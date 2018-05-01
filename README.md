@@ -15,7 +15,7 @@
 ## Basic Project Information ##
 
 Name:  Contex-ED3
-
+<p>Logo:  <img height=110px align="middle" src="https://lolika.be/files/8229/webshopartikelen/1141815/peer.png"></p>
 
 ## Group Member Information ##
 
