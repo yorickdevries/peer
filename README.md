@@ -5,7 +5,12 @@
 
 [Quick Report Link (under construction)](https://www.google.nl/search?q=peer&source=lnms&tbm=isch&sa=X&ved=0ahUKEwj0trz0luTaAhWRy6QKHcnEDQQQ_AUICigB&biw=1920&bih=974)
 
-[Google Drive](https://docs.google.com/document/d/1WDXAt8Y3s0uA_ZkksyxghEXkMfo3pauL40nOaxtgQ98/edit?usp=sharing)
+[Backlogs](https://drive.google.com/drive/folders/1kS_IHHDY4CqKE_MdchDL0R154ksvGw92?usp=sharing)
+
+[Meeting notes](https://drive.google.com/drive/folders/18Ue9durm2Rlb11G2k1Eguk-3tjCSaxhM?usp=sharing)
+
+[Guideline docs](https://drive.google.com/drive/folders/18bxNphp1rjMX1WRGwLL45RZbZiS-jO3W?usp=sharing)
+
 
 ## Basic Project Information ##
 
