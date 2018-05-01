@@ -7,6 +7,8 @@
 
 [Product Vision](https://www.overleaf.com/15912852pwhkvtzxbyyx#/60665355/)
 
+[Product Planning](https://www.overleaf.com/15914315rjccsrysjscw#/60672325/)
+
 [Backlogs](https://drive.google.com/drive/folders/1kS_IHHDY4CqKE_MdchDL0R154ksvGw92?usp=sharing)
 
 [Meeting notes](https://drive.google.com/drive/folders/18Ue9durm2Rlb11G2k1Eguk-3tjCSaxhM?usp=sharing)
