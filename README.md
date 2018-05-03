@@ -9,7 +9,8 @@
 | [Architecture Design](https://drive.google.com/open?id=1h1dirajEcvkcRcdFhfo3CgOzBTrAspKalOY-8s0Ieu0)                                                                   |
 | [Backlogs](https://drive.google.com/drive/folders/1kS_IHHDY4CqKE_MdchDL0R154ksvGw92?usp=sharing)                                                                       |
 | [Meeting notes](https://drive.google.com/drive/folders/18Ue9durm2Rlb11G2k1Eguk-3tjCSaxhM?usp=sharing)                                                                  |
-| [Guideline docs](https://drive.google.com/drive/folders/18bxNphp1rjMX1WRGwLL45RZbZiS-jO3W?usp=sharing)                                                                 |
+| [Guideline docs](https://drive.google.com/drive/folders/18bxNphp1rjMX1WRGwLL45RZbZiS-jO3W?usp=sharing)       
+| [Retrospective docs] (https://drive.google.com/open?id=1jiZvA1J_0j9eG9N1UwBpg7VX3x0uERFe)
 
 
 ## Basic Project Information ##
