@@ -1,6 +1,14 @@
 -- Default database dump file.
 -- WARNING: overwrites existing tables. 
 
+-- HOW TO USE:
+--  1. Download postgresql and pgadmin
+--  2. Create a new database (Servers -> PostgreSQL -> Databases -> right mouse -> create database "DB_NAME")
+--  3. Open query window (DB_NAME -> schemas -> public -> right mouse -> Query Tool...)
+--      If something does not show: right click -> refresh
+--  4. Copy paste THIS WHOLE FILE into the query tool and execute (F5 or click on thunder button)
+--  5. Refresh to see tables
+
 DROP TABLE IF EXISTS "group", "groupusers", "user";
 
 -- tables
