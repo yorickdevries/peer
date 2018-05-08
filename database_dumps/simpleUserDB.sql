@@ -58,7 +58,7 @@ INSERT INTO "user" ("netid", "email") VALUES ('bob', 'bob@tudelft.nl'),
 ('yorick', 'yorick@tudelft.nl'), 
 ('pravesh', 'pravesh@tudelft.nl');
 
-INSERT INTO "group" ("groupid") VALUES (2), (3), (4);
+INSERT INTO "group" ("groupid") VALUES (1), (2), (4);
 
 INSERT INTO "groupusers" ("user_netid", "group_groupid") VALUES ('bob', 1), 
 ('henk', 1), 
