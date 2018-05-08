@@ -9,7 +9,7 @@ router.get('/', function(req, res, next) {
 /* GET Userlist page. */
 router.get('/userlist', function(req, res) {
 	var pool = req.pool;
-    pool.query('SELECT * FROM usercsollection', (err, result) => {
+    pool.query('SELECT * FROM usercollection', (err, result) => {
 		if(err){
             console.log(err);
             //res.status(400).send(err);
