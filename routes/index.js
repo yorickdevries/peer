@@ -27,6 +27,17 @@ router.get('/userlist', function(req, res) {
         });
     });
 });
+
+/* GET Userlist page in JSON. */
+router.get('/userlistjson', function(req, res, next) {
+    db.any('SELECT * FROM usercollection')
+    .then(function (data) {
+      res.status(200)
+        .json(data);
+    })
+    .catch(function (err) {
+      return next(err);
+    });
 });
 
 /* GET New User page. */
