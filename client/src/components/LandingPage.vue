@@ -24,7 +24,9 @@
                                     <b-form-input type="password" placeholder="Password"></b-form-input>
                                 </b-form>
                             </p>
-                            <b-button href="#" variant="primary" class="w-100">Login</b-button>
+
+                            <router-link to="/dashboard/"><b-button variant="primary" class="w-100">Login</b-button></router-link>
+
                         </b-card>
                     </b-col>
                 </b-row>
