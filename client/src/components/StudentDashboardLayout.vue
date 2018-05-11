@@ -6,7 +6,7 @@
             <router-view></router-view>
         </main>
 
-        <Footer></Footer>
+        <!--<Footer></Footer>-->
     </div>
 </template>
 
@@ -16,10 +16,14 @@ import Navbar from "./Navbar"
 
 export default {
 name: "StudentDashboard",
-components: {
-    Navbar,
-    Footer
-}
+    components: {
+        Navbar,
+        Footer
+    }
 }
 </script>
+
+<style scoped>
+
+</style>
 

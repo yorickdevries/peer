@@ -6,7 +6,7 @@
 * {
     font-family: 'Nunito Sans', sans-serif;
     /*font-family: 'Montserrat', sans-serif;*/
-    /*-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale*/
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     /*font-family: 'Muli' ,Helvetica, Arial, sans-serif;*/
 }
 

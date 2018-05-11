@@ -1,6 +1,14 @@
 <template>
     <div>
-        <h2>Main Page</h2>
+        <b-container>
+
+            <b-row>
+                <b-col>
+                    <h1 class="my-5">Dashboard</h1>
+                </b-col>
+            </b-row>
+
+        </b-container>
     </div>
 </template>
 
