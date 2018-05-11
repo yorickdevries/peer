@@ -1,21 +1,25 @@
 <template>
     <div>
-        <h1>Student Dashboard</h1>
-        <nav>
-            <p><router-link to="/dashboard/">Main page</router-link></p>
-            <p><router-link to="/dashboard/courses">Courses</router-link></p>
-        </nav>
-        <router-view></router-view>
-        <footer>Footer</footer>
+        <Navbar/>
+
+        <main>
+            <router-view></router-view>
+        </main>
+
+        <Footer></Footer>
     </div>
 </template>
 
 <script>
+import Footer from '../components/Footer'
+import Navbar from "./Navbar"
+
 export default {
-    name: "StudentDashboard"
+name: "StudentDashboard",
+components: {
+    Navbar,
+    Footer
+}
 }
 </script>
 
-<style scoped>
-
-</style>

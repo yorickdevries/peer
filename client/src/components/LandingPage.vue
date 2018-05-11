@@ -70,35 +70,24 @@
 
         </b-container>
 
-
-        <footer class="text-muted fixed-bottom">
-            <div class="container">
-                <p class="float-right">
-                    <a href="#">Back to top</a>
-                </p>
-                <p>In development. </p>
-            </div>
-        </footer>
+        <Footer></Footer>
 
     </div>
 </template>
 
 <script>
+import Footer from '../components/Footer'
+
 export default {
-    name: "LandingPage"
+    name: "LandingPage",
+    components: {
+        Footer
+    }
 }
 </script>
 
 <style scoped>
 .bg-landing-page {
     background-color: #28b3ff;
-}
-footer {
-    padding-top: 3rem;
-    padding-bottom: 3rem;
-}
-
-footer p {
-    margin-bottom: .25rem;
 }
 </style>
