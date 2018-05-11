@@ -2,7 +2,8 @@ import { Router } from "express";
 const router = Router();
 
 // import database object
-const db = require("../database");
+import database from "../database";
+const db = database.db;
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
