@@ -1,5 +1,5 @@
-import express from 'express';
-var router = express.Router();
+import { Router } from 'express';
+var router = Router();
 
 //import database object
 var db = require('../database');

@@ -4,9 +4,11 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('peer_review:server');
-var http = require('http');
+import app from '../app';
+import debugModule from 'debug';
+import http from 'http';
+
+const debug = debugModule('peer_review:server');
 
 /**
  * Get port from environment and store in Express.
@@ -33,7 +35,7 @@ server.on('listening', onListening);
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val) {
+function normalizePort(val: any): number|string|boolean {
   var port = parseInt(val, 10);
 
   if (isNaN(port)) {
