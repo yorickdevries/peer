@@ -4,7 +4,27 @@
   "private": true,
   "scripts": {
     "start": "node ./dist/bin/www.js",
-    "test": "mocha -r ts-node/register test/**/*.spec.ts"
+    "test": "nyc mocha -r ts-node/register test/**/*.spec.ts"
+  },
+  "nyc": {
+    "check-coverage": true,
+    "all": true,
+    "extension": [
+      ".js",
+      ".jsx",
+      ".ts",
+      ".tsx"
+    ],
+    "include": [
+      "src/**/*"
+    ],
+    "exclude": [
+      "**/*.d.ts"
+    ],
+    "reporter": [
+      "text",
+      "text-summary"
+    ]
   },
   "dependencies": {
     "bluebird": "3.5.1",
@@ -32,6 +52,7 @@
     "@types/pg-promise": "^5.4.3",
     "chai": "^4.1.2",
     "mocha": "^5.1.1",
+    "nyc": "^11.7.3",
     "ts-node": "^6.0.3",
     "typescript": "^2.8.3"
   }
