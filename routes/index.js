@@ -59,7 +59,7 @@ router.post('/adduser', function(req, res) {
         })
         .catch(function (err) {
             // If it failed, return error
-			console.log(error);
+			console.log(err);
             res.send("There was a problem adding the information to the database.");
   });
 });
