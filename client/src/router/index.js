@@ -1,11 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import LandingPage from '../components/LandingPage'
-import StudentDashboardLayout from '../components/StudentDashboardLayout'
-import StudentDashboardCourses from '../components/StudentDashboardCourses'
-import StudentDashboardMain from '../components/StudentDashboardMain'
-
 Vue.use(Router)
 
 export default new Router({
@@ -13,22 +8,27 @@ export default new Router({
         {
             path: '/',
             name: 'LandingPage',
-            component: LandingPage
+            component: () => import('../components/LandingPage')
         },
         {
             path: '/dashboard',
             name: 'StudentDashboardCourses',
-            component: StudentDashboardLayout,
+            component: () => import('../components/student-dashboard/StudentDashboardLayout'),
             children: [
                 {
                     path: '',
                     name: 'StudentDashboardMain',
-                    component: StudentDashboardMain
+                    component: () => import('../components/student-dashboard/StudentDashboardMainPage')
                 },
                 {
                     path: 'courses',
                     name: 'StudentDashboardCourses',
-                    component: StudentDashboardCourses
+                    component: () => import('../components/student-dashboard/StudentDashboardCourses')
+                },
+                {
+                    path: 'courses/:id',
+                    name: 'StudentDashboardCourse',
+                    component: () => import('../components/student-dashboard/StudentDashboardCourse')
                 }
             ]
         }

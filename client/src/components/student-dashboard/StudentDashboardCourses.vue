@@ -28,8 +28,6 @@
                         </p>
                         <b-button variant="success" to="/dashboard/courses/2">Enter</b-button>
                     </b-card>
-
-
                 </b-col>
             </b-row>
         </b-container>
