@@ -1,7 +1,11 @@
 image: node:carbon
 
 services:
-  - postgres:10
+  - postgres:10.3
+
+variables:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: password
 
 before_script:
 - npm install

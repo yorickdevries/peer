@@ -1,6 +1,5 @@
 import promise from "bluebird";
 
-
 class Database {
   public options;
   public connection;
@@ -16,12 +15,11 @@ class Database {
       user: "postgres",
       host: "localhost",
       database: "postgres",
+      password: "password",
       port: 5432
     };
     this.db = pgp(this.connection);
   }
-
-
 }
 
 export default new Database();

@@ -5,13 +5,11 @@
   "scripts": {
     "start": "npm run build && node ./dist/bin/www.js",
     "tslint": "tslint -- src/**/*.ts test/**/*.ts",
-    "build": "npm run tsc",
+    "build": "npm run tsc && npm run db_init",
     "tsc": "tsc",
     "test": "mocha -r ts-node/register test/**/*.spec.ts",
     "coverage": "nyc npm run test",
-    "create_db": "psql -h localhost -U postgres -f ./database_dumps/create_db.sql",
-    "init_db": "psql -h localhost -d peer_database -U postgres -f ./database_dumps/simpleUserDB.sql",
-    "build_db":  "npm run create_db && npm run init_db"
+    "db_init": "node ./database_dumps/database_init.js"
   },
   "nyc": {
     "check-coverage": true,
