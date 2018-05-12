@@ -9,7 +9,7 @@
         <b-row>
             <b-col>
 
-                <b-tabs>
+                <b-tabs no-fade>
                     <b-row>
                         <b-col cols="8">
 
