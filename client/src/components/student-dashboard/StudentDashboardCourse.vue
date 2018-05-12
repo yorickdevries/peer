@@ -11,60 +11,56 @@
 
                 <b-tabs>
                     <b-tab title="Active Assignments" active>
-                        <div class="card mt-3" >
 
-                            <div class="card-body">
-                                <div class="card-title">
-                                    <h4>Assignment 1</h4>
-                                    <span class="text-muted float-right">Peer Review Due</span>
-                                </div>
-                                <p class="card-text">
+                        <b-card no-body class="mt-3">
+                            <b-card-body>
+                                <h4>Assignment 1</h4>
+                                <p>
+                                    Some quick example text to build on the card title and make up the bulk of the card's content.
+                                </p>
+                                <b-button variant="primary" to="/dashboard/assignment/1">View Assignment</b-button>
+                            </b-card-body>
+                            <b-card-footer class="text-danger">Peer review due in 2 days</b-card-footer>
+                        </b-card>
+
+                        <b-card no-body class="mt-3">
+                            <b-card-body>
+                                <h4>Assignment 2</h4>
+                                <p>
                                     Some quick example text to build on the card title and make up the bulk of the card's content.
                                 </p>
                                 <b-button variant="primary">View Assignment</b-button>
-                            </div>
 
-                            <div class="card-footer text-danger">
-                                Peer review due in 2 days
-                            </div>
-                        </div>
+                            </b-card-body>
+                            <b-card-footer class="text-danger">Peer review due in 2 days</b-card-footer>
+                        </b-card>
 
-                        <div class="card mt-3" >
-
-                            <div class="card-body">
-                                <div class="card-title">
-                                    <h4>Assignment 2</h4>
-                                    <span class="text-muted float-right">Peer Review Due</span>
-                                </div>
-                                <h5>Description</h5>
-                                <p class="card-text">
-                                    Some quick example text to build on the card title and make up the bulk of the card's content.
-                                </p>
-                                <b-button variant="primary">View Assignment</b-button>
-                            </div>
-
-                            <div class="card-footer text-danger">
-                                Peer review due in 2 days
-                            </div>
-                        </div>
 
                     </b-tab>
                     <b-tab title="Closed Assignments" >
-                        <b-card title="Assignment 3" class="mt-3">
-                            <h5>Description</h5>
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                Commodi consequuntur dolor illum impedit minus neque non quasi quis repudiandae. At atque culpa dicta eaque et molestias nulla quibusdam reiciendis sunt.
-                            </p>
-                            <b-button variant="primary">View Assignment</b-button>
+                        <b-card no-body class="mt-3">
+                            <b-card-body>
+                                <h4>Assignment 3</h4>
+                                <h5>Description</h5>
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                                    Commodi consequuntur dolor illum impedit minus neque non quasi quis repudiandae. At atque culpa dicta eaque et molestias nulla quibusdam reiciendis sunt.
+                                </p>
+                                <b-button variant="primary">View Assignment</b-button>
+                            </b-card-body>
+                            <b-card-footer>Done</b-card-footer>
                         </b-card>
-                        <b-card title="Assignment 4" class="mt-3">
+                        <b-card no-body class="mt-3">
+                            <b-card-body>
+                            <h4>Assignment 4</h4>
                             <h5>Description</h5>
                             <p>
                                 Lorem ipsum dolor sit amet, consectetur adipisicing elit.
                                 Commodi consequuntur dolor illum impedit minus neque non quasi quis repudiandae. At atque culpa dicta eaque et molestias nulla quibusdam reiciendis sunt.
                             </p>
-                            <b-button variant="primary">View Assignment</b-button>
+                                <b-button variant="primary">View Assignment</b-button>
+                            </b-card-body>
+                            <b-card-footer>Done</b-card-footer>
                         </b-card>
                     </b-tab>
                 </b-tabs>

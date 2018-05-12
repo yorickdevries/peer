@@ -29,6 +29,29 @@ export default new Router({
                     path: 'courses/:id',
                     name: 'StudentDashboardCourse',
                     component: () => import('../components/student-dashboard/StudentDashboardCourse')
+                },
+                {
+                    path: 'assignment/:id',
+                    name: 'StudentDashboardAssignment',
+                    redirect: 'assignment/:id/hand-in',
+                    component: () => import('../components/student-dashboard/StudentDashboardAssignment'),
+                    children: [
+                        {
+                            path: 'hand-in',
+                            name: 'HandIn',
+                            component: () => import('../components/student-dashboard/student-dashboard-assignment/HandIn')
+                        },
+                        {
+                            path: 'peer-review',
+                            name: 'PeerReview',
+                            component: () => import('../components/student-dashboard/student-dashboard-assignment/PeerReview')
+                        },
+                        {
+                            path: 'feedback',
+                            name: 'Feedback',
+                            component: () => import('../components/student-dashboard/student-dashboard-assignment/Feedback')
+                        }
+                    ]
                 }
             ]
         }
