@@ -5,7 +5,7 @@
 
                 <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
-                <b-navbar-brand href="#" class="font-weight-bold">PR</b-navbar-brand>
+                <router-link :to="{ name: 'LandingPage' }"><b-navbar-brand class="font-weight-bold">PR</b-navbar-brand></router-link>
 
                 <b-collapse is-nav id="nav_collapse">
 
