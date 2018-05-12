@@ -2,7 +2,20 @@ import database from "../../src/database";
 import { expect } from "chai";
 import "mocha";
 
+// load the queryfile into
+import { QueryFile } from "pg-promise";
+const qf = new QueryFile("../../../database_dumps/simpleUserDB.sql");
+
 describe("Database Test", () => {
+  beforeEach((done) => {
+    const db = database.db;
+    // run the query file to start with a fresh database
+    db.any(qf)
+      .then(function () {
+        done();
+      });
+  });
+
 
   it("connection port", () => {
     const result = database.connection.port;
