@@ -5,7 +5,6 @@ services:
 
 before_script:
 - npm install
-- npm run build_db
 lint:
   script:
   - npm run tslint
