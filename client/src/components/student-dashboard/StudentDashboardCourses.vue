@@ -4,7 +4,8 @@
 
             <b-row>
                 <b-col>
-                    <h1 class="my-5">Your Courses</h1>
+                    <h1 class="mt-5">Your Courses</h1>
+                    <b-breadcrumb :items="items"/>
                 </b-col>
             </b-row>
 
@@ -36,7 +37,18 @@
 
 <script>
 export default {
-    name: "StudentDashboardCourses"
+    name: "StudentDashboardCourses",
+    data() {
+        return {
+            items: [{
+                text: 'Dashboard',
+                to: { name: 'StudentDashboardMain'}
+            }, {
+                text: 'Courses',
+                to: { name: 'StudentDashboardCourses'}
+            }]
+        }
+    }
 }
 </script>
 
