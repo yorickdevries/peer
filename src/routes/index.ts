@@ -13,13 +13,13 @@ router.get("/", function (req, res, next) {
 /* GET Userlist page. */
 router.get("/userlist", function (req, res) {
     db.any("SELECT * FROM usercollection")
-        .then(function (data) {
+        .then(function (data: object) {
             // res.status(200).send(result.rows);
             res.render("userlist", {
                 "userlist": data
             });
         })
-        .catch(function (err) {
+        .catch(function (err: Error) {
             console.log(err);
             // res.status(400).send(err);
             res.render("error", {
@@ -32,11 +32,11 @@ router.get("/userlist", function (req, res) {
 /* GET Userlist page in JSON. */
 router.get("/userlistjson", function (req, res, next) {
     db.any("SELECT * FROM usercollection")
-        .then(function (data) {
+        .then(function (data: object) {
             res.status(200)
                 .json(data);
         })
-        .catch(function (err) {
+        .catch(function (err: Error) {
             next(err);
         });
 });
@@ -58,7 +58,7 @@ router.post("/adduser", function (req, res) {
             // And forward to success page
             res.redirect("userlist");
         })
-        .catch(function (err) {
+        .catch(function (err: Error) {
             // If it failed, return error
             console.log(err);
             res.send("There was a problem adding the information to the database.");

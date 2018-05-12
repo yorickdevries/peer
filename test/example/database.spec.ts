@@ -27,19 +27,34 @@ describe("Database Test", () => {
     expect(result).to.equal("postgres");
   });
 
-  it("database connection", async () => {
+  it("database connection correct", async () => {
     const db = database.db;
-    let netid;
+    let result;
     const db_prom = db.any("SELECT * FROM usercollection")
-      .then(function (result) {
-        netid = result[0].netid;
-      }).catch(function (err) {
-        console.log(err);
+      .then(function (data: any) {
+        result = data[0].netid;
+      }).catch(function (err: Error) {
+        result = err.name;
       });
 
     // wait for database promise to finish
     await db_prom;
-    expect(netid).to.equal("bob");
+    expect(result).to.equal("bob");
+  });
+
+  it("database connection error", async () => {
+    const db = database.db;
+    let result;
+    const db_prom = db.any("SELECT * FROM invalidtable")
+      .then(function (data: any) {
+        result = data[0].netid;
+      }).catch(function (err: Error) {
+        result = err.name;
+      });
+
+    // wait for database promise to finish
+    await db_prom;
+    expect(result).to.equal("error");
   });
 
 });
