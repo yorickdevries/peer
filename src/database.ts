@@ -15,7 +15,7 @@ class Database {
     this.connection = {
       user: "postgres",
       host: "localhost",
-      database: "postgres",
+      database: "peer_database",
       password: "password",
       port: 5432
     };

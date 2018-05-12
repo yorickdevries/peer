@@ -11,7 +11,7 @@ var pgp = pgpromise(options);
 var connection = {
     user: "postgres",
     host: "localhost",
-    database: "postgres",
+    database: "peer_database",
     password: "password",
     port: 5432
 };
@@ -19,7 +19,6 @@ if (isCI) {
     console.log('The code is running on a CI server');
     connection.host = "postgres";
 };
-
 
 var db = pgp(connection);
 

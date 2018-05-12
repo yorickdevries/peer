@@ -3,7 +3,7 @@
 
 -- HOW TO USE:
 --  1. Download postgresql and pgadmin
---  2. Create a new database (Servers -> PostgreSQL -> Databases -> right mouse -> create database "postgres")
+--  2. Create a new database (Servers -> PostgreSQL -> Databases -> right mouse -> create database "peer_database")
 --  3. Open query window (DB_NAME -> schemas -> public -> right mouse -> Query Tool...)
 --      If something does not show: right click -> refresh
 --  4. Copy paste THIS WHOLE FILE into the query tool and execute (F5 or click on thunder button)

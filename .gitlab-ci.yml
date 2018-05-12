@@ -4,6 +4,7 @@ services:
   - postgres:10.3
 
 variables:
+  POSTGRES_DB: peer_database
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: password
 
