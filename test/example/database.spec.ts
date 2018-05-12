@@ -16,7 +16,6 @@ describe("Database Test", () => {
       });
   });
 
-
   it("connection port", () => {
     const result = database.connection.port;
     expect(result).to.equal(5432);
