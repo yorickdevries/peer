@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./dist/bin/www.js",
+    "start": "npm run build && node ./dist/bin/www.js",
+    "tslint": "tslint -- src/**/*.ts test/**/*.ts",
+    "build": "npm run tsc",
+    "tsc": "tsc",
     "test": "nyc mocha -r ts-node/register test/**/*.spec.ts"
   },
   "nyc": {
