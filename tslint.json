@@ -1,3 +1,4 @@
+// Example TSlint adapted from https://github.com/Microsoft/TypeScript-Node-Starter
 {
     "rules": {
         "class-name": true,
