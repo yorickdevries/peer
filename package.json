@@ -7,10 +7,14 @@
     "tslint": "tslint -- src/**/*.ts test/**/*.ts",
     "build": "npm run tsc",
     "tsc": "tsc",
-    "test": "nyc mocha -r ts-node/register test/**/*.spec.ts"
+    "test": "mocha -r ts-node/register test/**/*.spec.ts",
+    "coverage": "nyc npm run test"
   },
   "nyc": {
     "check-coverage": true,
+    "lines": 0,
+    "functions": 0,
+    "branches": 0,
     "all": true,
     "extension": [
       ".js",

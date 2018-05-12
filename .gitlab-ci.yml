@@ -10,3 +10,6 @@ build:
 test:
   script:
   - npm run test
+coverage:
+  script:
+  - npm run coverage
