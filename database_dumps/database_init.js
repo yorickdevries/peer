@@ -1,3 +1,5 @@
+"use strict";
+
 const promise = require("bluebird");
 const pgpromise = require("pg-promise");
 const QueryFile = require('pg-promise').QueryFile;
