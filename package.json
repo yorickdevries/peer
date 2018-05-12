@@ -8,7 +8,10 @@
     "build": "npm run tsc",
     "tsc": "tsc",
     "test": "mocha -r ts-node/register test/**/*.spec.ts",
-    "coverage": "nyc npm run test"
+    "coverage": "nyc npm run test",
+    "create_db": "psql -h localhost -U postgres -f ./database_dumps/create_db.sql",
+    "init_db": "psql -h localhost -d peer_database -U postgres -f ./database_dumps/simpleUserDB.sql",
+    "build_db":  "npm run create_db && npm run init_db"
   },
   "nyc": {
     "check-coverage": true,
