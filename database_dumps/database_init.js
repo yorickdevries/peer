@@ -27,7 +27,7 @@ const qf = new QueryFile("./simpleUserDB.sql");
 // run the queryfile to start with a fresh database
 db.any(qf)
     .then(function () {
-        console.log("Imported database at " + connection.host);
+        console.log("Imported database to: " + connection.database + "@" + connection.host);
     })
     .catch(function (err) {
         console.log(err);
