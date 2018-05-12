@@ -37,7 +37,7 @@ router.get("/userlistjson", function (req, res, next) {
                 .json(data);
         })
         .catch(function (err) {
-            return next(err);
+            next(err);
         });
 });
 
