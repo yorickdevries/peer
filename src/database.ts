@@ -17,7 +17,7 @@ class Database {
       host: "localhost",
       database: "peer_database",
       password: "password",
-      port: 5432,
+      port: 5432
     };
     this.db = pgp(this.connection);
   }

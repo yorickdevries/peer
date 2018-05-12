@@ -14,4 +14,19 @@ describe("Database Test", () => {
     expect(result).to.equal("postgres");
   });
 
+  it("database connection", async () => {
+    const db = database.db;
+    let netid;
+    const db_prom = db.any("SELECT * FROM usercollection")
+      .then(function (result) {
+        netid = result[0].netid;
+      }).catch(function (err) {
+        console.log(err);
+      });
+
+    // wait for database promise to finish
+    await db_prom;
+    expect(netid).to.equal("bob");
+  });
+
 });
