@@ -11,7 +11,6 @@ var connection = {
     user: "postgres",
     host: "localhost",
     database: "postgres",
-    password: "password",
     port: 5432
 };
 var db = pgp(connection);
