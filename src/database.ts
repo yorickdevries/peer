@@ -16,7 +16,6 @@ class Database {
       user: "postgres",
       host: "localhost",
       database: "postgres",
-      password: "",
       port: 5432
     };
     this.db = pgp(this.connection);
