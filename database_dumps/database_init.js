@@ -9,7 +9,7 @@ var options = {
 var pgp = pgpromise(options);
 var connection = {
     user: "postgres",
-    host: "localhost",
+    host: "postgres",
     database: "postgres",
     port: 5432
 };
