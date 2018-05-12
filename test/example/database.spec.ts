@@ -2,11 +2,12 @@ import database from "../../src/database";
 import { expect } from "chai";
 import "mocha";
 
-// load the queryfile into
+// load the queryfile
 import { QueryFile } from "pg-promise";
 const qf = new QueryFile("../../../database_dumps/simpleUserDB.sql");
 
 describe("Database Test", () => {
+  // Make a clean database
   beforeEach((done) => {
     const db = database.db;
     // run the query file to start with a fresh database

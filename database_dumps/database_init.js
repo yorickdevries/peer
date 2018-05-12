@@ -17,6 +17,8 @@ var connection = {
     password: "password",
     port: 5432
 };
+
+// Change host in case on CI
 if (isCI) {
     console.log('The code is running on a CI server');
     connection.host = "postgres";
