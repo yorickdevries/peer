@@ -1,7 +1,7 @@
 image: node:carbon
 
 services:
-  - postgres:10.3
+  - postgres:10
 
 before_script:
 - npm install
