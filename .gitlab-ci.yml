@@ -1,24 +1,42 @@
 image: node:carbon
 
-services:
-  - postgres:10.3
-
 variables:
   POSTGRES_DB: peer_database
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: password
 
+stages:
+    - static-analysis
+    - build
+    - test
+    - coverage
+    
 before_script:
 - npm install
-lint:
+
+tslint:
+  stage: static-analysis
   script:
   - npm run tslint
 build:
+  stage: build
   script:
   - npm run build
+database:
+  stage: build
+  services:
+  - postgres:10.3
+  script:
+  - npm run db_init
 test:
+  stage: test
+  services:
+  - postgres:10.3
   script:
   - npm run test
 coverage:
+  stage: coverage
+  services:
+  - postgres:10.3
   script:
   - npm run coverage
