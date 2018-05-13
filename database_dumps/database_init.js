@@ -14,7 +14,7 @@ var connection = {
     user: "postgres",
     host: "localhost",
     database: "peer_database",
-    password: "passord",
+    password: "password",
     port: 5432
 };
 
