@@ -33,7 +33,7 @@ export default {
     name: "HandIn",
     data() {
         return {
-            file: null
+            file: true
         }
     }
 }

@@ -44,7 +44,7 @@ export default new Router({
                         {
                             path: 'peer-review',
                             name: 'PeerReview',
-                            component: () => import('../components/student-dashboard/student-dashboard-assignment/PeerReview')
+                            component: () => import('../components/student-dashboard/student-dashboard-assignment/PeerReviewNavigator')
                         },
                         {
                             path: 'feedback',

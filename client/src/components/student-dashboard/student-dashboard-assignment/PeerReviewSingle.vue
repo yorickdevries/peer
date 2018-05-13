@@ -4,7 +4,7 @@
         <!--Title Card with Download Button-->
         <b-card no-body>
             <b-card-body>
-                <b-container fluid>
+                <b-container fluid class="px-0">
                     <b-row>
                         <b-col>
                             <span class="text-muted">You are giving feedback to</span><br>
