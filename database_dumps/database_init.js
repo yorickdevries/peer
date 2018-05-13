@@ -14,7 +14,7 @@ var connection = {
     user: "postgres",
     host: "localhost",
     database: "peer_database",
-    password: "password",
+    password: "passord",
     port: 5432
 };
 
@@ -35,5 +35,5 @@ db.any(qf)
     })
     .catch(function (err) {
         console.log(err);
-        throw err;
+        process.exit(1);
     });
