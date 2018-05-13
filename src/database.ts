@@ -2,7 +2,7 @@ import promise from "bluebird";
 import isCI from "is-ci";
 import pgp from "pg-promise";
 
-class Database {
+export default class Database {
   public connection: {
     user: string,
     host: string,
@@ -34,5 +34,3 @@ class Database {
     this.db = pgp_object(this.connection);
   }
 }
-
-export default new Database();

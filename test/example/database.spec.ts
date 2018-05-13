@@ -1,4 +1,5 @@
-import database from "../../src/database";
+import Database from "../../src/database";
+const databaseObject = new Database();
 import { expect } from "chai";
 import "mocha";
 
@@ -9,7 +10,7 @@ const qf = new QueryFile("../../../database_dumps/simpleUserDB.sql");
 describe("Database Test", () => {
   // Make a clean database
   beforeEach((done) => {
-    const db = database.db;
+    const db = databaseObject.db;
     // run the query file to start with a fresh database
     db.any(qf)
       .then(function () {
@@ -18,17 +19,17 @@ describe("Database Test", () => {
   });
 
   it("connection port", () => {
-    const result = database.connection.port;
+    const result = databaseObject.connection.port;
     expect(result).to.equal(5432);
   });
 
   it("connection user", () => {
-    const result = database.connection.user;
+    const result = databaseObject.connection.user;
     expect(result).to.equal("postgres");
   });
 
   it("database connection correct", async () => {
-    const db = database.db;
+    const db = databaseObject.db;
     let result;
     const db_prom = db.any("SELECT * FROM usercollection")
       .then(function (data: any) {
@@ -43,7 +44,7 @@ describe("Database Test", () => {
   });
 
   it("database connection error", async () => {
-    const db = database.db;
+    const db = databaseObject.db;
     let result;
     const db_prom = db.any("SELECT * FROM invalidtable")
       .then(function (data: any) {
