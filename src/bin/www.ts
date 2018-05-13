@@ -5,10 +5,10 @@
  */
 
 import app from "../app";
-import debugModule from "debug";
+import debug from "debug";
 import http from "http";
 
-const debug = debugModule("peer_review:server");
+debug("peer_review:server");
 
 /**
  * Get port from environment and store in Express.
@@ -35,43 +35,27 @@ server.on("listening", onListening);
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val: any): number | string | boolean {
-  const port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
-
-  if (port >= 0) {
-    // port number
-    return port;
-  }
-
-  return false;
+function normalizePort(val: number | string): number | string | boolean {
+  const port: number = (typeof val === "string") ? parseInt(val, 10) : val;
+  if (isNaN(port)) return val;
+  else if (port >= 0) return port;
+  else return false;
 }
 
 /**
  * Event listener for HTTP server "error" event.
  */
 
-function onError(error: any) {
-  if (error.syscall !== "listen") {
-    throw error;
-  }
-
-  const bind = typeof port === "string"
-    ? "Pipe " + port
-    : "Port " + port;
-
-  // handle specific listen errors with friendly messages
+function onError(error: NodeJS.ErrnoException): void {
+  if (error.syscall !== "listen") throw error;
+  const bind = (typeof port === "string") ? "Pipe " + port : "Port " + port;
   switch (error.code) {
     case "EACCES":
-      console.error(bind + " requires elevated privileges");
+      console.error(`${bind} requires elevated privileges`);
       process.exit(1);
       break;
     case "EADDRINUSE":
-      console.error(bind + " is already in use");
+      console.error(`${bind} is already in use`);
       process.exit(1);
       break;
     default:
@@ -83,11 +67,8 @@ function onError(error: any) {
  * Event listener for HTTP server "listening" event.
  */
 
-function onListening() {
+function onListening(): void {
   const addr = server.address();
-  const bind = typeof addr === "string"
-    ? "pipe " + addr
-    : "port " + addr.port;
-  console.log("Listening on " + bind);
-  debug("Listening on " + bind);
+  const bind = (typeof addr === "string") ? `pipe ${addr}` : `port ${addr.port}`;
+  console.log(`Listening on ${bind}`);
 }
