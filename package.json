@@ -8,6 +8,6 @@
     "build_server": "npm run build --prefix ./server",
     "build_db": "npm run db_init --prefix ./server",
     "build_client": "npm run build --prefix ./client",
-    "start_server": "npm run start_server --prefix ./server",
+    "start_server": "npm run start_server --prefix ./server"
   }
 }
