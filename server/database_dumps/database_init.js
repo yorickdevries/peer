@@ -29,41 +29,18 @@ var db = pgp(connection);
 console.log("Importing database");
 const qf = new QueryFile("./simpleUserDB.sql");
 
-var db_empty = async function() {
-    try{
+const db_import = async function () {
+    try {
         await db.any("DROP SCHEMA IF EXISTS public CASCADE");
-        console.log("Schema dropped");
-    } catch (error){
-        console.log(error);
-        process.exit(1);
-    }
-};
-
-var db_create = async function() {
-    try{
+        console.log("Dropped schema");
         await db.any("CREATE SCHEMA public");
-        console.log("Schema created");
-    } catch (error){
-        console.log(error);
-        process.exit(1);
-    }
-};
-
-var db_tables = async function() {
-    try{
+        console.log("Created schema");
         await db.any(qf);
-        console.log("Tables created");
-    } catch (error){
+        console.log("Imported tables");
+    } catch (error) {
         console.log(error);
         process.exit(1);
     }
 };
 
-var db_import = async function() {
-    await db_empty();
-    await db_create();
-    await db_tables();
-};
-
-//run database import
 db_import();
