@@ -29,7 +29,6 @@
 import PeerReviewSingle from './PeerReviewSingle'
 
 export default {
-    name: "PeerReviewNavigator",
     data() {
         return {
             peerReviews: [
@@ -46,7 +45,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-
-</style>

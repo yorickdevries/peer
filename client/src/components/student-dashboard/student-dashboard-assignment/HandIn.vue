@@ -30,7 +30,6 @@
 
 <script>
 export default {
-    name: "HandIn",
     data() {
         return {
             file: true
@@ -38,7 +37,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -8,7 +8,6 @@
             </keep-alive>
         </main>
 
-        <!--<Footer></Footer>-->
     </div>
 </template>
 
@@ -17,15 +16,12 @@ import Footer from '../Footer'
 import Navbar from "../Navbar"
 
 export default {
-name: "StudentDashboard",
-    components: {
-        Navbar,
-        Footer
-    }
+    name: "StudentDashboard",
+        components: {
+            Navbar,
+            Footer
+        }
 }
 </script>
 
-<style scoped>
-
-</style>
 
