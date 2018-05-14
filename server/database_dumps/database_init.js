@@ -36,7 +36,7 @@ const db_import = async function () {
         await db.any("CREATE SCHEMA public");
         console.log("Created schema");
         await db.any(qf);
-        console.log("Imported tables");
+        console.log("Imported database to: " + connection.database + "@" + connection.host);
     } catch (error) {
         console.log(error);
         process.exit(1);
