@@ -49,7 +49,7 @@ export default new Router({
                         {
                             path: 'feedback',
                             name: 'Feedback',
-                            component: () => import('../components/student-dashboard/student-dashboard-assignment/Feedback')
+                            component: () => import('../components/student-dashboard/student-dashboard-assignment/FeedbackNavigator')
                         }
                     ]
                 }
