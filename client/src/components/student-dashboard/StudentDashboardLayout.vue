@@ -1,26 +1,28 @@
 <template>
     <div>
-        <Navbar/>
+        <Navbar :links="navbarItems"/>
 
-        <main>
-            <keep-alive>
-                <router-view></router-view>
-            </keep-alive>
-        </main>
+        <keep-alive><router-view></router-view></keep-alive>
 
     </div>
 </template>
 
 <script>
-import Footer from '../Footer'
 import Navbar from "../Navbar"
 
 export default {
     name: "StudentDashboard",
-        components: {
-            Navbar,
-            Footer
+    components: {
+        Navbar
+    },
+    data() {
+        return {
+            navbarItems: [
+                { to: { name: 'StudentDashboardMain' } , text: 'Dashboard'},
+                { to: { name: 'StudentDashboardCourses' } , text: 'Courses'}
+            ]
         }
+    }
 }
 </script>
 

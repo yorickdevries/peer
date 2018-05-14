@@ -10,8 +10,7 @@
                 <b-collapse is-nav id="nav_collapse">
 
                     <b-navbar-nav>
-                        <b-nav-item to="/dashboard/" exact>Dashboard</b-nav-item>
-                        <b-nav-item to="/dashboard/courses" exact>Courses</b-nav-item>
+                        <b-nav-item v-for="link in links" :to="link.to" exact> {{ link.text }} </b-nav-item>
                     </b-navbar-nav>
 
                     <!-- Right aligned nav items -->
@@ -25,6 +24,7 @@
                             <b-dropdown-item href="#">Profile</b-dropdown-item>
                             <b-dropdown-item href="#">Sign-out</b-dropdown-item>
                         </b-nav-item-dropdown>
+
                     </b-navbar-nav>
 
                 </b-collapse>
@@ -33,3 +33,8 @@
     </nav>
 </template>
 
+<script>
+export default {
+    props: ['links']
+}
+</script>
