@@ -1,18 +1,36 @@
-import promise from 'bluebird';
+import promise from "bluebird";
+import isCI from "is-ci";
+import pgp from "pg-promise";
 
-var options = {
-  // Initialization Options
-  promiseLib: promise
-};
-
-var pgp = require('pg-promise')(options);
-var connection = {
-    user: 'postgres',
-    host: 'localhost',
-    database: 'peer_database',
-    password: 'password',
-    port: 5432,
+export default class Database {
+  public connection: {
+    user: string,
+    host: string,
+    database: string,
+    password: string,
+    port: number
   };
-var db = pgp(connection);
+  public db: any;
 
-module.exports = db;
+  constructor() {
+    const options = {
+      // Initialization Options
+      promiseLib: promise
+    };
+    const pgp_object = pgp(options);
+
+    this.connection = {
+      user: "postgres",
+      host: "localhost",
+      database: "peer_database",
+      password: "password",
+      port: 5432
+    };
+
+    if (isCI) {
+      console.log("The code is running on a CI server");
+      this.connection.host = "postgres";
+    }
+    this.db = pgp_object(this.connection);
+  }
+}
