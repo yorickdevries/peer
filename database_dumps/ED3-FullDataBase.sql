@@ -333,7 +333,7 @@ INSERT INTO "userlist" (
 
 INSERT INTO public.courselist(
     description, name)
-    VALUES ('This is a beautiful course description! =D', 'ED-3');
+    VALUES ('This is a beautiful course description!', 'ED-3');
 
 INSERT INTO public.grouplist(
 	id)
@@ -341,7 +341,7 @@ INSERT INTO public.grouplist(
 
 INSERT INTO public.assignmentlist(
 	title, description, course_id)
-	VALUES ('Assignment 1', 'Super goede moeilijke kut assignment met queries', 1);
+	VALUES ('Assignment 1', 'Example assignment number one', 1);
 
 INSERT INTO public.rubric(
 	assignment_id)
@@ -361,11 +361,11 @@ INSERT INTO public.mcquestion(
 
 INSERT INTO public.mcoption(
 	option, mcquestion_id)
-	VALUES ('By using pgAdmin :)', 1);
+	VALUES ('By using pgAdmin', 1);
 
 INSERT INTO public.mcoption(
 	option, mcquestion_id)
-	VALUES ('By using command line!', 1);
+	VALUES ('By using command line', 1);
 
 INSERT INTO public.mcoption(
 	option, mcquestion_id)
@@ -393,7 +393,7 @@ INSERT INTO public.mcanswer(
 
 INSERT INTO public.openanswer(
 	answer, openquestion_id, review_id)
-	VALUES ('Flesje water is beter dan flesje bier, of toch niet!', 1, 1);
+	VALUES ('Flesje water is beter dan flesje bier', 1, 1);
 
 INSERT INTO public.rangeanswer(
 	answer, rangequestion_id, review_id)
