@@ -1,4 +1,4 @@
-﻿﻿-- Created by Vertabelo (http://vertabelo.com)
+-- Created by Vertabelo (http://vertabelo.com)
 -- Last modification date: 2018-05-14 13:17:27.143
 
 -- tables
@@ -399,6 +399,7 @@ INSERT INTO public.rangeanswer(
 	answer, rangequestion_id, review_id)
 	VALUES (4, 1, 1);
 -- End of file.
+
 
 
 
