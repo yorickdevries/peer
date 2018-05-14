@@ -1,5 +1,5 @@
-var express = require('express');
-var router = express.Router();
+import { Router } from 'express';
+var router = Router();
 
 //import database object
 var db = require('../database');
@@ -64,4 +64,4 @@ router.post('/adduser', function(req, res) {
   });
 });
 
-module.exports = router;
+export default router;

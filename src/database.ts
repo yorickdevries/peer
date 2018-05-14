@@ -1,4 +1,4 @@
-var promise = require('bluebird');
+import promise from 'bluebird';
 
 var options = {
   // Initialization Options
