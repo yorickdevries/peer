@@ -3,70 +3,70 @@
 
 -- HOW TO USE:
 --  1. Download postgresql and pgadmin
---  2. Create a new database (Servers -> PostgreSQL -> Databases -> right mouse -> create database "DB_NAME")
+--  2. Create a new database (Servers -> PostgreSQL -> Databases -> right mouse -> create database "peer_database")
 --  3. Open query window (DB_NAME -> schemas -> public -> right mouse -> Query Tool...)
 --      If something does not show: right click -> refresh
 --  4. Copy paste THIS WHOLE FILE into the query tool and execute (F5 or click on thunder button)
 --  5. Refresh to see tables
 
-DROP TABLE IF EXISTS "group", "groupusers", "user";
+DROP TABLE IF EXISTS "groupcollection", "groupusers", "usercollection";
 
 -- tables
--- Table: group
-CREATE TABLE "group" (
+-- Table: groupcollection
+CREATE TABLE "groupcollection" (
     groupid int  NOT NULL,
-    CONSTRAINT group_pk PRIMARY KEY (groupid)
+    CONSTRAINT groupcollection_pk PRIMARY KEY (groupid)
 );
 
 -- Table: groupusers
 CREATE TABLE groupusers (
-    user_netid varchar(256)  NOT NULL,
-    group_groupid int  NOT NULL,
-    CONSTRAINT groupusers_pk PRIMARY KEY (user_netid,group_groupid)
+    usercollection_netid varchar(256)  NOT NULL,
+    groupcollection_groupid int  NOT NULL,
+    CONSTRAINT groupusers_pk PRIMARY KEY (usercollection_netid,groupcollection_groupid)
 );
 
--- Table: user
-CREATE TABLE "user" (
+-- Table: usercollection
+CREATE TABLE "usercollection" (
     netid varchar(256)  NOT NULL,
     email varchar(256)  NOT NULL,
-    CONSTRAINT user_pk PRIMARY KEY (netid)
+    CONSTRAINT usercollection_pk PRIMARY KEY (netid)
 );
 
 -- foreign keys
--- Reference: groupusers_group (table: groupusers)
-ALTER TABLE groupusers ADD CONSTRAINT groupusers_group
-    FOREIGN KEY (group_groupid)
-    REFERENCES "group" (groupid)  
+-- Reference: groupusers_groupcollection (table: groupusers)
+ALTER TABLE groupusers ADD CONSTRAINT groupusers_groupcollection
+    FOREIGN KEY (groupcollection_groupid)
+    REFERENCES "groupcollection" (groupid)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
 
--- Reference: groupusers_user (table: groupusers)
-ALTER TABLE groupusers ADD CONSTRAINT groupusers_user
-    FOREIGN KEY (user_netid)
-    REFERENCES "user" (netid)  
+-- Reference: groupusers_usercollection (table: groupusers)
+ALTER TABLE groupusers ADD CONSTRAINT groupusers_usercollection
+    FOREIGN KEY (usercollection_netid)
+    REFERENCES "usercollection" (netid)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
 
 -- Insert some default data in the database
-INSERT INTO "user" ("netid", "email") VALUES ('Bob', 'bob@student.tudelft.nl'), 
-('Henk', 'henk@student.tudelft.nl'), 
-('Boef', 'bangbang@student.tudelft.nl'),
-('Brian', 'huh@student.tudelft.nl'), 
-('Pussy', 'bplanje@student.tudelft.nl'),
-('Yorick', 'pussydestroyer@secondlove.nl'), 
-('Pravesh', 'bangbangbang@student.tudelft.nl');
+INSERT INTO "usercollection" ("netid", "email") VALUES ('bob', 'bob@tudelft.nl'), 
+('henk', 'henk@tudelft.nl'), 
+('boef', 'boef@tudelft.nl'),
+('brian', 'brian@tudelft.nl'), 
+('paul', 'paul@tudelft.nl'),
+('yorick', 'yorick@tudelft.nl'), 
+('pravesh', 'pravesh@tudelft.nl');
 
-INSERT INTO "group" ("groupid") VALUES (2), (3), (4);
+INSERT INTO "groupcollection" ("groupid") VALUES (1), (2), (4);
 
-INSERT INTO "groupusers" ("user_netid", "group_groupid") VALUES ('Bob', 2), 
-('Henk', 3), 
-('Boef', 4),
-('Brian', 4), 
-('Pussy', 4),
-('Yorick', 3), 
-('Pravesh', 2);
+INSERT INTO "groupusers" ("usercollection_netid", "groupcollection_groupid") VALUES ('bob', 1), 
+('henk', 1), 
+('boef', 2),
+('brian', 2), 
+('paul', 1),
+('yorick', 2), 
+('pravesh', 1);
 
 
 -- End of file.
