@@ -12,7 +12,8 @@ stages:
     - coverage
     
 before_script:
-- npm install
+- cd server && npm install && cd ..
+- cd client && npm install && cd ..
 
 tslint:
   stage: static-analysis
