@@ -1,22 +1,22 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2018-05-14 13:03:47.096
+-- Last modification date: 2018-05-14 13:17:27.143
 
 -- tables
--- Table: Assignment
-CREATE TABLE Assignment (
+-- Table: AssignmentList
+CREATE TABLE AssignmentList (
     title varchar(100)  NOT NULL,
     description varchar(1000)  NOT NULL,
     id int  NOT NULL,
     Course_id int  NOT NULL,
-    CONSTRAINT Assignment_pk PRIMARY KEY (id)
+    CONSTRAINT AssignmentList_pk PRIMARY KEY (id)
 );
 
--- Table: Course
-CREATE TABLE Course (
+-- Table: CourseList
+CREATE TABLE CourseList (
     id int  NOT NULL,
     description varchar(200)  NOT NULL,
     name varchar(200)  NOT NULL,
-    CONSTRAINT Course_pk PRIMARY KEY (id)
+    CONSTRAINT CourseList_pk PRIMARY KEY (id)
 );
 
 -- Table: Enroll
@@ -27,17 +27,17 @@ CREATE TABLE Enroll (
     CONSTRAINT Enroll_pk PRIMARY KEY (Course_id,User_netid)
 );
 
--- Table: Group
-CREATE TABLE "Group" (
-    id int  NOT NULL,
-    CONSTRAINT Group_pk PRIMARY KEY (id)
-);
-
 -- Table: GroupExercise
 CREATE TABLE GroupExercise (
     Assignment_id int  NOT NULL,
     Group_id int  NOT NULL,
     CONSTRAINT GroupExercise_pk PRIMARY KEY (Assignment_id,Group_id)
+);
+
+-- Table: GroupList
+CREATE TABLE GroupList (
+    id int  NOT NULL,
+    CONSTRAINT GroupList_pk PRIMARY KEY (id)
 );
 
 -- Table: GroupUsers
@@ -129,18 +129,18 @@ CREATE TABLE Submission (
     CONSTRAINT Submission_pk PRIMARY KEY (id)
 );
 
--- Table: User
-CREATE TABLE "User" (
+-- Table: UserList
+CREATE TABLE UserList (
     netid varchar(256)  NOT NULL,
     email varchar(256)  NOT NULL,
-    CONSTRAINT User_pk PRIMARY KEY (netid)
+    CONSTRAINT UserList_pk PRIMARY KEY (netid)
 );
 
 -- foreign keys
--- Reference: Assignment_Course (table: Assignment)
-ALTER TABLE Assignment ADD CONSTRAINT Assignment_Course
+-- Reference: Assignment_Course (table: AssignmentList)
+ALTER TABLE AssignmentList ADD CONSTRAINT Assignment_Course
     FOREIGN KEY (Course_id)
-    REFERENCES Course (id)  
+    REFERENCES CourseList (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -148,7 +148,7 @@ ALTER TABLE Assignment ADD CONSTRAINT Assignment_Course
 -- Reference: Enroll_Course (table: Enroll)
 ALTER TABLE Enroll ADD CONSTRAINT Enroll_Course
     FOREIGN KEY (Course_id)
-    REFERENCES Course (id)  
+    REFERENCES CourseList (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -156,7 +156,7 @@ ALTER TABLE Enroll ADD CONSTRAINT Enroll_Course
 -- Reference: Enroll_User (table: Enroll)
 ALTER TABLE Enroll ADD CONSTRAINT Enroll_User
     FOREIGN KEY (User_netid)
-    REFERENCES "User" (netid)  
+    REFERENCES UserList (netid)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -164,7 +164,7 @@ ALTER TABLE Enroll ADD CONSTRAINT Enroll_User
 -- Reference: GroupExercise_Exercise (table: GroupExercise)
 ALTER TABLE GroupExercise ADD CONSTRAINT GroupExercise_Exercise
     FOREIGN KEY (Assignment_id)
-    REFERENCES Assignment (id)  
+    REFERENCES AssignmentList (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -172,7 +172,7 @@ ALTER TABLE GroupExercise ADD CONSTRAINT GroupExercise_Exercise
 -- Reference: GroupExercise_Group (table: GroupExercise)
 ALTER TABLE GroupExercise ADD CONSTRAINT GroupExercise_Group
     FOREIGN KEY (Group_id)
-    REFERENCES "Group" (id)  
+    REFERENCES GroupList (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -180,7 +180,7 @@ ALTER TABLE GroupExercise ADD CONSTRAINT GroupExercise_Group
 -- Reference: GroupUsers_Group (table: GroupUsers)
 ALTER TABLE GroupUsers ADD CONSTRAINT GroupUsers_Group
     FOREIGN KEY (Group_groupid)
-    REFERENCES "Group" (id)  
+    REFERENCES GroupList (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -188,7 +188,7 @@ ALTER TABLE GroupUsers ADD CONSTRAINT GroupUsers_Group
 -- Reference: GroupUsers_User (table: GroupUsers)
 ALTER TABLE GroupUsers ADD CONSTRAINT GroupUsers_User
     FOREIGN KEY (User_netid)
-    REFERENCES "User" (netid)  
+    REFERENCES UserList (netid)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -292,7 +292,7 @@ ALTER TABLE Review ADD CONSTRAINT Review_Submission
 -- Reference: Review_User (table: Review)
 ALTER TABLE Review ADD CONSTRAINT Review_User
     FOREIGN KEY (User_netid)
-    REFERENCES "User" (netid)  
+    REFERENCES UserList (netid)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -300,7 +300,7 @@ ALTER TABLE Review ADD CONSTRAINT Review_User
 -- Reference: Rubric_Exercise (table: Rubric)
 ALTER TABLE Rubric ADD CONSTRAINT Rubric_Exercise
     FOREIGN KEY (Assignment_id)
-    REFERENCES Assignment (id)  
+    REFERENCES AssignmentList (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -308,7 +308,7 @@ ALTER TABLE Rubric ADD CONSTRAINT Rubric_Exercise
 -- Reference: Submission_Assignment (table: Submission)
 ALTER TABLE Submission ADD CONSTRAINT Submission_Assignment
     FOREIGN KEY (Assignment_id)
-    REFERENCES Assignment (id)  
+    REFERENCES AssignmentList (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -316,7 +316,7 @@ ALTER TABLE Submission ADD CONSTRAINT Submission_Assignment
 -- Reference: Submission_User (table: Submission)
 ALTER TABLE Submission ADD CONSTRAINT Submission_User
     FOREIGN KEY (User_netid)
-    REFERENCES "User" (netid)  
+    REFERENCES UserList (netid)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
