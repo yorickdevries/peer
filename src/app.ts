@@ -4,15 +4,9 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 
-import index from "./routes/index";
-import users from "./routes/users";
+import api from "./routes/api";
 
 const app: express.Express = express();
-
-// view engine setup
-// will be replaced with vue
-app.set("views", path.join(__dirname, "../views"));
-app.set("view engine", "jade");
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -20,8 +14,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "../public")));
 
-app.use("/", index);
-app.use("/users", users);
+app.use("/api", api);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -36,7 +29,7 @@ app.use(function (err: any, req: any, res: any, next: any) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render("error");
+  res.json( {} );
 });
 
 export default app;
