@@ -28,12 +28,42 @@ var db = pgp(connection);
 
 console.log("Importing database");
 const qf = new QueryFile("./simpleUserDB.sql");
-// run the queryfile to start with a fresh database
-db.any(qf)
-    .then(function () {
-        console.log("Imported database to: " + connection.database + "@" + connection.host);
-    })
-    .catch(function (err) {
-        console.log(err);
+
+var db_empty = async function() {
+    try{
+        await db.any("DROP SCHEMA IF EXISTS public CASCADE");
+        console.log("Schema dropped");
+    } catch (error){
+        console.log(error);
         process.exit(1);
-    });
+    }
+};
+
+var db_create = async function() {
+    try{
+        await db.any("CREATE SCHEMA public");
+        console.log("Schema created");
+    } catch (error){
+        console.log(error);
+        process.exit(1);
+    }
+};
+
+var db_tables = async function() {
+    try{
+        await db.any(qf);
+        console.log("Tables created");
+    } catch (error){
+        console.log(error);
+        process.exit(1);
+    }
+};
+
+var db_import = async function() {
+    await db_empty();
+    await db_create();
+    await db_tables();
+};
+
+//run database import
+db_import();
