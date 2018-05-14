@@ -2,7 +2,6 @@
   "name": "ed3_peer_review",
   "version": "1.0.0",
   "scripts": {
-    "install": "npm install --prefix ./client && npm install --prefix ./server",
     "start": "npm run build && npm run start_server",
     "build": "npm run build_server && npm run build_db && npm run build_client",
     "build_server": "npm run build --prefix ./server",
