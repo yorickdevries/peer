@@ -17,26 +17,30 @@ before_script:
 tslint:
   stage: static-analysis
   script:
-  - npm run tslint
-build:
-  stage: build
-  script:
-  - npm run build
+  - npm run tslint --prefix ./server
 database:
   stage: build
   services:
   - postgres:10.3
   script:
-  - npm run db_init
+  - npm run db_init --prefix ./server
+build_server:
+  stage: build
+  script:
+  - npm run build --prefix ./server
+build_client:
+  stage: build
+  script:
+  - npm run build --prefix ./client
 test:
   stage: test
   services:
   - postgres:10.3
   script:
-  - npm run test
+  - npm run test --prefix ./server
 coverage:
   stage: coverage
   services:
   - postgres:10.3
   script:
-  - npm run coverage
+  - npm run coverage --prefix ./server
