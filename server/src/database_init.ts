@@ -3,7 +3,7 @@ import pgpromise from "pg-promise";
 import Database from "./database";
 
 const db = new Database();
-const qf = new pgpromise.QueryFile("../database_dumps/simpleUserDB.sql");
+const qf = new pgpromise.QueryFile("../database_dumps/ED3-FullDataBase.sql");
 
 // import database
 console.log("Importing database");

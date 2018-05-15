@@ -6,7 +6,7 @@ import "mocha";
 
 // load the queryfile
 import { QueryFile } from "pg-promise";
-const qf = new QueryFile("../../../database_dumps/simpleUserDB.sql");
+const qf = new QueryFile("../../../database_dumps/ED3-FullDataBase.sql");
 
 describe("Database Test", () => {
   // Make a clean database
@@ -27,7 +27,7 @@ describe("Database Test", () => {
   it("database connection correct", async () => {
     const db = databaseObject.db;
     let result;
-    const db_prom = db.any("SELECT * FROM usercollection")
+    const db_prom = db.any("SELECT * FROM userlist")
       .then(function (data: any) {
         result = data[0].netid;
       }).catch(function (err: Error) {
@@ -36,7 +36,7 @@ describe("Database Test", () => {
 
     // wait for database promise to finish
     await db_prom;
-    expect(result).to.equal("bob");
+    expect(result).to.equal("paulvanderlaan");
   });
 
   it("database connection error", async () => {
