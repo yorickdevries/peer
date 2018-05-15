@@ -2,15 +2,14 @@
 import pgpromise from "pg-promise";
 import Database from "./database";
 
-const db = new Database();
 const qf = new pgpromise.QueryFile("../database_dumps/ED3-FullDataBase.sql");
 
 // import database
 console.log("Importing database");
 const import_db = async function () {
     try {
-        await db.DatabaseImport(qf);
-        console.log("Imported database to: " + db.connection.database + "@" + db.connection.host);
+        await Database.DatabaseImport(qf);
+        console.log("Imported database to: " + Database.connection.database + "@" + Database.connection.host);
     } catch (error) {
         console.log(error);
         process.exit(1);

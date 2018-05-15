@@ -1,6 +1,4 @@
 import Database from "../../src/database";
-const databaseObject = new Database();
-
 import { expect } from "chai";
 import "mocha";
 
@@ -11,21 +9,21 @@ const qf = new QueryFile("../../../database_dumps/ED3-FullDataBase.sql");
 describe("Database Test", () => {
   // Make a clean database
   beforeEach((done) => {
-    databaseObject.DatabaseImport(qf).then(done);
+    Database.DatabaseImport(qf).then(done);
   });
 
   it("connection port", () => {
-    const result = databaseObject.connection.port;
+    const result = Database.connection.port;
     expect(result).to.equal(5432);
   });
 
   it("connection user", () => {
-    const result = databaseObject.connection.user;
+    const result = Database.connection.user;
     expect(result).to.equal("postgres");
   });
 
   it("database connection correct", async () => {
-    const db = databaseObject.db;
+    const db = Database.db;
     let result;
     const db_prom = db.any("SELECT * FROM userlist")
       .then(function (data: any) {
@@ -40,7 +38,7 @@ describe("Database Test", () => {
   });
 
   it("database connection error", async () => {
-    const db = databaseObject.db;
+    const db = Database.db;
     let result;
     const db_prom = db.any("SELECT * FROM invalidtable")
       .then(function (data: any) {
