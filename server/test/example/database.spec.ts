@@ -63,7 +63,7 @@ describe("Database Test", () => {
         let result;
 
         // Bind value.
-        UserPS.getUserById.values = ['paulvanderlaan'];
+        UserPS.getUserById.values = ["paulvanderlaan"];
 
         const db_prom = databaseObject.executeQuery(UserPS.getUserById)
             .then(function (data: any) {
