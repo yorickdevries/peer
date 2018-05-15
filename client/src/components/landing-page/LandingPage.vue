@@ -1,7 +1,7 @@
 <template>
     <div>
 
-        <Navbar></Navbar>
+        <Navbar :links="navbarItems"></Navbar>
 
         <!--Head Section with Login Card-->
         <b-container class="bg-landing-page" fluid>
@@ -78,14 +78,19 @@
 </template>
 
 <script>
-import Footer from '../components/Footer'
-import Navbar from '../components/Navbar'
+import Footer from '../Footer'
+import Navbar from '../Navbar'
 
 export default {
     name: "LandingPage",
     components: {
         Footer,
         Navbar
+    },
+    data() {
+        return {
+            navbarItems: null
+        }
     }
 }
 </script>
