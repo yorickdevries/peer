@@ -11,24 +11,14 @@
 
             <b-row>
                 <b-col>
-                    <b-card title="TI1316"
-                            sub-title="Algoritmen en Datastructuren"
-                            class="mb-3">
+
+                    <b-card v-for="course in courses" :title="course.code" :sub-title="course.name" class="mb-3">
                         <p class="card-text">
-                            Algorithms and data structures are fundamental notions in computer science and knowledge about standard data structures and algorithm is essential for programmers.
+                            {{ course.description}}
                         </p>
-                        <b-button variant="success" to="/dashboard/courses/1">Enter</b-button>
+                        <b-button variant="success" :to="{ name: 'StudentDashboardCourse', params: { id: course.id } }">Enter</b-button>
                     </b-card>
 
-                    <b-card title="TI2206"
-                            sub-title="Concepts of Programming Languages"
-                            class="mb-3">
-                        <p class="card-text">
-                            The design of a programming language is the result of a selection from a general collection of programming language concepts.
-                            With some frequency, new languages are introduced that combine concepts in an novel manner and sometimes...
-                        </p>
-                        <b-button variant="success" to="/dashboard/courses/2">Enter</b-button>
-                    </b-card>
                 </b-col>
             </b-row>
         </b-container>
@@ -36,18 +26,32 @@
 </template>
 
 <script>
-export default {
-    name: "StudentDashboardCourses",
-    data() {
-        return {
-            items: [{
-                text: 'Dashboard',
-                to: { name: 'StudentDashboardMain'}
-            }, {
-                text: 'Courses',
-                to: { name: 'StudentDashboardCourses'}
-            }]
+    export default {
+        name: "StudentDashboardCourses",
+        data() {
+            return {
+                items: [{
+                    text: 'Dashboard',
+                    to: { name: 'StudentDashboardMain'}
+                }, {
+                    text: 'Courses',
+                    to: { name: 'StudentDashboardCourses'}
+                }],
+                courses: [
+                    {
+                        id: "1",
+                        code: "TI1316",
+                        name: "Algoritmen en Datastructuren",
+                        description: "Algorithms and data structures are fundamental notions in computer science and knowledge about standard data structures and algorithm is essential for programmers."
+                    },
+                    {
+                        id: "2",
+                        code: "TI2206",
+                        name: "Concepts of Programming Languages",
+                        description: "The design of a programming language is the result of a selection from a general collection of programming language concepts."
+                    }
+                ]
+            }
         }
     }
-}
 </script>
