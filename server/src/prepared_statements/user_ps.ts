@@ -1,111 +1,97 @@
 import Database from "../database";
 import pgp, {PreparedStatement} from "pg-promise";
+import express = require('express');
 
 export default class UserPS {
-    private db: Database;
-    private addUser             : PreparedStatement 
-    private getUserById         : PreparedStatement;
-    private getUserByEmail      : PreparedStatement;
-    private getCoursesIdById    : PreparedStatement;
-    private getGroupsById       : PreparedStatement;
-    private getSubmissionsById  : PreparedStatement;
-    private getReviewsById      : PreparedStatement;
+    private static db: Database;
+    private static addUser             : PreparedStatement = new PreparedStatement('add-user',
+        'INSERT INTO "userlist" ("netid", "email") VALUES ($1, $2)');
 
-    /**
-     * Constructor for a user prepared statement (PS) object.
-     * Used to create and execute PS on the database.
-     */
-    constructor() {
-        this.db = new Database();
-        this.addUser        = new PreparedStatement('add-user',
-            'INSERT INTO "userlist" ("netid", "email") VALUES ($1, $2)');
+    private static getUserById         : PreparedStatement = new PreparedStatement('get-user-by-id',
+        'SELECT * FROM "userlist" WHERE "netid" LIKE $1');
+    private static getUserByEmail      : PreparedStatement = new PreparedStatement('get-user-by-email',
+        'SELECT * FROM "userlist" WHERE "email" LIKE $1');
 
-        this.getUserById    = new PreparedStatement('get-user-by-id',
-            'SELECT * FROM "userlist" WHERE "netid" LIKE $1');
+    private static getCoursesIdById    : PreparedStatement = new PreparedStatement('get-courses-by-id',
+        'SELECT * FROM "enroll" WHERE "user_netid" LIKE $1');
 
-        this.getUserByEmail = new PreparedStatement('get-user-by-email',
-            'SELECT * FROM "userlist" WHERE "email" LIKE $1');
+    private static getGroupsById       : PreparedStatement = new PreparedStatement('get-groups-by-id',
+        'SELECT * FROM "groupusers" WHERE "user_netid" LIKE $1');
 
-        this.getCoursesIdById  = new PreparedStatement('get-courses-by-id',
-            'SELECT * FROM "enroll" WHERE "user_netid" LIKE $1');
+    private static getSubmissionsById  : PreparedStatement = new PreparedStatement('get-submissions-by-id',
+        'SELECT * FROM "submission" WHERE "user_netid" LIKE $1');
 
-        this.getGroupsById     = new PreparedStatement('get-groups-by-id',
-            'SELECT * FROM "groupusers" WHERE "user_netid" LIKE $1');
-
-        this.getSubmissionsById = new PreparedStatement('get-submissions-by-id',
-            'SELECT * FROM "submission" WHERE "user_netid" LIKE $1');
-
-        this.getReviewsById = new PreparedStatement('get-reviews-by-id',
-            'SELECT * FROM "review" WHERE "user_netid" LIKE $1');
-    }
+    private static getReviewsById      : PreparedStatement = new PreparedStatement('get-reviews-by-id',
+        'SELECT * FROM "review" WHERE "user_netid" LIKE $1');
 
     /**
      * Executes an 'add user query'.
+     * @param {Response} res - a response.
      * @param {string} netid - a net id.
      * @param {string} email - an email.
-     * @return {any} rows - fetched rows.
      */
-    public executeAddUser(netid : string, email : string) {
+    public static executeAddUser(res : express.Response, netid : string, email : string) {
         this.addUser.values = [netid, email];
-        return this.db.executeQuery(this.addUser);
+        res.json(this.db.executeQuery(this.addUser));
     }
 
     /**
      * Executes a 'get user by user id' query.
+     * @param {Response} res - a response.
      * @param {number} userId - an id.
      */
-    public executeGetUserById(userId : number) {
+    public static executeGetUserById(res : express.Response, userId : number) {
         this.getUserById.values = [userId];
-        return this.db.executeQuery(this.getUserById);
+        res.json(this.db.executeQuery(this.getUserById));
     }
 
     /**
      * Executes a 'get user by email' query.
+     * @param {Response} res - a response.
      * @param {string} email - an email.
-     * @return {any} rows - fetched rows.
      */
-    public executeGetUserByEmail(email : string) {
+    public static executeGetUserByEmail(res : express.Response, email : string) {
         this.getUserByEmail.values = [email];
-        return this.db.executeQuery(this.getUserByEmail);
+        res.json(this.db.executeQuery(this.getUserByEmail));
     }
 
     /**
      * Executes a 'get courses ids by user id' query.
+     * @param {Response} res - a response.
      * @param {number} userId - a user id.
-     * @return {any} rows - fetched rows.
      */
-    public executeGetCoursesIdById(userId : number) {
+    public static executeGetCoursesIdById(res : express.Response, userId : number) {
         this.getCoursesIdById.values = [userId];
-        return this.db.executeQuery(this.getCoursesIdById);
+        res.json(this.db.executeQuery(this.getCoursesIdById));
     }
 
     /**
      * Executes a 'get group by user id' query.
+     * @param {Response} res - a response.
      * @param {number} userId - a user id.
-     * @return {any} rows - fetched rows.
      */
-    public executeGetGroupsById(userId : number) {
+    public static executeGetGroupsById(res : express.Response, userId : number) {
         this.getGroupsById.values = [userId];
-        return this.db.executeQuery(this.getGroupsById);
+        res.json(this.db.executeQuery(this.getGroupsById));
     }
 
     /**
      * Executes a 'get submission by user id' query.
+     * @param {Response} res - a response.
      * @param {number} userId - a user id.
-     * @return {any} rows - fetched rows.
      */
-    public executeGetSubmissionById(userId : number) {
+    public static executeGetSubmissionById(res : express.Response, userId : number) {
         this.getSubmissionsById.values = [userId];
-        return this.db.executeQuery(this.getSubmissionsById);
+        res.json(this.db.executeQuery(this.getSubmissionsById));
     }
 
     /**
      * Executes a 'get review by user id' query.
+     * @param {Response} res - a response.
      * @param {number} userId - a user id.
-     * @return {any} rows - fetched rows.
      */
-    public executeGetReviewById(userId : number) {
+    public static executeGetReviewById(res : express.Response, userId : number) {
         this.getReviewsById.values = [userId];
-        return this.db.executeQuery(this.getReviewsById);
+        res.json(this.db.executeQuery(this.getReviewsById));
     }
 }
