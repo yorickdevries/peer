@@ -9,6 +9,7 @@ export default class UserPS {
     private getCoursesIdById    : PreparedStatement;
     private getGroupsById       : PreparedStatement;
     private getSubmissionsById  : PreparedStatement;
+    private getReviewsById      : PreparedStatement;
 
     /**
      * Constructor for a user prepared statement (PS) object.
@@ -31,10 +32,11 @@ export default class UserPS {
         this.getGroupsById     = new PreparedStatement('get-groups-by-id',
             'SELECT * FROM "groupusers" WHERE "user_netid" LIKE $1');
 
-        this.getSubmissionsById = new PreparedStatement('get-submission-by-id',
+        this.getSubmissionsById = new PreparedStatement('get-submissions-by-id',
             'SELECT * FROM "submission" WHERE "user_netid" LIKE $1');
 
-
+        this.getReviewsById = new PreparedStatement('get-reviews-by-id',
+            'SELECT * FROM "review" WHERE "user_netid" LIKE $1');
     }
 
     /**
@@ -90,5 +92,14 @@ export default class UserPS {
     public executeGetSubmissionById(userId : number) {
         this.getSubmissionsById.values = [userId];
         this.db.executeQuery(this.getSubmissionsById);
+    }
+
+    /**
+     * Executes a 'get review by user id' query.
+     * @param {number} userId - a user id.
+     */
+    public executeGetReviewById(userId : number) {
+        this.getReviewsById.values = [userId];
+        this.db.executeQuery(this.getReviewsById);
     }
 }
