@@ -27,8 +27,15 @@
                                 </b-form>
                             </p>
 
-                            <router-link to="/dashboard/"><b-button variant="primary" class="w-100">Login</b-button></router-link>
-
+                            <p>
+                                <router-link to="/student-dashboard/"><b-button variant="primary" class="w-100">Login as student</b-button></router-link>
+                            </p>
+                            <p>
+                                <router-link to="/teaching-assistant-dashboard/"><b-button variant="primary" class="w-100">Login as TA</b-button></router-link>
+                            </p>
+                            <p>
+                                <router-link to="/teacher-dashboard/"><b-button variant="primary" class="w-100">Login as teacher</b-button></router-link>
+                            </p>
                         </b-card>
                     </b-col>
                 </b-row>
