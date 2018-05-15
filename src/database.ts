@@ -1,7 +1,6 @@
 import promise from "bluebird";
 import isCI from "is-ci";
 import pgp, {PreparedStatement} from "pg-promise";
-const PS = require('pg-promise').PreparedStatement;
 
 export default class Database {
   public connection: {
