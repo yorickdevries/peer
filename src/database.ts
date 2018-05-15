@@ -1,6 +1,7 @@
 import promise from "bluebird";
 import isCI from "is-ci";
-import pgp from "pg-promise";
+import pgp, {PreparedStatement} from "pg-promise";
+const PS = require('pg-promise').PreparedStatement;
 
 export default class Database {
   public connection: {
@@ -33,4 +34,20 @@ export default class Database {
     }
     this.db = pgp_object(this.connection);
   }
+
+    /**
+     * Execute a prepared statements on this database.
+     * @param {pgPromise.PreparedStatement} statement - a pg promise prepared statement.
+     */
+  public executeQuery(statement : PreparedStatement) {
+      // Execute prepared statement on database and respond with the json resulting object.
+      this.db.none(statement)
+          .then(() => {
+              // user added;
+          })
+          .catch((error : any) => {
+              return console.log("[src:database.ts] Error: " + error);
+          });
+  }
+
 }
