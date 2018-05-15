@@ -47,4 +47,5 @@ export default class UserPS {
         this.db.executeQuery(this.addUser);
     }
 
+    
 }
