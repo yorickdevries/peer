@@ -1,5 +1,6 @@
 import Database from "../../src/database";
 const databaseObject = new Database();
+
 import { expect } from "chai";
 import "mocha";
 
@@ -10,14 +11,7 @@ const qf = new QueryFile("../../../database_dumps/simpleUserDB.sql");
 describe("Database Test", () => {
   // Make a clean database
   beforeEach((done) => {
-    const db = databaseObject.db;
-    // run the query file to start with a fresh database
-    const db_import = async function () {
-      await db.any("DROP SCHEMA IF EXISTS public CASCADE");
-      await db.any("CREATE SCHEMA public");
-      await db.any(qf);
-    };
-    db_import().then(done);
+    databaseObject.DatabaseImport(qf).then(done);
   });
 
   it("connection port", () => {
