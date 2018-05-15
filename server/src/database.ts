@@ -18,7 +18,7 @@ export default class Database {
       // Initialization Options
       promiseLib: promise
     };
-    const pgp_object = pgp(options);
+    const pgpObject = pgp(options);
 
     this.connection = {
       user: "postgres",
@@ -32,7 +32,7 @@ export default class Database {
       console.log("The code is running on a CI server");
       this.connection.host = "postgres";
     }
-    this.db = pgp_object(this.connection);
+    this.db = pgpObject(this.connection);
   }
 
   // method to import default databse
