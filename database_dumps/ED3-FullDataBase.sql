@@ -37,6 +37,7 @@ CREATE TABLE GroupExercise (
 -- Table: GroupList
 CREATE TABLE GroupList (
     id int NOT NULL,
+    group_name varchar(20) NOT NULL,
     CONSTRAINT GroupList_pk PRIMARY KEY (id)
 );
 
@@ -68,6 +69,7 @@ CREATE TABLE MCQuestion (
     id SERIAL,
     question varchar(200)  NOT NULL,
     Rubric_Assignment_id SERIAL,
+    question_number int NOT NULL,
     CONSTRAINT MCQuestion_pk PRIMARY KEY (id)
 );
 
@@ -84,6 +86,7 @@ CREATE TABLE OpenQuestion (
     id SERIAL,
     question varchar(200)  NOT NULL,
     Rubric_Assignment_id SERIAL,
+    question_number int NOT NULL,
     CONSTRAINT OpenQuestion_pk PRIMARY KEY (id)
 );
 
@@ -101,6 +104,7 @@ CREATE TABLE RangeQuestion (
     question varchar(200)  NOT NULL,
     range int  NOT NULL,
     Rubric_Assignment_id SERIAL,
+    question_number int NOT NULL,
     CONSTRAINT RangeQuestion_pk PRIMARY KEY (id)
 );
 
@@ -336,8 +340,8 @@ INSERT INTO public.courselist(
     VALUES ('This is a beautiful course description!', 'ED-3');
 
 INSERT INTO public.grouplist(
-	id)
-	VALUES (10);
+	id, group_name)
+	VALUES (10, 'ED-3');
 
 INSERT INTO public.assignmentlist(
 	title, description, course_id)
@@ -348,16 +352,16 @@ INSERT INTO public.rubric(
 	VALUES (1);
 
 INSERT INTO public.openquestion(
-	question, rubric_assignment_id)
-	VALUES ('How to insert queries?', 1);
+	question, rubric_assignment_id, question_number)
+	VALUES ('How to insert queries?', 1, 1);
 
 INSERT INTO public.rangequestion(
-	question, range, rubric_assignment_id)
-	VALUES ('How much fun is inserting queries?', 7, 1);
+	question, range, rubric_assignment_id, question_number)
+	VALUES ('How much fun is inserting queries?', 7, 1, 2);
 
 INSERT INTO public.mcquestion(
-	question, rubric_assignment_id)
-	VALUES ('What is the best way to insert queries?', 1);
+	question, rubric_assignment_id, question_number)
+	VALUES ('What is the best way to insert queries?', 1, 3);
 
 INSERT INTO public.mcoption(
 	option, mcquestion_id)
