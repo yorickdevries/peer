@@ -35,7 +35,8 @@ export default {
                 PeerReviewSingle,
                 PeerReviewSingle,
                 PeerReviewSingle
-            ]
+            ],
+            current: PeerReviewSingle
         }
     },
     computed: {

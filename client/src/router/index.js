@@ -8,7 +8,7 @@ export default new Router({
         {
             path: '/',
             name: 'LandingPage',
-            component: () => import('../components/LandingPage')
+            component: () => import('../components/landing-page/LandingPage')
         },
         {
             path: '/dashboard',

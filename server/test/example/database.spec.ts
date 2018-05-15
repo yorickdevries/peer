@@ -12,10 +12,12 @@ describe("Database Test", () => {
   beforeEach((done) => {
     const db = databaseObject.db;
     // run the query file to start with a fresh database
-    db.any(qf)
-      .then(function () {
-        done();
-      });
+    const db_import = async function () {
+      await db.any("DROP SCHEMA IF EXISTS public CASCADE");
+      await db.any("CREATE SCHEMA public");
+      await db.any(qf);
+    };
+    db_import().then(done);
   });
 
   it("connection port", () => {
