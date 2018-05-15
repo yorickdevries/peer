@@ -10,7 +10,7 @@ console.log("Importing database");
 const import_db = async function () {
     try {
         await db.DatabaseImport(qf);
-        console.log("Done");
+        console.log("Imported database to: " + db.connection.database + "@" + db.connection.host);
     } catch (error) {
         console.log(error);
         process.exit(1);

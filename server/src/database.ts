@@ -36,10 +36,7 @@ export default class Database {
   // method to import default databse
   async DatabaseImport(qf: pgp.QueryFile) {
     await this.db.any("DROP SCHEMA IF EXISTS public CASCADE");
-    console.log("Dropped schema");
     await this.db.any("CREATE SCHEMA public");
-    console.log("Created schema");
     await this.db.any(qf);
-    console.log("Imported database to: " + this.connection.database + "@" + this.connection.host);
   }
 }
