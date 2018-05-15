@@ -8,7 +8,7 @@ const db = databaseObject.db;
 
 /* GET Userlist page in JSON. */
 router.get("/users", function (req, res, next) {
-    db.any("SELECT * FROM usercollection")
+    db.any("SELECT * FROM userlist")
         .then(function (data: object) {
             res.status(200)
                 .json(data);
@@ -24,7 +24,7 @@ router.post("/users", function (req, res) {
     const netID = req.body.netid;
     const email = req.body.email;
 
-    db.none("INSERT INTO usercollection(netid, email) VALUES($1, $2)", [netID, email])
+    db.none("INSERT INTO userlist(netid, email) VALUES($1, $2)", [netID, email])
         .then(function () {
             // If it worked, set the header so the address bar doesn't still say /adduser
             // And forward to success page

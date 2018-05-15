@@ -11,7 +11,7 @@ export default new Router({
             component: () => import('../components/landing-page/LandingPage')
         },
         {
-            path: '/dashboard',
+            path: '/student-dashboard',
             name: 'StudentDashboardCourses',
             component: () => import('../components/student-dashboard/StudentDashboardLayout'),
             children: [
@@ -54,6 +54,16 @@ export default new Router({
                     ]
                 }
             ]
+        },
+        {
+            path: '/teaching-assistant-dashboard',
+            name: 'TeachingAssistantDashboard',
+            component: () => import('../components/teaching-assistant-dashboard/TeachingAssistantDashboardLayout')
+        },
+        {
+            path: '/teacher-dashboard',
+            name: 'TeacherDashboard',
+            component: () => import('../components/teacher-dashboard/TeacherDashboardLayout')
         }
     ]
 })

@@ -3,7 +3,7 @@ import pgp, {PreparedStatement} from "pg-promise";
 
 export default class UserPS {
     private db: Database;
-    private addUser             : PreparedStatement;
+    private addUser             : PreparedStatement 
     private getUserById         : PreparedStatement;
     private getUserByEmail      : PreparedStatement;
     private getCoursesIdById    : PreparedStatement;
@@ -43,10 +43,11 @@ export default class UserPS {
      * Executes an 'add user query'.
      * @param {string} netid - a net id.
      * @param {string} email - an email.
+     * @return {any} rows - fetched rows.
      */
     public executeAddUser(netid : string, email : string) {
         this.addUser.values = [netid, email];
-        this.db.executeQuery(this.addUser);
+        return this.db.executeQuery(this.addUser);
     }
 
     /**
@@ -55,51 +56,56 @@ export default class UserPS {
      */
     public executeGetUserById(userId : number) {
         this.getUserById.values = [userId];
-        this.db.executeQuery(this.getUserById);
+        return this.db.executeQuery(this.getUserById);
     }
 
     /**
      * Executes a 'get user by email' query.
      * @param {string} email - an email.
+     * @return {any} rows - fetched rows.
      */
     public executeGetUserByEmail(email : string) {
         this.getUserByEmail.values = [email];
-        this.db.executeQuery(this.getUserByEmail);
+        return this.db.executeQuery(this.getUserByEmail);
     }
 
     /**
      * Executes a 'get courses ids by user id' query.
      * @param {number} userId - a user id.
+     * @return {any} rows - fetched rows.
      */
     public executeGetCoursesIdById(userId : number) {
         this.getCoursesIdById.values = [userId];
-        this.db.executeQuery(this.getCoursesIdById);
+        return this.db.executeQuery(this.getCoursesIdById);
     }
 
     /**
      * Executes a 'get group by user id' query.
      * @param {number} userId - a user id.
+     * @return {any} rows - fetched rows.
      */
     public executeGetGroupsById(userId : number) {
         this.getGroupsById.values = [userId];
-        this.db.executeQuery(this.getGroupsById);
+        return this.db.executeQuery(this.getGroupsById);
     }
 
     /**
      * Executes a 'get submission by user id' query.
      * @param {number} userId - a user id.
+     * @return {any} rows - fetched rows.
      */
     public executeGetSubmissionById(userId : number) {
         this.getSubmissionsById.values = [userId];
-        this.db.executeQuery(this.getSubmissionsById);
+        return this.db.executeQuery(this.getSubmissionsById);
     }
 
     /**
      * Executes a 'get review by user id' query.
      * @param {number} userId - a user id.
+     * @return {any} rows - fetched rows.
      */
     public executeGetReviewById(userId : number) {
         this.getReviewsById.values = [userId];
-        this.db.executeQuery(this.getReviewsById);
+        return this.db.executeQuery(this.getReviewsById);
     }
 }

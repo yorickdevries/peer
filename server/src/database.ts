@@ -1,6 +1,6 @@
 import promise from "bluebird";
 import isCI from "is-ci";
-import pgp, {PreparedStatement} from "pg-promise";
+import pgp, {errors, PreparedStatement} from "pg-promise";
 
 export default class Database {
   public connection: {
@@ -34,18 +34,29 @@ export default class Database {
     this.db = pgp_object(this.connection);
   }
 
+  // method to import default databse
+  async DatabaseImport(qf: pgp.QueryFile) {
+    await this.db.any("DROP SCHEMA IF EXISTS public CASCADE");
+    await this.db.any("CREATE SCHEMA public");
+    await this.db.any(qf);
+  }
+
   /**
    * Execute a prepared statements on this database.
    * @param {pgPromise.PreparedStatement} statement - a pg promise prepared statement.
    */
   public executeQuery(statement : PreparedStatement) {
       // Execute prepared statement on database and respond with the json resulting object.
-      this.db.none(statement)
-          .then(() => {
-              // user added;
+      this.db.any(statement)
+          .then((data : any) => {
+              return data;
           })
-          .catch((error : any) => {
-              return console.log("[src:database.ts] Error: " + error);
+          .catch((err : Error) => {
+              return {
+                error: err,
+                statement: statement,
+                msg: "There was a problem adding the information to the database.: "
+              };
           });
   }
 

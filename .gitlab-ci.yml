@@ -24,6 +24,7 @@ database:
   services:
   - postgres:10.3
   script:
+  - npm run build --prefix ./server
   - npm run db_init --prefix ./server
 build_server:
   stage: build

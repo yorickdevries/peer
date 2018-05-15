@@ -1,23 +1,17 @@
 import Database from "../../src/database";
 const databaseObject = new Database();
+
 import { expect } from "chai";
 import "mocha";
 
 // load the queryfile
 import { QueryFile } from "pg-promise";
-const qf = new QueryFile("../../../database_dumps/simpleUserDB.sql");
+const qf = new QueryFile("../../../database_dumps/ED3-FullDataBase.sql");
 
 describe("Database Test", () => {
   // Make a clean database
   beforeEach((done) => {
-    const db = databaseObject.db;
-    // run the query file to start with a fresh database
-    const db_import = async function () {
-      await db.any("DROP SCHEMA IF EXISTS public CASCADE");
-      await db.any("CREATE SCHEMA public");
-      await db.any(qf);
-    };
-    db_import().then(done);
+    databaseObject.DatabaseImport(qf).then(done);
   });
 
   it("connection port", () => {
@@ -33,7 +27,7 @@ describe("Database Test", () => {
   it("database connection correct", async () => {
     const db = databaseObject.db;
     let result;
-    const db_prom = db.any("SELECT * FROM usercollection")
+    const db_prom = db.any("SELECT * FROM userlist")
       .then(function (data: any) {
         result = data[0].netid;
       }).catch(function (err: Error) {
@@ -42,7 +36,7 @@ describe("Database Test", () => {
 
     // wait for database promise to finish
     await db_prom;
-    expect(result).to.equal("bob");
+    expect(result).to.equal("paulvanderlaan");
   });
 
   it("database connection error", async () => {

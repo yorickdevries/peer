@@ -10,7 +10,7 @@
     "tsc": "tsc",
     "test": "mocha -r ts-node/register test/**/*.spec.ts",
     "coverage": "nyc npm run test",
-    "db_init": "node ./database_dumps/database_init.js"
+    "db_init": "node ./dist/database_init.js"
   },
   "nyc": {
     "check-coverage": true,
