@@ -3,16 +3,17 @@ import isCI from "is-ci";
 import pgp, {errors, PreparedStatement} from "pg-promise";
 
 export default class Database {
-  public connection: {
+  static connection: {
     user: string,
     host: string,
     database: string,
     password: string,
     port: number
   };
-  public db: any;
 
-  constructor() {
+  static db: any;
+
+  static initialize() {
     const options = {
       // Initialization Options
       promiseLib: promise
@@ -35,7 +36,7 @@ export default class Database {
   }
 
   // method to import default databse
-  async DatabaseImport(qf: pgp.QueryFile) {
+  static async DatabaseImport(qf: pgp.QueryFile) {
     await this.db.any("DROP SCHEMA IF EXISTS public CASCADE");
     await this.db.any("CREATE SCHEMA public");
     await this.db.any(qf);
@@ -47,7 +48,7 @@ export default class Database {
    */
   public executeQuery(statement : PreparedStatement) {
       // Execute prepared statement on database and respond with the json resulting object.
-      return this.db.any(statement)
+      return Database.db.any(statement)
           .then((data : any) => {
               return data;
           })
@@ -61,3 +62,5 @@ export default class Database {
   }
 
 }
+
+Database.initialize();
