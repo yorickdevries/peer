@@ -33,4 +33,10 @@ export default class Database {
     }
     this.db = pgp_object(this.connection);
   }
+  // method to import default databse
+  async DatabaseImport(qf: pgp.QueryFile) {
+    await this.db.any("DROP SCHEMA IF EXISTS public CASCADE");
+    await this.db.any("CREATE SCHEMA public");
+    await this.db.any(qf);
+  }
 }
