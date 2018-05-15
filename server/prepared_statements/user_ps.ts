@@ -38,14 +38,57 @@ export default class UserPS {
     }
 
     /**
-     * Executes a add user query.
-     * @param {string} netid - a net id from the user.
-     * @param {string} email - an email from the user.
+     * Executes an 'add user query'.
+     * @param {string} netid - a net id.
+     * @param {string} email - an email.
      */
     public executeAddUser(netid : string, email : string) {
         this.addUser.values = [netid, email];
         this.db.executeQuery(this.addUser);
     }
 
-    
+    /**
+     * Executes a 'get user by user id' query.
+     * @param {number} userId - an id.
+     */
+    public executeGetUserById(userId : number) {
+        this.getUserById.values = [userId];
+        this.db.executeQuery(this.getUserById);
+    }
+
+    /**
+     * Executes a 'get user by email' query.
+     * @param {string} email - an email.
+     */
+    public executeGetUserByEmail(email : string) {
+        this.getUserByEmail.values = [email];
+        this.db.executeQuery(this.getUserByEmail);
+    }
+
+    /**
+     * Executes a 'get courses ids by user id' query.
+     * @param {number} userId - a user id.
+     */
+    public executeGetCoursesIdById(userId : number) {
+        this.getCoursesIdById.values = [userId];
+        this.db.executeQuery(this.getCoursesIdById);
+    }
+
+    /**
+     * Executes a 'get group by user id' query.
+     * @param {number} userId - a user id.
+     */
+    public executeGetGroupsById(userId : number) {
+        this.getGroupsById.values = [userId];
+        this.db.executeQuery(this.getGroupsById);
+    }
+
+    /**
+     * Executes a 'get submission by user id' query.
+     * @param {number} userId - a user id.
+     */
+    public executeGetSubmissionById(userId : number) {
+        this.getSubmissionsById.values = [userId];
+        this.db.executeQuery(this.getSubmissionsById);
+    }
 }
