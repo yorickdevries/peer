@@ -3,16 +3,17 @@ import isCI from "is-ci";
 import pgp from "pg-promise";
 
 export default class Database {
-  public connection: {
+  static connection: {
     user: string,
     host: string,
     database: string,
     password: string,
     port: number
   };
-  public db: any;
 
-  constructor() {
+  static db: any;
+
+  static initialize() {
     const options = {
       // Initialization Options
       promiseLib: promise
@@ -33,10 +34,12 @@ export default class Database {
     }
     this.db = pgp_object(this.connection);
   }
+
   // method to import default databse
-  async DatabaseImport(qf: pgp.QueryFile) {
+  static async DatabaseImport(qf: pgp.QueryFile) {
     await this.db.any("DROP SCHEMA IF EXISTS public CASCADE");
     await this.db.any("CREATE SCHEMA public");
     await this.db.any(qf);
   }
 }
+Database.initialize();
