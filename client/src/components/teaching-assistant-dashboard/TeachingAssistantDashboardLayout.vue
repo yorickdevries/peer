@@ -17,10 +17,7 @@ export default {
     },
     data() {
         return {
-            navbarItems: [
-                { to: { name: 'StudentDashboardMain' } , text: 'Dashboard'},
-                { to: { name: 'StudentDashboardCourses' } , text: 'Courses'}
-            ]
+            navbarItems: []
         }
     }
 }
