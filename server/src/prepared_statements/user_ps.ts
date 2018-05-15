@@ -4,24 +4,24 @@ import express = require('express');
 
 export default class UserPS {
     private static db: Database;
-    private static addUser             : PreparedStatement = new PreparedStatement('add-user',
+    public static addUser             : PreparedStatement = new PreparedStatement('add-user',
         'INSERT INTO "userlist" ("netid", "email") VALUES ($1, $2)');
 
-    private static getUserById         : PreparedStatement = new PreparedStatement('get-user-by-id',
+    public static getUserById         : PreparedStatement = new PreparedStatement('get-user-by-id',
         'SELECT * FROM "userlist" WHERE "netid" LIKE $1');
-    private static getUserByEmail      : PreparedStatement = new PreparedStatement('get-user-by-email',
+    public static getUserByEmail      : PreparedStatement = new PreparedStatement('get-user-by-email',
         'SELECT * FROM "userlist" WHERE "email" LIKE $1');
 
-    private static getCoursesIdById    : PreparedStatement = new PreparedStatement('get-courses-by-id',
+    public static getCoursesIdById    : PreparedStatement = new PreparedStatement('get-courses-by-id',
         'SELECT * FROM "enroll" WHERE "user_netid" LIKE $1');
 
-    private static getGroupsById       : PreparedStatement = new PreparedStatement('get-groups-by-id',
+    public static getGroupsById       : PreparedStatement = new PreparedStatement('get-groups-by-id',
         'SELECT * FROM "groupusers" WHERE "user_netid" LIKE $1');
 
-    private static getSubmissionsById  : PreparedStatement = new PreparedStatement('get-submissions-by-id',
+    public static getSubmissionsById  : PreparedStatement = new PreparedStatement('get-submissions-by-id',
         'SELECT * FROM "submission" WHERE "user_netid" LIKE $1');
 
-    private static getReviewsById      : PreparedStatement = new PreparedStatement('get-reviews-by-id',
+    public static getReviewsById      : PreparedStatement = new PreparedStatement('get-reviews-by-id',
         'SELECT * FROM "review" WHERE "user_netid" LIKE $1');
 
     /**

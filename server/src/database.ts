@@ -47,7 +47,7 @@ export default class Database {
    */
   public executeQuery(statement : PreparedStatement) {
       // Execute prepared statement on database and respond with the json resulting object.
-      this.db.any(statement)
+      return this.db.any(statement)
           .then((data : any) => {
               return data;
           })
