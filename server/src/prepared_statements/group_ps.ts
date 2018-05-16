@@ -26,7 +26,7 @@ export default class GroupsPS {
      */
     public static executeGetGroupByExerciseId (res: express.Response, id: number): Promise<pgPromise.queryResult> {
         this.getGroupsByExericeId.values = [id];
-        return this.db.executeQuery(this.getGroupsByExericeId);
+        return Database.executeQuery(this.getGroupsByExericeId);
     }
 
     /**
@@ -37,7 +37,7 @@ export default class GroupsPS {
      */
     public static executeAddGroup(res: express.Response, name: string): Promise<pgPromise.queryResult> {
         this.addGroup.values = [name];
-        return this.db.executeQuery(this.addGroup);
+        return Database.executeQuery(this.addGroup);
     }
 
     /**
@@ -48,7 +48,7 @@ export default class GroupsPS {
      */
     public static execcuteGetUserById(res: express.Response, id: number): Promise<pgPromise.queryResult> {
         this.getGroupById.values = [id];
-        return this.db.executeQuery(this.getGroupById);
+        return Database.executeQuery(this.getGroupById);
     }
 
     /**
@@ -59,7 +59,7 @@ export default class GroupsPS {
      */
     public static executeGetUserOfGroupById(res: express.Response, id: number): Promise<pgPromise.queryResult> {
         this.getUserOfGroupById.values = [id];
-        return this.db.executeQuery(this.getUserOfGroupById);
+        return Database.executeQuery(this.getUserOfGroupById);
     }
 
 }

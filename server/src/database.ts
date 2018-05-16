@@ -35,36 +35,34 @@ export default class Database {
     this.db = pgp_object(this.connection);
   }
 
-  // method to import default databse
+    /**
+     * Method to import default database.
+     * @param {pgPromise.QueryFile} qf - a pgp queryfile.
+     * @return {Promise<void>} - a promise of the result.
+     * @constructor - default constructor.
+     */
   static async DatabaseImport(qf: pgp.QueryFile) {
     await this.db.any("DROP SCHEMA IF EXISTS public CASCADE");
     await this.db.any("CREATE SCHEMA public");
     await this.db.any(qf);
   }
 
-
-  /**
-   * Execute a prepared statements on this database.
-   * @param {pgPromise.PreparedStatement} statement - a pg promise prepared statement.
-   * @return {pgPromise.queryResult} queryResult - a query result.
-   */
-  public executeQuery(statement : PreparedStatement): Promise<pgPromise.queryResult> {
-      // Execute prepared statement on database and respond a promise.
-      return Database.db.any(statement);
-  }
-
-  public static async fetchResults(queryResult: Promise<pgPromise.queryResult>) {
-    let result;
-    const db_result = await queryResult.then(function (data: pgPromise.queryResult) {
-        result = data;
-    })
-        .catch(function (err: Error) {
-            result = {
-                error: "There was a problem adding the information to the database."
-            };
-        });
-
-    return result;
+    /**
+     * Execute a query on the database, using a prepared statement.
+     * If the data is fetched without awaiting, a promise is returned. Otherwise the
+     * query result.
+     * @param {pgPromise.PreparedStatement} statement - a prepared statement to query.
+     * @return a database query result or an json error with awaiting, a promise otherwise.
+     */
+  public static async executeQuery(statement: PreparedStatement) {
+      try {
+          return await Database.db.any(statement);
+      } catch (err) {
+        return {
+            statement: statement,
+            error: "There was a problem executing the information to the database."
+        };
+      }
   }
 }
 

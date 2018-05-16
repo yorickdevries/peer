@@ -32,7 +32,7 @@ export default class UserPS {
      */
     public static executeAddUser(netId: string, email: string): Promise<pgPromise.queryResult> {
         this.addUser.values = [netId, email];
-        return this.db.executeQuery(this.addUser);
+        return Database.executeQuery(this.addUser);
     }
 
     /**
@@ -42,7 +42,7 @@ export default class UserPS {
      */
     public static async executeGetUserById(netId: string): Promise<pgPromise.queryResult> {
         this.getUserById.values = [netId];
-        return this.db.executeQuery(this.getUserById);
+        return Database.executeQuery(this.getUserById);
     }
 
     /**
@@ -52,7 +52,7 @@ export default class UserPS {
      */
     public static executeGetUserByEmail(email: string): Promise<pgPromise.queryResult> {
         this.getUserByEmail.values = [email];
-        return this.db.executeQuery(this.getUserByEmail);
+        return Database.executeQuery(this.getUserByEmail);
     }
 
     /**
@@ -62,7 +62,7 @@ export default class UserPS {
      */
     public static executeGetCoursesIdById(userId: number): Promise<pgPromise.queryResult> {
         this.getCoursesIdById.values = [userId];
-        return this.db.executeQuery(this.getCoursesIdById);
+        return Database.executeQuery(this.getCoursesIdById);
     }
 
     /**
@@ -72,7 +72,7 @@ export default class UserPS {
      */
     public static executeGetGroupsById(userId: number): Promise<pgPromise.queryResult> {
         this.getGroupsById.values = [userId];
-        return this.db.executeQuery(this.getGroupsById);
+        return Database.executeQuery(this.getGroupsById);
     }
 
     /**
@@ -82,7 +82,7 @@ export default class UserPS {
      */
     public static executeGetSubmissionById(userId: number): Promise<pgPromise.queryResult> {
         this.getSubmissionsById.values = [userId];
-        return this.db.executeQuery(this.getSubmissionsById);
+        return Database.executeQuery(this.getSubmissionsById);
     }
 
     /**
@@ -92,6 +92,6 @@ export default class UserPS {
      */
     public static executeGetReviewById(userId: number): Promise<pgPromise.queryResult> {
         this.getReviewsById.values = [userId];
-        return this.db.executeQuery(this.getReviewsById);
+        return Database.executeQuery(this.getReviewsById);
     }
 }
