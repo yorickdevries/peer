@@ -46,4 +46,15 @@ router.put("/assignment", async (req, res) => {
         req.body.assignment_id));
 });
 
+
+router.get("/courses", async (req, res) => {
+    res.json(await CoursesPS.executeGetAllCourses());
+});
+
+router.get('/courses/:courseId', async (req, res) => {
+    res.json(await CoursesPS.executeGetCourseById(req.params.courseId));
+});
+
+
+
 export default router;
