@@ -14,7 +14,7 @@ router.get("/assignments/:course_id", async (req, res) => {
 
 /**
  * Route to get an assignment for a specific course and assignment id.
- * @param assignment_id - assignment id.
+ * @param course_id - course id.
  * @param assignment_id - assignment id to get.
  */
 router.get("/assignment/:course_id/:assignment_id", async (req, res) => {
