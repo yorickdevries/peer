@@ -9,8 +9,7 @@ const router = Router();
  * @param course_id - course id.
  */
 router.get("/assignments/:course_id", async (req, res) => {
-    let re = await AssignmentPS.executeGetAssignments(req.params.course_id);
-    res.json(re);
+    res.json(await AssignmentPS.executeGetAssignments(req.params.course_id));
 });
 
 /**
@@ -23,27 +22,24 @@ router.get("/assignment/:course_id/:assignment_id", async (req, res) => {
 });
 
 /**
- * Route to post an assignment with a title and description
- * @body course_id - course id.
- * @body assignment_id - assignment id.
- */
-router.post("/assignment", async (req, res) => {
-    res.json(await AssignmentPS.executeAddAssignment(req.body.assignment_title, req.body.assignment_description));
-});
-
-/**
- * Route to update an assignment with a title, description, course and assignment id.
+ * Route to post and update an assignment.
  * @body assignment_title - assignment title.
  * @body assignment_description - assignment description.
  * @body course_id - course id.
  * @body assignment_id - assignment id.
  */
-router.put("/assignment", async (req, res) => {
-    res.json(await AssignmentPS.executeUpdateAssignmentById(
-        req.body.assignment_title,
-        req.body.assignment_description,
-        req.body.course_id,
-        req.body.assignment_id));
-});
+router.route("/assignment")
+    .post(async (req, res) => {
+        res.json(await AssignmentPS.executeAddAssignment(
+            req.body.assignment_title,
+            req.body.assignment_description));
+    })
+    .put(async (req, res) => {
+        res.json(await AssignmentPS.executeUpdateAssignmentById(
+            req.body.assignment_title,
+            req.body.assignment_description,
+            req.body.course_id,
+            req.body.assignment_id));
+    });
 
 export default router;
