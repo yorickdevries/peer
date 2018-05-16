@@ -36,7 +36,7 @@ CREATE TABLE GroupExercise (
 
 -- Table: GroupList
 CREATE TABLE GroupList (
-    id int NOT NULL,
+    id SERIAL,
     group_name varchar(20) NOT NULL,
     CONSTRAINT GroupList_pk PRIMARY KEY (id)
 );
