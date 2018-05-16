@@ -12,7 +12,7 @@ export default class AssignmentPS {
         'INSERT INTO "assignmentlist" ("title", "description") VALUES ($1, $2) RETURNING title, description, id, course_id');
 
     private static updateAssignmentById: PreparedStatement = new PreparedStatement("update-assignment-by-id",
-        'UPDATE assignmentlist SET title=$1, description=$2, course_id=$3 WHERE id=$4  RETURNING title, description, id, course_id');
+        "UPDATE assignmentlist SET title=$1, description=$2, course_id=$3 WHERE id=$4  RETURNING title, description, id, course_id");
 
 
     /**
