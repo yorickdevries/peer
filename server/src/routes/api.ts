@@ -22,22 +22,11 @@ router.get("/users", function (req, res, next) {
  * function for test purposes
  */
 
-router.post("/testquery", function(req, res) {
+router.post("/testquery", async function(req, res) {
     const netId = req.body.netid;
     const email = req.body.email;
 
-    UserPS.executeAddUser(netId, email)
-        .then(function (data: pgPromise.queryResult) {
-            res.json(data);
-        })
-        .catch(function (err: Error) {
-            // If it failed, return error
-            console.log(err);
-            res.json(
-                {
-                    error: "There was a problem adding the information to the database."
-                });
-        });
+    res.json(await Database.fetchResults(UserPS.executeGetUserByEmail("p.j.vanderlaan-1@student.tudelft.nl")));
 });
 
 

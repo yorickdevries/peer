@@ -53,6 +53,19 @@ export default class Database {
       return Database.db.any(statement);
   }
 
+  public static async fetchResults(queryResult: Promise<pgPromise.queryResult>) {
+    let result;
+    const db_result = await queryResult.then(function (data: pgPromise.queryResult) {
+        result = data;
+    })
+        .catch(function (err: Error) {
+            result = {
+                error: "There was a problem adding the information to the database."
+            };
+        });
+
+    return result;
+  }
 }
 
 Database.initialize();
