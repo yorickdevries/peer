@@ -24,7 +24,7 @@ export default class CoursesPS {
      * @param {number} id
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeGetAssignmentByCourseIs(id: number): Promise<pgPromise.queryResult> {
+    public static executeGetAssignmentByCourseId(id: number): Promise<pgPromise.queryResult> {
         this.getAssignmentByCourseId.values = [id];
         return Database.executeQuery(this.getAssignmentByCourseId);
     }
