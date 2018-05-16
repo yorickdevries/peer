@@ -37,7 +37,7 @@ export default class AssignmentPS {
     }
 
     /**
-     * Executes a 'get assignment by course id and assignment id'.
+     * Executes a 'insert assignment'.
      * @param {string} title - a title.
      * @param {string} description - a description.
      * @return {any} a query result.
