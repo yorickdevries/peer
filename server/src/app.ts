@@ -28,6 +28,22 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "./public")));
 
+//sample method to trigger login
+app.get('/loginpage', (req: any, res) => {
+  if (req.isAuthenticated()) {
+    console.log(req.userinfo);
+    res.send(`Hello ${req.userinfo.name}! <a href="logout">Logout</a>`);
+  } else {
+    res.send('Please <a href="/login">login</a>');
+  }
+});
+
+// logout route
+app.get('/logout', (req: any, res) => {
+  req.logout();
+  res.redirect('/');
+});
+
 app.use("/api", api);
 
 // catch 404 and forward to error handler
