@@ -1,5 +1,6 @@
 import { Router } from "express";
-import UserPS from "../prepared_statements/courses_ps";
+import CoursesPS from "../prepared_statements/courses_ps";
+import UserPS from "../prepared_statements/user_ps";
 const router = Router();
 
 // import database object
