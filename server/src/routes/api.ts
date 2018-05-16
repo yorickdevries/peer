@@ -4,22 +4,22 @@ import AssignmentPS from "../prepared_statements/assignment_ps";
 import UserPS from "../prepared_statements/user_ps";
 const router = Router();
 
-
 /**
  * Route to get all assignments for a specific course.
- * @body course_id - course id.
+ * @param course_id - course id.
  */
-router.get("/assignments", async (req, res) => {
-    res.json(await AssignmentPS.executeGetAssignments(req.body.course_id));
+router.get("/assignments/:course_id", async (req, res) => {
+    let re = await AssignmentPS.executeGetAssignments(req.params.course_id);
+    res.json(re);
 });
 
 /**
  * Route to get an assignment for a specific course and assignment id.
- * @body assignment_id - assignment id.
- * @body assignment_id - assignment id to get.
+ * @param assignment_id - assignment id.
+ * @param assignment_id - assignment id to get.
  */
-router.get("/assignment", async (req, res) => {
-    res.json(await AssignmentPS.executeAddAssignment(req.body.course_id, req.body.assignment_id));
+router.get("/assignment/:course_id/:assignment_id", async (req, res) => {
+    res.json(await AssignmentPS.executeGetAssignmentById(req.params.course_id, req.params.assignment_id));
 });
 
 /**
@@ -28,7 +28,7 @@ router.get("/assignment", async (req, res) => {
  * @body assignment_id - assignment id.
  */
 router.post("/assignment", async (req, res) => {
-    res.json(await AssignmentPS.executeGetAssignmentById(req.body.assignment_title, req.body.assignment_description));
+    res.json(await AssignmentPS.executeAddAssignment(req.body.assignment_title, req.body.assignment_description));
 });
 
 /**
