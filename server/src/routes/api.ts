@@ -27,7 +27,7 @@ router.post("/testquery", async function(req, res) {
     const netId = req.body.netid;
     const email = req.body.email;
 
-    res.json(await UserPS.executeCreateCourse("update", "p.j.vanderlaan-1@student.tudelft.nl"));
+    res.json(await CoursesPS.executeCreateCourse("update", "p.j.vanderlaan-1@student.tudelft.nl"));
 });
 
 
