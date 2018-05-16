@@ -3,10 +3,24 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
+// Okta-login
+import session from "express-session";
+import { oidc } from "./express-oidc";
 
 import api from "./routes/api";
 
 const app: express.Express = express();
+
+// Okta login
+// session support is required to use ExpressOIDC
+// needs a random secret
+app.use(session({
+  secret: 'add something random here',
+  resave: true,
+  saveUninitialized: false
+}));
+// ExpressOIDC will attach handlers for the /login and /authorization-code/callback routes
+app.use(oidc.router);
 
 app.use(logger("dev"));
 app.use(express.json());
