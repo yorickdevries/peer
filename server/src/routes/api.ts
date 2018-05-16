@@ -43,12 +43,6 @@ router.route("/assignment")
             req.body.assignment_id));
     });
 
-/**
- * Route to get all courses.
- */
-router.get('/courses', async (req, res) => {
-    res.json(await CoursesPS.executeGetAllCourses());
-});
 
 /**
  * Route to get information for a specific course.
@@ -58,23 +52,21 @@ router.get('/courses/:courseId', async (req, res) => {
     res.json(await CoursesPS.executeGetCourseById(req.params.courseId));
 });
 
-/**
- * Route that creates a new course
- * @body description - description
- * @body name - na,e
- */
-router.post('/courses', async (req, res) => {
-    res.json(await CoursesPS.executeCreateCourse(req.body.description, req.body.name));
-});
 
 /**
  * Route to update a course
+ * Route that creates a new course
+ * Route to get all courses.
  * @body id - id
  * @body description - description
  * @body name - name
  */
-router.put('/courses', async (req, res) => {
+router.route('/courses').put(async (req, res) => {
     res.json(await CoursesPS.executeUpdateCourse(req.body.id, req.body.description, req.body.name));
+}).post(async (req, res) => {
+    res.json(await CoursesPS.executeCreateCourse(req.body.description, req.body.name));
+}).get(async (req, res) => {
+    res.json(await CoursesPS.executeGetAllCourses());
 });
 
 /**
