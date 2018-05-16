@@ -3,8 +3,6 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 import express = require("express");
 
 export default class GroupsPS {
-    private static db: Database;
-
     public static addGroup: PreparedStatement = new PreparedStatement("add-group",
         'INSERT INTO "grouplist" ("group_name") VALUES ($1)');
 

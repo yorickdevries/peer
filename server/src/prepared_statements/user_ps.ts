@@ -3,7 +3,6 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 import express = require("express");
 
 export default class UserPS {
-    private static db: Database = new Database();
     public static addUser: PreparedStatement = new PreparedStatement("add-user",
         'INSERT INTO "userlist" ("netid", "email") VALUES ($1, $2)');
 
