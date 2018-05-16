@@ -9,12 +9,15 @@ export default class UserPS {
         '("group_name") VALUES ($1)');
 
     public static getGroupById: PreparedStatement = new PreparedStatement("get-group-id", 'SELECT * FROM ' +
-        '"grouplist" WHERE "id" LIKE ($1)')
+        '"grouplist" WHERE "id" LIKE ($1)');
+
+    public static getUserOfGroupById: PreparedStatement = new PreparedStatement("get-all-users-group",
+        'SELECT * FROM "groupusers" WHERE "id" LIKE ($1)');
 
 
 
     /**
-     * Excecutes a 'ad user' query
+     * Executes a 'ad user' query
      * @param {e.Response} res
      * @param {string} name
      */
@@ -24,13 +27,23 @@ export default class UserPS {
     }
 
     /**
-     * Excecutes a 'get user' query
+     * Executes a 'get user' query
      * @param {e.Response} res
      * @param {number} id
      */
-    public static excecuteGetUserById(res: express.Response, id: number) {
+    public static execcuteGetUserById(res: express.Response, id: number) {
         this.getGroupById.values = [id];
         res.json(this.db.executeQuery(this.getGroupById));
+    }
+
+    /**
+     * Executes a 'get all users of group' query
+     * @param {e.Response} res
+     * @param {number} id
+     */
+    public static executeGetUserOfGroupById(res: express.Response, id: number) {
+        this.getUserOfGroupById.values = [id];
+        res.json(this.db.executeQuery(this.getUserOfGroupById));
     }
 
 }
