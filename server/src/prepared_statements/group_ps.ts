@@ -22,40 +22,44 @@ export default class UserPS {
      * Executes a 'get all groups per exercise' query
      * @param {e.Response} res
      * @param {number} id
+     * @return {any} a query result.
      */
     public static executeGetGroupByExerciseId (res: express.Response, id: number) {
         this.getGroupsByExericeId.values = [id];
-        res.json(this.db.executeQuery(this.getGroupsByExericeId));
+        return this.db.executeQuery(this.getGroupsByExericeId);
     }
 
     /**
      * Executes a 'ad user' query
      * @param {e.Response} res
      * @param {string} name
+     * @return {any} a query result.
      */
     public static executeAddGroup(res: express.Response, name: string) {
         this.addGroup.values = [name];
-        res.json(this.db.executeQuery(this.addGroup));
+        return this.db.executeQuery(this.addGroup);
     }
 
     /**
      * Executes a 'get user' query
      * @param {e.Response} res
      * @param {number} id
+     * @return {any} a query result.
      */
     public static execcuteGetUserById(res: express.Response, id: number) {
         this.getGroupById.values = [id];
-        res.json(this.db.executeQuery(this.getGroupById));
+        return this.db.executeQuery(this.getGroupById);
     }
 
     /**
      * Executes a 'get all users of group' query
      * @param {e.Response} res
      * @param {number} id
+     * @return {any} a query result.
      */
     public static executeGetUserOfGroupById(res: express.Response, id: number) {
         this.getUserOfGroupById.values = [id];
-        res.json(this.db.executeQuery(this.getUserOfGroupById));
+        return this.db.executeQuery(this.getUserOfGroupById);
     }
 
 }

@@ -45,7 +45,8 @@
     "is-ci": "^1.1.0",
     "jade": "~1.11.0",
     "morgan": "~1.9.0",
-    "pg-promise": "8.4.4"
+    "pg-promise": "8.4.4",
+    "node-mocks-http": "latest"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",

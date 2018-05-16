@@ -1,6 +1,6 @@
 import promise from "bluebird";
 import isCI from "is-ci";
-import pgp, {errors, PreparedStatement} from "pg-promise";
+import pgp, {errors, default as pgPromise, PreparedStatement} from "pg-promise";
 
 export default class Database {
   static connection: {
@@ -42,23 +42,15 @@ export default class Database {
     await this.db.any(qf);
   }
 
+
   /**
    * Execute a prepared statements on this database.
    * @param {pgPromise.PreparedStatement} statement - a pg promise prepared statement.
+   * @return {pgPromise.queryResult} queryResult - a query result.
    */
-  public executeQuery(statement : PreparedStatement) {
-      // Execute prepared statement on database and respond with the json resulting object.
-      return Database.db.any(statement)
-          .then((data : any) => {
-              return data;
-          })
-          .catch((err : Error) => {
-              return {
-                error: err,
-                statement: statement,
-                msg: "There was a problem adding the information to the database.: "
-              };
-          });
+  public executeQuery(statement : PreparedStatement) : pgPromise.queryResult {
+      // Execute prepared statement on database and respond a promise.
+      return Database.db.any(statement);
   }
 
 }

@@ -3,7 +3,7 @@ import pgp, { PreparedStatement } from "pg-promise";
 import express = require("express");
 
 export default class UserPS {
-    private static db: Database;
+    private static db: Database = new Database();
     public static addUser: PreparedStatement = new PreparedStatement("add-user",
         'INSERT INTO "userlist" ("netid", "email") VALUES ($1, $2)');
 
@@ -26,72 +26,72 @@ export default class UserPS {
 
     /**
      * Executes an 'add user query'.
-     * @param {Response} res - a response.
-     * @param {string} netid - a net id.
+     * @param {string} netId - a net id.
      * @param {string} email - an email.
+     * @return {any} a query result.
      */
-    public static executeAddUser(res: express.Response, netid: string, email: string) {
-        this.addUser.values = [netid, email];
-        res.json(this.db.executeQuery(this.addUser));
+    public static executeAddUser(netId: string, email: string) {
+        this.addUser.values = [netId, email];
+        return this.db.executeQuery(this.addUser);
     }
 
     /**
      * Executes a 'get user by user id' query.
-     * @param {Response} res - a response.
-     * @param {number} userId - an id.
+     * @param {string} netId - an user id.
+     * @return {any} a query result.
      */
-    public static executeGetUserById(res: express.Response, userId: number) {
-        this.getUserById.values = [userId];
-        res.json(this.db.executeQuery(this.getUserById));
+    public static async executeGetUserById(netId: string) {
+        this.getUserById.values = [netId];
+        return this.db.executeQuery(this.getUserById);
     }
 
     /**
      * Executes a 'get user by email' query.
-     * @param {Response} res - a response.
      * @param {string} email - an email.
+     * @return {any} a query result.
      */
-    public static executeGetUserByEmail(res: express.Response, email: string) {
+    public static executeGetUserByEmail(email: string) {
         this.getUserByEmail.values = [email];
-        res.json(this.db.executeQuery(this.getUserByEmail));
+        return this.db.executeQuery(this.getUserByEmail);
     }
 
     /**
      * Executes a 'get courses ids by user id' query.
-     * @param {Response} res - a response.
      * @param {number} userId - a user id.
+     * @return {any} a query result.
      */
-    public static executeGetCoursesIdById(res: express.Response, userId: number) {
+    public static executeGetCoursesIdById(userId: number) {
         this.getCoursesIdById.values = [userId];
-        res.json(this.db.executeQuery(this.getCoursesIdById));
+        return this.db.executeQuery(this.getCoursesIdById);
     }
 
     /**
      * Executes a 'get group by user id' query.
-     * @param {Response} res - a response.
      * @param {number} userId - a user id.
+     * @return {any} a query result.
      */
-    public static executeGetGroupsById(res: express.Response, userId: number) {
+    public static executeGetGroupsById(userId: number) {
         this.getGroupsById.values = [userId];
-        res.json(this.db.executeQuery(this.getGroupsById));
+        return this.db.executeQuery(this.getGroupsById);
     }
 
     /**
      * Executes a 'get submission by user id' query.
-     * @param {Response} res - a response.
      * @param {number} userId - a user id.
+     * @return {any} a query result.
      */
-    public static executeGetSubmissionById(res: express.Response, userId: number) {
+    public static executeGetSubmissionById(userId: number) {
         this.getSubmissionsById.values = [userId];
-        res.json(this.db.executeQuery(this.getSubmissionsById));
+        return this.db.executeQuery(this.getSubmissionsById);
     }
 
     /**
      * Executes a 'get review by user id' query.
-     * @param {Response} res - a response.
-     * @param {number} userId - a user id.
+     * @param {number} userId
+     * @return {any} a query result.
      */
-    public static executeGetReviewById(res: express.Response, userId: number) {
+    public static executeGetReviewById(userId: number) {
         this.getReviewsById.values = [userId];
-        res.json(this.db.executeQuery(this.getReviewsById));
+        return this.db.executeQuery(this.getReviewsById);
     }
 }
