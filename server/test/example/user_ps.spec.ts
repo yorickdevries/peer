@@ -17,7 +17,7 @@ describe("UserPreparedStatements Test", () => {
         let expectNetid = "wrong";
         let expectEmail = "wrong";
 
-        let db_prom = UserPS.executeGetUserById("paulvanderlaan")
+        const db_prom = UserPS.executeGetUserById("paulvanderlaan")
             .then(function (data: any) {
                 expectNetid = data[0].netid;
                 expectEmail = data[0].email;
