@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import FeedbackSingle from './FeedbackSingle'
+import FeedbackSingle from './Feedback'
 
 export default {
     components: {

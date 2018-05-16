@@ -23,13 +23,13 @@
 
 <script>
 export default {
-    name: "StudentDashboardMain",
+    name: "student-dashboard.index",
     data() {
         return {
             crumbs: [
                 {
                     text: 'Dashboard',
-                    to: { name: 'StudentDashBoardMainPage'},
+                    to: { name: 'student-dashboard.indexPage'},
                     active: true
                 }
             ],
