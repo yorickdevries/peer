@@ -1,5 +1,5 @@
 import { Router } from "express";
-import UserPS from "../prepared_statements/user_ps";
+import UserPS from "../prepared_statements/courses_ps";
 const router = Router();
 
 // import database object
@@ -8,7 +8,7 @@ import * as pgPromise from "pg-promise";
 
 /* GET Userlist page in JSON. */
 router.get("/users", function (req, res, next) {
-    Database.db.any("SELECT * FROM userlist")
+    Database.db.any("SELECT * FROM courselist")
         .then(function (data: object) {
             res.status(200)
                 .json(data);
@@ -26,7 +26,7 @@ router.post("/testquery", async function(req, res) {
     const netId = req.body.netid;
     const email = req.body.email;
 
-    res.json(await UserPS.executeGetUserByEmail("p.j.vanderlaan-1@student.tudelft.nl"));
+    res.json(await UserPS.executeCreateCourse("update", "p.j.vanderlaan-1@student.tudelft.nl"));
 });
 
 

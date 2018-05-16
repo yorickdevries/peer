@@ -10,9 +10,23 @@ export default class CoursesPS {
         'SELECT * FROM "courselist" WHERE "id" LIKE $1');
 
     public static createCourse: PreparedStatement = new PreparedStatement("create-course",
-        'INSERT INTO "courselist" ("description", "name") VALUES ($1, $2)');
+        'INSERT INTO "courselist" ("description", "name") VALUES ($1, $2) RETURNING (id, description, name)');
+
+    public static updateCourse: PreparedStatement = new PreparedStatement("update-course",
+        'UPDATE "courselist" SET ("description", "name") = ($1, $2) WHERE "id" = $3 RETURNING(id, description, name')
 
 
+    public static executeUpdateCourse(id: number, description: string, name: string): Promise<pgPromise.queryResult> {
+        this.updateCourse.values = [description, name, id];
+        return Database.executeQuery(this.updateCourse);
+    }
+
+    /**
+     * Executes a 'create course' query
+     * @param {string} description
+     * @param {string} name
+     * @returns {Promise<pgPromise.queryResult>}
+     */
     public static executeCreateCourse(description: string, name: string): Promise<pgPromise.queryResult> {
         this.createCourse.values = [description, name];
         return Database.executeQuery(this.createCourse);
