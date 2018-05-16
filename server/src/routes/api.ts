@@ -15,7 +15,7 @@ router.get("/assignments", async (req, res) => {
 
 /**
  * Route to get an assignment for a specific course and assignment id.
- * @body course_id - course id.
+ * @body assignment_id - assignment id.
  * @body assignment_id - assignment id to get.
  */
 router.get("/assignment", async (req, res) => {
@@ -24,11 +24,26 @@ router.get("/assignment", async (req, res) => {
 
 /**
  * Route to post an assignment with a title and description
- * @body course_title - assignment title.
- * @body course_description - assignment description.
+ * @body course_id - course id.
+ * @body assignment_id - assignment id.
  */
 router.post("/assignment", async (req, res) => {
-    res.json(await AssignmentPS.executeGetAssignmentById(req.body.course_title, req.body.course_description));
+    res.json(await AssignmentPS.executeGetAssignmentById(req.body.assignment_title, req.body.assignment_description));
+});
+
+/**
+ * Route to update an assignment with a title, description, course and assignment id.
+ * @body assignment_title - assignment title.
+ * @body assignment_description - assignment description.
+ * @body course_id - course id.
+ * @body assignment_id - assignment id.
+ */
+router.put("/assignment", async (req, res) => {
+    res.json(await AssignmentPS.executeUpdateAssignmentById(
+        req.body.assignment_title,
+        req.body.assignment_description,
+        req.body.course_id,
+        req.body.assignment_id));
 });
 
 export default router;
