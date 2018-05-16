@@ -5,12 +5,13 @@ import Database from "../database";
 // okta-login
 import { oidc } from "../express-oidc";
 
+// Only logged in users can access the API
 router.use("/", function (req: any, res, next) {
     if (req.isAuthenticated()) {
+        console.log(req.userinfo.given_name + " accesses the API");
         next();
     } else {
-        // send empty json
-        res.json({});
+        next(new Error("Not Authenticated"));
     }
 });
 
