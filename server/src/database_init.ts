@@ -6,7 +6,7 @@ const qf = new pgpromise.QueryFile("../database_dumps/ED3-FullDataBase.sql");
 
 // import database
 console.log("Importing database");
-const import_db = async function () {
+const importDatabase = async function () {
     try {
         await Database.DatabaseImport(qf);
         console.log("Imported database to: " + Database.connection.database + "@" + Database.connection.host);
@@ -15,4 +15,4 @@ const import_db = async function () {
         process.exit(1);
     }
 };
-import_db();
+importDatabase();

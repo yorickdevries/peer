@@ -25,7 +25,7 @@ describe("Database Test", () => {
   it("database connection correct", async () => {
     const db = Database.db;
     let result;
-    const db_prom = db.any("SELECT * FROM userlist")
+    const dbPromise = db.any("SELECT * FROM userlist")
       .then(function (data: any) {
         result = data[0].netid;
       }).catch(function (err: Error) {
@@ -33,14 +33,14 @@ describe("Database Test", () => {
       });
 
     // wait for database promise to finish
-    await db_prom;
+    await dbPromise;
     expect(result).to.equal("paulvanderlaan");
   });
 
   it("database connection error", async () => {
     const db = Database.db;
     let result;
-    const db_prom = db.any("SELECT * FROM invalidtable")
+    const dbPromise = db.any("SELECT * FROM invalidtable")
       .then(function (data: any) {
         result = data[0].netid;
       }).catch(function (err: Error) {
@@ -48,7 +48,7 @@ describe("Database Test", () => {
       });
 
     // wait for database promise to finish
-    await db_prom;
+    await dbPromise;
     expect(result).to.equal("error");
   });
 
