@@ -2,7 +2,7 @@ import Database from "../database";
 import pgp, { PreparedStatement } from "pg-promise";
 import express = require("express");
 
-export default class UserPS {
+export default class GroupsPS {
     private static db: Database;
 
     public static addGroup: PreparedStatement = new PreparedStatement("add-group",
