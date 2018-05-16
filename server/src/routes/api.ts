@@ -1,8 +1,18 @@
 import { Router } from "express";
 const router = Router();
-
 // import database object
 import Database from "../database";
+// okta-login
+import { oidc } from "../express-oidc";
+
+router.use("/", function (req: any, res, next) {
+    if (req.isAuthenticated()) {
+        next();
+      } else {
+        //send empty json
+        res.json( {} );
+      }
+});
 
 /* GET Userlist page in JSON. */
 router.get("/users", function (req, res, next) {
