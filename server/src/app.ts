@@ -6,9 +6,11 @@ import logger from "morgan";
 
 import api from "./routes/api";
 
+var bodyParser = require('body-parser');
 const app: express.Express = express();
 
 app.use(logger("dev"));
+app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
