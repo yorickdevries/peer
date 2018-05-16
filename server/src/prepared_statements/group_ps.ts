@@ -14,7 +14,19 @@ export default class UserPS {
     public static getUserOfGroupById: PreparedStatement = new PreparedStatement("get-all-users-group",
         'SELECT * FROM "groupusers" WHERE "id" LIKE ($1)');
 
+    public static getGroupsByExericeId: PreparedStatement = new PreparedStatement("get-all-groups-per-exercise",
+        'SELECT * FROM "groupexercise" WHERE "id" LIKE ($1)');
 
+
+    /**
+     * Executes a 'get all groups per exercise' query
+     * @param {e.Response} res
+     * @param {number} id
+     */
+    public static executeGetGroupByExerciseId (res: express.Response, id: number) {
+        this.getGroupsByExericeId.values = [id];
+        res.json(this.db.executeQuery(this.getGroupsByExericeId));
+    }
 
     /**
      * Executes a 'ad user' query
