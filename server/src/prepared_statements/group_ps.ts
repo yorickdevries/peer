@@ -1,5 +1,5 @@
 import Database from "../database";
-import pgp, { PreparedStatement } from "pg-promise";
+import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 import express = require("express");
 
 export default class GroupsPS {
@@ -24,7 +24,7 @@ export default class GroupsPS {
      * @param {number} id
      * @return {any} a query result.
      */
-    public static executeGetGroupByExerciseId (res: express.Response, id: number) {
+    public static executeGetGroupByExerciseId (res: express.Response, id: number): Promise<pgPromise.queryResult> {
         this.getGroupsByExericeId.values = [id];
         return this.db.executeQuery(this.getGroupsByExericeId);
     }
@@ -35,7 +35,7 @@ export default class GroupsPS {
      * @param {string} name
      * @return {any} a query result.
      */
-    public static executeAddGroup(res: express.Response, name: string) {
+    public static executeAddGroup(res: express.Response, name: string): Promise<pgPromise.queryResult> {
         this.addGroup.values = [name];
         return this.db.executeQuery(this.addGroup);
     }
@@ -46,7 +46,7 @@ export default class GroupsPS {
      * @param {number} id
      * @return {any} a query result.
      */
-    public static execcuteGetUserById(res: express.Response, id: number) {
+    public static execcuteGetUserById(res: express.Response, id: number): Promise<pgPromise.queryResult> {
         this.getGroupById.values = [id];
         return this.db.executeQuery(this.getGroupById);
     }
@@ -57,7 +57,7 @@ export default class GroupsPS {
      * @param {number} id
      * @return {any} a query result.
      */
-    public static executeGetUserOfGroupById(res: express.Response, id: number) {
+    public static executeGetUserOfGroupById(res: express.Response, id: number): Promise<pgPromise.queryResult> {
         this.getUserOfGroupById.values = [id];
         return this.db.executeQuery(this.getUserOfGroupById);
     }

@@ -48,7 +48,7 @@ export default class Database {
    * @param {pgPromise.PreparedStatement} statement - a pg promise prepared statement.
    * @return {pgPromise.queryResult} queryResult - a query result.
    */
-  public executeQuery(statement : PreparedStatement) : pgPromise.queryResult {
+  public executeQuery(statement : PreparedStatement): Promise<pgPromise.queryResult> {
       // Execute prepared statement on database and respond a promise.
       return Database.db.any(statement);
   }

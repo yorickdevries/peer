@@ -4,6 +4,7 @@ const router = Router();
 
 // import database object
 import Database from "../database";
+import * as pgPromise from "pg-promise";
 
 /* GET Userlist page in JSON. */
 router.get("/users", function (req, res, next) {
@@ -20,14 +21,24 @@ router.get("/users", function (req, res, next) {
 /**
  * function for test purposes
  */
-// router.post("/testquery", function(req, res) {
-//     const netId = req.query.netid;
-//     const email = req.query.email;
-//     console.log(req)
-//     console.log("test query");
-//     console.log(netId + " " + email);
-//     UserPS.executeAddUser(res, netId, email);
-// });
+
+router.post("/testquery", function(req, res) {
+    const netId = req.body.netid;
+    const email = req.body.email;
+
+    UserPS.executeAddUser(netId, email)
+        .then(function (data: pgPromise.queryResult) {
+            res.json(data);
+        })
+        .catch(function (err: Error) {
+            // If it failed, return error
+            console.log(err);
+            res.json(
+                {
+                    error: "There was a problem adding the information to the database."
+                });
+        });
+});
 
 
 /* POST to Add User Service */
