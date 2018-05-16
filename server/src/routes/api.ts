@@ -1,4 +1,5 @@
 import { Router } from "express";
+import UserPS from "../prepared_statements/user_ps";
 const router = Router();
 
 // import database object
@@ -15,6 +16,19 @@ router.get("/users", function (req, res, next) {
             next(err);
         });
 });
+
+/**
+ * function for test purposes
+ */
+// router.post("/testquery", function(req, res) {
+//     const netId = req.query.netid;
+//     const email = req.query.email;
+//     console.log(req)
+//     console.log("test query");
+//     console.log(netId + " " + email);
+//     UserPS.executeAddUser(res, netId, email);
+// });
+
 
 /* POST to Add User Service */
 router.post("/users", function (req, res) {
