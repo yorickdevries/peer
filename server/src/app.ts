@@ -15,7 +15,7 @@ const app: express.Express = express();
 // session support is required to use ExpressOIDC
 // needs a random secret
 app.use(session({
-  secret: 'add something random here',
+  secret: "add something random here",
   resave: true,
   saveUninitialized: false
 }));
@@ -28,8 +28,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "./public")));
 
-//sample method to trigger login
-app.get('/loginpage', (req: any, res) => {
+// sample method to trigger login
+app.get("/loginpage", (req: any, res) => {
   if (req.isAuthenticated()) {
     console.log(req.userinfo);
     res.send(`Hello ${req.userinfo.name}! <a href="logout">Logout</a>`);
@@ -39,9 +39,9 @@ app.get('/loginpage', (req: any, res) => {
 });
 
 // logout route
-app.get('/logout', (req: any, res) => {
+app.get("/logout", (req: any, res) => {
   req.logout();
-  res.redirect('/');
+  res.redirect("/");
 });
 
 app.use("/api", api);
@@ -59,7 +59,7 @@ app.use(function (err: any, req: any, res: any, next: any) {
 
   // render the error page
   res.status(err.status || 500);
-  res.json( {} );
+  res.json({});
 });
 
 export default app;

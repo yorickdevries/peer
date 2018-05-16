@@ -8,10 +8,10 @@ import { oidc } from "../express-oidc";
 router.use("/", function (req: any, res, next) {
     if (req.isAuthenticated()) {
         next();
-      } else {
-        //send empty json
-        res.json( {} );
-      }
+    } else {
+        // send empty json
+        res.json({});
+    }
 });
 
 /* GET Userlist page in JSON. */
@@ -36,7 +36,7 @@ router.post("/users", function (req, res) {
         .then(function () {
             // If it worked, set the header so the address bar doesn't still say /adduser
             // And forward to success page
-            res.json( { });
+            res.json({});
         })
         .catch(function (err: Error) {
             // If it failed, return error

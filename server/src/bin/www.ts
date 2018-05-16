@@ -29,11 +29,11 @@ const server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-oidc.on('ready', () => {
+oidc.on("ready", () => {
   server.listen(3000);
 });
-oidc.on('error', (err: Error) => {
-  console.log('Unable to configure ExpressOIDC', err);
+oidc.on("error", (err: Error) => {
+  console.log("Unable to configure ExpressOIDC", err);
 });
 
 server.on("error", onError);
