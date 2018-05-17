@@ -1,8 +1,19 @@
 import CoursePS from "../../src/prepared_statements/courses_ps";
 import { expect } from "chai";
 import "mocha";
+import Database from "../../src/database";
+
+// load the queryfile
+import { QueryFile } from "pg-promise";
+const qf = new QueryFile("../../../database_dumps/ED3-FullDataBase.sql");
 
 describe("CoursePreparedStatement Test", () => {
+    /**
+     * Make a clean database before each test.
+     */
+    beforeEach((done) => {
+        Database.DatabaseImport(qf).then(done);
+    });
 
     /**
      * Get all courses
@@ -32,14 +43,9 @@ describe("CoursePreparedStatement Test", () => {
     it("get assignment by course id", async () => {
         expect(await CoursePS.executeGetAssignmentByCourseId(1)).to.deep.equal([{
             course_id: 1,
-            description: "Description",
-            id: 2,
-            title: "New"
-        }, {
-            course_id: 1,
-            description: "updated",
+            description: "Example assignment number one",
             id: 1,
-            title: "Updated"
+            title: "Assignment 1"
         }]);
     });
 

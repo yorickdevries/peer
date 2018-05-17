@@ -1,8 +1,20 @@
 import AssignmentPS from "../../src/prepared_statements/assignment_ps";
 import { expect } from "chai";
 import "mocha";
+import Database from "../../src/database";
+
+// load the queryfile
+import { QueryFile } from "pg-promise";
+const qf = new QueryFile("../../../database_dumps/ED3-FullDataBase.sql");
 
 describe("AssignmentPreparedStatements Test", () => {
+    /**
+     * Make a clean database before each test.
+     */
+    beforeEach((done) => {
+        Database.DatabaseImport(qf).then(done);
+    });
+
     /**
      * Test get assignments by course id.
      */
