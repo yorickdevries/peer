@@ -48,7 +48,7 @@ router.route("/assignment")
  * Route to get information for a specific course.
  * @param course_id - courseId
  */
-router.get('/courses/:courseId', async (req, res) => {
+router.get("/courses/:courseId", async (req, res) => {
     res.json(await CoursesPS.executeGetCourseById(req.params.courseId));
 });
 
@@ -61,7 +61,7 @@ router.get('/courses/:courseId', async (req, res) => {
  * @body description - description
  * @body name - name
  */
-router.route('/courses').put(async (req, res) => {
+router.route("/courses").put(async (req, res) => {
     res.json(await CoursesPS.executeUpdateCourse(req.body.id, req.body.description, req.body.name));
 }).post(async (req, res) => {
     res.json(await CoursesPS.executeCreateCourse(req.body.description, req.body.name));
@@ -73,7 +73,7 @@ router.route('/courses').put(async (req, res) => {
  * Route that gets all assignments of a course.
  * @param courseId - courseId
  */
-router.get('/courses/:courseId/assignments', async (req, res) => {
+router.get("/courses/:courseId/assignments", async (req, res) => {
     res.json(await CoursesPS.executeGetAssignmentByCourseId(req.params.courseId));
 });
 
@@ -84,7 +84,7 @@ router.get('/courses/:courseId/assignments', async (req, res) => {
  * @body submission_id - submission_id
  * @body rubric_id - rubric_id
  */
-router.post('/peer-reviews', async (req, res) => {
+router.post("/peer-reviews", async (req, res) => {
     res.json(await ReviewPS.executeCreateReview(req.body.comment, req.body.user_netid, req.body.submission_id));
 });
 
