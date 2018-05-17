@@ -9,7 +9,7 @@ export default class AssignmentPS {
         'SELECT * FROM "assignmentlist" WHERE "course_id" = $1 AND "id" = $2');
 
     private static addAssignment: PreparedStatement = new PreparedStatement("addAssignment",
-        'INSERT INTO "assignmentlist" ("title", "description") VALUES ($1, $2) RETURNING title, description, id, course_id');
+        'INSERT INTO "assignmentlist" ("title", "description", "due_date", "publish_date", "course_id") VALUES ($1, $2, $3, $4, $5) RETURNING title, description, id, course_id, due_date, publish_date');
 
     private static updateAssignmentById: PreparedStatement = new PreparedStatement("update-assignment-by-id",
         "UPDATE assignmentlist SET title=$1, description=$2, course_id=$3 WHERE id=$4  RETURNING title, description, id, course_id");
@@ -40,10 +40,13 @@ export default class AssignmentPS {
      * Executes a 'insert assignment'.
      * @param {string} title - a title.
      * @param {string} description - a description.
+     * @param due_date - a due date.
+     * @param publish_date - a publish date.
+     * @param course_id - a course id.
      * @return {any} a query result.
      */
-    public static executeAddAssignment(title: string, description: string): Promise<pgPromise.queryResult> {
-        this.addAssignment.values = [title, description];
+    public static executeAddAssignment(title: string, description: string, due_date: Date, publish_date: Date, course_id: number): Promise<pgPromise.queryResult> {
+        this.addAssignment.values = [title, description, due_date, publish_date, course_id];
         return Database.executeQuery(this.addAssignment);
     }
 
