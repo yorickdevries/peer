@@ -85,7 +85,7 @@ router.get('/courses/:courseId/assignments', async (req, res) => {
  * @body rubric_id - rubric_id
  */
 router.post('/peer-reviews', async (req, res) => {
-    res.json(await ReviewPS.executeCreateReview(req.body.comment, req.body.user_netid, req.body.submission_id, req.body.rubric_id));
+    res.json(await ReviewPS.executeCreateReview(req.body.comment, req.body.user_netid, req.body.submission_id));
 });
 
 export default router;
