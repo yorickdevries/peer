@@ -17,22 +17,22 @@ export default class AssignmentPS {
 
     /**
      * Executes a 'get assignment by course id'.
-     * @param {string} course_id - a course id.
+     * @param {string} courseId - a course id.
      * @return {any} a query result.
      */
-    public static executeGetAssignments(course_id: number): Promise<pgPromise.queryResult> {
-        this.getAssignments.values = [course_id];
+    public static executeGetAssignments(courseId: number): Promise<pgPromise.queryResult> {
+        this.getAssignments.values = [courseId];
         return Database.executeQuery(this.getAssignments);
     }
 
     /**
      * Executes a 'get assignment by course id and assignment id'.
-     * @param {string} course_id - a course id.
-     * @param {string} assignment_id - an assignment id.
+     * @param {string} courseId - a course id.
+     * @param {string} assignmentId - an assignment id.
      * @return {any} a query result.
      */
-    public static executeGetAssignmentById(course_id: number, assignment_id: number): Promise<pgPromise.queryResult> {
-        this.getAssignmentById.values = [course_id, assignment_id];
+    public static executeGetAssignmentById(courseId: number, assignmentId: number): Promise<pgPromise.queryResult> {
+        this.getAssignmentById.values = [courseId, assignmentId];
         return Database.executeQuery(this.getAssignmentById);
     }
 
@@ -40,13 +40,13 @@ export default class AssignmentPS {
      * Executes a 'insert assignment'.
      * @param {string} title - a title.
      * @param {string} description - a description.
-     * @param due_date - a due date.
-     * @param publish_date - a publish date.
-     * @param course_id - a course id.
+     * @param dueDate - a due date.
+     * @param publishDate - a publish date.
+     * @param courseId - a course id.
      * @return {any} a query result.
      */
-    public static executeAddAssignment(title: string, description: string, due_date: Date, publish_date: Date, course_id: number): Promise<pgPromise.queryResult> {
-        this.addAssignment.values = [title, description, due_date, publish_date, course_id];
+    public static executeAddAssignment(title: string, description: string, dueDate: Date, publishDate: Date, courseId: number): Promise<pgPromise.queryResult> {
+        this.addAssignment.values = [title, description, dueDate, publishDate, courseId];
         return Database.executeQuery(this.addAssignment);
     }
 
@@ -54,15 +54,15 @@ export default class AssignmentPS {
      * Executes a 'update assignment by assignment id'.
      * @param {string} title - a title.
      * @param {string} description - a description.
-     * @param course_id - a course id.
-     * @param assignment_id - an assignment id.
+     * @param courseId - a course id.
+     * @param assignmentId - an assignment id.
      * @return {any} a query result.
      */
     public static executeUpdateAssignmentById(title: string,
                                               description: string,
-                                              course_id: number,
-                                              assignment_id: number): Promise<pgPromise.queryResult> {
-        this.updateAssignmentById.values = [title, description, course_id, assignment_id];
+                                              courseId: number,
+                                              assignmentId: number): Promise<pgPromise.queryResult> {
+        this.updateAssignmentById.values = [title, description, courseId, assignmentId];
         return Database.executeQuery(this.updateAssignmentById);
     }
 }
