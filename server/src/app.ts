@@ -3,24 +3,12 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-// Okta-login
+
 import session from "express-session";
 import { oidc } from "./express-oidc";
 
 import api from "./routes/api";
-
 const app: express.Express = express();
-
-// Okta login
-// session support is required to use ExpressOIDC
-// needs a random secret
-app.use(session({
-  secret: "add something random here",
-  resave: true,
-  saveUninitialized: false
-}));
-// ExpressOIDC will attach handlers for the /login and /authorization-code/callback routes
-app.use(oidc.router);
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -28,17 +16,22 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "./public")));
 
-// Retruns boolean whether a user is logged in
-app.get("/authenticated", function (req: any, res) {
-  if (req.isAuthenticated()) {
-    res.json({ authenticated: true });
-  } else {
-    res.json({ authenticated: false });
-  }
+// OKTA login - session support is required to use Express OIDC
+app.use(session({
+  secret: "add something random here",
+  resave: true,
+  saveUninitialized: false
+}));
+
+// Login/login-redirect route from OIDC
+app.use(oidc.router);
+
+// Authentication route
+app.get("/api/authenticated", function (req: any, res) {
+    res.json({ authenticated: req.isAuthenticated() });
 });
 
-// logout route
-app.get("/logout", (req: any, res) => {
+app.get("/api/logout", (req: any, res) => {
   req.logout();
   res.redirect("/");
 });
