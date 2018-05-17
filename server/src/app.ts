@@ -28,13 +28,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "./public")));
 
-// sample method to trigger login
-app.get("/loginpage", (req: any, res) => {
+// Retruns boolean whether a user is logged in
+app.get("/authenticated", function (req: any, res) {
   if (req.isAuthenticated()) {
-    console.log(req.userinfo);
-    res.send(`Hello ${req.userinfo.name}! <a href="logout">Logout</a>`);
+    res.json({ authenticated: true });
   } else {
-    res.send('Please <a href="/login">login</a>');
+    res.json({ authenticated: false });
   }
 });
 
@@ -61,7 +60,7 @@ app.use(function (err: any, req: any, res: any, next: any) {
 
   // render the error page
   res.status(err.status || 500);
-  res.json( { error: "error"} ) ;
+  res.json({ error: "error" });
 });
 
 export default app;

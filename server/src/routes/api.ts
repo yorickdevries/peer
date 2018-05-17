@@ -6,13 +6,19 @@ import Database from "../database";
 import { oidc } from "../express-oidc";
 
 // Only logged in users can access the API
-router.use("/", function (req: any, res, next) {
+router.use(function (req: any, res, next) {
     if (req.isAuthenticated()) {
         console.log(req.userinfo.given_name + " accesses the API");
         next();
     } else {
         next(new Error("Not Authenticated"));
     }
+});
+
+router.get("/user", function (req: any, res, next) {
+    res.json({
+        user: req.userinfo
+    });
 });
 
 /* GET Userlist page in JSON. */
