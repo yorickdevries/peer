@@ -1,6 +1,4 @@
 import Database from "../../src/database";
-import UserPS from "../../src/prepared_statements/user_ps";
-const databaseObject = new Database();
 
 import { expect } from "chai";
 import "mocha";
