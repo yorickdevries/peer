@@ -1,6 +1,6 @@
 import promise from "bluebird";
 import isCI from "is-ci";
-import pgp, {errors, default as pgPromise, PreparedStatement} from "pg-promise";
+import pgp, { errors, default as pgPromise, PreparedStatement } from "pg-promise";
 
 export default class Database {
   static connection: {
