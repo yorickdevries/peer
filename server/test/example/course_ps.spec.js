@@ -61,6 +61,52 @@ describe("CoursePreparedStatement Test", function () {
         });
     }); });
     /**
+     * Get cousre by id
+     */
+    it("get course by id", function () { return __awaiter(_this, void 0, void 0, function () {
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _a = chai_1.expect;
+                    return [4 /*yield*/, courses_ps_1.default.executeGetCourseById(1)];
+                case 1:
+                    _a.apply(void 0, [_b.sent()]).to.deep.equal([{
+                            description: 'This is a beautiful course description!',
+                            id: 1,
+                            name: 'ED-3'
+                        }]);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    /**
+     * Get assignment by courseid
+     */
+    it("get assignment by course id", function () { return __awaiter(_this, void 0, void 0, function () {
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _a = chai_1.expect;
+                    return [4 /*yield*/, courses_ps_1.default.executeGetAssignmentByCourseId(1)];
+                case 1:
+                    _a.apply(void 0, [_b.sent()]).to.deep.equal([{
+                            course_id: 1,
+                            description: "Description",
+                            id: 2,
+                            title: "New"
+                        }, {
+                            course_id: 1,
+                            description: "updated",
+                            id: 1,
+                            title: "Updated"
+                        }]);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    /**
      * Test create a course
      */
     it("createa a course", function () { return __awaiter(_this, void 0, void 0, function () {
@@ -74,6 +120,26 @@ describe("CoursePreparedStatement Test", function () {
                     _a.apply(void 0, [_b.sent()]).to.deep.equal([{
                             description: 'hi',
                             id: 2,
+                            name: 'super leuk'
+                        }]);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    /**
+     * Test update a course
+     */
+    it("update a course", function () { return __awaiter(_this, void 0, void 0, function () {
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _a = chai_1.expect;
+                    return [4 /*yield*/, courses_ps_1.default.executeUpdateCourse(1, 'hi', 'super leuk')];
+                case 1:
+                    _a.apply(void 0, [_b.sent()]).to.deep.equal([{
+                            description: 'hi',
+                            id: 1,
                             name: 'super leuk'
                         }]);
                     return [2 /*return*/];

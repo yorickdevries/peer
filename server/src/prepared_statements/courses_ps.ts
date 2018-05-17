@@ -7,7 +7,7 @@ export default class CoursesPS {
         'SELECT * FROM "courselist"');
 
     private static getCourseById: PreparedStatement = new PreparedStatement("get-course-by-id",
-        'SELECT * FROM "courselist" WHERE "id" LIKE $1');
+        'SELECT * FROM "courselist" WHERE "id" = $1');
 
     private static createCourse: PreparedStatement = new PreparedStatement("create-course",
         'INSERT INTO "courselist" ("description", "name") VALUES ($1, $2) RETURNING id, description, name');
@@ -16,7 +16,7 @@ export default class CoursesPS {
         'UPDATE "courselist" SET ("description", "name") = ($1, $2) WHERE "id" = $3 RETURNING id, description, name');
 
     private static getAssignmentByCourseId: PreparedStatement = new PreparedStatement("get-assignment-of-course",
-        'SELECT * FROM "assignmentlist" WHERE "course_id" LIKE $1');
+        'SELECT * FROM "assignmentlist" WHERE "course_id" = $1');
 
 
     /**

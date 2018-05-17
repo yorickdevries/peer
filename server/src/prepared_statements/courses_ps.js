@@ -54,10 +54,10 @@ var CoursesPS = /** @class */ (function () {
         return database_1.default.executeQuery(this.getCourseById);
     };
     CoursesPS.getAllCourses = new pg_promise_1.PreparedStatement("get-all-courses", 'SELECT * FROM "courselist"');
-    CoursesPS.getCourseById = new pg_promise_1.PreparedStatement("get-course-by-id", 'SELECT * FROM "courselist" WHERE "id" LIKE $1');
+    CoursesPS.getCourseById = new pg_promise_1.PreparedStatement("get-course-by-id", 'SELECT * FROM "courselist" WHERE "id" = $1');
     CoursesPS.createCourse = new pg_promise_1.PreparedStatement("create-course", 'INSERT INTO "courselist" ("description", "name") VALUES ($1, $2) RETURNING id, description, name');
     CoursesPS.updateCourse = new pg_promise_1.PreparedStatement("update-course", 'UPDATE "courselist" SET ("description", "name") = ($1, $2) WHERE "id" = $3 RETURNING id, description, name');
-    CoursesPS.getAssignmentByCourseId = new pg_promise_1.PreparedStatement("get-assignment-of-course", 'SELECT * FROM "assignmentlist" WHERE "course_id" LIKE $1');
+    CoursesPS.getAssignmentByCourseId = new pg_promise_1.PreparedStatement("get-assignment-of-course", 'SELECT * FROM "assignmentlist" WHERE "course_id" = $1');
     return CoursesPS;
 }());
 exports.default = CoursesPS;
