@@ -1,4 +1,5 @@
 import Database from "../../src/database";
+
 import { expect } from "chai";
 import "mocha";
 
@@ -51,5 +52,4 @@ describe("Database Test", () => {
     await dbPromise;
     expect(result).to.equal("error");
   });
-
 });
