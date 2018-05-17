@@ -16,7 +16,7 @@
                         <p class="card-text">
                             {{ course.description}}
                         </p>
-                        <b-button variant="success" :to="{ name: 'StudentDashboardCourse', params: { id: course.id } }">Enter</b-button>
+                        <b-button variant="success" :to="{ name: 'student-dashboard.course', params: { id: course.id } }">Enter</b-button>
                     </b-card>
 
                 </b-col>
@@ -27,15 +27,15 @@
 
 <script>
     export default {
-        name: "StudentDashboardCourses",
+        name: "student-dashboard",
         data() {
             return {
                 items: [{
                     text: 'Dashboard',
-                    to: { name: 'StudentDashboardMain'}
+                    to: { name: 'student-dashboard.index'}
                 }, {
                     text: 'Courses',
-                    to: { name: 'StudentDashboardCourses'}
+                    to: { name: 'student-dashboard'}
                 }],
                 courses: [
                     {
