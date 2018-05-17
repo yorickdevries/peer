@@ -3,10 +3,9 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-
 import api from "./routes/api";
+import bodyParser = require("body-parser");
 
-var bodyParser = require('body-parser');
 const app: express.Express = express();
 
 app.use(logger("dev"));
