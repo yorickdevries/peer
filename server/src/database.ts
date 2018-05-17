@@ -1,5 +1,5 @@
 import promise from "bluebird";
-import isCI from 'is-ci';
+import isCI from "is-ci";
 import pgp from "pg-promise";
 
 export default class Database {
