@@ -12,7 +12,7 @@
             <b-row>
                 <b-col>
 
-                    <b-card v-for="course in courses" :title="course.code" :sub-title="course.name" class="mb-3">
+                    <b-card v-for="course in courses" :title="course.name" :sub-title="course.name" class="mb-3">
                         <p class="card-text">
                             {{ course.description}}
                         </p>
@@ -26,32 +26,24 @@
 </template>
 
 <script>
-    export default {
-        name: "student-dashboard",
-        data() {
-            return {
-                items: [{
-                    text: 'Dashboard',
-                    to: { name: 'student-dashboard.index'}
-                }, {
-                    text: 'Courses',
-                    to: { name: 'student-dashboard'}
-                }],
-                courses: [
-                    {
-                        id: "1",
-                        code: "TI1316",
-                        name: "Algoritmen en Datastructuren",
-                        description: "Algorithms and data structures are fundamental notions in computer science and knowledge about standard data structures and algorithm is essential for programmers."
-                    },
-                    {
-                        id: "2",
-                        code: "TI2206",
-                        name: "Concepts of Programming Languages",
-                        description: "The design of a programming language is the result of a selection from a general collection of programming language concepts."
-                    }
-                ]
-            }
+import api from '../../api'
+
+export default {
+    async created() {
+        let res = await api.getCourses()
+        this.courses = res.data
+    },
+    data() {
+        return {
+            items: [{
+                text: 'Dashboard',
+                to: { name: 'student-dashboard.index'}
+            }, {
+                text: 'Courses',
+                to: { name: 'student-dashboard'}
+            }],
+            courses: []
         }
     }
+}
 </script>
