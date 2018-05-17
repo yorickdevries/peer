@@ -11,19 +11,19 @@
                 <b-card no-body>
                     <b-row class="px-3 pt-3">
                             <b-col class="text-center border-right border-bottom">
-                                <router-link :to=" { name: 'HandIn' }">
+                                <router-link :to=" { name: 'student-dashboard.assignment.hand-in' }">
                                     <div class="lead font-weight-bold">Hand-In - <span class="text-success">Open</span></div>
                                     <div class="text-muted">Due: 20 Nov 23:57</div>
                                 </router-link>
                             </b-col>
                         <b-col class="text-center border-right border-bottom">
-                            <router-link :to=" { name: 'PeerReview' }">
+                            <router-link :to=" { name: 'student-dashboard.assignment.peer-review' }">
                                 <div class="lead font-weight-bold">Peer Review - <span class="text-danger">Closed</span></div>
                                 <span class="text-muted">Due: 20 Nov 23:58</span>
                             </router-link>
                         </b-col>
                         <b-col class="text-center border-bottom pb-3">
-                            <router-link :to=" { name: 'Feedback' }">
+                            <router-link :to=" { name: 'student-dashboard.assignment.feedback' }">
                                 <div class="lead font-weight-bold ">Received Feedback - <span class="text-danger">Closed</span></div>
                                 <span class="text-muted">Due: 20 Nov 23:59</span>
                             </router-link>
@@ -52,10 +52,10 @@
             return {
                 items: [{
                     text: 'Dashboard',
-                    to: {name: 'StudentDashboardMain'}
+                    to: {name: 'student-dashboard.index'}
                 }, {
                     text: 'Courses',
-                    to: {name: 'StudentDashboardCourses'}
+                    to: {name: 'student-dashboard'}
                 }, {
                     text: 'TI1316: Algoritmen en Datastructuren',
                     href: '#/dashboard/courses/1'

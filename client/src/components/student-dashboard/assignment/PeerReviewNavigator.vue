@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import PeerReviewSingle from './PeerReviewSingle'
+import PeerReviewSingle from './PeerReview'
 
 export default {
     data() {
