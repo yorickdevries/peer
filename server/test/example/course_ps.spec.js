@@ -52,9 +52,9 @@ describe("CoursePreparedStatement Test", function () {
                     return [4 /*yield*/, courses_ps_1.default.executeGetAllCourses()];
                 case 1:
                     _a.apply(void 0, [_b.sent()]).to.deep.equal([{
-                            description: 'This is a beautiful course description!',
+                            description: "This is a beautiful course description!",
                             id: 1,
-                            name: 'ED-3'
+                            name: "ED-3"
                         }]);
                     return [2 /*return*/];
             }
@@ -72,9 +72,9 @@ describe("CoursePreparedStatement Test", function () {
                     return [4 /*yield*/, courses_ps_1.default.executeGetCourseById(1)];
                 case 1:
                     _a.apply(void 0, [_b.sent()]).to.deep.equal([{
-                            description: 'This is a beautiful course description!',
+                            description: "This is a beautiful course description!",
                             id: 1,
-                            name: 'ED-3'
+                            name: "ED-3"
                         }]);
                     return [2 /*return*/];
             }
@@ -115,12 +115,12 @@ describe("CoursePreparedStatement Test", function () {
             switch (_b.label) {
                 case 0:
                     _a = chai_1.expect;
-                    return [4 /*yield*/, courses_ps_1.default.executeCreateCourse('hi', 'super leuk')];
+                    return [4 /*yield*/, courses_ps_1.default.executeCreateCourse("hi", "super leuk")];
                 case 1:
                     _a.apply(void 0, [_b.sent()]).to.deep.equal([{
-                            description: 'hi',
+                            description: "hi",
                             id: 2,
-                            name: 'super leuk'
+                            name: "super leuk"
                         }]);
                     return [2 /*return*/];
             }
@@ -135,12 +135,12 @@ describe("CoursePreparedStatement Test", function () {
             switch (_b.label) {
                 case 0:
                     _a = chai_1.expect;
-                    return [4 /*yield*/, courses_ps_1.default.executeUpdateCourse(1, 'hi', 'super leuk')];
+                    return [4 /*yield*/, courses_ps_1.default.executeUpdateCourse(1, "hi", "super leuk")];
                 case 1:
                     _a.apply(void 0, [_b.sent()]).to.deep.equal([{
-                            description: 'hi',
+                            description: "hi",
                             id: 1,
-                            name: 'super leuk'
+                            name: "super leuk"
                         }]);
                     return [2 /*return*/];
             }

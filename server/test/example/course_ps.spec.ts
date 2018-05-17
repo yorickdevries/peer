@@ -9,9 +9,9 @@ describe("CoursePreparedStatement Test", () => {
      */
     it("get all courses", async () => {
         expect(await CoursePS.executeGetAllCourses()).to.deep.equal([{
-            description: 'This is a beautiful course description!',
+            description: "This is a beautiful course description!",
             id: 1,
-            name: 'ED-3'
+            name: "ED-3"
         }]);
     });
 
@@ -20,9 +20,9 @@ describe("CoursePreparedStatement Test", () => {
      */
     it("get course by id", async () => {
         expect(await CoursePS.executeGetCourseById(1)).to.deep.equal([{
-            description: 'This is a beautiful course description!',
+            description: "This is a beautiful course description!",
             id: 1,
-            name: 'ED-3'
+            name: "ED-3"
         }]);
     });
 
@@ -48,10 +48,10 @@ describe("CoursePreparedStatement Test", () => {
      * Test create a course
      */
     it("createa a course", async () => {
-        expect(await CoursePS.executeCreateCourse('hi', 'super leuk')).to.deep.equal([{
-            description: 'hi',
+        expect(await CoursePS.executeCreateCourse("hi", "super leuk")).to.deep.equal([{
+            description: "hi",
             id: 2,
-            name: 'super leuk'
+            name: "super leuk"
         }]);
     });
 
@@ -59,10 +59,10 @@ describe("CoursePreparedStatement Test", () => {
      * Test update a course
      */
     it("update a course", async () => {
-        expect(await CoursePS.executeUpdateCourse(1, 'hi', 'super leuk')).to.deep.equal([{
-            description: 'hi',
+        expect(await CoursePS.executeUpdateCourse(1, "hi", "super leuk")).to.deep.equal([{
+            description: "hi",
             id: 1,
-            name: 'super leuk'
+            name: "super leuk"
         }]);
     });
 
