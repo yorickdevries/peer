@@ -21,7 +21,7 @@
                                     <b-card-body>
                                         <h4>{{ assignment.name}}</h4>
                                         <p>{{ assignment.description}}</p>
-                                        <b-button variant="primary" :to="{ name: 'StudentDashboardAssignment', params: { id: assignment.id } }">View Assignment</b-button>
+                                        <b-button variant="primary" :to="{ name: 'student-dashboard.assignment', params: { id: assignment.id } }">View Assignment</b-button>
                                     </b-card-body>
                                     <b-card-footer class="text-danger">Peer review due in 2 days</b-card-footer>
                                 </b-card>
@@ -33,7 +33,7 @@
                                     <b-card-body>
                                         <h4>{{ assignment.name}}</h4>
                                         <p>{{ assignment.description}}</p>
-                                        <b-button variant="primary" :to="{ name: 'StudentDashboardAssignment', params: { id: assignment.id } }">View Assignment</b-button>
+                                        <b-button variant="primary" :to="{ name: 'student-dashboard.assignment', params: { id: assignment.id } }">View Assignment</b-button>
                                     </b-card-body>
                                     <b-card-footer>Done</b-card-footer>
                                 </b-card>
@@ -78,10 +78,10 @@ export default {
         return {
             items: [{
                 text: 'Dashboard',
-                to: { name: 'StudentDashboardMain'}
+                to: { name: 'student-dashboard.index'}
             }, {
                 text: 'Courses',
-                to: { name: 'StudentDashboardCourses'}
+                to: { name: 'student-dashboard'}
             }, {
                 text: 'TI1316: Algoritmen en Datastructuren',
                 active: true

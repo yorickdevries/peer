@@ -1,6 +1,6 @@
 import promise from "bluebird";
 import isCI from "is-ci";
-import pgp from "pg-promise";
+import pgp, { errors, default as pgPromise, PreparedStatement } from "pg-promise";
 
 export default class Database {
   static connection: {
@@ -35,11 +35,35 @@ export default class Database {
     this.db = pgpObject(this.connection);
   }
 
-  // method to import default databse
+    /**
+     * Method to import default database.
+     * @param {pgPromise.QueryFile} qf - a pgp queryfile.
+     * @return {Promise<void>} - a promise of the result.
+     * @constructor - default constructor.
+     */
   static async DatabaseImport(qf: pgp.QueryFile) {
     await this.db.any("DROP SCHEMA IF EXISTS public CASCADE");
     await this.db.any("CREATE SCHEMA public");
     await this.db.any(qf);
   }
+
+    /**
+     * Execute a query on the database, using a prepared statement.
+     * If the data is fetched without awaiting, a promise is returned. Otherwise the
+     * query result.
+     * @param {pgPromise.PreparedStatement} statement - a prepared statement to query.
+     * @return a database query result or an json error with awaiting, a promise otherwise.
+     */
+  public static async executeQuery(statement: PreparedStatement) {
+      try {
+          return await Database.db.any(statement);
+      } catch (err) {
+        return {
+            statement: statement,
+            error: "There was a problem executing the information to the database."
+        };
+      }
+  }
 }
+
 Database.initialize();

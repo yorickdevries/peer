@@ -5,7 +5,7 @@
   "scripts": {
     "start": "npm run build && npm run db_init && npm run start_server",
     "start_server": "node ./dist/bin/www.js",
-    "tslint": "tslint -- src/**/*.ts test/**/*.ts",
+    "tslint": "tslint --project .",
     "build": "npm run tsc",
     "tsc": "tsc",
     "test": "mocha -r ts-node/register test/**/*.spec.ts",
@@ -38,7 +38,7 @@
   "dependencies": {
     "@okta/oidc-middleware": "^0.1.2",
     "bluebird": "3.5.1",
-    "body-parser": "^1.18.2",
+    "body-parser": "^1.18.3",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
