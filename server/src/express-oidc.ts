@@ -6,10 +6,5 @@ export const oidc = new ExpressOIDC({
   client_id: "0oaf1ynfhd82kfcJS0h7",
   client_secret: "Te6Mwv8IPqsLhKMQ7v8pMUbSQ8bkHGCgELuVfqG9",
   redirect_uri: "http://localhost:3000/api/authorization-code/callback",
-  routes: {
-    login: {
-      path: '/api/login'
-    }
-  },
   scope: "openid profile"
 });

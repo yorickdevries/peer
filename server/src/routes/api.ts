@@ -3,7 +3,30 @@ const router = Router();
 // import database object
 import Database from "../database";
 // okta-login
+import session from "express-session";
 import { oidc } from "../express-oidc";
+
+// Okta login
+// session support is required to use ExpressOIDC
+// needs a random secret
+router.use(session({
+    secret: "add something random here",
+    resave: true,
+    saveUninitialized: false
+  }));
+
+// Login/login-redirect route from OIDC
+router.use(oidc.router);
+
+router.get("/logout", (req: any, res) => {
+    req.logout();
+    res.redirect("/");
+  });
+
+// Authentication route
+router.get("/authenticated", function (req: any, res) {
+    res.json({ authenticated: req.isAuthenticated() });
+});
 
 // Only logged in users can access the API
 router.use(function (req: any, res, next) {
