@@ -18,7 +18,7 @@ before_script:
 tslint:
   stage: static-analysis
   script:
-  - npm run tslint --prefix ./server
+  - cd server && npm run tslint
 database:
   stage: build
   services:
