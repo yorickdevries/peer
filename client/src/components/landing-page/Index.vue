@@ -19,23 +19,10 @@
                     </b-col>
 
                     <b-col>
-                        <b-card title="Login" class="w-75">
-                            <p class="card-text">
-                                <b-form>
-                                    <b-form-input type="text" placeholder="Email address" class="my-2"></b-form-input>
-                                    <b-form-input type="password" placeholder="Password"></b-form-input>
-                                </b-form>
-                            </p>
-
-                            <p>
-                                <router-link to="/student-dashboard/"><b-button variant="primary" class="w-100">Login as student</b-button></router-link>
-                            </p>
-                            <p>
-                                <router-link to="/teaching-assistant-dashboard/"><b-button variant="primary" class="w-100">Login as TA</b-button></router-link>
-                            </p>
-                            <p>
-                                <router-link to="/teacher-dashboard/"><b-button variant="primary" class="w-100">Login as teacher</b-button></router-link>
-                            </p>
+                        <b-card title="Dashboards" class="w-75">
+                            <router-link to="/student-dashboard/"><b-button variant="primary" class="w-100 mt-1">Student Dashboard</b-button></router-link>
+                            <router-link to="/teaching-assistant-dashboard/"><b-button variant="primary" class="w-100 mt-1">TA Dashboard</b-button></router-link>
+                            <router-link to="/teacher-dashboard/"><b-button variant="primary" class="w-100 mt-1">Teacher Dashboard</b-button></router-link>
                         </b-card>
                     </b-col>
                 </b-row>
