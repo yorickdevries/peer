@@ -12,5 +12,11 @@ export default {
     },
     createCourse: async(course) => {
         return client.post('courses', course)
+    },
+    getAuthenticated: async() => {
+        return client.get('authenticated')
+    },
+    getUser: () => {
+        return client.get('user')
     }
 }
