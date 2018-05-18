@@ -6,8 +6,8 @@
 CREATE TABLE AssignmentList (
     title varchar(100)  NOT NULL,
     description varchar(1000)  NOT NULL,
-    due_date date NOT NULL,
-    publish_date date NOT NULL,
+    due_date timestamptz NOT NULL,
+    publish_date timestamptz NOT NULL,
     id SERIAL,
     Course_id int NOT NULL,
     CONSTRAINT AssignmentList_pk PRIMARY KEY (id)
@@ -347,7 +347,7 @@ INSERT INTO public.grouplist(
 
 INSERT INTO public.assignmentlist(
 	title, description, course_id, due_date, publish_date)
-	VALUES ('Assignment 1', 'Example assignment number one', 1, DATE '2018-05-01 20:30', DATE '2018-04-01 01:39');
+	VALUES ('Assignment 1', 'Example assignment number one', 1, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z');
 
 INSERT INTO public.rubric(
 	assignment_id)
