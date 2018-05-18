@@ -19,20 +19,13 @@ tslint:
   stage: static-analysis
   script:
   - npm run tslint --prefix ./server
-database:
+build:
   stage: build
   services:
   - postgres:10.3
   script:
   - npm run build --prefix ./server
   - npm run db_init --prefix ./server
-build_server:
-  stage: build
-  script:
-  - npm run build --prefix ./server
-build_client:
-  stage: build
-  script:
   - npm run build --prefix ./client
 test:
   stage: test
