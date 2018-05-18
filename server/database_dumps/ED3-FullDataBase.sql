@@ -1,13 +1,15 @@
 -- Created by Vertabelo (http://vertabelo.com)
 -- Last modification date: 2018-05-14 13:17:27.143
 
+SET timezone = 'Europe/Amsterdam';
+
 -- tables
 -- Table: AssignmentList
 CREATE TABLE AssignmentList (
     title varchar(100)  NOT NULL,
     description varchar(1000)  NOT NULL,
-    due_date date NOT NULL,
-    publish_date date NOT NULL,
+    due_date timestamp NOT NULL,
+    publish_date timestamp NOT NULL,
     id SERIAL,
     Course_id int NOT NULL,
     CONSTRAINT AssignmentList_pk PRIMARY KEY (id)
@@ -347,7 +349,7 @@ INSERT INTO public.grouplist(
 
 INSERT INTO public.assignmentlist(
 	title, description, course_id, due_date, publish_date)
-	VALUES ('Assignment 1', 'Example assignment number one', 1, DATE '2018-05-01 20:30', DATE '2018-04-01 01:39');
+	VALUES ('Assignment 1', 'Example assignment number one', 1, '2018-05-01 20:30', '2018-04-01 20:30');
 
 INSERT INTO public.rubric(
 	assignment_id)
