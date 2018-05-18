@@ -11,14 +11,14 @@ export default class ReviewPS {
     /**
      * Executes 'create review'query
      * @param {string} comment
-     * @param {string} user_netid
-     * @param {number} submission_id
+     * @param {string} userNetId
+     * @param {number} submissionId
      * @param {number} rubric_id
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateReview(comment: string, user_netid: string, submission_id: number)
+    public static executeCreateReview(comment: string, userNetId: string, submissionId: number)
         : Promise<pgPromise.queryResult> {
-        this.createReview.values = [comment, user_netid, submission_id];
+        this.createReview.values = [comment, userNetId, submissionId];
         return Database.executeQuery(this.createReview);
     }
 }

@@ -28,12 +28,17 @@ router.get("/assignment/:course_id/:assignment_id", async (req, res) => {
  * @body assignment_description - assignment description.
  * @body course_id - course id.
  * @body assignment_id - assignment id.
+ * @body due_date - due date.
+ * @body publish_date - publish date.
  */
 router.route("/assignment")
     .post(async (req, res) => {
         res.json(await AssignmentPS.executeAddAssignment(
             req.body.assignment_title,
-            req.body.assignment_description));
+            req.body.assignment_description,
+            req.body.assignment_due_date,
+            req.body.assignment_publish_date,
+            req.body.course_id));
     })
     .put(async (req, res) => {
         res.json(await AssignmentPS.executeUpdateAssignmentById(

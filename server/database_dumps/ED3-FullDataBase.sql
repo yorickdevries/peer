@@ -6,8 +6,10 @@
 CREATE TABLE AssignmentList (
     title varchar(100)  NOT NULL,
     description varchar(1000)  NOT NULL,
+    due_date date NOT NULL,
+    publish_date date NOT NULL,
     id SERIAL,
-    Course_id SERIAL,
+    Course_id int NOT NULL,
     CONSTRAINT AssignmentList_pk PRIMARY KEY (id)
 );
 
@@ -21,7 +23,7 @@ CREATE TABLE CourseList (
 
 -- Table: Enroll
 CREATE TABLE Enroll (
-    Course_id SERIAL,
+    Course_id int NOT NULL,
     User_netid varchar(256)  NOT NULL,
     role varchar(25)  NOT NULL,
     CONSTRAINT Enroll_pk PRIMARY KEY (Course_id,User_netid)
@@ -29,8 +31,8 @@ CREATE TABLE Enroll (
 
 -- Table: GroupExercise
 CREATE TABLE GroupExercise (
-    Assignment_id SERIAL,
-    Group_id SERIAL,
+    Assignment_id int NOT NULL,
+    Group_id int NOT NULL,
     CONSTRAINT GroupExercise_pk PRIMARY KEY (Assignment_id,Group_id)
 );
 
@@ -44,15 +46,15 @@ CREATE TABLE GroupList (
 -- Table: GroupUsers
 CREATE TABLE GroupUsers (
     User_netid varchar(256)  NOT NULL,
-    Group_groupid SERIAL,
+    Group_groupid int NOT NULL,
     CONSTRAINT GroupUsers_pk PRIMARY KEY (User_netid,Group_groupid)
 );
 
 -- Table: MCAnswer
 CREATE TABLE MCAnswer (
     answer char(1)  NOT NULL,
-    MCQuestion_id SERIAL,
-    Review_id SERIAL,
+    MCQuestion_id int NOT NULL,
+    Review_id int NOT NULL,
     CONSTRAINT MCAnswer_pk PRIMARY KEY (MCQuestion_id,Review_id)
 );
 
@@ -60,7 +62,7 @@ CREATE TABLE MCAnswer (
 CREATE TABLE MCOption (
     id SERIAL,
     option varchar(100)  NOT NULL,
-    MCQuestion_id SERIAL,
+    MCQuestion_id int NOT NULL,
     CONSTRAINT MCOption_pk PRIMARY KEY (id)
 );
 
@@ -68,7 +70,7 @@ CREATE TABLE MCOption (
 CREATE TABLE MCQuestion (
     id SERIAL,
     question varchar(200)  NOT NULL,
-    Rubric_Assignment_id SERIAL,
+    Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
     CONSTRAINT MCQuestion_pk PRIMARY KEY (id)
 );
@@ -76,8 +78,8 @@ CREATE TABLE MCQuestion (
 -- Table: OpenAnswer
 CREATE TABLE OpenAnswer (
     answer varchar(200)  NOT NULL,
-    OpenQuestion_id SERIAL,
-    Review_id SERIAL,
+    OpenQuestion_id int NOT NULL,
+    Review_id int NOT NULL,
     CONSTRAINT OpenAnswer_pk PRIMARY KEY (OpenQuestion_id,Review_id)
 );
 
@@ -85,7 +87,7 @@ CREATE TABLE OpenAnswer (
 CREATE TABLE OpenQuestion (
     id SERIAL,
     question varchar(200)  NOT NULL,
-    Rubric_Assignment_id SERIAL,
+    Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
     CONSTRAINT OpenQuestion_pk PRIMARY KEY (id)
 );
@@ -93,8 +95,8 @@ CREATE TABLE OpenQuestion (
 -- Table: RangeAnswer
 CREATE TABLE RangeAnswer (
     answer int  NOT NULL,
-    RangeQuestion_id SERIAL,
-    Review_id SERIAL,
+    RangeQuestion_id int NOT NULL,
+    Review_id int NOT NULL,
     CONSTRAINT RangeAnswer_pk PRIMARY KEY (RangeQuestion_id,Review_id)
 );
 
@@ -103,7 +105,7 @@ CREATE TABLE RangeQuestion (
     id SERIAL,
     question varchar(200)  NOT NULL,
     range int  NOT NULL,
-    Rubric_Assignment_id SERIAL,
+    Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
     CONSTRAINT RangeQuestion_pk PRIMARY KEY (id)
 );
@@ -113,14 +115,14 @@ CREATE TABLE Review (
     id SERIAL,
     comment varchar(500)  NOT NULL,
     User_netid varchar(256)  NOT NULL,
-    Submission_id SERIAL,
-    Rubric_Assignment_id SERIAL,
+    Submission_id int NOT NULL,
+    Rubric_Assignment_id int NOT NULL,
     CONSTRAINT Review_pk PRIMARY KEY (id)
 );
 
 -- Table: Rubric
 CREATE TABLE Rubric (
-    Assignment_id SERIAL,
+    Assignment_id int NOT NULL,
     CONSTRAINT Rubric_pk PRIMARY KEY (Assignment_id)
 );
 
@@ -128,8 +130,8 @@ CREATE TABLE Rubric (
 CREATE TABLE Submission (
     id SERIAL,
     User_netid varchar(256)  NOT NULL,
-    Assignment_id SERIAL,
-    filename varchar(100)  NOT NULL,
+    Assignment_id int NOT NULL,
+    file_path varchar(100)  NOT NULL,
     CONSTRAINT Submission_pk PRIMARY KEY (id)
 );
 
@@ -344,8 +346,8 @@ INSERT INTO public.grouplist(
 	VALUES (10, 'ED-3');
 
 INSERT INTO public.assignmentlist(
-	title, description, course_id)
-	VALUES ('Assignment 1', 'Example assignment number one', 1);
+	title, description, course_id, due_date, publish_date)
+	VALUES ('Assignment 1', 'Example assignment number one', 1, DATE '2018-05-01 20:30', DATE '2018-04-01 01:39');
 
 INSERT INTO public.rubric(
 	assignment_id)
@@ -384,8 +386,8 @@ INSERT INTO public.groupexercise(
 	VALUES (1, 10);
 
 INSERT INTO public.submission(
-	user_netid, assignment_id, filename)
-	VALUES ('paulvanderlaan', 1, 'verygudsubmission.pdf');
+	user_netid, assignment_id, file_path)
+	VALUES ('paulvanderlaan', 1, 'folder/verygudsubmission.pdf');
 
 INSERT INTO public.review(
 	comment, user_netid, submission_id, rubric_assignment_id)

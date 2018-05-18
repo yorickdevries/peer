@@ -9,7 +9,7 @@ export default class AssignmentPS {
         'SELECT * FROM "assignmentlist" WHERE "course_id" = $1 AND "id" = $2');
 
     private static addAssignment: PreparedStatement = new PreparedStatement("addAssignment",
-        'INSERT INTO "assignmentlist" ("title", "description") VALUES ($1, $2) RETURNING title, description, id, course_id');
+        'INSERT INTO "assignmentlist" ("title", "description", "due_date", "publish_date", "course_id") VALUES ($1, $2, $3, $4, $5) RETURNING title, description, id, course_id, due_date, publish_date');
 
     private static updateAssignmentById: PreparedStatement = new PreparedStatement("update-assignment-by-id",
         "UPDATE assignmentlist SET title=$1, description=$2, course_id=$3 WHERE id=$4  RETURNING title, description, id, course_id");
@@ -17,22 +17,22 @@ export default class AssignmentPS {
 
     /**
      * Executes a 'get assignment by course id'.
-     * @param {string} course_id - a course id.
+     * @param {string} courseId - a course id.
      * @return {any} a query result.
      */
-    public static executeGetAssignments(course_id: number): Promise<pgPromise.queryResult> {
-        this.getAssignments.values = [course_id];
+    public static executeGetAssignments(courseId: number): Promise<pgPromise.queryResult> {
+        this.getAssignments.values = [courseId];
         return Database.executeQuery(this.getAssignments);
     }
 
     /**
      * Executes a 'get assignment by course id and assignment id'.
-     * @param {string} course_id - a course id.
-     * @param {string} assignment_id - an assignment id.
+     * @param {string} courseId - a course id.
+     * @param {string} assignmentId - an assignment id.
      * @return {any} a query result.
      */
-    public static executeGetAssignmentById(course_id: number, assignment_id: number): Promise<pgPromise.queryResult> {
-        this.getAssignmentById.values = [course_id, assignment_id];
+    public static executeGetAssignmentById(courseId: number, assignmentId: number): Promise<pgPromise.queryResult> {
+        this.getAssignmentById.values = [courseId, assignmentId];
         return Database.executeQuery(this.getAssignmentById);
     }
 
@@ -40,10 +40,13 @@ export default class AssignmentPS {
      * Executes a 'insert assignment'.
      * @param {string} title - a title.
      * @param {string} description - a description.
+     * @param dueDate - a due date.
+     * @param publishDate - a publish date.
+     * @param courseId - a course id.
      * @return {any} a query result.
      */
-    public static executeAddAssignment(title: string, description: string): Promise<pgPromise.queryResult> {
-        this.addAssignment.values = [title, description];
+    public static executeAddAssignment(title: string, description: string, dueDate: Date, publishDate: Date, courseId: number): Promise<pgPromise.queryResult> {
+        this.addAssignment.values = [title, description, dueDate, publishDate, courseId];
         return Database.executeQuery(this.addAssignment);
     }
 
@@ -51,15 +54,15 @@ export default class AssignmentPS {
      * Executes a 'update assignment by assignment id'.
      * @param {string} title - a title.
      * @param {string} description - a description.
-     * @param course_id - a course id.
-     * @param assignment_id - an assignment id.
+     * @param courseId - a course id.
+     * @param assignmentId - an assignment id.
      * @return {any} a query result.
      */
     public static executeUpdateAssignmentById(title: string,
                                               description: string,
-                                              course_id: number,
-                                              assignment_id: number): Promise<pgPromise.queryResult> {
-        this.updateAssignmentById.values = [title, description, course_id, assignment_id];
+                                              courseId: number,
+                                              assignmentId: number): Promise<pgPromise.queryResult> {
+        this.updateAssignmentById.values = [title, description, courseId, assignmentId];
         return Database.executeQuery(this.updateAssignmentById);
     }
 }
