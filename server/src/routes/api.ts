@@ -3,7 +3,51 @@ import CoursesPS from "../prepared_statements/courses_ps";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import ReviewPS from "../prepared_statements/review_ps";
 import UserPS from "../prepared_statements/user_ps";
+// import database object
+import Database from "../database";
+// okta-login
+import session from "express-session";
+import { oidc } from "../express-oidc";
+
 const router = Router();
+
+// Okta login
+// session support is required to use ExpressOIDC
+// needs a random secret
+router.use(session({
+    secret: "add something random here",
+    resave: true,
+    saveUninitialized: false
+  }));
+
+// Login/login-redirect route from OIDC
+router.use(oidc.router);
+
+router.get("/logout", (req: any, res) => {
+    req.logout();
+    res.redirect("/");
+  });
+
+// Authentication route
+router.get("/authenticated", function (req: any, res) {
+    res.json({ authenticated: req.isAuthenticated() });
+});
+
+// Only logged in users can access the API
+router.use(function (req: any, res, next) {
+    if (req.isAuthenticated()) {
+        console.log(req.userinfo.given_name + " accesses the API");
+        next();
+    } else {
+        next(new Error("Not Authenticated"));
+    }
+});
+
+router.get("/user", function (req: any, res, next) {
+    res.json({
+        user: req.userinfo
+    });
+});
 
 /**
  * Route to get all assignments for a specific course.

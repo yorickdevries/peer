@@ -335,7 +335,7 @@ INSERT INTO "userlist" (
 
 INSERT INTO "userlist" (
 	"netid", "email")
-	VALUES ('HJ', 'h.j.@student.tudelft.nl');
+	VALUES ('henkjan', 'h.j@student.tudelft.nl');
 
 INSERT INTO public.courselist(
     description, name)
@@ -391,7 +391,7 @@ INSERT INTO public.submission(
 
 INSERT INTO public.review(
 	comment, user_netid, submission_id, rubric_assignment_id)
-	VALUES ('Plagiaat', 'HJ', 1, 1);
+	VALUES ('Plagiaat', 'henkjan', 1, 1);
 
 INSERT INTO public.mcanswer(
 	answer, mcquestion_id, review_id)

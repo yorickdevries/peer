@@ -4,14 +4,18 @@
 
             <b-row>
                 <b-col>
-                    <h1 class="mt-5">Your Courses</h1>
+                    <h1 class="mt-5">Managed Courses</h1>
                     <b-breadcrumb :items="items"/>
                 </b-col>
             </b-row>
 
             <b-row>
                 <b-col>
-
+                    <b-button class="mb-3" variant="success" :to="{ name: 'teacher-dashboard.courses.create' }">Create Course</b-button>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col>
                     <b-card v-for="course in courses" :title="course.name" :sub-title="course.name" class="mb-3">
                         <p class="card-text">
                             {{ course.description}}

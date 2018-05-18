@@ -9,6 +9,7 @@ Vue.use(Router)
  */
 
 export default new Router({
+    mode: 'history',
     routes: [
         {
             path: '/',
@@ -69,13 +70,26 @@ export default new Router({
                     path: '',
                     name: 'teaching-assistant-dashboard.index',
                     component: () => import('../components/teaching-assistant-dashboard/Index')
-                }
+                },
             ]
         },
         {
             path: '/teacher-dashboard',
             name: 'teacher-dashboard',
-            component: () => import('../components/teacher-dashboard/Layout')
+            redirect: { name: 'teacher-dashboard.courses' },
+            component: () => import('../components/teacher-dashboard/Layout'),
+            children: [
+                {
+                    path: 'courses',
+                    name: 'teacher-dashboard.courses',
+                    component: () => import('../components/teacher-dashboard/Courses'),
+                },
+                {
+                    path: 'create',
+                    name: 'teacher-dashboard.courses.create',
+                    component: () => import('../components/teacher-dashboard/courses/CreateCourse')
+                }
+            ]
         }
     ]
 })

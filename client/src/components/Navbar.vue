@@ -14,18 +14,22 @@
                     </b-navbar-nav>
 
                     <!-- Right aligned nav items -->
-                    <b-navbar-nav class="ml-auto">
+                    <b-navbar-nav v-if="authenticated" class="ml-auto">
 
                         <b-nav-item-dropdown right>
                             <!-- Using button-content slot -->
                             <template slot="button-content">
-                                <span class="p-3">Sample User</span>
+                                <span class="p-3">{{ user.name }}</span>
                             </template>
-                            <b-dropdown-item href="#">Profile</b-dropdown-item>
-                            <b-dropdown-item href="#">Sign-out</b-dropdown-item>
+                            <b-dropdown-item href="/api/logout">Sign-out</b-dropdown-item>
                         </b-nav-item-dropdown>
 
                     </b-navbar-nav>
+
+                    <b-navbar-nav v-else="authenticated" class="ml-auto">
+                        <b-nav-item href="/api/login">Login</b-nav-item>
+                    </b-navbar-nav>
+
 
                 </b-collapse>
             </b-container>
@@ -34,7 +38,31 @@
 </template>
 
 <script>
+import api from '../api'
+
 export default {
-    props: ['links']
+    props: ['links'],
+    mounted() {
+        this.refreshAuthenticated()
+        this.refreshUser()
+    },
+    data() {
+        return {
+            authenticated: null,
+            user: null
+        }
+    },
+    methods: {
+        async refreshAuthenticated() {
+            let res = await api.getAuthenticated()
+            console.log(res)
+            this.authenticated = res.data.authenticated
+        },
+        async refreshUser() {
+            let res = await api.getUser()
+            console.log(res.data.user)
+            this.user = res.data.user
+        },
+    }
 }
 </script>
