@@ -12,12 +12,11 @@
                 <b-tabs no-fade>
                     <b-row>
                         <b-col>
-
                             <!--Active Assignments-->
                             <b-tab title="Active Assignments" active>
                                 <b-card v-for="assignment in activeAssignments" :key="assignment.id" no-body class="mt-3">
                                     <b-card-body>
-                                        <h4>{{ assignment.name}}</h4>
+                                        <h4>{{ assignment.title}}</h4>
                                         <p>{{ assignment.description}}</p>
                                         <b-button variant="primary" :to="{ name: 'student-dashboard.assignment', params: { id: assignment.id } }">View Assignment</b-button>
                                     </b-card-body>
@@ -27,16 +26,15 @@
 
                             <!--Closed Assignments-->
                             <b-tab title="Closed Assignments" >
-                                <b-card v-for="assignment in activeAssignments" :key="assignment.id" no-body class="mt-3">
+                                <b-card v-for="assignment in closedAssignments" :key="assignment.id" no-body class="mt-3">
                                     <b-card-body>
-                                        <h4>{{ assignment.name}}</h4>
+                                        <h4>{{ assignment.title}}</h4>
                                         <p>{{ assignment.description}}</p>
                                         <b-button variant="primary" :to="{ name: 'student-dashboard.assignment', params: { id: assignment.id } }">View Assignment</b-button>
                                     </b-card-body>
                                     <b-card-footer>Done</b-card-footer>
                                 </b-card>
                             </b-tab>
-
                         </b-col>
 
                     </b-row>
@@ -49,54 +47,47 @@
 </template>
 
 <script>
+import api from "../../api"
+
 export default {
+    async created() {
+        let resAssignment = await api.getCourseAssignments(this.$route.params.id)
+        this.assignments = resAssignment.data
+
+        let resCourse = await api.getCourse(this.assignments[0].course_id)
+        this.course = resCourse.data[0]
+
+        this.items = [
+            {
+                text: this.course.name,
+                active: true
+            },
+            {
+                text: 'Assignments',
+                active: true
+            }]
+    },
     data() {
         return {
-            items: [
-            {
-                text: 'TI1316: Algoritmen en Datastructuren',
-                active: true
-            },
-            {
-                text: 'Course Home',
-                active: true
-            }],
-            activeAssignments: [
-                {
-                    id: "1",
-                    name: "Assignment 1",
-                    description: "Some quick example text to build on the card title and make up the bulk of the card's content."
-                },
-                {
-                    id: "2",
-                    name: "Assignment 2",
-                    description: "Some quick example text to build on the card title and make up the bulk of the card's content."
-                }
-            ],
-            closedAssignments: [
-                {
-                    id: "3",
-                    name: "Assignment 3",
-                    description: "Some quick example text to build on the card title and make up the bulk of the card's content."
-                },
-                {
-                    id: "4",
-                    name: "Assignment 4",
-                    description: "Some quick example text to build on the card title and make up the bulk of the card's content."
-                }
-            ],
+            items: [],
+            assignments: [],
             course: {
-                id: "1",
-                code: "TI1316",
-                name: "Algoritmen en Datastructuren",
-                description: "Algorithms and data structures are fundamental notions in computer science and knowledge about standard data structures and algorithm is essential for programmers."
-            },
-            members: ["User 1", "User 2", "User 3", "User 4", "User 5"]
+                name: null,
+                description: null
+            }
+        }
+    },
+    computed: {
+        activeAssignments() {
+            let now = new Date()
+            return this.assignments.filter(assignment => new Date(assignment.due_date) > now)
+        },
+        closedAssignments() {
+            let now = new Date()
+            return this.assignments.filter(assignment => new Date(assignment.due_date) < now)
+
         }
     }
 }
+
 </script>
-
-<style scoped>
-
-</style>
