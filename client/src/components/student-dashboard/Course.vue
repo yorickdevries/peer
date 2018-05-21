@@ -68,54 +68,28 @@
 </template>
 
 <script>
+import api from "../../api"
+
 export default {
-    data() {
-        return {
-            items: [
+    async created() {
+        let res = await api.getCourse(this.$route.params.id)
+        this.course = res.data[0]
+        this.items =  [
             {
-                text: 'TI1316: Algoritmen en Datastructuren',
+                text: this.course.name,
                 active: true
             },
             {
                 text: 'Course Home',
                 active: true
-            }],
-            activeAssignments: [
-                {
-                    id: "1",
-                    name: "Assignment 1",
-                    description: "Some quick example text to build on the card title and make up the bulk of the card's content."
-                },
-                {
-                    id: "2",
-                    name: "Assignment 2",
-                    description: "Some quick example text to build on the card title and make up the bulk of the card's content."
-                }
-            ],
-            closedAssignments: [
-                {
-                    id: "3",
-                    name: "Assignment 3",
-                    description: "Some quick example text to build on the card title and make up the bulk of the card's content."
-                },
-                {
-                    id: "4",
-                    name: "Assignment 4",
-                    description: "Some quick example text to build on the card title and make up the bulk of the card's content."
-                }
-            ],
-            course: {
-                id: "1",
-                code: "TI1316",
-                name: "Algoritmen en Datastructuren",
-                description: "Algorithms and data structures are fundamental notions in computer science and knowledge about standard data structures and algorithm is essential for programmers."
-            },
+            }]
+    },
+    data() {
+        return {
+            items: null,
+            course: null,
             members: ["User 1", "User 2", "User 3", "User 4", "User 5"]
         }
     }
 }
 </script>
-
-<style scoped>
-
-</style>

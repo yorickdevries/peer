@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Navbar :title="navbarTitle" :links="navbarItems"/>
+        <Navbar :title="course.name" :links="navbarItems"/>
 
         <keep-alive><router-view></router-view></keep-alive>
 
@@ -14,7 +14,7 @@ import Navbar from "../Navbar"
 export default {
     async created() {
         let res = await api.getCourse(this.$route.params.id)
-        this.navbarTitle = res.data[0].name
+        this.course = res.data[0]
     },
     data() {
         return {
@@ -22,7 +22,7 @@ export default {
                 { to: { name: 'student-dashboard.course' } , text: 'Course Home'},
                 { to: { name: 'student-dashboard.assignments' } , text: 'Assignments'},
             ],
-            navbarTitle: null
+            course: null
         }
     },
     components: {
