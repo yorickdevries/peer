@@ -1,0 +1,12 @@
+/**
+  Main CSS File.
+ */
+
+// Custom modifications.
+@import "./_custom.scss";
+
+// Bootstrap.
+@import "../../../node_modules/bootstrap/scss/bootstrap.scss";
+
+// Bootstrap Vue dependency.
+@import "../../../node_modules/bootstrap-vue/dist/bootstrap-vue.css";

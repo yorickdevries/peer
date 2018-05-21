@@ -4,8 +4,6 @@ import router from './router'
 
 // Use BootstrapVue
 import BootstrapVue from 'bootstrap-vue'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
 Vue.use(BootstrapVue)
 
 // Use Vue-Awesome
@@ -14,7 +12,7 @@ import Icon from 'vue-awesome/components/Icon'
 Vue.component('icon', Icon)
 
 // Use custom CSS
-import './assets/css/global.css'
+import './assets/css/_index.scss?module'
 
 Vue.config.productionTip = false
 
