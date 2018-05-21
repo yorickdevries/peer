@@ -8,7 +8,12 @@ export default [
             {
                 path: 'courses/:id',
                 name: 'student-dashboard.course',
-                component: () => import('../components/student-dashboard/Course')
+                component: () => import('../components/student-dashboard/Course'),
+            },
+            {
+                path: 'courses/:id/assignments',
+                name: 'student-dashboard.assignments',
+                component: () => import('../components/student-dashboard/Assignments')
             },
             {
                 path: 'assignment/:id',

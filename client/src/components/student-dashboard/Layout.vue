@@ -20,8 +20,7 @@ export default {
         return {
             navbarItems: [
                 { to: { name: 'student-dashboard.course' } , text: 'Course Home'},
-                { to: { name: 'student-dashboard.course' } , text: 'Assignments'},
-                { to: { name: 'student-dashboard.course' } , text: 'Groups'},
+                { to: { name: 'student-dashboard.assignments' } , text: 'Assignments'},
             ],
             navbarTitle: null
         }
