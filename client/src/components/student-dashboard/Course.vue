@@ -73,17 +73,15 @@
 
 <script>
 export default {
-    name: "StudentDashboardCourse",
     data() {
         return {
-            items: [{
-                text: 'Dashboard',
-                to: { name: 'student-dashboard.index'}
-            }, {
-                text: 'Courses',
-                to: { name: 'student-dashboard'}
-            }, {
+            items: [
+            {
                 text: 'TI1316: Algoritmen en Datastructuren',
+                active: true
+            },
+            {
+                text: 'Course Home',
                 active: true
             }],
             activeAssignments: [

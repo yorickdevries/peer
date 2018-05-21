@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import axios from 'axios'
 
 const client = axios.create({
@@ -9,6 +8,9 @@ const client = axios.create({
 export default {
     getCourses: async () => {
         return client.get('courses')
+    },
+    getCourse: async (id) => {
+        return client.get(`courses/${id}`)
     },
     createCourse: async(course) => {
         return client.post('courses', course)

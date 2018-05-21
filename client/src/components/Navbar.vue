@@ -13,7 +13,7 @@
 
                     <!-- Right aligned nav items -->
                     <b-navbar-nav v-if="authenticated" class="ml-auto">
-                        <b-nav-item :to="{ name: 'student-dashboard.courses' }" exact>
+                        <b-nav-item :to="{ name: 'courses' }" exact>
                             <icon name="th-large" class="mr-2 align-middle"></icon><span class="align-middle">Courses</span>
                         </b-nav-item>
 

@@ -4,7 +4,7 @@
 
             <b-row>
                 <b-col>
-                    <h1 class="mt-5">Dashboard Teaching Assistant</h1>
+                    <h1 class="mt-5">TA Course Home</h1>
                     <b-breadcrumb :items="crumbs"/>
                 </b-col>
             </b-row>
