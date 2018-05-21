@@ -8,7 +8,7 @@
                     <b-row>
                         <b-col>
                             <span class="text-muted">You are giving feedback to</span><br>
-                            <span class="lead">Peer #1</span>
+                            <span class="lead">Peer #{{ peerSubmission.id }}</span>
                         </b-col>
                         <b-col>
                             <b-button variant="success w-100 h-100">Download Hand-In</b-button>
@@ -23,7 +23,7 @@
                 <h4>Assignment Criteria</h4>
 
                 <div class="mb-3 bottom-right">
-                    <h5 class="text-primary">Question 1 of 10.</h5>
+                    <h5 class="text-primary">Question 1 of 1.</h5>
                     <p>
                         How well has the author done?
                     </p>
@@ -35,7 +35,7 @@
                 </div>
 
                 <div class="mb-3 bottom-right">
-                    <h5 class="text-primary">Question 2 of 10.</h5>
+                    <h5 class="text-primary">Question 2 of 2.</h5>
                     <p>
                         How well has the author done?
                     </p>
@@ -46,29 +46,6 @@
                                      :max-rows="6" />
                 </div>
 
-                <div class="mb-3 bottom-right">
-                    <h5 class="text-primary">Question 3 of 10.</h5>
-                    <p>
-                        How well has the author done?
-                    </p>
-                    <b-form-textarea id="textarea1"
-                                     v-model="text"
-                                     placeholder="Enter something"
-                                     :rows="3"
-                                     :max-rows="6" />
-                </div>
-
-                <div class="mb-3 bottom-right">
-                    <h5 class="text-primary">Question 4 of 10.</h5>
-                    <p>
-                        How well has the author done?
-                    </p>
-                    <b-form-textarea id="textarea1"
-                                     v-model="text"
-                                     placeholder="Enter something"
-                                     :rows="3"
-                                     :max-rows="6" />
-                </div>
 
                 <b-button variant="success float-right">Submit Review</b-button>
 
@@ -77,3 +54,26 @@
 
     </div>
 </template>
+
+<script>
+export default {
+    props: ['peer_review_id'],
+    async mounted() {
+        console.log(this.peer_review_id)
+
+        this.peerSubmission = {
+            id: this.$route.params.peer_review_id,
+            download_link: "sample"
+        }
+    },
+    data() {
+        return {
+            text: "",
+            peerSubmission: {
+                id: 2,
+                download_link: null,
+            }
+        }
+    }
+}
+</script>
