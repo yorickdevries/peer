@@ -18,8 +18,7 @@ export default {
     data() {
         return {
             navbarItems: [
-                { to: { name: 'student-dashboard.index' } , text: 'Dashboard'},
-                { to: { name: 'student-dashboard.courses' } , text: 'Courses'}
+                { to: { name: 'student-dashboard.course' } , text: 'Course Home'},
             ]
         }
     }
