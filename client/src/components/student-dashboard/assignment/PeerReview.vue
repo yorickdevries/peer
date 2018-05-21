@@ -21,34 +21,38 @@
         <b-card no-body class="mt-3">
             <b-card-body>
                 <h4>Assignment Criteria</h4>
-
-                <div class="mb-3 bottom-right">
-                    <h5 class="text-primary">Question 1 of 1.</h5>
-                    <p>
-                        How well has the author done?
-                    </p>
-                    <b-form-textarea id="textarea1"
-                                     v-model="text"
-                                     placeholder="Enter something"
-                                     :rows="3"
-                                     :max-rows="6" />
-                </div>
-
-                <div class="mb-3 bottom-right">
-                    <h5 class="text-primary">Question 2 of 2.</h5>
-                    <p>
-                        How well has the author done?
-                    </p>
-                    <b-form-textarea id="textarea1"
-                                     v-model="text"
-                                     placeholder="Enter something"
-                                     :rows="3"
-                                     :max-rows="6" />
-                </div>
-
-
+                <h6 class="card-subtitle text-muted">Give the peer review to one of your peers here.</h6>
+            </b-card-body>
+            <b-list-group flush>
+                <b-list-group-item>
+                    <div class="mb-3 bottom-right">
+                        <h5 class="text-primary">Question 1 of 1.</h5>
+                        <p>
+                            How well has the author done?
+                        </p>
+                        <b-form-textarea id="textarea1"
+                                         v-model="text"
+                                         placeholder="Enter something"
+                                         :rows="3"
+                                         :max-rows="6" />
+                    </div>
+                </b-list-group-item>
+                <b-list-group-item>
+                    <div class="mb-3 bottom-right">
+                        <h5 class="text-primary">Question 2 of 2.</h5>
+                        <p>
+                            How well has the author done?
+                        </p>
+                        <b-form-textarea id="textarea1"
+                                         v-model="text"
+                                         placeholder="Enter something"
+                                         :rows="3"
+                                         :max-rows="6" />
+                    </div>
+                </b-list-group-item>
+            </b-list-group>
+            <b-card-body>
                 <b-button variant="success float-right">Submit Review</b-button>
-
             </b-card-body>
         </b-card>
 
@@ -72,7 +76,14 @@ export default {
             peerSubmission: {
                 id: 2,
                 download_link: null,
-            }
+            },
+            rubric: [
+                {
+                    question_number: "1",
+                    type: "text",
+                    question: "How well has the author done?"
+                }
+            ]
         }
     }
 }
