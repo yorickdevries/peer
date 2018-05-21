@@ -15,6 +15,7 @@
     "vee-validate": "^2.0.9",
     "vue": "^2.5.16",
     "vue-awesome": "^3.0.0",
+    "vue-rate-it": "^2.1.0",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {

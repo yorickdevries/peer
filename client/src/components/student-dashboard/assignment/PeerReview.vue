@@ -23,10 +23,11 @@
                 <h4>Assignment Criteria</h4>
                 <h6 class="card-subtitle text-muted">Give the peer review to one of your peers here.</h6>
             </b-card-body>
+
             <b-list-group flush>
                 <b-list-group-item>
-                    <div class="mb-3 bottom-right">
-                        <h5 class="text-primary">Question 1 of 1.</h5>
+                    <div class="mb-2 bottom-right">
+                        <h5 class="text-primary">Question 1 of 3.</h5>
                         <p>
                             How well has the author done?
                         </p>
@@ -37,19 +38,46 @@
                                          :max-rows="6" />
                     </div>
                 </b-list-group-item>
+
                 <b-list-group-item>
-                    <div class="mb-3 bottom-right">
-                        <h5 class="text-primary">Question 2 of 2.</h5>
-                        <p>
-                            How well has the author done?
-                        </p>
-                        <b-form-textarea id="textarea1"
-                                         v-model="text"
-                                         placeholder="Enter something"
-                                         :rows="3"
-                                         :max-rows="6" />
+                    <div class="mb-2 bottom-right">
+                        <h5 class="text-primary">Question 2 of 3.</h5>
+                        <span class="mb-2">
+                            Rate the work.
+                        </span>
+                        <div>
+                        <StarRating
+                                class="align-middle"
+                                :border-color="'#007bff'"
+                                :active-color="'#007bff'"
+                                :border-width="2"
+                                :item-size="20"
+                                :spacing="5"
+                                inline
+                                :max-rating="7"
+                                :show-rating="false"
+                                v-model="rating"/>
+                            <span class="align-middle ml-2 small">{{ rating }}</span>
+                        </div>
+
                     </div>
                 </b-list-group-item>
+
+                <b-list-group-item>
+                    <div class="mb-2 bottom-right">
+                        <h5 class="text-primary">Question 3 of 3.</h5>
+                        <span class="mb-2">
+                            What do you agree with?
+                        </span>
+                        <b-form-group>
+                            <b-form-radio-group v-model="selected"
+                                                :options="options"
+                                                stacked>
+                            </b-form-radio-group>
+                        </b-form-group>
+                    </div>
+                </b-list-group-item>
+
             </b-list-group>
             <b-card-body>
                 <b-button variant="success float-right">Submit Review</b-button>
@@ -60,11 +88,13 @@
 </template>
 
 <script>
+import { StarRating } from 'vue-rate-it';
+
 export default {
     props: ['peer_review_id'],
     async mounted() {
-        console.log(this.peer_review_id)
 
+        // Get peer review.
         this.peerSubmission = {
             id: this.$route.params.peer_review_id,
             download_link: "sample"
@@ -73,6 +103,13 @@ export default {
     data() {
         return {
             text: "",
+            rating: null,
+            options: [
+                { text: 'First radio', value: 'first' },
+                { text: 'Second radio', value: 'second' },
+                { text: 'Third radio', value: 'third' }
+            ],
+            selected: null,
             peerSubmission: {
                 id: 2,
                 download_link: null,
@@ -85,6 +122,9 @@ export default {
                 }
             ]
         }
+    },
+    components: {
+        StarRating
     }
 }
 </script>
