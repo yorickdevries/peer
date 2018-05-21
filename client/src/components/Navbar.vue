@@ -5,9 +5,9 @@
 
                 <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
-                <router-link :to="{ name: 'student-dashboard.index' }"><b-navbar-brand class="font-weight-bold ">PR</b-navbar-brand></router-link>
+                <router-link :to="{ name: 'landing-page' }"><b-navbar-brand class="font-weight-bold ">PR</b-navbar-brand></router-link>
 
-                <h5 class="text-white font-weight-bold my-0">{{ currentCourse }}</h5>
+                <h5 class="text-white font-weight-bold my-0">{{ title }}</h5>
 
                 <b-collapse is-nav id="nav_collapse">
 
@@ -55,7 +55,7 @@
     import api from '../api'
 
     export default {
-        props: ['links'],
+        props: ['links', 'title'],
         mounted() {
             this.refreshAuthenticated()
             this.refreshUser()

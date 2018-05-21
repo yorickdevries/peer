@@ -19,13 +19,9 @@ export default new Router({
         {
             path: '/student-dashboard',
             name: 'student-dashboard',
+            redirect: { name: 'student-dashboard.courses'},
             component: () => import('../components/student-dashboard/Layout'),
             children: [
-                {
-                    path: '',
-                    name: 'student-dashboard.index',
-                    component: () => import('../components/student-dashboard/Index')
-                },
                 {
                     path: 'courses',
                     name: 'student-dashboard.courses',

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Navbar :links="navbarItems"/>
+        <Navbar :title="'TI1316: Algoritmen en Datastructuren'" :links="navbarItems"/>
 
         <keep-alive><router-view></router-view></keep-alive>
 

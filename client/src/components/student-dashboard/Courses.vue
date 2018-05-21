@@ -35,10 +35,8 @@ export default {
     },
     data() {
         return {
-            items: [{
-                text: 'Dashboard',
-                to: { name: 'student-dashboard.index'}
-            }, {
+            items: [
+            {
                 text: 'Courses',
                 to: { name: 'student-dashboard'}
             }],
