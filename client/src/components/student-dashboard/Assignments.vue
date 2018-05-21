@@ -15,7 +15,7 @@
 
                             <!--Active Assignments-->
                             <b-tab title="Active Assignments" active>
-                                <b-card v-for="assignment in activeAssignments" no-body class="mt-3">
+                                <b-card v-for="assignment in activeAssignments" :key="assignment.id" no-body class="mt-3">
                                     <b-card-body>
                                         <h4>{{ assignment.name}}</h4>
                                         <p>{{ assignment.description}}</p>
@@ -27,7 +27,7 @@
 
                             <!--Closed Assignments-->
                             <b-tab title="Closed Assignments" >
-                                <b-card v-for="assignment in activeAssignments" no-body class="mt-3">
+                                <b-card v-for="assignment in activeAssignments" :key="assignment.id" no-body class="mt-3">
                                     <b-card-body>
                                         <h4>{{ assignment.name}}</h4>
                                         <p>{{ assignment.description}}</p>

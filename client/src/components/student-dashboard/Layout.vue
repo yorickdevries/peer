@@ -22,7 +22,9 @@ export default {
                 { to: { name: 'student-dashboard.course' } , text: 'Course Home'},
                 { to: { name: 'student-dashboard.assignments' } , text: 'Assignments'},
             ],
-            course: null
+            course: {
+                name: null
+            }
         }
     },
     components: {

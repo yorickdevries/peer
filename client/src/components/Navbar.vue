@@ -20,14 +20,14 @@
                         <b-nav-item-dropdown right>
                             <!-- Using button-content slot -->
                             <template slot="button-content">
-                                <span class="p-3 align-middle">{{ user.name }}</span>
+                                <span class="p-3 align-middle"></span>
                             </template>
                             <b-dropdown-item href="/api/logout">Sign-out</b-dropdown-item>
                         </b-nav-item-dropdown>
 
                     </b-navbar-nav>
 
-                    <b-navbar-nav v-else="authenticated" class="ml-auto">
+                    <b-navbar-nav v-else class="ml-auto">
                         <b-nav-item href="/api/login">Login</b-nav-item>
                     </b-navbar-nav>
 

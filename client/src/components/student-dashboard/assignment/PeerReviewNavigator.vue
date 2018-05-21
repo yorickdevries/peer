@@ -17,7 +17,7 @@
 
                 <!--Peer Review Assesement-->
                 <b-col cols="9" class="pr-0">
-                    <component :is="current"></component>
+                    <component :is="selected"></component>
                 </b-col>
 
             </b-row>
@@ -40,7 +40,7 @@ export default {
         }
     },
     computed: {
-        current() {
+        selected() {
             return this.peerReviews[0]
         }
     }

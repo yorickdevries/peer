@@ -39,8 +39,6 @@
 </template>
 
 <script>
-import api from '../../../api'
-
 export default {
     async created() {
     },
@@ -61,11 +59,6 @@ export default {
     },
     methods: {
         async onSubmit() {
-            try {
-                let res = await api.createCourse(this.course)
-            } catch {
-
-            }
         }
     }
 }

@@ -12,7 +12,7 @@
 
             <!--Course Cards-->
             <b-row>
-                <b-col cols="6" v-for="course in courses">
+                <b-col cols="6" v-for="course in courses" :key="course.id">
                     <b-card :title="course.name" :sub-title="course.name" class="mb-3">
                         <p class="card-text">
                             {{ course.description}}
