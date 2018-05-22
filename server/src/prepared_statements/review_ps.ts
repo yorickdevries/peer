@@ -5,7 +5,7 @@ import express = require("express");
 export default class ReviewPS {
     private static getReview: PreparedStatement = new PreparedStatement("get-review",
         "SELECT review.id, rubric_assignment_id, file_path, comment, done " +
-        "FROM review JOIN submission ON submission.id = review.id " +
+        "FROM review JOIN submission ON submission.id = review.submission_id " +
         "WHERE review.id = $1");
 
     private static submitReview: PreparedStatement = new PreparedStatement("submit-review",
