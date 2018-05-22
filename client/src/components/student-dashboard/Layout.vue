@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Navbar :links="navbarItems"/>
+        <Navbar :title="navbarTitle" :links="navbarItems"/>
 
         <keep-alive><router-view></router-view></keep-alive>
 
@@ -8,20 +8,26 @@
 </template>
 
 <script>
+import api from "../../api"
 import Navbar from "../Navbar"
 
 export default {
-    name: "StudentDashboard",
-    components: {
-        Navbar
+    async created() {
+        let res = await api.getCourse(this.$route.params.id)
+        this.navbarTitle = res.data[0].name
     },
     data() {
         return {
             navbarItems: [
-                { to: { name: 'student-dashboard.index' } , text: 'Dashboard'},
-                { to: { name: 'student-dashboard.courses' } , text: 'Courses'}
-            ]
+                { to: { name: 'student-dashboard.course' } , text: 'Course Home'},
+                { to: { name: 'student-dashboard.course' } , text: 'Assignments'},
+                { to: { name: 'student-dashboard.course' } , text: 'Groups'},
+            ],
+            navbarTitle: null
         }
+    },
+    components: {
+        Navbar
     }
 }
 </script>

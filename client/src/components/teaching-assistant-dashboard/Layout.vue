@@ -11,13 +11,19 @@
 import Navbar from "../Navbar"
 
 export default {
-    name: "StudentDashboard",
     components: {
         Navbar
     },
     data() {
         return {
-            navbarItems: []
+            navbarItems: [
+                { to: { name: 'teaching-assistant-dashboard.course' } , text: 'Course Home'},
+                { to: { name: 'teaching-assistant-dashboard.course' } , text: 'TA Jobs' },
+                { to: { name: 'teaching-assistant-dashboard.course' } , text: 'Students' },
+                { to: { name: 'teaching-assistant-dashboard.course' } , text: 'Grades' },
+                { to: { name: 'teaching-assistant-dashboard.course' } , text: 'Help'},
+
+            ]
         }
     }
 }

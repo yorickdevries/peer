@@ -1,5 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import StudentRoutes from './student-routes'
+import TeacherRoutes from './teacher-routes'
+import TeachingAssistantRoutes from './teaching-assistant-routes'
 Vue.use(Router)
 
 /**
@@ -13,83 +16,24 @@ export default new Router({
     routes: [
         {
             path: '/',
-            name: 'landing-page',
-            component: () => import('../components/landing-page/Index')
-        },
-        {
-            path: '/student-dashboard',
-            name: 'student-dashboard',
-            component: () => import('../components/student-dashboard/Layout'),
+            name: 'general',
+            redirect: { name: 'landing-page' },
+            component: () => import('../components/general/Layout'),
             children: [
                 {
-                    path: '',
-                    name: 'student-dashboard.index',
-                    component: () => import('../components/student-dashboard/Index')
+                    path: '/',
+                    name: 'landing-page',
+                    component: () => import('../components/general/LandingPage')
                 },
                 {
-                    path: 'courses',
-                    name: 'student-dashboard.courses',
-                    component: () => import('../components/student-dashboard/Courses')
-                },
-                {
-                    path: 'courses/:id',
-                    name: 'student-dashboard.course',
-                    component: () => import('../components/student-dashboard/Course')
-                },
-                {
-                    path: 'assignment/:id',
-                    name: 'student-dashboard.assignment',
-                    redirect: 'assignment/:id/hand-in',
-                    component: () => import('../components/student-dashboard/Assignment'),
-                    children: [
-                        {
-                            path: 'hand-in',
-                            name: 'student-dashboard.assignment.hand-in',
-                            component: () => import('../components/student-dashboard/assignment/HandIn')
-                        },
-                        {
-                            path: 'peer-review',
-                            name: 'student-dashboard.assignment.peer-review',
-                            component: () => import('../components/student-dashboard/assignment/PeerReviewNavigator')
-                        },
-                        {
-                            path: 'feedback',
-                            name: 'student-dashboard.assignment.feedback',
-                            component: () => import('../components/student-dashboard/assignment/FeedbackNavigator')
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            path: '/teaching-assistant-dashboard',
-            name: 'teaching-assistant-dashboard',
-            component: () => import('../components/teaching-assistant-dashboard/Layout'),
-            children: [
-                {
-                    path: '',
-                    name: 'teaching-assistant-dashboard.index',
-                    component: () => import('../components/teaching-assistant-dashboard/Index')
+                    path: '/courses',
+                    name: 'courses',
+                    component: () => import('../components/general/Courses')
                 },
             ]
         },
-        {
-            path: '/teacher-dashboard',
-            name: 'teacher-dashboard',
-            redirect: { name: 'teacher-dashboard.courses' },
-            component: () => import('../components/teacher-dashboard/Layout'),
-            children: [
-                {
-                    path: 'courses',
-                    name: 'teacher-dashboard.courses',
-                    component: () => import('../components/teacher-dashboard/Courses'),
-                },
-                {
-                    path: 'create',
-                    name: 'teacher-dashboard.courses.create',
-                    component: () => import('../components/teacher-dashboard/courses/CreateCourse')
-                }
-            ]
-        }
+        ...StudentRoutes,
+        ...TeacherRoutes,
+        ...TeachingAssistantRoutes
     ]
 })

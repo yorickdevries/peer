@@ -16,3 +16,7 @@ body {
 }
 
 /** Custom bootstrap CSS. **/
+
+.bg-primary-light {
+  background-color: rgba($primary, .5);
+}

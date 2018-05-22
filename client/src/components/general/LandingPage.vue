@@ -1,8 +1,6 @@
 <template>
     <div>
 
-        <Navbar :links="navbarItems"></Navbar>
-
         <!--Head Section with Login Card-->
         <b-container class="bg-landing-page" fluid>
 
@@ -17,14 +15,7 @@
                             dictum orci eu lacinia.
                         </p>
                     </b-col>
-
-                    <b-col>
-                        <b-card title="Dashboards" class="w-75">
-                            <router-link to="/student-dashboard/"><b-button variant="primary" class="w-100 mt-1">Student Dashboard</b-button></router-link>
-                            <router-link to="/teaching-assistant-dashboard/"><b-button variant="primary" class="w-100 mt-1">TA Dashboard</b-button></router-link>
-                            <router-link to="/teacher-dashboard/"><b-button variant="primary" class="w-100 mt-1">Teacher Dashboard</b-button></router-link>
-                        </b-card>
-                    </b-col>
+                    <b-col></b-col>
                 </b-row>
             </b-container>
 
@@ -70,24 +61,6 @@
 
     </div>
 </template>
-
-<script>
-import Footer from '../Footer'
-import Navbar from '../Navbar'
-
-export default {
-    name: "LandingPage",
-    components: {
-        Footer,
-        Navbar
-    },
-    data() {
-        return {
-            navbarItems: null
-        }
-    }
-}
-</script>
 
 <style scoped>
 .bg-landing-page {
