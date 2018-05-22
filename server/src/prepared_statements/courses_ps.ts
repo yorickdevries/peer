@@ -15,6 +15,19 @@ export default class CoursesPS {
     private static updateCourse: PreparedStatement = new PreparedStatement("update-course",
         'UPDATE "courselist" SET ("description", "name") = ($1, $2) WHERE "id" = $3 RETURNING id, description, name');
 
+    private static getAssignmentsByCourseId: PreparedStatement = new PreparedStatement("get-assignment-of-course",
+        'SELECT * FROM "assignmentlist" WHERE "course_id" = $1');
+
+    /**
+     * Get all assignments that belong to a specific course.
+     * @param {number} id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeGetAssignmentsByCourseId(id: number): Promise<pgPromise.queryResult> {
+        this.getAssignmentsByCourseId.values = [id];
+        return Database.executeQuery(this.getAssignmentsByCourseId);
+    }
+
 
     /**
      * Executes an 'update course' query

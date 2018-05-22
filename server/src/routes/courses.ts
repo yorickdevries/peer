@@ -9,7 +9,6 @@ const router = Router();
  * Route to update a course
  * Route that creates a new course
  * Route to get all courses.
- * @body id - id
  * @body description - description
  * @body name - name
  */
@@ -17,6 +16,14 @@ router.route("/").post(async (req, res) => {
     res.json(await CoursesPS.executeCreateCourse(req.body.description, req.body.name));
 }).get(async (req, res) => {
     res.json(await CoursesPS.executeGetAllCourses());
+});
+
+/**
+ * Get all assignments that belong to a specific course.
+ * @param course_id - a course id.
+ */
+router.get("/:course_id/assignments", async (req, res) => {
+    res.json(await CoursesPS.executeGetAssignmentsByCourseId(req.params.course_id));
 });
 
 /**
