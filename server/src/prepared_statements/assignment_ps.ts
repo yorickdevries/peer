@@ -34,8 +34,8 @@ export default class AssignmentPS {
      * @param {string} net_id
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeGetReviewByAssignmentId(assignment_id: number, net_id: string): Promise<pgPromise.queryResult> {
-        this.getReviewByAssignmentId.values = [assignment_id, net_id];
+    public static executeGetReviewByAssignmentId(assignmentId: number, netId: string): Promise<pgPromise.queryResult> {
+        this.getReviewByAssignmentId.values = [assignmentId, netId];
         return Database.executeQuerySingleResult(this.getReviewByAssignmentId);
     }
 
@@ -46,8 +46,8 @@ export default class AssignmentPS {
      * @param {number} assignment_id - assignment id
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateReviewByAssignmentId(net_id: string, submission_id: number, assignment_id:number): Promise<pgPromise.queryResult> {
-        this.createReviewByAssignmentId.values = [net_id, submission_id, assignment_id];
+    public static executeCreateReviewByAssignmentId(netId: string, submissionId: number, assignmentId: number): Promise<pgPromise.queryResult> {
+        this.createReviewByAssignmentId.values = [netId, submissionId, assignmentId];
         return Database.executeQuerySingleResult(this.createReviewByAssignmentId);
     }
 
@@ -55,8 +55,8 @@ export default class AssignmentPS {
      * Executes 'get all submissions per assignment'
      * @param assignment_id - assignment_id
      */
-    public static executeGetAllSubmissionsByAssignmentId(assignment_id: number): Promise<pgPromise.queryResult> {
-        this.getAllSubmissionsByAssignmentId.values = [assignment_id];
+    public static executeGetAllSubmissionsByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
+        this.getAllSubmissionsByAssignmentId.values = [assignmentId];
         return Database.executeQuery(this.getAllSubmissionsByAssignmentId);
     }
 
@@ -88,6 +88,7 @@ export default class AssignmentPS {
      * @param dueDate - a due date.
      * @param publishDate - a publish date.
      * @param courseId - a course id.
+     * @param filename - filename
      * @return {any} a query result.
      */
     public static executeAddAssignment(title: string, description: string, dueDate: Date, publishDate: Date, courseId: number, filename: string): Promise<pgPromise.queryResult> {

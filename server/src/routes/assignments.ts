@@ -91,7 +91,7 @@ router.route("/:assignment_id/requestReview")
     .get(async (req: any, res) => {
         res.json(await AssignmentPS.executeCreateReviewByAssignmentId(
             req.userinfo.given_name,
-            0, //HERE THE SHUFFLING NEEDS TO BE DONE
+            0, // HERE THE SHUFFLING NEEDS TO BE DONE
             req.params.assignment_id
         ));
     });
