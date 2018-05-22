@@ -10,6 +10,7 @@ CREATE TABLE AssignmentList (
     publish_date timestamptz NOT NULL,
     id SERIAL,
     Course_id int NOT NULL,
+    filename varchar(100) NOT NULL,
     CONSTRAINT AssignmentList_pk PRIMARY KEY (id)
 );
 
@@ -347,8 +348,8 @@ INSERT INTO public.grouplist(
 	VALUES (10, 'ED-3');
 
 INSERT INTO public.assignmentlist(
-	title, description, course_id, due_date, publish_date)
-	VALUES ('Assignment 1', 'Example assignment number one', 1, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z');
+	title, description, course_id, due_date, publish_date, filename)
+	VALUES ('Assignment 1', 'Example assignment number one', 1, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment/test_file.pdf');
 
 INSERT INTO public.rubric(
 	assignment_id)
