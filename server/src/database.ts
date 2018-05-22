@@ -64,6 +64,24 @@ export default class Database {
         };
       }
   }
+
+    /**
+     * Execute a query on the database, using a prepared statement.
+     * If the data is fetched without awaiting, a promise is returned. Otherwise the
+     * query result.
+     * @param {pgPromise.PreparedStatement} statement - a prepared statement to query.
+     * @return a database query result or an json error with awaiting, a promise otherwise.
+     */
+    public static async executeQuerySingleResult(statement: PreparedStatement) {
+        try {
+            return await Database.db.one(statement);
+        } catch (err) {
+            return {
+                statement: statement,
+                error: "There was a problem executing the information to the database."
+            };
+        }
+    }
 }
 
 Database.initialize();
