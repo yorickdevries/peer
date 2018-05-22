@@ -9,10 +9,10 @@ export default class AssignmentPS {
         'SELECT * FROM "assignmentlist" WHERE "id" = $1');
 
     private static addAssignment: PreparedStatement = new PreparedStatement("addAssignment",
-        'INSERT INTO "assignmentlist" ("title", "description", "due_date", "publish_date", "course_id") VALUES ($1, $2, $3, $4, $5) RETURNING title, description, id, course_id, due_date, publish_date');
+        'INSERT INTO "assignmentlist" ("title", "description", "due_date", "publish_date", "course_id", "filename") VALUES ($1, $2, $3, $4, $5, $6) RETURNING title, description, id, course_id, due_date, publish_date, filename');
 
     private static updateAssignmentById: PreparedStatement = new PreparedStatement("update-assignment-by-id",
-        "UPDATE assignmentlist SET title=$1, description=$2, course_id=$3 WHERE id=$4  RETURNING title, description, id, course_id");
+        "UPDATE assignmentlist SET title=$1, description=$2, course_id=$3, filename=$5 WHERE id=$4  RETURNING title, description, id, course_id, filename");
 
     private static getSubmissionByAssignmentId: PreparedStatement = new PreparedStatement("get-submission-by-assignment",
         "SELECT * FROM sumbission WHERE user_netid = $1 AND assignment_id = $2");
@@ -20,6 +20,35 @@ export default class AssignmentPS {
     private static getAllSubmissionsByAssignmentId: PreparedStatement = new PreparedStatement("get-all-subbmissions-by-assignmentId",
         "SELECT * FROM submission WHERE assignment_id = $1");
 
+    private static createReviewByAssignmentId: PreparedStatement = new PreparedStatement("make-review-for-user",
+        "INSERT INTO review SET comment='', user_netid=$1, submission_id=$2, rubric_assignment_id=$3 RETURNING id, comment, user_netid, submission_id, rubric_assignment_id, done");
+
+    private static getReviewByAssignmentId: PreparedStatement = new PreparedStatement("get-review",
+        "SELECT * FROM review WHERE done=FALSE AND assignment_id=$1 AND user_netid=$2");
+
+
+    /**
+     * Executes a query that gets the review that was assigned to a certain user
+     * @param {number} assignment_id - assignment id
+     * @param {string} net_id - net id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeGetReviewByAssignmentId(assignment_id: number, net_id: string): Promise<pgPromise.queryResult> {
+        this.getReviewByAssignmentId.values = [assignment_id, net_id];
+        return Database.executeQuerySingleResult(this.getReviewByAssignmentId);
+    }
+
+    /**
+     * Executes create review for a specific assignment and user
+     * @param {string} net_id - net id
+     * @param {number} submission_id - submission id
+     * @param {number} assignment_id - assignment id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeCreateReviewByAssignmentId(net_id: string, submission_id: number, assignment_id:number): Promise<pgPromise.queryResult> {
+        this.createReviewByAssignmentId.values = [net_id, submission_id, assignment_id];
+        return Database.executeQuerySingleResult(this.createReviewByAssignmentId);
+    }
 
     /**
      * Executes 'get all submissions per assignment'
@@ -60,8 +89,8 @@ export default class AssignmentPS {
      * @param courseId - a course id.
      * @return {any} a query result.
      */
-    public static executeAddAssignment(title: string, description: string, dueDate: Date, publishDate: Date, courseId: number): Promise<pgPromise.queryResult> {
-        this.addAssignment.values = [title, description, dueDate, publishDate, courseId];
+    public static executeAddAssignment(title: string, description: string, dueDate: Date, publishDate: Date, courseId: number, filename: string): Promise<pgPromise.queryResult> {
+        this.addAssignment.values = [title, description, dueDate, publishDate, courseId, filename];
         return Database.executeQuerySingleResult(this.addAssignment);
     }
 
@@ -76,8 +105,8 @@ export default class AssignmentPS {
     public static executeUpdateAssignmentById(title: string,
                                               description: string,
                                               courseId: number,
-                                              assignmentId: number): Promise<pgPromise.queryResult> {
-        this.updateAssignmentById.values = [title, description, courseId, assignmentId];
+                                              assignmentId: number, filename: string): Promise<pgPromise.queryResult> {
+        this.updateAssignmentById.values = [title, description, courseId, assignmentId, filename];
         return Database.executeQuerySingleResult(this.updateAssignmentById);
     }
 

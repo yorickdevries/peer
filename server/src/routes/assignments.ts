@@ -32,7 +32,8 @@ router.route("/")
             req.body.assignment_description,
             req.body.assignment_due_date,
             req.body.assignment_publish_date,
-            req.body.course_id));
+            req.body.course_id,
+            req.body.filename));
     });
 
 
@@ -51,7 +52,8 @@ router.route("/:assignment_id")
             req.body.assignment_title,
             req.body.assignment_description,
             req.body.course_id,
-            req.params.assignment_id));
+            req.params.assignment_id,
+            req.body.filename));
     });
 
 
@@ -80,5 +82,32 @@ router.route("/:assignment_id/allsubmissions")
     });
 
 
+/**
+ * Route to request a review, returns a review object
+ * @userinfo given_name - NetId
+ * @params assignment_id - assignment_Id
+ */
+router.route("/:assignment_id/requestReview")
+    .get(async (req: any, res) => {
+        res.json(await AssignmentPS.executeCreateReviewByAssignmentId(
+            req.userinfo.given_name,
+            0, //HERE THE SHUFFLING NEEDS TO BE DONE
+            req.params.assignment_id
+        ));
+    });
+
+
+/**
+ * Route to request the review a user is working on
+ * @userinfo given_name - netId
+ * @params assignment_id - assignment_id
+ */
+router.route("/:assignment_id/review")
+    .get(async (req: any, res) => {
+        res.json(await AssignmentPS.executeGetReviewByAssignmentId(
+            req.params.assignment_id,
+            req.userinfo.given_name
+        ));
+    });
 
 export default router;
