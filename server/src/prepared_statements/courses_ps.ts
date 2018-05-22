@@ -4,7 +4,7 @@ import express = require("express");
 
 export default class CoursesPS {
     private static getAllCourses: PreparedStatement = new PreparedStatement("get-all-courses",
-        'SELECT * FROM "courselist"');
+        'SELECT * FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll")');
 
     private static getCourseById: PreparedStatement = new PreparedStatement("get-course-by-id",
         'SELECT * FROM "courselist" WHERE "id" = $1');
@@ -14,20 +14,6 @@ export default class CoursesPS {
 
     private static updateCourse: PreparedStatement = new PreparedStatement("update-course",
         'UPDATE "courselist" SET ("description", "name") = ($1, $2) WHERE "id" = $3 RETURNING id, description, name');
-
-    private static getAssignmentByCourseId: PreparedStatement = new PreparedStatement("get-assignment-of-course",
-        'SELECT * FROM "assignmentlist" WHERE "course_id" = $1');
-
-
-    /**
-     * Ececutes a 'get assignment' query
-     * @param {number} id
-     * @returns {Promise<pgPromise.queryResult>}
-     */
-    public static executeGetAssignmentByCourseId(id: number): Promise<pgPromise.queryResult> {
-        this.getAssignmentByCourseId.values = [id];
-        return Database.executeQuery(this.getAssignmentByCourseId);
-    }
 
 
     /**
@@ -39,7 +25,7 @@ export default class CoursesPS {
      */
     public static executeUpdateCourse(id: number, description: string, name: string): Promise<pgPromise.queryResult> {
         this.updateCourse.values = [description, name, id];
-        return Database.executeQuery(this.updateCourse);
+        return Database.executeQuerySingleResult(this.updateCourse);
     }
 
     /**
@@ -50,7 +36,7 @@ export default class CoursesPS {
      */
     public static executeCreateCourse(description: string, name: string): Promise<pgPromise.queryResult> {
         this.createCourse.values = [description, name];
-        return Database.executeQuery(this.createCourse);
+        return Database.executeQuerySingleResult(this.createCourse);
     }
 
     /**
@@ -70,7 +56,7 @@ export default class CoursesPS {
      */
     public static executeGetCourseById(id: number): Promise<pgPromise.queryResult> {
         this.getCourseById.values = [id];
-        return Database.executeQuery(this.getCourseById);
+        return Database.executeQuerySingleResult(this.getCourseById);
     }
 
 
