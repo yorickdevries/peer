@@ -23,6 +23,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "course_id": 1,
             "description": "Example assignment number one",
             "due_date": new Date("2018-05-01T20:30:00Z"),
+            "filename": "assignment/test_file.pdf",
             "id": 1,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             "title": "Assignment 1"
@@ -33,39 +34,76 @@ describe("AssignmentPreparedStatements Test", () => {
      * Test get assignments by course id and assignment id.
      */
     it("get assignments by course id and assignment id", async () => {
-        expect(await AssignmentPS.executeGetAssignmentById(1, 1)).to.deep.equal([{
+        expect(await AssignmentPS.executeGetAssignmentById(1)).to.deep.equal({
             title: "Assignment 1",
             description: "Example assignment number one",
             "due_date": new Date("2018-05-01T20:30:00Z"),
+            "filename": "assignment/test_file.pdf",
             "id": 1,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             course_id: 1
-        }]);
+        });
     });
 
     /**
      * Test add assignments.
      */
     it("add assignment", async () => {
-        expect(await AssignmentPS.executeAddAssignment("New", "Description", new Date("2018-07-01T20:30:00Z"), new Date("2018-06-01T20:30:00Z"), 1)).to.deep.equal([{
+        expect(await AssignmentPS.executeAddAssignment("New", "Description", new Date("2018-07-01T20:30:00Z"), new Date("2018-06-01T20:30:00Z"), 1,"assignment/test_file.pdf"
+    )).to.deep.equal({
             course_id: 1,
             description: "Description",
             id: 2,
             title: "New",
             due_date: new Date("2018-07-01T20:30:00Z"),
+            "filename": "assignment/test_file.pdf",
             publish_date: new Date("2018-06-01T20:30:00Z"),
-        }]);
+        });
     });
 
     /**
      * Test update assignments.
      */
     it("update assignment", async () => {
-        expect(await AssignmentPS.executeUpdateAssignmentById("Updated", "updated", 1, 1)).to.deep.equal([{
+        expect(await AssignmentPS.executeUpdateAssignmentById("Updated", "updated", 1, 1, "assignment/test_file.pdf")).to.deep.equal({
             course_id: 1,
             description: "updated",
+            "filename": "assignment/test_file.pdf",
             id: 1,
             title: "Updated"
-        }]);
+        });
+    });
+
+
+    /**
+     * Test get review assignment.
+     */
+    it("get review", async () => {
+        expect(await AssignmentPS.executeGetReviewByAssignmentId(1, 'henkjan')).to.deep.equal({
+            "comment": "Plagiaat",
+            "done": false,
+            "id": 1,
+            "rubric_assignment_id": 1,
+            "submission_id": 1,
+            "user_netid": "henkjan"
+
+        });
+    });
+
+
+
+    /**
+     * Test create review.
+     */
+    it("create review", async () => {
+        expect(await AssignmentPS.executeCreateReviewByAssignmentId('paulvanderlaan', 1, 1)).to.deep.equal({
+            "comment": "",
+            "done": false,
+            "id": 2,
+            "rubric_assignment_id": 1,
+            "submission_id": 1,
+            "user_netid": "paulvanderlaan"
+
+        });
     });
 });

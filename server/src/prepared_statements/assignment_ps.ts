@@ -21,16 +21,17 @@ export default class AssignmentPS {
         "SELECT * FROM submission WHERE assignment_id = $1");
 
     private static createReviewByAssignmentId: PreparedStatement = new PreparedStatement("make-review-for-user",
-        "INSERT INTO review SET comment='', user_netid=$1, submission_id=$2, rubric_assignment_id=$3 RETURNING id, comment, user_netid, submission_id, rubric_assignment_id, done");
+        "INSERT INTO review (comment, user_netid, submission_id, rubric_assignment_id) VALUES ('', $1, $2, $3) RETURNING id, comment, user_netid, submission_id, rubric_assignment_id, done");
+
 
     private static getReviewByAssignmentId: PreparedStatement = new PreparedStatement("get-review",
-        "SELECT * FROM review WHERE done=FALSE AND assignment_id=$1 AND user_netid=$2");
+        "SELECT * FROM review WHERE done=FALSE AND rubric_assignment_id=$1 AND user_netid=$2");
 
 
     /**
      * Executes a query that gets the review that was assigned to a certain user
      * @param {number} assignment_id - assignment id
-     * @param {string} net_id - net id
+     * @param {string} net_id
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeGetReviewByAssignmentId(assignment_id: number, net_id: string): Promise<pgPromise.queryResult> {
