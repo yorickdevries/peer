@@ -106,4 +106,18 @@ describe("AssignmentPreparedStatements Test", () => {
 
         });
     });
+
+    /**
+     * Test get all submissions.
+     */
+    it("get all submissions", async () => {
+        expect(await AssignmentPS.executeGetAllSubmissionsByAssignmentId(1)).to.deep.equal([{
+            "file_path": "folder/verygudsubmission.pdf",
+            "id": 1,
+            "assignment_id": 1,
+            "user_netid": "paulvanderlaan"
+        }]);
+    });
+
+
 });
