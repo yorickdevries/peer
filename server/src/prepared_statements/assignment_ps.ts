@@ -17,6 +17,18 @@ export default class AssignmentPS {
     private static getSubmissionByAssignmentId: PreparedStatement = new PreparedStatement("get-submission-by-assignment",
         "SELECT * FROM sumbission WHERE user_netid = $1 AND assignment_id = $2");
 
+    private static getAllSubmissionsByAssignmentId: PreparedStatement = new PreparedStatement("get-all-subbmissions-by-assignmentId",
+        "SELECT * FROM submission WHERE assignment_id = $1");
+
+
+    /**
+     * Executes 'get all submissions per assignment'
+     * @param assignment_id - assignment_id
+     */
+    public static executeGetAllSubmissionsByAssignmentId(assignment_id: number): Promise<pgPromise.queryResult> {
+        this.getAllSubmissionsByAssignmentId.values = [assignment_id];
+        return Database.executeQuery(this.getAllSubmissionsByAssignmentId);
+    }
 
     /**
      * Executes a 'get assignment by course id'.

@@ -54,6 +54,12 @@ router.route("/:assignment_id")
             req.params.assignment_id));
     });
 
+
+/**
+ * Route to get an subbission of someone's assignment
+ * @userinfo given_name - netId
+ * @params assignment_id - assignment_id
+ */
 router.route("/:assignment_id/submssion")
     .get(async (req: any, res) => {
         res.json(await AssignmentPS.executeGetSubmissionByAssignmentId(
@@ -61,6 +67,18 @@ router.route("/:assignment_id/submssion")
             req.params.assignment_id
         ));
     });
+
+/**
+ * Route to get all the submissions per assignment
+ * @params assignment_id - assignment_id
+ */
+router.route("/:assignment_id/allsubmissions")
+    .get(async (req, res) => {
+        res.json(await AssignmentPS.executeGetAllSubmissionsByAssignmentId(
+            req.params.assignment_id
+        ));
+    });
+
 
 
 export default router;
