@@ -7,9 +7,7 @@
                 <h5>Assignment Details</h5>
                 <span class="font-weight-bold">Description</span>
                 <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Commodi consequuntur dolor illum impedit minus neque non quasi quis repudiandae.
-                    At atque culpa dicta eaque et molestias nulla quibusdam reiciendis sunt.
+                    {{ assignment.description }}
                 </p>
                 <span class="font-weight-bold">Peer Review Setup</span>
                 <p>
@@ -25,9 +23,8 @@
             <b-col>
                 <h5>Hand-In</h5>
                 <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                    Commodi consequuntur dolor illum impedit minus neque non quasi quis repudiandae.
-                    At atque culpa dicta eaque et molestias nulla quibusdam reiciendis sunt.
+                    Hand in the assignment here before the due date seen above. Make sure to read the requirements
+                    for the file you need to submit!
                 </p>
                 <b-form-file v-model="file" :state="Boolean(file)" placeholder="Choose a file..."></b-form-file>
                 
@@ -41,8 +38,22 @@
 export default {
     data() {
         return {
-            file: true
+            file: true,
+            items: [],
+            course: {
+                id: 1,
+                name: "ED-3",
+                description: null
+            },
+            assignment: {
+                title: "Assignment 1",
+                description: "Example assignment number one",
+                due_date: "2018-05-01T20:30:00.000Z",
+                publish_date: "2018-04-01T20:30:00.000Z",
+                id: 1,
+                course_id: 1
+            }
         }
-    }
+    },
 }
 </script>

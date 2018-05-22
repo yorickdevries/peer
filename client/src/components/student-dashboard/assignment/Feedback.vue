@@ -20,8 +20,7 @@
 
         <b-card no-body class="mt-3">
             <b-card-body>
-                <h4>Feedback
-                    <Given></Given>
+                <h4>Feedback Given
                 </h4>
                 <p>
                     How well has the author done?
@@ -68,4 +67,14 @@
 
     </div>
 </template>
+
+<script>
+export default {
+    data() {
+        return {
+            text: null,
+        }
+    }
+}
+</script>
 

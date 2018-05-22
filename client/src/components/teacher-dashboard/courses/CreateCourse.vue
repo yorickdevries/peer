@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import api from '../../../api'
+import api from "../../../api";
 
 export default {
     async created() {
@@ -61,11 +61,8 @@ export default {
     },
     methods: {
         async onSubmit() {
-            try {
-                let res = await api.createCourse(this.course)
-            } catch {
-
-            }
+            await api.createCourse(this.course)
+            this.$router.push({name: 'courses'})
         }
     }
 }

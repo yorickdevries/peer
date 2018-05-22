@@ -27,7 +27,7 @@
 
                     </b-navbar-nav>
 
-                    <b-navbar-nav v-else="authenticated" class="ml-auto">
+                    <b-navbar-nav v-else class="ml-auto">
                         <b-nav-item href="/api/login">Login</b-nav-item>
                     </b-navbar-nav>
 

@@ -8,7 +8,12 @@ export default [
             {
                 path: 'courses/:id',
                 name: 'student-dashboard.course',
-                component: () => import('../components/student-dashboard/Course')
+                component: () => import('../components/student-dashboard/Course'),
+            },
+            {
+                path: 'courses/:id/assignments',
+                name: 'student-dashboard.assignments',
+                component: () => import('../components/student-dashboard/Assignments')
             },
             {
                 path: 'assignment/:id',
@@ -24,7 +29,15 @@ export default [
                     {
                         path: 'peer-review',
                         name: 'student-dashboard.assignment.peer-review',
-                        component: () => import('../components/student-dashboard/assignment/PeerReviewNavigator')
+                        component: () => import('../components/student-dashboard/assignment/PeerReviewNavigator'),
+                        children: [
+                            {
+                                path: ':peer_review_id',
+                                name: 'student-dashboard.assignment.peer-review.single',
+                                props: true,
+                                component: () => import ('../components/student-dashboard/assignment/PeerReview')
+                            }
+                        ]
                     },
                     {
                         path: 'feedback',
