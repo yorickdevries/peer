@@ -6,11 +6,11 @@ const router = Router();
 
 /**
  * Route to get a review by review id.
- * @param review_id - a review id.
+ * @param reviewId - a review id.
  * @return a database query result, all columns of review + file_path of the submission.
  */
-router.get("/:review_id", async (req, res) => {
-    res.json(await ReviewsPS.executeGetReview(req.params.review_id));
+router.get("/:reviewId", async (req, res) => {
+    res.json(await ReviewsPS.executeGetReview(req.params.reviewId));
 });
 
 /*
@@ -63,11 +63,11 @@ router.post("/", async (req, res) => {
 
 /**
  * Submit a review by id.
- * @param review_id - an id of a review.
+ * @param reviewId - an id of a review.
  * @return database return value.
  */
-router.get("/:id/submit", async (req, res) => {
-    res.json(await ReviewsPS.executeSubmitReview(req.params.review_id));
+router.get("/:reviewId/submit", async (req, res) => {
+    res.json(await ReviewsPS.executeSubmitReview(req.params.reviewId));
 });
 
 export default router;
