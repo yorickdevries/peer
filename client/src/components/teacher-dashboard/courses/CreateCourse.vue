@@ -39,6 +39,8 @@
 </template>
 
 <script>
+import api from "../../../api";
+
 export default {
     async created() {
     },
@@ -59,6 +61,8 @@ export default {
     },
     methods: {
         async onSubmit() {
+            await api.createCourse(this.course)
+            this.$router.push({name: 'courses'})
         }
     }
 }
