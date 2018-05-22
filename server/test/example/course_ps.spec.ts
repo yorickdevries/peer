@@ -30,18 +30,29 @@ describe("CoursePreparedStatement Test", () => {
      * Get cousre by id
      */
     it("get course by id", async () => {
-        expect(await CoursePS.executeGetCourseById(1)).to.deep.equal([{
+        expect(await CoursePS.executeGetCourseById(1)).to.deep.equal({
             description: "This is a beautiful course description!",
             "id": 1,
             name: "ED-3"
-        }]);
+        });
+    });
+
+    /**
+     * Test create a course
+     */
+    it("createa a course", async () => {
+        expect(await CoursePS.executeCreateCourse("hi", "super leuk")).to.deep.equal({
+            description: "hi",
+            id: 2,
+            name: "super leuk"
+        });
     });
 
     /**
      * Get assignment by courseid
      */
     it("get assignment by course id", async () => {
-        expect(await CoursePS.executeGetAssignmentByCourseId(1)).to.deep.equal([{
+        expect(await CoursePS.executeGetAssignmentsByCourseId(1)).to.deep.equal([{
             course_id: 1,
             description: "Example assignment number one",
             "due_date": new Date("2018-05-01T20:30:00Z"),
@@ -52,26 +63,15 @@ describe("CoursePreparedStatement Test", () => {
     });
 
 
-    /**
-     * Test create a course
-     */
-    it("createa a course", async () => {
-        expect(await CoursePS.executeCreateCourse("hi", "super leuk")).to.deep.equal([{
-            description: "hi",
-            id: 2,
-            name: "super leuk"
-        }]);
-    });
-
-    /**
+        /**
      * Test update a course
      */
     it("update a course", async () => {
-        expect(await CoursePS.executeUpdateCourse(1, "hi", "super leuk")).to.deep.equal([{
+        expect(await CoursePS.executeUpdateCourse(1, "hi", "super leuk")).to.deep.equal({
             description: "hi",
             id: 1,
             name: "super leuk"
-        }]);
+        });
     });
 
 
