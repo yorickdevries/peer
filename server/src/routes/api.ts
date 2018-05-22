@@ -5,9 +5,8 @@ import groups from "./groups";
 import reviews from "./reviews";
 import rubrics from "./rubrics";
 import submissions from "./submissions";
-import app from "../app";
 import session from "express-session";
-import {oidc} from "../express-oidc";
+import { oidc } from "../express-oidc";
 
 const router = Router();
 

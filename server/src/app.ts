@@ -5,8 +5,6 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 import bodyParser from "body-parser";
 import api from "./routes/api";
-import {oidc} from "./express-oidc";
-import session from "express-session";
 
 const app: express.Express = express();
 
