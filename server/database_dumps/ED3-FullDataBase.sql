@@ -117,6 +117,7 @@ CREATE TABLE Review (
     User_netid varchar(256)  NOT NULL,
     Submission_id int NOT NULL,
     Rubric_Assignment_id int NOT NULL,
+    done BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT Review_pk PRIMARY KEY (id)
 );
 
