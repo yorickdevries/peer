@@ -61,4 +61,13 @@ router.post("/", async (req, res) => {
     });
 });
 
+/**
+ * Submit a review by id.
+ * @param review_id - an id of a review.
+ * @return database return value.
+ */
+router.get("/:id/submit", async (req, res) => {
+    res.json(await ReviewsPS.executeSubmitReview(req.params.review_id));
+});
+
 export default router;
