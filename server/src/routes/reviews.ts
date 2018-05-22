@@ -54,7 +54,7 @@ router.post("/", async (req, res) => {
                 break;
             }
             default: {
-                res.json({ error: "Unrecognized type given: " + question.type })
+                res.json({ error: "Unrecognized type given: " + question.type });
                 break;
             }
         }

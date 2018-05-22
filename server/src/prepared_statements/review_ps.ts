@@ -43,7 +43,7 @@ export default class ReviewPS {
      * @param {number} reviewId - a review id.
      * @return {Promise<pgPromise.queryResult>} - a corresponding review where the done field is set to true.
      */
-    public static executeSubmitReview(reviewId: number) : Promise<pgPromise.queryResult> {
+    public static executeSubmitReview(reviewId: number): Promise<pgPromise.queryResult> {
         this.submitReview.values = [reviewId];
         return Database.executeQuery(this.submitReview);
     }

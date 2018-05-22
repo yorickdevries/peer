@@ -37,8 +37,10 @@
   },
   "dependencies": {
     "@okta/oidc-middleware": "^0.1.2",
+    "@types/chai-http": "^3.0.4",
     "bluebird": "3.5.1",
     "body-parser": "^1.18.3",
+    "chai-http": "^4.0.0",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
