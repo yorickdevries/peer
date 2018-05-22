@@ -20,15 +20,6 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-// Okta login
-// session support is required to use ExpressOIDC
-// needs a random secret
-app.use(session({
-    secret: "add something random here",
-    resave: true,
-    saveUninitialized: false
-}));
-
 // Routing
 app.use("/api", api);
 

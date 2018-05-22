@@ -1,16 +1,38 @@
 import { Router } from "express";
-import ReviewPS from "../prepared_statements/review_ps";
-import auth from "./auth";
 import assignments from "./assignments";
 import courses from "./courses";
 import groups from "./groups";
 import reviews from "./reviews";
 import rubrics from "./rubrics";
 import submissions from "./submissions";
+import app from "../app";
+import session from "express-session";
+import {oidc} from "../express-oidc";
 
 const router = Router();
 
-router.use(auth);
+// Okta login
+// session support is required to use ExpressOIDC
+// needs a random secret
+router.use(session({
+    secret: "add something random here",
+    resave: true,
+    saveUninitialized: false
+  }));
+
+// Login/login-redirect route from OIDC
+router.use(oidc.router);
+
+router.get("/logout", (req: any, res) => {
+    req.logout();
+    res.redirect("/");
+});
+
+// Authentication route
+router.get("/authenticated", function (req: any, res) {
+    res.json({ authenticated: req.isAuthenticated() });
+});
+
 
 // Only logged in users can access the API
 router.use(function (req: any, res, next) {

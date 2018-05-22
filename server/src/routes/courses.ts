@@ -1,5 +1,8 @@
 import CoursesPS from "../prepared_statements/courses_ps";
-import router from "./api";
+
+// Router
+import { Router } from "express";
+const router = Router();
 
 /**
  * Route to get information for a specific course.

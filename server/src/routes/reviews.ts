@@ -1,5 +1,8 @@
-import router from "./api";
 import ReviewPS from "../prepared_statements/review_ps";
+
+// Router
+import { Router } from "express";
+const router = Router();
 
 /**
  * Route that creates a new review

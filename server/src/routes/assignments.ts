@@ -1,5 +1,8 @@
 import AssignmentPS from "../prepared_statements/assignment_ps";
-import router from "./api";
+
+// Router
+import { Router } from "express";
+const router = Router();
 
 /**
  * Route to get all assignments for a specific course.

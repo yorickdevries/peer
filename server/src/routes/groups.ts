@@ -1,3 +1,5 @@
-import router from "./api";
+// Router
+import { Router } from "express";
+const router = Router();
 
 export default router;
