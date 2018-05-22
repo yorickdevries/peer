@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 import bodyParser from "body-parser";
 import api from "./routes/api";
+import {oidc} from "./express-oidc";
+import session from "express-session";
 
 const app: express.Express = express();
 
@@ -18,7 +20,16 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+// Okta login
+// session support is required to use ExpressOIDC
+// needs a random secret
+app.use(session({
+    secret: "add something random here",
+    resave: true,
+    saveUninitialized: false
+}));
 
+// Routing
 app.use("/api", api);
 
 // catch 404 and forward to error handler
