@@ -65,7 +65,7 @@ export default class ReviewPS {
     public static executeUpdateMpcAnswer(answer_option: number, questionId: number, reviewId: number)
         : Promise<pgPromise.queryResult> {
         this.updateMpcAnswer.values = [answer_option, questionId, reviewId];
-        return Database.executeQuery(this.updateMpcAnswer);
+        return Database.executeQuerySingleResult(this.updateMpcAnswer);
     }
 
     /**
@@ -78,7 +78,7 @@ export default class ReviewPS {
     public static executeUpdateOpenAnswer(answer: string, questionId: number, reviewId: number)
         : Promise<pgPromise.queryResult> {
         this.updateOpenAnswer.values = [answer, questionId, reviewId];
-        return Database.executeQuery(this.updateOpenAnswer);
+        return Database.executeQuerySingleResult(this.updateOpenAnswer);
     }
 
     /**
@@ -91,7 +91,7 @@ export default class ReviewPS {
     public static executeUpdateRangeAnswer(answer: number, questionId: number, reviewId: number)
         : Promise<pgPromise.queryResult> {
         this.updateRangeAnswer.values = [answer, questionId, reviewId];
-        return Database.executeQuery(this.updateRangeAnswer);
+        return Database.executeQuerySingleResult(this.updateRangeAnswer);
     }
 
     /**
