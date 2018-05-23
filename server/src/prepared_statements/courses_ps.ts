@@ -4,7 +4,7 @@ import express = require("express");
 
 export default class CoursesPS {
     private static getAllCourses: PreparedStatement = new PreparedStatement("get-all-courses",
-        'SELECT * FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll")');
+        'SELECT * FROM "courselist"');
 
     private static getCourseById: PreparedStatement = new PreparedStatement("get-course-by-id",
         'SELECT * FROM "courselist" WHERE "id" = $1');
