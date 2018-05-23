@@ -15,10 +15,12 @@ router.get("/:reviewId", async (req, res) => {
     const review = await ReviewsPS.executeGetReview(req.params.reviewId);
     const questions = await RubricPS.getAllQuestionsByRubricId(review.rubric_assignment_id);
 
+    // Loop through the questions and add answers to them.
     for (let i = 0; i < questions.length; i++) {
         const question = questions[i];
         let answer;
 
+        // Get the answers (from database) to the correct question type.
         switch (question.type_question) {
             case "mc": answer = await ReviewsPS.executeGetMCAnswer(req.params.reviewId, question.id); break;
             case "open": answer = await ReviewsPS.executeGetOpenAnswer(req.params.reviewId, question.id); break;
@@ -26,12 +28,11 @@ router.get("/:reviewId", async (req, res) => {
             default: answer = { error: "unrecognized question type: " + question.type_question }; break;
         }
 
-        jsonItems.push({
-            question: question,
-            answer: answer
-        });
+        // Create the correct JSON format (API documentation) and push to array.
+        jsonItems.push({ question: question, answer: answer });
     }
 
+    // Assemble correct json to send in the response.
     res.json({
         review: review,
         form: jsonItems
@@ -47,49 +48,31 @@ router.put("/:reviewId", async (req, res) => {
     const reviewId = req.params.reviewId;
     let jsonQuestions: any = [];
 
-    req.body.form.foreach(async (item: any) => {
+    req.body.form.forEach(async (item: any) => {
         // Don't insert or update if the answer is not specified.
         if (item.answer == null) return;
 
-        // Update or insert a specific answer.
+        // Update or insert a specific answer and add to questions array.
         switch (item.question.type_question) {
-            case "range": {
-                jsonQuestions.push({
-                    question: item.question,
-                    answer: await ReviewsPS.executeUpdateRangeAnswer(
-                        item.answer,
-                        item.question.id,
-                        reviewId)
-                });
-                break;
-            }
-            case "open": {
-                jsonQuestions.push({
-                    question: item.question,
-                    answer: await ReviewsPS.executeUpdateOpenAnswer(
-                        item.answer,
-                        item.question.id,
-                        reviewId)
-                });
-                break;
-            }
-            case "mpc": {
-                jsonQuestions.push({
-                    question: item.question,
-                    answer: await ReviewsPS.executeUpdateMpcAnswer(
-                        item.answer,
-                        item.question.id,
-                        reviewId)
-                });
-                break;
-            }
-            default: {
-                jsonQuestions.push({ error: "Unrecognized type given: " + item.question.type_question });
-                break;
-            }
+            case "range": jsonQuestions.push({
+                question: item.question,
+                answer: await ReviewsPS.executeUpdateRangeAnswer(item.answer, item.question.id, reviewId)
+            }); break;
+
+            case "open": jsonQuestions.push({
+                question: item.question,
+                answer: await ReviewsPS.executeUpdateOpenAnswer(item.answer, item.question.id, reviewId)
+            }); break;
+
+            case "mc": jsonQuestions.push({
+                question: item.question,
+                answer: await ReviewsPS.executeUpdateMpcAnswer(item.answer, item.question.id, reviewId)
+            }); break;
+            default: jsonQuestions.push({ error: "Unrecognized type given: " + item.question.type_question }); break;
         }
     });
 
+    // Create and respond with the resulting JSON.
     res.json({
         review: await ReviewsPS.executeGetReview(reviewId),
         form: jsonQuestions
