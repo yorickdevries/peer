@@ -206,5 +206,36 @@ export default class RubricPS {
         return Database.executeQuery(this.getAllMCQuestionById);
     }
 
+    /**
+     * Funtion that creates the rubric of all questions
+     * @param {number} rubric_id - rubric_id
+     * @returns {Promise<any[]>}
+     */
+    public static async getAllQuestionsByRubricId(rubricId: number) {
+        const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubricId);
+        const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubricId);
+        const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubricId);
+        const questionJson: any[] = [];
+
+
+        for (let i = 0; i < mcQuestions.length; i++) {
+            questionJson.push({
+                id: mcQuestions[i].id,
+                type_question: mcQuestions[i].type_question,
+                question: mcQuestions[i].question,
+                question_number: mcQuestions[i].question_number,
+                option: await RubricPS.executeGetAllMCOptionById(mcQuestions[i].id)
+        });
+        }
+
+        for (let i = 0; i < openQuestions.length; i++) {
+            questionJson.push(openQuestions[i]);
+        }
+        for (let i = 0; i < rangeQuestions.length; i++) {
+            questionJson.push(rangeQuestions[i]);
+        }
+
+        return questionJson;
+    }
 
 }

@@ -47,3 +47,19 @@ router.put("/openquestion/:question_id", async (req, res) => {
 router.post("/", async (req, res) => {
     res.json(RubricPS.executeCreateRubric(req.body.rubric_id));
 });
+
+/**
+ * Router to get all questions of the rubric in format defined in the documentation
+ * @params rubric_id
+ */
+router.get("/:rubric_id", async (req, res) => {
+   const rubric_id = req.params.rubric_id;
+   const questionJson = await RubricPS.getAllQuestionsByRubricId(rubric_id);
+
+   res.json({
+       id: rubric_id,
+       assignment_id: rubric_id,
+       questions: questionJson
+   });
+});
+
