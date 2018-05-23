@@ -18,46 +18,48 @@ export default {
     getCourseAssignments(courseId) {
         return client.get(`courses/${courseId}/assignments`)
     },
-    getCurrentPeerReview(assignmentId) {
+    getCurrentPeerReview() {
         return new Promise(resolve => {
 
                 let mock = {
-                    id: 1,
-                    rubric_assignment_id: 1,
-                    file_path: 'www.example.path',
-                    comment: "",
-                    done: false,
+                    review: {
+                        id: 1,
+                        rubric_assignment_id: 1,
+                        file_path: 'http://www.example.path',
+                        comment: "",
+                        done: false,
+                    },
 
                     form: [
                         {
                             question: {
                                 id: 32131,
                                 question_number: 1,
-                                type: "range",
+                                type_question: "range",
                                 range: 7,
                                 question: "How good is the project?"
                             },
                             answer: {
-                                answer: null
+                                answer: 3
                             }
                         },
                         {
                             question: {
                                 id: 213,
                                 question_number: 2,
-                                type: "open",
+                                type_question: "open",
                                 question: "Give your thoughts!"
                             },
                             answer: {
-                                answer: null
+                                answer: "Kapparino"
                             }
                         },
                         {
                             question: {
                                 id: 312,
                                 question_number: 3,
-                                type: "mpc",
-                                question: "Choose one",
+                                type_question: "mpc",
+                                question: "Choose one.",
                                 options: [
                                     {
                                         id: 23,
@@ -70,7 +72,7 @@ export default {
                                 ]
                             },
                             answer: {
-                                answer: 23
+                                answer_option: 23
                             }
                         }
                     ]
@@ -78,6 +80,9 @@ export default {
 
             resolve(mock)
         })
+    },
+    submitPeerReview(peerReview) {
+        return client.post(`/reviews/${peerReview.review.id}/submit`, peerReview)
     },
     getAuthenticated: async() => {
         return client.get('authenticated')
