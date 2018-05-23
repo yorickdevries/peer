@@ -8,7 +8,7 @@ export default class ReviewPS {
         "WHERE review.id = $1");
 
     private static submitReview: PreparedStatement = new PreparedStatement("submit-review",
-        "﻿UPDATE review " +
+        "UPDATE review " +
         "SET done=true " +
         "WHERE id = $1" +
         "RETURNING *");
