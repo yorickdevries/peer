@@ -1,6 +1,5 @@
 import Database from "../database";
 import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
-import express = require("express");
 
 export default class ReviewPS {
     private static getReview: PreparedStatement = new PreparedStatement("get-review",
@@ -15,16 +14,16 @@ export default class ReviewPS {
         "RETURNING *");
 
     private static updateMpcAnswer: PreparedStatement = new PreparedStatement("add-mpc-answer",
-        "INSERT INTO mcanswer(answer, mcquestion_id, review_id) VALUES ($1, $2, $3) " +
-        "ON CONFLICT (mcquestion_id, review_id) DO UPDATE SET answer=$1");
+        "INSERT INTO mcanswer(answer_option, mcquestion_id, review_id) VALUES ($1, $2, $3) " +
+        "ON CONFLICT (mcquestion_id, review_id) DO UPDATE SET answer_option=$1﻿RETURNING answer_option");
 
     private static updateOpenAnswer: PreparedStatement = new PreparedStatement("add-open-answer",
         "INSERT INTO openanswer(answer, openquestion_id, review_id) VALUES ($1, $2, $3) " +
-        "ON CONFLICT (openquestion_id, review_id) DO UPDATE SET answer=$1");
+        "ON CONFLICT (openquestion_id, review_id) DO UPDATE SET answer=$1 RETURNING answer");
 
     private static updateRangeAnswer: PreparedStatement = new PreparedStatement("add-range-answer",
         "﻿INSERT INTO rangeanswer(answer, rangequestion_id, review_id) VALUES ($1, $2, $3) " +
-        "ON CONFLICT (rangequestion_id, review_id) DO UPDATE SET answer=$1");
+        "ON CONFLICT (rangequestion_id, review_id) DO UPDATE SET answer=$1 RETURNING answer");
 
 
     /**
@@ -50,20 +49,20 @@ export default class ReviewPS {
 
     /**
      * Execute an 'add mpc answer' query.
-     * @param {string} answer - a 1 char answer.
+     * @param {number} answer_option - a 1 char answer.
      * @param {number} questionId - a question id.
      * @param {number} reviewId - a review id.
      * @return {Promise<pgPromise.queryResult>} - a database query result, empty if succeeded.
      */
-    public static executeUpdateMpcAnswer(answer: string, reviewId: number, questionId: number)
+    public static executeUpdateMpcAnswer(answer_option: number, questionId: number, reviewId: number)
         : Promise<pgPromise.queryResult> {
-        this.updateMpcAnswer.values = [answer, questionId, reviewId];
+        this.updateMpcAnswer.values = [answer_option, questionId, reviewId];
         return Database.executeQuery(this.updateMpcAnswer);
     }
 
     /**
      * Execute an 'add open answer' query.
-     * @param {string} answer - an open answer string.
+     * @param {number} answer - an open answer string.
      * @param {number} questionId - a question id.
      * @param {number} reviewId - a review id.
      * @return {Promise<pgPromise.queryResult>} - a database query result, empty if succeeded.
@@ -76,12 +75,12 @@ export default class ReviewPS {
 
     /**
      * Execute an 'update range answer' query.
-     * @param {string} answer - a range answer.
+     * @param {number} answer - a range answer.
      * @param {number} questionId - a question id.
      * @param {number} reviewId - a review id.
      * @return {Promise<pgPromise.queryResult>} - a database query result, empty if succeeded.
      */
-    public static executeUpdateRangeAnswer(answer: string, questionId: number, reviewId: number)
+    public static executeUpdateRangeAnswer(answer: number, questionId: number, reviewId: number)
         : Promise<pgPromise.queryResult> {
         this.updateRangeAnswer.values = [answer, questionId, reviewId];
         return Database.executeQuery(this.updateRangeAnswer);

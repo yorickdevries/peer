@@ -13,52 +13,63 @@ router.get("/:reviewId", async (req, res) => {
     res.json(await ReviewsPS.executeGetReview(req.params.reviewId));
 });
 
-/*
-JSON (example):
-{
-    updateValues: [
-        {
-            reviewId: 1,
-            questionId: 1,
-            type: "range",
-            answer: 3
-        },
-        {
-            reviewId: 1,
-            questionId: 2,
-            type: "open",
-            answer: "very gud answer"
-        },
-        {
-            reviewId: 1,
-            questionId: 3,
-            type: "mc",
-            answer: "B"
-        }
-    ]
-}
-*/
-router.post("/", async (req, res) => {
-    req.body.updateValues.foreach(async (question: any) => {
-        switch (question.type) {
+
+/**
+ * Route to update or insert and answer by review id.
+ * @body a json object of the whole form, as specified in the doc.
+ * @return
+ */
+router.put("/:reviewId", async (req, res) => {
+    const reviewId = req.params.reviewId;
+    let jsonQuestions: any = [];
+
+    req.body.form.foreach(async (item: any) => {
+        // Don't insert or update if the answer is not specified.
+        if (item.answer == null) return;
+
+        // Update or insert a specific answer.
+        switch (item.question.type_question) {
             case "range": {
-                res.json(await ReviewsPS.executeUpdateRangeAnswer(question.answer, question.questionId, question.reviewId));
+                jsonQuestions.push({
+                    question: item.question,
+                    answer: await ReviewsPS.executeUpdateRangeAnswer(
+                        item.answer,
+                        item.question.id,
+                        reviewId)
+                });
                 break;
             }
             case "open": {
-                res.json(await ReviewsPS.executeUpdateOpenAnswer(question.answer, question.questionId, question.reviewId));
+                jsonQuestions.push({
+                    question: item.question,
+                    answer: await ReviewsPS.executeUpdateOpenAnswer(
+                        item.answer,
+                        item.question.id,
+                        reviewId)
+                });
                 break;
             }
-            case "mc": {
-                res.json(await ReviewsPS.executeUpdateMpcAnswer(question.answer, question.questionId, question.reviewId));
+            case "mpc": {
+                jsonQuestions.push({
+                    question: item.question,
+                    answer: await ReviewsPS.executeUpdateMpcAnswer(
+                        item.answer,
+                        item.question.id,
+                        reviewId)
+                });
                 break;
             }
             default: {
-                res.json({ error: "Unrecognized type given: " + question.type });
+                jsonQuestions.push({ error: "Unrecognized type given: " + item.question.type_question });
                 break;
             }
         }
     });
+
+    return {
+        review: await ReviewsPS.executeGetReview(reviewId),
+        form: jsonQuestions
+    }
 });
 
 /**
