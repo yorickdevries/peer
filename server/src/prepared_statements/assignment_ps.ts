@@ -23,7 +23,6 @@ export default class AssignmentPS {
     private static createReviewByAssignmentId: PreparedStatement = new PreparedStatement("make-review-for-user",
         "INSERT INTO review (comment, user_netid, submission_id, rubric_assignment_id) VALUES ('', $1, $2, $3) RETURNING id, comment, user_netid, submission_id, rubric_assignment_id, done");
 
-
     private static getReviewByAssignmentId: PreparedStatement = new PreparedStatement("get-review",
         "SELECT * FROM review WHERE done=FALSE AND rubric_assignment_id=$1 AND user_netid=$2");
 
