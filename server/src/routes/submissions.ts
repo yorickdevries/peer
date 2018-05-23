@@ -93,4 +93,14 @@ router.post("/", async (req: any, res) => {
     });
 });
 
+/**
+ * Route to get a file from a submission.
+ * @param id - submission id.
+ */
+router.get("/:id/file", async (req, res) => {
+    const submission: any = await SubmissionsPS.executeGetSubmissionById(req.params.id);
+    const filePath = path.join(__dirname, "../files/", submission.file_path);
+    res.sendfile(filePath);
+});
+
 export default router;
