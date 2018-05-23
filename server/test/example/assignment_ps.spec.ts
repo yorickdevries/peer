@@ -22,9 +22,9 @@ describe("AssignmentPreparedStatements Test", () => {
         expect([{
             "course_id": 1,
             "description": "Example assignment number one",
-            "due_date": new Date("2018-05-01T20:30:00.000Z"),
+            "due_date": new Date("2018-05-01T20:30:00Z"),
             "id": 1,
-            "publish_date": new Date("2018-04-01T20:30:00.000Z"),
+            "publish_date": new Date("2018-04-01T20:30:00Z"),
             "title": "Assignment 1"
         }]).to.deep.equal(await AssignmentPS.executeGetAssignments(1));
     });
