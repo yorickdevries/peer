@@ -14,15 +14,15 @@ export default class ReviewPS {
         "RETURNING *");
 
     private static updateMpcAnswer: PreparedStatement = new PreparedStatement("add-mpc-answer",
-        "INSERT INTO mcanswer(answer_option, mcquestion_id, review_id) VALUES ($1, $2, $3) " +
-        "ON CONFLICT (mcquestion_id, review_id) DO UPDATE SET answer_option=$1﻿RETURNING answer_option");
+            "INSERT INTO mcanswer(answer_option, mcquestion_id, review_id) VALUES ($1, $2, $3) " +
+            "ON CONFLICT (mcquestion_id, review_id) DO UPDATE SET answer_option=$1 RETURNING answer_option");
 
     private static updateOpenAnswer: PreparedStatement = new PreparedStatement("add-open-answer",
         "INSERT INTO openanswer(answer, openquestion_id, review_id) VALUES ($1, $2, $3) " +
         "ON CONFLICT (openquestion_id, review_id) DO UPDATE SET answer=$1 RETURNING answer");
 
     private static updateRangeAnswer: PreparedStatement = new PreparedStatement("add-range-answer",
-        "﻿INSERT INTO rangeanswer(answer, rangequestion_id, review_id) VALUES ($1, $2, $3) " +
+        "INSERT INTO rangeanswer(answer, rangequestion_id, review_id) VALUES ($1, $2, $3) " +
         "ON CONFLICT (rangequestion_id, review_id) DO UPDATE SET answer=$1 RETURNING answer");
 
     private static getMCAnswerByReviewId: PreparedStatement = new PreparedStatement("get-mc-answer-by-id",
