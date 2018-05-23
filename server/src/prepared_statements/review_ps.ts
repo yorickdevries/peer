@@ -29,10 +29,10 @@ export default class ReviewPS {
         "SELECT * FROM mcanswer WHERE review_id = $1 AND mcquestion_id = $2");
 
     private static getOpenAnswerByReviewId: PreparedStatement = new PreparedStatement("get-open-answer-by-id",
-        "﻿SELECT * FROM openanswer WHERE review_id = $1 AND openquestion_id = $2");
+        "SELECT * FROM openanswer WHERE review_id = $1 AND openquestion_id = $2");
 
     private static getRangeAnswerByReviewId: PreparedStatement = new PreparedStatement("get-range-answer-by-id",
-        "﻿SELECT * FROM rangeanswer WHERE review_id = $1 AND rangequestion_id = $2");
+        "SELECT * FROM rangeanswer WHERE review_id = $1 AND rangequestion_id = $2");
 
     /**
      * Execute a 'get review' query, where all reviews are fetched.
@@ -114,8 +114,8 @@ export default class ReviewPS {
      */
     public static executeGetRangeAnswer(reviewId: number, rangeQuestionId: number)
         : Promise<pgPromise.queryResult> {
-        this.getOpenAnswerByReviewId.values = [reviewId, rangeQuestionId];
-        return Database.executeQuerySingleResult(this.getOpenAnswerByReviewId);
+        this.getRangeAnswerByReviewId.values = [reviewId, rangeQuestionId];
+        return Database.executeQuerySingleResult(this.getRangeAnswerByReviewId);
     }
 
     /**
@@ -126,7 +126,7 @@ export default class ReviewPS {
      */
     public static executeGetOpenAnswer(reviewId: number, openQuestionId: number)
         : Promise<pgPromise.queryResult> {
-        this.getRangeAnswerByReviewId.values = [reviewId, openQuestionId];
-        return Database.executeQuerySingleResult(this.getRangeAnswerByReviewId);
+        this.getOpenAnswerByReviewId.values = [reviewId, openQuestionId];
+        return Database.executeQuerySingleResult(this.getOpenAnswerByReviewId);
     }
 }
