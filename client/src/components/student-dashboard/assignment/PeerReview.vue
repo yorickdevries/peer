@@ -49,9 +49,9 @@
             <b-list-group flush>
 
                 <!--Loop through all the questions.-->
-                <b-list-group-item v-for="pair in peerReview.form" :key="pair.question.question_number">
+                <b-list-group-item v-for="pair in peerReviewSorted.form" :key="pair.question.question_number">
                     <div class="mb-2 bottom-right">
-                        <h5 class="text-primary">Question {{ pair.question.question_number }}</h5>
+                        <h5 class="text-primary">Question {{ pair.question.question_number }} of {{ totalAmountOfQuestions }}</h5>
                         <p>
                             {{ pair.question.question }}
                         </p>
@@ -148,8 +148,21 @@ export default {
             this.peerReview = res.data
         }
     },
+    computed: {
+        totalAmountOfQuestions() {
+            return this.peerReview.form.length
+        },
+        peerReviewSorted() {
+            return {
+                review: this.peerReview.review,
+                form: this.peerReview.form.sort((a, b) => {
+                    return a.question.question_number - b.question.question_number
+                })
+            }
+        }
+    },
     components: {
         StarRating
-    }
+    },
 }
 </script>
