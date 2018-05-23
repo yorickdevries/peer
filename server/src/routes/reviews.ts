@@ -11,14 +11,37 @@ const router = Router();
  * @return a database query result, all columns of review + file_path of the submission.
  */
 router.get("/:reviewId", async (req, res) => {
-    res.json(await ReviewsPS.executeGetReview(req.params.reviewId));
-});
+    let jsonItems: any = [];
+    const review = await ReviewsPS.executeGetReview(req.params.reviewId);
+    const questions = await RubricPS.getAllQuestionsByRubricId(review.rubric_assignment_id);
 
+    for (let i = 0; i < questions.length; i++) {
+        const question = questions[i];
+        let answer;
+
+        switch (question.type_question) {
+            case "mc": answer = await ReviewsPS.executeGetMCAnswer(req.params.reviewId, question.id); break;
+            case "open": answer = await ReviewsPS.executeGetOpenAnswer(req.params.reviewId, question.id); break;
+            case "range": answer = await ReviewsPS.executeGetRangeAnswer(req.params.reviewId, question.id); break;
+            default: answer = { error: "unrecognized question type: " + question.type_question }; break;
+        }
+
+        jsonItems.push({
+            question: question,
+            answer: answer
+        });
+    }
+
+    res.json({
+        review: review,
+        form: jsonItems
+    });
+});
 
 /**
  * Route to update or insert and answer by review id.
  * @body a json object of the whole form, as specified in the doc.
- * @return
+ * @return JSON representation of a review.
  */
 router.put("/:reviewId", async (req, res) => {
     const reviewId = req.params.reviewId;
