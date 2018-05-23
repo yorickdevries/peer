@@ -347,7 +347,7 @@ INSERT INTO public.grouplist(
 
 INSERT INTO public.assignmentlist(
 	title, description, course_id, due_date, publish_date)
-	VALUES ('Assignment 1', 'Example assignment number one', 1, '2018-05-01T20:30:00.000Z', '2018-04-01T20:30:00.000Z');
+	VALUES ('Assignment 1', 'Example assignment number one', 1, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z');
 
 INSERT INTO public.rubric(
 	assignment_id)
