@@ -18,6 +18,9 @@ export default {
     getCourseAssignments(courseId) {
         return client.get(`courses/${courseId}/assignments`)
     },
+    getAssignment(assignmentId) {
+        return client.get(`assignments/${assignmentId}`)
+    },
     getCurrentPeerReview() {
         return new Promise(resolve => {
 
