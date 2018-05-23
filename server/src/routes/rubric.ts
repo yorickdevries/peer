@@ -1,4 +1,4 @@
-import RubricPS, {default as rubricPS} from "../prepared_statements/rubric_ps"
+import RubricPS from "../prepared_statements/rubric_ps"
 
 // Router
 import { Router } from "express";
@@ -37,7 +37,7 @@ router.post("/mcquestion", async (req, res) => {
  * @body question, rubric_id, question_number
  */
 router.put("/mcquestion/:question_id", async (req, res) => {
-    res.json(rubricPS.executeUpdateMCQuestion(req.body.question, req.body.rubric_id, req.body.question_number, req.params.question_id));
+    res.json(RubricPS.executeUpdateMCQuestion(req.body.question, req.body.rubric_id, req.body.question_number, req.params.question_id));
 });
 
 /**
@@ -54,7 +54,7 @@ router.post("/rangequestion", async (req, res) => {
  * @body question, range, rubric_id, question_number
  */
 router.put("/rangequestion/:question_id", async (req, res) => {
-    res.json(rubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.rubric_id, req.body.question_number, req.params.question_id));
+    res.json(RubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.rubric_id, req.body.question_number, req.params.question_id));
 });
 
 /**
@@ -71,7 +71,7 @@ router.post("/openquestion", async (req, res) => {
  * @body question, rubric_id, question_number
  */
 router.put("/openquestion/:question_id", async (req, res) => {
-    res.json(rubricPS.executeUpdateOpenQuestion(req.body.question, req.body.rubric_id, req.body.question_number, req.params.question_id));
+    res.json(RubricPS.executeUpdateOpenQuestion(req.body.question, req.body.rubric_id, req.body.question_number, req.params.question_id));
 });
 
 /**
