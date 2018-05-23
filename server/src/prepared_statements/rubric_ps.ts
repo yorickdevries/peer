@@ -12,11 +12,21 @@ export default class rubricPS {
     private static createOpenQuestion: PreparedStatement = new PreparedStatement("make-open-question",
         'INSERT INTO openquestion (question, rubric_assignment_id, question_number VALUES ($1, $2, $3) RETURNING *');
 
+    private static createMPQuestion: PreparedStatement = new PreparedStatement("make-MPC-question",
+        'INSERT INTO mcquestion (question, rubric_assignment_id, question_number) VALUES ($1, $2, $3) RETURNING *');
+
+    private static createRangeQuestion: PreparedStatement = new PreparedStatement("make-range-question",
+        'INSERT INTO rangequestion (question, range, rubric_assignment_id, question_number) VALUES ($1, $2, $3, $4) RETURNING *');
+
+    private static createMCOption: PreparedStatement = new PreparedStatement("make-MC-option",
+        'INSERT INTO mcoption (option, mcquestion_id) VALUES ($1, $2) RETURNING *');
+    
+
     /**
      * executes 'create open question' query
      * @param {string} question - question
      * @param {number} assignmentId - assignment_id
-     * @param {number} questionNr - question_number
+     * @param {number} questionNr - questino_number
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeCreateOpenQuestion(question: string, assignmentId: number, questionNr: number): Promise<pgPromise.queryResult> {
