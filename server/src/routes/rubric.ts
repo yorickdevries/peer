@@ -1,4 +1,4 @@
-import RubricPS from "../prepared_statements/rubric_ps"
+import RubricPS from "../prepared_statements/rubric_ps";
 
 // Router
 import { Router } from "express";
@@ -89,12 +89,12 @@ router.post("/", async (req, res) => {
  */
 router.get("/:rubric_id", async (req, res) => {
    const rubric_id = req.params.rubric_id;
-   let mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubric_id);
-   let openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubric_id);
-   let rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubric_id);
-   let questionJson: any[] = [];
+   const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubric_id);
+   const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubric_id);
+   const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubric_id);
+   const questionJson: any[] = [];
 
-   for (var i = 0; i<mcQuestions.length; i++) {
+   for (let i = 0; i < mcQuestions.length; i++) {
         questionJson.push({
            id: mcQuestions[i].id,
            type_question: mcQuestions[i].type_question,
@@ -104,10 +104,10 @@ router.get("/:rubric_id", async (req, res) => {
        });
    }
 
-   for (var i = 0; i<openQuestions.length; i++) {
+   for (let i = 0; i < openQuestions.length; i++) {
        questionJson.push(openQuestions[i]);
    }
-   for (var i = 0; i<rangeQuestions.length; i++) {
+   for (let i = 0; i < rangeQuestions.length; i++) {
        questionJson.push(rangeQuestions[i]);
    }
 
@@ -115,5 +115,5 @@ router.get("/:rubric_id", async (req, res) => {
        id: rubric_id,
        assignment_id: rubric_id,
        questions: questionJson
-   })
+   });
 });

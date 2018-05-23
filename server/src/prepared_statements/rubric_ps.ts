@@ -53,8 +53,8 @@ export default class RubricPS {
      * @param {number} id
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeUpdateMCOption(option: string, mcquestion_id: number, id: number): Promise<pgPromise.queryResult> {
-        this.updateMCOption.values = [option, mcquestion_id, id];
+    public static executeUpdateMCOption(option: string, mcquestionId: number, id: number): Promise<pgPromise.queryResult> {
+        this.updateMCOption.values = [option, mcquestionId, id];
         return Database.executeQuerySingleResult(this.updateMCOption);
     }
 
@@ -66,8 +66,8 @@ export default class RubricPS {
      * @param {number} id - id
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeUpdateMCQuestion(question: string, rubric_assignment_id: number, question_number: number, id: number): Promise<pgPromise.queryResult> {
-        this.updateMCQuestion.values = [question, rubric_assignment_id, question_number, id];
+    public static executeUpdateMCQuestion(question: string, rubricAssignmentId: number, questionNumber: number, id: number): Promise<pgPromise.queryResult> {
+        this.updateMCQuestion.values = [question, rubricAssignmentId, questionNumber, id];
         return Database.executeQuerySingleResult(this.updateMCQuestion);
     }
 
@@ -80,8 +80,8 @@ export default class RubricPS {
      * @param {number} id - id
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeUpdateRangeQuestion(question: string, range: number, rubric_assignment_id: number, question_number: number, id: number): Promise<pgPromise.queryResult> {
-        this.updateRangeQuestion.values = [question, range, rubric_assignment_id, question_number, id];
+    public static executeUpdateRangeQuestion(question: string, range: number, rubricAssignmentId: number, questionNumber: number, id: number): Promise<pgPromise.queryResult> {
+        this.updateRangeQuestion.values = [question, range, rubricAssignmentId, questionNumber, id];
         return Database.executeQuerySingleResult(this.updateRangeQuestion);
     }
 
@@ -93,8 +93,8 @@ export default class RubricPS {
      * @param {number} id - id
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeUpdateOpenQuestion(question: string, rubric_assignment_id: number, question_number: number, id: number): Promise<pgPromise.queryResult> {
-        this.updateOpenQuestion.values = [question, rubric_assignment_id, question_number, id];
+    public static executeUpdateOpenQuestion(question: string, rubricAssignmentId: number, questionNumber: number, id: number): Promise<pgPromise.queryResult> {
+        this.updateOpenQuestion.values = [question, rubricAssignmentId, questionNumber, id];
         return Database.executeQuerySingleResult(this.updateOpenQuestion);
     }
 
@@ -104,8 +104,8 @@ export default class RubricPS {
      * @param {number} mcquestion_id - mcquestion_id
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateMCOption(option: string, mcquestion_id: number): Promise<pgPromise.queryResult> {
-        this.createMCOption.values = [option, mcquestion_id];
+    public static executeCreateMCOption(option: string, mcquestionId: number): Promise<pgPromise.queryResult> {
+        this.createMCOption.values = [option, mcquestionId];
         return Database.executeQuerySingleResult(this.createMCOption);
     }
 
@@ -117,8 +117,8 @@ export default class RubricPS {
      * @param {number} question_number - question_number
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateRangeQuestion(question: string, range: number, rubric_assignment_id: number, question_number: number): Promise<pgPromise.queryResult>{
-        this.createRangeQuestion.values = [question, range, rubric_assignment_id, question_number];
+    public static executeCreateRangeQuestion(question: string, range: number, rubricAssignmentId: number, questionNumber: number): Promise<pgPromise.queryResult> {
+        this.createRangeQuestion.values = [question, range, rubricAssignmentId, questionNumber];
         return Database.executeQuerySingleResult(this.createRangeQuestion);
     }
 
@@ -129,8 +129,8 @@ export default class RubricPS {
      * @param {number} question_number - question_number
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateMCQuestion(question: string, rubric_assignment_id: number, question_number: number): Promise<pgPromise.queryResult> {
-        this.createMCQuestion.values = [question, rubric_assignment_id, question_number];
+    public static executeCreateMCQuestion(question: string, rubricAssignmentId: number, questionNumber: number): Promise<pgPromise.queryResult> {
+        this.createMCQuestion.values = [question, rubricAssignmentId, questionNumber];
         return Database.executeQuerySingleResult(this.createMCQuestion);
     }
 
