@@ -211,10 +211,10 @@ export default class RubricPS {
      * @param {number} rubric_id - rubric_id
      * @returns {Promise<any[]>}
      */
-    public static async getAllQuestionsByRubricId(rubric_id: number) {
-        const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubric_id);
-        const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubric_id);
-        const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubric_id);
+    public static async getAllQuestionsByRubricId(rubricId: number) {
+        const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubricId);
+        const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubricId);
+        const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubricId);
         const questionJson: any[] = [];
 
 
