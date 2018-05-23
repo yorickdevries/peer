@@ -13,7 +13,7 @@
                                     <span class="lead">Peer #{{ peerReview.review.id }}</span>
                                 </b-col>
                                 <b-col>
-                                    <a href="http://www.example.path"><button type="button" class="btn btn-success success w-100 h-100">Download Hand-In</button></a>
+                                    <a :href="formattedFilePath"><button type="button" class="btn btn-success success w-100 h-100">Download Hand-In</button></a>
                                 </b-col>
                             </b-row>
                         </b-container>
@@ -49,8 +49,8 @@
             <b-list-group flush>
 
                 <!--Loop through all the questions.-->
-                <b-list-group-item v-for="pair in peerReviewSorted.form" :key="pair.question.question_number">
-                    <div class="mb-2 bottom-right">
+                <b-list-group-item class="py-4" v-for="pair in peerReviewSorted.form" :key="pair.question.question_number">
+                    <div class="mb-2">
                         <h5 class="text-primary">Question {{ pair.question.question_number }} of {{ totalAmountOfQuestions }}</h5>
                         <p>
                             {{ pair.question.question }}
@@ -159,6 +159,12 @@ export default {
                     return a.question.question_number - b.question.question_number
                 })
             }
+        },
+        formattedFilePath() {
+            if (this.peerReview.review.file_path.charAt(0) !== '/') {
+                return '/' + this.peerReview.review.file_path
+            }
+            return this.peerReview.review.file_path
         }
     },
     components: {
