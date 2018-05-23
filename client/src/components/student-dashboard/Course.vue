@@ -73,20 +73,17 @@ import api from "../../api"
 export default {
     async created() {
         let res = await api.getCourse(this.$route.params.id)
-        this.course = res.data[0]
-        this.items =  [
-            {
-                text: this.course.name,
-                active: true
-            },
-            {
-                text: 'Course Home',
-                active: true
-            }]
+
+        this.course = res.data
     },
     data() {
         return {
-            items: null,
+            items: [
+                {
+                    text: 'Course Home',
+                    active: true
+                }
+            ],
             course: {
                 name: null,
                 description: null

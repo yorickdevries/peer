@@ -16,7 +16,7 @@ export default {
         return client.post('courses', course)
     },
     getCourseAssignments(courseId) {
-        return client.get(`assignments/${courseId}`)
+        return client.get(`courses/${courseId}/assignments`)
     },
     getAuthenticated: async() => {
         return client.get('authenticated')

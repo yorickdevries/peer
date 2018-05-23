@@ -53,28 +53,16 @@ export default {
     async created() {
         let resAssignment = await api.getCourseAssignments(this.$route.params.id)
         this.assignments = resAssignment.data
-
-        let resCourse = await api.getCourse(this.assignments[0].course_id)
-        this.course = resCourse.data[0]
-
-        this.items = [
-            {
-                text: this.course.name,
-                active: true
-            },
-            {
-                text: 'Assignments',
-                active: true
-            }]
     },
     data() {
         return {
-            items: [],
-            assignments: [],
-            course: {
-                name: null,
-                description: null
-            }
+            items: [
+                {
+                    text: 'Assignments',
+                    active: true
+                }
+            ],
+            assignments: []
         }
     },
     computed: {

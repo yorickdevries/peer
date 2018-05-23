@@ -14,7 +14,7 @@ import Navbar from "../Navbar"
 export default {
     async created() {
         let res = await api.getCourse(this.$route.params.id)
-        this.course = res.data[0]
+        this.course = res.data
     },
     data() {
         return {

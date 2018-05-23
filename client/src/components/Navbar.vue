@@ -63,7 +63,9 @@
         data() {
             return {
                 authenticated: null,
-                user: null,
+                user: {
+                    name: null
+                },
                 currentCourse: "TI1316: Algoritmen en Datastructuren"
             }
         },
