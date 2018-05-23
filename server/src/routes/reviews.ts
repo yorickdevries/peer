@@ -66,10 +66,10 @@ router.put("/:reviewId", async (req, res) => {
         }
     });
 
-    return {
+    res.json({
         review: await ReviewsPS.executeGetReview(reviewId),
         form: jsonQuestions
-    }
+    });
 });
 
 /**
