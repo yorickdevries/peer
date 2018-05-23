@@ -1,8 +1,17 @@
 "use strict";
+import fs from "fs";
+import path from "path";
 import pgpromise from "pg-promise";
 import Database from "./database";
 
 const qf = new pgpromise.QueryFile("../database_dumps/ED3-FullDataBase.sql");
+
+// make file folder
+const fileFolder = path.join(__dirname, "./files/");
+if (!fs.existsSync(fileFolder)) {
+    fs.mkdirSync(fileFolder);
+    console.log("Created folder: " + fileFolder);
+}
 
 // import database
 console.log("Importing database");
