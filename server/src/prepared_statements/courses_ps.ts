@@ -7,7 +7,7 @@ export default class CoursesPS {
         'SELECT * FROM "courselist"');
 
     private static getAllEnrolledCourses: PreparedStatement = new PreparedStatement("get-all-courses-you-are-enrolled,",
-        '﻿SELECT * FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" WHERE user_netid LIKE $1)');
+        'SELECT * FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" WHERE user_netid LIKE $1)');
 
     private static getCourseById: PreparedStatement = new PreparedStatement("get-course-by-id",
         'SELECT * FROM "courselist" WHERE "id" = $1');

@@ -75,7 +75,25 @@ describe("CoursePreparedStatement Test", () => {
         });
     });
 
+    /**
+     * Test get enrolled courses.
+     */
+    it("get all enrolled courses", async () => {
+        expect([{
+            description: "This is a beautiful course description!",
+            id: 1,
+            name: "ED-3"
+        }]).to.deep.equal(await CoursePS.executeGetAllEnrolledCourses('paulvanderlaan'));
+    });
 
+    /**
+     * Test get course role of user.
+     */
+    it("get course role of user", async () => {
+        expect({
+            role: "Owner"
+        }).to.deep.equal(await CoursePS.executeGetRoleById('paulvanderlaan', 1));
+    });
 
 
 
