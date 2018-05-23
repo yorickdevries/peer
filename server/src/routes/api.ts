@@ -3,7 +3,7 @@ import assignments from "./assignments";
 import courses from "./courses";
 import groups from "./groups";
 import reviews from "./reviews";
-import rubrics from "./rubrics";
+import rubrics from "./rubric";
 import submissions from "./submissions";
 import session from "express-session";
 import { oidc } from "../express-oidc";
