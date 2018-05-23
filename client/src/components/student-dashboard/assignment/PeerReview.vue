@@ -25,6 +25,9 @@
             </b-card-body>
 
             <b-list-group flush>
+
+
+
                 <b-list-group-item>
                     <div class="mb-2 bottom-right">
                         <h5 class="text-primary">Question 1 of 3.</h5>
@@ -91,17 +94,21 @@
 import { StarRating } from 'vue-rate-it';
 
 export default {
-    props: ['peer_review_id'],
-    async mounted() {
-
-        // Get peer review.
-        this.peerSubmission = {
-            id: this.$route.params.peer_review_id,
-            download_link: "sample"
-        }
+    async created() {
+        let res = await api.getCurrentPeerReview(this.$route.params.$id);
+        this.peerReview = res
     },
     data() {
         return {
+            peerReview: {
+                id: null,
+                rubric_assignment_id: null,
+                file_path: null,
+                comment: null,
+                done: null,
+
+                form: []
+            },
             text: "",
             rating: null,
             options: [

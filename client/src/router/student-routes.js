@@ -29,15 +29,7 @@ export default [
                     {
                         path: 'peer-review',
                         name: 'student-dashboard.assignment.peer-review',
-                        component: () => import('../components/student-dashboard/assignment/PeerReviewNavigator'),
-                        children: [
-                            {
-                                path: ':peer_review_id',
-                                name: 'student-dashboard.assignment.peer-review.single',
-                                props: true,
-                                component: () => import ('../components/student-dashboard/assignment/PeerReview')
-                            }
-                        ]
+                        component: () => import('../components/student-dashboard/assignment/PeerReview'),
                     },
                     {
                         path: 'feedback',
