@@ -46,26 +46,6 @@ export default class rubricPS {
         'SELECT * FROM mcoption WHERE mcquestion_id = $1');
 
 
-    public static executeGetAllMCOptionById(id: number): any {
-        this.getAllMCOptionById.values = [id];
-        return Database.executeQuery(this.getAllMCOptionById);
-    }
-
-    public static executeGetAllRangeQuestionById(id: number): any {
-        this.getAllRangeQuestionById.values = [id];
-        return Database.executeQuery(this.getAllRangeQuestionById);
-    }
-
-    public static executeGetAllOpenQuestionById(id: number): any {
-        this.getAllOpenQuestionById.values = [id];
-        return Database.executeQuery(this.getAllOpenQuestionById);
-    }
-
-    public static executeGetAllMCQuestionById(id: number): any {
-        this.getAllMCQuestionById.values = [id];
-        return Database.executeQuery(this.getAllMCQuestionById);
-    }
-
     /**
      * executes 'update mc option' query
      * @param {string} option
@@ -184,6 +164,46 @@ export default class rubricPS {
     public static executeGetRubricById(assignmentId: number): Promise<pgPromise.queryResult> {
         this.getRubricById.values = [assignmentId];
         return Database.executeQuerySingleResult(this.getRubricById);
+    }
+
+    /**
+     * executes 'get all options by id' query
+     * @param {number} id - mcquestion_id
+     * @returns {any}
+     */
+    public static executeGetAllMCOptionById(id: number): any {
+        this.getAllMCOptionById.values = [id];
+        return Database.executeQuery(this.getAllMCOptionById);
+    }
+
+    /**
+     * executes 'get all range questions' query
+     * @param {number} id - assignment_id
+     * @returns {any}
+     */
+    public static executeGetAllRangeQuestionById(id: number): any {
+        this.getAllRangeQuestionById.values = [id];
+        return Database.executeQuery(this.getAllRangeQuestionById);
+    }
+
+    /**
+     * executes 'get all open questions' query
+     * @param {number} id - assignment_id
+     * @returns {any}
+     */
+    public static executeGetAllOpenQuestionById(id: number): any {
+        this.getAllOpenQuestionById.values = [id];
+        return Database.executeQuery(this.getAllOpenQuestionById);
+    }
+
+    /**
+     * executes 'get all MC questions' qeury
+     * @param {number} id - assignment_id
+     * @returns {any}
+     */
+    public static executeGetAllMCQuestionById(id: number): any {
+        this.getAllMCQuestionById.values = [id];
+        return Database.executeQuery(this.getAllMCQuestionById);
     }
 
 
