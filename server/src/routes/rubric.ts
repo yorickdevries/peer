@@ -89,27 +89,7 @@ router.post("/", async (req, res) => {
  */
 router.get("/:rubric_id", async (req, res) => {
    const rubric_id = req.params.rubric_id;
-   const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubric_id);
-   const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubric_id);
-   const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubric_id);
-   const questionJson: any[] = [];
-
-   for (let i = 0; i < mcQuestions.length; i++) {
-        questionJson.push({
-           id: mcQuestions[i].id,
-           type_question: mcQuestions[i].type_question,
-           question: mcQuestions[i].question,
-           question_number: mcQuestions[i].question_number,
-           option: await RubricPS.executeGetAllMCOptionById(mcQuestions[i].id)
-       });
-   }
-
-   for (let i = 0; i < openQuestions.length; i++) {
-       questionJson.push(openQuestions[i]);
-   }
-   for (let i = 0; i < rangeQuestions.length; i++) {
-       questionJson.push(rangeQuestions[i]);
-   }
+   const questionJson = await RubricPS.getAllQuestionsByRubricId(rubric_id);
 
    res.json({
        id: rubric_id,
@@ -117,3 +97,4 @@ router.get("/:rubric_id", async (req, res) => {
        questions: questionJson
    });
 });
+
