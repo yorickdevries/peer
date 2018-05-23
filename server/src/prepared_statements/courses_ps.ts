@@ -4,6 +4,9 @@ import express = require("express");
 
 export default class CoursesPS {
     private static getAllCourses: PreparedStatement = new PreparedStatement("get-all-courses",
+        'SELECT * FROM "courselist"');
+
+    private static getAllEnrolledCourses: PreparedStatement = new PreparedStatement("get-all-courses-you-are-enrolled,",
         'SELECT * FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll")');
 
     private static getCourseById: PreparedStatement = new PreparedStatement("get-course-by-id",
@@ -50,6 +53,15 @@ export default class CoursesPS {
     public static executeCreateCourse(description: string, name: string): Promise<pgPromise.queryResult> {
         this.createCourse.values = [description, name];
         return Database.executeQuerySingleResult(this.createCourse);
+    }
+
+    /**
+     * Executes a 'get all courses' query where you all enrolled
+     * @param {e.Response} res
+     * @return {any} a query result.
+     */
+    public static executeGetAllEnrolledCourses(): Promise<pgPromise.queryResult> {
+        return Database.executeQuery(this.getAllEnrolledCourses);
     }
 
     /**
