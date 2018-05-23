@@ -48,7 +48,12 @@ router.put("/:reviewId", async (req, res) => {
     const reviewId = req.params.reviewId;
     let jsonQuestions: any = [];
 
-    req.body.form.forEach(async (item: any) => {
+    let inputForm = req.body.form;
+
+    // Loop through form and update the answers.
+    for (let i = 0; i < inputForm.length; i++) {
+        const item = inputForm[i];
+
         // Don't insert or update if the answer is not specified.
         if (item.answer == null) return;
 
@@ -70,7 +75,7 @@ router.put("/:reviewId", async (req, res) => {
             }); break;
             default: jsonQuestions.push({ error: "Unrecognized type given: " + item.question.type_question }); break;
         }
-    });
+    }
 
     // Create and respond with the resulting JSON.
     res.json({
