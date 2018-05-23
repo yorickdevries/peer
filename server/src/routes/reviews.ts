@@ -61,17 +61,17 @@ router.put("/:reviewId", async (req, res) => {
         switch (item.question.type_question) {
             case "range": jsonQuestions.push({
                 question: item.question,
-                answer: await ReviewsPS.executeUpdateRangeAnswer(item.answer, item.question.id, reviewId)
+                answer: await ReviewsPS.executeUpdateRangeAnswer(item.answer.answer, item.question.id, reviewId)
             }); break;
 
             case "open": jsonQuestions.push({
                 question: item.question,
-                answer: await ReviewsPS.executeUpdateOpenAnswer(item.answer, item.question.id, reviewId)
+                answer: await ReviewsPS.executeUpdateOpenAnswer(item.answer.answer, item.question.id, reviewId)
             }); break;
 
             case "mc": jsonQuestions.push({
                 question: item.question,
-                answer: await ReviewsPS.executeUpdateMpcAnswer(item.answer, item.question.id, reviewId)
+                answer: await ReviewsPS.executeUpdateMpcAnswer(item.answer.answer_option, item.question.id, reviewId)
             }); break;
             default: jsonQuestions.push({ error: "Unrecognized type given: " + item.question.type_question }); break;
         }
