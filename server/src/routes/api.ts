@@ -48,7 +48,7 @@ router.use("/assignments", assignments);
 router.use("/courses", courses);
 router.use("/groups", groups);
 router.use("/reviews", reviews);
-router.use("/rubrics", rubrics);
+router.use("/rubric", rubrics);
 router.use("/submissions", submissions);
 
 router.get("/user", function (req: any, res, next) {

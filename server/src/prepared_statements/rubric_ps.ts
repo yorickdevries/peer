@@ -28,7 +28,7 @@ export default class rubricPS {
         'UPDATE rangequestion SET (question, range, rubric_assignment_id, question_number) = ($1, $2, $3, $4) WHERE id = $5 RETURNING *');
 
     private static updateMCQuestion: PreparedStatement = new PreparedStatement("update-mc-question",
-        'UPDATE mcquestion SET (question, rubric_assignment_id, question_number) = ($1, $2, $3) RETURNING *');
+        'UPDATE mcquestion SET (question, rubric_assignment_id, question_number) = ($1, $2, $3) WHERE id = $4 RETURNING *');
 
     private static updateMCOption: PreparedStatement = new PreparedStatement("updat-mc-option",
         'UPDATE mcoption SET (option, mcquestion_id) = ($1, $2, $3) WHERE id = $4 RETURNING *');
@@ -45,6 +45,78 @@ export default class rubricPS {
     private static getAllMCOptionById: PreparedStatement = new PreparedStatement("get-all-options",
         'SELECT * FROM mcoption WHERE mcquestion_id = $1');
 
+
+    public static executeGetAllMCOptionById(id: number): any {
+        this.getAllMCOptionById.values = [id];
+        return Database.executeQuery(this.getAllMCOptionById);
+    }
+
+    public static executeGetAllRangeQuestionById(id: number): any {
+        this.getAllRangeQuestionById.values = [id];
+        return Database.executeQuery(this.getAllRangeQuestionById);
+    }
+
+    public static executeGetAllOpenQuestionById(id: number): any {
+        this.getAllOpenQuestionById.values = [id];
+        return Database.executeQuery(this.getAllOpenQuestionById);
+    }
+
+    public static executeGetAllMCQuestionById(id: number): any {
+        this.getAllMCQuestionById.values = [id];
+        return Database.executeQuery(this.getAllMCQuestionById);
+    }
+
+    /**
+     * executes 'update mc option' query
+     * @param {string} option
+     * @param {number} mcquestion_id
+     * @param {number} id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeUpdateMCOption(option: string, mcquestion_id: number, id: number): Promise<pgPromise.queryResult> {
+        this.updateMCOption.values = [option, mcquestion_id, id];
+        return Database.executeQuerySingleResult(this.updateMCOption);
+    }
+
+    /**
+     * executes 'update mc question' query
+     * @param {string} question - question
+     * @param {number} rubric_assignment_id - rubric_assignment_id
+     * @param {number} question_number - question_number
+     * @param {number} id - id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeUpdateMCQuestion(question: string, rubric_assignment_id: number, question_number: number, id: number): Promise<pgPromise.queryResult> {
+        this.updateMCQuestion.values = [question, rubric_assignment_id, question_number, id];
+        return Database.executeQuerySingleResult(this.updateMCQuestion);
+    }
+
+    /**
+     * executes 'update range question' query
+     * @param {string} question - question
+     * @param {number} range - range
+     * @param {number} rubric_assignment_id - rubric_assignment_id
+     * @param {number} question_number - question_number
+     * @param {number} id - id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeUpdateRangeQuestion(question: string, range: number, rubric_assignment_id: number, question_number: number, id: number): Promise<pgPromise.queryResult> {
+        this.updateRangeQuestion.values = [question, range, rubric_assignment_id, question_number, id];
+        return Database.executeQuerySingleResult(this.updateRangeQuestion);
+    }
+
+    /**
+     * executes 'update open question' query
+     * @param {string} question - question
+     * @param {number} rubric_assignment_id - rubric_assignment_id
+     * @param {number} question_number - question_number
+     * @param {number} id - id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeUpdateOpenQuestion(question: string, rubric_assignment_id: number, question_number: number, id: number): Promise<pgPromise.queryResult> {
+        this.updateOpenQuestion.values = [question, rubric_assignment_id, question_number, id];
+        return Database.executeQuerySingleResult(this.updateOpenQuestion);
+    }
 
     /**
      * executes 'create MC option' query
