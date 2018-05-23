@@ -53,7 +53,7 @@ CREATE TABLE GroupUsers (
 
 -- Table: MCAnswer
 CREATE TABLE MCAnswer (
-    answer char(1)  NOT NULL,
+    answer_option int NOT NULL,
     MCQuestion_id int NOT NULL,
     Review_id int NOT NULL,
     CONSTRAINT MCAnswer_pk PRIMARY KEY (MCQuestion_id,Review_id)
@@ -381,7 +381,7 @@ INSERT INTO public.mcoption(
 
 INSERT INTO public.enroll(
 	course_id, user_netid, role)
-	VALUES (1, 'paulvanderlaan', 'Owner');
+	VALUES (1, 'henkjan', 'Owner');
 
 INSERT INTO public.groupexercise(
 	assignment_id, group_id)
@@ -389,15 +389,15 @@ INSERT INTO public.groupexercise(
 
 INSERT INTO public.submission(
 	user_netid, assignment_id, file_path)
-	VALUES ('paulvanderlaan', 1, 'folder/verygudsubmission.pdf');
+	VALUES ('henkjan', 1, 'folder/verygudsubmission.pdf');
 
 INSERT INTO public.review(
 	comment, user_netid, submission_id, rubric_assignment_id)
 	VALUES ('Plagiaat', 'henkjan', 1, 1);
 
 INSERT INTO public.mcanswer(
-	answer, mcquestion_id, review_id)
-	VALUES ('B', 1, 1);
+	answer_option, mcquestion_id, review_id)
+	VALUES (1, 1, 1);
 
 INSERT INTO public.openanswer(
 	answer, openquestion_id, review_id)
