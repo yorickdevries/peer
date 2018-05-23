@@ -49,7 +49,7 @@
             <b-list-group flush>
 
                 <!--Loop through all the questions.-->
-                <b-list-group-item v-for="pair in peerReview.form">
+                <b-list-group-item v-for="pair in peerReview.form" :key="pair.question.question_number">
                     <div class="mb-2 bottom-right">
                         <h5 class="text-primary">Question {{ pair.question.question_number }}</h5>
                         <p>
@@ -79,11 +79,11 @@
                                 v-model="pair.answer.answer"/>
 
                     <!-- MPC QUESTION -->
-                    <b-form-group v-else-if="pair.question.type_question === 'mpc'">
+                    <b-form-group v-else-if="pair.question.type_question === 'mc'">
                         <b-form-radio-group
-                            :options="transformOptions(pair.question.options)"
-                            v-model="pair.answer.answer_option"
-                            stacked>
+                                :options="transformOptions(pair.question.option)"
+                                v-model="pair.answer.answer_option"
+                                stacked>
                         </b-form-radio-group>
                     </b-form-group>
 
@@ -94,7 +94,7 @@
             <!--Save/Submit Button-->
             <b-card-body>
                 <b-button variant="success float-right" @click="submitPeerReview">Submit Review</b-button>
-                <b-button variant="primary float-right mr-2" @click="submitPeerReview">Save Review</b-button>
+                <b-button variant="primary float-right mr-2" @click="savePeerReview">Save Review</b-button>
             </b-card-body>
         </b-card>
 
@@ -107,9 +107,15 @@ import api from "../../../api";
 
 export default {
     async created() {
-        // Get the peer review.
-        let res = await api.getCurrentPeerReview();
-        this.peerReview = res
+
+        // Get the peer review ID from this assignment that is active.
+        let peerReviewID = 1
+
+        // Get peer review.
+        let res = await api.getPeerReview(peerReviewID)
+        this.peerReview = res.data
+
+        console.log(res)
     },
     data() {
         return {
@@ -128,15 +134,18 @@ export default {
     },
     methods: {
         transformOptions(options) {
+            // Transforms the option array from the API to a HTML option array.
             return options.map(option => {
-                return {
-                    text: option.option,
-                    value: option.id
-                }
+                return { text: option.option, value: option.id }
             })
         },
         async submitPeerReview() {
-            await api.submitPeerReview(peerReview)
+            await api.submitPeerReview(this.peerReview)
+        },
+        async savePeerReview() {
+            // Submit a PUT to save the current peer review.
+            let res = await api.savePeerReview(this.peerReview.review.id, this.peerReview)
+            this.peerReview = res.data
         }
     },
     components: {
