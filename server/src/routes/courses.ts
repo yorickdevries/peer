@@ -19,6 +19,13 @@ router.route("/").post(async (req, res) => {
 });
 
 /**
+ * Router to get all courses you are enrolled in
+ */
+router.get("/enrolled", async (req: any, res) => {
+   res.json(await CoursesPS.executeGetAllEnrolledCourses(req.userinfo.given_name));
+});
+
+/**
  * Get all assignments that belong to a specific course.
  * @param course_id - a course id.
  */
@@ -48,8 +55,8 @@ router.get("/:course_id", async (req, res) => {
  * Route to get information about the role of a user in a specific course.
  * @param course_id - course id.
  */
-router.get("/:course_id/role", async (req, res) => {
-
+router.get("/:course_id/role", async (req: any, res) => {
+    res.json(await CoursesPS.executeGetRoleById(req.userinfo.given_name, req.params.courseId));
 });
 
 export default router;
