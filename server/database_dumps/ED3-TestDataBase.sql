@@ -53,7 +53,7 @@ CREATE TABLE GroupUsers (
 
 -- Table: MCAnswer
 CREATE TABLE MCAnswer (
-    answer char(1)  NOT NULL,
+    answer int NOT NULL,
     MCQuestion_id int NOT NULL,
     Review_id int NOT NULL,
     CONSTRAINT MCAnswer_pk PRIMARY KEY (MCQuestion_id,Review_id)

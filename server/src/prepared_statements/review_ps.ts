@@ -14,7 +14,7 @@ export default class ReviewPS {
         "RETURNING *");
 
     private static updateMpcAnswer: PreparedStatement = new PreparedStatement("add-mpc-answer",
-            "INSERT INTO mcanswer(answer, mcquestion_id, review_id) VALUES ($1, $2, $3) ON CONFLICT (mcquestion_id, review_id) DO UPDATE SET answer_option=$1 RETURNING answer_option");
+            "INSERT INTO mcanswer(answer, mcquestion_id, review_id) VALUES ($1, $2, $3) ON CONFLICT (mcquestion_id, review_id) DO UPDATE SET answer=$1 RETURNING answer");
 
     private static updateOpenAnswer: PreparedStatement = new PreparedStatement("add-open-answer",
         "INSERT INTO openanswer(answer, openquestion_id, review_id) VALUES ($1, $2, $3) " +
