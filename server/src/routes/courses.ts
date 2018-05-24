@@ -27,27 +27,27 @@ router.get("/enrolled", async (req: any, res) => {
 
 /**
  * Get all assignments that belong to a specific course.
- * @param course_id - a course id.
+ * @param courseId - a course id.
  */
-router.get("/:course_id/assignments", async (req, res) => {
-    res.json(await CoursesPS.executeGetAssignmentsByCourseId(req.params.course_id));
+router.get("/:courseId/assignments", async (req, res) => {
+    res.json(await CoursesPS.executeGetAssignmentsByCourseId(req.params.courseId));
 });
 
 /**
  * Update the course, given a course id.
- * @param course_id - course id.
+ * @param courseId - course id.
  * @body description - a new course description.
  * @body name - a new course name.
  */
-router.put("/:course_id", async (req, res) => {
+router.put("/:courseId", async (req, res) => {
     res.json(await CoursesPS.executeUpdateCourse(req.params.courseId, req.body.description, req.body.name));
 });
 
 /**
  * Route to get information for a specific course.
- * @param course_id - course id.
+ * @param courseId - course id.
  */
-router.get("/:course_id", async (req, res) => {
+router.get("/:courseId", async (req, res) => {
     res.json(await CoursesPS.executeGetCourseById(req.params.courseId));
 });
 
@@ -55,7 +55,7 @@ router.get("/:course_id", async (req, res) => {
  * Route to get information about the role of a user in a specific course.
  * @param course_id - course id.
  */
-router.get("/:course_id/role", async (req: any, res) => {
+router.get("/:courseId/role", async (req: any, res) => {
     res.json(await CoursesPS.executeGetRoleById(req.userinfo.given_name, req.params.courseId));
 });
 
