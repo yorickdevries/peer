@@ -64,7 +64,7 @@ describe("CoursePreparedStatement Test", () => {
     });
 
 
-        /**
+    /**
      * Test update a course
      */
     it("update a course", async () => {
@@ -83,7 +83,7 @@ describe("CoursePreparedStatement Test", () => {
             description: "This is a beautiful course description!",
             id: 1,
             name: "ED-3"
-        }]).to.deep.equal(await CoursePS.executeGetAllEnrolledCourses('paulvanderlaan'));
+        }]).to.deep.equal(await CoursePS.executeGetAllEnrolledCourses("paulvanderlaan"));
     });
 
     /**
@@ -92,7 +92,7 @@ describe("CoursePreparedStatement Test", () => {
     it("get course role of user", async () => {
         expect({
             role: "Owner"
-        }).to.deep.equal(await CoursePS.executeGetRoleById('paulvanderlaan', 1));
+        }).to.deep.equal(await CoursePS.executeGetRoleById("paulvanderlaan", 1));
     });
 
 
