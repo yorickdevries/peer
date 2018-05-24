@@ -387,7 +387,11 @@ INSERT INTO public.groupexercise(
 
 INSERT INTO public.submission(
 	user_netid, assignment_id, file_path)
-	VALUES ('paulvanderlaan', 1, 'folder/verygudsubmission.pdf');
+	VALUES ('paulvanderlaan', 1, 'submission1.pdf');
+
+INSERT INTO public.submission(
+	user_netid, assignment_id, file_path)
+	VALUES ('henkjan', 1, 'submission2.pdf');
 
 INSERT INTO public.review(
 	comment, user_netid, submission_id, rubric_assignment_id)
