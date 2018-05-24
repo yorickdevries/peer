@@ -1,5 +1,6 @@
 "use strict";
 import fs from "fs";
+import fx from "mkdir-recursive";
 import path from "path";
 import pgpromise from "pg-promise";
 import Database from "./database";
@@ -12,17 +13,16 @@ const qf = new pgpromise.QueryFile("../database_dumps/ED3-FullDataBase.sql");
 // Make file folders
 const exampleSubmissionFolder = path.join(__dirname, "../example_data/submissions");
 const submissionFolder = path.join(__dirname, "./files/submissions");
-if (!fs.existsSync(submissionFolder)) {
-    fs.mkdirSync(submissionFolder);
+fx.mkdir(submissionFolder, function(err: Error) {
     console.log("Created folder: " + submissionFolder);
-}
-
-// Copy example data
-ncpfunc(exampleSubmissionFolder, submissionFolder, function (err: Error) {
- if (err) {
-   return console.error(err);
- }
-   console.log("Done copying example data!");
+    // Copy example data
+    ncpfunc(exampleSubmissionFolder, submissionFolder, function (err: Error) {
+    if (err) {
+        console.log(err);
+    } else {
+        console.log("Done copying example data!");
+    }
+   });
 });
 
 // import database
