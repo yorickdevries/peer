@@ -23,7 +23,7 @@ describe("ReviewPreparedStatement Test", () => {
             id: 1,
             comment: "Plagiaat",
             done: false,
-            file_path: "folder/verygudsubmission.pdf",
+            file_path: "submission1.pdf",
             rubric_assignment_id: 1
         }).to.deep.equal(await ReviewPS.executeGetReview(1));
     });
