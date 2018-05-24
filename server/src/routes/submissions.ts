@@ -21,8 +21,8 @@ const storage = multer.diskStorage({
     }
 });
 
-// 10 MB in bytes
-const maxSize = 10 * 1024 * 1024;
+// PDF of max 30 MB (in bytes)
+const maxSize = 30 * 1024 * 1024;
 const upload = multer({
     storage: storage,
     limits: { fileSize: maxSize },
@@ -42,14 +42,6 @@ const upload = multer({
  */
 router.get("/", async (req, res) => {
     res.json(await SubmissionsPS.executeGetSubmissions());
-});
-
-/**
- * Route to get one submission with a specific id.
- * @param id - submission id.
- */
-router.get("/:id", async (req, res) => {
-    res.json(await SubmissionsPS.executeGetSubmissionById(req.params.id));
 });
 
 /**
