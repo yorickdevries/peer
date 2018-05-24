@@ -21,7 +21,7 @@ describe("RubricPreparedStatements Test", () => {
      * Test to create a rubric
      */
     it("create rubric", async () => {
-        RubricPS.executeDeleteRubric(1);
+        await RubricPS.executeDeleteRubric(1);
         expect(await RubricPS.executeCreateRubric(1)).to.deep.equal({
             assignment_id: 1
         });
