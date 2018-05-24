@@ -82,7 +82,7 @@
                     <b-form-group v-else-if="pair.question.type_question === 'mc'">
                         <b-form-radio-group
                                 :options="transformOptions(pair.question.option)"
-                                v-model="pair.answer.answer_option"
+                                v-model="pair.answer.answer"
                                 stacked>
                         </b-form-radio-group>
                     </b-form-group>
