@@ -7,7 +7,7 @@ import SubmissionsPS from "../prepared_statements/submissions_ps";
 import { Router } from "express";
 const router = Router();
 
-const fileFolder = path.join(__dirname, "../files/");
+const fileFolder = path.join(__dirname, "../files/submissions");
 
 // Upload settings
 const storage = multer.diskStorage({
@@ -99,7 +99,7 @@ router.post("/", async (req: any, res) => {
  */
 router.get("/:id/file", async (req, res) => {
     const submission: any = await SubmissionsPS.executeGetSubmissionById(req.params.id);
-    const filePath = path.join(__dirname, "../files/", submission.file_path);
+    const filePath = path.join(__dirname, "../files/submissions", submission.file_path);
     res.sendfile(filePath);
 });
 

@@ -6,11 +6,11 @@ import Database from "./database";
 
 const qf = new pgpromise.QueryFile("../database_dumps/ED3-FullDataBase.sql");
 
-// make file folder
-const fileFolder = path.join(__dirname, "./files/");
-if (!fs.existsSync(fileFolder)) {
-    fs.mkdirSync(fileFolder);
-    console.log("Created folder: " + fileFolder);
+// make file folders
+const submissionFolder = path.join(__dirname, "./files/submissions");
+if (!fs.existsSync(submissionFolder)) {
+    fs.mkdirSync(submissionFolder);
+    console.log("Created folder: " + submissionFolder);
 }
 
 // import database
