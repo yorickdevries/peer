@@ -18,7 +18,7 @@ export default {
         return {
             navbarItems: [
                 { to: { name: 'teacher-dashboard.course' } , text: 'Course Home' },
-                { to: { name: 'teacher-dashboard.assignment' } , text: 'Assignments' },
+                { to: { name: 'teacher-dashboard.assignments' } , text: 'Assignments' },
                 { to: { name: 'teacher-dashboard.course' } , text: 'TA Management' },
                 { to: { name: 'teacher-dashboard.course' } , text: 'Student Management' },
                 { to: { name: 'teacher-dashboard.course' } , text: 'Students' },

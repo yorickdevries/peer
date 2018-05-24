@@ -18,6 +18,9 @@ export default {
     getCourseAssignments(courseId) {
         return client.get(`courses/${courseId}/assignments`)
     },
+    createAssignment: async(assignment) => {
+        return client.post('assignments', assignment)
+    },
     getAuthenticated: async() => {
         return client.get('authenticated')
     },
