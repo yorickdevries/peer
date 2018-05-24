@@ -31,7 +31,7 @@ export default class RubricPS {
         "UPDATE mcquestion SET (question, rubric_assignment_id, question_number) = ($1, $2, $3) WHERE id = $4 RETURNING *");
 
     private static updateMCOption: PreparedStatement = new PreparedStatement("updat-mc-option",
-        "UPDATE mcoption SET (option, mcquestion_id) = ($1, $2, $3) WHERE id = $4 RETURNING *");
+        "UPDATE mcoption SET (option, mcquestion_id) = ($1, $2) WHERE id = $3 RETURNING *");
 
     private static getAllMCQuestionById: PreparedStatement = new PreparedStatement("get-all-MC-questions",
         "SELECT * FROM mcquestion WHERE rubric_assignment_id = $1");
@@ -66,7 +66,7 @@ export default class RubricPS {
      * @param {number} id - assignment_id
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeDeleteRubric(id: number):Promise<pgPromise.queryResult> {
+    public static executeDeleteRubric(id: number): Promise<pgPromise.queryResult> {
         this.deleteRubric.values = [id];
         return Database.executeQuerySingleResult(this.deleteRubric);
     }

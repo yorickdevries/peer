@@ -127,6 +127,142 @@ describe("RubricPreparedStatements Test", () => {
         });
     });
 
+    /**
+     * Test to update a mc option
+     */
+    it("update mc option", async() => {
+        expect(await RubricPS.executeUpdateMCOption("hi2", 1,1)).to.deep.equal({
+            id: 1,
+            option: "hi2",
+            mcquestion_id: 1
+        });
+    });
+
+    /**
+     * Test to get all mc questions by an id
+     */
+    it("get mc question", async() => {
+        expect(await RubricPS.executeGetAllMCQuestionById(1)).to.deep.equal([{
+            id:1,
+            question: "What is the best way to insert queries?",
+            question_number: 3,
+            rubric_assignment_id: 1,
+            type_question: "mc"
+        }]);
+    });
+
+    /**
+     * Test to get all open questions by an id
+     */
+    it("get open question", async() => {
+        expect(await RubricPS.executeGetAllOpenQuestionById(1)).to.deep.equal([{
+            id:1,
+            question: "How to insert queries?",
+            question_number: 1,
+            rubric_assignment_id: 1,
+            type_question: "open"
+        }]);
+    });
+
+    /**
+     * Test to get all range questions by an id
+     */
+    it("get range question", async() => {
+        expect(await RubricPS.executeGetAllRangeQuestionById(1)).to.deep.equal([{
+            id:1,
+            question: "How much fun is inserting queries?",
+            range: 7,
+            question_number: 2,
+            rubric_assignment_id: 1,
+            type_question: "range"
+        }]);
+    });
+
+    /**
+     * Test to get all mc option by an id
+     */
+    it("get mc option", async() => {
+        expect(await RubricPS.executeGetAllMCOptionById(1)).to.deep.equal([{
+            id: 1,
+            mcquestion_id: 1,
+            option: "By using pgAdmin"
+        },
+            {
+                id: 2,
+                mcquestion_id: 1,
+                option: "By using command line"
+            },
+            {
+                id: 3,
+                mcquestion_id: 1,
+                option: "By asking Brian"
+            }]);
+    });
+
+    /**
+     * Test to delete a rubric
+     */
+    it("delete rubric", async() => {
+        expect(await RubricPS.executeDeleteRubric(1)).to.deep.equal({
+            assignment_id: 1
+        });
+    });
+
+    /**
+     * Test to delete a open question
+     */
+    it("delete open question", async() => {
+        expect(await RubricPS.executeDeleteOpenQuestion(1)).to.deep.equal({
+            rubric_assignment_id: 1,
+            id: 1,
+            question: "How to insert queries?",
+            question_number: 1,
+            type_question: "open"
+        });
+    });
+
+    /**
+     * Test to delete a range question
+     */
+    it("delete range question", async() => {
+        expect(await RubricPS.executeDeleteRangeQuestion(1)).to.deep.equal({
+            rubric_assignment_id: 1,
+            id: 1,
+            question: "How much fun is inserting queries?",
+            question_number: 2,
+            range: 7,
+            type_question: "range"
+        });
+    });
+
+    /**
+     * Test to delete a mc question
+     */
+    it("delete mc question", async() => {
+        expect(await RubricPS.executeDeleteMCQuestion(1)).to.deep.equal({
+            rubric_assignment_id: 1,
+            id: 1,
+            question: "What is the best way to insert queries?",
+            question_number: 3,
+            type_question: "mc"
+        });
+    });
+
+    /**
+     * Test to delete a mc option
+     */
+    it("delete mc option", async() => {
+        expect(await RubricPS.executeDeleteMCOption(1)).to.deep.equal({
+            id: 1,
+            mcquestion_id: 1,
+            option: "By using pgAdmin"
+        });
+    });
+
+
+
+
+
 
 
 
