@@ -1,4 +1,4 @@
-import RubricPS, {default as rubricPS} from "../prepared_statements/rubric_ps"
+import RubricPS, { default as rubricPS } from "../prepared_statements/rubric_ps";
 
 // Router
 import { Router } from "express";
