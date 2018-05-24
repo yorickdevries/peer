@@ -11,7 +11,7 @@ const router = Router();
  * @return a database query result, all columns of review + file_path of the submission.
  */
 router.get("/:reviewId", async (req, res) => {
-    let jsonItems: any = [];
+    const jsonItems: any = [];
     const review = await ReviewsPS.executeGetReview(req.params.reviewId);
     const questions = await RubricPS.getAllQuestionsByRubricId(review.rubric_assignment_id);
 
@@ -46,16 +46,16 @@ router.get("/:reviewId", async (req, res) => {
  */
 router.put("/:reviewId", async (req, res) => {
     const reviewId = req.params.reviewId;
-    let jsonQuestions: any = [];
+    const jsonQuestions: any = [];
 
-    let inputForm = req.body.form;
+    const inputForm = req.body.form;
 
     // Loop through form and update the answers.
     for (let i = 0; i < inputForm.length; i++) {
         const item = inputForm[i];
 
         // Don't insert or update if the answer is not specified.
-        if (item.answer == null) return;
+        if (item.answer === null) return;
 
         // Update or insert a specific answer and add to questions array.
         switch (item.question.type_question) {
@@ -71,7 +71,7 @@ router.put("/:reviewId", async (req, res) => {
 
             case "mc": jsonQuestions.push({
                 question: item.question,
-                answer: await ReviewsPS.executeUpdateMpcAnswer(item.answer.answer_option, item.question.id, reviewId)
+                answer: await ReviewsPS.executeUpdateMpcAnswer(item.answer.answer, item.question.id, reviewId)
             }); break;
             default: jsonQuestions.push({ error: "Unrecognized type given: " + item.question.type_question }); break;
         }
