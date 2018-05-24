@@ -17,7 +17,7 @@ export default [
             {
                 path: 'courses/:id/assignments',
                 name: 'teacher-dashboard.assignments',
-                component: () => import('../components/teacher-dashboard/Assignment')
+                component: () => import('../components/teacher-dashboard/Assignments')
             },
             {
                 path: 'courses/:id/create-assignment',
