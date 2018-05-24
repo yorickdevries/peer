@@ -8,8 +8,8 @@
     "tslint": "tslint --project .",
     "build": "npm run tsc",
     "tsc": "tsc",
-    "test": "mocha",
-    "coverage": "nyc mocha",
+    "test": "mocha --timeout 10000",
+    "coverage": "nyc npm run test",
     "db_init": "node ./dist/database_init.js"
   },
   "nyc": {
