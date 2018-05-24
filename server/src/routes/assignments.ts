@@ -103,6 +103,15 @@ router.route("/:assignment_id")
             req.params.assignment_id));
     });
 
+/**
+ * Route to get a file from an assignment.
+ * @param id - assignment id.
+ */
+router.get("/:id/file", async (req, res) => {
+    const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.id);
+    const fileName = path.join(__dirname, "../files/assignments", assignment.filename);
+    res.sendfile(fileName);
+});
 
 /**
  * Route to get an subbission of someone's assignment
