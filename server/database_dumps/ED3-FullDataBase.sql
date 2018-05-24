@@ -483,17 +483,17 @@ INSERT INTO public.groupexercise(
 INSERT INTO public.submission(
 	user_netid, assignment_id, file_path)
 	VALUES
-	    ('paulvanderlaan', 4, 'submissions/verygudsubmission4.pdf'),
-	    ('paulvanderlaan', 5, 'submissions/verygudsubmission5.pdf'),
-	    ('paulvanderlaan', 6, 'submissions/verygudsubmission6.pdf'),
-	    ('henkjan', 1, 'submissions/verygudsubmission1.pdf'),
-	    ('henkjan', 2, 'submissions/verygudsubmission2.pdf'),
-	    ('henkjan', 3, 'submissions/verygudsubmission3.pdf'),
-	    ('henkjan', 4, 'submissions/verygudsubmission4.pdf'),
-	    ('henkjan', 5, 'submissions/verygudsubmission5.pdf'),
-	    ('henkjan', 6, 'submissions/verygudsubmission6.pdf'),
-	    ('henkjan', 7, 'submissions/verygudsubmission7.pdf'),
-	    ('henkjan', 8, 'submissions/verygudsubmission8.pdf')
+	    ('paulvanderlaan', 4, 'submission1.pdf'),
+	    ('paulvanderlaan', 5, 'submission1.pdf'),
+	    ('paulvanderlaan', 6, 'submission1.pdf'),
+	    ('henkjan', 1, 'submission2.pdf'),
+	    ('henkjan', 2, 'submission2.pdf'),
+	    ('henkjan', 3, 'submission2.pdf'),
+	    ('henkjan', 4, 'submission2.pdf'),
+	    ('henkjan', 5, 'submission2.pdf'),
+	    ('henkjan', 6, 'submission2.pdf'),
+	    ('henkjan', 7, 'submission2.pdf'),
+	    ('henkjan', 8, 'submission2.pdf')
 	;
 
 INSERT INTO public.review(

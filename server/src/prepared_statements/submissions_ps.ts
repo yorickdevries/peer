@@ -43,6 +43,6 @@ export default class SubmissionsPS {
      */
     public static executeDeleteSubmissionById(submissionId: number): Promise<pgPromise.queryResult> {
         this.deleteSubmission.values = [submissionId];
-        return Database.executeQuery(this.deleteSubmission);
+        return Database.executeQuerySingleResult(this.deleteSubmission);
     }
 }

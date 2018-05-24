@@ -112,10 +112,16 @@ describe("AssignmentPreparedStatements Test", () => {
      */
     it("get all submissions", async () => {
         expect(await AssignmentPS.executeGetAllSubmissionsByAssignmentId(1)).to.deep.equal([{
-            "file_path": "folder/verygudsubmission.pdf",
+            "file_path": "submission1.pdf",
             "id": 1,
             "assignment_id": 1,
             "user_netid": "paulvanderlaan"
+        },
+        {
+            "file_path": "submission2.pdf",
+            "id": 2,
+            "assignment_id": 1,
+            "user_netid": "henkjan"
         }]);
     });
 
