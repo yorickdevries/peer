@@ -13,14 +13,14 @@ import Navbar from "../Navbar"
 
 export default {
     async created() {
-        let res = await api.getCourse(this.$route.params.id)
+        let res = await api.getCourse(this.$route.params.courseId)
         this.course = res.data
     },
     data() {
         return {
             navbarItems: [
-                { to: { name: 'student-dashboard.course' } , text: 'Course Home'},
-                { to: { name: 'student-dashboard.assignments' } , text: 'Assignments'},
+                { to: { name: 'student-dashboard.course.home' } , text: 'Course Home'},
+                { to: { name: 'student-dashboard.course.assignments' } , text: 'Assignments'},
             ],
             course: {
                 name: null

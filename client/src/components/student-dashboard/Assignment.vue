@@ -16,7 +16,7 @@
                                 active-class="bg-light"
                                 class="col px-0"
                                 tag="div"
-                                :to="{ name: 'student-dashboard.assignment.hand-in' }">
+                                :to="{ name: 'student-dashboard.course.assignment.hand-in' }">
                             <div class="text-center border-right border-bottom active py-3">
                                 <div class="lead font-weight-bold">Hand-In - <span class="text-success">Open</span></div>
                                 <div class="text-muted">Due: 20 Nov 23:57</div>
@@ -27,7 +27,7 @@
                                 active-class="bg-light"
                                 class="col px-0 text-muted"
                                 tag="div"
-                                :to="{ name: 'student-dashboard.assignment.peer-review' }">
+                                :to="{ name: 'student-dashboard.course.assignment.peer-review' }">
 
                             <div class="text-center border-right border-bottom py-3">
                                 <div class="lead font-weight-bold">Peer Review - <span class="text-danger">Closed</span></div>
@@ -39,7 +39,7 @@
                                 active-class="bg-light"
                                 class="col px-0 text-muted"
                                 tag="div"
-                                :to="{ name: 'student-dashboard.assignment.feedback' }">
+                                :to="{ name: 'student-dashboard.course.assignment.feedback' }">
                             <div class="text-center border-bottom py-3">
                                 <div class="lead font-weight-bold ">Received Feedback - <span class="text-danger">Closed</span></div>
                                 <span class="text-muted">Due: 20 Nov 23:59</span>
@@ -69,7 +69,7 @@ export default {
     async created() {
 
         // Get assignment.
-        let res = await api.getAssignment(this.$route.params.id)
+        let res = await api.getAssignment(this.$route.params.assignmentId)
         this.assignment = res.data
 
         // Add assignment name to breadcrumb.
