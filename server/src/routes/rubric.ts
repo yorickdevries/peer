@@ -6,6 +6,42 @@ const router = Router();
 
 export default router;
 
+/**
+ * Route to delete an open question
+ * @params id - id
+ */
+router.delete("/openquestion/:id", async (req, res) => {
+    res.json(RubricPS.executeDeleteOpenQuestion(req.params.id));
+});
+
+/**
+ * Route to delete a range question
+ * @params id - id
+ */
+router.delete("/rangequestion/:id", async (req, res) => {
+    res.json(RubricPS.executeDeleteRangeQuestion(req.params.id));
+});
+
+/**
+ * Route to delete mc question
+ * @params id - id
+ */
+router.delete("/mcquestion/:id", async (req, res) => {
+    res.json(RubricPS.executeDeleteMCQuestion(req.params.id));
+});
+
+/**
+ * Route to delete mc option
+ * @params id - id
+ */
+router.delete("/mcoption/:id", async (req, res) => {
+    res.json(RubricPS.executeDeleteMCOption(req.params.id));
+});
+
+/**
+ * Route to create an option for a multiple choice question
+ * @body option, mcquestion_id
+ */
 router.post("/mcoption", async (req, res) => {
     res.json(RubricPS.executeCreateMCOption(req.body.option, req.body.mcquestion_id));
 });

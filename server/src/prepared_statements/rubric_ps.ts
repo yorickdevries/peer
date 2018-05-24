@@ -10,7 +10,7 @@ export default class RubricPS {
         "SELECT * FROM rubric WHERE assignment_id=$1");
 
     private static createOpenQuestion: PreparedStatement = new PreparedStatement("make-open-question",
-        "INSERT INTO openquestion (question, rubric_assignment_id, question_number VALUES ($1, $2, $3) RETURNING *");
+        "INSERT INTO openquestion (question, rubric_assignment_id, question_number) VALUES ($1, $2, $3) RETURNING *");
 
     private static createMCQuestion: PreparedStatement = new PreparedStatement("make-MC-question",
         "INSERT INTO mcquestion (question, rubric_assignment_id, question_number) VALUES ($1, $2, $3) RETURNING *");
@@ -31,7 +31,7 @@ export default class RubricPS {
         "UPDATE mcquestion SET (question, rubric_assignment_id, question_number) = ($1, $2, $3) WHERE id = $4 RETURNING *");
 
     private static updateMCOption: PreparedStatement = new PreparedStatement("updat-mc-option",
-        "UPDATE mcoption SET (option, mcquestion_id) = ($1, $2, $3) WHERE id = $4 RETURNING *");
+        "UPDATE mcoption SET (option, mcquestion_id) = ($1, $2) WHERE id = $3 RETURNING *");
 
     private static getAllMCQuestionById: PreparedStatement = new PreparedStatement("get-all-MC-questions",
         "SELECT * FROM mcquestion WHERE rubric_assignment_id = $1");
@@ -45,6 +45,71 @@ export default class RubricPS {
     private static getAllMCOptionById: PreparedStatement = new PreparedStatement("get-all-options",
         "SELECT * FROM mcoption WHERE mcquestion_id = $1");
 
+    private static deleteMCOption: PreparedStatement = new PreparedStatement("delte-mc-option",
+        "DELETE FROM mcoption WHERE id=$1 RETURNING *");
+
+    private static deleteMCQuestion: PreparedStatement = new PreparedStatement("delete-mc-question",
+        "DELETE FROM mcquestion WHERE id=$1 RETURNING *");
+
+    private static deleteOpenQuestion: PreparedStatement = new PreparedStatement("delete-open-question",
+        "DELETE FROM openquestion WHERE id=$1 RETURNING *");
+
+    private static deleteRangeQuestion: PreparedStatement = new PreparedStatement("delete-range-question",
+        "DELETE FROM rangequestion WHERE id=$1 RETURNING *");
+
+    private static deleteRubric: PreparedStatement = new PreparedStatement("delete-rubric",
+        "DELETE FROM rubric WHERE assignment_id=$1 RETURNING *");
+
+
+    /**
+     * Query 'delete rubric'
+     * @param {number} id - assignment_id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteRubric(id: number): Promise<pgPromise.queryResult> {
+        this.deleteRubric.values = [id];
+        return Database.executeQuerySingleResult(this.deleteRubric);
+    }
+
+    /**
+     * Query 'delete mc option'
+     * @param {number} id - id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteMCOption(id: number): Promise<pgPromise.queryResult> {
+        this.deleteMCOption.values = [id];
+        return Database.executeQuerySingleResult(this.deleteMCOption);
+    }
+
+    /**
+     * Query 'delete MC question'
+     * @param {number} id - id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteMCQuestion(id: number): Promise<pgPromise.queryResult> {
+        this.deleteMCQuestion.values = [id];
+        return Database.executeQuerySingleResult(this.deleteMCQuestion);
+    }
+
+    /**
+     * Query 'delete open question'
+     * @param {number} id - id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteOpenQuestion(id: number): Promise<pgPromise.queryResult> {
+        this.deleteOpenQuestion.values = [id];
+        return Database.executeQuerySingleResult(this.deleteOpenQuestion);
+    }
+
+    /**
+     * Query 'delte range qustion'
+     * @param {number} id - id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteRangeQuestion(id: number): Promise<pgPromise.queryResult> {
+        this.deleteRangeQuestion.values = [id];
+        return Database.executeQuerySingleResult(this.deleteRangeQuestion);
+    }
 
     /**
      * executes 'update mc option' query
