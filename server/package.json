@@ -8,8 +8,8 @@
     "tslint": "tslint --project .",
     "build": "npm run tsc",
     "tsc": "tsc",
-    "test": "mocha -r ts-node/register test/**/*.spec.ts",
-    "coverage": "nyc npm run test",
+    "test": "mocha",
+    "coverage": "nyc mocha",
     "db_init": "node ./dist/database_init.js"
   },
   "nyc": {
@@ -25,7 +25,7 @@
       ".tsx"
     ],
     "include": [
-      "src/**/*"
+      "src/**/*.ts"
     ],
     "exclude": [
       "**/*.d.ts"
@@ -33,12 +33,19 @@
     "reporter": [
       "text",
       "text-summary"
-    ]
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "sourceMap": true,
+    "instrument": true
   },
   "dependencies": {
     "@okta/oidc-middleware": "^0.1.2",
+    "@types/chai-http": "^3.0.4",
     "bluebird": "3.5.1",
     "body-parser": "^1.18.3",
+    "chai-http": "^4.0.0",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
@@ -71,6 +78,7 @@
     "chai": "^4.1.2",
     "mocha": "^5.1.1",
     "nyc": "^11.7.3",
+    "source-map-support": "^0.5.6",
     "ts-node": "^6.0.3",
     "tslint": "^5.10.0",
     "typescript": "^2.8.3"
