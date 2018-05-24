@@ -4,7 +4,7 @@
 
             <b-row>
                 <b-col>
-                    <h1 class="mt-5">{{course.name}} | Teacher Course Home </h1>
+                    <h1 class="mt-5">{{course.name}} | Teacher Course Home</h1>
                 </b-col>
             </b-row>
 

@@ -17,6 +17,9 @@
                         <p class="card-text">
                             {{ assignment.description}}
                         </p>
+                        <!--<div>-->
+                            <!--<b-button variant="primary" :to="{ name: 'teacher-dashboard.assignments.assignment', params: { id: id, id2: assignment.id } }">View assignment</b-button>-->
+                        <!--</div>-->
                         <!--<div class="btn-group btn-group-sm" role="group" aria-label="Basic example">-->
                             <!--<b-button variant="primary" :to="{ name: 'student-dashboard.course', params: { id: course.id } }">Enter as Student</b-button>-->
                             <!--<b-button variant="primary" :to="{ name: 'teaching-assistant-dashboard.course', params: { id: course.id } }">Enter as TA</b-button>-->
@@ -43,6 +46,7 @@ export default {
     },
     data() {
         return {
+            id: null,
             assignments: null,
         }
     }
