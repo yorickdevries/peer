@@ -9,10 +9,10 @@ export default class SubmissionsPS {
         'SELECT * FROM "submission" WHERE "id" = $1');
 
     private static createSubmission: PreparedStatement = new PreparedStatement("create-submission",
-        'INSERT INTO "submission" ("user_netid", "assignment_id", "file_path") VALUES ($1, $2, $3) RETURNING id, user_netid, assignment_id');
+        'INSERT INTO "submission" ("user_netid", "assignment_id", "file_path") VALUES ($1, $2, $3) RETURNING id, user_netid, assignment_id, file_path');
 
     private static deleteSubmission: PreparedStatement = new PreparedStatement("delete-submission",
-        'DELETE FROM "submission" WHERE "id" = $1 RETURNING id, user_netid, assignment_id');
+        'DELETE FROM "submission" WHERE "id" = $1 RETURNING id, user_netid, assignment_id, file_path');
 
 
     /**
