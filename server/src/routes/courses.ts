@@ -55,7 +55,7 @@ router.get("/:courseId", async (req, res) => {
  * Route to get information about the role of a user in a specific course.
  * @param course_id - course id.
  */
-router.get("/:course_id/role", async (req: any, res) => {
+router.get("/:courseId/role", async (req: any, res) => {
     res.json(await CoursesPS.executeGetRoleById(req.userinfo.given_name, req.params.courseId));
 });
 
