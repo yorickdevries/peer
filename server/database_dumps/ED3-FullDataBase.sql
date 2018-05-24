@@ -17,7 +17,7 @@ CREATE TABLE AssignmentList (
 -- Table: CourseList
 CREATE TABLE CourseList (
     id SERIAL,
-    description varchar(200)  NOT NULL,
+    description varchar(2000)  NOT NULL,
     name varchar(200)  NOT NULL,
     CONSTRAINT CourseList_pk PRIMARY KEY (id)
 );
