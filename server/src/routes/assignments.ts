@@ -1,8 +1,42 @@
+// Imports
+import path from "path";
+import fs from "fs";
+import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 
 // Router
 import { Router } from "express";
 const router = Router();
+
+const fileFolder = path.join(__dirname, "../files/assignments");
+
+// Upload settings
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        // tslint:disable-next-line
+        cb(null, fileFolder);
+    },
+    filename: function (req, file, cb) {
+        // tslint:disable-next-line
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
+// PDF of max 30 MB (in bytes)
+const maxSize = 30 * 1024 * 1024;
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: maxSize },
+    fileFilter: function (req: any, file, cb: any) {
+        if (file.mimetype !== "application/pdf") {
+            req.fileValidationError = "File should be a .pdf file";
+            // tslint:disable-next-line
+            return cb(null, false, new Error("File should be a .pdf file"));
+        }
+        // tslint:disable-next-line
+        cb(null, true);
+    }
+}).single("assignmentFile");
 
 /**
  * Route to get all the information about an assignment
@@ -26,15 +60,29 @@ router.route("/:assignment_id")
  * @body publish_date - publish date.
  */
 router.route("/")
-    .post(async (req, res) => {
-        res.json(await AssignmentPS.executeAddAssignment(
-            req.body.title,
-            req.body.description,
-            req.body.due_date,
-            req.body.publish_date,
-            req.body.course_id,
-            req.body.filename));
+    .post(async (req: any, res) => {
+        // File upload handling
+        upload(req, res, async function (err) {
+            // Error in case of too large file size
+            if (err) {
+                res.json({ error: err });
+            }
+            // Error in case of wrong file type
+            else if (req.fileValidationError) {
+                res.json({ error: req.fileValidationError });
+            } else {
+                const fileName = req.file.filename;
+                // add to database
+                res.json(await AssignmentPS.executeAddAssignment(
+                    req.body.title,
+                    req.body.description,
+                    req.body.due_date,
+                    req.body.publish_date,
+                    req.body.course_id,
+                    fileName));
+            }
     });
+});
 
 
 /**
