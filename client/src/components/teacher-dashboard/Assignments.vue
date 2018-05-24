@@ -39,16 +39,33 @@ import api from '../../api'
 
 export default {
     async created() {
-        let id = this.$route.params.id
-        this.id = id
-        let res = await api.getCourseAssignments(id)
-        this.assignments = res.data
+
+        this.init()
     },
     data() {
         return {
             id: null,
             assignments: null,
         }
+    },
+    methods: {
+        async init() {
+            let id = this.$route.params.id
+            this.id = id
+            let res = await api.getCourseAssignments(id)
+            this.assignments = res.data
+        }
+    },
+    beforeRouteEnter (to, from, next) {
+        next(vm => {
+            // access to component's instance using `vm` . this is done because this navigation guard is called before the component is created.
+
+            //clear your previously populated search results.
+
+            //re-populate search results
+            vm.init();
+            next();
+        })
     }
 }
 </script>

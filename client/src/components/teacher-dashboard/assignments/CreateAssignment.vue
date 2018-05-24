@@ -48,14 +48,14 @@
                                     Due date should be past publish date!
                                 </b-form-invalid-feedback>
                             </b-form-group>
-                            <!--<b-form-group label="File">-->
-                                <!--<b-form-input   v-model="assignment.filename"-->
-                                                <!--type="text"-->
-                                                <!--placeholder="Upload your file here (WIP)"-->
-                                                <!--required>-->
+                            <b-form-group label="File">
+                                <b-form-input   v-model="assignment.filename"
+                                                type="text"
+                                                placeholder="Upload your file here (WIP)"
+                                                required>
 
-                                <!--</b-form-input>-->
-                            <!--</b-form-group>-->
+                                </b-form-input>
+                            </b-form-group>
                             <b-form-group label="Number of reviews that each student needs to do">
                                 <b-form-input   v-model="assignment.peer_review_cap"
                                                 type="number"
@@ -121,7 +121,7 @@ export default {
             let res = await api.createAssignment(this.assignment)
             console.log(this.assignment)
             console.log(res)
-            this.$router.push({name: 'teacher-dashboard.assignments'})
+            this.$router.push({name: 'teacher-dashboard.assignments', params: {id: this.assignment.course_id}})
         }
     }
 }
