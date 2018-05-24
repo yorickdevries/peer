@@ -63,7 +63,7 @@ router.delete("/:id", async (req, res) => {
     if (result.file_path) {
         const filePath = path.join(__dirname, "../files/submissions", result.file_path);
         fs.unlink(filePath, (err) => {
-            if (err){
+            if (err) {
                 console.log(err);
             } else {
                 console.log(filePath + "was deleted");
