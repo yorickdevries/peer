@@ -505,7 +505,7 @@ INSERT INTO public.review(
 	    ('Very good', 'henkjan', 1, 4),
 	    ('Impressive', 'henkjan', 2, 5),
 	    ('Excellent', 'henkjan', 3, 6),
-	    ('Wow!', 'paulvanderlaan', 4, 1),
+	    ('Wow!', 'henkjan', 4, 1),
 	    ('Wow!', 'paulvanderlaan', 5, 2),
 	    ('Wow!', 'paulvanderlaan', 6, 3),
 	    ('Wow!', 'paulvanderlaan', 7, 4),
