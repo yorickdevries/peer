@@ -17,7 +17,7 @@ CREATE TABLE AssignmentList (
 -- Table: CourseList
 CREATE TABLE CourseList (
     id SERIAL,
-    description varchar(200)  NOT NULL,
+    description varchar(2000)  NOT NULL,
     name varchar(200)  NOT NULL,
     CONSTRAINT CourseList_pk PRIMARY KEY (id)
 );
@@ -53,7 +53,7 @@ CREATE TABLE GroupUsers (
 
 -- Table: MCAnswer
 CREATE TABLE MCAnswer (
-    answer char(1)  NOT NULL,
+    answer int  NOT NULL,
     MCQuestion_id int NOT NULL,
     Review_id int NOT NULL,
     CONSTRAINT MCAnswer_pk PRIMARY KEY (MCQuestion_id,Review_id)
@@ -73,6 +73,7 @@ CREATE TABLE MCQuestion (
     question varchar(200)  NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
+    type_question char(2) DEFAULT 'mc',
     CONSTRAINT MCQuestion_pk PRIMARY KEY (id)
 );
 
@@ -90,6 +91,7 @@ CREATE TABLE OpenQuestion (
     question varchar(200)  NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
+    type_question char(4) DEFAULT 'open',
     CONSTRAINT OpenQuestion_pk PRIMARY KEY (id)
 );
 
@@ -108,6 +110,7 @@ CREATE TABLE RangeQuestion (
     range int  NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
+    type_question char(5) DEFAULT 'range',
     CONSTRAINT RangeQuestion_pk PRIMARY KEY (id)
 );
 
@@ -205,6 +208,7 @@ ALTER TABLE GroupUsers ADD CONSTRAINT GroupUsers_User
 ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_MCQuestion
     FOREIGN KEY (MCQuestion_id)
     REFERENCES MCQuestion (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -213,6 +217,7 @@ ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_MCQuestion
 ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_Review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -221,6 +226,7 @@ ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_Review
 ALTER TABLE MCOption ADD CONSTRAINT MCOption_MCQuestion
     FOREIGN KEY (MCQuestion_id)
     REFERENCES MCQuestion (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -229,6 +235,7 @@ ALTER TABLE MCOption ADD CONSTRAINT MCOption_MCQuestion
 ALTER TABLE MCQuestion ADD CONSTRAINT MCQuestion_Rubric
     FOREIGN KEY (Rubric_Assignment_id)
     REFERENCES Rubric (Assignment_id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -237,6 +244,7 @@ ALTER TABLE MCQuestion ADD CONSTRAINT MCQuestion_Rubric
 ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_OpenQuestion
     FOREIGN KEY (OpenQuestion_id)
     REFERENCES OpenQuestion (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -245,6 +253,7 @@ ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_OpenQuestion
 ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_Review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -253,6 +262,7 @@ ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_Review
 ALTER TABLE OpenQuestion ADD CONSTRAINT OpenQuestion_Rubric
     FOREIGN KEY (Rubric_Assignment_id)
     REFERENCES Rubric (Assignment_id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -261,6 +271,7 @@ ALTER TABLE OpenQuestion ADD CONSTRAINT OpenQuestion_Rubric
 ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_RangeQuestion
     FOREIGN KEY (RangeQuestion_id)
     REFERENCES RangeQuestion (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -269,6 +280,7 @@ ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_RangeQuestion
 ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_Review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -277,6 +289,7 @@ ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_Review
 ALTER TABLE RangeQuestion ADD CONSTRAINT RangeQuestion_Rubric
     FOREIGN KEY (Rubric_Assignment_id)
     REFERENCES Rubric (Assignment_id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -285,6 +298,7 @@ ALTER TABLE RangeQuestion ADD CONSTRAINT RangeQuestion_Rubric
 ALTER TABLE Review ADD CONSTRAINT Review_Rubric
     FOREIGN KEY (Rubric_Assignment_id)
     REFERENCES Rubric (Assignment_id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -397,7 +411,7 @@ INSERT INTO public.review(
 
 INSERT INTO public.mcanswer(
 	answer, mcquestion_id, review_id)
-	VALUES ('B', 1, 1);
+	VALUES (1, 1, 1);
 
 INSERT INTO public.openanswer(
 	answer, openquestion_id, review_id)

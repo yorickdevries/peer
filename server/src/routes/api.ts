@@ -3,7 +3,7 @@ import assignments from "./assignments";
 import courses from "./courses";
 import groups from "./groups";
 import reviews from "./reviews";
-import rubrics from "./rubrics";
+import rubrics from "./rubric";
 import submissions from "./submissions";
 import session from "express-session";
 import { oidc } from "../express-oidc";
@@ -48,7 +48,7 @@ router.use("/assignments", assignments);
 router.use("/courses", courses);
 router.use("/groups", groups);
 router.use("/reviews", reviews);
-router.use("/rubrics", rubrics);
+router.use("/rubric", rubrics);
 router.use("/submissions", submissions);
 
 router.get("/user", function (req: any, res, next) {
