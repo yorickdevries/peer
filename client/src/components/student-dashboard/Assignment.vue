@@ -51,7 +51,7 @@
                     <b-card-body>
                         <b-row>
                             <b-col>
-                                <router-view></router-view>
+                                <keep-alive><router-view></router-view></keep-alive>
                             </b-col>
                         </b-row>
                     </b-card-body>
