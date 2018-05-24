@@ -10,7 +10,7 @@ export default router;
  * Route to delete an open question
  * @params id - id
  */
-router.delete("/openqustion/:id", async (req, res) => {
+router.delete("/openquestion/:id", async (req, res) => {
     res.json(RubricPS.executeDeleteOpenQuestion(req.params.id));
 });
 
