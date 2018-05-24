@@ -1,5 +1,6 @@
 // Imports
 import path from "path";
+import fs from "fs";
 import multer from "multer";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 
@@ -57,7 +58,21 @@ router.get("/:id", async (req, res) => {
  * @param id - submission id.
  */
 router.delete("/:id", async (req, res) => {
-    res.json(await SubmissionsPS.executeDeleteSubmissionById(req.params.id));
+    const result: any = await SubmissionsPS.executeDeleteSubmissionById(req.params.id);
+    // In case the query was succesful
+    if (result.file_path) {
+        const filePath = path.join(__dirname, "../files/submissions", result.file_path);
+        fs.unlink(filePath, (err) => {
+            if (err){
+                console.log(err);
+            } else {
+                console.log(filePath + "was deleted");
+            }
+          });
+        res.json(result);
+    } else {
+        res.json(result);
+    }
 });
 
 /**
