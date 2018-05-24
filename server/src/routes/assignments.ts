@@ -28,10 +28,10 @@ router.route("/:assignment_id")
 router.route("/")
     .post(async (req, res) => {
         res.json(await AssignmentPS.executeAddAssignment(
-            req.body.assignment_title,
-            req.body.assignment_description,
-            req.body.assignment_due_date,
-            req.body.assignment_publish_date,
+            req.body.title,
+            req.body.description,
+            req.body.due_date,
+            req.body.publish_date,
             req.body.course_id,
             req.body.filename));
     });

@@ -2,7 +2,7 @@ import Database from "../database";
 import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 
 export default class ReviewPS {
-    private static getReview: PreparedStatement = new PreparedStatement("get-review",
+    private static getReview: PreparedStatement = new PreparedStatement("get-review-by-id",
         "SELECT review.id, rubric_assignment_id, file_path, comment, done " +
         "FROM review JOIN submission ON submission.id = review.submission_id " +
         "WHERE review.id = $1");

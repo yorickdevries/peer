@@ -208,6 +208,7 @@ ALTER TABLE GroupUsers ADD CONSTRAINT GroupUsers_User
 ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_MCQuestion
     FOREIGN KEY (MCQuestion_id)
     REFERENCES MCQuestion (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -216,6 +217,7 @@ ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_MCQuestion
 ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_Review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -224,6 +226,7 @@ ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_Review
 ALTER TABLE MCOption ADD CONSTRAINT MCOption_MCQuestion
     FOREIGN KEY (MCQuestion_id)
     REFERENCES MCQuestion (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -232,6 +235,7 @@ ALTER TABLE MCOption ADD CONSTRAINT MCOption_MCQuestion
 ALTER TABLE MCQuestion ADD CONSTRAINT MCQuestion_Rubric
     FOREIGN KEY (Rubric_Assignment_id)
     REFERENCES Rubric (Assignment_id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -240,6 +244,7 @@ ALTER TABLE MCQuestion ADD CONSTRAINT MCQuestion_Rubric
 ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_OpenQuestion
     FOREIGN KEY (OpenQuestion_id)
     REFERENCES OpenQuestion (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -248,6 +253,7 @@ ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_OpenQuestion
 ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_Review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -256,6 +262,7 @@ ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_Review
 ALTER TABLE OpenQuestion ADD CONSTRAINT OpenQuestion_Rubric
     FOREIGN KEY (Rubric_Assignment_id)
     REFERENCES Rubric (Assignment_id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -264,6 +271,7 @@ ALTER TABLE OpenQuestion ADD CONSTRAINT OpenQuestion_Rubric
 ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_RangeQuestion
     FOREIGN KEY (RangeQuestion_id)
     REFERENCES RangeQuestion (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -272,6 +280,7 @@ ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_RangeQuestion
 ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_Review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -280,6 +289,7 @@ ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_Review
 ALTER TABLE RangeQuestion ADD CONSTRAINT RangeQuestion_Rubric
     FOREIGN KEY (Rubric_Assignment_id)
     REFERENCES Rubric (Assignment_id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -288,6 +298,7 @@ ALTER TABLE RangeQuestion ADD CONSTRAINT RangeQuestion_Rubric
 ALTER TABLE Review ADD CONSTRAINT Review_Rubric
     FOREIGN KEY (Rubric_Assignment_id)
     REFERENCES Rubric (Assignment_id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -486,17 +497,17 @@ INSERT INTO public.groupexercise(
 INSERT INTO public.submission(
 	user_netid, assignment_id, file_path)
 	VALUES
-	    ('paulvanderlaan', 4, 'submissions/verygudsubmission4.pdf'),
-	    ('paulvanderlaan', 5, 'submissions/verygudsubmission5.pdf'),
-	    ('paulvanderlaan', 6, 'submissions/verygudsubmission6.pdf'),
-	    ('henkjan', 1, 'submissions/verygudsubmission1.pdf'),
-	    ('henkjan', 2, 'submissions/verygudsubmission2.pdf'),
-	    ('henkjan', 3, 'submissions/verygudsubmission3.pdf'),
-	    ('henkjan', 4, 'submissions/verygudsubmission4.pdf'),
-	    ('henkjan', 5, 'submissions/verygudsubmission5.pdf'),
-	    ('henkjan', 6, 'submissions/verygudsubmission6.pdf'),
-	    ('henkjan', 7, 'submissions/verygudsubmission7.pdf'),
-	    ('henkjan', 8, 'submissions/verygudsubmission8.pdf')
+	    ('paulvanderlaan', 4, 'submission1.pdf'),
+	    ('paulvanderlaan', 5, 'submission1.pdf'),
+	    ('paulvanderlaan', 6, 'submission1.pdf'),
+	    ('henkjan', 1, 'submission2.pdf'),
+	    ('henkjan', 2, 'submission2.pdf'),
+	    ('henkjan', 3, 'submission2.pdf'),
+	    ('henkjan', 4, 'submission2.pdf'),
+	    ('henkjan', 5, 'submission2.pdf'),
+	    ('henkjan', 6, 'submission2.pdf'),
+	    ('henkjan', 7, 'submission2.pdf'),
+	    ('henkjan', 8, 'submission2.pdf')
 	;
 
 INSERT INTO public.review(

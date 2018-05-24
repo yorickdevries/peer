@@ -8,8 +8,8 @@
     "tslint": "tslint --project .",
     "build": "npm run tsc",
     "tsc": "tsc",
-    "test": "mocha -r ts-node/register test/**/*.spec.ts",
-    "coverage": "nyc npm run test",
+    "test": "mocha",
+    "coverage": "nyc mocha",
     "db_init": "node ./dist/database_init.js"
   },
   "nyc": {
@@ -25,7 +25,7 @@
       ".tsx"
     ],
     "include": [
-      "src/**/*"
+      "src/**/*.ts"
     ],
     "exclude": [
       "**/*.d.ts"
@@ -33,7 +33,12 @@
     "reporter": [
       "text",
       "text-summary"
-    ]
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "sourceMap": true,
+    "instrument": true
   },
   "dependencies": {
     "@okta/oidc-middleware": "^0.1.2",
@@ -48,7 +53,10 @@
     "http-errors": "~1.6.2",
     "is-ci": "^1.1.0",
     "jade": "~1.11.0",
+    "mkdir-recursive": "^0.4.0",
     "morgan": "~1.9.0",
+    "multer": "^1.3.0",
+    "ncp": "^2.0.0",
     "pg-promise": "8.4.4"
   },
   "devDependencies": {
@@ -64,10 +72,13 @@
     "@types/jade": "0.0.30",
     "@types/mocha": "^5.2.0",
     "@types/morgan": "^1.7.35",
+    "@types/multer": "^1.3.6",
+    "@types/ncp": "^2.0.1",
     "@types/node": "^10.0.8",
     "chai": "^4.1.2",
     "mocha": "^5.1.1",
     "nyc": "^11.7.3",
+    "source-map-support": "^0.5.6",
     "ts-node": "^6.0.3",
     "tslint": "^5.10.0",
     "typescript": "^2.8.3"

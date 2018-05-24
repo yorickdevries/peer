@@ -58,6 +58,7 @@ export default class Database {
       try {
           return await Database.db.any(statement);
       } catch (err) {
+        console.log(err);
         return {
             statement: statement,
             error: "There was a problem executing the information to the database."
@@ -76,6 +77,7 @@ export default class Database {
         try {
             return await Database.db.one(statement);
         } catch (err) {
+          console.log(err);
             return {
                 statement: statement,
                 error: "There was a problem executing the information to the database."
