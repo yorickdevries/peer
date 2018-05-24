@@ -45,6 +45,58 @@ export default class RubricPS {
     private static getAllMCOptionById: PreparedStatement = new PreparedStatement("get-all-options",
         "SELECT * FROM mcoption WHERE mcquestion_id = $1");
 
+    private static deleteMCOption: PreparedStatement = new PreparedStatement("delte-mc-option",
+        "DELETE FROM mcoption WHERE id=$1 RETURNING *");
+
+    private static deleteMCQuestion: PreparedStatement = new PreparedStatement("delete-mc-question",
+        "DELETE FROM mcquestion WHERE id=$1 RETURNING *");
+
+    private static deleteOpenQuestion: PreparedStatement = new PreparedStatement("delete-open-question",
+        "DELETE FROM openquestion WHERE id=$1 RETURNING *");
+
+    private static deleteRangeQuestion: PreparedStatement = new PreparedStatement("delete-range-question",
+        "DELTE FROM rangequestion WHERE id=$1 RETURNING *");
+
+
+    /**
+     * Query 'delete mc option'
+     * @param {number} id - id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteMCOption(id: number): Promise<pgPromise.queryResult> {
+        this.deleteMCOption.values = [id];
+        return Database.executeQuerySingleResult(this.deleteMCOption);
+    }
+
+    /**
+     * Query 'delete MC question'
+     * @param {number} id - id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteMCQuestion(id: number): Promise<pgPromise.queryResult> {
+        this.deleteMCQuestion.values = [id];
+        return Database.executeQuerySingleResult(this.deleteMCQuestion);
+    }
+
+    /**
+     * Query 'delete open question'
+     * @param {number} id - id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteOpenQuestion(id: number): Promise<pgPromise.queryResult> {
+        this.deleteOpenQuestion.values = [id];
+        return Database.executeQuerySingleResult(this.deleteOpenQuestion);
+    }
+
+    /**
+     * Query 'delte range qustion'
+     * @param {number} id - id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteRangeQuestion(id: number): Promise<pgPromise.queryResult> {
+        this.deleteRangeQuestion.values = [id];
+        return Database.executeQuerySingleResult(this.deleteRangeQuestion);
+    }
 
     /**
      * executes 'update mc option' query
