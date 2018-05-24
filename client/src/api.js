@@ -12,6 +12,9 @@ export default {
     getCourse: async (id) => {
         return client.get(`courses/${id}`)
     },
+    getEnrolledCourses() {
+        return client.get(`courses/enrolled`)
+    },
     createCourse: async(course) => {
         return client.post('courses', course)
     },

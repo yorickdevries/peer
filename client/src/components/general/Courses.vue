@@ -36,7 +36,7 @@ import api from '../../api'
 
 export default {
     async created() {
-        let res = await api.getCourses()
+        let res = await api.getEnrolledCourses()
         this.courses = res.data
     },
     data() {
