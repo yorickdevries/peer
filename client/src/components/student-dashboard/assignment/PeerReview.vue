@@ -155,7 +155,7 @@ export default {
         peerReviewSorted() {
             return {
                 review: this.peerReview.review,
-                form: this.peerReview.form.sort((a, b) => {
+                form: this.peerReview.form.slice().sort((a, b) => {
                     return a.question.question_number - b.question.question_number
                 })
             }
