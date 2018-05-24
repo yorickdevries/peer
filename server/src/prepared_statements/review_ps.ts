@@ -14,8 +14,7 @@ export default class ReviewPS {
         "RETURNING *");
 
     private static updateMpcAnswer: PreparedStatement = new PreparedStatement("add-mpc-answer",
-            "INSERT INTO mcanswer(answer_option, mcquestion_id, review_id) VALUES ($1, $2, $3) " +
-            "ON CONFLICT (mcquestion_id, review_id) DO UPDATE SET answer_option=$1 RETURNING answer_option");
+            "INSERT INTO mcanswer(answer, mcquestion_id, review_id) VALUES ($1, $2, $3) ON CONFLICT (mcquestion_id, review_id) DO UPDATE SET answer=$1 RETURNING answer");
 
     private static updateOpenAnswer: PreparedStatement = new PreparedStatement("add-open-answer",
         "INSERT INTO openanswer(answer, openquestion_id, review_id) VALUES ($1, $2, $3) " +
@@ -57,14 +56,14 @@ export default class ReviewPS {
 
     /**
      * Execute an 'add mpc answer' query.
-     * @param {number} answer_option - a 1 char answer.
+     * @param {number} answerOption - a 1 char answer.
      * @param {number} questionId - a question id.
      * @param {number} reviewId - a review id.
      * @return {Promise<pgPromise.queryResult>} - a database query result, empty if succeeded.
      */
-    public static executeUpdateMpcAnswer(answer_option: number, questionId: number, reviewId: number)
+    public static executeUpdateMpcAnswer(answerOption: number, questionId: number, reviewId: number)
         : Promise<pgPromise.queryResult> {
-        this.updateMpcAnswer.values = [answer_option, questionId, reviewId];
+        this.updateMpcAnswer.values = [answerOption, questionId, reviewId];
         return Database.executeQuerySingleResult(this.updateMpcAnswer);
     }
 

@@ -19,6 +19,13 @@ router.route("/").post(async (req, res) => {
 });
 
 /**
+ * Router to get all courses you are enrolled in
+ */
+router.get("/enrolled", async (req, res) => {
+   res.json(await CoursesPS.executeGetAllEnrolledCourses());
+});
+
+/**
  * Get all assignments that belong to a specific course.
  * @param courseId - a course id.
  */
