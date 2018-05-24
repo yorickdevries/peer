@@ -397,7 +397,7 @@ INSERT INTO public.review(
 
 INSERT INTO public.mcanswer(
 	answer, mcquestion_id, review_id)
-	VALUES ('B', 1, 1);
+	VALUES (1, 1, 1);
 
 INSERT INTO public.openanswer(
 	answer, openquestion_id, review_id)

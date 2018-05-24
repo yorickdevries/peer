@@ -53,7 +53,7 @@ CREATE TABLE GroupUsers (
 
 -- Table: MCAnswer
 CREATE TABLE MCAnswer (
-    answer_option int NOT NULL,
+    answer int NOT NULL,
     MCQuestion_id int NOT NULL,
     Review_id int NOT NULL,
     CONSTRAINT MCAnswer_pk PRIMARY KEY (MCQuestion_id,Review_id)
@@ -518,13 +518,13 @@ INSERT INTO public.review(
 INSERT INTO public.mcanswer(
 	answer, mcquestion_id, review_id)
 	VALUES
-	    ('B', 1, 1),
-	    ('A', 2, 1),
-	    ('C', 3, 1),
-	    ('B', 4, 1),
-	    ('A', 5, 1),
-	    ('A', 6, 1),
-	    ('A', 7, 1)
+	    (1, 1, 1),
+	    (1, 2, 1),
+	    (2, 3, 1),
+	    (2, 4, 1),
+	    (2, 5, 1),
+	    (2, 6, 1),
+	    (2, 7, 1)
 	;
 
 INSERT INTO public.openanswer(
