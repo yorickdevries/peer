@@ -5,7 +5,7 @@ import "mocha";
 
 // load the queryfile
 import { QueryFile } from "pg-promise";
-const qf = new QueryFile("../../../database_dumps/ED3-FullDataBase.sql");
+const qf = new QueryFile("../../../database_dumps/ED3-TestDataBase.sql");
 
 describe("Database Test", () => {
   // Make a clean database

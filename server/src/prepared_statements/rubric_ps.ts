@@ -10,7 +10,7 @@ export default class RubricPS {
         "SELECT * FROM rubric WHERE assignment_id=$1");
 
     private static createOpenQuestion: PreparedStatement = new PreparedStatement("make-open-question",
-        "INSERT INTO openquestion (question, rubric_assignment_id, question_number VALUES ($1, $2, $3) RETURNING *");
+        "INSERT INTO openquestion (question, rubric_assignment_id, question_number) VALUES ($1, $2, $3) RETURNING *");
 
     private static createMCQuestion: PreparedStatement = new PreparedStatement("make-MC-question",
         "INSERT INTO mcquestion (question, rubric_assignment_id, question_number) VALUES ($1, $2, $3) RETURNING *");
@@ -55,8 +55,21 @@ export default class RubricPS {
         "DELETE FROM openquestion WHERE id=$1 RETURNING *");
 
     private static deleteRangeQuestion: PreparedStatement = new PreparedStatement("delete-range-question",
-        "DELTE FROM rangequestion WHERE id=$1 RETURNING *");
+        "DELETE FROM rangequestion WHERE id=$1 RETURNING *");
 
+    private static deleteRubric: PreparedStatement = new PreparedStatement("delete-rubric",
+        "DELETE FROM rubric WHERE assignment_id=$1 RETURNING *");
+
+
+    /**
+     * Query 'delete rubric'
+     * @param {number} id - assignment_id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteRubric(id: number):Promise<pgPromise.queryResult> {
+        this.deleteRubric.values = [id];
+        return Database.executeQuerySingleResult(this.deleteRubric);
+    }
 
     /**
      * Query 'delete mc option'
