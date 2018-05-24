@@ -3,17 +3,19 @@ import {expect} from "chai";
 import "mocha";
 import Database from "../../src/database";
 
-// load the queryfile
-import {QueryFile} from "pg-promise";
-
-const qf = new QueryFile("../../../database_dumps/ED3-TestDataBase.sql");
+// load the queryfiles
+import { QueryFile } from "pg-promise";
+const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
+const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
 
 describe("RubricPreparedStatements Test", () => {
     /**
      * Make a clean database before each test.
      */
-    beforeEach((done) => {
-        Database.DatabaseImport(qf).then(done);
+    beforeEach(async () => {
+        await Database.DatabaseDrop();
+        await Database.DatabaseImport(qfSchema);
+        await Database.DatabaseImport(qfData);
     });
 
 
