@@ -5,7 +5,7 @@ import Database from "../../src/database";
 
 // load the queryfile
 import { QueryFile } from "pg-promise";
-const qf = new QueryFile("../../../database_dumps/ED3-FullDataBase.sql");
+const qf = new QueryFile("../../../database_dumps/ED3-TestDataBase.sql");
 
 describe("UserPreparedStatements Test", () => {
     /**
