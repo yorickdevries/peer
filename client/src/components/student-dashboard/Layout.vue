@@ -2,7 +2,7 @@
     <div>
         <Navbar :title="course.name" :links="navbarItems"/>
 
-        <keep-alive><router-view></router-view></keep-alive>
+        <keep-alive exclude="Assignment"><router-view></router-view></keep-alive>
 
     </div>
 </template>

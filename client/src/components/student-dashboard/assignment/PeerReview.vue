@@ -109,7 +109,9 @@ export default {
     async created() {
 
         // Get the peer review ID from this assignment that is active.
-        let peerReviewID = 1
+        let subRes = await api.getCurrentPeerReview(this.$route.params.assignmentId)
+        let peerReviewID = subRes.data.id
+        console.log(subRes.data)
 
         // Get peer review.
         let res = await api.getPeerReview(peerReviewID)

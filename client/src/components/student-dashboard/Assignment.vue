@@ -66,6 +66,7 @@
 import api from "../../api"
 
 export default {
+    name: 'Assignment',
     async created() {
 
         // Get assignment.
