@@ -100,8 +100,7 @@ router.route("/:assignment_id")
             req.body.assignment_title,
             req.body.assignment_description,
             req.body.course_id,
-            req.params.assignment_id,
-            req.body.filename));
+            req.params.assignment_id));
     });
 
 
