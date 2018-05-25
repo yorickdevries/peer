@@ -35,7 +35,7 @@ app.use(function (err: any, req: any, res: any, next: any) {
   console.log("Error: " + err.message);
 
   // render the error page
-  next()
+  next();
 });
 
 app.get("/*", (req, res) => {
