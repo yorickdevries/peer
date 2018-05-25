@@ -15,7 +15,7 @@
                                         <span class="lead">Peer #{{ peerReview.review.id }}</span>
                                     </b-col>
                                     <b-col>
-                                        <a :href="formattedFilePath"><button type="button" class="btn btn-success success w-100 h-100">Download Hand-In</button></a>
+                                        <a :href="formattedFilePath(this.peerReview.review.file_path)"><button type="button" class="btn btn-success success w-100 h-100">Download Hand-In</button></a>
                                     </b-col>
                                 </b-row>
                             </b-container>

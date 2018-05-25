@@ -31,7 +31,7 @@ export default {
         return client.get(`reviews/${peerReviewId}`)
     },
     submitPeerReview(peerReview) {
-        return client.post(`/reviews/${peerReview.review.id}/submit`, peerReview)
+        return client.get(`/reviews/${peerReview.review.id}/submit`)
     },
     getAuthenticated: async() => {
         return client.get('authenticated')
