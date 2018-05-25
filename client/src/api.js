@@ -6,6 +6,7 @@ const client = axios.create({
 })
 
 export default {
+    client,
     getCourses: async () => {
         return client.get('courses')
     },
@@ -41,6 +42,12 @@ export default {
     },
     savePeerReview(peerReviewId, peerReview) {
         return client.put(`reviews/${peerReviewId}`, peerReview)
+    },
+    getSubmission(submissionId) {
+        return client.get(`submissions/${submissionId}`)
+    },
+    deleteSubmission(submissionId) {
+        return client.delete(`submissions/${submissionId}`)
     }
 }
 
