@@ -61,7 +61,9 @@ export default {
     },
     methods: {
         async onSubmit() {
-            await api.createCourse(this.course)
+            let res = await api.createCourse(this.course)
+            console.log(this.course)
+            console.log(res)
             this.$router.push({name: 'courses'})
         }
     }

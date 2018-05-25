@@ -18,7 +18,7 @@
                                     <b-card-body>
                                         <h4>{{ assignment.title}}</h4>
                                         <p>{{ assignment.description}}</p>
-                                        <b-button variant="primary" :to="{ name: 'student-dashboard.assignment', params: { id: assignment.id } }">View Assignment</b-button>
+                                        <b-button variant="primary" :to="{ name: 'student-dashboard.course.assignment', params: { courseId: assignment.course_id, assignmentId: assignment.id } }">View Assignment</b-button>
                                     </b-card-body>
                                     <b-card-footer class="text-danger">Peer review due in 2 days</b-card-footer>
                                 </b-card>
@@ -30,7 +30,7 @@
                                     <b-card-body>
                                         <h4>{{ assignment.title}}</h4>
                                         <p>{{ assignment.description}}</p>
-                                        <b-button variant="primary" :to="{ name: 'student-dashboard.assignment', params: { id: assignment.id } }">View Assignment</b-button>
+                                        <b-button variant="primary" :to="{ name: 'student-dashboard.course.assignment', params: { courseId: assignment.course_id, assignmentId: assignment.id } }">View Assignment</b-button>
                                     </b-card-body>
                                     <b-card-footer>Done</b-card-footer>
                                 </b-card>
@@ -51,30 +51,19 @@ import api from "../../api"
 
 export default {
     async created() {
-        let resAssignment = await api.getCourseAssignments(this.$route.params.id)
+        let resAssignment = await api.getCourseAssignments(this.$route.params.courseId)
         this.assignments = resAssignment.data
-
-        let resCourse = await api.getCourse(this.assignments[0].course_id)
-        this.course = resCourse.data[0]
-
-        this.items = [
-            {
-                text: this.course.name,
-                active: true
-            },
-            {
-                text: 'Assignments',
-                active: true
-            }]
+        console.log(resAssignment.data)
     },
     data() {
         return {
-            items: [],
-            assignments: [],
-            course: {
-                name: null,
-                description: null
-            }
+            items: [
+                {
+                    text: 'Assignments',
+                    active: true
+                }
+            ],
+            assignments: []
         }
     },
     computed: {
