@@ -5,11 +5,11 @@
   "scripts": {
     "start": "npm run build && npm run db_init && npm run start_server",
     "start_server": "node ./dist/bin/www.js",
-    "tslint": "tslint --project .",
+    "tslint": "tslint 'src/**/*.ts' 'test/**/*.spec.ts'",
     "build": "npm run tsc",
     "tsc": "tsc",
-    "test": "mocha",
-    "coverage": "nyc mocha",
+    "test": "mocha --timeout 10000",
+    "coverage": "nyc npm run test",
     "db_init": "node ./dist/database_init.js"
   },
   "nyc": {
