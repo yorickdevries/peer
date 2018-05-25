@@ -1,4 +1,4 @@
-import RubricPS from "../prepared_statements/rubric_ps";
+import RubricPS, { default as rubricPS } from "../prepared_statements/rubric_ps";
 
 // Router
 import { Router } from "express";
@@ -46,64 +46,34 @@ router.post("/mcoption", async (req, res) => {
     res.json(RubricPS.executeCreateMCOption(req.body.option, req.body.mcquestion_id));
 });
 
-/**
- * Route to update an option for a multiple choice question
- * @body option, mcquestion_id
- * @params option_id
- */
 router.put("/mcoption/:option_id", async (req, res) => {
     res.json(RubricPS.executeUpdateMCOption(req.body.option, req.body.mcquestion_id, req.params.option_id));
 });
 
-/**
- * Route to create a multiple choice question
- * @body question, rubric_id, question_number
- */
 router.post("/mcquestion", async (req, res) => {
     res.json(RubricPS.executeCreateMCQuestion(req.body.question, req.body.rubric_id, req.body.question_number));
 });
 
-/**
- * Route to update a multiple choice question
- * @params question_id
- * @body question, rubric_id, question_number
- */
-router.put("/mcquestion/:question_id", async (req, res) => {
-    res.json(RubricPS.executeUpdateMCQuestion(req.body.question, req.body.rubric_id, req.body.question_number, req.params.question_id));
+router.put("/openquestion/:question_id", async (req, res) => {
+    res.json(rubricPS.executeUpdateMCQuestion(req.body.question, req.body.rubric_id, req.body.question.number, req.params.question_id));
 });
 
-/**
- * Route to create a range question
- * @body quesiton, range, rubric_id, question_number
- */
+
 router.post("/rangequestion", async (req, res) => {
     res.json(RubricPS.executeCreateRangeQuestion(req.body.question, req.body.range, req.body.rubric_id, req.body.question_number));
 });
 
-/**
- * Route to update a range question
- * @param question_id
- * @body question, range, rubric_id, question_number
- */
 router.put("/rangequestion/:question_id", async (req, res) => {
-    res.json(RubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.rubric_id, req.body.question_number, req.params.question_id));
+    res.json(rubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.rubric_id, req.body.question.number, req.params.question_id));
 });
 
-/**
- * Route to create an open question
- * @body question, rubric_id, question_number
- */
+
 router.post("/openquestion", async (req, res) => {
     res.json(RubricPS.executeCreateOpenQuestion(req.body.question, req.body.rubric_id, req.body.question_number));
 });
 
-/**
- * Route to update an open question
- * @params question_id
- * @body question, rubric_id, question_number
- */
 router.put("/openquestion/:question_id", async (req, res) => {
-    res.json(RubricPS.executeUpdateOpenQuestion(req.body.question, req.body.rubric_id, req.body.question_number, req.params.question_id));
+    res.json(rubricPS.executeUpdateOpenQuestion(req.body.question, req.body.rubric_id, req.body.question.number, req.params.question_id));
 });
 
 /**
@@ -113,7 +83,6 @@ router.put("/openquestion/:question_id", async (req, res) => {
 router.post("/", async (req, res) => {
     res.json(RubricPS.executeCreateRubric(req.body.rubric_id));
 });
-
 
 /**
  * Router to get all questions of the rubric in format defined in the documentation

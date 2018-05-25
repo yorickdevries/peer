@@ -7,7 +7,7 @@
 | [Product Vision](https://www.overleaf.com/15912852pwhkvtzxbyyx#/60665355/)                                                                                             |
 | [Product Planning](https://www.overleaf.com/15914315rjccsrysjscw#/60672325/)                                                                                           |
 | [Architecture Design (WIP)](https://drive.google.com/open?id=1h1dirajEcvkcRcdFhfo3CgOzBTrAspKalOY-8s0Ieu0)                                                                   |
-| [API Documentation (WIP)](https://docs.google.com/document/d/1m11p5CM3ABdOvkM-99Y5f3V9y1EuayOgCe9k1uR5wyA/edit?usp=sharing)
+| [API Documentation (WIP)](https://docs.google.com/document/d/1T3CrurTxEPQj9gjq3f9S0LaflKdBjH1UjgnkIRom2xM/edit?usp=sharing)
 
 | Sprint Documents & Meetings                                                                                                                                            |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

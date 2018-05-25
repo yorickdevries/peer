@@ -42,10 +42,18 @@ export default class Database {
      * @constructor - default constructor.
      */
   static async DatabaseImport(qf: pgp.QueryFile) {
-    await this.db.any("DROP SCHEMA IF EXISTS public CASCADE");
-    await this.db.any("CREATE SCHEMA public");
     await this.db.any(qf);
   }
+
+    /**
+     * Method to drop all tables in default database.
+     * @return {Promise<void>} - a promise of the result.
+     * @constructor - default constructor.
+     */
+    static async DatabaseDrop() {
+      await this.db.any("DROP SCHEMA IF EXISTS public CASCADE");
+      await this.db.any("CREATE SCHEMA public");
+    }
 
     /**
      * Execute a query on the database, using a prepared statement.
@@ -58,6 +66,7 @@ export default class Database {
       try {
           return await Database.db.any(statement);
       } catch (err) {
+        console.log(err);
         return {
             statement: statement,
             error: "There was a problem executing the information to the database."
@@ -76,6 +85,7 @@ export default class Database {
         try {
             return await Database.db.one(statement);
         } catch (err) {
+          console.log(err);
             return {
                 statement: statement,
                 error: "There was a problem executing the information to the database."

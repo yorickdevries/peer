@@ -3,16 +3,19 @@ import { expect } from "chai";
 import "mocha";
 import Database from "../../src/database";
 
-// load the queryfile
+// load the queryfiles
 import { QueryFile } from "pg-promise";
-const qf = new QueryFile("../../../database_dumps/ED3-TestDataBase.sql");
+const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
+const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
 
 describe("AssignmentPreparedStatements Test", () => {
     /**
      * Make a clean database before each test.
      */
-    beforeEach((done) => {
-        Database.DatabaseImport(qf).then(done);
+    beforeEach(async () => {
+        await Database.DatabaseDrop();
+        await Database.DatabaseImport(qfSchema);
+        await Database.DatabaseImport(qfData);
     });
 
     /**
@@ -79,7 +82,7 @@ describe("AssignmentPreparedStatements Test", () => {
      * Test get review assignment.
      */
     it("get review", async () => {
-        expect(await AssignmentPS.executeGetReviewByAssignmentId(1, 'henkjan')).to.deep.equal({
+        expect(await AssignmentPS.executeGetReviewByAssignmentId(1, "henkjan")).to.deep.equal({
             "comment": "Plagiaat",
             "done": false,
             "id": 1,
@@ -96,7 +99,7 @@ describe("AssignmentPreparedStatements Test", () => {
      * Test create review.
      */
     it("create review", async () => {
-        expect(await AssignmentPS.executeCreateReviewByAssignmentId('paulvanderlaan', 1, 1)).to.deep.equal({
+        expect(await AssignmentPS.executeCreateReviewByAssignmentId("paulvanderlaan", 1, 1)).to.deep.equal({
             "comment": "",
             "done": false,
             "id": 2,
@@ -112,10 +115,16 @@ describe("AssignmentPreparedStatements Test", () => {
      */
     it("get all submissions", async () => {
         expect(await AssignmentPS.executeGetAllSubmissionsByAssignmentId(1)).to.deep.equal([{
-            "file_path": "folder/verygudsubmission.pdf",
+            "file_path": "submission1.pdf",
             "id": 1,
             "assignment_id": 1,
             "user_netid": "paulvanderlaan"
+        },
+        {
+            "file_path": "submission2.pdf",
+            "id": 2,
+            "assignment_id": 1,
+            "user_netid": "henkjan"
         }]);
     });
 

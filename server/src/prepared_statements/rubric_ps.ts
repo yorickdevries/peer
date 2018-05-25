@@ -114,7 +114,7 @@ export default class RubricPS {
     /**
      * executes 'update mc option' query
      * @param {string} option
-     * @param {number} mcquestion_id
+     * @param {number} mcquestionId
      * @param {number} id
      * @returns {Promise<pgPromise.queryResult>}
      */
@@ -126,8 +126,8 @@ export default class RubricPS {
     /**
      * executes 'update mc question' query
      * @param {string} question - question
-     * @param {number} rubric_assignment_id - rubric_assignment_id
-     * @param {number} question_number - question_number
+     * @param {number} rubricAssignmentId - rubric_assignment_id
+     * @param {number} questionNumber - question_number
      * @param {number} id - id
      * @returns {Promise<pgPromise.queryResult>}
      */
@@ -140,8 +140,8 @@ export default class RubricPS {
      * executes 'update range question' query
      * @param {string} question - question
      * @param {number} range - range
-     * @param {number} rubric_assignment_id - rubric_assignment_id
-     * @param {number} question_number - question_number
+     * @param {number} rubricAssignmentId - rubric_assignment_id
+     * @param {number} questionNumber - question_number
      * @param {number} id - id
      * @returns {Promise<pgPromise.queryResult>}
      */
@@ -153,8 +153,8 @@ export default class RubricPS {
     /**
      * executes 'update open question' query
      * @param {string} question - question
-     * @param {number} rubric_assignment_id - rubric_assignment_id
-     * @param {number} question_number - question_number
+     * @param {number} rubricAssignmentId - rubric_assignment_id
+     * @param {number} questionNumber - question_number
      * @param {number} id - id
      * @returns {Promise<pgPromise.queryResult>}
      */
@@ -166,7 +166,7 @@ export default class RubricPS {
     /**
      * executes 'create MC option' query
      * @param {string} option - option
-     * @param {number} mcquestion_id - mcquestion_id
+     * @param {number} mcquestionId - mcquestion_id
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeCreateMCOption(option: string, mcquestionId: number): Promise<pgPromise.queryResult> {
@@ -178,8 +178,8 @@ export default class RubricPS {
      * executes 'create range question' query
      * @param {string} question - question
      * @param {number} range - range
-     * @param {number} rubric_assignment_id - rubric_assignment_id
-     * @param {number} question_number - question_number
+     * @param {number} rubricAssignmentId - rubric_assignment_id
+     * @param {number} questionNumber - question_number
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeCreateRangeQuestion(question: string, range: number, rubricAssignmentId: number, questionNumber: number): Promise<pgPromise.queryResult> {
@@ -190,8 +190,8 @@ export default class RubricPS {
     /**
      * executes 'create mc question' query
      * @param {string} question - question
-     * @param {number} rubric_assignment_id - rubric_assignment_id
-     * @param {number} question_number - question_number
+     * @param {number} rubricAssignmentId - rubric_assignment_id
+     * @param {number} questionNumber - question_number
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeCreateMCQuestion(question: string, rubricAssignmentId: number, questionNumber: number): Promise<pgPromise.queryResult> {
@@ -273,7 +273,7 @@ export default class RubricPS {
 
     /**
      * Funtion that creates the rubric of all questions
-     * @param {number} rubric_id - rubric_id
+     * @param {number} rubricId - rubric_id
      * @returns {Promise<any[]>}
      */
     public static async getAllQuestionsByRubricId(rubricId: number) {
@@ -302,7 +302,5 @@ export default class RubricPS {
 
         return questionJson;
     }
-
-
 
 }

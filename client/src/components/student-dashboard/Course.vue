@@ -72,9 +72,11 @@ import api from "../../api"
 
 export default {
     async created() {
-        let res = await api.getCourse(this.$route.params.id)
+        let res = await api.getCourse(this.$route.params.courseId)
 
         this.course = res.data
+
+        console.log(true)
     },
     data() {
         return {
