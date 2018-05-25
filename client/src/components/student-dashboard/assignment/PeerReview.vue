@@ -142,21 +142,7 @@ import api from "../../../api";
 
 export default {
     async created() {
-
-        // Get the peer review ID from this assignment that is active.
-        let subRes = await api.getCurrentPeerReview(this.$route.params.assignmentId)
-        let peerReviewID = subRes.data.id
-
-        // Check if there is a peer review active, if not allow option to get request review.
-        if (isNaN(peerReviewID)) {
-            this.isPeerReviewActive = false
-            return
-        }
-
-        // Get peer review.
-        let res = await api.getPeerReview(peerReviewID)
-        this.peerReview = res.data
-
+        await this.fetchPeerReview()
     },
     data() {
         return {
@@ -183,10 +169,26 @@ export default {
         },
         async submitPeerReview() {
             await api.submitPeerReview(this.peerReview)
+            await this.fetchPeerReview()
         },
         async savePeerReview() {
             // Submit a PUT to save the current peer review.
             let res = await api.savePeerReview(this.peerReview.review.id, this.peerReview)
+            this.peerReview = res.data
+        },
+        async fetchPeerReview() {
+            // Get the peer review ID from this assignment that is active.
+            let subRes = await api.getCurrentPeerReview(this.$route.params.assignmentId)
+            let peerReviewID = subRes.data.id
+
+            // Check if there is a peer review active, if not allow option to get request review.
+            if (isNaN(peerReviewID)) {
+                this.isPeerReviewActive = false
+                return
+            }
+
+            // Get peer review.
+            let res = await api.getPeerReview(peerReviewID)
             this.peerReview = res.data
         },
         formattedFilePath(path) {
