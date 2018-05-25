@@ -1,5 +1,5 @@
 import RubricPS from "../../src/prepared_statements/rubric_ps";
-import {expect} from "chai";
+import { expect } from "chai";
 import "mocha";
 import Database from "../../src/database";
 
@@ -23,7 +23,7 @@ describe("RubricPreparedStatements Test", () => {
      * Test to create a rubric
      */
     it("create rubric", async () => {
-        RubricPS.executeDeleteRubric(1);
+        await RubricPS.executeDeleteRubric(1);
         expect(await RubricPS.executeCreateRubric(1)).to.deep.equal({
             assignment_id: 1
         });
@@ -48,7 +48,7 @@ describe("RubricPreparedStatements Test", () => {
             question_number: 1,
             rubric_assignment_id: 1,
             type_question: "open"
-        })
+        });
     });
 
     /**
@@ -61,7 +61,7 @@ describe("RubricPreparedStatements Test", () => {
             question_number: 1,
             rubric_assignment_id: 1,
             type_question: "mc"
-        })
+        });
     });
 
     /**
@@ -75,19 +75,19 @@ describe("RubricPreparedStatements Test", () => {
             rubric_assignment_id: 1,
             range: 6,
             type_question: "range"
-        })
+        });
     });
 
     /**
      * Test to create mc option
      */
     it("create mc option", async () => {
-        expect(await RubricPS.executeCreateMCOption("hi", 1,)).to.deep.equal({
+        expect(await RubricPS.executeCreateMCOption("hi", 1)).to.deep.equal({
             id: 4,
             mcquestion_id: 1,
             option: "hi"
 
-        })
+        });
     });
 
     /**
