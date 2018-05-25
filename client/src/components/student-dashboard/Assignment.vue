@@ -18,8 +18,11 @@
                                 tag="div"
                                 :to="{ name: 'student-dashboard.course.assignment.hand-in' }">
                             <div class="text-center border-right border-bottom active py-3">
-                                <div class="lead font-weight-bold">Hand-In - <span class="text-success">Open</span></div>
-                                <div class="text-muted">Due: 20 Nov 23:57</div>
+                                <div class="lead font-weight-bold">Hand-In -
+                                    <span class="text-success" v-if="isHandInActive">Open</span>
+                                    <span class="text-danger" v-else>Closed</span>
+                                </div>
+                                <div class="text-muted">Due: {{ formatDate(assignment.due_date) }}</div>
                             </div>
                         </router-link>
 
@@ -30,8 +33,11 @@
                                 :to="{ name: 'student-dashboard.course.assignment.peer-review' }">
 
                             <div class="text-center border-right border-bottom py-3">
-                                <div class="lead font-weight-bold">Peer Review - <span class="text-danger">Closed</span></div>
-                                <span class="text-muted">Due: 20 Nov 23:58</span>
+                                <div class="lead font-weight-bold">Peer Review -
+                                    <span class="text-success" v-if="isPeerReviewActive">Open</span>
+                                    <span class="text-danger" v-else>Closed</span>
+                                </div>
+                                <span class="text-muted">Due: {{ formatDate(assignment.peer_review_due_date) }}</span>
                             </div>
                         </router-link>
 
@@ -41,8 +47,11 @@
                                 tag="div"
                                 :to="{ name: 'student-dashboard.course.assignment.feedback' }">
                             <div class="text-center border-bottom py-3">
-                                <div class="lead font-weight-bold ">Received Feedback - <span class="text-danger">Closed</span></div>
-                                <span class="text-muted">Due: 20 Nov 23:59</span>
+                                <div class="lead font-weight-bold ">Received Feedback -
+                                    <span class="text-success" v-if="isFeedbackActive">Open</span>
+                                    <span class="text-danger" v-else>Closed</span>
+                                </div>
+                                <span class="text-muted">Opens after {{ formatDate(assignment.peer_review_due_date) }}</span>
                             </div>
                         </router-link>
 
@@ -78,6 +87,11 @@ export default {
             text: this.assignment.title,
             active: true
         })
+
+        // Temp:
+        let tempDate = new Date(this.assignment.due_date);
+        tempDate.setDate(tempDate.getDate() + 40);
+        this.assignment.peer_review_due_date = tempDate
     },
     data() {
         return {
@@ -86,8 +100,26 @@ export default {
                 active: true
             }],
             assignment: {
-                title: null
-            }
+                title: null,
+                due_date: null
+            },
+        }
+    },
+    computed: {
+        isHandInActive() {
+           return new Date() < new Date(this.assignment.due_date)
+        },
+        isPeerReviewActive() {
+            return new Date() < new Date(this.assignment.peer_review_due_date)
+        },
+        isFeedbackActive() {
+            return new Date() > new Date(this.assignment.peer_review_due_date)
+        }
+    },
+    methods: {
+        formatDate(date) {
+            if (!(date instanceof Date)) date = new Date(date)
+            return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
         }
     }
 }
