@@ -3,14 +3,19 @@ import Database from "../../src/database";
 import { expect } from "chai";
 import "mocha";
 
-// load the queryfile
+// load the queryfiles
 import { QueryFile } from "pg-promise";
-const qf = new QueryFile("../../../database_dumps/ED3-TestDataBase.sql");
+const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
+const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
 
 describe("Database Test", () => {
-  // Make a clean database
-  beforeEach((done) => {
-    Database.DatabaseImport(qf).then(done);
+    /**
+     * Make a clean database before each test.
+     */
+    beforeEach(async () => {
+      await Database.DatabaseDrop();
+      await Database.DatabaseImport(qfSchema);
+      await Database.DatabaseImport(qfData);
   });
 
   it("connection port", () => {
