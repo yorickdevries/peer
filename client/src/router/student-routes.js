@@ -34,7 +34,7 @@ export default [
                     {
                         path: 'feedback',
                         name: 'student-dashboard.course.assignment.feedback',
-                        component: () => import('../components/student-dashboard/assignment/FeedbackNavigator')
+                        component: () => import('../components/student-dashboard/assignment/Feedback')
                     }
                 ]
             }
