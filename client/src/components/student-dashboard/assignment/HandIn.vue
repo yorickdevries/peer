@@ -9,14 +9,14 @@
                 <p>
                     {{ assignment.description }}
                 </p>
-                <span class="font-weight-bold">Peer Review Setup</span>
+                <span class="font-weight-bold">Peer Review Setup (MOCK INFO)</span>
                 <p>
                     You will make the assignment as a <b-badge variant="success ml-1">GROUP</b-badge>
                     <br>
                     You will review the assignment as a <b-badge variant="success ml-1">INDIVIDUAL STUDENT</b-badge>
                 </p>
                 <span class="font-weight-bold">Download</span>
-                <b-button variant="primary w-100">Download Assignment</b-button>
+                <b-button variant="primary w-100" :href="formattedFilePath(assignment.filename)">Download Assignment</b-button>
             </b-col>
 
             <!--Hand-In Form-->
@@ -35,7 +35,13 @@
 </template>
 
 <script>
+import api from "../../../api"
+
 export default {
+    async created() {
+        let res = await api.getAssignment(this.$route.params.assignmentId)
+        this.assignment = res.data
+    },
     data() {
         return {
             file: true,
@@ -46,14 +52,23 @@ export default {
                 description: null
             },
             assignment: {
-                title: "Assignment 1",
-                description: "Example assignment number one",
-                due_date: "2018-05-01T20:30:00.000Z",
-                publish_date: "2018-04-01T20:30:00.000Z",
+                title: null,
+                description: null,
+                due_date: null,
+                publish_date: null,
                 id: 1,
-                course_id: 1
+                course_id: 1,
+                filename: ""
             }
         }
     },
+    methods: {
+        formattedFilePath(path) {
+            if (path.charAt(0) !== '/') {
+                return '/' + path
+            }
+            return path
+        }
+    }
 }
 </script>
