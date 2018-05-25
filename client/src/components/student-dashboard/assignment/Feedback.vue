@@ -36,7 +36,7 @@
                                 </div>
                             </b-list-group-item>
 
-                            <b-list-group-item v-for="answer in aggregateQuestionAnswer(activeQuestion.question_number)" :key="answer">
+                            <b-list-group-item v-for="(answer, index) in aggregateQuestionAnswer(activeQuestion.question_number)" :key="index">
 
                                 <!--&lt;!&ndash; OPEN QUESTION &ndash;&gt;-->
                                 <template v-if="activeQuestion.type_question === 'open'">
@@ -93,7 +93,6 @@ export default {
         // Get feedback array of reviews.
         this.peerReviews = [review, review2, review]
         this.activeQuestion = this.sortedQuestionsList[0]
-        console.log(this.activeQuestion)
     },
     data() {
         return {
