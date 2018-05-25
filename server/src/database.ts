@@ -42,10 +42,18 @@ export default class Database {
      * @constructor - default constructor.
      */
   static async DatabaseImport(qf: pgp.QueryFile) {
-    await this.db.any("DROP SCHEMA IF EXISTS public CASCADE");
-    await this.db.any("CREATE SCHEMA public");
     await this.db.any(qf);
   }
+
+    /**
+     * Method to drop all tables in default database.
+     * @return {Promise<void>} - a promise of the result.
+     * @constructor - default constructor.
+     */
+    static async DatabaseDrop() {
+      await this.db.any("DROP SCHEMA IF EXISTS public CASCADE");
+      await this.db.any("CREATE SCHEMA public");
+    }
 
     /**
      * Execute a query on the database, using a prepared statement.

@@ -3,16 +3,19 @@ import { expect } from "chai";
 import "mocha";
 import Database from "../../src/database";
 
-// load the queryfile
+// load the queryfiles
 import { QueryFile } from "pg-promise";
-const qf = new QueryFile("../../../database_dumps/ED3-TestDataBase.sql");
+const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
+const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
 
 describe("CoursePreparedStatement Test", () => {
     /**
      * Make a clean database before each test.
      */
-    beforeEach((done) => {
-        Database.DatabaseImport(qf).then(done);
+    beforeEach(async () => {
+        await Database.DatabaseDrop();
+        await Database.DatabaseImport(qfSchema);
+        await Database.DatabaseImport(qfData);
     });
 
     /**
@@ -64,7 +67,7 @@ describe("CoursePreparedStatement Test", () => {
     });
 
 
-        /**
+    /**
      * Test update a course
      */
     it("update a course", async () => {
@@ -83,7 +86,7 @@ describe("CoursePreparedStatement Test", () => {
             description: "This is a beautiful course description!",
             id: 1,
             name: "ED-3"
-        }]).to.deep.equal(await CoursePS.executeGetAllEnrolledCourses('paulvanderlaan'));
+        }]).to.deep.equal(await CoursePS.executeGetAllEnrolledCourses("paulvanderlaan"));
     });
 
     /**
@@ -92,7 +95,7 @@ describe("CoursePreparedStatement Test", () => {
     it("get course role of user", async () => {
         expect({
             role: "Owner"
-        }).to.deep.equal(await CoursePS.executeGetRoleById('paulvanderlaan', 1));
+        }).to.deep.equal(await CoursePS.executeGetRoleById("paulvanderlaan", 1));
     });
 
 
