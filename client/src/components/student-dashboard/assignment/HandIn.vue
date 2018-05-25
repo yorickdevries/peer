@@ -123,7 +123,9 @@ export default {
             let res = await api.client.post("/submissions", formData, config)
 
             // Check whether upload was successful or not.
-            this.uploadSuccess = Boolean(res.data.error)
+            res.data.error === undefined ? this.uploadSuccess = true : this.uploadSuccess = false
+
+            console.log(res)
         },
         async deleteSubmission() {
             // Delete the current submission.
