@@ -29,7 +29,7 @@ export default class UserPS {
      * @param {string} email - an email.
      * @return {any} a query result.
      */
-    public static executeAddUser(netId: string, email: string): Promise<pgPromise.queryResult> {
+    public static executeAddUser(netId: string, email: string | undefined): Promise<pgPromise.queryResult> {
         this.addUser.values = [netId, email];
         return Database.executeQuery(this.addUser);
     }
