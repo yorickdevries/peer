@@ -143,7 +143,7 @@ CREATE TABLE Submission (
 -- Table: UserList
 CREATE TABLE UserList (
     netid varchar(256)  NOT NULL,
-    email varchar(256)  NOT NULL,
+    email varchar(256),
     CONSTRAINT UserList_pk PRIMARY KEY (netid)
 );
 
