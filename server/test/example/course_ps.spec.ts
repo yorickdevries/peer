@@ -59,7 +59,7 @@ describe("CoursePreparedStatement Test", () => {
             course_id: 1,
             description: "Example assignment number one",
             "due_date": new Date("2018-05-01T20:30:00Z"),
-            filename: "assignment/test_file.pdf",
+            filename: "assignment1.pdf",
             "id": 1,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             title: "Assignment 1"

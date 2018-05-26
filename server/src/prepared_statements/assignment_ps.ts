@@ -12,7 +12,7 @@ export default class AssignmentPS {
         'INSERT INTO "assignmentlist" ("title", "description", "due_date", "publish_date", "course_id", "filename") VALUES ($1, $2, $3, $4, $5, $6) RETURNING title, description, id, course_id, due_date, publish_date, filename');
 
     private static updateAssignmentById: PreparedStatement = new PreparedStatement("update-assignment-by-id",
-        "UPDATE assignmentlist SET title=$1, description=$2, course_id=$3, filename=$5 WHERE id=$4  RETURNING title, description, id, course_id, filename");
+        "UPDATE assignmentlist SET title=$1, description=$2, course_id=$3 WHERE id=$4  RETURNING title, description, id, course_id, filename");
 
     private static getSubmissionByAssignmentId: PreparedStatement = new PreparedStatement("get-submission-by-assignment",
         "SELECT * FROM sumbission WHERE user_netid = $1 AND assignment_id = $2");
@@ -106,8 +106,8 @@ export default class AssignmentPS {
     public static executeUpdateAssignmentById(title: string,
                                               description: string,
                                               courseId: number,
-                                              assignmentId: number, filename: string): Promise<pgPromise.queryResult> {
-        this.updateAssignmentById.values = [title, description, courseId, assignmentId, filename];
+                                              assignmentId: number): Promise<pgPromise.queryResult> {
+        this.updateAssignmentById.values = [title, description, courseId, assignmentId];
         return Database.executeQuerySingleResult(this.updateAssignmentById);
     }
 
