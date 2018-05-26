@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
+import GroupParser from "../groupParser";
 
 // Router
 import { Router } from "express";
@@ -206,9 +207,8 @@ router.post("/:id/importgroups", async (req: any, res) => {
         } else {
             const groupColumn = req.body.groupColumn;
             const assignmentId = req.params.id;
-            res.json({group: groupColumn,
-                 assignment: assignmentId,
-                file: req.file});
+            const groups = await GroupParser.importGroups(req.file.buffer, groupColumn, assignmentId);
+            res.json(groups);
         }
     });
 });
