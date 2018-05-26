@@ -21,7 +21,21 @@ fx.mkdir(submissionFolder, function(err: Error) {
     if (err) {
         console.log(err);
     } else {
-        console.log("Done copying example data!");
+        console.log("Done copying example submission data!");
+    }
+   });
+});
+
+const exampleAssignmentFolder = path.join(__dirname, "../example_data/assignments");
+const assignmentFolder = path.join(__dirname, "./files/assignments");
+fx.mkdir(assignmentFolder, function(err: Error) {
+    console.log("Created folder: " + assignmentFolder);
+    // Copy example data
+    ncpfunc(exampleAssignmentFolder, assignmentFolder, function (err: Error) {
+    if (err) {
+        console.log(err);
+    } else {
+        console.log("Done copying example assignment data!");
     }
    });
 });
