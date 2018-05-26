@@ -6,10 +6,10 @@ export default class GroupsPS {
         'SELECT * FROM "grouplist"');
 
     public static getGroupById: PreparedStatement = new PreparedStatement("get-group-id",
-        'SELECT * FROM "grouplist" WHERE "id" LIKE ($1)');
+        'SELECT * FROM "grouplist" WHERE "id" = $1');
 
     public static getUsersOfGroupById: PreparedStatement = new PreparedStatement("get-all-users-group",
-        'SELECT * FROM "groupusers" WHERE "id" LIKE ($1)');
+        'SELECT * FROM "groupusers" WHERE "group_groupid" = $1');
 
     public static addGroup: PreparedStatement = new PreparedStatement("add-group",
         'INSERT INTO "grouplist" ("group_name") VALUES ($1) RETURNING id, group_name');
