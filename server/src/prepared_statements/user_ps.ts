@@ -41,7 +41,7 @@ export default class UserPS {
      */
     public static async executeGetUserById(netId: string): Promise<pgPromise.queryResult> {
         this.getUserById.values = [netId];
-        return Database.executeQuery(this.getUserById);
+        return Database.executeQuerySingleResult(this.getUserById);
     }
 
     /**
