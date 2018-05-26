@@ -11,9 +11,6 @@ export default class GroupsPS {
     public static getUsersOfGroupById: PreparedStatement = new PreparedStatement("get-all-users-group",
         'SELECT * FROM "groupusers" WHERE "id" LIKE ($1)');
 
-    public static getGroupsByAssignmentId: PreparedStatement = new PreparedStatement("get-all-groups-per-assignment",
-        'SELECT * FROM "groupexercise" WHERE "id" LIKE ($1)');
-
     public static addGroup: PreparedStatement = new PreparedStatement("add-group",
         'INSERT INTO "grouplist" ("group_name") VALUES ($1) RETURNING id, group_name');
 
@@ -38,12 +35,6 @@ export default class GroupsPS {
     public static executeGetUsersOfGroupById(id: number): Promise<pgPromise.queryResult> {
         this.getUsersOfGroupById.values = [id];
         return Database.executeQuery(this.getUsersOfGroupById);
-    }
-
-    // Executes a 'get-all-groups-per-assignment' query
-    public static executeGetGroupsByAssignmentId (id: number): Promise<pgPromise.queryResult> {
-        this.getGroupsByAssignmentId.values = [id];
-        return Database.executeQuery(this.getGroupsByAssignmentId);
     }
 
     // Executes a 'add group' query
