@@ -23,10 +23,10 @@ const storage = multer.diskStorage({
 });
 
 // PDF of max 30 MB (in bytes)
-const maxSize = 30 * 1024 * 1024;
-const upload = multer({
+const maxSizeAssignmentFile = 30 * 1024 * 1024;
+const uploadAssignment = multer({
     storage: storage,
-    limits: { fileSize: maxSize },
+    limits: { fileSize: maxSizeAssignmentFile },
     fileFilter: function (req: any, file, cb: any) {
         if (file.mimetype !== "application/pdf") {
             req.fileValidationError = "File should be a .pdf file";
@@ -62,7 +62,7 @@ router.route("/:assignment_id")
 router.route("/")
     .post(async (req: any, res) => {
         // File upload handling
-        upload(req, res, async function (err) {
+        uploadAssignment(req, res, async function (err) {
             // Error in case of too large file size
             if (err) {
                 res.json({ error: err });
