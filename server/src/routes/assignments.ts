@@ -6,8 +6,8 @@ import AssignmentPS from "../prepared_statements/assignment_ps";
 import GroupParser from "../groupParser";
 
 // Router
-import { Router } from "express";
-const router = Router();
+import express from "express";
+const router = express();
 
 const fileFolder = path.join(__dirname, "../files/assignments");
 
@@ -29,10 +29,11 @@ const uploadAssignment = multer({
     storage: storage,
     limits: { fileSize: maxSizeAssignmentFile },
     fileFilter: function (req: any, file, cb: any) {
-        if (file.mimetype !== "application/pdf") {
+        const ext = path.extname(file.originalname);
+        if (ext !== ".pdf") {
             req.fileValidationError = "File should be a .pdf file";
             // tslint:disable-next-line
-            return cb(null, false, new Error("File should be a .pdf file"));
+            return cb(null, false)
         }
         // tslint:disable-next-line
         cb(null, true);
@@ -46,10 +47,11 @@ const maxSizeGroupsfile = 1 * 1024 * 1024;
 const uploadGroups = multer({
     limits: { fileSize: maxSizeGroupsfile },
     fileFilter: function (req: any, file, cb: any) {
-        if (file.mimetype !== "text/csv") {
+        const ext = path.extname(file.originalname);
+        if (ext !== ".csv") {
             req.fileValidationError = "File should be a .csv file";
             // tslint:disable-next-line
-            return cb(null, false, new Error("File should be a .csv file"));
+            return cb(null, false)
         }
         // tslint:disable-next-line
         cb(null, true);
@@ -192,13 +194,12 @@ router.route("/:assignment_id/review")
 router.post("/:id/importgroups", async (req: any, res) => {
     // File upload handling
     uploadGroups(req, res, async function (err) {
-        console.log(req.file);
-        // Error (in case of too large file size)
-        if (err) {
-            res.json({ error: err });
         // Error in case of wrong file type
-        } else if (req.fileValidationError) {
+        if (req.fileValidationError) {
             res.json({ error: req.fileValidationError });
+        // Error (in case of too large file size)
+        } else if (err) {
+            res.json({ error: err });
         // error if no file was uploaded or no group column defined
         } else if (req.file == undefined) {
             res.json({ error: "No file uploaded" });
