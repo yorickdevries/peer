@@ -1,4 +1,4 @@
-import { Router } from "express";
+import express from "express";
 import assignments from "./assignments";
 import courses from "./courses";
 import groups from "./groups";
@@ -8,7 +8,7 @@ import submissions from "./submissions";
 import session from "express-session";
 import { oidc } from "../express-oidc";
 
-const router = Router();
+const router = express();
 
 // Okta login
 // session support is required to use ExpressOIDC
