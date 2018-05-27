@@ -47,21 +47,30 @@ export default class GroupParser {
         const result: Map<string, string[]> = new Map<string, string[]>();
         // iterate over all students
         studentlist.forEach(function(student: any) {
+            const currentStudent = student.Username;
+            // in case the student doesnt have a Username field
+            if (currentStudent == undefined) {
+                throw new Error("The file is improperly formatted");
+            }
+            // in case the student doesnt have a Username field
+            if (currentStudent == "") {
+                throw new Error("One student has no username");
+            }
             const currentGroup = student[groupColumn];
             // in case the student doesnt have a groupColumn field
-            if (currentGroup == undefined) {
-                throw new Error("student does not have a group");
+            if (currentGroup == undefined || currentGroup == "") {
+                throw new Error(currentStudent + " does not have a group");
             }
             // fill the map
             const currentStudentList = result.get(currentGroup);
             // In case there is already a list in the map
             if (currentStudentList !== undefined) {
                 // add username without @ adress
-                const netid = student.Username.split("@")[0];
+                const netid = currentStudent.split("@")[0];
                 currentStudentList.push(netid);
             } else {
                 // initialize list with this student
-                const netid = student.Username.split("@")[0];
+                const netid = currentStudent.split("@")[0];
                 result.set(student[groupColumn], [netid]);
             }
         });
@@ -70,6 +79,9 @@ export default class GroupParser {
 
     // Puts the groups into the database
     public static async addGroupsToDatabase(studentmap: Map<string, string[]>, assignmentId: number) {
+        if (!await this.assignmentExists(assignmentId)) {
+            throw new Error("Assignment doesn't exist in the database");
+        }
         // Get a list of all groups
         const groupnames = studentmap.keys();
         const importedGroups = [];
@@ -84,15 +96,11 @@ export default class GroupParser {
                 const groupId = group.id;
                 const groupAssignment = await GroupPS.executeAddGrouptoAssignment(groupId, assignmentId);
                 // add all students to a group
-                for (const student of students) {
-                    const studentEntry: any = await UserPS.executeGetUserById(student);
-                    // In case there is no student entry yet in the database, make one
-                    if (studentEntry.error) {
-                        // The email is not known while creating this student entry
-                        const result = await UserPS.executeAddUser(student, undefined);
-                    }
+                for (const studentNetId of students) {
+                    // create student in database
+                    await this.createStudentIfNotExists(studentNetId);
                     // add student to a group
-                    await GroupPS.executeAddStudenttoGroup(student, groupId);
+                    await GroupPS.executeAddStudenttoGroup(studentNetId, groupId);
                 }
                 importedGroups.push({groupId: groupId, groupname: groupname});
             }
