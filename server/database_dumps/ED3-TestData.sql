@@ -16,6 +16,14 @@ INSERT INTO public.grouplist(
 	id, group_name)
 	VALUES (10, 'ED-3');
 
+INSERT INTO public.groupusers(
+	User_netid, Group_groupid)
+	VALUES ('henkjan', 10);
+
+INSERT INTO public.groupusers(
+	User_netid, Group_groupid)
+	VALUES ('paulvanderlaan', 10);
+
 INSERT INTO public.assignmentlist(
 	title, description, course_id, due_date, publish_date, filename)
 	VALUES ('Assignment 1', 'Example assignment number one', 1, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment1.pdf');
