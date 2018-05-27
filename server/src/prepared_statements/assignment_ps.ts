@@ -8,6 +8,9 @@ export default class AssignmentPS {
     private static getAssignmentById: PreparedStatement = new PreparedStatement("get-assignment-by-id",
         'SELECT * FROM "assignmentlist" WHERE "id" = $1');
 
+    private static countAssignmentById: PreparedStatement = new PreparedStatement("count-assignment-by-id",
+        'SELECT COUNT(1) FROM "assignmentlist" WHERE "id" = $1');
+
     private static addAssignment: PreparedStatement = new PreparedStatement("addAssignment",
         'INSERT INTO "assignmentlist" ("title", "description", "due_date", "publish_date", "course_id", "filename") VALUES ($1, $2, $3, $4, $5, $6) RETURNING title, description, id, course_id, due_date, publish_date, filename');
 
@@ -80,6 +83,12 @@ export default class AssignmentPS {
     public static executeGetAssignmentById(assignmentId: number): Promise<pgPromise.queryResult> {
         this.getAssignmentById.values = [assignmentId];
         return Database.executeQuerySingleResult(this.getAssignmentById);
+    }
+
+    // counts the amount of assignments with this specific id
+    public static executeCountAssignmentById(assignmentId: number): Promise<pgPromise.queryResult> {
+        this.countAssignmentById.values = [assignmentId];
+        return Database.executeQuerySingleResult(this.countAssignmentById);
     }
 
     /**
