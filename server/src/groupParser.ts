@@ -14,7 +14,7 @@ export default class GroupParser {
             const groupnames = await this.addGroupsToDatabase(studentmap, assignmentId);
             return groupnames;
         } catch (err) {
-            return {error: err};
+            return {error: err.message};
         }
     }
 
