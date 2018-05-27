@@ -1,6 +1,7 @@
 import neatCsv from "neat-csv";
 import GroupPS from "./prepared_statements/group_ps";
 import UserPS from "./prepared_statements/user_ps";
+import AssignmentPS from "./prepared_statements/assignment_ps";
 
 export default class GroupParser {
     /**
@@ -16,6 +17,28 @@ export default class GroupParser {
         } catch (err) {
             return {error: err.message};
         }
+    }
+
+    // this function checks whether an assignment exists
+    public static async assignmentExists(assignmentId: number) {
+        const res: any = await AssignmentPS.executeCountAssignmentById(assignmentId);
+        if (res.error || res.count == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    // this function checks whether an assignment exists
+    public static async createStudentIfNotExists(netId: string) {
+        const res: any = await UserPS.executeCountUserById(netId);
+        // In case there is no student entry yet in the database, make one
+        if (res.error || res.count == 0) {
+            // The email is not known while creating this student entry
+            const newUser = await UserPS.executeAddUser(netId, undefined);
+            console.log("creating user: " + JSON.stringify(newUser));
+        }
+        return;
     }
 
     // this function maps the groups to the students
