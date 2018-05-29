@@ -94,7 +94,7 @@ describe("CoursePreparedStatement Test", () => {
      */
     it("get course role of user", async () => {
         expect({
-            role: "Owner"
+            role: "student"
         }).to.deep.equal(await CoursePS.executeGetRoleById("paulvanderlaan", 1));
     });
 
