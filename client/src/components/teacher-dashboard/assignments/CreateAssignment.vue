@@ -48,14 +48,30 @@
                                     Due date should be past publish date!
                                 </b-form-invalid-feedback>
                             </b-form-group>
-                            <b-form-group label="File">
-                                <b-form-input   v-model="assignment.filename"
-                                                type="text"
-                                                placeholder="Upload your file here (WIP)"
-                                                required>
+                            <!--<b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />-->
 
-                                </b-form-input>
-                            </b-form-group>
+                            <!--<b-alert show v-if="uploadSuccess === true">Upload was successful.</b-alert>-->
+                            <!--<b-alert show v-if="uploadSuccess === false">Something went wrong with uploading. Try again.</b-alert>-->
+
+                            <b-form-file
+                                    placeholder="Choose a file..."
+                                    accept=".pdf"
+                                    v-model="file"
+                                    :state="Boolean(file)"
+                                    v-if="uploadSuccess === null" />
+                            <!--<b-button-->
+                                    <!--variant="primary"-->
+                                    <!--class="mt-3"-->
+                                    <!--@click="submitAssignment()"-->
+                                    <!--v-if="uploadSuccess === null">Upload</b-button>-->
+                            <!--<b-form-group label="File">-->
+                                <!--<b-form-input   v-model="assignment.filename"-->
+                                                <!--type="text"-->
+                                                <!--placeholder="Upload your file here (WIP)"-->
+                                                <!--required>-->
+
+                                <!--</b-form-input>-->
+                            <!--</b-form-group>-->
                             <b-form-group label="Number of reviews that each student needs to do">
                                 <b-form-input   v-model="assignment.peer_review_cap"
                                                 type="number"
@@ -105,20 +121,39 @@ export default {
                 text: 'Courses',
                 to: { name: 'student-dashboard'}
             }],
+            file: true,
+            fileProgress: 0,
+            uploadSuccess: null,
+            acceptFiles: ".pdf",
             assignment: {
                 title: null,
                 description: null,
                 course_id: null,
                 publish_date: null,
                 due_date: null,
-                filename: null,
+                // filename: null,
                 peer_review_cap: null
             }
         }
     },
     methods: {
+        // async submitAssignment() {
+        //
+        //     // Create the form data with the file
+        //
+        // }
         async onSubmit() {
-            let res = await api.createAssignment(this.assignment)
+
+            let formData = new FormData()
+            formData.append("title", this.assignment.title)
+            formData.append("description", this.assignment.description)
+            formData.append("course_id", this.assignment.course_id)
+            formData.append("publish_date", this.assignment.publish_date)
+            formData.append("due_date", this.assignment.due_date)
+            formData.append("assignmentFile", this.file)
+            formData.append("peer_review_cap", this.assignment.title)
+
+            let res = await api.createAssignment(formData)
             console.log(this.assignment)
             console.log(res)
             this.$router.push({name: 'teacher-dashboard.assignments', params: {id: this.assignment.course_id}})

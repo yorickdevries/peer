@@ -37,7 +37,7 @@
                                 hide-footer
                                 title="Upload Submission">
 
-                        <b-progress :value="fileProgress" animated class="mb-3" />
+                        <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
 
                         <b-alert show v-if="uploadSuccess === true">Upload was successful.</b-alert>
                         <b-alert show v-if="uploadSuccess === false">Something went wrong with uploading. Try again.</b-alert>
