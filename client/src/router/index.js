@@ -34,6 +34,8 @@ export default new Router({
         },
         ...StudentRoutes,
         ...TeacherRoutes,
-        ...TeachingAssistantRoutes
+        ...TeachingAssistantRoutes,
+        { path: '*', redirect: '/404' },
+        { path: '/404', component: () => import('../components/404') },
     ]
 })
