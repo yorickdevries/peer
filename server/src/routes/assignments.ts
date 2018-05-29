@@ -3,7 +3,9 @@ import path from "path";
 import fs from "fs";
 import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
+import ReviewPS from "../prepared_statements/review_ps";
 import GroupParser from "../groupParser";
+import reviewDistribution from "../reviewDistribution";
 
 // Router
 import express from "express";
@@ -167,11 +169,12 @@ router.route("/:assignment_id/allsubmissions")
  */
 router.route("/:assignment_id/requestReview")
     .get(async (req: any, res) => {
-        res.json(await AssignmentPS.executeCreateReviewByAssignmentId(
-            req.userinfo.given_name,
-            0, // HERE THE SHUFFLING NEEDS TO BE DONE
-            req.params.assignment_id
-        ));
+        res.json(await ReviewPS.executeGetReviewByUserIdAndAssignmentId(req.userinfo.given_name, req.params.assignment_id));
+    });
+
+router.route("/:assignment_id/distributeReviews")
+    .get(async (req: any, res) => {
+        res.json(await reviewDistribution.distributeReviews(req.params.assignment_id));
     });
 
 
