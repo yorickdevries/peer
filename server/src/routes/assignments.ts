@@ -3,10 +3,11 @@ import path from "path";
 import fs from "fs";
 import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
+import GroupParser from "../groupParser";
 
 // Router
-import { Router } from "express";
-const router = Router();
+import express from "express";
+const router = express();
 
 const fileFolder = path.join(__dirname, "../files/assignments");
 
@@ -23,20 +24,41 @@ const storage = multer.diskStorage({
 });
 
 // PDF of max 30 MB (in bytes)
-const maxSize = 30 * 1024 * 1024;
-const upload = multer({
+const maxSizeAssignmentFile = 30 * 1024 * 1024;
+const uploadAssignment = multer({
     storage: storage,
-    limits: { fileSize: maxSize },
+    limits: { fileSize: maxSizeAssignmentFile },
     fileFilter: function (req: any, file, cb: any) {
-        if (file.mimetype !== "application/pdf") {
+        const ext = path.extname(file.originalname);
+        if (ext !== ".pdf") {
             req.fileValidationError = "File should be a .pdf file";
             // tslint:disable-next-line
-            return cb(null, false, new Error("File should be a .pdf file"));
+            return cb(null, false)
         }
         // tslint:disable-next-line
         cb(null, true);
     }
 }).single("assignmentFile");
+
+
+// CSV of max 1 MB (in bytes)
+const maxSizeGroupsfile = 1 * 1024 * 1024;
+// The file will be stored into the memory
+const uploadGroups = multer({
+    limits: { fileSize: maxSizeGroupsfile },
+    fileFilter: function (req: any, file, cb: any) {
+        const ext = path.extname(file.originalname);
+        if (ext !== ".csv") {
+            req.fileValidationError = "File should be a .csv file";
+            // tslint:disable-next-line
+            return cb(null, false)
+        }
+        // tslint:disable-next-line
+        cb(null, true);
+    }
+}).single("groupFile");
+
+
 
 /**
  * Route to get all the information about an assignment
@@ -62,7 +84,7 @@ router.route("/:assignment_id")
 router.route("/")
     .post(async (req: any, res) => {
         // File upload handling
-        upload(req, res, async function (err) {
+        uploadAssignment(req, res, async function (err) {
             // Error in case of too large file size
             if (err) {
                 res.json({ error: err });
@@ -81,8 +103,8 @@ router.route("/")
                     req.body.course_id,
                     fileName));
             }
+        });
     });
-});
 
 
 /**
@@ -118,7 +140,7 @@ router.get("/:id/file", async (req, res) => {
  * @userinfo given_name - netId
  * @params assignment_id - assignment_id
  */
-router.route("/:assignment_id/submssion")
+router.route("/:assignment_id/submission")
     .get(async (req: any, res) => {
         res.json(await AssignmentPS.executeGetSubmissionByAssignmentId(
             req.userinfo.given_name,
@@ -165,5 +187,35 @@ router.route("/:assignment_id/review")
             req.userinfo.given_name
         ));
     });
+
+/**
+ * Route to import groups for a specific assignment.
+ */
+router.post("/:id/importgroups", async (req: any, res) => {
+    // File upload handling
+    uploadGroups(req, res, async function (err) {
+        // Error in case of wrong file type
+        if (req.fileValidationError) {
+            res.json({ error: req.fileValidationError });
+            // Error (in case of too large file size)
+        } else if (err) {
+            res.json({ error: err });
+            // error if no file was uploaded or no group column defined
+        } else if (req.file == undefined) {
+            res.json({ error: "No file uploaded" });
+        } else if (req.body.groupColumn == undefined) {
+            res.json({ error: "No groupcolumn defined" });
+        } else {
+            const groupColumn = req.body.groupColumn;
+            const assignmentId = req.params.id;
+            const groups = await GroupParser.importGroups(req.file.buffer, groupColumn, assignmentId);
+            res.json(groups);
+        }
+    });
+});
+
+router.get("/:id/reviewCount", async (req: any, res) => {
+    res.json(await AssignmentPS.executeCountAssignmentReviews(req.params.id, req.userinfo.given_name));
+});
 
 export default router;

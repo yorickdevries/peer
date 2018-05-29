@@ -8,6 +8,9 @@ export default class AssignmentPS {
     private static getAssignmentById: PreparedStatement = new PreparedStatement("get-assignment-by-id",
         'SELECT * FROM "assignmentlist" WHERE "id" = $1');
 
+    private static countAssignmentById: PreparedStatement = new PreparedStatement("count-assignment-by-id",
+        'SELECT COUNT(1) FROM "assignmentlist" WHERE "id" = $1');
+
     private static addAssignment: PreparedStatement = new PreparedStatement("addAssignment",
         'INSERT INTO "assignmentlist" ("title", "description", "due_date", "publish_date", "course_id", "filename") VALUES ($1, $2, $3, $4, $5, $6) RETURNING title, description, id, course_id, due_date, publish_date, filename');
 
@@ -15,7 +18,7 @@ export default class AssignmentPS {
         "UPDATE assignmentlist SET title=$1, description=$2, course_id=$3 WHERE id=$4  RETURNING title, description, id, course_id, filename");
 
     private static getSubmissionByAssignmentId: PreparedStatement = new PreparedStatement("get-submission-by-assignment",
-        "SELECT * FROM sumbission WHERE user_netid = $1 AND assignment_id = $2");
+        "SELECT * FROM submission WHERE user_netid = $1 AND assignment_id = $2");
 
     private static getAllSubmissionsByAssignmentId: PreparedStatement = new PreparedStatement("get-all-subbmissions-by-assignmentId",
         "SELECT * FROM submission WHERE assignment_id = $1");
@@ -25,6 +28,12 @@ export default class AssignmentPS {
 
     private static getReviewByAssignmentId: PreparedStatement = new PreparedStatement("get-review",
         "SELECT * FROM review WHERE done=FALSE AND rubric_assignment_id=$1 AND user_netid=$2");
+
+    public static getGroupsByAssignmentId: PreparedStatement = new PreparedStatement("get-all-groups-per-assignment",
+        'SELECT * FROM "assignmentgroup" WHERE "id" LIKE ($1)');
+
+    private static countReviews: PreparedStatement = new PreparedStatement("count-reviews",
+        "SELECT count(*) FROM review WHERE rubric_assignment_id = $1 AND user_netid = $2");
 
 
     /**
@@ -80,6 +89,12 @@ export default class AssignmentPS {
         return Database.executeQuerySingleResult(this.getAssignmentById);
     }
 
+    // counts the amount of assignments with this specific id
+    public static executeCountAssignmentById(assignmentId: number): Promise<pgPromise.queryResult> {
+        this.countAssignmentById.values = [assignmentId];
+        return Database.executeQuerySingleResult(this.countAssignmentById);
+    }
+
     /**
      * Executes a 'insert assignment'.
      * @param {string} title - a title.
@@ -120,5 +135,22 @@ export default class AssignmentPS {
     public static executeGetSubmissionByAssignmentId(netId: string, assignmentId: number): Promise<pgPromise.queryResult> {
         this.getSubmissionByAssignmentId.values = [netId, assignmentId];
         return Database.executeQuerySingleResult(this.getSubmissionByAssignmentId);
+    }
+
+    // Executes a 'get-all-groups-per-assignment' query
+    public static executeGetGroupsByAssignmentId (id: number): Promise<pgPromise.queryResult> {
+        this.getGroupsByAssignmentId.values = [id];
+        return Database.executeQuery(this.getGroupsByAssignmentId);
+    }
+
+    /**
+     * Executes a 'count reviews of submission' query.
+     * @param assignmentId - an assignment id.
+     * @param {string} netId - user net id.
+     * @return {Promise<pgPromise.queryResult>} - promise of the database result.
+     */
+    public static executeCountAssignmentReviews(assignmentId: number, netId: string): Promise<pgPromise.queryResult> {
+        this.countReviews.values = [assignmentId, netId];
+        return Database.executeQuerySingleResult(this.countReviews);
     }
 }
