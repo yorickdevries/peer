@@ -67,11 +67,20 @@ router.put("/rangequestion/:question_id", async (req, res) => {
     res.json(rubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.rubric_id, req.body.question.number, req.params.question_id));
 });
 
-
+/**
+ * Create open question
+ * @body question - question
+ * @body rubric_id - rubric_id
+ * @body question_number - question_number
+ */
 router.post("/openquestion", async (req, res) => {
     res.json(RubricPS.executeCreateOpenQuestion(req.body.question, req.body.rubric_id, req.body.question_number));
 });
 
+/**
+ * Router to update open question
+ * @param question_id - question_id
+ */
 router.put("/openquestion/:question_id", async (req, res) => {
     res.json(rubricPS.executeUpdateOpenQuestion(req.body.question, req.body.rubric_id, req.body.question.number, req.params.question_id));
 });
