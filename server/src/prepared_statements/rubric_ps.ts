@@ -219,16 +219,6 @@ export default class RubricPS {
     }
 
     /**
-     * executes 'get rubric by id' query
-     * @param {number} assignmentId - assignment_id
-     * @returns {Promise<pgPromise.queryResult>}
-     */
-    public static executeGetRubricById(assignmentId: number): Promise<pgPromise.queryResult> {
-        this.getRubricById.values = [assignmentId];
-        return Database.executeQuerySingleResult(this.getRubricById);
-    }
-
-    /**
      * executes 'get all options by id' query
      * @param {number} id - mcquestion_id
      * @returns {any}
