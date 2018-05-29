@@ -33,7 +33,8 @@ INSERT INTO public.assignmentlist(
 	    ('A2', 'An example of a second assignment', 3, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
 	    ('Assignment one', 'Example assignment number one', 4, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
 	    ('Assignment two', 'An example of a second assignment', 4, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
-	    ('Assignment three', 'This is another example of a third assignment.', 4, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf')
+	    ('Assignment three', 'This is another example of a third assignment.', 4, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
+		('Bonus Assignment', 'bonus description', 2, '2019-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment2.pdf')
 	    ;
 
 
