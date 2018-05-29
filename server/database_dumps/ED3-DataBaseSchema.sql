@@ -172,7 +172,7 @@ ALTER TABLE Enroll ADD CONSTRAINT Enroll_User
     INITIALLY IMMEDIATE
 ;
 
--- Reference: AssignmentGroup_Assingment (table: AssignmentGroup)
+-- Reference: AssignmentGroup_Assignment (table: AssignmentGroup)
 ALTER TABLE AssignmentGroup ADD CONSTRAINT AssignmentGroup_Assignment
     FOREIGN KEY (Assignment_id)
     REFERENCES AssignmentList (id)
