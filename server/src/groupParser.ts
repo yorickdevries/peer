@@ -2,6 +2,7 @@ import neatCsv from "neat-csv";
 import GroupPS from "./prepared_statements/group_ps";
 import UserPS from "./prepared_statements/user_ps";
 import AssignmentPS from "./prepared_statements/assignment_ps";
+import CoursesPS from "./prepared_statements/courses_ps";
 
 export default class GroupParser {
     /**
@@ -37,6 +38,17 @@ export default class GroupParser {
             // The email is not known while creating this student entry
             const newUser = await UserPS.executeAddUser(netId, undefined);
             console.log("creating user: " + JSON.stringify(newUser));
+        }
+        return;
+    }
+
+    // this function enrolls a student if not already enrolled
+    public static async enrollStudentIfNotEnrolled(courseId: number, netId: string) {
+        const res: any = await CoursesPS.executeCountUserByCourseId(courseId, netId);
+        // In case there is no student entry yet in the database, make one
+        if (res.error || res.count == 0) {
+            const newUser = await CoursesPS.executeEnrollInCourseId(courseId, netId, "student");
+            console.log("enrolled user: " + JSON.stringify(newUser) + " in course " + courseId);
         }
         return;
     }
@@ -82,6 +94,10 @@ export default class GroupParser {
         if (!await this.assignmentExists(assignmentId)) {
             throw new Error("Assignment doesn't exist in the database");
         }
+        // get assignment info
+        const assignment: any = await AssignmentPS.executeGetAssignmentById(assignmentId);
+        // get course_Id
+        const courseId = assignment.course_id;
         // Get a list of all groups
         const groupnames = studentmap.keys();
         const importedGroups = [];
@@ -99,6 +115,8 @@ export default class GroupParser {
                 for (const studentNetId of students) {
                     // create student in database
                     await this.createStudentIfNotExists(studentNetId);
+                    // Enroll student in course
+                    await this.enrollStudentIfNotEnrolled(courseId, studentNetId);
                     // add student to a group
                     await GroupPS.executeAddStudenttoGroup(studentNetId, groupId);
                 }
