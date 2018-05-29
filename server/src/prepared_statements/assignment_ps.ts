@@ -26,6 +26,8 @@ export default class AssignmentPS {
     private static getReviewByAssignmentId: PreparedStatement = new PreparedStatement("get-review",
         "SELECT * FROM review WHERE done=FALSE AND rubric_assignment_id=$1 AND user_netid=$2");
 
+    private static countReviews: PreparedStatement = new PreparedStatement("count-reviews",
+        "SELECT count(*) FROM review WHERE rubric_assignment_id = $1 AND user_netid = $2");
 
     /**
      * Executes a query that gets the review that was assigned to a certain user
@@ -120,5 +122,16 @@ export default class AssignmentPS {
     public static executeGetSubmissionByAssignmentId(netId: string, assignmentId: number): Promise<pgPromise.queryResult> {
         this.getSubmissionByAssignmentId.values = [netId, assignmentId];
         return Database.executeQuerySingleResult(this.getSubmissionByAssignmentId);
+    }
+
+    /**
+     * Executes a 'count reviews of submission' query.
+     * @param assignmentId - an assignment id.
+     * @param {string} netId - user net id.
+     * @return {Promise<pgPromise.queryResult>} - promise of the database result.
+     */
+    public static executeCountAssignmentReviews(assignmentId: number, netId: string): Promise<pgPromise.queryResult> {
+        this.countReviews.values = [assignmentId, netId];
+        return Database.executeQuerySingleResult(this.countReviews);
     }
 }
