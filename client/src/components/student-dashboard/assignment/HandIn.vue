@@ -9,7 +9,7 @@
                 <p>
                     {{ assignment.description }}
                 </p>
-                <b-button variant="primary w-100">Download Assignment</b-button>
+                <b-button variant="primary w-100" :href="assignmentFilePath" >Download Assignment</b-button>
                 </b-card>
             </b-col>
 
@@ -97,6 +97,9 @@ export default {
         submissionFilePath() {
             // Get the submission file path.
             return `/api/submissions/${this.submission.id}/file`
+        },
+        assignmentFilePath() {
+            return `/api/assignments/${this.assignment.id}/file`
         },
         hasUploadedSubmission() {
             // Whether a (first) submission has been made to this assignment.
