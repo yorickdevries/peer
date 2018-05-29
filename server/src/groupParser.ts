@@ -30,7 +30,7 @@ export default class GroupParser {
         }
     }
 
-    // this function checks whether an assignment exists
+    // this function creates a student when the student doesnt exist
     public static async createStudentIfNotExists(netId: string) {
         const res: any = await UserPS.executeCountUserById(netId);
         // In case there is no student entry yet in the database, make one
@@ -110,7 +110,7 @@ export default class GroupParser {
                 const group: any = await GroupPS.executeAddGroup(groupname);
                 // add an assignment to the group
                 const groupId = group.id;
-                const groupAssignment = await GroupPS.executeAddGrouptoAssignment(groupId, assignmentId);
+                await GroupPS.executeAddGrouptoAssignment(groupId, assignmentId);
                 // add all students to a group
                 for (const studentNetId of students) {
                     // create student in database
