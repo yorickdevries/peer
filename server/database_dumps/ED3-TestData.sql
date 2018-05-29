@@ -8,6 +8,10 @@ INSERT INTO "userlist" (
 	"netid", "email")
 	VALUES ('henkjan', 'h.j@student.tudelft.nl');
 
+INSERT INTO "userlist" (
+	"netid", "email")
+	VALUES ('yorickdevries', NULL);
+
 INSERT INTO public.courselist(
     description, name)
     VALUES ('This is a beautiful course description!', 'ED-3');
@@ -58,7 +62,7 @@ INSERT INTO public.mcoption(
 
 INSERT INTO public.enroll(
 	course_id, user_netid, role)
-	VALUES (1, 'paulvanderlaan', 'Owner');
+	VALUES (1, 'paulvanderlaan', 'student');
 
 INSERT INTO public.assignmentgroup(
 	assignment_id, group_id)
