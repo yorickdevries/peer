@@ -69,9 +69,9 @@ describe("API Course routes", () => {
         const res = await chai.request(router).get("/enrolled");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify([{
-            id:1,
-            description:"This is a beautiful course description!",
-            name:"ED-3"
+            id: 1,
+            description: "This is a beautiful course description!",
+            name: "ED-3"
         }]));
     });
 
@@ -83,13 +83,13 @@ describe("API Course routes", () => {
         const res = await chai.request(router).get("/1/assignments");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify([{
-            title:"Assignment 1",
-            description:"Example assignment number one",
-            due_date:"2018-05-01T20:30:00.000Z",
-            publish_date:"2018-04-01T20:30:00.000Z",
-            id:1,
-            course_id:1,
-            filename:"assignment1.pdf"
+            title: "Assignment 1",
+            description: "Example assignment number one",
+            due_date: "2018-05-01T20:30:00.000Z",
+            publish_date: "2018-04-01T20:30:00.000Z",
+            id: 1,
+            course_id: 1,
+            filename: "assignment1.pdf"
         }]
         ));
     });
@@ -101,12 +101,12 @@ describe("API Course routes", () => {
         // test the router
         const res = await chai.request(router)
             .put("/1")
-            .send({ courseId: 1, description: "example", name: "test name"});;
+            .send({ courseId: 1, description: "example", name: "test name" });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({
-            id:1,
-            description:"example",
-            name:"test name"
+            id: 1,
+            description: "example",
+            name: "test name"
         }));
     });
 
@@ -118,9 +118,9 @@ describe("API Course routes", () => {
         const res = await chai.request(router).get("/1");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({
-            id:1,
-            description:"This is a beautiful course description!",
-            name:"ED-3"
+            id: 1,
+            description: "This is a beautiful course description!",
+            name: "ED-3"
         }));
     });
 
