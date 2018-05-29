@@ -15,7 +15,7 @@ export default class AssignmentPS {
         "UPDATE assignmentlist SET title=$1, description=$2, course_id=$3 WHERE id=$4  RETURNING title, description, id, course_id, filename");
 
     private static getSubmissionByAssignmentId: PreparedStatement = new PreparedStatement("get-submission-by-assignment",
-        "SELECT * FROM sumbission WHERE user_netid = $1 AND assignment_id = $2");
+        "SELECT * FROM submission WHERE user_netid = $1 AND assignment_id = $2");
 
     private static getAllSubmissionsByAssignmentId: PreparedStatement = new PreparedStatement("get-all-subbmissions-by-assignmentId",
         "SELECT * FROM submission WHERE assignment_id = $1");

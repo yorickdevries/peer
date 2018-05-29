@@ -118,7 +118,7 @@ router.get("/:id/file", async (req, res) => {
  * @userinfo given_name - netId
  * @params assignment_id - assignment_id
  */
-router.route("/:assignment_id/submssion")
+router.route("/:assignment_id/submission")
     .get(async (req: any, res) => {
         res.json(await AssignmentPS.executeGetSubmissionByAssignmentId(
             req.userinfo.given_name,
