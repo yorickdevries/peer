@@ -30,11 +30,11 @@ CREATE TABLE Enroll (
     CONSTRAINT Enroll_pk PRIMARY KEY (Course_id,User_netid)
 );
 
--- Table: GroupExercise
-CREATE TABLE GroupExercise (
+-- Table: AssignmentGroup
+CREATE TABLE AssignmentGroup (
     Assignment_id int NOT NULL,
     Group_id int NOT NULL,
-    CONSTRAINT GroupExercise_pk PRIMARY KEY (Assignment_id,Group_id)
+    CONSTRAINT AssignmentGroup_pk PRIMARY KEY (Assignment_id,Group_id)
 );
 
 -- Table: GroupList
@@ -143,7 +143,7 @@ CREATE TABLE Submission (
 -- Table: UserList
 CREATE TABLE UserList (
     netid varchar(256)  NOT NULL,
-    email varchar(256)  NOT NULL,
+    email varchar(256),
     CONSTRAINT UserList_pk PRIMARY KEY (netid)
 );
 
@@ -172,16 +172,16 @@ ALTER TABLE Enroll ADD CONSTRAINT Enroll_User
     INITIALLY IMMEDIATE
 ;
 
--- Reference: GroupExercise_Exercise (table: GroupExercise)
-ALTER TABLE GroupExercise ADD CONSTRAINT GroupExercise_Exercise
+-- Reference: AssignmentGroup_Assignment (table: AssignmentGroup)
+ALTER TABLE AssignmentGroup ADD CONSTRAINT AssignmentGroup_Assignment
     FOREIGN KEY (Assignment_id)
     REFERENCES AssignmentList (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
--- Reference: GroupExercise_Group (table: GroupExercise)
-ALTER TABLE GroupExercise ADD CONSTRAINT GroupExercise_Group
+-- Reference: AssignmentGroup_Group (table: AssignmentGroup)
+ALTER TABLE AssignmentGroup ADD CONSTRAINT AssignmentGroup_Group
     FOREIGN KEY (Group_id)
     REFERENCES GroupList (id)
     NOT DEFERRABLE
@@ -319,8 +319,8 @@ ALTER TABLE Review ADD CONSTRAINT Review_User
     INITIALLY IMMEDIATE
 ;
 
--- Reference: Rubric_Exercise (table: Rubric)
-ALTER TABLE Rubric ADD CONSTRAINT Rubric_Exercise
+-- Reference: Rubric_Assignment (table: Rubric)
+ALTER TABLE Rubric ADD CONSTRAINT Rubric_Assignment
     FOREIGN KEY (Assignment_id)
     REFERENCES AssignmentList (id)
     NOT DEFERRABLE
