@@ -5,8 +5,8 @@ import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 
 // Router
-import { Router } from "express";
-const router = Router();
+import express from "express";
+const router = express();
 
 const fileFolder = path.join(__dirname, "../files/assignments");
 
@@ -165,5 +165,9 @@ router.route("/:assignment_id/review")
             req.userinfo.given_name
         ));
     });
+
+router.get("/assignments/:id/review", async (req: any, res) => {
+    res.json(await AssignmentPS.executeCountAssignmentReviews(req.params.id, req.userinfo.given_name));
+});
 
 export default router;
