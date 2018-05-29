@@ -140,7 +140,7 @@ router.get("/:id/file", async (req, res) => {
  * @userinfo given_name - netId
  * @params assignment_id - assignment_id
  */
-router.route("/:assignment_id/submssion")
+router.route("/:assignment_id/submission")
     .get(async (req: any, res) => {
         res.json(await AssignmentPS.executeGetSubmissionByAssignmentId(
             req.userinfo.given_name,
@@ -212,6 +212,9 @@ router.post("/:id/importgroups", async (req: any, res) => {
             res.json(groups);
         }
     });
+
+router.get("/:id/reviewCount", async (req: any, res) => {
+    res.json(await AssignmentPS.executeCountAssignmentReviews(req.params.id, req.userinfo.given_name));
 });
 
 export default router;
