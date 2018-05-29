@@ -32,7 +32,12 @@ describe("API Group routes", () => {
     it("Get groups/", async () => {
         const res = await chai.request(router).get("/");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify([{id: 10, group_name: "ED-3"}]));
+        expect(res.text).to.deep.equal(JSON.stringify([
+            {id: 10, group_name: "ED-3"},
+            {id: 20, group_name: "Group 20"},
+            {id: 21, group_name: "Group 21"},
+            {id: 22, group_name: "Group 22"}
+        ]));
     });
 
     /**

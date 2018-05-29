@@ -150,19 +150,19 @@ INSERT INTO public.assignmentgroup(
 	VALUES (1, 10);
 
 INSERT INTO public.submission(
-	user_netid, assignment_id, file_path)
+	user_netid, group_id, assignment_id, file_path)
 	VALUES
-	    ('paulvanderlaan', 4, 'submission1.pdf'),
-	    ('paulvanderlaan', 5, 'submission1.pdf'),
-	    ('paulvanderlaan', 6, 'submission1.pdf'),
-	    ('henkjan', 1, 'submission2.pdf'),
-	    ('henkjan', 2, 'submission2.pdf'),
-	    ('henkjan', 3, 'submission2.pdf'),
-	    ('henkjan', 4, 'submission2.pdf'),
-	    ('henkjan', 5, 'submission2.pdf'),
-	    ('henkjan', 6, 'submission2.pdf'),
-	    ('henkjan', 7, 'submission2.pdf'),
-	    ('henkjan', 8, 'submission2.pdf')
+	    ('paulvanderlaan', 10, 4, 'submission1.pdf'),
+	    ('paulvanderlaan', 10, 5, 'submission1.pdf'),
+	    ('paulvanderlaan', 10, 6, 'submission1.pdf'),
+	    ('henkjan', 10, 1, 'submission2.pdf'),
+	    ('henkjan', 10, 2, 'submission2.pdf'),
+	    ('henkjan', 10, 3, 'submission2.pdf'),
+	    ('henkjan', 10, 4, 'submission2.pdf'),
+	    ('henkjan', 10, 5, 'submission2.pdf'),
+	    ('henkjan', 10, 6, 'submission2.pdf'),
+	    ('henkjan', 10, 7, 'submission2.pdf'),
+	    ('henkjan', 10, 8, 'submission2.pdf')
 	;
 
 INSERT INTO public.review(

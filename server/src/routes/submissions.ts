@@ -92,10 +92,11 @@ router.post("/", async (req: any, res) => {
         } else {
             // make path here
             const netId = req.userinfo.given_name;
+            const groupId = req.body.groupId;
             const assignmentId = req.body.assignmentId;
             const fileName = req.file.filename;
             // add to database
-            res.json(await SubmissionsPS.executeCreateSubmission(netId, assignmentId, fileName));
+            res.json(await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName));
         }
     });
 });

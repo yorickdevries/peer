@@ -9,7 +9,7 @@ export default class SubmissionsPS {
         'SELECT * FROM "submission" WHERE "id" = $1');
 
     private static createSubmission: PreparedStatement = new PreparedStatement("create-submission",
-        'INSERT INTO "submission" ("user_netid", "assignment_id", "file_path") VALUES ($1, $2, $3) RETURNING id, user_netid, assignment_id, file_path');
+        'INSERT INTO "submission" ("user_netid", "group_id", "assignment_id", "file_path") VALUES ($1, $2, $3, $4) RETURNING *');
 
     private static deleteSubmission: PreparedStatement = new PreparedStatement("delete-submission",
         'DELETE FROM "submission" WHERE "id" = $1 RETURNING id, user_netid, assignment_id, file_path');
@@ -33,8 +33,8 @@ export default class SubmissionsPS {
     /**
      * Executes a 'create submission' query
      */
-    public static executeCreateSubmission(netid: string, assignmentId: number, filePath: string): Promise<pgPromise.queryResult> {
-        this.createSubmission.values = [netid, assignmentId, filePath];
+    public static executeCreateSubmission(netid: string, groupId: number, assignmentId: number, filePath: string): Promise<pgPromise.queryResult> {
+        this.createSubmission.values = [netid, groupId, assignmentId, filePath];
         return Database.executeQuerySingleResult(this.createSubmission);
     }
 

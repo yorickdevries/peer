@@ -30,6 +30,15 @@ describe("AssignmentPreparedStatements Test", () => {
             "id": 1,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             "title": "Assignment 1"
+        },
+        {
+            "course_id": 1,
+            "description": "Example assignment number two",
+            "due_date": new Date("2018-05-01T20:30:00Z"),
+            "filename": "assignment2.pdf",
+            "id": 2,
+            "publish_date": new Date("2018-04-01T20:30:00Z"),
+            "title": "Assignment 2"
         }]).to.deep.equal(await AssignmentPS.executeGetAssignments(1));
     });
 
@@ -56,7 +65,7 @@ describe("AssignmentPreparedStatements Test", () => {
     )).to.deep.equal({
             course_id: 1,
             description: "Description",
-            id: 2,
+            id: 3,
             title: "New",
             due_date: new Date("2018-07-01T20:30:00Z"),
             filename: "test_file.pdf",
@@ -117,12 +126,14 @@ describe("AssignmentPreparedStatements Test", () => {
         expect(await AssignmentPS.executeGetAllSubmissionsByAssignmentId(1)).to.deep.equal([{
             "file_path": "submission1.pdf",
             "id": 1,
+            "group_id": 10,
             "assignment_id": 1,
             "user_netid": "paulvanderlaan"
         },
         {
             "file_path": "submission2.pdf",
             "id": 2,
+            "group_id": 10,
             "assignment_id": 1,
             "user_netid": "henkjan"
         }]);

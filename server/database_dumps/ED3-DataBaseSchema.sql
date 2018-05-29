@@ -117,7 +117,7 @@ CREATE TABLE RangeQuestion (
 -- Table: Review
 CREATE TABLE Review (
     id SERIAL,
-    comment varchar(500)  NOT NULL,
+    comment varchar(500),
     User_netid varchar(256)  NOT NULL,
     Submission_id int NOT NULL,
     Rubric_Assignment_id int NOT NULL,
@@ -135,6 +135,7 @@ CREATE TABLE Rubric (
 CREATE TABLE Submission (
     id SERIAL,
     User_netid varchar(256)  NOT NULL,
+    Group_id int NOT NULL,
     Assignment_id int NOT NULL,
     file_path varchar(100)  NOT NULL,
     CONSTRAINT Submission_pk PRIMARY KEY (id)
@@ -339,6 +340,14 @@ ALTER TABLE Submission ADD CONSTRAINT Submission_Assignment
 ALTER TABLE Submission ADD CONSTRAINT Submission_User
     FOREIGN KEY (User_netid)
     REFERENCES UserList (netid)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: Submission_Group (table: Submission)
+ALTER TABLE Submission ADD CONSTRAINT Submission_Group
+    FOREIGN KEY (Group_id)
+    REFERENCES GroupList (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
