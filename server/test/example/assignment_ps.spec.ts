@@ -128,5 +128,17 @@ describe("AssignmentPreparedStatements Test", () => {
         }]);
     });
 
-
+    /**
+     * Test count reviews for assignment.
+     */
+    it("Count reviews for assignment", async () => {
+        expect(await AssignmentPS.executeCountAssignmentReviews(1, 'henkjan')).to.deep.equal({
+            comment: "Plagiaat",
+            done: false,
+            id: 1,
+            rubric_assignment_id: 1,
+            submission_id: 1,
+            user_netid: "henkjan"
+        });
+    });
 });
