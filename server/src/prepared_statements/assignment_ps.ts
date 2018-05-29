@@ -30,7 +30,7 @@ export default class AssignmentPS {
         "SELECT * FROM review WHERE done=FALSE AND rubric_assignment_id=$1 AND user_netid=$2");
 
     public static getGroupsByAssignmentId: PreparedStatement = new PreparedStatement("get-all-groups-per-assignment",
-        'SELECT * FROM "assignmentgroup" WHERE "id" LIKE ($1)');
+        'SELECT * FROM "assignmentgroup" WHERE "assignment_id" = ($1)');
 
     private static countReviews: PreparedStatement = new PreparedStatement("count-reviews",
         "SELECT count(*) FROM review WHERE rubric_assignment_id = $1 AND user_netid = $2");
@@ -138,7 +138,7 @@ export default class AssignmentPS {
     }
 
     // Executes a 'get-all-groups-per-assignment' query
-    public static executeGetGroupsByAssignmentId (id: number): Promise<pgPromise.queryResult> {
+    public static executeGetGroupsByAssignmentId(id: number): Promise<pgPromise.queryResult> {
         this.getGroupsByAssignmentId.values = [id];
         return Database.executeQuery(this.getGroupsByAssignmentId);
     }
