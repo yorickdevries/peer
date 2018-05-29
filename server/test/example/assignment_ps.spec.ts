@@ -26,7 +26,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "course_id": 1,
             "description": "Example assignment number one",
             "due_date": new Date("2018-05-01T20:30:00Z"),
-            "filename": "assignment/test_file.pdf",
+            "filename": "assignment1.pdf",
             "id": 1,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             "title": "Assignment 1"
@@ -41,7 +41,7 @@ describe("AssignmentPreparedStatements Test", () => {
             title: "Assignment 1",
             description: "Example assignment number one",
             "due_date": new Date("2018-05-01T20:30:00Z"),
-            "filename": "assignment/test_file.pdf",
+            "filename": "assignment1.pdf",
             "id": 1,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             course_id: 1
@@ -52,14 +52,14 @@ describe("AssignmentPreparedStatements Test", () => {
      * Test add assignments.
      */
     it("add assignment", async () => {
-        expect(await AssignmentPS.executeAddAssignment("New", "Description", new Date("2018-07-01T20:30:00Z"), new Date("2018-06-01T20:30:00Z"), 1, "assignment/test_file.pdf"
+        expect(await AssignmentPS.executeAddAssignment("New", "Description", new Date("2018-07-01T20:30:00Z"), new Date("2018-06-01T20:30:00Z"), 1, "test_file.pdf"
     )).to.deep.equal({
             course_id: 1,
             description: "Description",
             id: 2,
             title: "New",
             due_date: new Date("2018-07-01T20:30:00Z"),
-            "filename": "assignment/test_file.pdf",
+            filename: "test_file.pdf",
             publish_date: new Date("2018-06-01T20:30:00Z"),
         });
     });
@@ -68,10 +68,10 @@ describe("AssignmentPreparedStatements Test", () => {
      * Test update assignments.
      */
     it("update assignment", async () => {
-        expect(await AssignmentPS.executeUpdateAssignmentById("Updated", "updated", 1, 1, "assignment/test_file.pdf")).to.deep.equal({
+        expect(await AssignmentPS.executeUpdateAssignmentById("Updated", "updated", 1, 1)).to.deep.equal({
             course_id: 1,
             description: "updated",
-            "filename": "assignment/test_file.pdf",
+            filename: "assignment1.pdf",
             id: 1,
             title: "Updated"
         });
