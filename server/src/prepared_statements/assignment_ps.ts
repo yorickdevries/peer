@@ -30,7 +30,7 @@ export default class AssignmentPS {
         "SELECT * FROM review WHERE done=FALSE AND rubric_assignment_id=$1 AND user_netid=$2");
 
     public static getGroupsByAssignmentId: PreparedStatement = new PreparedStatement("get-all-groups-per-assignment",
-        'SELECT * FROM "groupexercise" WHERE "id" LIKE ($1)');
+        'SELECT * FROM "assignmentgroup" WHERE "id" LIKE ($1)');
 
     /**
      * Executes a query that gets the review that was assigned to a certain user

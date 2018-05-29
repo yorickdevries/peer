@@ -145,7 +145,7 @@ INSERT INTO public.enroll(
 	    (3, 'henkjan', 'student')
 	;
 
-INSERT INTO public.groupexercise(
+INSERT INTO public.assignmentgroup(
 	assignment_id, group_id)
 	VALUES (1, 10);
 

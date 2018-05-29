@@ -15,7 +15,7 @@ export default class GroupsPS {
         'INSERT INTO "grouplist" ("group_name") VALUES ($1) RETURNING id, group_name');
 
     public static addGrouptoAssignment: PreparedStatement = new PreparedStatement("add-group-to-assignment",
-        'INSERT INTO "groupexercise" ("assignment_id", "group_id") VALUES ($1, $2) RETURNING assignment_id, group_id');
+        'INSERT INTO "assignmentgroup" ("assignment_id", "group_id") VALUES ($1, $2) RETURNING assignment_id, group_id');
 
     public static addStudenttoGroup: PreparedStatement = new PreparedStatement("add-student-to-group",
         'INSERT INTO "groupusers" ("user_netid", "group_groupid") VALUES ($1, $2) RETURNING user_netid, group_groupid');

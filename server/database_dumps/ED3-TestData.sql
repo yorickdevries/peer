@@ -60,7 +60,7 @@ INSERT INTO public.enroll(
 	course_id, user_netid, role)
 	VALUES (1, 'paulvanderlaan', 'Owner');
 
-INSERT INTO public.groupexercise(
+INSERT INTO public.assignmentgroup(
 	assignment_id, group_id)
 	VALUES (1, 10);
 
