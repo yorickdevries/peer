@@ -23,7 +23,7 @@ describe("API Course routes", () => {
      */
     beforeEach(async () => {
         // initializes the router with user paul
-        InitLogin.initialize(router, "henkjan");
+        InitLogin.initialize(router, "paulvanderlaan");
         await Database.DatabaseDrop();
         await Database.DatabaseImport(qfSchema);
         await Database.DatabaseImport(qfData);
@@ -68,8 +68,72 @@ describe("API Course routes", () => {
         // test the router
         const res = await chai.request(router).get("/enrolled");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify([]));
+        expect(res.text).to.equal(JSON.stringify([{
+            id:1,
+            description:"This is a beautiful course description!",
+            name:"ED-3"
+        }]));
     });
 
+    /**
+     * Test whether all assignments for a specific course are fetched.
+     */
+    it("Get /:courseId/assignments", async () => {
+        // test the router
+        const res = await chai.request(router).get("/1/assignments");
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify([{
+            title:"Assignment 1",
+            description:"Example assignment number one",
+            due_date:"2018-05-01T20:30:00.000Z",
+            publish_date:"2018-04-01T20:30:00.000Z",
+            id:1,
+            course_id:1,
+            filename:"assignment1.pdf"
+        }]
+        ));
+    });
 
+    /**
+     * Test whether a course is updated.
+     */
+    it("Put /:courseId", async () => {
+        // test the router
+        const res = await chai.request(router)
+            .put("/1")
+            .send({ courseId: 1, description: "example", name: "test name"});;
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify({
+            id:1,
+            description:"example",
+            name:"test name"
+        }));
+    });
+
+    /**
+     * Test to get course specific information.
+     */
+    it("Get /:courseId", async () => {
+        // test the router
+        const res = await chai.request(router).get("/1");
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify({
+            id:1,
+            description:"This is a beautiful course description!",
+            name:"ED-3"
+        }));
+    });
+
+    /**
+     * Test to get information about a role for a specific user.
+     */
+    it("Get /:courseId/role", async () => {
+        // test the router
+        const res = await chai.request(router).get("/1/role");
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify({
+                role: "Owner"
+            }
+        ));
+    });
 });
