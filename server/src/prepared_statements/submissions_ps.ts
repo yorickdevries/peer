@@ -8,6 +8,9 @@ export default class SubmissionsPS {
     private static getSubmissionById: PreparedStatement = new PreparedStatement("get-submission-by-id",
         'SELECT * FROM "submission" WHERE "id" = $1');
 
+    private static getSubmissionsByAssignmentId: PreparedStatement = new PreparedStatement("get-submissions-by-assignment-id",
+        'SELECT * FROM "submission" WHERE "assignment_id" = $1');
+
     private static createSubmission: PreparedStatement = new PreparedStatement("create-submission",
         'INSERT INTO "submission" ("user_netid", "group_id", "assignment_id", "file_path") VALUES ($1, $2, $3, $4) RETURNING *');
 
@@ -28,6 +31,14 @@ export default class SubmissionsPS {
     public static executeGetSubmissionById(id: number): Promise<pgPromise.queryResult> {
         this.getSubmissionById.values = [id];
         return Database.executeQuerySingleResult(this.getSubmissionById);
+    }
+
+    /**
+     * Executes a 'get submissions by assignmentid' query
+     */
+    public static executeGetSubmissionsByAssignmentId(id: number): Promise<pgPromise.queryResult> {
+        this.getSubmissionsByAssignmentId.values = [id];
+        return Database.executeQuery(this.getSubmissionsByAssignmentId);
     }
 
     /**

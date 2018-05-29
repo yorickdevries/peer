@@ -2,10 +2,16 @@ import Database from "../database";
 import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 
 export default class ReviewPS {
+    private static createReview: PreparedStatement = new PreparedStatement("create-review",
+        "INSERT INTO review(comment, user_netid, submission_id, rubric_assignment_id) VALUES ($1, $2, $3, $4) RETURNING *");
+
     private static getReview: PreparedStatement = new PreparedStatement("get-review-by-id",
         "SELECT review.id, rubric_assignment_id, file_path, comment, done " +
         "FROM review JOIN submission ON submission.id = review.submission_id " +
         "WHERE review.id = $1");
+
+    private static getReviewByUserIdAndAssignmentId: PreparedStatement = new PreparedStatement("get-review-by-user-id-and-assignment-id",
+        "SELECT * FROM review WHERE user_netid = $1 AND rubric_assignment_id = $2");
 
     private static submitReview: PreparedStatement = new PreparedStatement("submit-review",
         "UPDATE review " +
@@ -14,7 +20,7 @@ export default class ReviewPS {
         "RETURNING *");
 
     private static updateMpcAnswer: PreparedStatement = new PreparedStatement("add-mpc-answer",
-            "INSERT INTO mcanswer(answer, mcquestion_id, review_id) VALUES ($1, $2, $3) ON CONFLICT (mcquestion_id, review_id) DO UPDATE SET answer=$1 RETURNING answer");
+        "INSERT INTO mcanswer(answer, mcquestion_id, review_id) VALUES ($1, $2, $3) ON CONFLICT (mcquestion_id, review_id) DO UPDATE SET answer=$1 RETURNING answer");
 
     private static updateOpenAnswer: PreparedStatement = new PreparedStatement("add-open-answer",
         "INSERT INTO openanswer(answer, openquestion_id, review_id) VALUES ($1, $2, $3) " +
@@ -33,6 +39,11 @@ export default class ReviewPS {
     private static getRangeAnswerByReviewId: PreparedStatement = new PreparedStatement("get-range-answer-by-id",
         "SELECT * FROM rangeanswer WHERE review_id = $1 AND rangequestion_id = $2");
 
+    public static executeCreateReview(comment: string | undefined, userNetId: string, submissionId: number, rubricAssignmentId: number): Promise<pgPromise.queryResult> {
+            this.createReview.values = [comment, userNetId, submissionId, rubricAssignmentId];
+            return Database.executeQuerySingleResult(this.createReview);
+        }
+
     /**
      * Execute a 'get review' query, where all reviews are fetched.
      * Additionally, the file_path is fetched from the corresponding submission table.
@@ -42,6 +53,11 @@ export default class ReviewPS {
     public static executeGetReview(reviewId: number): any {
         this.getReview.values = [reviewId];
         return Database.executeQuerySingleResult(this.getReview);
+    }
+
+    public static executeGetReviewByUserIdAndAssignmentId(userNetId: string, assignmentId: number): Promise<pgPromise.queryResult> {
+        this.getReviewByUserIdAndAssignmentId.values = [userNetId, assignmentId];
+        return Database.executeQuerySingleResult(this.getReviewByUserIdAndAssignmentId);
     }
 
     /**
