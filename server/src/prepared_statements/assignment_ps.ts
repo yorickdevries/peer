@@ -27,7 +27,7 @@ export default class AssignmentPS {
         "SELECT * FROM review WHERE done=FALSE AND rubric_assignment_id=$1 AND user_netid=$2");
 
     private static countReviews: PreparedStatement = new PreparedStatement("count-reviews",
-        "SELECT count(*) FROM review WHERE id = $1 AND user_netid = $2");
+        "SELECT count(*) FROM review WHERE rubric_assignment_id = $1 AND user_netid = $2");
 
     /**
      * Executes a query that gets the review that was assigned to a certain user
