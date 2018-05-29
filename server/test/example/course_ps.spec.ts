@@ -94,10 +94,38 @@ describe("CoursePreparedStatement Test", () => {
      */
     it("get course role of user", async () => {
         expect({
-            role: "Owner"
+            role: "student"
         }).to.deep.equal(await CoursePS.executeGetRoleById("paulvanderlaan", 1));
     });
 
+    /**
+     * Test get course role of user.
+     */
+    it("Count User By CourseId", async () => {
+        expect(await CoursePS.executeCountUserByCourseId(1, "paulvanderlaan")).to.deep.equal({ count: "1" });
+    });
 
+    /**
+     * Test whether the right feedback is sent back when a user is enrolled
+     */
+    it("Enroll user to course", async () => {
+        expect(await CoursePS.executeEnrollInCourseId(1, "yorickdevries", "student")).to.deep.equal({
+            course_id: 1,
+            role: "student",
+            user_netid: "yorickdevries"
+             });
+    });
+
+    /**
+     * Test whether a student can be enrolled
+     */
+    it("Enroll user to course", async () => {
+        // Verify that the student is not yet enrolled
+        expect(await CoursePS.executeCountUserByCourseId(1, "yorickdevries")).to.deep.equal({ count: "0" });
+        // enroll in course
+        await CoursePS.executeEnrollInCourseId(1, "yorickdevries", "student");
+        // Verify that the student is enroleld now
+        expect(await CoursePS.executeCountUserByCourseId(1, "yorickdevries")).to.deep.equal({ count: "1" });
+    });
 
 });

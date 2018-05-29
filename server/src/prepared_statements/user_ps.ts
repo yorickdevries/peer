@@ -4,10 +4,14 @@ import express = require("express");
 
 export default class UserPS {
     public static addUser: PreparedStatement = new PreparedStatement("add-user",
-        'INSERT INTO "userlist" ("netid", "email") VALUES ($1, $2)');
+        'INSERT INTO "userlist" ("netid", "email") VALUES ($1, $2) RETURNING *');
 
     public static getUserById: PreparedStatement = new PreparedStatement("get-user-by-id",
         'SELECT * FROM "userlist" WHERE "netid" LIKE $1');
+
+    private static countUserById: PreparedStatement = new PreparedStatement("count-user-by-id",
+        'SELECT COUNT(1) FROM "userlist" WHERE "netid" = $1');
+
     public static getUserByEmail: PreparedStatement = new PreparedStatement("get-user-by-email",
         'SELECT * FROM "userlist" WHERE "email" LIKE $1');
 
@@ -29,9 +33,9 @@ export default class UserPS {
      * @param {string} email - an email.
      * @return {any} a query result.
      */
-    public static executeAddUser(netId: string, email: string): Promise<pgPromise.queryResult> {
+    public static executeAddUser(netId: string, email: string | undefined): Promise<pgPromise.queryResult> {
         this.addUser.values = [netId, email];
-        return Database.executeQuery(this.addUser);
+        return Database.executeQuerySingleResult(this.addUser);
     }
 
     /**
@@ -41,7 +45,14 @@ export default class UserPS {
      */
     public static async executeGetUserById(netId: string): Promise<pgPromise.queryResult> {
         this.getUserById.values = [netId];
-        return Database.executeQuery(this.getUserById);
+        return Database.executeQuerySingleResult(this.getUserById);
+    }
+
+
+    // counts the amount of assignments with this specific id
+    public static executeCountUserById(netId: string): Promise<pgPromise.queryResult> {
+        this.countUserById.values = [netId];
+        return Database.executeQuerySingleResult(this.countUserById);
     }
 
     /**

@@ -8,6 +8,10 @@ INSERT INTO "userlist" (
 	"netid", "email")
 	VALUES ('henkjan', 'h.j@student.tudelft.nl');
 
+INSERT INTO "userlist" (
+	"netid", "email")
+	VALUES ('yorickdevries', NULL);
+
 INSERT INTO public.courselist(
     description, name)
     VALUES ('This is a beautiful course description!', 'ED-3');
@@ -15,6 +19,14 @@ INSERT INTO public.courselist(
 INSERT INTO public.grouplist(
 	id, group_name)
 	VALUES (10, 'ED-3');
+
+INSERT INTO public.groupusers(
+	User_netid, Group_groupid)
+	VALUES ('henkjan', 10);
+
+INSERT INTO public.groupusers(
+	User_netid, Group_groupid)
+	VALUES ('paulvanderlaan', 10);
 
 INSERT INTO public.assignmentlist(
 	title, description, course_id, due_date, publish_date, filename)
@@ -50,9 +62,9 @@ INSERT INTO public.mcoption(
 
 INSERT INTO public.enroll(
 	course_id, user_netid, role)
-	VALUES (1, 'paulvanderlaan', 'Owner');
+	VALUES (1, 'paulvanderlaan', 'student');
 
-INSERT INTO public.groupexercise(
+INSERT INTO public.assignmentgroup(
 	assignment_id, group_id)
 	VALUES (1, 10);
 
