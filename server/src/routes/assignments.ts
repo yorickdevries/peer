@@ -103,8 +103,8 @@ router.route("/")
                     req.body.course_id,
                     fileName));
             }
+        });
     });
-});
 
 
 /**
@@ -197,10 +197,10 @@ router.post("/:id/importgroups", async (req: any, res) => {
         // Error in case of wrong file type
         if (req.fileValidationError) {
             res.json({ error: req.fileValidationError });
-        // Error (in case of too large file size)
+            // Error (in case of too large file size)
         } else if (err) {
             res.json({ error: err });
-        // error if no file was uploaded or no group column defined
+            // error if no file was uploaded or no group column defined
         } else if (req.file == undefined) {
             res.json({ error: "No file uploaded" });
         } else if (req.body.groupColumn == undefined) {
@@ -212,6 +212,7 @@ router.post("/:id/importgroups", async (req: any, res) => {
             res.json(groups);
         }
     });
+});
 
 router.get("/:id/reviewCount", async (req: any, res) => {
     res.json(await AssignmentPS.executeCountAssignmentReviews(req.params.id, req.userinfo.given_name));

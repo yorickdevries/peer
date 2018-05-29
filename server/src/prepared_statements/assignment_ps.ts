@@ -141,6 +141,7 @@ export default class AssignmentPS {
     public static executeGetGroupsByAssignmentId (id: number): Promise<pgPromise.queryResult> {
         this.getGroupsByAssignmentId.values = [id];
         return Database.executeQuery(this.getGroupsByAssignmentId);
+    }
 
     /**
      * Executes a 'count reviews of submission' query.
