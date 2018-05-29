@@ -132,7 +132,7 @@ describe("API Course routes", () => {
         const res = await chai.request(router).get("/1/role");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({
-                role: "Owner"
+                role: "student"
             }
         ));
     });
