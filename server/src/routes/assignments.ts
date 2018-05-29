@@ -166,7 +166,7 @@ router.route("/:assignment_id/review")
         ));
     });
 
-router.get("/assignments/:id/review", async (req: any, res) => {
+router.get("/assignments/:id/reviewCount", async (req: any, res) => {
     res.json(await AssignmentPS.executeCountAssignmentReviews(req.params.id, req.userinfo.given_name));
 });
 

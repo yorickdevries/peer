@@ -31,9 +31,9 @@ describe("API Assignment routes", () => {
     /**
      * Test whether userinfo is returned
      */
-    it("Count assignment/id/review", async () => {
+    it("Count assignment/id/reviewCount", async () => {
         // test the router
-        const res = await chai.request(router).get("/1/review");
+        const res = await chai.request(router).get("/1/reviewCount");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {"id":1,"comment":"Plagiaat","user_netid":"henkjan","submission_id":1,"rubric_assignment_id":1,"done":false}
