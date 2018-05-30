@@ -45,7 +45,7 @@ export default {
     data() {
         return {
             id: null,
-            assignments: null,
+            assignments: [],
         }
     },
     methods: {

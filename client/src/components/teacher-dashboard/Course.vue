@@ -44,7 +44,10 @@ export default {
     data() {
         return {
             id: null,
-            course: null,
+            course: {
+                name: null,
+                description: null
+            },
         }
     }
 }
