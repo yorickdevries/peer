@@ -1,18 +1,23 @@
 <template>
     <b-container>
 
+        <!--Header-->
         <b-row>
             <b-col>
                 <b-breadcrumb :items="items" class="mt-3"/>
             </b-col>
         </b-row>
 
+        <!--Blogpost-->
         <b-row>
             <b-col>
                 <b-card no-body>
+
                     <b-card-body>
                         <h4 class="card-title mb-0">Course Announcements</h4>
                     </b-card-body>
+
+                    <!--Blogpost Items-->
                     <b-list-group flush>
                         <b-list-group-item href="#" class="flex-column align-items-start">
                             <div class="d-flex w-100 justify-content-between">
@@ -41,6 +46,7 @@
 
                 </b-card>
             </b-col>
+
             <b-col cols="4">
                 <!--Course Information-->
                 <b-card no-body>
@@ -71,13 +77,6 @@
 import api from "../../api"
 
 export default {
-    async created() {
-        let res = await api.getCourse(this.$route.params.courseId)
-
-        this.course = res.data
-
-        console.log(true)
-    },
     data() {
         return {
             items: [
@@ -92,6 +91,11 @@ export default {
             },
             members: ["User 1", "User 2", "User 3", "User 4", "User 5"]
         }
-    }
+    },
+    async created() {
+        // Fetch course information.
+        let res = await api.getCourse(this.$route.params.courseId)
+        this.course = res.data
+    },
 }
 </script>
