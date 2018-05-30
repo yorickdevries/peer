@@ -9,7 +9,7 @@
                         <b-list-group-item
                                 v-for="question in sortedQuestionsList"
                                 :key="question.question_number"
-                                @click="setActiveQuestion(question)"
+                                @click="activeQuestion = question"
                                 :active="activeQuestion === question">
                             Question #{{ question.question_number}}
                         </b-list-group-item>
@@ -67,7 +67,7 @@
                                 <b-form-group v-else-if="activeQuestion.type_question === 'mc'" class="mb-0">
                                     <b-form-radio-group
                                             :checked="answer.answer"
-                                            :options="transformOptions(activeQuestion.option)"
+                                            :options="transformOptionsToHTMLOptions(activeQuestion.option)"
                                             stacked>
                                     </b-form-radio-group>
                                 </b-form-group>
@@ -86,13 +86,11 @@
 
 <script>
 import { StarRating } from 'vue-rate-it';
-
+import mockupReviews from './mockup-reviews'
 
 export default {
-    async created() {
-        // Get feedback array of reviews.
-        this.peerReviews = [review, review2, review]
-        this.activeQuestion = this.sortedQuestionsList[0]
+    components: {
+        StarRating
     },
     data() {
         return {
@@ -102,13 +100,19 @@ export default {
     },
     computed: {
         sortedQuestionsList() {
+            // Returns the sorted list of questions.
             let questions = this.peerReviews[0].form.slice().map(value => value.question)
-            let questionsSorted = questions.sort((a, b) => a.question_number - b.question_number)
-            return questionsSorted
+            return questions.sort((a, b) => a.question_number - b.question_number)
         }
+    },
+    async created() {
+        // Get feedback array of reviews.
+        this.peerReviews = [mockupReviews[0], mockupReviews[1], mockupReviews[0], mockupReviews[1]]
+        this.activeQuestion = this.sortedQuestionsList[0]
     },
     methods: {
         aggregateQuestionAnswer(targetQuestionNumber) {
+            // Aggregates the answers for a particular question into an array of answers.
             let res = []
             this.peerReviews.forEach(peerReview => {
                 let pair = peerReview.form.find(questionAnswerPair => questionAnswerPair.question.question_number === targetQuestionNumber)
@@ -116,163 +120,12 @@ export default {
             })
             return res
         },
-        setActiveQuestion(targetQuestionNumber) {
-            this.activeQuestion = targetQuestionNumber
-            console.log(this.activeQuestion)
-        },
-        transformOptions(options) {
+        transformOptionsToHTMLOptions(options) {
             // Transforms the option array from the API to a HTML option array.
             return options.map(option => {
                 return { text: option.option, value: option.id }
             })
         },
     },
-    components: {
-        StarRating
-    }
 }
-
-let review =
-    {
-        "review": {
-            "id": 1,
-            "rubric_assignment_id": 4,
-            "file_path": "submission1.pdf",
-            "comment": "Very good",
-            "done": false
-        },
-        "form": [
-            {
-                "question": {
-                    "id": 5,
-                    "type_question": "mc",
-                    "question": "Choose an option2",
-                    "question_number": 3,
-                    "option": [
-                        {
-                            "id": 13,
-                            "option": "Option 1 (1)",
-                            "mcquestion_id": 5
-                        },
-                        {
-                            "id": 14,
-                            "option": "Option 2 (1)",
-                            "mcquestion_id": 5
-                        },
-                        {
-                            "id": 15,
-                            "option": "Option 3 (1)",
-                            "mcquestion_id": 5
-                        }
-                    ]
-                },
-                "answer": {
-                    "answer": 15,
-                    "mcquestion_id": 5,
-                    "review_id": 1
-                }
-            },
-            {
-                "question": {
-                    "id": 8,
-                    "question": "Some open question5",
-                    "rubric_assignment_id": 4,
-                    "question_number": 1,
-                    "type_question": "open"
-                },
-                "answer": {
-                    "answer": "sdsada sadsa sadsada adssdsada sadsa sadsada adsasdsada sadsa sadsada adsasdsada sadsa sadsada adsasdsada sadsa sadsada adsasdsada sadsa sadsada adsasdsada sadsa sadsada adsasdsada sadsa sadsada adsasdsada sadsa sadsada adsasdsada sadsa sadsada adsasdsada sadsa sadsada adsaa",
-                    "openquestion_id": 8,
-                    "review_id": 1
-                }
-            },
-            {
-                "question": {
-                    "id": 6,
-                    "question": "Give a rating",
-                    "range": 7,
-                    "rubric_assignment_id": 4,
-                    "question_number": 2,
-                    "type_question": "range"
-                },
-                "answer": {
-                    "answer": 1,
-                    "rangequestion_id": 6,
-                    "review_id": 1
-                }
-            }
-        ]
-    }
-
-let review2 = {
-    "review": {
-        "id": 1,
-        "rubric_assignment_id": 4,
-        "file_path": "submission1.pdf",
-        "comment": "Very good",
-        "done": false
-    },
-    "form": [
-        {
-            "question": {
-                "id": 5,
-                "type_question": "mc",
-                "question": "Choose an option2",
-                "question_number": 3,
-                "option": [
-                    {
-                        "id": 13,
-                        "option": "Option 1 (1)",
-                        "mcquestion_id": 5
-                    },
-                    {
-                        "id": 14,
-                        "option": "Option 2 (1)",
-                        "mcquestion_id": 5
-                    },
-                    {
-                        "id": 15,
-                        "option": "Option 3 (1)",
-                        "mcquestion_id": 5
-                    }
-                ]
-            },
-            "answer": {
-                "answer": 13,
-                "mcquestion_id": 5,
-                "review_id": 1
-            }
-        },
-        {
-            "question": {
-                "id": 8,
-                "question": "Some open question5",
-                "rubric_assignment_id": 4,
-                "question_number": 1,
-                "type_question": "open"
-            },
-            "answer": {
-                "answer": "sdsada sadsa sd sadsadsasadsada adsa",
-                "openquestion_id": 8,
-                "review_id": 1
-            }
-        },
-        {
-            "question": {
-                "id": 6,
-                "question": "Give a rating",
-                "range": 7,
-                "rubric_assignment_id": 4,
-                "question_number": 2,
-                "type_question": "range"
-            },
-            "answer": {
-                "answer": 5,
-                "rangequestion_id": 6,
-                "review_id": 1
-            }
-        }
-    ]
-}
-
 </script>
