@@ -48,7 +48,7 @@ export default {
         return {
             items: [{
                 text: 'Dashboard',
-                to: { name: 'student-dashboard.index'}
+                to: { name: 'landing-page'}
             }, {
                 text: 'Courses',
                 to: { name: 'student-dashboard'}
