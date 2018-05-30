@@ -46,8 +46,8 @@ export default {
     savePeerReview(peerReviewId, peerReview) {
         return client.put(`reviews/${peerReviewId}`, peerReview)
     },
-    getSubmission(submissionId) {
-        return client.get(`submissions/${submissionId}`)
+    getAssignmentSubmission(assignmentId) {
+        return client.get(`assignments/${assignmentId}/submission`)
     },
     deleteSubmission(submissionId) {
         return client.delete(`submissions/${submissionId}`)
