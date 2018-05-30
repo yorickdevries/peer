@@ -1,8 +1,8 @@
 <template>
     <div>
-
         <b-container>
 
+            <!--Header-->
             <b-row>
                 <b-col>
                     <h1 class="mt-5">Available Courses</h1>
@@ -35,14 +35,15 @@
 import api from '../../api'
 
 export default {
-    async created() {
-        let res = await api.getEnrolledCourses()
-        this.courses = res.data
-    },
     data() {
         return {
-            courses: null,
+            courses: [],
         }
+    },
+    async created() {
+        // Fetch courses that user can access.
+        let res = await api.getEnrolledCourses()
+        this.courses = res.data
     }
 }
 </script>
