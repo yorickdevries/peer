@@ -21,23 +21,6 @@ app.use(bodyParser.json());
 // Routing
 app.use("/api", api);
 
-
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
-});
-// error handler
-app.use(function (err: any, req: any, res: any, next: any) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-  // Print error to console
-  console.log("Error: " + err.message);
-
-  // render the error page
-  next();
-});
-
 app.get("/*", (req, res) => {
     res.sendFile(path.join(__dirname, "./public/index.html"));
 });
