@@ -1,9 +1,12 @@
 import ReviewsPS from "../prepared_statements/review_ps";
 import RubricPS from "../prepared_statements/rubric_ps";
+import bodyParser from "body-parser";
 
 // Router
-import { Router } from "express";
-const router = Router();
+import express from "express";
+const router = express();
+router.use(bodyParser.json());
+
 
 /**
  * Route to get a review by review id.
