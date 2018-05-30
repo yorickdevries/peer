@@ -142,7 +142,7 @@
             },
             async deleteSubmission() {
                 // Delete the current submission.
-                let res = await api.deleteSubmission(this.submission.id)
+                await api.deleteSubmission(this.submission.id)
                 await this.fetchSubmission()
             },
             async fetchSubmission() {
