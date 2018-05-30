@@ -4,10 +4,12 @@ import fs from "fs";
 import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import GroupParser from "../groupParser";
+import bodyParser from "body-parser";
 
 // Router
 import express from "express";
 const router = express();
+router.use(bodyParser.json());
 
 const fileFolder = path.join(__dirname, "../files/assignments");
 
@@ -169,7 +171,7 @@ router.route("/:assignment_id/requestReview")
     .get(async (req: any, res) => {
         res.json(await AssignmentPS.executeCreateReviewByAssignmentId(
             req.userinfo.given_name,
-            0, // HERE THE SHUFFLING NEEDS TO BE DONE
+            1, // HERE THE SHUFFLING NEEDS TO BE DONE
             req.params.assignment_id
         ));
     });

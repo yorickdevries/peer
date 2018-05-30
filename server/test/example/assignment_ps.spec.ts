@@ -71,8 +71,10 @@ describe("AssignmentPreparedStatements Test", () => {
         expect(await AssignmentPS.executeUpdateAssignmentById("Updated", "updated", 1, 1)).to.deep.equal({
             course_id: 1,
             description: "updated",
+            due_date: new Date("2018-05-01T20:30:00Z"),
             filename: "assignment1.pdf",
             id: 1,
+            publish_date: new Date("2018-04-01T20:30:00Z"),
             title: "Updated"
         });
     });

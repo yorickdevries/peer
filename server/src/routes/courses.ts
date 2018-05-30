@@ -1,9 +1,10 @@
 import CoursesPS from "../prepared_statements/courses_ps";
+import bodyParser from "body-parser";
 
 // Router
 import express from "express";
 const router = express();
-
+router.use(bodyParser.json());
 
 /**
  * Route to update a course
