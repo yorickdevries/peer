@@ -1,6 +1,7 @@
 // Imports
 import path from "path";
 import fs from "fs";
+import index from "../security/index"
 import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import GroupParser from "../groupParser";
@@ -8,6 +9,7 @@ import bodyParser from "body-parser";
 
 // Router
 import express from "express";
+
 const router = express();
 router.use(bodyParser.json());
 
@@ -29,7 +31,7 @@ const storage = multer.diskStorage({
 const maxSizeAssignmentFile = 30 * 1024 * 1024;
 const uploadAssignment = multer({
     storage: storage,
-    limits: { fileSize: maxSizeAssignmentFile },
+    limits: {fileSize: maxSizeAssignmentFile},
     fileFilter: function (req: any, file, cb: any) {
         const ext = path.extname(file.originalname);
         if (ext !== ".pdf") {
@@ -47,7 +49,7 @@ const uploadAssignment = multer({
 const maxSizeGroupsfile = 1 * 1024 * 1024;
 // The file will be stored into the memory
 const uploadGroups = multer({
-    limits: { fileSize: maxSizeGroupsfile },
+    limits: {fileSize: maxSizeGroupsfile},
     fileFilter: function (req: any, file, cb: any) {
         const ext = path.extname(file.originalname);
         if (ext !== ".csv") {
@@ -61,16 +63,19 @@ const uploadGroups = multer({
 }).single("groupFile");
 
 
-
 /**
  * Route to get all the information about an assignment
  * @params assignment_id - assignment id
  */
 router.route("/:assignment_id")
     .get(async (req, res) => {
-        res.json(await AssignmentPS.executeGetAssignmentById(
-            req.params.assignment_id
-        ));
+        if (index.authorization.authorizeCheck(req, res, next)) {
+            res.json(await AssignmentPS.executeGetAssignmentById(
+                req.params.assignment_id
+            ));
+        } else {
+            res.sendStatus(401);
+        }
     });
 
 
@@ -89,11 +94,11 @@ router.route("/")
         uploadAssignment(req, res, async function (err) {
             // Error in case of too large file size
             if (err) {
-                res.json({ error: err });
+                res.json({error: err});
             }
             // Error in case of wrong file type
             else if (req.fileValidationError) {
-                res.json({ error: req.fileValidationError });
+                res.json({error: req.fileValidationError});
             } else {
                 const fileName = req.file.filename;
                 // add to database
@@ -198,15 +203,15 @@ router.post("/:id/importgroups", async (req: any, res) => {
     uploadGroups(req, res, async function (err) {
         // Error in case of wrong file type
         if (req.fileValidationError) {
-            res.json({ error: req.fileValidationError });
+            res.json({error: req.fileValidationError});
             // Error (in case of too large file size)
         } else if (err) {
-            res.json({ error: err });
+            res.json({error: err});
             // error if no file was uploaded or no group column defined
         } else if (req.file == undefined) {
-            res.json({ error: "No file uploaded" });
+            res.json({error: "No file uploaded"});
         } else if (req.body.groupColumn == undefined) {
-            res.json({ error: "No groupcolumn defined" });
+            res.json({error: "No groupcolumn defined"});
         } else {
             const groupColumn = req.body.groupColumn;
             const assignmentId = req.params.id;
