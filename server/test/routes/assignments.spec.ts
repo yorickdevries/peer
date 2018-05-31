@@ -168,18 +168,7 @@ describe("API Assignment routes", () => {
                 course_id: 1,
                 assignment_id: 1
             });
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            {
-                title: "Example title",
-                description: "Example description",
-                id: 1,
-                course_id: 1,
-                due_date: new Date("2018-05-01T20:30:00Z"),
-                publish_date: new Date("2018-04-01T20:30:00.000Z"),
-                filename: "assignment1.pdf"
-            }
-        ));
+        expect(res.status).to.equal(401);
     });
 
     /**

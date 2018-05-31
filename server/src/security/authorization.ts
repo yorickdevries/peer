@@ -8,11 +8,11 @@ import AssignmentPS from "../prepared_statements/assignment_ps";
  * @param next - next.
  */
 const authorizeCheck = (req: any, res: any, next: any) => {
-  if (req.isAuthenticated()) {
-      next();
-  }  else {
-      res.sendStatus(401);
-  }
+    if (req.isAuthenticated()) {
+        next();
+    } else {
+        res.sendStatus(401);
+    }
 };
 
 /**
@@ -20,7 +20,7 @@ const authorizeCheck = (req: any, res: any, next: any) => {
  */
 const enrolledAssignmentCheck = async (req: any, res: any, next: any) => {
     const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-    const authCheck =  await AuthorizationPS.executeCheckEnrollment(assignment.course_id, req.userinfo.given_name);
+    const authCheck = await AuthorizationPS.executeCheckEnrollment(assignment.course_id, req.userinfo.given_name);
     await response(res, authCheck.exists, next);
 };
 
@@ -50,17 +50,20 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
     await response(res, authCheck.exists, next);
 };
 
+/**
+ * Response method that handles the response
+ */
 const response = (res: any, bool: boolean, next: any) => {
-    if (bool){
+    if (bool) {
         next();
     } else {
         res.sendStatus(401);
     }
 };
 
-
-
-
+/**
+ * Exports
+ */
 export default {
     authorizeCheck,
     enrolledAssignmentCheck,
