@@ -29,36 +29,19 @@
                          stacked="md"
                          :items=assignments
                          :current-page="currentPage"
-                         :per-page=5
+                         :per-page="perPage"
                          :filter="filter"
                          @filtered="onFiltered">
 
-                    <template slot="name" slot-scope="row">{{row.value.first}} {{row.value.last}}</template>
-                    <template slot="isActive" slot-scope="row">{{row.value?'Yes :)':'No :('}}</template>
-                    <template slot="actions" slot-scope="row">
-                        <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
-                        <b-button size="sm" @click.stop="info(row.item, row.index, $event.target)" class="mr-1">
-                            Info modal
-                        </b-button>
-                        <b-button size="sm" @click.stop="row.toggleDetails">
-                            {{ row.detailsShowing ? 'Hide' : 'Show' }} Details
-                        </b-button>
-                    </template>
-                    <template slot="row-details" slot-scope="row">
-                        <b-card>
-                            <ul>
-                                <li v-for="(value, key) in row.item" :key="key">{{ key }}: {{ value}}</li>
-                            </ul>
-                        </b-card>
+                    <template slot="filename" slot-scope="data">
+                        <a :href="`/api/assignments/${data.value}/file`">
+                            {{data}}
+                        </a>
                     </template>
                 </b-table>
 
-                <b-pagination :total-rows=assignmentsCount() :per-page=5 v-model="currentPage" class="my-0" />
+                <b-pagination :total-rows=assignmentsCount() :per-page="perPage" v-model="currentPage" class="my-0" />
 
-                <!-- Info modal -->
-                <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
-                    <pre>{{ modalInfo.content }}</pre>
-                </b-modal>
             </b-card>
 
         </b-container>
@@ -79,6 +62,7 @@
                 ],
                 assignments: [
                     {
+                        id: null,
                         title: null,
                         description: null,
                         due_date: null,
@@ -90,15 +74,11 @@
                     name: null,
                     description: null
                 },
-                members: ["User 1", "User 2", "User 3", "User 4", "User 5"],
+                fields: [ 'first_name', 'last_name', 'age' ],
                 currentPage: 1,
                 perPage: 5,
                 pageOptions: [ 5, 10, 15, 25, 50 ],
-                sortBy: null,
-                sortDesc: false,
-                sortDirection: 'asc',
                 filter: null,
-                modalInfo: { title: '', content: '' }
             }
         },
         computed: {
@@ -110,15 +90,6 @@
             }
         },
         methods: {
-            info (item, index, button) {
-                this.modalInfo.title = `Row index: ${index}`
-                this.modalInfo.content = JSON.stringify(item, null, 2)
-                this.$root.$emit('bv::show::modal', 'modalInfo', button)
-            },
-            resetModal () {
-                this.modalInfo.title = ''
-                this.modalInfo.content = ''
-            },
             assignmentsCount() {
                 return this.assignments.length;
             }
@@ -134,20 +105,8 @@
             let course = await api.getCourse(this.$route.params.id);
             let assignments = await api.getCourseAssignments(this.$route.params.id);
 
-            // Construct an assignment array with data that will be displayed.
-            let assignmentsArray = [assignments.data.length];
-            for (let i = 0; i < assignments.data.length; i++) {
-                assignmentsArray[i] = {
-                    title: assignments.data[i].title,
-                    description: assignments.data[i].description,
-                    due_date: assignments.data[i].due_date,
-                    publish_date: assignments.data[i].publish_date,
-                    filename: assignments.data[i].filename
-                }
-            }
-
             // Assign fetched data.
-            this.assignments = assignmentsArray;
+            this.assignments = assignments.data;
             this.course = course.data;
         }
     }
