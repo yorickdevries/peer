@@ -28,14 +28,15 @@
                          show-empty
                          stacked="md"
                          :items=assignments
+                         :fields="fields"
                          :current-page="currentPage"
                          :per-page="perPage"
                          :filter="filter"
                          @filtered="onFiltered">
 
                     <template slot="filename" slot-scope="data">
-                        <a :href="`/api/assignments/${data.value}/file`">
-                            {{data}}
+                        <a :href="`/api/assignments/${data.item.id}/file`">
+                            {{data.value}}
                         </a>
                     </template>
                 </b-table>
@@ -74,7 +75,7 @@
                     name: null,
                     description: null
                 },
-                fields: [ 'first_name', 'last_name', 'age' ],
+                fields: [ 'title', 'description', 'due_date', 'publish_date', 'filename' ],
                 currentPage: 1,
                 perPage: 5,
                 pageOptions: [ 5, 10, 15, 25, 50 ],
