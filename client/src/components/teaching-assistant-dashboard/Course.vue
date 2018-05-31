@@ -2,7 +2,7 @@
     <div>
         <b-container>
 
-            <h1 class="mt-5">Course dashbosadfsfard</h1>
+            <h1 class="mt-5">Course dashboard</h1>
 
             <b-card>
                 <b-row>
