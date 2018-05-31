@@ -105,31 +105,7 @@ describe("API Assignment routes", () => {
         // log in as teacher
         InitLogin.initialize(router, "teacheraccount");
         const res = await chai.request(router).get("/2/distributeReviews");
-        // log in as henkjan
-        InitLogin.initialize(router, "henkjan");
-        const res1 = await chai.request(router).get("/2/requestReview");
-        expect(res1.status).to.equal(200);
-        expect(res1.text).to.equal(JSON.stringify(
-            {id: 2,
-            // tslint:disable-next-line
-            comment: null,
-            user_netid: "henkjan",
-            submission_id: 5,
-            rubric_assignment_id: 2,
-            done: false}
-        ));
-        // log in as paulvanderlaan
-        InitLogin.initialize(router, "paulvanderlaan");
-        const res2 = await chai.request(router).get("/2/requestReview");
-        expect(res2.status).to.equal(200);
-        expect(res2.text).to.equal(JSON.stringify(
-            {id: 5,
-            // tslint:disable-next-line
-            comment: null,
-            user_netid: "paulvanderlaan",
-            submission_id: 3,
-            rubric_assignment_id: 2,
-            done: false}
-        ));
-        });
+        expect(res.status).to.equal(200);
+        expect(JSON.parse(res.text).length).to.equal(8);
+    });
 });

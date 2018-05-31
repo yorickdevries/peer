@@ -10,7 +10,7 @@ export default class ReviewPS {
         "FROM review JOIN submission ON submission.id = review.submission_id " +
         "WHERE review.id = $1");
 
-    private static getReviewByUserIdAndAssignmentId: PreparedStatement = new PreparedStatement("get-review-by-user-id-and-assignment-id",
+    private static getReviewsByUserIdAndAssignmentId: PreparedStatement = new PreparedStatement("get-reviews-by-user-id-and-assignment-id",
         "SELECT * FROM review WHERE user_netid = $1 AND rubric_assignment_id = $2");
 
     private static submitReview: PreparedStatement = new PreparedStatement("submit-review",
@@ -39,7 +39,7 @@ export default class ReviewPS {
     private static getRangeAnswerByReviewId: PreparedStatement = new PreparedStatement("get-range-answer-by-id",
         "SELECT * FROM rangeanswer WHERE review_id = $1 AND rangequestion_id = $2");
 
-    public static executeCreateReview(comment: string | undefined, userNetId: string, submissionId: number, rubricAssignmentId: number): Promise<pgPromise.queryResult> {
+    public static executeCreateReview(comment: string, userNetId: string, submissionId: number, rubricAssignmentId: number): Promise<pgPromise.queryResult> {
             this.createReview.values = [comment, userNetId, submissionId, rubricAssignmentId];
             return Database.executeQuerySingleResult(this.createReview);
         }
@@ -55,9 +55,9 @@ export default class ReviewPS {
         return Database.executeQuerySingleResult(this.getReview);
     }
 
-    public static executeGetReviewByUserIdAndAssignmentId(userNetId: string, assignmentId: number): Promise<pgPromise.queryResult> {
-        this.getReviewByUserIdAndAssignmentId.values = [userNetId, assignmentId];
-        return Database.executeQuerySingleResult(this.getReviewByUserIdAndAssignmentId);
+    public static executeGetReviewsByUserIdAndAssignmentId(userNetId: string, assignmentId: number): Promise<pgPromise.queryResult> {
+        this.getReviewsByUserIdAndAssignmentId.values = [userNetId, assignmentId];
+        return Database.executeQuery(this.getReviewsByUserIdAndAssignmentId);
     }
 
     /**

@@ -170,7 +170,7 @@ router.route("/:assignment_id/allsubmissions")
  */
 router.route("/:assignment_id/requestReview")
     .get(async (req: any, res) => {
-        res.json(await ReviewPS.executeGetReviewByUserIdAndAssignmentId(req.userinfo.given_name, req.params.assignment_id));
+        res.json(await ReviewPS.executeGetReviewsByUserIdAndAssignmentId(req.userinfo.given_name, req.params.assignment_id));
     });
 
 router.route("/:assignment_id/distributeReviews")

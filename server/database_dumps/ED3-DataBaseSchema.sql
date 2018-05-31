@@ -118,8 +118,8 @@ CREATE TABLE RangeQuestion (
 -- Table: Review
 CREATE TABLE Review (
     id SERIAL,
-    comment varchar(500),
-    User_netid varchar(256)  NOT NULL,
+    comment varchar(2500) NOT NULL,
+    User_netid varchar(256) NOT NULL,
     Submission_id int NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
