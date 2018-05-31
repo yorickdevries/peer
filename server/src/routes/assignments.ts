@@ -1,7 +1,7 @@
 // Imports
 import path from "path";
 import fs from "fs";
-import index from "../security/index"
+import index from "../security/index";
 import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import GroupParser from "../groupParser";
@@ -115,7 +115,7 @@ router.route("/")
                 }
             });
         } else {
-            res.sendStatus(401)
+            res.sendStatus(401);
         }
 
     });

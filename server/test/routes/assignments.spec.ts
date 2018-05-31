@@ -37,17 +37,7 @@ describe("API Assignment routes", () => {
         // log in as henkjan
         InitLogin.initialize(router, "henkjan");
         const res = await chai.request(router).get("/1");
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            {
-                title: "Assignment 1",
-                description: "Example assignment number one",
-                due_date: new Date("2018-05-01T20:30:00.000Z"),
-                publish_date: new Date("2018-04-01T20:30:00.000Z"),
-                id: 1,
-                course_id: 1,
-                filename: "assignment1.pdf"
-            }));
+        expect(res.status).to.equal(401);
     });
 
     /**
