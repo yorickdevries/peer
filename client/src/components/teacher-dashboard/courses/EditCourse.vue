@@ -22,13 +22,14 @@
                                 </b-form-input>
                             </b-form-group>
                             <b-form-group label="Description">
-                                <b-form-input   v-model="course.description"
-                                                type="text"
-                                                placeholder="Please enter the course description"
-                                                required>
-                                </b-form-input>
+                                <b-form-textarea    v-model="course.description"
+                                                    id="textareadescription"
+                                                    placeholder="Please enter the course description here"
+                                                    :rows="4"
+                                                    required>
+                                </b-form-textarea>
                             </b-form-group>
-                            <b-button type="submit" variant="primary">Create new Course</b-button>
+                            <b-button type="submit" variant="primary">Save changes</b-button>
                         </b-form>
                     </b-card>
                 </b-col>
@@ -44,27 +45,25 @@ import api from "../../../api";
 export default {
     data() {
         return {
-            items: [{
-                text: 'Dashboard',
-                to: { name: 'landing-page'}
-            }, {
-                text: 'Courses',
-                to: { name: 'student-dashboard'}
-            }],
             course: {
+                id: null,
                 name: null,
                 description: null
             }
         }
     },
     async created() {
+        let id = this.$route.params.id
+        this.course.id = id
+        let res = await api.getCourse(id)
+        this.course = res.data
     },
     methods: {
         async onSubmit() {
-            let res = await api.createCourse(this.course)
+            let res = await api.saveCourse(this.course.id, this.course)
             console.log(this.course)
             console.log(res)
-            this.$router.push({name: 'courses'})
+            this.$router.push({name: 'teacher-dashboard.course', params: {id: this.course.id} })
         }
     }
 }
