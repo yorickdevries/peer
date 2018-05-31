@@ -92,7 +92,7 @@ router.route("/:assignment_id")
  */
 router.route("/")
     .post(async (req: any, res) => {
-        if (index.authorization.enrolledAsTeacherAssignmentCheck(req, res)) {
+        if (index.authorization.enrolledAsTeacherAssignmentCheckForPost(req, res)) {
             // File upload handling
             uploadAssignment(req, res, async function (err) {
                 // Error in case of too large file size
@@ -132,11 +132,16 @@ router.route("/")
  */
 router.route("/:assignment_id")
     .put(async (req, res) => {
-        res.json(await AssignmentPS.executeUpdateAssignmentById(
-            req.body.assignment_title,
-            req.body.assignment_description,
-            req.body.course_id,
-            req.params.assignment_id));
+        if (index.authorization.enrolledAsTeacherAssignmentCheckForPost(req, res)) {
+            res.json(await AssignmentPS.executeUpdateAssignmentById(
+                req.body.assignment_title,
+                req.body.assignment_description,
+                req.body.course_id,
+                req.params.assignment_id));
+        } else {
+            res.sendStatus(401);
+        }
+
     });
 
 /**
