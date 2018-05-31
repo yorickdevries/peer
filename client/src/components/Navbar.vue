@@ -1,5 +1,7 @@
 <template>
     <nav>
+
+        <!--Head Navbar-->
         <b-navbar toggleable="md" type="dark"  class="py-3 bg-primary">
             <b-container>
 
@@ -36,7 +38,8 @@
             </b-container>
         </b-navbar>
 
-        <b-navbar toggleable="md" type="dark" class="bg-primary-light" v-if="loadSecondNavbar">
+        <!--Secondary (Course) Navbar-->
+        <b-navbar toggleable="md" type="dark" class="bg-primary-light">
             <b-container>
 
                 <b-collapse is-nav id="nav_collapse">
@@ -52,37 +55,33 @@
 </template>
 
 <script>
-    import api from '../api'
+import api from '../api'
 
-    export default {
-        props: ['links', 'title'],
-        mounted() {
-            this.refreshAuthenticated()
-            this.refreshUser()
+export default {
+    props: ['links', 'title'],
+    data() {
+        return {
+            authenticated: null,
+            user: {name: null},
+            currentCourse: ""
+        }
+    },
+    async mounted() {
+        // Fetch authentication & user information.
+        await this.refreshAuthenticated()
+        await this.refreshUser()
+    },
+    methods: {
+        async refreshAuthenticated() {
+            // Refresh whether user is authenticated.
+            let res = await api.getAuthenticated()
+            this.authenticated = res.data.authenticated
         },
-        data() {
-            return {
-                authenticated: null,
-                user: {
-                    name: null
-                },
-                currentCourse: "TI1316: Algoritmen en Datastructuren"
-            }
-        },
-        methods: {
-            async refreshAuthenticated() {
-                let res = await api.getAuthenticated()
-                this.authenticated = res.data.authenticated
-            },
-            async refreshUser() {
-                let res = await api.getUser()
-                this.user = res.data.user
-            }
-        },
-        computed: {
-            loadSecondNavbar() {
-                return !(this.links === null || this.links.length === 0)
-            }
+        async refreshUser() {
+            // Refresh user information.
+            let res = await api.getUser()
+            this.user = res.data.user
         }
     }
+}
 </script>

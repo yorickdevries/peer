@@ -15,7 +15,7 @@
                                         <span class="lead">Peer #{{ peerReview.review.id }}</span>
                                     </b-col>
                                     <b-col>
-                                        <a :href="formattedFilePath(this.peerReview.review.file_path)"><button type="button" class="btn btn-success success w-100 h-100">Download Hand-In</button></a>
+                                        <a :href="peerReviewFilePath"><button type="button" class="btn btn-success success w-100 h-100">Download Hand-In</button></a>
                                     </b-col>
                                 </b-row>
                             </b-container>
@@ -83,7 +83,7 @@
                         <!-- MPC QUESTION -->
                         <b-form-group v-else-if="pair.question.type_question === 'mc'">
                             <b-form-radio-group
-                                    :options="transformOptions(pair.question.option)"
+                                    :options="transformOptionsToHTMLOptions(pair.question.option)"
                                     v-model="pair.answer.answer"
                                     stacked>
                             </b-form-radio-group>
@@ -141,12 +141,11 @@ import { StarRating } from 'vue-rate-it';
 import api from "../../../api";
 
 export default {
-    async created() {
-        await this.fetchPeerReview()
+    components: {
+        StarRating
     },
     data() {
         return {
-            isPeerReviewActive: true,
             peerReview: {
                 review: {
                     id: null,
@@ -155,64 +154,63 @@ export default {
                     comment: null,
                     done: null,
                 },
-
                 form: []
             },
         }
     },
-    methods: {
-        transformOptions(options) {
-            // Transforms the option array from the API to a HTML option array.
-            return options.map(option => {
-                return { text: option.option, value: option.id }
-            })
-        },
-        async submitPeerReview() {
-            await api.submitPeerReview(this.peerReview)
-            await this.fetchPeerReview()
-        },
-        async savePeerReview() {
-            // Submit a PUT to save the current peer review.
-            let res = await api.savePeerReview(this.peerReview.review.id, this.peerReview)
-            this.peerReview = res.data
-        },
-        async fetchPeerReview() {
-            // Get the peer review ID from this assignment that is active.
-            let subRes = await api.getCurrentPeerReview(this.$route.params.assignmentId)
-            let peerReviewID = subRes.data.id
-
-            // Check if there is a peer review active, if not allow option to get request review.
-            if (isNaN(peerReviewID)) {
-                this.isPeerReviewActive = false
-                return
-            }
-
-            // Get peer review.
-            let res = await api.getPeerReview(peerReviewID)
-            this.peerReview = res.data
-        },
-        formattedFilePath(path) {
-            if (path.charAt(0) !== '/') {
-                return '/' + path
-            }
-            return path
-        }
-    },
     computed: {
+        isPeerReviewActive() {
+            // Returns whether there is an active peer review or not.
+            return !isNaN(this.peerReview.review.id)
+        },
         totalAmountOfQuestions() {
+            // Returns the total amount of questions.
             return this.peerReview.form.length
         },
         peerReviewSorted() {
+            // Returns the review object, but sorted on question number.
             return {
                 review: this.peerReview.review,
                 form: this.peerReview.form.slice().sort((a, b) => {
                     return a.question.question_number - b.question.question_number
                 })
             }
+        },
+        peerReviewFilePath() {
+            // Get the submission file path.
+            return `/api/reviews/${this.peerReview.review.id}/file`
         }
     },
-    components: {
-        StarRating
+    async created() {
+        // Fetch the peer review.
+        await this.fetchPeerReview()
     },
+    methods: {
+        transformOptionsToHTMLOptions(options) {
+            // Transforms the option array from the API to a HTML option array.
+            return options.map(option => {
+                return { text: option.option, value: option.id }
+            })
+        },
+        async submitPeerReview() {
+            // Save the peer review.
+            await api.submitPeerReview(this.peerReview)
+            await this.fetchPeerReview()
+        },
+        async savePeerReview() {
+            // Submit the peer review.
+            await api.savePeerReview(this.peerReview.review.id, this.peerReview)
+            await this.fetchPeerReview()
+        },
+        async fetchPeerReview() {
+            // Get the peer review ID from this assignment that is active.
+            let subRes = await api.getCurrentPeerReview(this.$route.params.assignmentId)
+            let peerReviewID = subRes.data.id
+
+            // Get peer review.
+            let res = await api.getPeerReview(peerReviewID)
+            this.peerReview = res.data
+        }
+    }
 }
 </script>
