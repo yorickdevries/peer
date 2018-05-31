@@ -2,12 +2,14 @@
     <div>
         <b-container>
 
+            <!--Header-->
             <b-row>
                 <b-col>
                     <h1 class="mt-5">Create a new assignment</h1>
                 </b-col>
             </b-row>
 
+            <!--Create assignment card-->
             <b-row>
                 <b-col>
                     <b-card>
@@ -17,7 +19,6 @@
                                                 type="text"
                                                 placeholder="Please enter the assignment title here"
                                                 required>
-
                                 </b-form-input>
                             </b-form-group>
                             <b-form-group label="Description">
@@ -25,7 +26,6 @@
                                                 type="text"
                                                 placeholder="Please enter the assignment description here"
                                                 required>
-
                                 </b-form-input>
                             </b-form-group>
                             <b-form-group label="Publish date">
@@ -33,7 +33,6 @@
                                                 type="date"
                                                 placeholder="Please enter on which the assignment should be published"
                                                 required>
-
                                 </b-form-input>
                             </b-form-group>
                             <b-form-group label="Due date">
@@ -42,36 +41,17 @@
                                                 :state="checkDue"
                                                 placeholder="Please enter on which the assignment should be handed in"
                                                 required>
-
                                 </b-form-input>
                                 <b-form-invalid-feedback>
                                     Due date should be past publish date!
                                 </b-form-invalid-feedback>
                             </b-form-group>
-                            <!--<b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />-->
-
-                            <!--<b-alert show v-if="uploadSuccess === true">Upload was successful.</b-alert>-->
-                            <!--<b-alert show v-if="uploadSuccess === false">Something went wrong with uploading. Try again.</b-alert>-->
-
                             <b-form-file
                                     placeholder="Choose a file..."
                                     accept=".pdf"
                                     v-model="file"
                                     :state="Boolean(file)"
                                     v-if="uploadSuccess === null" />
-                            <!--<b-button-->
-                                    <!--variant="primary"-->
-                                    <!--class="mt-3"-->
-                                    <!--@click="submitAssignment()"-->
-                                    <!--v-if="uploadSuccess === null">Upload</b-button>-->
-                            <!--<b-form-group label="File">-->
-                                <!--<b-form-input   v-model="assignment.filename"-->
-                                                <!--type="text"-->
-                                                <!--placeholder="Upload your file here (WIP)"-->
-                                                <!--required>-->
-
-                                <!--</b-form-input>-->
-                            <!--</b-form-group>-->
                             <b-form-group label="Number of reviews that each student needs to do">
                                 <b-form-input   v-model="assignment.peer_review_cap"
                                                 type="number"
@@ -86,6 +66,7 @@
                     </b-card>
                 </b-col>
             </b-row>
+
         </b-container>
     </div>
 </template>
@@ -94,24 +75,6 @@
 import api from "../../../api";
 
 export default {
-    async created() {
-        let id = this.$route.params.id
-        this.assignment.course_id = id
-    },
-    computed: {
-        checkDue() {
-            if (this.assignment.due_date == null|| this.assignment.publish_date == null)
-                return null
-            else
-                return this.assignment.due_date > this.assignment.publish_date
-        },
-        checkPeerNumber() {
-            if (this.assignment.peer_review_cap == null)
-                return null
-            else
-                return this.assignment.peer_review_cap > 0 && this.assignment.peer_review_cap < 11
-        }
-    },
     data() {
         return {
             items: [{
@@ -131,17 +94,28 @@ export default {
                 course_id: null,
                 publish_date: null,
                 due_date: null,
-                // filename: null,
                 peer_review_cap: null
             }
         }
     },
+    computed: {
+        checkDue() {
+            if (this.assignment.due_date == null|| this.assignment.publish_date == null)
+                return null
+            else
+                return this.assignment.due_date > this.assignment.publish_date
+        },
+        checkPeerNumber() {
+            if (this.assignment.peer_review_cap == null)
+                return null
+            else
+                return this.assignment.peer_review_cap > 0 && this.assignment.peer_review_cap < 11
+        }
+    },
+    async created() {
+        this.assignment.course_id = this.$route.params.id
+    },
     methods: {
-        // async submitAssignment() {
-        //
-        //     // Create the form data with the file
-        //
-        // }
         async onSubmit() {
 
             let formData = new FormData()
