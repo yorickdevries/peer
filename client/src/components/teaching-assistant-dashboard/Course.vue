@@ -31,14 +31,12 @@
                          :fields="fields"
                          :current-page="currentPage"
                          :per-page="perPage"
-                         :filter="filter"
-                         @filtered="onFiltered">
-
+                         :filter="filter">
                     <template slot="filename" slot-scope="data">
-                        <a :href="`/api/assignments/${data.item.id}/file`">
-                            {{data.value}}
-                        </a>
+                        <a :href="`/api/assignments/${data.item.id}/file`"> {{data.value}} </a>
                     </template>
+                    <template slot="due_date" slot-scope="data"> {{ formatDate(data.value) }} </template>
+                    <template slot="publish_date" slot-scope="data"> {{ formatDate(data.value) }} </template>
                 </b-table>
 
                 <b-pagination :total-rows=assignmentsCount() :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -93,13 +91,12 @@
         methods: {
             assignmentsCount() {
                 return this.assignments.length;
+            },
+            formatDate(date) {
+                // Formats the date to a readable format for the UI.
+                if (!(date instanceof Date)) date = new Date(date)
+                return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
             }
-            // ,
-            // onFiltered (filteredItems) {
-            //     // Trigger pagination to update the number of buttons/pages due to filtering
-            //     this.totalRows = filteredItems.length
-            //     this.currentPage = 1
-            // }
         },
         async created() {
             // Fetch course information.
