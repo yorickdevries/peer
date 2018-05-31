@@ -39,66 +39,69 @@
 
             </b-row>
             <!--Peer Review Form-->
-            <b-card no-body class="mt-3">
+                <b-card no-body class="mt-3">
 
-                <!--Title-->
-                <b-card-body>
-                    <h4>Assignment Criteria</h4>
-                    <h6 class="card-subtitle text-muted">Give the peer review to one of your peers here.</h6>
-                </b-card-body>
+                    <!--Title-->
+                    <b-card-body>
+                        <h4>Assignment Criteria</h4>
+                        <h6 class="card-subtitle text-muted">Give the peer review to one of your peers here.</h6>
+                    </b-card-body>
 
-                <!--Questions-->
-                <b-list-group flush>
+                        <!--Questions-->
+                        <b-list-group flush>
 
-                    <!--Loop through all the questions.-->
-                    <b-list-group-item class="py-4" v-for="pair in peerReviewSorted.form" :key="pair.question.id + pair.question.type_question">
-                        <div class="mb-2">
-                            <h5 class="text-primary">Question {{ pair.question.question_number }} of {{ totalAmountOfQuestions }}</h5>
-                            <p>
-                                {{ pair.question.question }}
-                            </p>
-                        </div>
+                            <!--Loop through all the questions.-->
+                            <b-list-group-item class="py-4" v-for="pair in peerReviewSorted.form" :key="pair.question.id + pair.question.type_question">
+                                <div class="mb-2">
+                                    <h5 class="text-primary">Question {{ pair.question.question_number }} of {{ totalAmountOfQuestions }}</h5>
+                                    <p>
+                                        {{ pair.question.question }}
+                                    </p>
+                                </div>
 
-                        <!-- OPEN QUESTION -->
-                        <b-form-textarea v-if="pair.question.type_question === 'open'"
-                                         id="textarea1"
-                                         placeholder="Enter something"
-                                         :rows="3"
-                                         :max-rows="6"
-                                         v-model="pair.answer.answer" />
+                                <!-- OPEN QUESTION -->
+                                <b-form-textarea v-if="pair.question.type_question === 'open'"
+                                                 id="textarea1"
+                                                 placeholder="Enter something"
+                                                 :rows="3"
+                                                 :max-rows="6"
+                                                 v-model="pair.answer.answer"
+                                                 required/>
 
-                        <!-- RANGE QUESTION -->
-                        <StarRating v-else-if="pair.question.type_question === 'range'"
-                                    class="align-middle"
-                                    :border-color="'#007bff'"
-                                    :active-color="'#007bff'"
-                                    :border-width="2"
-                                    :item-size="20"
-                                    :spacing="5"
-                                    inline
-                                    :max-rating="7"
-                                    :show-rating="false"
-                                    v-model="pair.answer.answer"/>
+                                <!-- RANGE QUESTION -->
+                                <StarRating v-else-if="pair.question.type_question === 'range'"
+                                            class="align-middle"
+                                            :border-color="'#007bff'"
+                                            :active-color="'#007bff'"
+                                            :border-width="2"
+                                            :item-size="20"
+                                            :spacing="5"
+                                            inline
+                                            :max-rating="7"
+                                            :show-rating="false"
+                                            v-model="pair.answer.answer"/>
 
-                        <!-- MPC QUESTION -->
-                        <b-form-group v-else-if="pair.question.type_question === 'mc'">
-                            <b-form-radio-group
-                                    :options="transformOptionsToHTMLOptions(pair.question.option)"
-                                    v-model="pair.answer.answer"
-                                    stacked>
-                            </b-form-radio-group>
-                        </b-form-group>
+                                <!-- MPC QUESTION -->
+                                <b-form-group v-else-if="pair.question.type_question === 'mc'">
+                                    <b-form-radio-group
+                                            :options="transformOptionsToHTMLOptions(pair.question.option)"
+                                            v-model="pair.answer.answer"
+                                            stacked
+                                            required>
+                                    </b-form-radio-group>
+                                </b-form-group>
 
-                    </b-list-group-item>
+                            </b-list-group-item>
 
-                </b-list-group>
+                        </b-list-group>
 
-                <!--Save/Submit Button-->
-                <b-card-body>
-                    <b-button variant="success float-right" @click="submitPeerReview">Submit Review</b-button>
-                    <b-button variant="primary float-right mr-2" @click="savePeerReview">Save Review</b-button>
-                </b-card-body>
-            </b-card>
+                        <!--Save/Submit Button-->
+                        <b-card-body>
+                            <b-button type="submit" variant="success float-right" @click="submitPeerReview">Submit Review</b-button>
+                            <b-button variant="primary float-right mr-2" @click="savePeerReview">Save Review</b-button>
+                        </b-card-body>
+
+                </b-card>
         </template>
 
         <!--No Peer Review Active-->
@@ -138,6 +141,7 @@
 
 <script>
 import { StarRating } from 'vue-rate-it';
+import VueNotifications from 'vue-notifications'
 import api from "../../../api";
 
 export default {
@@ -193,14 +197,31 @@ export default {
             })
         },
         async submitPeerReview() {
-            // Save the peer review.
-            await api.submitPeerReview(this.peerReview)
-            await this.fetchPeerReview()
+
+            // Validate all fields (required).
+            let validated = true;
+            this.peerReview.form.forEach(pair => {
+                if (pair.answer.answer === null || pair.answer.answer === undefined) {
+                    validated = false
+                }
+            })
+
+            // Give validation error/success based on validation.
+            if (validated) {
+                // Save the peer review.
+                await api.submitPeerReview(this.peerReview)
+                await this.fetchPeerReview()
+                this.showSubmitMessage()
+            } else {
+                this.showSubmitErrorMessage()
+            }
+
         },
         async savePeerReview() {
             // Submit the peer review.
             await api.savePeerReview(this.peerReview.review.id, this.peerReview)
             await this.fetchPeerReview()
+            this.showSaveMessage()
         },
         async fetchPeerReview() {
             // Get the peer review ID from this assignment that is active.
@@ -210,6 +231,23 @@ export default {
             // Get peer review.
             let res = await api.getPeerReview(peerReviewID)
             this.peerReview = res.data
+        }
+    },
+    notifications: {
+        showSaveMessage: {
+            type: VueNotifications.types.success,
+            title: 'Saved',
+            message: 'Peer review has successfully been saved'
+        },
+        showSubmitMessage: {
+            type: VueNotifications.types.success,
+            title: 'Submit',
+            message: 'Peer review has successfully been submitted'
+        },
+        showSubmitErrorMessage: {
+            type: VueNotifications.types.error,
+            title: 'Submit',
+            message: 'All fields are required to submit!'
         }
     }
 }
