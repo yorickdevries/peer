@@ -40,6 +40,13 @@ const enrolledAsTeacherAssignmentCheckForPost = async (req: any, res: any) => {
     return await AuthorizationPS.executeCheckEnrollmentAsTeacher(req.body.course_id, req.userinfo.given_name);
 };
 
+/**
+ * Check enrollment of a user as teacher or ta for a given course
+ */
+const enrolledAsTAOrTeacherAssignment = async (req: any, res: any) => {
+    const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
+    return await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
+};
 
 
 
@@ -48,5 +55,6 @@ export default {
     authorizeCheck,
     enrolledAssignmentCheck,
     enrolledAsTeacherAssignmentCheck,
-    enrolledAsTeacherAssignmentCheckForPost
+    enrolledAsTeacherAssignmentCheckForPost,
+    enrolledAsTAOrTeacherAssignment
 };

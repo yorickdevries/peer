@@ -173,9 +173,14 @@ router.route("/:assignment_id/submission")
  */
 router.route("/:assignment_id/allsubmissions")
     .get(async (req, res) => {
-        res.json(await AssignmentPS.executeGetAllSubmissionsByAssignmentId(
-            req.params.assignment_id
-        ));
+        if (index.authorization.enrolledAsTAOrTeacherAssignment(req, res)) {
+            res.json(await AssignmentPS.executeGetAllSubmissionsByAssignmentId(
+                req.params.assignment_id
+            ));
+        } else {
+            res.sendStatus(401);
+        }
+
     });
 
 
