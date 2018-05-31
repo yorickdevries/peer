@@ -2,12 +2,10 @@
  * Default file imports for security middleware.
  */
 
-import authorizeCheck from './authorization'
+import authorization from './authorization'
 
 export default {
-    authorization: {
-        authorizeCheck
-    },
+    authorization: authorization,
     validation: {
 
     }

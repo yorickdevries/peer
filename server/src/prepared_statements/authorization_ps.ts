@@ -13,7 +13,7 @@ export default class AuthorizationPS {
      * @param {String} netId - netId
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCheckEnrollment(course_id: number, netId: String): Promise<pgPromise.queryResult> {
+    public static executeCheckEnrollment(course_id: number, netId: String): any {
         this.checkEnrollment.values = [course_id, netId];
         return Database.executeQuerySingleResult(this.checkEnrollment);
     }

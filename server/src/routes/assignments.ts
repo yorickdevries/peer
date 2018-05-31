@@ -69,7 +69,9 @@ const uploadGroups = multer({
  */
 router.route("/:assignment_id")
     .get(async (req, res) => {
-        if (index.authorization.authorizeCheck(req, res, next)) {
+        const auth = await index.authorization.enrolledAssignmentCheck(req, res);
+        console.log(auth.exists);
+        if (auth.exists) {
             res.json(await AssignmentPS.executeGetAssignmentById(
                 req.params.assignment_id
             ));

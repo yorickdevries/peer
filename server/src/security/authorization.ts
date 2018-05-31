@@ -18,8 +18,10 @@ const authorizeCheck = (req: any, res: any, next: any) => {
 /**
  * Check whether a user is enrolled to the course of the assignment it wants to access
  */
-const enrolledAssignmentCheck = async (req, res, next) => {
+const enrolledAssignmentCheck = async (req: any, res: any) => {
     const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
+    console.log(assignment.course_id);
+    console.log(req.userinfo.given_name);
     return await AuthorizationPS.executeCheckEnrollment(assignment.course_id, req.userinfo.given_name);
 };
 
@@ -27,4 +29,7 @@ const enrolledAssignmentCheck = async (req, res, next) => {
 
 
 
-export default authorizeCheck;
+export default {
+    authorizeCheck,
+    enrolledAssignmentCheck
+};
