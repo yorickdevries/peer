@@ -42,7 +42,7 @@
                         <b-button size="sm"
                                   :to="{ name: 'teaching-assistant-dashboard.course.assignment', params: { assignmentId: data.item.id } }"
                                   class="mr-1">
-                            Select
+                            Details
                         </b-button>
                     </template>
 
