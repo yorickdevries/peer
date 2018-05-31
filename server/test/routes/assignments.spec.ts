@@ -187,15 +187,15 @@ describe("API Assignment routes", () => {
      */
     it("GET /:assignment_id/submission", async () => {
         // test the router
-        InitLogin.initialize(router, "paulvanderlaan");
+        InitLogin.initialize(router, "henkjan");
         const res = await chai.request(router).get("/1/submission");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                id: 1,
-                user_netid: "paulvanderlaan",
+                id: 2,
+                user_netid: "henkjan",
                 assignment_id: 1,
-                file_path: "submission1.pdf"
+                file_path: "submission2.pdf"
             }
         ));
     });
@@ -207,23 +207,7 @@ describe("API Assignment routes", () => {
         // test the router
         InitLogin.initialize(router, "paulvanderlaan");
         const res = await chai.request(router).get("/1/allsubmissions");
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            [
-                {
-                    id: 1,
-                    user_netid: "paulvanderlaan",
-                    assignment_id: 1,
-                    file_path: "submission1.pdf"
-                },
-                {
-                    id: 2,
-                    user_netid: "henkjan",
-                    assignment_id: 1,
-                    file_path: "submission2.pdf"
-                }
-            ]
-        ));
+        expect(res.status).to.equal(401);
     });
 
     /**

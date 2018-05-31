@@ -7,10 +7,12 @@ export default class AuthorizationPS {
         "SELECT EXISTS(SELECT 1 FROM ENROLL WHERE course_id = $1 AND user_netid = $2)");
 
     public static checkEnrollmentAsTeacher: PreparedStatement = new PreparedStatement("check-enrollment-as-teacher",
-        "SELECT EXISTS(SELECT 1 FROM ENROLL WHERE course_id = $1 AND user_netid = $2 AND role = teacher)");
+        "SELECT EXISTS(SELECT 1 FROM ENROLL WHERE course_id = $1 AND user_netid = $2 AND role = 'teacher')");
 
     public static checkEnrollmentAsTAOrTeacher: PreparedStatement = new PreparedStatement("check-enrollment-ta-teacher",
-        "SELECT EXISTS(SELECT 1 FROM ENROLL WHERE course_id = $1 AND user_netid = $2 AND (role = teacher OR role = TA))");
+        "SELECT EXISTS(SELECT 1 FROM ENROLL WHERE course_id = $1 AND user_netid = $2 AND (role = 'teacher' OR role = 'TA'))");
+
+
     /**
      * Check with the course_id if a user is enrolled
      * @param {number} course_id - course_id

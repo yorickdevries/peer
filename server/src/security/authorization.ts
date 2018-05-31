@@ -18,34 +18,44 @@ const authorizeCheck = (req: any, res: any, next: any) => {
 /**
  * Check whether a user is enrolled to the course of the assignment it wants to access
  */
-const enrolledAssignmentCheck = async (req: any, res: any) => {
+const enrolledAssignmentCheck = async (req: any, res: any, next: any) => {
     const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-    console.log(assignment.course_id);
-    console.log(req.userinfo.given_name);
-    return await AuthorizationPS.executeCheckEnrollment(assignment.course_id, req.userinfo.given_name);
+    const authCheck =  await AuthorizationPS.executeCheckEnrollment(assignment.course_id, req.userinfo.given_name);
+    await response(res, authCheck.exists, next);
 };
 
 /**
  * Check whether a user in enrolled as teacher
  */
-const enrolledAsTeacherAssignmentCheck = async (req: any, res: any) => {
+const enrolledAsTeacherAssignmentCheck = async (req: any, res: any, next: any) => {
     const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-    return await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.userinfo.given_name);
+    const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.userinfo.given_name);
+    await response(res, authCheck.exists, next);
 };
 
 /**
  * Check whether a user in enrolled as teacher for post and put
  */
-const enrolledAsTeacherAssignmentCheckForPost = async (req: any, res: any) => {
-    return await AuthorizationPS.executeCheckEnrollmentAsTeacher(req.body.course_id, req.userinfo.given_name);
+const enrolledAsTeacherAssignmentCheckForPost = async (req: any, res: any, next: any) => {
+    const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(req.body.course_id, req.userinfo.given_name);
+    await response(res, authCheck.exists, next);
 };
 
 /**
  * Check enrollment of a user as teacher or ta for a given course
  */
-const enrolledAsTAOrTeacherAssignment = async (req: any, res: any) => {
+const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) => {
     const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-    return await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
+    const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
+    await response(res, authCheck.exists, next);
+};
+
+const response = (res: any, bool: boolean, next: any) => {
+    if (bool){
+        next();
+    } else {
+        res.sendStatus(401);
+    }
 };
 
 

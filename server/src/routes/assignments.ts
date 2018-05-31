@@ -68,16 +68,10 @@ const uploadGroups = multer({
  * @params assignment_id - assignment id
  */
 router.route("/:assignment_id")
-    .get(async (req, res) => {
-        const auth = await index.authorization.enrolledAssignmentCheck(req, res);
-        console.log(auth.exists);
-        if (auth.exists) {
+    .get(index.authorization.enrolledAssignmentCheck, async (req, res) => {
             res.json(await AssignmentPS.executeGetAssignmentById(
                 req.params.assignment_id
             ));
-        } else {
-            res.sendStatus(401);
-        }
     });
 
 
@@ -91,8 +85,7 @@ router.route("/:assignment_id")
  * @body publish_date - publish date.
  */
 router.route("/")
-    .post(async (req: any, res) => {
-        if (index.authorization.enrolledAsTeacherAssignmentCheckForPost(req, res)) {
+    .post(index.authorization.enrolledAsTeacherAssignmentCheckForPost, async (req: any, res, next) => {
             // File upload handling
             uploadAssignment(req, res, async function (err) {
                 // Error in case of too large file size
@@ -114,9 +107,6 @@ router.route("/")
                         fileName));
                 }
             });
-        } else {
-            res.sendStatus(401);
-        }
 
     });
 
@@ -131,17 +121,12 @@ router.route("/")
  * @body publish_date - publish date.
  */
 router.route("/:assignment_id")
-    .put(async (req, res) => {
-        if (index.authorization.enrolledAsTeacherAssignmentCheckForPost(req, res)) {
+    .put(index.authorization.enrolledAsTeacherAssignmentCheckForPost, async (req, res) => {
             res.json(await AssignmentPS.executeUpdateAssignmentById(
                 req.body.assignment_title,
                 req.body.assignment_description,
                 req.body.course_id,
                 req.params.assignment_id));
-        } else {
-            res.sendStatus(401);
-        }
-
     });
 
 /**
@@ -172,15 +157,10 @@ router.route("/:assignment_id/submission")
  * @params assignment_id - assignment_id
  */
 router.route("/:assignment_id/allsubmissions")
-    .get(async (req, res) => {
-        if (index.authorization.enrolledAsTAOrTeacherAssignment(req, res)) {
+    .get(index.authorization.enrolledAsTAOrTeacherAssignment, async (req, res) => {
             res.json(await AssignmentPS.executeGetAllSubmissionsByAssignmentId(
                 req.params.assignment_id
             ));
-        } else {
-            res.sendStatus(401);
-        }
-
     });
 
 
