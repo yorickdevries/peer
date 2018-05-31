@@ -2,7 +2,7 @@
     <div>
         <Navbar :links="navbarItems"/>
 
-        <keep-alive><router-view></router-view></keep-alive>
+        <router-view></router-view>
 
     </div>
 </template>

@@ -2,12 +2,14 @@
     <div>
         <b-container>
 
+            <!--Header-->
             <b-row>
                 <b-col>
                     <h1 class="mt-5">{{course.name}} | Teacher Course Home</h1>
                 </b-col>
             </b-row>
 
+            <!--Course description card-->
             <b-row>
                 <b-col>
                     <b-card no-body>
@@ -35,12 +37,6 @@
 import api from '../../api'
 
 export default {
-    async created() {
-        let id = this.$route.params.id
-        this.id = id
-        let res = await api.getCourse(id)
-        this.course = res.data
-    },
     data() {
         return {
             id: null,
@@ -49,6 +45,13 @@ export default {
                 description: null
             },
         }
+    },
+    async created() {
+        let id = this.$route.params.id
+        this.id = id
+        let res = await api.getCourse(id)
+        this.course = res.data
     }
+
 }
 </script>
