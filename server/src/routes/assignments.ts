@@ -92,27 +92,32 @@ router.route("/:assignment_id")
  */
 router.route("/")
     .post(async (req: any, res) => {
-        // File upload handling
-        uploadAssignment(req, res, async function (err) {
-            // Error in case of too large file size
-            if (err) {
-                res.json({error: err});
-            }
-            // Error in case of wrong file type
-            else if (req.fileValidationError) {
-                res.json({error: req.fileValidationError});
-            } else {
-                const fileName = req.file.filename;
-                // add to database
-                res.json(await AssignmentPS.executeAddAssignment(
-                    req.body.title,
-                    req.body.description,
-                    req.body.due_date,
-                    req.body.publish_date,
-                    req.body.course_id,
-                    fileName));
-            }
-        });
+        if (index.authorization.enrolledAsTeacherAssignmentCheck(req, res)) {
+            // File upload handling
+            uploadAssignment(req, res, async function (err) {
+                // Error in case of too large file size
+                if (err) {
+                    res.json({error: err});
+                }
+                // Error in case of wrong file type
+                else if (req.fileValidationError) {
+                    res.json({error: req.fileValidationError});
+                } else {
+                    const fileName = req.file.filename;
+                    // add to database
+                    res.json(await AssignmentPS.executeAddAssignment(
+                        req.body.title,
+                        req.body.description,
+                        req.body.due_date,
+                        req.body.publish_date,
+                        req.body.course_id,
+                        fileName));
+                }
+            });
+        } else {
+            res.sendStatus(401)
+        }
+
     });
 
 
