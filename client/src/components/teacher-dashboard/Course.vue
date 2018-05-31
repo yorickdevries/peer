@@ -29,6 +29,13 @@
                 </b-col>
             </b-row>
 
+            <!--Edit button-->
+            <b-row>
+                <b-col>
+                    <b-button disabled variant="success" class="mt-3" :to="{ name: 'teacher-dashboard.assignments.create' }">Edit course</b-button>
+                </b-col>
+            </b-row>
+
         </b-container>
     </div>
 </template>
