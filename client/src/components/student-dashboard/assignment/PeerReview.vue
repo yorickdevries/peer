@@ -47,8 +47,6 @@
                         <h6 class="card-subtitle text-muted">Give the peer review to one of your peers here.</h6>
                     </b-card-body>
 
-                    <b-form @sumbit.prevent="submitPeerReview">
-
                         <!--Questions-->
                         <b-list-group flush>
 
@@ -99,11 +97,10 @@
 
                         <!--Save/Submit Button-->
                         <b-card-body>
-                            <b-button type="submit" variant="success float-right">Submit Review</b-button>
+                            <b-button type="submit" variant="success float-right" @click="submitPeerReview">Submit Review</b-button>
                             <b-button variant="primary float-right mr-2" @click="savePeerReview">Save Review</b-button>
                         </b-card-body>
 
-                    </b-form>
                 </b-card>
         </template>
 
@@ -144,6 +141,7 @@
 
 <script>
 import { StarRating } from 'vue-rate-it';
+import VueNotifications from 'vue-notifications'
 import api from "../../../api";
 
 export default {
@@ -199,14 +197,31 @@ export default {
             })
         },
         async submitPeerReview() {
-            // Save the peer review.
-            await api.submitPeerReview(this.peerReview)
-            await this.fetchPeerReview()
+
+            // Validate all fields (required).
+            let validated = true;
+            this.peerReview.form.forEach(pair => {
+                if (pair.answer.answer === null || pair.answer.answer === undefined) {
+                    validated = false
+                }
+            })
+
+            // Give validation error/success based on validation.
+            if (validated) {
+                // Save the peer review.
+                await api.submitPeerReview(this.peerReview)
+                await this.fetchPeerReview()
+                this.showSubmitMessage()
+            } else {
+                this.showSubmitErrorMessage()
+            }
+
         },
         async savePeerReview() {
             // Submit the peer review.
             await api.savePeerReview(this.peerReview.review.id, this.peerReview)
             await this.fetchPeerReview()
+            this.showSaveMessage()
         },
         async fetchPeerReview() {
             // Get the peer review ID from this assignment that is active.
@@ -216,6 +231,23 @@ export default {
             // Get peer review.
             let res = await api.getPeerReview(peerReviewID)
             this.peerReview = res.data
+        }
+    },
+    notifications: {
+        showSaveMessage: {
+            type: VueNotifications.types.success,
+            title: 'Saved',
+            message: 'Peer review has successfully been saved'
+        },
+        showSubmitMessage: {
+            type: VueNotifications.types.success,
+            title: 'Submit',
+            message: 'Peer review has successfully been submitted'
+        },
+        showSubmitErrorMessage: {
+            type: VueNotifications.types.error,
+            title: 'Submit',
+            message: 'All fields are required to submit!'
         }
     }
 }
