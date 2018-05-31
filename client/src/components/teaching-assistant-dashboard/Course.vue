@@ -2,7 +2,7 @@
     <div>
         <b-container>
 
-            <h1 class="mt-5"> Course dashboard</h1>
+            <h1 class="mt-5">Course dashbosadfsfard</h1>
 
             <b-card>
                 <b-row>
@@ -24,7 +24,7 @@
                 </b-row>
 
                 <b-table striped
-                         bordered
+                         outlined
                          show-empty
                          stacked="md"
                          :items=assignments
@@ -37,11 +37,23 @@
                     </template>
                     <template slot="due_date" slot-scope="data"> {{ formatDate(data.value) }} </template>
                     <template slot="publish_date" slot-scope="data"> {{ formatDate(data.value) }} </template>
+
+                    <template slot="actions" slot-scope="data">
+                        <b-button size="sm"
+                                  :to="{ name: 'teaching-assistant-dashboard.course.assignment', params: { assignmentId: data.item.id } }"
+                                  class="mr-1">
+                            Select
+                        </b-button>
+                    </template>
+
                 </b-table>
 
                 <b-pagination :total-rows=assignmentsCount() :per-page="perPage" v-model="currentPage" class="my-0" />
 
             </b-card>
+
+
+
 
         </b-container>
     </div>
@@ -73,7 +85,14 @@
                     name: null,
                     description: null
                 },
-                fields: [ 'title', 'description', 'due_date', 'publish_date', 'filename' ],
+                fields: [
+                    { key:'title', label:'Title' },
+                    { key:'description', label:'Description' },
+                    { key:'publish_date', label:'Publish date' },
+                    { key:'due_date', label:'Due date' },
+                    { key:'filename', label:'Download' },
+                    { key:'actions', label:'Action' }
+                ],
                 currentPage: 1,
                 perPage: 5,
                 pageOptions: [ 5, 10, 15, 25, 50 ],
@@ -100,9 +119,10 @@
         },
         async created() {
             // Fetch course information.
-            let course = await api.getCourse(this.$route.params.id);
-            let assignments = await api.getCourseAssignments(this.$route.params.id);
+            let course = await api.getCourse(this.$route.params.courseId);
+            let assignments = await api.getCourseAssignments(this.$route.params.courseId);
 
+            console.log()
             // Assign fetched data.
             this.assignments = assignments.data;
             this.course = course.data;
