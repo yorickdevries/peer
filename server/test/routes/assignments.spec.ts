@@ -43,6 +43,7 @@ describe("API Assignment routes", () => {
             publish_date: new Date("2018-04-01T20:30:00.000Z"),
             id: 1,
             course_id: 1,
+            reviews_per_user: 2,
             filename: "assignment1.pdf"}));
     });
 
@@ -113,7 +114,7 @@ describe("API Assignment routes", () => {
             // tslint:disable-next-line
             comment: null,
             user_netid: "henkjan",
-            submission_id: 4,
+            submission_id: 5,
             rubric_assignment_id: 2,
             done: false}
         ));

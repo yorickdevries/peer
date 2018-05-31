@@ -103,6 +103,7 @@ router.route("/")
                     req.body.due_date,
                     req.body.publish_date,
                     req.body.course_id,
+                    req.body.reviews_per_user,
                     fileName));
             }
         });

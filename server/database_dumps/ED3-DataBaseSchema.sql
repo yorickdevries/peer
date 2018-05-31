@@ -9,7 +9,8 @@ CREATE TABLE AssignmentList (
     due_date timestamptz NOT NULL,
     publish_date timestamptz NOT NULL,
     id SERIAL,
-    Course_id int NOT NULL,
+    course_id int NOT NULL,
+    reviews_per_user int NOT NULL,
     filename varchar(100) NOT NULL,
     CONSTRAINT AssignmentList_pk PRIMARY KEY (id)
 );

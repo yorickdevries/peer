@@ -62,7 +62,8 @@ describe("CoursePreparedStatement Test", () => {
             "filename": "assignment1.pdf",
             "id": 1,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
-            "title": "Assignment 1"
+            "title": "Assignment 1",
+            "reviews_per_user": 2
         },
         {
             "course_id": 1,
@@ -71,7 +72,8 @@ describe("CoursePreparedStatement Test", () => {
             "filename": "assignment2.pdf",
             "id": 2,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
-            "title": "Assignment 2"
+            "title": "Assignment 2",
+            "reviews_per_user": 2
         }]);
     });
 
