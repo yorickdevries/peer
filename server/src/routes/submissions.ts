@@ -95,8 +95,9 @@ router.post("/", async (req: any, res) => {
             const groupId = req.body.groupId;
             const assignmentId = req.body.assignmentId;
             const fileName = req.file.filename;
+            const date = new Date();
             // add to database
-            res.json(await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName));
+            res.json(await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName, date));
         }
     });
 });

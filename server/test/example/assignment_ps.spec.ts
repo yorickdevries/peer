@@ -128,14 +128,16 @@ describe("AssignmentPreparedStatements Test", () => {
             "id": 1,
             "group_id": 10,
             "assignment_id": 1,
-            "user_netid": "paulvanderlaan"
+            "user_netid": "paulvanderlaan",
+            "date": new Date("2018-05-01T20:30:00Z")
         },
         {
             "file_path": "submission2.pdf",
             "id": 2,
             "group_id": 10,
             "assignment_id": 1,
-            "user_netid": "henkjan"
+            "user_netid": "henkjan",
+            "date": new Date("2018-05-01T20:30:00Z")
         }]);
     });
 

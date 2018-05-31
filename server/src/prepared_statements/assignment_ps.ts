@@ -17,7 +17,7 @@ export default class AssignmentPS {
     private static updateAssignmentById: PreparedStatement = new PreparedStatement("update-assignment-by-id",
         "UPDATE assignmentlist SET title=$1, description=$2, course_id=$3 WHERE id=$4  RETURNING title, description, id, course_id, filename");
 
-    private static getSubmissionByAssignmentId: PreparedStatement = new PreparedStatement("get-submission-by-assignment",
+    private static getSubmissionsByAssignmentId: PreparedStatement = new PreparedStatement("get-submissions-by-assignment-id",
         "SELECT * FROM submission WHERE user_netid = $1 AND assignment_id = $2");
 
     private static getAllSubmissionsByAssignmentId: PreparedStatement = new PreparedStatement("get-all-subbmissions-by-assignmentId",
@@ -133,8 +133,8 @@ export default class AssignmentPS {
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeGetSubmissionByAssignmentId(netId: string, assignmentId: number): Promise<pgPromise.queryResult> {
-        this.getSubmissionByAssignmentId.values = [netId, assignmentId];
-        return Database.executeQuerySingleResult(this.getSubmissionByAssignmentId);
+        this.getSubmissionsByAssignmentId.values = [netId, assignmentId];
+        return Database.executeQuery(this.getSubmissionsByAssignmentId);
     }
 
     // Executes a 'get-all-groups-per-assignment' query

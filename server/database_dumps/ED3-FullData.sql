@@ -150,19 +150,19 @@ INSERT INTO public.assignmentgroup(
 	VALUES (1, 10);
 
 INSERT INTO public.submission(
-	user_netid, group_id, assignment_id, file_path)
+	user_netid, group_id, assignment_id, file_path, date)
 	VALUES
-	    ('paulvanderlaan', 10, 4, 'submission1.pdf'),
-	    ('paulvanderlaan', 10, 5, 'submission1.pdf'),
-	    ('paulvanderlaan', 10, 6, 'submission1.pdf'),
-	    ('henkjan', 10, 1, 'submission2.pdf'),
-	    ('henkjan', 10, 2, 'submission2.pdf'),
-	    ('henkjan', 10, 3, 'submission2.pdf'),
-	    ('henkjan', 10, 4, 'submission2.pdf'),
-	    ('henkjan', 10, 5, 'submission2.pdf'),
-	    ('henkjan', 10, 6, 'submission2.pdf'),
-	    ('henkjan', 10, 7, 'submission2.pdf'),
-	    ('henkjan', 10, 8, 'submission2.pdf')
+	    ('paulvanderlaan', 10, 4, 'submission1.pdf', '2018-05-01T20:30:00Z'),
+	    ('paulvanderlaan', 10, 5, 'submission1.pdf', '2018-05-01T20:30:00Z'),
+	    ('paulvanderlaan', 10, 6, 'submission1.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 2, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 3, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 4, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 5, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 6, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 7, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 8, 'submission2.pdf', '2018-05-01T20:30:00Z')
 	;
 
 INSERT INTO public.review(
