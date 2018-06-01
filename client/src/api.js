@@ -31,6 +31,9 @@ export default {
     createAssignment: async(assignment) => {
         return client.post('/assignments', assignment)
     },
+    getAssignmentReviews(assignmentId) {
+        return client.get(`/assignments/${assignmentId}/reviews`)
+    },
     getCurrentPeerReview(assignmentId) {
         return client.get(`assignments/${assignmentId}/review`)
     },
