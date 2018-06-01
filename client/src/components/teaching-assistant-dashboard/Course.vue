@@ -122,7 +122,6 @@
             let course = await api.getCourse(this.$route.params.courseId);
             let assignments = await api.getCourseAssignments(this.$route.params.courseId);
 
-            console.log()
             // Assign fetched data.
             this.assignments = assignments.data;
             this.course = course.data;
