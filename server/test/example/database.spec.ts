@@ -1,4 +1,5 @@
 import Database from "../../src/database";
+import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 
 import { expect } from "chai";
 import "mocha";
@@ -56,5 +57,34 @@ describe("Database Test", () => {
     // wait for database promise to finish
     await dbPromise;
     expect(result).to.equal("error");
+  });
+
+  it("database query single result", async () => {
+    const statement = new PreparedStatement("user-count",
+    "SELECT COUNT(1) FROM userlist");
+    const result = await Database.executeQuerySingleResult(statement);
+    expect(result).to.deep.equal({ count: "3" });
+  });
+
+  it("database query any result", async () => {
+    const statement = new PreparedStatement("get-all-users",
+    "SELECT * FROM userlist");
+    const result = await Database.executeQuery(statement);
+    expect(result.length).to.equal(3);
+  });
+
+  it("database error query single result", async () => {
+    const statement = new PreparedStatement("get-all-users2",
+    "SELECT * FROM userlist");
+    const result = await Database.executeQuerySingleResult(statement);
+    expect(result.error).to.equal("There was a problem executing the information to the database.");
+  });
+
+  it("database error query any result", async () => {
+    const statement = new PreparedStatement("invalid-query",
+    "THIS IS NOT A VALID QUERY");
+    const result = await Database.executeQuery(statement);
+    console.log(result);
+    expect(result.error).to.equal("There was a problem executing the information to the database.");
   });
 });

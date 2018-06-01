@@ -1,32 +1,13 @@
 import Database from "../database";
 import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
-import express = require("express");
 
+/**
+ * Executes User prepared statements in the database.
+ *
+ * @export
+ * @class UserPS
+ */
 export default class UserPS {
-    public static addUser: PreparedStatement = new PreparedStatement("add-user",
-        'INSERT INTO "userlist" ("netid", "email") VALUES ($1, $2) RETURNING *');
-
-    public static getUserById: PreparedStatement = new PreparedStatement("get-user-by-id",
-        'SELECT * FROM "userlist" WHERE "netid" LIKE $1');
-
-    private static countUserById: PreparedStatement = new PreparedStatement("count-user-by-id",
-        'SELECT COUNT(1) FROM "userlist" WHERE "netid" = $1');
-
-    public static getUserByEmail: PreparedStatement = new PreparedStatement("get-user-by-email",
-        'SELECT * FROM "userlist" WHERE "email" LIKE $1');
-
-    public static getCoursesIdById: PreparedStatement = new PreparedStatement("get-courses-by-id",
-        'SELECT * FROM "enroll" WHERE "user_netid" LIKE $1');
-
-    public static getGroupsById: PreparedStatement = new PreparedStatement("get-groups-by-id",
-        'SELECT * FROM "groupusers" WHERE "user_netid" LIKE $1');
-
-    public static getSubmissionsById: PreparedStatement = new PreparedStatement("get-submissions-by-id",
-        'SELECT * FROM "submission" WHERE "user_netid" LIKE $1');
-
-    public static getReviewsById: PreparedStatement = new PreparedStatement("get-reviews-by-id",
-        'SELECT * FROM "review" WHERE "user_netid" LIKE $1');
-
     /**
      * Executes an 'add user query'.
      * @param {string} netId - a net id.
@@ -34,8 +15,10 @@ export default class UserPS {
      * @return {any} a query result.
      */
     public static executeAddUser(netId: string, email: string | undefined): Promise<pgPromise.queryResult> {
-        this.addUser.values = [netId, email];
-        return Database.executeQuerySingleResult(this.addUser);
+        const statement = new PreparedStatement("add-user",
+        'INSERT INTO "userlist" ("netid", "email") VALUES ($1, $2) RETURNING *');
+        statement.values = [netId, email];
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
@@ -44,15 +27,26 @@ export default class UserPS {
      * @return {any} a query result.
      */
     public static async executeGetUserById(netId: string): Promise<pgPromise.queryResult> {
-        this.getUserById.values = [netId];
-        return Database.executeQuerySingleResult(this.getUserById);
+        const statement = new PreparedStatement("get-user-by-id",
+        'SELECT * FROM "userlist" WHERE "netid" LIKE $1');
+        statement.values = [netId];
+        return Database.executeQuerySingleResult(statement);
     }
 
 
-    // counts the amount of assignments with this specific id
+    /**
+     * Counts the amount of assignments with this specific id.
+     *
+     * @static
+     * @param {string} netId
+     * @returns {Promise<pgPromise.queryResult>}
+     * @memberof UserPS
+     */
     public static executeCountUserById(netId: string): Promise<pgPromise.queryResult> {
-        this.countUserById.values = [netId];
-        return Database.executeQuerySingleResult(this.countUserById);
+        const statement = new PreparedStatement("count-user-by-id",
+        'SELECT COUNT(1) FROM "userlist" WHERE "netid" = $1');
+        statement.values = [netId];
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
@@ -61,8 +55,10 @@ export default class UserPS {
      * @return {any} a query result.
      */
     public static executeGetUserByEmail(email: string): Promise<pgPromise.queryResult> {
-        this.getUserByEmail.values = [email];
-        return Database.executeQuery(this.getUserByEmail);
+        const statement = new PreparedStatement("get-user-by-email",
+        'SELECT * FROM "userlist" WHERE "email" LIKE $1');
+        statement.values = [email];
+        return Database.executeQuery(statement);
     }
 
     /**
@@ -71,8 +67,10 @@ export default class UserPS {
      * @return {any} a query result.
      */
     public static executeGetCoursesIdById(userId: number): Promise<pgPromise.queryResult> {
-        this.getCoursesIdById.values = [userId];
-        return Database.executeQuery(this.getCoursesIdById);
+        const statement = new PreparedStatement("get-courses-by-id",
+        'SELECT * FROM "enroll" WHERE "user_netid" LIKE $1');
+        statement.values = [userId];
+        return Database.executeQuery(statement);
     }
 
     /**
@@ -81,8 +79,10 @@ export default class UserPS {
      * @return {any} a query result.
      */
     public static executeGetGroupsById(userId: number): Promise<pgPromise.queryResult> {
-        this.getGroupsById.values = [userId];
-        return Database.executeQuery(this.getGroupsById);
+        const statement = new PreparedStatement("get-groups-by-id",
+        'SELECT * FROM "groupusers" WHERE "user_netid" LIKE $1');
+        statement.values = [userId];
+        return Database.executeQuery(statement);
     }
 
     /**
@@ -91,8 +91,10 @@ export default class UserPS {
      * @return {any} a query result.
      */
     public static executeGetSubmissionById(userId: number): Promise<pgPromise.queryResult> {
-        this.getSubmissionsById.values = [userId];
-        return Database.executeQuery(this.getSubmissionsById);
+        const statement = new PreparedStatement("get-submissions-by-id",
+        'SELECT * FROM "submission" WHERE "user_netid" LIKE $1');
+        statement.values = [userId];
+        return Database.executeQuery(statement);
     }
 
     /**
@@ -101,7 +103,9 @@ export default class UserPS {
      * @return {any} a query result.
      */
     public static executeGetReviewById(userId: number): Promise<pgPromise.queryResult> {
-        this.getReviewsById.values = [userId];
-        return Database.executeQuery(this.getReviewsById);
+        const statement = new PreparedStatement("get-reviews-by-id",
+        'SELECT * FROM "review" WHERE "user_netid" LIKE $1');
+        statement.values = [userId];
+        return Database.executeQuery(statement);
     }
 }

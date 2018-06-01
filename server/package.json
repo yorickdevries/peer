@@ -5,7 +5,7 @@
   "scripts": {
     "start": "npm run build && npm run db_init && npm run start_server",
     "start_server": "node ./dist/bin/www.js",
-    "tslint": "tslint 'src/**/*.ts' 'test/**/*.ts'",
+    "tslint": "tslint --project ./tsconfig_tslint.json",
     "build": "npm run tsc",
     "tsc": "tsc",
     "test": "mocha --timeout 10000",
