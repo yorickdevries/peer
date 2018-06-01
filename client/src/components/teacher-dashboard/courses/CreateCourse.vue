@@ -2,23 +2,23 @@
     <div>
         <b-container>
 
+            <!--Header-->
             <b-row>
                 <b-col>
-                    <h1 class="mt-5">Managed Courses</h1>
-                    <b-breadcrumb :items="items"/>
+                    <h1 class="mt-5">Create a new course</h1>
                 </b-col>
             </b-row>
 
+            <!--Create course card-->
             <b-row>
                 <b-col>
-                    <b-card title="Create Course">
+                    <b-card>
                         <b-form @submit.prevent="onSubmit">
                             <b-form-group label="Name">
                                 <b-form-input   v-model="course.name"
                                                 type="text"
                                                 placeholder="Please enter the course name here"
                                                 required>
-
                                 </b-form-input>
                             </b-form-group>
                             <b-form-group label="Description">
@@ -26,7 +26,6 @@
                                                 type="text"
                                                 placeholder="Please enter the course description"
                                                 required>
-
                                 </b-form-input>
                             </b-form-group>
                             <b-button type="submit" variant="primary">Create new Course</b-button>
@@ -34,6 +33,7 @@
                     </b-card>
                 </b-col>
             </b-row>
+
         </b-container>
     </div>
 </template>
@@ -42,13 +42,11 @@
 import api from "../../../api";
 
 export default {
-    async created() {
-    },
     data() {
         return {
             items: [{
                 text: 'Dashboard',
-                to: { name: 'student-dashboard.index'}
+                to: { name: 'landing-page'}
             }, {
                 text: 'Courses',
                 to: { name: 'student-dashboard'}
@@ -58,6 +56,8 @@ export default {
                 description: null
             }
         }
+    },
+    async created() {
     },
     methods: {
         async onSubmit() {

@@ -1,8 +1,8 @@
 <template>
     <div>
-
         <b-container>
 
+            <!--Header-->
             <b-row>
                 <b-col>
                     <h1 class="mt-5">Available Courses</h1>
@@ -19,7 +19,7 @@
                         </p>
                         <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                             <b-button variant="primary" :to="{ name: 'student-dashboard.course.home', params: { courseId: course.id } }">Enter as Student</b-button>
-                            <b-button variant="primary" :to="{ name: 'teaching-assistant-dashboard.course', params: { id: course.id } }">Enter as TA</b-button>
+                            <b-button variant="primary" :to="{ name: 'teaching-assistant-dashboard.course.home', params: { courseId: course.id } }">Enter as TA</b-button>
                             <b-button variant="primary" :to="{ name: 'teacher-dashboard.course', params: { id: course.id } }">Enter as Teacher</b-button>
                         </div>
                     </b-card>
@@ -35,14 +35,15 @@
 import api from '../../api'
 
 export default {
-    async created() {
-        let res = await api.getEnrolledCourses()
-        this.courses = res.data
-    },
     data() {
         return {
-            courses: null,
+            courses: [],
         }
+    },
+    async created() {
+        // Fetch courses that user can access.
+        let res = await api.getEnrolledCourses()
+        this.courses = res.data
     }
 }
 </script>

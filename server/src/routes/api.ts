@@ -7,6 +7,7 @@ import rubrics from "./rubric";
 import submissions from "./submissions";
 import session from "express-session";
 import { oidc } from "../express-oidc";
+import security from "../security";
 
 const router = express();
 
@@ -32,16 +33,7 @@ router.get("/authenticated", function (req: any, res) {
     res.json({ authenticated: req.isAuthenticated() });
 });
 
-
-// Only logged in users can access the API
-router.use(function (req: any, res, next) {
-    if (req.isAuthenticated()) {
-        console.log(req.userinfo.given_name + " accesses the API");
-        next();
-    } else {
-        next(new Error("Not Authenticated"));
-    }
-});
+router.use("*", security.authorization.authorizeCheck);
 
 // Routing
 router.use("/assignments", assignments);
@@ -55,6 +47,20 @@ router.get("/user", function (req: any, res, next) {
     res.json({
         user: req.userinfo
     });
+
+// error handler
+router.use(function (err: any, req: any, res: any, next: any) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get("env") === "development" ? err : {};
+    // Print error to console
+    console.log("Error: " + err.message);
+
+    // render the error page
+    res.status(err.status || 500);
+    res.json({ error: "There is an error in your API request" });
+  });
+
 });
 
 export default router;

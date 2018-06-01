@@ -50,11 +50,6 @@
 import api from "../../api"
 
 export default {
-    async created() {
-        let resAssignment = await api.getCourseAssignments(this.$route.params.courseId)
-        this.assignments = resAssignment.data
-        console.log(resAssignment.data)
-    },
     data() {
         return {
             items: [
@@ -76,7 +71,12 @@ export default {
             return this.assignments.filter(assignment => new Date(assignment.due_date) < now)
 
         }
-    }
+    },
+    async created() {
+        // Fetch assignments.
+        let resAssignment = await api.getCourseAssignments(this.$route.params.courseId)
+        this.assignments = resAssignment.data
+    },
 }
 
 </script>

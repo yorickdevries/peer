@@ -9,7 +9,7 @@
                 <p>
                     {{ assignment.description }}
                 </p>
-                <b-button variant="primary w-100">Download Assignment</b-button>
+                <b-button variant="primary w-100" :href="assignmentFilePath" >Download Assignment</b-button>
                 </b-card>
             </b-col>
 
@@ -25,11 +25,20 @@
                     <b-alert v-else show variant="danger">You have not yet made a submission</b-alert>
 
                     <!-- Modal Button -->
-                    <b-button v-b-modal="'uploadModal'"
-                              variant="primary"
-                              @click="resetUploadModal">
+                    <b-button   :disabled="submission.file_path !== null"
+                                v-b-modal="'uploadModal'"
+                                variant="primary"
+                                @click="onFileReset">
                         Upload / Overwrite File
                     </b-button>
+
+                    <b-button   :disabled="submission.file_path === null"
+                                variant="danger"
+                                class="ml-2"
+                                @click="deleteSubmission">
+                        Delete
+                    </b-button>
+
 
                     <!-- Upload Modal-->
                     <b-modal    id="uploadModal"
@@ -37,7 +46,7 @@
                                 hide-footer
                                 title="Upload Submission">
 
-                        <b-progress :value="fileProgress" animated class="mb-3" />
+                        <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
 
                         <b-alert show v-if="uploadSuccess === true">Upload was successful.</b-alert>
                         <b-alert show v-if="uploadSuccess === false">Something went wrong with uploading. Try again.</b-alert>
@@ -53,8 +62,9 @@
                                 class="mt-3"
                                 @click="submitSubmission()"
                                 v-if="uploadSuccess === null">Upload</b-button>
-
                     </b-modal>
+
+
                 </b-card>
             </b-col>
 
@@ -66,14 +76,9 @@
 import api from "../../../api"
 
 export default {
-    async created() {
-        // Fetch assignment & submission (if it exists).
-        await this.fetchAssignment()
-        await this.fetchSubmission()
-    },
     data() {
         return {
-            file: true,
+            file: null,
             fileProgress: 0,
             uploadSuccess: null,
             acceptFiles: ".pdf",
@@ -98,10 +103,19 @@ export default {
             // Get the submission file path.
             return `/api/submissions/${this.submission.id}/file`
         },
+        assignmentFilePath() {
+            // Get the assignment file path.
+            return `/api/assignments/${this.assignment.id}/file`
+        },
         hasUploadedSubmission() {
-            // Whether a (first) submission has been made to this assignment.
+            // Returns whether an submission has been uploaded or not.
             return this.submission.id !== undefined
         }
+    },
+    async created() {
+        // Fetch assignment & submission.
+        await this.fetchAssignment()
+        await this.fetchSubmission()
     },
     methods: {
         async submitSubmission() {
@@ -125,27 +139,44 @@ export default {
             // Check whether upload was successful or not.
             res.data.error === undefined ? this.uploadSuccess = true : this.uploadSuccess = false
 
-            console.log(res)
+            // Re-fetch new submission.
+            await this.fetchSubmission()
         },
         async deleteSubmission() {
             // Delete the current submission.
             await api.deleteSubmission(this.submission.id)
-        },
-        async fetchSubmission() {
-            // Get the current submission (hardcoded for now).
-            let res = await api.getSubmission(4)
-            this.submission = res.data
+            await this.fetchSubmission()
         },
         async fetchAssignment() {
             // Fetch the assignment.
             let res = await api.getAssignment(this.$route.params.assignmentId)
             this.assignment = res.data
         },
-        resetUploadModal() {
+        async fetchSubmission() {
+            // Fetch the submission.
+            let res = await api.getAssignmentSubmission(this.assignment.id)
+
+            // If submission is not available, clear it.
+            if (!res.data.error) {
+                this.submission = res.data
+            }
+            else {
+                this.onSubmissionReset()
+            }
+
+        },
+        onFileReset() {
             // Reset the upload modal state.
             this.fileProgress = 0
             this.file = false
             this.uploadSuccess = null
+        },
+        onSubmissionReset() {
+            this.submission =  {
+                user_netid: null,
+                assignment_id: null,
+                file_path: null
+            }
         }
     }
 }

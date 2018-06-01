@@ -85,7 +85,7 @@ export default class Database {
         try {
             return await Database.db.one(statement);
         } catch (err) {
-          console.log(err);
+          console.log("Error " + err + "\nStatement: " + statement);
             return {
                 statement: statement,
                 error: "There was a problem executing the information to the database."

@@ -13,6 +13,16 @@ export default [
                 path: 'create',
                 name: 'teacher-dashboard.courses.create',
                 component: () => import('../components/teacher-dashboard/courses/CreateCourse')
+            },
+            {
+                path: 'courses/:id/assignments',
+                name: 'teacher-dashboard.assignments',
+                component: () => import('../components/teacher-dashboard/Assignments')
+            },
+            {
+                path: 'courses/:id/create-assignment',
+                name: 'teacher-dashboard.assignments.create',
+                component: () => import('../components/teacher-dashboard/assignments/CreateAssignment')
             }
         ]
     }

@@ -2,8 +2,9 @@
     <div>
         <Navbar :title="course.name" :links="navbarItems"/>
 
-        <keep-alive exclude="Assignment"><router-view></router-view></keep-alive>
-
+        <keep-alive exclude="Assignment">
+            <router-view></router-view>
+        </keep-alive>
     </div>
 </template>
 
@@ -12,9 +13,8 @@ import api from "../../api"
 import Navbar from "../Navbar"
 
 export default {
-    async created() {
-        let res = await api.getCourse(this.$route.params.courseId)
-        this.course = res.data
+    components: {
+        Navbar
     },
     data() {
         return {
@@ -27,9 +27,11 @@ export default {
             }
         }
     },
-    components: {
-        Navbar
-    }
+    async created() {
+        // Fetch course information (for navbar).
+        let res = await api.getCourse(this.$route.params.courseId)
+        this.course = res.data
+    },
 }
 </script>
 
