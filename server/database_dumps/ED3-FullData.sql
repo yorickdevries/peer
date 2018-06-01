@@ -180,19 +180,19 @@ INSERT INTO public.submission(
 	;
 
 INSERT INTO public.review(
-	comment, user_netid, submission_id, rubric_assignment_id)
+	comment, user_netid, submission_id, rubric_assignment_id, done)
 	VALUES
-	    ('Very good', 'henkjan', 1, 4),
-	    ('Impressive', 'henkjan', 2, 5),
-	    ('Excellent', 'henkjan', 3, 6),
-	    ('Wow!', 'paulvanderlaan', 4, 1),
-	    ('Wow!', 'paulvanderlaan', 5, 2),
-	    ('Wow!', 'paulvanderlaan', 6, 3),
-	    ('Wow!', 'paulvanderlaan', 7, 4),
-	    ('Wow!', 'paulvanderlaan', 8, 5),
-	    ('Wow!', 'paulvanderlaan', 8, 6),
-	    ('Wow!', 'paulvanderlaan', 8, 7),
-	    ('Wow!', 'paulvanderlaan', 8, 8)
+	    ('Very good', 'henkjan', 1, 4, true),
+	    ('Impressive', 'henkjan', 2, 5, false),
+	    ('Excellent', 'henkjan', 3, 6, false),
+	    ('Wow!', 'paulvanderlaan', 4, 1, false),
+	    ('Wow!', 'paulvanderlaan', 5, 2, false),
+	    ('Wow!', 'paulvanderlaan', 6, 3, false),
+	    ('Wow!', 'paulvanderlaan', 7, 4, false),
+	    ('Wow!', 'paulvanderlaan', 8, 5, false),
+	    ('Wow!', 'paulvanderlaan', 8, 6, false),
+	    ('Wow!', 'paulvanderlaan', 8, 7, false),
+	    ('Wow!', 'paulvanderlaan', 8, 8, false)
 	;
 
 INSERT INTO public.mcanswer(
