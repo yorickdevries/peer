@@ -113,7 +113,7 @@ export default {
         }
     },
     async created() {
-        this.assignment.course_id = this.$route.params.id
+        this.assignment.course_id = this.$route.params.courseId
     },
     methods: {
         async onSubmit() {
@@ -130,7 +130,7 @@ export default {
             let res = await api.createAssignment(formData)
             console.log(this.assignment)
             console.log(res)
-            this.$router.push({name: 'teacher-dashboard.assignments', params: {id: this.assignment.course_id}})
+            this.$router.push({name: 'teacher-dashboard.assignments', params: {courseId: this.assignment.course_id}})
         }
     }
 }

@@ -20,7 +20,7 @@
                         <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                             <b-button variant="primary" :to="{ name: 'student-dashboard.course.home', params: { courseId: course.id } }">Enter as Student</b-button>
                             <b-button variant="primary" :to="{ name: 'teaching-assistant-dashboard.course.home', params: { courseId: course.id } }">Enter as TA</b-button>
-                            <b-button variant="primary" :to="{ name: 'teacher-dashboard.course', params: { id: course.id } }">Enter as Teacher</b-button>
+                            <b-button variant="primary" :to="{ name: 'teacher-dashboard.course', params: { courseId: course.id } }">Enter as Teacher</b-button>
                         </div>
                     </b-card>
                 </b-col>
