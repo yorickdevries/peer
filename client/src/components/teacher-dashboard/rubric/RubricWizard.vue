@@ -3,8 +3,15 @@
     <b-container>
         <b-row>
             <b-col>
-                <b-card header="Rubric Wizard" class="mt-4">
 
+                <b-card class="mt-4" no-body>
+
+                    <b-card-header>
+                        <span>Rubric Wizard</span>
+                        <b-button v-b-modal="'createModal'" size="sm" variant="outline-primary" class="float-right">Add new Question</b-button>
+                    </b-card-header>
+
+                    <b-card-body>
                     <b-card v-for="(question, index) in rubric.questions"
                             :key="question.id"
                             :header="`Question ${question.question_number} [${question.type_question.toUpperCase()}]`"
@@ -22,13 +29,18 @@
                                 <MCQuestion v-model="rubric.questions[index]"></MCQuestion>
                             </template>
 
-
                         <b-button @click="saveQuestion(question)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
                         <b-button @click="deleteQuestion(question)" variant="outline-danger" size="sm">Delete</b-button>
 
                     </b-card>
+                    </b-card-body>
 
                 </b-card>
+
+                <b-modal id="createModal" centered hide-header hide-footer class="p-0 m-0">
+                    <CreateQuestionWizard :rubricId="rubric.id"></CreateQuestionWizard>
+                </b-modal>
+
             </b-col>
         </b-row>
     </b-container>
@@ -40,6 +52,7 @@ import VueNotifications from 'vue-notifications'
 import OpenQuestion from './OpenQuestion'
 import RangeQuestion from './RangeQuestion'
 import MCQuestion from './MCQuestion'
+import CreateQuestionWizard from './CreateQuestionWizard'
 
 let apiPrefixes = {
     open: '/rubric/openquestion',
@@ -51,7 +64,8 @@ export default {
     components: {
         OpenQuestion,
         RangeQuestion,
-        MCQuestion
+        MCQuestion,
+        CreateQuestionWizard
     },
     data() {
         return {
