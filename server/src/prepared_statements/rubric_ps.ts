@@ -2,61 +2,10 @@ import Database from "../database";
 import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 import express = require("express");
 
+/**
+ * Prepared stement class for rubric routes
+ */
 export default class RubricPS {
-    private static createRubric: PreparedStatement = new PreparedStatement("create-rubric",
-        'INSERT INTO "rubric" ("assignment_id") VALUES ($1) RETURNING *');
-
-    private static createOpenQuestion: PreparedStatement = new PreparedStatement("make-open-question",
-        "INSERT INTO openquestion (question, rubric_assignment_id, question_number) VALUES ($1, $2, $3) RETURNING *");
-
-    private static createMCQuestion: PreparedStatement = new PreparedStatement("make-MC-question",
-        "INSERT INTO mcquestion (question, rubric_assignment_id, question_number) VALUES ($1, $2, $3) RETURNING *");
-
-    private static createRangeQuestion: PreparedStatement = new PreparedStatement("make-range-question",
-        "INSERT INTO rangequestion (question, range, rubric_assignment_id, question_number) VALUES ($1, $2, $3, $4) RETURNING *");
-
-    private static createMCOption: PreparedStatement = new PreparedStatement("make-MC-option",
-        "INSERT INTO mcoption (option, mcquestion_id) VALUES ($1, $2) RETURNING *");
-
-    private static updateOpenQuestion: PreparedStatement = new PreparedStatement("update-open-question",
-        "UPDATE openquestion SET (question, rubric_assignment_id, question_number) = ($1, $2, $3) WHERE id = $4 RETURNING *");
-
-    private static updateRangeQuestion: PreparedStatement = new PreparedStatement("update-range-question",
-        "UPDATE rangequestion SET (question, range, rubric_assignment_id, question_number) = ($1, $2, $3, $4) WHERE id = $5 RETURNING *");
-
-    private static updateMCQuestion: PreparedStatement = new PreparedStatement("update-mc-question",
-        "UPDATE mcquestion SET (question, rubric_assignment_id, question_number) = ($1, $2, $3) WHERE id = $4 RETURNING *");
-
-    private static updateMCOption: PreparedStatement = new PreparedStatement("updat-mc-option",
-        "UPDATE mcoption SET (option, mcquestion_id) = ($1, $2) WHERE id = $3 RETURNING *");
-
-    private static getAllMCQuestionById: PreparedStatement = new PreparedStatement("get-all-MC-questions",
-        "SELECT * FROM mcquestion WHERE rubric_assignment_id = $1");
-
-    private static getAllOpenQuestionById: PreparedStatement = new PreparedStatement("get-all-openquestions",
-        "SELECT * FROM openquestion WHERE rubric_assignment_id = $1");
-
-    private static getAllRangeQuestionById: PreparedStatement = new PreparedStatement("get-all-rangequestion",
-        "SELECT * FROM rangequestion WHERE rubric_assignment_id = $1");
-
-    private static getAllMCOptionById: PreparedStatement = new PreparedStatement("get-all-options",
-        "SELECT * FROM mcoption WHERE mcquestion_id = $1");
-
-    private static deleteMCOption: PreparedStatement = new PreparedStatement("delte-mc-option",
-        "DELETE FROM mcoption WHERE id=$1 RETURNING *");
-
-    private static deleteMCQuestion: PreparedStatement = new PreparedStatement("delete-mc-question",
-        "DELETE FROM mcquestion WHERE id=$1 RETURNING *");
-
-    private static deleteOpenQuestion: PreparedStatement = new PreparedStatement("delete-open-question",
-        "DELETE FROM openquestion WHERE id=$1 RETURNING *");
-
-    private static deleteRangeQuestion: PreparedStatement = new PreparedStatement("delete-range-question",
-        "DELETE FROM rangequestion WHERE id=$1 RETURNING *");
-
-    private static deleteRubric: PreparedStatement = new PreparedStatement("delete-rubric",
-        "DELETE FROM rubric WHERE assignment_id=$1 RETURNING *");
-
 
     /**
      * Query 'delete rubric'

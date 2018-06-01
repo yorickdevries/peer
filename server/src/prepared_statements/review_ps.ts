@@ -40,8 +40,12 @@ export default class ReviewPS {
      * @return {Promise<pgPromise.queryResult>} - a result, containing tuples following the API documentation.
      */
     public static executeGetReview(reviewId: number): any {
-        this.getReview.values = [reviewId];
-        return Database.executeQuerySingleResult(this.getReview);
+        const statement = new PreparedStatement("get-review-by-id",
+            "SELECT review.id, rubric_assignment_id, file_path, comment, done " +
+            "FROM review JOIN submission ON submission.id = review.submission_id " +
+            "WHERE review.id = $1");
+        statement.values = [reviewId];
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
@@ -50,8 +54,13 @@ export default class ReviewPS {
      * @return {Promise<pgPromise.queryResult>} - a corresponding review where the done field is set to true.
      */
     public static executeSubmitReview(reviewId: number): Promise<pgPromise.queryResult> {
-        this.submitReview.values = [reviewId];
-        return Database.executeQuery(this.submitReview);
+        const statement = new PreparedStatement("submit-review",
+            "UPDATE review " +
+            "SET done=true " +
+            "WHERE id = $1" +
+            "RETURNING *");
+        statement.values = [reviewId];
+        return Database.executeQuery(statement);
     }
 
     /**
