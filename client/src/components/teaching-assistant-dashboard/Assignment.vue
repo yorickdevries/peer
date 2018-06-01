@@ -66,15 +66,15 @@
                         active: true
                     }
                 ],
-                assignment: null,
+                assignment: {
+                    title: "",
+                    due_date: ""
+                },
                 submissions: [
                     {
-                        id: null,
-                        title: null,
-                        description: null,
-                        due_date: null,
-                        publish_date: null,
-                        filename: null
+                        user_netid: null,
+                        date: null,
+                        file_path: null
                     }
                 ],
                 course: {
