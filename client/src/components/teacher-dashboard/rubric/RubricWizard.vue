@@ -10,10 +10,17 @@
                             class="mb-3">
 
                             <template v-if="question.type_question === 'open'">
-                                <b-form-group label="Question text:">
-                                    <b-form-textarea v-model="question.question">
+                                <b-form-group label="Question text" description="Text above the open question.">
+                                    <b-form-textarea v-model="question.question"/>
+                                </b-form-group>
+                            </template>
 
-                                    </b-form-textarea>
+                            <template v-if="question.type_question === 'range'">
+                                <b-form-group label="Question text" description="Text above the range question.">
+                                    <b-form-textarea v-model="question.question"/>
+                                </b-form-group>
+                                <b-form-group label="Range" description="Maximum stars a student can give.">
+                                    <b-form-input v-model="question.range" type="number"/>
                                 </b-form-group>
                             </template>
 
@@ -34,9 +41,9 @@ import api from "../../../api";
 import VueNotifications from 'vue-notifications'
 
 let apiPrefixes = {
-    open: '/rubric/openquestion/',
-    mc: '/rubric/mcquestion/',
-    range: '/rubric/rangequestion/'
+    open: '/rubric/openquestion',
+    mc: '/rubric/mcquestion',
+    range: '/rubric/rangequestion'
 }
 export default {
     data() {
@@ -58,7 +65,9 @@ export default {
             await this.fetchRubric()
         },
         async saveQuestion(question) {
-            await api.client.delete(`${apiPrefixes[question.type_question]}/${question.id}`)
+            console.log(`${apiPrefixes[question.type_question]}/${question.id}`)
+            console.log(question)
+            let res = await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
             console.log(res)
             this.showSuccessMessage({message: 'Successfully saved question.'})
             await this.fetchRubric()
@@ -79,55 +88,4 @@ export default {
     }
 }
 
-// let rubric = {
-//     "id": "4",
-//     "assignment_id": "4",
-//     "questions": [
-//         {
-//             "id": 5,
-//             "type_question": "mc",
-//             "question": "Choose an option2",
-//             "question_number": 3,
-//             "option": [
-//                 {
-//                     "id": 13,
-//                     "option": "Option 1 (1)",
-//                     "mcquestion_id": 5
-//                 },
-//                 {
-//                     "id": 14,
-//                     "option": "Option 2 (1)",
-//                     "mcquestion_id": 5
-//                 },
-//                 {
-//                     "id": 15,
-//                     "option": "Option 3 (1)",
-//                     "mcquestion_id": 5
-//                 }
-//             ]
-//         },
-//         {
-//             "id": 8,
-//             "question": "Some open question5",
-//             "rubric_assignment_id": 4,
-//             "question_number": 1,
-//             "type_question": "open"
-//         },
-//         {
-//             "id": 16,
-//             "question": "Hallo, this is a open!",
-//             "rubric_assignment_id": 4,
-//             "question_number": 4,
-//             "type_question": "open"
-//         },
-//         {
-//             "id": 6,
-//             "question": "Give a rating",
-//             "range": 7,
-//             "rubric_assignment_id": 4,
-//             "question_number": 2,
-//             "type_question": "range"
-//         }
-//     ]
-// }
 </script>
