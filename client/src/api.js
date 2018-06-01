@@ -49,6 +49,9 @@ export default {
     getAssignmentSubmission(assignmentId) {
         return client.get(`assignments/${assignmentId}/submission`)
     },
+    getAssignmentAllSubmissions(assignmentId) {
+        return client.get(`assignments/${assignmentId}/allsubmissions`)
+    },
     deleteSubmission(submissionId) {
         return client.delete(`submissions/${submissionId}`)
     }
