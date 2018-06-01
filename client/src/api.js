@@ -51,6 +51,9 @@ export default {
     },
     deleteSubmission(submissionId) {
         return client.delete(`submissions/${submissionId}`)
+    },
+    getCurrentRoleForCourse(courseId) {
+        return client.get(`courses/${courseId}/role`)
     }
 }
 
