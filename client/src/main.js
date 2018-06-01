@@ -29,6 +29,10 @@ function toast ({title, message, type, timeout, cb}) {
     })
 }
 
+// Use (custom) text filters.
+import filters from './filters'
+Vue.use(filters)
+
 const options = {
     success: toast,
     error: toast,
