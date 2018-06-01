@@ -6,30 +6,20 @@
 
                     <b-card v-for="question in rubric.questions"
                             :key="question.id"
-                            class="mb-3"
-                    no-body>
+                            :header="`Question ${question.question_number}`"
+                            class="mb-3">
 
-                        <b-card-header>
-                            <span>Question {{ question.question_number}}</span>
-                            <b-button variant="outline-danger" size="sm" class="float-right">Delete</b-button>
-                        </b-card-header>
+                            <template v-if="question.type_question === 'open'">
+                                <b-form-group label="Question text:">
+                                    <b-form-textarea v-model="question.question">
 
-                        <b-card-body v-if="question.type_question === 'open'">
-
-                            <b-form-group label="Question text:">
-                                <b-form-textarea v-model="question.question">
-
-                                </b-form-textarea>
-                            </b-form-group>
+                                    </b-form-textarea>
+                                </b-form-group>
+                            </template>
 
 
-                        </b-card-body>
-
-                        <b-card-footer>
-                            <b-button variant="outline-primary" size="sm">Save</b-button>
-                        </b-card-footer>
-
-
+                        <b-button @click="saveQuestion(question)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
+                        <b-button @click="deleteQuestion(question)" variant="outline-danger" size="sm">Delete</b-button>
 
                     </b-card>
 
@@ -41,7 +31,13 @@
 
 <script>
 import api from "../../../api";
+import VueNotifications from 'vue-notifications'
 
+let apiPrefixes = {
+    open: '/rubric/openquestion/',
+    mc: '/rubric/mcquestion/',
+    range: '/rubric/rangequestion/'
+}
 export default {
     data() {
         return {
@@ -55,7 +51,30 @@ export default {
         async fetchRubric() {
             let res = await api.client.get(`/rubric/4`)
             this.rubric = res.data
+        },
+        async deleteQuestion(question) {
+            await api.client.delete(`${apiPrefixes[question.type_question]}/${question.id}`);
+            this.showSuccessMessage({message: 'Successfully deleted question.'})
+            await this.fetchRubric()
+        },
+        async saveQuestion(question) {
+            await api.client.delete(`${apiPrefixes[question.type_question]}/${question.id}`)
+            console.log(res)
+            this.showSuccessMessage({message: 'Successfully saved question.'})
+            await this.fetchRubric()
+        }
 
+    },
+    notifications: {
+        showSuccessMessage: {
+            type: VueNotifications.types.success,
+            title: 'Success',
+            message: 'Success.'
+        },
+        showErrorMessage: {
+            type: VueNotifications.types.error,
+            title: 'Error',
+            message: 'Error.'
         }
     }
 }
