@@ -33,6 +33,11 @@ export default [
                 path: 'courses/:courseId/assignments/:assignmentId',
                 name: 'teacher-dashboard.assignments.assignment',
                 component: () => import('../components/teacher-dashboard/assignments/Assignment')
+            },
+            {
+                path: 'courses/:courseId/assignments/:assignmentId/edit',
+                name: 'teacher-dashboard.assignments.assignment.edit',
+                component: () => import('../components/teacher-dashboard/assignments/EditAssignment')
             }
         ]
     }
