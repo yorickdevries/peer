@@ -28,6 +28,11 @@ export default [
                 path: 'courses/:id/create-assignment',
                 name: 'teacher-dashboard.assignments.create',
                 component: () => import('../components/teacher-dashboard/assignments/CreateAssignment')
+            },
+            {
+                path: 'rubric',
+                name: 'rubric-wizard',
+                component: () => import('../components/teacher-dashboard/rubric/RubricWizard')
             }
         ]
     }
