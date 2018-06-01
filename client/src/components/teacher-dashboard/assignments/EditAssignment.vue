@@ -26,10 +26,11 @@
                                                     id="textareadescription"
                                                     placeholder="Please enter the course description here"
                                                     :rows="4"
-                                                    required>
+                                                    resquired>
                                 </b-form-textarea>
                             </b-form-group>
                             <b-form-group label="Publish date">
+                                <div class="mb-0 text-secondary">Current publish date is {{formatDate(assignment.publish_date)}}, set a new publish date below:</div>
                                 <b-form-input   v-model="assignment.publish_date"
                                                 type="date"
                                                 placeholder="Please enter on which the assignment should be published"
@@ -37,6 +38,7 @@
                                 </b-form-input>
                             </b-form-group>
                             <b-form-group label="Due date">
+                                <div class="mb-0 text-secondary">Current due date is {{formatDate(assignment.due_date)}}, set a new due date below:</div>
                                 <b-form-input   v-model="assignment.due_date"
                                                 type="date"
                                                 :state="checkDue"
@@ -100,7 +102,13 @@ export default {
             console.log(this.course)
             console.log(res)
             this.$router.push({name: 'teacher-dashboard.course', params: {courseId: this.course.id} })
+        },
+        formatDate(date) {
+            // Formats the date to a readable format for the UI.
+            if (!(date instanceof Date)) date = new Date(date)
+            return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
         }
     }
+
 }
 </script>
