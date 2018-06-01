@@ -55,71 +55,71 @@
 </template>
 
 <script>
-    import api from "../../api"
+import api from "../../api"
 
-    export default {
-        data() {
-            return {
-                items: [
-                    {
-                        text: 'Course Home',
-                        active: true
-                    }
-                ],
-                assignment: {
-                    title: "",
-                    due_date: ""
-                },
-                submissions: [
-                    {
-                        user_netid: null,
-                        date: null,
-                        file_path: null
-                    }
-                ],
-                course: {
-                    name: null,
-                    description: null
-                },
-                fields: [
-                    { key: 'user_netid', label: 'Username' },
-                    { key: 'date', label: 'Submitted' },
-                    { key: 'file_path', label: 'Download' }
-                ],
-                currentPage: 1,
-                perPage: 5,
-                pageOptions: [ 5, 10, 15, 25, 50 ],
-                filter: null,
-            }
-        },
-        computed: {
-            sortOptions () {
-                // Create an options list from our fields
-                return this.fields
-                    .filter(f => f.sortable)
-                    .map(f => { return { text: f.label, value: f.key } })
-            }
-        },
-        methods: {
-            submissionsCount() {
-                return this.submissions.length;
+export default {
+    data() {
+        return {
+            items: [
+                {
+                    text: 'Course Home',
+                    active: true
+                }
+            ],
+            assignment: {
+                title: "",
+                due_date: ""
             },
-            formatDate(date) {
-                // Formats the date to a readable format for the UI.
-                if (!(date instanceof Date)) date = new Date(date)
-                return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
-            }
-        },
-        async created() {
-            // Fetch course information.
-            let course = await api.getCourse(this.$route.params.courseId);
-            let submissions = await api.getAssignmentAllSubmissions(this.$route.params.assignmentId);
-            let assignment = await api.getAssignment(this.$route.params.assignmentId);
-
-            // Assign fetched data.
-            this.course = course.data;
-            this.submissions = submissions.data;
-            this.assignment = assignment.data;
+            submissions: [
+                {
+                    user_netid: null,
+                    date: null,
+                    file_path: null
+                }
+            ],
+            course: {
+                name: null,
+                description: null
+            },
+            fields: [
+                { key: 'user_netid', label: 'Username' },
+                { key: 'date', label: 'Submitted' },
+                { key: 'file_path', label: 'Download' }
+            ],
+            currentPage: 1,
+            perPage: 5,
+            pageOptions: [ 5, 10, 15, 25, 50 ],
+            filter: null,
         }
+    },
+    computed: {
+        sortOptions () {
+            // Create an options list from our fields
+            return this.fields
+                .filter(f => f.sortable)
+                .map(f => { return { text: f.label, value: f.key } })
+        }
+    },
+    methods: {
+        submissionsCount() {
+            return this.submissions.length;
+        },
+        formatDate(date) {
+            // Formats the date to a readable format for the UI.
+            if (!(date instanceof Date)) date = new Date(date)
+            return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
+        }
+    },
+    async created() {
+        // Fetch course information.
+        let course = await api.getCourse(this.$route.params.courseId);
+        let submissions = await api.getAssignmentAllSubmissions(this.$route.params.assignmentId);
+        let assignment = await api.getAssignment(this.$route.params.assignmentId);
+
+        // Assign fetched data.
+        this.course = course.data;
+        this.submissions = submissions.data;
+        this.assignment = assignment.data;
     }
+}
 </script>
