@@ -18,7 +18,7 @@
                         <p class="card-text">
                             {{ assignment.description}}
                         </p>
-                        <b-button variant="primary" :to="{ name: 'teacher-dashboard.course.assignment', params: { courseId: assignment.course_id, assignmentId: assignment.id } }">View Assignment</b-button>
+                        <b-button variant="primary" :to="{ name: 'teacher-dashboard.assignments.assignment', params: { courseId: assignment.course_id, assignmentId: assignment.id } }">View Assignment</b-button>
                     </b-card>
                 </b-col>
 
@@ -44,9 +44,9 @@ export default {
     },
     methods: {
         async init() {
-            let id = this.$route.params.courseId
-            this.id = id
-            let res = await api.getCourseAssignments(id)
+            let cid = this.$route.params.courseId
+            this.cid = cid
+            let res = await api.getCourseAssignments(cid)
             this.assignments = res.data
         }
     }
