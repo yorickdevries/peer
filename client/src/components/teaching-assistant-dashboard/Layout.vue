@@ -2,7 +2,7 @@
     <div>
         <Navbar :links="navbarItems"/>
 
-        <keep-alive><router-view></router-view></keep-alive>
+        <router-view></router-view>
 
     </div>
 </template>
@@ -17,7 +17,7 @@ export default {
     data() {
         return {
             navbarItems: [
-                { to: { name: 'teaching-assistant-dashboard.course' } , text: 'Course Home'},
+                { to: { name: 'teaching-assistant-dashboard.course' } , text: 'Assignments'},
                 { to: { name: 'teaching-assistant-dashboard.course' } , text: 'TA Jobs' },
                 { to: { name: 'teaching-assistant-dashboard.course' } , text: 'Students' },
                 { to: { name: 'teaching-assistant-dashboard.course' } , text: 'Grades' },

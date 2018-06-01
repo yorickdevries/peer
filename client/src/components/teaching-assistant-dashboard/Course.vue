@@ -46,6 +46,9 @@
                         </b-button>
                     </template>
 
+                    <template slot="table-caption">
+                        Assignments for: {{course.name}}
+                    </template>
                 </b-table>
 
                 <b-pagination :total-rows=assignmentsCount() :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -60,72 +63,71 @@
 </template>
 
 <script>
-    import api from "../../api"
+import api from "../../api"
 
-    export default {
-        data() {
-            return {
-                items: [
-                    {
-                        text: 'Course Home',
-                        active: true
-                    }
-                ],
-                assignments: [
-                    {
-                        id: null,
-                        title: null,
-                        description: null,
-                        due_date: null,
-                        publish_date: null,
-                        filename: null
-                    }
-                ],
-                course: {
-                    name: null,
-                    description: null
-                },
-                fields: [
-                    { key:'title', label:'Title' },
-                    { key:'description', label:'Description' },
-                    { key:'publish_date', label:'Publish date' },
-                    { key:'due_date', label:'Due date' },
-                    { key:'filename', label:'Download' },
-                    { key:'actions', label:'Action' }
-                ],
-                currentPage: 1,
-                perPage: 5,
-                pageOptions: [ 5, 10, 15, 25, 50 ],
-                filter: null,
-            }
-        },
-        computed: {
-            sortOptions () {
-                // Create an options list from our fields
-                return this.fields
-                    .filter(f => f.sortable)
-                    .map(f => { return { text: f.label, value: f.key } })
-            }
-        },
-        methods: {
-            assignmentsCount() {
-                return this.assignments.length;
+export default {
+    data() {
+        return {
+            items: [
+                {
+                    text: 'Course Home',
+                    active: true
+                }
+            ],
+            assignments: [
+                {
+                    id: null,
+                    title: null,
+                    description: null,
+                    due_date: null,
+                    publish_date: null,
+                    filename: null
+                }
+            ],
+            course: {
+                name: null,
+                description: null
             },
-            formatDate(date) {
-                // Formats the date to a readable format for the UI.
-                if (!(date instanceof Date)) date = new Date(date)
-                return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
-            }
-        },
-        async created() {
-            // Fetch course information.
-            let course = await api.getCourse(this.$route.params.courseId);
-            let assignments = await api.getCourseAssignments(this.$route.params.courseId);
-
-            console.log()
-            // Assign fetched data.
-            this.assignments = assignments.data;
-            this.course = course.data;
+            fields: [
+                { key:'title', label:'Title' },
+                { key:'description', label:'Description' },
+                { key:'publish_date', label:'Publish date' },
+                { key:'due_date', label:'Due date' },
+                { key:'filename', label:'Download' },
+                { key:'actions', label:'Action' }
+            ],
+            currentPage: 1,
+            perPage: 5,
+            pageOptions: [ 5, 10, 15, 25, 50 ],
+            filter: null,
         }
+    },
+    computed: {
+        sortOptions () {
+            // Create an options list from our fields
+            return this.fields
+                .filter(f => f.sortable)
+                .map(f => { return { text: f.label, value: f.key } })
+        }
+    },
+    methods: {
+        assignmentsCount() {
+            return this.assignments.length;
+        },
+        formatDate(date) {
+            // Formats the date to a readable format for the UI.
+            if (!(date instanceof Date)) date = new Date(date)
+            return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
+        }
+    },
+    async created() {
+        // Fetch course information.
+        let course = await api.getCourse(this.$route.params.courseId);
+        let assignments = await api.getCourseAssignments(this.$route.params.courseId);
+
+        // Assign fetched data.
+        this.assignments = assignments.data;
+        this.course = course.data;
     }
+}
 </script>
