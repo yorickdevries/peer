@@ -15,7 +15,7 @@
                 <b-col cols="6" v-for="course in courses" :key="course.id">
                     <b-card :title="course.name" :sub-title="course.name" class="mb-3">
                         <p class="card-text">
-                            {{ course.description}}
+                            {{ course.description | truncate(200)}}
                         </p>
                         <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                             <b-button v-if="course.role === 'student'" variant="outline-primary" :to="{ name: 'student-dashboard.course.home', params: { courseId: course.id } }">Enter as Student</b-button>
