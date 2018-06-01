@@ -10,6 +10,11 @@ export default [
                 component: () => import('../components/teacher-dashboard/Course')
             },
             {
+                path: 'courses/:id/edit',
+                name: 'teacher-dashboard.course.edit',
+                component: () => import('../components/teacher-dashboard/courses/EditCourse')
+            },
+            {
                 path: 'create',
                 name: 'teacher-dashboard.courses.create',
                 component: () => import('../components/teacher-dashboard/courses/CreateCourse')
