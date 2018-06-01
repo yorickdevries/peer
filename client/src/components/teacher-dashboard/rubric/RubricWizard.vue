@@ -1,10 +1,11 @@
+
 <template>
     <b-container>
         <b-row>
             <b-col>
                 <b-card header="Rubric Wizard" class="mt-4">
 
-                    <b-card v-for="question in rubric.questions"
+                    <b-card v-for="question in sortQuestions(rubric.questions)"
                             :key="question.id"
                             :header="`Question ${question.question_number}`"
                             class="mb-3">
@@ -71,8 +72,10 @@ export default {
             console.log(res)
             this.showSuccessMessage({message: 'Successfully saved question.'})
             await this.fetchRubric()
+        },
+        sortQuestions(questions) {
+            return questions.sort((a, b) => a.question_number - b.question_number)
         }
-
     },
     notifications: {
         showSuccessMessage: {
