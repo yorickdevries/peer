@@ -68,7 +68,11 @@ export default class AssignmentPS {
         return Database.executeQuerySingleResult(statement);
     }
 
-    // counts the amount of assignments with this specific id
+    /**
+     * Executes assignment Id
+     * @param {number} assignmentId - assignmentId
+     * @returns {Promise<pgPromise.queryResult>}
+     */
     public static executeCountAssignmentById(assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("count-assignment-by-id",
             'SELECT COUNT(1) FROM "assignmentlist" WHERE "id" = $1');
@@ -88,8 +92,8 @@ export default class AssignmentPS {
      */
     public static executeAddAssignment(title: string, description: string, dueDate: Date, publishDate: Date, courseId: number, filename: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("addAssignment",
-            'INSERT INTO "assignmentlist" ("title", "description", "due_date", "publish_date", "course_id", "filename") ' +
-            'VALUES ($1, $2, $3, $4, $5, $6) RETURNING title, description, id, course_id, due_date, publish_date, filename');
+            "INSERT INTO assignmentlist (title, description, due_date, publish_date, course_id, filename)"  +
+            "VALUES ($1, $2, $3, $4, $5, $6) RETURNING title, description, id, course_id, due_date, publish_date, filename");
         statement.values = [title, description, dueDate, publishDate, courseId, filename];
         return Database.executeQuerySingleResult(statement);
     }
@@ -126,7 +130,11 @@ export default class AssignmentPS {
         return Database.executeQuerySingleResult(statement);
     }
 
-    // Executes a 'get-all-groups-per-assignment' query
+    /**
+     * Executes group assignment Id
+     * @param {number} id - id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
     public static executeGetGroupsByAssignmentId (id: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-all-groups-per-assignment",
             'SELECT * FROM "assignmentgroup" WHERE "id" LIKE ($1)');
