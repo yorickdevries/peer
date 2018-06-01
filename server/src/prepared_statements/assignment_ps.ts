@@ -35,6 +35,8 @@ export default class AssignmentPS {
     private static countReviews: PreparedStatement = new PreparedStatement("count-reviews",
         "SELECT count(*) FROM review WHERE rubric_assignment_id = $1 AND user_netid = $2");
 
+    private static getReviewsById: PreparedStatement = new PreparedStatement("get-all-reviews-by-assignment",
+        "SELECT review.user_netid as reviewer, submission.user_netid as submitter FROM review JOIN assignmentlist ON assignmentlist.id = review.rubric_assignment_id  JOIN submission ON submission.id = review.id WHERE assignmentlist.id = $1 AND review.done = true");
 
     /**
      * Executes a query that gets the review that was assigned to a certain user
@@ -152,5 +154,15 @@ export default class AssignmentPS {
     public static executeCountAssignmentReviews(assignmentId: number, netId: string): Promise<pgPromise.queryResult> {
         this.countReviews.values = [assignmentId, netId];
         return Database.executeQuerySingleResult(this.countReviews);
+    }
+
+    /**
+     * Executes a 'get review by assignment id' query.
+     * @param {number} assignmentId - an assignment id.
+     * @return {Promise<pgPromise.queryResult>} - a promise of the database result.
+     */
+    public static executeGetReviewsById(assignmentId: number) : Promise<pgPromise.queryResult> {
+        this.getReviewsById.values = [assignmentId];
+        return Database.executeQuery(this.getReviewsById);
     }
 }
