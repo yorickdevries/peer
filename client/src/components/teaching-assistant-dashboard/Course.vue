@@ -46,6 +46,9 @@
                         </b-button>
                     </template>
 
+                    <template slot="table-caption">
+                        Assignments for: {{course.name}}
+                    </template>
                 </b-table>
 
                 <b-pagination :total-rows=assignmentsCount() :per-page="perPage" v-model="currentPage" class="my-0" />

@@ -36,6 +36,10 @@
                     <template slot="file_path" slot-scope="data">
                         <a :href="`/api/submissions/${data.item.id}/file`"> {{data.value}} </a>
                     </template>
+
+                    <template slot="table-caption">
+                        Submissions for: {{assignment.title}} (due date: {{formatDate(assignment.due_date)}})
+                    </template>
                 </b-table>
 
 
@@ -62,6 +66,7 @@
                         active: true
                     }
                 ],
+                assignment: null,
                 submissions: [
                     {
                         id: null,
@@ -108,12 +113,13 @@
         async created() {
             // Fetch course information.
             let course = await api.getCourse(this.$route.params.courseId);
-            console.log(this.$route.params.assignmentId);
             let submissions = await api.getAssignmentAllSubmissions(this.$route.params.assignmentId);
-            console.log(submissions);
+            let assignment = await api.getAssignment(this.$route.params.assignmentId);
+
             // Assign fetched data.
             this.course = course.data;
             this.submissions = submissions.data;
+            this.assignment = assignment.data;
         }
     }
 </script>
