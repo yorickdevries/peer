@@ -61,9 +61,7 @@ import api from '../../../api'
 
 export default {
     async created() {
-        // let cid = this.$route.params.id
         let aid = this.$route.params.assignmentId
-        // this.cid = cid
         this.aid = aid
         let res = await api.getAssignment(aid)
         this.assignment = res.data
@@ -71,8 +69,10 @@ export default {
     data() {
         return {
             // cid: null,
-            id2: null,
-            assignment: null,
+            aid: null,
+            assignment: {
+
+            },
         }
     }
 }

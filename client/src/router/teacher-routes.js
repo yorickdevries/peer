@@ -30,7 +30,7 @@ export default [
                 component: () => import('../components/teacher-dashboard/assignments/CreateAssignment')
             },
             {
-                path: 'courses/:courseId/assignments/assignmentId',
+                path: 'courses/:courseId/assignments/:assignmentId',
                 name: 'teacher-dashboard.assignments.assignment',
                 component: () => import('../components/teacher-dashboard/assignments/Assignment')
             }
