@@ -2,7 +2,25 @@ import promise from "bluebird";
 import isCI from "is-ci";
 import pgp, { errors, default as pgPromise, PreparedStatement } from "pg-promise";
 
+/**
+ * Database class responsible for the connection to the postgreSQL database.
+ * @export
+ * @class Database
+ */
 export default class Database {
+  /**
+   * Connection object.
+   * 
+   * @static
+   * @type {{
+   *     user: string,
+   *     host: string,
+   *     database: string,
+   *     password: string,
+   *     port: number
+   *   }}
+   * @memberof Database
+   */
   static connection: {
     user: string,
     host: string,
@@ -12,7 +30,7 @@ export default class Database {
   };
 
   static db: any;
-
+  
   static initialize() {
     const options = {
       // Initialization Options
