@@ -123,7 +123,7 @@ describe("API Assignment routes", () => {
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                id: 2,
+                id: 3,
                 comment: "",
                 user_netid: "henkjan",
                 submission_id: 1,
@@ -216,6 +216,19 @@ describe("API Assignment routes", () => {
                 rubric_assignment_id: 1,
                 done: false
             }
+        ));
+    });
+
+    /**
+     * Test to get all reviews of an assignment.
+     */
+    it("GET /:id/reviews", async () => {
+        // test the router
+        InitLogin.initialize(router, "henkjan");
+        const res = await chai.request(router).get("/1/reviews");
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            [{"reviewer": "paulvanderlaan", "submitter": "henkjan"}]
         ));
     });
 });

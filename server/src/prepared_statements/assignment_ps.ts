@@ -161,7 +161,7 @@ export default class AssignmentPS {
      * @param {number} assignmentId - an assignment id.
      * @return {Promise<pgPromise.queryResult>} - a promise of the database result.
      */
-    public static executeGetReviewsById(assignmentId: number) : Promise<pgPromise.queryResult> {
+    public static executeGetReviewsById(assignmentId: number): Promise<pgPromise.queryResult> {
         this.getReviewsById.values = [assignmentId];
         return Database.executeQuery(this.getReviewsById);
     }
