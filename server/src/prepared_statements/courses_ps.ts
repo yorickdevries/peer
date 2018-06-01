@@ -94,7 +94,12 @@ export default class CoursesPS {
         return Database.executeQuerySingleResult(statement);
     }
 
-    // Executes count-user-by-course-id
+    /**
+     * Executes counte ruser by course id, how many users in a certain course
+     * @param {number} courseId - course_Id
+     * @param {string} netId - net_id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
     public static executeCountUserByCourseId(courseId: number, netId: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("count-user-by-course-id",
             'SELECT COUNT(1) FROM enroll WHERE "course_id" = $1 AND "user_netid" = $2');
@@ -102,7 +107,13 @@ export default class CoursesPS {
         return Database.executeQuerySingleResult(statement);
     }
 
-    // Executes Enroll In CourseId query
+    /**
+     * Executes enroll in course with certain id
+     * @param {number} courseId - course_Id
+     * @param {string} netId - net_id
+     * @param {string} role - role
+     * @returns {Promise<pgPromise.queryResult>}
+     */
     public static executeEnrollInCourseId(courseId: number, netId: string, role: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("enroll-in-course-id",
             "INSERT INTO enroll (course_id, user_netid, role) VALUES ($1, $2, $3) RETURNING *");
