@@ -138,9 +138,9 @@ INSERT INTO public.mcoption(
 INSERT INTO public.enroll(
 	course_id, user_netid, role)
 	VALUES
-	    (2, 'paulvanderlaan', 'student'),
-	    (3, 'paulvanderlaan', 'student'),
-	    (4, 'paulvanderlaan', 'student'),
+	    (2, 'paulvanderlaan', 'TA'),
+	    (3, 'paulvanderlaan', 'TA'),
+	    (4, 'paulvanderlaan', 'TA'),
 	    (1, 'henkjan', 'student'),
 	    (2, 'henkjan', 'student'),
 	    (3, 'henkjan', 'student')
@@ -156,6 +156,19 @@ INSERT INTO public.submission(
 	    ('paulvanderlaan', 4, 'submission1.pdf'),
 	    ('paulvanderlaan', 5, 'submission1.pdf'),
 	    ('paulvanderlaan', 6, 'submission1.pdf'),
+	    ('henkjan', 1, 'submission2.pdf'),
+	    ('henkjan', 1, 'submission2.pdf'),
+	    ('henkjan', 1, 'submission2.pdf'),
+	    ('henkjan', 1, 'submission2.pdf'),
+	    ('henkjan', 1, 'submission1.pdf'),
+	    ('henkjan', 1, 'submission1.pdf'),
+	    ('henkjan', 1, 'submission1.pdf'),
+	    ('henkjan', 1, 'submission1.pdf'),
+	    ('henkjan', 1, 'submission1.pdf'),
+	    ('henkjan', 1, 'submission2.pdf'),
+	    ('henkjan', 1, 'submission2.pdf'),
+	    ('henkjan', 1, 'submission2.pdf'),
+	    ('henkjan', 1, 'submission2.pdf'),
 	    ('henkjan', 1, 'submission2.pdf'),
 	    ('henkjan', 2, 'submission2.pdf'),
 	    ('henkjan', 3, 'submission2.pdf'),
