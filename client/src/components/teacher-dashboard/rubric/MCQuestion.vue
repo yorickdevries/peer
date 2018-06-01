@@ -1,0 +1,63 @@
+<template>
+    <div>
+        <b-form-group label="Question Number" description="The question number. These questions will appear in this order (sorted).">
+            <b-form-input type="number" v-model="question.question_number"/>
+        </b-form-group>
+        <b-form-group label="Question Text" description="Text above the MC question.">
+            <b-form-textarea v-model="question.question"/>
+        </b-form-group>
+
+        <b-form-group label="Multiple Choice Options" description="Delete, edit and add MC options here. Make sure to save.">
+            <template v-for="option in question.option">
+                <b-form inline>
+                    <b-form-group class="mb-2">
+                        <b-form-input v-model="option.option" :disabled="option.delete" class="mr-2"></b-form-input>
+                        <b-button @click="deleteMCOption(question, option)" v-if="!option.delete" variant="danger" size="sm">Delete</b-button>
+                        <b-button @click="undoDeleteMCOption(option)" v-else variant="seconadry" size="sm">Undo</b-button>
+                    </b-form-group>
+                </b-form>
+            </template>
+            <b-button @click="addMCOption(question)" variant="success" size="sm">Add new option</b-button>
+        </b-form-group>
+    </div>
+</template>
+
+<script>
+export default {
+    props: ['value'],
+    data() {
+        return {
+            question: this.value
+        }
+    },
+    watch: {
+        question(val) {
+            this.$emit('input', val)
+        },
+        value(val) {
+            this.question = val
+        }
+    },
+    methods: {
+        addMCOption(question) {
+            question.option.push({
+                option: "",
+                mcquestion_id: question.id
+            })
+        },
+        deleteMCOption(question, option) {
+            // Mark a MC option as deleted.
+            if (option.id === undefined) {
+                let index = question.option.findIndex(value => value === option)
+                question.option.splice(index, 1)
+            } else {
+                this.$set(option, 'delete', true)
+            }
+        },
+        undoDeleteMCOption(option) {
+            // Undo the mark to delete a MC option.
+            option.delete = false
+        }
+    }
+}
+</script>

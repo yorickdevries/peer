@@ -5,47 +5,21 @@
             <b-col>
                 <b-card header="Rubric Wizard" class="mt-4">
 
-                    <b-card v-for="question in rubric.questions"
+                    <b-card v-for="(question, index) in rubric.questions"
                             :key="question.id"
                             :header="`Question ${question.question_number} [${question.type_question.toUpperCase()}]`"
                             class="mb-3">
 
-                            <b-form-group label="Question Number" description="The question number. These questions will appear in this order (sorted).">
-                                <b-form-input type="number" v-model="question.question_number"/>
-                            </b-form-group>
-
                             <template v-if="question.type_question === 'open'">
-                                <b-form-group label="Question Text" description="Text above the open question.">
-                                    <b-form-textarea v-model="question.question"/>
-                                </b-form-group>
+                                <OpenQuestion v-model="rubric.questions[index]"></OpenQuestion>
                             </template>
 
                             <template v-if="question.type_question === 'range'">
-                                <b-form-group label="Question Text" description="Text above the range question.">
-                                    <b-form-textarea v-model="question.question"/>
-                                </b-form-group>
-                                <b-form-group label="Range" description="Maximum stars a student can give.">
-                                    <b-form-input v-model="question.range" type="number"/>
-                                </b-form-group>
+                                <RangeQuestion v-model="rubric.questions[index]"></RangeQuestion>
                             </template>
 
                             <template v-if="question.type_question === 'mc'">
-                                <b-form-group label="Question Text" description="Text above the MC question.">
-                                    <b-form-textarea v-model="question.question"/>
-                                </b-form-group>
-
-                                <b-form-group label="Multiple Choice Options" description="Delete, edit and add MC options here. Make sure to save.">
-                                    <template v-for="option in question.option">
-                                        <b-form inline>
-                                            <b-form-group class="mb-2">
-                                                <b-form-input v-model="option.option" :disabled="option.delete" class="mr-2"></b-form-input>
-                                                <b-button @click="deleteMCOption(question, option)" v-if="!option.delete" variant="danger" size="sm">Delete</b-button>
-                                                <b-button @click="undoDeleteMCOption(option)" v-else variant="seconadry" size="sm">Undo</b-button>
-                                            </b-form-group>
-                                        </b-form>
-                                    </template>
-                                    <b-button @click="addMCOption(question)" variant="success" size="sm">Add new option</b-button>
-                                </b-form-group>
+                                <MCQuestion v-model="rubric.questions[index]"></MCQuestion>
                             </template>
 
 
@@ -63,6 +37,9 @@
 <script>
 import api from "../../../api";
 import VueNotifications from 'vue-notifications'
+import OpenQuestion from './OpenQuestion'
+import RangeQuestion from './RangeQuestion'
+import MCQuestion from './MCQuestion'
 
 let apiPrefixes = {
     open: '/rubric/openquestion',
@@ -71,9 +48,14 @@ let apiPrefixes = {
     mcoption: '/rubric/mcoption',
 }
 export default {
+    components: {
+        OpenQuestion,
+        RangeQuestion,
+        MCQuestion
+    },
     data() {
         return {
-            rubric: {}
+            rubric: {},
         }
     },
     async created() {
@@ -118,25 +100,6 @@ export default {
             this.showSuccessMessage({message: 'Successfully saved question.'})
             await this.fetchRubric()
 
-        },
-        addMCOption(question) {
-            question.option.push({
-                option: "",
-                mcquestion_id: question.id
-            })
-        },
-        deleteMCOption(question, option) {
-            // Mark a MC option as deleted.
-            if (option.id === undefined) {
-                let index = question.option.findIndex(value => value === option)
-                question.option.splice(index, 1)
-            } else {
-                this.$set(option, 'delete', true)
-            }
-        },
-        undoDeleteMCOption(option) {
-            // Undo the mark to delete a MC option.
-            option.delete = false
         }
     },
     notifications: {
