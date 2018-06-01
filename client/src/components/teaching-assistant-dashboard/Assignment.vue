@@ -82,7 +82,7 @@
                     description: null
                 },
                 fields: [
-                    { key: 'user_netid', label: 'Title' },
+                    { key: 'user_netid', label: 'Username' },
                     { key: 'date', label: 'Submitted' },
                     { key: 'file_path', label: 'Download' }
                 ],
