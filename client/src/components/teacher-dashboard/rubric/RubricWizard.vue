@@ -38,7 +38,7 @@
                 </b-card>
 
                 <b-modal id="createModal" centered hide-header hide-footer class="p-0 m-0">
-                    <CreateQuestionWizard :rubricId="rubric.id"></CreateQuestionWizard>
+                    <CreateQuestionWizard :rubricId="rubric.id" @saved="fetchRubric"></CreateQuestionWizard>
                 </b-modal>
 
             </b-col>
@@ -113,8 +113,7 @@ export default {
             await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
             this.showSuccessMessage({message: 'Successfully saved question.'})
             await this.fetchRubric()
-
-        }
+        },
     },
     notifications: {
         showSuccessMessage: {

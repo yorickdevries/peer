@@ -14,6 +14,12 @@
             <b-button @click="createQuestion(rangeQuestion, selectedType)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
         </template>
 
+        <template v-if="selectedType === 'mc'">
+            <MCQuestion v-model="mcQuestion"></MCQuestion>
+            <b-button @click="createQuestion(mcQuestion, selectedType)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
+        </template>
+
+        {{ rubricId }}
     </b-card>
 </template>
 
@@ -22,6 +28,7 @@ import OpenQuestion from './OpenQuestion'
 import RangeQuestion from './RangeQuestion'
 import MCQuestion from './MCQuestion'
 import api from "../../../api"
+import VueNotifications from "vue-notifications"
 
 let apiPrefixes = {
     open: '/rubric/openquestion',
@@ -55,12 +62,72 @@ export default {
                 range: null,
                 rubric_assignment_id: this.rubricId,
                 question_number: null
+            },
+            mcQuestion: {
+                question: '',
+                rubric_assignment_id: this.rubricId,
+                question_number: null,
+                option: []
             }
+        }
+    },
+    watch: {
+        rubricId(val) {
+            this.openQuestion.rubric_assignment_id = val
+            this.rangeQuestion.rubric_assignment_id = val
+            this.mcQuestion.rubric_assignment_id = val
         }
     },
     methods: {
         async createQuestion(question, type) {
+            // Special function to create MC question.
+            if (type === 'mc') return this.createMCQuestion(question)
+
             await api.client.post(`${apiPrefixes[type]}`, question)
+            this.showSuccessMessage({message: "Successfully created question."})
+            this.$emit('saved')
+        },
+        async createMCQuestion(question) {
+
+            // Create the MC question itself.
+            await api.client.post(`${apiPrefixes['mc']}`, {
+                question: question.question,
+                rubric_assignment_id: question.rubric_assignment_id,
+                question_number: question.question_number
+            })
+
+            // TODO: wait for the ^ POST to correctly return the created object
+            // let mcquestion_id = null
+            //
+            // // Create all the options.
+            // let options = question.option
+            // options.forEach(async option => {
+            //     console.log(`${apiPrefixes['mcoption']}`)
+            //     console.log({
+            //         option: option.option,
+            //         mcquestion_id: mcquestion_id
+            //     })
+            //     let res = await api.client.post(`${apiPrefixes['mcoption']}`, {
+            //         option: option.option,
+            //         mcquestion_id: mcquestion_id
+            //     })
+            // })
+            //
+
+            this.showSuccessMessage({message: "Successfully created question."})
+            this.$emit('saved')
+        }
+    },
+    notifications: {
+        showSuccessMessage: {
+            type: VueNotifications.types.success,
+            title: 'Success',
+            message: 'Success.'
+        },
+        showErrorMessage: {
+            type: VueNotifications.types.error,
+            title: 'Error',
+            message: 'Error.'
         }
     }
 
