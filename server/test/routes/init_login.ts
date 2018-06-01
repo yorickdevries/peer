@@ -1,6 +1,21 @@
+/**
+ * Class responsible for making a fake logged in user ofr testing purposes.
+ *
+ * @export
+ * @class InitLogin
+ */
 export default class InitLogin {
-    // adds sample data to a router
-    static initialize(router: any, netid: string | undefined = undefined, email: string | undefined = undefined) {
+/**
+ * Adds sample data to a router.
+ *
+ * @static
+ * @param {*} router
+ * @param {(string | undefined)} [netid=undefined]
+ * @param {(string | undefined)} [email=undefined]
+ * @returns
+ * @memberof InitLogin
+ */
+static initialize(router: any, netid: string | undefined = undefined, email: string | undefined = undefined) {
         // Authenticated function
         if (router.request == undefined) {
             console.log("invalid router object");
