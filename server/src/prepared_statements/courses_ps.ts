@@ -6,33 +6,6 @@ import express = require("express");
  * Prepared statement class for courses§
  */
 export default class CoursesPS {
-    private static getAllCourses: PreparedStatement = new PreparedStatement("get-all-courses",
-        'SELECT * FROM "courselist"');
-
-    private static getAllEnrolledCourses: PreparedStatement = new PreparedStatement("get-all-courses-you-are-enrolled,",
-        'SELECT * FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" WHERE user_netid LIKE $1)');
-
-    private static getCourseById: PreparedStatement = new PreparedStatement("get-course-by-id",
-        'SELECT * FROM "courselist" WHERE "id" = $1');
-
-    private static createCourse: PreparedStatement = new PreparedStatement("create-course",
-        'INSERT INTO "courselist" ("description", "name") VALUES ($1, $2) RETURNING id, description, name');
-
-    private static updateCourse: PreparedStatement = new PreparedStatement("update-course",
-        'UPDATE "courselist" SET ("description", "name") = ($1, $2) WHERE "id" = $3 RETURNING id, description, name');
-
-    private static getAssignmentsByCourseId: PreparedStatement = new PreparedStatement("get-assignment-of-course",
-        'SELECT * FROM "assignmentlist" WHERE "course_id" = $1');
-
-    private static getRoleByCourseId: PreparedStatement = new PreparedStatement("get-course-role",
-        "SELECT enroll.role FROM enroll JOIN courselist ON courselist.id = enroll.course_id WHERE user_netid = $1 AND course_id = $2");
-
-    private static countUserByCourseId: PreparedStatement = new PreparedStatement("count-user-by-course-id",
-        'SELECT COUNT(1) FROM enroll WHERE "course_id" = $1 AND "user_netid" = $2');
-
-    private static enrollInCourseId: PreparedStatement = new PreparedStatement("enroll-in-course-id",
-        "INSERT INTO enroll (course_id, user_netid, role) VALUES ($1, $2, $3) RETURNING *");
-
 
     /**
      * Get all assignments that belong to a specific course.
