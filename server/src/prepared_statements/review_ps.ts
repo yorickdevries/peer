@@ -1,37 +1,10 @@
 import Database from "../database";
 import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 
+/**
+ * Prepared statement class for review
+ */
 export default class ReviewPS {
-    private static getReview: PreparedStatement = new PreparedStatement("get-review-by-id",
-        "SELECT review.id, rubric_assignment_id, file_path, comment, done " +
-        "FROM review JOIN submission ON submission.id = review.submission_id " +
-        "WHERE review.id = $1");
-
-    private static submitReview: PreparedStatement = new PreparedStatement("submit-review",
-        "UPDATE review " +
-        "SET done=true " +
-        "WHERE id = $1" +
-        "RETURNING *");
-
-    private static updateMpcAnswer: PreparedStatement = new PreparedStatement("add-mpc-answer",
-            "INSERT INTO mcanswer(answer, mcquestion_id, review_id) VALUES ($1, $2, $3) ON CONFLICT (mcquestion_id, review_id) DO UPDATE SET answer=$1 RETURNING answer");
-
-    private static updateOpenAnswer: PreparedStatement = new PreparedStatement("add-open-answer",
-        "INSERT INTO openanswer(answer, openquestion_id, review_id) VALUES ($1, $2, $3) " +
-        "ON CONFLICT (openquestion_id, review_id) DO UPDATE SET answer=$1 RETURNING answer");
-
-    private static updateRangeAnswer: PreparedStatement = new PreparedStatement("add-range-answer",
-        "INSERT INTO rangeanswer(answer, rangequestion_id, review_id) VALUES ($1, $2, $3) " +
-        "ON CONFLICT (rangequestion_id, review_id) DO UPDATE SET answer=$1 RETURNING answer");
-
-    private static getMCAnswerByReviewId: PreparedStatement = new PreparedStatement("get-mc-answer-by-id",
-        "SELECT * FROM mcanswer WHERE review_id = $1 AND mcquestion_id = $2");
-
-    private static getOpenAnswerByReviewId: PreparedStatement = new PreparedStatement("get-open-answer-by-id",
-        "SELECT * FROM openanswer WHERE review_id = $1 AND openquestion_id = $2");
-
-    private static getRangeAnswerByReviewId: PreparedStatement = new PreparedStatement("get-range-answer-by-id",
-        "SELECT * FROM rangeanswer WHERE review_id = $1 AND rangequestion_id = $2");
 
     /**
      * Execute a 'get review' query, where all reviews are fetched.
@@ -40,8 +13,12 @@ export default class ReviewPS {
      * @return {Promise<pgPromise.queryResult>} - a result, containing tuples following the API documentation.
      */
     public static executeGetReview(reviewId: number): any {
-        this.getReview.values = [reviewId];
-        return Database.executeQuerySingleResult(this.getReview);
+        const statement = new PreparedStatement("get-review-by-id",
+            "SELECT review.id, rubric_assignment_id, file_path, comment, done " +
+            "FROM review JOIN submission ON submission.id = review.submission_id " +
+            "WHERE review.id = $1");
+        statement.values = [reviewId];
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
@@ -50,8 +27,13 @@ export default class ReviewPS {
      * @return {Promise<pgPromise.queryResult>} - a corresponding review where the done field is set to true.
      */
     public static executeSubmitReview(reviewId: number): Promise<pgPromise.queryResult> {
-        this.submitReview.values = [reviewId];
-        return Database.executeQuery(this.submitReview);
+        const statement = new PreparedStatement("submit-review",
+            "UPDATE review " +
+            "SET done=true " +
+            "WHERE id = $1" +
+            "RETURNING *");
+        statement.values = [reviewId];
+        return Database.executeQuery(statement);
     }
 
     /**
@@ -63,8 +45,11 @@ export default class ReviewPS {
      */
     public static executeUpdateMpcAnswer(answerOption: number, questionId: number, reviewId: number)
         : Promise<pgPromise.queryResult> {
-        this.updateMpcAnswer.values = [answerOption, questionId, reviewId];
-        return Database.executeQuerySingleResult(this.updateMpcAnswer);
+        const statement =  new PreparedStatement("add-mpc-answer",
+            "INSERT INTO mcanswer(answer, mcquestion_id, review_id) VALUES ($1, $2, $3) ON CONFLICT (mcquestion_id, review_id) " +
+            "DO UPDATE SET answer=$1 RETURNING answer");
+        statement.values = [answerOption, questionId, reviewId];
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
@@ -76,8 +61,11 @@ export default class ReviewPS {
      */
     public static executeUpdateOpenAnswer(answer: string, questionId: number, reviewId: number)
         : Promise<pgPromise.queryResult> {
-        this.updateOpenAnswer.values = [answer, questionId, reviewId];
-        return Database.executeQuerySingleResult(this.updateOpenAnswer);
+        const statement = new PreparedStatement("add-open-answer",
+            "INSERT INTO openanswer(answer, openquestion_id, review_id) VALUES ($1, $2, $3) " +
+            "ON CONFLICT (openquestion_id, review_id) DO UPDATE SET answer=$1 RETURNING answer");
+        statement.values = [answer, questionId, reviewId];
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
@@ -89,8 +77,11 @@ export default class ReviewPS {
      */
     public static executeUpdateRangeAnswer(answer: number, questionId: number, reviewId: number)
         : Promise<pgPromise.queryResult> {
-        this.updateRangeAnswer.values = [answer, questionId, reviewId];
-        return Database.executeQuerySingleResult(this.updateRangeAnswer);
+        const statement = new PreparedStatement("add-range-answer",
+            "INSERT INTO rangeanswer(answer, rangequestion_id, review_id) VALUES ($1, $2, $3) " +
+            "ON CONFLICT (rangequestion_id, review_id) DO UPDATE SET answer=$1 RETURNING answer");
+        statement.values = [answer, questionId, reviewId];
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
@@ -101,8 +92,10 @@ export default class ReviewPS {
      */
     public static executeGetMCAnswer(reviewId: number, mcQuestionId: number)
         : Promise<pgPromise.queryResult> {
-        this.getMCAnswerByReviewId.values = [reviewId, mcQuestionId];
-        return Database.executeQuerySingleResult(this.getMCAnswerByReviewId);
+        const statement = new PreparedStatement("get-mc-answer-by-id",
+            "SELECT * FROM mcanswer WHERE review_id = $1 AND mcquestion_id = $2");
+        statement.values = [reviewId, mcQuestionId];
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
@@ -113,8 +106,10 @@ export default class ReviewPS {
      */
     public static executeGetRangeAnswer(reviewId: number, rangeQuestionId: number)
         : Promise<pgPromise.queryResult> {
-        this.getRangeAnswerByReviewId.values = [reviewId, rangeQuestionId];
-        return Database.executeQuerySingleResult(this.getRangeAnswerByReviewId);
+        const statement = new PreparedStatement("get-range-answer-by-id",
+            "SELECT * FROM rangeanswer WHERE review_id = $1 AND rangequestion_id = $2");
+        statement.values = [reviewId, rangeQuestionId];
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
@@ -125,7 +120,9 @@ export default class ReviewPS {
      */
     public static executeGetOpenAnswer(reviewId: number, openQuestionId: number)
         : Promise<pgPromise.queryResult> {
-        this.getOpenAnswerByReviewId.values = [reviewId, openQuestionId];
-        return Database.executeQuerySingleResult(this.getOpenAnswerByReviewId);
+        const statement = new PreparedStatement("get-open-answer-by-id",
+            "SELECT * FROM openanswer WHERE review_id = $1 AND openquestion_id = $2");
+        statement.values = [reviewId, openQuestionId];
+        return Database.executeQuerySingleResult(statement);
     }
 }

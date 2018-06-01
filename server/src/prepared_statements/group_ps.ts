@@ -1,57 +1,80 @@
 import Database from "../database";
 import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 
+/**
+ * Prepared statement class for routes
+ */
 export default class GroupsPS {
-    public static getGroups: PreparedStatement = new PreparedStatement("get-groups",
-        'SELECT * FROM "grouplist"');
 
-    public static getGroupById: PreparedStatement = new PreparedStatement("get-group-id",
-        'SELECT * FROM "grouplist" WHERE "id" = $1');
-
-    public static getUsersOfGroupById: PreparedStatement = new PreparedStatement("get-all-users-group",
-        'SELECT * FROM "groupusers" WHERE "group_groupid" = $1');
-
-    public static addGroup: PreparedStatement = new PreparedStatement("add-group",
-        'INSERT INTO "grouplist" ("group_name") VALUES ($1) RETURNING id, group_name');
-
-    public static addGrouptoAssignment: PreparedStatement = new PreparedStatement("add-group-to-assignment",
-        'INSERT INTO "assignmentgroup" ("assignment_id", "group_id") VALUES ($1, $2) RETURNING assignment_id, group_id');
-
-    public static addStudenttoGroup: PreparedStatement = new PreparedStatement("add-student-to-group",
-        'INSERT INTO "groupusers" ("user_netid", "group_groupid") VALUES ($1, $2) RETURNING user_netid, group_groupid');
-
-    // Executes a 'get-groups' query
+    /**
+     * Prepeared statement that gets all groupes
+     * @returns {Promise<pgPromise.queryResult>}
+     */
     public static executeGetGroups(): Promise<pgPromise.queryResult> {
-        return Database.executeQuery(this.getGroups);
+        const statement = new PreparedStatement("get-groups",
+            'SELECT * FROM "grouplist"');
+        return Database.executeQuery(statement);
     }
 
-    // Executes a 'get-group-id' query
+    /**
+     * Prepared statement fumction that gets a group with a certain id
+     * @param {number} id - group_id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
     public static executeGetGroupById(id: number): Promise<pgPromise.queryResult> {
-        this.getGroupById.values = [id];
-        return Database.executeQuerySingleResult(this.getGroupById);
+        const statement = new PreparedStatement("get-group-id",
+            'SELECT * FROM "grouplist" WHERE "id" = $1');
+        statement.values = [id];
+        return Database.executeQuerySingleResult(statement);
     }
 
-    // Executes a 'get-all-users-group' query
+    /**
+     * Prepared statement that gets all users of a certain group
+     * @param {number} id - group_id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
     public static executeGetUsersOfGroupById(id: number): Promise<pgPromise.queryResult> {
-        this.getUsersOfGroupById.values = [id];
-        return Database.executeQuery(this.getUsersOfGroupById);
+        const statement = new PreparedStatement("get-all-users-group",
+            'SELECT * FROM "groupusers" WHERE "group_groupid" = $1');
+        statement.values = [id];
+        return Database.executeQuery(statement);
     }
 
-    // Executes a 'add group' query
+    /**
+     * Prepared statement function that adds a group to the database
+     * @param {string} name - name
+     * @returns {Promise<pgPromise.queryResult>}
+     */
     public static executeAddGroup(name: string): Promise<pgPromise.queryResult> {
-        this.addGroup.values = [name];
-        return Database.executeQuerySingleResult(this.addGroup);
+        const statement = new PreparedStatement("add-group",
+            'INSERT INTO "grouplist" ("group_name") VALUES ($1) RETURNING id, group_name');
+        statement.values = [name];
+        return Database.executeQuerySingleResult(statement);
     }
 
-    // Executes a 'add-group-to-assignment' query
+    /**
+     * Prepared statement fucntion that adds a group to an assignment
+     * @param {number} groupId - group_id
+     * @param {number} assignmentId - assignment_id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
     public static executeAddGrouptoAssignment(groupId: number, assignmentId: number): Promise<pgPromise.queryResult> {
-        this.addGrouptoAssignment.values = [assignmentId, groupId];
-        return Database.executeQuerySingleResult(this.addGrouptoAssignment);
+        const statement = new PreparedStatement("add-group-to-assignment",
+            'INSERT INTO "assignmentgroup" ("assignment_id", "group_id") VALUES ($1, $2) RETURNING assignment_id, group_id');
+        statement.values = [assignmentId, groupId];
+        return Database.executeQuerySingleResult(statement);
     }
 
-    // Executes a 'add-student-to-group' query
+    /**
+     * Prepared statement that add a student to a group
+     * @param {string} netId - net_id
+     * @param {number} groupId - group_id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
     public static executeAddStudenttoGroup(netId: string, groupId: number): Promise<pgPromise.queryResult> {
-        this.addStudenttoGroup.values = [netId, groupId];
-        return Database.executeQuerySingleResult(this.addStudenttoGroup);
+        const statement = new PreparedStatement("add-student-to-group",
+            'INSERT INTO "groupusers" ("user_netid", "group_groupid") VALUES ($1, $2) RETURNING user_netid, group_groupid');
+        statement.values = [netId, groupId];
+        return Database.executeQuerySingleResult(statement);
     }
 }
