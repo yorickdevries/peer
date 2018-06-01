@@ -28,7 +28,7 @@
                                     <h5 class="mb-1">Publish date</h5>
                                 </div>
                                 <p class="mb-1">
-                                    {{assignment.publish_date}}
+                                    {{formatDate(assignment.publish_date)}}
                                 </p>
                             </b-list-group-item>
                             <b-list-group-item class="flex-column align-items-start">
@@ -36,17 +36,9 @@
                                     <h5 class="mb-1">Due date</h5>
                                 </div>
                                 <p class="mb-1">
-                                    {{assignment.due_date}}
+                                    {{formatDate(assignment.due_date)}}
                                 </p>
                             </b-list-group-item>
-                            <!--<b-list-group-item class="flex-column align-items-start">-->
-                                <!--<div class="d-flex w-100 justify-content-between">-->
-                                    <!--<h5 class="mb-1">Number of reviews that each student needs to do</h5>-->
-                                <!--</div>-->
-                                <!--<p class="mb-1">-->
-                                    <!--{{assignment.peer_review_cap}}-->
-                                <!--</p>-->
-                            <!--</b-list-group-item>-->
                         </b-list-group>
                     </b-card>
                 </b-col>
@@ -73,6 +65,13 @@ export default {
             assignment: {
 
             },
+        }
+    },
+    methods: {
+        formatDate(date) {
+            // Formats the date to a readable format for the UI.
+            if (!(date instanceof Date)) date = new Date(date)
+            return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
         }
     }
 }
