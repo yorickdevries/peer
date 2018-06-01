@@ -1,5 +1,5 @@
 /**
- * Class responsible for making a fake logged in user ofr testing purposes.
+ * Class responsible for making a fake logged in user for testing purposes.
  *
  * @export
  * @class InitLogin
