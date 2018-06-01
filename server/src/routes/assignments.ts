@@ -222,4 +222,12 @@ router.get("/:id/reviewCount", async (req: any, res) => {
     res.json(await AssignmentPS.executeCountAssignmentReviews(req.params.id, req.userinfo.given_name));
 });
 
+/**
+ * Route to get the reviews belonging to an assignment.
+ * @param id - assignment id.
+ */
+router.get("/:id/reviews", async (req: any, res) => {
+    res.json(await AssignmentPS.executeGetReviewsById(req.params.id));
+});
+
 export default router;
