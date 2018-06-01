@@ -50,6 +50,7 @@ describe("API review routes", () => {
                     "question": {
                         "id": 1,
                         "type_question": "mc",
+                        "rubric_assignment_id": 1,
                         "question": "What is the best way to insert queries?",
                         "question_number": 3,
                         "option": [{"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}, {
