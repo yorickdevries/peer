@@ -68,6 +68,7 @@ export default class ReviewDistribution {
             for (const user of allUsers) {
                 const groupId = user.groupId;
                 // make a list of all other submissions
+                // TODO: Here one should make sure that the list doesnt include the already assigned submissions to this user
                 const otherSubmissions = this.makeCountList(groupId, allSubmissions, reviews);
                 // Shuffle all the submissions
                 this.shuffle(otherSubmissions);
