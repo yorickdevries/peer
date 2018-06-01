@@ -8,8 +8,8 @@ export default class AssignmentPS {
 
     /**
      * Executes a query that gets the review that was assigned to a certain user
-     * @param {number} assignment_id - assignment id
-     * @param {string} net_id
+     * @param {number} assignmentId - assignment id
+     * @param {string} netId
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeGetReviewByAssignmentId(assignmentId: number, netId: string): Promise<pgPromise.queryResult> {
@@ -21,9 +21,9 @@ export default class AssignmentPS {
 
     /**
      * Executes create review for a specific assignment and user
-     * @param {string} net_id - net id
-     * @param {number} submission_id - submission id
-     * @param {number} assignment_id - assignment id
+     * @param {string} netId - net id
+     * @param {number} submissionId - submission id
+     * @param {number} assignmentId - assignment id
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeCreateReviewByAssignmentId(netId: string, submissionId: number, assignmentId: number): Promise<pgPromise.queryResult> {
@@ -35,12 +35,12 @@ export default class AssignmentPS {
 
     /**
      * Executes 'get all submissions per assignment'
-     * @param assignment_id - assignment_id
+     * @param assignmentId - assignment_id
      */
     public static executeGetAllSubmissionsByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-all-subbmissions-by-assignmentId",
             "SELECT * FROM submission WHERE assignment_id = $1");
-        statemen.values = [assignmentId];
+        statement.values = [assignmentId];
         return Database.executeQuery(statement);
     }
 

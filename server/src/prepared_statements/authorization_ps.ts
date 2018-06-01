@@ -8,7 +8,7 @@ export default class AuthorizationPS {
 
     /**
      * Check with the course_id if a user is enrolled
-     * @param {number} course_id - course_id
+     * @param {number} courseId - course_id
      * @param {String} netId - netId
      * @returns {Promise<pgPromise.queryResult>}
      */
