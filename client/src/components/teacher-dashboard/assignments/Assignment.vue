@@ -44,6 +44,12 @@
                 </b-col>
             </b-row>
 
+            <b-row>
+                <b-col>
+                    <b-button variant="success" class="mt-3" :to="{ name: 'teacher-dashboard.assignments.assignment.edit', params: {courseId: course.id, assignmentId: assignment.id} }">Edit assignment</b-button>
+                </b-col>
+            </b-row>
+
         </b-container>
     </div>
 </template>
@@ -53,17 +59,25 @@ import api from '../../../api'
 
 export default {
     async created() {
+        let cid = this.$route.params.courseId
         let aid = this.$route.params.assignmentId
-        this.aid = aid
+        this.course.id = cid
+        this.assignment.id = aid
         let res = await api.getAssignment(aid)
         this.assignment = res.data
     },
     data() {
         return {
-            // cid: null,
-            aid: null,
+            course: {
+                id: null
+            },
             assignment: {
-
+                id: null,
+                title: null,
+                description: null,
+                publish_date: null,
+                due_date: null,
+                filename: null
             },
         }
     },
