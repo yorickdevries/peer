@@ -1,6 +1,5 @@
 import Database from "../database";
 import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
-import express = require("express");
 
 /**
  * Executes User prepared statements in the database.
