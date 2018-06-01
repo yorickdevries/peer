@@ -10,7 +10,7 @@ import pgp, { errors, default as pgPromise, PreparedStatement } from "pg-promise
 export default class Database {
   /**
    * Connection object.
-   * 
+   *
    * @static
    * @type {{
    *     user: string,
@@ -29,8 +29,20 @@ export default class Database {
     port: number
   };
 
+  /**
+   * Database object which will contain the connection
+   *
+   * @static
+   * @type {*}
+   * @memberof Database
+   */
   static db: any;
-  
+  /**
+   * Initialisation method which connects the database settings to this.db .
+   *
+   * @static
+   * @memberof Database
+   */
   static initialize() {
     const options = {
       // Initialization Options

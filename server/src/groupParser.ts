@@ -3,7 +3,12 @@ import GroupPS from "./prepared_statements/group_ps";
 import UserPS from "./prepared_statements/user_ps";
 import AssignmentPS from "./prepared_statements/assignment_ps";
 import CoursesPS from "./prepared_statements/courses_ps";
-
+/**
+ * Enables parsing of Group files in CSV format.
+ *
+ * @export
+ * @class GroupParser
+ */
 export default class GroupParser {
     /**
      * Parses the group data into the database
@@ -20,7 +25,14 @@ export default class GroupParser {
         }
     }
 
-    // this function checks whether an assignment exists
+    /**
+     * Checks whether an assignment exists
+     *
+     * @static
+     * @param {number} assignmentId
+     * @returns
+     * @memberof GroupParser
+     */
     public static async assignmentExists(assignmentId: number) {
         const res: any = await AssignmentPS.executeCountAssignmentById(assignmentId);
         if (res.error || res.count == 0) {
@@ -30,7 +42,14 @@ export default class GroupParser {
         }
     }
 
-    // this function creates a student when the student doesnt exist
+    /**
+     * Creates a student when the student doesn't exist.
+     *
+     * @static
+     * @param {string} netId
+     * @returns
+     * @memberof GroupParser
+     */
     public static async createStudentIfNotExists(netId: string) {
         const res: any = await UserPS.executeCountUserById(netId);
         // In case there is no student entry yet in the database, make one
@@ -42,7 +61,15 @@ export default class GroupParser {
         return;
     }
 
-    // this function enrolls a student if not already enrolled
+    /**
+     * Enrolls a student if not already enrolled.
+     *
+     * @static
+     * @param {number} courseId
+     * @param {string} netId
+     * @returns
+     * @memberof GroupParser
+     */
     public static async enrollStudentIfNotEnrolled(courseId: number, netId: string) {
         const res: any = await CoursesPS.executeCountUserByCourseId(courseId, netId);
         // In case there is no student entry yet in the database, make one
@@ -53,7 +80,15 @@ export default class GroupParser {
         return;
     }
 
-    // this function maps the groups to the students
+    /**
+     * Maps the groups to the students
+     *
+     * @static
+     * @param {object[]} studentlist
+     * @param {string} groupColumn
+     * @returns {Map<string, string[]>}
+     * @memberof GroupParser
+     */
     public static mapGroups(studentlist: object[], groupColumn: string): Map<string, string[]> {
         // initialize result map
         const result: Map<string, string[]> = new Map<string, string[]>();
@@ -89,7 +124,15 @@ export default class GroupParser {
         return result;
     }
 
-    // Puts the groups into the database
+    /**
+     * Puts the groups into the database
+     *
+     * @static
+     * @param {Map<string, string[]>} studentmap
+     * @param {number} assignmentId
+     * @returns
+     * @memberof GroupParser
+     */
     public static async addGroupsToDatabase(studentmap: Map<string, string[]>, assignmentId: number) {
         if (!await this.assignmentExists(assignmentId)) {
             throw new Error("Assignment doesn't exist in the database");
