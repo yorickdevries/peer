@@ -258,6 +258,7 @@ export default class RubricPS {
             questionJson.push({
                 id: mcQuestions[i].id,
                 type_question: mcQuestions[i].type_question,
+                rubric_assignment_id: mcQuestions[i].rubric_assignment_id,
                 question: mcQuestions[i].question,
                 question_number: mcQuestions[i].question_number,
                 option: await RubricPS.executeGetAllMCOptionById(mcQuestions[i].id)
