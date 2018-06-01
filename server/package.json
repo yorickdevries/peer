@@ -10,7 +10,7 @@
     "tsc": "tsc",
     "test": "mocha --timeout 10000",
     "coverage": "nyc npm run test",
-    "db_init": "node ./dist/database_init.js"
+    "db_init": "node ./dist/scripts/database_init.js"
   },
   "nyc": {
     "check-coverage": true,
@@ -29,7 +29,9 @@
       "src/**/*.ts"
     ],
     "exclude": [
-      "**/*.d.ts"
+      "**/*.d.ts",
+      "src/bin/www.ts",
+      "src/scripts/*.ts"
     ],
     "reporter": [
       "text",
