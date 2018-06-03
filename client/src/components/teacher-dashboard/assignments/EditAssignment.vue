@@ -34,7 +34,7 @@
                                 <b-form-input   v-model="assignment.publish_date"
                                                 type="date"
                                                 placeholder="Please enter on which the assignment should be published"
-                                                required>
+                                                >
                                 </b-form-input>
                             </b-form-group>
                             <b-form-group label="Due date">
@@ -43,7 +43,7 @@
                                                 type="date"
                                                 :state="checkDue"
                                                 placeholder="Please enter on which the assignment should be handed in"
-                                                required>
+                                                >
                                 </b-form-input>
                                 <b-form-invalid-feedback>
                                     Due date should be past publish date!
