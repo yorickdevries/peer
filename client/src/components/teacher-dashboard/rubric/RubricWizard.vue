@@ -20,7 +20,7 @@
                         <b-card-header>
                             <span>Question {{ question.question_number }}</span>
                             <b-badge variant="success" class="ml-2 float-right p-1">{{
-                                question.type_question.toUpperCase() }}
+                                question.type_question.toUpperCase() }} QUESTION
                             </b-badge>
                         </b-card-header>
 
@@ -80,17 +80,21 @@ export default {
     },
     data() {
         return {
-            rubric: {},
+            rubric: {
+                id: null,
+                assignment_id: null,
+                question: []
+            },
         }
     },
     async created() {
         await this.fetchRubric()
-        this.rubric.questions.sort((a, b) => a.question_number - b.question_number)
     },
     methods: {
         async fetchRubric() {
             let res = await api.client.get(`/rubric/4`)
             this.rubric = res.data
+            this.rubric.questions.sort((a, b) => a.question_number - b.question_number)
         },
         async deleteQuestion(question) {
             await api.client.delete(`${apiPrefixes[question.type_question]}/${question.id}`);
