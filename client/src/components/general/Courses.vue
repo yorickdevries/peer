@@ -23,10 +23,10 @@
                             <b-button-group size="sm" class="d-inline-block">
                                 <b-button v-if="course.role === 'student'" variant="outline-primary" :to="{ name: 'student-dashboard.course.home', params: { courseId: course.id } }">Enter as Student</b-button>
                                 <b-button v-else-if="course.role === 'TA'" variant="outline-primary" :to="{ name: 'teaching-assistant-dashboard.course.home', params: { courseId: course.id } }">Enter as TA</b-button>
-                                <b-button v-else-if="course.role === 'teacher'" variant="outline-primary" :to="{ name: 'teacher-dashboard.course', params: { id: course.id } }">Enter as Teacher</b-button>
+                                <b-button v-else-if="course.role === 'teacher'" variant="outline-primary" :to="{ name: 'teacher-dashboard.course', params: { courseId: course.id } }">Enter as Teacher</b-button>
                                 <b-button variant="outline-danger" :to="{ name: 'student-dashboard.course.home', params: { courseId: course.id } }">Student (DEV)</b-button>
                                 <b-button variant="outline-danger" :to="{ name: 'teaching-assistant-dashboard.course.home', params: { courseId: course.id } }">TA (DEV)</b-button>
-                                <b-button variant="outline-danger" :to="{ name: 'teacher-dashboard.course', params: { id: course.id } }">Teacher (DEV)</b-button>
+                                <b-button variant="outline-danger" :to="{ name: 'teacher-dashboard.course', params: { courseId: course.id } }">Teacher (DEV)</b-button>
                             </b-button-group>
                             </div>
                     </b-card>

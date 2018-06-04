@@ -32,7 +32,7 @@
             <!--Edit button-->
             <b-row>
                 <b-col>
-                    <b-button variant="success" class="mt-3" :to="{ name: 'teacher-dashboard.course.edit', params: {id: course.id} }">Edit course</b-button>
+                    <b-button variant="success" class="mt-3" :to="{ name: 'teacher-dashboard.course.edit', params: {courseId: course.id} }">Edit course</b-button>
                 </b-col>
             </b-row>
 
@@ -54,7 +54,7 @@ export default {
         }
     },
     async created() {
-        let id = this.$route.params.id
+        let id = this.$route.params.courseId
         this.course.id = id
         let res = await api.getCourse(id)
         this.course = res.data
