@@ -1,51 +1,48 @@
 
 <template>
     <b-container>
+
+        <b-row class="mb-3">
+            <b-col>
+                <b-button v-b-modal="'createModal'" size="sm" variant="primary" class="w-100">Add new Question
+                </b-button>
+            </b-col>
+        </b-row>
+
         <b-row>
             <b-col>
 
-                <b-card class="mt-4" no-body>
+                <b-card v-for="(question, index) in rubric.questions"
+                        :key="question.id"
+                        class="mb-3"
+                        no-body>
 
                     <b-card-header class="d-flex align-items-center">
-                        <div class="w-100">Rubric Wizard</div>
-                        <b-button v-b-modal="'createModal'" size="sm" variant="primary">Add new Question</b-button>
+                        <span class="w-100">Question {{ question.question_number }}</span>
+                        <b-badge variant="success" class="ml-2 float-right p-1">{{
+                            question.type_question.toUpperCase() }} QUESTION
+                        </b-badge>
                     </b-card-header>
 
                     <b-card-body>
-                    <b-card v-for="(question, index) in rubric.questions"
-                            :key="question.id"
-                            class="mb-3"
-                            no-body>
+                        <template v-if="question.type_question === 'open'">
+                            <OpenQuestion v-model="rubric.questions[index]"></OpenQuestion>
+                        </template>
 
-                        <b-card-header class="d-flex align-items-center">
-                            <span class="w-100">Question {{ question.question_number }}</span>
-                            <b-badge variant="success" class="ml-2 float-right p-1">{{
-                                question.type_question.toUpperCase() }} QUESTION
-                            </b-badge>
-                        </b-card-header>
+                        <template v-if="question.type_question === 'range'">
+                            <RangeQuestion v-model="rubric.questions[index]"></RangeQuestion>
+                        </template>
 
-                        <b-card-body>
-                            <template v-if="question.type_question === 'open'">
-                                <OpenQuestion v-model="rubric.questions[index]"></OpenQuestion>
-                            </template>
+                        <template v-if="question.type_question === 'mc'">
+                            <MCQuestion v-model="rubric.questions[index]"></MCQuestion>
+                        </template>
 
-                            <template v-if="question.type_question === 'range'">
-                                <RangeQuestion v-model="rubric.questions[index]"></RangeQuestion>
-                            </template>
-
-                            <template v-if="question.type_question === 'mc'">
-                                <MCQuestion v-model="rubric.questions[index]"></MCQuestion>
-                            </template>
-
-                            <b-button @click="saveQuestion(question)" variant="outline-primary" size="sm" class="mr-1">
-                                Save
-                            </b-button>
-                            <b-button @click="deleteQuestion(question)" variant="outline-danger" size="sm">Delete
-                            </b-button>
-                        </b-card-body>
-                    </b-card>
+                        <b-button @click="saveQuestion(question)" variant="outline-primary" size="sm" class="mr-1">
+                            Save
+                        </b-button>
+                        <b-button @click="deleteQuestion(question)" variant="outline-danger" size="sm">Delete
+                        </b-button>
                     </b-card-body>
-
                 </b-card>
 
                 <b-modal id="createModal" centered hide-header hide-footer class="p-0 m-0">
@@ -78,9 +75,7 @@ export default {
         MCQuestion,
         CreateQuestionWizard
     },
-    props: [
-        ["id"]
-    ],
+    props: ['rubricId'],
     data() {
         return {
             rubric: {
@@ -95,7 +90,7 @@ export default {
     },
     methods: {
         async fetchRubric() {
-            let res = await api.client.get(`/rubric/4`)
+            let res = await api.client.get(`/rubric/${this.rubricId}`)
             this.rubric = res.data
             this.rubric.questions.sort((a, b) => a.question_number - b.question_number)
         },

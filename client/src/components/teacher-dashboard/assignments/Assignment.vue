@@ -47,6 +47,11 @@
                                     </b-list-group-item>
                                 </b-list-group>
                             </b-tab>
+
+                            <b-tab title="Rubric">
+                                <RubricWizard :rubricId="assignment.id"></RubricWizard>
+                            </b-tab>
+
                         </b-tabs>
                     </b-card>
                 </b-col>
@@ -59,8 +64,12 @@
 
 <script>
 import api from '../../../api'
+import RubricWizard from '../rubric/RubricWizard'
 
 export default {
+    components: {
+        RubricWizard
+    },
     async created() {
         let cid = this.$route.params.courseId
         let aid = this.$route.params.assignmentId
