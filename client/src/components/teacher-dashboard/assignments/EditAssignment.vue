@@ -29,26 +29,35 @@
                                                     resquired>
                                 </b-form-textarea>
                             </b-form-group>
-                            <!--<b-form-group label="Publish date">-->
-                                <!--<div class="mb-0 text-secondary">Current publish date is {{formatDate(assignment.publish_date)}}, set a new publish date below:</div>-->
-                                <!--<b-form-input   v-model="assignment.publish_date"-->
-                                                <!--type="date"-->
-                                                <!--placeholder="Please enter on which the assignment should be published"-->
-                                                <!--&gt;-->
-                                <!--</b-form-input>-->
-                            <!--</b-form-group>-->
-                            <!--<b-form-group label="Due date">-->
-                                <!--<div class="mb-0 text-secondary">Current due date is {{formatDate(assignment.due_date)}}, set a new due date below:</div>-->
-                                <!--<b-form-input   v-model="assignment.due_date"-->
-                                                <!--type="date"-->
-                                                <!--:state="checkDue"-->
-                                                <!--placeholder="Please enter on which the assignment should be handed in"-->
-                                                <!--&gt;-->
-                                <!--</b-form-input>-->
-                                <!--<b-form-invalid-feedback>-->
-                                    <!--Due date should be past publish date!-->
-                                <!--</b-form-invalid-feedback>-->
-                            <!--</b-form-group>-->
+                            <b-form-group label="Publish date and time">
+                                <b-form-input   v-model="assignment.publish_date"
+                                                type="date"
+                                                placeholder="Please enter date on which the assignment should be published"
+                                                >
+                                </b-form-input>
+                                <b-form-input   v-model="assignment.publish_time"
+                                                type="time"
+                                                placeholder="Please enter time on which the assignment should be published"
+                                >
+                                </b-form-input>
+                            </b-form-group>
+                            <b-form-group label="Due date and time">
+                                <b-form-input   v-model="assignment.due_date"
+                                                type="date"
+                                                :state="checkDue"
+                                                placeholder="Please enter date on which the assignment should be handed in"
+                                                >
+                                </b-form-input>
+                                <b-form-input   v-model="assignment.due_time"
+                                                type="time"
+                                                :state="checkDue"
+                                                placeholder="Please enter time before which the assignment should be handed in"
+                                >
+                                </b-form-input>
+                                <b-form-invalid-feedback>
+                                    Due date and time should be past publish date and time!
+                                </b-form-invalid-feedback>
+                            </b-form-group>
                             <b-button type="submit" variant="primary">Save changes</b-button>
                         </b-form>
                     </b-card>
@@ -70,7 +79,9 @@ export default {
                 title: null,
                 description: null,
                 publish_date: null,
+                publish_time: null,
                 due_date: null,
+                due_time: null,
                 filename: null
             },
             course: {
@@ -95,6 +106,13 @@ export default {
         this.assignment.id = aid
         let res = await api.getAssignment(aid)
         this.assignment = res.data
+        console.log(res.data.publish_date)
+        let ptime = res.data.publish_date.split('T')[1].substring(0,5)
+        let dtime = res.data.due_date.split('T')[1].substring(0,5)
+        this.assignment.publish_date = res.data.publish_date.split('T')[0]
+        this.assignment.publish_time = ptime
+        this.assignment.due_date = res.data.due_date.split('T')[0]
+        this.assignment.due_time = dtime
     },
     methods: {
         async onSubmit() {
