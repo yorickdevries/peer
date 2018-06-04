@@ -125,8 +125,9 @@ export default {
             formData.append("publish_date", this.assignment.publish_date)
             formData.append("due_date", this.assignment.due_date)
             formData.append("assignmentFile", this.file)
-            formData.append("peer_review_cap", this.assignment.title)
+            formData.append("peer_review_cap", this.assignment.peer_review_cap)
 
+            console.log(formData)
             let res = await api.createAssignment(formData)
             console.log(this.assignment)
             console.log(res)
