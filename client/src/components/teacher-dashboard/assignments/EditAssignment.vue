@@ -29,26 +29,26 @@
                                                     resquired>
                                 </b-form-textarea>
                             </b-form-group>
-                            <b-form-group label="Publish date">
-                                <div class="mb-0 text-secondary">Current publish date is {{formatDate(assignment.publish_date)}}, set a new publish date below:</div>
-                                <b-form-input   v-model="assignment.publish_date"
-                                                type="date"
-                                                placeholder="Please enter on which the assignment should be published"
-                                                >
-                                </b-form-input>
-                            </b-form-group>
-                            <b-form-group label="Due date">
-                                <div class="mb-0 text-secondary">Current due date is {{formatDate(assignment.due_date)}}, set a new due date below:</div>
-                                <b-form-input   v-model="assignment.due_date"
-                                                type="date"
-                                                :state="checkDue"
-                                                placeholder="Please enter on which the assignment should be handed in"
-                                                >
-                                </b-form-input>
-                                <b-form-invalid-feedback>
-                                    Due date should be past publish date!
-                                </b-form-invalid-feedback>
-                            </b-form-group>
+                            <!--<b-form-group label="Publish date">-->
+                                <!--<div class="mb-0 text-secondary">Current publish date is {{formatDate(assignment.publish_date)}}, set a new publish date below:</div>-->
+                                <!--<b-form-input   v-model="assignment.publish_date"-->
+                                                <!--type="date"-->
+                                                <!--placeholder="Please enter on which the assignment should be published"-->
+                                                <!--&gt;-->
+                                <!--</b-form-input>-->
+                            <!--</b-form-group>-->
+                            <!--<b-form-group label="Due date">-->
+                                <!--<div class="mb-0 text-secondary">Current due date is {{formatDate(assignment.due_date)}}, set a new due date below:</div>-->
+                                <!--<b-form-input   v-model="assignment.due_date"-->
+                                                <!--type="date"-->
+                                                <!--:state="checkDue"-->
+                                                <!--placeholder="Please enter on which the assignment should be handed in"-->
+                                                <!--&gt;-->
+                                <!--</b-form-input>-->
+                                <!--<b-form-invalid-feedback>-->
+                                    <!--Due date should be past publish date!-->
+                                <!--</b-form-invalid-feedback>-->
+                            <!--</b-form-group>-->
                             <b-button type="submit" variant="primary">Save changes</b-button>
                         </b-form>
                     </b-card>
