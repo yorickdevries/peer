@@ -79,7 +79,7 @@ export default {
         CreateQuestionWizard
     },
     props: [
-        id
+        ["id"]
     ],
     data() {
         return {
