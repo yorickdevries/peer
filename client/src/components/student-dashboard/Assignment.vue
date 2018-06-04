@@ -76,23 +76,6 @@ import api from "../../api"
 
 export default {
     name: 'Assignment',
-    async created() {
-
-        // Get assignment.
-        let res = await api.getAssignment(this.$route.params.assignmentId)
-        this.assignment = res.data
-
-        // Add assignment name to breadcrumb.
-        this.items.push({
-            text: this.assignment.title,
-            active: true
-        })
-
-        // Temp:
-        let tempDate = new Date(this.assignment.due_date);
-        tempDate.setDate(tempDate.getDate() + 40);
-        this.assignment.peer_review_due_date = tempDate
-    },
     data() {
         return {
             items: [{
@@ -101,13 +84,14 @@ export default {
             }],
             assignment: {
                 title: null,
-                due_date: null
+                due_date: null,
+                peer_review_due_date: null
             },
         }
     },
     computed: {
         isHandInActive() {
-           return new Date() < new Date(this.assignment.due_date)
+            return new Date() < new Date(this.assignment.due_date)
         },
         isPeerReviewActive() {
             return new Date() < new Date(this.assignment.peer_review_due_date)
@@ -116,8 +100,29 @@ export default {
             return new Date() > new Date(this.assignment.peer_review_due_date)
         }
     },
+    async created() {
+        // Fetch the assignment.
+        await this.fetchAssignment()
+
+        // Add assignment name to breadcrumb header.
+        this.items.push({
+            text: this.assignment.title,
+            active: true
+        })
+
+        // Temporary creation of a due date for the peer review (offset by 40).
+        let tempDate = new Date(this.assignment.due_date);
+        tempDate.setDate(tempDate.getDate() + 40);
+        this.assignment.peer_review_due_date = tempDate
+    },
     methods: {
+        async fetchAssignment() {
+            // Fetch the assignment information.
+            let res = await api.getAssignment(this.$route.params.assignmentId)
+            this.assignment = res.data
+        },
         formatDate(date) {
+            // Formats the date to a readable format for the UI.
             if (!(date instanceof Date)) date = new Date(date)
             return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
         }

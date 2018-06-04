@@ -1,8 +1,10 @@
 <template>
     <div>
-
         <Navbar :links="null"></Navbar>
-        <keep-alive><router-view></router-view></keep-alive>
+
+        <keep-alive>
+            <router-view></router-view>
+        </keep-alive>
 
     </div>
 </template>

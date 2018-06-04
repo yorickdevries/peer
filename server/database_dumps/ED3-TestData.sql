@@ -145,8 +145,8 @@ INSERT INTO public.submission(
 	VALUES ('paulvanderlaan', 22, 2, 'submission2.pdf', '2018-05-01T20:30:00Z');
 
 INSERT INTO public.review(
-	comment, user_netid, submission_id, rubric_assignment_id)
-	VALUES ('Plagiaat', 'henkjan', 1, 1);
+	comment, user_netid, submission_id, rubric_assignment_id, done)
+	VALUES ('Plagiaat', 'henkjan', 1, 1, false), ('Review finished!', 'paulvanderlaan', 1, 1, true);
 
 INSERT INTO public.mcanswer(
 	answer, mcquestion_id, review_id)

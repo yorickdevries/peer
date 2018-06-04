@@ -28,10 +28,11 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: maxSize },
     fileFilter: function (req: any, file, cb: any) {
-        if (file.mimetype !== "application/pdf") {
+        const ext = path.extname(file.originalname);
+        if (ext !== ".pdf") {
             req.fileValidationError = "File should be a .pdf file";
             // tslint:disable-next-line
-            return cb(null, false, new Error("File should be a .pdf file"));
+            return cb(null, false)
         }
         // tslint:disable-next-line
         cb(null, true);

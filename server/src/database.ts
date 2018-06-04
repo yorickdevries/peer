@@ -2,7 +2,25 @@ import promise from "bluebird";
 import isCI from "is-ci";
 import pgp, { errors, default as pgPromise, PreparedStatement } from "pg-promise";
 
+/**
+ * Database class responsible for the connection to the postgreSQL database.
+ * @export
+ * @class Database
+ */
 export default class Database {
+  /**
+   * Connection object.
+   *
+   * @static
+   * @type {{
+   *     user: string,
+   *     host: string,
+   *     database: string,
+   *     password: string,
+   *     port: number
+   *   }}
+   * @memberof Database
+   */
   static connection: {
     user: string,
     host: string,
@@ -11,8 +29,20 @@ export default class Database {
     port: number
   };
 
+  /**
+   * Database object which will contain the connection
+   *
+   * @static
+   * @type {*}
+   * @memberof Database
+   */
   static db: any;
-
+  /**
+   * Initialisation method which connects the database settings to this.db .
+   *
+   * @static
+   * @memberof Database
+   */
   static initialize() {
     const options = {
       // Initialization Options
@@ -85,7 +115,7 @@ export default class Database {
         try {
             return await Database.db.one(statement);
         } catch (err) {
-          console.log(err);
+          console.log("Error " + err + "\nStatement: " + statement);
             return {
                 statement: statement,
                 error: "There was a problem executing the information to the database."

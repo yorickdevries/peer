@@ -1,15 +1,19 @@
 // Imports
 import path from "path";
 import fs from "fs";
+import index from "../security/index";
 import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import ReviewPS from "../prepared_statements/review_ps";
 import GroupParser from "../groupParser";
 import reviewDistribution from "../reviewDistribution";
+import bodyParser from "body-parser";
 
 // Router
 import express from "express";
+
 const router = express();
+router.use(bodyParser.json());
 
 const fileFolder = path.join(__dirname, "../files/assignments");
 
@@ -29,7 +33,7 @@ const storage = multer.diskStorage({
 const maxSizeAssignmentFile = 30 * 1024 * 1024;
 const uploadAssignment = multer({
     storage: storage,
-    limits: { fileSize: maxSizeAssignmentFile },
+    limits: {fileSize: maxSizeAssignmentFile},
     fileFilter: function (req: any, file, cb: any) {
         const ext = path.extname(file.originalname);
         if (ext !== ".pdf") {
@@ -47,7 +51,7 @@ const uploadAssignment = multer({
 const maxSizeGroupsfile = 1 * 1024 * 1024;
 // The file will be stored into the memory
 const uploadGroups = multer({
-    limits: { fileSize: maxSizeGroupsfile },
+    limits: {fileSize: maxSizeGroupsfile},
     fileFilter: function (req: any, file, cb: any) {
         const ext = path.extname(file.originalname);
         if (ext !== ".csv") {
@@ -61,16 +65,15 @@ const uploadGroups = multer({
 }).single("groupFile");
 
 
-
 /**
  * Route to get all the information about an assignment
  * @params assignment_id - assignment id
  */
 router.route("/:assignment_id")
-    .get(async (req, res) => {
-        res.json(await AssignmentPS.executeGetAssignmentById(
-            req.params.assignment_id
-        ));
+    .get(index.authorization.enrolledAssignmentCheck, async (req, res) => {
+            res.json(await AssignmentPS.executeGetAssignmentById(
+                req.params.assignment_id
+            ));
     });
 
 
@@ -84,29 +87,29 @@ router.route("/:assignment_id")
  * @body publish_date - publish date.
  */
 router.route("/")
-    .post(async (req: any, res) => {
-        // File upload handling
-        uploadAssignment(req, res, async function (err) {
-            // Error in case of too large file size
-            if (err) {
-                res.json({ error: err });
-            }
-            // Error in case of wrong file type
-            else if (req.fileValidationError) {
-                res.json({ error: req.fileValidationError });
-            } else {
-                const fileName = req.file.filename;
-                // add to database
-                res.json(await AssignmentPS.executeAddAssignment(
-                    req.body.title,
-                    req.body.description,
-                    req.body.due_date,
-                    req.body.publish_date,
-                    req.body.course_id,
-                    req.body.reviews_per_user,
-                    fileName));
-            }
-        });
+    .post(index.authorization.enrolledAsTeacherAssignmentCheckForPost, async (req: any, res, next) => {
+            // File upload handling
+            uploadAssignment(req, res, async function (err) {
+                // Error in case of too large file size
+                if (err) {
+                    res.json({error: err});
+                }
+                // Error in case of wrong file type
+                else if (req.fileValidationError) {
+                    res.json({error: req.fileValidationError});
+                } else {
+                    const fileName = req.file.filename;
+                    // add to database
+                    res.json(await AssignmentPS.executeAddAssignment(
+                        req.body.title,
+                        req.body.description,
+                        req.body.due_date,
+                        req.body.publish_date,
+                        req.body.course_id,
+                        req.body.reviews_per_user,
+                        fileName));
+                }
+            });
     });
 
 
@@ -120,12 +123,12 @@ router.route("/")
  * @body publish_date - publish date.
  */
 router.route("/:assignment_id")
-    .put(async (req, res) => {
-        res.json(await AssignmentPS.executeUpdateAssignmentById(
-            req.body.assignment_title,
-            req.body.assignment_description,
-            req.body.course_id,
-            req.params.assignment_id));
+    .put(index.authorization.enrolledAsTeacherAssignmentCheckForPost, async (req, res) => {
+            res.json(await AssignmentPS.executeUpdateAssignmentById(
+                req.body.assignment_title,
+                req.body.assignment_description,
+                req.body.course_id,
+                req.params.assignment_id));
     });
 
 /**
@@ -156,10 +159,10 @@ router.route("/:assignment_id/submission")
  * @params assignment_id - assignment_id
  */
 router.route("/:assignment_id/allsubmissions")
-    .get(async (req, res) => {
-        res.json(await AssignmentPS.executeGetAllSubmissionsByAssignmentId(
-            req.params.assignment_id
-        ));
+    .get(index.authorization.enrolledAsTAOrTeacherAssignment, async (req, res) => {
+            res.json(await AssignmentPS.executeGetAllSubmissionsByAssignmentId(
+                req.params.assignment_id
+            ));
     });
 
 
@@ -170,7 +173,11 @@ router.route("/:assignment_id/allsubmissions")
  */
 router.route("/:assignment_id/requestReview")
     .get(async (req: any, res) => {
-        res.json(await ReviewPS.executeGetReviewsByUserIdAndAssignmentId(req.userinfo.given_name, req.params.assignment_id));
+        res.json(await AssignmentPS.executeCreateReviewByAssignmentId(
+            req.userinfo.given_name,
+            1, // HERE THE SHUFFLING NEEDS TO BE DONE
+            req.params.assignment_id
+        ));
     });
 
 router.route("/:assignment_id/distributeReviews")
@@ -200,15 +207,15 @@ router.post("/:id/importgroups", async (req: any, res) => {
     uploadGroups(req, res, async function (err) {
         // Error in case of wrong file type
         if (req.fileValidationError) {
-            res.json({ error: req.fileValidationError });
+            res.json({error: req.fileValidationError});
             // Error (in case of too large file size)
         } else if (err) {
-            res.json({ error: err });
+            res.json({error: err});
             // error if no file was uploaded or no group column defined
         } else if (req.file == undefined) {
-            res.json({ error: "No file uploaded" });
+            res.json({error: "No file uploaded"});
         } else if (req.body.groupColumn == undefined) {
-            res.json({ error: "No groupcolumn defined" });
+            res.json({error: "No groupcolumn defined"});
         } else {
             const groupColumn = req.body.groupColumn;
             const assignmentId = req.params.id;
@@ -220,6 +227,14 @@ router.post("/:id/importgroups", async (req: any, res) => {
 
 router.get("/:id/reviewCount", async (req: any, res) => {
     res.json(await AssignmentPS.executeCountAssignmentReviews(req.params.id, req.userinfo.given_name));
+});
+
+/**
+ * Route to get the reviews belonging to an assignment.
+ * @param id - assignment id.
+ */
+router.get("/:id/reviews", async (req: any, res) => {
+    res.json(await AssignmentPS.executeGetReviewsById(req.params.id));
 });
 
 export default router;

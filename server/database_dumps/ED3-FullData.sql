@@ -33,7 +33,8 @@ INSERT INTO public.assignmentlist(
 	    ('A2', 'An example of a second assignment', 3, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
 	    ('Assignment one', 'Example assignment number one', 4, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
 	    ('Assignment two', 'An example of a second assignment', 4, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
-	    ('Assignment three', 'This is another example of a third assignment.', 4, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf')
+	    ('Assignment three', 'This is another example of a third assignment.', 4, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
+		('Bonus Assignment', 'bonus description', 2, 2, '2019-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment2.pdf')
 	    ;
 
 
@@ -137,9 +138,9 @@ INSERT INTO public.mcoption(
 INSERT INTO public.enroll(
 	course_id, user_netid, role)
 	VALUES
-	    (2, 'paulvanderlaan', 'student'),
-	    (3, 'paulvanderlaan', 'student'),
-	    (4, 'paulvanderlaan', 'student'),
+	    (2, 'paulvanderlaan', 'TA'),
+	    (3, 'paulvanderlaan', 'TA'),
+	    (4, 'paulvanderlaan', 'TA'),
 	    (1, 'henkjan', 'student'),
 	    (2, 'henkjan', 'student'),
 	    (3, 'henkjan', 'student')
@@ -155,7 +156,20 @@ INSERT INTO public.submission(
 	    ('paulvanderlaan', 10, 4, 'submission1.pdf', '2018-05-01T20:30:00Z'),
 	    ('paulvanderlaan', 10, 5, 'submission1.pdf', '2018-05-01T20:30:00Z'),
 	    ('paulvanderlaan', 10, 6, 'submission1.pdf', '2018-05-01T20:30:00Z'),
-	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission2.pdf'),
+	    ('henkjan', 10, 1, 'submission2.pdf'),
+	    ('henkjan', 10, 1, 'submission2.pdf'),
+	    ('henkjan', 10, 1, 'submission2.pdf'),
+	    ('henkjan', 10, 1, 'submission1.pdf'),
+	    ('henkjan', 10, 1, 'submission1.pdf'),
+	    ('henkjan', 10, 1, 'submission1.pdf'),
+	    ('henkjan', 10, 1, 'submission1.pdf'),
+	    ('henkjan', 10, 1, 'submission1.pdf'),
+	    ('henkjan', 10, 1, 'submission2.pdf'),
+	    ('henkjan', 10, 1, 'submission2.pdf'),
+	    ('henkjan', 10, 1, 'submission2.pdf'),
+	    ('henkjan', 10, 1, 'submission2.pdf'),
+	    ('henkjan', 10, 1, 'submission2.pdf'),
 	    ('henkjan', 10, 2, 'submission2.pdf', '2018-05-01T20:30:00Z'),
 	    ('henkjan', 10, 3, 'submission2.pdf', '2018-05-01T20:30:00Z'),
 	    ('henkjan', 10, 4, 'submission2.pdf', '2018-05-01T20:30:00Z'),
@@ -166,19 +180,19 @@ INSERT INTO public.submission(
 	;
 
 INSERT INTO public.review(
-	comment, user_netid, submission_id, rubric_assignment_id)
+	comment, user_netid, submission_id, rubric_assignment_id, done)
 	VALUES
-	    ('Very good', 'henkjan', 1, 4),
-	    ('Impressive', 'henkjan', 2, 5),
-	    ('Excellent', 'henkjan', 3, 6),
-	    ('Wow!', 'paulvanderlaan', 4, 1),
-	    ('Wow!', 'paulvanderlaan', 5, 2),
-	    ('Wow!', 'paulvanderlaan', 6, 3),
-	    ('Wow!', 'paulvanderlaan', 7, 4),
-	    ('Wow!', 'paulvanderlaan', 8, 5),
-	    ('Wow!', 'paulvanderlaan', 8, 6),
-	    ('Wow!', 'paulvanderlaan', 8, 7),
-	    ('Wow!', 'paulvanderlaan', 8, 8)
+	    ('Very good', 'henkjan', 1, 4, true),
+	    ('Impressive', 'henkjan', 2, 5, false),
+	    ('Excellent', 'henkjan', 3, 6, false),
+	    ('Wow!', 'paulvanderlaan', 4, 1, false),
+	    ('Wow!', 'paulvanderlaan', 5, 2, false),
+	    ('Wow!', 'paulvanderlaan', 6, 3, false),
+	    ('Wow!', 'paulvanderlaan', 7, 4, false),
+	    ('Wow!', 'paulvanderlaan', 8, 5, false),
+	    ('Wow!', 'paulvanderlaan', 8, 6, false),
+	    ('Wow!', 'paulvanderlaan', 8, 7, false),
+	    ('Wow!', 'paulvanderlaan', 8, 8, false)
 	;
 
 INSERT INTO public.mcanswer(

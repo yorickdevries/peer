@@ -29,14 +29,6 @@ describe("RubricPreparedStatements Test", () => {
         });
     });
 
-    /**
-     * Test to get info about a rubric
-     */
-    it("get rubric", async () => {
-        expect(await RubricPS.executeGetRubricById(1)).to.deep.equal({
-            assignment_id: 1
-        });
-    });
 
     /**
      * Test to create open question
@@ -288,6 +280,7 @@ describe("RubricPreparedStatements Test", () => {
                     ],
                     "question": "What is the best way to insert queries?",
                     "question_number": 3,
+                    "rubric_assignment_id": 1,
                     "type_question": "mc",
                 },
                 {

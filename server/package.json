@@ -5,19 +5,16 @@
   "scripts": {
     "start": "npm run build && npm run db_init && npm run start_server",
     "start_server": "node ./dist/bin/www.js",
-    "tslint": "tslint 'src/**/*.ts' 'test/**/*.ts'",
+    "tslint": "tslint --project ./tsconfig_tslint.json",
     "build": "npm run tsc",
     "tsc": "tsc",
     "test": "mocha --timeout 10000",
     "coverage": "nyc npm run test",
-    "db_init": "node ./dist/database_init.js"
+    "db_init": "node ./dist/scripts/database_init.js"
   },
   "nyc": {
     "check-coverage": true,
-    "statements": 0,
-    "lines": 0,
-    "functions": 0,
-    "branches": 0,
+    "lines": 80,
     "all": true,
     "extension": [
       ".js",
@@ -29,7 +26,9 @@
       "src/**/*.ts"
     ],
     "exclude": [
-      "**/*.d.ts"
+      "**/*.d.ts",
+      "src/bin/www.ts",
+      "src/scripts/*.ts"
     ],
     "reporter": [
       "text",

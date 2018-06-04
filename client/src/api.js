@@ -19,11 +19,20 @@ export default {
     createCourse: async(course) => {
         return client.post('courses', course)
     },
+    saveCourse(courseId, course) {
+        return client.put(`courses/${courseId}`, course)
+    },
     getCourseAssignments(courseId) {
         return client.get(`courses/${courseId}/assignments`)
     },
     getAssignment(assignmentId) {
         return client.get(`assignments/${assignmentId}`)
+    },
+    createAssignment: async(assignment) => {
+        return client.post('/assignments', assignment)
+    },
+    getAssignmentReviews(assignmentId) {
+        return client.get(`/assignments/${assignmentId}/reviews`)
     },
     getCurrentPeerReview(assignmentId) {
         return client.get(`assignments/${assignmentId}/review`)
@@ -43,11 +52,17 @@ export default {
     savePeerReview(peerReviewId, peerReview) {
         return client.put(`reviews/${peerReviewId}`, peerReview)
     },
-    getSubmission(submissionId) {
-        return client.get(`submissions/${submissionId}`)
+    getAssignmentSubmission(assignmentId) {
+        return client.get(`assignments/${assignmentId}/submission`)
+    },
+    getAssignmentAllSubmissions(assignmentId) {
+        return client.get(`assignments/${assignmentId}/allsubmissions`)
     },
     deleteSubmission(submissionId) {
         return client.delete(`submissions/${submissionId}`)
+    },
+    getCurrentRoleForCourse(courseId) {
+        return client.get(`courses/${courseId}/role`)
     }
 }
 

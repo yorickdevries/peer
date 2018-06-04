@@ -46,34 +46,73 @@ router.post("/mcoption", async (req, res) => {
     res.json(RubricPS.executeCreateMCOption(req.body.option, req.body.mcquestion_id));
 });
 
+/**
+ * Route to update mcoption
+ *
+ */
 router.put("/mcoption/:option_id", async (req, res) => {
     res.json(RubricPS.executeUpdateMCOption(req.body.option, req.body.mcquestion_id, req.params.option_id));
 });
 
+/**
+ * create mcquestion
+ * @body question - question
+ * @body question_number - question_number
+ */
 router.post("/mcquestion", async (req, res) => {
-    res.json(RubricPS.executeCreateMCQuestion(req.body.question, req.body.rubric_id, req.body.question_number));
-});
-
-router.put("/openquestion/:question_id", async (req, res) => {
-    res.json(rubricPS.executeUpdateMCQuestion(req.body.question, req.body.rubric_id, req.body.question.number, req.params.question_id));
+        res.json(RubricPS.executeCreateMCQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number));
 });
 
 
+/**
+ * Update mcquestion
+ * @params  question_id - question_id
+ * @body question - question
+ * @body question_number - question_number
+ */
+router.put("/mcquestion/:question_id", async (req, res) => {
+    res.json(rubricPS.executeUpdateMCQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number, req.params.question_id));
+});
+
+/**
+ * Create rangequestion
+ * @body question - question
+ * @body range - range
+ * @body rubric_id - rubric_id
+ * @body question_number - question_number
+ */
 router.post("/rangequestion", async (req, res) => {
-    res.json(RubricPS.executeCreateRangeQuestion(req.body.question, req.body.range, req.body.rubric_id, req.body.question_number));
+    res.json(RubricPS.executeCreateRangeQuestion(req.body.question, req.body.range, req.body.rubric_assignment_id, req.body.question_number));
 });
 
+/**
+ * Update rangequestion
+ * @params question_id - question_id
+ * @body question - question
+ * @body range - range
+ * @body rubric_id - rubric_id
+ * @body question_number - question_number
+ */
 router.put("/rangequestion/:question_id", async (req, res) => {
-    res.json(rubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.rubric_id, req.body.question.number, req.params.question_id));
+    res.json(rubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.rubric_assignment_id, req.body.question_number, req.params.question_id));
 });
 
-
+/**
+ * Create open question
+ * @body question - question
+ * @body rubric_id - rubric_id
+ * @body question_number - question_number
+ */
 router.post("/openquestion", async (req, res) => {
-    res.json(RubricPS.executeCreateOpenQuestion(req.body.question, req.body.rubric_id, req.body.question_number));
+    res.json(RubricPS.executeCreateOpenQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number));
 });
 
+/**
+ * Router to update open question
+ * @param question_id - question_id
+ */
 router.put("/openquestion/:question_id", async (req, res) => {
-    res.json(rubricPS.executeUpdateOpenQuestion(req.body.question, req.body.rubric_id, req.body.question.number, req.params.question_id));
+    res.json(rubricPS.executeUpdateOpenQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number, req.params.question_id));
 });
 
 /**
@@ -81,7 +120,7 @@ router.put("/openquestion/:question_id", async (req, res) => {
  * @body rubric_id
  */
 router.post("/", async (req, res) => {
-    res.json(RubricPS.executeCreateRubric(req.body.rubric_id));
+    res.json(RubricPS.executeCreateRubric(req.body.rubric_assignment_id));
 });
 
 /**
