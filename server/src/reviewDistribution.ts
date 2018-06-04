@@ -2,13 +2,18 @@ import SubmissionsPS from "./prepared_statements/submissions_ps";
 import GroupsPS from "./prepared_statements/group_ps";
 import AssignmentPS from "./prepared_statements/assignment_ps";
 import ReviewPS from "./prepared_statements/review_ps";
+import RubricPS from "./prepared_statements/rubric_ps";
 
 export default class ReviewDistribution {
     /**
      * Distribute reviews for a specific assignment
      */
     public static async distributeReviews(assignmentId: number) {
-        // Check for a rubric entry!!!
+        // Check for a rubric entry
+        const rubric: any = await RubricPS.executeGetRubricById(assignmentId);
+        if (rubric.error) {
+            return {error: "No rubric is present for this assignment"};
+        }
         console.log("Distribution of reviews for assignment " + assignmentId);
         try {
             let reviews = undefined;
@@ -18,10 +23,11 @@ export default class ReviewDistribution {
                 reviews = await this.assignUsersToSubmissions(assignmentId);
                 console.log("Reviews: " + JSON.stringify(reviews));
             }
-            // Adding to database
+            // Add the review assignments to the database
             for (const review of reviews) {
                 await ReviewPS.executeCreateReview("", review.userNetId, review.submissionId, assignmentId);
             }
+            // Return a list of made reviews
             return reviews;
         } catch (err) {
             return {error: err.message};
@@ -32,7 +38,7 @@ export default class ReviewDistribution {
         const assignment: any = await AssignmentPS.executeGetAssignmentById(assignmentId);
         const reviewsPerUser = assignment.reviews_per_user;
         console.log("reviews per User: " + reviewsPerUser);
-        // Get the latest versions of all submissions
+        // Get the latest versions of all submissions per group
         const allSubmissions: any = await SubmissionsPS.executeGetLatestSubmissionsByAssignmentId(assignmentId);
         // If there are less submissions than required
         // to review per person, then no division can be made
@@ -56,9 +62,9 @@ export default class ReviewDistribution {
                 allUsers.push(userGroup);
             }
         }
-        // If there are less users than submissions
+        // If there are less users * reviews per user than submissions
         // then no division can be made
-        if (allSubmissions.length > allUsers.length) {
+        if (allSubmissions.length > (allUsers.length * reviewsPerUser)) {
             throw new Error("There are not enough users for the amount of submissions");
         }
         // Shuffle all the users
@@ -66,10 +72,8 @@ export default class ReviewDistribution {
         // make a certain amount of reviews per user
         for (let k = 0; k < reviewsPerUser; k++) {
             for (const user of allUsers) {
-                const groupId = user.groupId;
-                // make a list of all other submissions
-                // TODO: Here one should make sure that the list doesnt include the already assigned submissions to this user
-                const otherSubmissions = this.makeCountList(groupId, allSubmissions, reviews);
+                // make a list of all potential submissions
+                const otherSubmissions = this.makeCountList(user.userNetId, user.groupId, allSubmissions, reviews);
                 // Shuffle all the submissions
                 this.shuffle(otherSubmissions);
                 // Sort the submissions based on reviewcount
@@ -83,10 +87,10 @@ export default class ReviewDistribution {
             }
         }
         // make a submissionCount of all submissions
-        const submissionCount = this.makeCountList(undefined, allSubmissions, reviews);
+        const submissionCount = this.makeCountList(undefined, undefined, allSubmissions, reviews);
         // sort submissions from low to high
         this.sortSubmissionCount(submissionCount);
-        // In case there is a submission without assignment
+        // In case there is a submission without assignment return undefined
         if (submissionCount[0].count == 0) {
             return undefined;
         } else {
@@ -94,7 +98,7 @@ export default class ReviewDistribution {
         }
     }
 
-    // Counts the amount of assigned reviews
+    // Counts the amount of assigned reviews to a certain submission
     public static countReviews(submissionId: number, reviews: any[]) {
         let count = 0;
         for (const review of reviews) {
@@ -105,13 +109,24 @@ export default class ReviewDistribution {
         return count;
     }
 
+    // checks whether this user already reviews this submission
+    public static reviewsSubmission(netId: string | undefined, submissionId: number, reviews: any[]) {
+        for (const review of reviews) {
+            if (review.userNetId == netId && review.submissionId == submissionId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Makes a list of reviewcounts
-    public static makeCountList(currentGroupId: number | undefined, submissions: any[], reviews: any[]) {
+    // Here one should make sure that the list doesnt include the already assigned submissions to this user
+    public static makeCountList(currentnetId: string | undefined, currentGroupId: number | undefined, submissions: any[], reviews: any[]) {
         // make a list of all other submissions
         const otherSubmissions = [];
         for (const submission of submissions) {
-            // skip the current submission
-            if (submission.group_id !== currentGroupId) {
+            // skip the current submission if the user is the same group or if the user already reviews this submission
+            if (submission.group_id !== currentGroupId && !this.reviewsSubmission(currentnetId, submission.id, reviews)) {
                 const count = this.countReviews(submission.id, reviews);
                 const submissionCount = {submission: submission, count: count};
                 otherSubmissions.push(submissionCount);
