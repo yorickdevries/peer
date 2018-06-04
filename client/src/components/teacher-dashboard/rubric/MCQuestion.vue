@@ -9,13 +9,17 @@
 
         <b-form-group label="Multiple Choice Options" description="Delete, edit and add MC options here. Make sure to save.">
             <template v-for="(option, index) in question.option">
-                <b-form :key="index" inline>
-                    <b-form-group class="mb-2">
-                        <b-form-input v-model="option.option" :disabled="option.delete" class="mr-2"></b-form-input>
-                        <b-button @click="deleteMCOption(question, option)" v-if="!option.delete" variant="danger" size="sm">Delete</b-button>
-                        <b-button @click="undoDeleteMCOption(option)" v-else variant="secondary" size="sm">Undo
-                        </b-button>
-                    </b-form-group>
+                <b-form :key="index">
+                    <div class="input-group mb-2">
+                        <b-form-input v-model="option.option" :disabled="option.delete"></b-form-input>
+                        <div class="input-group-append">
+                            <b-button @click="deleteMCOption(question, option)" v-if="!option.delete" variant="danger"
+                                      size="sm">Delete
+                            </b-button>
+                            <b-button @click="undoDeleteMCOption(option)" v-else variant="secondary" size="sm">Undo
+                            </b-button>
+                        </div>
+                    </div>
                 </b-form>
             </template>
             <b-button @click="addMCOption(question)" variant="success" size="sm">Add new option</b-button>
