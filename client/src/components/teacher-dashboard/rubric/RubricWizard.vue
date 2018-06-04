@@ -6,17 +6,25 @@
 
                 <b-card class="mt-4" no-body>
 
-                    <b-card-header>
-                        <span>Rubric Wizard</span>
-                        <b-button v-b-modal="'createModal'" size="sm" variant="outline-primary" class="float-right">Add new Question</b-button>
+                    <b-card-header class="d-flex align-items-center">
+                        <div class="w-100">Rubric Wizard</div>
+                        <b-button v-b-modal="'createModal'" size="sm" variant="primary">Add new Question</b-button>
                     </b-card-header>
 
                     <b-card-body>
                     <b-card v-for="(question, index) in rubric.questions"
                             :key="question.id"
-                            :header="`Question ${question.question_number} [${question.type_question.toUpperCase()}]`"
-                            class="mb-3">
+                            class="mb-3"
+                            no-body>
 
+                        <b-card-header>
+                            <span>Question {{ question.question_number }}</span>
+                            <b-badge variant="success" class="ml-2 float-right p-1">{{
+                                question.type_question.toUpperCase() }}
+                            </b-badge>
+                        </b-card-header>
+
+                        <b-card-body>
                             <template v-if="question.type_question === 'open'">
                                 <OpenQuestion v-model="rubric.questions[index]"></OpenQuestion>
                             </template>
@@ -29,9 +37,12 @@
                                 <MCQuestion v-model="rubric.questions[index]"></MCQuestion>
                             </template>
 
-                        <b-button @click="saveQuestion(question)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
-                        <b-button @click="deleteQuestion(question)" variant="outline-danger" size="sm">Delete</b-button>
-
+                            <b-button @click="saveQuestion(question)" variant="outline-primary" size="sm" class="mr-1">
+                                Save
+                            </b-button>
+                            <b-button @click="deleteQuestion(question)" variant="outline-danger" size="sm">Delete
+                            </b-button>
+                        </b-card-body>
                     </b-card>
                     </b-card-body>
 
