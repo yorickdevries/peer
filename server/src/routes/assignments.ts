@@ -29,6 +29,44 @@ const uploadAssignment = multer({
     }
 }).single("assignmentFile");
 
+// File upload handling
+const uploadAssignmentFunction = function(req: any, res: any, next: any) {
+    uploadAssignment(req, res, function (err) {
+        // Error in case of too large file size
+        if (err) {
+            res.json({error: err});
+        }
+        // Error in case of wrong file type
+        else if (req.fileValidationError) {
+            res.json({error: req.fileValidationError});
+        } else {
+            next();
+        }
+    });
+};
+
+// Function which adds the assignment to the database.
+const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
+    const fileFolder = path.join(__dirname, "../files/assignments");
+    const fileName = Date.now() + "-" + req.file.originalname;
+    const filePath = path.join(fileFolder, fileName);
+    // writing the file
+    fs.writeFile(filePath, req.file.buffer, (err) => {
+        if (err) {
+            res.json({error: err});
+        }
+        console.log("The file has been saved at" + filePath);
+    });
+    // add to database
+    res.json(await AssignmentPS.executeAddAssignment(
+        req.body.title,
+        req.body.description,
+        req.body.due_date,
+        req.body.publish_date,
+        req.body.course_id,
+        fileName));
+};
+
 
 // CSV of max 1 MB (in bytes)
 const maxSizeGroupsfile = 1 * 1024 * 1024;
@@ -62,48 +100,8 @@ router.route("/:assignment_id")
 
 /**
  * Route to post and update an assignment.
- * @body assignment_title - assignment title.
- * @body assignment_description - assignment description.
- * @params course_id - course id.
- * @body assignment_id - assignment id.
- * @body due_date - due date.
- * @body publish_date - publish date.
  */
-router.route("/")
-    .post(index.authorization.enrolledAsTeacherAssignmentCheckForPost, async (req: any, res, next) => {
-            // File upload handling
-            uploadAssignment(req, res, async function (err) {
-                // Error in case of too large file size
-                if (err) {
-                    res.json({error: err});
-                }
-                // Error in case of wrong file type
-                else if (req.fileValidationError) {
-                    res.json({error: req.fileValidationError});
-                } else {
-                    const fileFolder = path.join(__dirname, "../files/assignments");
-                    const fileName = Date.now() + "-" + req.file.originalname;
-                    const filePath = path.join(fileFolder, fileName);
-                    // writing the file
-                    fs.writeFile(filePath, req.file.buffer, (err) => {
-                        if (err) {
-                            res.json({error: err});
-                        }
-                        console.log("The file has been saved at" + filePath);
-                      });
-
-                    // add to database
-                    res.json(await AssignmentPS.executeAddAssignment(
-                        req.body.title,
-                        req.body.description,
-                        req.body.due_date,
-                        req.body.publish_date,
-                        req.body.course_id,
-                        fileName));
-                }
-            });
-
-    });
+router.post("/", uploadAssignmentFunction, index.authorization.enrolledAsTeacherAssignmentCheckForPost, addAssignmentToDatabase);
 
 
 /**
