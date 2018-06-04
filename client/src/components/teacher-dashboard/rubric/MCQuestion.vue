@@ -13,7 +13,8 @@
                     <b-form-group class="mb-2">
                         <b-form-input v-model="option.option" :disabled="option.delete" class="mr-2"></b-form-input>
                         <b-button @click="deleteMCOption(question, option)" v-if="!option.delete" variant="danger" size="sm">Delete</b-button>
-                        <b-button @click="undoDeleteMCOption(option)" v-else variant="seconadry" size="sm">Undo</b-button>
+                        <b-button @click="undoDeleteMCOption(option)" v-else variant="secondary" size="sm">Undo
+                        </b-button>
                     </b-form-group>
                 </b-form>
             </template>
