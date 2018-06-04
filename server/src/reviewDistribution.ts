@@ -4,6 +4,12 @@ import AssignmentPS from "./prepared_statements/assignment_ps";
 import ReviewPS from "./prepared_statements/review_ps";
 import RubricPS from "./prepared_statements/rubric_ps";
 
+/**
+ * Class which takes care of the distribution of all reviews over the students
+ *
+ * @export
+ * @class ReviewDistribution
+ */
 export default class ReviewDistribution {
     /**
      * Distribute reviews for a specific assignment
@@ -20,7 +26,7 @@ export default class ReviewDistribution {
             // Calculate a solution until a valid solution is found or an error is thrown
             while (reviews == undefined) {
                 console.log("Assigning reviews:");
-                reviews = await this.assignUsersToSubmissions(assignmentId);
+                reviews = await this.assignSubmissionstoUsers(assignmentId);
                 console.log("Reviews: " + JSON.stringify(reviews));
             }
             // Add the review assignments to the database
@@ -34,7 +40,15 @@ export default class ReviewDistribution {
         }
     }
 
-    public static async assignUsersToSubmissions(assignmentId: number) {
+    /**
+     * This methods assigns reviews for a specific assignment
+     *
+     * @static
+     * @param {number} assignmentId
+     * @returns
+     * @memberof ReviewDistribution
+     */
+    public static async assignSubmissionstoUsers(assignmentId: number) {
         const assignment: any = await AssignmentPS.executeGetAssignmentById(assignmentId);
         const reviewsPerUser = assignment.reviews_per_user;
         console.log("reviews per User: " + reviewsPerUser);
@@ -98,7 +112,15 @@ export default class ReviewDistribution {
         }
     }
 
-    // Counts the amount of assigned reviews to a certain submission
+    /**
+     * Counts the amount of assigned reviews to a certain submission
+     *
+     * @static
+     * @param {number} submissionId
+     * @param {any[]} reviews
+     * @returns
+     * @memberof ReviewDistribution
+     */
     public static countReviews(submissionId: number, reviews: any[]) {
         let count = 0;
         for (const review of reviews) {
@@ -109,7 +131,16 @@ export default class ReviewDistribution {
         return count;
     }
 
-    // checks whether this user already reviews this submission
+    /**
+     * Checks whether this user already reviews this submission
+     *
+     * @static
+     * @param {(string | undefined)} netId
+     * @param {number} submissionId
+     * @param {any[]} reviews
+     * @returns
+     * @memberof ReviewDistribution
+     */
     public static reviewsSubmission(netId: string | undefined, submissionId: number, reviews: any[]) {
         for (const review of reviews) {
             if (review.userNetId == netId && review.submissionId == submissionId) {
@@ -119,8 +150,18 @@ export default class ReviewDistribution {
         return false;
     }
 
-    // Makes a list of reviewcounts
-    // Here one should make sure that the list doesnt include the already assigned submissions to this user
+    /**
+     * Makes a list of reviewcounts
+     * this method makes sure that the list doesnt include the already assigned submissions to this user
+     *
+     * @static
+     * @param {(string | undefined)} currentnetId
+     * @param {(number | undefined)} currentGroupId
+     * @param {any[]} submissions
+     * @param {any[]} reviews
+     * @returns
+     * @memberof ReviewDistribution
+     */
     public static makeCountList(currentnetId: string | undefined, currentGroupId: number | undefined, submissions: any[], reviews: any[]) {
         // make a list of all other submissions
         const otherSubmissions = [];
@@ -135,16 +176,22 @@ export default class ReviewDistribution {
         return otherSubmissions;
     }
 
-    // sorts submissions based on the submissioncount
+    /**
+     * Sorts submissions based on the submissioncount
+     *
+     * @static
+     * @param {any[]} submissions
+     * @returns
+     * @memberof ReviewDistribution
+     */
     public static sortSubmissionCount(submissions: any[]) {
-        // sort function
-        function compare(a: any, b: any) {
+        const compare = function(a: any, b: any) {
             if (a.count < b.count)
                 return -1;
             if (a.count > b.count)
                 return 1;
             return 0;
-        }
+        };
         submissions.sort(compare);
         return;
     }

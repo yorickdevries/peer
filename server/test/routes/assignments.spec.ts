@@ -149,6 +149,7 @@ describe("API Assignment routes", () => {
                 publish_date: "2018-04-01T20:30:00.000Z",
                 id: 1,
                 course_id: 1,
+                reviews_per_user: 2,
                 filename: "assignment1.pdf"
             }
         ));

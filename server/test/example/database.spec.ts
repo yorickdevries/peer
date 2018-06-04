@@ -63,14 +63,14 @@ describe("Database Test", () => {
     const statement = new PreparedStatement("user-count",
     "SELECT COUNT(1) FROM userlist");
     const result = await Database.executeQuerySingleResult(statement);
-    expect(result).to.deep.equal({ count: "3" });
+    expect(result).to.deep.equal({ count: "4" });
   });
 
   it("database query any result", async () => {
     const statement = new PreparedStatement("get-all-users",
     "SELECT * FROM userlist");
     const result = await Database.executeQuery(statement);
-    expect(result.length).to.equal(3);
+    expect(result.length).to.equal(4);
   });
 
   it("database error query single result", async () => {
