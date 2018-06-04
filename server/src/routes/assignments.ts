@@ -13,24 +13,9 @@ import express from "express";
 const router = express();
 router.use(bodyParser.json());
 
-const fileFolder = path.join(__dirname, "../files/assignments");
-
-// Upload settings
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        // tslint:disable-next-line
-        cb(null, fileFolder);
-    },
-    filename: function (req, file, cb) {
-        // tslint:disable-next-line
-        cb(null, Date.now() + '-' + file.originalname);
-    }
-});
-
 // PDF of max 30 MB (in bytes)
 const maxSizeAssignmentFile = 30 * 1024 * 1024;
 const uploadAssignment = multer({
-    storage: storage,
     limits: {fileSize: maxSizeAssignmentFile},
     fileFilter: function (req: any, file, cb: any) {
         const ext = path.extname(file.originalname);
@@ -96,7 +81,17 @@ router.route("/")
                 else if (req.fileValidationError) {
                     res.json({error: req.fileValidationError});
                 } else {
-                    const fileName = req.file.filename;
+                    const fileFolder = path.join(__dirname, "../files/assignments");
+                    const fileName = Date.now() + "-" + req.file.originalname;
+                    const filePath = path.join(fileFolder, fileName);
+                    // writing the file
+                    fs.writeFile(filePath, req.file.buffer, (err) => {
+                        if (err) {
+                            res.json({error: err});
+                        }
+                        console.log("The file has been saved at" + filePath);
+                      });
+
                     // add to database
                     res.json(await AssignmentPS.executeAddAssignment(
                         req.body.title,
