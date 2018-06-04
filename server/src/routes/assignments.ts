@@ -17,15 +17,16 @@ router.use(bodyParser.json());
 const maxSizeAssignmentFile = 30 * 1024 * 1024;
 const uploadAssignment = multer({
     limits: {fileSize: maxSizeAssignmentFile},
-    fileFilter: function (req: any, file, cb: any) {
+    fileFilter: function (req: any, file, callback) {
         const ext = path.extname(file.originalname);
         if (ext !== ".pdf") {
             req.fileValidationError = "File should be a .pdf file";
             // tslint:disable-next-line
-            return cb(null, false)
+            return callback(null, false);
+        } else {
+            // tslint:disable-next-line
+            return callback(null, true);
         }
-        // tslint:disable-next-line
-        cb(null, true);
     }
 }).single("assignmentFile");
 
@@ -34,11 +35,15 @@ const uploadAssignmentFunction = function(req: any, res: any, next: any) {
     uploadAssignment(req, res, function (err) {
         // Error in case of too large file size
         if (err) {
-            res.json({error: err});
+            res.json({ error: err });
+        }
+        // Error in case of no file
+        else if (req.file == undefined) {
+            res.json({ error: "No file uploaded" });
         }
         // Error in case of wrong file type
         else if (req.fileValidationError) {
-            res.json({error: req.fileValidationError});
+            res.json({ error: req.fileValidationError });
         } else {
             next();
         }
@@ -50,21 +55,24 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
     const fileFolder = path.join(__dirname, "../files/assignments");
     const fileName = Date.now() + "-" + req.file.originalname;
     const filePath = path.join(fileFolder, fileName);
-    // writing the file
-    fs.writeFile(filePath, req.file.buffer, (err) => {
-        if (err) {
-            res.json({error: err});
-        }
-        console.log("The file has been saved at" + filePath);
-    });
     // add to database
-    res.json(await AssignmentPS.executeAddAssignment(
+    const result: any = await AssignmentPS.executeAddAssignment(
         req.body.title,
         req.body.description,
         req.body.due_date,
         req.body.publish_date,
         req.body.course_id,
-        fileName));
+        fileName);
+    // writing the file if no error is there
+    if (!result.error) {
+        fs.writeFile(filePath, req.file.buffer, (err) => {
+            if (err) {
+                res.json({error: err});
+            }
+            console.log("The file has been saved at" + filePath);
+        });
+    }
+    res.json(result);
 };
 
 
@@ -73,15 +81,16 @@ const maxSizeGroupsfile = 1 * 1024 * 1024;
 // The file will be stored into the memory
 const uploadGroups = multer({
     limits: {fileSize: maxSizeGroupsfile},
-    fileFilter: function (req: any, file, cb: any) {
+    fileFilter: function (req: any, file, callback) {
         const ext = path.extname(file.originalname);
         if (ext !== ".csv") {
             req.fileValidationError = "File should be a .csv file";
             // tslint:disable-next-line
-            return cb(null, false)
+            return callback(null, false);
+        } else {
+            // tslint:disable-next-line
+            return callback(null, true);
         }
-        // tslint:disable-next-line
-        cb(null, true);
     }
 }).single("groupFile");
 

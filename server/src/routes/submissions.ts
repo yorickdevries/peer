@@ -3,24 +3,27 @@ import path from "path";
 import fs from "fs";
 import multer from "multer";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
+import bodyParser from "body-parser";
 
 // Router
-import { Router } from "express";
-const router = Router();
+import express from "express";
+const router = express();
+router.use(bodyParser.json());
 
 // PDF of max 30 MB (in bytes)
 const maxSizeSubmissionFile = 30 * 1024 * 1024;
 const uploadSubmission = multer({
     limits: {fileSize: maxSizeSubmissionFile},
-    fileFilter: function (req: any, file, cb: any) {
+    fileFilter: function (req: any, file, callback) {
         const ext = path.extname(file.originalname);
         if (ext !== ".pdf") {
             req.fileValidationError = "File should be a .pdf file";
             // tslint:disable-next-line
-            return cb(null, false)
+            return callback(null, false);
+        } else {
+            // tslint:disable-next-line
+            return callback(null, true);
         }
-        // tslint:disable-next-line
-        cb(null, true);
     }
 }).single("submissionFile");
 
@@ -30,6 +33,10 @@ const uploadSubmissionFunction = function(req: any, res: any, next: any) {
         // Error in case of too large file size
         if (err) {
             res.json({ error: err });
+        }
+        // Error in case of no file
+        else if (req.file == undefined) {
+            res.json({ error: "No file uploaded" });
         }
         // Error in case of wrong file type
         else if (req.fileValidationError) {
@@ -45,18 +52,20 @@ const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
     const fileFolder = path.join(__dirname, "../files/submissions");
     const fileName = Date.now() + "-" + req.file.originalname;
     const filePath = path.join(fileFolder, fileName);
-    // writing the file
-    fs.writeFile(filePath, req.file.buffer, (err) => {
-        if (err) {
-            res.json({error: err});
-        }
-        console.log("The file has been saved at" + filePath);
-    });
-    // add to database
     const netId = req.userinfo.given_name;
     const assignmentId = req.body.assignmentId;
     // add to database
-    res.json(await SubmissionsPS.executeCreateSubmission(netId, assignmentId, fileName));
+    const result: any = await SubmissionsPS.executeCreateSubmission(netId, assignmentId, fileName);
+    // writing the file if no error is there
+    if (!result.error) {
+        fs.writeFile(filePath, req.file.buffer, (err) => {
+            if (err) {
+                res.json({error: err});
+            }
+            console.log("The file has been saved at" + filePath);
+        });
+    }
+    res.json(result);
 };
 
 /**
