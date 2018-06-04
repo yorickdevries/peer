@@ -33,12 +33,12 @@
                                 <b-form-input   v-model="assignment.publish_date"
                                                 type="date"
                                                 placeholder="Please enter date on which the assignment should be published"
-                                                >
+                                                required>
                                 </b-form-input>
                                 <b-form-input   v-model="assignment.publish_time"
                                                 type="time"
                                                 placeholder="Please enter time on which the assignment should be published"
-                                >
+                                                required>
                                 </b-form-input>
                             </b-form-group>
                             <b-form-group label="Due date and time">
@@ -46,16 +46,16 @@
                                                 type="date"
                                                 :state="checkDue"
                                                 placeholder="Please enter date on which the assignment should be handed in"
-                                                >
+                                                required>
                                 </b-form-input>
                                 <b-form-input   v-model="assignment.due_time"
                                                 type="time"
                                                 :state="checkDue"
                                                 placeholder="Please enter time before which the assignment should be handed in"
-                                >
+                                                required>
                                 </b-form-input>
                                 <b-form-invalid-feedback>
-                                    Due date and time should be past publish date and time!
+                                    Due date should be past publish date!
                                 </b-form-invalid-feedback>
                             </b-form-group>
                             <b-button type="submit" variant="primary">Save changes</b-button>
@@ -106,7 +106,6 @@ export default {
         this.assignment.id = aid
         let res = await api.getAssignment(aid)
         this.assignment = res.data
-        console.log(res.data.publish_date)
         let ptime = res.data.publish_date.split('T')[1].substring(0,5)
         let dtime = res.data.due_date.split('T')[1].substring(0,5)
         this.assignment.publish_date = res.data.publish_date.split('T')[0]
