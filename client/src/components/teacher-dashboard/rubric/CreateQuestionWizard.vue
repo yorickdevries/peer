@@ -18,8 +18,6 @@
             <MCQuestion v-model="mcQuestion"></MCQuestion>
             <b-button @click="createQuestion(mcQuestion, selectedType)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
         </template>
-
-        {{ rubricId }}
     </b-card>
 </template>
 
@@ -90,29 +88,23 @@ export default {
         async createMCQuestion(question) {
 
             // Create the MC question itself.
-            await api.client.post(`${apiPrefixes['mc']}`, {
+            let res = await api.client.post(`${apiPrefixes['mc']}`, {
                 question: question.question,
                 rubric_assignment_id: question.rubric_assignment_id,
                 question_number: question.question_number
             })
 
-            // TODO: wait for the ^ POST to correctly return the created object
-            // let mcquestion_id = null
-            //
-            // // Create all the options.
-            // let options = question.option
-            // options.forEach(async option => {
-            //     console.log(`${apiPrefixes['mcoption']}`)
-            //     console.log({
-            //         option: option.option,
-            //         mcquestion_id: mcquestion_id
-            //     })
-            //     let res = await api.client.post(`${apiPrefixes['mcoption']}`, {
-            //         option: option.option,
-            //         mcquestion_id: mcquestion_id
-            //     })
-            // })
-            //
+            // Get the newly created ID of the MC question.
+            let mcquestion_id = res.data.id
+
+            // Create all the options.
+            let options = question.option
+            options.forEach(async option => {
+                await api.client.post(`${apiPrefixes['mcoption']}`, {
+                    option: option.option,
+                    mcquestion_id: mcquestion_id
+                })
+            })
 
             this.showSuccessMessage({message: "Successfully created question."})
             this.$emit('saved')
