@@ -17,8 +17,8 @@
                             class="mb-3"
                             no-body>
 
-                        <b-card-header>
-                            <span>Question {{ question.question_number }}</span>
+                        <b-card-header class="d-flex align-items-center">
+                            <span class="w-100">Question {{ question.question_number }}</span>
                             <b-badge variant="success" class="ml-2 float-right p-1">{{
                                 question.type_question.toUpperCase() }} QUESTION
                             </b-badge>
@@ -78,6 +78,9 @@ export default {
         MCQuestion,
         CreateQuestionWizard
     },
+    props: [
+        id
+    ],
     data() {
         return {
             rubric: {
