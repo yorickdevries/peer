@@ -116,21 +116,21 @@ describe("API Assignment routes", () => {
     /**
      * Create a new review.
      */
-    it("GET /:assignment_id/requestReview", async () => {
+    it("GET /:assignment_id/reviews", async () => {
         // test the router
         InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/requestReview");
+        const res = await chai.request(router).get("/1/reviews");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
+        expect(res.text).to.equal(JSON.stringify([
             {
-                id: 3,
-                comment: "",
+                id: 1,
+                comment: "Plagiaat",
                 user_netid: "henkjan",
                 submission_id: 1,
                 rubric_assignment_id: 1,
                 done: false
             }
-        ));
+        ]));
     });
 
     /**
@@ -230,10 +230,10 @@ describe("API Assignment routes", () => {
     /**
      * Test to get all reviews of an assignment.
      */
-    it("GET /:id/reviews", async () => {
+    it("GET /:id/allreviews", async () => {
         // test the router
         InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/reviews");
+        const res = await chai.request(router).get("/1/allreviews");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             [{"reviewer": "paulvanderlaan", "submitter": "henkjan"}]
