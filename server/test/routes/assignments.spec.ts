@@ -173,20 +173,27 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Test to get the submission of someone else.
+     * Test to get all the submissions of a certain assignment
      */
-    it("GET /:assignment_id/submission", async () => {
+    it("GET /:assignment_id/submissions", async () => {
         // test the router
         InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/submission");
+        const res = await chai.request(router).get("/1/submissions");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            {
-                id: 2,
-                user_netid: "henkjan",
-                assignment_id: 1,
-                file_path: "submission2.pdf"
-            }
+        expect(res.text).to.equal(JSON.stringify([
+            {id: 1,
+            user_netid: "paulvanderlaan",
+            group_id: 10,
+            assignment_id: 1,
+            file_path: "submission1.pdf",
+            date: new Date("2018-05-01T20:30:00.000Z")},
+            {id: 2,
+            user_netid: "henkjan",
+            group_id: 10,
+            assignment_id: 1,
+            file_path: "submission2.pdf",
+            date: new Date("2018-05-01T20:30:00.000Z"),
+            }]
         ));
     });
 

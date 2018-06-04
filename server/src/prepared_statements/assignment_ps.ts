@@ -123,7 +123,7 @@ export default class AssignmentPS {
      */
     public static executeGetSubmissionsByAssignmentId(netId: string, assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-submissions-by-assignment",
-            "SELECT * FROM submission WHERE user_netid = $1 AND assignment_id = $2");
+            "SELECT s.id, s.user_netid, s.group_id, s.assignment_id, s.file_path, s.date FROM submission AS s JOIN groupusers gu ON s.group_id = gu.group_groupid WHERE gu.user_netid = $1 AND assignment_id = $2");
         statement.values = [netId, assignmentId];
         return Database.executeQuery(statement);
     }

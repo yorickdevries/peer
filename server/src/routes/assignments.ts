@@ -142,13 +142,13 @@ router.get("/:id/file", async (req, res) => {
 });
 
 /**
- * Route to get an subbission of someone's assignment
+ * Route to get all submissions of a certain assignment of your specific group
  * @userinfo given_name - netId
  * @params assignment_id - assignment_id
  */
-router.route("/:assignment_id/submission")
+router.route("/:assignment_id/submissions")
     .get(async (req: any, res) => {
-        res.json(await AssignmentPS.executeGetSubmissionByAssignmentId(
+        res.json(await AssignmentPS.executeGetSubmissionsByAssignmentId(
             req.userinfo.given_name,
             req.params.assignment_id
         ));
