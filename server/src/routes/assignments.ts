@@ -167,19 +167,18 @@ router.route("/:assignment_id/allsubmissions")
 
 
 /**
- * Route to request a review, returns a review object
+ * Route to request a list of reviews
  * @userinfo given_name - NetId
  * @params assignment_id - assignment_Id
  */
-router.route("/:assignment_id/requestReview")
+router.route("/:assignment_id/reviews")
     .get(async (req: any, res) => {
-        res.json(await AssignmentPS.executeCreateReviewByAssignmentId(
-            req.userinfo.given_name,
-            1, // HERE THE SHUFFLING NEEDS TO BE DONE
-            req.params.assignment_id
-        ));
+        res.json(await ReviewPS.executeGetReviewsByUserIdAndAssignmentId(req.userinfo.given_name, req.params.assignment_id));
     });
 
+/**
+ * Route to distribute reviews for a certain assignment
+ */
 router.route("/:assignment_id/distributeReviews")
     .get(async (req: any, res) => {
         res.json(await reviewDistribution.distributeReviews(req.params.assignment_id));
