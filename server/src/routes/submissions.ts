@@ -24,22 +24,67 @@ const storage = multer.diskStorage({
     }
 });
 
+
 // PDF of max 30 MB (in bytes)
-const maxSize = 30 * 1024 * 1024;
-const upload = multer({
-    storage: storage,
-    limits: { fileSize: maxSize },
-    fileFilter: function (req: any, file, cb: any) {
+const maxSizeSubmissionFile = 30 * 1024 * 1024;
+const uploadSubmission = multer({
+    limits: {fileSize: maxSizeSubmissionFile},
+    fileFilter: function (req: any, file, callback) {
         const ext = path.extname(file.originalname);
         if (ext !== ".pdf") {
             req.fileValidationError = "File should be a .pdf file";
             // tslint:disable-next-line
-            return cb(null, false)
+            return callback(null, false);
+        } else {
+            // tslint:disable-next-line
+            return callback(null, true);
         }
-        // tslint:disable-next-line
-        cb(null, true);
     }
 }).single("submissionFile");
+
+// File upload handling
+const uploadSubmissionFunction = function(req: any, res: any, next: any) {
+    uploadSubmission(req, res, function (err) {
+        // Error in case of too large file size
+        if (err) {
+            res.json({ error: err });
+        }
+        // Error in case of no file
+        else if (req.file == undefined) {
+            res.json({ error: "No file uploaded" });
+        }
+        // Error in case of wrong file type
+        else if (req.fileValidationError) {
+            res.json({ error: req.fileValidationError });
+        } else {
+            next();
+        }
+    });
+};
+
+// Function which adds the submission to the database.
+const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
+    const fileFolder = path.join(__dirname, "../files/submissions");
+    const fileName = Date.now() + "-" + req.file.originalname;
+    const filePath = path.join(fileFolder, fileName);
+    const netId = req.userinfo.given_name;
+    const assignmentId = req.body.assignmentId;
+    const groupId = req.body.groupId;
+    const date = new Date();
+
+    // add to database
+    const result: any = await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName, date);
+    // writing the file if no error is there
+    if (!result.error) {
+        fs.writeFile(filePath, req.file.buffer, (err) => {
+            if (err) {
+                res.json({error: err});
+            }
+            console.log("The file has been saved at" + filePath);
+        });
+    }
+    res.json(result);
+};
 
 /**
  * Route to get all submissions.
@@ -81,29 +126,7 @@ router.delete("/:id", async (req, res) => {
 /**
  * Route to make a new submission.
  */
-
-router.post("/", async (req: any, res) => {
-    // File upload handling
-    upload(req, res, async function (err) {
-        // Error in case of too large file size
-        if (err) {
-            res.json({ error: err });
-        }
-        // Error in case of wrong file type
-        else if (req.fileValidationError) {
-            res.json({ error: req.fileValidationError });
-        } else {
-            // make path here
-            const netId = req.userinfo.given_name;
-            const groupId = req.body.groupId;
-            const assignmentId = req.body.assignmentId;
-            const fileName = req.file.filename;
-            const date = new Date();
-            // add to database
-            res.json(await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName, date));
-        }
-    });
-});
+router.post("/", uploadSubmissionFunction, addSubmissionToDatabase);
 
 /**
  * Route to get a file from a submission.

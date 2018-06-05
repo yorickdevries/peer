@@ -94,8 +94,7 @@ describe("API Course routes", () => {
                 "reviews_per_user": 2,
                 "filename": "assignment1.pdf",
                 "review_due_date": "2018-05-01T20:30:00.000Z",
-                "review_publish_date": "2018-04-01T20:30:00.000Z",
-                "version": "A"
+                "review_publish_date": "2018-04-01T20:30:00.000Z"
             }, {
                 "title": "Assignment 2",
                 "description": "Example assignment number two",
@@ -106,8 +105,7 @@ describe("API Course routes", () => {
                 "reviews_per_user": 2,
                 "filename": "assignment2.pdf",
                 "review_due_date": "2018-05-01T20:30:00.000Z",
-                "review_publish_date": "2018-04-01T20:30:00.000Z",
-                "version": "A"
+                "review_publish_date": "2018-04-01T20:30:00.000Z"
             }]
         ));
     });
