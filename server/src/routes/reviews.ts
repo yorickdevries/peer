@@ -96,4 +96,43 @@ router.get("/:reviewId/submit", async (req, res) => {
     res.json(await ReviewsPS.executeSubmitReview(req.params.reviewId));
 });
 
+/**
+ * Get all review comments.
+ * @param reviewId - an id of a review.
+ * @return database return value.
+ */
+router.get("/:reviewId/allComments", async (req, res) => {
+    res.json(await ReviewsPS.executeGetAllReviewComments(req.params.reviewId));
+});
+
+/**
+ * Get all review comments.
+ * @param reviewId - an id of a review.
+ * @body comment - a comment of the review.
+ * @return database return value.
+ */
+router.put("/:reviewId/comment", async (req, res) => {
+    res.json(await ReviewsPS.executeUpdateReviewComment(req.params.reviewId, req.body.comment));
+});
+
+/**
+ * Get all review comments.
+ * @param reviewId - an id of a review.
+ * @body ta_netid - a net id of the ta.
+ * @body comment - a comment of the review.
+ * @return database return value.
+ */
+router.post("/:reviewId/comment", async (req, res) => {
+    res.json(await ReviewsPS.executeAddReviewComment(req.params.reviewId, req.body.ta_netid, req.body.comment));
+});
+
+/**
+ * Get all review comments.
+ * @param reviewId - an id of a review.
+ * @return database return value.
+ */
+router.delete("/:reviewId/comment", async (req, res) => {
+    res.json(await ReviewsPS.executeDeleteReviewComment(req.params.reviewId));
+});
+
 export default router;
