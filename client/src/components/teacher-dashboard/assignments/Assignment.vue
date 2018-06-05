@@ -5,7 +5,7 @@
             <b-row>
                 <b-col>
                     <div class="d-flex align-items-center mt-5">
-                        <span class="h1 w-100">{{assignment.title}}</span>
+                        <span class="h1 w-100">Assignment: {{assignment.title}}</span>
                         <b-button variant="success"
                                   :to="{ name: 'teacher-dashboard.assignments.assignment.edit', params: {courseId: course.id, assignmentId: assignment.id} }">
                             Edit assignment
@@ -31,7 +31,7 @@
                                     </b-list-group-item>
                                     <b-list-group-item class="flex-column align-items-start">
                                         <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">Publish date</h5>
+                                            <h5 class="mb-1">Publish date and time</h5>
                                         </div>
                                         <p class="mb-1">
                                             {{formatDate(assignment.publish_date)}}
@@ -39,11 +39,19 @@
                                     </b-list-group-item>
                                     <b-list-group-item class="flex-column align-items-start">
                                         <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">Due date</h5>
+                                            <h5 class="mb-1">Due date and time</h5>
                                         </div>
                                         <p class="mb-1">
                                             {{formatDate(assignment.due_date)}}
                                         </p>
+                                    </b-list-group-item>
+                                    <b-list-group-item class="flex-column align-items-start">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1">Number of reviews that each student needs to do: {{assignment.reviews_per_user}}</h5>
+                                        </div>
+                                    </b-list-group-item>
+                                    <b-list-group-item>
+                                        <b-button variant="primary w-100" :href="assignmentFilePath" >Download Assignment File</b-button>
                                     </b-list-group-item>
                                 </b-list-group>
                             </b-tab>
@@ -92,6 +100,12 @@ export default {
                 filename: null
             },
         }
+    },
+    computed: {
+        assignmentFilePath() {
+            // Get the assignment file path.
+            return `/api/assignments/${this.assignment.id}/file`
+        },
     },
     methods: {
         formatDate(date) {
