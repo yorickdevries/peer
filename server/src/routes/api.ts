@@ -41,8 +41,9 @@ router.use("*", async function(req: any, res, next) {
         if (user.error) {
             console.log("Adding user: ");
             console.log(await UserPS.executeAddUser(netid, email));
-        // in case the email is undefined in the database
-        } else if (user.email !== email) {
+        // in case the new email is not undefined
+        // and different from whats in the database
+        } else if (email !== undefined && user.email !== email) {
             console.log("Updating user email: ");
             console.log(await UserPS.executeUpdateEmailUser(netid, email));
         }
