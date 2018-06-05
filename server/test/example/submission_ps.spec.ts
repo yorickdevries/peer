@@ -28,7 +28,8 @@ describe("SubmissionPreparedStatements Test", () => {
             group_id: 10,
             assignment_id: 1,
             file_path: "submission1.pdf",
-            date: new Date("2018-05-01T20:30:00Z")
+            date: new Date("2018-05-01T20:30:00Z"),
+            grade: -1
         });
     });
 
@@ -42,7 +43,8 @@ describe("SubmissionPreparedStatements Test", () => {
             user_netid: "paulvanderlaan",
             assignment_id: 1,
             file_path: "filepathhere",
-            date: new Date("2018-05-01T20:30:00Z")
+            date: new Date("2018-05-01T20:30:00Z"),
+            grade: -1
         });
     });
 
@@ -56,7 +58,8 @@ describe("SubmissionPreparedStatements Test", () => {
             group_id: 10,
             assignment_id: 1,
             file_path: "submission2.pdf",
-            date: new Date("2018-05-01T20:30:00Z")
+            date: new Date("2018-05-01T20:30:00Z"),
+            grade: -1
         });
     });
 
