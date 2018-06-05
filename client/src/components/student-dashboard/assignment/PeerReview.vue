@@ -1,25 +1,14 @@
 <template>
     <div>
 
-        <!--Header-->
+        <!--Download-->
         <b-row>
             <b-col>
-                <b-card>
-                    <b-container fluid class="px-0">
-                        <b-row>
-                            <b-col>
-                                <span class="text-muted">You are giving feedback to</span><br>
-                                <span class="lead">Peer #X</span>
-                            </b-col>
-                            <b-col>
-                                <a>
-                                    <button type="button" class="btn btn-success success w-100 h-100">Download Hand-In
-                                    </button>
-                                </a>
-                            </b-col>
-                        </b-row>
-                    </b-container>
-                </b-card>
+                <a :href="peerReviewFilePath">
+                    <button type="button" class="btn btn-success success w-100"
+                            style="height: 3rem">Download Hand-In
+                    </button>
+                </a>
             </b-col>
         </b-row>
 
@@ -37,12 +26,12 @@
                 <!--Questions-->
                 <b-list-group-item class="py-4" v-for="pair in peerReviewSorted.form"
                                    :key="pair.question.id + pair.question.type_question">
+
+                    <!--Question Information-->
                     <div class="mb-2">
                         <h5 class="text-primary">Question {{ pair.question.question_number }} of {{
                             totalAmountOfQuestions }}</h5>
-                        <p>
-                            {{ pair.question.question }}
-                        </p>
+                        <p>{{ pair.question.question }}</p>
                     </div>
 
                     <!-- OPEN QUESTION -->
@@ -52,6 +41,7 @@
                                      :rows="3"
                                      :max-rows="6"
                                      v-model="pair.answer.answer"
+                                     :readonly="peerReview.review.done"
                                      required/>
 
                     <!-- RANGE QUESTION -->
@@ -65,6 +55,7 @@
                                 inline
                                 :max-rating="7"
                                 :show-rating="false"
+                                :read-only="peerReview.review.done"
                                 v-model="pair.answer.answer"/>
 
                     <!-- MPC QUESTION -->
@@ -73,7 +64,8 @@
                                 :options="transformOptionsToHTMLOptions(pair.question.option)"
                                 v-model="pair.answer.answer"
                                 stacked
-                                required>
+                                required
+                                :disabled="peerReview.review.done">
                         </b-form-radio-group>
                     </b-form-group>
 
@@ -81,8 +73,7 @@
             </b-list-group>
 
             <!--Save/Submit Buttons-->
-
-            <b-card-body>
+            <b-card-body v-if="!peerReview.review.done">
                 <b-button type="submit" variant="success float-right" @click="submitPeerReview">Submit Review</b-button>
                 <b-button variant="primary float-right mr-2" @click="savePeerReview">Save Review</b-button>
             </b-card-body>
@@ -130,14 +121,17 @@ export default {
             // Returns the total amount of questions.
             return this.peerReview.form.length
         },
+        peerReviewFilePath() {
+            // Get the submission file path.
+            return `/api/reviews/${this.peerReview.review.id}/file`
+        }
     },
     async created() {
         await this.fetchPeerReview()
     },
     methods: {
         async fetchPeerReview() {
-            let reviewId = 7
-            let {data} = await api.getPeerReview(reviewId)
+            let {data} = await api.getPeerReview(this.reviewId)
             this.peerReview = data
         },
         async submitPeerReview() {
