@@ -14,7 +14,6 @@ CREATE TABLE AssignmentList (
     filename varchar(100) NOT NULL,
     review_due_date timestamptz NOT NULL,
     review_publish_date timestamptz NOT NULL,
-    version char(1) NOT NULL DEFAULT 'A',
     CONSTRAINT AssignmentList_pk PRIMARY KEY (id)
 );
 
