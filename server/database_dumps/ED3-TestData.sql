@@ -160,6 +160,10 @@ INSERT INTO public.rangeanswer(
 INSERT INTO public.reviewcomment(
 	comment, review_id, ta_netid)
 	VALUES ('Keep it up Brian!', 1, 'paulvanderlaan');
+
+INSERT INTO public.submissioncomment(
+	comment, submission_id, ta_netid)
+	VALUES ('Keep it up Brian!', 1, 'paulvanderlaan');
 -- End of file.
 
 
