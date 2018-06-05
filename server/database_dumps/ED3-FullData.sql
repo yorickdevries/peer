@@ -6,7 +6,10 @@ INSERT INTO "userlist" (
 
 INSERT INTO "userlist" (
 	"netid", "email")
-	VALUES ('henkjan', 'h.j@student.tudelft.nl');
+	VALUES
+		('henkjan', 'h.j@student.tudelft.nl'),
+		('yorickdevries', NULL),
+		('teacheraccount', 'email@adress.nl');;
 
 INSERT INTO public.courselist(
     description, name)
