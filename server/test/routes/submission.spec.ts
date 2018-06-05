@@ -42,7 +42,7 @@ describe("API submission routes", () => {
                 "id": 1,
                 "comment": "Keep it up Brian!",
                 "submission_id": 1,
-                "ta_netid": "paulvanderlaan"
+                "netid": "paulvanderlaan"
             }]
         ));
     });
@@ -53,14 +53,14 @@ describe("API submission routes", () => {
     it("POST submission/:submissionId/comment", async () => {
         const res = await chai.request(router)
             .post("/1/comment")
-            .send({ ta_netid: "otherTA", comment: "new" });
+            .send({ netid: "otherTA", comment: "new" });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
                 "id": 2,
                 "comment": "new",
                 "submission_id": 1,
-                "ta_netid": "otherTA"
+                "netid": "otherTA"
             }
         ));
     });
@@ -78,7 +78,7 @@ describe("API submission routes", () => {
                 "id": 1,
                 "comment": "new",
                 "submission_id": 1,
-                "ta_netid": "paulvanderlaan"
+                "netid": "paulvanderlaan"
             }
         ));
     });
@@ -94,7 +94,7 @@ describe("API submission routes", () => {
                 "id": 1,
                 "comment": "Keep it up Brian!",
                 "submission_id": 1,
-                "ta_netid": "paulvanderlaan"
+                "netid": "paulvanderlaan"
             }
         ));
     });

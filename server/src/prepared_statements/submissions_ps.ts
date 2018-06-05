@@ -86,7 +86,7 @@ export default class SubmissionsPS {
      */
     public static executeAddSubmissionComment(submissionId: number, taNetId: string, comment: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("add-submission-comments",
-            "INSERT INTO submissioncomment(comment, submission_id, ta_netid) VALUES ($1, $2, $3) RETURNING *");
+            "INSERT INTO submissioncomment(comment, submission_id, netid) VALUES ($1, $2, $3) RETURNING *");
         statement.values = [comment, submissionId, taNetId];
         return Database.executeQuerySingleResult(statement);
     }

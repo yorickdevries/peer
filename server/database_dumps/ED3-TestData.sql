@@ -158,11 +158,11 @@ INSERT INTO public.rangeanswer(
 	VALUES (4, 1, 1);
 
 INSERT INTO public.reviewcomment(
-	comment, review_id, ta_netid)
+	comment, review_id, netid)
 	VALUES ('Keep it up Brian!', 1, 'paulvanderlaan');
 
 INSERT INTO public.submissioncomment(
-	comment, submission_id, ta_netid)
+	comment, submission_id, netid)
 	VALUES ('Keep it up Brian!', 1, 'paulvanderlaan');
 -- End of file.
 

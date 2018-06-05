@@ -181,7 +181,7 @@ export default class ReviewPS {
      */
     public static executeAddReviewComment(reviewId: number, taNetId: string, comment: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("add-review-comments",
-            "INSERT INTO reviewcomment(comment, review_id, ta_netid) VALUES ($1, $2, $3) RETURNING *");
+            "INSERT INTO reviewcomment(comment, review_id, netid) VALUES ($1, $2, $3) RETURNING *");
         statement.values = [comment, reviewId, taNetId];
         return Database.executeQuerySingleResult(statement);
     }

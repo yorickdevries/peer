@@ -160,12 +160,12 @@ router.put("/:submissionId/comment", async (req, res) => {
 /**
  * Get all review comments.
  * @param submissionId - an id of a submission.
- * @body ta_netid - a net id of the ta.
+ * @body netid - a net id of the ta.
  * @body comment - a comment of the review.
  * @return database return value.
  */
 router.post("/:submissionId/comment", async (req, res) => {
-    res.json(await SubmissionsPS.executeAddSubmissionComment(req.params.submissionId, req.body.ta_netid, req.body.comment));
+    res.json(await SubmissionsPS.executeAddSubmissionComment(req.params.submissionId, req.body.netid, req.body.comment));
 });
 
 /**

@@ -116,7 +116,7 @@ describe("ReviewPreparedStatement Test", () => {
             "comment": "Keep it up Brian!",
             "id": 1,
             "review_id": 1,
-            "ta_netid": "paulvanderlaan"
+            "netid": "paulvanderlaan"
         }]);
     });
 
@@ -128,7 +128,7 @@ describe("ReviewPreparedStatement Test", () => {
             "comment": "new",
             "id": 2,
             "review_id": 1,
-            "ta_netid": "paulvanderlaan"
+            "netid": "paulvanderlaan"
         });
     });
 
@@ -140,7 +140,7 @@ describe("ReviewPreparedStatement Test", () => {
             "comment": "new",
             "id": 1,
             "review_id": 1,
-            "ta_netid": "paulvanderlaan"
+            "netid": "paulvanderlaan"
         });
     });
 
@@ -152,7 +152,7 @@ describe("ReviewPreparedStatement Test", () => {
             "comment": "Keep it up Brian!",
             "id": 1,
             "review_id": 1,
-            "ta_netid": "paulvanderlaan"
+            "netid": "paulvanderlaan"
         });
     });
 

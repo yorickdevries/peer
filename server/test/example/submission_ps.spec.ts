@@ -72,7 +72,7 @@ describe("SubmissionPreparedStatements Test", () => {
             "comment": "Keep it up Brian!",
             "id": 1,
             "submission_id": 1,
-            "ta_netid": "paulvanderlaan"
+            "netid": "paulvanderlaan"
         }]);
     });
 
@@ -84,7 +84,7 @@ describe("SubmissionPreparedStatements Test", () => {
             "comment": "new",
             "id": 2,
             "submission_id": 1,
-            "ta_netid": "paulvanderlaan"
+            "netid": "paulvanderlaan"
         });
     });
 
@@ -96,7 +96,7 @@ describe("SubmissionPreparedStatements Test", () => {
             "comment": "new",
             "id": 1,
             "submission_id": 1,
-            "ta_netid": "paulvanderlaan"
+            "netid": "paulvanderlaan"
         });
     });
 
@@ -108,7 +108,7 @@ describe("SubmissionPreparedStatements Test", () => {
             "comment": "Keep it up Brian!",
             "id": 1,
             "submission_id": 1,
-            "ta_netid": "paulvanderlaan"
+            "netid": "paulvanderlaan"
         });
     });
 

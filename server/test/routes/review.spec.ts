@@ -200,7 +200,7 @@ describe("API review routes", () => {
                 "id": 1,
                 "comment": "Keep it up Brian!",
                 "review_id": 1,
-                "ta_netid": "paulvanderlaan"
+                "netid": "paulvanderlaan"
             }]
         ));
     });
@@ -211,14 +211,14 @@ describe("API review routes", () => {
     it("POST review/:reviewId/comment", async () => {
         const res = await chai.request(router)
             .post("/1/comment")
-            .send({ ta_netid: "otherTA", comment: "new" });
+            .send({ netid: "otherTA", comment: "new" });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
                 "id": 2,
                 "comment": "new",
                 "review_id": 1,
-                "ta_netid": "otherTA"
+                "netid": "otherTA"
             }
         ));
     });
@@ -236,7 +236,7 @@ describe("API review routes", () => {
                 "id": 1,
                 "comment": "new",
                 "review_id": 1,
-                "ta_netid": "paulvanderlaan"
+                "netid": "paulvanderlaan"
             }
         ));
     });
@@ -252,7 +252,7 @@ describe("API review routes", () => {
                 "id": 1,
                 "comment": "Keep it up Brian!",
                 "review_id": 1,
-                "ta_netid": "paulvanderlaan"
+                "netid": "paulvanderlaan"
             }
         ));
     });

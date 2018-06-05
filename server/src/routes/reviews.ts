@@ -118,12 +118,12 @@ router.put("/:reviewId/comment", async (req, res) => {
 /**
  * Get all review comments.
  * @param reviewId - an id of a review.
- * @body ta_netid - a net id of the ta.
+ * @body netid - a net id of the ta.
  * @body comment - a comment of the review.
  * @return database return value.
  */
 router.post("/:reviewId/comment", async (req, res) => {
-    res.json(await ReviewsPS.executeAddReviewComment(req.params.reviewId, req.body.ta_netid, req.body.comment));
+    res.json(await ReviewsPS.executeAddReviewComment(req.params.reviewId, req.body.netid, req.body.comment));
 });
 
 /**
