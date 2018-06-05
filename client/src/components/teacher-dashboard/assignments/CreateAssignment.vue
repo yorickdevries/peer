@@ -57,6 +57,14 @@
                                     Due date should be past publish date!
                                 </b-form-invalid-feedback>
                             </b-form-group>
+                            <b-form-group label="Number of reviews that each student needs to do">
+                                <b-form-input   v-model="assignment.reviews_per_user"
+                                                type="number"
+                                                :state="checkPeerNumber"
+                                                placeholder="Enter a number between 1 and 10"
+                                                required>
+                                </b-form-input>
+                            </b-form-group>
                             <b-form-group label="Assignment file">
                                 <b-form-file
                                         placeholder="Choose a file..."
@@ -65,15 +73,6 @@
                                         :state="Boolean(file)"
                                         v-if="uploadSuccess === null">
                                 </b-form-file>
-                            </b-form-group>
-                            <b-form-group label="Number of reviews that each student needs to do">
-                                <b-form-input   v-model="assignment.reviews_per_user"
-                                                type="number"
-                                                :state="checkPeerNumber"
-                                                placeholder="Enter a number between 1 and 10"
-                                                required>
-
-                                </b-form-input>
                             </b-form-group>
                             <b-button type="submit" variant="primary">Create the assignment</b-button>
                         </b-form>
