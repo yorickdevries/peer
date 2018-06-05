@@ -6,6 +6,7 @@ import SubmissionsPS from "../prepared_statements/submissions_ps";
 
 // Router
 import { Router } from "express";
+import ReviewsPS from "../prepared_statements/review_ps";
 const router = Router();
 
 const fileFolder = path.join(__dirname, "../files/submissions");
@@ -111,6 +112,45 @@ router.get("/:id/file", async (req, res) => {
     const submission: any = await SubmissionsPS.executeGetSubmissionById(req.params.id);
     const filePath = path.join(__dirname, "../files/submissions", submission.file_path);
     res.sendfile(filePath);
+});
+
+/**
+ * Get all review comments.
+ * @param submissionId - an id of a submission.
+ * @return database return value.
+ */
+router.get("/:submissionId/allComments", async (req, res) => {
+    res.json(await SubmissionsPS.executeGetAllSubmissionComments(req.params.submissionId));
+});
+
+/**
+ * Get all review comments.
+ * @param submissionId - an id of a submission.
+ * @body comment - a comment of the review.
+ * @return database return value.
+ */
+router.put("/:submissionId/comment", async (req, res) => {
+    res.json(await SubmissionsPS.executeUpdateSubmissionComment(req.params.submissionId, req.body.comment));
+});
+
+/**
+ * Get all review comments.
+ * @param submissionId - an id of a submission.
+ * @body ta_netid - a net id of the ta.
+ * @body comment - a comment of the review.
+ * @return database return value.
+ */
+router.post("/:submissionId/comment", async (req, res) => {
+    res.json(await SubmissionsPS.executeAddSubmissionComment(req.params.submissionId, req.body.ta_netid, req.body.comment));
+});
+
+/**
+ * Get all review comments.
+ * @param submissionId - an id of a submission.
+ * @return database return value.
+ */
+router.delete("/:submissionId/comment", async (req, res) => {
+    res.json(await SubmissionsPS.executeDeleteSubmissionComment(req.params.submissionId));
 });
 
 export default router;
