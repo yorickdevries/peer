@@ -122,6 +122,7 @@ CREATE TABLE Review (
     Submission_id int NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
+    creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT Review_pk PRIMARY KEY (id)
 );
 
@@ -139,6 +140,7 @@ CREATE TABLE Submission (
     Assignment_id int NOT NULL,
     file_path varchar(100)  NOT NULL,
     date timestamptz NOT NULL,
+    grade int NOT NULL DEFAULT -1,
     CONSTRAINT Submission_pk PRIMARY KEY (id)
 );
 
