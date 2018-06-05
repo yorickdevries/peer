@@ -53,7 +53,7 @@
                                     :state="Boolean(file)"
                                     v-if="uploadSuccess === null" />
                             <b-form-group label="Number of reviews that each student needs to do">
-                                <b-form-input   v-model="assignment.peer_review_cap"
+                                <b-form-input   v-model="assignment.reviews_per_user"
                                                 type="number"
                                                 :state="checkPeerNumber"
                                                 placeholder="Enter a number between 1 and 10"
@@ -98,7 +98,7 @@ export default {
                 due_date: null,
                 due_day: null,
                 due_time: null,
-                peer_review_cap: null
+                reviews_per_user: null
             }
         }
     },
@@ -110,10 +110,10 @@ export default {
                 return this.assignment.due_date > this.assignment.publish_date
         },
         checkPeerNumber() {
-            if (this.assignment.peer_review_cap == null)
+            if (this.assignment.reviews_per_user == null)
                 return null
             else
-                return this.assignment.peer_review_cap > 0 && this.assignment.peer_review_cap < 11
+                return this.assignment.reviews_per_user > 0 && this.assignment.reviews_per_user < 11
         }
     },
     async created() {
@@ -129,7 +129,7 @@ export default {
             formData.append("publish_date", this.assignment.publish_date)
             formData.append("due_date", this.assignment.due_date)
             formData.append("assignmentFile", this.file)
-            formData.append("peer_review_cap", this.assignment.peer_review_cap)
+            formData.append("reviews_per_user", this.assignment.reviews_per_user)
 
             console.log(formData)
             let res = await api.createAssignment(formData)
