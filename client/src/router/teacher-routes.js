@@ -5,12 +5,12 @@ export default [
         component: () => import('../components/teacher-dashboard/Layout'),
         children: [
             {
-                path: 'courses/:id',
+                path: 'courses/:courseId',
                 name: 'teacher-dashboard.course',
                 component: () => import('../components/teacher-dashboard/Course')
             },
             {
-                path: 'courses/:id/edit',
+                path: 'courses/:courseId/edit',
                 name: 'teacher-dashboard.course.edit',
                 component: () => import('../components/teacher-dashboard/courses/EditCourse')
             },
@@ -20,14 +20,29 @@ export default [
                 component: () => import('../components/teacher-dashboard/courses/CreateCourse')
             },
             {
-                path: 'courses/:id/assignments',
+                path: 'courses/:courseId/assignments',
                 name: 'teacher-dashboard.assignments',
                 component: () => import('../components/teacher-dashboard/Assignments')
             },
             {
-                path: 'courses/:id/create-assignment',
+                path: 'courses/:courseId/create-assignment',
                 name: 'teacher-dashboard.assignments.create',
                 component: () => import('../components/teacher-dashboard/assignments/CreateAssignment')
+            },
+            {
+                path: 'courses/:courseId/assignments/:assignmentId',
+                name: 'teacher-dashboard.assignments.assignment',
+                component: () => import('../components/teacher-dashboard/assignments/Assignment')
+            },
+            {
+                path: 'courses/:courseId/assignments/:assignmentId/edit',
+                name: 'teacher-dashboard.assignments.assignment.edit',
+                component: () => import('../components/teacher-dashboard/assignments/EditAssignment')
+            },
+            {
+                path: 'rubric',
+                name: 'rubric-wizard',
+                component: () => import('../components/teacher-dashboard/rubric/RubricWizard')
             }
         ]
     }

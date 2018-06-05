@@ -34,6 +34,9 @@ export default {
     getAssignmentReviews(assignmentId) {
         return client.get(`/assignments/${assignmentId}/reviews`)
     },
+    saveAssignment(assignmentId, assignment) {
+        return client.put(`courses/${assignmentId}`, assignment)
+    },
     getCurrentPeerReview(assignmentId) {
         return client.get(`assignments/${assignmentId}/review`)
     },
