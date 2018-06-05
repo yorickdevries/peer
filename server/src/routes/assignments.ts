@@ -243,13 +243,10 @@ router.get("/:id/allreviews", async (req: any, res) => {
  */
 router.get("/:id/feedback", async (req: any, res) => {
     const assignmentId = req.params.id;
-    // console.log(assignmentId);
     const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.userinfo.given_name, req.params.id);
     const groupId = group.group_groupid;
-    // console.log(groupId);
     const submission = await SubmissionsPS.executeGetLatestSubmissionsByAssignmentIdByGroupId(assignmentId, groupId);
     const submissionId = submission.id;
-    // console.log(submissionId);
     res.json(await ReviewPS.executeGetReviewsByGroupIdAndAssignmentId(submissionId));
 });
 
