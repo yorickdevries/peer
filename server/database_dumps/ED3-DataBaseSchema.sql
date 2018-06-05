@@ -159,7 +159,7 @@ CREATE TABLE ReviewComment (
     id SERIAL,
     comment varchar(5000)  NOT NULL,
     review_id int NOT NULL,
-    ta_netid varchar(256) NOT NULL,
+    netid varchar(256) NOT NULL,
     CONSTRAINT ReviewComment_pk PRIMARY KEY (id)
 );
 
@@ -168,7 +168,7 @@ CREATE TABLE SubmissionComment (
     id SERIAL,
     comment varchar(5000)  NOT NULL,
     submission_id int NOT NULL,
-    ta_netid varchar(256) NOT NULL,
+    netid varchar(256) NOT NULL,
     CONSTRAINT SubmissionComment_pk PRIMARY KEY (id)
 );
 
