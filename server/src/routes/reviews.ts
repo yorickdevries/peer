@@ -118,7 +118,7 @@ router.put("/:reviewId/comment", async (req, res) => {
 /**
  * Get all review comments.
  * @param reviewId - an id of a review.
- * @body netid - a net id of the ta.
+ * @body netid - a netid.
  * @body comment - a comment of the review.
  * @return database return value.
  */
