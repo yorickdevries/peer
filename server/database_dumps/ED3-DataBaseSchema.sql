@@ -123,6 +123,7 @@ CREATE TABLE Review (
     Rubric_Assignment_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
     creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    grade int NOT NULL DEFAULT -1,
     CONSTRAINT Review_pk PRIMARY KEY (id)
 );
 
@@ -151,7 +152,41 @@ CREATE TABLE UserList (
     CONSTRAINT UserList_pk PRIMARY KEY (netid)
 );
 
+-- Table: ReviewComment
+CREATE TABLE ReviewComment (
+    id SERIAL,
+    comment varchar(5000)  NOT NULL,
+    review_id int NOT NULL,
+    ta_netid varchar(256) NOT NULL,
+    CONSTRAINT ReviewComment_pk PRIMARY KEY (id)
+);
+
+-- Table: SubmissionComment
+CREATE TABLE SubmissionComment (
+    id SERIAL,
+    comment varchar(5000)  NOT NULL,
+    submission_id int NOT NULL,
+    ta_netid varchar(256) NOT NULL,
+    CONSTRAINT SubmissionComment_pk PRIMARY KEY (id)
+);
+
 -- foreign keys
+-- Reference: ReviewComment (table: Review)
+ALTER TABLE ReviewComment ADD CONSTRAINT ReviewComment_review
+    FOREIGN KEY (Review_id)
+    REFERENCES Review (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: SubmissionComment (table: Submission)
+ALTER TABLE SubmissionComment ADD CONSTRAINT SubmissionComment_review
+    FOREIGN KEY (Submission_id)
+    REFERENCES Submission (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
 -- Reference: Assignment_Course (table: AssignmentList)
 ALTER TABLE AssignmentList ADD CONSTRAINT Assignment_Course
     FOREIGN KEY (Course_id)
