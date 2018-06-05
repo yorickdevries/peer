@@ -65,7 +65,9 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
         req.body.publish_date,
         req.body.course_id,
         req.body.reviews_per_user,
-        fileName);
+        fileName,
+        req.body.review_due_date,
+        req.body.review_publish_date);
     // writing the file if no error is there
     if (!result.error) {
         fs.writeFile(filePath, req.file.buffer, (err) => {
@@ -114,7 +116,6 @@ router.route("/:assignment_id")
  * Route to post and update an assignment.
  */
 router.post("/", uploadAssignmentFunction, index.authorization.enrolledAsTeacherAssignmentCheckForPost, addAssignmentToDatabase);
-
 
 /**
  * Route to update an assignment.
