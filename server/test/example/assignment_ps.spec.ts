@@ -97,7 +97,6 @@ describe("AssignmentPreparedStatements Test", () => {
      */
     it("get review", async () => {
         expect(await AssignmentPS.executeGetReviewByAssignmentId(1, "henkjan")).to.deep.equal({
-            "comment": "Plagiaat",
             "done": false,
             "id": 1,
             "rubric_assignment_id": 1,
@@ -114,7 +113,6 @@ describe("AssignmentPreparedStatements Test", () => {
      */
     it("create review", async () => {
         expect(await AssignmentPS.executeCreateReviewByAssignmentId("paulvanderlaan", 1, 1)).to.deep.equal({
-            "comment": "",
             "done": false,
             "id": 3,
             "rubric_assignment_id": 1,

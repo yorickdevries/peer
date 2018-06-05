@@ -124,7 +124,6 @@ describe("API Assignment routes", () => {
         expect(res.text).to.equal(JSON.stringify([
             {
                 id: 1,
-                comment: "Plagiaat",
                 user_netid: "henkjan",
                 submission_id: 1,
                 rubric_assignment_id: 1,
@@ -218,7 +217,6 @@ describe("API Assignment routes", () => {
         expect(res.text).to.equal(JSON.stringify(
             {
                 id: 1,
-                comment: "Plagiaat",
                 user_netid: "henkjan",
                 submission_id: 1,
                 rubric_assignment_id: 1,

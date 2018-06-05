@@ -27,7 +27,7 @@ export default class AssignmentPS {
      */
     public static executeCreateReviewByAssignmentId(netId: string, submissionId: number, assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("make-review-for-user",
-            "INSERT INTO review (comment, user_netid, submission_id, rubric_assignment_id) VALUES ('', $1, $2, $3) RETURNING id, comment, user_netid, submission_id, rubric_assignment_id, done");
+            "INSERT INTO review (user_netid, submission_id, rubric_assignment_id) VALUES ($1, $2, $3) RETURNING id, user_netid, submission_id, rubric_assignment_id, done");
         statement.values = [netId, submissionId, assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
