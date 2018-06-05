@@ -93,7 +93,11 @@ export default {
                 description: null,
                 course_id: null,
                 publish_date: null,
+                publish_day: null,
+                publish_time: null,
                 due_date: null,
+                due_day: null,
+                due_time: null,
                 peer_review_cap: null
             }
         }
