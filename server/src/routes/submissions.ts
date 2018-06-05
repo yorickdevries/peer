@@ -54,8 +54,11 @@ const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
     const filePath = path.join(fileFolder, fileName);
     const netId = req.userinfo.given_name;
     const assignmentId = req.body.assignmentId;
+    const groupId = req.body.groupId;
+    const date = new Date();
+
     // add to database
-    const result: any = await SubmissionsPS.executeCreateSubmission(netId, assignmentId, fileName);
+    const result: any = await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName, date);
     // writing the file if no error is there
     if (!result.error) {
         fs.writeFile(filePath, req.file.buffer, (err) => {
@@ -109,7 +112,6 @@ router.delete("/:id", async (req, res) => {
  * Route to make a new submission.
  */
 router.post("/", uploadSubmissionFunction, addSubmissionToDatabase);
-
 
 /**
  * Route to get a file from a submission.

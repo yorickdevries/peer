@@ -7,6 +7,18 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 export default class RubricPS {
 
     /**
+     * executes 'get rubric by id' query
+     * @param {number} assignmentId - assignment_id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeGetRubricById(assignmentId: number): Promise<pgPromise.queryResult> {
+        const statement =  new PreparedStatement("get-rubric-by-id",
+        "SELECT * FROM rubric WHERE assignment_id=$1");
+        statement.values = [assignmentId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Query 'delete rubric'
      * @param {number} id - assignment_id
      * @returns {Promise<pgPromise.queryResult>}

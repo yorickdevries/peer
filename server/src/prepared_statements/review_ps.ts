@@ -7,6 +7,24 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 export default class ReviewPS {
 
     /**
+     * Creates a review
+     *
+     * @static
+     * @param {string} comment
+     * @param {string} userNetId
+     * @param {number} submissionId
+     * @param {number} rubricAssignmentId
+     * @returns {Promise<pgPromise.queryResult>}
+     * @memberof ReviewPS
+     */
+    public static executeCreateReview(comment: string, userNetId: string, submissionId: number, rubricAssignmentId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("create-review",
+        "INSERT INTO review(comment, user_netid, submission_id, rubric_assignment_id) VALUES ($1, $2, $3, $4) RETURNING *");
+        statement.values = [comment, userNetId, submissionId, rubricAssignmentId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Execute a 'get review' query, where all reviews are fetched.
      * Additionally, the file_path is fetched from the corresponding submission table.
      * @param {number} reviewId - a review id.
@@ -19,6 +37,22 @@ export default class ReviewPS {
             "WHERE review.id = $1");
         statement.values = [reviewId];
         return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Gets all reviews made by a certain user for a certain assignment
+     *
+     * @static
+     * @param {string} userNetId
+     * @param {number} assignmentId
+     * @returns {Promise<pgPromise.queryResult>}
+     * @memberof ReviewPS
+     */
+    public static executeGetReviewsByUserIdAndAssignmentId(userNetId: string, assignmentId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-reviews-by-user-id-and-assignment-id",
+        "SELECT * FROM review WHERE user_netid = $1 AND rubric_assignment_id = $2");
+        statement.values = [userNetId, assignmentId];
+        return Database.executeQuery(statement);
     }
 
     /**

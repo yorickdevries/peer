@@ -51,10 +51,8 @@ describe("Submission routes", () => {
     it("Get submissions/", async () => {
         const res = await chai.request(router).get("/");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify([
-            {id: 1, user_netid: "paulvanderlaan", assignment_id: 1, file_path: "submission1.pdf"},
-            {id: 2, user_netid: "henkjan", assignment_id: 1, file_path: "submission2.pdf"}
-        ]));
+        const result = JSON.parse(res.text);
+        expect(result.length).to.equal(6);
     });
 
     /**
@@ -66,7 +64,8 @@ describe("Submission routes", () => {
         const exampleSubmissionFile = path.join(__dirname, "../../example_data/submissions/submission1.pdf");
         const res = await chai.request(router).post("/")
         .attach("submissionFile", fs.readFileSync(exampleSubmissionFile), "submission1.pdf")
-        .field("assignmentId", 1);
+        .field("assignmentId", 1)
+        .field("groupId", 20);
         // assertions
         const result = JSON.parse(res.text);
         expect(res.status).to.equal(200);
