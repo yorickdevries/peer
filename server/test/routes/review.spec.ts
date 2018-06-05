@@ -189,4 +189,72 @@ describe("API review routes", () => {
     });
 
 
+    /**
+     * Tests if all comments are fetched for a specific review.
+     */
+    it("GET review/:reviewId/allComments", async () => {
+        const res = await chai.request(router).get("/1/allComments");
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            [{
+                "id": 1,
+                "comment": "Keep it up Brian!",
+                "review_id": 1,
+                "ta_netid": "paulvanderlaan"
+            }]
+        ));
+    });
+
+    /**
+     * Tests if a specific comment can be added.
+     */
+    it("POST review/:reviewId/comment", async () => {
+        const res = await chai.request(router)
+            .post("/1/comment")
+            .send({ ta_netid: 'otherTA', comment: 'new' });
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            {
+                "id": 2,
+                "comment": "new",
+                "review_id": 1,
+                "ta_netid": "otherTA"
+            }
+        ));
+    });
+
+    /**
+     * Tests if a specific comment can be updated.
+     */
+    it("PUT review/:reviewId/comment", async () => {
+        const res = await chai.request(router)
+            .put("/1/comment")
+            .send({ comment: 'new' });
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            {
+                "id": 1,
+                "comment": "new",
+                "review_id": 1,
+                "ta_netid": "paulvanderlaan"
+            }
+        ));
+    });
+
+    /**
+     * Tests if a specific comment can be deleted.
+     */
+    it("review/:reviewId/comment", async () => {
+        const res = await chai.request(router).del("/1/comment");
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            {
+                "id": 1,
+                "comment": "Keep it up Brian!",
+                "review_id": 1,
+                "ta_netid": "paulvanderlaan"
+            }
+        ));
+    });
+
 });
