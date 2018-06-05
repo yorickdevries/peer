@@ -159,4 +159,20 @@ export default class ReviewPS {
         statement.values = [reviewId, openQuestionId];
         return Database.executeQuerySingleResult(statement);
     }
+
+    /**
+     * Gets all reviews made by a certain group for a certain assignment
+     *
+     * @static
+     * @param {string} userNetId
+     * @param {number} assignmentId
+     * @returns {Promise<pgPromise.queryResult>}
+     * @memberof ReviewPS
+     */
+    public static executeGetReviewsByGroupIdAndAssignmentId(submissionId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-reviews-by-group-id-and-assignment-id",
+            "SELECT id FROM review WHERE submission_id = $1");
+        statement.values = [submissionId];
+        return Database.executeQuery(statement);
+    }
 }

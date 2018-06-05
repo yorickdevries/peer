@@ -1,5 +1,5 @@
 import chai from "chai";
-import { expect } from "chai";
+import {expect} from "chai";
 import chaiHttp from "chai-http";
 
 chai.use(chaiHttp);
@@ -13,7 +13,7 @@ import InitLogin from "./init_login";
 
 import Database from "../../src/database";
 // load the queryfiles
-import { QueryFile } from "pg-promise";
+import {QueryFile} from "pg-promise";
 
 const qfSchema = new QueryFile(path.join(__dirname, "../../database_dumps/ED3-DataBaseSchema.sql"));
 const qfData = new QueryFile(path.join(__dirname, "../../database_dumps/ED3-TestData.sql"));
@@ -114,12 +114,26 @@ describe("API Assignment routes", () => {
     });
 
     /**
+     * Test whether the right reviewId's are returned
+     */
+    it("GET assignment/id/feedback", async () => {
+        // test the router
+        InitLogin.initialize(router, "henkjan");
+        const res = await chai.request(router).get("/1/feedback");
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            [{"id": 1}, {"id": 2}]
+        ));
+    });
+
+    /**
      * Create a new review.
      */
     it("GET /:assignment_id/reviews", async () => {
         // test the router
         InitLogin.initialize(router, "henkjan");
         const res = await chai.request(router).get("/1/reviews");
+        console.log(res);
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify([
             {
@@ -181,18 +195,21 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).get("/1/submissions");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify([
-            {id: 1,
-            user_netid: "paulvanderlaan",
-            group_id: 10,
-            assignment_id: 1,
-            file_path: "submission1.pdf",
-            date: new Date("2018-05-01T20:30:00.000Z")},
-            {id: 2,
-            user_netid: "henkjan",
-            group_id: 10,
-            assignment_id: 1,
-            file_path: "submission2.pdf",
-            date: new Date("2018-05-01T20:30:00.000Z"),
+            {
+                id: 1,
+                user_netid: "paulvanderlaan",
+                group_id: 10,
+                assignment_id: 1,
+                file_path: "submission1.pdf",
+                date: new Date("2018-05-01T20:30:00.000Z")
+            },
+            {
+                id: 2,
+                user_netid: "henkjan",
+                group_id: 10,
+                assignment_id: 1,
+                file_path: "submission2.pdf",
+                date: new Date("2018-05-01T20:30:00.000Z"),
             }]
         ));
     });
@@ -250,4 +267,17 @@ describe("API Assignment routes", () => {
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).length).to.equal(8);
     });
+
+    // /**
+    //  * Test whether the right reviewId's are returned
+    //  */
+    // it("GET assignment/id/feedback", async () => {
+    //     // test the router
+    //     InitLogin.initialize(router, "henkjan");
+    //     const res = await chai.request(router).get("/1/feedback");
+    //     expect(res.status).to.equal(200);
+    //     expect(res.text).to.equal(JSON.stringify(
+    //         [{"id": 1}, {"id": 2}]
+    //     ));
+    // });
 });
