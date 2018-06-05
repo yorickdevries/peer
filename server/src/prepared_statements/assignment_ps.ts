@@ -141,19 +141,6 @@ export default class AssignmentPS {
     }
 
     /**
-     * Executes a 'count reviews of submission' query.
-     * @param assignmentId - an assignment id.
-     * @param {string} netId - user net id.
-     * @return {Promise<pgPromise.queryResult>} - promise of the database result.
-     */
-    public static executeCountAssignmentReviews(assignmentId: number, netId: string): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("count-reviews",
-            "SELECT count(*) FROM review WHERE rubric_assignment_id = $1 AND user_netid = $2");
-        statement.values = [assignmentId, netId];
-        return Database.executeQuerySingleResult(statement);
-    }
-
-    /**
      * Executes a 'get review by assignment id' query.
      * @param {number} assignmentId - an assignment id.
      * @return {Promise<pgPromise.queryResult>} - a promise of the database result.
