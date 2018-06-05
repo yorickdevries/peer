@@ -107,7 +107,9 @@ router.route("/")
                         req.body.publish_date,
                         req.body.course_id,
                         req.body.reviews_per_user,
-                        fileName));
+                        fileName,
+                        req.body.review_due_date,
+                        req.body.review_publish_date));
                 }
             });
     });
