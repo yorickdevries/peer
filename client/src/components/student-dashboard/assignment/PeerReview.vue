@@ -39,6 +39,7 @@
                                      :rows="3"
                                      :max-rows="6"
                                      v-model="pair.answer.answer"
+                                     :readonly="peerReview.review.done"
                                      required/>
 
                     <!-- RANGE QUESTION -->
@@ -52,6 +53,7 @@
                                 inline
                                 :max-rating="7"
                                 :show-rating="false"
+                                :read-only="peerReview.review.done"
                                 v-model="pair.answer.answer"/>
 
                     <!-- MPC QUESTION -->
@@ -60,7 +62,8 @@
                                 :options="transformOptionsToHTMLOptions(pair.question.option)"
                                 v-model="pair.answer.answer"
                                 stacked
-                                required>
+                                required
+                                :disabled="peerReview.review.done">
                         </b-form-radio-group>
                     </b-form-group>
 
