@@ -4,7 +4,9 @@ import fs from "fs";
 import index from "../security/index";
 import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
+import ReviewPS from "../prepared_statements/review_ps";
 import GroupParser from "../groupParser";
+import reviewDistribution from "../reviewDistribution";
 import bodyParser from "body-parser";
 
 // Router
@@ -104,10 +106,10 @@ router.route("/")
                         req.body.due_date,
                         req.body.publish_date,
                         req.body.course_id,
+                        req.body.reviews_per_user,
                         fileName));
                 }
             });
-
     });
 
 
@@ -140,13 +142,13 @@ router.get("/:id/file", async (req, res) => {
 });
 
 /**
- * Route to get an subbission of someone's assignment
+ * Route to get all submissions of a certain assignment of your specific group
  * @userinfo given_name - netId
  * @params assignment_id - assignment_id
  */
-router.route("/:assignment_id/submission")
+router.route("/:assignment_id/submissions")
     .get(async (req: any, res) => {
-        res.json(await AssignmentPS.executeGetSubmissionByAssignmentId(
+        res.json(await AssignmentPS.executeGetSubmissionsByAssignmentId(
             req.userinfo.given_name,
             req.params.assignment_id
         ));
@@ -165,17 +167,21 @@ router.route("/:assignment_id/allsubmissions")
 
 
 /**
- * Route to request a review, returns a review object
+ * Route to request a list of reviews
  * @userinfo given_name - NetId
  * @params assignment_id - assignment_Id
  */
-router.route("/:assignment_id/requestReview")
+router.route("/:assignment_id/reviews")
     .get(async (req: any, res) => {
-        res.json(await AssignmentPS.executeCreateReviewByAssignmentId(
-            req.userinfo.given_name,
-            1, // HERE THE SHUFFLING NEEDS TO BE DONE
-            req.params.assignment_id
-        ));
+        res.json(await ReviewPS.executeGetReviewsByUserIdAndAssignmentId(req.userinfo.given_name, req.params.assignment_id));
+    });
+
+/**
+ * Route to distribute reviews for a certain assignment
+ */
+router.route("/:assignment_id/distributeReviews")
+    .get(async (req: any, res) => {
+        res.json(await reviewDistribution.distributeReviews(req.params.assignment_id));
     });
 
 
@@ -226,7 +232,7 @@ router.get("/:id/reviewCount", async (req: any, res) => {
  * Route to get the reviews belonging to an assignment.
  * @param id - assignment id.
  */
-router.get("/:id/reviews", async (req: any, res) => {
+router.get("/:id/allreviews", async (req: any, res) => {
     res.json(await AssignmentPS.executeGetReviewsById(req.params.id));
 });
 

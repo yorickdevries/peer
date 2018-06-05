@@ -116,21 +116,21 @@ describe("API Assignment routes", () => {
     /**
      * Create a new review.
      */
-    it("GET /:assignment_id/requestReview", async () => {
+    it("GET /:assignment_id/reviews", async () => {
         // test the router
         InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/requestReview");
+        const res = await chai.request(router).get("/1/reviews");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
+        expect(res.text).to.equal(JSON.stringify([
             {
-                id: 3,
-                comment: "",
+                id: 1,
+                comment: "Plagiaat",
                 user_netid: "henkjan",
                 submission_id: 1,
                 rubric_assignment_id: 1,
                 done: false
             }
-        ));
+        ]));
     });
 
     /**
@@ -149,6 +149,7 @@ describe("API Assignment routes", () => {
                 publish_date: "2018-04-01T20:30:00.000Z",
                 id: 1,
                 course_id: 1,
+                reviews_per_user: 2,
                 filename: "assignment1.pdf"
             }
         ));
@@ -172,20 +173,27 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Test to get the submission of someone else.
+     * Test to get all the submissions of a certain assignment
      */
-    it("GET /:assignment_id/submission", async () => {
+    it("GET /:assignment_id/submissions", async () => {
         // test the router
         InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/submission");
+        const res = await chai.request(router).get("/1/submissions");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            {
-                id: 2,
-                user_netid: "henkjan",
-                assignment_id: 1,
-                file_path: "submission2.pdf"
-            }
+        expect(res.text).to.equal(JSON.stringify([
+            {id: 1,
+            user_netid: "paulvanderlaan",
+            group_id: 10,
+            assignment_id: 1,
+            file_path: "submission1.pdf",
+            date: new Date("2018-05-01T20:30:00.000Z")},
+            {id: 2,
+            user_netid: "henkjan",
+            group_id: 10,
+            assignment_id: 1,
+            file_path: "submission2.pdf",
+            date: new Date("2018-05-01T20:30:00.000Z"),
+            }]
         ));
     });
 
@@ -222,13 +230,24 @@ describe("API Assignment routes", () => {
     /**
      * Test to get all reviews of an assignment.
      */
-    it("GET /:id/reviews", async () => {
+    it("GET /:id/allreviews", async () => {
         // test the router
         InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/reviews");
+        const res = await chai.request(router).get("/1/allreviews");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             [{"reviewer": "paulvanderlaan", "submitter": "henkjan"}]
         ));
+    });
+
+    /**
+     * Check whether reviews can be distributed
+     */
+    it("Distribute reviews", async () => {
+        // log in as teacher
+        InitLogin.initialize(router, "teacheraccount");
+        const res = await chai.request(router).get("/2/distributeReviews");
+        expect(res.status).to.equal(200);
+        expect(JSON.parse(res.text).length).to.equal(8);
     });
 });

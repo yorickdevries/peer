@@ -29,7 +29,18 @@ describe("AssignmentPreparedStatements Test", () => {
             "filename": "assignment1.pdf",
             "id": 1,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
-            "title": "Assignment 1"
+            "title": "Assignment 1",
+            "reviews_per_user": 2
+        },
+        {
+            "course_id": 1,
+            "description": "Example assignment number two",
+            "due_date": new Date("2018-05-01T20:30:00Z"),
+            "filename": "assignment2.pdf",
+            "id": 2,
+            "publish_date": new Date("2018-04-01T20:30:00Z"),
+            "title": "Assignment 2",
+            "reviews_per_user": 2
         }]).to.deep.equal(await AssignmentPS.executeGetAssignments(1));
     });
 
@@ -44,7 +55,8 @@ describe("AssignmentPreparedStatements Test", () => {
             "filename": "assignment1.pdf",
             "id": 1,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
-            course_id: 1
+            course_id: 1,
+            "reviews_per_user": 2
         });
     });
 
@@ -52,11 +64,11 @@ describe("AssignmentPreparedStatements Test", () => {
      * Test add assignments.
      */
     it("add assignment", async () => {
-        expect(await AssignmentPS.executeAddAssignment("New", "Description", new Date("2018-07-01T20:30:00Z"), new Date("2018-06-01T20:30:00Z"), 1, "test_file.pdf"
+        expect(await AssignmentPS.executeAddAssignment("New", "Description", new Date("2018-07-01T20:30:00Z"), new Date("2018-06-01T20:30:00Z"), 1, 2, "test_file.pdf"
     )).to.deep.equal({
             course_id: 1,
             description: "Description",
-            id: 2,
+            id: 3,
             title: "New",
             due_date: new Date("2018-07-01T20:30:00Z"),
             filename: "test_file.pdf",
@@ -119,14 +131,18 @@ describe("AssignmentPreparedStatements Test", () => {
         expect(await AssignmentPS.executeGetAllSubmissionsByAssignmentId(1)).to.deep.equal([{
             "file_path": "submission1.pdf",
             "id": 1,
+            "group_id": 10,
             "assignment_id": 1,
-            "user_netid": "paulvanderlaan"
+            "user_netid": "paulvanderlaan",
+            "date": new Date("2018-05-01T20:30:00Z")
         },
         {
             "file_path": "submission2.pdf",
             "id": 2,
+            "group_id": 10,
             "assignment_id": 1,
-            "user_netid": "henkjan"
+            "user_netid": "henkjan",
+            "date": new Date("2018-05-01T20:30:00Z")
         }]);
     });
 

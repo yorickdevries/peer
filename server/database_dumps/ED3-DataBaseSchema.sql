@@ -9,7 +9,8 @@ CREATE TABLE AssignmentList (
     due_date timestamptz NOT NULL,
     publish_date timestamptz NOT NULL,
     id SERIAL,
-    Course_id int NOT NULL,
+    course_id int NOT NULL,
+    reviews_per_user int NOT NULL,
     filename varchar(100) NOT NULL,
     CONSTRAINT AssignmentList_pk PRIMARY KEY (id)
 );
@@ -117,8 +118,8 @@ CREATE TABLE RangeQuestion (
 -- Table: Review
 CREATE TABLE Review (
     id SERIAL,
-    comment varchar(500)  NOT NULL,
-    User_netid varchar(256)  NOT NULL,
+    comment varchar(2500) NOT NULL,
+    User_netid varchar(256) NOT NULL,
     Submission_id int NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
@@ -135,8 +136,10 @@ CREATE TABLE Rubric (
 CREATE TABLE Submission (
     id SERIAL,
     User_netid varchar(256)  NOT NULL,
+    Group_id int NOT NULL,
     Assignment_id int NOT NULL,
     file_path varchar(100)  NOT NULL,
+    date timestamptz NOT NULL,
     CONSTRAINT Submission_pk PRIMARY KEY (id)
 );
 
@@ -339,6 +342,14 @@ ALTER TABLE Submission ADD CONSTRAINT Submission_Assignment
 ALTER TABLE Submission ADD CONSTRAINT Submission_User
     FOREIGN KEY (User_netid)
     REFERENCES UserList (netid)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: Submission_Group (table: Submission)
+ALTER TABLE Submission ADD CONSTRAINT Submission_Group
+    FOREIGN KEY (Group_id)
+    REFERENCES GroupList (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;

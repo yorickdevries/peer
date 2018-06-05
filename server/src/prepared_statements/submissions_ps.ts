@@ -26,12 +26,32 @@ export default class SubmissionsPS {
     }
 
     /**
+     * Executes a 'get submissions by assignmentid' query
+     */
+    public static executeGetSubmissionsByAssignmentId(id: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-submissions-by-assignment-id",
+        'SELECT * FROM "submission" WHERE "assignment_id" = $1');
+        statement.values = [id];
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Executes a 'get latest submissions by assignmentid' query
+     */
+    public static executeGetLatestSubmissionsByAssignmentId(id: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-submissions-by-assignment-id",
+        "SELECT * FROM submission s1 WHERE assignment_id = $1 AND date = (SELECT max(date) FROM submission s2 WHERE s2.group_id = s1.group_id)");
+        statement.values = [id];
+        return Database.executeQuery(statement);
+    }
+
+    /**
      * Executes a 'create submission' query
      */
-    public static executeCreateSubmission(netid: string, assignmentId: number, filePath: string): Promise<pgPromise.queryResult> {
+    public static executeCreateSubmission(netid: string, groupId: number, assignmentId: number, filePath: string, date: Date): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("create-submission",
-            'INSERT INTO "submission" ("user_netid", "assignment_id", "file_path") VALUES ($1, $2, $3) RETURNING id, user_netid, assignment_id, file_path');
-        statement.values = [netid, assignmentId, filePath];
+        'INSERT INTO "submission" ("user_netid", "group_id", "assignment_id", "file_path", "date") VALUES ($1, $2, $3, $4, $5) RETURNING *');
+        statement.values = [netid, groupId, assignmentId, filePath, date];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -40,7 +60,7 @@ export default class SubmissionsPS {
      */
     public static executeDeleteSubmissionById(submissionId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("delete-submission",
-            'DELETE FROM "submission" WHERE "id" = $1 RETURNING id, user_netid, assignment_id, file_path');
+            'DELETE FROM "submission" WHERE "id" = $1 RETURNING *');
         statement.values = [submissionId];
         return Database.executeQuerySingleResult(statement);
     }

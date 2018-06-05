@@ -89,8 +89,17 @@ describe("API Course routes", () => {
             publish_date: "2018-04-01T20:30:00.000Z",
             id: 1,
             course_id: 1,
+            reviews_per_user: 2,
             filename: "assignment1.pdf"
-        }]
+        },
+        {title: "Assignment 2",
+        description: "Example assignment number two",
+        due_date: "2018-05-01T20:30:00.000Z",
+        publish_date: "2018-04-01T20:30:00.000Z",
+        id: 2,
+        course_id: 1,
+        reviews_per_user: 2,
+        filename: "assignment2.pdf"}]
         ));
     });
 

@@ -19,32 +19,16 @@ describe("SubmissionPreparedStatements Test", () => {
     });
 
     /**
-     * Test get submissions prepared statement.
-     */
-    it("get submissions list", async () => {
-        expect(await SubmissionPS.executeGetSubmissions()).to.deep.equal([{
-            id: 1,
-            user_netid: "paulvanderlaan",
-            assignment_id: 1,
-            file_path: "submission1.pdf"
-        },
-        {
-            id: 2,
-            user_netid: "henkjan",
-            assignment_id: 1,
-            file_path: "submission2.pdf"
-        }]);
-    });
-
-    /**
      * Test get submission by id prepared statement.
      */
     it("get submission by id", async () => {
         expect(await SubmissionPS.executeGetSubmissionById(1)).to.deep.equal({
             id: 1,
             user_netid: "paulvanderlaan",
+            group_id: 10,
             assignment_id: 1,
-            file_path: "submission1.pdf"
+            file_path: "submission1.pdf",
+            date: new Date("2018-05-01T20:30:00Z")
         });
     });
 
@@ -52,11 +36,13 @@ describe("SubmissionPreparedStatements Test", () => {
      * Test creation of a submission prepared statement.
      */
     it("create submission", async () => {
-        expect(await SubmissionPS.executeCreateSubmission("paulvanderlaan", 1, "filepathhere")).to.deep.equal({
-            id: 3,
+        expect(await SubmissionPS.executeCreateSubmission("paulvanderlaan", 10, 1, "filepathhere", new Date("2018-05-01T20:30:00Z"))).to.deep.equal({
+            id: 7,
+            group_id: 10,
             user_netid: "paulvanderlaan",
             assignment_id: 1,
-            file_path: "filepathhere"
+            file_path: "filepathhere",
+            date: new Date("2018-05-01T20:30:00Z")
         });
     });
 
@@ -67,8 +53,10 @@ describe("SubmissionPreparedStatements Test", () => {
         expect(await SubmissionPS.executeDeleteSubmissionById(2)).to.deep.equal({
             id: 2,
             user_netid: "henkjan",
+            group_id: 10,
             assignment_id: 1,
-            file_path: "submission2.pdf"
+            file_path: "submission2.pdf",
+            date: new Date("2018-05-01T20:30:00Z")
         });
     });
 
