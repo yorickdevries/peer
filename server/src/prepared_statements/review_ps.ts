@@ -180,10 +180,10 @@ export default class ReviewPS {
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
     public static executeAddReviewComment(reviewId: number, taNetId: string, comment: string): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-review-comments",
-            "INSERT INTO reviewcomment(comment, review_id, ta_netid) VALUES ($1, $2, $3)");
+        const statement = new PreparedStatement("add-review-comments",
+            "INSERT INTO reviewcomment(comment, review_id, ta_netid) VALUES ($1, $2, $3) RETURNING *");
         statement.values = [comment, reviewId, taNetId];
-        return Database.executeQuery(statement);
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
@@ -193,10 +193,10 @@ export default class ReviewPS {
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
      public static executeUpdateReviewComment(reviewId: number, comment: string): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-review-comments",
-            "UPDATE reviewcomment SET comment = $1 WHERE id = $2");
+        const statement = new PreparedStatement("put-review-comments",
+            "UPDATE reviewcomment SET comment = $1 WHERE id = $2 RETURNING *");
         statement.values = [comment, reviewId];
-        return Database.executeQuery(statement);
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
@@ -205,9 +205,9 @@ export default class ReviewPS {
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
      public static executeDeleteReviewComment(reviewId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-review-comments",
-            "DELETE FROM reviewcomment WHERE id = $1");
+        const statement = new PreparedStatement("delete-review-comments",
+            "DELETE FROM reviewcomment WHERE id = $1 RETURNING *");
         statement.values = [reviewId];
-        return Database.executeQuery(statement);
+        return Database.executeQuerySingleResult(statement);
     }
 }

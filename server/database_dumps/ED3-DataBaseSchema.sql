@@ -178,6 +178,7 @@ CREATE TABLE SubmissionComment (
 ALTER TABLE ReviewComment ADD CONSTRAINT ReviewComment_review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -365,6 +366,7 @@ ALTER TABLE Review ADD CONSTRAINT Review_User
 ALTER TABLE Rubric ADD CONSTRAINT Rubric_Assignment
     FOREIGN KEY (Assignment_id)
     REFERENCES AssignmentList (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
