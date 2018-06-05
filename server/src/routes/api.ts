@@ -8,6 +8,7 @@ import submissions from "./submissions";
 import session from "express-session";
 import { oidc } from "../express-oidc";
 import security from "../security";
+import UserPS from "../prepared_statements/user_ps";
 
 const router = express();
 
@@ -22,6 +23,32 @@ router.use(session({
 
 // Login/login-redirect route from OIDC
 router.use(oidc.router);
+
+// This route checks the user and updates it in the database
+router.use("*", async function(req: any, res, next) {
+    const userinfo = req.userinfo;
+    // check whether userinfo exists
+    if (userinfo == undefined || userinfo.given_name == undefined) {
+        // no user logged in
+        next();
+    } else {
+        // get userinfo
+        const netid = userinfo.given_name;
+        const email = userinfo.preferred_username;
+        // lookup user in database
+        const user: any = await UserPS.executeGetUserById(netid);
+        // in case the user is not in the database
+        if (user.error) {
+            console.log("Adding user: ");
+            console.log(await UserPS.executeAddUser(netid, email));
+        // in case the email is undefined in the database
+        } else if (user.email !== email) {
+            console.log("Updating user email: ");
+            console.log(await UserPS.executeUpdateEmailUser(netid, email));
+        }
+        next();
+    }
+});
 
 router.get("/logout", (req: any, res) => {
     req.logout();
