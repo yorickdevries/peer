@@ -5,7 +5,7 @@
             <!--Header-->
             <b-row>
                 <b-col>
-                    <h1 class="mt-5">Create a new course</h1>
+                    <h1 class="mt-5">Edit {{course.name}}</h1>
                 </b-col>
             </b-row>
 
@@ -53,7 +53,7 @@ export default {
         }
     },
     async created() {
-        let id = this.$route.params.id
+        let id = this.$route.params.courseId
         this.course.id = id
         let res = await api.getCourse(id)
         this.course = res.data
@@ -63,7 +63,7 @@ export default {
             let res = await api.saveCourse(this.course.id, this.course)
             console.log(this.course)
             console.log(res)
-            this.$router.push({name: 'teacher-dashboard.course', params: {id: this.course.id} })
+            this.$router.push({name: 'teacher-dashboard.course', params: {courseId: this.course.id} })
         }
     }
 }
