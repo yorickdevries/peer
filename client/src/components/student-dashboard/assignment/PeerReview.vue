@@ -4,9 +4,11 @@
         <!--Download-->
         <b-row>
             <b-col>
-                <b-button :href="peerReviewFilePath" type="button" class="btn btn-success success w-100"
-                          style="height: 3rem">Download Hand-In
-                </b-button>
+                <a :href="peerReviewFilePath">
+                    <button type="button" class="btn btn-success success w-100"
+                            style="height: 3rem">Download Hand-In
+                    </button>
+                </a>
             </b-col>
         </b-row>
 
