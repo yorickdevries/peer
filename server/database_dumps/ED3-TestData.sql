@@ -156,6 +156,10 @@ INSERT INTO public.openanswer(
 INSERT INTO public.rangeanswer(
 	answer, rangequestion_id, review_id)
 	VALUES (4, 1, 1);
+
+INSERT INTO public.reviewcomment(
+	comment, review_id, ta_netid)
+	VALUES ('Keep it up Brian!', 1, 'paulvanderlaan');
 -- End of file.
 
 
