@@ -80,14 +80,14 @@ export default class SubmissionsPS {
     /**
      * Executes a 'add submission comment' query.
      * @param {number} submissionId - a review id.
-     * @param {string} taNetId - a ta net id.
+     * @param {string} netId - a netid.
      * @param {string} comment - a comment.
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
-    public static executeAddSubmissionComment(submissionId: number, taNetId: string, comment: string): Promise<pgPromise.queryResult> {
+    public static executeAddSubmissionComment(submissionId: number, netId: string, comment: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("add-submission-comments",
             "INSERT INTO submissioncomment(comment, submission_id, netid) VALUES ($1, $2, $3) RETURNING *");
-        statement.values = [comment, submissionId, taNetId];
+        statement.values = [comment, submissionId, netId];
         return Database.executeQuerySingleResult(statement);
     }
 
