@@ -3,11 +3,12 @@ import path from "path";
 import fs from "fs";
 import multer from "multer";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
+import bodyParser from "body-parser";
 
 // Router
-import { Router } from "express";
-import ReviewsPS from "../prepared_statements/review_ps";
-const router = Router();
+import express from "express";
+const router = express();
+router.use(bodyParser.json());
 
 const fileFolder = path.join(__dirname, "../files/submissions");
 
