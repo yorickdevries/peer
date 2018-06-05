@@ -21,7 +21,7 @@ describe("AssignmentPreparedStatements Test", () => {
     /**
      * Test get assignments by course id.
      */
-    it("get assignments by course id", async () => {
+    it("get assignments by course id1", async () => {
         expect([{
             "course_id": 1,
             "description": "Example assignment number one",
@@ -29,8 +29,11 @@ describe("AssignmentPreparedStatements Test", () => {
             "filename": "assignment1.pdf",
             "id": 1,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
+            "review_due_date": new Date("2018-05-01T20:30:00Z"),
+            "review_publish_date": new Date("2018-04-01T20:30:00Z"),
             "title": "Assignment 1",
-            "reviews_per_user": 2
+            "reviews_per_user": 2,
+            "version": "A"
         },
         {
             "course_id": 1,
@@ -39,8 +42,11 @@ describe("AssignmentPreparedStatements Test", () => {
             "filename": "assignment2.pdf",
             "id": 2,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
+            "review_due_date": new Date("2018-05-01T20:30:00Z"),
+            "review_publish_date": new Date("2018-04-01T20:30:00Z"),
             "title": "Assignment 2",
-            "reviews_per_user": 2
+            "reviews_per_user": 2,
+            "version": "A"
         }]).to.deep.equal(await AssignmentPS.executeGetAssignments(1));
     });
 
@@ -56,7 +62,10 @@ describe("AssignmentPreparedStatements Test", () => {
             "id": 1,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             course_id: 1,
-            "reviews_per_user": 2
+            "reviews_per_user": 2,
+            "review_due_date": new Date("2018-05-01T20:30:00Z"),
+            "review_publish_date": new Date("2018-04-01T20:30:00Z"),
+            "version": "A"
         });
     });
 
@@ -64,7 +73,8 @@ describe("AssignmentPreparedStatements Test", () => {
      * Test add assignments.
      */
     it("add assignment", async () => {
-        expect(await AssignmentPS.executeAddAssignment("New", "Description", new Date("2018-07-01T20:30:00Z"), new Date("2018-06-01T20:30:00Z"), 1, 2, "test_file.pdf"
+        expect(await AssignmentPS.executeAddAssignment("New", "Description", new Date("2018-07-01T20:30:00Z"), new Date("2018-06-01T20:30:00Z"), 1, 2, "test_file.pdf",
+            new Date("2018-07-01T20:30:00Z"), new Date("2018-06-01T20:30:00Z")
     )).to.deep.equal({
             course_id: 1,
             description: "Description",
@@ -96,12 +106,15 @@ describe("AssignmentPreparedStatements Test", () => {
      * Test get review assignment.
      */
     it("get review", async () => {
-        expect(await AssignmentPS.executeGetReviewByAssignmentId(1, "henkjan")).to.deep.equal({
+        const result = await AssignmentPS.executeGetReviewByAssignmentId(1, "henkjan");
+        expect(result).to.deep.equal({
             "done": false,
             "id": 1,
             "rubric_assignment_id": 1,
             "submission_id": 1,
-            "user_netid": "henkjan"
+            "grade": -1,
+            "user_netid": "henkjan",
+            "creation_date": result.creation_date
 
         });
     });
@@ -130,6 +143,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "file_path": "submission1.pdf",
             "id": 1,
             "group_id": 10,
+            "grade": -1,
             "assignment_id": 1,
             "user_netid": "paulvanderlaan",
             "date": new Date("2018-05-01T20:30:00Z")
@@ -138,6 +152,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "file_path": "submission2.pdf",
             "id": 2,
             "group_id": 10,
+            "grade": -1,
             "assignment_id": 1,
             "user_netid": "henkjan",
             "date": new Date("2018-05-01T20:30:00Z")

@@ -34,12 +34,15 @@ describe("ReviewPreparedStatement Test", () => {
      * Submit review by id.
      */
     it("submit review by id", async () => {
-        expect(await ReviewPS.executeSubmitReview(1)).to.deep.equal([{
+        const result = await ReviewPS.executeSubmitReview(1);
+        expect(result).to.deep.equal([{
             id: 1,
             rubric_assignment_id: 1,
             submission_id: 1,
             user_netid: "henkjan",
-            done: true
+            done: true,
+            "grade": -1,
+            "creation_date": result[0].creation_date
         }]);
     });
 

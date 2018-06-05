@@ -1,5 +1,5 @@
 import chai from "chai";
-import { expect } from "chai";
+import {expect} from "chai";
 import chaiHttp from "chai-http";
 
 chai.use(chaiHttp);
@@ -14,7 +14,7 @@ import InitLogin from "./init_login";
 
 import Database from "../../src/database";
 // load the queryfiles
-import { QueryFile } from "pg-promise";
+import {QueryFile} from "pg-promise";
 
 const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
 const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
@@ -93,7 +93,9 @@ describe("API review routes", () => {
                 "user_netid": "henkjan",
                 "submission_id": 1,
                 "rubric_assignment_id": 1,
-                "done": true
+                "done": true,
+                "creation_date": JSON.parse(res.text)[0].creation_date,
+                "grade": -1
             }]
         ));
     });

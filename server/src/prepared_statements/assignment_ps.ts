@@ -11,7 +11,7 @@ export default class AssignmentPS {
      * @param {string} netId
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeGetReviewByAssignmentId(assignmentId: number, netId: string): Promise<pgPromise.queryResult> {
+    public static executeGetReviewByAssignmentId(assignmentId: number, netId: string): any {
         const statement = new PreparedStatement("get-review",
             "SELECT * FROM review WHERE done=FALSE AND rubric_assignment_id=$1 AND user_netid=$2");
         statement.values = [assignmentId, netId];
@@ -89,10 +89,10 @@ export default class AssignmentPS {
      * @param filename - filename
      * @return {any} a query result.
      */
-    public static executeAddAssignment(title: string, description: string, dueDate: Date, publishDate: Date, courseId: number, reviewsPerUser: number, filename: string): Promise<pgPromise.queryResult> {
+    public static executeAddAssignment(title: string, description: string, dueDate: Date, publishDate: Date, courseId: number, reviewsPerUser: number, filename: string, reviewDueDate: Date, reviewPublishDate: Date): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("addAssignment",
-        'INSERT INTO "assignmentlist" ("title", "description", "due_date", "publish_date", "course_id", "reviews_per_user", "filename") VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING title, description, id, course_id, due_date, publish_date, filename');
-        statement.values = [title, description, dueDate, publishDate, courseId, reviewsPerUser, filename];
+        'INSERT INTO "assignmentlist" ("title", "description", "due_date", "publish_date", "course_id", "reviews_per_user", "filename", "review_due_date", "review_publish_date") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING title, description, id, course_id, due_date, publish_date, filename');
+        statement.values = [title, description, dueDate, publishDate, courseId, reviewsPerUser, filename, reviewDueDate, reviewPublishDate];
         return Database.executeQuerySingleResult(statement);
     }
 

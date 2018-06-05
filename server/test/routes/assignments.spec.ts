@@ -1,5 +1,5 @@
 import chai from "chai";
-import { expect } from "chai";
+import {expect} from "chai";
 import chaiHttp from "chai-http";
 
 chai.use(chaiHttp);
@@ -13,7 +13,7 @@ import InitLogin from "./init_login";
 
 import Database from "../../src/database";
 // load the queryfiles
-import { QueryFile } from "pg-promise";
+import {QueryFile} from "pg-promise";
 
 const qfSchema = new QueryFile(path.join(__dirname, "../../database_dumps/ED3-DataBaseSchema.sql"));
 const qfData = new QueryFile(path.join(__dirname, "../../database_dumps/ED3-TestData.sql"));
@@ -116,20 +116,21 @@ describe("API Assignment routes", () => {
     /**
      * Create a new review.
      */
-    it("GET /:assignment_id/reviews", async () => {
+    it("GET /:assignment_id/reviews1", async () => {
         // test the router
         InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/reviews");
+        const res: any = await chai.request(router).get("/1/reviews");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify([
-            {
-                id: 1,
-                user_netid: "henkjan",
-                submission_id: 1,
-                rubric_assignment_id: 1,
-                done: false
-            }
-        ]));
+        expect(res.text).to.equal(JSON.stringify([{
+                "id": 1,
+                "user_netid": "henkjan",
+                "submission_id": 1,
+                "rubric_assignment_id": 1,
+                "done": false,
+                "creation_date": JSON.parse(res.text)[0].creation_date,
+                "grade": -1
+            }]
+        ));
     });
 
     /**
@@ -142,14 +143,17 @@ describe("API Assignment routes", () => {
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                title: "Assignment 1",
-                description: "Example assignment number one",
-                due_date: "2018-05-01T20:30:00.000Z",
-                publish_date: "2018-04-01T20:30:00.000Z",
-                id: 1,
-                course_id: 1,
-                reviews_per_user: 2,
-                filename: "assignment1.pdf"
+                "title": "Assignment 1",
+                "description": "Example assignment number one",
+                "due_date": "2018-05-01T20:30:00.000Z",
+                "publish_date": "2018-04-01T20:30:00.000Z",
+                "id": 1,
+                "course_id": 1,
+                "reviews_per_user": 2,
+                "filename": "assignment1.pdf",
+                "review_due_date": "2018-05-01T20:30:00.000Z",
+                "review_publish_date": "2018-04-01T20:30:00.000Z",
+                "version": "A"
             }
         ));
     });
@@ -180,18 +184,21 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).get("/1/submissions");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify([
-            {id: 1,
-            user_netid: "paulvanderlaan",
-            group_id: 10,
-            assignment_id: 1,
-            file_path: "submission1.pdf",
-            date: new Date("2018-05-01T20:30:00.000Z")},
-            {id: 2,
-            user_netid: "henkjan",
-            group_id: 10,
-            assignment_id: 1,
-            file_path: "submission2.pdf",
-            date: new Date("2018-05-01T20:30:00.000Z"),
+            {
+                id: 1,
+                user_netid: "paulvanderlaan",
+                group_id: 10,
+                assignment_id: 1,
+                file_path: "submission1.pdf",
+                date: new Date("2018-05-01T20:30:00.000Z")
+            },
+            {
+                id: 2,
+                user_netid: "henkjan",
+                group_id: 10,
+                assignment_id: 1,
+                file_path: "submission2.pdf",
+                date: new Date("2018-05-01T20:30:00.000Z"),
             }]
         ));
     });
@@ -216,11 +223,13 @@ describe("API Assignment routes", () => {
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                id: 1,
-                user_netid: "henkjan",
-                submission_id: 1,
-                rubric_assignment_id: 1,
-                done: false
+                "id": 1,
+                "user_netid": "henkjan",
+                "submission_id": 1,
+                "rubric_assignment_id": 1,
+                "done": false,
+                "creation_date": JSON.parse(res.text).creation_date,
+                "grade": -1
             }
         ));
     });
