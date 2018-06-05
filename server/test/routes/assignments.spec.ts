@@ -101,19 +101,6 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Test whether userinfo is returned
-     */
-    it("GET assignment/id/reviewCount", async () => {
-        // test the router
-        InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/reviewCount");
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            {count: "1"}
-        ));
-    });
-
-    /**
      * Create a new review.
      */
     it("GET /:assignment_id/reviews", async () => {
@@ -205,26 +192,6 @@ describe("API Assignment routes", () => {
         InitLogin.initialize(router, "paulvanderlaan");
         const res = await chai.request(router).get("/1/allsubmissions");
         expect(res.status).to.equal(401);
-    });
-
-    /**
-     * Test to get the review the user is currently working on.
-     */
-    it("GET /:assignment_id/review", async () => {
-        // test the router
-        InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/review");
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            {
-                id: 1,
-                comment: "Plagiaat",
-                user_netid: "henkjan",
-                submission_id: 1,
-                rubric_assignment_id: 1,
-                done: false
-            }
-        ));
     });
 
     /**

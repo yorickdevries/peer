@@ -91,24 +91,6 @@ describe("AssignmentPreparedStatements Test", () => {
         });
     });
 
-
-    /**
-     * Test get review assignment.
-     */
-    it("get review", async () => {
-        expect(await AssignmentPS.executeGetReviewByAssignmentId(1, "henkjan")).to.deep.equal({
-            "comment": "Plagiaat",
-            "done": false,
-            "id": 1,
-            "rubric_assignment_id": 1,
-            "submission_id": 1,
-            "user_netid": "henkjan"
-
-        });
-    });
-
-
-
     /**
      * Test create review.
      */
@@ -144,15 +126,6 @@ describe("AssignmentPreparedStatements Test", () => {
             "user_netid": "henkjan",
             "date": new Date("2018-05-01T20:30:00Z")
         }]);
-    });
-
-    /**
-     * Test count reviews for assignment.
-     */
-    it("Count reviews for assignment", async () => {
-        expect(await AssignmentPS.executeCountAssignmentReviews(1, "henkjan")).to.deep.equal({
-            count: "1"
-        });
     });
 
     /**

@@ -6,19 +6,6 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
  */
 export default class AssignmentPS {
     /**
-     * Executes a query that gets the review that was assigned to a certain user
-     * @param {number} assignmentId - assignment id
-     * @param {string} netId
-     * @returns {Promise<pgPromise.queryResult>}
-     */
-    public static executeGetReviewByAssignmentId(assignmentId: number, netId: string): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-review",
-            "SELECT * FROM review WHERE done=FALSE AND rubric_assignment_id=$1 AND user_netid=$2");
-        statement.values = [assignmentId, netId];
-        return Database.executeQuerySingleResult(statement);
-    }
-
-    /**
      * Executes create review for a specific assignment and user
      * @param {string} netId - net id
      * @param {number} submissionId - submission id
