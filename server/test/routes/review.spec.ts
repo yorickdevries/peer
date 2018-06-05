@@ -211,7 +211,7 @@ describe("API review routes", () => {
     it("POST review/:reviewId/comment", async () => {
         const res = await chai.request(router)
             .post("/1/comment")
-            .send({ ta_netid: 'otherTA', comment: 'new' });
+            .send({ ta_netid: "otherTA", comment: "new" });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
@@ -229,7 +229,7 @@ describe("API review routes", () => {
     it("PUT review/:reviewId/comment", async () => {
         const res = await chai.request(router)
             .put("/1/comment")
-            .send({ comment: 'new' });
+            .send({ comment: "new" });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {

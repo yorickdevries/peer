@@ -71,7 +71,7 @@ export default class SubmissionsPS {
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
     public static executeGetAllSubmissionComments(submissionId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-review-comments",
+        const statement = new PreparedStatement("get-submission-comments",
             "SELECT * FROM submissioncomment WHERE submission_id = $1");
         statement.values = [submissionId];
         return Database.executeQuery(statement);
@@ -85,7 +85,7 @@ export default class SubmissionsPS {
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
     public static executeAddSubmissionComment(submissionId: number, taNetId: string, comment: string): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("add-review-comments",
+        const statement = new PreparedStatement("add-submission-comments",
             "INSERT INTO submissioncomment(comment, submission_id, ta_netid) VALUES ($1, $2, $3) RETURNING *");
         statement.values = [comment, submissionId, taNetId];
         return Database.executeQuerySingleResult(statement);
@@ -98,7 +98,7 @@ export default class SubmissionsPS {
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
     public static executeUpdateSubmissionComment(submissionId: number, comment: string): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("put-review-comments",
+        const statement = new PreparedStatement("put-submission-comments",
             "UPDATE submissioncomment SET comment = $1 WHERE id = $2 RETURNING *");
         statement.values = [comment, submissionId];
         return Database.executeQuerySingleResult(statement);
@@ -110,7 +110,7 @@ export default class SubmissionsPS {
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
     public static executeDeleteSubmissionComment(submissionId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("delete-review-comments",
+        const statement = new PreparedStatement("delete-submission-comments",
             "DELETE FROM submissioncomment WHERE id = $1 RETURNING *");
         statement.values = [submissionId];
         return Database.executeQuerySingleResult(statement);
