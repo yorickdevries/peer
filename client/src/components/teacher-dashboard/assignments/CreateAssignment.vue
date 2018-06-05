@@ -61,7 +61,7 @@
                                 <b-form-input   v-model="assignment.reviews_per_user"
                                                 type="number"
                                                 :state="checkPeerNumber"
-                                                placeholder="Enter a number between 1 and 10"
+                                                placeholder="Enter an integer larger than 0"
                                                 required>
                                 </b-form-input>
                             </b-form-group>
@@ -126,7 +126,7 @@ export default {
             if (this.assignment.reviews_per_user == null)
                 return null
             else
-                return this.assignment.reviews_per_user > 0 && this.assignment.reviews_per_user < 11
+                return this.assignment.reviews_per_user > 0
         }
     },
     async created() {
