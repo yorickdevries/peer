@@ -47,6 +47,22 @@
                                     </b-list-group-item>
                                     <b-list-group-item class="flex-column align-items-start">
                                         <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1">Peer review start date and time</h5>
+                                        </div>
+                                        <p class="mb-1">
+                                            {{formatDate(assignment.review_publish_date)}}
+                                        </p>
+                                    </b-list-group-item>
+                                    <b-list-group-item class="flex-column align-items-start">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1">Peer review due date and time</h5>
+                                        </div>
+                                        <p class="mb-1">
+                                            {{formatDate(assignment.review_due_date)}}
+                                        </p>
+                                    </b-list-group-item>
+                                    <b-list-group-item class="flex-column align-items-start">
+                                        <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1">Number of reviews that each student needs to do: {{assignment.reviews_per_user}}</h5>
                                         </div>
                                     </b-list-group-item>
@@ -97,6 +113,8 @@ export default {
                 description: null,
                 publish_date: null,
                 due_date: null,
+                review_publish_date: null,
+                review_due_date: null,
                 filename: null
             },
         }
