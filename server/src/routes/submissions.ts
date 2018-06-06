@@ -149,12 +149,12 @@ router.get("/:submissionId/allComments", async (req, res) => {
 
 /**
  * Get all review comments.
- * @param submissionId - an id of a submission.
+ * @param submissionCommentId - an id of a submission.
  * @body comment - a comment of the review.
  * @return database return value.
  */
 router.put("/:submissionCommentId/comment", async (req, res) => {
-    res.json(await SubmissionsPS.executeUpdateSubmissionComment(req.params.submissionId, req.body.comment));
+    res.json(await SubmissionsPS.executeUpdateSubmissionComment(req.params.submissionCommentId, req.body.comment));
 });
 
 /**
@@ -170,11 +170,11 @@ router.post("/:submissionId/comment", async (req, res) => {
 
 /**
  * Get all review comments.
- * @param submissionId - an id of a submission.
+ * @param submissionCommentId - an id of a submission.
  * @return database return value.
  */
 router.delete("/:submissionCommentId/comment", async (req, res) => {
-    res.json(await SubmissionsPS.executeDeleteSubmissionComment(req.params.submissionId));
+    res.json(await SubmissionsPS.executeDeleteSubmissionComment(req.params.submissionCommentId));
 });
 
 export default router;

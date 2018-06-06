@@ -112,7 +112,7 @@ router.get("/:reviewId/allComments", async (req, res) => {
  * @return database return value.
  */
 router.put("/:reviewCommentId/comment", async (req, res) => {
-    res.json(await ReviewsPS.executeUpdateReviewComment(req.params.reviewId, req.body.comment));
+    res.json(await ReviewsPS.executeUpdateReviewComment(req.params.reviewCommentId, req.body.comment));
 });
 
 /**
@@ -132,7 +132,7 @@ router.post("/:reviewId/comment", async (req, res) => {
  * @return database return value.
  */
 router.delete("/:reviewCommentId/comment", async (req, res) => {
-    res.json(await ReviewsPS.executeDeleteReviewComment(req.params.reviewId));
+    res.json(await ReviewsPS.executeDeleteReviewComment(req.params.reviewCommentId));
 });
 
 export default router;
