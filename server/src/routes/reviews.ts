@@ -111,7 +111,7 @@ router.get("/:reviewId/allComments", async (req, res) => {
  * @body comment - a comment of the review.
  * @return database return value.
  */
-router.put("/:reviewId/comment", async (req, res) => {
+router.put("/:reviewCommentId/comment", async (req, res) => {
     res.json(await ReviewsPS.executeUpdateReviewComment(req.params.reviewId, req.body.comment));
 });
 
@@ -131,7 +131,7 @@ router.post("/:reviewId/comment", async (req, res) => {
  * @param reviewId - an id of a review.
  * @return database return value.
  */
-router.delete("/:reviewId/comment", async (req, res) => {
+router.delete("/:reviewCommentId/comment", async (req, res) => {
     res.json(await ReviewsPS.executeDeleteReviewComment(req.params.reviewId));
 });
 

@@ -68,7 +68,7 @@ describe("API submission routes", () => {
     /**
      * Tests if a specific comment can be updated.
      */
-    it("PUT submission/:submissionId/comment", async () => {
+    it("PUT submission/:submissionCommentId/comment", async () => {
         const res = await chai.request(router)
             .put("/1/comment")
             .send({ comment: "new" });
@@ -86,7 +86,7 @@ describe("API submission routes", () => {
     /**
      * Tests if a specific comment can be deleted.
      */
-    it("submission/:submissionId/comment", async () => {
+    it("submission/:submissionCommentId/comment", async () => {
         const res = await chai.request(router).del("/1/comment");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(

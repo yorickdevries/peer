@@ -188,26 +188,26 @@ export default class ReviewPS {
 
     /**
      * Executes a 'update review comment' query.
-     * @param {number} reviewId - a review id.
+     * @param {number} reviewCommentId - a review id.
      * @param {string} comment - a comment id.
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
-     public static executeUpdateReviewComment(reviewId: number, comment: string): Promise<pgPromise.queryResult> {
+     public static executeUpdateReviewComment(reviewCommentId: number, comment: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("put-review-comments",
             "UPDATE reviewcomment SET comment = $1 WHERE id = $2 RETURNING *");
-        statement.values = [comment, reviewId];
+        statement.values = [comment, reviewCommentId];
         return Database.executeQuerySingleResult(statement);
     }
 
     /**
      * Executes a 'delete review comment' query.
-     * @param {number} reviewId - a review id.
+     * @param {number} reviewCommentId - a review id.
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
-     public static executeDeleteReviewComment(reviewId: number): Promise<pgPromise.queryResult> {
+     public static executeDeleteReviewComment(reviewCommentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("delete-review-comments",
             "DELETE FROM reviewcomment WHERE id = $1 RETURNING *");
-        statement.values = [reviewId];
+        statement.values = [reviewCommentId];
         return Database.executeQuerySingleResult(statement);
     }
 }

@@ -93,26 +93,26 @@ export default class SubmissionsPS {
 
     /**
      * Executes a 'update submission comment' query.
-     * @param {number} submissionId - a review id.
+     * @param {number} submissionCommentId - a submission comment id.
      * @param {string} comment - a comment id.
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
-    public static executeUpdateSubmissionComment(submissionId: number, comment: string): Promise<pgPromise.queryResult> {
+    public static executeUpdateSubmissionComment(submissionCommentId: number, comment: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("put-submission-comments",
             "UPDATE submissioncomment SET comment = $1 WHERE id = $2 RETURNING *");
-        statement.values = [comment, submissionId];
+        statement.values = [comment, submissionCommentId];
         return Database.executeQuerySingleResult(statement);
     }
 
     /**
      * Executes a 'delete submission comment' query.
-     * @param {number} submissionId - a review id.
+     * @param {number} submissionCommentId - a submisison comment id.
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
-    public static executeDeleteSubmissionComment(submissionId: number): Promise<pgPromise.queryResult> {
+    public static executeDeleteSubmissionComment(submissionCommentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("delete-submission-comments",
             "DELETE FROM submissioncomment WHERE id = $1 RETURNING *");
-        statement.values = [submissionId];
+        statement.values = [submissionCommentId];
         return Database.executeQuerySingleResult(statement);
     }
 }
