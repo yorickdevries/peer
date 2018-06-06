@@ -171,6 +171,10 @@ export default {
     },
     methods: {
         async onSubmit() {
+            this.assignment.publish_date = this.assignment.publish_day + "T" + this.assignment.publish_time + ":00.000Z"
+            this.assignment.due_date = this.assignment.due_day + "T" + this.assignment.due_time + ":00.000Z"
+            this.assignment.review_publish_date = this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z"
+            this.assignment.review_due_date = this.assignment.review_due_day + "T" + this.assignment.review_due_time + ":00.000Z"
             let res = await api.saveAssignment(this.assignment.id, this.assignment)
             console.log(this.course)
             console.log(res)
