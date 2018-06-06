@@ -1,13 +1,13 @@
 <template>
     <div>
-        <Navbar :links="navbarItems"/>
+        <Navbar :title="course.name" :links="navbarItems" :role="role"/>
 
         <router-view></router-view>
-
     </div>
 </template>
 
 <script>
+    import api from "../../api"
 import Navbar from "../Navbar"
 
 export default {
@@ -18,10 +18,22 @@ export default {
         return {
             navbarItems: [
                 { to: { name: 'teaching-assistant-dashboard.course' } , text: 'Assignments'}
-
-            ]
+            ],
+            course: {
+                name: null
+            },
+            role: ""
         }
-    }
+    },
+    async created() {
+        // Fetch course information (for navbar).
+        let res = await api.getCourse(this.$route.params.courseId)
+        this.course = res.data
+
+        // Fetch user information about course.
+        let {data} = await api.getCurrentRoleForCourse(this.$route.params.courseId)
+        this.role = data.role
+    },
 }
 </script>
 

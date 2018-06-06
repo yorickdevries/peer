@@ -24,7 +24,6 @@ describe("ReviewPreparedStatement Test", () => {
     it("get all review by id", async () => {
         expect(await ReviewPS.executeGetReview(1)).to.deep.equal({
             id: 1,
-            comment: "Plagiaat",
             done: false,
             file_path: "submission1.pdf",
             rubric_assignment_id: 1
@@ -35,13 +34,15 @@ describe("ReviewPreparedStatement Test", () => {
      * Submit review by id.
      */
     it("submit review by id", async () => {
-        expect(await ReviewPS.executeSubmitReview(1)).to.deep.equal([{
+        const result = await ReviewPS.executeSubmitReview(1);
+        expect(result).to.deep.equal([{
             id: 1,
             rubric_assignment_id: 1,
             submission_id: 1,
             user_netid: "henkjan",
-            comment: "Plagiaat",
-            done: true
+            done: true,
+            "grade": -1,
+            "creation_date": result[0].creation_date
         }]);
     });
 

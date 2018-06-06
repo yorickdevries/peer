@@ -113,7 +113,7 @@ export default {
         }
     },
     async created() {
-        this.assignment.course_id = this.$route.params.id
+        this.assignment.course_id = this.$route.params.courseId
     },
     methods: {
         async onSubmit() {
@@ -125,12 +125,13 @@ export default {
             formData.append("publish_date", this.assignment.publish_date)
             formData.append("due_date", this.assignment.due_date)
             formData.append("assignmentFile", this.file)
-            formData.append("peer_review_cap", this.assignment.title)
+            formData.append("peer_review_cap", this.assignment.peer_review_cap)
 
+            console.log(formData)
             let res = await api.createAssignment(formData)
             console.log(this.assignment)
             console.log(res)
-            this.$router.push({name: 'teacher-dashboard.assignments', params: {id: this.assignment.course_id}})
+            this.$router.push({name: 'teacher-dashboard.assignments', params: {courseId: this.assignment.course_id}})
         }
     }
 }
