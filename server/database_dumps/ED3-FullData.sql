@@ -227,6 +227,10 @@ INSERT INTO public.groupusers(
 	User_netid, Group_groupid)
 	VALUES ('henkjan', 10);
 
+INSERT INTO public.groupusers(
+	User_netid, Group_groupid)
+	VALUES ('paulvanderlaan', 10);
+
 -- End of file.
 
 
