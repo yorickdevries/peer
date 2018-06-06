@@ -66,6 +66,9 @@ export default {
     },
     getCurrentRoleForCourse(courseId) {
         return client.get(`courses/${courseId}/role`)
+    },
+    getFeedbackOfAssignment(assignmentId) {
+        return client.get(`assignments/${assignmentId}/feedback`)
     }
 }
 
