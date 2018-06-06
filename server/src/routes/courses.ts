@@ -66,4 +66,14 @@ router.get("/:courseId/role", async (req: any, res) => {
     res.json(await CoursesPS.executeGetRoleById(req.userinfo.given_name, req.params.courseId));
 });
 
+/**
+ * Route to promote a user for a course.
+ * @param courseId - course id.
+ * @body netId - a net id of a user to promote.
+ * @body role - a new role for the user.
+ */
+router.put("/:courseId/promotion", async (req: any, res) => {
+    res.json(await CoursesPS.executePromoteUser(req.params.courseId, req.body.netId, req.body.role));
+});
+
 export default router;
