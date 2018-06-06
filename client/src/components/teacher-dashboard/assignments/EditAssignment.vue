@@ -30,7 +30,7 @@
                                 </b-form-textarea>
                             </b-form-group>
                             <b-form-group label="Publish date and time">
-                                <b-form-input   v-model="assignment.publish_date"
+                                <b-form-input   v-model="assignment.publish_day"
                                                 type="date"
                                                 placeholder="Please enter date on which the assignment should be published"
                                                 required>
@@ -42,7 +42,7 @@
                                 </b-form-input>
                             </b-form-group>
                             <b-form-group label="Due date and time">
-                                <b-form-input   v-model="assignment.due_date"
+                                <b-form-input   v-model="assignment.due_day"
                                                 type="date"
                                                 :state="checkDue"
                                                 placeholder="Please enter date on which the assignment should be handed in"
@@ -57,6 +57,38 @@
                                 <b-form-invalid-feedback>
                                     Due date should be past publish date!
                                 </b-form-invalid-feedback>
+                            </b-form-group>
+                            <b-form-group label="Start date and time for peer review">
+                                <b-form-input   v-model="assignment.review_publish_day"
+                                                type="date"
+                                                placeholder="Please enter start date of the peer review"
+                                                required>
+                                </b-form-input>
+                                <b-form-input   v-model="assignment.review_publish_time"
+                                                type="time"
+                                                placeholder="Please enter start time of the peer review"
+                                                required>
+                                </b-form-input>
+                            </b-form-group>
+                            <b-form-group label="Due date and time for peer review">
+                                <b-form-input   v-model="assignment.review_due_day"
+                                                type="date"
+                                                placeholder="Please enter due date of the peer review"
+                                                required>
+                                </b-form-input>
+                                <b-form-input   v-model="assignment.review_due_time"
+                                                type="time"
+                                                placeholder="Please enter due time of the peer review"
+                                                required>
+                                </b-form-input>
+                            </b-form-group>
+                            <b-form-group label="Number of reviews that each student needs to do">
+                                <b-form-input   v-model="assignment.reviews_per_user"
+                                                type="number"
+                                                :state="checkPeerNumber"
+                                                placeholder="Enter an integer larger than 0"
+                                                required>
+                                </b-form-input>
                             </b-form-group>
                             <b-button type="submit" variant="primary">Save changes</b-button>
                         </b-form>
@@ -107,6 +139,12 @@ export default {
                 return null
             else
                 return this.assignment.due_date > this.assignment.publish_date
+        },
+        checkPeerNumber() {
+            if (this.assignment.reviews_per_user == null)
+                return null
+            else
+                return this.assignment.reviews_per_user > 0
         }
     },
     async created() {
@@ -120,13 +158,13 @@ export default {
         let dtime = res.data.due_date.split('T')[1].substring(0,5)
         let rptime = res.data.review_publish_date.split('T')[1].substring(0,5)
         let rdtime = res.data.review_due_date.split('T')[1].substring(0,5)
-        this.assignment.publish_date = res.data.publish_date.split('T')[0]
+        this.assignment.publish_day = res.data.publish_date.split('T')[0]
         this.assignment.publish_time = ptime
-        this.assignment.due_date = res.data.due_date.split('T')[0]
+        this.assignment.due_day = res.data.due_date.split('T')[0]
         this.assignment.due_time = dtime
-        this.assignment.review_publish_date = res.data.review_publish_date.split('T')[0]
+        this.assignment.review_publish_day = res.data.review_publish_date.split('T')[0]
         this.assignment.review_publish_time = rptime
-        this.assignment.review_due_date = res.data.review_due_date.split('T')[0]
+        this.assignment.review_due_day = res.data.review_due_date.split('T')[0]
         this.assignment.review_due_time = rdtime
     },
     methods: {
