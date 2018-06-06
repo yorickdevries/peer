@@ -174,7 +174,7 @@ export default {
             let res = await api.saveAssignment(this.assignment.id, this.assignment)
             console.log(this.course)
             console.log(res)
-            this.$router.push({name: 'teacher-dashboard.assignments', params: {courseId: this.course.id} })
+            this.$router.push({name: 'teacher-dashboard.assignments.assignment', params: {courseId: this.course.id, assignmentId: this.assignment.id} })
         },
         formatDate(date) {
             // Formats the date to a readable format for the UI.
