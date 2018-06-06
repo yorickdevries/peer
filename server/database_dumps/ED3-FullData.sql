@@ -182,6 +182,7 @@ INSERT INTO public.review(
 	comment, user_netid, submission_id, rubric_assignment_id, done)
 	VALUES
 	    ('Very good', 'henkjan', 1, 4, true),
+	    ('Very impressive', 'henkjan', 4, 1, true),
 	    ('Impressive', 'henkjan', 2, 5, false),
 	    ('Excellent', 'henkjan', 3, 6, false),
 	    ('Wow!', 'paulvanderlaan', 4, 1, false),
@@ -210,9 +211,22 @@ INSERT INTO public.openanswer(
 	answer, openquestion_id, review_id)
 	VALUES ('Flesje water is beter dan flesje bier', 1, 1);
 
+INSERT INTO public.openanswer(
+	answer, openquestion_id, review_id)
+	VALUES ('Flesje water is beter dan flesje cola', 1, 2);
+
 INSERT INTO public.rangeanswer(
 	answer, rangequestion_id, review_id)
 	VALUES (4, 1, 1);
+
+INSERT INTO public.rangeanswer(
+	answer, rangequestion_id, review_id)
+	VALUES (3, 1, 2);
+
+INSERT INTO public.groupusers(
+	User_netid, Group_groupid)
+	VALUES ('henkjan', 10);
+
 -- End of file.
 
 
