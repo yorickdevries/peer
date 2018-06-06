@@ -17,10 +17,10 @@ export default class ReviewPS {
      * @returns {Promise<pgPromise.queryResult>}
      * @memberof ReviewPS
      */
-    public static executeCreateReview(comment: string, userNetId: string, submissionId: number, rubricAssignmentId: number): Promise<pgPromise.queryResult> {
+    public static executeCreateReview(userNetId: string, submissionId: number, rubricAssignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("create-review",
-        "INSERT INTO review(comment, user_netid, submission_id, rubric_assignment_id) VALUES ($1, $2, $3, $4) RETURNING *");
-        statement.values = [comment, userNetId, submissionId, rubricAssignmentId];
+        "INSERT INTO review(user_netid, submission_id, rubric_assignment_id) VALUES ($1, $2, $3) RETURNING *");
+        statement.values = [userNetId, submissionId, rubricAssignmentId];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -32,7 +32,7 @@ export default class ReviewPS {
      */
     public static executeGetReview(reviewId: number): any {
         const statement = new PreparedStatement("get-review-by-id",
-            "SELECT review.id, rubric_assignment_id, file_path, comment, done " +
+            "SELECT review.id, rubric_assignment_id, file_path, done " +
             "FROM review JOIN submission ON submission.id = review.submission_id " +
             "WHERE review.id = $1");
         statement.values = [reviewId];
@@ -60,7 +60,7 @@ export default class ReviewPS {
      * @param {number} reviewId - a review id.
      * @return {Promise<pgPromise.queryResult>} - a corresponding review where the done field is set to true.
      */
-    public static executeSubmitReview(reviewId: number): Promise<pgPromise.queryResult> {
+    public static executeSubmitReview(reviewId: number): any {
         const statement = new PreparedStatement("submit-review",
             "UPDATE review " +
             "SET done=true " +
@@ -158,5 +158,21 @@ export default class ReviewPS {
             "SELECT * FROM openanswer WHERE review_id = $1 AND openquestion_id = $2");
         statement.values = [reviewId, openQuestionId];
         return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Gets the submission beloning to a reviewId
+     *
+     * @static
+     * @param {number} reviewId
+     * @returns {Promise<pgPromise.queryResult>}
+     * @memberof ReviewPS
+     */
+    public static executeGetSubmissionByReviewId(reviewId: number)
+    : Promise<pgPromise.queryResult> {
+    const statement = new PreparedStatement("get-submission-by-review-id",
+        "SELECT s.id, s.user_netid, s.group_id, s.file_path, s.date FROM review r JOIN submission s ON r.submission_id = s.id WHERE r.id = $1");
+    statement.values = [reviewId];
+    return Database.executeQuerySingleResult(statement);
     }
 }
