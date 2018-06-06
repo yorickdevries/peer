@@ -9,7 +9,7 @@
                 </b-col>
             </b-row>
 
-            <!--Create course card-->
+            <!--Edit course card-->
             <b-row>
                 <b-col>
                     <b-card>
@@ -148,6 +148,7 @@ export default {
         }
     },
     async created() {
+        // Load necessary data
         let cid = this.$route.params.courseId
         let aid = this.$route.params.assignmentId
         this.course.id = cid
@@ -171,13 +172,17 @@ export default {
     },
     methods: {
         async onSubmit() {
+            // Compose datetime format from date and time
             this.assignment.publish_date = this.assignment.publish_day + "T" + this.assignment.publish_time + ":00.000Z"
             this.assignment.due_date = this.assignment.due_day + "T" + this.assignment.due_time + ":00.000Z"
             this.assignment.review_publish_date = this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z"
             this.assignment.review_due_date = this.assignment.review_due_day + "T" + this.assignment.review_due_time + ":00.000Z"
+
+            // Update assignment in database
             let res = await api.saveAssignment(this.assignment.id, this.assignment)
-            console.log(this.course)
             console.log(res)
+
+            // Redirect to updated assignment
             this.$router.push({name: 'teacher-dashboard.assignments.assignment', params: {courseId: this.course.id, assignmentId: this.assignment.id} })
         },
         formatDate(date) {
