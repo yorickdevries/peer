@@ -129,8 +129,8 @@ router.post("/", uploadAssignmentFunction, index.authorization.enrolledAsTeacher
 router.route("/:assignment_id")
     .put(index.authorization.enrolledAsTeacherAssignmentCheckForPost, async (req, res) => {
             res.json(await AssignmentPS.executeUpdateAssignmentById(
-                req.body.assignment_title,
-                req.body.assignment_description,
+                req.body.title,
+                req.body.description,
                 req.body.course_id,
                 req.params.assignment_id));
     });
