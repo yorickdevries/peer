@@ -43,13 +43,13 @@ describe("API review routes", () => {
                     "id": 1,
                     "rubric_assignment_id": 1,
                     "file_path": "submission1.pdf",
-                    "comment": "Plagiaat",
                     "done": false
                 },
                 "form": [{
                     "question": {
                         "id": 1,
                         "type_question": "mc",
+                        "rubric_assignment_id": 1,
                         "question": "What is the best way to insert queries?",
                         "question_number": 3,
                         "option": [{"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}, {
@@ -90,11 +90,12 @@ describe("API review routes", () => {
         expect(res.text).to.equal(JSON.stringify(
             [{
                 "id": 1,
-                "comment": "Plagiaat",
                 "user_netid": "henkjan",
                 "submission_id": 1,
                 "rubric_assignment_id": 1,
-                "done": true
+                "done": true,
+                "creation_date": JSON.parse(res.text)[0].creation_date,
+                "grade": -1
             }]
         ));
     });
@@ -110,7 +111,6 @@ describe("API review routes", () => {
                     "id": 1,
                     "rubric_assignment_id": 1,
                     "file_path": "submission1.pdf",
-                    "comment": "Plagiaat!!!",
                     "done": false
                 },
                 "form": [{
@@ -152,7 +152,6 @@ describe("API review routes", () => {
                     "id": 1,
                     "rubric_assignment_id": 1,
                     "file_path": "submission1.pdf",
-                    "comment": "Plagiaat",
                     "done": false
                 },
                 "form": [{

@@ -1,35 +1,10 @@
 import Database from "../database";
 import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
-import express = require("express");
 
+/**
+ * Prepared statement class for courses§
+ */
 export default class CoursesPS {
-    private static getAllCourses: PreparedStatement = new PreparedStatement("get-all-courses",
-        'SELECT * FROM "courselist"');
-
-    private static getAllEnrolledCourses: PreparedStatement = new PreparedStatement("get-all-courses-you-are-enrolled,",
-        'SELECT * FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" WHERE user_netid LIKE $1)');
-
-    private static getCourseById: PreparedStatement = new PreparedStatement("get-course-by-id",
-        'SELECT * FROM "courselist" WHERE "id" = $1');
-
-    private static createCourse: PreparedStatement = new PreparedStatement("create-course",
-        'INSERT INTO "courselist" ("description", "name") VALUES ($1, $2) RETURNING id, description, name');
-
-    private static updateCourse: PreparedStatement = new PreparedStatement("update-course",
-        'UPDATE "courselist" SET ("description", "name") = ($1, $2) WHERE "id" = $3 RETURNING id, description, name');
-
-    private static getAssignmentsByCourseId: PreparedStatement = new PreparedStatement("get-assignment-of-course",
-        'SELECT * FROM "assignmentlist" WHERE "course_id" = $1');
-
-    private static getRoleByCourseId: PreparedStatement = new PreparedStatement("get-course-role",
-        "SELECT enroll.role FROM enroll JOIN courselist ON courselist.id = enroll.course_id WHERE user_netid = $1 AND course_id = $2");
-
-    private static countUserByCourseId: PreparedStatement = new PreparedStatement("count-user-by-course-id",
-        'SELECT COUNT(1) FROM enroll WHERE "course_id" = $1 AND "user_netid" = $2');
-
-    private static enrollInCourseId: PreparedStatement = new PreparedStatement("enroll-in-course-id",
-        "INSERT INTO enroll (course_id, user_netid, role) VALUES ($1, $2, $3) RETURNING *");
-
 
     /**
      * Get all assignments that belong to a specific course.
@@ -37,8 +12,10 @@ export default class CoursesPS {
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeGetAssignmentsByCourseId(id: number): Promise<pgPromise.queryResult> {
-        this.getAssignmentsByCourseId.values = [id];
-        return Database.executeQuery(this.getAssignmentsByCourseId);
+        const statement = new PreparedStatement("get-assignment-of-course",
+            'SELECT * FROM "assignmentlist" WHERE "course_id" = $1');
+        statement.values = [id];
+        return Database.executeQuery(statement);
     }
 
 
@@ -50,8 +27,10 @@ export default class CoursesPS {
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeUpdateCourse(id: number, description: string, name: string): Promise<pgPromise.queryResult> {
-        this.updateCourse.values = [description, name, id];
-        return Database.executeQuerySingleResult(this.updateCourse);
+        const statement = new PreparedStatement("update-course",
+            'UPDATE "courselist" SET ("description", "name") = ($1, $2) WHERE "id" = $3 RETURNING id, description, name');
+        statement.values = [description, name, id];
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
@@ -61,8 +40,10 @@ export default class CoursesPS {
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeCreateCourse(description: string, name: string): Promise<pgPromise.queryResult> {
-        this.createCourse.values = [description, name];
-        return Database.executeQuerySingleResult(this.createCourse);
+        const statement = new PreparedStatement("create-course",
+            'INSERT INTO "courselist" ("description", "name") VALUES ($1, $2) RETURNING id, description, name');
+        statement.values = [description, name];
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
@@ -71,8 +52,10 @@ export default class CoursesPS {
      * @return {any} a query result.
      */
     public static executeGetAllEnrolledCourses(userNetId: string): Promise<pgPromise.queryResult> {
-        this.getAllEnrolledCourses.values = [userNetId];
-        return Database.executeQuery(this.getAllEnrolledCourses);
+        const statement = new PreparedStatement("get-all-courses-you-are-enrolled,",
+            'SELECT * FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" WHERE user_netid LIKE $1)');
+        statement.values = [userNetId];
+        return Database.executeQuery(statement);
     }
 
     /**
@@ -80,7 +63,9 @@ export default class CoursesPS {
      * @return {any} a query result.
      */
     public static executeGetAllCourses(): Promise<pgPromise.queryResult> {
-        return Database.executeQuery(this.getAllCourses);
+        const statement = new PreparedStatement("get-all-courses",
+            'SELECT * FROM "courselist"');
+        return Database.executeQuery(statement);
     }
 
     /**
@@ -89,8 +74,10 @@ export default class CoursesPS {
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeGetCourseById(id: number): Promise<pgPromise.queryResult> {
-        this.getCourseById.values = [id];
-        return Database.executeQuerySingleResult(this.getCourseById);
+        const statement = new PreparedStatement("get-course-by-id",
+            'SELECT * FROM "courselist" WHERE "id" = $1');
+        statement.values = [id];
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
@@ -100,20 +87,37 @@ export default class CoursesPS {
      * @return {Promise<pgPromise.queryResult>} a json object containing the role, if any (as promise).
      */
     public static executeGetRoleById(netId: string, id: number): Promise<pgPromise.queryResult> {
-        this.getRoleByCourseId.values = [netId, id];
-        return Database.executeQuerySingleResult(this.getRoleByCourseId);
+        const statement = new PreparedStatement("get-course-role",
+            "SELECT enroll.role FROM enroll JOIN courselist ON courselist.id = enroll.course_id WHERE user_netid = $1 AND course_id = $2");
+        statement.values = [netId, id];
+        return Database.executeQuerySingleResult(statement);
     }
 
-    // Executes count-user-by-course-id
+    /**
+     * Executes counte ruser by course id, how many users in a certain course
+     * @param {number} courseId - course_Id
+     * @param {string} netId - net_id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
     public static executeCountUserByCourseId(courseId: number, netId: string): Promise<pgPromise.queryResult> {
-        this.countUserByCourseId.values = [courseId, netId];
-        return Database.executeQuerySingleResult(this.countUserByCourseId);
+        const statement = new PreparedStatement("count-user-by-course-id",
+            'SELECT COUNT(1) FROM enroll WHERE "course_id" = $1 AND "user_netid" = $2');
+        statement.values = [courseId, netId];
+        return Database.executeQuerySingleResult(statement);
     }
 
-    // Executes Enroll In CourseId query
+    /**
+     * Executes enroll in course with certain id
+     * @param {number} courseId - course_Id
+     * @param {string} netId - net_id
+     * @param {string} role - role
+     * @returns {Promise<pgPromise.queryResult>}
+     */
     public static executeEnrollInCourseId(courseId: number, netId: string, role: string): Promise<pgPromise.queryResult> {
-        this.enrollInCourseId.values = [courseId, netId, role];
-        return Database.executeQuerySingleResult(this.enrollInCourseId);
+        const statement = new PreparedStatement("enroll-in-course-id",
+            "INSERT INTO enroll (course_id, user_netid, role) VALUES ($1, $2, $3) RETURNING *");
+        statement.values = [courseId, netId, role];
+        return Database.executeQuerySingleResult(statement);
     }
 
 }

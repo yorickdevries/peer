@@ -21,20 +21,20 @@ INSERT INTO public.grouplist(
 	VALUES (10, 'ED-3');
 
 INSERT INTO public.assignmentlist(
-	title, description, course_id, due_date, publish_date, filename)
+	title, description, course_id, reviews_per_user, due_date, publish_date, filename, review_due_date, review_publish_date)
 	VALUES
-	    ('Lab assignment 1', 'How to build a DFA', 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment1.pdf'),
-	    ('Lab assignment 2', 'How to build a NFA', 2, '2018-05-01T20:30:00Z', '2018-04-15T20:30:00Z', 'assignment1.pdf'),
-	    ('Lab assignment 3', 'How to build a DFA given a NFA', 2, '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z', 'assignment1.pdf'),
-	    ('Assignment 1', 'Example assignment number one', 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment1.pdf'),
-	    ('Assignment 2', 'An example of a second assignment', 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
-	    ('Assignment 3', 'This is another example of a third assignment.', 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
-	    ('A1', 'Example assignment number one', 3, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
-	    ('A2', 'An example of a second assignment', 3, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
-	    ('Assignment one', 'Example assignment number one', 4, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
-	    ('Assignment two', 'An example of a second assignment', 4, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
-	    ('Assignment three', 'This is another example of a third assignment.', 4, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf'),
-		('Bonus Assignment', 'bonus description', 2, '2019-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment2.pdf')
+	    ('Lab assignment 1', 'How to build a DFA', 2, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment1.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
+	    ('Lab assignment 2', 'How to build a NFA', 2, 2, '2018-05-01T20:30:00Z', '2018-04-15T20:30:00Z', 'assignment1.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
+	    ('Lab assignment 3', 'How to build a DFA given a NFA', 2, 2, '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z', 'assignment1.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
+	    ('Assignment 1', 'Example assignment number one', 2, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment1.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
+	    ('Assignment 2', 'An example of a second assignment', 2, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
+	    ('Assignment 3', 'This is another example of a third assignment.', 2, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
+	    ('A1', 'Example assignment number one', 3, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
+	    ('A2', 'An example of a second assignment', 3, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
+	    ('Assignment one', 'Example assignment number one', 4, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
+	    ('Assignment two', 'An example of a second assignment', 4, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
+	    ('Assignment three', 'This is another example of a third assignment.', 4, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
+		('Bonus Assignment', 'bonus description', 2, 2, '2019-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z')
 	    ;
 
 
@@ -138,9 +138,9 @@ INSERT INTO public.mcoption(
 INSERT INTO public.enroll(
 	course_id, user_netid, role)
 	VALUES
-	    (2, 'paulvanderlaan', 'student'),
-	    (3, 'paulvanderlaan', 'student'),
-	    (4, 'paulvanderlaan', 'student'),
+	    (2, 'paulvanderlaan', 'TA'),
+	    (3, 'paulvanderlaan', 'TA'),
+	    (4, 'paulvanderlaan', 'TA'),
 	    (1, 'henkjan', 'student'),
 	    (2, 'henkjan', 'student'),
 	    (3, 'henkjan', 'student')
@@ -151,35 +151,47 @@ INSERT INTO public.assignmentgroup(
 	VALUES (1, 10);
 
 INSERT INTO public.submission(
-	user_netid, assignment_id, file_path)
+	user_netid, group_id, assignment_id, file_path, date)
 	VALUES
-	    ('paulvanderlaan', 4, 'submission1.pdf'),
-	    ('paulvanderlaan', 5, 'submission1.pdf'),
-	    ('paulvanderlaan', 6, 'submission1.pdf'),
-	    ('henkjan', 1, 'submission2.pdf'),
-	    ('henkjan', 2, 'submission2.pdf'),
-	    ('henkjan', 3, 'submission2.pdf'),
-	    ('henkjan', 4, 'submission2.pdf'),
-	    ('henkjan', 5, 'submission2.pdf'),
-	    ('henkjan', 6, 'submission2.pdf'),
-	    ('henkjan', 7, 'submission2.pdf'),
-	    ('henkjan', 8, 'submission2.pdf')
+	    ('paulvanderlaan', 10, 4, 'submission1.pdf', '2018-05-01T20:30:00Z'),
+	    ('paulvanderlaan', 10, 5, 'submission1.pdf', '2018-05-01T20:30:00Z'),
+	    ('paulvanderlaan', 10, 6, 'submission1.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission1.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission1.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission1.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission1.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission1.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 2, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 3, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 4, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 5, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 6, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 7, 'submission2.pdf', '2018-05-01T20:30:00Z'),
+	    ('henkjan', 10, 8, 'submission2.pdf', '2018-05-01T20:30:00Z')
 	;
 
 INSERT INTO public.review(
-	comment, user_netid, submission_id, rubric_assignment_id)
+	user_netid, submission_id, rubric_assignment_id, done)
 	VALUES
-	    ('Very good', 'henkjan', 1, 4),
-	    ('Impressive', 'henkjan', 2, 5),
-	    ('Excellent', 'henkjan', 3, 6),
-	    ('Wow!', 'paulvanderlaan', 4, 1),
-	    ('Wow!', 'paulvanderlaan', 5, 2),
-	    ('Wow!', 'paulvanderlaan', 6, 3),
-	    ('Wow!', 'paulvanderlaan', 7, 4),
-	    ('Wow!', 'paulvanderlaan', 8, 5),
-	    ('Wow!', 'paulvanderlaan', 8, 6),
-	    ('Wow!', 'paulvanderlaan', 8, 7),
-	    ('Wow!', 'paulvanderlaan', 8, 8)
+	    ('henkjan', 1, 4, true),
+	    ('henkjan', 2, 5, false),
+	    ('henkjan', 3, 6, false),
+	    ('paulvanderlaan', 4, 1, false),
+	    ('paulvanderlaan', 5, 2, false),
+	    ('paulvanderlaan', 6, 4, false),
+	    ('paulvanderlaan', 7, 4, false),
+	    ('paulvanderlaan', 8, 4, false),
+	    ('paulvanderlaan', 8, 6, false),
+	    ('paulvanderlaan', 8, 7, false),
+	    ('paulvanderlaan', 8, 8, false)
 	;
 
 INSERT INTO public.mcanswer(

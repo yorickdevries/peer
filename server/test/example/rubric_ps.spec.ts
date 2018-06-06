@@ -280,6 +280,7 @@ describe("RubricPreparedStatements Test", () => {
                     ],
                     "question": "What is the best way to insert queries?",
                     "question_number": 3,
+                    "rubric_assignment_id": 1,
                     "type_question": "mc",
                 },
                 {

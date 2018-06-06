@@ -31,6 +31,9 @@ export default {
     createAssignment: async(assignment) => {
         return client.post('/assignments', assignment)
     },
+    getAssignmentReviews(assignmentId) {
+        return client.get(`/assignments/${assignmentId}/reviews`)
+    },
     saveAssignment(assignmentId, assignment) {
         return client.put(`courses/${assignmentId}`, assignment)
     },
@@ -55,8 +58,14 @@ export default {
     getAssignmentSubmission(assignmentId) {
         return client.get(`assignments/${assignmentId}/submission`)
     },
+    getAssignmentAllSubmissions(assignmentId) {
+        return client.get(`assignments/${assignmentId}/allsubmissions`)
+    },
     deleteSubmission(submissionId) {
         return client.delete(`submissions/${submissionId}`)
+    },
+    getCurrentRoleForCourse(courseId) {
+        return client.get(`courses/${courseId}/role`)
     }
 }
 

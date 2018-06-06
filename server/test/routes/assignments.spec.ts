@@ -101,35 +101,22 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Test whether userinfo is returned
-     */
-    it("GET assignment/id/reviewCount", async () => {
-        // test the router
-        InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/reviewCount");
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            {count: "1"}
-        ));
-    });
-
-    /**
      * Create a new review.
      */
-    it("GET /:assignment_id/requestReview", async () => {
+    it("GET /:assignment_id/reviews1", async () => {
         // test the router
         InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/requestReview");
+        const res: any = await chai.request(router).get("/1/reviews");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            {
-                id: 2,
-                comment: "",
-                user_netid: "henkjan",
-                submission_id: 1,
-                rubric_assignment_id: 1,
-                done: false
-            }
+        expect(res.text).to.equal(JSON.stringify([{
+                "id": 1,
+                "user_netid": "henkjan",
+                "submission_id": 1,
+                "rubric_assignment_id": 1,
+                "done": false,
+                "creation_date": JSON.parse(res.text)[0].creation_date,
+                "grade": -1
+            }]
         ));
     });
 
@@ -143,13 +130,16 @@ describe("API Assignment routes", () => {
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                title: "Assignment 1",
-                description: "Example assignment number one",
-                due_date: "2018-05-01T20:30:00.000Z",
-                publish_date: "2018-04-01T20:30:00.000Z",
-                id: 1,
-                course_id: 1,
-                filename: "assignment1.pdf"
+                "title": "Assignment 1",
+                "description": "Example assignment number one",
+                "due_date": "2018-05-01T20:30:00.000Z",
+                "publish_date": "2018-04-01T20:30:00.000Z",
+                "id": 1,
+                "course_id": 1,
+                "reviews_per_user": 2,
+                "filename": "assignment1.pdf",
+                "review_due_date": "2018-05-01T20:30:00.000Z",
+                "review_publish_date": "2018-04-01T20:30:00.000Z"
             }
         ));
     });
@@ -172,20 +162,30 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Test to get the submission of someone else.
+     * Test to get all the submissions of a certain assignment
      */
-    it("GET /:assignment_id/submission", async () => {
+    it("GET /:assignment_id/submissions", async () => {
         // test the router
         InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/submission");
+        const res = await chai.request(router).get("/1/submissions");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
+        expect(res.text).to.equal(JSON.stringify([
+            {
+                id: 1,
+                user_netid: "paulvanderlaan",
+                group_id: 10,
+                assignment_id: 1,
+                file_path: "submission1.pdf",
+                date: new Date("2018-05-01T20:30:00.000Z")
+            },
             {
                 id: 2,
                 user_netid: "henkjan",
+                group_id: 10,
                 assignment_id: 1,
-                file_path: "submission2.pdf"
-            }
+                file_path: "submission2.pdf",
+                date: new Date("2018-05-01T20:30:00.000Z"),
+            }]
         ));
     });
 
@@ -199,23 +199,28 @@ describe("API Assignment routes", () => {
         expect(res.status).to.equal(401);
     });
 
+
     /**
-     * Test to get the review the user is currently working on.
+     * Test to get all reviews of an assignment.
      */
-    it("GET /:assignment_id/review", async () => {
+    it("GET /:id/allreviews", async () => {
         // test the router
         InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/review");
+        const res = await chai.request(router).get("/1/allreviews");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
-            {
-                id: 1,
-                comment: "Plagiaat",
-                user_netid: "henkjan",
-                submission_id: 1,
-                rubric_assignment_id: 1,
-                done: false
-            }
+            [{"reviewer": "paulvanderlaan", "submitter": "henkjan"}]
         ));
+    });
+
+    /**
+     * Check whether reviews can be distributed
+     */
+    it("Distribute reviews", async () => {
+        // log in as teacher
+        InitLogin.initialize(router, "teacheraccount");
+        const res = await chai.request(router).get("/2/distributeReviews");
+        expect(res.status).to.equal(200);
+        expect(JSON.parse(res.text).length).to.equal(8);
     });
 });

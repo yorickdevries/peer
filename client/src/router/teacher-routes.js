@@ -38,6 +38,11 @@ export default [
                 path: 'courses/:courseId/assignments/:assignmentId/edit',
                 name: 'teacher-dashboard.assignments.assignment.edit',
                 component: () => import('../components/teacher-dashboard/assignments/EditAssignment')
+            },
+            {
+                path: 'rubric',
+                name: 'rubric-wizard',
+                component: () => import('../components/teacher-dashboard/rubric/RubricWizard')
             }
         ]
     }

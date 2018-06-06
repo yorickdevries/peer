@@ -1,153 +1,98 @@
 <template>
     <div>
 
-        <!--Peer Review Active-->
-        <template v-if="isPeerReviewActive">
-            <b-row>
-                <!--Title Card with Download Button-->
-                <b-col>
-                    <b-card no-body>
-                        <b-card-body>
-                            <b-container fluid class="px-0">
-                                <b-row>
-                                    <b-col>
-                                        <span class="text-muted">You are giving feedback to</span><br>
-                                        <span class="lead">Peer #{{ peerReview.review.id }}</span>
-                                    </b-col>
-                                    <b-col>
-                                        <a :href="peerReviewFilePath"><button type="button" class="btn btn-success success w-100 h-100">Download Hand-In</button></a>
-                                    </b-col>
-                                </b-row>
-                            </b-container>
-                        </b-card-body>
-                    </b-card>
-                </b-col>
-                <b-col cols="3">
-                    <b-card no-body>
-                        <b-card-body>
-                            <b-container fluid class="px-0">
-                                <b-row>
-                                    <b-col>
-                                        <span class="text-muted">This is peer review</span><br>
-                                        <span class="lead">{{ peerReview.review.id }} / 5</span>
-                                    </b-col>
-                                </b-row>
-                            </b-container>
-                        </b-card-body>
-                    </b-card>
-                </b-col>
+        <!--Download-->
+        <b-row>
+            <b-col>
+                <a :href="peerReviewFilePath">
+                    <button type="button" class="btn btn-success success w-100"
+                            style="height: 3rem">Download Hand-In
+                    </button>
+                </a>
+            </b-col>
+        </b-row>
 
-            </b-row>
-            <!--Peer Review Form-->
-                <b-card no-body class="mt-3">
+        <!--Form-->
+        <b-card no-body class="mt-3">
+            <!--Title-->
+            <b-card-body>
+                <h4>Assignment Criteria</h4>
+                <h6 class="card-subtitle text-muted">Give the peer review to one of your peers here.</h6>
+            </b-card-body>
 
-                    <!--Title-->
-                    <b-card-body>
-                        <h4>Assignment Criteria</h4>
-                        <h6 class="card-subtitle text-muted">Give the peer review to one of your peers here.</h6>
-                    </b-card-body>
+            <!--Form-->
+            <b-list-group flush>
 
-                        <!--Questions-->
-                        <b-list-group flush>
+                <!--Questions-->
+                <b-list-group-item class="py-4" v-for="pair in peerReviewSorted.form"
+                                   :key="pair.question.id + pair.question.type_question">
 
-                            <!--Loop through all the questions.-->
-                            <b-list-group-item class="py-4" v-for="pair in peerReviewSorted.form" :key="pair.question.id + pair.question.type_question">
-                                <div class="mb-2">
-                                    <h5 class="text-primary">Question {{ pair.question.question_number }} of {{ totalAmountOfQuestions }}</h5>
-                                    <p>
-                                        {{ pair.question.question }}
-                                    </p>
-                                </div>
+                    <!--Question Information-->
+                    <div class="mb-2">
+                        <h5 class="text-primary">Question {{ pair.question.question_number }} of {{
+                            totalAmountOfQuestions }}</h5>
+                        <p>{{ pair.question.question }}</p>
+                    </div>
 
-                                <!-- OPEN QUESTION -->
-                                <b-form-textarea v-if="pair.question.type_question === 'open'"
-                                                 id="textarea1"
-                                                 placeholder="Enter something"
-                                                 :rows="3"
-                                                 :max-rows="6"
-                                                 v-model="pair.answer.answer"
-                                                 required/>
+                    <!-- OPEN QUESTION -->
+                    <b-form-textarea v-if="pair.question.type_question === 'open'"
+                                     id="textarea1"
+                                     placeholder="Enter something"
+                                     :rows="3"
+                                     :max-rows="6"
+                                     v-model="pair.answer.answer"
+                                     :readonly="peerReview.review.done"
+                                     required/>
 
-                                <!-- RANGE QUESTION -->
-                                <StarRating v-else-if="pair.question.type_question === 'range'"
-                                            class="align-middle"
-                                            :border-color="'#007bff'"
-                                            :active-color="'#007bff'"
-                                            :border-width="2"
-                                            :item-size="20"
-                                            :spacing="5"
-                                            inline
-                                            :max-rating="7"
-                                            :show-rating="false"
-                                            v-model="pair.answer.answer"/>
+                    <!-- RANGE QUESTION -->
+                    <StarRating v-else-if="pair.question.type_question === 'range'"
+                                class="align-middle"
+                                :border-color="'#007bff'"
+                                :active-color="'#007bff'"
+                                :border-width="2"
+                                :item-size="20"
+                                :spacing="5"
+                                inline
+                                :max-rating="7"
+                                :show-rating="false"
+                                :read-only="peerReview.review.done"
+                                v-model="pair.answer.answer"/>
 
-                                <!-- MPC QUESTION -->
-                                <b-form-group v-else-if="pair.question.type_question === 'mc'">
-                                    <b-form-radio-group
-                                            :options="transformOptionsToHTMLOptions(pair.question.option)"
-                                            v-model="pair.answer.answer"
-                                            stacked
-                                            required>
-                                    </b-form-radio-group>
-                                </b-form-group>
+                    <!-- MPC QUESTION -->
+                    <b-form-group v-else-if="pair.question.type_question === 'mc'">
+                        <b-form-radio-group
+                                :options="transformOptionsToHTMLOptions(pair.question.option)"
+                                v-model="pair.answer.answer"
+                                stacked
+                                required
+                                :disabled="peerReview.review.done">
+                        </b-form-radio-group>
+                    </b-form-group>
 
-                            </b-list-group-item>
+                </b-list-group-item>
+            </b-list-group>
 
-                        </b-list-group>
+            <!--Save/Submit Buttons-->
+            <b-card-body v-if="!peerReview.review.done">
+                <b-button type="submit" variant="success float-right" @click="submitPeerReview">Submit Review</b-button>
+                <b-button variant="primary float-right mr-2" @click="savePeerReview">Save Review</b-button>
+            </b-card-body>
 
-                        <!--Save/Submit Button-->
-                        <b-card-body>
-                            <b-button type="submit" variant="success float-right" @click="submitPeerReview">Submit Review</b-button>
-                            <b-button variant="primary float-right mr-2" @click="savePeerReview">Save Review</b-button>
-                        </b-card-body>
+        </b-card>
 
-                </b-card>
-        </template>
-
-        <!--No Peer Review Active-->
-        <template v-else>
-            <b-row>
-                <b-col>
-                    <b-card no-body class="h-100">
-                        <b-card-body class="h-100">
-                            <b-container fluid class="px-0 h-100">
-                                <b-row class="h-100">
-                                    <b-col class="h-100">
-                                        <button type="button" class="btn btn-primary success w-100 h-100" >Request Peer Review</button>
-                                    </b-col>
-                                </b-row>
-                            </b-container>
-                        </b-card-body>
-                    </b-card>
-                </b-col>
-                <b-col cols="3">
-                    <b-card no-body>
-                        <b-card-body>
-                            <b-container fluid class="px-0">
-                                <b-row>
-                                    <b-col>
-                                        <span class="text-muted">You have peer reviewed</span><br>
-                                        <span class="lead">0 / 5</span>
-                                    </b-col>
-                                </b-row>
-                            </b-container>
-                        </b-card-body>
-                    </b-card>
-                </b-col>
-            </b-row>
-        </template>
     </div>
 </template>
 
 <script>
+    import api from "../../../api"
 import { StarRating } from 'vue-rate-it';
-import VueNotifications from 'vue-notifications'
-import api from "../../../api";
+    import VueNotifications from "vue-notifications/src/main"
 
 export default {
     components: {
         StarRating
     },
+    props: ["reviewId"],
     data() {
         return {
             peerReview: {
@@ -163,14 +108,6 @@ export default {
         }
     },
     computed: {
-        isPeerReviewActive() {
-            // Returns whether there is an active peer review or not.
-            return !isNaN(this.peerReview.review.id)
-        },
-        totalAmountOfQuestions() {
-            // Returns the total amount of questions.
-            return this.peerReview.form.length
-        },
         peerReviewSorted() {
             // Returns the review object, but sorted on question number.
             return {
@@ -180,21 +117,22 @@ export default {
                 })
             }
         },
+        totalAmountOfQuestions() {
+            // Returns the total amount of questions.
+            return this.peerReview.form.length
+        },
         peerReviewFilePath() {
             // Get the submission file path.
             return `/api/reviews/${this.peerReview.review.id}/file`
         }
     },
     async created() {
-        // Fetch the peer review.
         await this.fetchPeerReview()
     },
     methods: {
-        transformOptionsToHTMLOptions(options) {
-            // Transforms the option array from the API to a HTML option array.
-            return options.map(option => {
-                return { text: option.option, value: option.id }
-            })
+        async fetchPeerReview() {
+            let {data} = await api.getPeerReview(this.reviewId)
+            this.peerReview = data
         },
         async submitPeerReview() {
 
@@ -223,15 +161,12 @@ export default {
             await this.fetchPeerReview()
             this.showSaveMessage()
         },
-        async fetchPeerReview() {
-            // Get the peer review ID from this assignment that is active.
-            let subRes = await api.getCurrentPeerReview(this.$route.params.assignmentId)
-            let peerReviewID = subRes.data.id
-
-            // Get peer review.
-            let res = await api.getPeerReview(peerReviewID)
-            this.peerReview = res.data
-        }
+        transformOptionsToHTMLOptions(options) {
+            // Transforms the option array from the API to a HTML option array.
+            return options.map(option => {
+                return {text: option.option, value: option.id}
+            })
+        },
     },
     notifications: {
         showSaveMessage: {

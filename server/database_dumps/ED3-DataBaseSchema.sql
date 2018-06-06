@@ -9,8 +9,11 @@ CREATE TABLE AssignmentList (
     due_date timestamptz NOT NULL,
     publish_date timestamptz NOT NULL,
     id SERIAL,
-    Course_id int NOT NULL,
+    course_id int NOT NULL,
+    reviews_per_user int NOT NULL,
     filename varchar(100) NOT NULL,
+    review_due_date timestamptz NOT NULL,
+    review_publish_date timestamptz NOT NULL,
     CONSTRAINT AssignmentList_pk PRIMARY KEY (id)
 );
 
@@ -117,11 +120,12 @@ CREATE TABLE RangeQuestion (
 -- Table: Review
 CREATE TABLE Review (
     id SERIAL,
-    comment varchar(500)  NOT NULL,
-    User_netid varchar(256)  NOT NULL,
+    User_netid varchar(256) NOT NULL,
     Submission_id int NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
+    creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    grade int NOT NULL DEFAULT -1,
     CONSTRAINT Review_pk PRIMARY KEY (id)
 );
 
@@ -135,8 +139,11 @@ CREATE TABLE Rubric (
 CREATE TABLE Submission (
     id SERIAL,
     User_netid varchar(256)  NOT NULL,
+    Group_id int NOT NULL,
     Assignment_id int NOT NULL,
     file_path varchar(100)  NOT NULL,
+    date timestamptz NOT NULL,
+    grade int NOT NULL DEFAULT -1,
     CONSTRAINT Submission_pk PRIMARY KEY (id)
 );
 
@@ -147,7 +154,41 @@ CREATE TABLE UserList (
     CONSTRAINT UserList_pk PRIMARY KEY (netid)
 );
 
+-- Table: ReviewComment
+CREATE TABLE ReviewComment (
+    id SERIAL,
+    comment varchar(5000)  NOT NULL,
+    review_id int NOT NULL,
+    netid varchar(256) NOT NULL,
+    CONSTRAINT ReviewComment_pk PRIMARY KEY (id)
+);
+
+-- Table: SubmissionComment
+CREATE TABLE SubmissionComment (
+    id SERIAL,
+    comment varchar(5000)  NOT NULL,
+    submission_id int NOT NULL,
+    netid varchar(256) NOT NULL,
+    CONSTRAINT SubmissionComment_pk PRIMARY KEY (id)
+);
+
 -- foreign keys
+-- Reference: ReviewComment (table: Review)
+ALTER TABLE ReviewComment ADD CONSTRAINT ReviewComment_review
+    FOREIGN KEY (Review_id)
+    REFERENCES Review (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: SubmissionComment (table: Submission)
+ALTER TABLE SubmissionComment ADD CONSTRAINT SubmissionComment_review
+    FOREIGN KEY (Submission_id)
+    REFERENCES Submission (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
 -- Reference: Assignment_Course (table: AssignmentList)
 ALTER TABLE AssignmentList ADD CONSTRAINT Assignment_Course
     FOREIGN KEY (Course_id)
@@ -339,6 +380,14 @@ ALTER TABLE Submission ADD CONSTRAINT Submission_Assignment
 ALTER TABLE Submission ADD CONSTRAINT Submission_User
     FOREIGN KEY (User_netid)
     REFERENCES UserList (netid)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: Submission_Group (table: Submission)
+ALTER TABLE Submission ADD CONSTRAINT Submission_Group
+    FOREIGN KEY (Group_id)
+    REFERENCES GroupList (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
