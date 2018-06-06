@@ -118,10 +118,16 @@ export default {
         this.assignment = res.data
         let ptime = res.data.publish_date.split('T')[1].substring(0,5)
         let dtime = res.data.due_date.split('T')[1].substring(0,5)
+        let rptime = res.data.review_publish_date.split('T')[1].substring(0,5)
+        let rdtime = res.data.review_due_date.split('T')[1].substring(0,5)
         this.assignment.publish_date = res.data.publish_date.split('T')[0]
         this.assignment.publish_time = ptime
         this.assignment.due_date = res.data.due_date.split('T')[0]
         this.assignment.due_time = dtime
+        this.assignment.review_publish_date = res.data.review_publish_date.split('T')[0]
+        this.assignment.review_publish_time = rptime
+        this.assignment.review_due_date = res.data.review_due_date.split('T')[0]
+        this.assignment.review_due_time = rdtime
     },
     methods: {
         async onSubmit() {
