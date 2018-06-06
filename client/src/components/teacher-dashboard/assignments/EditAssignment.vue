@@ -154,6 +154,8 @@ export default {
         this.assignment.id = aid
         let res = await api.getAssignment(aid)
         this.assignment = res.data
+
+        // Decompose datetime into date and time
         let ptime = res.data.publish_date.split('T')[1].substring(0,5)
         let dtime = res.data.due_date.split('T')[1].substring(0,5)
         let rptime = res.data.review_publish_date.split('T')[1].substring(0,5)
@@ -169,7 +171,7 @@ export default {
     },
     methods: {
         async onSubmit() {
-            let res = await api.saveCourse(this.course.id, this.course)
+            let res = await api.saveAssignment(this.assignment.id, this.assignment)
             console.log(this.course)
             console.log(res)
             this.$router.push({name: 'teacher-dashboard.assignments', params: {courseId: this.course.id} })
