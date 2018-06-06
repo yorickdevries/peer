@@ -39,10 +39,11 @@ export default class CoursesPS {
      * @param {string} name
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateCourse(description: string, name: string): Promise<pgPromise.queryResult> {
+    public static executeCreateCourse(description: string, name: string): any {
         const statement = new PreparedStatement("create-course",
             'INSERT INTO "courselist" ("description", "name") VALUES ($1, $2) RETURNING id, description, name');
         statement.values = [description, name];
+
         return Database.executeQuerySingleResult(statement);
     }
 
