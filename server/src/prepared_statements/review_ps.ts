@@ -209,5 +209,20 @@ export default class ReviewPS {
             "DELETE FROM reviewcomment WHERE id = $1 RETURNING *");
         statement.values = [reviewCommentId];
         return Database.executeQuerySingleResult(statement);
+     }
+
+    /**
+     * Gets the submission beloning to a reviewId
+     *
+     * @static
+     * @param {number} reviewId
+     * @returns {Promise<pgPromise.queryResult>}
+     * @memberof ReviewPS
+     */
+    public static executeGetSubmissionByReviewId(reviewId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-submission-by-review-id",
+            "SELECT s.id, s.user_netid, s.group_id, s.file_path, s.date FROM review r JOIN submission s ON r.submission_id = s.id WHERE r.id = $1");
+        statement.values = [reviewId];
+        return Database.executeQuerySingleResult(statement);
     }
 }

@@ -186,9 +186,9 @@ INSERT INTO public.review(
 	    ('henkjan', 3, 6, false),
 	    ('paulvanderlaan', 4, 1, false),
 	    ('paulvanderlaan', 5, 2, false),
-	    ('paulvanderlaan', 6, 3, false),
+	    ('paulvanderlaan', 6, 4, false),
 	    ('paulvanderlaan', 7, 4, false),
-	    ('paulvanderlaan', 8, 5, false),
+	    ('paulvanderlaan', 8, 4, false),
 	    ('paulvanderlaan', 8, 6, false),
 	    ('paulvanderlaan', 8, 7, false),
 	    ('paulvanderlaan', 8, 8, false)

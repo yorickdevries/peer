@@ -29,7 +29,7 @@ export default [
                     {
                         path: 'peer-review',
                         name: 'student-dashboard.course.assignment.peer-review',
-                        component: () => import('../components/student-dashboard/assignment/PeerReview'),
+                        component: () => import('../components/student-dashboard/assignment/PeerReviewList'),
                     },
                     {
                         path: 'feedback',

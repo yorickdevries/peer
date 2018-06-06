@@ -1,6 +1,7 @@
 import ReviewsPS from "../prepared_statements/review_ps";
 import RubricPS from "../prepared_statements/rubric_ps";
 import bodyParser from "body-parser";
+import path from "path";
 
 // Router
 import express from "express";
@@ -133,6 +134,15 @@ router.post("/:reviewId/comment", async (req, res) => {
  */
 router.delete("/:reviewCommentId/comment", async (req, res) => {
     res.json(await ReviewsPS.executeDeleteReviewComment(req.params.reviewCommentId));
+});
+
+/**
+ * Gets the file that needs to be reviewed.
+ */
+router.get("/:id/file", async (req, res) => {
+    const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(req.params.id);
+    const filePath = path.join(__dirname, "../files/submissions", submission.file_path);
+    res.sendfile(filePath);
 });
 
 export default router;
