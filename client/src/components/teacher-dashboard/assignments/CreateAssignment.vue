@@ -40,7 +40,7 @@
                                                 required>
                                 </b-form-input>
                             </b-form-group>
-                            <b-form-group label="Due date and time">
+                            <b-form-group label="Hand in due date and time">
                                 <b-form-input   v-model="assignment.due_day"
                                                 type="date"
                                                 :state="checkDue"
@@ -56,6 +56,30 @@
                                 <b-form-invalid-feedback>
                                     Due date should be past publish date!
                                 </b-form-invalid-feedback>
+                            </b-form-group>
+                            <b-form-group label="Start date and time for peer review">
+                                <b-form-input   v-model="assignment.review_publish_day"
+                                                type="date"
+                                                placeholder="Please enter start date of the peer review"
+                                                required>
+                                </b-form-input>
+                                <b-form-input   v-model="assignment.review_publish_time"
+                                                type="time"
+                                                placeholder="Please enter start time of the peer review"
+                                                required>
+                                </b-form-input>
+                            </b-form-group>
+                            <b-form-group label="Due date and time for peer review">
+                                <b-form-input   v-model="assignment.review_due_day"
+                                                type="date"
+                                                placeholder="Please enter due date of the peer review"
+                                                required>
+                                </b-form-input>
+                                <b-form-input   v-model="assignment.review_due_time"
+                                                type="time"
+                                                placeholder="Please enter due time of the peer review"
+                                                required>
+                                </b-form-input>
                             </b-form-group>
                             <b-form-group label="Number of reviews that each student needs to do">
                                 <b-form-input   v-model="assignment.reviews_per_user"
@@ -105,12 +129,14 @@ export default {
                 title: null,
                 description: null,
                 course_id: null,
-                publish_date: null,
                 publish_day: null,
                 publish_time: null,
-                due_date: null,
                 due_day: null,
                 due_time: null,
+                review_publish_day: null,
+                review_publish_time: null,
+                review_due_day: null,
+                review_due_time: null,
                 reviews_per_user: null
             }
         }
@@ -141,6 +167,8 @@ export default {
             formData.append("course_id", this.assignment.course_id)
             formData.append("publish_date", this.assignment.publish_day + "T" + this.assignment.publish_time + ":00.000Z")
             formData.append("due_date", this.assignment.due_day + "T" + this.assignment.due_time + ":00.000Z")
+            formData.append("review_publish_date", this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z")
+            formData.append("review_due_date", this.assignment.review_due_day + "T" + this.assignment.review_due_time + ":00.000Z")
             formData.append("assignmentFile", this.file)
             formData.append("reviews_per_user", this.assignment.reviews_per_user)
 
