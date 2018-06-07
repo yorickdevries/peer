@@ -205,15 +205,14 @@ describe("API Course routes", () => {
             .send({ netid: "paulvanderlaan", role: "invalid role" });
         expect(res.status).to.equal(400);
     });
-    
+
     /**
      * Test put the role of a student, invalid request
      */
     it("GET /:courseId/users/:role/", async () => {
         // test the router
-        const res = await chai.request(router)
-            .get("/1/users/student");
-        expect(res.status).to.equal(400);
+        const res = await chai.request(router).get("/1/users/student");
+        expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify([{ user_netid: "paulvanderlaan" }]));
     });
 });
