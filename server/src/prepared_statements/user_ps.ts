@@ -77,7 +77,7 @@ export default class UserPS {
      */
     public static executeGetGroupsById(userId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-groups-by-id",
-        'SELECT * FROM "groupusers" WHERE "user_netid" LIKE $1 ');
+        'SELECT * FROM "groupusers" WHERE "user_netid" LIKE $1');
         statement.values = [userId];
         return Database.executeQuery(statement);
     }
@@ -85,6 +85,7 @@ export default class UserPS {
     /**
      * Executes a 'get group by user id' query.
      * @param {number} userId - a user id.
+     * @param {number} assignmentId - assignmentId
      * @return {any} a query result.
      */
     public static executeGetGroupsByNetIdByAssignmentId(userId: string, assignmentId: number): any {
