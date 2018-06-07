@@ -58,15 +58,6 @@
                     </b-card-body>
                 </b-card>
 
-                <!--Group Information-->
-                <b-card no-body class="mt-3">
-                    <b-card-body>
-                        <h4 class="mb-0">Group Members</h4>
-                    </b-card-body>
-                    <b-list-group flush>
-                        <b-list-group-item v-for="member in members" :key="member">{{ member }}</b-list-group-item>
-                    </b-list-group>
-                </b-card>
             </b-col>
         </b-row>
 
@@ -88,8 +79,7 @@ export default {
             course: {
                 name: null,
                 description: null
-            },
-            members: ["User 1", "User 2", "User 3", "User 4", "User 5"]
+            }
         }
     },
     async created() {
