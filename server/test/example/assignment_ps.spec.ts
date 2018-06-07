@@ -161,15 +161,6 @@ describe("AssignmentPreparedStatements Test", () => {
     });
 
     /**
-     * Test count reviews for assignment.
-     */
-    it("Count reviews for assignment", async () => {
-        expect(await AssignmentPS.executeCountAssignmentReviews(1, "henkjan")).to.deep.equal({
-            count: "1"
-        });
-    });
-
-    /**
      * Test get reviews for an assignment.
      */
     it("Reviews of an assignment", async () => {

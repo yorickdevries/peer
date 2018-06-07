@@ -28,38 +28,75 @@
                                                 required>
                                 </b-form-input>
                             </b-form-group>
-                            <b-form-group label="Publish date">
-                                <b-form-input   v-model="assignment.publish_date"
+                            <b-form-group label="Publish date and time">
+                                <b-form-input   v-model="assignment.publish_day"
                                                 type="date"
-                                                placeholder="Please enter on which the assignment should be published"
+                                                placeholder="Please enter date on which the assignment should be published"
+                                                required>
+                                </b-form-input>
+                                <b-form-input   v-model="assignment.publish_time"
+                                                type="time"
+                                                placeholder="Please enter time on which the assignment should be published"
                                                 required>
                                 </b-form-input>
                             </b-form-group>
-                            <b-form-group label="Due date">
-                                <b-form-input   v-model="assignment.due_date"
+                            <b-form-group label="Hand in due date and time">
+                                <b-form-input   v-model="assignment.due_day"
                                                 type="date"
                                                 :state="checkDue"
-                                                placeholder="Please enter on which the assignment should be handed in"
+                                                placeholder="Please enter date on which the assignment should be handed in"
+                                                required>
+                                </b-form-input>
+                                <b-form-input   v-model="assignment.due_time"
+                                                type="time"
+                                                :state="checkDue"
+                                                placeholder="Please enter time before which the assignment should be handed in"
                                                 required>
                                 </b-form-input>
                                 <b-form-invalid-feedback>
                                     Due date should be past publish date!
                                 </b-form-invalid-feedback>
                             </b-form-group>
-                            <b-form-file
-                                    placeholder="Choose a file..."
-                                    accept=".pdf"
-                                    v-model="file"
-                                    :state="Boolean(file)"
-                                    v-if="uploadSuccess === null" />
+                            <b-form-group label="Start date and time for peer review">
+                                <b-form-input   v-model="assignment.review_publish_day"
+                                                type="date"
+                                                placeholder="Please enter start date of the peer review"
+                                                required>
+                                </b-form-input>
+                                <b-form-input   v-model="assignment.review_publish_time"
+                                                type="time"
+                                                placeholder="Please enter start time of the peer review"
+                                                required>
+                                </b-form-input>
+                            </b-form-group>
+                            <b-form-group label="Due date and time for peer review">
+                                <b-form-input   v-model="assignment.review_due_day"
+                                                type="date"
+                                                placeholder="Please enter due date of the peer review"
+                                                required>
+                                </b-form-input>
+                                <b-form-input   v-model="assignment.review_due_time"
+                                                type="time"
+                                                placeholder="Please enter due time of the peer review"
+                                                required>
+                                </b-form-input>
+                            </b-form-group>
                             <b-form-group label="Number of reviews that each student needs to do">
-                                <b-form-input   v-model="assignment.peer_review_cap"
+                                <b-form-input   v-model="assignment.reviews_per_user"
                                                 type="number"
                                                 :state="checkPeerNumber"
-                                                placeholder="Enter a number between 1 and 10"
+                                                placeholder="Enter an integer larger than 0"
                                                 required>
-
                                 </b-form-input>
+                            </b-form-group>
+                            <b-form-group label="Assignment file">
+                                <b-form-file
+                                        placeholder="Choose a file..."
+                                        accept=".pdf"
+                                        v-model="file"
+                                        :state="Boolean(file)"
+                                        v-if="uploadSuccess === null">
+                                </b-form-file>
                             </b-form-group>
                             <b-button type="submit" variant="primary">Create the assignment</b-button>
                         </b-form>
@@ -92,9 +129,15 @@ export default {
                 title: null,
                 description: null,
                 course_id: null,
-                publish_date: null,
-                due_date: null,
-                peer_review_cap: null
+                publish_day: null,
+                publish_time: null,
+                due_day: null,
+                due_time: null,
+                review_publish_day: null,
+                review_publish_time: null,
+                review_due_day: null,
+                review_due_time: null,
+                reviews_per_user: null
             }
         }
     },
@@ -106,10 +149,10 @@ export default {
                 return this.assignment.due_date > this.assignment.publish_date
         },
         checkPeerNumber() {
-            if (this.assignment.peer_review_cap == null)
+            if (this.assignment.reviews_per_user == null)
                 return null
             else
-                return this.assignment.peer_review_cap > 0 && this.assignment.peer_review_cap < 11
+                return this.assignment.reviews_per_user > 0
         }
     },
     async created() {
@@ -122,12 +165,13 @@ export default {
             formData.append("title", this.assignment.title)
             formData.append("description", this.assignment.description)
             formData.append("course_id", this.assignment.course_id)
-            formData.append("publish_date", this.assignment.publish_date)
-            formData.append("due_date", this.assignment.due_date)
+            formData.append("publish_date", this.assignment.publish_day + "T" + this.assignment.publish_time + ":00.000Z")
+            formData.append("due_date", this.assignment.due_day + "T" + this.assignment.due_time + ":00.000Z")
+            formData.append("review_publish_date", this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z")
+            formData.append("review_due_date", this.assignment.review_due_day + "T" + this.assignment.review_due_time + ":00.000Z")
             formData.append("assignmentFile", this.file)
-            formData.append("peer_review_cap", this.assignment.peer_review_cap)
+            formData.append("reviews_per_user", this.assignment.reviews_per_user)
 
-            console.log(formData)
             let res = await api.createAssignment(formData)
             console.log(this.assignment)
             console.log(res)

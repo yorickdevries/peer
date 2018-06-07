@@ -61,6 +61,18 @@ describe("API Course routes", () => {
                 name: "test name"
             }
         ));
+
+        const enrolled = await chai.request(router).get("/enrolled");
+        expect(enrolled.status).to.equal(200);
+        expect(enrolled.text).to.equal(JSON.stringify([{
+            id: 1,
+            description: "This is a beautiful course description!",
+            name: "ED-3"
+        }, {
+            id: 2,
+            description: "example",
+            name: "test name"
+        }]));
     });
 
     /**
