@@ -9,6 +9,18 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
  */
 export default class UserPS {
     /**
+     * Executes a 'get user by user id' query.
+     * @param {string} netId - an user id.
+     * @return {any} a query result.
+     */
+    public static async executeGetUserById(netId: string): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-user-by-id",
+        'SELECT * FROM "userlist" WHERE "netid" = $1');
+        statement.values = [netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Executes an 'add user query'.
      * @param {string} netId - a net id.
      * @param {string} email - an email.
@@ -22,30 +34,15 @@ export default class UserPS {
     }
 
     /**
-     * Executes a 'get user by user id' query.
-     * @param {string} netId - an user id.
-     * @return {any} a query result.
-     */
-    public static async executeGetUserById(netId: string): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-user-by-id",
-        'SELECT * FROM "userlist" WHERE "netid" LIKE $1');
-        statement.values = [netId];
-        return Database.executeQuerySingleResult(statement);
-    }
-
-
-    /**
-     * Counts the amount of assignments with this specific id.
+     * Update user email
      *
-     * @static
      * @param {string} netId
-     * @returns {Promise<pgPromise.queryResult>}
-     * @memberof UserPS
+     * @param {string} email
      */
-    public static executeCountUserById(netId: string): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("count-user-by-id",
-        'SELECT COUNT(1) FROM "userlist" WHERE "netid" = $1');
-        statement.values = [netId];
+    public static executeUpdateEmailUser(netId: string, email: string): any {
+        const statement = new PreparedStatement("update-user-to-database",
+        "UPDATE userlist SET email = $2 WHERE netid = $1 RETURNING *");
+        statement.values = [netId, email];
         return Database.executeQuerySingleResult(statement);
     }
 
