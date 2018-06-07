@@ -16,10 +16,10 @@
                         <b-col class="p-0 d-flex flex-wrap">
 
                             <router-link
-                                    active-class=""
+                                    active-class="bg-light"
                                     class="flex-fill"
                                     tag="a"
-                                    :to="{ name: 'student-dashboard.course.assignment.hand-in' }">
+                                    :to="{ name: 'student-dashboard.course.assignment.information' }">
                                 <div class="text-center border-right border-bottom active py-3 h-100 align-middle">
                                     <div class="lead font-weight-bold align-middle">Assignment</div>
                                     <div class="text-muted">Information</div>
