@@ -12,48 +12,64 @@
                 <b-card no-body>
 
                     <b-row class="px-3 pt-0">
-                        <router-link
-                                active-class="bg-light"
-                                class="col px-0"
-                                tag="div"
-                                :to="{ name: 'student-dashboard.course.assignment.hand-in' }">
-                            <div class="text-center border-right border-bottom active py-3">
-                                <div class="lead font-weight-bold">Hand-In -
-                                    <span class="text-success" v-if="isHandInActive">Open</span>
-                                    <span class="text-danger" v-else>Closed</span>
-                                </div>
-                                <div class="text-muted">Due: {{ formatDate(assignment.due_date) }}</div>
-                            </div>
-                        </router-link>
 
-                        <router-link
-                                active-class="bg-light"
-                                class="col px-0 text-muted"
-                                tag="div"
-                                :to="{ name: 'student-dashboard.course.assignment.peer-review' }">
+                        <b-col class="p-0 d-flex flex-wrap">
 
-                            <div class="text-center border-right border-bottom py-3">
-                                <div class="lead font-weight-bold">Peer Review -
-                                    <span class="text-success" v-if="isPeerReviewActive">Open</span>
-                                    <span class="text-danger" v-else>Closed</span>
+                            <router-link
+                                    active-class=""
+                                    class="flex-fill"
+                                    tag="a"
+                                    :to="{ name: 'student-dashboard.course.assignment.hand-in' }">
+                                <div class="text-center border-right border-bottom active py-3 h-100 align-middle">
+                                    <div class="lead font-weight-bold align-middle">Assignment</div>
+                                    <div class="text-muted">Information</div>
                                 </div>
-                                <span class="text-muted">Due: {{ formatDate(assignment.peer_review_due_date) }}</span>
-                            </div>
-                        </router-link>
 
-                        <router-link
-                                active-class="bg-light"
-                                class="col px-0 text-muted"
-                                tag="div"
-                                :to="{ name: 'student-dashboard.course.assignment.feedback' }">
-                            <div class="text-center border-bottom py-3">
-                                <div class="lead font-weight-bold ">Received Feedback -
-                                    <span class="text-success" v-if="isFeedbackActive">Open</span>
-                                    <span class="text-danger" v-else>Closed</span>
+                            </router-link>
+
+                            <router-link
+                                    active-class="bg-light"
+                                    class="flex-fill"
+                                    tag="a"
+                                    :to="{ name: 'student-dashboard.course.assignment.hand-in' }">
+                                <div class="text-center border-right border-bottom active py-3">
+                                    <div class="lead font-weight-bold">Submission
+                                        <b-badge variant="success" v-if="isHandInActive">Open</b-badge>
+                                        <b-badge variant="danger" v-else>Closed</b-badge>
+                                    </div>
+                                    <div class="text-muted">Due: {{ assignment.due_date | formatDate }}</div>
                                 </div>
-                                <span class="text-muted">Opens after {{ formatDate(assignment.peer_review_due_date) }}</span>
-                            </div>
-                        </router-link>
+                            </router-link>
+
+                            <router-link
+                                    active-class="bg-light"
+                                    class="flex-fill"
+                                    tag="a"
+                                    :to="{ name: 'student-dashboard.course.assignment.peer-review' }">
+                                <div class="text-center border-right border-bottom py-3">
+                                    <div class="lead font-weight-bold">Peer Review
+                                        <b-badge variant="success" v-if="isPeerReviewActive">Open</b-badge>
+                                        <b-badge variant="danger" v-else>Closed</b-badge>
+                                    </div>
+                                    <span class="text-muted">Due: {{ assignment.review_due_date | formatDate }}</span>
+                                </div>
+                            </router-link>
+
+                            <router-link
+                                    active-class="bg-light"
+                                    class="flex-fill"
+                                    tag="a"
+                                    :to="{ name: 'student-dashboard.course.assignment.feedback' }">
+                                <div class="text-center border-bottom py-3">
+                                    <div class="lead font-weight-bold ">Received Feedback
+                                        <b-badge variant="success" v-if="isFeedbackActive">Open</b-badge>
+                                        <b-badge variant="danger" v-else>Closed</b-badge>
+                                    </div>
+                                    <span class="text-muted">Opens after {{ assignment.review_due_date | formatDate }}</span>
+                                </div>
+                            </router-link>
+                        </b-col>
+
 
                     </b-row>
 
@@ -64,6 +80,7 @@
                             </b-col>
                         </b-row>
                     </b-card-body>
+
                 </b-card>
             </b-col>
         </b-row>
@@ -85,7 +102,7 @@ export default {
             assignment: {
                 title: null,
                 due_date: null,
-                peer_review_due_date: null
+                review_due_date: null
             },
         }
     },
@@ -94,10 +111,10 @@ export default {
             return new Date() < new Date(this.assignment.due_date)
         },
         isPeerReviewActive() {
-            return new Date() < new Date(this.assignment.peer_review_due_date)
+            return new Date() < new Date(this.assignment.review_due_date)
         },
         isFeedbackActive() {
-            return new Date() > new Date(this.assignment.peer_review_due_date)
+            return new Date() > new Date(this.assignment.review_due_date)
         }
     },
     async created() {
@@ -109,22 +126,12 @@ export default {
             text: this.assignment.title,
             active: true
         })
-
-        // Temporary creation of a due date for the peer review (offset by 40).
-        let tempDate = new Date(this.assignment.due_date);
-        tempDate.setDate(tempDate.getDate() + 40);
-        this.assignment.peer_review_due_date = tempDate
     },
     methods: {
         async fetchAssignment() {
             // Fetch the assignment information.
-            let res = await api.getAssignment(this.$route.params.assignmentId)
-            this.assignment = res.data
-        },
-        formatDate(date) {
-            // Formats the date to a readable format for the UI.
-            if (!(date instanceof Date)) date = new Date(date)
-            return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
+            let { data } = await api.getAssignment(this.$route.params.assignmentId)
+            this.assignment = data
         }
     }
 }
