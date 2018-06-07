@@ -1,5 +1,6 @@
 import CoursesPS from "../prepared_statements/courses_ps";
 import bodyParser from "body-parser";
+import { Roles } from "../roles";
 
 // Router
 import express from "express";
@@ -13,8 +14,13 @@ router.use(bodyParser.json());
  * @body description - description
  * @body name - name
  */
-router.route("/").post(async (req, res) => {
-    res.json(await CoursesPS.executeCreateCourse(req.body.description, req.body.name));
+router.route("/").post(async (req: any, res) => {
+    // Create the course
+    const course = await CoursesPS.executeCreateCourse(req.body.description, req.body.name);
+    // Enroll the teacher in the course
+    await CoursesPS.executeEnrollInCourseId(course.id, req.userinfo.given_name, Roles.teacher);
+    // Respond with appropriate JSON
+    res.json(course);
 }).get(async (req, res) => {
     res.json(await CoursesPS.executeGetAllCourses());
 });

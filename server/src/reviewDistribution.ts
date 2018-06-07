@@ -31,7 +31,7 @@ export default class ReviewDistribution {
             }
             // Add the review assignments to the database
             for (const review of reviews) {
-                await ReviewPS.executeCreateReview("", review.userNetId, review.submissionId, assignmentId);
+                await ReviewPS.executeCreateReview(review.userNetId, review.submissionId, assignmentId);
             }
             // Return a list of made reviews
             return reviews;

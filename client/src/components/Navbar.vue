@@ -10,6 +10,7 @@
                 <router-link :to="{ name: 'landing-page' }"><b-navbar-brand class="font-weight-bold ">PR</b-navbar-brand></router-link>
 
                 <h5 class="text-white font-weight-bold my-0">{{ title }}</h5>
+                <b-badge variant="secondary" class="ml-2">{{ role }}</b-badge>
 
                 <b-collapse is-nav id="nav_collapse">
 
@@ -58,7 +59,7 @@
 import api from '../api'
 
 export default {
-    props: ['links', 'title'],
+    props: ['links', 'title', 'role'],
     data() {
         return {
             authenticated: null,

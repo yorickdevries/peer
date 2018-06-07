@@ -65,7 +65,9 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
         req.body.publish_date,
         req.body.course_id,
         req.body.reviews_per_user,
-        fileName);
+        fileName,
+        req.body.review_due_date,
+        req.body.review_publish_date);
     // writing the file if no error is there
     if (!result.error) {
         fs.writeFile(filePath, req.file.buffer, (err) => {
@@ -114,7 +116,6 @@ router.route("/:assignment_id")
  * Route to post and update an assignment.
  */
 router.post("/", uploadAssignmentFunction, index.authorization.enrolledAsTeacherAssignmentCheckForPost, addAssignmentToDatabase);
-
 
 /**
  * Route to update an assignment.
@@ -187,20 +188,6 @@ router.route("/:assignment_id/distributeReviews")
         res.json(await reviewDistribution.distributeReviews(req.params.assignment_id));
     });
 
-
-/**
- * Route to request the review a user is working on
- * @userinfo given_name - netId
- * @params assignment_id - assignment_id
- */
-router.route("/:assignment_id/review")
-    .get(async (req: any, res) => {
-        res.json(await AssignmentPS.executeGetReviewByAssignmentId(
-            req.params.assignment_id,
-            req.userinfo.given_name
-        ));
-    });
-
 /**
  * Route to import groups for a specific assignment.
  */
@@ -225,10 +212,6 @@ router.post("/:id/importgroups", async (req: any, res) => {
             res.json(groups);
         }
     });
-});
-
-router.get("/:id/reviewCount", async (req: any, res) => {
-    res.json(await AssignmentPS.executeCountAssignmentReviews(req.params.id, req.userinfo.given_name));
 });
 
 /**
