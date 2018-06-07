@@ -2,7 +2,7 @@
     <div>
         <b-container>
 
-            <h1 class="mt-5">Assignment dashboard</h1>
+            <h1 class="mt-5">Assignment dashboard: {{ assignment.title }}</h1>
 
             <!--Tab Layout-->
             <b-card no-body>
