@@ -64,8 +64,7 @@ describe("Submission routes", () => {
         const exampleSubmissionFile = path.join(__dirname, "../../example_data/submissions/submission1.pdf");
         const res = await chai.request(router).post("/")
         .attach("submissionFile", fs.readFileSync(exampleSubmissionFile), "submission1.pdf")
-        .field("assignmentId", 1)
-        .field("groupId", 20);
+        .field("assignmentId", 1);
         // assertions
         const result = JSON.parse(res.text);
         expect(res.status).to.equal(200);

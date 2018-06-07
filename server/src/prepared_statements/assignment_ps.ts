@@ -151,4 +151,20 @@ export default class AssignmentPS {
         statement.values = [assignmentId];
         return Database.executeQuery(statement);
     }
+
+    /**
+     * Gets the group of a user for a specific assignment
+     *
+     * @static
+     * @param {string} netId
+     * @param {number} assignmentId
+     * @returns {Promise<pgPromise.queryResult>}
+     * @memberof AssignmentPS
+     */
+    public static executeGetGroupOfNetIdByAssignmentId(netId: string, assignmentId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-all-groups-per-assignment",
+        "SELECT a.assignment_id, a.group_id FROM assignmentgroup a JOIN groupusers g ON a.group_id = g.group_groupid WHERE g.user_netid = $1 AND a.assignment_id = $2");
+        statement.values = [netId, assignmentId];
+        return Database.executeQuerySingleResult(statement);
+    }
 }
