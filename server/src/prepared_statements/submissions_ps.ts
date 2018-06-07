@@ -74,4 +74,55 @@ export default class SubmissionsPS {
         statement.values = [submissionId];
         return Database.executeQuerySingleResult(statement);
     }
+
+    /**
+     * Executes a 'get all submission comments' query.
+     * @param {number} submissionId - a review id.
+     * @return {Promise<pgPromise.queryResult>} - a database promise.
+     */
+    public static executeGetAllSubmissionComments(submissionId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-submission-comments",
+            "SELECT * FROM submissioncomment WHERE submission_id = $1");
+        statement.values = [submissionId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Executes a 'add submission comment' query.
+     * @param {number} submissionId - a review id.
+     * @param {string} netId - a netid.
+     * @param {string} comment - a comment.
+     * @return {Promise<pgPromise.queryResult>} - a database promise.
+     */
+    public static executeAddSubmissionComment(submissionId: number, netId: string, comment: string): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("add-submission-comments",
+            "INSERT INTO submissioncomment(comment, submission_id, netid) VALUES ($1, $2, $3) RETURNING *");
+        statement.values = [comment, submissionId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes a 'update submission comment' query.
+     * @param {number} submissionCommentId - a submission comment id.
+     * @param {string} comment - a comment id.
+     * @return {Promise<pgPromise.queryResult>} - a database promise.
+     */
+    public static executeUpdateSubmissionComment(submissionCommentId: number, comment: string): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("put-submission-comments",
+            "UPDATE submissioncomment SET comment = $1 WHERE id = $2 RETURNING *");
+        statement.values = [comment, submissionCommentId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes a 'delete submission comment' query.
+     * @param {number} submissionCommentId - a submisison comment id.
+     * @return {Promise<pgPromise.queryResult>} - a database promise.
+     */
+    public static executeDeleteSubmissionComment(submissionCommentId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("delete-submission-comments",
+            "DELETE FROM submissioncomment WHERE id = $1 RETURNING *");
+        statement.values = [submissionCommentId];
+        return Database.executeQuerySingleResult(statement);
+    }
 }

@@ -5,6 +5,7 @@ import Database from "../../src/database";
 
 // load the queryfiles
 import { QueryFile } from "pg-promise";
+
 const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
 const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
 
@@ -106,6 +107,55 @@ describe("ReviewPreparedStatement Test", () => {
             review_id: 1
         });
     });
+
+    /**
+     * Get all review comments.
+     */
+    it("get all review comments", async () => {
+        expect(await ReviewPS.executeGetAllReviewComments(1)).to.deep.equal([{
+            "comment": "Keep it up Brian!",
+            "id": 1,
+            "review_id": 1,
+            "netid": "paulvanderlaan"
+        }]);
+    });
+
+    /**
+     * Post review comment.
+     */
+    it("post review comment", async () => {
+        expect(await ReviewPS.executeAddReviewComment(1, "paulvanderlaan", "new")).to.deep.equal({
+            "comment": "new",
+            "id": 2,
+            "review_id": 1,
+            "netid": "paulvanderlaan"
+        });
+    });
+
+    /**
+     * Put review comment.
+     */
+    it("update review comment", async () => {
+        expect(await ReviewPS.executeUpdateReviewComment(1, "new")).to.deep.equal({
+            "comment": "new",
+            "id": 1,
+            "review_id": 1,
+            "netid": "paulvanderlaan"
+        });
+    });
+
+    /**
+     * Delete review comment.
+     */
+    it("delete review comment", async () => {
+        expect(await ReviewPS.executeDeleteReviewComment(1)).to.deep.equal({
+            "comment": "Keep it up Brian!",
+            "id": 1,
+            "review_id": 1,
+            "netid": "paulvanderlaan"
+        });
+    });
+
 
     /**
      * get submission belonging to an review
