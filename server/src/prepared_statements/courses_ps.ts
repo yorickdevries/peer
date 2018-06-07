@@ -122,16 +122,29 @@ export default class CoursesPS {
     }
 
     /**
-     * Upgrade a user net id to either a ta or teacher.
+     * Set the role of a user net id.
      * @param {number} courseId - a course id to upgrade the net id in.
      * @param {string} netId - a net id of a user to upgrade.
      * @param {string} role - a new role, either teacher or TA.
      * @return {any} - a database query result.
      */
     public static executeSetRole(courseId: number, netId: string, role: string): any {
-        const statement = new PreparedStatement("upgrade-user",
+        const statement = new PreparedStatement("set-user-role",
             "UPDATE enroll SET role=$1 WHERE course_id =$2 AND user_netid=$3 RETURNING *");
         statement.values = [role, courseId, netId];
         return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Get all users of a course that have a specific role.
+     * @param {number} courseId - a course id.
+     * @param {string} role - a role to filter on.
+     * @return {any} - a database query result.
+     */
+    public static executeGetUsersByRole(courseId: number, role: string): any {
+        const statement = new PreparedStatement("get-user-by-role",
+            "SELECT enroll.user_netid FROM courselist JOIN enroll ON courselist.id = enroll.course_id WHERE courselist.id=$1 AND enroll.role=$2");
+        statement.values = [courseId, role];
+        return Database.executeQuery(statement);
     }
 }

@@ -69,7 +69,7 @@ router.get("/:courseId/role", async (req: any, res) => {
 /**
  * Route to set the role of a user for a course.
  * @param courseId - course id.
- * @body netId - a net id of a user to promote.
+ * @body netid - a net id of a user to promote.
  * @body role - a new role for the user.
  * @return json containing { courseId: number, role: Role }
  */
@@ -97,7 +97,20 @@ router.put("/:courseId/setRole", async (req: any, res) => {
     } else {
         res.sendStatus(400);
     }
+});
 
+/**
+ * Route to fetch, for a specific course, all net ids with a given role.
+ * @body courseId - id of the course.
+ * @body role - role to filter on.
+ * @return json with an array of all net ids.
+ */
+router.get("/:courseId/users/:role/", async (req: any, res) => {
+    // Check if the role is valid and supported.
+    if (!(req.params.role in Roles)) res.sendStatus(400);
+
+    // Query and return all net ids as json.
+    res.json(await CoursesPS.executeGetUsersByRole(req.params.courseId, req.params.role));
 });
 
 export default router;
