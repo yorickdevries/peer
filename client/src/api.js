@@ -32,7 +32,7 @@ export default {
         return client.post('/assignments', assignment)
     },
     getAssignmentReviews(assignmentId) {
-        return client.get(`/assignments/${assignmentId}/reviews`)
+        return client.get(`/assignments/${assignmentId}/allreviews`)
     },
     saveAssignment(assignmentId, assignment) {
         return client.put(`courses/${assignmentId}`, assignment)
