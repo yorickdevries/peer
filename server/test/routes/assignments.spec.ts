@@ -199,6 +199,38 @@ describe("API Assignment routes", () => {
         expect(res.status).to.equal(401);
     });
 
+    // not in a group
+    it("GET /:assignment_id/latestsubmission - user not in group", async () => {
+        // test the router
+        InitLogin.initialize(router, "paulvanderlaan");
+        const res = await chai.request(router).get("/3/latestsubmission");
+        expect(res.text).to.equal(JSON.stringify({error: "User is not in a group in this assignment"}));
+    });
+
+    // no submission yet
+    it("GET /:assignment_id/latestsubmission - no submission yet", async () => {
+        // test the router
+        InitLogin.initialize(router, "paulvanderlaan");
+        const res = await chai.request(router).get("/2/latestsubmission");
+        expect(res.text).to.equal(JSON.stringify({error: "No latest submission could be found"}));
+    });
+
+    // latest submission
+    it("GET /:assignment_id/latestsubmission", async () => {
+        // test the router
+        InitLogin.initialize(router, "bplanje");
+        const res = await chai.request(router).get("/2/latestsubmission");
+        expect(res.text).to.equal(JSON.stringify({
+            id: 5,
+            user_netid: "yorickdevries",
+            group_id: 21,
+            assignment_id: 2,
+            file_path: "submission2.pdf",
+            date: new Date("2018-05-01T22:30:00.000Z"),
+            grade: -1
+        }));
+    });
+
 
     /**
      * Test to get all reviews of an assignment.
@@ -220,7 +252,8 @@ describe("API Assignment routes", () => {
         // log in as teacher
         InitLogin.initialize(router, "teacheraccount");
         const res = await chai.request(router).get("/2/distributeReviews");
+        console.log(res.text);
         expect(res.status).to.equal(200);
-        expect(JSON.parse(res.text).length).to.equal(8);
+        expect(JSON.parse(res.text).length).to.equal(3);
     });
 });

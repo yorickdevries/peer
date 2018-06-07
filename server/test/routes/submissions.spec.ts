@@ -52,7 +52,7 @@ describe("Submission routes", () => {
         const res = await chai.request(router).get("/");
         expect(res.status).to.equal(200);
         const result = JSON.parse(res.text);
-        expect(result.length).to.equal(6);
+        expect(result.length).to.equal(5);
     });
 
     /**

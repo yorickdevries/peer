@@ -77,7 +77,7 @@ describe("CoursePreparedStatement Test", () => {
             "review_due_date": new Date("2018-05-01T20:30:00Z"),
             "review_publish_date": new Date("2018-04-01T20:30:00Z"),
             "title": "Assignment 2",
-            "reviews_per_user": 2
+            "reviews_per_user": 1
         },
         {
             "course_id": 1,
@@ -89,7 +89,7 @@ describe("CoursePreparedStatement Test", () => {
             "review_due_date": new Date("2018-05-01T20:30:00Z"),
             "review_publish_date": new Date("2018-04-01T20:30:00Z"),
             "title": "Assignment 3",
-            "reviews_per_user": 2
+            "reviews_per_user": 1
         }]);
     });
 
