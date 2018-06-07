@@ -123,4 +123,43 @@ router.get("/:id/file", async (req, res) => {
     res.sendfile(filePath);
 });
 
+/**
+ * Get all review comments.
+ * @param submissionId - an id of a submission.
+ * @return database return value.
+ */
+router.get("/:submissionId/allComments", async (req, res) => {
+    res.json(await SubmissionsPS.executeGetAllSubmissionComments(req.params.submissionId));
+});
+
+/**
+ * Get all review comments.
+ * @param submissionCommentId - an id of a submission.
+ * @body comment - a comment of the review.
+ * @return database return value.
+ */
+router.put("/:submissionCommentId/comment", async (req, res) => {
+    res.json(await SubmissionsPS.executeUpdateSubmissionComment(req.params.submissionCommentId, req.body.comment));
+});
+
+/**
+ * Get all review comments.
+ * @param submissionId - an id of a submission.
+ * @body netid - a netid.
+ * @body comment - a comment of the review.
+ * @return database return value.
+ */
+router.post("/:submissionId/comment", async (req, res) => {
+    res.json(await SubmissionsPS.executeAddSubmissionComment(req.params.submissionId, req.body.netid, req.body.comment));
+});
+
+/**
+ * Get all review comments.
+ * @param submissionCommentId - an id of a submission.
+ * @return database return value.
+ */
+router.delete("/:submissionCommentId/comment", async (req, res) => {
+    res.json(await SubmissionsPS.executeDeleteSubmissionComment(req.params.submissionCommentId));
+});
+
 export default router;
