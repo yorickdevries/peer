@@ -75,7 +75,11 @@ router.get("/:courseId/role", async (req: any, res) => {
  */
 router.put("/:courseId/setRole", async (req: any, res) => {
     // Check if the role to upgrade to is valid.
-    if (!(req.body.role in Roles)) res.sendStatus(400);
+    if (!(req.body.role in Roles)) {
+        res.sendStatus(400);
+        return;
+    }
+
 
     // Fetch enrollments of the user to set the role from.
     const enrolled: any = await CoursesPS.executeCountUserByCourseId(req.params.courseId, req.body.netid);
@@ -107,7 +111,10 @@ router.put("/:courseId/setRole", async (req: any, res) => {
  */
 router.get("/:courseId/users/:role/", async (req: any, res) => {
     // Check if the role is valid and supported.
-    if (!(req.params.role in Roles)) res.sendStatus(400);
+    if (!(req.params.role in Roles)) {
+        res.sendStatus(400);
+        return;
+    }
 
     // Query and return all net ids as json.
     res.json(await CoursesPS.executeGetUsersByRole(req.params.courseId, req.params.role));
