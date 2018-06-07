@@ -1,6 +1,5 @@
 import Database from "../database";
 import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
-import { Roles } from "../roles";
 
 /**
  * Prepared statement class for courses§
@@ -53,7 +52,7 @@ export default class CoursesPS {
      * @param {string} userNetId - a netid of the current user.
      * @return {any} a query result.
      */
-    public static executeGetAllEnrolledCourses(userNetId: string): Promise<pgPromise.queryResult> {
+    public static executeGetAllEnrolledCourses(userNetId: string): any {
         const statement = new PreparedStatement("get-all-courses-you-are-enrolled,",
             'SELECT * FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" WHERE user_netid LIKE $1)');
         statement.values = [userNetId];
@@ -129,10 +128,7 @@ export default class CoursesPS {
      * @param {string} role - a new role, either teacher or TA.
      * @return {any} - a database query result.
      */
-    public static executePromoteUser(courseId: number, netId: string, role: string): any {
-        // Check if the role to upgrade to is valid.
-        if (!(role === Roles.TA || role === Roles.teacher)) return { error: "Invalid role" };
-
+    public static executeSetRole(courseId: number, netId: string, role: string): any {
         const statement = new PreparedStatement("upgrade-user",
             "UPDATE enroll SET role=$1 WHERE course_id =$2 AND user_netid=$3 RETURNING *");
         statement.values = [role, courseId, netId];

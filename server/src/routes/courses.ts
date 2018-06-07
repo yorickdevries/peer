@@ -67,13 +67,27 @@ router.get("/:courseId/role", async (req: any, res) => {
 });
 
 /**
- * Route to promote a user for a course.
+ * Route to set the role of a user for a course.
  * @param courseId - course id.
  * @body netId - a net id of a user to promote.
  * @body role - a new role for the user.
  */
-router.put("/:courseId/promotion", async (req: any, res) => {
-    res.json(await CoursesPS.executePromoteUser(req.params.courseId, req.body.netId, req.body.role));
+router.put("/:courseId/setRole", async (req: any, res) => {
+    // Check if the role to upgrade to is valid.
+    if (!((<any>Object).values(Roles).includes(req.body.role))) return { error: "Invalid role" };
+
+    // Fetch enrollments of the user to set the role from.
+    const enrolled: [any] = await CoursesPS.executeGetAllEnrolledCourses(req.body.netId);
+
+    // Check if the student is enrolled in the course.
+    const isEnrolled: boolean = enrolled.find((course) => course.id === req.params.courseId) != undefined;
+
+    // Depending if the student is enrolled, update the role of the student.
+    if (!isEnrolled) {
+        res.json(await CoursesPS.executeEnrollInCourseId(req.params.courseId, req.body.netId, req.body.role));
+    } else {
+        res.json(await CoursesPS.executeSetRole(req.params.courseId, req.body.netId, req.body.role));
+    }
 });
 
 export default router;
