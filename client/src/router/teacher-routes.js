@@ -44,6 +44,11 @@ export default [
                 name: 'teacher-dashboard.course.teaching-assistants',
                 component: () => import('../components/teacher-dashboard/TAManager')
             },
+            {
+                path: 'courses/:courseId/students',
+                name: 'teacher-dashboard.course.students',
+                component: () => import('../components/teacher-dashboard/StudentManager')
+            },
         ]
     }
 ]
