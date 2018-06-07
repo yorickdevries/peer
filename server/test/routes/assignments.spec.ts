@@ -47,7 +47,7 @@ describe("API Assignment routes", () => {
         const file = path.join(__dirname, "../../example_data/csv_test/example_export.csv");
         // log in as teacheraccount
         InitLogin.initialize(router, "teacheraccount");
-        const res = await chai.request(router).post("/1/importgroups")
+        const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv")
             .field("groupColumn", "Education Groups");
         expect(res.status).to.equal(200);
@@ -60,7 +60,7 @@ describe("API Assignment routes", () => {
         const file = path.join(__dirname, "../../example_data/csv_test/text_file.txt");
         // log in as teacheraccount
         InitLogin.initialize(router, "teacheraccount");
-        const res = await chai.request(router).post("/1/importgroups")
+        const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "text_file.txt");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({error: "File should be a .csv file"}));
@@ -70,7 +70,7 @@ describe("API Assignment routes", () => {
         const file = path.join(__dirname, "../../example_data/csv_test/example_export_big.csv");
         // log in as teacheraccount
         InitLogin.initialize(router, "teacheraccount");
-        const res = await chai.request(router).post("/1/importgroups")
+        const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({
@@ -85,7 +85,7 @@ describe("API Assignment routes", () => {
     it("Import groups - no file", async () => {
         // log in as teacheraccount
         InitLogin.initialize(router, "teacheraccount");
-        const res = await chai.request(router).post("/1/importgroups");
+        const res = await chai.request(router).post("/3/importgroups");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({error: "No file uploaded"}));
     });
@@ -94,7 +94,7 @@ describe("API Assignment routes", () => {
         const file = path.join(__dirname, "../../example_data/csv_test/example_export.csv");
         // log in as teacheraccount
         InitLogin.initialize(router, "teacheraccount");
-        const res = await chai.request(router).post("/1/importgroups")
+        const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({error: "No groupcolumn defined"}));
