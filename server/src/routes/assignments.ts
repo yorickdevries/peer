@@ -11,6 +11,7 @@ import bodyParser from "body-parser";
 
 // Router
 import express from "express";
+import SubmissionsPS from "../prepared_statements/submissions_ps";
 
 const router = express();
 router.use(bodyParser.json());
@@ -157,6 +158,29 @@ router.route("/:assignment_id/submissions")
             req.params.assignment_id
         ));
     });
+
+/**
+ * Route to get the latest submission of a certain assignment of your specific group
+ */
+router.route("/:id/latestsubmission")
+.get(async (req: any, res) => {
+    const netId = req.userinfo.given_name;
+    const assignmentId = req.params.id;
+    // get the groupId of this user for this assignment
+    const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
+    const groupId = groupAssignment.group_id;
+    if (groupId == undefined) {
+        res.json({error: "User is not in a group in this assignment"});
+    } else {
+        const result: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
+        if (result.error) {
+            res.json({error: "No latest submission could be found"});
+        } else {
+        // get the latest submission
+            res.json(result);
+        }
+    }
+});
 
 /**
  * Route to get all the submissions per assignment
