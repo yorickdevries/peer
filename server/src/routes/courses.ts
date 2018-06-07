@@ -71,23 +71,33 @@ router.get("/:courseId/role", async (req: any, res) => {
  * @param courseId - course id.
  * @body netId - a net id of a user to promote.
  * @body role - a new role for the user.
+ * @return json containing { courseId: number, role: Role }
  */
 router.put("/:courseId/setRole", async (req: any, res) => {
     // Check if the role to upgrade to is valid.
-    if (!((<any>Object).values(Roles).includes(req.body.role))) return { error: "Invalid role" };
+    if (!(req.body.role in Roles)) res.sendStatus(400);
 
     // Fetch enrollments of the user to set the role from.
-    const enrolled: [any] = await CoursesPS.executeGetAllEnrolledCourses(req.body.netId);
+    const enrolled: any = await CoursesPS.executeCountUserByCourseId(req.params.courseId, req.body.netid);
 
     // Check if the student is enrolled in the course.
-    const isEnrolled: boolean = enrolled.find((course) => course.id === req.params.courseId) != undefined;
+    const isEnrolled: boolean = (enrolled.count > 0);
 
     // Depending if the student is enrolled, update the role of the student.
+    let enroll: any;
     if (!isEnrolled) {
-        res.json(await CoursesPS.executeEnrollInCourseId(req.params.courseId, req.body.netId, req.body.role));
+        enroll =  await CoursesPS.executeEnrollInCourseId(req.params.courseId, req.body.netid, req.body.role);
     } else {
-        res.json(await CoursesPS.executeSetRole(req.params.courseId, req.body.netId, req.body.role));
+        enroll = await CoursesPS.executeSetRole(req.params.courseId, req.body.netid, req.body.role);
     }
+
+    // Send the correct json response.
+    if (enroll.course_id != undefined) {
+        res.json({ courseId: enroll.course_id, role: enroll.role });
+    } else {
+        res.sendStatus(400);
+    }
+
 });
 
 export default router;

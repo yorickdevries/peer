@@ -1,12 +1,14 @@
 import CoursePS from "../../src/prepared_statements/courses_ps";
-import { expect } from "chai";
+import {expect} from "chai";
 import "mocha";
 import Database from "../../src/database";
 
 // load the queryfiles
-import { QueryFile } from "pg-promise";
+import {QueryFile} from "pg-promise";
+
 const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
 const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
+import {Roles} from "../../src/roles";
 
 describe("CoursePreparedStatement Test", () => {
     /**
@@ -26,7 +28,13 @@ describe("CoursePreparedStatement Test", () => {
             description: "This is a beautiful course description!",
             id: 1,
             name: "ED-3"
-        }]);
+        },
+            {
+                "description": "Test-course",
+                "id": 2,
+                "name": "ED-4"
+            }
+        ]);
     });
 
     /**
@@ -46,7 +54,7 @@ describe("CoursePreparedStatement Test", () => {
     it("createa a course", async () => {
         expect(await CoursePS.executeCreateCourse("hi", "super leuk")).to.deep.equal({
             description: "hi",
-            id: 2,
+            id: 3,
             name: "super leuk"
         });
     });
@@ -67,18 +75,18 @@ describe("CoursePreparedStatement Test", () => {
             "title": "Assignment 1",
             "reviews_per_user": 2
         },
-        {
-            "course_id": 1,
-            "description": "Example assignment number two",
-            "due_date": new Date("2018-05-01T20:30:00Z"),
-            "filename": "assignment2.pdf",
-            "id": 2,
-            "publish_date": new Date("2018-04-01T20:30:00Z"),
-            "review_due_date": new Date("2018-05-01T20:30:00Z"),
-            "review_publish_date": new Date("2018-04-01T20:30:00Z"),
-            "title": "Assignment 2",
-            "reviews_per_user": 2
-        }]);
+            {
+                "course_id": 1,
+                "description": "Example assignment number two",
+                "due_date": new Date("2018-05-01T20:30:00Z"),
+                "filename": "assignment2.pdf",
+                "id": 2,
+                "publish_date": new Date("2018-04-01T20:30:00Z"),
+                "review_due_date": new Date("2018-05-01T20:30:00Z"),
+                "review_publish_date": new Date("2018-04-01T20:30:00Z"),
+                "title": "Assignment 2",
+                "reviews_per_user": 2
+            }]);
     });
 
 
@@ -117,7 +125,7 @@ describe("CoursePreparedStatement Test", () => {
      * Test get course role of user.
      */
     it("Count User By CourseId", async () => {
-        expect(await CoursePS.executeCountUserByCourseId(1, "paulvanderlaan")).to.deep.equal({ count: "1" });
+        expect(await CoursePS.executeCountUserByCourseId(1, "paulvanderlaan")).to.deep.equal({count: "1"});
     });
 
     /**
@@ -128,7 +136,7 @@ describe("CoursePreparedStatement Test", () => {
             course_id: 1,
             role: "student",
             user_netid: "yorickdevries"
-             });
+        });
     });
 
     /**
@@ -136,11 +144,25 @@ describe("CoursePreparedStatement Test", () => {
      */
     it("Enroll user to course", async () => {
         // Verify that the student is not yet enrolled
-        expect(await CoursePS.executeCountUserByCourseId(1, "yorickdevries")).to.deep.equal({ count: "0" });
+        expect(await CoursePS.executeCountUserByCourseId(1, "yorickdevries")).to.deep.equal({count: "0"});
         // enroll in course
         await CoursePS.executeEnrollInCourseId(1, "yorickdevries", "student");
         // Verify that the student is enroleld now
-        expect(await CoursePS.executeCountUserByCourseId(1, "yorickdevries")).to.deep.equal({ count: "1" });
+        expect(await CoursePS.executeCountUserByCourseId(1, "yorickdevries")).to.deep.equal({count: "1"});
+    });
+
+    /**
+     * Test whether a student can be enrolled
+     */
+    it("Set role to teacher", async () => {
+        // Verify that the student has student as role
+        expect(await CoursePS.executeGetRoleById("paulvanderlaan", 1)).to.deep.equal({role: Roles.student});
+
+        // Set the role to teacher
+        await CoursePS.executeSetRole(1, "paulvanderlaan", Roles.teacher);
+
+        // Verify that the student is enroleld now
+        expect(await CoursePS.executeGetRoleById("paulvanderlaan", 1)).to.deep.equal({role: Roles.teacher});
     });
 
 });
