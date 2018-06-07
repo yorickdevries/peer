@@ -18,9 +18,14 @@ export default [
             {
                 path: 'assignment/:assignmentId',
                 name: 'student-dashboard.course.assignment',
-                redirect: 'assignment/:assignmentId/hand-in',
+                redirect: 'assignment/:assignmentId/information',
                 component: () => import('../components/student-dashboard/Assignment'),
                 children: [
+                    {
+                        path: 'information',
+                        name: 'student-dashboard.course.assignment.information',
+                        component: () => import('../components/student-dashboard/assignment/Information')
+                    },
                     {
                         path: 'hand-in',
                         name: 'student-dashboard.course.assignment.hand-in',
