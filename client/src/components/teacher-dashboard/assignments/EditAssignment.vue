@@ -14,6 +14,7 @@
                 <b-col>
                     <b-card>
                         <b-form @submit.prevent="onSubmit">
+                            <!--Assignment title-->
                             <b-form-group label="Name">
                                 <b-form-input   v-model="assignment.title"
                                                 type="text"
@@ -21,14 +22,16 @@
                                                 required>
                                 </b-form-input>
                             </b-form-group>
+                            <!--Assignment description-->
                             <b-form-group label="Description">
                                 <b-form-textarea    v-model="assignment.description"
                                                     id="textareadescription"
                                                     placeholder="Please enter the course description here"
                                                     :rows="4"
-                                                    resquired>
+                                                    required>
                                 </b-form-textarea>
                             </b-form-group>
+                            <!--Publish and due date of the assignment-->
                             <b-form-group label="Publish date and time">
                                 <b-form-input   v-model="assignment.publish_day"
                                                 type="date"
@@ -58,6 +61,7 @@
                                     Due date should be past publish date!
                                 </b-form-invalid-feedback>
                             </b-form-group>
+                            <!--Publish and due date of the peer review-->
                             <b-form-group label="Start date and time for peer review">
                                 <b-form-input   v-model="assignment.review_publish_day"
                                                 type="date"
@@ -82,6 +86,7 @@
                                                 required>
                                 </b-form-input>
                             </b-form-group>
+                            <!--Number of peer reviews per student-->
                             <b-form-group label="Number of reviews that each student needs to do">
                                 <b-form-input   v-model="assignment.reviews_per_user"
                                                 type="number"
@@ -89,6 +94,25 @@
                                                 placeholder="Enter an integer larger than 0"
                                                 required>
                                 </b-form-input>
+                            </b-form-group>
+                            <!--File upload-->
+                            <b-form-group label="Assignment file">
+                                <!--Show currently uploaded file-->
+                                <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
+                                    <div>You currently have uploaded the file:
+                                        <br><a :href="assignmentFilePath" :download="assignment.filename">{{ assignment.filename }}</a>
+                                    </div>
+                                    <!--Buttons for toggling new assignment upload-->
+                                    <b-button v-if="!uploadNewFile" variant="success" @click="uploadNewFile = true">Change file</b-button>
+                                    <b-button v-else variant="danger" @click="uploadNewFile = false; file = null; fileProgress = 0">Cancel</b-button>
+                                </b-alert>
+                                <b-form-file  v-if="uploadNewFile"
+                                              placeholder="Choose a new file..."
+                                              accept=".pdf"
+                                              v-model="file"
+                                              :state="Boolean(file)">
+                                </b-form-file>
+                                <p class="mb-0" v-if="uploadNewFile && file">File will be uploaded when you press the "save changes" button</p>
                             </b-form-group>
                             <b-button type="submit" variant="primary">Save changes</b-button>
                         </b-form>
@@ -106,6 +130,10 @@ import api from "../../../api";
 export default {
     data() {
         return {
+            file: null,
+            fileProgress: 0,
+            uploadNewFile: false,
+            acceptFiles: ".pdf",
             assignment: {
                 id: null,
                 title: null,
@@ -145,6 +173,10 @@ export default {
                 return null
             else
                 return this.assignment.reviews_per_user > 0
+        },
+        assignmentFilePath() {
+            // Get the assignment file path.
+            return `/api/assignments/${this.assignment.id}/file`
         }
     },
     async created() {
