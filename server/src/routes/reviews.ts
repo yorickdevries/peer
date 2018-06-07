@@ -1,6 +1,7 @@
 import ReviewsPS from "../prepared_statements/review_ps";
 import RubricPS from "../prepared_statements/rubric_ps";
 import bodyParser from "body-parser";
+import path from "path";
 
 // Router
 import express from "express";
@@ -94,6 +95,54 @@ router.put("/:reviewId", async (req, res) => {
  */
 router.get("/:reviewId/submit", async (req, res) => {
     res.json(await ReviewsPS.executeSubmitReview(req.params.reviewId));
+});
+
+/**
+ * Get all review comments.
+ * @param reviewId - an id of a review.
+ * @return database return value.
+ */
+router.get("/:reviewId/allComments", async (req, res) => {
+    res.json(await ReviewsPS.executeGetAllReviewComments(req.params.reviewId));
+});
+
+/**
+ * Get all review comments.
+ * @param reviewId - an id of a review.
+ * @body comment - a comment of the review.
+ * @return database return value.
+ */
+router.put("/:reviewCommentId/comment", async (req, res) => {
+    res.json(await ReviewsPS.executeUpdateReviewComment(req.params.reviewCommentId, req.body.comment));
+});
+
+/**
+ * Get all review comments.
+ * @param reviewId - an id of a review.
+ * @body netid - a netid.
+ * @body comment - a comment of the review.
+ * @return database return value.
+ */
+router.post("/:reviewId/comment", async (req, res) => {
+    res.json(await ReviewsPS.executeAddReviewComment(req.params.reviewId, req.body.netid, req.body.comment));
+});
+
+/**
+ * Get all review comments.
+ * @param reviewId - an id of a review.
+ * @return database return value.
+ */
+router.delete("/:reviewCommentId/comment", async (req, res) => {
+    res.json(await ReviewsPS.executeDeleteReviewComment(req.params.reviewCommentId));
+});
+
+/**
+ * Gets the file that needs to be reviewed.
+ */
+router.get("/:id/file", async (req, res) => {
+    const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(req.params.id);
+    const filePath = path.join(__dirname, "../files/submissions", submission.file_path);
+    res.sendfile(filePath);
 });
 
 export default router;

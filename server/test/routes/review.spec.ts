@@ -43,7 +43,6 @@ describe("API review routes", () => {
                     "id": 1,
                     "rubric_assignment_id": 1,
                     "file_path": "submission1.pdf",
-                    "comment": "Plagiaat",
                     "done": false
                 },
                 "form": [{
@@ -91,11 +90,12 @@ describe("API review routes", () => {
         expect(res.text).to.equal(JSON.stringify(
             [{
                 "id": 1,
-                "comment": "Plagiaat",
                 "user_netid": "henkjan",
                 "submission_id": 1,
                 "rubric_assignment_id": 1,
-                "done": true
+                "done": true,
+                "creation_date": JSON.parse(res.text)[0].creation_date,
+                "grade": -1
             }]
         ));
     });
@@ -111,7 +111,6 @@ describe("API review routes", () => {
                     "id": 1,
                     "rubric_assignment_id": 1,
                     "file_path": "submission1.pdf",
-                    "comment": "Plagiaat!!!",
                     "done": false
                 },
                 "form": [{
@@ -153,7 +152,6 @@ describe("API review routes", () => {
                     "id": 1,
                     "rubric_assignment_id": 1,
                     "file_path": "submission1.pdf",
-                    "comment": "Plagiaat",
                     "done": false
                 },
                 "form": [{
@@ -190,5 +188,73 @@ describe("API review routes", () => {
         ));
     });
 
+
+    /**
+     * Tests if all comments are fetched for a specific review.
+     */
+    it("GET review/:reviewId/allComments", async () => {
+        const res = await chai.request(router).get("/1/allComments");
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            [{
+                "id": 1,
+                "comment": "Keep it up Brian!",
+                "review_id": 1,
+                "netid": "paulvanderlaan"
+            }]
+        ));
+    });
+
+    /**
+     * Tests if a specific comment can be added.
+     */
+    it("POST review/:reviewId/comment", async () => {
+        const res = await chai.request(router)
+            .post("/1/comment")
+            .send({ netid: "otherTA", comment: "new" });
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            {
+                "id": 2,
+                "comment": "new",
+                "review_id": 1,
+                "netid": "otherTA"
+            }
+        ));
+    });
+
+    /**
+     * Tests if a specific comment can be updated.
+     */
+    it("PUT review/:reviewCommentId/comment", async () => {
+        const res = await chai.request(router)
+            .put("/1/comment")
+            .send({ comment: "new" });
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            {
+                "id": 1,
+                "comment": "new",
+                "review_id": 1,
+                "netid": "paulvanderlaan"
+            }
+        ));
+    });
+
+    /**
+     * Tests if a specific comment can be deleted.
+     */
+    it("review/:reviewCommentId/comment", async () => {
+        const res = await chai.request(router).del("/1/comment");
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            {
+                "id": 1,
+                "comment": "Keep it up Brian!",
+                "review_id": 1,
+                "netid": "paulvanderlaan"
+            }
+        ));
+    });
 
 });

@@ -61,12 +61,9 @@ INSERT INTO public.groupusers(
 	VALUES ('paulvanderlaan', 22);
 
 INSERT INTO public.assignmentlist(
-	title, description, course_id, reviews_per_user, due_date, publish_date, filename)
-	VALUES ('Assignment 1', 'Example assignment number one', 1, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment1.pdf');
-
-INSERT INTO public.assignmentlist(
-	title, description, course_id, reviews_per_user, due_date, publish_date, filename)
-	VALUES ('Assignment 2', 'Example assignment number two', 1, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf');
+	title, description, course_id, reviews_per_user, due_date, publish_date, filename, review_due_date, review_publish_date)
+	VALUES ('Assignment 1', 'Example assignment number one', 1, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment1.pdf', '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z'),
+	('Assignment 2', 'Example assignment number two', 1, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z');
 
 INSERT INTO public.rubric(
 	assignment_id)
@@ -145,8 +142,8 @@ INSERT INTO public.submission(
 	VALUES ('paulvanderlaan', 22, 2, 'submission2.pdf', '2018-05-01T20:30:00Z');
 
 INSERT INTO public.review(
-	comment, user_netid, submission_id, rubric_assignment_id, done)
-	VALUES ('Plagiaat', 'henkjan', 1, 1, false), ('Review finished!', 'paulvanderlaan', 1, 1, true);
+	user_netid, submission_id, rubric_assignment_id, done)
+	VALUES ('henkjan', 1, 1, false), ('paulvanderlaan', 1, 1, true);
 
 INSERT INTO public.mcanswer(
 	answer, mcquestion_id, review_id)
@@ -159,6 +156,14 @@ INSERT INTO public.openanswer(
 INSERT INTO public.rangeanswer(
 	answer, rangequestion_id, review_id)
 	VALUES (4, 1, 1);
+
+INSERT INTO public.reviewcomment(
+	comment, review_id, netid)
+	VALUES ('Keep it up Brian!', 1, 'paulvanderlaan');
+
+INSERT INTO public.submissioncomment(
+	comment, submission_id, netid)
+	VALUES ('Keep it up Brian!', 1, 'paulvanderlaan');
 -- End of file.
 
 

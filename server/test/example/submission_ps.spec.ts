@@ -5,6 +5,7 @@ import Database from "../../src/database";
 
 // load the queryfiles
 import { QueryFile } from "pg-promise";
+import ReviewPS from "../../src/prepared_statements/review_ps";
 const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
 const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
 
@@ -28,7 +29,8 @@ describe("SubmissionPreparedStatements Test", () => {
             group_id: 10,
             assignment_id: 1,
             file_path: "submission1.pdf",
-            date: new Date("2018-05-01T20:30:00Z")
+            date: new Date("2018-05-01T20:30:00Z"),
+            grade: -1
         });
     });
 
@@ -42,7 +44,8 @@ describe("SubmissionPreparedStatements Test", () => {
             user_netid: "paulvanderlaan",
             assignment_id: 1,
             file_path: "filepathhere",
-            date: new Date("2018-05-01T20:30:00Z")
+            date: new Date("2018-05-01T20:30:00Z"),
+            grade: -1
         });
     });
 
@@ -56,7 +59,56 @@ describe("SubmissionPreparedStatements Test", () => {
             group_id: 10,
             assignment_id: 1,
             file_path: "submission2.pdf",
-            date: new Date("2018-05-01T20:30:00Z")
+            date: new Date("2018-05-01T20:30:00Z"),
+            grade: -1
+        });
+    });
+
+    /**
+     * Get all review comments.
+     */
+    it("get all submission comments", async () => {
+        expect(await SubmissionPS.executeGetAllSubmissionComments(1)).to.deep.equal([{
+            "comment": "Keep it up Brian!",
+            "id": 1,
+            "submission_id": 1,
+            "netid": "paulvanderlaan"
+        }]);
+    });
+
+    /**
+     * Post review comment.
+     */
+    it("post submission comment", async () => {
+        expect(await SubmissionPS.executeAddSubmissionComment(1, "paulvanderlaan", "new")).to.deep.equal({
+            "comment": "new",
+            "id": 2,
+            "submission_id": 1,
+            "netid": "paulvanderlaan"
+        });
+    });
+
+    /**
+     * Put review comment.
+     */
+    it("update submission comment", async () => {
+        expect(await SubmissionPS.executeUpdateSubmissionComment(1, "new")).to.deep.equal({
+            "comment": "new",
+            "id": 1,
+            "submission_id": 1,
+            "netid": "paulvanderlaan"
+        });
+    });
+
+    /**
+     * Delete review comment.
+     */
+    it("delete submission comment", async () => {
+        expect(await SubmissionPS.executeDeleteSubmissionComment(1)).to.deep.equal({
+            "comment": "Keep it up Brian!",
+            "id": 1,
+            "submission_id": 1,
+            "netid": "paulvanderlaan"
         });
     });
 

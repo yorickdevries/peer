@@ -5,6 +5,7 @@ import Database from "../../src/database";
 
 // load the queryfiles
 import { QueryFile } from "pg-promise";
+
 const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
 const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
 
@@ -24,7 +25,6 @@ describe("ReviewPreparedStatement Test", () => {
     it("get all review by id", async () => {
         expect(await ReviewPS.executeGetReview(1)).to.deep.equal({
             id: 1,
-            comment: "Plagiaat",
             done: false,
             file_path: "submission1.pdf",
             rubric_assignment_id: 1
@@ -35,13 +35,15 @@ describe("ReviewPreparedStatement Test", () => {
      * Submit review by id.
      */
     it("submit review by id", async () => {
-        expect(await ReviewPS.executeSubmitReview(1)).to.deep.equal([{
+        const result = await ReviewPS.executeSubmitReview(1);
+        expect(result).to.deep.equal([{
             id: 1,
             rubric_assignment_id: 1,
             submission_id: 1,
             user_netid: "henkjan",
-            comment: "Plagiaat",
-            done: true
+            done: true,
+            "grade": -1,
+            "creation_date": result[0].creation_date
         }]);
     });
 
@@ -103,6 +105,68 @@ describe("ReviewPreparedStatement Test", () => {
             answer: 4,
             rangequestion_id: 1,
             review_id: 1
+        });
+    });
+
+    /**
+     * Get all review comments.
+     */
+    it("get all review comments", async () => {
+        expect(await ReviewPS.executeGetAllReviewComments(1)).to.deep.equal([{
+            "comment": "Keep it up Brian!",
+            "id": 1,
+            "review_id": 1,
+            "netid": "paulvanderlaan"
+        }]);
+    });
+
+    /**
+     * Post review comment.
+     */
+    it("post review comment", async () => {
+        expect(await ReviewPS.executeAddReviewComment(1, "paulvanderlaan", "new")).to.deep.equal({
+            "comment": "new",
+            "id": 2,
+            "review_id": 1,
+            "netid": "paulvanderlaan"
+        });
+    });
+
+    /**
+     * Put review comment.
+     */
+    it("update review comment", async () => {
+        expect(await ReviewPS.executeUpdateReviewComment(1, "new")).to.deep.equal({
+            "comment": "new",
+            "id": 1,
+            "review_id": 1,
+            "netid": "paulvanderlaan"
+        });
+    });
+
+    /**
+     * Delete review comment.
+     */
+    it("delete review comment", async () => {
+        expect(await ReviewPS.executeDeleteReviewComment(1)).to.deep.equal({
+            "comment": "Keep it up Brian!",
+            "id": 1,
+            "review_id": 1,
+            "netid": "paulvanderlaan"
+        });
+    });
+
+
+    /**
+     * get submission belonging to an review
+     */
+    it("get submission belonging to an review", async () => {
+        expect(await ReviewPS.executeGetSubmissionByReviewId(1)).to.deep.equal({
+            date: new Date("2018-05-01T20:30:00.000Z"),
+            file_path: "submission1.pdf",
+            group_id: 10,
+            id: 1,
+            user_netid: "paulvanderlaan"
         });
     });
 });

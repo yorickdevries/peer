@@ -16,6 +16,8 @@ import { QueryFile } from "pg-promise";
 const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
 const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
 
+import UserPS from "../../src/prepared_statements/user_ps";
+
 describe("API root routes", () => {
     /**
      * Make a clean database before each test.
@@ -67,5 +69,34 @@ describe("API root routes", () => {
         const res = await chai.request(router).get("/user");
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).user.preferred_username).to.equal("h.j@dtudent.tudelft.nl");
+    });
+
+    /**
+     * Test whether user is added to the database
+     */
+    it("User is added upon login", async () => {
+        InitLogin.initialize(router, "newuser", "newemail@mail");
+        const res = await chai.request(router).get("/anything");
+        const user: any = await UserPS.executeGetUserById("newuser");
+        expect(user.netid).to.equal("newuser");
+        expect(user.email).to.equal("newemail@mail");
+    });
+
+    /**
+     * Test whether useremail is updated to the database
+     */
+    it("Useremail is updated to the database", async () => {
+        // first session
+        InitLogin.initialize(router, "newuser", "email@mail.nl");
+        await chai.request(router).get("/anything");
+        const user: any = await UserPS.executeGetUserById("newuser");
+        expect(user.netid).to.equal("newuser");
+        expect(user.email).to.equal("email@mail.nl");
+        // second session
+        InitLogin.initialize(router, "newuser", "newemail@mail.nl");
+        await chai.request(router).get("/anything");
+        const user2: any = await UserPS.executeGetUserById("newuser");
+        expect(user2.netid).to.equal("newuser");
+        expect(user2.email).to.equal("newemail@mail.nl");
     });
 });

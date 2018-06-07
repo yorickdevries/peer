@@ -100,18 +100,6 @@ describe("API Assignment routes", () => {
         expect(res.text).to.equal(JSON.stringify({error: "No groupcolumn defined"}));
     });
 
-    /**
-     * Test whether userinfo is returned
-     */
-    it("GET assignment/id/reviewCount", async () => {
-        // test the router
-        InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/reviewCount");
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            {count: "1"}
-        ));
-    });
 
     /**
      * Test whether the right reviewId's are returned
@@ -129,22 +117,21 @@ describe("API Assignment routes", () => {
     /**
      * Create a new review.
      */
-    it("GET /:assignment_id/reviews", async () => {
+    it("GET /:assignment_id/reviews1", async () => {
         // test the router
         InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/reviews");
-        console.log(res);
+        const res: any = await chai.request(router).get("/1/reviews");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify([
-            {
-                id: 1,
-                comment: "Plagiaat",
-                user_netid: "henkjan",
-                submission_id: 1,
-                rubric_assignment_id: 1,
-                done: false
-            }
-        ]));
+        expect(res.text).to.equal(JSON.stringify([{
+                "id": 1,
+                "user_netid": "henkjan",
+                "submission_id": 1,
+                "rubric_assignment_id": 1,
+                "done": false,
+                "creation_date": JSON.parse(res.text)[0].creation_date,
+                "grade": -1
+            }]
+        ));
     });
 
     /**
@@ -157,14 +144,16 @@ describe("API Assignment routes", () => {
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                title: "Assignment 1",
-                description: "Example assignment number one",
-                due_date: "2018-05-01T20:30:00.000Z",
-                publish_date: "2018-04-01T20:30:00.000Z",
-                id: 1,
-                course_id: 1,
-                reviews_per_user: 2,
-                filename: "assignment1.pdf"
+                "title": "Assignment 1",
+                "description": "Example assignment number one",
+                "due_date": "2018-05-01T20:30:00.000Z",
+                "publish_date": "2018-04-01T20:30:00.000Z",
+                "id": 1,
+                "course_id": 1,
+                "reviews_per_user": 2,
+                "filename": "assignment1.pdf",
+                "review_due_date": "2018-05-01T20:30:00.000Z",
+                "review_publish_date": "2018-04-01T20:30:00.000Z"
             }
         ));
     });
@@ -224,25 +213,6 @@ describe("API Assignment routes", () => {
         expect(res.status).to.equal(401);
     });
 
-    /**
-     * Test to get the review the user is currently working on.
-     */
-    it("GET /:assignment_id/review", async () => {
-        // test the router
-        InitLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/review");
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            {
-                id: 1,
-                comment: "Plagiaat",
-                user_netid: "henkjan",
-                submission_id: 1,
-                rubric_assignment_id: 1,
-                done: false
-            }
-        ));
-    });
 
     /**
      * Test to get all reviews of an assignment.
@@ -267,17 +237,4 @@ describe("API Assignment routes", () => {
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).length).to.equal(8);
     });
-
-    // /**
-    //  * Test whether the right reviewId's are returned
-    //  */
-    // it("GET assignment/id/feedback", async () => {
-    //     // test the router
-    //     InitLogin.initialize(router, "henkjan");
-    //     const res = await chai.request(router).get("/1/feedback");
-    //     expect(res.status).to.equal(200);
-    //     expect(res.text).to.equal(JSON.stringify(
-    //         [{"id": 1}, {"id": 2}]
-    //     ));
-    // });
 });
