@@ -51,7 +51,7 @@
                     <b-card class="mb-3" header="Add a teaching assistant">
                         <label>NetID</label>
                         <div class="input-group">
-                            <b-form-input v-model="netId"></b-form-input>
+                            <b-form-input v-model="netid"></b-form-input>
                             <div class="input-group-append">
                                 <b-button @click="submitTA" variant="primary" size="sm">Add</b-button>
                             </div>
@@ -74,23 +74,41 @@
                 teachingAssistants: [],
                 currentPage: 1,
                 fields: [
-                    {key: 'reviewer', label: 'Reviewer'},
-                    {key: 'submitter', label: 'Submitter'}
+                    {key: 'user_netid', label: 'NetID'},
                 ],
                 perPage: 5,
                 filter: null,
-                netId: ""
+                netid: ""
             }
         },
         async created() {
-
+            await this.fetchTeachingAssistants()
         },
         methods: {
-            submitTA() {
+            async submitTA() {
                 // Check if input has been filled in.
-                if (this.netId === "") this.showErrorMessage({message: "Please input a valid netID."})
+                if (this.netid === "") return this.showErrorMessage({message: "Please input a valid netID."})
 
+                // Change the role through the API.
+                let res;
+                try {
+                    res = await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
+                        netid: this.netid,
+                        role: "TA"
+                    })
+                } catch (e) {
+                    return this.showErrorMessage({message: "Something went wrong adding the TA."})
+                }
 
+                // Show correct status message.
+                this.showSuccessMessage({message: `Successfully added ${this.netid} as a teaching assistant.`})
+
+                // Re-fetch teaching assistants.
+                await this.fetchTeachingAssistants()
+            },
+            async fetchTeachingAssistants() {
+                let {data} = await api.getUsersWithRole(this.$route.params.courseId, "TA")
+                this.teachingAssistants = data
             }
         },
         notifications: {
@@ -98,7 +116,12 @@
                 type: VueNotifications.types.error,
                 title: 'Error',
                 message: 'Error.'
-            }
+            },
+            showSuccessMessage: {
+                type: VueNotifications.types.success,
+                title: 'Success',
+                message: 'Success.'
+            },
         }
     }
 </script>
