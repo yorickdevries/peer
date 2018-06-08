@@ -60,6 +60,9 @@ export default {
     },
     getCurrentRoleForCourse(courseId) {
         return client.get(`courses/${courseId}/role`)
-    }
+    },
+    getUsersWithRole(courseId, role) {
+        return client.get(`courses/${courseId}/users/${role}`)
+    },
 }
 

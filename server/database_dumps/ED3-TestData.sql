@@ -18,7 +18,7 @@ INSERT INTO "userlist" (
 
 INSERT INTO public.courselist(
     description, name)
-    VALUES ('This is a beautiful course description!', 'ED-3');
+    VALUES ('This is a beautiful course description!', 'ED-3'), ('Test-course', 'ED-4');
 
 INSERT INTO public.grouplist(
 	id, group_name)

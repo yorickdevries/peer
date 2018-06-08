@@ -66,4 +66,58 @@ router.get("/:courseId/role", async (req: any, res) => {
     res.json(await CoursesPS.executeGetRoleById(req.userinfo.given_name, req.params.courseId));
 });
 
+/**
+ * Route to set the role of a user for a course.
+ * @param courseId - course id.
+ * @body netid - a net id of a user to promote.
+ * @body role - a new role for the user.
+ * @return json containing { courseId: number, role: Role }
+ */
+router.put("/:courseId/setRole", async (req: any, res) => {
+    // Check if the role to upgrade to is valid.
+    if (!(req.body.role in Roles)) {
+        res.sendStatus(400);
+        return;
+    }
+
+
+    // Fetch enrollments of the user to set the role from.
+    const enrolled: any = await CoursesPS.executeCountUserByCourseId(req.params.courseId, req.body.netid);
+
+    // Check if the student is enrolled in the course.
+    const isEnrolled: boolean = (enrolled.count > 0);
+
+    // Depending if the student is enrolled, update the role of the student.
+    let enroll: any;
+    if (!isEnrolled) {
+        enroll =  await CoursesPS.executeEnrollInCourseId(req.params.courseId, req.body.netid, req.body.role);
+    } else {
+        enroll = await CoursesPS.executeSetRole(req.params.courseId, req.body.netid, req.body.role);
+    }
+
+    // Send the correct json response.
+    if (enroll.course_id != undefined) {
+        res.json({ courseId: enroll.course_id, role: enroll.role });
+    } else {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Route to fetch, for a specific course, all net ids with a given role.
+ * @body courseId - id of the course.
+ * @body role - role to filter on.
+ * @return json with an array of all net ids.
+ */
+router.get("/:courseId/users/:role/", async (req: any, res) => {
+    // Check if the role is valid and supported.
+    if (!(req.params.role in Roles)) {
+        res.sendStatus(400);
+        return;
+    }
+
+    // Query and return all net ids as json.
+    res.json(await CoursesPS.executeGetUsersByRole(req.params.courseId, req.params.role));
+});
+
 export default router;
