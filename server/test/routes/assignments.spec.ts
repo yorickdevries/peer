@@ -145,7 +145,7 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Tests whether a assignment uploaded
+     * Tests whether an assignment can be uploaded
      */
     it("post assignment/ with file", async () => {
         // log in as bplanje (teacher)
@@ -170,7 +170,7 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Update all information about an assignment.
+     * Test whether an assignment is properly updated.
      */
     it("PUT /:assignment_id", async () => {
         const file = path.join(__dirname, "../../example_data/assignments/assignment1.pdf");
@@ -193,7 +193,7 @@ describe("API Assignment routes", () => {
         // Test the updating of an assignment.
         const res = await chai.request(router)
             .put("/1")
-            .attach("assignmentFile", file)
+            .attach("assignmentFile", fs.readFileSync(file), "assignment1.pdf")
             .field("title", "Example title")
             .field("description", "Example description")
             .field("course_id", 1)
