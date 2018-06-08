@@ -66,10 +66,10 @@ const deleteAssignmentFile = async function(req: any, res: any, next: any) {
     const filePath = path.join(fileFolder, filename);
 
     // remove old file from database
-    const result: any = await AssignmentPS.executeDeleteAssignment(req.params.assignment_id);
+    let result: any = await AssignmentPS.executeDeleteAssignment(req.params.assignment_id);
     if (!result.error) {
         fs.unlink(filename, (err) => {
-            if (err) throw err;
+            if (err) result = {error: err};
             console.log("The file has been deleted: " + filePath);
         });
     }
@@ -82,7 +82,7 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
     const filePath = path.join(fileFolder, fileName);
 
     // add to database
-    const result: any = await AssignmentPS.executeAddAssignment(
+    let result: any = await AssignmentPS.executeAddAssignment(
         req.body.title,
         req.body.description,
         req.body.due_date,
@@ -96,9 +96,10 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
     if (!result.error) {
         fs.writeFile(filePath, req.file.buffer, (err) => {
             if (err) {
-                res.json({error: err});
+                result = {error: err};
+            } else {
+                console.log("The file has been saved at " + filePath);
             }
-            console.log("The file has been saved at " + filePath);
         });
     }
     res.json(result);
