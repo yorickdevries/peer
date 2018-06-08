@@ -16,8 +16,6 @@ import express from "express";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 
 const router = express();
-const fileFolder = path.join(__dirname, "../files/assignments");
-
 router.use(bodyParser.json());
 
 // PDF of max 30 MB (in bytes)
@@ -57,35 +55,13 @@ const uploadAssignmentFunction = function(req: any, res: any, next: any) {
     });
 };
 
-/**
- * Remove an assignment file from the assignments folder.
- * @param req - a request object.
- * @param res - a response object.
- * @param next - a next object.
- * @return {Promise<void>}
- */
-const deleteAssignmentFile = async function(req: any, res: any, next: any) {
-    const filename: string = (await AssignmentPS.executeGetAssignmentById(req.params.assignment_id)).filename;
-    const filePath = path.join(fileFolder, filename);
-
-    // remove old file from database
-    let result: any = await AssignmentPS.executeDeleteAssignment(req.params.assignment_id);
-    if (!result.error) {
-        fs.unlink(filename, (err) => {
-            if (err) result = {error: err};
-            console.log("The file has been deleted: " + filePath);
-        });
-    }
-    res.json(result);
-};
-
 // Function which adds the assignment to the database.
 const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
+    const fileFolder = path.join(__dirname, "../files/assignments");
     const fileName = Date.now() + "-" + req.file.originalname;
     const filePath = path.join(fileFolder, fileName);
-
     // add to database
-    let result: any = await AssignmentPS.executeAddAssignment(
+    const result: any = await AssignmentPS.executeAddAssignment(
         req.body.title,
         req.body.description,
         req.body.due_date,
@@ -99,10 +75,9 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
     if (!result.error) {
         fs.writeFile(filePath, req.file.buffer, (err) => {
             if (err) {
-                result = {error: err};
-            } else {
-                console.log("The file has been saved at " + filePath);
+                res.json({error: err});
             }
+            console.log("The file has been saved at" + filePath);
         });
     }
     res.json(result);
@@ -147,9 +122,31 @@ router.post("/", uploadAssignmentFunction, index.authorization.enrolledAsTeacher
 
 /**
  * Route to update an assignment.
- * Removes the old assignment (also from the files folder) and adds the new assignment.
+ * @body assignment_title - assignment title.
+ * @body assignment_description - assignment description.
+ * @params course_id - course id.
+ * @body assignment_id - assignment id.
+ * @body due_date - due date.
+ * @body publish_date - publish date.
+ * @body reviews_per_user - allowed reviews per user.
+ * @body filename - filename of the assignment.
+ * @body review_due_date - due date of the review.
+ * @body review_publish_date - publish date of the review.
  */
-router.put("/:assignment_id", uploadAssignmentFunction, deleteAssignmentFile, addAssignmentToDatabase);
+router.route("/:assignment_id")
+    .put(index.authorization.enrolledAsTeacherAssignmentCheckForPost, async (req, res) => {
+            res.json(await AssignmentPS.executeUpdateAssignmentById(
+                req.body.title,
+                req.body.description,
+                req.body.course_id,
+                req.params.assignment_id,
+                req.body.due_date,
+                req.body.publish_date,
+                req.body.reviews_per_user,
+                req.body.filename,
+                req.body.review_due_date,
+                req.body.review_publish_date));
+    });
 
 /**
  * Route to get a file from an assignment.
