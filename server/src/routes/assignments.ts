@@ -7,6 +7,7 @@ import AssignmentPS from "../prepared_statements/assignment_ps";
 import UserPS from "../prepared_statements/user_ps";
 import GroupPS from "../prepared_statements/group_ps";
 import ReviewPS from "../prepared_statements/review_ps";
+import RubricPS from "../prepared_statements/rubric_ps";
 import GroupParser from "../groupParser";
 import reviewDistribution from "../reviewDistribution";
 import bodyParser from "body-parser";
@@ -71,6 +72,8 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
         fileName,
         req.body.review_due_date,
         req.body.review_publish_date);
+    // Create rubric
+    await RubricPS.executeCreateRubric(result.id);
     // writing the file if no error is there
     if (!result.error) {
         fs.writeFile(filePath, req.file.buffer, (err) => {
