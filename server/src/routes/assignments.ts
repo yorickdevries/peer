@@ -128,14 +128,24 @@ router.post("/", uploadAssignmentFunction, index.authorization.enrolledAsTeacher
  * @body assignment_id - assignment id.
  * @body due_date - due date.
  * @body publish_date - publish date.
+ * @body reviews_per_user - allowed reviews per user.
+ * @body filename - filename of the assignment.
+ * @body review_due_date - due date of the review.
+ * @body review_publish_date - publish date of the review.
  */
 router.route("/:assignment_id")
     .put(index.authorization.enrolledAsTeacherAssignmentCheckForPost, async (req, res) => {
             res.json(await AssignmentPS.executeUpdateAssignmentById(
-                req.body.assignment_title,
-                req.body.assignment_description,
+                req.body.title,
+                req.body.description,
                 req.body.course_id,
-                req.params.assignment_id));
+                req.params.assignment_id,
+                req.body.due_date,
+                req.body.publish_date,
+                req.body.reviews_per_user,
+                req.body.filename,
+                req.body.review_due_date,
+                req.body.review_publish_date));
     });
 
 /**

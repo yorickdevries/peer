@@ -167,10 +167,10 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router)
             .put("/1")
             .send({
-                assignment_title: "Example title",
-                assignment_description: "Example description",
+                title: "Example title",
+                description: "Example description",
                 course_id: 1,
-                assignment_id: 1
+                due_date: new Date("2018-05-01T20:30:00.000Z"),
             });
         expect(res.status).to.equal(401);
     });

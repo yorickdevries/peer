@@ -72,6 +72,9 @@ export default {
     },
     getGroupMembersOfAssignment(assignmentId) {
         return client.get(`assignments/${assignmentId}/group`)
-    }
+    },
+    getUsersWithRole(courseId, role) {
+        return client.get(`courses/${courseId}/users/${role}`)
+    },
 }
 

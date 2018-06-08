@@ -102,16 +102,30 @@ export default class AssignmentPS {
      * @param {string} description - a description.
      * @param courseId - a course id.
      * @param assignmentId - an assignment id.
+     * @param dueDate - an assignment due date.
+     * @param publishDate - an assignment publish date.
+     * @param reviewsPerUser - allowed reviews per user.
+     * @param filename - a file name of the assignment.
+     * @param reviewDueDate - a due date for the review.
+     * @param reviewPublishDate - a publish date of the review.
      * @return {any} a query result.
      */
     public static executeUpdateAssignmentById(title: string,
                                               description: string,
                                               courseId: number,
-                                              assignmentId: number): Promise<pgPromise.queryResult> {
+                                              assignmentId: number,
+                                              dueDate: Date,
+                                              publishDate: Date,
+                                              reviewsPerUser: number,
+                                              filename: string,
+                                              reviewDueDate: Date,
+                                              reviewPublishDate: Date): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-assignment-by-id",
-            "UPDATE assignmentlist SET title=$1, description=$2, course_id=$3 WHERE id=$4  " +
-            "RETURNING title, description, id, course_id, due_date, publish_date, filename");
-        statement.values = [title, description, courseId, assignmentId];
+            "UPDATE assignmentlist " +
+            "SET title=$1, description=$2, due_date=$3, publish_date=$4, reviews_per_user=$5, filename=$6, review_due_date=$7, review_publish_date=$8 " +
+            "WHERE id = $9 RETURNING *");
+
+        statement.values = [title, description, dueDate, publishDate, reviewsPerUser, filename, reviewDueDate, reviewPublishDate, courseId];
         return Database.executeQuerySingleResult(statement);
     }
 

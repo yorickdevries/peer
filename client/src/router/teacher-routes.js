@@ -40,10 +40,15 @@ export default [
                 component: () => import('../components/teacher-dashboard/assignments/EditAssignment')
             },
             {
-                path: 'rubric',
-                name: 'rubric-wizard',
-                component: () => import('../components/teacher-dashboard/rubric/RubricWizard')
-            }
+                path: 'courses/:courseId/teaching-assistants',
+                name: 'teacher-dashboard.course.teaching-assistants',
+                component: () => import('../components/teacher-dashboard/TAManager')
+            },
+            {
+                path: 'courses/:courseId/students',
+                name: 'teacher-dashboard.course.students',
+                component: () => import('../components/teacher-dashboard/StudentManager')
+            },
         ]
     }
 ]
