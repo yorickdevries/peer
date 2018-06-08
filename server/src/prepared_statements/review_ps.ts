@@ -227,11 +227,10 @@ export default class ReviewPS {
     }
 
     /**
-     * Gets all reviews made by a certain group for a certain assignment
+     * Gets all reviews made by a certain group for a certain assignment with a submission id
      *
      * @static
-     * @param {string} userNetId
-     * @param {number} assignmentId
+     * @param {number} submissionId - submission_id
      * @returns {Promise<pgPromise.queryResult>}
      * @memberof ReviewPS
      */
