@@ -46,12 +46,12 @@ export default class SubmissionsPS {
     }
 
     /**
-     * Executes a 'get latest submissions by assignmentid' query for a group
+     * Gets the latest submission of an assignment by a certain group.
      */
-    public static executeGetLatestSubmissionsByAssignmentIdByGroupId(id: number, groupId: number): any {
-        const statement = new PreparedStatement("get-submissions-by-assignment-id-group-id",
-            "SELECT id FROM submission s1 WHERE group_id = $1 AND assignment_id = $2 AND date = (SELECT max(date) FROM submission s2 WHERE s2.group_id = s1.group_id)");
-        statement.values = [groupId, id];
+    public static executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId: number, groupId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-latest-submission-by-assignmentid-by-groupid",
+        "SELECT * FROM submission s1 WHERE assignment_id = $1 AND group_id = $2 AND date = (SELECT max(date) FROM submission s2 WHERE s2.group_id = $2)");
+        statement.values = [assignmentId, groupId];
         return Database.executeQuerySingleResult(statement);
     }
 

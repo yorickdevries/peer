@@ -39,7 +39,7 @@ describe("SubmissionPreparedStatements Test", () => {
      */
     it("create submission", async () => {
         expect(await SubmissionPS.executeCreateSubmission("paulvanderlaan", 10, 1, "filepathhere", new Date("2018-05-01T20:30:00Z"))).to.deep.equal({
-            id: 7,
+            id: 6,
             group_id: 10,
             user_netid: "paulvanderlaan",
             assignment_id: 1,
