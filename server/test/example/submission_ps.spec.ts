@@ -29,7 +29,7 @@ describe("SubmissionPreparedStatements Test", () => {
             group_id: 10,
             assignment_id: 1,
             file_path: "submission1.pdf",
-            date: new Date("2018-05-01T20:30:00Z"),
+            date: new Date("2018-05-01T20:30:01.000Z"),
             grade: -1
         });
     });

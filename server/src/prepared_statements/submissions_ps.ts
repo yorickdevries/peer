@@ -50,7 +50,7 @@ export default class SubmissionsPS {
      */
     public static executeGetLatestSubmissionsByAssignmentIdByGroupId(id: number, groupId: number): any {
         const statement = new PreparedStatement("get-submissions-by-assignment-id-group-id",
-            "SELECT id FROM submission s1 WHERE group_id = $1 AND assignment_id = $2 AND date = (SELECT max(date) FROM submission s2 WHERE s2.group_id = s1.group_id) LIMIT 1");
+            "SELECT id FROM submission s1 WHERE group_id = $1 AND assignment_id = $2 AND date = (SELECT max(date) FROM submission s2 WHERE s2.group_id = s1.group_id)");
         statement.values = [groupId, id];
         return Database.executeQuerySingleResult(statement);
     }
