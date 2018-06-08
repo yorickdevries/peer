@@ -161,7 +161,7 @@ export default class AssignmentPS {
      */
     public static executeGetReviewsById(assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-all-reviews-by-assignment",
-            "SELECT review.user_netid as reviewer, submission.user_netid as submitter FROM review JOIN assignmentlist ON assignmentlist.id = review.rubric_assignment_id  JOIN submission ON submission.id = review.id WHERE assignmentlist.id = $1 AND review.done = true");
+            "SELECT review.user_netid as reviewer, submission.user_netid as submitter FROM review JOIN assignmentlist ON assignmentlist.id = review.rubric_assignment_id  JOIN submission ON submission.id = review.submission_id WHERE assignmentlist.id = $1 AND review.done = true");
         statement.values = [assignmentId];
         return Database.executeQuery(statement);
     }
