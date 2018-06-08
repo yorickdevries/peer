@@ -76,5 +76,8 @@ export default {
     getUsersWithRole(courseId, role) {
         return client.get(`courses/${courseId}/users/${role}`)
     },
+    getAssignmentReviewsStudent(assignmentId) {
+        return client.get(`/assignments/${assignmentId}/reviews`)
+    },
 }
 
