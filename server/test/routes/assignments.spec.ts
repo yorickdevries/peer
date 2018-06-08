@@ -47,7 +47,7 @@ describe("API Assignment routes", () => {
         const file = path.join(__dirname, "../../example_data/csv_test/example_export.csv");
         // log in as teacheraccount
         InitLogin.initialize(router, "teacheraccount");
-        const res = await chai.request(router).post("/1/importgroups")
+        const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv")
             .field("groupColumn", "Education Groups");
         expect(res.status).to.equal(200);
@@ -60,7 +60,7 @@ describe("API Assignment routes", () => {
         const file = path.join(__dirname, "../../example_data/csv_test/text_file.txt");
         // log in as teacheraccount
         InitLogin.initialize(router, "teacheraccount");
-        const res = await chai.request(router).post("/1/importgroups")
+        const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "text_file.txt");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({error: "File should be a .csv file"}));
@@ -70,7 +70,7 @@ describe("API Assignment routes", () => {
         const file = path.join(__dirname, "../../example_data/csv_test/example_export_big.csv");
         // log in as teacheraccount
         InitLogin.initialize(router, "teacheraccount");
-        const res = await chai.request(router).post("/1/importgroups")
+        const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({
@@ -85,7 +85,7 @@ describe("API Assignment routes", () => {
     it("Import groups - no file", async () => {
         // log in as teacheraccount
         InitLogin.initialize(router, "teacheraccount");
-        const res = await chai.request(router).post("/1/importgroups");
+        const res = await chai.request(router).post("/3/importgroups");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({error: "No file uploaded"}));
     });
@@ -94,10 +94,24 @@ describe("API Assignment routes", () => {
         const file = path.join(__dirname, "../../example_data/csv_test/example_export.csv");
         // log in as teacheraccount
         InitLogin.initialize(router, "teacheraccount");
-        const res = await chai.request(router).post("/1/importgroups")
+        const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({error: "No groupcolumn defined"}));
+    });
+
+
+    /**
+     * Test whether the right reviewId's are returned
+     */
+    it("GET assignment/id/feedback", async () => {
+        // test the router
+        InitLogin.initialize(router, "henkjan");
+        const res = await chai.request(router).get("/1/feedback");
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            [{"id": 1}, {"id": 2}]
+        ));
     });
 
     /**
@@ -169,22 +183,20 @@ describe("API Assignment routes", () => {
         InitLogin.initialize(router, "henkjan");
         const res = await chai.request(router).get("/1/submissions");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify([
-            {
-                id: 1,
-                user_netid: "paulvanderlaan",
-                group_id: 10,
-                assignment_id: 1,
-                file_path: "submission1.pdf",
-                date: new Date("2018-05-01T20:30:00.000Z")
-            },
-            {
-                id: 2,
-                user_netid: "henkjan",
-                group_id: 10,
-                assignment_id: 1,
-                file_path: "submission2.pdf",
-                date: new Date("2018-05-01T20:30:00.000Z"),
+        expect(res.text).to.equal(JSON.stringify([{
+                "id": 1,
+                "user_netid": "paulvanderlaan",
+                "group_id": 10,
+                "assignment_id": 1,
+                "file_path": "submission1.pdf",
+                "date": "2018-05-01T20:30:01.000Z"
+            }, {
+                "id": 2,
+                "user_netid": "henkjan",
+                "group_id": 10,
+                "assignment_id": 1,
+                "file_path": "submission2.pdf",
+                "date": "2018-05-01T20:30:00.000Z"
             }]
         ));
     });
@@ -197,6 +209,38 @@ describe("API Assignment routes", () => {
         InitLogin.initialize(router, "paulvanderlaan");
         const res = await chai.request(router).get("/1/allsubmissions");
         expect(res.status).to.equal(401);
+    });
+
+    // not in a group
+    it("GET /:assignment_id/latestsubmission - user not in group", async () => {
+        // test the router
+        InitLogin.initialize(router, "paulvanderlaan");
+        const res = await chai.request(router).get("/3/latestsubmission");
+        expect(res.text).to.equal(JSON.stringify({error: "User is not in a group in this assignment"}));
+    });
+
+    // no submission yet
+    it("GET /:assignment_id/latestsubmission - no submission yet", async () => {
+        // test the router
+        InitLogin.initialize(router, "paulvanderlaan");
+        const res = await chai.request(router).get("/2/latestsubmission");
+        expect(res.text).to.equal(JSON.stringify({error: "No latest submission could be found"}));
+    });
+
+    // latest submission
+    it("GET /:assignment_id/latestsubmission", async () => {
+        // test the router
+        InitLogin.initialize(router, "bplanje");
+        const res = await chai.request(router).get("/2/latestsubmission");
+        expect(res.text).to.equal(JSON.stringify({
+            id: 5,
+            user_netid: "yorickdevries",
+            group_id: 21,
+            assignment_id: 2,
+            file_path: "submission2.pdf",
+            date: new Date("2018-05-01T22:30:04.000Z"),
+            grade: -1
+        }));
     });
 
 
@@ -220,7 +264,8 @@ describe("API Assignment routes", () => {
         // log in as teacher
         InitLogin.initialize(router, "teacheraccount");
         const res = await chai.request(router).get("/2/distributeReviews");
+        console.log(res.text);
         expect(res.status).to.equal(200);
-        expect(JSON.parse(res.text).length).to.equal(8);
+        expect(JSON.parse(res.text).length).to.equal(3);
     });
 });

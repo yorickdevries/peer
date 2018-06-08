@@ -2,43 +2,28 @@
     <b-container fluid class="px-0">
         <b-row>
 
-            <!--Assignment Details-->
-            <b-col>
-                <b-card header="Assignment Details" class="h-100">
-                <span class="font-weight-bold">Description</span>
-                <p>
-                    {{ assignment.description }}
-                </p>
-                <b-button variant="primary w-100" :href="assignmentFilePath" >Download Assignment</b-button>
-                </b-card>
-            </b-col>
-
             <!--Hand-In Form-->
             <b-col>
 
                 <!--Submission Information-->
-                <b-card header="Hand-In Assignment" class="h-100">
+                <b-card header="Submission" class="h-100">
                     <b-alert show variant="secondary">PDF files only.</b-alert>
-                    <b-alert v-if="hasUploadedSubmission" show variant="success">You currently have submitted the file:
-                        <br><a :href="submissionFilePath" :download="submission.file_path">{{ submission.file_path }}</a>
+                    <b-alert v-if="hasUploadedSubmission" show variant="success">
+                        <dl class="mb-0">
+                            <dt>This is the latest submission you have made:</dt>
+                            <dd></dd>
+                            <dt>File</dt>
+                            <dd><a :href="submissionFilePath" :download="submission.file_path">{{ submission.file_path }}</a></dd>
+                            <dt>Date</dt>
+                            <dd>{{ submission.date | formatDate }}</dd>
+                        </dl>
                     </b-alert>
                     <b-alert v-else show variant="danger">You have not yet made a submission</b-alert>
 
                     <!-- Modal Button -->
-                    <b-button   :disabled="submission.file_path !== null"
-                                v-b-modal="'uploadModal'"
+                    <b-button   v-b-modal="'uploadModal'"
                                 variant="primary"
-                                @click="onFileReset">
-                        Upload / Overwrite File
-                    </b-button>
-
-                    <b-button   :disabled="submission.file_path === null"
-                                variant="danger"
-                                class="ml-2"
-                                @click="deleteSubmission">
-                        Delete
-                    </b-button>
-
+                                @click="onFileReset">Upload / Overwrite Submission</b-button>
 
                     <!-- Upload Modal-->
                     <b-modal    id="uploadModal"
@@ -46,8 +31,8 @@
                                 hide-footer
                                 title="Upload Submission">
 
+                        <b-alert show variant="danger">If you already have a file uploaded, this will overwrite the file!</b-alert>
                         <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
-
                         <b-alert show v-if="uploadSuccess === true">Upload was successful.</b-alert>
                         <b-alert show v-if="uploadSuccess === false">Something went wrong with uploading. Try again.</b-alert>
 
@@ -63,7 +48,6 @@
                                 @click="submitSubmission()"
                                 v-if="uploadSuccess === null">Upload</b-button>
                     </b-modal>
-
 
                 </b-card>
             </b-col>
@@ -85,7 +69,8 @@ export default {
             submission: {
                 user_netid: null,
                 assignment_id: null,
-                file_path: null
+                file_path: null,
+                date: null,
             },
             assignment: {
                 title: null,
@@ -102,10 +87,6 @@ export default {
         submissionFilePath() {
             // Get the submission file path.
             return `/api/submissions/${this.submission.id}/file`
-        },
-        assignmentFilePath() {
-            // Get the assignment file path.
-            return `/api/assignments/${this.assignment.id}/file`
         },
         hasUploadedSubmission() {
             // Returns whether an submission has been uploaded or not.
@@ -135,16 +116,10 @@ export default {
 
             // Perform upload.
             let res = await api.client.post("/submissions", formData, config)
-
             // Check whether upload was successful or not.
             res.data.error === undefined ? this.uploadSuccess = true : this.uploadSuccess = false
 
             // Re-fetch new submission.
-            await this.fetchSubmission()
-        },
-        async deleteSubmission() {
-            // Delete the current submission.
-            await api.deleteSubmission(this.submission.id)
             await this.fetchSubmission()
         },
         async fetchAssignment() {
@@ -154,7 +129,7 @@ export default {
         },
         async fetchSubmission() {
             // Fetch the submission.
-            let res = await api.getAssignmentSubmission(this.assignment.id)
+            let res = await api.getAssignmentLatestSubmission(this.assignment.id)
 
             // If submission is not available, clear it.
             if (!res.data.error) {

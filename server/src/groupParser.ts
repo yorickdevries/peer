@@ -17,11 +17,50 @@ export default class GroupParser {
         // parse the file
         try {
             const studentlist = await neatCsv(filebuffer);
+            await this.checkStudentList(studentlist, assignmentId);
             const studentmap = this.mapGroups(studentlist, groupColumn);
             const groupnames = await this.addGroupsToDatabase(studentmap, assignmentId);
             return groupnames;
         } catch (err) {
             return {error: err.message};
+        }
+    }
+    /**
+     * Checks whether the studentlist is valid;
+     * Checks whether there are duplicate students in this file
+     * or whether a student already has a group for this assignment.
+     * Makes sure the student always has at most one group for an assignment.
+     *
+     * @static
+     * @param {any[]} studentlist
+     * @param {number} assignmentId
+     * @memberof GroupParser
+     */
+    public static async checkStudentList(studentlist: any[], assignmentId: number) {
+        const allStudents: string[] = [];
+        for (const student of studentlist) {
+            const currentStudent = student.Username;
+            // in case the student doesnt have a Username field
+            if (currentStudent == undefined) {
+                throw new Error("The file is improperly formatted");
+            }
+            // in case the student doesnt have a Username field
+            if (currentStudent == "") {
+                throw new Error("One student has no username");
+            }
+            const netId = student.Username.split("@")[0];
+            if (allStudents.indexOf(netId) >= 0) {
+                throw new Error("Duplicate student: " + netId);
+            }
+            // check whether the student is already in a group for this assignment
+            // should error as no group exists yet
+            const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
+            if (groupAssignment.group_id) {
+                throw new Error(netId + " is already in group: " + groupAssignment.group_id);
+            } else {
+                // Add student to list
+                allStudents.push(netId);
+            }
         }
     }
 
@@ -95,14 +134,6 @@ export default class GroupParser {
         // iterate over all students
         studentlist.forEach(function(student: any) {
             const currentStudent = student.Username;
-            // in case the student doesnt have a Username field
-            if (currentStudent == undefined) {
-                throw new Error("The file is improperly formatted");
-            }
-            // in case the student doesnt have a Username field
-            if (currentStudent == "") {
-                throw new Error("One student has no username");
-            }
             const currentGroup = student[groupColumn];
             // in case the student doesnt have a groupColumn field
             if (currentGroup == undefined || currentGroup == "") {
@@ -156,6 +187,11 @@ export default class GroupParser {
                 await GroupPS.executeAddGrouptoAssignment(groupId, assignmentId);
                 // add all students to a group
                 for (const studentNetId of students) {
+                    // Check whether student doesnt have a group yet
+                    const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(studentNetId, assignmentId);
+                    if (groupAssignment.group_id) {
+                        throw new Error(studentNetId + " is already in group: " + groupAssignment.group_id);
+                    }
                     // create student in database
                     await this.createStudentIfNotExists(studentNetId);
                     // Enroll student in course

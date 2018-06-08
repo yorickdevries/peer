@@ -44,7 +44,19 @@ describe("AssignmentPreparedStatements Test", () => {
             "review_due_date": new Date("2018-05-01T20:30:00Z"),
             "review_publish_date": new Date("2018-04-01T20:30:00Z"),
             "title": "Assignment 2",
-            "reviews_per_user": 2
+            "reviews_per_user": 1
+        },
+        {
+            "course_id": 1,
+            "description": "Example assignment number three",
+            "due_date": new Date("2018-05-01T20:30:00Z"),
+            "filename": "assignment3.pdf",
+            "id": 3,
+            "publish_date": new Date("2018-04-01T20:30:00Z"),
+            "review_due_date": new Date("2018-05-01T20:30:00Z"),
+            "review_publish_date": new Date("2018-04-01T20:30:00Z"),
+            "title": "Assignment 3",
+            "reviews_per_user": 1
         }]).to.deep.equal(await AssignmentPS.executeGetAssignments(1));
     });
 
@@ -75,7 +87,7 @@ describe("AssignmentPreparedStatements Test", () => {
     )).to.deep.equal({
             course_id: 1,
             description: "Description",
-            id: 3,
+            id: 4,
             title: "New",
             due_date: new Date("2018-07-01T20:30:00Z"),
             filename: "test_file.pdf",
@@ -150,7 +162,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "grade": -1,
             "assignment_id": 1,
             "user_netid": "paulvanderlaan",
-            "date": new Date("2018-05-01T20:30:00Z")
+            "date": new Date("2018-05-01T20:30:01.000Z")
         },
         {
             "file_path": "submission2.pdf",
@@ -159,7 +171,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "grade": -1,
             "assignment_id": 1,
             "user_netid": "henkjan",
-            "date": new Date("2018-05-01T20:30:00Z")
+            "date": new Date("2018-05-01T20:30:00.000Z")
         }]);
     });
 

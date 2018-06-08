@@ -162,7 +162,7 @@ describe("ReviewPreparedStatement Test", () => {
      */
     it("get submission belonging to an review", async () => {
         expect(await ReviewPS.executeGetSubmissionByReviewId(1)).to.deep.equal({
-            date: new Date("2018-05-01T20:30:00.000Z"),
+            date: new Date("2018-05-01T20:30:01.000Z"),
             file_path: "submission1.pdf",
             group_id: 10,
             id: 1,
