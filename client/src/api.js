@@ -32,7 +32,7 @@ export default {
         return client.post('/assignments', assignment)
     },
     getAssignmentReviews(assignmentId) {
-        return client.get(`/assignments/${assignmentId}/reviews`)
+        return client.get(`/assignments/${assignmentId}/allreviews`)
     },
     saveAssignment(assignmentId, assignment) {
         return client.put(`assignments/${assignmentId}`, assignment)
@@ -66,6 +66,9 @@ export default {
     },
     getCurrentRoleForCourse(courseId) {
         return client.get(`courses/${courseId}/role`)
-    }
+    },
+    getUsersWithRole(courseId, role) {
+        return client.get(`courses/${courseId}/users/${role}`)
+    },
 }
 

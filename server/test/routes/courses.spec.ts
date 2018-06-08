@@ -1,6 +1,7 @@
 import chai from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
+import { Roles } from "../../src/roles";
 
 chai.use(chaiHttp);
 import "mocha";
@@ -42,6 +43,11 @@ describe("API Course routes", () => {
                 id: 1,
                 description: "This is a beautiful course description!",
                 name: "ED-3"
+            },
+            {
+                "id": 2,
+                "description": "Test-course",
+                "name": "ED-4"
             }
         ]));
     });
@@ -56,11 +62,23 @@ describe("API Course routes", () => {
 
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({
-                id: 2,
+                id: 3,
                 description: "example",
                 name: "test name"
             }
         ));
+
+        const enrolled = await chai.request(router).get("/enrolled");
+        expect(enrolled.status).to.equal(200);
+        expect(enrolled.text).to.equal(JSON.stringify([{
+            id: 1,
+            description: "This is a beautiful course description!",
+            name: "ED-3"
+        }, {
+            id: 3,
+            description: "example",
+            name: "test name"
+        }]));
     });
 
     /**
@@ -151,5 +169,50 @@ describe("API Course routes", () => {
                 role: "student"
             }
         ));
+    });
+
+    /**
+     * Test put the role of a student, which is enrolled in the course.
+     */
+    it("Valid put enrolled /:courseId/setRole", async () => {
+        // test the router
+        const res = await chai.request(router)
+            .put("/1/setRole")
+            .send({ netid: "paulvanderlaan", role: Roles.teacher });
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify({ courseId: 1, role: Roles.teacher }));
+    });
+
+    /**
+     * Test put the role of a student, which is not enrolled in the course.
+     */
+    it("Valid put not enrolled /:courseId/setRole", async () => {
+        // test the router
+        const res = await chai.request(router)
+            .put("/2/setRole")
+            .send({ netid: "paulvanderlaan", role: Roles.teacher });
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify({ courseId: 2, role: Roles.teacher }));
+    });
+
+    /**
+     * Test put the role of a student, invalid request
+     */
+    it("Invalid put /:courseId/setRole", async () => {
+        // test the router
+        const res = await chai.request(router)
+            .put("/1/setRole")
+            .send({ netid: "paulvanderlaan", role: "invalid role" });
+        expect(res.status).to.equal(400);
+    });
+
+    /**
+     * Test put the role of a student, invalid request
+     */
+    it("GET /:courseId/users/:role/", async () => {
+        // test the router
+        const res = await chai.request(router).get("/1/users/student");
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify([{ user_netid: "paulvanderlaan" }]));
     });
 });

@@ -161,6 +161,57 @@ export default class ReviewPS {
     }
 
     /**
+     * Executes a 'get all review comments' query.
+     * @param {number} reviewId - a review id.
+     * @return {Promise<pgPromise.queryResult>} - a database promise.
+     */
+    public static executeGetAllReviewComments(reviewId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-review-comments",
+            "SELECT * FROM reviewcomment WHERE review_id = $1");
+        statement.values = [reviewId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Executes a 'add review comment' query.
+     * @param {number} reviewId - a review id.
+     * @param {string} netId - a netid.
+     * @param {string} comment - a comment.
+     * @return {Promise<pgPromise.queryResult>} - a database promise.
+     */
+    public static executeAddReviewComment(reviewId: number, netId: string, comment: string): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("add-review-comments",
+            "INSERT INTO reviewcomment(comment, review_id, netid) VALUES ($1, $2, $3) RETURNING *");
+        statement.values = [comment, reviewId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes a 'update review comment' query.
+     * @param {number} reviewCommentId - a review id.
+     * @param {string} comment - a comment id.
+     * @return {Promise<pgPromise.queryResult>} - a database promise.
+     */
+     public static executeUpdateReviewComment(reviewCommentId: number, comment: string): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("put-review-comments",
+            "UPDATE reviewcomment SET comment = $1 WHERE id = $2 RETURNING *");
+        statement.values = [comment, reviewCommentId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes a 'delete review comment' query.
+     * @param {number} reviewCommentId - a review id.
+     * @return {Promise<pgPromise.queryResult>} - a database promise.
+     */
+     public static executeDeleteReviewComment(reviewCommentId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("delete-review-comments",
+            "DELETE FROM reviewcomment WHERE id = $1 RETURNING *");
+        statement.values = [reviewCommentId];
+        return Database.executeQuerySingleResult(statement);
+     }
+
+    /**
      * Gets the submission beloning to a reviewId
      *
      * @static
@@ -168,11 +219,10 @@ export default class ReviewPS {
      * @returns {Promise<pgPromise.queryResult>}
      * @memberof ReviewPS
      */
-    public static executeGetSubmissionByReviewId(reviewId: number)
-    : Promise<pgPromise.queryResult> {
-    const statement = new PreparedStatement("get-submission-by-review-id",
-        "SELECT s.id, s.user_netid, s.group_id, s.file_path, s.date FROM review r JOIN submission s ON r.submission_id = s.id WHERE r.id = $1");
-    statement.values = [reviewId];
-    return Database.executeQuerySingleResult(statement);
+    public static executeGetSubmissionByReviewId(reviewId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-submission-by-review-id",
+            "SELECT s.id, s.user_netid, s.group_id, s.file_path, s.date FROM review r JOIN submission s ON r.submission_id = s.id WHERE r.id = $1");
+        statement.values = [reviewId];
+        return Database.executeQuerySingleResult(statement);
     }
 }

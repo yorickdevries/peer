@@ -51,9 +51,9 @@ export default class GroupParser {
      * @memberof GroupParser
      */
     public static async createStudentIfNotExists(netId: string) {
-        const res: any = await UserPS.executeCountUserById(netId);
+        const res: any = await UserPS.executeGetUserById(netId);
         // In case there is no student entry yet in the database, make one
-        if (res.error || res.count == 0) {
+        if (res.error) {
             // The email is not known while creating this student entry
             const newUser = await UserPS.executeAddUser(netId, undefined);
             console.log("creating user: " + JSON.stringify(newUser));
