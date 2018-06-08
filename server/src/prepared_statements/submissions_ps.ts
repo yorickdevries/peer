@@ -29,7 +29,7 @@ export default class SubmissionsPS {
      * Executes a 'get submissions by assignmentid' query
      */
     public static executeGetSubmissionsByAssignmentId(id: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-submissions-by-assignment-id",
+        const statement = new PreparedStatement("get-submissions-by-assignment-id-promise",
         'SELECT * FROM "submission" WHERE "assignment_id" = $1');
         statement.values = [id];
         return Database.executeQuery(statement);

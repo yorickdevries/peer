@@ -86,7 +86,7 @@
 
 <script>
 import { StarRating } from 'vue-rate-it';
-import mockupReviews from './mockup-reviews'
+import api from "../../../api"
 
 export default {
     components: {
@@ -101,14 +101,20 @@ export default {
     computed: {
         sortedQuestionsList() {
             // Returns the sorted list of questions.
+            if (this.peerReviews.length === 0) return
             let questions = this.peerReviews[0].form.slice().map(value => value.question)
             return questions.sort((a, b) => a.question_number - b.question_number)
         }
     },
     async created() {
         // Get feedback array of reviews.
-        this.peerReviews = [mockupReviews[0], mockupReviews[1], mockupReviews[0], mockupReviews[1]]
+        let metaRes = await api.getFeedbackOfAssignment(this.$route.params.assignmentId)
+        metaRes.data.forEach(async value => {
+            let review = await api.getPeerReview(value.id)
+            this.peerReviews.push(review.data)
+        })
         this.activeQuestion = this.sortedQuestionsList[0]
+
     },
     methods: {
         aggregateQuestionAnswer(targetQuestionNumber) {

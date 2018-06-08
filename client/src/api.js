@@ -61,8 +61,17 @@ export default {
     getCurrentRoleForCourse(courseId) {
         return client.get(`courses/${courseId}/role`)
     },
+    getFeedbackOfAssignment(assignmentId) {
+        return client.get(`assignments/${assignmentId}/feedback`)
+    },
+    getGroupMembersOfAssignment(assignmentId) {
+        return client.get(`assignments/${assignmentId}/group`)
+    },
     getUsersWithRole(courseId, role) {
         return client.get(`courses/${courseId}/users/${role}`)
+    },
+    getAssignmentReviewsStudent(assignmentId) {
+        return client.get(`/assignments/${assignmentId}/reviews`)
     },
 }
 

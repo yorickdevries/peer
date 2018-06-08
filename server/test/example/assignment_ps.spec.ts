@@ -162,7 +162,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "grade": -1,
             "assignment_id": 1,
             "user_netid": "paulvanderlaan",
-            "date": new Date("2018-05-01T20:30:00Z")
+            "date": new Date("2018-05-01T20:30:01.000Z")
         },
         {
             "file_path": "submission2.pdf",
@@ -171,7 +171,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "grade": -1,
             "assignment_id": 1,
             "user_netid": "henkjan",
-            "date": new Date("2018-05-01T20:30:00Z")
+            "date": new Date("2018-05-01T20:30:00.000Z")
         }]);
     });
 
