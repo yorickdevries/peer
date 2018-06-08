@@ -227,7 +227,7 @@ export default class ReviewPS {
     }
 
     /**
-     * Gets all reviews made by a certain group for a certain assignment with a submission id
+     * Gets all reviews made by submission id
      *
      * @static
      * @param {number} submissionId - submission_id
