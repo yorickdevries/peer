@@ -186,6 +186,7 @@ ALTER TABLE ReviewComment ADD CONSTRAINT ReviewComment_review
 ALTER TABLE SubmissionComment ADD CONSTRAINT SubmissionComment_review
     FOREIGN KEY (Submission_id)
     REFERENCES Submission (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -194,6 +195,7 @@ ALTER TABLE SubmissionComment ADD CONSTRAINT SubmissionComment_review
 ALTER TABLE AssignmentList ADD CONSTRAINT Assignment_Course
     FOREIGN KEY (Course_id)
     REFERENCES CourseList (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -202,6 +204,7 @@ ALTER TABLE AssignmentList ADD CONSTRAINT Assignment_Course
 ALTER TABLE Enroll ADD CONSTRAINT Enroll_Course
     FOREIGN KEY (Course_id)
     REFERENCES CourseList (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -210,6 +213,7 @@ ALTER TABLE Enroll ADD CONSTRAINT Enroll_Course
 ALTER TABLE Enroll ADD CONSTRAINT Enroll_User
     FOREIGN KEY (User_netid)
     REFERENCES UserList (netid)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -218,6 +222,7 @@ ALTER TABLE Enroll ADD CONSTRAINT Enroll_User
 ALTER TABLE AssignmentGroup ADD CONSTRAINT AssignmentGroup_Assignment
     FOREIGN KEY (Assignment_id)
     REFERENCES AssignmentList (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -226,6 +231,7 @@ ALTER TABLE AssignmentGroup ADD CONSTRAINT AssignmentGroup_Assignment
 ALTER TABLE AssignmentGroup ADD CONSTRAINT AssignmentGroup_Group
     FOREIGN KEY (Group_id)
     REFERENCES GroupList (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -234,6 +240,7 @@ ALTER TABLE AssignmentGroup ADD CONSTRAINT AssignmentGroup_Group
 ALTER TABLE GroupUsers ADD CONSTRAINT GroupUsers_Group
     FOREIGN KEY (Group_groupid)
     REFERENCES GroupList (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -242,6 +249,7 @@ ALTER TABLE GroupUsers ADD CONSTRAINT GroupUsers_Group
 ALTER TABLE GroupUsers ADD CONSTRAINT GroupUsers_User
     FOREIGN KEY (User_netid)
     REFERENCES UserList (netid)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -349,6 +357,7 @@ ALTER TABLE Review ADD CONSTRAINT Review_Rubric
 ALTER TABLE Review ADD CONSTRAINT Review_Submission
     FOREIGN KEY (Submission_id)
     REFERENCES Submission (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -357,6 +366,7 @@ ALTER TABLE Review ADD CONSTRAINT Review_Submission
 ALTER TABLE Review ADD CONSTRAINT Review_User
     FOREIGN KEY (User_netid)
     REFERENCES UserList (netid)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -374,6 +384,7 @@ ALTER TABLE Rubric ADD CONSTRAINT Rubric_Assignment
 ALTER TABLE Submission ADD CONSTRAINT Submission_Assignment
     FOREIGN KEY (Assignment_id)
     REFERENCES AssignmentList (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -382,6 +393,7 @@ ALTER TABLE Submission ADD CONSTRAINT Submission_Assignment
 ALTER TABLE Submission ADD CONSTRAINT Submission_User
     FOREIGN KEY (User_netid)
     REFERENCES UserList (netid)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -390,6 +402,7 @@ ALTER TABLE Submission ADD CONSTRAINT Submission_User
 ALTER TABLE Submission ADD CONSTRAINT Submission_Group
     FOREIGN KEY (Group_id)
     REFERENCES GroupList (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
