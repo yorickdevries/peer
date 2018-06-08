@@ -29,7 +29,7 @@ export default class SubmissionsPS {
      * Executes a 'get submissions by assignmentid' query
      */
     public static executeGetSubmissionsByAssignmentId(id: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-submissions-by-assignment-id",
+        const statement = new PreparedStatement("get-submissions-by-assignment-id-promise",
         'SELECT * FROM "submission" WHERE "assignment_id" = $1');
         statement.values = [id];
         return Database.executeQuery(statement);
@@ -43,6 +43,16 @@ export default class SubmissionsPS {
         "SELECT * FROM submission s1 WHERE assignment_id = $1 AND date = (SELECT max(date) FROM submission s2 WHERE s2.group_id = s1.group_id)");
         statement.values = [id];
         return Database.executeQuery(statement);
+    }
+
+    /**
+     * Executes a 'get latest submissions by assignmentid' query for a group
+     */
+    public static executeGetLatestSubmissionsByAssignmentIdByGroupId(id: number, groupId: number): any {
+        const statement = new PreparedStatement("get-submissions-by-assignment-id-group-id",
+            "SELECT id FROM submission s1 WHERE group_id = $1 AND assignment_id = $2 AND date = (SELECT max(date) FROM submission s2 WHERE s2.group_id = s1.group_id)");
+        statement.values = [groupId, id];
+        return Database.executeQuerySingleResult(statement);
     }
 
     /**
