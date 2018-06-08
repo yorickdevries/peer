@@ -86,13 +86,28 @@ export default class AssignmentPS {
      * @param dueDate - a due date.
      * @param publishDate - a publish date.
      * @param courseId - a course id.
+     * @param reviewsPerUser
      * @param filename - filename
+     * @param reviewDueDate
+     * @param reviewPublishDate
      * @return {any} a query result.
      */
     public static executeAddAssignment(title: string, description: string, dueDate: Date, publishDate: Date, courseId: number, reviewsPerUser: number, filename: string, reviewDueDate: Date, reviewPublishDate: Date): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("addAssignment",
         'INSERT INTO "assignmentlist" ("title", "description", "due_date", "publish_date", "course_id", "reviews_per_user", "filename", "review_due_date", "review_publish_date") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *');
         statement.values = [title, description, dueDate, publishDate, courseId, reviewsPerUser, filename, reviewDueDate, reviewPublishDate];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes a 'delete assignment by id' query.
+     * @param {number} assignmentId - an assignment id.
+     * @return {Promise<pgPromise.queryResult>} - query result containing all fields of the deleted assignment.
+     */
+    public static executeDeleteAssignment(assignmentId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("removeAssignment",
+            "DELETE FROM assignmentlist WHERE id = $1 RETURNING *");
+        statement.values = [assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
 

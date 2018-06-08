@@ -159,20 +159,78 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Update all information about an assignment.
+     * Tests whether an assignment can be uploaded
+     */
+    it("post assignment/ with file", async () => {
+        // log in as bplanje (teacher)
+        InitLogin.initialize(router, "bplanje");
+        const exampleSubmissionFile = path.join(__dirname, "../../example_data/assignments/assignment1.pdf");
+        const res = await chai.request(router).post("/")
+            .attach("assignmentFile", fs.readFileSync(exampleSubmissionFile), "assignment1.pdf")
+            .field("title", "Example title")
+            .field("description", "Example description")
+            .field("course_id", 1)
+            .field("due_date", "2018-05-01T20:30:00.000Z")
+            .field("publish_date", "2018-06-01T20:30:00.000Z")
+            .field("reviews_per_user", 2)
+            .field("review_due_date", "2018-06-01T20:30:00.000Z")
+            .field("review_publish_date", "2018-07-01T20:30:00.000Z");
+        // assertions
+        const result = JSON.parse(res.text);
+
+        expect(res.status).to.equal(200);
+        expect(result.title).to.equal("Example title");
+        expect(result.description).to.equal("Example description");
+    });
+
+    /**
+     * Test whether an assignment is properly updated.
      */
     it("PUT /:assignment_id", async () => {
-        // test the router
-        InitLogin.initialize(router, "paulvanderlaan");
+        const file = path.join(__dirname, "../../example_data/assignments/assignment1.pdf");
+
+        // login as bplanje (teacher)
+        InitLogin.initialize(router, "bplanje");
+
+        // Make sure that the assignment is in place.
+        await chai.request(router).post("/")
+            .attach("assignmentFile", fs.readFileSync(file), "assignment1.pdf")
+            .field("title", "Different title")
+            .field("description", "Different description")
+            .field("course_id", 1)
+            .field("due_date", "2018-05-01T20:30:00.000Z")
+            .field("publish_date", "2018-06-01T20:30:00.000Z")
+            .field("reviews_per_user", 2)
+            .field("review_due_date", "2018-06-01T20:30:00.000Z")
+            .field("review_publish_date", "2018-07-01T20:30:00.000Z");
+
+        // Test the updating of an assignment.
         const res = await chai.request(router)
             .put("/1")
-            .send({
-                title: "Example title",
-                description: "Example description",
-                course_id: 1,
-                due_date: new Date("2018-05-01T20:30:00.000Z"),
-            });
-        expect(res.status).to.equal(401);
+            .attach("assignmentFile", fs.readFileSync(file), "assignment1.pdf")
+            .field("title", "Example title")
+            .field("description", "Example description")
+            .field("course_id", 1)
+            .field("due_date", "2018-05-01T20:30:00.000Z")
+            .field("publish_date", "2018-06-01T20:30:00.000Z")
+            .field("reviews_per_user", 2)
+            .field("review_due_date", "2018-06-01T20:30:00.000Z")
+            .field("review_publish_date", "2018-07-01T20:30:00.000Z");
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            {
+                "title": "Assignment 1",
+                "description": "Example assignment number one",
+                "due_date": "2018-05-01T20:30:00.000Z",
+                "publish_date": "2018-04-01T20:30:00.000Z",
+                "id": 1,
+                "course_id": 1,
+                "reviews_per_user": 2,
+                "filename": "assignment1.pdf",
+                "review_due_date": "2018-05-01T20:30:00.000Z",
+                "review_publish_date": "2018-04-01T20:30:00.000Z"
+            }
+        ));
     });
 
     /**
