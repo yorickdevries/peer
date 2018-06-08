@@ -11,20 +11,6 @@ import express from "express";
 const router = express();
 router.use(bodyParser.json());
 
-const fileFolder = path.join(__dirname, "../files/submissions");
-
-// Upload settings
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        // tslint:disable-next-line
-        cb(null, fileFolder);
-    },
-    filename: function (req, file, cb) {
-        // tslint:disable-next-line
-        cb(null, Date.now() + '-' + file.originalname);
-    }
-});
-
 // PDF of max 30 MB (in bytes)
 const maxSizeSubmissionFile = 30 * 1024 * 1024;
 const uploadSubmission = multer({
