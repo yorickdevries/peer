@@ -255,7 +255,7 @@ router.get("/:id/feedback", async (req: any, res) => {
     const groupId = group.group_groupid;
     const submission = await SubmissionsPS.executeGetLatestSubmissionsByAssignmentIdByGroupId(assignmentId, groupId);
     const submissionId = submission.id;
-    res.json(await ReviewPS.executeGetReviewsByGroupIdAndAssignmentId(submissionId));
+    res.json(await ReviewPS.executeGetReviewsBySubmissionId(submissionId));
 });
 
 export default router;
