@@ -143,7 +143,7 @@ export default class CoursesPS {
      */
     public static executeGetUsersByRole(courseId: number, role: string): any {
         const statement = new PreparedStatement("get-user-by-role",
-            "SELECT enroll.user_netid FROM courselist JOIN enroll ON courselist.id = enroll.course_id WHERE courselist.id=$1 AND enroll.role=$2");
+            "SELECT user_netid FROM enroll WHERE course_id=$1 AND enroll.role=$2");
         statement.values = [courseId, role];
         return Database.executeQuery(statement);
     }
