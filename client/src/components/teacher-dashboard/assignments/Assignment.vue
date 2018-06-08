@@ -77,7 +77,7 @@
                             </b-tab>
 
                             <b-tab title="Groups">
-                                <Groups></Groups>
+                                <Groups :assignmentId="this.assignment.id"></Groups>
                             </b-tab>
 
                         </b-tabs>
