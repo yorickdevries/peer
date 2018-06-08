@@ -1,5 +1,6 @@
 <template>
     <b-card header="Import groups">
+        <!--Group name-->
         <b-form-group label="Enter name of group column">
             <b-form-input   v-model="groupColumn"
                             type="text"
@@ -7,6 +8,7 @@
                             required>
             </b-form-input>
         </b-form-group>
+        <!--File upload-->
         <b-form-group label="CSV file from Brightspace" class="mb-0">
             <b-form-file    v-model="file"
                             accept=".csv"
@@ -36,6 +38,7 @@
             }
         },
         methods: {
+            // Submit to back-end
             async importGroups() {
                 // Compose object to send to server
                 let formData = new FormData()
