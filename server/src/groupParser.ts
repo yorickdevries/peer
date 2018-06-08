@@ -17,7 +17,7 @@ export default class GroupParser {
         // parse the file
         try {
             const studentlist = await neatCsv(filebuffer);
-            await this.checkDuplicateStudents(studentlist, assignmentId);
+            await this.checkStudentList(studentlist, assignmentId);
             const studentmap = this.mapGroups(studentlist, groupColumn);
             const groupnames = await this.addGroupsToDatabase(studentmap, assignmentId);
             return groupnames;
@@ -26,6 +26,7 @@ export default class GroupParser {
         }
     }
     /**
+     * Checks whether the studentlist is valid;
      * Checks whether there are duplicate students in this file
      * or whether a student already has a group for this assignment.
      * Makes sure the student always has at most one group for an assignment.
@@ -35,7 +36,7 @@ export default class GroupParser {
      * @param {number} assignmentId
      * @memberof GroupParser
      */
-    public static async checkDuplicateStudents(studentlist: any[], assignmentId: number) {
+    public static async checkStudentList(studentlist: any[], assignmentId: number) {
         const allStudents: string[] = [];
         for (const student of studentlist) {
             const currentStudent = student.Username;
