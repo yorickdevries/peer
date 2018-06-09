@@ -1,48 +1,15 @@
 "use strict";
-import fs from "fs";
-import fx from "mkdir-recursive";
-import path from "path";
-import pgpromise from "pg-promise";
+import { QueryFile } from "pg-promise";
 import Database from "../database";
-import ncp from "ncp";
-const ncpfunc: any = ncp.ncp;
-ncpfunc.limit = 16;
 
-const qfSchema = new pgpromise.QueryFile("../../database_dumps/ED3-DataBaseSchema.sql");
-const qfData = new pgpromise.QueryFile("../../database_dumps/ED3-FullData.sql");
-
-// Make file folders
-const exampleSubmissionFolder = path.join(__dirname, "../../example_data/submissions");
-const submissionFolder = path.join(__dirname, "../files/submissions");
-fx.mkdir(submissionFolder, function(err: Error) {
-    console.log("Created folder: " + submissionFolder);
-    // Copy example data
-    ncpfunc(exampleSubmissionFolder, submissionFolder, function (err: Error) {
-    if (err) {
-        console.log(err);
-    } else {
-        console.log("Done copying example submission data!");
-    }
-   });
-});
-
-const exampleAssignmentFolder = path.join(__dirname, "../../example_data/assignments");
-const assignmentFolder = path.join(__dirname, "../files/assignments");
-fx.mkdir(assignmentFolder, function(err: Error) {
-    console.log("Created folder: " + assignmentFolder);
-    // Copy example data
-    ncpfunc(exampleAssignmentFolder, assignmentFolder, function (err: Error) {
-    if (err) {
-        console.log(err);
-    } else {
-        console.log("Done copying example assignment data!");
-    }
-   });
-});
+import fs from "fs-extra";
+import path from "path";
 
 // import database
-console.log("Importing database");
 const importDatabase = async function () {
+    // Database import files
+    const qfSchema = new QueryFile("../../database_dumps/ED3-DataBaseSchema.sql");
+    const qfData = new QueryFile("../../database_dumps/ED3-FullData.sql");
     try {
         await Database.DatabaseDrop();
         await Database.DatabaseImport(qfSchema);
@@ -53,4 +20,46 @@ const importDatabase = async function () {
         process.exit(1);
     }
 };
+
+// copy assignment files
+const copyExampleAssignmentData = async function () {
+    // Assignment file folders
+    const exampleAssignmentFolder = path.join(__dirname, "../../example_data/assignments");
+    const assignmentFolder = path.join(__dirname, "../files/assignments");
+    try {
+        // Make folder
+        await fs.mkdirs(assignmentFolder);
+        console.log("Created folder: " + assignmentFolder);
+        // Copy example data
+        await fs.copy(exampleAssignmentFolder, assignmentFolder);
+        console.log("Done copying example assignment data!");
+    } catch (error) {
+        console.log(error);
+        process.exit(1);
+    }
+};
+
+// copy submission files
+const copyExampleSubmissionData = async function () {
+    // Submission file folders
+    const exampleSubmissionFolder = path.join(__dirname, "../../example_data/submissions");
+    const submissionFolder = path.join(__dirname, "../files/submissions");
+    try {
+        // Make folder
+        await fs.mkdirs(submissionFolder);
+        console.log("Created folder: " + submissionFolder);
+        // Copy example data
+        await fs.copy(exampleSubmissionFolder, submissionFolder);
+        console.log("Done copying example submission data!");
+    } catch (error) {
+        console.log(error);
+        process.exit(1);
+    }
+};
+
+// running the initialisation functions
+console.log("Importing database");
 importDatabase();
+console.log("Copying example data");
+copyExampleAssignmentData();
+copyExampleSubmissionData();
