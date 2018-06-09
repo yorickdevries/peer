@@ -1,7 +1,8 @@
-import CoursePS from "../../src/prepared_statements/courses_ps";
-import { expect } from "chai";
 import "mocha";
+import { expect } from "chai";
 import TestData from "../test_helpers/test_data";
+
+import CoursePS from "../../src/prepared_statements/courses_ps";
 import { Roles } from "../../src/roles";
 
 describe("CoursePreparedStatement Test", () => {

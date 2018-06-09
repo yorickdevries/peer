@@ -1,7 +1,8 @@
-import ReviewPS from "../../src/prepared_statements/review_ps";
-import { expect } from "chai";
 import "mocha";
+import { expect } from "chai";
 import TestData from "../test_helpers/test_data";
+
+import ReviewPS from "../../src/prepared_statements/review_ps";
 
 describe("ReviewPreparedStatement Test", () => {
     /**
