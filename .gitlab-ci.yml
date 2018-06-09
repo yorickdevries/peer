@@ -33,9 +33,13 @@ test:
   - postgres:10.3
   script:
   - npm run test --prefix ./server
+  tags:
+  - longJob
 coverage:
   stage: coverage
   services:
   - postgres:10.3
   script:
   - npm run coverage --prefix ./server
+  tags:
+  - longJob
