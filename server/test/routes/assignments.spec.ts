@@ -11,12 +11,7 @@ const router: any = require("../../src/routes/assignments").default;
 // Imitates the login of Okta for testing
 import MockLogin from "../test_helpers/mock_login";
 
-import Database from "../../src/database";
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-
-const qfSchema = new QueryFile(path.join(__dirname, "../../database_dumps/ED3-DataBaseSchema.sql"));
-const qfData = new QueryFile(path.join(__dirname, "../../database_dumps/ED3-TestData.sql"));
+import TestDatabase from "../test_helpers/test_database";
 
 describe("API Assignment routes", () => {
     /**
@@ -25,9 +20,7 @@ describe("API Assignment routes", () => {
     beforeEach(async () => {
         // initializes the router without user
         MockLogin.initialize(router);
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
+        await TestDatabase.initialize();
     });
 
     /**

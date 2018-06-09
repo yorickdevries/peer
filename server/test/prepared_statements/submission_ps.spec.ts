@@ -1,22 +1,15 @@
 import SubmissionPS from "../../src/prepared_statements/submissions_ps";
 import { expect } from "chai";
 import "mocha";
-import Database from "../../src/database";
-
-// load the queryfiles
-import { QueryFile } from "pg-promise";
+import TestDatabase from "../test_helpers/test_database";
 import ReviewPS from "../../src/prepared_statements/review_ps";
-const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
-const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
 
 describe("SubmissionPreparedStatements Test", () => {
     /**
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
+        await TestDatabase.initialize();
     });
 
     /**

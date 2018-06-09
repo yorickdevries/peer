@@ -1,13 +1,7 @@
 import CoursePS from "../../src/prepared_statements/courses_ps";
 import { expect } from "chai";
 import "mocha";
-import Database from "../../src/database";
-
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-
-const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
-const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
+import TestDatabase from "../test_helpers/test_database";
 import { Roles } from "../../src/roles";
 
 describe("CoursePreparedStatement Test", () => {
@@ -15,9 +9,7 @@ describe("CoursePreparedStatement Test", () => {
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
+        await TestDatabase.initialize();
     });
 
     /**

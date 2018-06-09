@@ -10,12 +10,7 @@ import path from "path";
 const router: any = require("../../src/routes/submissions").default;
 // Imitates the login of Okta for testing
 import MockLogin from "../test_helpers/mock_login";
-
-import Database from "../../src/database";
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
-const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
+import TestDatabase from "../test_helpers/test_database";
 
 describe("Submission routes", () => {
     /**
@@ -24,9 +19,7 @@ describe("Submission routes", () => {
     beforeEach(async () => {
         // initializes the router
         MockLogin.initialize(router);
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
+        await TestDatabase.initialize();
 
         // Make file folders
         const exampleSubmissionFolder = path.join(__dirname, "../../example_data/submissions");

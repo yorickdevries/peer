@@ -10,11 +10,7 @@ const router: any = require("../../src/routes/api").default;
 // so make sure you re-initialize them when needed!
 import MockLogin from "../test_helpers/mock_login";
 
-import Database from "../../src/database";
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
-const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
+import TestDatabase from "../test_helpers/test_database";
 
 import UserPS from "../../src/prepared_statements/user_ps";
 
@@ -25,9 +21,7 @@ describe("API root routes", () => {
     beforeEach(async () => {
         // initializes the router without an user
         MockLogin.initialize(router);
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
+        await TestDatabase.initialize();
     });
 
     /**

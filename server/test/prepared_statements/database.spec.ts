@@ -3,20 +3,14 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 
 import { expect } from "chai";
 import "mocha";
-
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
-const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
+import TestDatabase from "../test_helpers/test_database";
 
 describe("Database Test", () => {
     /**
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-      await Database.DatabaseDrop();
-      await Database.DatabaseImport(qfSchema);
-      await Database.DatabaseImport(qfData);
+      await TestDatabase.initialize();
   });
 
   it("connection port", () => {

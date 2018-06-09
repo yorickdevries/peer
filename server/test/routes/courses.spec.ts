@@ -13,12 +13,7 @@ const router: any = require("../../src/routes/courses").default;
 // so make sure you re-initialize them when needed!
 import MockLogin from "../test_helpers/mock_login";
 
-import Database from "../../src/database";
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-
-const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
-const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
+import TestDatabase from "../test_helpers/test_database";
 
 describe("API Course routes", () => {
     /**
@@ -27,9 +22,7 @@ describe("API Course routes", () => {
     beforeEach(async () => {
         // initializes the router with user paul
         MockLogin.initialize(router, "paulvanderlaan");
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
+        await TestDatabase.initialize();
     });
 
     /**
