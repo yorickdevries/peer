@@ -20,22 +20,14 @@ describe("Submission routes", () => {
         // initializes the router
         MockLogin.initialize(router);
         await TestData.initializeDatabase();
-
-        // Make file folders
-        const exampleSubmissionFolder = path.join(__dirname, "../../example_data/submissions");
-        const submissionFolder = path.join(__dirname, "../../src/files/submissions");
-        await fs.mkdirs(submissionFolder);
-        // Copy example data
-        await fs.copy(exampleSubmissionFolder, submissionFolder);
+        await TestData.initializeSubmissionFiles();
     });
 
     /**
      * Remove file folders used for testing
      */
     afterEach(async () => {
-        const submissionFolder = path.join(__dirname, "../../src/files/submissions");
-        // Remove example data
-        await fs.remove(submissionFolder);
+        await TestData.removeSubmissionFiles();
     });
 
     /**
