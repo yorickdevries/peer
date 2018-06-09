@@ -1,12 +1,15 @@
+import "mocha";
 import chai from "chai";
 import { expect } from "chai";
-import "mocha";
-import path from "path";
-import fs from "fs";
+import TestData from "./test_helpers/test_data";
 
 import GroupParser from "../src/groupParser";
 import neatCsv from "neat-csv";
-import TestData from "./test_helpers/test_data";
+
+// file system imports
+import fs from "fs-extra";
+import path from "path";
+
 describe("GroupParser tests", () => {
     /**
      * Make a clean database before each test.

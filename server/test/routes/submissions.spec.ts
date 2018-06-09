@@ -1,16 +1,15 @@
+import "mocha";
 import chai from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 chai.use(chaiHttp);
+const router: any = require("../../src/routes/submissions").default;
+import MockLogin from "../test_helpers/mock_login";
+import TestData from "../test_helpers/test_data";
 
 // file system imports
 import fs from "fs-extra";
 import path from "path";
-
-const router: any = require("../../src/routes/submissions").default;
-// Imitates the login of Okta for testing
-import MockLogin from "../test_helpers/mock_login";
-import TestData from "../test_helpers/test_data";
 
 describe("Submission routes", () => {
     /**

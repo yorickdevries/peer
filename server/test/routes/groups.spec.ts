@@ -1,13 +1,10 @@
+import "mocha";
 import chai from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 chai.use(chaiHttp);
-import "mocha";
-
 const router: any = require("../../src/routes/groups").default;
-// Imitates the login of Okta for testing
 import MockLogin from "../test_helpers/mock_login";
-
 import TestData from "../test_helpers/test_data";
 
 describe("API Group routes", () => {

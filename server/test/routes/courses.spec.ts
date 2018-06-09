@@ -1,19 +1,13 @@
+import "mocha";
 import chai from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
-import { Roles } from "../../src/roles";
-
 chai.use(chaiHttp);
-import "mocha";
-
 const router: any = require("../../src/routes/courses").default;
-
-// Imitates the login of Okta for testing
-// Note these field are also available outside of this test
-// so make sure you re-initialize them when needed!
 import MockLogin from "../test_helpers/mock_login";
-
 import TestData from "../test_helpers/test_data";
+
+import { Roles } from "../../src/roles";
 
 describe("API Course routes", () => {
     /**
