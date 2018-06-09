@@ -8,7 +8,7 @@ const router: any = require("../../src/routes/groups").default;
 // Imitates the login of Okta for testing
 import MockLogin from "../test_helpers/mock_login";
 
-import TestDatabase from "../test_helpers/test_database";
+import TestData from "../test_helpers/test_data";
 
 describe("API Group routes", () => {
     /**
@@ -17,7 +17,7 @@ describe("API Group routes", () => {
     beforeEach(async () => {
         // initializes the router with user teacheraccount
         MockLogin.initialize(router, "teacheraccount");
-        await TestDatabase.initialize();
+        await TestData.initializeDatabase();
     });
 
     /**

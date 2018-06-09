@@ -1,7 +1,7 @@
 import SubmissionPS from "../../src/prepared_statements/submissions_ps";
 import { expect } from "chai";
 import "mocha";
-import TestDatabase from "../test_helpers/test_database";
+import TestData from "../test_helpers/test_data";
 import ReviewPS from "../../src/prepared_statements/review_ps";
 
 describe("SubmissionPreparedStatements Test", () => {
@@ -9,7 +9,7 @@ describe("SubmissionPreparedStatements Test", () => {
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-        await TestDatabase.initialize();
+        await TestData.initializeDatabase();
     });
 
     /**

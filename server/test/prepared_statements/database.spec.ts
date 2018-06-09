@@ -3,14 +3,14 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 
 import { expect } from "chai";
 import "mocha";
-import TestDatabase from "../test_helpers/test_database";
+import TestData from "../test_helpers/test_data";
 
 describe("Database Test", () => {
     /**
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-      await TestDatabase.initialize();
+      await TestData.initializeDatabase();
   });
 
   it("connection port", () => {

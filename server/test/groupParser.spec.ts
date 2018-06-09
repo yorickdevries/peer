@@ -6,13 +6,13 @@ import fs from "fs";
 
 import GroupParser from "../src/groupParser";
 import neatCsv from "neat-csv";
-import TestDatabase from "./test_helpers/test_database";
+import TestData from "./test_helpers/test_data";
 describe("GroupParser tests", () => {
     /**
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-        await TestDatabase.initialize();
+        await TestData.initializeDatabase();
     });
 
     /**

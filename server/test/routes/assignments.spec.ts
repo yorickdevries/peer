@@ -11,7 +11,7 @@ const router: any = require("../../src/routes/assignments").default;
 // Imitates the login of Okta for testing
 import MockLogin from "../test_helpers/mock_login";
 
-import TestDatabase from "../test_helpers/test_database";
+import TestData from "../test_helpers/test_data";
 
 describe("API Assignment routes", () => {
     /**
@@ -20,7 +20,7 @@ describe("API Assignment routes", () => {
     beforeEach(async () => {
         // initializes the router without user
         MockLogin.initialize(router);
-        await TestDatabase.initialize();
+        await TestData.initializeDatabase();
     });
 
     /**

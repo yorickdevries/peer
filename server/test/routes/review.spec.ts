@@ -12,7 +12,7 @@ const router: any = require("../../src/routes/reviews").default;
 // so make sure you re-initialize them when needed!
 import MockLogin from "../test_helpers/mock_login";
 
-import TestDatabase from "../test_helpers/test_database";
+import TestData from "../test_helpers/test_data";
 
 describe("API review routes", () => {
     /**
@@ -21,7 +21,7 @@ describe("API review routes", () => {
     beforeEach(async () => {
         // initializes the router with user paul
         MockLogin.initialize(router, "paulvanderlaan");
-        await TestDatabase.initialize();
+        await TestData.initializeDatabase();
     });
 
     /**

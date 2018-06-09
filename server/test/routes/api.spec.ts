@@ -10,7 +10,7 @@ const router: any = require("../../src/routes/api").default;
 // so make sure you re-initialize them when needed!
 import MockLogin from "../test_helpers/mock_login";
 
-import TestDatabase from "../test_helpers/test_database";
+import TestData from "../test_helpers/test_data";
 
 import UserPS from "../../src/prepared_statements/user_ps";
 
@@ -21,7 +21,7 @@ describe("API root routes", () => {
     beforeEach(async () => {
         // initializes the router without an user
         MockLogin.initialize(router);
-        await TestDatabase.initialize();
+        await TestData.initializeDatabase();
     });
 
     /**

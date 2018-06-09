@@ -10,7 +10,7 @@ import path from "path";
 const router: any = require("../../src/routes/submissions").default;
 // Imitates the login of Okta for testing
 import MockLogin from "../test_helpers/mock_login";
-import TestDatabase from "../test_helpers/test_database";
+import TestData from "../test_helpers/test_data";
 
 describe("Submission routes", () => {
     /**
@@ -19,7 +19,7 @@ describe("Submission routes", () => {
     beforeEach(async () => {
         // initializes the router
         MockLogin.initialize(router);
-        await TestDatabase.initialize();
+        await TestData.initializeDatabase();
 
         // Make file folders
         const exampleSubmissionFolder = path.join(__dirname, "../../example_data/submissions");
