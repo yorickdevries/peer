@@ -7,7 +7,7 @@ const router: any = require("../../src/routes/submissions").default;
 import MockLogin from "../test_helpers/mock_login";
 import TestData from "../test_helpers/test_data";
 
-describe("API submission routes", () => {
+describe("submission comment routes", () => {
     /**
      * Make a clean database before each test.
      */
