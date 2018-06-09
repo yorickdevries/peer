@@ -3,14 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "npm run build && npm run db_init && npm run start_server",
+    "start": "npm run build && npm run data_init && npm run start_server",
     "start_server": "node ./dist/bin/www.js",
     "tslint": "tslint --project ./tsconfig_tslint.json",
     "build": "npm run tsc",
     "tsc": "tsc",
     "test": "mocha --timeout 10000",
     "coverage": "nyc npm run test",
-    "db_init": "node ./dist/scripts/database_init.js"
+    "data_init": "node ./dist/scripts/data_init.js"
   },
   "nyc": {
     "check-coverage": true,

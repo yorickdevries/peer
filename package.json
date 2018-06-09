@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "start": "npm run build && npm run start_server",
-    "build": "npm run build_server && npm run build_db && npm run build_client",
+    "build": "npm run build_server && npm run build_data && npm run build_client",
     "build_server": "npm run build --prefix ./server",
-    "build_db": "npm run db_init --prefix ./server",
+    "build_data": "npm run data_init --prefix ./server",
     "build_client": "npm run build --prefix ./client",
     "start_server": "npm run start_server --prefix ./server",
     "test_all": "npm run tslint --prefix ./server && npm run build && npm run coverage --prefix ./server"
