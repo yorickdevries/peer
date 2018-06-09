@@ -10,7 +10,7 @@ const router: any = require("../../src/routes/submissions").default;
 // Imitates the login of Okta for testing
 // Note these field are also available outside of this test
 // so make sure you re-initialize them when needed!
-import InitLogin from "./init_login";
+import MockLogin from "../test_helpers/mock_login";
 
 import Database from "../../src/database";
 // load the queryfiles
@@ -25,7 +25,7 @@ describe("API submission routes", () => {
      */
     beforeEach(async () => {
         // initializes the router with user paul
-        InitLogin.initialize(router, "paulvanderlaan");
+        MockLogin.initialize(router, "paulvanderlaan");
         await Database.DatabaseDrop();
         await Database.DatabaseImport(qfSchema);
         await Database.DatabaseImport(qfData);

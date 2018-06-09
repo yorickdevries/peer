@@ -8,7 +8,7 @@ const router: any = require("../../src/routes/api").default;
 // Imitates the login of Okta for testing
 // Note these field are also available outside of this test
 // so make sure you re-initialize them when needed!
-import InitLogin from "./init_login";
+import MockLogin from "../test_helpers/mock_login";
 
 import Database from "../../src/database";
 // load the queryfiles
@@ -24,7 +24,7 @@ describe("API root routes", () => {
      */
     beforeEach(async () => {
         // initializes the router without an user
-        InitLogin.initialize(router);
+        MockLogin.initialize(router);
         await Database.DatabaseDrop();
         await Database.DatabaseImport(qfSchema);
         await Database.DatabaseImport(qfData);
@@ -35,7 +35,7 @@ describe("API root routes", () => {
      */
     it("Get /authenticated info while not logged in", async () => {
         // initializes router without an user logged in
-        InitLogin.initialize(router);
+        MockLogin.initialize(router);
         const res = await chai.request(router).get("/authenticated");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({ authenticated: false }));
@@ -45,7 +45,7 @@ describe("API root routes", () => {
      * Test whether user is authenticated
      */
     it("Get /authenticated info while logged in", async () => {
-        InitLogin.initialize(router, "henkjan");
+        MockLogin.initialize(router, "henkjan");
         const res = await chai.request(router).get("/authenticated");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({ authenticated: true }));
@@ -55,7 +55,7 @@ describe("API root routes", () => {
      * Test whether userinfo is returned
      */
     it("Get /user info - netid", async () => {
-        InitLogin.initialize(router, "henkjan");
+        MockLogin.initialize(router, "henkjan");
         const res = await chai.request(router).get("/user");
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).user.given_name).to.equal("henkjan");
@@ -65,7 +65,7 @@ describe("API root routes", () => {
      * Test whether userinfo is returned
      */
     it("Get /user info email", async () => {
-        InitLogin.initialize(router, "henkjan", "h.j@dtudent.tudelft.nl");
+        MockLogin.initialize(router, "henkjan", "h.j@dtudent.tudelft.nl");
         const res = await chai.request(router).get("/user");
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).user.preferred_username).to.equal("h.j@dtudent.tudelft.nl");
@@ -75,7 +75,7 @@ describe("API root routes", () => {
      * Test whether user is added to the database
      */
     it("User is added upon login", async () => {
-        InitLogin.initialize(router, "newuser", "newemail@mail");
+        MockLogin.initialize(router, "newuser", "newemail@mail");
         const res = await chai.request(router).get("/anything");
         const user: any = await UserPS.executeGetUserById("newuser");
         expect(user.netid).to.equal("newuser");
@@ -87,13 +87,13 @@ describe("API root routes", () => {
      */
     it("Useremail is updated to the database", async () => {
         // first session
-        InitLogin.initialize(router, "newuser", "email@mail.nl");
+        MockLogin.initialize(router, "newuser", "email@mail.nl");
         await chai.request(router).get("/anything");
         const user: any = await UserPS.executeGetUserById("newuser");
         expect(user.netid).to.equal("newuser");
         expect(user.email).to.equal("email@mail.nl");
         // second session
-        InitLogin.initialize(router, "newuser", "newemail@mail.nl");
+        MockLogin.initialize(router, "newuser", "newemail@mail.nl");
         await chai.request(router).get("/anything");
         const user2: any = await UserPS.executeGetUserById("newuser");
         expect(user2.netid).to.equal("newuser");

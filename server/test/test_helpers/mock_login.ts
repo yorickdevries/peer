@@ -1,10 +1,10 @@
 /**
- * Class responsible for making a fake logged in user for testing purposes.
+ * Class responsible for making a fake mocked logged in user for testing purposes.
  *
  * @export
- * @class InitLogin
+ * @class MockLogin
  */
-export default class InitLogin {
+export default class MockLogin {
 /**
  * Adds sample data to a router.
  *
@@ -13,7 +13,7 @@ export default class InitLogin {
  * @param {(string | undefined)} [netid=undefined]
  * @param {(string | undefined)} [email=undefined]
  * @returns
- * @memberof InitLogin
+ * @memberof MockLogin
  */
 static initialize(router: any, netid: string | undefined = undefined, email: string | undefined = undefined) {
         // Authenticated function

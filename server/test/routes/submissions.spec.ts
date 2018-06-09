@@ -9,7 +9,7 @@ import path from "path";
 
 const router: any = require("../../src/routes/submissions").default;
 // Imitates the login of Okta for testing
-import InitLogin from "./init_login";
+import MockLogin from "../test_helpers/mock_login";
 
 import Database from "../../src/database";
 // load the queryfiles
@@ -23,7 +23,7 @@ describe("Submission routes", () => {
      */
     beforeEach(async () => {
         // initializes the router
-        InitLogin.initialize(router);
+        MockLogin.initialize(router);
         await Database.DatabaseDrop();
         await Database.DatabaseImport(qfSchema);
         await Database.DatabaseImport(qfData);
@@ -60,7 +60,7 @@ describe("Submission routes", () => {
      */
     it("post submissions/ with file", async () => {
         // log in as henkjan
-        InitLogin.initialize(router, "henkjan");
+        MockLogin.initialize(router, "henkjan");
         const exampleSubmissionFile = path.join(__dirname, "../../example_data/submissions/submission1.pdf");
         const res = await chai.request(router).post("/")
         .attach("submissionFile", fs.readFileSync(exampleSubmissionFile), "submission1.pdf")
@@ -77,7 +77,7 @@ describe("Submission routes", () => {
      */
     it("post submissions/ without file", async () => {
         // log in as henkjan
-        InitLogin.initialize(router, "henkjan");
+        MockLogin.initialize(router, "henkjan");
         const exampleSubmissionFile = path.join(__dirname, "../../example_data/submissions/submission1.pdf");
         const res = await chai.request(router).post("/")
         .field("assignmentId", 1);
