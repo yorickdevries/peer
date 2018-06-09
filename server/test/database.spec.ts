@@ -1,8 +1,8 @@
 import "mocha";
 import { expect } from "chai";
-import TestData from "../test_helpers/test_data";
+import TestData from "./test_helpers/test_data";
 
-import Database from "../../src/database";
+import Database from "../src/database";
 import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 
 describe("Database Test", () => {
