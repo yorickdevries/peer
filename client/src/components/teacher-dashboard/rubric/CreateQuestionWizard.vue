@@ -85,6 +85,7 @@ export default {
             await api.client.post(`${apiPrefixes[type]}`, question)
             this.showSuccessMessage({message: "Successfully created question."})
             this.$emit('saved')
+            this.onReset()
         },
         async createMCQuestion(question) {
 
@@ -109,6 +110,26 @@ export default {
 
             this.showSuccessMessage({message: "Successfully created question."})
             this.$emit('saved')
+        },
+        onReset() {
+            this.selectedType = ''
+            this.openQuestion = {
+                question: '',
+                    rubric_assignment_id: this.rubricId,
+                    question_number: null
+            }
+            this.rangeQuestion = {
+                question: '',
+                range: null,
+                rubric_assignment_id: this.rubricId,
+                question_number: null
+            }
+            this.mcQuestion = {
+                question: '',
+                rubric_assignment_id: this.rubricId,
+                question_number: null,
+                option: []
+            }
         }
     },
 
