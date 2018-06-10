@@ -22,5 +22,15 @@ export default {
             title: 'Warning',
             message: 'Warning.'
         },
+        showSaveMessage: {
+            type: VueNotifications.types.success,
+            title: 'Saved',
+            message: 'The item has successfully been saved.'
+        },
+        showSubmitMessage: {
+            type: VueNotifications.types.success,
+            title: 'Saved',
+            message: 'The item has successfully been submitted.'
+        },
     }
 }

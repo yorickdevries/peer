@@ -26,7 +26,7 @@ import OpenQuestion from './OpenQuestion'
 import RangeQuestion from './RangeQuestion'
 import MCQuestion from './MCQuestion'
 import api from "../../../api"
-import VueNotifications from "vue-notifications"
+import notifications from '../../../mixins/notifications'
 
 let apiPrefixes = {
     open: '/rubric/openquestion',
@@ -36,6 +36,7 @@ let apiPrefixes = {
 }
 
 export default {
+    mixins: [notifications],
     components: {
         OpenQuestion,
         RangeQuestion,
@@ -110,18 +111,6 @@ export default {
             this.$emit('saved')
         }
     },
-    notifications: {
-        showSuccessMessage: {
-            type: VueNotifications.types.success,
-            title: 'Success',
-            message: 'Success.'
-        },
-        showErrorMessage: {
-            type: VueNotifications.types.error,
-            title: 'Error',
-            message: 'Error.'
-        }
-    }
 
 }
 </script>
