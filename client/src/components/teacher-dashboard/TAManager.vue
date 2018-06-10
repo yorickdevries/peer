@@ -96,9 +96,8 @@
                 if (this.netid === "") return this.showErrorMessage({message: "Please input a valid netID."})
 
                 // Change the role through the API.
-                let res;
                 try {
-                    res = await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
+                    await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
                         netid: this.netid,
                         role: "TA"
                     })
@@ -114,9 +113,8 @@
             },
             async removeTA(netid) {
                 // Change the role through the API.
-                let res;
                 try {
-                    res = await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
+                    await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
                         netid: netid,
                         role: "student"
                     })
