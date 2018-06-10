@@ -1,3 +1,14 @@
+// Bootstrap Settings
+
+// Colours (https://www.tudelft.nl/en/tu-delft-corporate-design/colours/)
+$primary: #00A6D6;    // TU Delft colour
+$secondary: #000000;  // TU Delft colour
+$success: #73a812;    // TU Delft colour
+$danger: #e21a1a;     // TU Delft colour
+
+.bg-primary-light { background-color: rgba($primary, .5); }
+
+// Import Bootstrap
 @import "../../../node_modules/bootstrap/scss/bootstrap.scss";            // Bootstrap
 @import "../../../node_modules/bootstrap-vue/dist/bootstrap-vue.css";     // Bootstrap-Vue
 
@@ -20,6 +31,6 @@ body {
 }
 /** Custom bootstrap CSS. **/
 
-.bg-primary-light {
-  background-color: rgba($primary, .5);
-}
+
+
+
