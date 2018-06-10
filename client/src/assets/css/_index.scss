@@ -1,18 +1,42 @@
-// Bootstrap Settings
+/**
+  ======================
+  Bootstrap Settings
+  ======================
+ */
 
 // Colours (https://www.tudelft.nl/en/tu-delft-corporate-design/colours/)
 $primary: #00A6D6;    // TU Delft colour
-$secondary: #000000;  // TU Delft colour
+$secondary: #252525;  // TU Delft colour
 $success: #73a812;    // TU Delft colour
 $danger: #e21a1a;     // TU Delft colour
 
-.bg-primary-light { background-color: rgba($primary, .5); }
+// Card customization
+.card {
+  @extend .shadow-sm;
+}
+
+// Navbar customization
+$navbar-dark-color:                 rgba(#FFFFFF, 1);
+$navbar-dark-hover-color:           rgba(#FFFFFF, 1);
+$navbar-dark-active-color:          rgba(#FFFFFF, 1);
+
+.navbar-dark {
+  .navbar-nav {
+    .nav-link.active {
+      font-weight: bold;
+    }
+  }
+}
 
 // Import Bootstrap
 @import "../../../node_modules/bootstrap/scss/bootstrap.scss";            // Bootstrap
 @import "../../../node_modules/bootstrap-vue/dist/bootstrap-vue.css";     // Bootstrap-Vue
 
-/** Custom non-bootstrap CSS **/
+/**
+  ======================
+  Non-Bootstrap CSS
+  ======================
+ */
 
 // Font.
 @import url('https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,700,900');
@@ -21,16 +45,12 @@ $danger: #e21a1a;     // TU Delft colour
   -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
 }
 
-// Overflow fix.
-body {
-  overflow:scroll;
-}
-
+// Background colour.
 body {
   background-color: #f5f5f5;
 }
-/** Custom bootstrap CSS. **/
 
+.bg-primary-light { background-color: rgba($primary, .5); }
 
 
 
