@@ -15,20 +15,16 @@
             <!--Course Cards-->
             <b-row>
                 <b-col cols="6" v-for="course in courses" :key="course.id" class="d-flex align-items-stretch">
-                    <b-card :title="course.name" :sub-title="course.name" class="mb-3">
-                        <p class="card-text">
-                            {{ course.description | truncate(200)}}
-                        </p>
-                        <div>
-                            <b-button-group size="sm" class="d-inline-block">
-                                <b-button v-if="course.role === 'student'" variant="outline-primary" :to="{ name: 'student-dashboard.course.home', params: { courseId: course.id } }">Enter as Student</b-button>
-                                <b-button v-else-if="course.role === 'TA'" variant="outline-primary" :to="{ name: 'teaching-assistant-dashboard.course.home', params: { courseId: course.id } }">Enter as TA</b-button>
-                                <b-button v-else-if="course.role === 'teacher'" variant="outline-primary" :to="{ name: 'teacher-dashboard.course', params: { courseId: course.id } }">Enter as Teacher</b-button>
-                                <b-button variant="outline-danger" :to="{ name: 'student-dashboard.course.home', params: { courseId: course.id } }">Student (DEV)</b-button>
-                                <b-button variant="outline-danger" :to="{ name: 'teaching-assistant-dashboard.course.home', params: { courseId: course.id } }">TA (DEV)</b-button>
-                                <b-button variant="outline-danger" :to="{ name: 'teacher-dashboard.course', params: { courseId: course.id } }">Teacher (DEV)</b-button>
-                            </b-button-group>
-                            </div>
+                    <b-card no-body class="mb-3 w-100">
+                        <b-card-body>
+                            <h4 class="card-title mb-0">{{ course.name }}</h4>
+                            <b-badge show variant="primary" class="mb-2 pt-1">{{ course.role.toUpperCase()}}</b-badge>
+                            <p>{{ course.description | truncate(200)}}</p>
+                            <b-button v-if="course.role === 'student'" variant="outline-primary" :to="{ name: 'student-dashboard.course.home', params: { courseId: course.id } }">Enter Course</b-button>
+                            <b-button v-else-if="course.role === 'TA'" variant="outline-primary" :to="{ name: 'teaching-assistant-dashboard.course.home', params: { courseId: course.id } }">Enter as TA</b-button>
+                            <b-button v-else-if="course.role === 'teacher'" variant="outline-primary" :to="{ name: 'teacher-dashboard.course', params: { courseId: course.id } }">Enter as Teacher</b-button>
+                        </b-card-body>
+
                     </b-card>
                 </b-col>
 
