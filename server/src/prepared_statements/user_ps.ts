@@ -21,6 +21,19 @@ export default class UserPS {
     }
 
     /**
+     * Checks whether an user exists in the database
+     * @param {string} netId - an user id.
+     * @return {any} a query result.
+     */
+    public static async executeExistsUserById(netId: string): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("exists-user-by-id",
+        'SELECT EXISTS(SELECT * FROM "userlist" WHERE "netid" = $1)');
+        statement.values = [netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+
+    /**
      * Executes an 'add user query'.
      * @param {string} netId - a net id.
      * @param {string} email - an email.
