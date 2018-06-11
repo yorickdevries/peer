@@ -26,7 +26,7 @@ import OpenQuestion from './OpenQuestion'
 import RangeQuestion from './RangeQuestion'
 import MCQuestion from './MCQuestion'
 import api from "../../../api"
-import VueNotifications from "vue-notifications"
+import notifications from '../../../mixins/notifications'
 
 let apiPrefixes = {
     open: '/rubric/openquestion',
@@ -36,6 +36,7 @@ let apiPrefixes = {
 }
 
 export default {
+    mixins: [notifications],
     components: {
         OpenQuestion,
         RangeQuestion,
@@ -84,6 +85,7 @@ export default {
             await api.client.post(`${apiPrefixes[type]}`, question)
             this.showSuccessMessage({message: "Successfully created question."})
             this.$emit('saved')
+            this.onReset()
         },
         async createMCQuestion(question) {
 
@@ -108,20 +110,28 @@ export default {
 
             this.showSuccessMessage({message: "Successfully created question."})
             this.$emit('saved')
+        },
+        onReset() {
+            this.selectedType = ''
+            this.openQuestion = {
+                question: '',
+                    rubric_assignment_id: this.rubricId,
+                    question_number: null
+            }
+            this.rangeQuestion = {
+                question: '',
+                range: null,
+                rubric_assignment_id: this.rubricId,
+                question_number: null
+            }
+            this.mcQuestion = {
+                question: '',
+                rubric_assignment_id: this.rubricId,
+                question_number: null,
+                option: []
+            }
         }
     },
-    notifications: {
-        showSuccessMessage: {
-            type: VueNotifications.types.success,
-            title: 'Success',
-            message: 'Success.'
-        },
-        showErrorMessage: {
-            type: VueNotifications.types.error,
-            title: 'Error',
-            message: 'Error.'
-        }
-    }
 
 }
 </script>

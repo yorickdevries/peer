@@ -5,7 +5,7 @@
         <b-card v-else no-body>
 
             <b-tabs card>
-                <b-tab v-for="(review, index) in reviews">
+                <b-tab v-for="(review, index) in reviews" :key="review.id">
                     <template slot="title">
                         <div class="d-flex align-items-center">
                             <b-badge v-if="review.done" variant="success" class="mr-2">DONE</b-badge>

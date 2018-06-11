@@ -236,7 +236,7 @@ export default class ReviewPS {
      */
     public static executeGetReviewsBySubmissionId(submissionId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-reviews-by-group-id-and-assignment-id",
-            "SELECT id FROM review WHERE submission_id = $1");
+            "SELECT id FROM review WHERE submission_id = $1 AND done = true");
         statement.values = [submissionId];
         return Database.executeQuery(statement);
     }
