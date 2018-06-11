@@ -93,12 +93,10 @@ const updateAssignment = async function(req: any, res: any, next: any) {
         // Try to remove the old file and write the new file.
         try {
             fs.unlinkSync(oldFilePath);
-            console.log("The file has been deleted: " + oldFilePath);
-
             fs.writeFileSync(newFilePath, req.file.buffer);
-            console.log("The file has been saved at " + newFilePath);
         } catch (err) {
             result = { error: err };
+            console.log("Error trying to unlink/write: " + err);
         }
     }
     res.json(result);
@@ -126,9 +124,9 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
         // Try to write the file.
         try {
             fs.writeFileSync(filePath, req.file.buffer);
-            console.log("The file has been saved at" + filePath);
         } catch (err) {
             result = { error: err };
+            console.log("Error trying to write: " + err);
         }
     }
     res.json(result);
