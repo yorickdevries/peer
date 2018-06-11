@@ -56,7 +56,7 @@
 
 <script>
 import api from "../../../api";
-import VueNotifications from 'vue-notifications'
+import notifications from '../../../mixins/notifications'
 import OpenQuestion from './OpenQuestion'
 import RangeQuestion from './RangeQuestion'
 import MCQuestion from './MCQuestion'
@@ -69,6 +69,7 @@ let apiPrefixes = {
     mcoption: '/rubric/mcoption',
 }
 export default {
+    mixins: [notifications],
     components: {
         OpenQuestion,
         RangeQuestion,
@@ -127,18 +128,6 @@ export default {
             this.showSuccessMessage({message: 'Successfully saved question.'})
             await this.fetchRubric()
         },
-    },
-    notifications: {
-        showSuccessMessage: {
-            type: VueNotifications.types.success,
-            title: 'Success',
-            message: 'Success.'
-        },
-        showErrorMessage: {
-            type: VueNotifications.types.error,
-            title: 'Error',
-            message: 'Error.'
-        }
     }
 }
 

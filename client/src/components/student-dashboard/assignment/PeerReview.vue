@@ -53,7 +53,7 @@
                                 :item-size="20"
                                 :spacing="5"
                                 inline
-                                :max-rating="7"
+                                :max-rating="pair.question.range"
                                 :show-rating="false"
                                 :read-only="peerReview.review.done"
                                 v-model="pair.answer.answer"/>
@@ -84,11 +84,12 @@
 </template>
 
 <script>
-    import api from "../../../api"
+import api from "../../../api"
 import { StarRating } from 'vue-rate-it';
-    import VueNotifications from "vue-notifications/src/main"
+import notifications from '../../../mixins/notifications'
 
 export default {
+    mixins: [notifications],
     components: {
         StarRating
     },
@@ -151,7 +152,7 @@ export default {
                 await this.fetchPeerReview()
                 this.showSubmitMessage()
             } else {
-                this.showSubmitErrorMessage()
+                this.showErrorMessage({message: "All fields are required."})
             }
 
         },
@@ -168,22 +169,5 @@ export default {
             })
         },
     },
-    notifications: {
-        showSaveMessage: {
-            type: VueNotifications.types.success,
-            title: 'Saved',
-            message: 'Peer review has successfully been saved'
-        },
-        showSubmitMessage: {
-            type: VueNotifications.types.success,
-            title: 'Submit',
-            message: 'Peer review has successfully been submitted'
-        },
-        showSubmitErrorMessage: {
-            type: VueNotifications.types.error,
-            title: 'Submit',
-            message: 'All fields are required to submit!'
-        }
-    }
 }
 </script>
