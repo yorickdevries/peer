@@ -244,7 +244,7 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).get("/1/allreviews");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
-            [{"reviewer": "paulvanderlaan", "submitter": "henkjan"}]
+            [{"reviewer": "paulvanderlaan", "submitter": "paulvanderlaan"}]
         ));
     });
 

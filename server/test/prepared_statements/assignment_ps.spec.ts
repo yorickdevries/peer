@@ -175,7 +175,7 @@ describe("AssignmentPreparedStatements Test", () => {
     it("Reviews of an assignment", async () => {
         expect(await AssignmentPS.executeGetReviewsById(1)).to.deep.equal([{
             "reviewer": "paulvanderlaan",
-            "submitter": "henkjan"
+            "submitter": "paulvanderlaan"
         }]);
     });
 
