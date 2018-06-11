@@ -171,7 +171,8 @@ router.post("/", uploadAssignmentFunction, index.authorization.enrolledAsTeacher
 
 /**
  * Route to update an assignment.
- * Removes the old assignment (also from the files folder) and adds the new assignment.
+ * Removes the old assignment (also from the files folder - if a file is uploaded)
+ * and adds the new assignment.
  */
 router.put("/:assignment_id", uploadAssignmentFunction, updateAssignment);
 
