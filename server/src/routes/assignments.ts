@@ -107,7 +107,7 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
     // Error in case of no file
     if (req.file == undefined) {
         res.json({ error: "No file uploaded" });
-        return;
+        next();
     }
 
     const fileName = Date.now() + "-" + req.file.originalname;
