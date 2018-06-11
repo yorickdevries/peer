@@ -4,6 +4,8 @@ import fs from "fs";
 import index from "../security/index";
 import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
+import UserPS from "../prepared_statements/user_ps";
+import GroupPS from "../prepared_statements/group_ps";
 import ReviewPS from "../prepared_statements/review_ps";
 import GroupParser from "../groupParser";
 import reviewDistribution from "../reviewDistribution";
@@ -11,6 +13,7 @@ import bodyParser from "body-parser";
 
 // Router
 import express from "express";
+import SubmissionsPS from "../prepared_statements/submissions_ps";
 
 const router = express();
 router.use(bodyParser.json());
@@ -230,6 +233,29 @@ router.post("/:id/importgroups", async (req: any, res) => {
  */
 router.get("/:id/allreviews", async (req: any, res) => {
     res.json(await AssignmentPS.executeGetReviewsById(req.params.id));
+});
+
+/**
+ * Route to get your group for this assignment
+ * @param id - assignment id.
+ */
+router.get("/:id/group", async (req: any, res) => {
+    const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.userinfo.given_name, req.params.id);
+    const groupId = group.group_groupid;
+    const groupmembers = await GroupPS.executeGetUsersOfGroupById(groupId);
+    res.json({group, groupmembers});
+});
+
+/**
+ * Route to get review Ids of a certain person.
+ */
+router.get("/:id/feedback", async (req: any, res) => {
+    const assignmentId = req.params.id;
+    const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.userinfo.given_name, req.params.id);
+    const groupId = group.group_groupid;
+    const submission = await SubmissionsPS.executeGetLatestSubmissionsByAssignmentIdByGroupId(assignmentId, groupId);
+    const submissionId = submission.id;
+    res.json(await ReviewPS.executeGetReviewsBySubmissionId(submissionId));
 });
 
 export default router;

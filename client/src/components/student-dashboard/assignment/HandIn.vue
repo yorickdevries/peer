@@ -2,17 +2,6 @@
     <b-container fluid class="px-0">
         <b-row>
 
-            <!--Assignment Details-->
-            <b-col>
-                <b-card header="Assignment Details" class="h-100">
-                <span class="font-weight-bold">Description</span>
-                <p>
-                    {{ assignment.description }}
-                </p>
-                <b-button variant="primary w-100" :href="assignmentFilePath" >Download Assignment</b-button>
-                </b-card>
-            </b-col>
-
             <!--Hand-In Form-->
             <b-col>
 
@@ -102,10 +91,6 @@ export default {
         submissionFilePath() {
             // Get the submission file path.
             return `/api/submissions/${this.submission.id}/file`
-        },
-        assignmentFilePath() {
-            // Get the assignment file path.
-            return `/api/assignments/${this.assignment.id}/file`
         },
         hasUploadedSubmission() {
             // Returns whether an submission has been uploaded or not.

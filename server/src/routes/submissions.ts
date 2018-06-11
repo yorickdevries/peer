@@ -7,6 +7,7 @@ import bodyParser from "body-parser";
 
 // Router
 import express from "express";
+
 const router = express();
 router.use(bodyParser.json());
 
