@@ -177,7 +177,7 @@ export default class AssignmentPS {
      * @memberof AssignmentPS
      */
     public static executeGetGroupOfNetIdByAssignmentId(netId: string, assignmentId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-all-groups-per-assignment",
+        const statement = new PreparedStatement("get-group-of-netid-by-assignmentid",
         "SELECT a.assignment_id, a.group_id FROM assignmentgroup a JOIN groupusers g ON a.group_id = g.group_groupid WHERE g.user_netid = $1 AND a.assignment_id = $2");
         statement.values = [netId, assignmentId];
         return Database.executeQuerySingleResult(statement);
