@@ -261,7 +261,6 @@ describe("API Assignment routes", () => {
 
         // assertions
         const result = JSON.parse(res.text);
-        console.log(result);
         expect(res.status).to.equal(200);
         expect(result.title).to.equal("Example title");
         expect(result.description).to.equal("Example description");
