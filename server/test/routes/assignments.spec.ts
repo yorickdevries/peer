@@ -259,4 +259,18 @@ describe("API Assignment routes", () => {
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).length).to.equal(3);
     });
+
+    /**
+     * Tests the route for all groups of an assignment
+     */
+    it("Get groups of an assignment", async () => {
+        // log in as henkjan
+        MockLogin.initialize(router, "henkjan");
+        const res = await chai.request(router).get("/2/groups");
+        expect(res.text).to.equal(JSON.stringify([
+            {id: 20, group_name: "Group 20"},
+            {id: 21, group_name: "Group 21"},
+            {id: 22, group_name: "Group 22"}
+        ]));
+    });
 });

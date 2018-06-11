@@ -284,4 +284,12 @@ router.get("/:id/feedback", async (req: any, res) => {
     res.json(await ReviewPS.executeGetReviewsBySubmissionId(submissionId));
 });
 
+/**
+ * Route to get all groups of an assignment
+ */
+router.get("/:id/groups", async (req: any, res) => {
+    const assignmentId = req.params.id;
+    res.json(await AssignmentPS.executeGetGroupsByAssignmentId(assignmentId));
+});
+
 export default router;
