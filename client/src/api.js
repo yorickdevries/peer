@@ -37,6 +37,12 @@ export default {
     saveAssignment(assignmentId, assignment) {
         return client.put(`courses/${assignmentId}`, assignment)
     },
+    getAssignmentGroups(assignmentId) {
+        return client.get(`/assignments/${assignmentId}/groups`)
+    },
+    getUsersGroupById(groupId) {
+        return client.get(`/groups/${groupId}/users`)
+    },
     getPeerReview(peerReviewId) {
         return client.get(`reviews/${peerReviewId}`)
     },
