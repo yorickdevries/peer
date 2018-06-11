@@ -37,6 +37,18 @@
                     </b-col>
                 </b-row>
 
+                <!--Table-->
+                <b-table striped
+                         outline
+                         show-empty
+                         stacked="md"
+                         :items="groups"
+                         :fields="fields"
+                         :current-page="currentPage"
+                         :per-page="Number(perPage)"
+                         :filter="filter">
+                </b-table>
+                
 
             </b-col>
         </b-row>
