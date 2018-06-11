@@ -75,18 +75,30 @@ describe("CoursePreparedStatement Test", () => {
             "title": "Assignment 1",
             "reviews_per_user": 2
         },
-            {
-                "course_id": 1,
-                "description": "Example assignment number two",
-                "due_date": new Date("2018-05-01T20:30:00Z"),
-                "filename": "assignment2.pdf",
-                "id": 2,
-                "publish_date": new Date("2018-04-01T20:30:00Z"),
-                "review_due_date": new Date("2018-05-01T20:30:00Z"),
-                "review_publish_date": new Date("2018-04-01T20:30:00Z"),
-                "title": "Assignment 2",
-                "reviews_per_user": 2
-            }]);
+        {
+            "course_id": 1,
+            "description": "Example assignment number two",
+            "due_date": new Date("2018-05-01T20:30:00Z"),
+            "filename": "assignment2.pdf",
+            "id": 2,
+            "publish_date": new Date("2018-04-01T20:30:00Z"),
+            "review_due_date": new Date("2018-05-01T20:30:00Z"),
+            "review_publish_date": new Date("2018-04-01T20:30:00Z"),
+            "title": "Assignment 2",
+            "reviews_per_user": 1
+        },
+        {
+            "course_id": 1,
+            "description": "Example assignment number three",
+            "due_date": new Date("2018-05-01T20:30:00Z"),
+            "filename": "assignment3.pdf",
+            "id": 3,
+            "publish_date": new Date("2018-04-01T20:30:00Z"),
+            "review_due_date": new Date("2018-05-01T20:30:00Z"),
+            "review_publish_date": new Date("2018-04-01T20:30:00Z"),
+            "title": "Assignment 3",
+            "reviews_per_user": 1
+        }]);
     });
 
 
