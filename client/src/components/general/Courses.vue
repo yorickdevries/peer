@@ -34,7 +34,7 @@
                                           :to="{ name: 'teacher-dashboard.course', params: { courseId: course.id } }">
                                     Enter as Teacher
                                 </b-button>
-                                <b-badge show variant="success" class="my-2 "><h6 class="m-0 font-weight-bold">{{
+                                <b-badge show variant="secondary" class="my-2 "><h6 class="m-0 font-weight-bold">{{
                                     course.role }}</h6></b-badge>
                             </div>
 
