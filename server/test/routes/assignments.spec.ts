@@ -110,7 +110,7 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).get("/1/feedback");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
-            [{"id": 1}, {"id": 2}]
+            [{"id": 2}]
         ));
     });
 
