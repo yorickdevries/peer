@@ -62,16 +62,17 @@ const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
     const groupId = groupAssignment.group_id;
 
     // add to database
-    const result: any = await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName, date);
+    let result: any = await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName, date);
     // writing the file if no error is there
     if (!result.error) {
-        fs.writeFile(filePath, req.file.buffer, (err) => {
-            if (err) {
-                res.json({error: err});
-            }
-            console.log("The file has been saved at" + filePath);
-        });
+        // Try to write the file.
+        try {
+            fs.writeFileSync(filePath, req.file.buffer);
+        } catch (err) {
+            result = { error: err };
+        }
     }
+
     res.json(result);
 };
 
@@ -88,28 +89,6 @@ router.get("/", async (req, res) => {
  */
 router.get("/:id", async (req, res) => {
     res.json(await SubmissionsPS.executeGetSubmissionById(req.params.id));
-});
-
-/**
- * Route to delete one submission with a specific id.
- * @param id - submission id.
- */
-router.delete("/:id", async (req, res) => {
-    const result: any = await SubmissionsPS.executeDeleteSubmissionById(req.params.id);
-    // In case the query was succesful
-    if (result.file_path) {
-        const filePath = path.join(__dirname, "../files/submissions", result.file_path);
-        fs.unlink(filePath, (err) => {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log(filePath + "was deleted");
-            }
-          });
-        res.json(result);
-    } else {
-        res.json(result);
-    }
 });
 
 /**

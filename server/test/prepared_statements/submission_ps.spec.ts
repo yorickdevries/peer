@@ -43,21 +43,6 @@ describe("SubmissionPreparedStatements Test", () => {
     });
 
     /**
-     * Test delete submission by id prepared statement.
-     */
-    it("delete submission by id", async () => {
-        expect(await SubmissionPS.executeDeleteSubmissionById(2)).to.deep.equal({
-            id: 2,
-            user_netid: "henkjan",
-            group_id: 10,
-            assignment_id: 1,
-            file_path: "submission2.pdf",
-            date: new Date("2018-05-01T20:30:00Z"),
-            grade: -1
-        });
-    });
-
-    /**
      * Get all review comments.
      */
     it("get all submission comments", async () => {

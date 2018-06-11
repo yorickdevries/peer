@@ -66,16 +66,6 @@ export default class SubmissionsPS {
     }
 
     /**
-     * Executes a 'delete submission' query
-     */
-    public static executeDeleteSubmissionById(submissionId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("delete-submission",
-            'DELETE FROM "submission" WHERE "id" = $1 RETURNING *');
-        statement.values = [submissionId];
-        return Database.executeQuerySingleResult(statement);
-    }
-
-    /**
      * Executes a 'get all submission comments' query.
      * @param {number} submissionId - a review id.
      * @return {Promise<pgPromise.queryResult>} - a database promise.
