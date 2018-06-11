@@ -53,7 +53,7 @@
                                 :item-size="20"
                                 :spacing="5"
                                 inline
-                                :max-rating="7"
+                                :max-rating="pair.question.range"
                                 :show-rating="false"
                                 :read-only="peerReview.review.done"
                                 v-model="pair.answer.answer"/>
