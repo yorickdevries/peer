@@ -92,26 +92,6 @@ router.get("/:id", async (req, res) => {
 });
 
 /**
- * Route to delete one submission with a specific id.
- * @param id - submission id.
- */
-router.delete("/:id", async (req, res) => {
-    let result: any = await SubmissionsPS.executeDeleteSubmissionById(req.params.id);
-    // In case the query was succesful
-    if (result.file_path) {
-        const filePath = path.join(__dirname, "../files/submissions", result.file_path);
-        // Try to unlink the file.
-        try {
-            fs.unlinkSync(filePath);
-        } catch (err) {
-            result = { error: err };
-        }
-    }
-
-    res.json(result);
-});
-
-/**
  * Route to make a new submission.
  */
 router.post("/", uploadSubmissionFunction, addSubmissionToDatabase);
