@@ -1,6 +1,6 @@
 <template>
     <div class="site">
-        <router-view class="site-content"></router-view>
+        <router-view class="site-content d-flex flex-column"></router-view>
         <Footer></Footer>
     </div>
 </template>
