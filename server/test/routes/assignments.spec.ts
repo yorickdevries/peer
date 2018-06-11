@@ -1,22 +1,15 @@
+import "mocha";
 import chai from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
-
 chai.use(chaiHttp);
-import "mocha";
-import path from "path";
-import fs from "fs";
-
 const router: any = require("../../src/routes/assignments").default;
-// Imitates the login of Okta for testing
-import InitLogin from "./init_login";
+import MockLogin from "../test_helpers/mock_login";
+import TestData from "../test_helpers/test_data";
 
-import Database from "../../src/database";
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-
-const qfSchema = new QueryFile(path.join(__dirname, "../../database_dumps/ED3-DataBaseSchema.sql"));
-const qfData = new QueryFile(path.join(__dirname, "../../database_dumps/ED3-TestData.sql"));
+// file system imports
+import fs from "fs-extra";
+import path from "path";
 
 describe("API Assignment routes", () => {
     /**
@@ -24,10 +17,8 @@ describe("API Assignment routes", () => {
      */
     beforeEach(async () => {
         // initializes the router without user
-        InitLogin.initialize(router);
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
+        MockLogin.initialize(router);
+        await TestData.initializeDatabase();
     });
 
     /**
@@ -35,7 +26,7 @@ describe("API Assignment routes", () => {
      */
     it("Get assignments/", async () => {
         // log in as henkjan
-        InitLogin.initialize(router, "henkjan");
+        MockLogin.initialize(router, "henkjan");
         const res = await chai.request(router).get("/1");
         expect(res.status).to.equal(401);
     });
@@ -46,7 +37,7 @@ describe("API Assignment routes", () => {
     it("Import groups - good weather", async () => {
         const file = path.join(__dirname, "../../example_data/csv_test/example_export.csv");
         // log in as teacheraccount
-        InitLogin.initialize(router, "teacheraccount");
+        MockLogin.initialize(router, "teacheraccount");
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv")
             .field("groupColumn", "Education Groups");
@@ -59,7 +50,7 @@ describe("API Assignment routes", () => {
     it("Import groups - wrong extension", async () => {
         const file = path.join(__dirname, "../../example_data/csv_test/text_file.txt");
         // log in as teacheraccount
-        InitLogin.initialize(router, "teacheraccount");
+        MockLogin.initialize(router, "teacheraccount");
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "text_file.txt");
         expect(res.status).to.equal(200);
@@ -69,7 +60,7 @@ describe("API Assignment routes", () => {
     it("Import groups - file larger than 1MB", async () => {
         const file = path.join(__dirname, "../../example_data/csv_test/example_export_big.csv");
         // log in as teacheraccount
-        InitLogin.initialize(router, "teacheraccount");
+        MockLogin.initialize(router, "teacheraccount");
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv");
         expect(res.status).to.equal(200);
@@ -84,7 +75,7 @@ describe("API Assignment routes", () => {
 
     it("Import groups - no file", async () => {
         // log in as teacheraccount
-        InitLogin.initialize(router, "teacheraccount");
+        MockLogin.initialize(router, "teacheraccount");
         const res = await chai.request(router).post("/3/importgroups");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({error: "No file uploaded"}));
@@ -93,7 +84,7 @@ describe("API Assignment routes", () => {
     it("Import groups - good file + no groupcolumn", async () => {
         const file = path.join(__dirname, "../../example_data/csv_test/example_export.csv");
         // log in as teacheraccount
-        InitLogin.initialize(router, "teacheraccount");
+        MockLogin.initialize(router, "teacheraccount");
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv");
         expect(res.status).to.equal(200);
@@ -106,7 +97,7 @@ describe("API Assignment routes", () => {
      */
     it("GET assignment/id/feedback", async () => {
         // test the router
-        InitLogin.initialize(router, "henkjan");
+        MockLogin.initialize(router, "henkjan");
         const res = await chai.request(router).get("/1/feedback");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
@@ -119,7 +110,7 @@ describe("API Assignment routes", () => {
      */
     it("GET /:assignment_id/reviews1", async () => {
         // test the router
-        InitLogin.initialize(router, "henkjan");
+        MockLogin.initialize(router, "henkjan");
         const res: any = await chai.request(router).get("/1/reviews");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify([{
@@ -139,7 +130,7 @@ describe("API Assignment routes", () => {
      */
     it("GET /:assignment_id", async () => {
         // test the router
-        InitLogin.initialize(router, "paulvanderlaan");
+        MockLogin.initialize(router, "paulvanderlaan");
         const res = await chai.request(router).get("/1");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
@@ -163,7 +154,7 @@ describe("API Assignment routes", () => {
      */
     it("PUT /:assignment_id", async () => {
         // test the router
-        InitLogin.initialize(router, "paulvanderlaan");
+        MockLogin.initialize(router, "paulvanderlaan");
         const res = await chai.request(router)
             .put("/1")
             .send({
@@ -180,7 +171,7 @@ describe("API Assignment routes", () => {
      */
     it("GET /:assignment_id/submissions", async () => {
         // test the router
-        InitLogin.initialize(router, "henkjan");
+        MockLogin.initialize(router, "henkjan");
         const res = await chai.request(router).get("/1/submissions");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify([{
@@ -206,7 +197,7 @@ describe("API Assignment routes", () => {
      */
     it("GET /:assignment_id/allsubmissions", async () => {
         // test the router
-        InitLogin.initialize(router, "paulvanderlaan");
+        MockLogin.initialize(router, "paulvanderlaan");
         const res = await chai.request(router).get("/1/allsubmissions");
         expect(res.status).to.equal(401);
     });
@@ -214,7 +205,7 @@ describe("API Assignment routes", () => {
     // not in a group
     it("GET /:assignment_id/latestsubmission - user not in group", async () => {
         // test the router
-        InitLogin.initialize(router, "paulvanderlaan");
+        MockLogin.initialize(router, "paulvanderlaan");
         const res = await chai.request(router).get("/3/latestsubmission");
         expect(res.text).to.equal(JSON.stringify({error: "User is not in a group in this assignment"}));
     });
@@ -222,7 +213,7 @@ describe("API Assignment routes", () => {
     // no submission yet
     it("GET /:assignment_id/latestsubmission - no submission yet", async () => {
         // test the router
-        InitLogin.initialize(router, "paulvanderlaan");
+        MockLogin.initialize(router, "paulvanderlaan");
         const res = await chai.request(router).get("/2/latestsubmission");
         expect(res.text).to.equal(JSON.stringify({error: "No latest submission could be found"}));
     });
@@ -230,7 +221,7 @@ describe("API Assignment routes", () => {
     // latest submission
     it("GET /:assignment_id/latestsubmission", async () => {
         // test the router
-        InitLogin.initialize(router, "bplanje");
+        MockLogin.initialize(router, "bplanje");
         const res = await chai.request(router).get("/2/latestsubmission");
         expect(res.text).to.equal(JSON.stringify({
             id: 5,
@@ -249,7 +240,7 @@ describe("API Assignment routes", () => {
      */
     it("GET /:id/allreviews", async () => {
         // test the router
-        InitLogin.initialize(router, "henkjan");
+        MockLogin.initialize(router, "henkjan");
         const res = await chai.request(router).get("/1/allreviews");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
@@ -262,7 +253,7 @@ describe("API Assignment routes", () => {
      */
     it("Distribute reviews", async () => {
         // log in as teacher
-        InitLogin.initialize(router, "teacheraccount");
+        MockLogin.initialize(router, "teacheraccount");
         const res = await chai.request(router).get("/2/distributeReviews");
         console.log(res.text);
         expect(res.status).to.equal(200);
