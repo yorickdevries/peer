@@ -26,9 +26,9 @@ router.get("/:reviewId", async (req, res) => {
 
         // Get the answers (from database) to the correct question type.
         switch (question.type_question) {
-            case "mc": answer = await ReviewsPS.executeGetMCAnswer(req.params.reviewId, question.id); break;
-            case "open": answer = await ReviewsPS.executeGetOpenAnswer(req.params.reviewId, question.id); break;
-            case "range": answer = await ReviewsPS.executeGetRangeAnswer(req.params.reviewId, question.id); break;
+            case "mc": answer = await ReviewsPS.executeGetMCAnswer(+req.params.reviewId, question.id); break;
+            case "open": answer = await ReviewsPS.executeGetOpenAnswer(+req.params.reviewId, question.id); break;
+            case "range": answer = await ReviewsPS.executeGetRangeAnswer(+req.params.reviewId, question.id); break;
             default: answer = { error: "unrecognized question type: " + question.type_question }; break;
         }
 
