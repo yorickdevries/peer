@@ -35,22 +35,26 @@ router.use("*", async function(req: any, res, next) {
         // get userinfo
         const netid = userinfo.given_name;
         const email = userinfo.preferred_username;
-        // check whether user is in the database
-        const userExists: any = await UserPS.executeExistsUserById(netid);
-        // in case the user is not in the database
-        if (!userExists.exists) {
-            // Adding user
-            await UserPS.executeAddUser(netid, email);
-        } else {
-            const user: any = await UserPS.executeGetUserById(netid);
-            // in case the new email is not undefined
-            // or different from what's in the database
-            if (email !== undefined && user.email !== email) {
-                // Updating user email
-                await UserPS.executeUpdateEmailUser(netid, email);
+        try {
+            // check whether user is in the database
+            const userExists: any = await UserPS.executeExistsUserById(netid);
+            // in case the user is not in the database
+            if (!userExists.exists) {
+                // Adding user
+                await UserPS.executeAddUser(netid, email);
+            } else {
+                const user: any = await UserPS.executeGetUserById(netid);
+                // in case the new email is not undefined
+                // or different from what's in the database
+                if (email !== undefined && user.email !== email) {
+                    // Updating user email
+                    await UserPS.executeUpdateEmailUser(netid, email);
+                }
             }
+            next();
+        } catch (err) {
+            next(err);
         }
-        next();
     }
 });
 
