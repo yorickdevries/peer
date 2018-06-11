@@ -16,9 +16,17 @@ describe("API Assignment routes", () => {
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-        // initializes the router without user
+        // initializes the router
         MockLogin.initialize(router);
         await TestData.initializeDatabase();
+        await TestData.initializeAssignmentFiles();
+    });
+
+    /**
+     * Remove file folders used for testing
+     */
+    afterEach(async () => {
+        await TestData.removeAssignmentFiles();
     });
 
     /**

@@ -90,23 +90,16 @@ const updateAssignment = async function(req: any, res: any, next: any) {
     // Remove the old file and add the new file if there was not error,
     // if a file is uploaded (ie. name of the file is not undefined).
     if (!result.error && req.file.originalname) {
-        // Remove old file.
-        fs.unlink(oldFilePath, (err: any) => {
-            if (err) {
-                result = {error: err};
-            } else {
-                console.log("The file has been deleted: " + oldFilePath);
-            }
-        });
+        // Try to remove the old file and write the new file.
+        try {
+            fs.unlinkSync(oldFilePath);
+            console.log("The file has been deleted: " + oldFilePath);
 
-        // Add new file.
-        fs.writeFile(newFilePath, req.file.buffer, (err: any) => {
-            if (err) {
-                result = {error: err};
-            } else {
-                console.log("The file has been saved at " + newFilePath);
-            }
-        });
+            fs.writeFileSync(newFilePath, req.file.buffer);
+            console.log("The file has been saved at " + newFilePath);
+        } catch (err) {
+            result = { error: err };
+        }
     }
     res.json(result);
 };
@@ -116,7 +109,7 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
     const fileName = Date.now() + "-" + req.file.originalname;
     const filePath = path.join(fileFolder, fileName);
     // add to database
-    const result: any = await AssignmentPS.executeAddAssignment(
+    let result: any = await AssignmentPS.executeAddAssignment(
         req.body.title,
         req.body.description,
         req.body.due_date,
@@ -130,12 +123,13 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
     await RubricPS.executeCreateRubric(result.id);
     // writing the file if no error is there
     if (!result.error) {
-        fs.writeFile(filePath, req.file.buffer, (err: any) => {
-            if (err) {
-                res.json({error: err});
-            }
+        // Try to write the file.
+        try {
+            fs.writeFileSync(filePath, req.file.buffer);
             console.log("The file has been saved at" + filePath);
-        });
+        } catch (err) {
+            result = { error: err };
+        }
     }
     res.json(result);
 };
