@@ -90,8 +90,8 @@ export default class GroupParser {
         // In case there is no student entry yet in the database, make one
         if (!res.exists) {
             // The email is not known while creating this student entry
+            // Creating user
             const newUser = await UserPS.executeAddUser(netId, undefined);
-            console.log("creating user: " + JSON.stringify(newUser));
         }
         return;
     }
@@ -109,8 +109,8 @@ export default class GroupParser {
         const res: any = await CoursesPS.executeExistsEnrolledByCourseIdUserById(courseId, netId);
         // In case there is no student entry yet in the database, make one
         if (!res.exists) {
+            // enrolling user
             const newUser = await CoursesPS.executeEnrollInCourseId(courseId, netId, "student");
-            console.log("enrolled user: " + JSON.stringify(newUser) + " in course " + courseId);
         }
         return;
     }

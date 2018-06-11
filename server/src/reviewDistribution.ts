@@ -20,14 +20,13 @@ export default class ReviewDistribution {
         if (!rubricExists.exists) {
             return {error: "No rubric is present for this assignment"};
         }
-        console.log("Distribution of reviews for assignment " + assignmentId);
+        // Distribution of reviews for assignment
         try {
             let reviews = undefined;
             // Calculate a solution until a valid solution is found or an error is thrown
             while (reviews == undefined) {
-                console.log("Assigning reviews:");
+                // Assigning reviews
                 reviews = await this.assignSubmissionstoUsers(assignmentId);
-                console.log("Reviews: " + JSON.stringify(reviews));
             }
             // Add the review assignments to the database
             for (const review of reviews) {
@@ -51,7 +50,6 @@ export default class ReviewDistribution {
     public static async assignSubmissionstoUsers(assignmentId: number) {
         const assignment: any = await AssignmentPS.executeGetAssignmentById(assignmentId);
         const reviewsPerUser = assignment.reviews_per_user;
-        console.log("reviews per User: " + reviewsPerUser);
         // Get the latest versions of all submissions per group
         const allSubmissions: any = await SubmissionsPS.executeGetLatestSubmissionsByAssignmentId(assignmentId);
         // If there are less submissions than required
