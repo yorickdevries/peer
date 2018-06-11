@@ -222,6 +222,8 @@ describe("API Assignment routes", () => {
         expect(res.status).to.equal(200);
         expect(result.title).to.equal("Example title");
         expect(result.description).to.equal("Example description");
+        const filename = result.filename;
+        expect(filename.substr(filename.length - 15)).to.equal("assignment2.pdf");
     });
 
     /**
@@ -263,6 +265,8 @@ describe("API Assignment routes", () => {
         expect(res.status).to.equal(200);
         expect(result.title).to.equal("Example title");
         expect(result.description).to.equal("Example description");
+        const filename = result.filename;
+        expect(filename.substr(filename.length - 15)).to.equal("assignment1.pdf");
     });
 
     /**
