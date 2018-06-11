@@ -1,6 +1,9 @@
 <template>
     <div>
-        <b-container fluid class="">
+
+        <b-card v-if="peerReviews.length === 0">No feedback available.</b-card>
+
+        <b-container v-else fluid>
             <b-row>
 
                 <!--Side-bar for questions -->
