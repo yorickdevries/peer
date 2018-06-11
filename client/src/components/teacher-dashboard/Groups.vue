@@ -60,6 +60,7 @@
 </template>
 
 <script>
+    import api from '../../api'
     import ImportGroupsWizard from "./ImportGroupsWizard";
 
     export default {
@@ -70,11 +71,23 @@
             return {
                 groups: [],
                 currentPage: 1,
+                fields: [
+                    {key: "id", label: "Group ID", sortable: true},
+                    {key: "group_name", label: "Group name", sortable: true}
+                ],
                 filter: null,
                 perPage: 10
             }
         },
-        props: ['assignmentId']
+        props: ['assignmentId'],
+        async created() {
+            try {
+                let res = await api.getAssignmentGroups(this.assignmentId)
+                this.groups = res.data
+            } catch (e) {
+                console.log(e)
+            }
+        }
     }
 </script>
 
