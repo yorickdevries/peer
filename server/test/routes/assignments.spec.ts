@@ -255,7 +255,6 @@ describe("API Assignment routes", () => {
         // log in as teacher
         MockLogin.initialize(router, "teacheraccount");
         const res = await chai.request(router).get("/2/distributeReviews");
-        console.log(res.text);
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).length).to.equal(3);
     });
