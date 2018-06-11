@@ -225,6 +225,47 @@ describe("API Assignment routes", () => {
     });
 
     /**
+     * Test whether an assignment is properly updated.
+     */
+    it("PUT /:assignment_id without file", async () => {
+        const file = path.join(__dirname, "../../example_data/assignments/assignment1.pdf");
+
+        // login as bplanje (teacher)
+        MockLogin.initialize(router, "bplanje");
+
+        // Make sure that the assignment is in place.
+        const assignment: any = await chai.request(router).post("/")
+            .attach("assignmentFile", fs.readFileSync(file), "assignment1.pdf")
+            .field("title", "Different title")
+            .field("description", "Different description")
+            .field("course_id", 1)
+            .field("due_date", "2018-05-01T20:30:00.000Z")
+            .field("publish_date", "2018-06-01T20:30:00.000Z")
+            .field("reviews_per_user", 2)
+            .field("review_due_date", "2018-06-01T20:30:00.000Z")
+            .field("review_publish_date", "2018-07-01T20:30:00.000Z");
+
+        // Test the updating of the assignment just added.
+        const res = await chai.request(router)
+            .put("/" + JSON.parse(assignment.text).id)
+            .field("title", "Example title")
+            .field("description", "Example description")
+            .field("course_id", 1)
+            .field("due_date", "2018-05-01T20:30:00.000Z")
+            .field("publish_date", "2018-06-01T20:30:00.000Z")
+            .field("reviews_per_user", 2)
+            .field("review_due_date", "2018-06-01T20:30:00.000Z")
+            .field("review_publish_date", "2018-07-01T20:30:00.000Z");
+
+        // assertions
+        const result = JSON.parse(res.text);
+        console.log(result);
+        expect(res.status).to.equal(200);
+        expect(result.title).to.equal("Example title");
+        expect(result.description).to.equal("Example description");
+    });
+
+    /**
      * Test to get all the submissions of a certain assignment
      */
     it("GET /:assignment_id/submissions", async () => {

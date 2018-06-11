@@ -45,10 +45,6 @@ const uploadAssignmentFunction = function(req: any, res: any, next: any) {
         if (err) {
             res.json({ error: err });
         }
-        // Error in case of no file
-        else if (req.file == undefined) {
-            res.json({ error: "No file uploaded" });
-        }
         // Error in case of wrong file type
         else if (req.fileValidationError) {
             res.json({ error: req.fileValidationError });
@@ -69,10 +65,9 @@ const uploadAssignmentFunction = function(req: any, res: any, next: any) {
  */
 const updateAssignment = async function(req: any, res: any, next: any) {
     const oldFilename: string = (await AssignmentPS.executeGetAssignmentById(req.params.assignment_id)).filename;
-    const oldFilePath: string = path.join(fileFolder, oldFilename);
 
-    const newFilename: string = Date.now() + "-" + req.file.originalname;
-    const newFilePath: string = path.join(fileFolder, newFilename);
+    // Determine whether a file is uploaded and set the filename accordingly.
+    const updatedFileName: string = (req.file) ? Date.now() + "-" + req.file.originalname : oldFilename;
 
     // Update the assignment in the database.
     let result: any = await AssignmentPS.executeUpdateAssignmentById(
@@ -83,13 +78,18 @@ const updateAssignment = async function(req: any, res: any, next: any) {
         req.body.due_date,
         req.body.publish_date,
         req.body.reviews_per_user,
-        newFilename,
+        updatedFileName,
         req.body.review_due_date,
         req.body.review_publish_date);
 
     // Remove the old file and add the new file if there was not error,
     // if a file is uploaded (ie. name of the file is not undefined).
-    if (!result.error && req.file.originalname) {
+    if (!result.error && req.file) {
+        // Assemble the file path. Updated file name is the new file name.
+        // It can never be the old since req.file would be undefined.
+        const newFilePath: string = path.join(fileFolder, updatedFileName);
+        const oldFilePath: string = path.join(fileFolder, oldFilename);
+
         // Try to remove the old file and write the new file.
         try {
             fs.unlinkSync(oldFilePath);
@@ -104,6 +104,12 @@ const updateAssignment = async function(req: any, res: any, next: any) {
 
 // Function which adds the assignment to the database.
 const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
+    // Error in case of no file
+    if (req.file == undefined) {
+        res.json({ error: "No file uploaded" });
+        return;
+    }
+
     const fileName = Date.now() + "-" + req.file.originalname;
     const filePath = path.join(fileFolder, fileName);
     // add to database
