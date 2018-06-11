@@ -182,18 +182,14 @@ router.route("/:id/latestsubmission")
     const netId = req.userinfo.given_name;
     const assignmentId = req.params.id;
     // get the groupId of this user for this assignment
-    const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
-    const groupId = groupAssignment.group_id;
-    if (groupId == undefined) {
-        res.json({error: "User is not in a group in this assignment"});
-    } else {
-        const result: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
-        if (result.error) {
-            res.json({error: "No latest submission could be found"});
-        } else {
+    try {
+        const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
+        const groupId = groupAssignment.group_id;
         // get the latest submission
-            res.json(result);
-        }
+        const result: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
+        res.json(result);
+    } catch {
+        res.json({error: "No latest submission could be found"});
     }
 });
 

@@ -79,26 +79,22 @@ router.put("/:courseId/setRole", async (req: any, res) => {
         res.sendStatus(400);
         return;
     }
-
-
     // Fetch enrollments of the user to set the role from.
-    const enrolled: any = await CoursesPS.executeCountUserByCourseId(req.params.courseId, req.body.netid);
+    const enrolled: any = await CoursesPS.executeExistsEnrolledByCourseIdUserById(req.params.courseId, req.body.netid);
 
     // Check if the student is enrolled in the course.
-    const isEnrolled: boolean = (enrolled.count > 0);
+    const isEnrolled: boolean = enrolled.exists;
 
     // Depending if the student is enrolled, update the role of the student.
-    let enroll: any;
-    if (!isEnrolled) {
-        enroll =  await CoursesPS.executeEnrollInCourseId(req.params.courseId, req.body.netid, req.body.role);
-    } else {
-        enroll = await CoursesPS.executeSetRole(req.params.courseId, req.body.netid, req.body.role);
-    }
-
-    // Send the correct json response.
-    if (enroll.course_id != undefined) {
+    try {
+        let enroll: any;
+        if (!isEnrolled) {
+            enroll =  await CoursesPS.executeEnrollInCourseId(req.params.courseId, req.body.netid, req.body.role);
+        } else {
+            enroll = await CoursesPS.executeSetRole(req.params.courseId, req.body.netid, req.body.role);
+        }
         res.json({ courseId: enroll.course_id, role: enroll.role });
-    } else {
+    } catch {
         res.sendStatus(400);
     }
 });

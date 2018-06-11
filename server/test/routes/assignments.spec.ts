@@ -207,7 +207,7 @@ describe("API Assignment routes", () => {
         // test the router
         MockLogin.initialize(router, "paulvanderlaan");
         const res = await chai.request(router).get("/3/latestsubmission");
-        expect(res.text).to.equal(JSON.stringify({error: "User is not in a group in this assignment"}));
+        expect(res.text).to.equal(JSON.stringify({error: "No latest submission could be found"}));
     });
 
     // no submission yet

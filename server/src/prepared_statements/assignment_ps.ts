@@ -19,6 +19,21 @@ export default class AssignmentPS {
     }
 
     /**
+     * Checks whether an assignment exists in the database
+     *
+     * @static
+     * @param {number} assignmentId
+     * @returns {*}
+     * @memberof AssignmentPS
+     */
+    public static async executeExistsAssignmentById(assignmentId: number) {
+        const statement = new PreparedStatement("exists-assignment-by-id",
+        'SELECT EXISTS(SELECT * FROM "assignmentlist" WHERE "id" = $1)');
+        statement.values = [assignmentId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Executes create review for a specific assignment and user
      * @param {string} netId - net id
      * @param {number} submissionId - submission id
@@ -63,18 +78,6 @@ export default class AssignmentPS {
     public static executeGetAssignmentById(assignmentId: number): any {
         const statement = new PreparedStatement("get-assignment-by-id",
             'SELECT * FROM "assignmentlist" WHERE "id" = $1');
-        statement.values = [assignmentId];
-        return Database.executeQuerySingleResult(statement);
-    }
-
-    /**
-     * Executes assignment Id
-     * @param {number} assignmentId - assignmentId
-     * @returns {Promise<pgPromise.queryResult>}
-     */
-    public static executeCountAssignmentById(assignmentId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("count-assignment-by-id",
-            'SELECT COUNT(1) FROM "assignmentlist" WHERE "id" = $1');
         statement.values = [assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -178,6 +181,22 @@ export default class AssignmentPS {
     public static executeGetGroupOfNetIdByAssignmentId(netId: string, assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-all-groups-per-assignment",
         "SELECT a.assignment_id, a.group_id FROM assignmentgroup a JOIN groupusers g ON a.group_id = g.group_groupid WHERE g.user_netid = $1 AND a.assignment_id = $2");
+        statement.values = [netId, assignmentId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Checks whether this netId already has a group for this assignment
+     *
+     * @static
+     * @param {string} netId
+     * @param {number} assignmentId
+     * @returns {Promise<pgPromise.queryResult>}
+     * @memberof AssignmentPS
+     */
+    public static executeExistsGroupOfNetIdByAssignmentId(netId: string, assignmentId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("exists-group-netid-assignment-id",
+        "SELECT EXISTS(SELECT a.assignment_id, a.group_id FROM assignmentgroup a JOIN groupusers g ON a.group_id = g.group_groupid WHERE g.user_netid = $1 AND a.assignment_id = $2)");
         statement.values = [netId, assignmentId];
         return Database.executeQuerySingleResult(statement);
     }

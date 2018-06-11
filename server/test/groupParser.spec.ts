@@ -126,7 +126,7 @@ describe("GroupParser tests", () => {
         const groupColumn = "Education Groups";
         const assignmentId = 1;
         const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
-        expect(result).to.deep.equal({ error: "paulvanderlaan is already in group: 10" });
+        expect(result).to.deep.equal({ error: "paulvanderlaan is already in a group" });
     });
 
 });

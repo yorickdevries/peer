@@ -95,14 +95,17 @@ export default class CoursesPS {
     }
 
     /**
-     * Executes counte ruser by course id, how many users in a certain course
-     * @param {number} courseId - course_Id
-     * @param {string} netId - net_id
+     * Checks whether an user exists in a course
+     *
+     * @static
+     * @param {number} courseId
+     * @param {string} netId
      * @returns {Promise<pgPromise.queryResult>}
+     * @memberof CoursesPS
      */
-    public static executeCountUserByCourseId(courseId: number, netId: string): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("count-user-by-course-id",
-            'SELECT COUNT(1) FROM enroll WHERE "course_id" = $1 AND "user_netid" = $2');
+    public static async executeExistsEnrolledByCourseIdUserById(courseId: number, netId: string): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("exists-enrolled-user-by-id",
+        'SELECT EXISTS(SELECT * FROM enroll WHERE "course_id" = $1 AND "user_netid" = $2)');
         statement.values = [courseId, netId];
         return Database.executeQuerySingleResult(statement);
     }

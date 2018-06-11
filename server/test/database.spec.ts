@@ -1,5 +1,10 @@
 import "mocha";
+import chai from "chai";
 import { expect } from "chai";
+import chaiAsPromised from "chai-as-promised";
+
+chai.use(chaiAsPromised);
+
 import TestData from "./test_helpers/test_data";
 
 import Database from "../src/database";
@@ -70,15 +75,12 @@ describe("Database Test", () => {
   it("database error query single result", async () => {
     const statement = new PreparedStatement("get-all-users2",
     "SELECT * FROM userlist");
-    const result = await Database.executeQuerySingleResult(statement);
-    expect(result.error).to.equal("There was a problem executing the information to the database.");
+    expect(Database.executeQuerySingleResult(statement)).to.eventually.be.rejectedWith(Error);
   });
 
   it("database error query any result", async () => {
     const statement = new PreparedStatement("invalid-query",
     "THIS IS NOT A VALID QUERY");
-    const result = await Database.executeQuery(statement);
-    console.log(result);
-    expect(result.error).to.equal("There was a problem executing the information to the database.");
+    expect(Database.executeQuery(statement)).to.eventually.be.rejectedWith(Error);
   });
 });
