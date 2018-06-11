@@ -47,6 +47,22 @@
                          :current-page="currentPage"
                          :per-page="Number(perPage)"
                          :filter="filter">
+
+                    <template slot="actions" slot-scope="row">
+                        <!-- we use @click.stop here to prevent emitting of a 'row-clicked' event  -->
+                        <b-button size="sm" @click.stop="showDetails(row)" class="mr-2">
+                            {{ row.detailsShowing ? 'Hide' : 'Show'}} Details
+                        </b-button>
+                    </template>
+                    <template slot="row-details" slot-scope="row">
+                        <b-card>
+                            <b-row class="mb-2">
+                                <b-col sm="3" class="text-sm"><b>Group members</b>
+                                <p class="m-0" v-for="member in row.item.members">- {{ member.user_netid }}</p>
+                                </b-col>
+                            </b-row>
+                        </b-card>
+                    </template>
                 </b-table>
 
                 <!--Pagination-->
@@ -73,7 +89,8 @@
                 currentPage: 1,
                 fields: [
                     {key: "id", label: "Group ID", sortable: true},
-                    {key: "group_name", label: "Group name", sortable: true}
+                    {key: "group_name", label: "Group name", sortable: true},
+                    {key: 'actions', label: 'Actions'},
                 ],
                 filter: null,
                 perPage: 10
@@ -86,6 +103,13 @@
                 this.groups = res.data
             } catch (e) {
                 console.log(e)
+            }
+        },
+        methods: {
+            async showDetails(row) {
+                row.toggleDetails()
+                let res = await api.getUsersGroupById(row.item.id)
+                this.$set(row.item, 'members', res.data)
             }
         }
     }
