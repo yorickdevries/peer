@@ -16,7 +16,7 @@ export default class ReviewDistribution {
      */
     public static async distributeReviews(assignmentId: number) {
         // Check for a rubric entry
-        const rubricExists: any = await RubricPS.executeExistsRubricById(assignmentId);
+        const rubricExists: any = await RubricPS.executeExistsRubricByAssignmentId(assignmentId);
         if (!rubricExists.exists) {
             return {error: "No rubric is present for this assignment"};
         }

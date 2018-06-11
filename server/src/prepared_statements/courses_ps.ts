@@ -103,7 +103,7 @@ export default class CoursesPS {
      * @returns {Promise<pgPromise.queryResult>}
      * @memberof CoursesPS
      */
-    public static async executeExistsEnrolledByCourseIdUserById(courseId: number, netId: string): Promise<pgPromise.queryResult> {
+    public static executeExistsEnrolledByCourseIdUserById(courseId: number, netId: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("exists-enrolled-user-by-id",
         'SELECT EXISTS(SELECT * FROM enroll WHERE "course_id" = $1 AND "user_netid" = $2)');
         statement.values = [courseId, netId];

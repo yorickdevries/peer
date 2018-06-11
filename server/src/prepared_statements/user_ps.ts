@@ -13,7 +13,7 @@ export default class UserPS {
      * @param {string} netId - an user id.
      * @return {any} a query result.
      */
-    public static async executeGetUserById(netId: string): Promise<pgPromise.queryResult> {
+    public static executeGetUserById(netId: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-user-by-id",
         'SELECT * FROM "userlist" WHERE "netid" = $1');
         statement.values = [netId];
@@ -25,7 +25,7 @@ export default class UserPS {
      * @param {string} netId - an user id.
      * @return {any} a query result.
      */
-    public static async executeExistsUserById(netId: string): Promise<pgPromise.queryResult> {
+    public static executeExistsUserById(netId: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("exists-user-by-id",
         'SELECT EXISTS(SELECT * FROM "userlist" WHERE "netid" = $1)');
         statement.values = [netId];

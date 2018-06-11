@@ -26,7 +26,7 @@ export default class AssignmentPS {
      * @returns {*}
      * @memberof AssignmentPS
      */
-    public static async executeExistsAssignmentById(assignmentId: number) {
+    public static executeExistsAssignmentById(assignmentId: number) {
         const statement = new PreparedStatement("exists-assignment-by-id",
         'SELECT EXISTS(SELECT * FROM "assignmentlist" WHERE "id" = $1)');
         statement.values = [assignmentId];

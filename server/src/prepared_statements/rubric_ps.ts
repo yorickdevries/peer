@@ -19,12 +19,12 @@ export default class RubricPS {
     }
 
     /**
-     * check whether there already is a rubric with a certain id
+     * check whether there already is a rubric with a certain assignment id
      * @param {number} assignmentId - assignment_id
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeExistsRubricById(assignmentId: number): Promise<pgPromise.queryResult> {
-        const statement =  new PreparedStatement("exists-rubric-by-id",
+    public static executeExistsRubricByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
+        const statement =  new PreparedStatement("exists-rubric-by-assignmentid",
         "SELECT EXISTS(SELECT * FROM rubric WHERE assignment_id=$1)");
         statement.values = [assignmentId];
         return Database.executeQuerySingleResult(statement);
