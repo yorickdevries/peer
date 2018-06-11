@@ -210,8 +210,19 @@ export default {
             this.assignment.review_publish_date = this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z"
             this.assignment.review_due_date = this.assignment.review_due_day + "T" + this.assignment.review_due_time + ":00.000Z"
 
+            // Compose formdata object to send information to back-end
+            let formData = new FormData()
+            formData.append("title", this.assignment.title)
+            formData.append("description", this.assignment.description)
+            formData.append("course_id", this.assignment.course_id)
+            formData.append("publish_date", this.assignment.publish_day + "T" + this.assignment.publish_time + ":00.000Z")
+            formData.append("due_date", this.assignment.due_day + "T" + this.assignment.due_time + ":00.000Z")
+            formData.append("review_publish_date", this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z")
+            formData.append("review_due_date", this.assignment.review_due_day + "T" + this.assignment.review_due_time + ":00.000Z")
+            formData.append("assignmentFile", this.file)
+            formData.append("reviews_per_user", this.assignment.reviews_per_user)
             // Update assignment in database
-            let res = await api.saveAssignment(this.assignment.id, this.assignment)
+            let res = await api.saveAssignment(this.assignment.id, formData)
             console.log(res)
 
             // Redirect to updated assignment
