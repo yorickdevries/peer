@@ -30,7 +30,14 @@
                             </b-input-group>
                         </b-form-group>
                     </b-col>
+                    <b-col cols="6">
+                        <b-form-group horizontal label="Per page">
+                            <b-form-input type="number" v-model="perPage"></b-form-input>
+                        </b-form-group>
+                    </b-col>
                 </b-row>
+
+
             </b-col>
         </b-row>
 
@@ -46,7 +53,8 @@
         },
         data() {
             return {
-                filter: null
+                filter: null,
+                perPage: 10
             }
         },
         props: ['assignmentId']
