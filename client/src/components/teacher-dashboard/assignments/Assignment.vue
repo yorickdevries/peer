@@ -21,6 +21,10 @@
                         <b-tabs card>
                             <b-tab title="Details" active>
                                 <b-list-group flush>
+                                    <b-list-group-item>
+                                        <b-button class="w-100" @click="shuffleGroups()">Shuffle Groups</b-button>
+                                    </b-list-group-item>
+
                                     <b-list-group-item class="flex-column align-items-start">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1">Description</h5>
@@ -94,8 +98,10 @@
 import api from '../../../api'
 import RubricWizard from '../rubric/RubricWizard'
 import Groups from '../Groups'
+import notifications from '../../../mixins/notifications'
 
 export default {
+    mixins: [notifications],
     components: {
         RubricWizard,
         Groups
@@ -136,6 +142,15 @@ export default {
             // Formats the date to a readable format for the UI.
             if (!(date instanceof Date)) date = new Date(date)
             return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
+        },
+        async shuffleGroups() {
+            let res;
+            try {
+                res = await api.shuffleGroups(this.$route.params.assignmentId)
+                this.showSuccessMessage({message: "Groups have successfully been shuffled and assigned submissions."})
+            } catch (e) {
+                this.showErrorMessage({message: res.data.error})
+            }
         }
     }
 }
