@@ -48,7 +48,10 @@
                          :per-page="Number(perPage)"
                          :filter="filter">
                 </b-table>
-                
+
+                <!--Pagination-->
+                <b-pagination :total-rows="this.groups.length" :per-page="Number(perPage)" v-model="currentPage">
+                </b-pagination>
 
             </b-col>
         </b-row>
@@ -65,6 +68,7 @@
         },
         data() {
             return {
+                groups: [],
                 filter: null,
                 perPage: 10
             }
