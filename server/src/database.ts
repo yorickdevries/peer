@@ -98,7 +98,6 @@ export default class Database {
       } catch (err) {
         console.log(err);
         return {
-            statement: statement,
             error: "There was a problem executing the information to the database."
         };
       }
@@ -117,7 +116,6 @@ export default class Database {
         } catch (err) {
           console.log("Error " + err + "\nStatement: " + statement);
             return {
-                statement: statement,
                 error: "There was a problem executing the information to the database."
             };
         }
