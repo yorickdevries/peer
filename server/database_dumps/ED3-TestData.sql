@@ -63,7 +63,8 @@ INSERT INTO public.groupusers(
 INSERT INTO public.assignmentlist(
 	title, description, course_id, reviews_per_user, due_date, publish_date, filename, review_due_date, review_publish_date)
 	VALUES ('Assignment 1', 'Example assignment number one', 1, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment1.pdf', '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z'),
-	('Assignment 2', 'Example assignment number two', 1, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z');
+	('Assignment 2', 'Example assignment number two', 1, 1, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z'),
+	('Assignment 3', 'Example assignment number three', 1, 1, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment3.pdf', '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z');
 
 INSERT INTO public.rubric(
 	assignment_id)
@@ -99,8 +100,7 @@ INSERT INTO public.mcoption(
 
 INSERT INTO public.enroll(
 	course_id, user_netid, role)
-	VALUES (1, 'paulvanderlaan', 'student'),
-	(1, 'bplanje', 'teacher');
+	VALUES (1, 'paulvanderlaan', 'student');
 
 INSERT INTO public.assignmentgroup(
 	assignment_id, group_id)
@@ -120,7 +120,7 @@ INSERT INTO public.assignmentgroup(
 
 INSERT INTO public.submission(
 	user_netid, group_id, assignment_id, file_path, date)
-	VALUES ('paulvanderlaan', 10, 1, 'submission1.pdf', '2018-05-01T20:30:00Z');
+	VALUES ('paulvanderlaan', 10, 1, 'submission1.pdf', '2018-05-01T20:30:01Z');
 
 INSERT INTO public.submission(
 	user_netid, group_id, assignment_id, file_path, date)
@@ -128,19 +128,15 @@ INSERT INTO public.submission(
 
 INSERT INTO public.submission(
 	user_netid, group_id, assignment_id, file_path, date)
-	VALUES ('henkjan', 20, 2, 'submission1.pdf','2018-05-01T20:30:00Z');
+	VALUES ('henkjan', 20, 2, 'submission1.pdf','2018-05-01T20:30:30Z');
 
 INSERT INTO public.submission(
 	user_netid, group_id, assignment_id, file_path, date)
-	VALUES ('yorickdevries', 21, 2, 'submission2_old.pdf', '2018-05-01T20:30:00Z');
+	VALUES ('yorickdevries', 21, 2, 'submission2_old.pdf', '2018-05-01T20:30:32Z');
 
 INSERT INTO public.submission(
 	user_netid, group_id, assignment_id, file_path, date)
-	VALUES ('yorickdevries', 21, 2, 'submission2.pdf', '2018-05-01T22:30:00Z');
-
-INSERT INTO public.submission(
-	user_netid, group_id, assignment_id, file_path, date)
-	VALUES ('paulvanderlaan', 22, 2, 'submission2.pdf', '2018-05-01T20:30:00Z');
+	VALUES ('yorickdevries', 21, 2, 'submission2.pdf', '2018-05-01T22:30:04Z');
 
 INSERT INTO public.review(
 	user_netid, submission_id, rubric_assignment_id, done)

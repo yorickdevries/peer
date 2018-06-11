@@ -4,9 +4,11 @@ import fs from "fs";
 import multer from "multer";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 import bodyParser from "body-parser";
+import AssignmentPS from "../prepared_statements/assignment_ps";
 
 // Router
 import express from "express";
+
 const router = express();
 router.use(bodyParser.json());
 
@@ -54,8 +56,10 @@ const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
     const filePath = path.join(fileFolder, fileName);
     const netId = req.userinfo.given_name;
     const assignmentId = req.body.assignmentId;
-    const groupId = req.body.groupId;
     const date = new Date();
+    // get the groupId of this user for this assignment
+    const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
+    const groupId = groupAssignment.group_id;
 
     // add to database
     const result: any = await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName, date);

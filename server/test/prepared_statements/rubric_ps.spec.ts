@@ -1,21 +1,15 @@
-import RubricPS from "../../src/prepared_statements/rubric_ps";
-import { expect } from "chai";
 import "mocha";
-import Database from "../../src/database";
+import { expect } from "chai";
+import TestData from "../test_helpers/test_data";
 
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
-const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
+import RubricPS from "../../src/prepared_statements/rubric_ps";
 
 describe("RubricPreparedStatements Test", () => {
     /**
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
+        await TestData.initializeDatabase();
     });
 
 

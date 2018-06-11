@@ -46,7 +46,7 @@
         },
         methods: {
             async fetchMetaReviews() {
-                let {data} = await api.getAssignmentReviews(this.$route.params.assignmentId)
+                let {data} = await api.getAssignmentReviewsStudent(this.$route.params.assignmentId)
                 this.reviews = data
             }
         }

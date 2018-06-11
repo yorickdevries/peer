@@ -86,28 +86,13 @@ export default class AssignmentPS {
      * @param dueDate - a due date.
      * @param publishDate - a publish date.
      * @param courseId - a course id.
-     * @param reviewsPerUser
      * @param filename - filename
-     * @param reviewDueDate
-     * @param reviewPublishDate
      * @return {any} a query result.
      */
     public static executeAddAssignment(title: string, description: string, dueDate: Date, publishDate: Date, courseId: number, reviewsPerUser: number, filename: string, reviewDueDate: Date, reviewPublishDate: Date): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("addAssignment",
         'INSERT INTO "assignmentlist" ("title", "description", "due_date", "publish_date", "course_id", "reviews_per_user", "filename", "review_due_date", "review_publish_date") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *');
         statement.values = [title, description, dueDate, publishDate, courseId, reviewsPerUser, filename, reviewDueDate, reviewPublishDate];
-        return Database.executeQuerySingleResult(statement);
-    }
-
-    /**
-     * Executes a 'delete assignment by id' query.
-     * @param {number} assignmentId - an assignment id.
-     * @return {Promise<pgPromise.queryResult>} - query result containing all fields of the deleted assignment.
-     */
-    public static executeDeleteAssignment(assignmentId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("removeAssignment",
-            "DELETE FROM assignmentlist WHERE id = $1 RETURNING *");
-        statement.values = [assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -158,13 +143,14 @@ export default class AssignmentPS {
     }
 
     /**
-     * Executes group assignment Id
+     * Gets all groups for a certain assignment
+     *
      * @param {number} id - id
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeGetGroupsByAssignmentId (id: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-all-groups-per-assignment",
-        'SELECT * FROM "assignmentgroup" WHERE "assignment_id" = ($1)');
+        "SELECT g.id, g.group_name FROM assignmentgroup a JOIN grouplist g ON a.group_id = g.id WHERE assignment_id = $1");
         statement.values = [id];
         return Database.executeQuery(statement);
     }
@@ -179,5 +165,21 @@ export default class AssignmentPS {
             "SELECT review.user_netid as reviewer, submission.user_netid as submitter FROM review JOIN assignmentlist ON assignmentlist.id = review.rubric_assignment_id  JOIN submission ON submission.id = review.id WHERE assignmentlist.id = $1 AND review.done = true");
         statement.values = [assignmentId];
         return Database.executeQuery(statement);
+    }
+
+    /**
+     * Gets the group of a user for a specific assignment
+     *
+     * @static
+     * @param {string} netId
+     * @param {number} assignmentId
+     * @returns {Promise<pgPromise.queryResult>}
+     * @memberof AssignmentPS
+     */
+    public static executeGetGroupOfNetIdByAssignmentId(netId: string, assignmentId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-group-of-netid-by-assignmentid",
+        "SELECT a.assignment_id, a.group_id FROM assignmentgroup a JOIN groupusers g ON a.group_id = g.group_groupid WHERE g.user_netid = $1 AND a.assignment_id = $2");
+        statement.values = [netId, assignmentId];
+        return Database.executeQuerySingleResult(statement);
     }
 }

@@ -4,13 +4,17 @@ import fs from "fs-extra";
 import index from "../security/index";
 import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
+import UserPS from "../prepared_statements/user_ps";
+import GroupPS from "../prepared_statements/group_ps";
 import ReviewPS from "../prepared_statements/review_ps";
+import RubricPS from "../prepared_statements/rubric_ps";
 import GroupParser from "../groupParser";
 import reviewDistribution from "../reviewDistribution";
 import bodyParser from "body-parser";
 
 // Router
 import express from "express";
+import SubmissionsPS from "../prepared_statements/submissions_ps";
 
 const router = express();
 const fileFolder = path.join(__dirname, "../files/assignments");
@@ -107,9 +111,8 @@ const updateAssignment = async function(req: any, res: any, next: any) {
 const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
     const fileName = Date.now() + "-" + req.file.originalname;
     const filePath = path.join(fileFolder, fileName);
-
     // add to database
-    let result: any = await AssignmentPS.executeAddAssignment(
+    const result: any = await AssignmentPS.executeAddAssignment(
         req.body.title,
         req.body.description,
         req.body.due_date,
@@ -119,14 +122,15 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
         fileName,
         req.body.review_due_date,
         req.body.review_publish_date);
+    // Create rubric
+    await RubricPS.executeCreateRubric(result.id);
     // writing the file if no error is there
     if (!result.error) {
         fs.writeFile(filePath, req.file.buffer, (err) => {
             if (err) {
-                result = {error: err};
-            } else {
-                console.log("The file has been saved at " + filePath);
+                res.json({error: err});
             }
+            console.log("The file has been saved at" + filePath);
         });
     }
     res.json(result);
@@ -199,6 +203,29 @@ router.route("/:assignment_id/submissions")
     });
 
 /**
+ * Route to get the latest submission of a certain assignment of your specific group
+ */
+router.route("/:id/latestsubmission")
+.get(async (req: any, res) => {
+    const netId = req.userinfo.given_name;
+    const assignmentId = req.params.id;
+    // get the groupId of this user for this assignment
+    const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
+    const groupId = groupAssignment.group_id;
+    if (groupId == undefined) {
+        res.json({error: "User is not in a group in this assignment"});
+    } else {
+        const result: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
+        if (result.error) {
+            res.json({error: "No latest submission could be found"});
+        } else {
+        // get the latest submission
+            res.json(result);
+        }
+    }
+});
+
+/**
  * Route to get all the submissions per assignment
  * @params assignment_id - assignment_id
  */
@@ -260,6 +287,37 @@ router.post("/:id/importgroups", async (req: any, res) => {
  */
 router.get("/:id/allreviews", async (req: any, res) => {
     res.json(await AssignmentPS.executeGetReviewsById(req.params.id));
+});
+
+/**
+ * Route to get your group for this assignment
+ * @param id - assignment id.
+ */
+router.get("/:id/group", async (req: any, res) => {
+    const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.userinfo.given_name, req.params.id);
+    const groupId = group.group_groupid;
+    const groupmembers = await GroupPS.executeGetUsersOfGroupById(groupId);
+    res.json({group, groupmembers});
+});
+
+/**
+ * Route to get review Ids of a certain person.
+ */
+router.get("/:id/feedback", async (req: any, res) => {
+    const assignmentId = req.params.id;
+    const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.userinfo.given_name, req.params.id);
+    const groupId = group.group_groupid;
+    const submission: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
+    const submissionId = submission.id;
+    res.json(await ReviewPS.executeGetReviewsBySubmissionId(submissionId));
+});
+
+/**
+ * Route to get all groups of an assignment
+ */
+router.get("/:id/groups", async (req: any, res) => {
+    const assignmentId = req.params.id;
+    res.json(await AssignmentPS.executeGetGroupsByAssignmentId(assignmentId));
 });
 
 export default router;

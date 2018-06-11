@@ -1,10 +1,11 @@
 import RubricPS, { default as rubricPS } from "../prepared_statements/rubric_ps";
+import bodyParser from "body-parser";
 
 // Router
-import { Router } from "express";
-const router = Router();
+import express from "express";
 
-export default router;
+const router = express();
+router.use(bodyParser.json());
 
 /**
  * Route to delete an open question
@@ -138,3 +139,4 @@ router.get("/:rubric_id", async (req, res) => {
    });
 });
 
+export default router;

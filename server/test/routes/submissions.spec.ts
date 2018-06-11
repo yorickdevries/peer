@@ -1,21 +1,15 @@
+import "mocha";
 import chai from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 chai.use(chaiHttp);
+const router: any = require("../../src/routes/submissions").default;
+import MockLogin from "../test_helpers/mock_login";
+import TestData from "../test_helpers/test_data";
 
 // file system imports
 import fs from "fs-extra";
 import path from "path";
-
-const router: any = require("../../src/routes/submissions").default;
-// Imitates the login of Okta for testing
-import InitLogin from "./init_login";
-
-import Database from "../../src/database";
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
-const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
 
 describe("Submission routes", () => {
     /**
@@ -23,26 +17,16 @@ describe("Submission routes", () => {
      */
     beforeEach(async () => {
         // initializes the router
-        InitLogin.initialize(router);
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
-
-        // Make file folders
-        const exampleSubmissionFolder = path.join(__dirname, "../../example_data/submissions");
-        const submissionFolder = path.join(__dirname, "../../src/files/submissions");
-        await fs.mkdirs(submissionFolder);
-        // Copy example data
-        await fs.copy(exampleSubmissionFolder, submissionFolder);
+        MockLogin.initialize(router);
+        await TestData.initializeDatabase();
+        await TestData.initializeSubmissionFiles();
     });
 
     /**
      * Remove file folders used for testing
      */
     afterEach(async () => {
-        const submissionFolder = path.join(__dirname, "../../src/files/submissions");
-        // Remove example data
-        await fs.remove(submissionFolder);
+        await TestData.removeSubmissionFiles();
     });
 
     /**
@@ -52,7 +36,7 @@ describe("Submission routes", () => {
         const res = await chai.request(router).get("/");
         expect(res.status).to.equal(200);
         const result = JSON.parse(res.text);
-        expect(result.length).to.equal(6);
+        expect(result.length).to.equal(5);
     });
 
     /**
@@ -60,12 +44,11 @@ describe("Submission routes", () => {
      */
     it("post submissions/ with file", async () => {
         // log in as henkjan
-        InitLogin.initialize(router, "henkjan");
+        MockLogin.initialize(router, "henkjan");
         const exampleSubmissionFile = path.join(__dirname, "../../example_data/submissions/submission1.pdf");
         const res = await chai.request(router).post("/")
         .attach("submissionFile", fs.readFileSync(exampleSubmissionFile), "submission1.pdf")
-        .field("assignmentId", 1)
-        .field("groupId", 20);
+        .field("assignmentId", 1);
         // assertions
         const result = JSON.parse(res.text);
         expect(res.status).to.equal(200);
@@ -78,7 +61,7 @@ describe("Submission routes", () => {
      */
     it("post submissions/ without file", async () => {
         // log in as henkjan
-        InitLogin.initialize(router, "henkjan");
+        MockLogin.initialize(router, "henkjan");
         const exampleSubmissionFile = path.join(__dirname, "../../example_data/submissions/submission1.pdf");
         const res = await chai.request(router).post("/")
         .field("assignmentId", 1);

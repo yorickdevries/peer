@@ -83,6 +83,20 @@ export default class UserPS {
     }
 
     /**
+     * Executes a 'get group by user id' query.
+     * @param {number} userId - a user id.
+     * @param {number} assignmentId - assignmentId
+     * @return {any} a query result.
+     */
+    public static executeGetGroupsByNetIdByAssignmentId(userId: string, assignmentId: number): any {
+        const statement = new PreparedStatement("get-groups-by-id",
+        "SELECT g.group_groupid FROM groupusers g JOIN assignmentgroup a ON " +
+            "g.group_groupid = a.group_id WHERE a.assignment_id = $1 AND g.user_netid = $2");
+        statement.values = [assignmentId, userId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Executes a 'get submission by user id' query.
      * @param {number} userId - a user id.
      * @return {any} a query result.

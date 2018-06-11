@@ -1,26 +1,21 @@
+import "mocha";
 import chai from "chai";
 import { expect } from "chai";
-import "mocha";
-import path from "path";
-import fs from "fs";
+import TestData from "./test_helpers/test_data";
 
 import GroupParser from "../src/groupParser";
 import neatCsv from "neat-csv";
 
-import Database from "../src/database";
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-const qfSchema = new QueryFile(path.join(__dirname, "../database_dumps/ED3-DataBaseSchema.sql"));
-const qfData = new QueryFile(path.join(__dirname, "../database_dumps/ED3-TestData.sql"));
+// file system imports
+import fs from "fs-extra";
+import path from "path";
 
 describe("GroupParser tests", () => {
     /**
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
+        await TestData.initializeDatabase();
     });
 
     /**
@@ -32,7 +27,7 @@ describe("GroupParser tests", () => {
         const file = path.join(__dirname, "../example_data/csv_test/example_export.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const groupColumn = "Education Groups";
-        const assignmentId = 1;
+        const assignmentId = 3;
         const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
         expect(result).to.deep.equal([{ groupId: 1, groupname: "ED 4" },
         { groupId: 2, groupname: "ED 3" }]);
@@ -43,7 +38,7 @@ describe("GroupParser tests", () => {
         const file = path.join(__dirname, "../example_data/csv_test/example_export_groupnumbers.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const groupColumn = "Education Groups";
-        const assignmentId = 1;
+        const assignmentId = 3;
         const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
         expect(result).to.deep.equal([{ groupId: 1, groupname: "4" },
         { groupId: 2, groupname: "ED 3" }]);
@@ -58,7 +53,7 @@ describe("GroupParser tests", () => {
         const file = path.join(__dirname, "../example_data/csv_test/example_export_non_csv.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const groupColumn = "Education Groups";
-        const assignmentId = 1;
+        const assignmentId = 3;
         const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
         expect(result).to.deep.equal({ error: "The file is improperly formatted" });
     });
@@ -68,7 +63,7 @@ describe("GroupParser tests", () => {
         const file = path.join(__dirname, "../example_data/csv_test/example_export_missing_group.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const groupColumn = "Education Groups";
-        const assignmentId = 1;
+        const assignmentId = 3;
         const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
         expect(result).to.deep.equal({ error: "bplanje@tudelft.nl does not have a group" });
     });
@@ -78,7 +73,7 @@ describe("GroupParser tests", () => {
         const file = path.join(__dirname, "../example_data/csv_test/example_export_missing_username.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const groupColumn = "Education Groups";
-        const assignmentId = 1;
+        const assignmentId = 3;
         const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
         expect(result).to.deep.equal({ error: "The file is improperly formatted" });
     });
@@ -88,7 +83,7 @@ describe("GroupParser tests", () => {
         const file = path.join(__dirname, "../example_data/csv_test/example_export_empty_username.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const groupColumn = "Education Groups";
-        const assignmentId = 1;
+        const assignmentId = 3;
         const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
         expect(result).to.deep.equal({ error: "One student has no username" });
     });
@@ -114,5 +109,24 @@ describe("GroupParser tests", () => {
         expect(result).to.deep.equal({ error: "Assignment doesn't exist in the database" });
     });
 
+    it("duplicate student", async () => {
+        // set up input data
+        const file = path.join(__dirname, "../example_data/csv_test/duplicate_student.csv");
+        const filebuffer = new Buffer(fs.readFileSync(file));
+        const groupColumn = "Education Groups";
+        const assignmentId = 3;
+        const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
+        expect(result).to.deep.equal({ error: "Duplicate student: bplanje" });
+    });
+
+    it("Student has already a group", async () => {
+        // set up input data
+        const file = path.join(__dirname, "../example_data/csv_test/example_export.csv");
+        const filebuffer = new Buffer(fs.readFileSync(file));
+        const groupColumn = "Education Groups";
+        const assignmentId = 1;
+        const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
+        expect(result).to.deep.equal({ error: "paulvanderlaan is already in group: 10" });
+    });
 
 });

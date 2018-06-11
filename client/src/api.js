@@ -37,9 +37,6 @@ export default {
     saveAssignment(assignmentId, assignment) {
         return client.put(`courses/${assignmentId}`, assignment)
     },
-    getCurrentPeerReview(assignmentId) {
-        return client.get(`assignments/${assignmentId}/review`)
-    },
     getPeerReview(peerReviewId) {
         return client.get(`reviews/${peerReviewId}`)
     },
@@ -55,20 +52,26 @@ export default {
     savePeerReview(peerReviewId, peerReview) {
         return client.put(`reviews/${peerReviewId}`, peerReview)
     },
-    getAssignmentSubmission(assignmentId) {
-        return client.get(`assignments/${assignmentId}/submission`)
+    getAssignmentLatestSubmission(assignmentId) {
+        return client.get(`assignments/${assignmentId}/latestsubmission`)
     },
     getAssignmentAllSubmissions(assignmentId) {
         return client.get(`assignments/${assignmentId}/allsubmissions`)
     },
-    deleteSubmission(submissionId) {
-        return client.delete(`submissions/${submissionId}`)
-    },
     getCurrentRoleForCourse(courseId) {
         return client.get(`courses/${courseId}/role`)
     },
+    getFeedbackOfAssignment(assignmentId) {
+        return client.get(`assignments/${assignmentId}/feedback`)
+    },
+    getGroupMembersOfAssignment(assignmentId) {
+        return client.get(`assignments/${assignmentId}/group`)
+    },
     getUsersWithRole(courseId, role) {
         return client.get(`courses/${courseId}/users/${role}`)
+    },
+    getAssignmentReviewsStudent(assignmentId) {
+        return client.get(`/assignments/${assignmentId}/reviews`)
     },
 }
 

@@ -1,22 +1,15 @@
-import ReviewPS from "../../src/prepared_statements/review_ps";
-import { expect } from "chai";
 import "mocha";
-import Database from "../../src/database";
+import { expect } from "chai";
+import TestData from "../test_helpers/test_data";
 
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-
-const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
-const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
+import ReviewPS from "../../src/prepared_statements/review_ps";
 
 describe("ReviewPreparedStatement Test", () => {
     /**
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
+        await TestData.initializeDatabase();
     });
 
     /**
@@ -162,7 +155,7 @@ describe("ReviewPreparedStatement Test", () => {
      */
     it("get submission belonging to an review", async () => {
         expect(await ReviewPS.executeGetSubmissionByReviewId(1)).to.deep.equal({
-            date: new Date("2018-05-01T20:30:00.000Z"),
+            date: new Date("2018-05-01T20:30:01.000Z"),
             file_path: "submission1.pdf",
             group_id: 10,
             id: 1,
