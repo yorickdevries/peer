@@ -108,11 +108,14 @@ export default {
     },
     async created() {
         // Get feedback array of reviews.
-        let metaRes = await api.getFeedbackOfAssignment(this.$route.params.assignmentId)
-        metaRes.data.forEach(async value => {
-            let review = await api.getPeerReview(value.id)
-            this.peerReviews.push(review.data)
-        })
+        let idsRes = await api.getFeedbackOfAssignment(this.$route.params.assignmentId)
+        let ids = idsRes.data.map(value => value.id)
+
+        for (let i = 0; i < ids.length; i++) {
+            let {data} = await api.getPeerReview(ids[i])
+            this.peerReviews.push(data)
+
+        }
         this.activeQuestion = this.sortedQuestionsList[0]
 
     },
