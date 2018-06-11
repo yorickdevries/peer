@@ -1,6 +1,6 @@
 // Imports
 import path from "path";
-import fs from "fs";
+import fs from "fs-extra";
 import index from "../security/index";
 import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
@@ -86,12 +86,19 @@ const updateAssignment = async function(req: any, res: any, next: any) {
     // if a file is uploaded (ie. name of the file is not undefined).
     if (!result.error && req.file.originalname) {
         // Remove old file.
-        const customRes0 = fs.unlinkSync(oldFilePath);
-        console.log("res0: " + customRes0);
+        fs.unlink(oldFilePath, (err) => {
+            if (err) result = {error: err};
+            console.log("The file has been deleted: " + oldFilePath);
+        });
 
         // Add new file.
-        const customRes1 = fs.writeFileSync(newFilePath, req.file.buffer);
-        console.log("res1: " + customRes1);
+        fs.writeFile(newFilePath, req.file.buffer, (err) => {
+            if (err) {
+                result = {error: err};
+            } else {
+                console.log("The file has been saved at " + newFilePath);
+            }
+        });
     }
     res.json(result);
 };
@@ -114,8 +121,13 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
         req.body.review_publish_date);
     // writing the file if no error is there
     if (!result.error) {
-        const customRes = fs.writeFileSync(filePath, req.file.buffer);
-        console.log("res2: " + customRes);
+        fs.writeFile(filePath, req.file.buffer, (err) => {
+            if (err) {
+                result = {error: err};
+            } else {
+                console.log("The file has been saved at " + filePath);
+            }
+        });
     }
     res.json(result);
 };
