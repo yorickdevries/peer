@@ -55,23 +55,43 @@ const uploadAssignmentFunction = function(req: any, res: any, next: any) {
 };
 
 /**
- * Remove an assignment file from the assignments folder.
+ * Update the assignment in the database.
+ * Removes the file linked to the assignment.
  * @param req - a request object.
  * @param res - a response object.
  * @param next - a next object.
  * @return {Promise<void>}
  */
-const deleteAssignmentFile = async function(req: any, res: any, next: any) {
-    const filename: string = (await AssignmentPS.executeGetAssignmentById(req.params.assignment_id)).filename;
-    const filePath = path.join(fileFolder, filename);
+const updateAssignment = async function(req: any, res: any, next: any) {
+    const oldFilename: string = (await AssignmentPS.executeGetAssignmentById(req.params.assignment_id)).filename;
+    const oldFilePath: string = path.join(fileFolder, oldFilename);
 
-    // remove old file from database
-    let result: any = await AssignmentPS.executeDeleteAssignment(req.params.assignment_id);
-    if (!result.error) {
-        fs.unlink(filename, (err) => {
-            if (err) result = {error: err};
-            console.log("The file has been deleted: " + filePath);
-        });
+    const newFilename: string = Date.now() + "-" + req.file.originalname;
+    const newFilePath: string = path.join(fileFolder, newFilename);
+
+    // Update the assignment in the database.
+    let result: any = await AssignmentPS.executeUpdateAssignmentById(
+        req.body.title,
+        req.body.description,
+        req.body.course_id,
+        req.params.assignment_id,
+        req.body.due_date,
+        req.body.publish_date,
+        req.body.reviews_per_user,
+        newFilename,
+        req.body.review_due_date,
+        req.body.review_publish_date);
+
+    // Remove the old file and add the new file if there was not error,
+    // if a file is uploaded (ie. name of the file is not undefined).
+    if (!result.error && req.file.originalname) {
+        // Remove old file.
+        const customRes0 = fs.unlinkSync(oldFilePath);
+        console.log("res0: " + customRes0);
+
+        // Add new file.
+        const customRes1 = fs.writeFileSync(newFilePath, req.file.buffer);
+        console.log("res1: " + customRes1);
     }
     res.json(result);
 };
@@ -94,13 +114,8 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
         req.body.review_publish_date);
     // writing the file if no error is there
     if (!result.error) {
-        fs.writeFile(filePath, req.file.buffer, (err) => {
-            if (err) {
-                result = {error: err};
-            } else {
-                console.log("The file has been saved at " + filePath);
-            }
-        });
+        const customRes = fs.writeFileSync(filePath, req.file.buffer);
+        console.log("res2: " + customRes);
     }
     res.json(result);
 };
@@ -146,7 +161,7 @@ router.post("/", uploadAssignmentFunction, index.authorization.enrolledAsTeacher
  * Route to update an assignment.
  * Removes the old assignment (also from the files folder) and adds the new assignment.
  */
-router.put("/:assignment_id", uploadAssignmentFunction, deleteAssignmentFile, addAssignmentToDatabase);
+router.put("/:assignment_id", uploadAssignmentFunction, updateAssignment);
 
 /**
  * Route to get a file from an assignment.

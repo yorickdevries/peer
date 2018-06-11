@@ -179,7 +179,7 @@ describe("API Assignment routes", () => {
         InitLogin.initialize(router, "bplanje");
 
         // Make sure that the assignment is in place.
-        await chai.request(router).post("/")
+        const assignment: any = await chai.request(router).post("/")
             .attach("assignmentFile", fs.readFileSync(file), "assignment1.pdf")
             .field("title", "Different title")
             .field("description", "Different description")
@@ -190,10 +190,10 @@ describe("API Assignment routes", () => {
             .field("review_due_date", "2018-06-01T20:30:00.000Z")
             .field("review_publish_date", "2018-07-01T20:30:00.000Z");
 
-        // Test the updating of an assignment.
+        // Test the updating of the assignment just added.
         const res = await chai.request(router)
-            .put("/1")
-            .attach("assignmentFile", fs.readFileSync(file), "assignment1.pdf")
+            .put("/" + JSON.parse(assignment.text).id)
+            .attach("assignmentFile", fs.readFileSync(file), "assignment2.pdf")
             .field("title", "Example title")
             .field("description", "Example description")
             .field("course_id", 1)
@@ -202,21 +202,13 @@ describe("API Assignment routes", () => {
             .field("reviews_per_user", 2)
             .field("review_due_date", "2018-06-01T20:30:00.000Z")
             .field("review_publish_date", "2018-07-01T20:30:00.000Z");
+
+        // assertions
+        const result = JSON.parse(res.text);
+
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            {
-                "title": "Assignment 1",
-                "description": "Example assignment number one",
-                "due_date": "2018-05-01T20:30:00.000Z",
-                "publish_date": "2018-04-01T20:30:00.000Z",
-                "id": 1,
-                "course_id": 1,
-                "reviews_per_user": 2,
-                "filename": "assignment1.pdf",
-                "review_due_date": "2018-05-01T20:30:00.000Z",
-                "review_publish_date": "2018-04-01T20:30:00.000Z"
-            }
-        ));
+        expect(result.title).to.equal("Example title");
+        expect(result.description).to.equal("Example description");
     });
 
     /**
