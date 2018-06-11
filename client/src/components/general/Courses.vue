@@ -19,7 +19,7 @@
                         <b-card-body>
                             <h4 class="card-title mb-0">{{ course.name }}</h4>
                             <b-badge show variant="secondary" class="my-2 p-1"><h6 class="m-0 font-weight-bold">{{
-                                course.role.toUpperCase()}}</h6></b-badge>
+                                course.role }}</h6></b-badge>
                             <p>{{ course.description | truncate(200)}}</p>
                             <b-button v-if="course.role === 'student'" variant="outline-primary" :to="{ name: 'student-dashboard.course.home', params: { courseId: course.id } }">Enter Course</b-button>
                             <b-button v-else-if="course.role === 'TA'" variant="outline-primary" :to="{ name: 'teaching-assistant-dashboard.course.home', params: { courseId: course.id } }">Enter as TA</b-button>
