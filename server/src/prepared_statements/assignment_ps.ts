@@ -143,13 +143,14 @@ export default class AssignmentPS {
     }
 
     /**
-     * Executes group assignment Id
+     * Gets all groups for a certain assignment
+     *
      * @param {number} id - id
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeGetGroupsByAssignmentId (id: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-all-groups-per-assignment",
-        'SELECT * FROM "assignmentgroup" WHERE "assignment_id" = ($1)');
+        "SELECT g.id, g.group_name FROM assignmentgroup a JOIN grouplist g ON a.group_id = g.id WHERE assignment_id = $1");
         statement.values = [id];
         return Database.executeQuery(statement);
     }
