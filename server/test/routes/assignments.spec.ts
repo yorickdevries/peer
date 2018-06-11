@@ -154,7 +154,7 @@ describe("API Assignment routes", () => {
      */
     it("post assignment/ with file", async () => {
         // log in as bplanje (teacher)
-        InitLogin.initialize(router, "bplanje");
+        MockLogin.initialize(router, "bplanje");
         const exampleSubmissionFile = path.join(__dirname, "../../example_data/assignments/assignment1.pdf");
         const res = await chai.request(router).post("/")
             .attach("assignmentFile", fs.readFileSync(exampleSubmissionFile), "assignment1.pdf")
@@ -181,7 +181,7 @@ describe("API Assignment routes", () => {
         const file = path.join(__dirname, "../../example_data/assignments/assignment1.pdf");
 
         // login as bplanje (teacher)
-        InitLogin.initialize(router, "bplanje");
+        MockLogin.initialize(router, "bplanje");
 
         // Make sure that the assignment is in place.
         const assignment: any = await chai.request(router).post("/")

@@ -60,7 +60,8 @@ const uploadAssignmentFunction = function(req: any, res: any, next: any) {
 
 /**
  * Update the assignment in the database.
- * Removes the file linked to the assignment.
+ * Removes the file linked to the assignment and writes the new file,
+ * if a new file is uploaded.
  * @param req - a request object.
  * @param res - a response object.
  * @param next - a next object.
@@ -90,13 +91,16 @@ const updateAssignment = async function(req: any, res: any, next: any) {
     // if a file is uploaded (ie. name of the file is not undefined).
     if (!result.error && req.file.originalname) {
         // Remove old file.
-        fs.unlink(oldFilePath, (err) => {
-            if (err) result = {error: err};
-            console.log("The file has been deleted: " + oldFilePath);
+        fs.unlink(oldFilePath, (err: any) => {
+            if (err) {
+                result = {error: err};
+            } else {
+                console.log("The file has been deleted: " + oldFilePath);
+            }
         });
 
         // Add new file.
-        fs.writeFile(newFilePath, req.file.buffer, (err) => {
+        fs.writeFile(newFilePath, req.file.buffer, (err: any) => {
             if (err) {
                 result = {error: err};
             } else {
@@ -126,7 +130,7 @@ const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
     await RubricPS.executeCreateRubric(result.id);
     // writing the file if no error is there
     if (!result.error) {
-        fs.writeFile(filePath, req.file.buffer, (err) => {
+        fs.writeFile(filePath, req.file.buffer, (err: any) => {
             if (err) {
                 res.json({error: err});
             }
