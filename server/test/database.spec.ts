@@ -1,22 +1,16 @@
-import Database from "../../src/database";
-import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
-
-import { expect } from "chai";
 import "mocha";
+import { expect } from "chai";
+import TestData from "./test_helpers/test_data";
 
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
-const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
+import Database from "../src/database";
+import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 
 describe("Database Test", () => {
     /**
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-      await Database.DatabaseDrop();
-      await Database.DatabaseImport(qfSchema);
-      await Database.DatabaseImport(qfData);
+      await TestData.initializeDatabase();
   });
 
   it("connection port", () => {

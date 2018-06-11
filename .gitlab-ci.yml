@@ -25,7 +25,7 @@ build:
   - postgres:10.3
   script:
   - npm run build --prefix ./server
-  - npm run db_init --prefix ./server
+  - npm run data_init --prefix ./server
   - npm run build --prefix ./client
 test:
   stage: test
@@ -33,9 +33,13 @@ test:
   - postgres:10.3
   script:
   - npm run test --prefix ./server
+  tags:
+  - longJob
 coverage:
   stage: coverage
   services:
   - postgres:10.3
   script:
   - npm run coverage --prefix ./server
+  tags:
+  - longJob

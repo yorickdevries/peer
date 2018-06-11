@@ -66,7 +66,7 @@ export default class Database {
   }
 
     /**
-     * Method to import default database.
+     * Method to import a query file.
      * @param {pgPromise.QueryFile} qf - a pgp queryfile.
      * @return {Promise<void>} - a promise of the result.
      * @constructor - default constructor.
