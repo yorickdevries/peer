@@ -1,26 +1,21 @@
+import "mocha";
 import chai from "chai";
 import { expect } from "chai";
-import "mocha";
-import path from "path";
-import fs from "fs";
+import TestData from "./test_helpers/test_data";
 
 import GroupParser from "../src/groupParser";
 import neatCsv from "neat-csv";
 
-import Database from "../src/database";
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-const qfSchema = new QueryFile(path.join(__dirname, "../database_dumps/ED3-DataBaseSchema.sql"));
-const qfData = new QueryFile(path.join(__dirname, "../database_dumps/ED3-TestData.sql"));
+// file system imports
+import fs from "fs-extra";
+import path from "path";
 
 describe("GroupParser tests", () => {
     /**
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
+        await TestData.initializeDatabase();
     });
 
     /**
