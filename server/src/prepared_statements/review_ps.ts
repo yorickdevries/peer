@@ -240,4 +240,33 @@ export default class ReviewPS {
         statement.values = [submissionId];
         return Database.executeQuery(statement);
     }
+
+
+    /**
+     * Gets all reviews for a certain assignment
+     *
+     * @static
+     * @param {number} assignmentId
+     * @returns {Promise<pgPromise.queryResult>}
+     * @memberof ReviewPS
+     */
+    public static executeGetReviewsByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-all-reviews-by-assignmentid",
+            "SELECT review.* FROM review JOIN rubric ON review.rubric_assignment_id = rubric.assignment_id WHERE rubric.assignment_id = $1");
+        statement.values = [assignmentId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Gets all done reviews for a certain assignment
+     *
+     * @param {number} assignmentId - an assignment id.
+     * @return {Promise<pgPromise.queryResult>} - a promise of the database result.
+     */
+    public static executeGetAllDoneReviewsByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-all-done-reviews-by-assignmentid",
+            "SELECT review.user_netid as reviewer, submission.user_netid as submitter FROM review JOIN assignmentlist ON assignmentlist.id = review.rubric_assignment_id  JOIN submission ON submission.id = review.submission_id WHERE assignmentlist.id = $1 AND review.done = true");
+        statement.values = [assignmentId];
+        return Database.executeQuery(statement);
+    }
 }

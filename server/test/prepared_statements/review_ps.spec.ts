@@ -162,4 +162,14 @@ describe("ReviewPreparedStatement Test", () => {
             user_netid: "paulvanderlaan"
         });
     });
+
+    /**
+     * Test get reviews for an assignment.
+     */
+    it("Reviews of an assignment", async () => {
+        expect(await ReviewPS.executeGetAllDoneReviewsByAssignmentId(1)).to.deep.equal([{
+            "reviewer": "paulvanderlaan",
+            "submitter": "paulvanderlaan"
+        }]);
+    });
 });
