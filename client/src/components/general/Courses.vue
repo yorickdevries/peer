@@ -12,9 +12,16 @@
                 </b-col>
             </b-row>
 
+            <!--Filter Input-->
+            <b-row>
+                <b-col class="mb-3" cols="6">
+                    <b-input placeholder="Filter courses" v-model="filter"></b-input>
+                </b-col>
+            </b-row>
+
             <!--Course Cards-->
             <b-row>
-                <b-col cols="6" v-for="course in courses" :key="course.id" class="d-flex align-items-stretch">
+                <b-col cols="6" v-for="course in filteredCourses" :key="course.id" class="d-flex align-items-stretch pr-0">
 
                     <!--Single Card-->
                     <b-card no-body class="mb-3 w-100">
@@ -63,7 +70,18 @@ export default {
                     id: null,
                     role: ''
                 }
-            ]
+            ],
+            filter: ""
+        }
+    },
+    computed: {
+        filteredCourses() {
+            // Filters course based on text filter.
+            if (this.filter === "") return this.courses
+
+            return this.courses.filter(course => {
+                return course.name.toLowerCase().includes(this.filter.toLowerCase())
+            })
         }
     },
     async created() {
