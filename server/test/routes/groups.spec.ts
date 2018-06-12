@@ -12,24 +12,11 @@ describe("API Group routes", () => {
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-        // initializes the router with user teacheraccount
-        MockLogin.initialize(router, "teacheraccount");
+        // initializes the router with user henkjan
+        MockLogin.initialize(router, "bplanje");
         await TestData.initializeDatabase();
     });
 
-    /**
-     * Tests whether groups are returned
-     */
-    it("Get groups/", async () => {
-        const res = await chai.request(router).get("/");
-        expect(res.status).to.equal(200);
-        expect(res.text).to.deep.equal(JSON.stringify([
-            {id: 10, group_name: "ED-3"},
-            {id: 20, group_name: "Group 20"},
-            {id: 21, group_name: "Group 21"},
-            {id: 22, group_name: "Group 22"}
-        ]));
-    });
 
     /**
      * Test whether one group is returned
@@ -39,6 +26,15 @@ describe("API Group routes", () => {
         const res = await chai.request(router).get("/10");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({id: 10, group_name: "ED-3"}));
+    });
+
+    /**
+     * Test whether access is denied
+     */
+    it("Get courses/:id access denied", async () => {
+        // test the router
+        const res = await chai.request(router).get("/11");
+        expect(res.status).to.equal(401);
     });
 
     /**
