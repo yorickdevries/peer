@@ -63,6 +63,40 @@ const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
 };
 
 /**
+ * Check if the user is allowed to change the review
+ */
+const checkReviewOwner = async (req: any, res: any, next: any) => {
+    const authCheck = await AuthorizationPS.executeCheckReviewMakerNotDone(req.params.reviewId, req.userinfo.given_name);
+    response(res, authCheck.exists, next);
+};
+
+/**
+ * Check if the user is allowed to submit the review
+ */
+const checkReviewOwnerDone = async (req: any, res: any, next: any) => {
+    const authCheck = await AuthorizationPS.executeCheckReviewMaker(req.params.reviewId, req.userinfo.given_name);
+    response(res, authCheck.exists, next);
+};
+
+/**
+ * Check if the user is a ta or teacher for the course of this review
+ */
+const checkReviewTAOrTeacher = async (req: any, res: any, next: any) => {
+    const authCheck = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.userinfo.given_name);
+    response(res, authCheck.exists, next);
+};
+
+/**
+ * Check if the user is a ta or teacher for the course of this review comment
+ */
+const checkOwnerReviewComment = async (req: any, res: any, next: any) => {
+    const authCheck = await AuthorizationPS.executeCheckOwnerReviewComment(req.params.reviewCommentId, req.userinfo.given_name);
+    response(res, authCheck.exists, next);
+};
+
+
+
+/**
  * Response method that handles the response
  */
 const response = (res: any, bool: boolean, next: any) => {
@@ -79,6 +113,10 @@ const response = (res: any, bool: boolean, next: any) => {
 export default {
     authorizeCheck,
     enrolledAssignmentCheck,
+    checkReviewTAOrTeacher,
+    checkReviewOwner,
+    checkReviewOwnerDone,
+    checkOwnerReviewComment,
     enrolledAsTeacherAssignmentCheck,
     checkAuthorizationForReview,
     enrolledAsTeacherAssignmentCheckForPost,

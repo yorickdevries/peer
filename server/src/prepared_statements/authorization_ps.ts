@@ -51,7 +51,7 @@ export default class AuthorizationPS {
     }
 
     /**
-     * Check if the review is for or
+     * Check if the review is of by the user
      */
     public static executeCheckReviewMaker(reviewId: number, netId: String): any {
         const statement = new PreparedStatement("check-review-owner",
@@ -59,6 +59,24 @@ export default class AuthorizationPS {
         statement.values = [reviewId, netId];
         return Database.executeQuerySingleResult(statement);
     }
+
+    /**
+     * Check if the review is of the user and not yet done.
+     */
+    public static executeCheckReviewMakerNotDone(reviewId: number, netId: String): any {
+        const statement = new PreparedStatement("check-review-owner",
+            "SELECT EXISTS(SELECT * FROM review WHERE review.done = false AND review.id = $1 AND review.user_netid = $2)");
+        statement.values = [reviewId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    public static executeCheckOwnerReviewComment(reviewCommentId: number, netId: String): any {
+        const statement = new PreparedStatement("check-reviewComment-owner",
+            "SELECT EXISTS(SELECT * FROM reviewcomment WHERE id = $1 AND netid = $2)");
+        statement.values = [reviewCommentId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
 
     /**
      * Check if the review belongs to the user, i.e. is the submission where the review is on review done by your group

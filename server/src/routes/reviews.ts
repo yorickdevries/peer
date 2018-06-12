@@ -49,7 +49,7 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
  * @body a json object of the whole form, as specified in the doc.
  * @return JSON representation of a review.
  */
-router.put("/:reviewId", async (req, res) => {
+router.route("/:reviewId").put(index.authorization.checkReviewOwner, async (req, res) => {
     const reviewId = req.params.reviewId;
     const jsonQuestions: any = [];
 
@@ -94,7 +94,7 @@ router.put("/:reviewId", async (req, res) => {
  * @param reviewId - an id of a review.
  * @return database return value.
  */
-router.get("/:reviewId/submit", async (req, res) => {
+router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, async (req, res) => {
     res.json(await ReviewsPS.executeSubmitReview(req.params.reviewId));
 });
 
@@ -113,7 +113,7 @@ router.route("/:reviewId/allComments").get(index.authorization.checkAuthorizatio
  * @body comment - a comment of the review.
  * @return database return value.
  */
-router.put("/:reviewCommentId/comment", async (req, res) => {
+router.route("/:reviewCommentId/comment").put(index.authorization.checkOwnerReviewComment, async (req, res) => {
     res.json(await ReviewsPS.executeUpdateReviewComment(req.params.reviewCommentId, req.body.comment));
 });
 
@@ -124,7 +124,7 @@ router.put("/:reviewCommentId/comment", async (req, res) => {
  * @body comment - a comment of the review.
  * @return database return value.
  */
-router.post("/:reviewId/comment", async (req, res) => {
+router.route("/:reviewId/comment").post(index.authorization.checkReviewTAOrTeacher, async (req, res) => {
     res.json(await ReviewsPS.executeAddReviewComment(req.params.reviewId, req.body.netid, req.body.comment));
 });
 
@@ -133,11 +133,11 @@ router.post("/:reviewId/comment", async (req, res) => {
  * @param reviewId - an id of a review.
  * @return database return value.
  */
-router.delete("/:reviewCommentId/comment", async (req, res) => {
+router.route("/:reviewCommentId/comment").delete(index.authorization.checkOwnerReviewComment, async (req, res) => {
     res.json(await ReviewsPS.executeDeleteReviewComment(req.params.reviewCommentId));
 });
 
-/**
+/**x
  * Gets the file that needs to be reviewed.
  */
 router.route("/:id/file").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
