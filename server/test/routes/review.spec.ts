@@ -18,6 +18,14 @@ describe("API review routes", () => {
     });
 
     /**
+     * Tests if user has authorization to see the review
+     */
+    it("get review auth", async() => {
+        const res = await chai.request(router).get("/3");
+        expect(res.status).to.equal(401);
+    });
+
+    /**
      * Tests whether reviews are returned
      */
     it("Get review/", async () => {
