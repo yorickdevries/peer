@@ -126,8 +126,10 @@
 
 <script>
 import api from "../../../api";
+import notifications from "../../../mixins/notifications";
 
 export default {
+    mixins: [notifications],
     data() {
         return {
             file: null,
@@ -226,11 +228,16 @@ export default {
                 formData.append("assignmentFile", this.file)
             }
             // Update assignment in database
-            let res = await api.saveAssignment(this.assignment.id, formData)
-            console.log(res)
-
-            // Redirect to updated assignment
-            this.$router.push({name: 'teacher-dashboard.assignments.assignment', params: {courseId: this.course.id, assignmentId: this.assignment.id} })
+            try{
+                let res = await api.saveAssignment(this.assignment.id, formData)
+                console.log(res)
+                this.showSuccessMessage({message: "Updated assignment successfully"})
+                // Redirect to updated assignment
+                this.$router.push({name: 'teacher-dashboard.assignments.assignment', params: {courseId: this.course.id, assignmentId: this.assignment.id} })
+            } catch (e) {
+                console.log(e)
+                this.showErrorMessage()
+            }
         },
         formatDate(date) {
             // Formats the date to a readable format for the UI.
