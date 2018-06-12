@@ -93,4 +93,24 @@ export default class AuthorizationPS {
         return Database.executeQuerySingleResult(statement);
     }
 
+    /**
+     * Checks if the user is a ta or teacher for the course the group is in
+     */
+    public static isTAOrTeacherForGroup(netId: String, groupId: number): any {
+        const statement = new PreparedStatement("Check-if-netid-is-TA-or-Teacher-for-group",
+            "SELECT EXISTS(SELECT * FROM grouplist, assignmentgroup, assignmentlist, enroll WHERE grouplist.id = assignmentgroup.group_id AND assignmentgroup.assignment_id = assignmentlist.id AND (enroll.role = 'TA' OR enroll.role = 'teacher') AND assignmentlist.course_id = enroll.course_id AND enroll.user_netid = $1 AND grouplist.id = $2)");
+        statement.values = [netId, groupId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Checks if the student is in a certain group
+     */
+    public static isInGroup(netId: String, groupId: number): any {
+        const statement = new PreparedStatement("Check-if-student-is-in-group",
+            "SELECT EXISTS(SELECT * FROM groupusers WHERE user_netid = $1 AND group_groupid = $2)");
+        statement.values = [netId, groupId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
 }
