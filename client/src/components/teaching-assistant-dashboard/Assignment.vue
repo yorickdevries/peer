@@ -18,6 +18,11 @@
                         <Reviews :assignmentId="$route.params.assignmentId"></Reviews>
                     </b-tab>
 
+                    <!--Groups-->
+                    <b-tab title="Groups">
+                        <Groups :assignment-id="$route.params.assignmentId"></Groups>
+                    </b-tab>
+
                 </b-tabs>
             </b-card>
 
@@ -28,13 +33,15 @@
 
 <script>
 import api from "../../api"
-import Submissions from "./assignment/Submissions"
-import Reviews from './assignment/Reviews'
+import Submissions from "../ta_teacher_shared/Submissions"
+import Reviews from '../ta_teacher_shared/Reviews'
+import Groups from '../ta_teacher_shared/Groups'
 
 export default {
     components: {
         Submissions,
-        Reviews
+        Reviews,
+        Groups
     },
     data() {
         return {

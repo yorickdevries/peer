@@ -19,6 +19,8 @@
                 <b-col>
                     <b-card no-body>
                         <b-tabs card>
+
+                            <!--Details & Action-->
                             <b-tab title="Home" active>
 
                                 <b-row>
@@ -74,14 +76,25 @@
                                 </b-row>
                             </b-tab>
 
-                            <b-tab title="Rubric">
+                            <!--Rubric Wizard-->
+                            <b-tab title="Rubric Wizard">
                                 <RubricWizard :rubricId="assignment.id"></RubricWizard>
                             </b-tab>
 
-                            <b-tab title="Groups">
-                                <Groups :assignmentId="this.assignment.id"></Groups>
+                            <!--Submissions-->
+                            <b-tab title="Submissions" active>
+                                <Submissions :assignmentId="assignment.id"></Submissions>
                             </b-tab>
 
+                            <!--Reviews-->
+                            <b-tab title="Reviews">
+                                <Reviews :assignmentId="assignment.id"></Reviews>
+                            </b-tab>
+
+                            <!--Groups-->
+                            <b-tab title="Groups">
+                                <Groups :assignmentId="assignment.id"></Groups>
+                            </b-tab>
                         </b-tabs>
                     </b-card>
                 </b-col>
@@ -96,7 +109,9 @@
 import api from '../../../api'
 import RubricWizard from '../rubric/RubricWizard'
 import ImportGroupsWizard from '../ImportGroupsWizard'
-import Groups from '../Groups'
+import Groups from '../../ta_teacher_shared/Groups'
+import Reviews from '../../ta_teacher_shared/Reviews'
+import Submissions from '../../ta_teacher_shared/Submissions'
 import notifications from '../../../mixins/notifications'
 
 export default {
@@ -104,7 +119,9 @@ export default {
     components: {
         RubricWizard,
         Groups,
-        ImportGroupsWizard
+        ImportGroupsWizard,
+        Reviews,
+        Submissions
     },
     async created() {
         let cid = this.$route.params.courseId

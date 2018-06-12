@@ -25,44 +25,42 @@
                  outlined
                  show-empty
                  stacked="md"
-                 :items=submissions
+                 :items=reviews
                  :fields="fields"
                  :current-page="currentPage"
                  :per-page="Number(perPage)"
                  :filter="filter">
 
             <template slot="file_path" slot-scope="data">
-                <a :href="`/api/submissions/${data.item.id}/file`"> {{data.value }} </a>
+                <a :href="`/api/submissions/${data.item.id}/file`"> {{data.value}} </a>
             </template>
         </b-table>
 
         <!--Pagination-->
-        <b-pagination :total-rows=this.submissions.length :per-page="Number(perPage)" v-model="currentPage"
-                      class="my-0"/>
+        <b-pagination :total-rows=this.reviews.length :per-page="Number(perPage)" v-model="currentPage" class="my-0"/>
     </div>
 </template>
 
 <script>
-    import api from "../../../api"
+    import api from "../../api"
 
     export default {
         props: ["assignmentId"],
         data() {
             return {
-                submissions: [],
+                reviews: [],
                 currentPage: 1,
                 fields: [
-                    {key: 'user_netid', label: 'Username'},
-                    {key: 'date', label: 'Submitted'},
-                    {key: 'file_path', label: 'Download'}
+                    {key: 'reviewer', label: 'Reviewer'},
+                    {key: 'submitter', label: 'Submitter'}
                 ],
                 perPage: 5,
                 filter: null
             }
         },
         async created() {
-            let res = await api.getAssignmentAllSubmissions(this.assignmentId);
-            this.submissions = res.data
+            let res = await api.getAssignmentReviews(this.assignmentId)
+            this.reviews = res.data
         }
     }
 </script>
