@@ -75,12 +75,12 @@ describe("Database Test", () => {
   it("database error query single result", async () => {
     const statement = new PreparedStatement("get-all-users2",
     "SELECT * FROM userlist");
-    expect(Database.executeQuerySingleResult(statement)).to.eventually.be.rejectedWith(Error);
+    await expect(Database.executeQuerySingleResult(statement)).to.eventually.be.rejectedWith("Multiple rows were not expected.");
   });
 
   it("database error query any result", async () => {
     const statement = new PreparedStatement("invalid-query",
     "THIS IS NOT A VALID QUERY");
-    expect(Database.executeQuery(statement)).to.eventually.be.rejectedWith(Error);
+    await expect(Database.executeQuery(statement)).to.eventually.be.rejected;
   });
 });
