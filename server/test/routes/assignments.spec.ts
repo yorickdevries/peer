@@ -61,7 +61,7 @@ describe("API Assignment routes", () => {
         MockLogin.initialize(router, "teacheraccount");
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "text_file.txt");
-        expect(res.status).to.equal(200);
+        expect(res.status).to.equal(400);
         expect(res.text).to.equal(JSON.stringify({error: "File should be a .csv file"}));
     });
 
@@ -71,21 +71,15 @@ describe("API Assignment routes", () => {
         MockLogin.initialize(router, "teacheraccount");
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv");
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify({
-            error: {
-                code: "LIMIT_FILE_SIZE",
-                field: "groupFile",
-                storageErrors: []
-            }
-        }));
+        expect(res.status).to.equal(400);
+        expect(res.text).to.equal(JSON.stringify({error: "File is too large" }));
     });
 
     it("Import groups - no file", async () => {
         // log in as teacheraccount
         MockLogin.initialize(router, "teacheraccount");
         const res = await chai.request(router).post("/3/importgroups");
-        expect(res.status).to.equal(200);
+        expect(res.status).to.equal(400);
         expect(res.text).to.equal(JSON.stringify({error: "No file uploaded"}));
     });
 
@@ -95,7 +89,7 @@ describe("API Assignment routes", () => {
         MockLogin.initialize(router, "teacheraccount");
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv");
-        expect(res.status).to.equal(200);
+        expect(res.status).to.equal(400);
         expect(res.text).to.equal(JSON.stringify({error: "No groupcolumn defined"}));
     });
 
@@ -155,6 +149,17 @@ describe("API Assignment routes", () => {
                 "review_publish_date": "2018-04-01T20:30:00.000Z"
             }
         ));
+    });
+
+    /**
+     * Error when the assignment_id doesnt exist
+     */
+    it("GET /:assignment_id - id doesnt exist", async () => {
+        // test the router
+        MockLogin.initialize(router, "paulvanderlaan");
+        const res = await chai.request(router).get("/1234");
+        // no access
+        expect(res.status).to.equal(401);
     });
 
     /**
@@ -309,7 +314,7 @@ describe("API Assignment routes", () => {
         // test the router
         MockLogin.initialize(router, "paulvanderlaan");
         const res = await chai.request(router).get("/3/latestsubmission");
-        expect(res.text).to.equal(JSON.stringify({error: "User is not in a group in this assignment"}));
+        expect(res.text).to.equal(JSON.stringify({error: "No latest submission could be found"}));
     });
 
     // no submission yet

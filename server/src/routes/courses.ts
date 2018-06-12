@@ -8,36 +8,59 @@ const router = express();
 router.use(bodyParser.json());
 
 /**
- * Route to update a course
  * Route that creates a new course
  * Route to get all courses.
  * @body description - description
  * @body name - name
  */
-router.route("/").post(async (req: any, res) => {
-    // Create the course
-    const course = await CoursesPS.executeCreateCourse(req.body.description, req.body.name);
-    // Enroll the teacher in the course
-    await CoursesPS.executeEnrollInCourseId(course.id, req.userinfo.given_name, Roles.teacher);
-    // Respond with appropriate JSON
-    res.json(course);
-}).get(async (req, res) => {
-    res.json(await CoursesPS.executeGetAllCourses());
+router.post("/", async (req: any, res) => {
+    try {
+        // Create the course
+        const course = await CoursesPS.executeCreateCourse(req.body.description, req.body.name);
+        // Enroll the teacher in the course
+        await CoursesPS.executeEnrollInCourseId(course.id, req.userinfo.given_name, Roles.teacher);
+        // Respond with appropriate JSON
+        res.json(course);
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Route to get all courses.
+ */
+router.get("/", (req, res) => {
+    CoursesPS.executeGetAllCourses()
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
 });
 
 /**
  * Router to get all courses you are enrolled in
  */
-router.get("/enrolled", async (req: any, res) => {
-   res.json(await CoursesPS.executeGetAllEnrolledCourses(req.userinfo.given_name));
+router.get("/enrolled", (req: any, res) => {
+   CoursesPS.executeGetAllEnrolledCourses(req.userinfo.given_name)
+   .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
 });
 
 /**
  * Get all assignments that belong to a specific course.
  * @param courseId - a course id.
  */
-router.get("/:courseId/assignments", async (req, res) => {
-    res.json(await CoursesPS.executeGetAssignmentsByCourseId(req.params.courseId));
+router.get("/:courseId/assignments", (req, res) => {
+    CoursesPS.executeGetAssignmentsByCourseId(req.params.courseId)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
 });
 
 /**
@@ -46,16 +69,26 @@ router.get("/:courseId/assignments", async (req, res) => {
  * @body description - a new course description.
  * @body name - a new course name.
  */
-router.put("/:courseId", async (req, res) => {
-    res.json(await CoursesPS.executeUpdateCourse(req.params.courseId, req.body.description, req.body.name));
+router.put("/:courseId", (req, res) => {
+    CoursesPS.executeUpdateCourse(req.params.courseId, req.body.description, req.body.name)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
 });
 
 /**
  * Route to get information for a specific course.
  * @param courseId - course id.
  */
-router.get("/:courseId", async (req, res) => {
-    res.json(await CoursesPS.executeGetCourseById(req.params.courseId));
+router.get("/:courseId", (req, res) => {
+    CoursesPS.executeGetCourseById(req.params.courseId)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
 });
 
 /**
@@ -63,7 +96,12 @@ router.get("/:courseId", async (req, res) => {
  * @param course_id - course id.
  */
 router.get("/:courseId/role", async (req: any, res) => {
-    res.json(await CoursesPS.executeGetRoleById(req.userinfo.given_name, req.params.courseId));
+    CoursesPS.executeGetRoleById(req.userinfo.given_name, req.params.courseId)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
 });
 
 /**
@@ -74,31 +112,26 @@ router.get("/:courseId/role", async (req: any, res) => {
  * @return json containing { courseId: number, role: Role }
  */
 router.put("/:courseId/setRole", async (req: any, res) => {
-    // Check if the role to upgrade to is valid.
-    if (!(req.body.role in Roles)) {
-        res.sendStatus(400);
-        return;
-    }
+    try {
+        // Check if the role to upgrade to is valid.
+        if (!(req.body.role in Roles)) {
+            throw new Error("Invalid role");
+        }
+        // Fetch enrollments of the user to set the role from.
+        const enrolled: any = await CoursesPS.executeExistsEnrolledByCourseIdUserById(req.params.courseId, req.body.netid);
 
+        // Check if the student is enrolled in the course.
+        const isEnrolled: boolean = enrolled.exists;
 
-    // Fetch enrollments of the user to set the role from.
-    const enrolled: any = await CoursesPS.executeCountUserByCourseId(req.params.courseId, req.body.netid);
-
-    // Check if the student is enrolled in the course.
-    const isEnrolled: boolean = (enrolled.count > 0);
-
-    // Depending if the student is enrolled, update the role of the student.
-    let enroll: any;
-    if (!isEnrolled) {
-        enroll =  await CoursesPS.executeEnrollInCourseId(req.params.courseId, req.body.netid, req.body.role);
-    } else {
-        enroll = await CoursesPS.executeSetRole(req.params.courseId, req.body.netid, req.body.role);
-    }
-
-    // Send the correct json response.
-    if (enroll.course_id != undefined) {
+        // Depending if the student is enrolled, update the role of the student.
+        let enroll: any;
+        if (!isEnrolled) {
+            enroll =  await CoursesPS.executeEnrollInCourseId(req.params.courseId, req.body.netid, req.body.role);
+        } else {
+            enroll = await CoursesPS.executeSetRole(req.params.courseId, req.body.netid, req.body.role);
+        }
         res.json({ courseId: enroll.course_id, role: enroll.role });
-    } else {
+    } catch {
         res.sendStatus(400);
     }
 });
@@ -110,14 +143,16 @@ router.put("/:courseId/setRole", async (req: any, res) => {
  * @return json with an array of all net ids.
  */
 router.get("/:courseId/users/:role/", async (req: any, res) => {
-    // Check if the role is valid and supported.
-    if (!(req.params.role in Roles)) {
+    try {
+        // Check if the role is valid and supported.
+        if (!(req.params.role in Roles)) {
+            throw new Error("Invalid role");
+        }
+        // Query and return all net ids as json.
+        res.json(await CoursesPS.executeGetUsersByRole(req.params.courseId, req.params.role));
+    } catch {
         res.sendStatus(400);
-        return;
     }
-
-    // Query and return all net ids as json.
-    res.json(await CoursesPS.executeGetUsersByRole(req.params.courseId, req.params.role));
 });
 
 export default router;

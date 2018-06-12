@@ -93,15 +93,7 @@ export default class Database {
      * @return a database query result or an json error with awaiting, a promise otherwise.
      */
   public static async executeQuery(statement: PreparedStatement) {
-      try {
-          return await Database.db.any(statement);
-      } catch (err) {
-        console.log(err);
-        return {
-            statement: statement,
-            error: "There was a problem executing the information to the database."
-        };
-      }
+      return Database.db.any(statement);
   }
 
     /**
@@ -112,15 +104,7 @@ export default class Database {
      * @return a database query result or an json error with awaiting, a promise otherwise.
      */
     public static async executeQuerySingleResult(statement: PreparedStatement) {
-        try {
-            return await Database.db.one(statement);
-        } catch (err) {
-          console.log("Error " + err + "\nStatement: " + statement);
-            return {
-                statement: statement,
-                error: "There was a problem executing the information to the database."
-            };
-        }
+        return Database.db.one(statement);
     }
 }
 

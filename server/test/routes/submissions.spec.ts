@@ -66,7 +66,7 @@ describe("Submission routes", () => {
         const res = await chai.request(router).post("/")
         .field("assignmentId", 1);
         // assertions
-        expect(res.status).to.equal(200);
+        expect(res.status).to.equal(400);
         expect(res.text).to.equal(JSON.stringify({error: "No file uploaded"}));
     });
 });

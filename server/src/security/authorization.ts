@@ -19,45 +19,65 @@ const authorizeCheck = (req: any, res: any, next: any) => {
  * Check whether a user is enrolled to the course of the assignment it wants to access
  */
 const enrolledAssignmentCheck = async (req: any, res: any, next: any) => {
-    const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-    const authCheck = await AuthorizationPS.executeCheckEnrollment(assignment.course_id, req.userinfo.given_name);
-    await response(res, authCheck.exists, next);
+    try {
+        const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
+        const authCheck = await AuthorizationPS.executeCheckEnrollment(assignment.course_id, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
 };
 
 /**
  * Check whether a user in enrolled as teacher
  */
 const enrolledAsTeacherAssignmentCheck = async (req: any, res: any, next: any) => {
-    const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-    const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.userinfo.given_name);
-    await response(res, authCheck.exists, next);
+    try {
+        const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
+        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
 };
 
 /**
  * Check whether a user in enrolled as teacher for post and put
  */
 const enrolledAsTeacherAssignmentCheckForPost = async (req: any, res: any, next: any) => {
-    const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(req.body.course_id, req.userinfo.given_name);
-    await response(res, authCheck.exists, next);
+    try {
+        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(req.body.course_id, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
 };
 
 /**
  * Check enrollment of a user as teacher or ta for a given course
  */
 const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) => {
-    const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-    const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
-    await response(res, authCheck.exists, next);
+    try {
+        const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
+        const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
 };
 
 /**
  * Check if the person is authorized to view the group.
  */
 const isAuthorizedToViewGroup = async (req: any, res: any, next: any) => {
-    const authCheckTATeacher = await AuthorizationPS.isTAOrTeacherForGroup(req.userinfo.given_name, req.params.id);
-    const authCheckStudent = await AuthorizationPS.isInGroup(req.userinfo.given_name, req.params.id);
-    const authCheck = authCheckTATeacher.exists || authCheckStudent.exists;
-    await response(res, authCheck, next);
+    try {
+        const authCheckTATeacher = await AuthorizationPS.isTAOrTeacherForGroup(req.userinfo.given_name, req.params.id);
+        const authCheckStudent = await AuthorizationPS.isInGroup(req.userinfo.given_name, req.params.id);
+        const authCheck = authCheckTATeacher.exists || authCheckStudent.exists;
+        await response(res, authCheck, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
 };
 
 

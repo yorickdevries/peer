@@ -15,15 +15,11 @@ export default class GroupParser {
      */
     public static async importGroups(filebuffer: Buffer, groupColumn: string, assignmentId: number) {
         // parse the file
-        try {
-            const studentlist = await neatCsv(filebuffer);
-            await this.checkStudentList(studentlist, assignmentId);
-            const studentmap = this.mapGroups(studentlist, groupColumn);
-            const groupnames = await this.addGroupsToDatabase(studentmap, assignmentId);
-            return groupnames;
-        } catch (err) {
-            return {error: err.message};
-        }
+        const studentlist = await neatCsv(filebuffer);
+        await this.checkStudentList(studentlist, assignmentId);
+        const studentmap = this.mapGroups(studentlist, groupColumn);
+        const groupnames = await this.addGroupsToDatabase(studentmap, assignmentId);
+        return groupnames;
     }
     /**
      * Checks whether the studentlist is valid;
@@ -54,9 +50,9 @@ export default class GroupParser {
             }
             // check whether the student is already in a group for this assignment
             // should error as no group exists yet
-            const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
-            if (groupAssignment.group_id) {
-                throw new Error(netId + " is already in group: " + groupAssignment.group_id);
+            const groupAssignment: any = await AssignmentPS.executeExistsGroupOfNetIdByAssignmentId(netId, assignmentId);
+            if (groupAssignment.exists) {
+                throw new Error(netId + " is already in a group");
             } else {
                 // Add student to list
                 allStudents.push(netId);
@@ -73,12 +69,8 @@ export default class GroupParser {
      * @memberof GroupParser
      */
     public static async assignmentExists(assignmentId: number) {
-        const res: any = await AssignmentPS.executeCountAssignmentById(assignmentId);
-        if (res.error || res.count == 0) {
-            return false;
-        } else {
-            return true;
-        }
+        const res: any = await AssignmentPS.executeExistsAssignmentById(assignmentId);
+        return res.exists;
     }
 
     /**
@@ -90,12 +82,12 @@ export default class GroupParser {
      * @memberof GroupParser
      */
     public static async createStudentIfNotExists(netId: string) {
-        const res: any = await UserPS.executeGetUserById(netId);
+        const res: any = await UserPS.executeExistsUserById(netId);
         // In case there is no student entry yet in the database, make one
-        if (res.error) {
+        if (!res.exists) {
             // The email is not known while creating this student entry
+            // Creating user
             const newUser = await UserPS.executeAddUser(netId, undefined);
-            console.log("creating user: " + JSON.stringify(newUser));
         }
         return;
     }
@@ -110,11 +102,11 @@ export default class GroupParser {
      * @memberof GroupParser
      */
     public static async enrollStudentIfNotEnrolled(courseId: number, netId: string) {
-        const res: any = await CoursesPS.executeCountUserByCourseId(courseId, netId);
+        const res: any = await CoursesPS.executeExistsEnrolledByCourseIdUserById(courseId, netId);
         // In case there is no student entry yet in the database, make one
-        if (res.error || res.count == 0) {
+        if (!res.exists) {
+            // enrolling user
             const newUser = await CoursesPS.executeEnrollInCourseId(courseId, netId, "student");
-            console.log("enrolled user: " + JSON.stringify(newUser) + " in course " + courseId);
         }
         return;
     }
@@ -165,7 +157,8 @@ export default class GroupParser {
      * @memberof GroupParser
      */
     public static async addGroupsToDatabase(studentmap: Map<string, string[]>, assignmentId: number) {
-        if (!await this.assignmentExists(assignmentId)) {
+        const assignmentExists = await this.assignmentExists(assignmentId);
+        if (!assignmentExists) {
             throw new Error("Assignment doesn't exist in the database");
         }
         // get assignment info
@@ -188,9 +181,9 @@ export default class GroupParser {
                 // add all students to a group
                 for (const studentNetId of students) {
                     // Check whether student doesnt have a group yet
-                    const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(studentNetId, assignmentId);
-                    if (groupAssignment.group_id) {
-                        throw new Error(studentNetId + " is already in group: " + groupAssignment.group_id);
+                    const groupAssignment: any = await AssignmentPS.executeExistsGroupOfNetIdByAssignmentId(studentNetId, assignmentId);
+                    if (groupAssignment.exists) {
+                        throw new Error(studentNetId + " is already in a group");
                     }
                     // create student in database
                     await this.createStudentIfNotExists(studentNetId);
