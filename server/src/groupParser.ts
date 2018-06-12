@@ -15,15 +15,11 @@ export default class GroupParser {
      */
     public static async importGroups(filebuffer: Buffer, groupColumn: string, assignmentId: number) {
         // parse the file
-        try {
-            const studentlist = await neatCsv(filebuffer);
-            await this.checkStudentList(studentlist, assignmentId);
-            const studentmap = this.mapGroups(studentlist, groupColumn);
-            const groupnames = await this.addGroupsToDatabase(studentmap, assignmentId);
-            return groupnames;
-        } catch (err) {
-            return {error: err.message};
-        }
+        const studentlist = await neatCsv(filebuffer);
+        await this.checkStudentList(studentlist, assignmentId);
+        const studentmap = this.mapGroups(studentlist, groupColumn);
+        const groupnames = await this.addGroupsToDatabase(studentmap, assignmentId);
+        return groupnames;
     }
     /**
      * Checks whether the studentlist is valid;

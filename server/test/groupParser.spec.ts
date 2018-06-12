@@ -1,6 +1,10 @@
 import "mocha";
 import chai from "chai";
 import { expect } from "chai";
+import chaiAsPromised from "chai-as-promised";
+
+chai.use(chaiAsPromised);
+
 import TestData from "./test_helpers/test_data";
 
 import GroupParser from "../src/groupParser";
@@ -54,8 +58,8 @@ describe("GroupParser tests", () => {
         const filebuffer = new Buffer(fs.readFileSync(file));
         const groupColumn = "Education Groups";
         const assignmentId = 3;
-        const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
-        expect(result).to.deep.equal({ error: "The file is improperly formatted" });
+        await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
+        .to.eventually.be.rejectedWith("The file is improperly formatted");
     });
 
     it("students misses a group field", async () => {
@@ -64,8 +68,8 @@ describe("GroupParser tests", () => {
         const filebuffer = new Buffer(fs.readFileSync(file));
         const groupColumn = "Education Groups";
         const assignmentId = 3;
-        const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
-        expect(result).to.deep.equal({ error: "bplanje@tudelft.nl does not have a group" });
+        await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
+        .to.eventually.be.rejectedWith("bplanje@tudelft.nl does not have a group");
     });
 
     it("students misses a username", async () => {
@@ -74,8 +78,8 @@ describe("GroupParser tests", () => {
         const filebuffer = new Buffer(fs.readFileSync(file));
         const groupColumn = "Education Groups";
         const assignmentId = 3;
-        const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
-        expect(result).to.deep.equal({ error: "The file is improperly formatted" });
+        await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
+        .to.eventually.be.rejectedWith("The file is improperly formatted");
     });
 
     it("student has no username field", async () => {
@@ -84,8 +88,8 @@ describe("GroupParser tests", () => {
         const filebuffer = new Buffer(fs.readFileSync(file));
         const groupColumn = "Education Groups";
         const assignmentId = 3;
-        const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
-        expect(result).to.deep.equal({ error: "One student has no username" });
+        await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
+        .to.eventually.be.rejectedWith("One student has no username");
     });
 
     it("some netids are without @ symbol", async () => {
@@ -105,8 +109,8 @@ describe("GroupParser tests", () => {
         const filebuffer = new Buffer(fs.readFileSync(file));
         const groupColumn = "Education Groups";
         const assignmentId = -1;
-        const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
-        expect(result).to.deep.equal({ error: "Assignment doesn't exist in the database" });
+        await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
+        .to.eventually.be.rejectedWith("Assignment doesn't exist in the database");
     });
 
     it("duplicate student", async () => {
@@ -115,8 +119,8 @@ describe("GroupParser tests", () => {
         const filebuffer = new Buffer(fs.readFileSync(file));
         const groupColumn = "Education Groups";
         const assignmentId = 3;
-        const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
-        expect(result).to.deep.equal({ error: "Duplicate student: bplanje" });
+        await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
+        .to.eventually.be.rejectedWith("Duplicate student: bplanje");
     });
 
     it("Student has already a group", async () => {
@@ -125,8 +129,8 @@ describe("GroupParser tests", () => {
         const filebuffer = new Buffer(fs.readFileSync(file));
         const groupColumn = "Education Groups";
         const assignmentId = 1;
-        const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
-        expect(result).to.deep.equal({ error: "paulvanderlaan is already in a group" });
+        await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
+        .to.eventually.be.rejectedWith("paulvanderlaan is already in a group");
     });
 
 });
