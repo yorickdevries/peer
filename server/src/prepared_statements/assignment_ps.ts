@@ -59,7 +59,7 @@ export default class AssignmentPS {
     }
 
     /**
-     * Executes a 'get assignment by course id'.
+     * Get all assignments that belong to a specific course.
      * @param {string} courseId - a course id.
      * @return {any} a query result.
      */
