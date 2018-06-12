@@ -53,7 +53,7 @@ export default class AuthorizationPS {
     /**
      * Checks if the student is in a certain group
      */
-    public static isInGroup(netId: String, groupId:number): any {
+    public static isInGroup(netId: String, groupId: number): any {
         const statement = new PreparedStatement("Check-if-student-is-in-group",
             "SELECT EXISTS(SELECT * FROM groupusers WHERE user_netid = $1 AND group_groupid = $2)");
         statement.values = [netId, groupId];
