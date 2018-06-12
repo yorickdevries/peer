@@ -94,18 +94,18 @@ describe("API Assignment routes", () => {
     });
 
 
-    /**
-     * Test whether the right reviewId's are returned
-     */
-    it("GET assignment/id/feedback", async () => {
-        // test the router
-        MockLogin.initialize("henkjan");
-        const res = await chai.request(router).get("/1/feedback");
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            [{"id": 2}]
-        ));
-    });
+    // /**
+    //  * Test whether the right reviewId's are returned
+    //  */
+    // it("GET assignment/id/feedback", async () => {
+    //     // test the router
+    //     MockLogin.initialize("henkjan");
+    //     const res = await chai.request(router).get("/1/feedback");
+    //     expect(res.status).to.equal(200);
+    //     expect(res.text).to.equal(JSON.stringify(
+    //         [{"id": 2}]
+    //     ));
+    // });
 
     /**
      * Create a new review.

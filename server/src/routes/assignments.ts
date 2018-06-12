@@ -350,7 +350,7 @@ router.get("/:id/feedback", async (req: any, res) => {
         const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.id);
         if (new Date(assignment.review_due_date) < new Date()) {
             res.sendStatus(401);
-            res.json({ error: "You can only access the review after the review due date is passed." })
+            res.json({ error: "You can only access the review after the review due date is passed." });
         } else {
             const assignmentId = req.params.id;
             const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.userinfo.given_name, req.params.id);

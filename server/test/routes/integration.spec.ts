@@ -17,7 +17,7 @@ describe("API integration test", () => {
      */
     beforeEach(async () => {
         // initializes the router
-        MockLogin.initialize(router);
+        MockLogin.initialize();
         await TestData.initializeDatabase();
         await TestData.initializeAssignmentFiles();
     });
@@ -41,9 +41,7 @@ describe("API integration test", () => {
     it("Full integration test for assignments", async () => {
         // [1]
         // Log in as bplanje (teacher) and create a course.
-        MockLogin.initialize(router, "bplanje");
-        console.log("logged in user:");
-        console.log((await chai.request(router).get("/user")).text);
+        MockLogin.initialize("bplanje");
         const course: any = await chai.request(router)
             .post("/courses/")
             .send({description: "example", name: "test name"});
@@ -60,7 +58,7 @@ describe("API integration test", () => {
 
         // [2]
         // Create an assignment.
-        MockLogin.initialize(router, "bplanje");
+        MockLogin.initialize("bplanje");
         const exampleSubmissionFile1 = path.join(__dirname, "../../example_data/assignments/assignment1.pdf");
         const assignment: any = await chai.request(router).post("/assignments/")
             .attach("assignmentFile", fs.readFileSync(exampleSubmissionFile1), "assignment1.pdf")
@@ -72,9 +70,6 @@ describe("API integration test", () => {
             .field("reviews_per_user", 1)
             .field("review_due_date", "2018-06-01T20:30:00.000Z")
             .field("review_publish_date", "2018-07-01T20:30:00.000Z");
-        console.log("here: " + assignment.text + " for course: " + courseId);
-        console.log("logged in user:");
-        console.log((await chai.request(router).get("/user")).text);
         const assignmentId = JSON.parse(assignment.text).id;
         // Assertions to make sure the assignment is created.
         const assignmentResult = JSON.parse(assignment.text);
@@ -99,13 +94,14 @@ describe("API integration test", () => {
 
         // [4]
         // Login as paulvanderlaan and submit a submission.
-        MockLogin.initialize(router, "paulvanderlaan");
+        MockLogin.initialize("paulvanderlaan");
         const exampleSubmissionFile2 = path.join(__dirname, "../../example_data/submissions/submission1.pdf");
         const submissionPaul = await chai.request(router).post("/submissions/")
             .attach("submissionFile", fs.readFileSync(exampleSubmissionFile2), "submission2.pdf")
             .field("assignmentId", assignmentId);
         // Assertions to make sure Paul submitted.
         const submissionPaulResult = JSON.parse(submissionPaul.text);
+        console.log(submissionPaulResult);
         expect(submissionPaul.status).to.equal(200);
         expect(submissionPaulResult.user_netid).to.equal("paulvanderlaan");
         expect(submissionPaulResult.assignment_id).to.equal(assignmentId);
@@ -113,7 +109,7 @@ describe("API integration test", () => {
 
         // [5]
         // Login as yorickdevries and submit a submission
-        MockLogin.initialize(router, "yorickdevries");
+        MockLogin.initialize("yorickdevries");
         const submissionYorick = await chai.request(router).post("/submissions/")
             .attach("submissionFile", fs.readFileSync(exampleSubmissionFile2), "submission2.pdf")
             .field("assignmentId", assignmentId);
@@ -126,11 +122,11 @@ describe("API integration test", () => {
 
         // [6]
         // Distribute the reviews
-        MockLogin.initialize(router, "bplanje");
+        MockLogin.initialize("bplanje");
         const res = await chai.request(router).get("/assignments/" + assignmentId + "/distributeReviews");
         // Assertions to make sure the reviews are distributed.
         expect(res.status).to.equal(200);
-        expect(JSON.parse(res.text).length).to.equal(assignmentId);
+        expect(JSON.parse(res.text).length).to.equal(5);
         console.log("Teacher distributed the reviews");
 
         // // [7]
