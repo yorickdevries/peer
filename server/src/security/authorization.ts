@@ -50,6 +50,15 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
     await response(res, authCheck.exists, next);
 };
 
+const isAuthorizedToViewGroup = async (req: any, res: any, next: any) => {
+    const authCheckTATeacher = await AuthorizationPS.isTAOrTeacherForGroup(req.userinfo.given_name, req.params.id);
+    const authCheckStudent = await AuthorizationPS.isInGroup(req.userinfo.given_name, req.params.id);
+    const authCheck = authCheckTATeacher.exists || authCheckStudent.exists;
+    await response(res, authCheck, next);
+};
+
+
+
 /**
  * Response method that handles the response
  */
@@ -68,6 +77,7 @@ export default {
     authorizeCheck,
     enrolledAssignmentCheck,
     enrolledAsTeacherAssignmentCheck,
+    isAuthorizedToViewGroup,
     enrolledAsTeacherAssignmentCheckForPost,
     enrolledAsTAOrTeacherAssignment
 };
