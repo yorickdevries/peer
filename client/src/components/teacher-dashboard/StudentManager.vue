@@ -1,8 +1,10 @@
 <template>
     <b-container>
-        <b-card header="Student Management"
-                class="mt-5">
 
+        <!--Header-->
+        <BreadcrumbTitle :items="['Student Management']" class="mt-3"></BreadcrumbTitle>
+
+        <b-card>
             <b-row>
                 <b-col>
 
@@ -51,8 +53,10 @@
 
 <script>
     import api from '../../api'
+    import BreadcrumbTitle from '../BreadcrumbTitle'
 
     export default {
+        components: {BreadcrumbTitle},
         data() {
             return {
                 students: [],
