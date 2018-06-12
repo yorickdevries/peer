@@ -37,6 +37,7 @@ const enrolledAsTeacherAssignmentCheck = async (req: any, res: any, next: any) =
  * Check whether a user in enrolled as teacher for post and put
  */
 const enrolledAsTeacherAssignmentCheckForPost = async (req: any, res: any, next: any) => {
+    console.log("here2: " + req.userinfo.given_name + " for " + req.body.course_id);
     const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(req.body.course_id, req.userinfo.given_name);
     await response(res, authCheck.exists, next);
 };

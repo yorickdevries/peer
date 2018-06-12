@@ -99,20 +99,6 @@ describe("API Assignment routes", () => {
         expect(res.text).to.equal(JSON.stringify({error: "No groupcolumn defined"}));
     });
 
-
-    /**
-     * Test whether the right reviewId's are returned
-     */
-    it("GET assignment/id/feedback", async () => {
-        // test the router
-        MockLogin.initialize(router, "henkjan");
-        const res = await chai.request(router).get("/1/feedback");
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            [{"id": 2}]
-        ));
-    });
-
     /**
      * Create a new review.
      */
