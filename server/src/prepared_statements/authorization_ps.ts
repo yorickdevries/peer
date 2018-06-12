@@ -70,6 +70,10 @@ export default class AuthorizationPS {
         return Database.executeQuerySingleResult(statement);
     }
 
+    /**
+     * Check if the user is te owner of the review comment
+     */
+
     public static executeCheckOwnerReviewComment(reviewCommentId: number, netId: String): any {
         const statement = new PreparedStatement("check-reviewComment-owner",
             "SELECT EXISTS(SELECT * FROM reviewcomment WHERE id = $1 AND netid = $2)");
