@@ -2,10 +2,11 @@
     <div>
         <Navbar :links="null"></Navbar>
 
-        <keep-alive>
-            <router-view></router-view>
-        </keep-alive>
-
+        <transition name="slide-right" mode="out-in">
+            <keep-alive>
+                <router-view></router-view>
+            </keep-alive>
+        </transition>
     </div>
 </template>
 
