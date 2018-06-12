@@ -17,7 +17,7 @@ describe("Submission routes", () => {
      */
     beforeEach(async () => {
         // initializes the router
-        MockLogin.initialize(router);
+        MockLogin.initialize();
         await TestData.initializeDatabase();
         await TestData.initializeSubmissionFiles();
     });
@@ -44,7 +44,7 @@ describe("Submission routes", () => {
      */
     it("post submissions/ with file", async () => {
         // log in as henkjan
-        MockLogin.initialize(router, "henkjan");
+        MockLogin.initialize("henkjan");
         const exampleSubmissionFile = path.join(__dirname, "../../example_data/submissions/submission1.pdf");
         const res = await chai.request(router).post("/")
         .attach("submissionFile", fs.readFileSync(exampleSubmissionFile), "submission1.pdf")
@@ -61,7 +61,7 @@ describe("Submission routes", () => {
      */
     it("post submissions/ without file", async () => {
         // log in as henkjan
-        MockLogin.initialize(router, "henkjan");
+        MockLogin.initialize("henkjan");
         const exampleSubmissionFile = path.join(__dirname, "../../example_data/submissions/submission1.pdf");
         const res = await chai.request(router).post("/")
         .field("assignmentId", 1);
