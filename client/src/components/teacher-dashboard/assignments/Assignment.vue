@@ -21,7 +21,6 @@
                         <b-tabs card>
                             <b-tab title="Home" active>
 
-
                                 <b-row>
                                     <b-col cols="8">
                                         <b-card header="Details">
@@ -57,9 +56,19 @@
                                                 <dd>This action will shuffle the groups and assign the groups to each
                                                     other.
                                                 </dd>
-                                                <b-button @click="shuffleGroups()">Shuffle Groups</b-button>
+                                                <b-button @click="shuffleGroups()" class="mb-3" variant="primary">
+                                                    Shuffle Groups
+                                                </b-button>
 
+                                                <dt>Import groups</dt>
+                                                <dd>This action will import the groups in the assignment.</dd>
+                                                <b-button v-b-modal="'importGroups'" variant="primary">Import groups
+                                                </b-button>
                                             </dl>
+
+                                            <b-modal id="importGroups" centered hide-header hide-footer class="p-0 m-0">
+                                                <ImportGroupsWizard :assignmentId="assignment.id"></ImportGroupsWizard>
+                                            </b-modal>
                                         </b-card>
                                     </b-col>
                                 </b-row>
@@ -86,6 +95,7 @@
 <script>
 import api from '../../../api'
 import RubricWizard from '../rubric/RubricWizard'
+import ImportGroupsWizard from '../ImportGroupsWizard'
 import Groups from '../Groups'
 import notifications from '../../../mixins/notifications'
 
@@ -93,7 +103,8 @@ export default {
     mixins: [notifications],
     components: {
         RubricWizard,
-        Groups
+        Groups,
+        ImportGroupsWizard
     },
     async created() {
         let cid = this.$route.params.courseId
