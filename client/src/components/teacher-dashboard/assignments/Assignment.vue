@@ -19,61 +19,50 @@
                 <b-col>
                     <b-card no-body>
                         <b-tabs card>
-                            <b-tab title="Details" active>
-                                <b-list-group flush>
-                                    <b-list-group-item>
-                                        <b-button class="w-100" @click="shuffleGroups()">Shuffle Groups</b-button>
-                                    </b-list-group-item>
+                            <b-tab title="Home" active>
 
-                                    <b-list-group-item class="flex-column align-items-start">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">Description</h5>
-                                        </div>
-                                        <p class="mb-1">
-                                            {{assignment.description}}
-                                        </p>
-                                    </b-list-group-item>
-                                    <b-list-group-item class="flex-column align-items-start">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">Publish date and time</h5>
-                                        </div>
-                                        <p class="mb-1">
-                                            {{formatDate(assignment.publish_date)}}
-                                        </p>
-                                    </b-list-group-item>
-                                    <b-list-group-item class="flex-column align-items-start">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">Due date and time</h5>
-                                        </div>
-                                        <p class="mb-1">
-                                            {{formatDate(assignment.due_date)}}
-                                        </p>
-                                    </b-list-group-item>
-                                    <b-list-group-item class="flex-column align-items-start">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">Peer review start date and time</h5>
-                                        </div>
-                                        <p class="mb-1">
-                                            {{formatDate(assignment.review_publish_date)}}
-                                        </p>
-                                    </b-list-group-item>
-                                    <b-list-group-item class="flex-column align-items-start">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">Peer review due date and time</h5>
-                                        </div>
-                                        <p class="mb-1">
-                                            {{formatDate(assignment.review_due_date)}}
-                                        </p>
-                                    </b-list-group-item>
-                                    <b-list-group-item class="flex-column align-items-start">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">Number of reviews that each student needs to do: {{assignment.reviews_per_user}}</h5>
-                                        </div>
-                                    </b-list-group-item>
-                                    <b-list-group-item>
-                                        <b-button variant="primary w-100" :href="assignmentFilePath" >Download Assignment File</b-button>
-                                    </b-list-group-item>
-                                </b-list-group>
+
+                                <b-row>
+                                    <b-col cols="8">
+                                        <b-card header="Details">
+                                            <dl class="mb-0">
+                                                <dt>Description</dt>
+                                                <dd>{{ assignment.description }}</dd>
+
+                                                <dt>Publish date-time</dt>
+                                                <dd>{{ assignment.publish_date | formatDate }}</dd>
+
+                                                <dt>Assignment due date-time</dt>
+                                                <dd>{{ assignment.due_date | formatDate }}</dd>
+
+                                                <dt>Peer review publish date-time</dt>
+                                                <dd>{{ assignment.review_publish_date | formatDate }}</dd>
+
+                                                <dt>Peer review due date-time</dt>
+                                                <dd>{{ assignment.review_due_date | formatDate }}</dd>
+
+                                                <dt>Amount of peer reviews assigned per student</dt>
+                                                <dd>{{ assignment.reviews_per_user }}</dd>
+
+                                                <dt>Assignment File</dt>
+                                                <dd><a :href="assignmentFilePath">{{ assignment.filename }}</a></dd>
+                                            </dl>
+                                        </b-card>
+                                    </b-col>
+
+                                    <b-col cols="4">
+                                        <b-card header="Actions">
+                                            <dl class="mb-0">
+                                                <dt>Shuffle groups</dt>
+                                                <dd>This action will shuffle the groups and assign the groups to each
+                                                    other.
+                                                </dd>
+                                                <b-button @click="shuffleGroups()">Shuffle Groups</b-button>
+
+                                            </dl>
+                                        </b-card>
+                                    </b-col>
+                                </b-row>
                             </b-tab>
 
                             <b-tab title="Rubric">

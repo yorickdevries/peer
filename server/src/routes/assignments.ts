@@ -43,10 +43,12 @@ const uploadAssignmentFunction = function(req: any, res: any, next: any) {
     uploadAssignment(req, res, function (err) {
         // Error in case of too large file size
         if (err) {
-            res.json({ error: err });
+            res.status(400);
+            res.json({ error: "File is too large" });
         }
         // Error in case of wrong file type
         else if (req.fileValidationError) {
+            res.status(400);
             res.json({ error: req.fileValidationError });
         } else {
             next();
@@ -63,79 +65,76 @@ const uploadAssignmentFunction = function(req: any, res: any, next: any) {
  * @param next - a next object.
  * @return {Promise<void>}
  */
-const updateAssignment = async function(req: any, res: any, next: any) {
-    const oldFilename: string = (await AssignmentPS.executeGetAssignmentById(req.params.assignment_id)).filename;
+const updateAssignment = async function(req: any, res: any) {
+    try {
+        const oldFilename: string = (await AssignmentPS.executeGetAssignmentById(req.params.assignment_id)).filename;
+        // Determine whether a file is uploaded and set the filename accordingly.
+        const updatedFileName: string = (req.file) ? Date.now() + "-" + req.file.originalname : oldFilename;
 
-    // Determine whether a file is uploaded and set the filename accordingly.
-    const updatedFileName: string = (req.file) ? Date.now() + "-" + req.file.originalname : oldFilename;
+        // Update the assignment in the database.
+        const result: any = await AssignmentPS.executeUpdateAssignmentById(
+            req.body.title,
+            req.body.description,
+            req.body.course_id,
+            req.params.assignment_id,
+            req.body.due_date,
+            req.body.publish_date,
+            req.body.reviews_per_user,
+            updatedFileName,
+            req.body.review_due_date,
+            req.body.review_publish_date);
 
-    // Update the assignment in the database.
-    let result: any = await AssignmentPS.executeUpdateAssignmentById(
-        req.body.title,
-        req.body.description,
-        req.body.course_id,
-        req.params.assignment_id,
-        req.body.due_date,
-        req.body.publish_date,
-        req.body.reviews_per_user,
-        updatedFileName,
-        req.body.review_due_date,
-        req.body.review_publish_date);
+        // Remove the old file and add the new file if a file is uploaded
+        // (ie. name of the file is not undefined).
+        if (req.file) {
+            // Assemble the file path. Updated file name is the new file name.
+            // It can never be the old since req.file would be undefined.
+            const newFilePath = path.join(fileFolder, updatedFileName);
+            const oldFilePath = path.join(fileFolder, oldFilename);
 
-    // Remove the old file and add the new file if there was not error,
-    // if a file is uploaded (ie. name of the file is not undefined).
-    if (!result.error && req.file) {
-        // Assemble the file path. Updated file name is the new file name.
-        // It can never be the old since req.file would be undefined.
-        const newFilePath: string = path.join(fileFolder, updatedFileName);
-        const oldFilePath: string = path.join(fileFolder, oldFilename);
-
-        // Try to remove the old file and write the new file.
-        try {
+            // Remove the old file and write the new file.
             fs.unlinkSync(oldFilePath);
             fs.writeFileSync(newFilePath, req.file.buffer);
-        } catch (err) {
-            result = { error: err };
-            console.log("Error trying to unlink/write: " + err);
         }
+        res.json(result);
+    } catch (err) {
+        res.status(400);
+        res.json({ error: "An error occurred while updating the assignment" });
     }
-    res.json(result);
 };
 
 // Function which adds the assignment to the database.
-const addAssignmentToDatabase = async function(req: any, res: any, next: any) {
-    // Error in case of no file
-    if (req.file == undefined) {
-        res.json({ error: "No file uploaded" });
-        next();
-    }
-
-    const fileName = Date.now() + "-" + req.file.originalname;
-    const filePath = path.join(fileFolder, fileName);
-    // add to database
-    let result: any = await AssignmentPS.executeAddAssignment(
-        req.body.title,
-        req.body.description,
-        req.body.due_date,
-        req.body.publish_date,
-        req.body.course_id,
-        req.body.reviews_per_user,
-        fileName,
-        req.body.review_due_date,
-        req.body.review_publish_date);
-    // Create rubric
-    await RubricPS.executeCreateRubric(result.id);
-    // writing the file if no error is there
-    if (!result.error) {
-        // Try to write the file.
-        try {
-            fs.writeFileSync(filePath, req.file.buffer);
-        } catch (err) {
-            result = { error: err };
-            console.log("Error trying to write: " + err);
+const addAssignmentToDatabase = async function(req: any, res: any) {
+    try {
+        // Error in case of no file
+        if (req.file == undefined) {
+            res.status(400);
+            res.json({ error: "No file uploaded" });
+            return;
         }
+
+        const fileName = Date.now() + "-" + req.file.originalname;
+        const filePath = path.join(fileFolder, fileName);
+        // add to database
+        const result: any = await AssignmentPS.executeAddAssignment(
+            req.body.title,
+            req.body.description,
+            req.body.due_date,
+            req.body.publish_date,
+            req.body.course_id,
+            req.body.reviews_per_user,
+            fileName,
+            req.body.review_due_date,
+            req.body.review_publish_date);
+        // Create rubric
+        await RubricPS.executeCreateRubric(result.id);
+        // writing the file if no error is there
+        fs.writeFileSync(filePath, req.file.buffer);
+        res.json(result);
+    } catch (err) {
+        res.status(400);
+        res.json({ error: "An error occurred while creating the assignment" });
     }
-    res.json(result);
 };
 
 
@@ -163,10 +162,13 @@ const uploadGroups = multer({
  * @params assignment_id - assignment id
  */
 router.route("/:assignment_id")
-    .get(index.authorization.enrolledAssignmentCheck, async (req, res) => {
-            res.json(await AssignmentPS.executeGetAssignmentById(
-                req.params.assignment_id
-            ));
+    .get(index.authorization.enrolledAssignmentCheck, (req, res) => {
+        AssignmentPS.executeGetAssignmentById(req.params.assignment_id)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.sendStatus(400);
+        });
     });
 
 
@@ -187,9 +189,13 @@ router.put("/:assignment_id", uploadAssignmentFunction, updateAssignment);
  * @param id - assignment id.
  */
 router.get("/:id/file", async (req, res) => {
-    const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.id);
-    const fileName = path.join(__dirname, "../files/assignments", assignment.filename);
-    res.sendfile(fileName);
+    try {
+        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.id);
+        const fileName = path.join(__dirname, "../files/assignments", assignment.filename);
+        res.sendfile(fileName);
+    } catch (err) {
+        res.sendStatus(400);
+    }
 });
 
 /**
@@ -198,11 +204,15 @@ router.get("/:id/file", async (req, res) => {
  * @params assignment_id - assignment_id
  */
 router.route("/:assignment_id/submissions")
-    .get(async (req: any, res) => {
-        res.json(await AssignmentPS.executeGetSubmissionsByAssignmentId(
+    .get((req: any, res) => {
+        AssignmentPS.executeGetSubmissionsByAssignmentId(
             req.userinfo.given_name,
             req.params.assignment_id
-        ));
+        ).then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.sendStatus(400);
+        });
     });
 
 /**
@@ -213,18 +223,15 @@ router.route("/:id/latestsubmission")
     const netId = req.userinfo.given_name;
     const assignmentId = req.params.id;
     // get the groupId of this user for this assignment
-    const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
-    const groupId = groupAssignment.group_id;
-    if (groupId == undefined) {
-        res.json({error: "User is not in a group in this assignment"});
-    } else {
-        const result: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
-        if (result.error) {
-            res.json({error: "No latest submission could be found"});
-        } else {
+    try {
+        const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
+        const groupId = groupAssignment.group_id;
         // get the latest submission
-            res.json(result);
-        }
+        const result: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
+        res.json(result);
+    } catch {
+        res.status(400);
+        res.json({error: "No latest submission could be found"});
     }
 });
 
@@ -233,10 +240,13 @@ router.route("/:id/latestsubmission")
  * @params assignment_id - assignment_id
  */
 router.route("/:assignment_id/allsubmissions")
-    .get(index.authorization.enrolledAsTAOrTeacherAssignment, async (req, res) => {
-            res.json(await AssignmentPS.executeGetAllSubmissionsByAssignmentId(
-                req.params.assignment_id
-            ));
+    .get(index.authorization.enrolledAsTAOrTeacherAssignment, (req, res) => {
+        AssignmentPS.executeGetAllSubmissionsByAssignmentId(req.params.assignment_id)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.sendStatus(400);
+        });
     });
 
 
@@ -246,40 +256,60 @@ router.route("/:assignment_id/allsubmissions")
  * @params assignment_id - assignment_Id
  */
 router.route("/:assignment_id/reviews")
-    .get(async (req: any, res) => {
-        res.json(await ReviewPS.executeGetReviewsByUserIdAndAssignmentId(req.userinfo.given_name, req.params.assignment_id));
+    .get((req: any, res) => {
+        ReviewPS.executeGetReviewsByUserIdAndAssignmentId(req.userinfo.given_name, req.params.assignment_id)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.sendStatus(400);
+        });
     });
 
 /**
  * Route to distribute reviews for a certain assignment
  */
 router.route("/:assignment_id/distributeReviews")
-    .get(async (req: any, res) => {
-        res.json(await reviewDistribution.distributeReviews(req.params.assignment_id));
+    .get((req: any, res) => {
+        reviewDistribution.distributeReviews(req.params.assignment_id)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.status(400);
+            res.json({error: error.message});
+        });
     });
 
 /**
  * Route to import groups for a specific assignment.
  */
-router.post("/:id/importgroups", async (req: any, res) => {
+router.post("/:id/importgroups", (req: any, res) => {
     // File upload handling
-    uploadGroups(req, res, async function (err) {
+    uploadGroups(req, res, function (err) {
         // Error in case of wrong file type
         if (req.fileValidationError) {
-            res.json({error: req.fileValidationError});
+            res.status(400);
+            res.json({ error: req.fileValidationError });
             // Error (in case of too large file size)
         } else if (err) {
-            res.json({error: err});
+            res.status(400);
+            res.json({ error: "File is too large" });
             // error if no file was uploaded or no group column defined
         } else if (req.file == undefined) {
+            res.status(400);
             res.json({error: "No file uploaded"});
         } else if (req.body.groupColumn == undefined) {
+            res.status(400);
             res.json({error: "No groupcolumn defined"});
         } else {
             const groupColumn = req.body.groupColumn;
             const assignmentId = req.params.id;
-            const groups = await GroupParser.importGroups(req.file.buffer, groupColumn, assignmentId);
-            res.json(groups);
+            GroupParser.importGroups(req.file.buffer, groupColumn, assignmentId)
+            .then((data) => {
+                res.json(data);
+            }).catch((error) => {
+                res.status(400);
+                res.json({error: error.message});
+            });
         }
     });
 });
@@ -288,8 +318,13 @@ router.post("/:id/importgroups", async (req: any, res) => {
  * Route to get the reviews belonging to an assignment.
  * @param id - assignment id.
  */
-router.get("/:id/allreviews", async (req: any, res) => {
-    res.json(await AssignmentPS.executeGetReviewsById(req.params.id));
+router.get("/:id/allreviews", (req: any, res) => {
+    AssignmentPS.executeGetReviewsById(req.params.id)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
 });
 
 /**
@@ -297,36 +332,48 @@ router.get("/:id/allreviews", async (req: any, res) => {
  * @param id - assignment id.
  */
 router.get("/:id/group", async (req: any, res) => {
-    const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.userinfo.given_name, req.params.id);
-    const groupId = group.group_groupid;
-    const groupmembers = await GroupPS.executeGetUsersOfGroupById(groupId);
-    res.json({group, groupmembers});
+    try {
+        const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.userinfo.given_name, req.params.id);
+        const groupId = group.group_groupid;
+        const groupmembers = await GroupPS.executeGetUsersOfGroupById(groupId);
+        res.json({group, groupmembers});
+    } catch {
+        res.sendStatus(400);
+    }
 });
 
 /**
  * Route to get review Ids of a certain person.
  */
 router.get("/:id/feedback", async (req: any, res) => {
-    const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.id);
-    if (new Date(assignment.review_due_date) < new Date()) {
-        res.sendStatus(401);
-        res.json({ error: "You can only access the review after the review due date is passed." })
-    } else {
-        const assignmentId = req.params.id;
-        const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.userinfo.given_name, req.params.id);
-        const groupId = group.group_groupid;
-        const submission: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
-        const submissionId = submission.id;
-        res.json(await ReviewPS.executeGetReviewsBySubmissionId(submissionId));
+    try {
+        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.id);
+        if (new Date(assignment.review_due_date) < new Date()) {
+            res.sendStatus(401);
+            res.json({ error: "You can only access the review after the review due date is passed." })
+        } else {
+            const assignmentId = req.params.id;
+            const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.userinfo.given_name, req.params.id);
+            const groupId = group.group_groupid;
+            const submission: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
+            const submissionId = submission.id;
+            res.json(await ReviewPS.executeGetReviewsBySubmissionId(submissionId));
+        }
+    } catch {
+        res.sendStatus(400);
     }
 });
 
 /**
  * Route to get all groups of an assignment
  */
-router.get("/:id/groups", async (req: any, res) => {
-    const assignmentId = req.params.id;
-    res.json(await AssignmentPS.executeGetGroupsByAssignmentId(assignmentId));
+router.get("/:id/groups", (req: any, res) => {
+    AssignmentPS.executeGetGroupsByAssignmentId(req.params.id)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
 });
 
 export default router;

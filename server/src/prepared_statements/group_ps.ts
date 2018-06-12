@@ -6,15 +6,6 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
  */
 export default class GroupsPS {
 
-    /**
-     * Prepeared statement that gets all groupes
-     * @returns {Promise<pgPromise.queryResult>}
-     */
-    public static executeGetGroups(): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-groups",
-            'SELECT * FROM "grouplist"');
-        return Database.executeQuery(statement);
-    }
 
     /**
      * Prepared statement fumction that gets a group with a certain id

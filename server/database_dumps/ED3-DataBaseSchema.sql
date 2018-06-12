@@ -4,14 +4,14 @@
 -- tables
 -- Table: AssignmentList
 CREATE TABLE AssignmentList (
-    title varchar(100)  NOT NULL,
-    description varchar(1000)  NOT NULL,
+    title varchar(5000)  NOT NULL,
+    description varchar(5000)  NOT NULL,
     due_date timestamptz NOT NULL,
     publish_date timestamptz NOT NULL,
     id SERIAL,
     course_id int NOT NULL,
     reviews_per_user int NOT NULL,
-    filename varchar(100) NOT NULL,
+    filename varchar(5000) NOT NULL,
     review_due_date timestamptz NOT NULL,
     review_publish_date timestamptz NOT NULL,
     CONSTRAINT AssignmentList_pk PRIMARY KEY (id)
@@ -20,16 +20,16 @@ CREATE TABLE AssignmentList (
 -- Table: CourseList
 CREATE TABLE CourseList (
     id SERIAL,
-    description varchar(2000)  NOT NULL,
-    name varchar(200)  NOT NULL,
+    description varchar(5000)  NOT NULL,
+    name varchar(5000)  NOT NULL,
     CONSTRAINT CourseList_pk PRIMARY KEY (id)
 );
 
 -- Table: Enroll
 CREATE TABLE Enroll (
     Course_id int NOT NULL,
-    User_netid varchar(256)  NOT NULL,
-    role varchar(25)  NOT NULL,
+    User_netid varchar(5000)  NOT NULL,
+    role varchar(5000)  NOT NULL,
     CONSTRAINT Enroll_pk PRIMARY KEY (Course_id,User_netid)
 );
 
@@ -43,13 +43,13 @@ CREATE TABLE AssignmentGroup (
 -- Table: GroupList
 CREATE TABLE GroupList (
     id SERIAL,
-    group_name varchar(20) NOT NULL,
+    group_name varchar(5000) NOT NULL,
     CONSTRAINT GroupList_pk PRIMARY KEY (id)
 );
 
 -- Table: GroupUsers
 CREATE TABLE GroupUsers (
-    User_netid varchar(256)  NOT NULL,
+    User_netid varchar(5000)  NOT NULL,
     Group_groupid int NOT NULL,
     CONSTRAINT GroupUsers_pk PRIMARY KEY (User_netid,Group_groupid)
 );
@@ -65,7 +65,7 @@ CREATE TABLE MCAnswer (
 -- Table: MCOption
 CREATE TABLE MCOption (
     id SERIAL,
-    option varchar(100)  NOT NULL,
+    option varchar(5000)  NOT NULL,
     MCQuestion_id int NOT NULL,
     CONSTRAINT MCOption_pk PRIMARY KEY (id)
 );
@@ -73,7 +73,7 @@ CREATE TABLE MCOption (
 -- Table: MCQuestion
 CREATE TABLE MCQuestion (
     id SERIAL,
-    question varchar(200)  NOT NULL,
+    question varchar(5000)  NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
     type_question char(2) DEFAULT 'mc',
@@ -82,7 +82,7 @@ CREATE TABLE MCQuestion (
 
 -- Table: OpenAnswer
 CREATE TABLE OpenAnswer (
-    answer varchar(200)  NOT NULL,
+    answer varchar(5000)  NOT NULL,
     OpenQuestion_id int NOT NULL,
     Review_id int NOT NULL,
     CONSTRAINT OpenAnswer_pk PRIMARY KEY (OpenQuestion_id,Review_id)
@@ -91,7 +91,7 @@ CREATE TABLE OpenAnswer (
 -- Table: OpenQuestion
 CREATE TABLE OpenQuestion (
     id SERIAL,
-    question varchar(200)  NOT NULL,
+    question varchar(5000)  NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
     type_question char(4) DEFAULT 'open',
@@ -109,7 +109,7 @@ CREATE TABLE RangeAnswer (
 -- Table: RangeQuestion
 CREATE TABLE RangeQuestion (
     id SERIAL,
-    question varchar(200)  NOT NULL,
+    question varchar(5000)  NOT NULL,
     range int  NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE RangeQuestion (
 -- Table: Review
 CREATE TABLE Review (
     id SERIAL,
-    User_netid varchar(256) NOT NULL,
+    User_netid varchar(5000) NOT NULL,
     Submission_id int NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
@@ -138,10 +138,10 @@ CREATE TABLE Rubric (
 -- Table: Submission
 CREATE TABLE Submission (
     id SERIAL,
-    User_netid varchar(256)  NOT NULL,
+    User_netid varchar(5000)  NOT NULL,
     Group_id int NOT NULL,
     Assignment_id int NOT NULL,
-    file_path varchar(100)  NOT NULL,
+    file_path varchar(5000)  NOT NULL,
     date timestamptz NOT NULL,
     grade int NOT NULL DEFAULT -1,
     CONSTRAINT Submission_pk PRIMARY KEY (id)
@@ -149,8 +149,8 @@ CREATE TABLE Submission (
 
 -- Table: UserList
 CREATE TABLE UserList (
-    netid varchar(256)  NOT NULL,
-    email varchar(256),
+    netid varchar(5000)  NOT NULL,
+    email varchar(5000),
     CONSTRAINT UserList_pk PRIMARY KEY (netid)
 );
 
@@ -159,7 +159,7 @@ CREATE TABLE ReviewComment (
     id SERIAL,
     comment varchar(5000)  NOT NULL,
     review_id int NOT NULL,
-    netid varchar(256) NOT NULL,
+    netid varchar(5000) NOT NULL,
     CONSTRAINT ReviewComment_pk PRIMARY KEY (id)
 );
 
@@ -168,7 +168,7 @@ CREATE TABLE SubmissionComment (
     id SERIAL,
     comment varchar(5000)  NOT NULL,
     submission_id int NOT NULL,
-    netid varchar(256) NOT NULL,
+    netid varchar(5000) NOT NULL,
     CONSTRAINT SubmissionComment_pk PRIMARY KEY (id)
 );
 
