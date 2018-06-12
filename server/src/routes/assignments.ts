@@ -274,7 +274,8 @@ router.route("/:assignment_id/distributeReviews")
         .then((data) => {
             res.json(data);
         }).catch((error) => {
-            res.sendStatus(400);
+            res.status(400);
+            res.json({error: error.message});
         });
     });
 
