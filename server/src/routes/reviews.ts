@@ -1,6 +1,7 @@
 import ReviewsPS from "../prepared_statements/review_ps";
 import RubricPS from "../prepared_statements/rubric_ps";
 import bodyParser from "body-parser";
+import index from "../security/index";
 import path from "path";
 
 // Router
@@ -14,7 +15,7 @@ router.use(bodyParser.json());
  * @param reviewId - a review id.
  * @return a database query result, all columns of review + file_path of the submission.
  */
-router.get("/:reviewId", async (req, res) => {
+router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
     const jsonItems: any = [];
     const review = await ReviewsPS.executeGetReview(req.params.reviewId);
     const questions = await RubricPS.getAllQuestionsByRubricId(review.rubric_assignment_id);
@@ -102,7 +103,7 @@ router.get("/:reviewId/submit", async (req, res) => {
  * @param reviewId - an id of a review.
  * @return database return value.
  */
-router.get("/:reviewId/allComments", async (req, res) => {
+router.route("/:reviewId/allComments").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
     res.json(await ReviewsPS.executeGetAllReviewComments(req.params.reviewId));
 });
 
@@ -139,7 +140,7 @@ router.delete("/:reviewCommentId/comment", async (req, res) => {
 /**
  * Gets the file that needs to be reviewed.
  */
-router.get("/:id/file", async (req, res) => {
+router.route("/:id/file").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
     const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(req.params.id);
     const filePath = path.join(__dirname, "../files/submissions", submission.file_path);
     res.sendfile(filePath);

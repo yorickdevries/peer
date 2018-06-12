@@ -51,6 +51,18 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
 };
 
 /**
+ * Check if the user can show this review, i.e. is he the owner of the submission, is he the owner of the review
+ * or is he a TA or teacher for the course of the review
+ */
+const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
+    const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.userinfo.given_name);
+    const authCheckOwner = await AuthorizationPS.executeCheckReviewMaker(req.params.reviewId, req.userinfo.given_name);
+    const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(req.params.reviewId, req.userinfo.given_name);
+    const bool = authCheckTAOrTeacher.exists || authCheckOwner.exists || authCheckSubmissionOwner.exists;
+    await response(res, bool, next);
+};
+
+/**
  * Response method that handles the response
  */
 const response = (res: any, bool: boolean, next: any) => {
@@ -68,6 +80,7 @@ export default {
     authorizeCheck,
     enrolledAssignmentCheck,
     enrolledAsTeacherAssignmentCheck,
+    checkAuthorizationForReview,
     enrolledAsTeacherAssignmentCheckForPost,
     enrolledAsTAOrTeacherAssignment
 };

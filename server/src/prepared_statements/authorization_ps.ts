@@ -44,7 +44,7 @@ export default class AuthorizationPS {
      */
     public static executeCheckTAOrTeacherForReview(reviewId: number, netId: String): any {
         const statement = new PreparedStatement("check-enrollment-ta-teacher-via-review",
-            "SELECT EXISTS(SELECT * FROM review, submission, assignmentlist, enroll, courselist WHERE review.submission_id = submission.id AND submission.assignment_id = assignmentlist.id AND \n" +
+            "SELECT EXISTS(SELECT * FROM review, submission, assignmentlist, enroll, courselist WHERE review.submission_id = submission.id AND submission.assignment_id = assignmentlist.id AND " +
             "assignmentlist.course_id = courselist.id AND (enroll.role = 'TA' OR enroll.role = 'teacher') AND review.id = $1 AND enroll.user_netid = $2)");
         statement.values = [reviewId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -64,7 +64,11 @@ export default class AuthorizationPS {
      * Check if the review belongs to the user, i.e. is the submission where the review is on review done by your group
      */
     public static executeCheckGroupBelongingToReview(reviewId: number, netId: String): any {
-        
+        const statement = new PreparedStatement("check-review-belonging-to-submussion-of-user",
+            "SELECT EXISTS(SELECT * FROM review, submission, groupusers WHERE review.submission_id = submission.id AND " +
+            "submission.group_id = groupusers.group_groupId AND review.id = $1 AND groupusers.user_netid = $2)");
+        statement.values = [reviewId, netId];
+        return Database.executeQuerySingleResult(statement);
     }
 
 }
