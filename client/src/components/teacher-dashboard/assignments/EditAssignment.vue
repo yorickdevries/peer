@@ -219,8 +219,12 @@ export default {
             formData.append("due_date", this.assignment.due_day + "T" + this.assignment.due_time + ":00.000Z")
             formData.append("review_publish_date", this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z")
             formData.append("review_due_date", this.assignment.review_due_day + "T" + this.assignment.review_due_time + ":00.000Z")
-            formData.append("assignmentFile", this.file)
             formData.append("reviews_per_user", this.assignment.reviews_per_user)
+
+            // Add file if a new one has been uploaded
+            if (this.file != null) {
+                formData.append("assignmentFile", this.file)
+            }
             // Update assignment in database
             let res = await api.saveAssignment(this.assignment.id, formData)
             console.log(res)
