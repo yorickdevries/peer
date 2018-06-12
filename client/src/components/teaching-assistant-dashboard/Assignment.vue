@@ -2,7 +2,8 @@
     <div>
         <b-container>
 
-            <h1 class="mt-5">Assignment dashboard: {{ assignment.title }}</h1>
+            <!--Header-->
+            <BreadcrumbTitle :items="['Assignment', assignment.title]" class="mt-3"></BreadcrumbTitle>
 
             <!--Tab Layout-->
             <b-card no-body>
@@ -37,6 +38,7 @@
 
 <script>
 import api from "../../api"
+import BreadcrumbTitle from '../BreadcrumbTitle'
 import Submissions from "../ta_teacher_shared/Submissions"
 import Reviews from '../ta_teacher_shared/Reviews'
 import Groups from '../ta_teacher_shared/Groups'
@@ -44,6 +46,7 @@ import AssignmentDetails from '../ta_teacher_shared/AssignmentDetails'
 
 export default {
     components: {
+        BreadcrumbTitle,
         Submissions,
         Reviews,
         Groups,

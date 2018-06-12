@@ -1,5 +1,10 @@
 <template>
-    <b-breadcrumb :items="breadcrumbItems(items)"></b-breadcrumb>
+    <div class="d-flex align-items-center">
+        <b-breadcrumb :items="breadcrumbItems(items)" class="w-100"></b-breadcrumb>
+        <div :class="{ 'ml-3': hasDefaultSlot, 'mb-3': true }">
+            <slot></slot>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -7,7 +12,11 @@
         props: {
             items: Array
         },
-        name: "Breadcrumb",
+        computed: {
+            hasDefaultSlot() {
+                return !!this.$slots.default
+            },
+        },
         methods: {
             breadcrumbItems(items) {
                 return items.map(item => {

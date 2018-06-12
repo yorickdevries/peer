@@ -2,18 +2,13 @@
     <div>
         <b-container>
 
-            <b-row>
-                <b-col>
-                    <div class="d-flex align-items-center mt-5">
-                        <span class="h1 w-100">Assignment: {{assignment.title}}</span>
-                        <b-button variant="success"
-                                  :to="{ name: 'teacher-dashboard.assignments.assignment.edit', params: {courseId: course.id, assignmentId: assignment.id} }">
-                            Edit assignment
-                        </b-button>
-                    </div>
-
-                </b-col>
-            </b-row>
+            <!--Header and action-->
+            <BreadcrumbTitle :items="['Assignments', assignment.title]" class="mt-3">
+                <b-button variant="success"
+                          :to="{ name: 'teacher-dashboard.assignments.assignment.edit', params: {courseId: course.id, assignmentId: assignment.id} }">
+                    Edit assignment
+                </b-button>
+            </BreadcrumbTitle>
 
             <b-row>
                 <b-col>
@@ -82,6 +77,7 @@
 
 <script>
 import api from '../../../api'
+import BreadcrumbTitle from '../../BreadcrumbTitle'
 import RubricWizard from '../rubric/RubricWizard'
 import ImportGroupsWizard from '../ImportGroupsWizard'
 import Groups from '../../ta_teacher_shared/Groups'
@@ -93,6 +89,7 @@ import notifications from '../../../mixins/notifications'
 export default {
     mixins: [notifications],
     components: {
+        BreadcrumbTitle,
         RubricWizard,
         Groups,
         ImportGroupsWizard,
