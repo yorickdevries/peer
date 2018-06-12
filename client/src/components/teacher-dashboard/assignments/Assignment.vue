@@ -25,30 +25,7 @@
 
                                 <b-row>
                                     <b-col cols="8">
-                                        <b-card header="Details">
-                                            <dl class="mb-0">
-                                                <dt>Description</dt>
-                                                <dd>{{ assignment.description }}</dd>
-
-                                                <dt>Publish date-time</dt>
-                                                <dd>{{ assignment.publish_date | formatDate }}</dd>
-
-                                                <dt>Assignment due date-time</dt>
-                                                <dd>{{ assignment.due_date | formatDate }}</dd>
-
-                                                <dt>Peer review publish date-time</dt>
-                                                <dd>{{ assignment.review_publish_date | formatDate }}</dd>
-
-                                                <dt>Peer review due date-tie=me</dt>
-                                                <dd>{{ assignment.review_due_date | formatDate }}</dd>
-
-                                                <dt>Amount of peer reviews assigned per student</dt>
-                                                <dd>{{ assignment.reviews_per_user }}</dd>
-
-                                                <dt>Assignment File</dt>
-                                                <dd><a :href="assignmentFilePath">{{ assignment.filename }}</a></dd>
-                                            </dl>
-                                        </b-card>
+                                        <AssignmentDetails :assignment="assignment"></AssignmentDetails>
                                     </b-col>
 
                                     <b-col cols="4">
@@ -82,7 +59,7 @@
                             </b-tab>
 
                             <!--Submissions-->
-                            <b-tab title="Submissions" active>
+                            <b-tab title="Submissions">
                                 <Submissions :assignmentId="assignment.id"></Submissions>
                             </b-tab>
 
@@ -99,8 +76,6 @@
                     </b-card>
                 </b-col>
             </b-row>
-
-
         </b-container>
     </div>
 </template>
@@ -112,6 +87,7 @@ import ImportGroupsWizard from '../ImportGroupsWizard'
 import Groups from '../../ta_teacher_shared/Groups'
 import Reviews from '../../ta_teacher_shared/Reviews'
 import Submissions from '../../ta_teacher_shared/Submissions'
+import AssignmentDetails from '../../ta_teacher_shared/AssignmentDetails'
 import notifications from '../../../mixins/notifications'
 
 export default {
@@ -121,7 +97,8 @@ export default {
         Groups,
         ImportGroupsWizard,
         Reviews,
-        Submissions
+        Submissions,
+        AssignmentDetails
     },
     async created() {
         let cid = this.$route.params.courseId
@@ -147,12 +124,6 @@ export default {
                 filename: null
             },
         }
-    },
-    computed: {
-        assignmentFilePath() {
-            // Get the assignment file path.
-            return `/api/assignments/${this.assignment.id}/file`
-        },
     },
     methods: {
         formatDate(date) {

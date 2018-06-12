@@ -8,8 +8,13 @@
             <b-card no-body>
                 <b-tabs card>
 
+                    <!--Details-->
+                    <b-tab title="Home" active>
+                        <AssignmentDetails :assignment="assignment"></AssignmentDetails>
+                    </b-tab>
+
                     <!--Submissions-->
-                    <b-tab title="Submissions" active>
+                    <b-tab title="Submissions">
                         <Submissions :assignmentId="$route.params.assignmentId"></Submissions>
                     </b-tab>
 
@@ -22,7 +27,6 @@
                     <b-tab title="Groups">
                         <Groups :assignment-id="$route.params.assignmentId"></Groups>
                     </b-tab>
-
                 </b-tabs>
             </b-card>
 
@@ -36,12 +40,14 @@ import api from "../../api"
 import Submissions from "../ta_teacher_shared/Submissions"
 import Reviews from '../ta_teacher_shared/Reviews'
 import Groups from '../ta_teacher_shared/Groups'
+import AssignmentDetails from '../ta_teacher_shared/AssignmentDetails'
 
 export default {
     components: {
         Submissions,
         Reviews,
-        Groups
+        Groups,
+        AssignmentDetails
     },
     data() {
         return {
