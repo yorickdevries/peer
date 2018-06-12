@@ -1,18 +1,11 @@
+import "mocha";
 import chai from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 chai.use(chaiHttp);
-import "mocha";
-
 const router: any = require("../../src/routes/groups").default;
-// Imitates the login of Okta for testing
-import InitLogin from "./init_login";
-
-import Database from "../../src/database";
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
-const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
+import MockLogin from "../test_helpers/mock_login";
+import TestData from "../test_helpers/test_data";
 
 describe("API Group routes", () => {
     /**
@@ -20,10 +13,8 @@ describe("API Group routes", () => {
      */
     beforeEach(async () => {
         // initializes the router with user teacheraccount
-        InitLogin.initialize(router, "teacheraccount");
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
+        MockLogin.initialize(router, "teacheraccount");
+        await TestData.initializeDatabase();
     });
 
     /**

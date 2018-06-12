@@ -70,83 +70,70 @@
 </template>
 
 <script>
-    import api from '../../api'
-    import VueNotifications from "vue-notifications/src/main"
+import api from '../../api'
+import notifications from '../../mixins/notifications'
 
-    export default {
-        data() {
-            return {
-                teachingAssistants: [],
-                currentPage: 1,
-                fields: [
-                    {key: 'user_netid', label: 'NetID'},
-                    'actions'
-                ],
-                perPage: 5,
-                filter: null,
-                netid: ""
+export default {
+    mixins: [notifications],
+    data() {
+        return {
+            teachingAssistants: [],
+            currentPage: 1,
+            fields: [
+                {key: 'user_netid', label: 'NetID'},
+                'actions'
+            ],
+            perPage: 5,
+            filter: null,
+            netid: ""
+        }
+    },
+    async created() {
+        await this.fetchTeachingAssistants()
+    },
+    methods: {
+        async submitTA() {
+            // Check if input has been filled in.
+            if (this.netid === "") return this.showErrorMessage({message: "Please input a valid netID."})
+
+            // Change the role through the API.
+            try {
+                await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
+                    netid: this.netid,
+                    role: "TA"
+                })
+            } catch (e) {
+                return this.showErrorMessage({message: "Something went wrong adding the TA."})
             }
-        },
-        async created() {
+
+            // Show correct status message.
+            this.showSuccessMessage({message: `Successfully added ${this.netid} as a teaching assistant.`})
+
+            // Re-fetch teaching assistants.
             await this.fetchTeachingAssistants()
         },
-        methods: {
-            async submitTA() {
-                // Check if input has been filled in.
-                if (this.netid === "") return this.showErrorMessage({message: "Please input a valid netID."})
-
-                // Change the role through the API.
-                let res;
-                try {
-                    res = await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
-                        netid: this.netid,
-                        role: "TA"
-                    })
-                } catch (e) {
-                    return this.showErrorMessage({message: "Something went wrong adding the TA."})
-                }
-
-                // Show correct status message.
-                this.showSuccessMessage({message: `Successfully added ${this.netid} as a teaching assistant.`})
-
-                // Re-fetch teaching assistants.
-                await this.fetchTeachingAssistants()
-            },
-            async removeTA(netid) {
-                // Change the role through the API.
-                let res;
-                try {
-                    res = await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
-                        netid: netid,
-                        role: "student"
-                    })
-                } catch (e) {
-                    console.log(e)
-                    return this.showErrorMessage({message: "Something went wrong removing the TA."})
-                }
-
-                // Show correct status message.
-                this.showSuccessMessage({message: `Successfully added ${this.netid} as a teaching assistant.`})
-
-                // Re-fetch teaching assistants.
-                await this.fetchTeachingAssistants()
-            },
-            async fetchTeachingAssistants() {
-                let {data} = await api.getUsersWithRole(this.$route.params.courseId, "TA")
-                this.teachingAssistants = data
+        async removeTA(netid) {
+            // Change the role through the API.
+            try {
+                await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
+                    netid: netid,
+                    role: "student"
+                })
+            } catch (e) {
+                console.log(e)
+                return this.showErrorMessage({message: "Something went wrong removing the TA."})
             }
+
+            // Show correct status message.
+            this.showSuccessMessage({message: `Successfully added ${this.netid} as a teaching assistant.`})
+
+            // Re-fetch teaching assistants.
+            await this.fetchTeachingAssistants()
         },
-        notifications: {
-            showErrorMessage: {
-                type: VueNotifications.types.error,
-                title: 'Error',
-                message: 'Error.'
-            },
-            showSuccessMessage: {
-                type: VueNotifications.types.success,
-                title: 'Success',
-                message: 'Success.'
-            },
+        async fetchTeachingAssistants() {
+            let {data} = await api.getUsersWithRole(this.$route.params.courseId, "TA")
+            this.teachingAssistants = data
         }
-    }
+    },
+}
 </script>

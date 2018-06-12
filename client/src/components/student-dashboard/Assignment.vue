@@ -15,23 +15,21 @@
 
                         <b-col class="p-0 d-flex flex-wrap">
 
-                            <router-link
-                                    active-class="bg-light"
-                                    class="flex-fill"
-                                    tag="a"
-                                    :to="{ name: 'student-dashboard.course.assignment.information' }">
+                            <b-button   variant="white"
+                                        class="flex-fill p-0"
+                                        :to="{ name: 'student-dashboard.course.assignment.information' }">
                                 <div class="text-center border-right border-bottom active py-3 h-100 align-middle">
                                     <div class="lead font-weight-bold align-middle">Assignment</div>
                                     <div class="text-muted">Information</div>
                                 </div>
 
-                            </router-link>
+                            </b-button>
 
-                            <router-link
+                            <b-button variant="white"
                                     active-class="bg-light"
-                                    class="flex-fill"
-                                    tag="a"
-                                    :to="{ name: 'student-dashboard.course.assignment.hand-in' }">
+                                    class="flex-fill p-0"
+                                    :to="{ name: 'student-dashboard.course.assignment.hand-in' }"
+                                    :disabled="!isHandInActive">
                                 <div class="text-center border-right border-bottom active py-3">
                                     <div class="lead font-weight-bold">Submission
                                         <b-badge variant="success" v-if="isHandInActive">Open</b-badge>
@@ -39,27 +37,27 @@
                                     </div>
                                     <div class="text-muted">Due: {{ assignment.due_date | formatDate }}</div>
                                 </div>
-                            </router-link>
+                            </b-button>
 
-                            <router-link
-                                    active-class="bg-light"
-                                    class="flex-fill"
-                                    tag="a"
-                                    :to="{ name: 'student-dashboard.course.assignment.peer-review' }">
+                            <b-button   variant="white"
+                                        active-class="bg-light"
+                                        class="flex-fill p-0"
+                                    :to="{ name: 'student-dashboard.course.assignment.peer-review' }"
+                                    :disabled="!isPeerReviewActive">
                                 <div class="text-center border-right border-bottom py-3">
                                     <div class="lead font-weight-bold">Peer Review
                                         <b-badge variant="success" v-if="isPeerReviewActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
-                                    <span class="text-muted">Due: {{ assignment.review_due_date | formatDate }}</span>
+                                    <span class="text-muted">Due: {{ assignment.due_date | formatDate }}</span>
                                 </div>
-                            </router-link>
+                            </b-button>
 
-                            <router-link
-                                    active-class="bg-light"
-                                    class="flex-fill"
-                                    tag="a"
-                                    :to="{ name: 'student-dashboard.course.assignment.feedback' }">
+                            <b-button   variant="white"
+                                        active-class="bg-light"
+                                        class="flex-fill p-0"
+                                    :to="{ name: 'student-dashboard.course.assignment.feedback' }"
+                                    :disabled="!isFeedbackActive">
                                 <div class="text-center border-bottom py-3">
                                     <div class="lead font-weight-bold ">Received Feedback
                                         <b-badge variant="success" v-if="isFeedbackActive">Open</b-badge>
@@ -67,9 +65,8 @@
                                     </div>
                                     <span class="text-muted">Opens after {{ assignment.review_due_date | formatDate }}</span>
                                 </div>
-                            </router-link>
+                            </b-button>
                         </b-col>
-
 
                     </b-row>
 

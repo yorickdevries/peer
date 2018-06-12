@@ -122,10 +122,10 @@ export default class AssignmentPS {
                                               reviewPublishDate: Date): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-assignment-by-id",
             "UPDATE assignmentlist " +
-            "SET title=$1, description=$2, due_date=$3, publish_date=$4, reviews_per_user=$5, filename=$6, review_due_date=$7, review_publish_date=$8 " +
-            "WHERE id = $9 RETURNING *");
+            "SET title=$1, description=$2, due_date=$3, publish_date=$4, reviews_per_user=$5, filename=$6, review_due_date=$7, review_publish_date=$8, course_id = $9 " +
+            "WHERE id = $10 RETURNING *");
 
-        statement.values = [title, description, dueDate, publishDate, reviewsPerUser, filename, reviewDueDate, reviewPublishDate, courseId];
+        statement.values = [title, description, dueDate, publishDate, reviewsPerUser, filename, reviewDueDate, reviewPublishDate, courseId, assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -143,13 +143,14 @@ export default class AssignmentPS {
     }
 
     /**
-     * Executes group assignment Id
+     * Gets all groups for a certain assignment
+     *
      * @param {number} id - id
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeGetGroupsByAssignmentId (id: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-all-groups-per-assignment",
-        'SELECT * FROM "assignmentgroup" WHERE "assignment_id" = ($1)');
+        "SELECT g.id, g.group_name FROM assignmentgroup a JOIN grouplist g ON a.group_id = g.id WHERE assignment_id = $1");
         statement.values = [id];
         return Database.executeQuery(statement);
     }
@@ -161,7 +162,7 @@ export default class AssignmentPS {
      */
     public static executeGetReviewsById(assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-all-reviews-by-assignment",
-            "SELECT review.user_netid as reviewer, submission.user_netid as submitter FROM review JOIN assignmentlist ON assignmentlist.id = review.rubric_assignment_id  JOIN submission ON submission.id = review.id WHERE assignmentlist.id = $1 AND review.done = true");
+            "SELECT review.user_netid as reviewer, submission.user_netid as submitter FROM review JOIN assignmentlist ON assignmentlist.id = review.rubric_assignment_id  JOIN submission ON submission.id = review.submission_id WHERE assignmentlist.id = $1 AND review.done = true");
         statement.values = [assignmentId];
         return Database.executeQuery(statement);
     }
@@ -176,7 +177,7 @@ export default class AssignmentPS {
      * @memberof AssignmentPS
      */
     public static executeGetGroupOfNetIdByAssignmentId(netId: string, assignmentId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-all-groups-per-assignment",
+        const statement = new PreparedStatement("get-group-of-netid-by-assignmentid",
         "SELECT a.assignment_id, a.group_id FROM assignmentgroup a JOIN groupusers g ON a.group_id = g.group_groupid WHERE g.user_netid = $1 AND a.assignment_id = $2");
         statement.values = [netId, assignmentId];
         return Database.executeQuerySingleResult(statement);

@@ -15,20 +15,30 @@
             <!--Course Cards-->
             <b-row>
                 <b-col cols="6" v-for="course in courses" :key="course.id" class="d-flex align-items-stretch">
-                    <b-card :title="course.name" :sub-title="course.name" class="mb-3">
-                        <p class="card-text">
-                            {{ course.description | truncate(200)}}
-                        </p>
-                        <div>
-                            <b-button-group size="sm" class="d-inline-block">
-                                <b-button v-if="course.role === 'student'" variant="outline-primary" :to="{ name: 'student-dashboard.course.home', params: { courseId: course.id } }">Enter as Student</b-button>
-                                <b-button v-else-if="course.role === 'TA'" variant="outline-primary" :to="{ name: 'teaching-assistant-dashboard.course.home', params: { courseId: course.id } }">Enter as TA</b-button>
-                                <b-button v-else-if="course.role === 'teacher'" variant="outline-primary" :to="{ name: 'teacher-dashboard.course', params: { courseId: course.id } }">Enter as Teacher</b-button>
-                                <b-button variant="outline-danger" :to="{ name: 'student-dashboard.course.home', params: { courseId: course.id } }">Student (DEV)</b-button>
-                                <b-button variant="outline-danger" :to="{ name: 'teaching-assistant-dashboard.course.home', params: { courseId: course.id } }">TA (DEV)</b-button>
-                                <b-button variant="outline-danger" :to="{ name: 'teacher-dashboard.course', params: { courseId: course.id } }">Teacher (DEV)</b-button>
-                            </b-button-group>
+                    <b-card no-body class="mb-3 w-100">
+                        <b-card-body class="d-flex flex-column justify-content-between" style="align-items: flex-start">
+                            <div>
+                                <h4 class="card-title mb-2">{{ course.name }}</h4>
+                                <p>{{ course.description | truncate(200)}}</p>
                             </div>
+                            <div class="d-flex justify-content-between w-100">
+                                <b-button v-if="course.role === 'student'" variant="outline-primary"
+                                          :to="{ name: 'student-dashboard.course.home', params: { courseId: course.id } }">
+                                    Enter Course
+                                </b-button>
+                                <b-button v-else-if="course.role === 'TA'" variant="outline-primary"
+                                          :to="{ name: 'teaching-assistant-dashboard.course.home', params: { courseId: course.id } }">
+                                    Enter as TA
+                                </b-button>
+                                <b-button v-else-if="course.role === 'teacher'" variant="outline-primary"
+                                          :to="{ name: 'teacher-dashboard.course', params: { courseId: course.id } }">
+                                    Enter as Teacher
+                                </b-button>
+                                <b-badge show variant="secondary" class="my-2 "><h6 class="m-0 font-weight-bold">{{
+                                    course.role }}</h6></b-badge>
+                            </div>
+
+                        </b-card-body>
                     </b-card>
                 </b-col>
 

@@ -1,22 +1,15 @@
-import SubmissionPS from "../../src/prepared_statements/submissions_ps";
-import { expect } from "chai";
 import "mocha";
-import Database from "../../src/database";
+import { expect } from "chai";
+import TestData from "../test_helpers/test_data";
 
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-import ReviewPS from "../../src/prepared_statements/review_ps";
-const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
-const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
+import SubmissionPS from "../../src/prepared_statements/submissions_ps";
 
 describe("SubmissionPreparedStatements Test", () => {
     /**
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
+        await TestData.initializeDatabase();
     });
 
     /**
@@ -44,21 +37,6 @@ describe("SubmissionPreparedStatements Test", () => {
             user_netid: "paulvanderlaan",
             assignment_id: 1,
             file_path: "filepathhere",
-            date: new Date("2018-05-01T20:30:00Z"),
-            grade: -1
-        });
-    });
-
-    /**
-     * Test delete submission by id prepared statement.
-     */
-    it("delete submission by id", async () => {
-        expect(await SubmissionPS.executeDeleteSubmissionById(2)).to.deep.equal({
-            id: 2,
-            user_netid: "henkjan",
-            group_id: 10,
-            assignment_id: 1,
-            file_path: "submission2.pdf",
             date: new Date("2018-05-01T20:30:00Z"),
             grade: -1
         });

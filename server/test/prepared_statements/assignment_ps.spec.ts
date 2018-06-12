@@ -1,21 +1,15 @@
-import AssignmentPS from "../../src/prepared_statements/assignment_ps";
-import { expect } from "chai";
 import "mocha";
-import Database from "../../src/database";
+import { expect } from "chai";
+import TestData from "../test_helpers/test_data";
 
-// load the queryfiles
-import { QueryFile } from "pg-promise";
-const qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
-const qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
+import AssignmentPS from "../../src/prepared_statements/assignment_ps";
 
 describe("AssignmentPreparedStatements Test", () => {
     /**
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-        await Database.DatabaseDrop();
-        await Database.DatabaseImport(qfSchema);
-        await Database.DatabaseImport(qfData);
+        await TestData.initializeDatabase();
     });
 
     /**
@@ -181,7 +175,7 @@ describe("AssignmentPreparedStatements Test", () => {
     it("Reviews of an assignment", async () => {
         expect(await AssignmentPS.executeGetReviewsById(1)).to.deep.equal([{
             "reviewer": "paulvanderlaan",
-            "submitter": "henkjan"
+            "submitter": "paulvanderlaan"
         }]);
     });
 
