@@ -49,7 +49,7 @@
                             </b-tab>
 
                             <!--Rubric Wizard-->
-                            <b-tab title="Rubric Wizard">
+                            <b-tab title="Rubric">
                                 <RubricWizard :rubricId="assignment.id"></RubricWizard>
                             </b-tab>
 
