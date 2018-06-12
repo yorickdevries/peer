@@ -2,7 +2,8 @@
     <div>
         <b-container>
 
-            <h1 class="mt-5">Course dashboard</h1>
+            <!--Header-->
+            <BreadcrumbTitle :items="['Courses']" class="mt-3"></BreadcrumbTitle>
 
             <b-card>
                 <b-row>
@@ -64,8 +65,9 @@
 
 <script>
 import api from "../../api"
-
+import BreadcrumbTitle from '../BreadcrumbTitle'
 export default {
+    components: {BreadcrumbTitle},
     data() {
         return {
             items: [

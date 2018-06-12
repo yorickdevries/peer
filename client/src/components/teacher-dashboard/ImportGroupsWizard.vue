@@ -25,8 +25,10 @@
 
 <script>
     import api from "../../api"
+    import notifications from '../../mixins/notifications'
 
     export default {
+        mixins: [notifications],
         props: ['assignmentId'],
         data() {
             return {
@@ -46,14 +48,14 @@
                 formData.append("groupFile", this.file)
 
                 // Send files to server
-                let res = await api.client.post(`/assignments/${this.assignmentId}/importgroups`, formData)
-                console.log(res)
+                try {
+                    await api.client.post(`/assignments/${this.assignmentId}/importgroups`, formData)
+                    this.showSuccessMessage()
+                } catch (e) {
+                    this.showErrorMessage()
+                }
             }
         }
 
     }
 </script>
-
-<style scoped>
-
-</style>

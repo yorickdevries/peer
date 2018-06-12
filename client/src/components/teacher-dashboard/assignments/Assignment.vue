@@ -2,52 +2,25 @@
     <div>
         <b-container>
 
-            <b-row>
-                <b-col>
-                    <div class="d-flex align-items-center mt-5">
-                        <span class="h1 w-100">Assignment: {{assignment.title}}</span>
-                        <b-button variant="success"
-                                  :to="{ name: 'teacher-dashboard.assignments.assignment.edit', params: {courseId: course.id, assignmentId: assignment.id} }">
-                            Edit assignment
-                        </b-button>
-                    </div>
-
-                </b-col>
-            </b-row>
+            <!--Header and action-->
+            <BreadcrumbTitle :items="['Assignments', assignment.title]" class="mt-3">
+                <b-button variant="success"
+                          :to="{ name: 'teacher-dashboard.assignments.assignment.edit', params: {courseId: course.id, assignmentId: assignment.id} }">
+                    Edit assignment
+                </b-button>
+            </BreadcrumbTitle>
 
             <b-row>
                 <b-col>
                     <b-card no-body>
                         <b-tabs card>
-                            <b-tab title="Home" active>
 
+                            <!--Details & Action-->
+                            <b-tab title="Home" active>
 
                                 <b-row>
                                     <b-col cols="8">
-                                        <b-card header="Details">
-                                            <dl class="mb-0">
-                                                <dt>Description</dt>
-                                                <dd>{{ assignment.description }}</dd>
-
-                                                <dt>Publish date-time</dt>
-                                                <dd>{{ assignment.publish_date | formatDate }}</dd>
-
-                                                <dt>Assignment due date-time</dt>
-                                                <dd>{{ assignment.due_date | formatDate }}</dd>
-
-                                                <dt>Peer review publish date-time</dt>
-                                                <dd>{{ assignment.review_publish_date | formatDate }}</dd>
-
-                                                <dt>Peer review due date-time</dt>
-                                                <dd>{{ assignment.review_due_date | formatDate }}</dd>
-
-                                                <dt>Amount of peer reviews assigned per student</dt>
-                                                <dd>{{ assignment.reviews_per_user }}</dd>
-
-                                                <dt>Assignment File</dt>
-                                                <dd><a :href="assignmentFilePath">{{ assignment.filename }}</a></dd>
-                                            </dl>
-                                        </b-card>
+                                        <AssignmentDetails :assignment="assignment"></AssignmentDetails>
                                     </b-col>
 
                                     <b-col cols="4">
@@ -57,43 +30,72 @@
                                                 <dd>This action will shuffle the groups and assign the groups to each
                                                     other.
                                                 </dd>
-                                                <b-button @click="shuffleGroups()">Shuffle Groups</b-button>
+                                                <b-button @click="shuffleGroups()" class="mb-3" variant="primary">
+                                                    Shuffle Groups
+                                                </b-button>
 
+                                                <dt>Import groups</dt>
+                                                <dd>This action will import the groups in the assignment.</dd>
+                                                <b-button v-b-modal="'importGroups'" variant="primary">Import groups
+                                                </b-button>
                                             </dl>
+
+                                            <b-modal id="importGroups" centered hide-header hide-footer class="p-0 m-0">
+                                                <ImportGroupsWizard :assignmentId="assignment.id"></ImportGroupsWizard>
+                                            </b-modal>
                                         </b-card>
                                     </b-col>
                                 </b-row>
                             </b-tab>
 
+                            <!--Rubric Wizard-->
                             <b-tab title="Rubric">
                                 <RubricWizard :rubricId="assignment.id"></RubricWizard>
                             </b-tab>
 
-                            <b-tab title="Groups">
-                                <Groups :assignmentId="this.assignment.id"></Groups>
+                            <!--Submissions-->
+                            <b-tab title="Submissions">
+                                <Submissions :assignmentId="assignment.id"></Submissions>
                             </b-tab>
 
+                            <!--Reviews-->
+                            <b-tab title="Reviews">
+                                <Reviews :assignmentId="assignment.id"></Reviews>
+                            </b-tab>
+
+                            <!--Groups-->
+                            <b-tab title="Groups">
+                                <Groups :assignmentId="assignment.id"></Groups>
+                            </b-tab>
                         </b-tabs>
                     </b-card>
                 </b-col>
             </b-row>
-
-
         </b-container>
     </div>
 </template>
 
 <script>
 import api from '../../../api'
+import BreadcrumbTitle from '../../BreadcrumbTitle'
 import RubricWizard from '../rubric/RubricWizard'
-import Groups from '../Groups'
+import ImportGroupsWizard from '../ImportGroupsWizard'
+import Groups from '../../ta_teacher_shared/Groups'
+import Reviews from '../../ta_teacher_shared/Reviews'
+import Submissions from '../../ta_teacher_shared/Submissions'
+import AssignmentDetails from '../../ta_teacher_shared/AssignmentDetails'
 import notifications from '../../../mixins/notifications'
 
 export default {
     mixins: [notifications],
     components: {
+        BreadcrumbTitle,
         RubricWizard,
-        Groups
+        Groups,
+        ImportGroupsWizard,
+        Reviews,
+        Submissions,
+        AssignmentDetails
     },
     async created() {
         let cid = this.$route.params.courseId
@@ -119,12 +121,6 @@ export default {
                 filename: null
             },
         }
-    },
-    computed: {
-        assignmentFilePath() {
-            // Get the assignment file path.
-            return `/api/assignments/${this.assignment.id}/file`
-        },
     },
     methods: {
         formatDate(date) {

@@ -2,12 +2,12 @@
     <div>
         <b-container>
 
-            <!--Header-->
-            <b-row>
-                <b-col>
-                    <h1 class="mt-5">{{course.name}} | Teacher Course Home</h1>
-                </b-col>
-            </b-row>
+            <!--Header and action-->
+            <BreadcrumbTitle :items="['Course Home']" class="mt-3">
+                <b-button variant="success"
+                          :to="{ name: 'teacher-dashboard.course.edit', params: {courseId: course.id} }">Edit course
+                </b-button>
+            </BreadcrumbTitle>
 
             <!--Course description card-->
             <b-row>
@@ -29,21 +29,16 @@
                 </b-col>
             </b-row>
 
-            <!--Edit button-->
-            <b-row>
-                <b-col>
-                    <b-button variant="success" class="mt-3" :to="{ name: 'teacher-dashboard.course.edit', params: {courseId: course.id} }">Edit course</b-button>
-                </b-col>
-            </b-row>
-
         </b-container>
     </div>
 </template>
 
 <script>
 import api from '../../api'
+import BreadcrumbTitle from '../BreadcrumbTitle'
 
 export default {
+    components: {BreadcrumbTitle},
     data() {
         return {
             course: {

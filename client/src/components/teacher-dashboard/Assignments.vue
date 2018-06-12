@@ -4,12 +4,10 @@
         <b-container>
 
             <!--Header with create button-->
-            <b-row>
-                <b-col>
-                    <h1 class="mt-5">Assignments</h1>
-                    <b-button variant="success" class="mb-3" :to="{ name: 'teacher-dashboard.assignments.create' }">Create Assignment</b-button>
-                </b-col>
-            </b-row>
+            <BreadcrumbTitle :items="['Assignments']" class="mt-3">
+                <b-button variant="success" :to="{ name: 'teacher-dashboard.assignments.create' }">Create Assignment
+                </b-button>
+            </BreadcrumbTitle>
 
             <!--Course Cards-->
             <b-row>
@@ -30,8 +28,10 @@
 
 <script>
 import api from '../../api'
+import BreadcrumbTitle from '../BreadcrumbTitle'
 
 export default {
+    components: {BreadcrumbTitle},
     data() {
         return {
             id: null,
