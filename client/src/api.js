@@ -35,7 +35,7 @@ export default {
         return client.get(`/assignments/${assignmentId}/allreviews`)
     },
     saveAssignment(assignmentId, assignment) {
-        return client.put(`courses/${assignmentId}`, assignment)
+        return client.put(`assignments/${assignmentId}`, assignment)
     },
     getAssignmentGroups(assignmentId) {
         return client.get(`/assignments/${assignmentId}/groups`)

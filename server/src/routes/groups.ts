@@ -12,15 +12,25 @@ router.use(bodyParser.json());
 /**
  * Route to get a group with a specific id
  */
-router.route("/:id").get(index.authorization.isAuthorizedToViewGroup, async (req: any, res) => {
-    res.json(await GroupsPS.executeGetGroupById(req.params.id));
+router.get("/:id", index.authorization.isAuthorizedToViewGroup, (req: any, res) => {
+    GroupsPS.executeGetGroupById(req.params.id)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
  });
 
 /**
  * Route to get he users of a group with a specific id
  */
-router.route("/:id/users").get(index.authorization.isAuthorizedToViewGroup, async (req: any, res) => {
-    res.json(await GroupsPS.executeGetUsersOfGroupById(req.params.id));
+router.get("/:id/users", index.authorization.isAuthorizedToViewGroup, (req: any, res) => {
+    GroupsPS.executeGetUsersOfGroupById(req.params.id)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
  });
 
 export default router;

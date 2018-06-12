@@ -16,32 +16,36 @@ router.use(bodyParser.json());
  * @return a database query result, all columns of review + file_path of the submission.
  */
 router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
-    const jsonItems: any = [];
-    const review = await ReviewsPS.executeGetReview(req.params.reviewId);
-    const questions = await RubricPS.getAllQuestionsByRubricId(review.rubric_assignment_id);
+    try {
+        const jsonItems: any = [];
+        const review = await ReviewsPS.executeGetReview(req.params.reviewId);
+        const questions = await RubricPS.getAllQuestionsByRubricId(review.rubric_assignment_id);
 
-    // Loop through the questions and add answers to them.
-    for (let i = 0; i < questions.length; i++) {
-        const question = questions[i];
-        let answer;
+        // Loop through the questions and add answers to them.
+        for (let i = 0; i < questions.length; i++) {
+            const question = questions[i];
+            let answer;
 
-        // Get the answers (from database) to the correct question type.
-        switch (question.type_question) {
-            case "mc": answer = await ReviewsPS.executeGetMCAnswer(+req.params.reviewId, question.id); break;
-            case "open": answer = await ReviewsPS.executeGetOpenAnswer(+req.params.reviewId, question.id); break;
-            case "range": answer = await ReviewsPS.executeGetRangeAnswer(+req.params.reviewId, question.id); break;
-            default: answer = { error: "unrecognized question type: " + question.type_question }; break;
+            // Get the answers (from database) to the correct question type.
+            switch (question.type_question) {
+                case "mc": answer = await ReviewsPS.executeGetMCAnswer(+req.params.reviewId, question.id); break;
+                case "open": answer = await ReviewsPS.executeGetOpenAnswer(+req.params.reviewId, question.id); break;
+                case "range": answer = await ReviewsPS.executeGetRangeAnswer(+req.params.reviewId, question.id); break;
+                default: answer = { error: "unrecognized question type: " + question.type_question }; break;
+            }
+
+            // Create the correct JSON format (API documentation) and push to array.
+            jsonItems.push({ question: question, answer: answer });
         }
 
-        // Create the correct JSON format (API documentation) and push to array.
-        jsonItems.push({ question: question, answer: answer });
+        // Assemble correct json to send in the response.
+        res.json({
+            review: review,
+            form: jsonItems
+        });
+    } catch {
+        res.sendStatus(400);
     }
-
-    // Assemble correct json to send in the response.
-    res.json({
-        review: review,
-        form: jsonItems
-    });
 });
 
 /**
@@ -50,43 +54,47 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
  * @return JSON representation of a review.
  */
 router.route("/:reviewId").put(index.authorization.checkReviewOwner, async (req, res) => {
-    const reviewId = req.params.reviewId;
-    const jsonQuestions: any = [];
+    try {
+        const reviewId = req.params.reviewId;
+        const jsonQuestions: any = [];
 
-    const inputForm = req.body.form;
+        const inputForm = req.body.form;
 
-    // Loop through form and update the answers.
-    for (let i = 0; i < inputForm.length; i++) {
-        const item = inputForm[i];
+        // Loop through form and update the answers.
+        for (let i = 0; i < inputForm.length; i++) {
+            const item = inputForm[i];
 
-        // Don't insert or update if the answer is not specified.
-        if (item.answer === null) return;
+            // Don't insert or update if the answer is not specified.
+            if (item.answer === null) return;
 
-        // Update or insert a specific answer and add to questions array.
-        switch (item.question.type_question) {
-            case "range": jsonQuestions.push({
-                question: item.question,
-                answer: await ReviewsPS.executeUpdateRangeAnswer(item.answer.answer, item.question.id, reviewId)
-            }); break;
+            // Update or insert a specific answer and add to questions array.
+            switch (item.question.type_question) {
+                case "range": jsonQuestions.push({
+                    question: item.question,
+                    answer: await ReviewsPS.executeUpdateRangeAnswer(item.answer.answer, item.question.id, reviewId)
+                }); break;
 
-            case "open": jsonQuestions.push({
-                question: item.question,
-                answer: await ReviewsPS.executeUpdateOpenAnswer(item.answer.answer, item.question.id, reviewId)
-            }); break;
+                case "open": jsonQuestions.push({
+                    question: item.question,
+                    answer: await ReviewsPS.executeUpdateOpenAnswer(item.answer.answer, item.question.id, reviewId)
+                }); break;
 
-            case "mc": jsonQuestions.push({
-                question: item.question,
-                answer: await ReviewsPS.executeUpdateMpcAnswer(item.answer.answer, item.question.id, reviewId)
-            }); break;
-            default: jsonQuestions.push({ error: "Unrecognized type given: " + item.question.type_question }); break;
+                case "mc": jsonQuestions.push({
+                    question: item.question,
+                    answer: await ReviewsPS.executeUpdateMpcAnswer(item.answer.answer, item.question.id, reviewId)
+                }); break;
+                default: jsonQuestions.push({ error: "Unrecognized type given: " + item.question.type_question }); break;
+            }
         }
-    }
 
-    // Create and respond with the resulting JSON.
-    res.json({
-        review: await ReviewsPS.executeGetReview(reviewId),
-        form: jsonQuestions
-    });
+        // Create and respond with the resulting JSON.
+        res.json({
+            review: await ReviewsPS.executeGetReview(reviewId),
+            form: jsonQuestions
+        });
+    } catch {
+        res.sendStatus(400);
+    }
 });
 
 /**
@@ -94,8 +102,13 @@ router.route("/:reviewId").put(index.authorization.checkReviewOwner, async (req,
  * @param reviewId - an id of a review.
  * @return database return value.
  */
-router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, async (req, res) => {
-    res.json(await ReviewsPS.executeSubmitReview(req.params.reviewId));
+router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, (req, res) => {
+    ReviewsPS.executeSubmitReview(req.params.reviewId)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
 });
 
 /**
@@ -103,8 +116,13 @@ router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, 
  * @param reviewId - an id of a review.
  * @return database return value.
  */
-router.route("/:reviewId/allComments").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
-    res.json(await ReviewsPS.executeGetAllReviewComments(req.params.reviewId));
+router.route("/:reviewId/allComments").get(index.authorization.checkAuthorizationForReview, (req, res) => {
+    ReviewsPS.executeGetAllReviewComments(req.params.reviewId)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
 });
 
 /**
@@ -113,8 +131,13 @@ router.route("/:reviewId/allComments").get(index.authorization.checkAuthorizatio
  * @body comment - a comment of the review.
  * @return database return value.
  */
-router.route("/:reviewCommentId/comment").put(index.authorization.checkOwnerReviewComment, async (req, res) => {
-    res.json(await ReviewsPS.executeUpdateReviewComment(req.params.reviewCommentId, req.body.comment));
+router.route("/:reviewCommentId/comment").put(index.authorization.checkOwnerReviewComment, (req, res) => {
+    ReviewsPS.executeUpdateReviewComment(req.params.reviewCommentId, req.body.comment)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
 });
 
 /**
@@ -124,8 +147,13 @@ router.route("/:reviewCommentId/comment").put(index.authorization.checkOwnerRevi
  * @body comment - a comment of the review.
  * @return database return value.
  */
-router.route("/:reviewId/comment").post(index.authorization.checkReviewTAOrTeacher, async (req, res) => {
-    res.json(await ReviewsPS.executeAddReviewComment(req.params.reviewId, req.body.netid, req.body.comment));
+router.route("/:reviewId/comment").post(index.authorization.checkReviewTAOrTeacher, (req, res) => {
+    ReviewsPS.executeAddReviewComment(req.params.reviewId, req.body.netid, req.body.comment)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
 });
 
 /**
@@ -133,17 +161,26 @@ router.route("/:reviewId/comment").post(index.authorization.checkReviewTAOrTeach
  * @param reviewId - an id of a review.
  * @return database return value.
  */
-router.route("/:reviewCommentId/comment").delete(index.authorization.checkOwnerReviewComment, async (req, res) => {
-    res.json(await ReviewsPS.executeDeleteReviewComment(req.params.reviewCommentId));
+router.route("/:reviewCommentId/comment").delete(index.authorization.checkOwnerReviewComment, (req, res) => {
+    ReviewsPS.executeDeleteReviewComment(req.params.reviewCommentId)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
 });
 
-/**x
+/**
  * Gets the file that needs to be reviewed.
  */
 router.route("/:id/file").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
-    const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(req.params.id);
-    const filePath = path.join(__dirname, "../files/submissions", submission.file_path);
-    res.sendfile(filePath);
+    try {
+        const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(req.params.id);
+        const filePath = path.join(__dirname, "../files/submissions", submission.file_path);
+        res.sendfile(filePath);
+    } catch (err) {
+        res.sendStatus(400);
+    }
 });
 
 export default router;

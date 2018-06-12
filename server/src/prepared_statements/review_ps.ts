@@ -60,7 +60,7 @@ export default class ReviewPS {
      * @param {number} reviewId - a review id.
      * @return {Promise<pgPromise.queryResult>} - a corresponding review where the done field is set to true.
      */
-    public static executeSubmitReview(reviewId: number): any {
+    public static executeSubmitReview(reviewId: number) {
         const statement = new PreparedStatement("submit-review",
             "UPDATE review " +
             "SET done=true " +
