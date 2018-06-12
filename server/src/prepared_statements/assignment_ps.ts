@@ -75,7 +75,7 @@ export default class AssignmentPS {
      * @param {string} assignmentId - an assignment id.
      * @return {any} a query result.
      */
-    public static executeGetAssignmentById(assignmentId: number): any {
+    public static executeGetAssignmentById(assignmentId: number) {
         const statement = new PreparedStatement("get-assignment-by-id",
             'SELECT * FROM "assignmentlist" WHERE "id" = $1');
         statement.values = [assignmentId];

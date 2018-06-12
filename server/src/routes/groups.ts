@@ -9,22 +9,37 @@ router.use(bodyParser.json());
 /**
  * Route to get all the groups
  */
-router.get("/", async (req: any, res) => {
-    res.json(await GroupsPS.executeGetGroups());
+router.get("/", (req: any, res) => {
+    GroupsPS.executeGetGroups()
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
  });
 
 /**
  * Route to get a group with a specific id
  */
-router.get("/:id", async (req: any, res) => {
-    res.json(await GroupsPS.executeGetGroupById(req.params.id));
+router.get("/:id", (req: any, res) => {
+    GroupsPS.executeGetGroupById(req.params.id)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
  });
 
 /**
  * Route to get he users of a group with a specific id
  */
-router.get("/:id/users", async (req: any, res) => {
-    res.json(await GroupsPS.executeGetUsersOfGroupById(req.params.id));
+router.get("/:id/users", (req: any, res) => {
+    GroupsPS.executeGetUsersOfGroupById(req.params.id)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
  });
 
 export default router;

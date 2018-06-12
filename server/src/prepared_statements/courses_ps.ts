@@ -52,7 +52,7 @@ export default class CoursesPS {
      * @param {string} userNetId - a netid of the current user.
      * @return {any} a query result.
      */
-    public static executeGetAllEnrolledCourses(userNetId: string): any {
+    public static executeGetAllEnrolledCourses(userNetId: string) {
         const statement = new PreparedStatement("get-all-courses-you-are-enrolled,",
             'SELECT * FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" WHERE user_netid LIKE $1)');
         statement.values = [userNetId];
