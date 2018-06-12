@@ -51,8 +51,12 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
 };
 
 const isAuthorizedToViewGroup = async (req: any, res: any, next: any) => {
+    console.log(req.userinfo.given_name);
+    console.log(req.params.id);
     const authCheckTATeacher = await AuthorizationPS.isTAOrTeacherForGroup(req.userinfo.given_name, req.params.id);
     const authCheckStudent = await AuthorizationPS.isInGroup(req.userinfo.given_name, req.params.id);
+    console.log(authCheckTATeacher.exists);
+    console.log(authCheckStudent.exists);
     const authCheck = authCheckTATeacher.exists || authCheckStudent.exists;
     await response(res, authCheck, next);
 };

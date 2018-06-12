@@ -14,7 +14,7 @@ describe("API Group routes", () => {
      */
     beforeEach(async () => {
         // initializes the router with user henkjan
-        MockLogin.initialize(router, "bplanje ");
+        MockLogin.initialize(router, "bplanje");
         await Database.DatabaseDrop();
         await TestData.initializeDatabase();
     });
