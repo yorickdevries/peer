@@ -15,7 +15,7 @@ describe("API Course routes", () => {
      */
     beforeEach(async () => {
         // initializes the router with user paul
-        MockLogin.initialize(router, "paulvanderlaan");
+        MockLogin.initialize("paulvanderlaan");
         await TestData.initializeDatabase();
     });
 

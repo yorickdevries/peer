@@ -15,7 +15,7 @@ describe("API root routes", () => {
      */
     beforeEach(async () => {
         // initializes the router without an user
-        MockLogin.initialize(router);
+        MockLogin.initialize();
         await TestData.initializeDatabase();
     });
 
@@ -24,7 +24,7 @@ describe("API root routes", () => {
      */
     it("Get /authenticated info while not logged in", async () => {
         // initializes router without an user logged in
-        MockLogin.initialize(router);
+        MockLogin.initialize();
         const res = await chai.request(router).get("/authenticated");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({ authenticated: false }));
@@ -34,7 +34,7 @@ describe("API root routes", () => {
      * Test whether user is authenticated
      */
     it("Get /authenticated info while logged in", async () => {
-        MockLogin.initialize(router, "henkjan");
+        MockLogin.initialize("henkjan");
         const res = await chai.request(router).get("/authenticated");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({ authenticated: true }));
@@ -44,7 +44,7 @@ describe("API root routes", () => {
      * Test whether userinfo is returned
      */
     it("Get /user info - netid", async () => {
-        MockLogin.initialize(router, "henkjan");
+        MockLogin.initialize("henkjan");
         const res = await chai.request(router).get("/user");
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).user.given_name).to.equal("henkjan");
@@ -54,7 +54,7 @@ describe("API root routes", () => {
      * Test whether userinfo is returned
      */
     it("Get /user info email", async () => {
-        MockLogin.initialize(router, "henkjan", "h.j@dtudent.tudelft.nl");
+        MockLogin.initialize("henkjan", "h.j@dtudent.tudelft.nl");
         const res = await chai.request(router).get("/user");
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).user.preferred_username).to.equal("h.j@dtudent.tudelft.nl");
@@ -64,7 +64,7 @@ describe("API root routes", () => {
      * Test whether user is added to the database
      */
     it("User is added upon login", async () => {
-        MockLogin.initialize(router, "newuser", "newemail@mail");
+        MockLogin.initialize("newuser", "newemail@mail");
         const res = await chai.request(router).get("/anything");
         const user: any = await UserPS.executeGetUserById("newuser");
         expect(user.netid).to.equal("newuser");
@@ -76,13 +76,13 @@ describe("API root routes", () => {
      */
     it("Useremail is updated to the database", async () => {
         // first session
-        MockLogin.initialize(router, "newuser", "email@mail.nl");
+        MockLogin.initialize("newuser", "email@mail.nl");
         await chai.request(router).get("/anything");
         const user: any = await UserPS.executeGetUserById("newuser");
         expect(user.netid).to.equal("newuser");
         expect(user.email).to.equal("email@mail.nl");
         // second session
-        MockLogin.initialize(router, "newuser", "newemail@mail.nl");
+        MockLogin.initialize("newuser", "newemail@mail.nl");
         await chai.request(router).get("/anything");
         const user2: any = await UserPS.executeGetUserById("newuser");
         expect(user2.netid).to.equal("newuser");
