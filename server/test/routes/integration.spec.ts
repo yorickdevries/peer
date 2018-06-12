@@ -19,6 +19,7 @@ describe("API integration test", () => {
         // initializes the router
         MockLogin.initialize();
         await TestData.initializeDatabase();
+        await TestData.initializeSubmissionFiles();
         await TestData.initializeAssignmentFiles();
     });
 
@@ -26,17 +27,28 @@ describe("API integration test", () => {
      * Remove file folders used for testing
      */
     afterEach(async () => {
+        await TestData.removeSubmissionFiles();
         await TestData.removeAssignmentFiles();
+        await TestData.initializeAssignmentFiles();
     });
 
     /**
      * Test if reviews can only be fetched after the due date.
      * Integration test. User story:
      *
-     * bplanje logs in as teacher and:
-     *  - creates a course [1]
-     *  - creates an assignment [2]
-     *  - imports the groups [3]
+     * bplanje logs in as teacher:
+     *  - [1] creates a course
+     *  - [2] creates an assignment
+     *  - [3] imports the groups
+     *
+     *  paulvanderlaan logs in as student:
+     *  - [4] submit a submission
+     *
+     *  yorickdevries logs in as student:
+     *  - [5] submit a submission
+     *
+     *  bplanje logs in as teacher:
+     *  - [6] distribute the reviews
      */
     it("Full integration test for assignments", async () => {
         // [1]
@@ -128,6 +140,10 @@ describe("API integration test", () => {
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).length).to.equal(5);
         console.log("Teacher distributed the reviews");
+
+        // [7]
+        // Paulvanderlaan reviews yorickdevries.
+        
 
         // // [7]
         // MockLogin.initialize(router, "yorickdevries");
