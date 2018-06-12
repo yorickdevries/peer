@@ -1,10 +1,11 @@
 <template>
     <b-container>
-        <b-card header="TA Management"
-                class="mt-5">
 
-            <b-row>
-                <b-col>
+        <!--Header-->
+        <BreadcrumbTitle :items="['TA Management']" class="mt-3"></BreadcrumbTitle>
+
+        <b-row>
+            <b-col>
 
                     <b-card header="Teaching Assistants">
                         <!--Table Options-->
@@ -72,9 +73,11 @@
 <script>
 import api from '../../api'
 import notifications from '../../mixins/notifications'
+import BreadcrumbTitle from '../BreadcrumbTitle'
 
 export default {
     mixins: [notifications],
+    components: {BreadcrumbTitle},
     data() {
         return {
             teachingAssistants: [],

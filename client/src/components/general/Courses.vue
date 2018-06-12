@@ -6,7 +6,7 @@
             <b-row>
                 <b-col>
                     <div class="mt-5">
-                        <span class="h1">Enrolled Courses</span>
+                        <span class="h2">Enrolled Courses</span>
                         <b-button variant="success" class="mb-3 float-right" :to="{ name: 'teacher-dashboard.courses.create' }">Create Course</b-button>
                     </div>
                 </b-col>
