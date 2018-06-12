@@ -89,7 +89,6 @@ import notifications from '../../../mixins/notifications'
 export default {
     mixins: [notifications],
     components: {
-        BreadcrumbTitle,
         RubricWizard,
         Groups,
         ImportGroupsWizard,
