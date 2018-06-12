@@ -158,7 +158,8 @@ describe("API Assignment routes", () => {
         // test the router
         MockLogin.initialize(router, "paulvanderlaan");
         const res = await chai.request(router).get("/1234");
-        expect(res.status).to.equal(400);
+        // no access
+        expect(res.status).to.equal(401);
     });
 
     /**

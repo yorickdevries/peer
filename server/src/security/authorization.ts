@@ -24,7 +24,7 @@ const enrolledAssignmentCheck = async (req: any, res: any, next: any) => {
         const authCheck = await AuthorizationPS.executeCheckEnrollment(assignment.course_id, req.userinfo.given_name);
         response(res, authCheck.exists, next);
     } catch (error) {
-        res.sendStatus(400);
+        res.sendStatus(401);
     }
 };
 
@@ -37,7 +37,7 @@ const enrolledAsTeacherAssignmentCheck = async (req: any, res: any, next: any) =
         const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.userinfo.given_name);
         response(res, authCheck.exists, next);
     } catch (error) {
-        res.sendStatus(400);
+        res.sendStatus(401);
     }
 };
 
@@ -49,7 +49,7 @@ const enrolledAsTeacherAssignmentCheckForPost = async (req: any, res: any, next:
         const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(req.body.course_id, req.userinfo.given_name);
         response(res, authCheck.exists, next);
     } catch (error) {
-        res.sendStatus(400);
+        res.sendStatus(401);
     }
 };
 
@@ -62,7 +62,7 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
         const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
         await response(res, authCheck.exists, next);
     } catch (error) {
-        res.sendStatus(400);
+        res.sendStatus(401);
     }
 };
 
