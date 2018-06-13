@@ -71,43 +71,63 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
  * or is he a TA or teacher for the course of the review
  */
 const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
-    const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.userinfo.given_name);
-    const authCheckOwner = await AuthorizationPS.executeCheckReviewMaker(req.params.reviewId, req.userinfo.given_name);
-    const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(req.params.reviewId, req.userinfo.given_name);
-    const bool = authCheckTAOrTeacher.exists || authCheckOwner.exists || authCheckSubmissionOwner.exists;
-    await response(res, bool, next);
+    try {
+        const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.userinfo.given_name);
+        const authCheckOwner = await AuthorizationPS.executeCheckReviewMaker(req.params.reviewId, req.userinfo.given_name);
+        const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(req.params.reviewId, req.userinfo.given_name);
+        const bool = authCheckTAOrTeacher.exists || authCheckOwner.exists || authCheckSubmissionOwner.exists;
+        await response(res, bool, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
 };
 
 /**
  * Check if the user is allowed to change the review
  */
 const checkReviewOwner = async (req: any, res: any, next: any) => {
-    const authCheck = await AuthorizationPS.executeCheckReviewMakerNotDone(req.params.reviewId, req.userinfo.given_name);
-    response(res, authCheck.exists, next);
+    try {
+        const authCheck = await AuthorizationPS.executeCheckReviewMakerNotDone(req.params.reviewId, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
 };
 
 /**
  * Check if the user is allowed to submit the review
  */
 const checkReviewOwnerDone = async (req: any, res: any, next: any) => {
-    const authCheck = await AuthorizationPS.executeCheckReviewMaker(req.params.reviewId, req.userinfo.given_name);
-    response(res, authCheck.exists, next);
+    try {
+        const authCheck = await AuthorizationPS.executeCheckReviewMaker(req.params.reviewId, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
 };
 
 /**
  * Check if the user is a ta or teacher for the course of this review
  */
 const checkReviewTAOrTeacher = async (req: any, res: any, next: any) => {
-    const authCheck = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.userinfo.given_name);
-    response(res, authCheck.exists, next);
+    try {
+        const authCheck = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
 };
 
 /**
  * Check if the user is a ta or teacher for the course of this review comment
  */
 const checkOwnerReviewComment = async (req: any, res: any, next: any) => {
-    const authCheck = await AuthorizationPS.executeCheckOwnerReviewComment(req.params.reviewCommentId, req.userinfo.given_name);
-    response(res, authCheck.exists, next);
+    try {
+        const authCheck = await AuthorizationPS.executeCheckOwnerReviewComment(req.params.reviewCommentId, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
 };
 
 
