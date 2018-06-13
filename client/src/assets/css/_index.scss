@@ -51,11 +51,32 @@ $navbar-dark-active-color:          rgba(#FFFFFF, 1);
 // Background colour.
 body {
   background-color: #f5f5f5;
+  overflow-y: scroll;
 }
 
 .bg-primary-light {
   background-color: rgba($primary, 0.6);
 }
 
+// Vue Page Transition Classes
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition-duration: 0.1s;
+  transition-property: height, opacity, transform;
+  transition-timing-function: cubic-bezier(0.55, 0, 0.1, 1);
+  overflow: hidden;
+}
 
+.slide-left-enter,
+.slide-right-leave-active {
+  opacity: 0;
+  transform: translate(1em, 0);
+}
 
+.slide-left-leave-active,
+.slide-right-enter {
+  opacity: 0;
+  transform: translate(-1em, 0);
+}
