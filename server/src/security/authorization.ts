@@ -67,6 +67,72 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
 };
 
 /**
+ * Check if the user can show this review, i.e. is he the owner of the submission, is he the owner of the review
+ * or is he a TA or teacher for the course of the review
+ */
+const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
+    try {
+        const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.userinfo.given_name);
+        const authCheckOwner = await AuthorizationPS.executeCheckReviewMaker(req.params.reviewId, req.userinfo.given_name);
+        const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(req.params.reviewId, req.userinfo.given_name);
+        const bool = authCheckTAOrTeacher.exists || authCheckOwner.exists || authCheckSubmissionOwner.exists;
+        await response(res, bool, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check if the user is allowed to change the review
+ */
+const checkReviewOwner = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeCheckReviewMakerNotDone(req.params.reviewId, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check if the user is allowed to submit the review
+ */
+const checkReviewOwnerDone = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeCheckReviewMaker(req.params.reviewId, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check if the user is a ta or teacher for the course of this review
+ */
+const checkReviewTAOrTeacher = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check if the user is a ta or teacher for the course of this review comment
+ */
+const checkOwnerReviewComment = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeCheckOwnerReviewComment(req.params.reviewCommentId, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+
+
+/**
  * Check if the person is authorized to view the group.
  */
 const isAuthorizedToViewGroup = async (req: any, res: any, next: any) => {
@@ -98,6 +164,11 @@ const response = (res: any, bool: boolean, next: any) => {
 export default {
     authorizeCheck,
     enrolledAssignmentCheck,
+    checkOwnerReviewComment,
+    checkReviewTAOrTeacher,
+    checkReviewOwnerDone,
+    checkReviewOwner,
+    checkAuthorizationForReview,
     enrolledAsTeacherAssignmentCheck,
     isAuthorizedToViewGroup,
     enrolledAsTeacherAssignmentCheckForPost,

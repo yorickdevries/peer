@@ -18,6 +18,14 @@ describe("API review routes", () => {
     });
 
     /**
+     * Tests if user has authorization to see the review
+     */
+    it("get review auth", async() => {
+        const res = await chai.request(router).get("/3");
+        expect(res.status).to.equal(401);
+    });
+
+    /**
      * Tests whether reviews are returned
      */
     it("Get review/", async () => {
@@ -71,12 +79,12 @@ describe("API review routes", () => {
      * Tests whether review get submitted
      */
     it("submit review/", async () => {
-        const res = await chai.request(router).get("/1/submit");
+        const res = await chai.request(router).get("/2/submit");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             [{
-                "id": 1,
-                "user_netid": "henkjan",
+                "id": 2,
+                "user_netid": "paulvanderlaan",
                 "submission_id": 1,
                 "rubric_assignment_id": 1,
                 "done": true,
@@ -91,10 +99,10 @@ describe("API review routes", () => {
      */
     it("Put review/", async () => {
         const res = await chai.request(router)
-            .put("/1")
+            .put("/2")
             .send({
                 "review": {
-                    "id": 1,
+                    "id": 2,
                     "rubric_assignment_id": 1,
                     "file_path": "submission1.pdf",
                     "done": false
@@ -135,10 +143,10 @@ describe("API review routes", () => {
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({
                 "review": {
-                    "id": 1,
+                    "id": 2,
                     "rubric_assignment_id": 1,
                     "file_path": "submission1.pdf",
-                    "done": false
+                    "done": true
                 },
                 "form": [{
                     "question": {
@@ -171,6 +179,7 @@ describe("API review routes", () => {
                     }, "answer": {"answer": 4}
                 }]
             }
+
         ));
     });
 
@@ -195,6 +204,7 @@ describe("API review routes", () => {
      * Tests if a specific comment can be added.
      */
     it("POST review/:reviewId/comment", async () => {
+        MockLogin.initialize("bplanje");
         const res = await chai.request(router)
             .post("/1/comment")
             .send({ netid: "otherTA", comment: "new" });
@@ -213,6 +223,7 @@ describe("API review routes", () => {
      * Tests if a specific comment can be updated.
      */
     it("PUT review/:reviewCommentId/comment", async () => {
+        MockLogin.initialize("paulvanderlaan");
         const res = await chai.request(router)
             .put("/1/comment")
             .send({ comment: "new" });

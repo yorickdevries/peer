@@ -7,19 +7,6 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 export default class CoursesPS {
 
     /**
-     * Get all assignments that belong to a specific course.
-     * @param {number} id
-     * @returns {Promise<pgPromise.queryResult>}
-     */
-    public static executeGetAssignmentsByCourseId(id: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-assignment-of-course",
-            'SELECT * FROM "assignmentlist" WHERE "course_id" = $1');
-        statement.values = [id];
-        return Database.executeQuery(statement);
-    }
-
-
-    /**
      * Executes an 'update course' query
      * @param {number} id
      * @param {string} description
