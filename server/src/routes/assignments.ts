@@ -319,7 +319,7 @@ router.post("/:id/importgroups", (req: any, res) => {
  * @param id - assignment id.
  */
 router.get("/:id/allreviews", (req: any, res) => {
-    AssignmentPS.executeGetReviewsById(req.params.id)
+    ReviewPS.executeGetAllDoneReviewsByAssignmentId(req.params.id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
