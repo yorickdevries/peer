@@ -2,12 +2,14 @@
     <div>
         <Navbar :title="course.name" :links="navbarItems" :role="role"/>
 
-        <router-view></router-view>
+        <transition name="slide-right" mode="out-in">
+            <router-view></router-view>
+        </transition>
     </div>
 </template>
 
 <script>
-    import api from "../../api"
+import api from "../../api"
 import Navbar from "../Navbar"
 
 export default {

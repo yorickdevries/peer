@@ -367,6 +367,20 @@ describe("API Assignment routes", () => {
     });
 
     /**
+     * Check whether reviews cannot be distributed twice
+     */
+    it("Distribute reviews twice", async () => {
+        // log in as teacher
+        MockLogin.initialize("teacheraccount");
+        const res = await chai.request(router).get("/2/distributeReviews");
+        expect(res.status).to.equal(200);
+        expect(JSON.parse(res.text).length).to.equal(3);
+        const res2 = await chai.request(router).get("/2/distributeReviews");
+        expect(res2.status).to.equal(400);
+        expect(JSON.parse(res2.text).error).to.equal("There are already reviews assigned for this assignment");
+    });
+
+    /**
      * Tests the route for all groups of an assignment
      */
     it("Get groups of an assignment", async () => {

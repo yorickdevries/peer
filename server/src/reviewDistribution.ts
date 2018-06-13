@@ -16,16 +16,20 @@ export default class ReviewDistribution {
      */
     public static async distributeReviews(assignmentId: number) {
         // Distribution of reviews for assignment
-        // Check for a rubric entry
-        const rubricExists: any = await RubricPS.executeExistsRubricByAssignmentId(assignmentId);
-        if (!rubricExists.exists) {
-            throw new Error("No rubric is present for this assignment");
-        }
         let reviews = undefined;
         // Calculate a solution until a valid solution is found or an error is thrown
         while (reviews == undefined) {
             // Assigning reviews
             reviews = await this.assignSubmissionstoUsers(assignmentId);
+        }
+        // Check for a rubric entry
+        const rubricExists: any = await RubricPS.executeExistsRubricByAssignmentId(assignmentId);
+        if (!rubricExists.exists) {
+            throw new Error("No rubric is present for this assignment");
+        }
+        const existingReviews: any = await ReviewPS.executeGetReviewsByAssignmentId(assignmentId);
+        if (existingReviews.length !== 0) {
+            throw new Error("There are already reviews assigned for this assignment");
         }
         // Add the review assignments to the database
         for (const review of reviews) {

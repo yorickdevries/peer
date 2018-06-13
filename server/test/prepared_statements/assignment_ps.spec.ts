@@ -169,14 +169,4 @@ describe("AssignmentPreparedStatements Test", () => {
         }]);
     });
 
-    /**
-     * Test get reviews for an assignment.
-     */
-    it("Reviews of an assignment", async () => {
-        expect(await AssignmentPS.executeGetReviewsById(1)).to.deep.equal([{
-            "reviewer": "paulvanderlaan",
-            "submitter": "paulvanderlaan"
-        }]);
-    });
-
 });
