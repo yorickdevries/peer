@@ -237,11 +237,11 @@ describe("API integration test", () => {
         // [10]
         // Submit the reviews
         MockLogin.initialize("yorickdevries");
-        const submitReviewYorick = await chai.request(router).get("/reviews/" + paulFeedbackId + "/submit");
+        const submitReviewYorick = await chai.request(router).get("/reviews/" + yorickFeedbackId + "/submit");
         expect(submitReviewYorick.status).to.equal(200);
 
         MockLogin.initialize("paulvanderlaan");
-        const submitReviewPaul = await chai.request(router).get("/reviews/" + yorickFeedbackId + "/submit");
+        const submitReviewPaul = await chai.request(router).get("/reviews/" + paulFeedbackId + "/submit");
         expect(submitReviewYorick.status).to.equal(200);
 
 

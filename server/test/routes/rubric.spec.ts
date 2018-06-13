@@ -25,7 +25,7 @@ describe("API review routes", () => {
         expect(res.status).to.equal(200);
 
         const result = JSON.parse(res.text);
-        expect(result.id).to.equal('1');
+        expect(result.id).to.equal("1");
     });
 
     /**
@@ -131,7 +131,7 @@ describe("API review routes", () => {
     it("rubric/rangequestion/:question_id", async () => {
         const res = await chai.request(router)
             .put("/rangequestion/1")
-            .send({ question: "optNew", range:4, rubric_assignment_id: 2, question_number: 2 });
+            .send({ question: "optNew", range: 4, rubric_assignment_id: 2, question_number: 2 });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({
                 "id": 1,
