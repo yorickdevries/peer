@@ -49,6 +49,9 @@ describe("API integration test", () => {
      *
      *  bplanje logs in as teacher:
      *  - [7] distribute the reviews
+     *
+     *  paul and yorick log in as student:
+     *  - [8] review each other
      */
     it("Full integration test for assignments", async () => {
         // [1]
@@ -94,10 +97,11 @@ describe("API integration test", () => {
         const openQuestion = await chai.request(router)
             .post("/rubric/openquestion")
             .send({ question: "opt", rubric_assignment_id: assignmentId, question_number: 1 });
+        const openQuestionId = JSON.parse(openQuestion.text).id;
         expect(openQuestion.status).to.equal(200);
         expect(openQuestion.text).to.equal(JSON.stringify(
             {
-                "id": 2,
+                "id": openQuestionId,
                 "question": "opt",
                 "rubric_assignment_id": assignmentId,
                 "question_number": 1,
@@ -108,7 +112,7 @@ describe("API integration test", () => {
 
         // [4]
         // Import the groups for the created assignment.
-        const file = path.join(__dirname, "../../example_data/csv_test/example_export.csv");
+        const file = path.join(__dirname, "../../example_data/csv_test/integration_export.csv");
 
         const groups = await chai.request(router).post("/assignments/" + assignmentId + "/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv")
@@ -129,7 +133,6 @@ describe("API integration test", () => {
             .field("assignmentId", assignmentId);
         // Assertions to make sure Paul submitted.
         const submissionPaulResult = JSON.parse(submissionPaul.text);
-        console.log(submissionPaulResult);
         expect(submissionPaul.status).to.equal(200);
         expect(submissionPaulResult.user_netid).to.equal("paulvanderlaan");
         expect(submissionPaulResult.assignment_id).to.equal(assignmentId);
@@ -154,68 +157,114 @@ describe("API integration test", () => {
         const distribution = await chai.request(router).get("/assignments/" + assignmentId + "/distributeReviews");
         // Assertions to make sure the reviews are distributed.
         expect(distribution.status).to.equal(200);
-        expect(JSON.parse(distribution.text).length).to.equal(5);
+        expect(JSON.parse(distribution.text).length).to.equal(2);
         console.log("Teacher distributed the reviews");
 
+
         // [8]
+        // Review each other.
+        // Get the review id that paul should give feedback to.
+        MockLogin.initialize("paulvanderlaan");
+        const paulFeedback: any = await chai.request(router).get("/assignments/" + assignmentId + "/reviews");
+        expect(paulFeedback.status).to.equal(200);
+
+        // Get the review id that yorick should give feedback to.
+        MockLogin.initialize("yorickdevries");
+        const yorickFeedback: any = await chai.request(router).get("/assignments/" + assignmentId + "/reviews");
+        expect(yorickFeedback.status).to.equal(200);
+
+        const yorickFeedbackId = JSON.parse(yorickFeedback.text)[0].id;
+        const yorickFeedbackAnswer = "you did great paul :)";
+
+        const paulFeedbackId = JSON.parse(paulFeedback.text)[0].id;
+        const paulFeedbackAnswer = "maybe look at it again";
+
         // Paulvanderlaan reviews yorickdevries.
-        const res = await chai.request(router)
-            .put("/")
+        MockLogin.initialize("paulvanderlaan");
+        const reviewPaul = await chai.request(router)
+            .put("/reviews/" + paulFeedbackId)
             .send({
                 "review": {
-                    "id": 1,
-                    "rubric_assignment_id": 1,
-                    "file_path": "submission1.pdf",
+                    "id": paulFeedbackId,
+                    "rubric_assignment_id": assignmentId,
+                    "file_path": "assignment1.pdf",
                     "done": false
                 },
                 "form": [{
                     "question": {
-                        "id": 1,
-                        "type_question": "mc",
-                        "question": "What is the best way to insert queries?",
-                        "question_number": 3,
-                        "option": [{"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}, {
-                            "id": 2,
-                            "option": "By using command line",
-                            "mcquestion_id": 1
-                        }, {"id": 3, "option": "By asking Brian", "mcquestion_id": 1}]
-                    }, "answer": {"answer": 1, "mcquestion_id": 1, "review_id": 1}
+                        "id": openQuestionId,
+                        "type_question": "open",
+                        "question": "opt",
+                        "question_number": 1,
+                    }, "answer": {"answer": paulFeedbackAnswer, "openquestion_id": openQuestionId, "review_id": paulFeedbackId}
                 }]
             });
 
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify({
+        // Assertions to make sure the feedback was correctly inserted.
+        expect(reviewPaul.status).to.equal(200);
+        const reviewPaulRes = JSON.parse(reviewPaul.text);
+        expect(reviewPaulRes.review.id).to.equal(paulFeedbackId);
+        expect(reviewPaulRes.form[0].answer.answer).to.equal(paulFeedbackAnswer);
+
+        // Yorickdevries reviews paulvanderlaan.
+        MockLogin.initialize("yorickdevries");
+        const reviewYorick = await chai.request(router)
+            .put("/reviews/" + yorickFeedbackId)
+            .send({
                 "review": {
-                    "id": 1,
-                    "rubric_assignment_id": 1,
-                    "file_path": "submission1.pdf",
+                    "id": yorickFeedbackId,
+                    "rubric_assignment_id": assignmentId,
+                    "file_path": "assignment1.pdf",
                     "done": false
                 },
                 "form": [{
                     "question": {
-                        "id": 1,
-                        "type_question": "mc",
-                        "question": "What is the best way to insert queries?",
-                        "question_number": 3,
-                        "option": [{"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}, {
-                            "id": 2,
-                            "option": "By using command line",
-                            "mcquestion_id": 1
-                        }, {"id": 3, "option": "By asking Brian", "mcquestion_id": 1}]
-                    }, "answer": {"answer": 1}
+                        "id": openQuestionId,
+                        "type_question": "open",
+                        "question": "opt",
+                        "question_number": 1,
+                    }, "answer": {"answer": yorickFeedbackAnswer, "openquestion_id": openQuestionId, "review_id": yorickFeedbackId}
                 }]
-            }
-        ));
+            });
 
-        // // [7]
-        // MockLogin.initialize(router, "yorickdevries");
-        // const feedbackIds = await chai.request(router).get("/1/feedback");
-        //
-        //
-        // expect(feedbackIds.text).to.equal(JSON.stringify([
-        //     {id: 20, group_name: "Group 20"},
-        //     {id: 21, group_name: "Group 21"},
-        //     {id: 22, group_name: "Group 22"}
-        // ]));
+        // Assertions to make sure the feedback was correctly inserted.
+        expect(reviewYorick.status).to.equal(200);
+        const reviewYorickRes = JSON.parse(reviewYorick.text);
+
+        expect(reviewYorickRes.review.id).to.equal(yorickFeedbackId);
+        expect(reviewYorickRes.form[0].answer.answer).to.equal(yorickFeedbackAnswer);
+
+        // [10]
+        // Submit the reviews
+        MockLogin.initialize("yorickdevries");
+        const submitReviewYorick = await chai.request(router).get("/reviews/" + paulFeedbackId + "/submit");
+        expect(submitReviewYorick.status).to.equal(200);
+
+        MockLogin.initialize("paulvanderlaan");
+        const submitReviewPaul = await chai.request(router).get("/reviews/" + yorickFeedbackId + "/submit");
+        expect(submitReviewYorick.status).to.equal(200);
+
+
+        // [11]
+        MockLogin.initialize("yorickdevries");
+        const feedbackYorickIds = await chai.request(router).get("/assignments/" + assignmentId + "/feedback");
+        expect(feedbackYorickIds.status).to.equal(200);
+        const feedBackYorickId = JSON.parse(feedbackYorickIds.text)[0].id;
+
+        MockLogin.initialize("paulvanderlaan");
+        const feedbackPaulIds = await chai.request(router).get("/assignments/" + assignmentId + "/feedback");
+        expect(feedbackPaulIds.status).to.equal(200);
+        const feedBackPaulId = JSON.parse(feedbackPaulIds.text)[0].id;
+
+        // [12]
+        MockLogin.initialize("paulvanderlaan");
+        const feedbackPaul = await chai.request(router).get("/reviews/" + feedBackPaulId);
+        expect(feedbackPaul.status).to.equal(200);
+        expect(JSON.parse(feedbackPaul.text).form[0].answer.answer).to.equal(yorickFeedbackAnswer);
+
+        MockLogin.initialize("yorickdevries");
+        const feedbackYorick = await chai.request(router).get("/reviews/" + feedBackYorickId);
+        expect(feedbackYorick.status).to.equal(200);
+        expect(JSON.parse(feedbackYorick.text).form[0].answer.answer).to.equal(paulFeedbackAnswer);
     });
 });

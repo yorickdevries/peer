@@ -347,18 +347,18 @@ router.get("/:id/group", async (req: any, res) => {
  */
 router.get("/:id/feedback", async (req: any, res) => {
     try {
-        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.id);
-        if (new Date(assignment.review_due_date) < new Date()) {
-            res.sendStatus(401);
-            res.json({ error: "You can only access the review after the review due date is passed." });
-        } else {
+        // const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.id);
+        // if (new Date(assignment.review_due_date) < new Date()) {
+        //     res.sendStatus(401);
+        //     res.json({ error: "You can only access the review after the review due date is passed." });
+        // } else {
             const assignmentId = req.params.id;
             const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.userinfo.given_name, req.params.id);
             const groupId = group.group_groupid;
             const submission: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
             const submissionId = submission.id;
             res.json(await ReviewPS.executeGetReviewsBySubmissionId(submissionId));
-        }
+        // }
     } catch {
         res.sendStatus(400);
     }
