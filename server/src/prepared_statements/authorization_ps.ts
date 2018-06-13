@@ -40,6 +40,60 @@ export default class AuthorizationPS {
     }
 
     /**
+     * Check if the user is a TA or Teacher for the course a certain review is for
+     */
+    public static executeCheckTAOrTeacherForReview(reviewId: number, netId: String): any {
+        const statement = new PreparedStatement("check-enrollment-ta-teacher-via-review",
+            "SELECT EXISTS(SELECT * FROM review, submission, assignmentlist, enroll, courselist WHERE review.submission_id = submission.id AND submission.assignment_id = assignmentlist.id AND " +
+            "assignmentlist.course_id = courselist.id AND (enroll.role = 'TA' OR enroll.role = 'teacher') AND review.id = $1 AND enroll.user_netid = $2)");
+        statement.values = [reviewId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Check if the review is of by the user
+     */
+    public static executeCheckReviewMaker(reviewId: number, netId: String): any {
+        const statement = new PreparedStatement("check-review-owner",
+            "SELECT EXISTS(SELECT * FROM review WHERE review.id = $1 AND review.user_netid = $2)");
+        statement.values = [reviewId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Check if the review is of the user and not yet done.
+     */
+    public static executeCheckReviewMakerNotDone(reviewId: number, netId: String): any {
+        const statement = new PreparedStatement("check-review-owner",
+            "SELECT EXISTS(SELECT * FROM review WHERE review.done = false AND review.id = $1 AND review.user_netid = $2)");
+        statement.values = [reviewId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Check if the user is te owner of the review comment
+     */
+
+    public static executeCheckOwnerReviewComment(reviewCommentId: number, netId: String): any {
+        const statement = new PreparedStatement("check-reviewComment-owner",
+            "SELECT EXISTS(SELECT * FROM reviewcomment WHERE id = $1 AND netid = $2)");
+        statement.values = [reviewCommentId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+
+    /**
+     * Check if the review belongs to the user, i.e. is the submission where the review is on review done by your group
+     */
+    public static executeCheckGroupBelongingToReview(reviewId: number, netId: String): any {
+        const statement = new PreparedStatement("check-review-belonging-to-submussion-of-user",
+            "SELECT EXISTS(SELECT * FROM review, submission, groupusers WHERE review.submission_id = submission.id AND " +
+            "submission.group_id = groupusers.group_groupId AND review.id = $1 AND groupusers.user_netid = $2)");
+        statement.values = [reviewId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Checks if the user is a ta or teacher for the course the group is in
      */
     public static isTAOrTeacherForGroup(netId: String, groupId: number): any {
