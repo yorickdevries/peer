@@ -1,4 +1,5 @@
 import CoursesPS from "../prepared_statements/courses_ps";
+import AssignmentsPS from "../prepared_statements/assignment_ps";
 import bodyParser from "body-parser";
 import { Roles } from "../roles";
 
@@ -55,7 +56,7 @@ router.get("/enrolled", (req: any, res) => {
  * @param courseId - a course id.
  */
 router.get("/:courseId/assignments", (req, res) => {
-    CoursesPS.executeGetAssignmentsByCourseId(req.params.courseId)
+    AssignmentsPS.executeGetAssignments(req.params.courseId)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
