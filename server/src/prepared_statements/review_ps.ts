@@ -129,7 +129,7 @@ export default class ReviewPS {
         const statement = new PreparedStatement("get-mc-answer-by-id",
             "SELECT * FROM mcanswer WHERE review_id = $1 AND mcquestion_id = $2");
         statement.values = [reviewId, mcQuestionId];
-        return Database.executeQuerySingleResult(statement);
+        return Database.executeQuery(statement);
     }
 
     /**
@@ -143,7 +143,7 @@ export default class ReviewPS {
         const statement = new PreparedStatement("get-range-answer-by-id",
             "SELECT * FROM rangeanswer WHERE review_id = $1 AND rangequestion_id = $2");
         statement.values = [reviewId, rangeQuestionId];
-        return Database.executeQuerySingleResult(statement);
+        return Database.executeQuery(statement);
     }
 
     /**
@@ -157,7 +157,7 @@ export default class ReviewPS {
         const statement = new PreparedStatement("get-open-answer-by-id",
             "SELECT * FROM openanswer WHERE review_id = $1 AND openquestion_id = $2");
         statement.values = [reviewId, openQuestionId];
-        return Database.executeQuerySingleResult(statement);
+        return Database.executeQuery(statement);
     }
 
     /**
