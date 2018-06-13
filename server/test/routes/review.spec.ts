@@ -204,7 +204,7 @@ describe("API review routes", () => {
      * Tests if a specific comment can be added.
      */
     it("POST review/:reviewId/comment", async () => {
-        MockLogin.initialize(router, "bplanje");
+        MockLogin.initialize("bplanje");
         const res = await chai.request(router)
             .post("/1/comment")
             .send({ netid: "otherTA", comment: "new" });
@@ -223,7 +223,7 @@ describe("API review routes", () => {
      * Tests if a specific comment can be updated.
      */
     it("PUT review/:reviewCommentId/comment", async () => {
-        MockLogin.initialize(router, "paulvanderlaan");
+        MockLogin.initialize("paulvanderlaan");
         const res = await chai.request(router)
             .put("/1/comment")
             .send({ comment: "new" });
