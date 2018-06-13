@@ -59,7 +59,7 @@ export default class AssignmentPS {
     }
 
     /**
-     * Executes a 'get assignment by course id'.
+     * Get all assignments that belong to a specific course.
      * @param {string} courseId - a course id.
      * @return {any} a query result.
      */
@@ -155,18 +155,6 @@ export default class AssignmentPS {
         const statement = new PreparedStatement("get-all-groups-per-assignment",
         "SELECT g.id, g.group_name FROM assignmentgroup a JOIN grouplist g ON a.group_id = g.id WHERE assignment_id = $1");
         statement.values = [id];
-        return Database.executeQuery(statement);
-    }
-
-    /**
-     * Executes a 'get review by assignment id' query.
-     * @param {number} assignmentId - an assignment id.
-     * @return {Promise<pgPromise.queryResult>} - a promise of the database result.
-     */
-    public static executeGetReviewsById(assignmentId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-all-reviews-by-assignment",
-            "SELECT review.user_netid as reviewer, submission.user_netid as submitter FROM review JOIN assignmentlist ON assignmentlist.id = review.rubric_assignment_id  JOIN submission ON submission.id = review.submission_id WHERE assignmentlist.id = $1 AND review.done = true");
-        statement.values = [assignmentId];
         return Database.executeQuery(statement);
     }
 

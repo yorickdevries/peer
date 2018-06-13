@@ -12,34 +12,44 @@
                 </b-col>
             </b-row>
 
+            <!--Filter Input-->
+            <b-row>
+                <b-col class="mb-3" cols="6">
+                    <b-input placeholder="Filter courses" v-model="filter"></b-input>
+                </b-col>
+            </b-row>
+
             <!--Course Cards-->
             <b-row>
-                <b-col cols="6" v-for="course in courses" :key="course.id" class="d-flex align-items-stretch">
+                <b-col cols="6" v-for="course in filteredCourses" :key="course.id" class="d-flex align-items-stretch pr-0">
+
+                    <!--Single Card-->
                     <b-card no-body class="mb-3 w-100">
-                        <b-card-body class="d-flex flex-column justify-content-between" style="align-items: flex-start">
-                            <div>
-                                <h4 class="card-title mb-2">{{ course.name }}</h4>
+                        <b-card-body class="d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h4 class="card-title m-0">{{ course.name }}</h4>
+                                <b-badge v-if="course.role" show variant="primary font-weight-bold">{{ course.role.toUpperCase() }}</b-badge>
+                            </div>
+                            <div class="mb-auto">
                                 <p>{{ course.description | truncate(200)}}</p>
                             </div>
-                            <div class="d-flex justify-content-between w-100">
-                                <b-button v-if="course.role === 'student'" variant="outline-primary"
-                                          :to="{ name: 'student-dashboard.course.home', params: { courseId: course.id } }">
-                                    Enter Course
+                            <div>
+                                <b-button   v-if="course.role === 'student'" variant="outline-primary" size="sm"
+                                            :to="{ name: 'student-dashboard.course.home', params: { courseId: course.id } }">
+                                            Enter
                                 </b-button>
-                                <b-button v-else-if="course.role === 'TA'" variant="outline-primary"
-                                          :to="{ name: 'teaching-assistant-dashboard.course.home', params: { courseId: course.id } }">
-                                    Enter as TA
+                                <b-button   v-else-if="course.role === 'TA'" variant="outline-primary" size="sm"
+                                            :to="{ name: 'teaching-assistant-dashboard.course.home', params: { courseId: course.id } }">
+                                            Enter
                                 </b-button>
-                                <b-button v-else-if="course.role === 'teacher'" variant="outline-primary"
-                                          :to="{ name: 'teacher-dashboard.course', params: { courseId: course.id } }">
-                                    Enter as Teacher
+                                <b-button   v-else-if="course.role === 'teacher'" variant="outline-primary" size="sm"
+                                            :to="{ name: 'teacher-dashboard.course', params: { courseId: course.id } }">
+                                            Enter
                                 </b-button>
-                                <b-badge show variant="secondary" class="my-2 "><h6 class="m-0 font-weight-bold">{{
-                                    course.role }}</h6></b-badge>
                             </div>
-
                         </b-card-body>
                     </b-card>
+
                 </b-col>
 
             </b-row>
@@ -60,7 +70,18 @@ export default {
                     id: null,
                     role: ''
                 }
-            ]
+            ],
+            filter: ""
+        }
+    },
+    computed: {
+        filteredCourses() {
+            // Filters course based on text filter.
+            if (this.filter === "") return this.courses
+
+            return this.courses.filter(course => {
+                return course.name.toLowerCase().includes(this.filter.toLowerCase())
+            })
         }
     },
     async created() {

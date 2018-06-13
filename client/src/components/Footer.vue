@@ -1,27 +1,29 @@
 <template>
     <footer class="text-muted">
-        <div class="container">
-            <p class="float-right">
+        <div class="container d-flex align-items-center h-100">
+            <div class="mr-auto">In development. </div>
+            <b-img :src="require('../assets/images/tu_delft_logo_black.png')" alt="tu-delft-logo" height="30px" class="mr-5 mb-3"></b-img>
+            <div class="float-right ">
                 <a href="#">Back to top</a>
-            </p>
-            <p>In development. </p>
+            </div>
         </div>
+
     </footer>
+
 </template>
 
 <script>
-export default {
-    name: "Footer"
-}
+    export default {
+        name: "Footer"
+    }
 </script>
 
 <style scoped>
-footer {
-    padding-top: 3rem;
-    padding-bottom: 3rem;
-}
+    footer {
+        height: 125px;
+    }
 
-footer p {
-    margin-bottom: .25rem;
-}
+    footer p {
+        margin-bottom: .25rem;
+    }
 </style>
