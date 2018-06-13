@@ -52,6 +52,9 @@ describe("API integration test", () => {
      *
      *  paul and yorick log in as student:
      *  - [8] review each other
+     *  - [9] submit reviews
+     *  - [10] fetch the feedback ids (which id to see your review feedback on)
+     *  - [11] fetch the feedback
      */
     it("Full integration test for assignments", async () => {
         // [1]
@@ -234,7 +237,7 @@ describe("API integration test", () => {
         expect(reviewYorickRes.review.id).to.equal(yorickFeedbackId);
         expect(reviewYorickRes.form[0].answer.answer).to.equal(yorickFeedbackAnswer);
 
-        // [10]
+        // [9]
         // Submit the reviews
         MockLogin.initialize("yorickdevries");
         const submitReviewYorick = await chai.request(router).get("/reviews/" + yorickFeedbackId + "/submit");
@@ -245,7 +248,8 @@ describe("API integration test", () => {
         expect(submitReviewYorick.status).to.equal(200);
 
 
-        // [11]
+        // [10]
+        // Fetch the feedback ids.
         MockLogin.initialize("yorickdevries");
         const feedbackYorickIds = await chai.request(router).get("/assignments/" + assignmentId + "/feedback");
         expect(feedbackYorickIds.status).to.equal(200);
@@ -256,7 +260,8 @@ describe("API integration test", () => {
         expect(feedbackPaulIds.status).to.equal(200);
         const feedBackPaulId = JSON.parse(feedbackPaulIds.text)[0].id;
 
-        // [12]
+        // [11]
+        // Fetch the feedback (answers).
         MockLogin.initialize("paulvanderlaan");
         const feedbackPaul = await chai.request(router).get("/reviews/" + feedBackPaulId);
         expect(feedbackPaul.status).to.equal(200);
