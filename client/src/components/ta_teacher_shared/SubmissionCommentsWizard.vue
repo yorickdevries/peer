@@ -31,7 +31,7 @@
         </b-card>
 
         <!--Add Submission Comment-->
-        <b-card header="Create component">
+        <b-card header="Create Comment">
             <b-form-group label="Create comment"
                           description="A comment you can put on the submission the group/student submitted.">
                 <b-form-textarea v-model="newComment.comment"

@@ -5,12 +5,25 @@
         <b-row>
             <b-col cols="6" class="mb-3">
                 <b-form-group horizontal label="Filter" class="mb-0 mr-4">
-                    <b-input-group>
+                    <b-input-group class="mb-2">
                         <b-form-input v-model="filter" placeholder="Type to Search"/>
                         <b-input-group-append>
                             <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
                         </b-input-group-append>
                     </b-input-group>
+
+                    <b-button-group class="mx-auto">
+                        <button @click="setLatestSubmissionsActive(false)"
+                                :class="{'bg-primary': !latestSubmissionsActive, 'btn-outline-primary': latestSubmissionsActive, 'text-white': !latestSubmissionsActive}"
+                                class="btn btn-sm" size="sm">All submissions
+                        </button>
+                        <button @click="setLatestSubmissionsActive(true)"
+                                :class="{'bg-primary': latestSubmissionsActive, 'btn-outline-primary': !latestSubmissionsActive, 'text-white': latestSubmissionsActive}"
+                                class="btn btn-sm" size="sm">Latest submissions
+                        </button>
+                        <!--<button @click="setLatestSubmissionsActive(false)" :class="{'bg-primary': !latestSubmissionsActive, 'btn-outline-primary': latestSubmissionsActive, 'text-white': !latestSubmissionsActive}" class="btn btn-sm" size="sm">Latest submissions</button>-->
+                    </b-button-group>
+
                 </b-form-group>
             </b-col>
             <b-col cols="6">
@@ -71,12 +84,31 @@
                     'actions'
                 ],
                 perPage: 5,
+                latestSubmissionsActive: false,
                 filter: null
             }
         },
         async created() {
-            let res = await api.getAssignmentAllSubmissions(this.assignmentId);
-            this.submissions = res.data
+            await this.fetchSubmissions()
+        },
+        methods: {
+            async fetchSubmissions() {
+                let res;
+                try {
+                    if (this.latestSubmissionsActive) {
+                        res = await api.getAssignmentAllLatestSubmissions(this.assignmentId)
+                    } else {
+                        res = await api.getAssignmentAllSubmissions(this.assignmentId)
+                    }
+                    this.submissions = res.data
+                } catch (error) {
+                    console.log(error)
+                }
+            },
+            async setLatestSubmissionsActive(boolean) {
+                this.latestSubmissionsActive = boolean
+                await this.fetchSubmissions()
+            }
         }
     }
 </script>
