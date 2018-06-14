@@ -39,7 +39,7 @@ router.delete("/rangequestion/:question_id", index.authorization.checkRangeQuest
  * Route to delete mc question
  * @params id - id
  */
-router.delete("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit,(req, res) => {
+router.delete("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, (req, res) => {
     RubricPS.executeDeleteMCQuestion(req.params.question_id)
     .then((data) => {
         res.json(data);
