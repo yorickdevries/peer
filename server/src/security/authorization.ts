@@ -80,7 +80,6 @@ const checkRubricAuthorizationPost = async (req: any, res: any, next: any) => {
     } catch (error) {
         res.sendStatus(401);
     }
-
 };
 
 /**
@@ -93,8 +92,21 @@ const checkMCQuestionEdit = async (req: any, res: any, next: any) => {
     } catch (error) {
         res.sendStatus(401);
     }
-
 };
+
+/**
+ * Check authorization to edit a mc option
+ */
+const checkMCOptionEdit = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeAuthorizationMCOption(req.params.option_id, req.userinfo.given_name);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+
 
 /**
  * Check authorization to edit a open question
@@ -106,7 +118,6 @@ const checkOpenQuestionEdit = async (req: any, res: any, next: any) => {
     } catch (error) {
         res.sendStatus(401);
     }
-
 };
 
 /**
@@ -119,7 +130,6 @@ const checkRangeQuestionEdit = async (req: any, res: any, next: any) => {
     } catch (error) {
         res.sendStatus(401);
     }
-
 };
 
 /**
@@ -227,6 +237,7 @@ export default {
     checkOpenQuestionEdit,
     checkRangeQuestionEdit,
     checkMCQuestionEdit,
+    checkMCOptionEdit,
     checkRubricAuthorizationPost,
     checkAuthorizationForReview,
     enrolledAsTeacherAssignmentCheck,

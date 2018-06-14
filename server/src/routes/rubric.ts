@@ -52,7 +52,7 @@ router.delete("/mcquestion/:question_id", index.authorization.checkMCQuestionEdi
  * Route to delete mc option
  * @params id - id
  */
-router.delete("/mcoption/:option_id", (req, res) => {
+router.delete("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (req, res) => {
     RubricPS.executeDeleteMCOption(req.params.option_id)
     .then((data) => {
         res.json(data);
@@ -78,7 +78,7 @@ router.post("/mcoption", (req, res) => {
  * Route to update mcoption
  *
  */
-router.put("/mcoption/:option_id", (req, res) => {
+router.put("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (req, res) => {
     RubricPS.executeUpdateMCOption(req.body.option, req.body.mcquestion_id, req.params.option_id)
     .then((data) => {
         res.json(data);
