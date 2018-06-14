@@ -42,7 +42,7 @@ export default class SubmissionsPS {
         const statement = new PreparedStatement("get-submissions-by-assignment-id",
         "SELECT s1.*, s2.comment_count FROM submission s1 JOIN "
         + "(SELECT s.*, COUNT(sc.submission_id) AS comment_count FROM submission s LEFT JOIN submissioncomment sc ON s.id = sc.submission_id GROUP BY s.id) s2 ON s2.id = s1.id "
-        + "WHERE s1.assignment_id = 1 AND s1.date = (SELECT max(date) FROM submission s3 WHERE s3.group_id = s1.group_id)"
+        + "WHERE s1.assignment_id = $1 AND s1.date = (SELECT max(date) FROM submission s3 WHERE s3.group_id = s1.group_id)"
     );
         statement.values = [id];
         return Database.executeQuery(statement);
