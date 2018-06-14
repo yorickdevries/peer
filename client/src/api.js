@@ -81,6 +81,9 @@ export default {
     },
     shuffleGroups(assignmentId) {
         return client.get(`/assignments/${assignmentId}/distributeReviews`)
+    },
+    getSubmission(submissionId) {
+        return client.get(`/submissions/${submissionId}`)
     }
 }
 

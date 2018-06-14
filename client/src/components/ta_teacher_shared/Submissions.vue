@@ -34,6 +34,18 @@
             <template slot="file_path" slot-scope="data">
                 <a :href="`/api/submissions/${data.item.id}/file`"> {{data.value }} </a>
             </template>
+
+            <template slot="actions" slot-scope="row">
+                <b-button @click.stop="row.toggleDetails">{{ row.detailsShowing ? "Hide Comments" : "Show Comments"}}
+                </b-button>
+            </template>
+
+            <template slot="row-details" slot-scope="row">
+                <SubmissionCommentWizard>
+
+                </SubmissionCommentWizard>
+            </template>
+
         </b-table>
 
         <!--Pagination-->
@@ -44,8 +56,10 @@
 
 <script>
     import api from "../../api"
+    import SubmissionCommentWizard from './SubmissionCommentsWizard'
 
     export default {
+        components: {SubmissionCommentWizard},
         props: ["assignmentId"],
         data() {
             return {
@@ -54,7 +68,8 @@
                 fields: [
                     {key: 'user_netid', label: 'Username'},
                     {key: 'date', label: 'Submitted'},
-                    {key: 'file_path', label: 'Download'}
+                    {key: 'file_path', label: 'Download'},
+                    'actions'
                 ],
                 perPage: 5,
                 filter: null
