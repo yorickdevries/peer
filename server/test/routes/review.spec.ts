@@ -208,14 +208,14 @@ describe("API review routes", () => {
         MockLogin.initialize("bplanje");
         const res = await chai.request(router)
             .post("/1/comment")
-            .send({ netid: "otherTA", comment: "new" });
+            .send({ comment: "new" });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
                 "id": 2,
                 "comment": "new",
                 "review_id": 1,
-                "netid": "otherTA"
+                "netid": "bplanje"
             }
         ));
     });

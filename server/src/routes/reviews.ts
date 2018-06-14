@@ -144,12 +144,11 @@ router.route("/:reviewCommentId/comment").put(index.authorization.checkOwnerRevi
 /**
  * Get all review comments.
  * @param reviewId - an id of a review.
- * @body netid - a netid.
  * @body comment - a comment of the review.
  * @return database return value.
  */
-router.route("/:reviewId/comment").post(index.authorization.checkReviewTAOrTeacher, (req, res) => {
-    ReviewsPS.executeAddReviewComment(req.params.reviewId, req.body.netid, req.body.comment)
+router.route("/:reviewId/comment").post(index.authorization.checkReviewTAOrTeacher, (req: any, res) => {
+    ReviewsPS.executeAddReviewComment(req.params.reviewId, req.userinfo.given_name, req.body.comment)
     .then((data) => {
         res.json(data);
     }).catch((error) => {

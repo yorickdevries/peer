@@ -39,14 +39,14 @@ describe("submission comment routes", () => {
     it("POST submission/:submissionId/comment", async () => {
         const res = await chai.request(router)
             .post("/1/comment")
-            .send({ netid: "otherTA", comment: "new" });
+            .send({ comment: "new" });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
                 "id": 2,
                 "comment": "new",
                 "submission_id": 1,
-                "netid": "otherTA"
+                "netid": "paulvanderlaan"
             }
         ));
     });
