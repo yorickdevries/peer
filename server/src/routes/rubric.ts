@@ -1,5 +1,7 @@
 import RubricPS, { default as rubricPS } from "../prepared_statements/rubric_ps";
 import bodyParser from "body-parser";
+import index from "../security/index";
+
 
 // Router
 import express from "express";
@@ -90,7 +92,7 @@ router.put("/mcoption/:option_id", (req, res) => {
  * @body question - question
  * @body question_number - question_number
  */
-router.post("/mcquestion", (req, res) => {
+router.post("/mcquestion", index.authorization.checkRubricAuthorizationPost, (req, res) => {
     RubricPS.executeCreateMCQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number)
     .then((data) => {
         res.json(data);
@@ -122,7 +124,7 @@ router.put("/mcquestion/:question_id", (req, res) => {
  * @body rubric_id - rubric_id
  * @body question_number - question_number
  */
-router.post("/rangequestion", (req, res) => {
+router.post("/rangequestion", index.authorization.checkRubricAuthorizationPost, (req, res) => {
     RubricPS.executeCreateRangeQuestion(req.body.question, req.body.range, req.body.rubric_assignment_id, req.body.question_number)
     .then((data) => {
         res.json(data);
@@ -154,7 +156,7 @@ router.put("/rangequestion/:question_id", (req, res) => {
  * @body rubric_id - rubric_id
  * @body question_number - question_number
  */
-router.post("/openquestion", (req, res) => {
+router.post("/openquestion", index.authorization.checkRubricAuthorizationPost, (req, res) => {
     RubricPS.executeCreateOpenQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number)
     .then((data) => {
         res.json(data);
@@ -180,7 +182,7 @@ router.put("/openquestion/:question_id", (req, res) => {
  * Router to make a rubric
  * @body rubric_id
  */
-router.post("/", (req, res) => {
+router.post("/", index.authorization.checkRubricAuthorizationPost, (req, res) => {
     RubricPS.executeCreateRubric(req.body.rubric_assignment_id)
     .then((data) => {
         res.json(data);

@@ -66,6 +66,21 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
     }
 };
 
+
+/**
+ * Check authorization to edit a rubric
+ */
+const checkRubricAuthorizationPost = async (req: any, res: any, next: any) => {
+    try {
+        const assignment = await AssignmentPS.executeGetAssignmentById(req.body.rubric_assignment_id);
+        const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+
+};
+
 /**
  * Check if the user can show this review, i.e. is he the owner of the submission, is he the owner of the review
  * or is he a TA or teacher for the course of the review
@@ -168,6 +183,7 @@ export default {
     checkReviewTAOrTeacher,
     checkReviewOwnerDone,
     checkReviewOwner,
+    checkRubricAuthorizationPost,
     checkAuthorizationForReview,
     enrolledAsTeacherAssignmentCheck,
     isAuthorizedToViewGroup,
