@@ -1,5 +1,5 @@
 <template>
-    <nav class="shadow-sm">
+    <nav class="shadow-smb">
 
         <!--Head Navbar-->
         <b-navbar toggleable="md" type="dark"  class="py-3 bg-primary">
