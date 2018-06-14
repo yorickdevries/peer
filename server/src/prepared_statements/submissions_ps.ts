@@ -16,6 +16,17 @@ export default class SubmissionsPS {
     }
 
     /**
+     * Get the course id through the submission id.
+     * @return database single result of the course id.
+     */
+    public static executeGetCourseId(submissionId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-course-id",
+            "SELECT course_id FROM submission JOIN assignmentlist ON submission.assignment_id = assignmentlist.id WHERE submission.id = $1");
+        statement.values = [submissionId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Executes a 'get submission by id' query
      */
     public static executeGetSubmissionById(id: number): Promise<pgPromise.queryResult> {
