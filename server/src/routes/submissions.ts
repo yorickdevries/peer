@@ -5,6 +5,7 @@ import multer from "multer";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 import bodyParser from "body-parser";
 import AssignmentPS from "../prepared_statements/assignment_ps";
+import index from "../security/index";
 
 // Router
 import express from "express";
@@ -77,20 +78,9 @@ const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
 };
 
 /**
- * Route to get all submissions.
- */
-router.get("/", (req, res) => {
-    SubmissionsPS.executeGetSubmissions()
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
-        res.sendStatus(400);
-    });
-});
-
-/**
  * Route to get one submission with a specific id.
  * @param id - submission id.
+ * @authorization user should be TA, teacher, reviewer or submitter.
  */
 router.get("/:id", (req, res) => {
     SubmissionsPS.executeGetSubmissionById(req.params.id)
