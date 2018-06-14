@@ -2,7 +2,7 @@
     <nav class="shadow-sm">
 
         <!--Head Navbar-->
-        <b-navbar toggleable="md" type="dark"  class="py-3 bg-primary">
+        <b-navbar toggleable="md" type="dark"  class="py-3" :class="headNavbarClass">
             <b-container>
 
                 <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
@@ -12,7 +12,7 @@
 
                 <!--Course/Role Text-->
                 <h5 class="text-white font-weight-bold my-0">{{ title }}</h5>
-                <b-badge variant="secondary" class="ml-2">{{ role }}</b-badge>
+                <b-badge v-if="role " variant="dark" class="ml-3 p-2"><span class="font-weight-bold">ROLE: {{ role.toUpperCase()}}</span></b-badge>
 
                 <b-collapse is-nav id="nav_collapse">
 
@@ -42,7 +42,7 @@
         </b-navbar>
 
         <!--Secondary (Course) Navbar-->
-        <b-navbar toggleable="md" type="dark" class="bg-primary-light">
+        <b-navbar toggleable="md" type="dark" :class="subNavbarClass">
             <b-container>
 
                 <b-collapse is-nav id="nav_collapse">
@@ -61,13 +61,31 @@
 import api from '../api'
 
 export default {
-    props: ['links', 'title', 'role'],
+    props: ['links', 'title', 'role', 'variant'],
     data() {
         return {
             authenticated: null,
             user: {name: null},
             currentCourse: ""
         }
+    },
+    computed: {
+        headNavbarClass() {
+            switch (this.variant) {
+                case 'primary': return { 'bg-primary': true }
+                case 'success': return { 'bg-success': true }
+                case 'danger': return { 'bg-danger': true }
+                default: return { 'bg-primary': true }
+            }
+        },
+        subNavbarClass() {
+            switch (this.variant) {
+                case 'primary': return { 'bg-primary-light': true }
+                case 'success': return { 'bg-success-light': true }
+                case 'danger': return { 'bg-danger-light': true }
+                default: return { 'bg-primary-light': true }
+            }
+        },
     },
     async mounted() {
         // Fetch authentication & user information.

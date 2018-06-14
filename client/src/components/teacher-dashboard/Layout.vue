@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Navbar :title="course.name" :links="navbarItems" :role="role"/>
+        <Navbar :title="course.name" :links="navbarItems" :role="role" variant="success"/>
 
         <transition name="slide-right" mode="out-in">
             <router-view></router-view>
@@ -21,8 +21,8 @@ export default {
             navbarItems: [
                 { to: { name: 'teacher-dashboard.course' } , text: 'Course Home' },
                 { to: { name: 'teacher-dashboard.assignments' } , text: 'Assignments' },
-                {to: {name: 'teacher-dashboard.course.teaching-assistants'}, text: 'TA Management'},
-                {to: {name: 'teacher-dashboard.course.students'}, text: 'Student Management'},
+                { to: { name: 'teacher-dashboard.course.teaching-assistants' }, text: 'TA Management' },
+                { to: { name: 'teacher-dashboard.course.students' }, text: 'Student Management' },
             ],
             course: {
                 name: null

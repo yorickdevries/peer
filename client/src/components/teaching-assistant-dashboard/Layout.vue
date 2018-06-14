@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Navbar :title="course.name" :links="navbarItems" :role="role"/>
+        <Navbar :title="course.name" :links="navbarItems" :role="role" variant="danger"/>
 
         <transition name="slide-right" mode="out-in">
             <router-view></router-view>
