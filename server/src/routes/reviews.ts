@@ -24,7 +24,7 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
         // Loop through the questions and add answers to them.
         for (let i = 0; i < questions.length; i++) {
             const question = questions[i];
-            let answer;
+            let answer: any;
 
             // Get the answers (from database) to the correct question type.
             switch (question.type_question) {
@@ -35,7 +35,7 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
             }
 
             // Create the correct JSON format (API documentation) and push to array.
-            jsonItems.push({ question: question, answer: answer });
+            jsonItems.push({question: question, answer: (answer[0]) ? answer[0] : {answer: ""}});
         }
 
         // Assemble correct json to send in the response.
@@ -43,7 +43,8 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
             review: review,
             form: jsonItems
         });
-    } catch {
+    } catch (e) {
+        console.log(e);
         res.sendStatus(400);
     }
 });
@@ -173,9 +174,9 @@ router.route("/:reviewCommentId/comment").delete(index.authorization.checkOwnerR
 /**
  * Gets the file that needs to be reviewed.
  */
-router.route("/:id/file").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
+router.route("/:reviewId/file").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
     try {
-        const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(req.params.id);
+        const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(req.params.reviewId);
         const filePath = path.join(__dirname, "../files/submissions", submission.file_path);
         res.sendfile(filePath);
     } catch (err) {

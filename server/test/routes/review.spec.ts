@@ -79,12 +79,13 @@ describe("API review routes", () => {
      * Tests whether review get submitted
      */
     it("submit review/", async () => {
-        const res = await chai.request(router).get("/2/submit");
+        MockLogin.initialize("henkjan");
+        const res = await chai.request(router).get("/1/submit");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             [{
-                "id": 2,
-                "user_netid": "paulvanderlaan",
+                "id": 1,
+                "user_netid": "henkjan",
                 "submission_id": 1,
                 "rubric_assignment_id": 1,
                 "done": true,
@@ -98,8 +99,10 @@ describe("API review routes", () => {
      * Put a review
      */
     it("Put review/", async () => {
+        MockLogin.initialize("henkjan");
+
         const res = await chai.request(router)
-            .put("/2")
+            .put("/1")
             .send({
                 "review": {
                     "id": 2,
@@ -142,45 +145,43 @@ describe("API review routes", () => {
 
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({
-                "review": {
-                    "id": 2,
+            "review": {
+                "id": 1,
+                "rubric_assignment_id": 1,
+                "file_path": "submission1.pdf",
+                "done": false
+            },
+            "form": [{
+                "question": {
+                    "id": 1,
+                    "type_question": "mc",
+                    "question": "What is the best way to insert queries?",
+                    "question_number": 3,
+                    "option": [{"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}, {
+                        "id": 2,
+                        "option": "By using command line",
+                        "mcquestion_id": 1
+                    }, {"id": 3, "option": "By asking Brian", "mcquestion_id": 1}]
+                }, "answer": {"answer": 1}
+            }, {
+                "question": {
+                    "id": 1,
+                    "question": "How to insert queries?",
                     "rubric_assignment_id": 1,
-                    "file_path": "submission1.pdf",
-                    "done": true
-                },
-                "form": [{
-                    "question": {
-                        "id": 1,
-                        "type_question": "mc",
-                        "question": "What is the best way to insert queries?",
-                        "question_number": 3,
-                        "option": [{"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}, {
-                            "id": 2,
-                            "option": "By using command line",
-                            "mcquestion_id": 1
-                        }, {"id": 3, "option": "By asking Brian", "mcquestion_id": 1}]
-                    }, "answer": {"answer": 1}
-                }, {
-                    "question": {
-                        "id": 1,
-                        "question": "How to insert queries?",
-                        "rubric_assignment_id": 1,
-                        "question_number": 1,
-                        "type_question": "open"
-                    }, "answer": {"answer": "Flesje water is beter dan flesje bier"}
-                }, {
-                    "question": {
-                        "id": 1,
-                        "question": "How much fun is inserting queries?",
-                        "range": 7,
-                        "rubric_assignment_id": 1,
-                        "question_number": 2,
-                        "type_question": "range"
-                    }, "answer": {"answer": 4}
-                }]
-            }
-
-        ));
+                    "question_number": 1,
+                    "type_question": "open"
+                }, "answer": {"answer": "Flesje water is beter dan flesje bier"}
+            }, {
+                "question": {
+                    "id": 1,
+                    "question": "How much fun is inserting queries?",
+                    "range": 7,
+                    "rubric_assignment_id": 1,
+                    "question_number": 2,
+                    "type_question": "range"
+                }, "answer": {"answer": 4}
+            }]
+        }));
     });
 
 
