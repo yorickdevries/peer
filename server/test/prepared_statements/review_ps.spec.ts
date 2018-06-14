@@ -71,7 +71,6 @@ describe("ReviewPreparedStatement Test", () => {
      * Get mc answer.
      */
     it("get mc answer by id", async () => {
-        console.log("here: " + JSON.stringify(await ReviewPS.executeGetMCAnswer(1, 1)));
         expect(await ReviewPS.executeGetMCAnswer(1, 1)).to.deep.equal([{
             "answer": 1,
             "mcquestion_id": 1,
