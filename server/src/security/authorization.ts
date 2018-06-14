@@ -82,12 +82,26 @@ const checkRubricAuthorizationPost = async (req: any, res: any, next: any) => {
     }
 };
 
+
+
 /**
  * Check authorization to edit a mc question
  */
 const checkMCQuestionEdit = async (req: any, res: any, next: any) => {
     try {
         const authCheck = await AuthorizationPS.executeAuthorizationMCQuestion(req.params.question_id, req.userinfo.given_name);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check authorization to post mc option
+ */
+const checkMCOptionPost = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeAuthorizationMCQuestion(req.body.mcquestion_id, req.userinfo.given_name);
         await response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -240,6 +254,7 @@ export default {
     checkMCOptionEdit,
     checkRubricAuthorizationPost,
     checkAuthorizationForReview,
+    checkMCOptionPost,
     enrolledAsTeacherAssignmentCheck,
     isAuthorizedToViewGroup,
     enrolledAsTeacherAssignmentCheckForPost,

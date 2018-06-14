@@ -65,7 +65,7 @@ router.delete("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (re
  * Route to create an option for a multiple choice question
  * @body option, mcquestion_id
  */
-router.post("/mcoption", (req, res) => {
+router.post("/mcoption", index.authorization.checkMCOptionPost, (req, res) => {
     RubricPS.executeCreateMCOption(req.body.option, req.body.mcquestion_id)
     .then((data) => {
         res.json(data);
