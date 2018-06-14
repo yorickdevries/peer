@@ -71,6 +71,7 @@
                                     <b-form-radio-group
                                             :checked="answer.answer"
                                             :options="transformOptionsToHTMLOptions(activeQuestion.option)"
+                                            disabled
                                             stacked>
                                     </b-form-radio-group>
                                 </b-form-group>
