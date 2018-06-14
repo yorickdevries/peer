@@ -6,16 +6,17 @@
             <b-list-group v-if="comments.length > 0" flush>
 
                 <!--Single Comment-->
-                <b-list-group-item v-for="(comment, index) in comments" :id="comment.id">
+                <b-list-group-item v-for="comment in comments" :id="comment.id">
                     <dl class="mb-0">
-                        <dt>Created by:</dt>
+                        <dt>Created by</dt>
                         <dd>{{ comment.netid }}</dd>
                     </dl>
                     <b-form-group label="Comment"
                                   description="A comment you can put on the submission the group/student submitted.">
                         <b-form-textarea v-model="comment.comment"
                                          placeholder="Input your submission comment here."
-                                         rows="1"></b-form-textarea>
+                                         rows="1"
+                                         max-rows="10"></b-form-textarea>
                     </b-form-group>
                     <b-button @click="editComment(comment.id, comment)" variant="success" size="sm" class="mr-2">Save
                     </b-button>
