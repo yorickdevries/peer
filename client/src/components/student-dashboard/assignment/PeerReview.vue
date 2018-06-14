@@ -53,7 +53,7 @@
                                 :item-size="20"
                                 :spacing="5"
                                 inline
-                                :max-rating="pair.question.range"
+                                :max-rating="Number(pair.question.range)"
                                 :show-rating="false"
                                 :read-only="peerReview.review.done"
                                 v-model="pair.answer.answer"/>
@@ -136,6 +136,8 @@ export default {
             this.peerReview = data
         },
         async submitPeerReview() {
+
+            await this.savePeerReview()
 
             // Validate all fields (required).
             let validated = true;
