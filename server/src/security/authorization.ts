@@ -29,6 +29,7 @@ const enrolledAssignmentCheck = async (req: any, res: any, next: any) => {
     }
 };
 
+
 /**
  * Check whether a user in enrolled as teacher
  */

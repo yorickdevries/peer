@@ -193,16 +193,15 @@ router.post("/", index.authorization.checkRubricAuthorizationPost, (req, res) =>
 
 /**
  * Router to get all questions of the rubric in format defined in the documentation
- * @params rubric_id
+ * @params assignment_id - rubric_id
  */
-router.get("/:rubric_id", async (req, res) => {
+router.get("/:assignment_id", index.authorization.enrolledAssignmentCheck, async (req, res) => {
     try {
-    const rubric_id = req.params.rubric_id;
-    const questionJson = await RubricPS.getAllQuestionsByRubricId(req.params.rubric_id);
+    const questionJson = await RubricPS.getAllQuestionsByRubricId(req.params.assignment_id);
 
     res.json({
-        id: rubric_id,
-        assignment_id: rubric_id,
+        id: req.params.assignment_id,
+        assignment_id: req.params.assignment_id,
         questions: questionJson});
     } catch {
         res.sendStatus(400);
