@@ -393,4 +393,24 @@ describe("API Assignment routes", () => {
             {id: 22, group_name: "Group 22"}
         ]));
     });
+
+    /**
+     * Tests the route for all submissions of an assignment
+     */
+    it("Get all submission of an assignment", async () => {
+        // log in as henkjan
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).get("/1/allsubmissions");
+        expect(JSON.parse(res.text).length).to.equal(2);
+    });
+
+    /**
+     * Tests the route for all latest submissions of an assignment
+     */
+    it("Get all latest submission of an assignment", async () => {
+        // log in as henkjan
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).get("/1/alllatestsubmissions");
+        expect(JSON.parse(res.text).length).to.equal(1);
+    });
 });
