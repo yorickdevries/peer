@@ -152,12 +152,11 @@ router.put("/:submissionCommentId/comment", (req, res) => {
 /**
  * Get all review comments.
  * @param submissionId - an id of a submission.
- * @body netid - a netid.
  * @body comment - a comment of the review.
  * @return database return value.
  */
-router.post("/:submissionId/comment", (req, res) => {
-    SubmissionsPS.executeAddSubmissionComment(req.params.submissionId, req.body.netid, req.body.comment)
+router.post("/:submissionId/comment", (req: any, res) => {
+    SubmissionsPS.executeAddSubmissionComment(req.params.submissionId, req.userinfo.given_name, req.body.comment)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
