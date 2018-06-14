@@ -36,14 +36,13 @@
             </template>
 
             <template slot="actions" slot-scope="row">
-                <b-button @click.stop="row.toggleDetails">{{ row.detailsShowing ? "Hide Comments" : "Show Comments"}}
+                <b-button @click.stop="row.toggleDetails" variant="primary" size="sm">{{ row.detailsShowing ? "Hide" :
+                    "Show/Edit Comments"}}
                 </b-button>
             </template>
 
             <template slot="row-details" slot-scope="row">
-                <SubmissionCommentWizard>
-
-                </SubmissionCommentWizard>
+                <SubmissionCommentWizard :submissionId="row.item.id"/>
             </template>
 
         </b-table>
