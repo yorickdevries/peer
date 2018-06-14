@@ -13,8 +13,8 @@ router.use(bodyParser.json());
  * Route to delete an open question
  * @params id - id
  */
-router.delete("/openquestion/:id", (req, res) => {
-    RubricPS.executeDeleteOpenQuestion(req.params.id)
+router.delete("/openquestion/:question_id", (req, res) => {
+    RubricPS.executeDeleteOpenQuestion(req.params.question_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -26,8 +26,8 @@ router.delete("/openquestion/:id", (req, res) => {
  * Route to delete a range question
  * @params id - id
  */
-router.delete("/rangequestion/:id", (req, res) => {
-    RubricPS.executeDeleteRangeQuestion(req.params.id)
+router.delete("/rangequestion/:question_id", (req, res) => {
+    RubricPS.executeDeleteRangeQuestion(req.params.question_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -39,8 +39,8 @@ router.delete("/rangequestion/:id", (req, res) => {
  * Route to delete mc question
  * @params id - id
  */
-router.delete("/mcquestion/:id", (req, res) => {
-    RubricPS.executeDeleteMCQuestion(req.params.id)
+router.delete("/mcquestion/:question_id", (req, res) => {
+    RubricPS.executeDeleteMCQuestion(req.params.question_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -52,8 +52,8 @@ router.delete("/mcquestion/:id", (req, res) => {
  * Route to delete mc option
  * @params id - id
  */
-router.delete("/mcoption/:id", (req, res) => {
-    RubricPS.executeDeleteMCOption(req.params.id)
+router.delete("/mcoption/:option_id", (req, res) => {
+    RubricPS.executeDeleteMCOption(req.params.option_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {

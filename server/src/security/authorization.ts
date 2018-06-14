@@ -1,5 +1,6 @@
 import AuthorizationPS from "../prepared_statements/authorization_ps";
 import AssignmentPS from "../prepared_statements/assignment_ps";
+import RubricPS from "../prepared_statements/rubric_ps";
 
 /**
  * Check whether the user who does the request is authenticated.
@@ -73,6 +74,20 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
 const checkRubricAuthorizationPost = async (req: any, res: any, next: any) => {
     try {
         const assignment = await AssignmentPS.executeGetAssignmentById(req.body.rubric_assignment_id);
+        const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+
+};
+
+/**
+ * Check authorization to edit a mc question
+ */
+const checkMCQuestionEdit = async (req: any, res: any, next: any) => {
+    try {
+        const mcQuestion = await RubricPS.get(req.body.rubric_assignment_id);
         const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
         await response(res, authCheck.exists, next);
     } catch (error) {
