@@ -121,7 +121,7 @@ export default class AuthorizationPS {
      * Check if the review belongs to the user, i.e. is the submission where the review is on review done by your group
      */
     public static executeCheckGroupBelongingToReview(reviewId: number, netId: String): any {
-        const statement = new PreparedStatement("check-review-belonging-to-submussion-of-user",
+        const statement = new PreparedStatement("check-review-belonging-to-submission-of-user",
             "SELECT EXISTS(SELECT * FROM review, submission, groupusers WHERE review.submission_id = submission.id AND " +
             "submission.group_id = groupusers.group_groupId AND review.id = $1 AND groupusers.user_netid = $2)");
         statement.values = [reviewId, netId];
