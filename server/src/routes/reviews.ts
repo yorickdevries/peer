@@ -175,7 +175,7 @@ router.route("/:reviewCommentId/comment").delete(index.authorization.checkOwnerR
  */
 router.route("/:reviewId/file").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
     try {
-        const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(req.params.id);
+        const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(req.params.reviewId);
         const filePath = path.join(__dirname, "../files/submissions", submission.file_path);
         res.sendfile(filePath);
     } catch (err) {
