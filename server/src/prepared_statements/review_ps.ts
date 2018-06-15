@@ -241,6 +241,19 @@ export default class ReviewPS {
         return Database.executeQuery(statement);
     }
 
+    /**
+     * Get a review by submission id and net id.
+     * @param {number} submissionId - a submission id.
+     * @param {string} netId - a net id.
+     * @return {Promise<pgPromise.queryResult>} - all reviews for a submission id and net id.
+     */
+    public static executeGetReviewBySubmissionIdNetId(submissionId: number, netId: string): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-reviews-by-assignment-id-net-id",
+            "SELECT id FROM review WHERE submission_id = $1 AND user_netid = $2");
+        statement.values = [submissionId, netId];
+        return Database.executeQuery(statement);
+    }
+
 
     /**
      * Gets all reviews for a certain assignment

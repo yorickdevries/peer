@@ -113,4 +113,10 @@ export default class AuthorizationPS {
         return Database.executeQuerySingleResult(statement);
     }
 
+    public static isSubmissionReviewerOrSubmitter(netId: string, submissionId: number): any {
+        const statement = new PreparedStatement("check-submission-submitter",
+            "SELECT EXISTS(SELECT * FROM submission, review WHERE submission.id = $1 AND (submission.user_netid = $2 OR review.user_netid = $2))");
+        statement.values = [submissionId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
 }

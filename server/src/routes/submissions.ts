@@ -80,9 +80,9 @@ const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
 /**
  * Route to get one submission with a specific id.
  * @param id - submission id.
- * @authorization user should be TA, teacher, reviewer or submitter.
+ * @authorization user should be TA, teacher or part of the group which has submitted.
  */
-router.get("/:id", (req, res) => {
+router.get("/:id", index.authorization.getSubmissionAuth, (req, res) => {
     SubmissionsPS.executeGetSubmissionById(req.params.id)
     .then((data) => {
         res.json(data);
@@ -93,14 +93,15 @@ router.get("/:id", (req, res) => {
 
 /**
  * Route to make a new submission.
+ * @authorization the user should be part of a group in the course.
  */
-router.post("/", uploadSubmissionFunction, addSubmissionToDatabase);
+router.post("/", index.authorization.postSubmissionAuth, uploadSubmissionFunction, addSubmissionToDatabase);
 
 /**
  * Route to get a file from a submission.
  * @param id - submission id.
  */
-router.get("/:id/file", async (req, res) => {
+router.get("/:id/file", index.authorization.getSubmissionFileAuth, async (req, res) => {
     try {
         const submission: any = await SubmissionsPS.executeGetSubmissionById(req.params.id);
         const filePath = path.join(__dirname, "../files/submissions", submission.file_path);
