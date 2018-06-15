@@ -348,7 +348,7 @@ describe("API Assignment routes", () => {
      */
     it("GET /:id/allreviews", async () => {
         // test the router
-        MockLogin.initialize("henkjan");
+        MockLogin.initialize("bplanje");
         const res = await chai.request(router).get("/1/allreviews");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(

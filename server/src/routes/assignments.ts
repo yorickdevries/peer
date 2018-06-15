@@ -188,9 +188,9 @@ router.put("/:assignment_id", index.authorization.enrolledAsTAOrTeacherAssignmen
  * Route to get a file from an assignment.
  * @param id - assignment id.
  */
-router.get("/:id/file", async (req, res) => {
+router.get("/:assignment_id/file", index.authorization.enrolledAssignmentCheck, async (req, res) => {
     try {
-        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.id);
+        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
         const fileName = path.join(__dirname, "../files/assignments", assignment.filename);
         res.sendfile(fileName);
     } catch (err) {
@@ -318,8 +318,8 @@ router.post("/:assignment_id/importgroups", index.authorization.enrolledAsTAOrTe
  * Route to get the reviews belonging to an assignment.
  * @param id - assignment id.
  */
-router.get("/:id/allreviews", (req: any, res) => {
-    ReviewPS.executeGetAllDoneReviewsByAssignmentId(req.params.id)
+router.get("/:assignment_id/allreviews", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
+    ReviewPS.executeGetAllDoneReviewsByAssignmentId(req.params.assignment_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
