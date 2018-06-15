@@ -166,7 +166,7 @@ router.post("/:id/comment", index.authorization.getSubmissionAuth, (req, res) =>
  * @param submissionCommentId - an id of a submission.
  * @return database return value.
  */
-router.delete("/:submissionCommentId/comment", index.authorization.getSubmissionCommentAuth, (req, res) => {
+router.delete("/:submissionCommentId/comment", index.authorization.putSubmissionCommentAuth, (req, res) => {
     SubmissionsPS.executeDeleteSubmissionComment(req.params.submissionCommentId)
     .then((data) => {
         res.json(data);

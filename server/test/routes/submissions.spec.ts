@@ -30,17 +30,6 @@ describe("Submission routes", () => {
     });
 
     /**
-     * Tests whether submissions are returned
-     */
-    it("Get submissions/", async () => {
-        const res = await chai.request(router).get("/");
-        expect(res.status).to.equal(200);
-        const result = JSON.parse(res.text);
-        expect(result.length).to.equal(5);
-    });
-
-
-    /**
      * Tests whether a submission can be made
      */
     it("post submissions/ with file", async () => {
