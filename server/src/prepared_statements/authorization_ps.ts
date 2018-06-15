@@ -160,16 +160,23 @@ export default class AuthorizationPS {
         return Database.executeQuerySingleResult(statement);
     }
 
-    public static isSubmissionReviewerOrSubmitter(netId: string, submissionId: number): any {
-        const statement = new PreparedStatement("check-submission-submitter",
-            "SELECT EXISTS(SELECT * FROM submission, review WHERE submission.id = $1 AND (submission.user_netid = $2 OR review.user_netid = $2))");
+    public static isGetSubmissionAuth(submissionId: number, netId: number): any {
+        const statement = new PreparedStatement("check-submission-auth-submission-id",
+            "SELECT EXISTS(SELECT * FROM submission JOIN grouplist ON submission.group_id = grouplist.id JOIN groupusers ON grouplist.id = groupusers.group_groupid WHERE submission.id = $1 AND groupusers.user_netid = $2)");
         statement.values = [submissionId, netId];
         return Database.executeQuerySingleResult(statement);
     }
 
-    public static isGetSubmissionAuth(submissionId: number, netId: number): any {
-        const statement = new PreparedStatement("check-submission-submitter",
-            "SELECT EXISTS(SELECT * FROM submission JOIN grouplist ON submission.group_id = grouplist.id JOIN groupusers ON grouplist.id = groupusers.group_groupid WHERE submission.id = $1 AND groupusers.user_netid = $2)");
+    public static isPostSubmissionAuth(assignmentId: number, netId: number): any {
+        const statement = new PreparedStatement("check-submission-submitter-assignment-id",
+            "SELECT EXISTS(SELECT a.assignment_id, a.group_id FROM assignmentgroup a JOIN groupusers g ON a.group_id = g.group_groupid WHERE g.user_netid = $1 AND a.assignment_id = $2)");
+        statement.values = [netId, assignmentId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    public static isSubmissionReviewerAuth(submissionId: number, netId: number): any {
+        const statement = new PreparedStatement("check-submission-submitter-assignment-id",
+            "SELECT EXISTS(SELECT id FROM review WHERE submission_id = $1 AND user_netid = $2)");
         statement.values = [submissionId, netId];
         return Database.executeQuerySingleResult(statement);
     }

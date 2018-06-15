@@ -263,8 +263,7 @@ const getSubmissionAuth = async (req: any, res: any, next: any) => {
 const postSubmissionAuth = async (req: any, res: any, next: any) => {
     try {
         // Check if the user in in a group.
-        const groupCheck: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(req.userinfo.given_name, req.body.assignmentId);
-
+        const groupCheck: any = await AuthorizationPS.isPostSubmissionAuth(req.body.assignmentId, req.userinfo.given_name);
         // Verify the authorization.
         await response(res, groupCheck.exists, next);
     } catch (error) {
@@ -292,11 +291,11 @@ const getSubmissionFileAuth = async (req: any, res: any, next: any) => {
 
         // Execute the database checks.
         const roleCheck: any = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(courseId, req.userinfo.given_name);
-        const submittedCheck: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
-        const reviewCheck: any = await ReviewPS.executeGetReviewBySubmissionIdNetId(req.params.id, req.userinfo.given_name);
+        const groupCheck: any = await AuthorizationPS.isGetSubmissionAuth(req.params.id, req.userinfo.given_name);
+        const reviewCheck: any = await AuthorizationPS.isSubmissionReviewerAuth(req.params.id, req.userinfo.given_name);
 
         // Verify the authorization.
-        await response(res, roleCheck.exists || submittedCheck.exists || reviewCheck.exists, next);
+        await response(res, roleCheck.exists || groupCheck.exists || reviewCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
     }
