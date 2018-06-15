@@ -40,7 +40,7 @@
                                                 </b-button>
                                             </dl>
 
-                                            <b-modal id="importGroups" centered hide-header hide-footer class="p-0 m-0">
+                                            <b-modal id="importGroups" centered hide-header hide-footer class="p-0 m-0" size="lg">
                                                 <ImportGroupsWizard :assignmentId="assignment.id"></ImportGroupsWizard>
                                             </b-modal>
                                         </b-card>
