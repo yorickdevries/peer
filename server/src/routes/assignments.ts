@@ -182,7 +182,7 @@ router.post("/", uploadAssignmentFunction, index.authorization.enrolledAsTeacher
  * Removes the old assignment (also from the files folder - if a file is uploaded)
  * and adds the new assignment.
  */
-router.put("/:assignment_id", uploadAssignmentFunction, updateAssignment);
+router.put("/:assignment_id", index.authorization.enrolledAsTAOrTeacherAssignment, uploadAssignmentFunction, updateAssignment);
 
 /**
  * Route to get a file from an assignment.
@@ -203,7 +203,7 @@ router.get("/:id/file", async (req, res) => {
  * @userinfo given_name - netId
  * @params assignment_id - assignment_id
  */
-router.route("/:assignment_id/submissions")
+router.route("/:assignment_id/submissions", )
     .get((req: any, res) => {
         AssignmentPS.executeGetSubmissionsByAssignmentId(
             req.userinfo.given_name,
@@ -269,7 +269,7 @@ router.route("/:assignment_id/reviews")
  * Route to distribute reviews for a certain assignment
  */
 router.route("/:assignment_id/distributeReviews")
-    .get((req: any, res) => {
+    .get(index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
         reviewDistribution.distributeReviews(req.params.assignment_id)
         .then((data) => {
             res.json(data);
@@ -282,7 +282,7 @@ router.route("/:assignment_id/distributeReviews")
 /**
  * Route to import groups for a specific assignment.
  */
-router.post("/:id/importgroups", (req: any, res) => {
+router.post("/:assignment_id/importgroups", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
     // File upload handling
     uploadGroups(req, res, function (err) {
         // Error in case of wrong file type
@@ -302,7 +302,7 @@ router.post("/:id/importgroups", (req: any, res) => {
             res.json({error: "No groupcolumn defined"});
         } else {
             const groupColumn = req.body.groupColumn;
-            const assignmentId = req.params.id;
+            const assignmentId = req.params.assignment_id;
             GroupParser.importGroups(req.file.buffer, groupColumn, assignmentId)
             .then((data) => {
                 res.json(data);
