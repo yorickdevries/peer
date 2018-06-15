@@ -151,7 +151,8 @@ CREATE TABLE Submission (
 CREATE TABLE UserList (
     netid varchar(5000)  NOT NULL,
     email varchar(5000),
-    CONSTRAINT UserList_pk PRIMARY KEY (netid)
+    CONSTRAINT UserList_pk PRIMARY KEY (netid),
+    CONSTRAINT netid_lower CHECK (netid = lower(netid))
 );
 
 -- Table: ReviewComment
