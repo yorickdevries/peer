@@ -191,6 +191,18 @@ export default {
         this.assignment = res.data
 
         // Decompose datetime into date and time
+        // Define functions for correct formatting of date and time
+        function dateToInputFormat(date) {
+            let str = "";
+            console.log(str)
+            str = str + date.getFullYear().toString() + "-"
+            console.log(str)
+            str = date.getMonth() < 10 ? str + "0" + date.getMonth().toString() + "-" : str + date.getMonth().toString() + "-"
+            console.log(str)
+            str = date.getDate() < 10 ? str + "0" + date.getDate().toString() : str + date.getDate().toString()
+            console.log(str)
+            return str
+        }
         let ptime = new Date(res.data.publish_date)
         ptime = ptime.getHours().toString() + ":" + ptime.getMinutes().toString()
         let dtime = res.data.due_date.split('T')[1].substring(0,5)
