@@ -68,6 +68,7 @@ router.get("/authenticated", function (req: any, res) {
     res.json({ authenticated: req.isAuthenticated() });
 });
 
+// Check always whether someone is logged in
 router.use("*", security.authorization.authorizeCheck);
 
 // Routing

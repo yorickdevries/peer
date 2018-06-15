@@ -53,7 +53,7 @@ CREATE TABLE GroupList (
 
 -- Table: GroupUsers
 CREATE TABLE GroupUsers (
-    User_netid varchar(5000)  NOT NULL,
+    User_netid varchar(5000) NOT NULL,
     Group_groupid int NOT NULL,
     CONSTRAINT GroupUsers_pk PRIMARY KEY (User_netid,Group_groupid)
 );
@@ -69,7 +69,7 @@ CREATE TABLE MCAnswer (
 -- Table: MCOption
 CREATE TABLE MCOption (
     id SERIAL,
-    option varchar(5000)  NOT NULL,
+    option varchar(5000) NOT NULL,
     MCQuestion_id int NOT NULL,
     CONSTRAINT MCOption_pk PRIMARY KEY (id)
 );
@@ -77,17 +77,17 @@ CREATE TABLE MCOption (
 -- Table: MCQuestion
 CREATE TABLE MCQuestion (
     id SERIAL,
-    question varchar(5000)  NOT NULL,
+    question varchar(5000) NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
     type_question char(2) DEFAULT 'mc',
-    CONSTRAINT MCQuestion_pk PRIMARY KEY (id)
+    CONSTRAINT MCQuestion_pk PRIMARY KEY (id),
     CONSTRAINT mc_question CHECK (type_question = 'mc')
 );
 
 -- Table: OpenAnswer
 CREATE TABLE OpenAnswer (
-    answer varchar(5000)  NOT NULL,
+    answer varchar(5000) NOT NULL,
     OpenQuestion_id int NOT NULL,
     Review_id int NOT NULL,
     CONSTRAINT OpenAnswer_pk PRIMARY KEY (OpenQuestion_id,Review_id)
@@ -96,17 +96,17 @@ CREATE TABLE OpenAnswer (
 -- Table: OpenQuestion
 CREATE TABLE OpenQuestion (
     id SERIAL,
-    question varchar(5000)  NOT NULL,
+    question varchar(5000) NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
     type_question char(4) DEFAULT 'open',
-    CONSTRAINT OpenQuestion_pk PRIMARY KEY (id)
+    CONSTRAINT OpenQuestion_pk PRIMARY KEY (id),
     CONSTRAINT open_question CHECK (type_question = 'open')
 );
 
 -- Table: RangeAnswer
 CREATE TABLE RangeAnswer (
-    answer int  NOT NULL,
+    answer int NOT NULL,
     RangeQuestion_id int NOT NULL,
     Review_id int NOT NULL,
     CONSTRAINT RangeAnswer_pk PRIMARY KEY (RangeQuestion_id,Review_id)
@@ -115,12 +115,12 @@ CREATE TABLE RangeAnswer (
 -- Table: RangeQuestion
 CREATE TABLE RangeQuestion (
     id SERIAL,
-    question varchar(5000)  NOT NULL,
-    range int  NOT NULL,
+    question varchar(5000) NOT NULL,
+    range int NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
     type_question char(5) DEFAULT 'range',
-    CONSTRAINT RangeQuestion_pk PRIMARY KEY (id)
+    CONSTRAINT RangeQuestion_pk PRIMARY KEY (id),
     CONSTRAINT range_question CHECK (type_question = 'range')
 );
 
@@ -145,10 +145,10 @@ CREATE TABLE Rubric (
 -- Table: Submission
 CREATE TABLE Submission (
     id SERIAL,
-    User_netid varchar(5000)  NOT NULL,
+    User_netid varchar(5000) NOT NULL,
     Group_id int NOT NULL,
     Assignment_id int NOT NULL,
-    file_path varchar(5000)  NOT NULL,
+    file_path varchar(5000) NOT NULL,
     date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     grade int NOT NULL DEFAULT -1,
     CONSTRAINT Submission_pk PRIMARY KEY (id)
@@ -156,7 +156,7 @@ CREATE TABLE Submission (
 
 -- Table: UserList
 CREATE TABLE UserList (
-    netid varchar(5000)  NOT NULL,
+    netid varchar(5000) NOT NULL,
     email varchar(5000),
     CONSTRAINT UserList_pk PRIMARY KEY (netid)
 );
@@ -164,7 +164,7 @@ CREATE TABLE UserList (
 -- Table: ReviewComment
 CREATE TABLE ReviewComment (
     id SERIAL,
-    comment varchar(5000)  NOT NULL,
+    comment varchar(5000) NOT NULL,
     review_id int NOT NULL,
     netid varchar(5000) NOT NULL,
     CONSTRAINT ReviewComment_pk PRIMARY KEY (id)
@@ -173,7 +173,7 @@ CREATE TABLE ReviewComment (
 -- Table: SubmissionComment
 CREATE TABLE SubmissionComment (
     id SERIAL,
-    comment varchar(5000)  NOT NULL,
+    comment varchar(5000) NOT NULL,
     submission_id int NOT NULL,
     netid varchar(5000) NOT NULL,
     CONSTRAINT SubmissionComment_pk PRIMARY KEY (id)
