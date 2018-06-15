@@ -29,6 +29,30 @@ const enrolledAssignmentCheck = async (req: any, res: any, next: any) => {
     }
 };
 
+/**
+ * Check whether a user is enrolled for a course
+ */
+const enrolledCourseCheck = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeCheckEnrollment(req.params.courseId, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check whether a user is enrolled as teacher for a course
+ */
+const enrolledCourseTeacherCheck = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(req.params.courseId, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
 
 /**
  * Check whether a user in enrolled as teacher
@@ -254,7 +278,9 @@ export default {
     checkMCOptionEdit,
     checkRubricAuthorizationPost,
     checkAuthorizationForReview,
+    enrolledCourseCheck,
     checkMCOptionPost,
+    enrolledCourseTeacherCheck,
     enrolledAsTeacherAssignmentCheck,
     isAuthorizedToViewGroup,
     enrolledAsTeacherAssignmentCheckForPost,
