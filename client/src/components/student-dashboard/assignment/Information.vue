@@ -2,6 +2,8 @@
     <b-container fluid class="p-0">
         <b-row>
             <b-col cols="8">
+
+                <!--Assignment Details-->
                 <b-card header="Assignment Details" class="h-100">
                     <span class="font-weight-bold">Description</span>
                     <p>{{ assignment.description }}</p>
@@ -17,12 +19,13 @@
             </b-col>
 
             <b-col cols="4">
+                <!--Group Information-->
                 <b-card header="Group Information" no-body>
                     <b-card-body>
                         <p>Assignments are made in groups. The group members you are with for this assignment are displayed here.</p>
                         <dl>
                             <dt>Group ID</dt>
-                            <dd>13</dd>
+                            <dd>{{ groupInfo.group.group_groupid }}</dd>
 
                             <dt>Group Members</dt>
                             <dt><ul><li v-for="member in groupInfo.groupmembers" :key="member.user_netid" class="font-weight-light">{{ member.user_netid }}</li></ul></dt>

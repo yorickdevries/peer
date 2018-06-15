@@ -2,7 +2,7 @@
     <b-container>
         <b-row>
             <b-col>
-                <b-breadcrumb :items="items" class="mt-3"/>
+                <BreadcrumbTitle :items="['Assignments', assignment.title]" class="mt-3"/>
             </b-col>
         </b-row>
         <b-row>
@@ -87,15 +87,13 @@
 
 <script>
 import api from "../../api"
+import BreadcrumbTitle from '../BreadcrumbTitle'
 
 export default {
     name: 'Assignment',
+    components: {BreadcrumbTitle},
     data() {
         return {
-            items: [{
-                text: 'Assignments',
-                active: true
-            }],
             assignment: {
                 title: null,
                 due_date: null,
@@ -117,12 +115,6 @@ export default {
     async created() {
         // Fetch the assignment.
         await this.fetchAssignment()
-
-        // Add assignment name to breadcrumb header.
-        this.items.push({
-            text: this.assignment.title,
-            active: true
-        })
     },
     methods: {
         async fetchAssignment() {

@@ -4,7 +4,7 @@
         <!--Header-->
         <b-row>
             <b-col>
-                <b-breadcrumb :items="items" class="mt-3"/>
+                <BreadcrumbTitle :items="['Course Home']" class="mt-3"/>
             </b-col>
         </b-row>
 
@@ -66,16 +66,12 @@
 
 <script>
 import api from "../../api"
+import BreadcrumbTitle from '../BreadcrumbTitle'
 
 export default {
+    components: {BreadcrumbTitle},
     data() {
         return {
-            items: [
-                {
-                    text: 'Course Home',
-                    active: true
-                }
-            ],
             course: {
                 name: null,
                 description: null

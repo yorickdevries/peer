@@ -60,6 +60,53 @@ export default class AuthorizationPS {
         return Database.executeQuerySingleResult(statement);
     }
 
+
+    /**
+     * Check if user is authorized to edit or delete mcquestion
+     */
+    public static executeAuthorizationMCQuestion(questionId: number, netId: String): any {
+        const statement = new PreparedStatement("check-authorization-mcquestion",
+            "SELECT EXISTS(SELECT * FROM mcquestion, assignmentlist, enroll WHERE mcquestion.rubric_assignment_id = assignmentlist.id " +
+            "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher' OR enroll.role = 'TA') AND mcquestion.id = $1 AND enroll.user_netid = $2)");
+        statement.values = [questionId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Check if user is authorized to edit or delete option
+     */
+    public static executeAuthorizationMCOption(optionId: number, netId: String): any {
+        const statement = new PreparedStatement("check-authorization-mcquestion",
+            "SELECT EXISTS(SELECT * FROM mcoption, mcquestion, assignmentlist, enroll WHERE mcoption.mcquestion_id = mcquestion.id AND mcquestion.rubric_assignment_id = assignmentlist.id" +
+            " AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher' OR enroll.role = 'TA') AND mcoption.id = $1 AND enroll.user_netid = $2)");
+        statement.values = [optionId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+
+    /**
+     * Check if user is authorized to edit or delete rangequestion
+     */
+    public static executeAuthorizationRangeQuestion(questionId: number, netId: String): any {
+        const statement = new PreparedStatement("check-authorization-mcquestion",
+            "SELECT EXISTS(SELECT * FROM rangequestion, assignmentlist, enroll WHERE rangequestion.rubric_assignment_id = assignmentlist.id " +
+            "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher' OR enroll.role = 'TA') AND rangequestion.id = $1 AND enroll.user_netid = $2)");
+        statement.values = [questionId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Check if user is authorized to edit or delete openquestion
+     */
+    public static executeAuthorizationOpenQuestion(questionId: number, netId: String): any {
+        const statement = new PreparedStatement("check-authorization-mcquestion",
+            "SELECT EXISTS(SELECT * FROM openquestion, assignmentlist, enroll WHERE openquestion.rubric_assignment_id = assignmentlist.id " +
+            "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher' OR enroll.role = 'TA') AND openquestion.id = $1 AND enroll.user_netid = $2)");
+        statement.values = [questionId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+
     /**
      * Check if the review is of the user and not yet done.
      */
@@ -86,7 +133,7 @@ export default class AuthorizationPS {
      * Check if the review belongs to the user, i.e. is the submission where the review is on review done by your group
      */
     public static executeCheckGroupBelongingToReview(reviewId: number, netId: String): any {
-        const statement = new PreparedStatement("check-review-belonging-to-submussion-of-user",
+        const statement = new PreparedStatement("check-review-belonging-to-submission-of-user",
             "SELECT EXISTS(SELECT * FROM review, submission, groupusers WHERE review.submission_id = submission.id AND " +
             "submission.group_id = groupusers.group_groupId AND review.id = $1 AND groupusers.user_netid = $2)");
         statement.values = [reviewId, netId];

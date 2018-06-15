@@ -2,6 +2,7 @@ import AuthorizationPS from "../prepared_statements/authorization_ps";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 import ReviewPS from "../prepared_statements/review_ps";
+import RubricPS from "../prepared_statements/rubric_ps";
 
 /**
  * Check whether the user who does the request is authenticated.
@@ -29,6 +30,7 @@ const enrolledAssignmentCheck = async (req: any, res: any, next: any) => {
         res.sendStatus(401);
     }
 };
+
 
 /**
  * Check whether a user in enrolled as teacher
@@ -62,6 +64,84 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
     try {
         const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
         const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+
+/**
+ * Check authorization to edit a rubric
+ */
+const checkRubricAuthorizationPost = async (req: any, res: any, next: any) => {
+    try {
+        const assignment = await AssignmentPS.executeGetAssignmentById(req.body.rubric_assignment_id);
+        const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+
+
+/**
+ * Check authorization to edit a mc question
+ */
+const checkMCQuestionEdit = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeAuthorizationMCQuestion(req.params.question_id, req.userinfo.given_name);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check authorization to post mc option
+ */
+const checkMCOptionPost = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeAuthorizationMCQuestion(req.body.mcquestion_id, req.userinfo.given_name);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check authorization to edit a mc option
+ */
+const checkMCOptionEdit = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeAuthorizationMCOption(req.params.option_id, req.userinfo.given_name);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+
+
+/**
+ * Check authorization to edit a open question
+ */
+const checkOpenQuestionEdit = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeAuthorizationOpenQuestion(req.params.question_id, req.userinfo.given_name);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check authorization to edit a range question
+ */
+const checkRangeQuestionEdit = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeAuthorizationRangeQuestion(req.params.question_id, req.userinfo.given_name);
         await response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -243,7 +323,13 @@ export default {
     checkReviewTAOrTeacher,
     checkReviewOwnerDone,
     checkReviewOwner,
+    checkOpenQuestionEdit,
+    checkRangeQuestionEdit,
+    checkMCQuestionEdit,
+    checkMCOptionEdit,
+    checkRubricAuthorizationPost,
     checkAuthorizationForReview,
+    checkMCOptionPost,
     enrolledAsTeacherAssignmentCheck,
     isAuthorizedToViewGroup,
     enrolledAsTeacherAssignmentCheckForPost,
