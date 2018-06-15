@@ -26,18 +26,18 @@ INSERT INTO public.grouplist(
 INSERT INTO public.assignmentlist(
 	title, description, course_id, reviews_per_user, due_date, publish_date, filename, review_due_date, review_publish_date)
 	VALUES
-	    ('Lab assignment 1', 'How to build a DFA', 2, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment1.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
-	    ('Lab assignment 2', 'How to build a NFA', 2, 2, '2018-05-01T20:30:00Z', '2018-04-15T20:30:00Z', 'assignment1.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
-	    ('Lab assignment 3', 'How to build a DFA given a NFA', 2, 2, '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z', 'assignment1.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
-	    ('Assignment 1', 'Example assignment number one', 2, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment1.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
-	    ('Assignment 2', 'An example of a second assignment', 2, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
-	    ('Assignment 3', 'This is another example of a third assignment.', 2, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
-	    ('A1', 'Example assignment number one', 3, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
-	    ('A2', 'An example of a second assignment', 3, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
-	    ('Assignment one', 'Example assignment number one', 4, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
-	    ('Assignment two', 'An example of a second assignment', 4, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
-	    ('Assignment three', 'This is another example of a third assignment.', 4, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z'),
-		('Bonus Assignment', 'bonus description', 2, 2, '2019-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment2.pdf', '2018-05-01T20:30:00Z', '2018-03-01T20:30:00Z')
+	    ('Lab assignment 1', 'How to build a DFA', 2, 2, '2018-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment1.pdf', '2020-05-01T20:30:00Z', '2019-03-01T20:30:00Z'),
+	    ('Lab assignment 2', 'How to build a NFA', 2, 2, '2018-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment1.pdf', '2020-05-01T20:30:00Z', '2019-03-01T20:30:00Z'),
+	    ('Lab assignment 3', 'How to build a DFA given a NFA', 2, 2, '2018-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment1.pdf', '2020-05-01T20:30:00Z', '2019-03-01T20:30:00Z'),
+	    ('Assignment 1', 'Example assignment number one', 2, 2, '2018-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment1.pdf', '2020-05-01T20:30:00Z', '2019-03-01T20:30:00Z'),
+	    ('Assignment 2', 'An example of a second assignment', 2, 2, '2018-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment2.pdf', '2020-05-01T20:30:00Z', '2019-03-01T20:30:00Z'),
+	    ('Assignment 3', 'This is another example of a third assignment.', 2, 2, '2018-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment2.pdf', '2020-05-01T20:30:00Z', '2019-03-01T20:30:00Z'),
+	    ('A1', 'Example assignment number one', 3, 2, '2018-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment2.pdf', '2020-05-01T20:30:00Z', '2019-03-01T20:30:00Z'),
+	    ('A2', 'An example of a second assignment', 3, 2, '2018-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment2.pdf', '2020-05-01T20:30:00Z', '2019-03-01T20:30:00Z'),
+	    ('Assignment one', 'Example assignment number one', 4, 2, '2018-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment2.pdf', '2020-05-01T20:30:00Z', '2019-03-01T20:30:00Z'),
+	    ('Assignment two', 'An example of a second assignment', 4, 2, '2018-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment2.pdf', '2020-05-01T20:30:00Z', '2019-03-01T20:30:00Z'),
+	    ('Assignment three', 'This is another example of a third assignment.', 4, 2, '2018-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment2.pdf', '2020-05-01T20:30:00Z', '2019-03-01T20:30:00Z'),
+		('Bonus Assignment', 'bonus description', 2, 2, '2019-05-01T20:30:00Z', '2017-04-01T20:30:00Z', 'assignment2.pdf', '2021-05-01T20:30:00Z', '2020-03-01T20:30:00Z')
 	    ;
 
 

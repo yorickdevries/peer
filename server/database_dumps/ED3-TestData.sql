@@ -61,10 +61,10 @@ INSERT INTO public.groupusers(
 	VALUES ('paulvanderlaan', 22);
 
 INSERT INTO public.assignmentlist(
-	title, description, course_id, reviews_per_user, due_date, publish_date, filename, review_due_date, review_publish_date)
-	VALUES ('Assignment 1', 'Example assignment number one', 1, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment1.pdf', '9999-05-01T20:30:00Z', '2018-04-01T20:30:00Z'),
-	('Assignment 2', 'Example assignment number two', 1, 1, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '9999-05-01T20:30:00Z', '2018-04-01T20:30:00Z'),
-	('Assignment 3', 'Example assignment number three', 1, 1, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment3.pdf', '9999-05-01T20:30:00Z', '2018-04-01T20:30:00Z');
+	title, description, course_id, reviews_per_user, filename, publish_date, due_date, review_publish_date, review_due_date)
+	VALUES ('Assignment 1', 'Example assignment number one', 1, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z'),
+	('Assignment 2', 'Example assignment number two', 1, 1, 'assignment2.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z'),
+	('Assignment 3', 'Example assignment number three', 1, 1, 'assignment3.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z');
 
 INSERT INTO public.rubric(
 	assignment_id)

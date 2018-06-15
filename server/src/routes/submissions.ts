@@ -60,13 +60,12 @@ const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
         const filePath = path.join(fileFolder, fileName);
         const netId = req.userinfo.given_name;
         const assignmentId = req.body.assignmentId;
-        const date = new Date();
         // get the groupId of this user for this assignment
         const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
         const groupId = groupAssignment.group_id;
 
         // add to database
-        const result: any = await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName, date);
+        const result: any = await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName);
         // writing the file if no error is there
         fs.writeFileSync(filePath, req.file.buffer);
         res.json(result);

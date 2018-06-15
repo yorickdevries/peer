@@ -58,10 +58,10 @@ export default class SubmissionsPS {
     /**
      * Executes a 'create submission' query
      */
-    public static executeCreateSubmission(netid: string, groupId: number, assignmentId: number, filePath: string, date: Date): Promise<pgPromise.queryResult> {
+    public static executeCreateSubmission(netid: string, groupId: number, assignmentId: number, filePath: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("create-submission",
-        'INSERT INTO "submission" ("user_netid", "group_id", "assignment_id", "file_path", "date") VALUES ($1, $2, $3, $4, $5) RETURNING *');
-        statement.values = [netid, groupId, assignmentId, filePath, date];
+        'INSERT INTO "submission" ("user_netid", "group_id", "assignment_id", "file_path") VALUES ($1, $2, $3, $4) RETURNING *');
+        statement.values = [netid, groupId, assignmentId, filePath];
         return Database.executeQuerySingleResult(statement);
     }
 

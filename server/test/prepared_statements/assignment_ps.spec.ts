@@ -24,7 +24,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "id": 1,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             "review_due_date": new Date("9999-05-01T20:30:00Z"),
-            "review_publish_date": new Date("2018-04-01T20:30:00Z"),
+            "review_publish_date": new Date("2020-05-01T20:30:00Z"),
             "title": "Assignment 1",
             "reviews_per_user": 2,
         },
@@ -36,7 +36,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "id": 2,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             "review_due_date": new Date("9999-05-01T20:30:00Z"),
-            "review_publish_date": new Date("2018-04-01T20:30:00Z"),
+            "review_publish_date": new Date("2020-05-01T20:30:00Z"),
             "title": "Assignment 2",
             "reviews_per_user": 1
         },
@@ -48,7 +48,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "id": 3,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             "review_due_date": new Date("9999-05-01T20:30:00Z"),
-            "review_publish_date": new Date("2018-04-01T20:30:00Z"),
+            "review_publish_date": new Date("2020-05-01T20:30:00Z"),
             "title": "Assignment 3",
             "reviews_per_user": 1
         }]).to.deep.equal(await AssignmentPS.executeGetAssignments(1));
@@ -68,7 +68,7 @@ describe("AssignmentPreparedStatements Test", () => {
             course_id: 1,
             "reviews_per_user": 2,
             "review_due_date": new Date("9999-05-01T20:30:00Z"),
-            "review_publish_date": new Date("2018-04-01T20:30:00Z")
+            "review_publish_date": new Date("2020-05-01T20:30:00Z")
         });
     });
 
@@ -76,20 +76,19 @@ describe("AssignmentPreparedStatements Test", () => {
      * Test add assignments.
      */
     it("add assignment", async () => {
-        expect(await AssignmentPS.executeAddAssignment("New", "Description", new Date("2018-07-01T20:30:00Z"), new Date("2018-06-01T20:30:00Z"), 1, 2, "test_file.pdf",
-            new Date("2018-07-01T20:30:00Z"), new Date("2018-06-01T20:30:00Z")
+        expect(await AssignmentPS.executeAddAssignment("New", "Description", 1, 2, "test_file.pdf",
+        new Date("2017-07-01T20:30:00Z"), new Date("2018-07-01T20:30:00Z"), new Date("2019-07-01T20:30:00Z"), new Date("2020-07-01T20:30:00Z")
     )).to.deep.equal({
-            course_id: 1,
-            description: "Description",
             id: 4,
             title: "New",
-            due_date: new Date("2018-07-01T20:30:00Z"),
+            description: "Description",
+            course_id: 1,
             filename: "test_file.pdf",
-            publish_date: new Date("2018-06-01T20:30:00Z"),
-            "review_due_date": new Date("2018-07-01T20:30:00Z"),
-            "review_publish_date": new Date("2018-06-01T20:30:00Z"),
-            "reviews_per_user": 2
-
+            reviews_per_user: 2,
+            publish_date: new Date("2017-07-01T20:30:00Z"),
+            due_date: new Date("2018-07-01T20:30:00Z"),
+            review_publish_date: new Date("2019-07-01T20:30:00Z"),
+            review_due_date: new Date("2020-07-01T20:30:00Z")
     });
     });
 
@@ -97,15 +96,15 @@ describe("AssignmentPreparedStatements Test", () => {
      * Test update assignments.
      */
     it("update assignment", async () => {
-        expect(await AssignmentPS.executeUpdateAssignmentById("Updated", "updated", 1, 1, new Date("2018-06-01T20:30:00Z"), new Date("2018-06-01T20:30:00Z"), 1, "filename", new Date("2018-06-01T20:30:00Z"), new Date("2018-06-01T20:30:00Z"))).to.deep.equal({
+        expect(await AssignmentPS.executeUpdateAssignmentById("Updated", "updated", 1, 1, "filename", new Date("2018-06-01T20:30:00Z"), new Date("2018-06-01T20:31:00Z"), new Date("2018-06-01T20:32:00Z"), new Date("2018-06-01T20:33:00Z"), 1)).to.deep.equal({
             course_id: 1,
             description: "updated",
-            due_date: new Date("2018-06-01T20:30:00Z"),
             filename: "filename",
             id: 1,
             publish_date: new Date("2018-06-01T20:30:00Z"),
-            review_due_date: new Date("2018-06-01T20:30:00.000Z"),
-            review_publish_date: new Date("2018-06-01T20:30:00.000Z"),
+            due_date: new Date("2018-06-01T20:31:00Z"),
+            review_publish_date: new Date("2018-06-01T20:32:00.000Z"),
+            review_due_date: new Date("2018-06-01T20:33:00.000Z"),
             reviews_per_user: 1,
             title: "Updated"
         });

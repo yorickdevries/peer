@@ -76,13 +76,14 @@ const updateAssignment = async function(req: any, res: any) {
             req.body.title,
             req.body.description,
             req.body.course_id,
-            req.params.assignment_id,
-            req.body.due_date,
-            req.body.publish_date,
             req.body.reviews_per_user,
             updatedFileName,
+            req.body.publish_date,
+            req.body.due_date,
+            req.body.review_publish_date,
             req.body.review_due_date,
-            req.body.review_publish_date);
+            req.params.assignment_id
+        );
 
         // Remove the old file and add the new file if a file is uploaded
         // (ie. name of the file is not undefined).
@@ -119,13 +120,13 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
         const result: any = await AssignmentPS.executeAddAssignment(
             req.body.title,
             req.body.description,
-            req.body.due_date,
-            req.body.publish_date,
             req.body.course_id,
             req.body.reviews_per_user,
             fileName,
-            req.body.review_due_date,
-            req.body.review_publish_date);
+            req.body.publish_date,
+            req.body.due_date,
+            req.body.review_publish_date,
+            req.body.review_due_date);
         // Create rubric
         await RubricPS.executeCreateRubric(result.id);
         // writing the file if no error is there

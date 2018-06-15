@@ -31,15 +31,11 @@ describe("SubmissionPreparedStatements Test", () => {
      * Test creation of a submission prepared statement.
      */
     it("create submission", async () => {
-        expect(await SubmissionPS.executeCreateSubmission("paulvanderlaan", 10, 1, "filepathhere", new Date("2018-05-01T20:30:00Z"))).to.deep.equal({
-            id: 6,
-            group_id: 10,
-            user_netid: "paulvanderlaan",
-            assignment_id: 1,
-            file_path: "filepathhere",
-            date: new Date("2018-05-01T20:30:00Z"),
-            grade: -1
-        });
+        const result: any = await SubmissionPS.executeCreateSubmission("paulvanderlaan", 10, 1, "filepathhere");
+        expect(result.group_id).to.equal(10);
+        expect(result.user_netid).to.equal("paulvanderlaan");
+        expect(result.assignment_id).to.equal(1);
+        expect(result.file_path).to.equal("filepathhere");
     });
 
     /**

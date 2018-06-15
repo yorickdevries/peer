@@ -142,7 +142,7 @@ CREATE TABLE Submission (
     Group_id int NOT NULL,
     Assignment_id int NOT NULL,
     file_path varchar(5000)  NOT NULL,
-    date timestamptz NOT NULL,
+    date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     grade int NOT NULL DEFAULT -1,
     CONSTRAINT Submission_pk PRIMARY KEY (id)
 );

@@ -92,10 +92,18 @@ export default class AssignmentPS {
      * @param filename - filename
      * @return {any} a query result.
      */
-    public static executeAddAssignment(title: string, description: string, dueDate: Date, publishDate: Date, courseId: number, reviewsPerUser: number, filename: string, reviewDueDate: Date, reviewPublishDate: Date): Promise<pgPromise.queryResult> {
+    public static executeAddAssignment(title: string,
+                                        description: string,
+                                        courseId: number,
+                                        reviewsPerUser: number,
+                                        filename: string,
+                                        publishDate: Date,
+                                        dueDate: Date,
+                                        reviewPublishDate: Date,
+                                        reviewDueDate: Date): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("addAssignment",
-        'INSERT INTO "assignmentlist" ("title", "description", "due_date", "publish_date", "course_id", "reviews_per_user", "filename", "review_due_date", "review_publish_date") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *');
-        statement.values = [title, description, dueDate, publishDate, courseId, reviewsPerUser, filename, reviewDueDate, reviewPublishDate];
+        'INSERT INTO "assignmentlist" (title, description, course_id, reviews_per_user, filename, publish_date, due_date, review_publish_date, review_due_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *');
+        statement.values = [title, description, courseId, reviewsPerUser, filename, publishDate, dueDate, reviewPublishDate, reviewDueDate];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -114,21 +122,21 @@ export default class AssignmentPS {
      * @return {any} a query result.
      */
     public static executeUpdateAssignmentById(title: string,
-                                              description: string,
-                                              courseId: number,
-                                              assignmentId: number,
-                                              dueDate: Date,
-                                              publishDate: Date,
-                                              reviewsPerUser: number,
-                                              filename: string,
-                                              reviewDueDate: Date,
-                                              reviewPublishDate: Date): Promise<pgPromise.queryResult> {
+                                                description: string,
+                                                courseId: number,
+                                                reviewsPerUser: number,
+                                                filename: string,
+                                                publishDate: Date,
+                                                dueDate: Date,
+                                                reviewPublishDate: Date,
+                                                reviewDueDate: Date,
+                                                assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-assignment-by-id",
             "UPDATE assignmentlist " +
-            "SET title=$1, description=$2, due_date=$3, publish_date=$4, reviews_per_user=$5, filename=$6, review_due_date=$7, review_publish_date=$8, course_id = $9 " +
+            "SET title=$1, description=$2, course_id=$3, reviews_per_user=$4, filename=$5, publish_date=$6, due_date=$7, review_publish_date=$8, review_due_date=$9 " +
             "WHERE id = $10 RETURNING *");
 
-        statement.values = [title, description, dueDate, publishDate, reviewsPerUser, filename, reviewDueDate, reviewPublishDate, courseId, assignmentId];
+        statement.values = [title, description, courseId, reviewsPerUser, filename, publishDate, dueDate, reviewPublishDate, reviewDueDate, assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
 
