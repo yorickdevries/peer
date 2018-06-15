@@ -99,6 +99,7 @@ router.post("/", uploadSubmissionFunction, index.authorization.postSubmissionAut
 
 /**
  * Route to get a file from a submission.
+ * @authorization user should part of the group which has submitted or the reviewer for the submission..
  * @param id - submission id.
  */
 router.get("/:id/file", index.authorization.getSubmissionFileAuth, async (req, res) => {
@@ -113,6 +114,7 @@ router.get("/:id/file", index.authorization.getSubmissionFileAuth, async (req, r
 
 /**
  * Get all submission comments.
+ * @authorization user should be TA, teacher or part of the group which has submitted.
  * @param submissionId - an id of a submission.
  * @return database return value.
  */
@@ -127,6 +129,7 @@ router.get("/:submissionId/allComments", index.authorization.getSubmissionAuth, 
 
 /**
  * Put submission comments.
+ * @authorization user should be TA, teacher or part of the group which has submitted.
  * @param submissionCommentId - an id of a submission.
  * @body comment - a comment of the review.
  * @return database return value.
@@ -142,6 +145,7 @@ router.put("/:submissionCommentId/comment", index.authorization.getSubmissionAut
 
 /**
  * Post all submission comments.
+ * @authorization user should be TA, teacher or part of the group which has submitted.
  * @param submissionId - an id of a submission.
  * @body netid - a netid.
  * @body comment - a comment of the review.
@@ -158,6 +162,7 @@ router.post("/:submissionId/comment", index.authorization.getSubmissionAuth, (re
 
 /**
  * Delete submission comments.
+ * @authorization user should be TA, teacher or part of the group which has submitted.
  * @param submissionCommentId - an id of a submission.
  * @return database return value.
  */
