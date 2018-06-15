@@ -38,6 +38,7 @@ describe("submission comment routes", () => {
      * Tests if a specific comment can be added.
      */
     it("POST submission/:submissionId/comment", async () => {
+        MockLogin.initialize("paulvanderlaan");
         const res = await chai.request(router)
             .post("/1/comment")
             .send({ comment: "new" });
