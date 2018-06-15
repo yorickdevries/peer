@@ -15,7 +15,7 @@ describe("API Course routes", () => {
      */
     beforeEach(async () => {
         // initializes the router with user paul
-        MockLogin.initialize("paulvanderlaan");
+        MockLogin.initialize("bplanje");
         await TestData.initializeDatabase();
     });
 
@@ -164,7 +164,7 @@ describe("API Course routes", () => {
         const res = await chai.request(router).get("/1/role");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({
-                role: "student"
+                role: "teacher"
             }
         ));
     });
@@ -187,10 +187,10 @@ describe("API Course routes", () => {
     it("Valid put not enrolled /:courseId/setRole", async () => {
         // test the router
         const res = await chai.request(router)
-            .put("/2/setRole")
+            .put("/1/setRole")
             .send({ netid: "paulvanderlaan", role: Roles.teacher });
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify({ courseId: 2, role: Roles.teacher }));
+        expect(res.text).to.equal(JSON.stringify({ courseId: 1, role: Roles.teacher }));
     });
 
     /**
