@@ -112,11 +112,11 @@ router.get("/:id/file", index.authorization.getSubmissionFileAuth, async (req, r
 });
 
 /**
- * Get all review comments.
+ * Get all submission comments.
  * @param submissionId - an id of a submission.
  * @return database return value.
  */
-router.get("/:submissionId/allComments", (req, res) => {
+router.get("/:submissionId/allComments", index.authorization.getSubmissionAuth, (req, res) => {
     SubmissionsPS.executeGetAllSubmissionComments(req.params.submissionId)
     .then((data) => {
         res.json(data);
@@ -126,12 +126,12 @@ router.get("/:submissionId/allComments", (req, res) => {
 });
 
 /**
- * Get all review comments.
+ * Put submission comments.
  * @param submissionCommentId - an id of a submission.
  * @body comment - a comment of the review.
  * @return database return value.
  */
-router.put("/:submissionCommentId/comment", (req, res) => {
+router.put("/:submissionCommentId/comment", index.authorization.getSubmissionAuth, (req, res) => {
     SubmissionsPS.executeUpdateSubmissionComment(req.params.submissionCommentId, req.body.comment)
     .then((data) => {
         res.json(data);
@@ -141,13 +141,13 @@ router.put("/:submissionCommentId/comment", (req, res) => {
 });
 
 /**
- * Get all review comments.
+ * Post all submission comments.
  * @param submissionId - an id of a submission.
  * @body netid - a netid.
  * @body comment - a comment of the review.
  * @return database return value.
  */
-router.post("/:submissionId/comment", (req, res) => {
+router.post("/:submissionId/comment", index.authorization.getSubmissionAuth, (req, res) => {
     SubmissionsPS.executeAddSubmissionComment(req.params.submissionId, req.body.netid, req.body.comment)
     .then((data) => {
         res.json(data);
@@ -157,11 +157,11 @@ router.post("/:submissionId/comment", (req, res) => {
 });
 
 /**
- * Get all review comments.
+ * Delete submission comments.
  * @param submissionCommentId - an id of a submission.
  * @return database return value.
  */
-router.delete("/:submissionCommentId/comment", (req, res) => {
+router.delete("/:submissionCommentId/comment", index.authorization.getSubmissionAuth, (req, res) => {
     SubmissionsPS.executeDeleteSubmissionComment(req.params.submissionCommentId)
     .then((data) => {
         res.json(data);
