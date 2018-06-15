@@ -21,7 +21,7 @@
 
             <!--Course Cards-->
             <b-row>
-                <b-col cols="6" v-for="course in filteredCourses" :key="course.id" class="d-flex align-items-stretch pr-0">
+                <b-col cols="6" v-for="course in filteredCourses" :key="course.id" class="d-flex align-items-stretch">
 
                     <!--Single Card-->
                     <b-card no-body class="mb-3 w-100">

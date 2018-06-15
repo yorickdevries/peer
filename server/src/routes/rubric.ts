@@ -1,5 +1,7 @@
 import RubricPS, { default as rubricPS } from "../prepared_statements/rubric_ps";
 import bodyParser from "body-parser";
+import index from "../security/index";
+
 
 // Router
 import express from "express";
@@ -11,8 +13,8 @@ router.use(bodyParser.json());
  * Route to delete an open question
  * @params id - id
  */
-router.delete("/openquestion/:id", (req, res) => {
-    RubricPS.executeDeleteOpenQuestion(req.params.id)
+router.delete("/openquestion/:question_id", index.authorization.checkOpenQuestionEdit, (req, res) => {
+    RubricPS.executeDeleteOpenQuestion(req.params.question_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -24,8 +26,8 @@ router.delete("/openquestion/:id", (req, res) => {
  * Route to delete a range question
  * @params id - id
  */
-router.delete("/rangequestion/:id", (req, res) => {
-    RubricPS.executeDeleteRangeQuestion(req.params.id)
+router.delete("/rangequestion/:question_id", index.authorization.checkRangeQuestionEdit, (req, res) => {
+    RubricPS.executeDeleteRangeQuestion(req.params.question_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -37,8 +39,8 @@ router.delete("/rangequestion/:id", (req, res) => {
  * Route to delete mc question
  * @params id - id
  */
-router.delete("/mcquestion/:id", (req, res) => {
-    RubricPS.executeDeleteMCQuestion(req.params.id)
+router.delete("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, (req, res) => {
+    RubricPS.executeDeleteMCQuestion(req.params.question_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -50,8 +52,8 @@ router.delete("/mcquestion/:id", (req, res) => {
  * Route to delete mc option
  * @params id - id
  */
-router.delete("/mcoption/:id", (req, res) => {
-    RubricPS.executeDeleteMCOption(req.params.id)
+router.delete("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (req, res) => {
+    RubricPS.executeDeleteMCOption(req.params.option_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -63,7 +65,7 @@ router.delete("/mcoption/:id", (req, res) => {
  * Route to create an option for a multiple choice question
  * @body option, mcquestion_id
  */
-router.post("/mcoption", (req, res) => {
+router.post("/mcoption", index.authorization.checkMCOptionPost, (req, res) => {
     RubricPS.executeCreateMCOption(req.body.option, req.body.mcquestion_id)
     .then((data) => {
         res.json(data);
@@ -76,7 +78,7 @@ router.post("/mcoption", (req, res) => {
  * Route to update mcoption
  *
  */
-router.put("/mcoption/:option_id", (req, res) => {
+router.put("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (req, res) => {
     RubricPS.executeUpdateMCOption(req.body.option, req.body.mcquestion_id, req.params.option_id)
     .then((data) => {
         res.json(data);
@@ -90,7 +92,7 @@ router.put("/mcoption/:option_id", (req, res) => {
  * @body question - question
  * @body question_number - question_number
  */
-router.post("/mcquestion", (req, res) => {
+router.post("/mcquestion", index.authorization.checkRubricAuthorizationPost, (req, res) => {
     RubricPS.executeCreateMCQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number)
     .then((data) => {
         res.json(data);
@@ -106,7 +108,7 @@ router.post("/mcquestion", (req, res) => {
  * @body question - question
  * @body question_number - question_number
  */
-router.put("/mcquestion/:question_id", (req, res) => {
+router.put("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, (req, res) => {
     rubricPS.executeUpdateMCQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number, req.params.question_id)
     .then((data) => {
         res.json(data);
@@ -122,7 +124,7 @@ router.put("/mcquestion/:question_id", (req, res) => {
  * @body rubric_id - rubric_id
  * @body question_number - question_number
  */
-router.post("/rangequestion", (req, res) => {
+router.post("/rangequestion", index.authorization.checkRubricAuthorizationPost, (req, res) => {
     RubricPS.executeCreateRangeQuestion(req.body.question, req.body.range, req.body.rubric_assignment_id, req.body.question_number)
     .then((data) => {
         res.json(data);
@@ -139,7 +141,7 @@ router.post("/rangequestion", (req, res) => {
  * @body rubric_id - rubric_id
  * @body question_number - question_number
  */
-router.put("/rangequestion/:question_id", (req, res) => {
+router.put("/rangequestion/:question_id", index.authorization.checkRangeQuestionEdit, (req, res) => {
     rubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.rubric_assignment_id, req.body.question_number, req.params.question_id)
     .then((data) => {
         res.json(data);
@@ -154,7 +156,7 @@ router.put("/rangequestion/:question_id", (req, res) => {
  * @body rubric_id - rubric_id
  * @body question_number - question_number
  */
-router.post("/openquestion", (req, res) => {
+router.post("/openquestion", index.authorization.checkRubricAuthorizationPost, (req, res) => {
     RubricPS.executeCreateOpenQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number)
     .then((data) => {
         res.json(data);
@@ -167,7 +169,7 @@ router.post("/openquestion", (req, res) => {
  * Router to update open question
  * @param question_id - question_id
  */
-router.put("/openquestion/:question_id", (req, res) => {
+router.put("/openquestion/:question_id", index.authorization.checkOpenQuestionEdit, (req, res) => {
     rubricPS.executeUpdateOpenQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number, req.params.question_id)
     .then((data) => {
         res.json(data);
@@ -180,7 +182,7 @@ router.put("/openquestion/:question_id", (req, res) => {
  * Router to make a rubric
  * @body rubric_id
  */
-router.post("/", (req, res) => {
+router.post("/", index.authorization.checkRubricAuthorizationPost, (req, res) => {
     RubricPS.executeCreateRubric(req.body.rubric_assignment_id)
     .then((data) => {
         res.json(data);
@@ -191,16 +193,15 @@ router.post("/", (req, res) => {
 
 /**
  * Router to get all questions of the rubric in format defined in the documentation
- * @params rubric_id
+ * @params assignment_id - rubric_id
  */
-router.get("/:rubric_id", async (req, res) => {
+router.get("/:assignment_id", index.authorization.enrolledAssignmentCheck, async (req, res) => {
     try {
-    const rubric_id = req.params.rubric_id;
-    const questionJson = await RubricPS.getAllQuestionsByRubricId(req.params.rubric_id);
+    const questionJson = await RubricPS.getAllQuestionsByRubricId(req.params.assignment_id);
 
     res.json({
-        id: rubric_id,
-        assignment_id: rubric_id,
+        id: req.params.assignment_id,
+        assignment_id: req.params.assignment_id,
         questions: questionJson});
     } catch {
         res.sendStatus(400);

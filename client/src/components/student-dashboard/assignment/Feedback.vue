@@ -42,50 +42,49 @@
                                             </div>
                                         </b-list-group-item>
 
-                                        <b-list-group-item
-                                                v-for="(answer, index) in aggregateQuestionAnswer(activeQuestion.question_number)"
-                                                :key="index">
+                            <b-list-group-item v-for="(pair, index) in aggregateQuestionAnswer(activeQuestion.question_number)" :key="index">
 
-                                            <!--&lt;!&ndash; OPEN QUESTION &ndash;&gt;-->
-                                            <template v-if="activeQuestion.type_question === 'open'">
+                                <!--&lt;!&ndash; OPEN QUESTION &ndash;&gt;-->
+                                <template v-if="activeQuestion.type_question === 'open'">
 
-                                                <b-form-textarea
-                                                        id="textarea1"
-                                                        :value="answer.answer"
-                                                        :rows="3"
-                                                        readonly
-                                                        :max-rows="6"/>
-                                            </template>
+                                    <b-form-textarea
+                                            id="textarea1"
+                                            :value="pair.answer.answer"
+                                            :rows="3"
+                                            readonly
+                                            :max-rows="6"/>
+                                </template>
 
 
-                                            <!--&lt;!&ndash; RANGE QUESTION &ndash;&gt;-->
-                                            <StarRating v-else-if="activeQuestion.type_question === 'range'"
-                                                        class="align-middle"
-                                                        :border-color="'#007bff'"
-                                                        :active-color="'#007bff'"
-                                                        :border-width="2"
-                                                        :item-size="20"
-                                                        :spacing="5"
-                                                        read-only
-                                                        :rating="answer.answer"
-                                                        :max-rating="7"/>
 
-                                            <!--&lt;!&ndash; MPC QUESTION &ndash;&gt;-->
-                                            <b-form-group v-else-if="activeQuestion.type_question === 'mc'"
-                                                          class="mb-0">
-                                                <b-form-radio-group
-                                                        :checked="answer.answer"
-                                                        :options="transformOptionsToHTMLOptions(activeQuestion.option)"
-                                                        stacked>
-                                                </b-form-radio-group>
-                                            </b-form-group>
+                                <!--&lt;!&ndash; RANGE QUESTION &ndash;&gt;-->
+                                <StarRating v-else-if="activeQuestion.type_question === 'range'"
+                                            class="align-middle"
+                                            :border-color="'#007bff'"
+                                            :active-color="'#007bff'"
+                                            :border-width="2"
+                                            :item-size="20"
+                                            :spacing="5"
+                                            read-only
+                                            :rating="pair.answer.answer"
+                                            :max-rating="pair.question.range"/>
 
-                                        </b-list-group-item>
+                                <!--&lt;!&ndash; MPC QUESTION &ndash;&gt;-->
+                                <b-form-group v-else-if="activeQuestion.type_question === 'mc'" class="mb-0">
+                                    <b-form-radio-group
+                                            :checked="pair.answer.answer"
+                                            :options="transformOptionsToHTMLOptions(activeQuestion.option)"
+                                            disabled
+                                            stacked>
+                                    </b-form-radio-group>
+                                </b-form-group>
 
-                                    </b-list-group>
+                            </b-list-group-item>
 
-                                </b-card>
-                            </b-col>
+                        </b-list-group>
+
+                    </b-card>
+                </b-col>
 
                         </b-row>
                     </b-container>
@@ -173,7 +172,7 @@ export default {
             let res = []
             this.peerReviews.forEach(peerReview => {
                 let pair = peerReview.form.find(questionAnswerPair => questionAnswerPair.question.question_number === targetQuestionNumber)
-                res.push(pair.answer)
+                res.push(pair)
             })
             return res
         },
