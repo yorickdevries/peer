@@ -165,6 +165,7 @@ export default {
         if (this.sortedQuestionsList !== undefined)
             this.activeQuestion = this.sortedQuestionsList[0]
 
+        await this.getSubmissionComments()
 
     },
     methods: {
