@@ -115,11 +115,11 @@ router.get("/:id/file", index.authorization.getSubmissionFileAuth, async (req, r
 /**
  * Get all submission comments.
  * @authorization user should be TA, teacher or part of the group which has submitted.
- * @param submissionId - an id of a submission.
+ * @param id - an id of a submission.
  * @return database return value.
  */
-router.get("/:submissionId/allComments", index.authorization.getSubmissionAuth, (req, res) => {
-    SubmissionsPS.executeGetAllSubmissionComments(req.params.submissionId)
+router.get("/:id/allComments", index.authorization.getSubmissionAuth, (req, res) => {
+    SubmissionsPS.executeGetAllSubmissionComments(req.params.id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -134,7 +134,7 @@ router.get("/:submissionId/allComments", index.authorization.getSubmissionAuth, 
  * @body comment - a comment of the review.
  * @return database return value.
  */
-router.put("/:submissionCommentId/comment", index.authorization.getSubmissionAuth, (req, res) => {
+router.put("/:submissionCommentId/comment", index.authorization.putSubmissionCommentAuth, (req, res) => {
     SubmissionsPS.executeUpdateSubmissionComment(req.params.submissionCommentId, req.body.comment)
     .then((data) => {
         res.json(data);
@@ -146,13 +146,13 @@ router.put("/:submissionCommentId/comment", index.authorization.getSubmissionAut
 /**
  * Post all submission comments.
  * @authorization user should be TA, teacher or part of the group which has submitted.
- * @param submissionId - an id of a submission.
+ * @param id - an id of a submission.
  * @body netid - a netid.
  * @body comment - a comment of the review.
  * @return database return value.
  */
-router.post("/:submissionId/comment", index.authorization.getSubmissionAuth, (req, res) => {
-    SubmissionsPS.executeAddSubmissionComment(req.params.submissionId, req.body.netid, req.body.comment)
+router.post("/:id/comment", index.authorization.getSubmissionAuth, (req, res) => {
+    SubmissionsPS.executeAddSubmissionComment(req.params.id, req.body.netid, req.body.comment)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -166,7 +166,7 @@ router.post("/:submissionId/comment", index.authorization.getSubmissionAuth, (re
  * @param submissionCommentId - an id of a submission.
  * @return database return value.
  */
-router.delete("/:submissionCommentId/comment", index.authorization.getSubmissionAuth, (req, res) => {
+router.delete("/:submissionCommentId/comment", index.authorization.getSubmissionCommentAuth, (req, res) => {
     SubmissionsPS.executeDeleteSubmissionComment(req.params.submissionCommentId)
     .then((data) => {
         res.json(data);

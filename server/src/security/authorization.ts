@@ -277,6 +277,31 @@ const getSubmissionAuth = async (req: any, res: any, next: any) => {
 };
 
 /**
+ * Authorization for the fetching of a submission.
+ * User should be TA, teacher or part of the group of the submission.
+ * @param req - a request.
+ * @param res - a response.
+ * @param next - a next.
+ * @return {Promise<void>} - response containing the authorization.
+ */
+const getSubmissionCommentAuth = async (req: any, res: any, next: any) => {
+    try {
+        // Fetch the parameters required for the check.
+        const submissionId = (<any> await SubmissionsPS.executeGetSubmissionBySubmissionCommentId(req.params.submissionCommentId)).submission_id;
+        const courseId = (<any> await SubmissionsPS.executeGetCourseId(submissionId)).course_id;
+
+        // Execute the database checks.
+        const roleCheck: any = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(courseId, req.userinfo.given_name);
+        const groupCheck: any = await AuthorizationPS.isGetSubmissionAuth(submissionId, req.userinfo.given_name);
+
+        // Verify the authorization.
+        await response(res, roleCheck.exists || groupCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
  * Authorization for the posting of a submission.
  * The user should be part of a group in the course.
  * @param req - a request.
@@ -290,6 +315,25 @@ const postSubmissionAuth = async (req: any, res: any, next: any) => {
         const groupCheck: any = await AuthorizationPS.isPostSubmissionAuth(req.body.assignmentId, req.userinfo.given_name);
         // Verify the authorization.
         await response(res, groupCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Authorization for the putting of a submission comment.
+ * The user should be part of a group in the course.
+ * @param req - a request.
+ * @param res - a response.
+ * @param next - a next.
+ * @return {Promise<void>} - a response containing the authorization.
+ */
+const putSubmissionCommentAuth = async (req: any, res: any, next: any) => {
+    try {
+        // Check if the user in in a group.
+        const authorCheck: any = await AuthorizationPS.isPutSubmissionCommentAuth(req.params.submissionCommentId, req.userinfo.given_name);
+        // Verify the authorization.
+        await response(res, authorCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
     }
@@ -361,5 +405,7 @@ export default {
     enrolledAsTAOrTeacherAssignment,
     getSubmissionAuth,
     postSubmissionAuth,
-    getSubmissionFileAuth
+    getSubmissionFileAuth,
+    getSubmissionCommentAuth,
+    putSubmissionCommentAuth
 };

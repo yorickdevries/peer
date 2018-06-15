@@ -126,4 +126,16 @@ export default class SubmissionsPS {
         statement.values = [submissionCommentId];
         return Database.executeQuerySingleResult(statement);
     }
+
+    /**
+     * Get the submission by a submission comment id.
+     * @param {number} submissionCommentId - a submission comment id.
+     * @return {Promise<pgPromise.queryResult>}
+     */
+    public static executeGetSubmissionBySubmissionCommentId(submissionCommentId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("delete-submission-comments",
+            "SELECT * FROM submissioncomment WHERE id = $1");
+        statement.values = [submissionCommentId];
+        return Database.executeQuerySingleResult(statement);
+    }
 }
