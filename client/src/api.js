@@ -64,6 +64,9 @@ export default {
     getAssignmentAllSubmissions(assignmentId) {
         return client.get(`assignments/${assignmentId}/allsubmissions`)
     },
+    getAssignmentAllLatestSubmissions(assignmentId) {
+        return client.get(`assignments/${assignmentId}/alllatestsubmissions`)
+    },
     getCurrentRoleForCourse(courseId) {
         return client.get(`courses/${courseId}/role`)
     },
@@ -81,6 +84,9 @@ export default {
     },
     shuffleGroups(assignmentId) {
         return client.get(`/assignments/${assignmentId}/distributeReviews`)
-    }
+    },
+    getSubmission(submissionId) {
+        return client.get(`/submissions/${submissionId}`)
+    },
 }
 

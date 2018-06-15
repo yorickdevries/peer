@@ -39,9 +39,11 @@ export default class SubmissionsPS {
     /**
      * Executes a 'get submissions by assignmentid' query
      */
-    public static executeGetSubmissionsByAssignmentId(id: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-submissions-by-assignment-id-promise",
-        'SELECT * FROM "submission" WHERE "assignment_id" = $1');
+    public static executeGetAllSubmissionsByAssignmentId(id: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-all-submissions-by-assignment-id",
+        "SELECT s1.*, s2.comment_count FROM submission s1 JOIN "
+        + "(SELECT s.id, COUNT(sc.submission_id) AS comment_count FROM submission s LEFT JOIN submissioncomment sc ON s.id = sc.submission_id GROUP BY s.id) s2 ON s2.id = s1.id "
+        + "WHERE s1.assignment_id = $1");
         statement.values = [id];
         return Database.executeQuery(statement);
     }
@@ -50,8 +52,11 @@ export default class SubmissionsPS {
      * Executes a 'get latest submissions by assignmentid' query
      */
     public static executeGetLatestSubmissionsByAssignmentId(id: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-submissions-by-assignment-id",
-        "SELECT * FROM submission s1 WHERE assignment_id = $1 AND date = (SELECT max(date) FROM submission s2 WHERE s2.group_id = s1.group_id)");
+        const statement = new PreparedStatement("get-latest-submissions-by-assignment-id",
+        "SELECT s1.*, s2.comment_count FROM submission s1 JOIN "
+        + "(SELECT s.id, COUNT(sc.submission_id) AS comment_count FROM submission s LEFT JOIN submissioncomment sc ON s.id = sc.submission_id GROUP BY s.id) s2 ON s2.id = s1.id "
+        + "WHERE s1.assignment_id = $1 AND s1.date = (SELECT max(date) FROM submission s3 WHERE s3.group_id = s1.group_id AND s3.assignment_id = $1)"
+    );
         statement.values = [id];
         return Database.executeQuery(statement);
     }

@@ -151,8 +151,8 @@ router.put("/:submissionCommentId/comment", index.authorization.putSubmissionCom
  * @body comment - a comment of the review.
  * @return database return value.
  */
-router.post("/:id/comment", index.authorization.getSubmissionAuth, (req, res) => {
-    SubmissionsPS.executeAddSubmissionComment(req.params.id, req.body.netid, req.body.comment)
+router.post("/:id/comment", index.authorization.getSubmissionAuth, (req: any, res) => {
+    SubmissionsPS.executeAddSubmissionComment(req.params.id,  req.userinfo.given_name, req.body.comment)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -166,7 +166,7 @@ router.post("/:id/comment", index.authorization.getSubmissionAuth, (req, res) =>
  * @param submissionCommentId - an id of a submission.
  * @return database return value.
  */
-router.delete("/:submissionCommentId/comment", index.authorization.putSubmissionCommentAuth, (req, res) => {
+router.delete("/:submissionCommentId/comment", (req, res) => {
     SubmissionsPS.executeDeleteSubmissionComment(req.params.submissionCommentId)
     .then((data) => {
         res.json(data);

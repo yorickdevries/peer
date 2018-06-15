@@ -241,7 +241,21 @@ router.route("/:id/latestsubmission")
  */
 router.route("/:assignment_id/allsubmissions")
     .get(index.authorization.enrolledAsTAOrTeacherAssignment, (req, res) => {
-        AssignmentPS.executeGetAllSubmissionsByAssignmentId(req.params.assignment_id)
+        SubmissionsPS.executeGetAllSubmissionsByAssignmentId(req.params.assignment_id)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.sendStatus(400);
+        });
+    });
+
+/**
+ * Route to get all the submissions per assignment
+ * @params assignment_id - assignment_id
+ */
+router.route("/:assignment_id/alllatestsubmissions")
+    .get(index.authorization.enrolledAsTAOrTeacherAssignment, (req, res) => {
+        SubmissionsPS.executeGetLatestSubmissionsByAssignmentId(req.params.assignment_id)
         .then((data) => {
             res.json(data);
         }).catch((error) => {

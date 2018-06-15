@@ -31,7 +31,9 @@
                                 hide-footer
                                 title="Upload Submission">
 
-                        <b-alert show variant="danger">If you already have a file uploaded, this will overwrite the file!</b-alert>
+                        <b-alert show variant="warning">If you already have a file uploaded, this will overwrite the
+                            file!
+                        </b-alert>
                         <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
                         <b-alert show v-if="uploadSuccess === true">Upload was successful.</b-alert>
                         <b-alert show v-if="uploadSuccess === false">Something went wrong with uploading. Try again.</b-alert>
