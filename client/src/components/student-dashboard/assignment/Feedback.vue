@@ -159,9 +159,11 @@ export default {
         for (let i = 0; i < ids.length; i++) {
             let {data} = await api.getPeerReview(ids[i])
             this.peerReviews.push(data)
-
         }
-        this.activeQuestion = this.sortedQuestionsList[0]
+
+        if (this.sortedQuestionsList !== undefined)
+            this.activeQuestion = this.sortedQuestionsList[0]
+
         await this.getSubmissionComments()
 
     },
