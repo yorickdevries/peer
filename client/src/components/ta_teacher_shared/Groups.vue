@@ -1,7 +1,7 @@
 <template>
-    <b-container>
+    <div fluid>
         <!--Display existing groups-->
-        <b-row class="mt-3">
+        <b-row>
             <b-col>
 
                 <b-row>
@@ -57,7 +57,7 @@
             </b-col>
         </b-row>
 
-    </b-container>
+    </div>
 </template>
 
 <script>
