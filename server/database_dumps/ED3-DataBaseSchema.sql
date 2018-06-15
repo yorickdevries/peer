@@ -82,6 +82,7 @@ CREATE TABLE MCQuestion (
     question_number int NOT NULL,
     type_question char(2) DEFAULT 'mc',
     CONSTRAINT MCQuestion_pk PRIMARY KEY (id)
+    CONSTRAINT mc_question CHECK (type_question = 'mc')
 );
 
 -- Table: OpenAnswer
@@ -100,6 +101,7 @@ CREATE TABLE OpenQuestion (
     question_number int NOT NULL,
     type_question char(4) DEFAULT 'open',
     CONSTRAINT OpenQuestion_pk PRIMARY KEY (id)
+    CONSTRAINT open_question CHECK (type_question = 'open')
 );
 
 -- Table: RangeAnswer
@@ -119,6 +121,7 @@ CREATE TABLE RangeQuestion (
     question_number int NOT NULL,
     type_question char(5) DEFAULT 'range',
     CONSTRAINT RangeQuestion_pk PRIMARY KEY (id)
+    CONSTRAINT range_question CHECK (type_question = 'range')
 );
 
 -- Table: Review
