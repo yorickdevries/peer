@@ -129,12 +129,11 @@ export default {
             return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
         },
         async shuffleGroups() {
-            let res;
             try {
-                res = await api.shuffleGroups(this.$route.params.assignmentId)
+                await api.shuffleGroups(this.$route.params.assignmentId)
                 this.showSuccessMessage({message: "Groups have successfully been shuffled and assigned submissions."})
             } catch (e) {
-                this.showErrorMessage({message: res.data.error})
+                this.showErrorMessage({message: e.response.data.error})
             }
         }
     }
