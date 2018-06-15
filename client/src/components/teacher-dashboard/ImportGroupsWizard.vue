@@ -63,7 +63,7 @@
                     await api.client.post(`/assignments/${this.assignmentId}/importgroups`, formData)
                     this.showSuccessMessage()
                 } catch (e) {
-                    this.showErrorMessage()
+                    this.showErrorMessage({message: e.response.data.error})
                 }
             }
         }
