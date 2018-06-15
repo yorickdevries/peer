@@ -3,8 +3,8 @@
         <b-alert class="d-flex justify-content-between flex-wrap" show variant="primary">
             <p>Please upload a comma separated file containing the groups e.g. Brightspace export</p>
             <ul class="mb-0">
-                <li>The NetID's of the users should be in column "Username" (case-sensitive)</li>
-                <li>NetID's can be in the form of netid@tudelft.nl</li>
+                <li>The NetIDs of the users should be in column "Username" (case-sensitive)</li>
+                <li>NetIDs are also allowed to be in the form of netid@tudelft.nl</li>
                 <li>The name of the column in which the group names are should be entered below (case-sensitive)</li>
                 <li>File should have extension .csv</li>
                 <li>Max file size is 1MB</li>
