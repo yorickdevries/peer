@@ -1,5 +1,7 @@
 import AuthorizationPS from "../prepared_statements/authorization_ps";
 import AssignmentPS from "../prepared_statements/assignment_ps";
+import SubmissionsPS from "../prepared_statements/submissions_ps";
+import ReviewPS from "../prepared_statements/review_ps";
 
 /**
  * Check whether the user who does the request is authenticated.
@@ -146,6 +148,84 @@ const isAuthorizedToViewGroup = async (req: any, res: any, next: any) => {
     }
 };
 
+/**
+ * Authorization for the fetching of a submission.
+ * User should be TA, teacher or part of the group which has submitted.
+ * @param req - a request.
+ * @param res - a response.
+ * @param next - a next.
+ * @return {Promise<void>} - response containing the authorization.
+ */
+const getSubmissionAuth = async (req: any, res: any, next: any) => {
+    try {
+        // Fetch the submission
+        const submission: any = await SubmissionsPS.executeGetSubmissionById(req.params.id);
+
+        // Fetch the parameters required for the check.
+        const courseId = (<any> await SubmissionsPS.executeGetCourseId(req.params.id)).course_id;
+        const assignmentId: number = submission.assignment_id;
+        const groupId: number = submission.group_id;
+
+        // Execute the database checks.
+        const roleCheck: any = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(courseId, req.userinfo.given_name);
+        const submittedCheck: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
+
+        // Verify the authorization.
+        await response(res, roleCheck.exists || submittedCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Authorization for the posting of a submission.
+ * The user should be part of a group in the course.
+ * @param req - a request.
+ * @param res - a response.
+ * @param next - a next.
+ * @return {Promise<void>} - a response containing the authorization.
+ */
+const postSubmissionAuth = async (req: any, res: any, next: any) => {
+    try {
+        // Check if the user in in a group.
+        const groupCheck: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(req.userinfo.given_name, req.body.assignmentId);
+
+        // Verify the authorization.
+        await response(res, groupCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Authorization for the fetching of a submission file.
+ * User should be TA, teacher, part of the group which has submitted or a reviewer.
+ * @param req - a request.
+ * @param res - a response.
+ * @param next - a next.
+ * @return {Promise<void>} - response containing the authorization.
+ */
+const getSubmissionFileAuth = async (req: any, res: any, next: any) => {
+    try {
+        // Fetch the submission
+        const submission: any = await SubmissionsPS.executeGetSubmissionById(req.params.id);
+
+        // Fetch the parameters required for the check.
+        const courseId = (<any> await SubmissionsPS.executeGetCourseId(req.params.id)).course_id;
+        const assignmentId: number = submission.assignment_id;
+        const groupId: number = submission.group_id;
+
+        // Execute the database checks.
+        const roleCheck: any = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(courseId, req.userinfo.given_name);
+        const submittedCheck: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
+        const reviewCheck: any = await ReviewPS.executeGetReviewBySubmissionIdNetId(req.params.id, req.userinfo.given_name);
+
+        // Verify the authorization.
+        await response(res, roleCheck.exists || submittedCheck.exists || reviewCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
 
 /**
  * Response method that handles the response
@@ -172,5 +252,8 @@ export default {
     enrolledAsTeacherAssignmentCheck,
     isAuthorizedToViewGroup,
     enrolledAsTeacherAssignmentCheckForPost,
-    enrolledAsTAOrTeacherAssignment
+    enrolledAsTAOrTeacherAssignment,
+    getSubmissionAuth,
+    postSubmissionAuth,
+    getSubmissionFileAuth
 };
