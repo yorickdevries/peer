@@ -66,7 +66,6 @@
                 </b-col>
 
             </b-row>
-        </b-card>
     </b-container>
 </template>
 

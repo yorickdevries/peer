@@ -43,7 +43,7 @@
                         <b-card>
                             <b-row class="mb-2">
                                 <b-col sm="3" class="text-sm"><b>Group members</b>
-                                <p class="m-0" v-for="member in row.item.members">- {{ member.user_netid }}</p>
+                                <p class="m-0" v-for="member in row.item.members" :key="member.user_netid">- {{ member.user_netid }}</p>
                                 </b-col>
                             </b-row>
                         </b-card>
