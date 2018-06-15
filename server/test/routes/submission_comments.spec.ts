@@ -21,6 +21,7 @@ describe("submission comment routes", () => {
      * Tests if all comments are fetched for a specific submission.
      */
     it("GET submission/:submissionId/allComments", async () => {
+        MockLogin.initialize("paulvanderlaan");
         const res = await chai.request(router).get("/1/allComments");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
@@ -73,6 +74,7 @@ describe("submission comment routes", () => {
      * Tests if a specific comment can be deleted.
      */
     it("submission/:submissionCommentId/comment", async () => {
+        MockLogin.initialize("paulvanderlaan");
         const res = await chai.request(router).del("/1/comment");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(

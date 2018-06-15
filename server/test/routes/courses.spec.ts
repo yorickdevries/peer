@@ -48,23 +48,19 @@ describe("API Course routes", () => {
             .send({description: "example", name: "test name"});
 
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify({
-                id: 3,
-                description: "example",
-                name: "test name"
-            }
+        expect(res.text).to.equal(JSON.stringify({"id": 3, "description": "example", "name": "test name"}
         ));
 
         const enrolled = await chai.request(router).get("/enrolled");
         expect(enrolled.status).to.equal(200);
         expect(enrolled.text).to.equal(JSON.stringify([{
-            id: 1,
-            description: "This is a beautiful course description!",
-            name: "ED-3"
-        }, {
-            id: 3,
-            description: "example",
-            name: "test name"
+            "id": 1,
+            "description": "This is a beautiful course description!",
+            "name": "ED-3"
+        }, {"id": 2, "description": "Test-course", "name": "ED-4"}, {
+            "id": 3,
+            "description": "example",
+            "name": "test name"
         }]));
     });
 
@@ -76,10 +72,10 @@ describe("API Course routes", () => {
         const res = await chai.request(router).get("/enrolled");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify([{
-            id: 1,
-            description: "This is a beautiful course description!",
-            name: "ED-3"
-        }]));
+            "id": 1,
+            "description": "This is a beautiful course description!",
+            "name": "ED-3"
+        }, {"id": 2, "description": "Test-course", "name": "ED-4"}]));
     });
 
     /**
