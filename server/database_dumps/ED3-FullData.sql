@@ -9,7 +9,7 @@ INSERT INTO "userlist" (
 	VALUES
 		('henkjan', 'h.j@student.tudelft.nl'),
 		('yorickdevries', NULL),
-		('teacheraccount', 'email@adress.nl');;
+		('teacheraccount', 'email@adress.nl');
 
 INSERT INTO public.courselist(
     description, name)
@@ -21,7 +21,11 @@ INSERT INTO public.courselist(
 
 INSERT INTO public.grouplist(
 	id, group_name)
-	VALUES (10, 'ED-3');
+	VALUES
+	(10, 'ED-3'),
+	(11, 'ED-4'),
+	(12, 'ED-5')
+	;
 
 INSERT INTO public.assignmentlist(
 	title, description, course_id, reviews_per_user, due_date, publish_date, filename, review_due_date, review_publish_date)
@@ -151,14 +155,16 @@ INSERT INTO public.enroll(
 
 INSERT INTO public.assignmentgroup(
 	assignment_id, group_id)
-	VALUES (1, 10);
+	VALUES 
+	(1, 10),
+	(1, 11);
 
 INSERT INTO public.submission(
 	user_netid, group_id, assignment_id, file_path, date)
 	VALUES
-	    ('paulvanderlaan', 10, 4, 'submission1.pdf', '2018-05-01T20:30:01Z'),
-	    ('paulvanderlaan', 10, 5, 'submission1.pdf', '2018-05-01T20:30:02Z'),
-	    ('paulvanderlaan', 10, 6, 'submission1.pdf', '2018-05-01T20:30:03Z'),
+	    ('paulvanderlaan', 10, 1, 'submission1.pdf', '2018-05-01T20:30:01Z'),
+	    ('paulvanderlaan', 10, 1, 'submission1.pdf', '2018-05-01T20:30:02Z'),
+	    ('paulvanderlaan', 10, 1, 'submission1.pdf', '2018-05-01T20:30:03Z'),
 	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:29:04Z'),
 	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:05Z'),
 	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:06Z'),
@@ -172,13 +178,14 @@ INSERT INTO public.submission(
 	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:14Z'),
 	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:15Z'),
 	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:16Z'),
-	    ('henkjan', 10, 2, 'submission2.pdf', '2018-05-01T20:30:17Z'),
-	    ('henkjan', 10, 3, 'submission2.pdf', '2018-05-01T20:30:18Z'),
-	    ('henkjan', 10, 4, 'submission2.pdf', '2018-05-01T20:30:19Z'),
-	    ('henkjan', 10, 5, 'submission2.pdf', '2018-05-01T20:30:20Z'),
-	    ('henkjan', 10, 6, 'submission2.pdf', '2018-05-01T20:30:21Z'),
-	    ('henkjan', 10, 7, 'submission2.pdf', '2018-05-01T20:30:22Z'),
-	    ('henkjan', 10, 8, 'submission2.pdf', '2018-05-01T20:30:23Z')
+	    ('henkjan', 12, 2, 'submission2.pdf', '2018-05-01T20:30:17Z'),
+	    ('henkjan', 12, 3, 'submission2.pdf', '2018-05-01T20:30:18Z'),
+	    ('henkjan', 12, 4, 'submission2.pdf', '2018-05-01T20:30:19Z'),
+	    ('henkjan', 12, 5, 'submission2.pdf', '2018-05-01T20:30:20Z'),
+	    ('henkjan', 12, 6, 'submission2.pdf', '2018-05-01T20:30:21Z'),
+	    ('henkjan', 12, 7, 'submission2.pdf', '2018-05-01T20:30:22Z'),
+	    ('henkjan', 12, 8, 'submission2.pdf', '2018-05-01T20:30:23Z'),
+		('yorickdevries', 11, 1, 'submission1.pdf', '2018-05-01T15:30:01Z')
 	;
 
 INSERT INTO public.review(
@@ -232,6 +239,14 @@ INSERT INTO public.groupusers(
 INSERT INTO public.groupusers(
 	User_netid, Group_groupid)
 	VALUES ('paulvanderlaan', 10);
+
+INSERT INTO public.groupusers(
+	User_netid, Group_groupid)
+	VALUES ('yorickdevries', 11);
+
+INSERT INTO public.submissioncomment(
+	comment, submission_id, netid)
+	VALUES ('Keep it up Brian!', 16, 'paulvanderlaan');
 
 -- End of file.
 

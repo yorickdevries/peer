@@ -1,5 +1,7 @@
 import AuthorizationPS from "../prepared_statements/authorization_ps";
 import AssignmentPS from "../prepared_statements/assignment_ps";
+import SubmissionsPS from "../prepared_statements/submissions_ps";
+import ReviewPS from "../prepared_statements/review_ps";
 import RubricPS from "../prepared_statements/rubric_ps";
 
 /**
@@ -23,6 +25,30 @@ const enrolledAssignmentCheck = async (req: any, res: any, next: any) => {
     try {
         const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
         const authCheck = await AuthorizationPS.executeCheckEnrollment(assignment.course_id, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check whether a user is enrolled for a course
+ */
+const enrolledCourseCheck = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeCheckEnrollment(req.params.courseId, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check whether a user is enrolled as teacher for a course
+ */
+const enrolledCourseTeacherCheck = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(req.params.courseId, req.userinfo.given_name);
         response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -226,6 +252,122 @@ const isAuthorizedToViewGroup = async (req: any, res: any, next: any) => {
     }
 };
 
+/**
+ * Authorization for the fetching of a submission.
+ * User should be TA, teacher or part of the group of the submission.
+ * @param req - a request.
+ * @param res - a response.
+ * @param next - a next.
+ * @return {Promise<void>} - response containing the authorization.
+ */
+const getSubmissionAuth = async (req: any, res: any, next: any) => {
+    try {
+        // Fetch the parameters required for the check.
+        const courseId = (<any> await SubmissionsPS.executeGetCourseId(req.params.id)).course_id;
+
+        // Execute the database checks.
+        const roleCheck: any = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(courseId, req.userinfo.given_name);
+        const groupCheck: any = await AuthorizationPS.isGetSubmissionAuth(req.params.id, req.userinfo.given_name);
+
+        // Verify the authorization.
+        await response(res, roleCheck.exists || groupCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Authorization for the fetching of a submission.
+ * User should be TA, teacher or part of the group of the submission.
+ * @param req - a request.
+ * @param res - a response.
+ * @param next - a next.
+ * @return {Promise<void>} - response containing the authorization.
+ */
+const getSubmissionCommentAuth = async (req: any, res: any, next: any) => {
+    try {
+        // Fetch the parameters required for the check.
+        const submissionId = (<any> await SubmissionsPS.executeGetSubmissionBySubmissionCommentId(req.params.submissionCommentId)).submission_id;
+        const courseId = (<any> await SubmissionsPS.executeGetCourseId(submissionId)).course_id;
+
+        // Execute the database checks.
+        const roleCheck: any = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(courseId, req.userinfo.given_name);
+        const groupCheck: any = await AuthorizationPS.isGetSubmissionAuth(submissionId, req.userinfo.given_name);
+
+        // Verify the authorization.
+        await response(res, roleCheck.exists || groupCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Authorization for the posting of a submission.
+ * The user should be part of a group in the course.
+ * @param req - a request.
+ * @param res - a response.
+ * @param next - a next.
+ * @return {Promise<void>} - a response containing the authorization.
+ */
+const postSubmissionAuth = async (req: any, res: any, next: any) => {
+    try {
+        // Check if the user in in a group.
+        const groupCheck: any = await AuthorizationPS.isPostSubmissionAuth(req.body.assignmentId, req.userinfo.given_name);
+        // Verify the authorization.
+        await response(res, groupCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Authorization for the putting of a submission comment.
+ * The user should be part of a group in the course.
+ * @param req - a request.
+ * @param res - a response.
+ * @param next - a next.
+ * @return {Promise<void>} - a response containing the authorization.
+ */
+const putSubmissionCommentAuth = async (req: any, res: any, next: any) => {
+    try {
+        // Check if the user in in a group.
+        const authorCheck: any = await AuthorizationPS.isPutSubmissionCommentAuth(req.params.submissionCommentId, req.userinfo.given_name);
+        // Verify the authorization.
+        await response(res, authorCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Authorization for the fetching of a submission file.
+ * User should be TA, teacher, part of the group which has submitted or a reviewer.
+ * @param req - a request.
+ * @param res - a response.
+ * @param next - a next.
+ * @return {Promise<void>} - response containing the authorization.
+ */
+const getSubmissionFileAuth = async (req: any, res: any, next: any) => {
+    try {
+        // Fetch the submission
+        const submission: any = await SubmissionsPS.executeGetSubmissionById(req.params.id);
+
+        // Fetch the parameters required for the check.
+        const courseId = (<any> await SubmissionsPS.executeGetCourseId(req.params.id)).course_id;
+        const assignmentId: number = submission.assignment_id;
+        const groupId: number = submission.group_id;
+
+        // Execute the database checks.
+        const roleCheck: any = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(courseId, req.userinfo.given_name);
+        const groupCheck: any = await AuthorizationPS.isGetSubmissionAuth(req.params.id, req.userinfo.given_name);
+        const reviewCheck: any = await AuthorizationPS.isSubmissionReviewerAuth(req.params.id, req.userinfo.given_name);
+
+        // Verify the authorization.
+        await response(res, roleCheck.exists || groupCheck.exists || reviewCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
 
 /**
  * Response method that handles the response
@@ -254,9 +396,16 @@ export default {
     checkMCOptionEdit,
     checkRubricAuthorizationPost,
     checkAuthorizationForReview,
+    enrolledCourseCheck,
     checkMCOptionPost,
+    enrolledCourseTeacherCheck,
     enrolledAsTeacherAssignmentCheck,
     isAuthorizedToViewGroup,
     enrolledAsTeacherAssignmentCheckForPost,
-    enrolledAsTAOrTeacherAssignment
+    enrolledAsTAOrTeacherAssignment,
+    getSubmissionAuth,
+    postSubmissionAuth,
+    getSubmissionFileAuth,
+    getSubmissionCommentAuth,
+    putSubmissionCommentAuth
 };

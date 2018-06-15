@@ -1,43 +1,46 @@
 <template>
     <div>
+        <b-card no-body>
+            <b-tabs card>
+                <b-tab title="Student Feedback">
+                    <b-card v-if="peerReviews.length === 0">No feedback available.</b-card>
 
-        <b-card v-if="peerReviews.length === 0">No feedback available.</b-card>
+                    <b-container v-else fluid>
+                        <b-row>
+                            <!--Side-bar for questions -->
+                            <b-col class="pl-0">
+                                <b-list-group>
+                                    <b-list-group-item
+                                            v-for="question in sortedQuestionsList"
+                                            :key="question.question_number"
+                                            @click="activeQuestion = question"
+                                            :active="activeQuestion === question">
+                                        Question #{{ question.question_number}}
+                                    </b-list-group-item>
+                                </b-list-group>
+                            </b-col>
 
-        <b-container v-else fluid>
-            <b-row>
+                            <!--Feedback view with 1 question at a time-->
+                            <b-col cols="9" class="pr-0">
+                                <b-card no-body>
 
-                <!--Side-bar for questions -->
-                <b-col class="pl-0">
-                    <b-list-group>
-                        <b-list-group-item
-                                v-for="question in sortedQuestionsList"
-                                :key="question.question_number"
-                                @click="activeQuestion = question"
-                                :active="activeQuestion === question">
-                            Question #{{ question.question_number}}
-                        </b-list-group-item>
-                    </b-list-group>
-                </b-col>
+                                    <!--Title-->
+                                    <b-card-body>
+                                        <h4>Feedback</h4>
+                                        <h6 class="card-subtitle text-muted">Feedback given to you aggregated per
+                                            question.</h6>
+                                    </b-card-body>
 
-                <!--Feedback view with 1 question at a time-->
-                <b-col cols="9" class="pr-0">
-                    <b-card no-body>
+                                    <!--Single Active Question-->
+                                    <b-list-group flush>
 
-                        <!--Title-->
-                        <b-card-body>
-                            <h4>Feedback</h4>
-                            <h6 class="card-subtitle text-muted">Feedback given to you aggregated per question.</h6>
-                        </b-card-body>
-
-                        <!--Single Active Question-->
-                        <b-list-group flush>
-
-                            <b-list-group-item>
-                                <div class="">
-                                    <h5 class="text-primary">Question {{ activeQuestion.question_number }}</h5>
-                                    {{ activeQuestion.question}}
-                                </div>
-                            </b-list-group-item>
+                                        <b-list-group-item>
+                                            <div class="">
+                                                <h5 class="text-primary">Question {{ activeQuestion.question_number
+                                                    }}</h5>
+                                                {{ activeQuestion.question}}
+                                            </div>
+                                        </b-list-group-item>
 
                             <b-list-group-item v-for="(pair, index) in aggregateQuestionAnswer(activeQuestion.question_number)" :key="index">
 
@@ -83,8 +86,46 @@
                     </b-card>
                 </b-col>
 
-            </b-row>
-        </b-container>
+                        </b-row>
+                    </b-container>
+                </b-tab>
+
+                <!--TA Feedback Comments-->
+                <b-tab title="TA Feedback" no-body>
+
+                    <b-card-body>
+                        This pages houses the feedback TA's have given on your submission.
+                    </b-card-body>
+                    <!--View Comments-->
+                    <b-list-group v-if="comments.length > 0" flush>
+
+                        <!--Single Comment-->
+                        <b-list-group-item v-for="(comment, index) in comments" :id="comment.id">
+                            <dl class="mb-0">
+                                <dt>Comment</dt>
+                                <dd>
+                                    <b-form-textarea v-model="comment.comment"
+                                                     placeholder="Input your submission comment here."
+                                                     max-rows="10"
+                                                     readonly></b-form-textarea>
+                                </dd>
+
+                                <dt>Created by</dt>
+                                <dd>{{ comment.netid }}</dd>
+                            </dl>
+                        </b-list-group-item>
+                    </b-list-group>
+
+                    <!--No comment available text.-->
+                    <b-card-body v-else>
+                        <b-card>
+                            No comments have been made.
+                        </b-card>
+                    </b-card-body>
+
+                </b-tab>
+            </b-tabs>
+        </b-card>
     </div>
 </template>
 
@@ -99,7 +140,8 @@ export default {
     data() {
         return {
             peerReviews: [],
-            activeQuestion: {}
+            activeQuestion: {},
+            comments: []
         }
     },
     computed: {
@@ -118,9 +160,12 @@ export default {
         for (let i = 0; i < ids.length; i++) {
             let {data} = await api.getPeerReview(ids[i])
             this.peerReviews.push(data)
-
         }
-        this.activeQuestion = this.sortedQuestionsList[0]
+
+        if (this.sortedQuestionsList !== undefined)
+            this.activeQuestion = this.sortedQuestionsList[0]
+
+        await this.getSubmissionComments()
 
     },
     methods: {
@@ -138,6 +183,17 @@ export default {
             return options.map(option => {
                 return { text: option.option, value: option.id }
             })
+        },
+        async getSubmissionComments() {
+            try {
+                let resSubmission = await api.getAssignmentLatestSubmission(this.$route.params.assignmentId)
+                let submissionId = resSubmission.data.id
+                let res = await api.client.get(`submissions/${submissionId}/allComments`)
+                this.comments = res.data
+            } catch (e) {
+                console.log(e)
+                this.showErrorMessage()
+            }
         },
     },
 }

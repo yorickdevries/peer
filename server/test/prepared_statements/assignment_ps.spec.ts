@@ -144,28 +144,4 @@ describe("AssignmentPreparedStatements Test", () => {
         });
     });
 
-    /**
-     * Test get all submissions.
-     */
-    it("get all submissions", async () => {
-        expect(await AssignmentPS.executeGetAllSubmissionsByAssignmentId(1)).to.deep.equal([{
-            "file_path": "submission1.pdf",
-            "id": 1,
-            "group_id": 10,
-            "grade": -1,
-            "assignment_id": 1,
-            "user_netid": "paulvanderlaan",
-            "date": new Date("2018-05-01T20:30:01.000Z")
-        },
-        {
-            "file_path": "submission2.pdf",
-            "id": 2,
-            "group_id": 10,
-            "grade": -1,
-            "assignment_id": 1,
-            "user_netid": "henkjan",
-            "date": new Date("2018-05-01T20:30:00.000Z")
-        }]);
-    });
-
 });

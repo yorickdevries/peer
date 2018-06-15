@@ -5,6 +5,7 @@ import multer from "multer";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 import bodyParser from "body-parser";
 import AssignmentPS from "../prepared_statements/assignment_ps";
+import index from "../security/index";
 
 // Router
 import express from "express";
@@ -76,22 +77,11 @@ const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
 };
 
 /**
- * Route to get all submissions.
- */
-router.get("/", (req, res) => {
-    SubmissionsPS.executeGetSubmissions()
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
-        res.sendStatus(400);
-    });
-});
-
-/**
  * Route to get one submission with a specific id.
  * @param id - submission id.
+ * @authorization user should be TA, teacher or part of the group which has submitted.
  */
-router.get("/:id", (req, res) => {
+router.get("/:id", index.authorization.getSubmissionAuth, (req, res) => {
     SubmissionsPS.executeGetSubmissionById(req.params.id)
     .then((data) => {
         res.json(data);
@@ -102,14 +92,16 @@ router.get("/:id", (req, res) => {
 
 /**
  * Route to make a new submission.
+ * @authorization the user should be part of a group in the course.
  */
-router.post("/", uploadSubmissionFunction, addSubmissionToDatabase);
+router.post("/", uploadSubmissionFunction, index.authorization.postSubmissionAuth, addSubmissionToDatabase);
 
 /**
  * Route to get a file from a submission.
+ * @authorization user should part of the group which has submitted or the reviewer for the submission..
  * @param id - submission id.
  */
-router.get("/:id/file", async (req, res) => {
+router.get("/:id/file", index.authorization.getSubmissionFileAuth, async (req, res) => {
     try {
         const submission: any = await SubmissionsPS.executeGetSubmissionById(req.params.id);
         const filePath = path.join(__dirname, "../files/submissions", submission.file_path);
@@ -120,12 +112,13 @@ router.get("/:id/file", async (req, res) => {
 });
 
 /**
- * Get all review comments.
- * @param submissionId - an id of a submission.
+ * Get all submission comments.
+ * @authorization user should be TA, teacher or part of the group which has submitted.
+ * @param id - an id of a submission.
  * @return database return value.
  */
-router.get("/:submissionId/allComments", (req, res) => {
-    SubmissionsPS.executeGetAllSubmissionComments(req.params.submissionId)
+router.get("/:id/allComments", index.authorization.getSubmissionAuth, (req, res) => {
+    SubmissionsPS.executeGetAllSubmissionComments(req.params.id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -134,12 +127,13 @@ router.get("/:submissionId/allComments", (req, res) => {
 });
 
 /**
- * Get all review comments.
+ * Put submission comments.
+ * @authorization user should be TA, teacher or part of the group which has submitted.
  * @param submissionCommentId - an id of a submission.
  * @body comment - a comment of the review.
  * @return database return value.
  */
-router.put("/:submissionCommentId/comment", (req, res) => {
+router.put("/:submissionCommentId/comment", index.authorization.putSubmissionCommentAuth, (req, res) => {
     SubmissionsPS.executeUpdateSubmissionComment(req.params.submissionCommentId, req.body.comment)
     .then((data) => {
         res.json(data);
@@ -149,14 +143,15 @@ router.put("/:submissionCommentId/comment", (req, res) => {
 });
 
 /**
- * Get all review comments.
- * @param submissionId - an id of a submission.
+ * Post all submission comments.
+ * @authorization user should be TA, teacher or part of the group which has submitted.
+ * @param id - an id of a submission.
  * @body netid - a netid.
  * @body comment - a comment of the review.
  * @return database return value.
  */
-router.post("/:submissionId/comment", (req, res) => {
-    SubmissionsPS.executeAddSubmissionComment(req.params.submissionId, req.body.netid, req.body.comment)
+router.post("/:id/comment", index.authorization.getSubmissionAuth, (req: any, res) => {
+    SubmissionsPS.executeAddSubmissionComment(req.params.id,  req.userinfo.given_name, req.body.comment)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -165,7 +160,8 @@ router.post("/:submissionId/comment", (req, res) => {
 });
 
 /**
- * Get all review comments.
+ * Delete submission comments.
+ * @authorization user should be TA, teacher or part of the group which has submitted.
  * @param submissionCommentId - an id of a submission.
  * @return database return value.
  */

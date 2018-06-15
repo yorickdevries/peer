@@ -183,15 +183,15 @@ router.post("/", uploadAssignmentFunction, index.authorization.enrolledAsTeacher
  * Removes the old assignment (also from the files folder - if a file is uploaded)
  * and adds the new assignment.
  */
-router.put("/:assignment_id", uploadAssignmentFunction, updateAssignment);
+router.put("/:assignment_id", index.authorization.enrolledAsTAOrTeacherAssignment, uploadAssignmentFunction, updateAssignment);
 
 /**
  * Route to get a file from an assignment.
  * @param id - assignment id.
  */
-router.get("/:id/file", async (req, res) => {
+router.get("/:assignment_id/file", index.authorization.enrolledAssignmentCheck, async (req, res) => {
     try {
-        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.id);
+        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
         const fileName = path.join(__dirname, "../files/assignments", assignment.filename);
         res.sendfile(fileName);
     } catch (err) {
@@ -204,7 +204,7 @@ router.get("/:id/file", async (req, res) => {
  * @userinfo given_name - netId
  * @params assignment_id - assignment_id
  */
-router.route("/:assignment_id/submissions")
+router.route("/:assignment_id/submissions", )
     .get((req: any, res) => {
         AssignmentPS.executeGetSubmissionsByAssignmentId(
             req.userinfo.given_name,
@@ -242,7 +242,21 @@ router.route("/:id/latestsubmission")
  */
 router.route("/:assignment_id/allsubmissions")
     .get(index.authorization.enrolledAsTAOrTeacherAssignment, (req, res) => {
-        AssignmentPS.executeGetAllSubmissionsByAssignmentId(req.params.assignment_id)
+        SubmissionsPS.executeGetAllSubmissionsByAssignmentId(req.params.assignment_id)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.sendStatus(400);
+        });
+    });
+
+/**
+ * Route to get all the submissions per assignment
+ * @params assignment_id - assignment_id
+ */
+router.route("/:assignment_id/alllatestsubmissions")
+    .get(index.authorization.enrolledAsTAOrTeacherAssignment, (req, res) => {
+        SubmissionsPS.executeGetLatestSubmissionsByAssignmentId(req.params.assignment_id)
         .then((data) => {
             res.json(data);
         }).catch((error) => {
@@ -270,7 +284,7 @@ router.route("/:assignment_id/reviews")
  * Route to distribute reviews for a certain assignment
  */
 router.route("/:assignment_id/distributeReviews")
-    .get((req: any, res) => {
+    .get(index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
         reviewDistribution.distributeReviews(req.params.assignment_id)
         .then((data) => {
             res.json(data);
@@ -283,7 +297,7 @@ router.route("/:assignment_id/distributeReviews")
 /**
  * Route to import groups for a specific assignment.
  */
-router.post("/:id/importgroups", (req: any, res) => {
+router.post("/:assignment_id/importgroups", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
     // File upload handling
     uploadGroups(req, res, function (err) {
         // Error in case of wrong file type
@@ -303,7 +317,7 @@ router.post("/:id/importgroups", (req: any, res) => {
             res.json({error: "No groupcolumn defined"});
         } else {
             const groupColumn = req.body.groupColumn;
-            const assignmentId = req.params.id;
+            const assignmentId = req.params.assignment_id;
             GroupParser.importGroups(req.file.buffer, groupColumn, assignmentId)
             .then((data) => {
                 res.json(data);
@@ -319,8 +333,8 @@ router.post("/:id/importgroups", (req: any, res) => {
  * Route to get the reviews belonging to an assignment.
  * @param id - assignment id.
  */
-router.get("/:id/allreviews", (req: any, res) => {
-    ReviewPS.executeGetAllDoneReviewsByAssignmentId(req.params.id)
+router.get("/:assignment_id/allreviews", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
+    ReviewPS.executeGetAllDoneReviewsByAssignmentId(req.params.assignment_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -368,8 +382,8 @@ router.get("/:id/feedback", async (req: any, res) => {
 /**
  * Route to get all groups of an assignment
  */
-router.get("/:id/groups", (req: any, res) => {
-    AssignmentPS.executeGetGroupsByAssignmentId(req.params.id)
+router.get("/:assignment_id/groups", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
+    AssignmentPS.executeGetGroupsByAssignmentId(req.params.assignment_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {

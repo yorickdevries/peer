@@ -48,17 +48,6 @@ export default class AssignmentPS {
     }
 
     /**
-     * Executes 'get all submissions per assignment'
-     * @param assignmentId - assignment_id
-     */
-    public static executeGetAllSubmissionsByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-all-subbmissions-by-assignmentId",
-            "SELECT * FROM submission WHERE assignment_id = $1");
-        statement.values = [assignmentId];
-        return Database.executeQuery(statement);
-    }
-
-    /**
      * Get all assignments that belong to a specific course.
      * @param {string} courseId - a course id.
      * @return {any} a query result.

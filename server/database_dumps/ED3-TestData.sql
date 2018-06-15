@@ -100,7 +100,7 @@ INSERT INTO public.mcoption(
 
 INSERT INTO public.enroll(
 	course_id, user_netid, role)
-	VALUES (1, 'paulvanderlaan', 'student'), (1, 'bplanje', 'teacher');
+	VALUES (1, 'paulvanderlaan', 'student'), (1, 'bplanje', 'teacher'), (2, 'bplanje', 'teacher');
 
 INSERT INTO public.assignmentgroup(
 	assignment_id, group_id)
