@@ -110,6 +110,7 @@ export default {
 
             this.showSuccessMessage({message: "Successfully created question."})
             this.$emit('saved')
+            this.onReset()
         },
         onReset() {
             this.selectedType = ''
