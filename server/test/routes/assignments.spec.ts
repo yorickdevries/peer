@@ -188,6 +188,29 @@ describe("API Assignment routes", () => {
     });
 
     /**
+     * Tests whether an assignment with 0 reviews per users is rejected
+     */
+    it("post assignment/ with 0 reviews", async () => {
+        // log in as bplanje (teacher)
+        MockLogin.initialize("bplanje");
+        const exampleSubmissionFile = path.join(__dirname, "../../example_data/assignments/assignment1.pdf");
+        const res = await chai.request(router).post("/")
+            .attach("assignmentFile", fs.readFileSync(exampleSubmissionFile), "assignment1.pdf")
+            .field("title", "Example title")
+            .field("description", "Example description")
+            .field("course_id", 1)
+            .field("reviews_per_user", 0)
+            .field("publish_date", "2018-05-01T20:30:00.000Z")
+            .field("due_date", "2018-06-01T20:30:00.000Z")
+            .field("review_publish_date", "2018-07-01T20:30:00.000Z")
+            .field("review_due_date", "2018-08-01T20:30:00.000Z");
+        // assertions
+        const result = JSON.parse(res.text);
+
+        expect(res.status).to.equal(400);
+    });
+
+    /**
      * Test whether an assignment is properly updated.
      */
     it("PUT /:assignment_id", async () => {

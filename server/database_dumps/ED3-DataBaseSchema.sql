@@ -4,32 +4,36 @@
 -- tables
 -- Table: AssignmentList
 CREATE TABLE AssignmentList (
-    title varchar(5000)  NOT NULL,
-    description varchar(5000)  NOT NULL,
-    due_date timestamptz NOT NULL,
-    publish_date timestamptz NOT NULL,
+    title varchar(5000) NOT NULL,
+    description varchar(5000) NOT NULL,
     id SERIAL,
     course_id int NOT NULL,
     reviews_per_user int NOT NULL,
     filename varchar(5000) NOT NULL,
-    review_due_date timestamptz NOT NULL,
+    publish_date timestamptz NOT NULL,
+    due_date timestamptz NOT NULL,
     review_publish_date timestamptz NOT NULL,
-    CONSTRAINT AssignmentList_pk PRIMARY KEY (id)
+    review_due_date timestamptz NOT NULL,
+    CONSTRAINT AssignmentList_pk PRIMARY KEY (id),
+    CONSTRAINT positive_review_per_user CHECK (reviews_per_user > 0),
+    CONSTRAINT publish_before_due CHECK (publish_date < due_date),
+    CONSTRAINT due_before_review_publish CHECK (due_date < review_publish_date),
+    CONSTRAINT review_publish_before_review_due CHECK (review_publish_date < review_due_date)
 );
 
 -- Table: CourseList
 CREATE TABLE CourseList (
     id SERIAL,
-    description varchar(5000)  NOT NULL,
-    name varchar(5000)  NOT NULL,
+    description varchar(5000) NOT NULL,
+    name varchar(5000) NOT NULL,
     CONSTRAINT CourseList_pk PRIMARY KEY (id)
 );
 
 -- Table: Enroll
 CREATE TABLE Enroll (
     Course_id int NOT NULL,
-    User_netid varchar(5000)  NOT NULL,
-    role varchar(5000)  NOT NULL,
+    User_netid varchar(5000) NOT NULL,
+    role varchar(100) NOT NULL,
     CONSTRAINT Enroll_pk PRIMARY KEY (Course_id,User_netid)
 );
 
