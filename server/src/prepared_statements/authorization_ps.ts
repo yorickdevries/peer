@@ -119,4 +119,15 @@ export default class AuthorizationPS {
         statement.values = [submissionId, netId];
         return Database.executeQuerySingleResult(statement);
     }
+
+    public static isGetSubmissionAuth(submissionId: number, netId: number): any {
+        const statement = new PreparedStatement("check-submission-submitter",
+            "SELECT EXISTS(SELECT * FROM submission JOIN grouplist ON submission.group_id = grouplist.id JOIN groupusers ON grouplist.id = groupusers.group_groupid WHERE submission.id = $1 AND groupusers.user_netid = $2)");
+        statement.values = [submissionId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+
+
+
 }
