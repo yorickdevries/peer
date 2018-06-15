@@ -47,7 +47,7 @@
                 file: true,
                 fileProgress: 0,
                 uploadSuccess: null,
-                acceptFiles: ".csv",
+                acceptFiles: ".csv"
             }
         },
         methods: {
