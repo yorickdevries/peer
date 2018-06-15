@@ -367,8 +367,8 @@ router.get("/:id/feedback", async (req: any, res) => {
 /**
  * Route to get all groups of an assignment
  */
-router.get("/:id/groups", (req: any, res) => {
-    AssignmentPS.executeGetGroupsByAssignmentId(req.params.id)
+router.get("/:assignment_id/groups", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
+    AssignmentPS.executeGetGroupsByAssignmentId(req.params.assignment_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {

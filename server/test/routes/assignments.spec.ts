@@ -386,7 +386,7 @@ describe("API Assignment routes", () => {
      */
     it("Get groups of an assignment", async () => {
         // log in as henkjan
-        MockLogin.initialize("henkjan");
+        MockLogin.initialize("bplanje");
         const res = await chai.request(router).get("/2/groups");
         expect(res.text).to.equal(JSON.stringify([
             {id: 20, group_name: "Group 20"},
