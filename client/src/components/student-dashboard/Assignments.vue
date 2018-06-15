@@ -21,7 +21,6 @@
                                             <p>{{ assignment.description | truncate(100)}}</p>
                                             <b-button variant="primary" :to="{ name: 'student-dashboard.course.assignment', params: { courseId: assignment.course_id, assignmentId: assignment.id } }">View Assignment</b-button>
                                         </b-card-body>
-                                        <b-card-footer class="text-danger">Due</b-card-footer>
                                     </b-card>
                                 </b-tab>
 
@@ -33,7 +32,6 @@
                                             <p>{{ assignment.description | truncate(100)}}</p>
                                             <b-button variant="primary" :to="{ name: 'student-dashboard.course.assignment', params: { courseId: assignment.course_id, assignmentId: assignment.id } }">View Assignment</b-button>
                                         </b-card-body>
-                                        <b-card-footer>Done</b-card-footer>
                                     </b-card>
                                 </b-tab>
                             </b-col>

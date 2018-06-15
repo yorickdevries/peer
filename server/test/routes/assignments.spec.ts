@@ -45,10 +45,11 @@ describe("API Assignment routes", () => {
     it("Import groups - good weather", async () => {
         const file = path.join(__dirname, "../../example_data/csv_test/example_export.csv");
         // log in as teacheraccount
-        MockLogin.initialize("teacheraccount");
+        MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv")
             .field("groupColumn", "Education Groups");
+        console.log(res.text);
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             [{groupId: 1, groupname: "ED 4"}, {groupId: 2, groupname: "ED 3"}]
@@ -58,7 +59,7 @@ describe("API Assignment routes", () => {
     it("Import groups - wrong extension", async () => {
         const file = path.join(__dirname, "../../example_data/csv_test/text_file.txt");
         // log in as teacheraccount
-        MockLogin.initialize("teacheraccount");
+        MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "text_file.txt");
         expect(res.status).to.equal(400);
@@ -68,7 +69,7 @@ describe("API Assignment routes", () => {
     it("Import groups - file larger than 1MB", async () => {
         const file = path.join(__dirname, "../../example_data/csv_test/example_export_big.csv");
         // log in as teacheraccount
-        MockLogin.initialize("teacheraccount");
+        MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv");
         expect(res.status).to.equal(400);
@@ -77,7 +78,7 @@ describe("API Assignment routes", () => {
 
     it("Import groups - no file", async () => {
         // log in as teacheraccount
-        MockLogin.initialize("teacheraccount");
+        MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups");
         expect(res.status).to.equal(400);
         expect(res.text).to.equal(JSON.stringify({error: "No file uploaded"}));
@@ -86,7 +87,7 @@ describe("API Assignment routes", () => {
     it("Import groups - good file + no groupcolumn", async () => {
         const file = path.join(__dirname, "../../example_data/csv_test/example_export.csv");
         // log in as teacheraccount
-        MockLogin.initialize("teacheraccount");
+        MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv");
         expect(res.status).to.equal(400);
@@ -347,7 +348,7 @@ describe("API Assignment routes", () => {
      */
     it("GET /:id/allreviews", async () => {
         // test the router
-        MockLogin.initialize("henkjan");
+        MockLogin.initialize("bplanje");
         const res = await chai.request(router).get("/1/allreviews");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
@@ -360,7 +361,7 @@ describe("API Assignment routes", () => {
      */
     it("Distribute reviews", async () => {
         // log in as teacher
-        MockLogin.initialize("teacheraccount");
+        MockLogin.initialize("bplanje");
         const res = await chai.request(router).get("/2/distributeReviews");
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).length).to.equal(3);
@@ -371,7 +372,7 @@ describe("API Assignment routes", () => {
      */
     it("Distribute reviews twice", async () => {
         // log in as teacher
-        MockLogin.initialize("teacheraccount");
+        MockLogin.initialize("bplanje");
         const res = await chai.request(router).get("/2/distributeReviews");
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).length).to.equal(3);
@@ -385,7 +386,7 @@ describe("API Assignment routes", () => {
      */
     it("Get groups of an assignment", async () => {
         // log in as henkjan
-        MockLogin.initialize("henkjan");
+        MockLogin.initialize("bplanje");
         const res = await chai.request(router).get("/2/groups");
         expect(res.text).to.equal(JSON.stringify([
             {id: 20, group_name: "Group 20"},

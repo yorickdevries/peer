@@ -130,13 +130,13 @@ export default {
                 description: null,
                 course_id: null,
                 publish_day: null,
-                publish_time: null,
+                publish_time: "23:59",
                 due_day: null,
-                due_time: null,
+                due_time: "23:59",
                 review_publish_day: null,
-                review_publish_time: null,
+                review_publish_time: "23:59",
                 review_due_day: null,
-                review_due_time: null,
+                review_due_time: "23:59",
                 reviews_per_user: null
             }
         }

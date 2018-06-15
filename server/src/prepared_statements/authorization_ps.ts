@@ -160,4 +160,59 @@ export default class AuthorizationPS {
         return Database.executeQuerySingleResult(statement);
     }
 
+    /**
+     * Checks if a user is authorized to get a submission.
+     * @param {number} submissionId - a submission id.
+     * @param {number} netId - a net id.
+     * @return {any} true if authorized.
+     */
+    public static isGetSubmissionAuth(submissionId: number, netId: number): any {
+        const statement = new PreparedStatement("check-submission-auth-submission-id",
+            "SELECT EXISTS(SELECT * FROM submission JOIN grouplist ON submission.group_id = grouplist.id JOIN groupusers ON grouplist.id = groupusers.group_groupid WHERE submission.id = $1 AND groupusers.user_netid = $2)");
+        statement.values = [submissionId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Checks if a user is authorized to post a submission (for a given assignment).
+     * @param {number} assignmentId - an assignment id.
+     * @param {number} netId - a net id.
+     * @return {any} true if authorized.
+     */
+    public static isPostSubmissionAuth(assignmentId: number, netId: number): any {
+        const statement = new PreparedStatement("check-post-submission-submitter-assignment-id",
+            "SELECT EXISTS(SELECT a.assignment_id, a.group_id FROM assignmentgroup a JOIN groupusers g ON a.group_id = g.group_groupid WHERE g.user_netid = $1 AND a.assignment_id = $2)");
+        statement.values = [netId, assignmentId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Checks if a user is authorized to put a submission comment (for a given assignment).
+     * @param {number} submissionCommentId - an submission comment id id.
+     * @param {number} netId - a net id.
+     * @return {any} true if authorized.
+     */
+    public static isPutSubmissionCommentAuth(submissionCommentId: number, netId: number): any {
+        const statement = new PreparedStatement("put-submission-comment-for-submission",
+            "SELECT EXISTS(SELECT * FROM submissioncomment WHERE id = $1 AND netid = $2)");
+        statement.values = [submissionCommentId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Checks if a user is authorized to access a submission file as a reviewer.
+     * @param {number} submissionId - a submission id.
+     * @param {number} netId - a user net id.
+     * @return {any} true if authorized.
+     */
+    public static isSubmissionReviewerAuth(submissionId: number, netId: number): any {
+        const statement = new PreparedStatement("check-submission-submitter-assignment-id-reviewer",
+            "SELECT EXISTS(SELECT id FROM review WHERE submission_id = $1 AND user_netid = $2)");
+        statement.values = [submissionId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+
+
+
 }

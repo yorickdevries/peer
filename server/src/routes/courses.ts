@@ -1,6 +1,7 @@
 import CoursesPS from "../prepared_statements/courses_ps";
 import AssignmentsPS from "../prepared_statements/assignment_ps";
 import bodyParser from "body-parser";
+import index from "../security/index";
 import { Roles } from "../roles";
 
 // Router
@@ -55,7 +56,7 @@ router.get("/enrolled", (req: any, res) => {
  * Get all assignments that belong to a specific course.
  * @param courseId - a course id.
  */
-router.get("/:courseId/assignments", (req, res) => {
+router.get("/:courseId/assignments", index.authorization.enrolledCourseCheck, (req, res) => {
     AssignmentsPS.executeGetAssignments(req.params.courseId)
     .then((data) => {
         res.json(data);
@@ -70,7 +71,7 @@ router.get("/:courseId/assignments", (req, res) => {
  * @body description - a new course description.
  * @body name - a new course name.
  */
-router.put("/:courseId", (req, res) => {
+router.put("/:courseId", index.authorization.enrolledCourseTeacherCheck, (req, res) => {
     CoursesPS.executeUpdateCourse(req.params.courseId, req.body.description, req.body.name)
     .then((data) => {
         res.json(data);
@@ -83,7 +84,7 @@ router.put("/:courseId", (req, res) => {
  * Route to get information for a specific course.
  * @param courseId - course id.
  */
-router.get("/:courseId", (req, res) => {
+router.get("/:courseId", index.authorization.enrolledCourseCheck, (req, res) => {
     CoursesPS.executeGetCourseById(req.params.courseId)
     .then((data) => {
         res.json(data);
@@ -96,7 +97,7 @@ router.get("/:courseId", (req, res) => {
  * Route to get information about the role of a user in a specific course.
  * @param course_id - course id.
  */
-router.get("/:courseId/role", async (req: any, res) => {
+router.get("/:courseId/role", index.authorization.enrolledCourseCheck, async (req: any, res) => {
     CoursesPS.executeGetRoleById(req.userinfo.given_name, req.params.courseId)
     .then((data) => {
         res.json(data);
@@ -112,7 +113,7 @@ router.get("/:courseId/role", async (req: any, res) => {
  * @body role - a new role for the user.
  * @return json containing { courseId: number, role: Role }
  */
-router.put("/:courseId/setRole", async (req: any, res) => {
+router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck, async (req: any, res) => {
     try {
         // Check if the role to upgrade to is valid.
         if (!(req.body.role in Roles)) {
@@ -143,7 +144,7 @@ router.put("/:courseId/setRole", async (req: any, res) => {
  * @body role - role to filter on.
  * @return json with an array of all net ids.
  */
-router.get("/:courseId/users/:role/", async (req: any, res) => {
+router.get("/:courseId/users/:role/", index.authorization.enrolledCourseTeacherCheck, async (req: any, res) => {
     try {
         // Check if the role is valid and supported.
         if (!(req.params.role in Roles)) {

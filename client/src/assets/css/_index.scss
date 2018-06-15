@@ -54,9 +54,10 @@ body {
   overflow-y: scroll;
 }
 
-.bg-primary-light {
-  background-color: rgba($primary, 0.6);
-}
+.bg-primary-light { background-color: rgba($primary, 0.6); }
+.bg-secondary-light { background-color: rgba($secondary, 0.6); }
+.bg-success-light { background-color: rgba($success, 0.6); }
+.bg-danger-light { background-color: rgba($danger, 0.6); }
 
 // Vue Page Transition Classes
 .slide-left-enter-active,
