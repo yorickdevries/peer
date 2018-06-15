@@ -191,11 +191,14 @@ export default {
         this.assignment = res.data
 
         // Decompose datetime into date and time
-        let ptime = res.data.publish_date.split('T')[1].substring(0,5)
+        let ptime = new Date(res.data.publish_date)
+        ptime = ptime.getHours().toString() + ":" + ptime.getMinutes().toString()
         let dtime = res.data.due_date.split('T')[1].substring(0,5)
         let rptime = res.data.review_publish_date.split('T')[1].substring(0,5)
         let rdtime = res.data.review_due_date.split('T')[1].substring(0,5)
-        this.assignment.publish_day = res.data.publish_date.split('T')[0]
+        let pday = new Date(res.data.publish_date)
+        this.assignment.publish_day = pday.getFullYear().toString() + "-" + pday.getMonth().toString() + "-" + pday.getDate().toString()
+
         this.assignment.publish_time = ptime
         this.assignment.due_day = res.data.due_date.split('T')[0]
         this.assignment.due_time = dtime
@@ -207,7 +210,7 @@ export default {
     methods: {
         async onSubmit() {
             // Compose datetime format from date and time
-            this.assignment.publish_date = this.assignment.publish_day + "T" + this.assignment.publish_time + ":00.000Z"
+            this.assignment.publish_date = new Date(this.assignment.publish_day + " " + this.assignment.publish_time).toJSON();
             this.assignment.due_date = this.assignment.due_day + "T" + this.assignment.due_time + ":00.000Z"
             this.assignment.review_publish_date = this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z"
             this.assignment.review_due_date = this.assignment.review_due_day + "T" + this.assignment.review_due_time + ":00.000Z"
@@ -217,7 +220,7 @@ export default {
             formData.append("title", this.assignment.title)
             formData.append("description", this.assignment.description)
             formData.append("course_id", this.assignment.course_id)
-            formData.append("publish_date", this.assignment.publish_day + "T" + this.assignment.publish_time + ":00.000Z")
+            formData.append("publish_date", this.assignment.publish_date)
             formData.append("due_date", this.assignment.due_day + "T" + this.assignment.due_time + ":00.000Z")
             formData.append("review_publish_date", this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z")
             formData.append("review_due_date", this.assignment.review_due_day + "T" + this.assignment.review_due_time + ":00.000Z")
