@@ -39,14 +39,14 @@
                                 </div>
                             </b-list-group-item>
 
-                            <b-list-group-item v-for="(answer, index) in aggregateQuestionAnswer(activeQuestion.question_number)" :key="index">
+                            <b-list-group-item v-for="(pair, index) in aggregateQuestionAnswer(activeQuestion.question_number)" :key="index">
 
                                 <!--&lt;!&ndash; OPEN QUESTION &ndash;&gt;-->
                                 <template v-if="activeQuestion.type_question === 'open'">
 
                                     <b-form-textarea
                                             id="textarea1"
-                                            :value="answer.answer"
+                                            :value="pair.answer.answer"
                                             :rows="3"
                                             readonly
                                             :max-rows="6"/>
@@ -63,14 +63,15 @@
                                             :item-size="20"
                                             :spacing="5"
                                             read-only
-                                            :rating="answer.answer"
-                                            :max-rating="7"/>
+                                            :rating="pair.answer.answer"
+                                            :max-rating="pair.question.range"/>
 
                                 <!--&lt;!&ndash; MPC QUESTION &ndash;&gt;-->
                                 <b-form-group v-else-if="activeQuestion.type_question === 'mc'" class="mb-0">
                                     <b-form-radio-group
-                                            :checked="answer.answer"
+                                            :checked="pair.answer.answer"
                                             :options="transformOptionsToHTMLOptions(activeQuestion.option)"
+                                            disabled
                                             stacked>
                                     </b-form-radio-group>
                                 </b-form-group>
@@ -128,7 +129,7 @@ export default {
             let res = []
             this.peerReviews.forEach(peerReview => {
                 let pair = peerReview.form.find(questionAnswerPair => questionAnswerPair.question.question_number === targetQuestionNumber)
-                res.push(pair.answer)
+                res.push(pair)
             })
             return res
         },
