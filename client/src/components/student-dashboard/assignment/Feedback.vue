@@ -118,7 +118,9 @@
 
                     <!--No comment available text.-->
                     <b-card-body v-else>
-                        No comments have been made.
+                        <b-card>
+                            No comments have been made.
+                        </b-card>
                     </b-card-body>
 
                 </b-tab>
@@ -163,7 +165,6 @@ export default {
         if (this.sortedQuestionsList !== undefined)
             this.activeQuestion = this.sortedQuestionsList[0]
 
-        await this.getSubmissionComments()
 
     },
     methods: {
