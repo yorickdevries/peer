@@ -42,7 +42,7 @@ describe("RubricPreparedStatements Test", () => {
      */
     it("create mc quetion", async () => {
         expect(await RubricPS.executeCreateMCQuestion("hi", 1, 1)).to.deep.equal({
-            id: 2,
+            id: 3,
             question: "hi",
             question_number: 1,
             rubric_assignment_id: 1,
@@ -69,7 +69,7 @@ describe("RubricPreparedStatements Test", () => {
      */
     it("create mc option", async () => {
         expect(await RubricPS.executeCreateMCOption("hi", 1)).to.deep.equal({
-            id: 4,
+            id: 5,
             mcquestion_id: 1,
             option: "hi"
 
@@ -137,7 +137,14 @@ describe("RubricPreparedStatements Test", () => {
             question_number: 3,
             rubric_assignment_id: 1,
             type_question: "mc"
-        }]);
+        },
+        {
+            id: 2,
+            question: "Is the right Answer A?",
+            question_number: 4,
+            rubric_assignment_id: 1,
+            type_question: "mc"
+            }]);
     });
 
     /**
@@ -228,11 +235,11 @@ describe("RubricPreparedStatements Test", () => {
      * Test to delete a mc question
      */
     it("delete mc question", async () => {
-        expect(await RubricPS.executeDeleteMCQuestion(1)).to.deep.equal({
+        expect(await RubricPS.executeDeleteMCQuestion(2)).to.deep.equal({
             rubric_assignment_id: 1,
-            id: 1,
-            question: "What is the best way to insert queries?",
-            question_number: 3,
+            id: 2,
+            question: "Is the right Answer A?",
+            question_number: 4,
             type_question: "mc"
         });
     });
@@ -241,10 +248,10 @@ describe("RubricPreparedStatements Test", () => {
      * Test to delete a mc option
      */
     it("delete mc option", async () => {
-        expect(await RubricPS.executeDeleteMCOption(1)).to.deep.equal({
-            id: 1,
+        expect(await RubricPS.executeDeleteMCOption(2)).to.deep.equal({
+            id: 2,
             mcquestion_id: 1,
-            option: "By using pgAdmin"
+            option: "By using command line"
         });
     });
 
@@ -276,6 +283,20 @@ describe("RubricPreparedStatements Test", () => {
                     "question_number": 3,
                     "rubric_assignment_id": 1,
                     "type_question": "mc",
+                },
+                {
+                    "id": 2,
+                    "option": [
+                    {
+                      "id": 4,
+                      "mcquestion_id": 2,
+                      "option": "A",
+                    }
+                    ],
+                    "question": "Is the right Answer A?",
+                    "question_number": 4,
+                    "rubric_assignment_id": 1,
+                    "type_question": "mc"
                 },
                 {
                     "id": 1,

@@ -53,7 +53,7 @@ describe("API review routes", () => {
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                "id": 4, "option": "opt", "mcquestion_id": 1
+                "id": 5, "option": "opt", "mcquestion_id": 1
             }
         ));
     });
@@ -83,7 +83,7 @@ describe("API review routes", () => {
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                "id": 2, "question": "opt", "rubric_assignment_id": 1, "question_number": 1, "type_question": "mc"
+                "id": 3, "question": "opt", "rubric_assignment_id": 1, "question_number": 1, "type_question": "mc"
             }
         ));
     });
@@ -238,11 +238,11 @@ describe("API review routes", () => {
      * Tests if a mc option can be deleted.
      */
     it("rubric/mcoption/:id", async () => {
-        const res = await chai.request(router).del("/mcoption/1");
+        const res = await chai.request(router).del("/mcoption/2");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                "id": 1, "option": "By using pgAdmin", "mcquestion_id": 1
+                "id": 2, "option": "By using command line", "mcquestion_id": 1
             }
         ));
     });

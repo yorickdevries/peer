@@ -86,6 +86,10 @@ INSERT INTO public.mcquestion(
 	question, rubric_assignment_id, question_number)
 	VALUES ('What is the best way to insert queries?', 1, 3);
 
+INSERT INTO public.mcquestion(
+	question, rubric_assignment_id, question_number)
+	VALUES ('Is the right Answer A?', 1, 4);
+
 INSERT INTO public.mcoption(
 	option, mcquestion_id)
 	VALUES ('By using pgAdmin', 1);
@@ -97,6 +101,10 @@ INSERT INTO public.mcoption(
 INSERT INTO public.mcoption(
 	option, mcquestion_id)
 	VALUES ('By asking Brian', 1);
+
+INSERT INTO public.mcoption(
+	option, mcquestion_id)
+	VALUES ('A', 2);
 
 INSERT INTO public.enroll(
 	course_id, user_netid, role)
