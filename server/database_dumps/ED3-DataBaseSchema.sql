@@ -34,7 +34,8 @@ CREATE TABLE Enroll (
     Course_id int NOT NULL,
     User_netid varchar(5000) NOT NULL,
     role varchar(100) NOT NULL,
-    CONSTRAINT Enroll_pk PRIMARY KEY (Course_id,User_netid)
+    CONSTRAINT Enroll_pk PRIMARY KEY (Course_id,User_netid),
+    CONSTRAINT Role_name CHECK (role = 'student' OR role = 'TA' OR role = 'teacher')
 );
 
 -- Table: AssignmentGroup
