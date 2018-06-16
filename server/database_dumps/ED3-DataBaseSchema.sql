@@ -282,6 +282,14 @@ ALTER TABLE MCOption ADD CONSTRAINT MCOption_MCQuestion
     INITIALLY IMMEDIATE
 ;
 
+-- Reference: MCAnser_MCOption (table: MCAnswer)
+ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_MCOption
+    FOREIGN KEY (answer)
+    REFERENCES MCOption (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
 -- Reference: MCQuestion_Rubric (table: MCQuestion)
 ALTER TABLE MCQuestion ADD CONSTRAINT MCQuestion_Rubric
     FOREIGN KEY (Rubric_Assignment_id)
