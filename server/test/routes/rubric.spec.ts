@@ -186,12 +186,19 @@ describe("API review routes", () => {
      * Tests if an open question can be deleted.
      */
     it("rubric/openquestion/:id", async () => {
-        const res = await chai.request(router).del("/openquestion/1");
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
+        // Create a question
+        const res1 = await chai.request(router)
+        .post("/openquestion")
+        .send({ question: "opt", rubric_assignment_id: 1, question_number: 1 });
+        const newq = JSON.parse(res1.text);
+
+        // Delete a question
+        const res2 = await chai.request(router).del("/openquestion/" + newq.id);
+        expect(res2.status).to.equal(200);
+        expect(res2.text).to.equal(JSON.stringify(
             {
-                "id": 1,
-                "question": "How to insert queries?",
+                "id": newq.id,
+                "question": "opt",
                 "rubric_assignment_id": 1,
                 "question_number": 1,
                 "type_question": "open"
@@ -203,14 +210,21 @@ describe("API review routes", () => {
      * Tests if a mc question can be deleted.
      */
     it("rubric/mcquestion/:id", async () => {
-        const res = await chai.request(router).del("/mcquestion/1");
+        // Create a question
+        const res1 = await chai.request(router)
+        .post("/mcquestion")
+        .send({ question: "opt", rubric_assignment_id: 1, question_number: 1 });
+        const newq = JSON.parse(res1.text);
+
+        // Delete a question
+        const res = await chai.request(router).del("/mcquestion/" + newq.id);
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                "id": 1,
-                "question": "What is the best way to insert queries?",
+                "id": newq.id,
+                "question": "opt",
                 "rubric_assignment_id": 1,
-                "question_number": 3,
+                "question_number": 1,
                 "type_question": "mc"
             }
         ));
@@ -220,14 +234,21 @@ describe("API review routes", () => {
      * Tests if a range question can be deleted.
      */
     it("rubric/rangequestion/:id", async () => {
-        const res = await chai.request(router).del("/rangequestion/1");
+        // Create a question
+        const res1 = await chai.request(router)
+        .post("/rangequestion")
+        .send({ question: "optNew", range: 4, rubric_assignment_id: 2, question_number: 2 });
+        const newq = JSON.parse(res1.text);
+
+        // Delete a question
+        const res = await chai.request(router).del("/rangequestion/" + newq.id);
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                "id": 1,
-                "question": "How much fun is inserting queries?",
-                "range": 7,
-                "rubric_assignment_id": 1,
+                "id": newq.id,
+                "question": "optNew",
+                "range": 4,
+                "rubric_assignment_id": 2,
                 "question_number": 2,
                 "type_question": "range"
             }

@@ -17,9 +17,8 @@ describe("RubricPreparedStatements Test", () => {
      * Test to create a rubric
      */
     it("create rubric", async () => {
-        await RubricPS.executeDeleteRubric(1);
-        expect(await RubricPS.executeCreateRubric(1)).to.deep.equal({
-            assignment_id: 1
+        expect(await RubricPS.executeCreateRubric(3)).to.deep.equal({
+            assignment_id: 3
         });
     });
 
@@ -199,8 +198,9 @@ describe("RubricPreparedStatements Test", () => {
      * Test to delete a rubric
      */
     it("delete rubric", async () => {
-        expect(await RubricPS.executeDeleteRubric(1)).to.deep.equal({
-            assignment_id: 1
+        await RubricPS.executeCreateRubric(3);
+        expect(await RubricPS.executeDeleteRubric(3)).to.deep.equal({
+            assignment_id: 3
         });
     });
 
@@ -208,11 +208,12 @@ describe("RubricPreparedStatements Test", () => {
      * Test to delete a open question
      */
     it("delete open question", async () => {
-        expect(await RubricPS.executeDeleteOpenQuestion(1)).to.deep.equal({
+        const newq: any = await RubricPS.executeCreateOpenQuestion("New Question", 1, 5);
+        expect(await RubricPS.executeDeleteOpenQuestion(newq.id)).to.deep.equal({
             rubric_assignment_id: 1,
-            id: 1,
-            question: "How to insert queries?",
-            question_number: 1,
+            id: newq.id,
+            question: "New Question",
+            question_number: 5,
             type_question: "open"
         });
     });
@@ -221,12 +222,13 @@ describe("RubricPreparedStatements Test", () => {
      * Test to delete a range question
      */
     it("delete range question", async () => {
-        expect(await RubricPS.executeDeleteRangeQuestion(1)).to.deep.equal({
+        const newq: any = await RubricPS.executeCreateRangeQuestion("New Question", 5, 1, 5);
+        expect(await RubricPS.executeDeleteRangeQuestion(newq.id)).to.deep.equal({
             rubric_assignment_id: 1,
-            id: 1,
-            question: "How much fun is inserting queries?",
-            question_number: 2,
-            range: 7,
+            id: newq.id,
+            question: "New Question",
+            question_number: 5,
+            range: 5,
             type_question: "range"
         });
     });

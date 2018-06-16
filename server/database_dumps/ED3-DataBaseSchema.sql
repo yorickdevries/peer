@@ -186,7 +186,6 @@ CREATE TABLE SubmissionComment (
 ALTER TABLE ReviewComment ADD CONSTRAINT ReviewComment_review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -259,7 +258,6 @@ ALTER TABLE GroupUsers ADD CONSTRAINT GroupUsers_User
 ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_MCQuestion
     FOREIGN KEY (MCQuestion_id)
     REFERENCES MCQuestion (id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -268,7 +266,6 @@ ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_MCQuestion
 ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_Review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -303,7 +300,6 @@ ALTER TABLE MCQuestion ADD CONSTRAINT MCQuestion_Rubric
 ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_OpenQuestion
     FOREIGN KEY (OpenQuestion_id)
     REFERENCES OpenQuestion (id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -312,7 +308,6 @@ ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_OpenQuestion
 ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_Review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -330,7 +325,6 @@ ALTER TABLE OpenQuestion ADD CONSTRAINT OpenQuestion_Rubric
 ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_RangeQuestion
     FOREIGN KEY (RangeQuestion_id)
     REFERENCES RangeQuestion (id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -339,7 +333,6 @@ ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_RangeQuestion
 ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_Review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -357,7 +350,6 @@ ALTER TABLE RangeQuestion ADD CONSTRAINT RangeQuestion_Rubric
 ALTER TABLE Review ADD CONSTRAINT Review_Rubric
     FOREIGN KEY (Rubric_Assignment_id)
     REFERENCES Rubric (Assignment_id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
