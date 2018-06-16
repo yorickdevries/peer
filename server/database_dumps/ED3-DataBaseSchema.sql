@@ -122,7 +122,8 @@ CREATE TABLE RangeQuestion (
     question_number int NOT NULL,
     type_question char(5) DEFAULT 'range',
     CONSTRAINT RangeQuestion_pk PRIMARY KEY (id),
-    CONSTRAINT range_question CHECK (type_question = 'range')
+    CONSTRAINT range_question CHECK (type_question = 'range'),
+    CONSTRAINT positive_range CHECK (range > 0)
 );
 
 -- Table: Review
