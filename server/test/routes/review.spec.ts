@@ -31,7 +31,7 @@ describe("API review routes", () => {
     it("Get review/", async () => {
         const res = await chai.request(router).get("/1");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
+        expect(JSON.parse(res.text)).to.deep.equal(
             {
                 "review": {
                     "id": 1,
@@ -54,6 +54,24 @@ describe("API review routes", () => {
                     }, "answer": {"answer": 1, "mcquestion_id": 1, "review_id": 1}
                 }, {
                     "question": {
+                       "id": 2,
+                       "type_question": "mc",
+                       "rubric_assignment_id": 1,
+                       "question": "Is the right Answer A?",
+                       "question_number": 4,
+                       "option": [
+                          {
+                             "id": 4,
+                             "option": "A",
+                             "mcquestion_id": 2
+                          }
+                       ]
+                    },
+                    "answer": {
+                       "answer": ""
+                    }
+                 }, {
+                    "question": {
                         "id": 1,
                         "question": "How to insert queries?",
                         "rubric_assignment_id": 1,
@@ -72,7 +90,7 @@ describe("API review routes", () => {
                     }, "answer": {"answer": 4, "rangequestion_id": 1, "review_id": 1}
                 }]
             }
-        ));
+        );
     });
 
     /**
