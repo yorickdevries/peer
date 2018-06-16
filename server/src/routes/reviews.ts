@@ -1,5 +1,6 @@
 import ReviewsPS from "../prepared_statements/review_ps";
 import RubricPS from "../prepared_statements/rubric_ps";
+import ReviewUpdate from "../reviewUpdate";
 import bodyParser from "body-parser";
 import index from "../security/index";
 import path from "path";
@@ -58,44 +59,12 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
 router.route("/:reviewId").put(index.authorization.checkReviewOwner, async (req, res) => {
     try {
         const reviewId = req.params.reviewId;
-        const jsonQuestions: any = [];
-
         const inputForm = req.body.form;
-
-        // Loop through form and update the answers.
-        for (let i = 0; i < inputForm.length; i++) {
-            const item = inputForm[i];
-
-            // Don't insert or update if the answer is not specified.
-            if (item.answer === null) return;
-
-            // Update or insert a specific answer and add to questions array.
-            switch (item.question.type_question) {
-                case "range": jsonQuestions.push({
-                    question: item.question,
-                    answer: await ReviewsPS.executeUpdateRangeAnswer(item.answer.answer, item.question.id, reviewId)
-                }); break;
-
-                case "open": jsonQuestions.push({
-                    question: item.question,
-                    answer: await ReviewsPS.executeUpdateOpenAnswer(item.answer.answer, item.question.id, reviewId)
-                }); break;
-
-                case "mc": jsonQuestions.push({
-                    question: item.question,
-                    answer: await ReviewsPS.executeUpdateMpcAnswer(item.answer.answer, item.question.id, reviewId)
-                }); break;
-                default: jsonQuestions.push({ error: "Unrecognized type given: " + item.question.type_question }); break;
-            }
-        }
-
-        // Create and respond with the resulting JSON.
-        res.json({
-            review: await ReviewsPS.executeGetReview(reviewId),
-            form: jsonQuestions
-        });
-    } catch {
-        res.sendStatus(400);
+        const result = await ReviewUpdate.updateReview(reviewId, inputForm);
+        res.json(result);
+    } catch (error) {
+        res.status(400);
+        res.json({error: error.message});
     }
 });
 
