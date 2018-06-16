@@ -24,18 +24,20 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
         // Loop through the questions and add answers to them.
         for (let i = 0; i < questions.length; i++) {
             const question = questions[i];
-            let answer: any;
-
-            // Get the answers (from database) to the correct question type.
-            switch (question.type_question) {
-                case "mc": answer = await ReviewsPS.executeGetMCAnswer(+req.params.reviewId, question.id); break;
-                case "open": answer = await ReviewsPS.executeGetOpenAnswer(+req.params.reviewId, question.id); break;
-                case "range": answer = await ReviewsPS.executeGetRangeAnswer(+req.params.reviewId, question.id); break;
-                default: answer = { error: "unrecognized question type: " + question.type_question }; break;
+            try {
+                let answer: any;
+                // Get the answers (from database) to the correct question type.
+                switch (question.type_question) {
+                    case "mc": answer = await ReviewsPS.executeGetMCAnswer(req.params.reviewId, question.id); break;
+                    case "open": answer = await ReviewsPS.executeGetOpenAnswer(req.params.reviewId, question.id); break;
+                    case "range": answer = await ReviewsPS.executeGetRangeAnswer(req.params.reviewId, question.id); break;
+                    default: answer = { error: "unrecognized question type: " + question.type_question }; break;
+                }
+                // Create the correct JSON format (API documentation) and push to array.
+                jsonItems.push({question: question, answer});
+            } catch (error) {
+                jsonItems.push({question: question, answer: {answer: ""}});
             }
-
-            // Create the correct JSON format (API documentation) and push to array.
-            jsonItems.push({question: question, answer: (answer[0]) ? answer[0] : {answer: ""}});
         }
 
         // Assemble correct json to send in the response.
@@ -44,7 +46,6 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
             form: jsonItems
         });
     } catch (e) {
-        console.log(e);
         res.sendStatus(400);
     }
 });
