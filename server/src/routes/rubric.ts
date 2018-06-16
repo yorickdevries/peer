@@ -79,7 +79,7 @@ router.post("/mcoption", index.authorization.checkMCOptionPost, (req, res) => {
  *
  */
 router.put("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (req, res) => {
-    RubricPS.executeUpdateMCOption(req.body.option, req.body.mcquestion_id, req.params.option_id)
+    RubricPS.executeUpdateMCOption(req.body.option, req.params.option_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -109,7 +109,7 @@ router.post("/mcquestion", index.authorization.checkRubricAuthorizationPost, (re
  * @body question_number - question_number
  */
 router.put("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, (req, res) => {
-    rubricPS.executeUpdateMCQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number, req.params.question_id)
+    rubricPS.executeUpdateMCQuestion(req.body.question, req.body.question_number, req.params.question_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -142,7 +142,7 @@ router.post("/rangequestion", index.authorization.checkRubricAuthorizationPost, 
  * @body question_number - question_number
  */
 router.put("/rangequestion/:question_id", index.authorization.checkRangeQuestionEdit, (req, res) => {
-    rubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.rubric_assignment_id, req.body.question_number, req.params.question_id)
+    rubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.question_number, req.params.question_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -170,7 +170,7 @@ router.post("/openquestion", index.authorization.checkRubricAuthorizationPost, (
  * @param question_id - question_id
  */
 router.put("/openquestion/:question_id", index.authorization.checkOpenQuestionEdit, (req, res) => {
-    rubricPS.executeUpdateOpenQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number, req.params.question_id)
+    rubricPS.executeUpdateOpenQuestion(req.body.question, req.body.question_number, req.params.question_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {

@@ -95,11 +95,11 @@ describe("API review routes", () => {
     it("rubric/mcquestion/:question_id", async () => {
         const res = await chai.request(router)
             .put("/mcquestion/1")
-            .send({ question: "optNew", rubric_assignment_id: 2, question_number: 2 });
+            .send({ question: "optNew", question_number: 2 });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                "id": 1, "question": "optNew", "rubric_assignment_id": 2, "question_number": 2, "type_question": "mc"
+                "id": 1, "question": "optNew", "rubric_assignment_id": 1, "question_number": 2, "type_question": "mc"
             }
         ));
     });
@@ -131,13 +131,13 @@ describe("API review routes", () => {
     it("rubric/rangequestion/:question_id", async () => {
         const res = await chai.request(router)
             .put("/rangequestion/1")
-            .send({ question: "optNew", range: 4, rubric_assignment_id: 2, question_number: 2 });
+            .send({ question: "optNew", range: 4, question_number: 2 });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({
                 "id": 1,
                 "question": "optNew",
                 "range": 4,
-                "rubric_assignment_id": 2,
+                "rubric_assignment_id": 1,
                 "question_number": 2,
                 "type_question": "range"
             }
@@ -170,12 +170,12 @@ describe("API review routes", () => {
     it("rubric/openquestion/:question_id", async () => {
         const res = await chai.request(router)
             .put("/openquestion/1")
-            .send({ question: "optNew", rubric_assignment_id: 2, question_number: 2 });
+            .send({ question: "optNew", question_number: 2 });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({
                 "id": 1,
                 "question": "optNew",
-                "rubric_assignment_id": 2,
+                "rubric_assignment_id": 1,
                 "question_number": 2,
                 "type_question": "open"
             }
