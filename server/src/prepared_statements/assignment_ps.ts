@@ -100,7 +100,6 @@ export default class AssignmentPS {
      * Executes a 'update assignment by assignment id'.
      * @param {string} title - a title.
      * @param {string} description - a description.
-     * @param courseId - a course id.
      * @param assignmentId - an assignment id.
      * @param dueDate - an assignment due date.
      * @param publishDate - an assignment publish date.
@@ -112,7 +111,6 @@ export default class AssignmentPS {
      */
     public static executeUpdateAssignmentById(title: string,
                                                 description: string,
-                                                courseId: number,
                                                 reviewsPerUser: number,
                                                 filename: string,
                                                 publishDate: Date,
@@ -122,10 +120,10 @@ export default class AssignmentPS {
                                                 assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-assignment-by-id",
             "UPDATE assignmentlist " +
-            "SET title=$1, description=$2, course_id=$3, reviews_per_user=$4, filename=$5, publish_date=$6, due_date=$7, review_publish_date=$8, review_due_date=$9 " +
-            "WHERE id = $10 RETURNING *");
+            "SET title=$1, description=$2, reviews_per_user=$3, filename=$4, publish_date=$5, due_date=$6, review_publish_date=$7, review_due_date=$8 " +
+            "WHERE id = $9 RETURNING *");
 
-        statement.values = [title, description, courseId, reviewsPerUser, filename, publishDate, dueDate, reviewPublishDate, reviewDueDate, assignmentId];
+        statement.values = [title, description, reviewsPerUser, filename, publishDate, dueDate, reviewPublishDate, reviewDueDate, assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
 

@@ -96,7 +96,7 @@ describe("AssignmentPreparedStatements Test", () => {
      * Test update assignments.
      */
     it("update assignment", async () => {
-        expect(await AssignmentPS.executeUpdateAssignmentById("Updated", "updated", 1, 1, "filename", new Date("2018-06-01T20:30:00Z"), new Date("2018-06-01T20:31:00Z"), new Date("2018-06-01T20:32:00Z"), new Date("2018-06-01T20:33:00Z"), 1)).to.deep.equal({
+        expect(await AssignmentPS.executeUpdateAssignmentById("Updated", "updated", 1, "filename", new Date("2018-06-01T20:30:00Z"), new Date("2018-06-01T20:31:00Z"), new Date("2018-06-01T20:32:00Z"), new Date("2018-06-01T20:33:00Z"), 1)).to.deep.equal({
             course_id: 1,
             description: "updated",
             filename: "filename",

@@ -75,7 +75,6 @@ const updateAssignment = async function(req: any, res: any) {
         const result: any = await AssignmentPS.executeUpdateAssignmentById(
             req.body.title,
             req.body.description,
-            req.body.course_id,
             req.body.reviews_per_user,
             updatedFileName,
             req.body.publish_date,
@@ -183,7 +182,7 @@ router.post("/", uploadAssignmentFunction, index.authorization.enrolledAsTeacher
  * Removes the old assignment (also from the files folder - if a file is uploaded)
  * and adds the new assignment.
  */
-router.put("/:assignment_id", index.authorization.enrolledAsTAOrTeacherAssignment, uploadAssignmentFunction, updateAssignment);
+router.put("/:assignment_id", uploadAssignmentFunction, index.authorization.enrolledAsTAOrTeacherAssignment, updateAssignment);
 
 /**
  * Route to get a file from an assignment.
@@ -192,7 +191,7 @@ router.put("/:assignment_id", index.authorization.enrolledAsTAOrTeacherAssignmen
 router.get("/:assignment_id/file", index.authorization.enrolledAssignmentCheck, async (req, res) => {
     try {
         const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-        const fileName = path.join(__dirname, "../files/assignments", assignment.filename);
+        const fileName = path.join(fileFolder, assignment.filename);
         res.sendfile(fileName);
     } catch (err) {
         res.sendStatus(400);
