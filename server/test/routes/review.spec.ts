@@ -162,44 +162,95 @@ describe("API review routes", () => {
             });
 
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify({
-            "review": {
-                "id": 1,
-                "rubric_assignment_id": 1,
-                "file_path": "submission1.pdf",
-                "done": false
-            },
-            "form": [{
-                "question": {
+        expect(JSON.parse(res.text)).to.deep.equal({
+              "form": [
+                {
+                  "answer": {
+                    "answer": 1,
+                    "mcquestion_id": 1,
+                    "review_id": 1
+                  },
+                  "question": {
                     "id": 1,
-                    "type_question": "mc",
+                    "option": [
+                      {
+                        "id": 1,
+                        "mcquestion_id": 1,
+                        "option": "By using pgAdmin"
+                      },
+                      {
+                        "id": 2,
+                        "mcquestion_id": 1,
+                        "option": "By using command line"
+                      },
+                      {
+                        "id": 3,
+                        "mcquestion_id": 1,
+                        "option": "By asking Brian"
+                      }
+                    ],
                     "question": "What is the best way to insert queries?",
                     "question_number": 3,
-                    "option": [{"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}, {
-                        "id": 2,
-                        "option": "By using command line",
-                        "mcquestion_id": 1
-                    }, {"id": 3, "option": "By asking Brian", "mcquestion_id": 1}]
-                }, "answer": {"answer": 1}
-            }, {
-                "question": {
+                    "rubric_assignment_id": 1,
+                    "type_question": "mc"
+                  }
+                },
+                {
+                  "answer": {
+                    "answer": ""
+                  },
+                  "question": {
+                    "id": 2,
+                    "option": [
+                      {
+                        "id": 4,
+                        "mcquestion_id": 2,
+                        "option": "A"
+                      }
+                    ],
+                    "question": "Is the right Answer A?",
+                    "question_number": 4,
+                    "rubric_assignment_id": 1,
+                    "type_question": "mc"
+                  }
+                },
+                {
+                  "answer": {
+                    "answer": "Flesje water is beter dan flesje bier",
+                    "openquestion_id": 1,
+                    "review_id": 1
+                  },
+                  "question": {
                     "id": 1,
                     "question": "How to insert queries?",
-                    "rubric_assignment_id": 1,
                     "question_number": 1,
+                    "rubric_assignment_id": 1,
                     "type_question": "open"
-                }, "answer": {"answer": "Flesje water is beter dan flesje bier"}
-            }, {
-                "question": {
+                  }
+                },
+                {
+                  "answer": {
+                    "answer": 4,
+                    "rangequestion_id": 1,
+                    "review_id": 1
+                  },
+                  "question": {
                     "id": 1,
                     "question": "How much fun is inserting queries?",
+                    "question_number": 2,
                     "range": 7,
                     "rubric_assignment_id": 1,
-                    "question_number": 2,
                     "type_question": "range"
-                }, "answer": {"answer": 4}
-            }]
-        }));
+                  }
+                }
+              ],
+              "review": {
+                "done": false,
+                "file_path": "submission1.pdf",
+                "id": 1,
+                "rubric_assignment_id": 1
+              }
+            });
     });
 
 

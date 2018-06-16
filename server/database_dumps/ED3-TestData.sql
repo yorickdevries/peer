@@ -78,6 +78,10 @@ INSERT INTO public.openquestion(
 	question, rubric_assignment_id, question_number)
 	VALUES ('How to insert queries?', 1, 1);
 
+INSERT INTO public.openquestion(
+	question, rubric_assignment_id, question_number)
+	VALUES ('This is a question for assignment 2?', 2, 1);
+
 INSERT INTO public.rangequestion(
 	question, range, rubric_assignment_id, question_number)
 	VALUES ('How much fun is inserting queries?', 7, 1, 2);

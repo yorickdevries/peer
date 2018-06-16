@@ -7,7 +7,7 @@ const router: any = require("../../src/routes/rubric").default;
 import MockLogin from "../test_helpers/mock_login";
 import TestData from "../test_helpers/test_data";
 
-describe("API review routes", () => {
+describe("API rubric routes", () => {
     /**
      * Make a clean database before each test.
      */
@@ -154,7 +154,7 @@ describe("API review routes", () => {
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                "id": 2,
+                "id": 3,
                 "question": "opt",
                 "rubric_assignment_id": 1,
                 "question_number": 1,

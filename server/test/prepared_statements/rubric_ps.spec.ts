@@ -28,7 +28,7 @@ describe("RubricPreparedStatements Test", () => {
      */
     it("create open quetion", async () => {
         expect(await RubricPS.executeCreateOpenQuestion("hi", 1, 1)).to.deep.equal({
-            id: 2,
+            id: 3,
             question: "hi",
             question_number: 1,
             rubric_assignment_id: 1,
