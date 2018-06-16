@@ -1,5 +1,4 @@
 import ReviewsPS from "../prepared_statements/review_ps";
-import RubricPS from "../prepared_statements/rubric_ps";
 import ReviewUpdate from "../reviewUpdate";
 import bodyParser from "body-parser";
 import index from "../security/index";
