@@ -2,7 +2,7 @@ import ReviewsPS from "./prepared_statements/review_ps";
 import RubricPS from "./prepared_statements/rubric_ps";
 
 /**
- * Class which takes care of updating a review in the database
+ * Class which takes care of getting and updating a review in the database
  *
  * @export
  * @class ReviewUpdate
@@ -10,6 +10,11 @@ import RubricPS from "./prepared_statements/rubric_ps";
 export default class ReviewUpdate {
     /**
      * Get a review
+     *
+     * @static
+     * @param {number} reviewId
+     * @returns
+     * @memberof ReviewUpdate
      */
     public static async getReview(reviewId: number) {
         const jsonItems: any = [];
@@ -30,64 +35,208 @@ export default class ReviewUpdate {
                 }
                 // Create the correct JSON format (API documentation) and push to array.
                 jsonItems.push({question: question, answer});
+            // in case no answer exists yet, return an empty answer
             } catch (error) {
                 jsonItems.push({question: question, answer: {answer: ""}});
             }
         }
-
         // Assemble correct json to send in the response.
-        return {
-            review: review,
-            form: jsonItems
-        };
+        return {review: review, form: jsonItems};
     }
 
     /**
      * Update a review
+     *
+     * @static
+     * @param {number} reviewId
+     * @param {any[]} inputForm
+     * @returns
+     * @memberof ReviewUpdate
      */
     public static async updateReview(reviewId: number, inputForm: any[]) {
-        // Create and respond with the resulting JSON.
-        return {
-            review: await ReviewsPS.executeGetReview(reviewId),
-            form: await this.checkQuestions(reviewId, inputForm)
-        };
+        // check all questions
+        const checkedQuestions = await this.checkQuestions(reviewId, inputForm);
+        // If no error, apply all questions to the database
+        await this.applyQuestions(reviewId, checkedQuestions);
+        // Get and return the new review
+        return this.getReview(reviewId);
     }
 
     /**
      * Check the validity of all questions
+     *
+     * @static
+     * @param {number} reviewId
+     * @param {any[]} inputForm
+     * @returns
+     * @memberof ReviewUpdate
      */
     public static async checkQuestions(reviewId: number, inputForm: any[]) {
-        console.log(inputForm);
+        const review = await ReviewsPS.executeGetReview(reviewId);
+        const rubric: any = await RubricPS.executeGetRubricById(review.rubric_assignment_id);
+        const rubricId = rubric.assignment_id;
 
-        const jsonQuestions: any = [];
+        // build up the questionlist
+        const questionList: any = [];
         // Loop through form and update the answers.
         for (let i = 0; i < inputForm.length; i++) {
             const item = inputForm[i];
-            // Don't insert or update if the answer is not specified.
-            if (item.answer === null) return;
-            const answer = item.answer.answer;
-            const questionId = item.question.id;
 
-            // Update or insert a specific answer and add to questions array.
-            switch (item.question.type_question) {
-                case "range": jsonQuestions.push({
-                    question: item.question,
-                    answer: await ReviewsPS.executeUpdateRangeAnswer(answer, questionId, reviewId)
-                }); break;
+            // Get important parameters
+            const questionObject = item.question;
+            const answerObject = item.answer;
+            if (questionObject == undefined || questionObject.id == undefined || answerObject == undefined || answerObject.answer == undefined) {
+                throw new Error("Question isn't formatted properly at index: " + i);
+            }
+            const questionId = questionObject.id;
+            const answerText = answerObject.answer;
+            const questionType = questionObject.type_question;
 
-                case "open": jsonQuestions.push({
-                    question: item.question,
-                    answer: await ReviewsPS.executeUpdateOpenAnswer(answer, questionId, reviewId)
-                }); break;
-
-                case "mc": jsonQuestions.push({
-                    question: item.question,
-                    answer: await ReviewsPS.executeUpdateMpcAnswer(answer, questionId, reviewId)
-                }); break;
-                default: jsonQuestions.push({ error: "Unrecognized type given: " + item.question.type_question }); break;
+            // Check the answer based on the questiontype
+            switch (questionType) {
+                case "range":
+                    questionList.push(await this.checkRangeQuestion(questionId, rubricId, answerText));
+                break;
+                case "open":
+                    questionList.push(await this.checkOpenQuestion(questionId, rubricId, answerText));
+                break;
+                case "mc":
+                    questionList.push(await this.checkMCQuestion(questionId, rubricId, answerText));
+                break;
+                default: throw new Error("Unrecognized question type: " + questionType);
             }
         }
-        // Create and respond with the resulting JSON.
-        return jsonQuestions;
+        return questionList;
+    }
+
+    /**
+     * Checks whether an answer for an range question is valid to add to the database
+     *
+     * @static
+     * @param {number} questionId
+     * @param {number} rubricId
+     * @param {*} answerText
+     * @returns
+     * @memberof ReviewUpdate
+     */
+    public static async checkRangeQuestion(questionId: number, rubricId: number, answerText: any) {
+        // Initialize the question variable
+        let question;
+        try {
+            question = await RubricPS.executeGetRangeQuestionByIdAndRubricId(questionId, rubricId);
+        } catch (error) {
+            throw new Error("Wrong Range Question: " + questionId);
+        }
+        // answer validation
+        if (!Number.isInteger(answerText) || answerText > question.range || answerText < 0) {
+            throw new Error("The following Range Question has an answer out of range: " + questionId);
+        } else {
+            return {
+                questionType: "range",
+                questionId: questionId,
+                answer: answerText
+            };
+        }
+    }
+
+    /**
+     * Checks whether an answer for an open question is valid to add to the database
+     *
+     * @static
+     * @param {number} questionId
+     * @param {number} rubricId
+     * @param {*} answerText
+     * @returns
+     * @memberof ReviewUpdate
+     */
+    public static async checkOpenQuestion(questionId: number, rubricId: number, answerText: any) {
+        // Initialize the question variable
+        let question;
+        try {
+            question = await RubricPS.executeGetOpenQuestionByIdAndRubricId(questionId, rubricId);
+        } catch (error) {
+            throw new Error("Wrong Open Question: " + questionId);
+        }
+        // answer validation
+        if (!(typeof answerText === "string") || answerText == "") {
+            throw new Error("The following Open Question has an invalid answer: " + questionId);
+        } else {
+            return {
+                questionType: "open",
+                questionId: questionId,
+                answer: answerText
+            };
+        }
+    }
+
+    /**
+     * Checks whether an answer for an MC question is valid to add to the database
+     *
+     * @static
+     * @param {number} questionId
+     * @param {number} rubricId
+     * @param {*} answerText
+     * @returns
+     * @memberof ReviewUpdate
+     */
+    public static async checkMCQuestion(questionId: number, rubricId: number, answerText: any) {
+        // Initialize the question variable
+        let question;
+        try {
+            question = await RubricPS.executeGetMCQuestionByIdAndRubricId(questionId, rubricId);
+        } catch (error) {
+            throw new Error("Wrong MC Question: " + questionId);
+        }
+        const options = await RubricPS.executeGetAllMCOptionById(question.id);
+        const chosenoption = options.find((option: any) => option.id == answerText);
+        // answer validation
+        if (chosenoption == undefined) {
+            throw new Error("The following MC Question has an invalid answer: " + questionId);
+        } else {
+            return {
+                questionType: "mc",
+                questionId: questionId,
+                answer: answerText
+            };
+        }
+    }
+
+    /**
+     * Apply all questions to the database
+     *
+     * @static
+     * @param {number} reviewId
+     * @param {any[]} checkedQuestions
+     * @returns
+     * @memberof ReviewUpdate
+     */
+    public static async applyQuestions(reviewId: number, checkedQuestions: any[]) {
+        // Loop through checkedQuestions and update the answers.
+        try {
+            for (let i = 0; i < checkedQuestions.length; i++) {
+                const item = checkedQuestions[i];
+                // get variables
+                const questionType = item.questionType;
+                const questionId = item.questionId;
+                const answer = item.answer;
+                // Update or insert a specific answer and add to questions array.
+                switch (questionType) {
+                    case "range":
+                        await ReviewsPS.executeUpdateRangeAnswer(answer, questionId, reviewId);
+                    break;
+                    case "open":
+                        await ReviewsPS.executeUpdateOpenAnswer(answer, questionId, reviewId);
+                    break;
+                    case "mc":
+                        await ReviewsPS.executeUpdateMpcAnswer(answer, questionId, reviewId);
+                    break;
+                    default: throw new Error("Unrecognized question type: " + questionType);
+                }
+            }
+            // Create and respond with the resulting JSON.
+            return;
+        } catch {
+            throw new Error("An error occured while inserting the review to the database");
+        }
     }
 }
