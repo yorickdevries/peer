@@ -18,36 +18,12 @@ router.use(bodyParser.json());
  */
 router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
     try {
-        const jsonItems: any = [];
-        const review = await ReviewsPS.executeGetReview(req.params.reviewId);
-        const questions = await RubricPS.getAllQuestionsByRubricId(review.rubric_assignment_id);
-
-        // Loop through the questions and add answers to them.
-        for (let i = 0; i < questions.length; i++) {
-            const question = questions[i];
-            try {
-                let answer: any;
-                // Get the answers (from database) to the correct question type.
-                switch (question.type_question) {
-                    case "mc": answer = await ReviewsPS.executeGetMCAnswer(req.params.reviewId, question.id); break;
-                    case "open": answer = await ReviewsPS.executeGetOpenAnswer(req.params.reviewId, question.id); break;
-                    case "range": answer = await ReviewsPS.executeGetRangeAnswer(req.params.reviewId, question.id); break;
-                    default: answer = { error: "unrecognized question type: " + question.type_question }; break;
-                }
-                // Create the correct JSON format (API documentation) and push to array.
-                jsonItems.push({question: question, answer});
-            } catch (error) {
-                jsonItems.push({question: question, answer: {answer: ""}});
-            }
-        }
-
-        // Assemble correct json to send in the response.
-        res.json({
-            review: review,
-            form: jsonItems
-        });
-    } catch (e) {
-        res.sendStatus(400);
+        const reviewId = req.params.reviewId;
+        const result = await ReviewUpdate.getReview(reviewId);
+        res.json(result);
+    } catch (error) {
+        res.status(400);
+        res.json({error: error.message});
     }
 });
 
