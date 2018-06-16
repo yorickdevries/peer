@@ -349,13 +349,8 @@ const putSubmissionCommentAuth = async (req: any, res: any, next: any) => {
  */
 const getSubmissionFileAuth = async (req: any, res: any, next: any) => {
     try {
-        // Fetch the submission
-        const submission: any = await SubmissionsPS.executeGetSubmissionById(req.params.id);
-
         // Fetch the parameters required for the check.
         const courseId = (<any> await SubmissionsPS.executeGetCourseId(req.params.id)).course_id;
-        const assignmentId: number = submission.assignment_id;
-        const groupId: number = submission.group_id;
 
         // Execute the database checks.
         const roleCheck: any = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(courseId, req.userinfo.given_name);
