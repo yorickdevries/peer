@@ -79,7 +79,7 @@ describe("RubricPreparedStatements Test", () => {
      * Test to update an open question
      */
     it("update open question", async () => {
-        expect(await RubricPS.executeUpdateOpenQuestion("hi2", 1, 1, 1)).to.deep.equal({
+        expect(await RubricPS.executeUpdateOpenQuestion("hi2", 1, 1)).to.deep.equal({
             id: 1,
             question: "hi2",
             question_number: 1,
@@ -92,7 +92,7 @@ describe("RubricPreparedStatements Test", () => {
      * Test to update an range question
      */
     it("update range question", async () => {
-        expect(await RubricPS.executeUpdateRangeQuestion("hi2", 6, 1, 1, 1)).to.deep.equal({
+        expect(await RubricPS.executeUpdateRangeQuestion("hi2", 6, 1, 1)).to.deep.equal({
             id: 1,
             question: "hi2",
             question_number: 1,
@@ -106,7 +106,7 @@ describe("RubricPreparedStatements Test", () => {
      * Test to update a mc question
      */
     it("update mc question", async () => {
-        expect(await RubricPS.executeUpdateMCQuestion("hi2", 1, 1, 1)).to.deep.equal({
+        expect(await RubricPS.executeUpdateMCQuestion("hi2", 1, 1)).to.deep.equal({
             id: 1,
             question: "hi2",
             question_number: 1,
@@ -119,7 +119,7 @@ describe("RubricPreparedStatements Test", () => {
      * Test to update a mc option
      */
     it("update mc option", async () => {
-        expect(await RubricPS.executeUpdateMCOption("hi2", 1, 1)).to.deep.equal({
+        expect(await RubricPS.executeUpdateMCOption("hi2", 1)).to.deep.equal({
             id: 1,
             option: "hi2",
             mcquestion_id: 1
