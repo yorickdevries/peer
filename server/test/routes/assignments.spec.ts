@@ -146,8 +146,8 @@ describe("API Assignment routes", () => {
                 "course_id": 1,
                 "reviews_per_user": 2,
                 "filename": "assignment1.pdf",
-                "review_due_date": "9999-05-01T20:30:00.000Z",
-                "review_publish_date": "2020-05-01T20:30:00.000Z"
+                "review_due_date": "2018-05-03T20:30:00.000Z",
+                "review_publish_date": "2018-05-02T20:30:00.000Z"
             }
         );
     });

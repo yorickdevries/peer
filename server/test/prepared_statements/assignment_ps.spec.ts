@@ -23,8 +23,8 @@ describe("AssignmentPreparedStatements Test", () => {
             "filename": "assignment1.pdf",
             "id": 1,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
-            "review_due_date": new Date("9999-05-01T20:30:00Z"),
-            "review_publish_date": new Date("2020-05-01T20:30:00Z"),
+            "review_due_date": new Date("2018-05-03T20:30:00Z"),
+            "review_publish_date": new Date("2018-05-02T20:30:00Z"),
             "title": "Assignment 1",
             "reviews_per_user": 2,
         },
@@ -67,8 +67,8 @@ describe("AssignmentPreparedStatements Test", () => {
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             course_id: 1,
             "reviews_per_user": 2,
-            "review_due_date": new Date("9999-05-01T20:30:00Z"),
-            "review_publish_date": new Date("2020-05-01T20:30:00Z")
+            "review_due_date": new Date("2018-05-03T20:30:00Z"),
+            "review_publish_date": new Date("2018-05-02T20:30:00Z")
         });
     });
 

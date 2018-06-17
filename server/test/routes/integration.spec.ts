@@ -83,10 +83,10 @@ describe("API integration test", () => {
             .field("description", "Example description")
             .field("course_id", courseId)
             .field("reviews_per_user", 1)
-            .field("publish_date", "2018-05-01T20:30:00.000Z")
-            .field("due_date", "2018-06-01T20:30:00.000Z")
-            .field("review_publish_date", "2018-07-01T20:30:00.000Z")
-            .field("review_due_date", "9999-06-13T20:10:00.000Z");
+            .field("publish_date", "2017-05-01T20:30:00.000Z")
+            .field("due_date", "2017-06-01T20:30:00.000Z")
+            .field("review_publish_date", "2018-05-01T20:30:00.000Z")
+            .field("review_due_date", "2018-06-01T20:30:00.000Z");
         const assignmentId = JSON.parse(assignment.text).id;
         // Assertions to make sure the assignment is created.
         const assignmentResult = JSON.parse(assignment.text);
