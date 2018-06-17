@@ -185,7 +185,7 @@ const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
         // Check if past due date
         const review = await ReviewPS.executeGetReview(req.params.reviewId);
         const assignment: any = await AssignmentPS.executeGetAssignmentById(review.rubric_assignment_id);
-        if ((new Date(assignment.review_due_date) < new Date()) && authCheckSubmissionOwner.exists) {
+        if ((new Date(assignment.review_due_date) > new Date()) && authCheckSubmissionOwner.exists) {
             throw new Error("You can only access the review after the review due date is passed.");
         }
         const bool = authCheckTAOrTeacher.exists || authCheckOwner.exists || authCheckSubmissionOwner.exists;
