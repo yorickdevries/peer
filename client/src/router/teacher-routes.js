@@ -45,6 +45,11 @@ export default [
                 component: () => import('../components/teacher-dashboard/TAManager')
             },
             {
+                path: 'courses/:courseId/teachers',
+                name: 'teacher-dashboard.course.teachers',
+                component: () => import('../components/teacher-dashboard/TeacherManager')
+            },
+            {
                 path: 'courses/:courseId/students',
                 name: 'teacher-dashboard.course.students',
                 component: () => import('../components/teacher-dashboard/StudentManager')
