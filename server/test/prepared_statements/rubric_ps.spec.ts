@@ -17,9 +17,8 @@ describe("RubricPreparedStatements Test", () => {
      * Test to create a rubric
      */
     it("create rubric", async () => {
-        await RubricPS.executeDeleteRubric(1);
-        expect(await RubricPS.executeCreateRubric(1)).to.deep.equal({
-            assignment_id: 1
+        expect(await RubricPS.executeCreateRubric(3)).to.deep.equal({
+            assignment_id: 3
         });
     });
 
@@ -29,7 +28,7 @@ describe("RubricPreparedStatements Test", () => {
      */
     it("create open quetion", async () => {
         expect(await RubricPS.executeCreateOpenQuestion("hi", 1, 1)).to.deep.equal({
-            id: 2,
+            id: 3,
             question: "hi",
             question_number: 1,
             rubric_assignment_id: 1,
@@ -42,7 +41,7 @@ describe("RubricPreparedStatements Test", () => {
      */
     it("create mc quetion", async () => {
         expect(await RubricPS.executeCreateMCQuestion("hi", 1, 1)).to.deep.equal({
-            id: 2,
+            id: 3,
             question: "hi",
             question_number: 1,
             rubric_assignment_id: 1,
@@ -69,7 +68,7 @@ describe("RubricPreparedStatements Test", () => {
      */
     it("create mc option", async () => {
         expect(await RubricPS.executeCreateMCOption("hi", 1)).to.deep.equal({
-            id: 4,
+            id: 5,
             mcquestion_id: 1,
             option: "hi"
 
@@ -80,7 +79,7 @@ describe("RubricPreparedStatements Test", () => {
      * Test to update an open question
      */
     it("update open question", async () => {
-        expect(await RubricPS.executeUpdateOpenQuestion("hi2", 1, 1, 1)).to.deep.equal({
+        expect(await RubricPS.executeUpdateOpenQuestion("hi2", 1, 1)).to.deep.equal({
             id: 1,
             question: "hi2",
             question_number: 1,
@@ -93,7 +92,7 @@ describe("RubricPreparedStatements Test", () => {
      * Test to update an range question
      */
     it("update range question", async () => {
-        expect(await RubricPS.executeUpdateRangeQuestion("hi2", 6, 1, 1, 1)).to.deep.equal({
+        expect(await RubricPS.executeUpdateRangeQuestion("hi2", 6, 1, 1)).to.deep.equal({
             id: 1,
             question: "hi2",
             question_number: 1,
@@ -107,7 +106,7 @@ describe("RubricPreparedStatements Test", () => {
      * Test to update a mc question
      */
     it("update mc question", async () => {
-        expect(await RubricPS.executeUpdateMCQuestion("hi2", 1, 1, 1)).to.deep.equal({
+        expect(await RubricPS.executeUpdateMCQuestion("hi2", 1, 1)).to.deep.equal({
             id: 1,
             question: "hi2",
             question_number: 1,
@@ -120,7 +119,7 @@ describe("RubricPreparedStatements Test", () => {
      * Test to update a mc option
      */
     it("update mc option", async () => {
-        expect(await RubricPS.executeUpdateMCOption("hi2", 1, 1)).to.deep.equal({
+        expect(await RubricPS.executeUpdateMCOption("hi2", 1)).to.deep.equal({
             id: 1,
             option: "hi2",
             mcquestion_id: 1
@@ -137,7 +136,14 @@ describe("RubricPreparedStatements Test", () => {
             question_number: 3,
             rubric_assignment_id: 1,
             type_question: "mc"
-        }]);
+        },
+        {
+            id: 2,
+            question: "Is the right Answer A?",
+            question_number: 4,
+            rubric_assignment_id: 1,
+            type_question: "mc"
+            }]);
     });
 
     /**
@@ -192,8 +198,9 @@ describe("RubricPreparedStatements Test", () => {
      * Test to delete a rubric
      */
     it("delete rubric", async () => {
-        expect(await RubricPS.executeDeleteRubric(1)).to.deep.equal({
-            assignment_id: 1
+        await RubricPS.executeCreateRubric(3);
+        expect(await RubricPS.executeDeleteRubric(3)).to.deep.equal({
+            assignment_id: 3
         });
     });
 
@@ -201,11 +208,12 @@ describe("RubricPreparedStatements Test", () => {
      * Test to delete a open question
      */
     it("delete open question", async () => {
-        expect(await RubricPS.executeDeleteOpenQuestion(1)).to.deep.equal({
+        const newq: any = await RubricPS.executeCreateOpenQuestion("New Question", 1, 5);
+        expect(await RubricPS.executeDeleteOpenQuestion(newq.id)).to.deep.equal({
             rubric_assignment_id: 1,
-            id: 1,
-            question: "How to insert queries?",
-            question_number: 1,
+            id: newq.id,
+            question: "New Question",
+            question_number: 5,
             type_question: "open"
         });
     });
@@ -214,12 +222,13 @@ describe("RubricPreparedStatements Test", () => {
      * Test to delete a range question
      */
     it("delete range question", async () => {
-        expect(await RubricPS.executeDeleteRangeQuestion(1)).to.deep.equal({
+        const newq: any = await RubricPS.executeCreateRangeQuestion("New Question", 5, 1, 5);
+        expect(await RubricPS.executeDeleteRangeQuestion(newq.id)).to.deep.equal({
             rubric_assignment_id: 1,
-            id: 1,
-            question: "How much fun is inserting queries?",
-            question_number: 2,
-            range: 7,
+            id: newq.id,
+            question: "New Question",
+            question_number: 5,
+            range: 5,
             type_question: "range"
         });
     });
@@ -228,11 +237,11 @@ describe("RubricPreparedStatements Test", () => {
      * Test to delete a mc question
      */
     it("delete mc question", async () => {
-        expect(await RubricPS.executeDeleteMCQuestion(1)).to.deep.equal({
+        expect(await RubricPS.executeDeleteMCQuestion(2)).to.deep.equal({
             rubric_assignment_id: 1,
-            id: 1,
-            question: "What is the best way to insert queries?",
-            question_number: 3,
+            id: 2,
+            question: "Is the right Answer A?",
+            question_number: 4,
             type_question: "mc"
         });
     });
@@ -241,10 +250,10 @@ describe("RubricPreparedStatements Test", () => {
      * Test to delete a mc option
      */
     it("delete mc option", async () => {
-        expect(await RubricPS.executeDeleteMCOption(1)).to.deep.equal({
-            id: 1,
+        expect(await RubricPS.executeDeleteMCOption(2)).to.deep.equal({
+            id: 2,
             mcquestion_id: 1,
-            option: "By using pgAdmin"
+            option: "By using command line"
         });
     });
 
@@ -276,6 +285,20 @@ describe("RubricPreparedStatements Test", () => {
                     "question_number": 3,
                     "rubric_assignment_id": 1,
                     "type_question": "mc",
+                },
+                {
+                    "id": 2,
+                    "option": [
+                    {
+                      "id": 4,
+                      "mcquestion_id": 2,
+                      "option": "A",
+                    }
+                    ],
+                    "question": "Is the right Answer A?",
+                    "question_number": 4,
+                    "rubric_assignment_id": 1,
+                    "type_question": "mc"
                 },
                 {
                     "id": 1,

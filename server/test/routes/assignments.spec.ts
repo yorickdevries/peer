@@ -136,7 +136,7 @@ describe("API Assignment routes", () => {
         MockLogin.initialize("paulvanderlaan");
         const res = await chai.request(router).get("/1");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
+        expect(JSON.parse(res.text)).to.deep.equal(
             {
                 "title": "Assignment 1",
                 "description": "Example assignment number one",
@@ -146,10 +146,10 @@ describe("API Assignment routes", () => {
                 "course_id": 1,
                 "reviews_per_user": 2,
                 "filename": "assignment1.pdf",
-                "review_due_date": "9999-05-01T20:30:00.000Z",
-                "review_publish_date": "2018-04-01T20:30:00.000Z"
+                "review_due_date": "2018-05-03T20:30:00.000Z",
+                "review_publish_date": "2018-05-02T20:30:00.000Z"
             }
-        ));
+        );
     });
 
     /**
@@ -175,17 +175,40 @@ describe("API Assignment routes", () => {
             .field("title", "Example title")
             .field("description", "Example description")
             .field("course_id", 1)
-            .field("due_date", "2018-05-01T20:30:00.000Z")
-            .field("publish_date", "2018-06-01T20:30:00.000Z")
             .field("reviews_per_user", 2)
-            .field("review_due_date", "2018-06-01T20:30:00.000Z")
-            .field("review_publish_date", "2018-07-01T20:30:00.000Z");
+            .field("publish_date", "2018-05-01T20:30:00.000Z")
+            .field("due_date", "2018-06-01T20:30:00.000Z")
+            .field("review_publish_date", "2018-07-01T20:30:00.000Z")
+            .field("review_due_date", "2018-08-01T20:30:00.000Z");
         // assertions
         const result = JSON.parse(res.text);
 
         expect(res.status).to.equal(200);
         expect(result.title).to.equal("Example title");
         expect(result.description).to.equal("Example description");
+    });
+
+    /**
+     * Tests whether an assignment with 0 reviews per users is rejected
+     */
+    it("post assignment/ with 0 reviews", async () => {
+        // log in as bplanje (teacher)
+        MockLogin.initialize("bplanje");
+        const exampleSubmissionFile = path.join(__dirname, "../../example_data/assignments/assignment1.pdf");
+        const res = await chai.request(router).post("/")
+            .attach("assignmentFile", fs.readFileSync(exampleSubmissionFile), "assignment1.pdf")
+            .field("title", "Example title")
+            .field("description", "Example description")
+            .field("course_id", 1)
+            .field("reviews_per_user", 0)
+            .field("publish_date", "2018-05-01T20:30:00.000Z")
+            .field("due_date", "2018-06-01T20:30:00.000Z")
+            .field("review_publish_date", "2018-07-01T20:30:00.000Z")
+            .field("review_due_date", "2018-08-01T20:30:00.000Z");
+        // assertions
+        const result = JSON.parse(res.text);
+
+        expect(res.status).to.equal(400);
     });
 
     /**
@@ -203,11 +226,11 @@ describe("API Assignment routes", () => {
             .field("title", "Different title")
             .field("description", "Different description")
             .field("course_id", 1)
-            .field("due_date", "2018-05-01T20:30:00.000Z")
-            .field("publish_date", "2018-06-01T20:30:00.000Z")
             .field("reviews_per_user", 2)
-            .field("review_due_date", "2018-06-01T20:30:00.000Z")
-            .field("review_publish_date", "2018-07-01T20:30:00.000Z");
+            .field("publish_date", "2018-05-01T20:30:00.000Z")
+            .field("due_date", "2018-05-01T20:31:00.000Z")
+            .field("review_publish_date", "2018-05-01T20:32:00.000Z")
+            .field("review_due_date", "2018-05-01T20:33:00.000Z");
 
         // Test the updating of the assignment just added.
         const res = await chai.request(router)
@@ -216,11 +239,11 @@ describe("API Assignment routes", () => {
             .field("title", "Example title")
             .field("description", "Example description")
             .field("course_id", 1)
-            .field("due_date", "2018-05-01T20:30:00.000Z")
-            .field("publish_date", "2018-06-01T20:30:00.000Z")
             .field("reviews_per_user", 2)
-            .field("review_due_date", "2018-06-01T20:30:00.000Z")
-            .field("review_publish_date", "2018-07-01T20:30:00.000Z");
+            .field("publish_date", "2018-05-01T20:30:00.000Z")
+            .field("due_date", "2018-05-01T20:31:00.000Z")
+            .field("review_publish_date", "2018-05-01T20:32:00.000Z")
+            .field("review_due_date", "2018-05-01T20:33:00.000Z");
 
         // assertions
         const result = JSON.parse(res.text);
@@ -247,11 +270,11 @@ describe("API Assignment routes", () => {
             .field("title", "Different title")
             .field("description", "Different description")
             .field("course_id", 1)
-            .field("due_date", "2018-05-01T20:30:00.000Z")
-            .field("publish_date", "2018-06-01T20:30:00.000Z")
             .field("reviews_per_user", 2)
-            .field("review_due_date", "2018-06-01T20:30:00.000Z")
-            .field("review_publish_date", "2018-07-01T20:30:00.000Z");
+            .field("publish_date", "2018-05-01T20:30:00.000Z")
+            .field("due_date", "2018-05-01T20:31:00.000Z")
+            .field("review_publish_date", "2018-05-01T20:32:00.000Z")
+            .field("review_due_date", "2018-05-01T20:33:00.000Z");
 
         // Test the updating of the assignment just added.
         const res = await chai.request(router)
@@ -259,11 +282,12 @@ describe("API Assignment routes", () => {
             .field("title", "Example title")
             .field("description", "Example description")
             .field("course_id", 1)
-            .field("due_date", "2018-05-01T20:30:00.000Z")
-            .field("publish_date", "2018-06-01T20:30:00.000Z")
             .field("reviews_per_user", 2)
-            .field("review_due_date", "2018-06-01T20:30:00.000Z")
-            .field("review_publish_date", "2018-07-01T20:30:00.000Z");
+            .field("publish_date", "2018-05-01T20:30:00.000Z")
+            .field("due_date", "2018-05-01T20:31:00.000Z")
+            .field("review_publish_date", "2018-05-01T20:32:00.000Z")
+            .field("review_due_date", "2018-05-01T20:33:00.000Z");
+
 
         // assertions
         const result = JSON.parse(res.text);
@@ -282,7 +306,7 @@ describe("API Assignment routes", () => {
         MockLogin.initialize("henkjan");
         const res = await chai.request(router).get("/1/submissions");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify([{
+        expect(JSON.parse(res.text)).to.deep.equal([{
                 "id": 1,
                 "user_netid": "paulvanderlaan",
                 "group_id": 10,
@@ -297,7 +321,7 @@ describe("API Assignment routes", () => {
                 "file_path": "submission2.pdf",
                 "date": "2018-05-01T20:30:00.000Z"
             }]
-        ));
+        );
     });
 
     /**

@@ -71,34 +71,33 @@ describe("ReviewPreparedStatement Test", () => {
      * Get mc answer.
      */
     it("get mc answer by id", async () => {
-        expect(await ReviewPS.executeGetMCAnswer(1, 1)).to.deep.equal([{
+        expect(await ReviewPS.executeGetMCAnswer(1, 1)).to.deep.equal({
             "answer": 1,
             "mcquestion_id": 1,
             "review_id": 1
-        }]);
+        });
     });
 
     /**
      * Get open answer.
      */
     it("get open answer by id", async () => {
-        expect(await ReviewPS.executeGetOpenAnswer(1, 1)).to.deep.equal([{
+        expect(await ReviewPS.executeGetOpenAnswer(1, 1)).to.deep.equal({
             answer: "Flesje water is beter dan flesje bier",
             openquestion_id: 1,
             review_id: 1
-
-        }]);
+        });
     });
 
     /**
      * Get range answer.
      */
     it("get range answer by id", async () => {
-        expect(await ReviewPS.executeGetRangeAnswer(1, 1)).to.deep.equal([{
+        expect(await ReviewPS.executeGetRangeAnswer(1, 1)).to.deep.equal({
             answer: 4,
             rangequestion_id: 1,
             review_id: 1
-        }]);
+        });
     });
 
     /**

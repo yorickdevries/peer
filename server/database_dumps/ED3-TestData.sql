@@ -61,10 +61,10 @@ INSERT INTO public.groupusers(
 	VALUES ('paulvanderlaan', 22);
 
 INSERT INTO public.assignmentlist(
-	title, description, course_id, reviews_per_user, due_date, publish_date, filename, review_due_date, review_publish_date)
-	VALUES ('Assignment 1', 'Example assignment number one', 1, 2, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment1.pdf', '9999-05-01T20:30:00Z', '2018-04-01T20:30:00Z'),
-	('Assignment 2', 'Example assignment number two', 1, 1, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment2.pdf', '9999-05-01T20:30:00Z', '2018-04-01T20:30:00Z'),
-	('Assignment 3', 'Example assignment number three', 1, 1, '2018-05-01T20:30:00Z', '2018-04-01T20:30:00Z', 'assignment3.pdf', '9999-05-01T20:30:00Z', '2018-04-01T20:30:00Z');
+	title, description, course_id, reviews_per_user, filename, publish_date, due_date, review_publish_date, review_due_date)
+	VALUES ('Assignment 1', 'Example assignment number one', 1, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2018-05-02T20:30:00Z', '2018-05-03T20:30:00Z'),
+	('Assignment 2', 'Example assignment number two', 1, 1, 'assignment2.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z'),
+	('Assignment 3', 'Example assignment number three', 1, 1, 'assignment3.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z');
 
 INSERT INTO public.rubric(
 	assignment_id)
@@ -78,6 +78,10 @@ INSERT INTO public.openquestion(
 	question, rubric_assignment_id, question_number)
 	VALUES ('How to insert queries?', 1, 1);
 
+INSERT INTO public.openquestion(
+	question, rubric_assignment_id, question_number)
+	VALUES ('This is a question for assignment 2?', 2, 1);
+
 INSERT INTO public.rangequestion(
 	question, range, rubric_assignment_id, question_number)
 	VALUES ('How much fun is inserting queries?', 7, 1, 2);
@@ -85,6 +89,10 @@ INSERT INTO public.rangequestion(
 INSERT INTO public.mcquestion(
 	question, rubric_assignment_id, question_number)
 	VALUES ('What is the best way to insert queries?', 1, 3);
+
+INSERT INTO public.mcquestion(
+	question, rubric_assignment_id, question_number)
+	VALUES ('Is the right Answer A?', 1, 4);
 
 INSERT INTO public.mcoption(
 	option, mcquestion_id)
@@ -97,6 +105,10 @@ INSERT INTO public.mcoption(
 INSERT INTO public.mcoption(
 	option, mcquestion_id)
 	VALUES ('By asking Brian', 1);
+
+INSERT INTO public.mcoption(
+	option, mcquestion_id)
+	VALUES ('A', 2);
 
 INSERT INTO public.enroll(
 	course_id, user_netid, role)

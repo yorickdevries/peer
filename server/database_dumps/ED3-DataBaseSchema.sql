@@ -4,33 +4,38 @@
 -- tables
 -- Table: AssignmentList
 CREATE TABLE AssignmentList (
-    title varchar(5000)  NOT NULL,
-    description varchar(5000)  NOT NULL,
-    due_date timestamptz NOT NULL,
-    publish_date timestamptz NOT NULL,
+    title varchar(5000) NOT NULL,
+    description varchar(5000) NOT NULL,
     id SERIAL,
     course_id int NOT NULL,
     reviews_per_user int NOT NULL,
     filename varchar(5000) NOT NULL,
-    review_due_date timestamptz NOT NULL,
+    publish_date timestamptz NOT NULL,
+    due_date timestamptz NOT NULL,
     review_publish_date timestamptz NOT NULL,
-    CONSTRAINT AssignmentList_pk PRIMARY KEY (id)
+    review_due_date timestamptz NOT NULL,
+    CONSTRAINT AssignmentList_pk PRIMARY KEY (id),
+    CONSTRAINT positive_review_per_user CHECK (reviews_per_user > 0),
+    CONSTRAINT publish_before_due CHECK (publish_date < due_date),
+    CONSTRAINT due_before_review_publish CHECK (due_date < review_publish_date),
+    CONSTRAINT review_publish_before_review_due CHECK (review_publish_date < review_due_date)
 );
 
 -- Table: CourseList
 CREATE TABLE CourseList (
     id SERIAL,
-    description varchar(5000)  NOT NULL,
-    name varchar(5000)  NOT NULL,
+    description varchar(5000) NOT NULL,
+    name varchar(5000) NOT NULL,
     CONSTRAINT CourseList_pk PRIMARY KEY (id)
 );
 
 -- Table: Enroll
 CREATE TABLE Enroll (
     Course_id int NOT NULL,
-    User_netid varchar(5000)  NOT NULL,
-    role varchar(5000)  NOT NULL,
-    CONSTRAINT Enroll_pk PRIMARY KEY (Course_id,User_netid)
+    User_netid varchar(5000) NOT NULL,
+    role varchar(100) NOT NULL,
+    CONSTRAINT Enroll_pk PRIMARY KEY (Course_id,User_netid),
+    CONSTRAINT Role_name CHECK (role = 'student' OR role = 'TA' OR role = 'teacher')
 );
 
 -- Table: AssignmentGroup
@@ -49,7 +54,7 @@ CREATE TABLE GroupList (
 
 -- Table: GroupUsers
 CREATE TABLE GroupUsers (
-    User_netid varchar(5000)  NOT NULL,
+    User_netid varchar(5000) NOT NULL,
     Group_groupid int NOT NULL,
     CONSTRAINT GroupUsers_pk PRIMARY KEY (User_netid,Group_groupid)
 );
@@ -65,7 +70,7 @@ CREATE TABLE MCAnswer (
 -- Table: MCOption
 CREATE TABLE MCOption (
     id SERIAL,
-    option varchar(5000)  NOT NULL,
+    option varchar(5000) NOT NULL,
     MCQuestion_id int NOT NULL,
     CONSTRAINT MCOption_pk PRIMARY KEY (id)
 );
@@ -73,16 +78,17 @@ CREATE TABLE MCOption (
 -- Table: MCQuestion
 CREATE TABLE MCQuestion (
     id SERIAL,
-    question varchar(5000)  NOT NULL,
+    question varchar(5000) NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
     type_question char(2) DEFAULT 'mc',
-    CONSTRAINT MCQuestion_pk PRIMARY KEY (id)
+    CONSTRAINT MCQuestion_pk PRIMARY KEY (id),
+    CONSTRAINT mc_question CHECK (type_question = 'mc')
 );
 
 -- Table: OpenAnswer
 CREATE TABLE OpenAnswer (
-    answer varchar(5000)  NOT NULL,
+    answer varchar(5000) NOT NULL,
     OpenQuestion_id int NOT NULL,
     Review_id int NOT NULL,
     CONSTRAINT OpenAnswer_pk PRIMARY KEY (OpenQuestion_id,Review_id)
@@ -91,16 +97,17 @@ CREATE TABLE OpenAnswer (
 -- Table: OpenQuestion
 CREATE TABLE OpenQuestion (
     id SERIAL,
-    question varchar(5000)  NOT NULL,
+    question varchar(5000) NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
     type_question char(4) DEFAULT 'open',
-    CONSTRAINT OpenQuestion_pk PRIMARY KEY (id)
+    CONSTRAINT OpenQuestion_pk PRIMARY KEY (id),
+    CONSTRAINT open_question CHECK (type_question = 'open')
 );
 
 -- Table: RangeAnswer
 CREATE TABLE RangeAnswer (
-    answer int  NOT NULL,
+    answer int NOT NULL,
     RangeQuestion_id int NOT NULL,
     Review_id int NOT NULL,
     CONSTRAINT RangeAnswer_pk PRIMARY KEY (RangeQuestion_id,Review_id)
@@ -109,12 +116,14 @@ CREATE TABLE RangeAnswer (
 -- Table: RangeQuestion
 CREATE TABLE RangeQuestion (
     id SERIAL,
-    question varchar(5000)  NOT NULL,
-    range int  NOT NULL,
+    question varchar(5000) NOT NULL,
+    range int NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
     type_question char(5) DEFAULT 'range',
-    CONSTRAINT RangeQuestion_pk PRIMARY KEY (id)
+    CONSTRAINT RangeQuestion_pk PRIMARY KEY (id),
+    CONSTRAINT range_question CHECK (type_question = 'range'),
+    CONSTRAINT positive_range CHECK (range > 0)
 );
 
 -- Table: Review
@@ -138,18 +147,18 @@ CREATE TABLE Rubric (
 -- Table: Submission
 CREATE TABLE Submission (
     id SERIAL,
-    User_netid varchar(5000)  NOT NULL,
+    User_netid varchar(5000) NOT NULL,
     Group_id int NOT NULL,
     Assignment_id int NOT NULL,
-    file_path varchar(5000)  NOT NULL,
-    date timestamptz NOT NULL,
+    file_path varchar(5000) NOT NULL,
+    date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     grade int NOT NULL DEFAULT -1,
     CONSTRAINT Submission_pk PRIMARY KEY (id)
 );
 
 -- Table: UserList
 CREATE TABLE UserList (
-    netid varchar(5000)  NOT NULL,
+    netid varchar(5000) NOT NULL,
     email varchar(5000),
     CONSTRAINT UserList_pk PRIMARY KEY (netid)
 );
@@ -157,7 +166,7 @@ CREATE TABLE UserList (
 -- Table: ReviewComment
 CREATE TABLE ReviewComment (
     id SERIAL,
-    comment varchar(5000)  NOT NULL,
+    comment varchar(5000) NOT NULL,
     review_id int NOT NULL,
     netid varchar(5000) NOT NULL,
     CONSTRAINT ReviewComment_pk PRIMARY KEY (id)
@@ -166,7 +175,7 @@ CREATE TABLE ReviewComment (
 -- Table: SubmissionComment
 CREATE TABLE SubmissionComment (
     id SERIAL,
-    comment varchar(5000)  NOT NULL,
+    comment varchar(5000) NOT NULL,
     submission_id int NOT NULL,
     netid varchar(5000) NOT NULL,
     CONSTRAINT SubmissionComment_pk PRIMARY KEY (id)
@@ -177,7 +186,6 @@ CREATE TABLE SubmissionComment (
 ALTER TABLE ReviewComment ADD CONSTRAINT ReviewComment_review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -250,7 +258,6 @@ ALTER TABLE GroupUsers ADD CONSTRAINT GroupUsers_User
 ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_MCQuestion
     FOREIGN KEY (MCQuestion_id)
     REFERENCES MCQuestion (id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -259,7 +266,6 @@ ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_MCQuestion
 ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_Review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -269,6 +275,14 @@ ALTER TABLE MCOption ADD CONSTRAINT MCOption_MCQuestion
     FOREIGN KEY (MCQuestion_id)
     REFERENCES MCQuestion (id)
     ON DELETE CASCADE
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: MCAnser_MCOption (table: MCAnswer)
+ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_MCOption
+    FOREIGN KEY (answer)
+    REFERENCES MCOption (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -286,7 +300,6 @@ ALTER TABLE MCQuestion ADD CONSTRAINT MCQuestion_Rubric
 ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_OpenQuestion
     FOREIGN KEY (OpenQuestion_id)
     REFERENCES OpenQuestion (id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -295,7 +308,6 @@ ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_OpenQuestion
 ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_Review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -313,7 +325,6 @@ ALTER TABLE OpenQuestion ADD CONSTRAINT OpenQuestion_Rubric
 ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_RangeQuestion
     FOREIGN KEY (RangeQuestion_id)
     REFERENCES RangeQuestion (id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -322,7 +333,6 @@ ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_RangeQuestion
 ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_Review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -340,7 +350,6 @@ ALTER TABLE RangeQuestion ADD CONSTRAINT RangeQuestion_Rubric
 ALTER TABLE Review ADD CONSTRAINT Review_Rubric
     FOREIGN KEY (Rubric_Assignment_id)
     REFERENCES Rubric (Assignment_id)
-    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
