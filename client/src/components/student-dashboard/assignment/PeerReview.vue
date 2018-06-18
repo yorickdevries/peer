@@ -137,12 +137,10 @@ export default {
         },
         async submitPeerReview() {
 
-            await this.savePeerReview()
-
             // Validate all fields (required).
             let validated = true;
             this.peerReview.form.forEach(pair => {
-                if (pair.answer.answer === null || pair.answer.answer === undefined) {
+                if (pair.answer.answer === null || pair.answer.answer === undefined || pair.answer.answer === "") {
                     validated = false
                 }
             })
@@ -150,6 +148,9 @@ export default {
             // Give validation error/success based on validation.
             if (validated) {
                 // Save the peer review.
+                await this.savePeerReview()
+
+                // Submit peer review.
                 await api.submitPeerReview(this.peerReview)
                 await this.fetchPeerReview()
                 this.showSubmitMessage()
@@ -160,7 +161,11 @@ export default {
         },
         async savePeerReview() {
             // Submit the peer review.
-            await api.savePeerReview(this.peerReview.review.id, this.peerReview)
+            try {
+                await api.savePeerReview(this.peerReview.review.id, this.peerReview)
+            } catch (error) {
+                this.showErrorMessage({message: "Error saving peer review."})
+            }
             await this.fetchPeerReview()
             this.showSaveMessage()
         },
