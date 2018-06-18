@@ -34,7 +34,7 @@
                          :per-page="perPage"
                          :filter="filter">
                     <template slot="filename" slot-scope="data">
-                        <a :href="`/api/assignments/${data.item.id}/file`"> {{data.value}} </a>
+                        <a :href="`/api/assignments/${data.item.id}/file`" target="_blank"> {{data.value}} </a>
                     </template>
                     <template slot="due_date" slot-scope="data"> {{ formatDate(data.value) }} </template>
                     <template slot="publish_date" slot-scope="data"> {{ formatDate(data.value) }} </template>

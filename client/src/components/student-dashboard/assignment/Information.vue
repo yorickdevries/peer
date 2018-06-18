@@ -14,7 +14,8 @@
                     <span class="font-weight-bold">Review Due Date</span>
                     <p>At this date the submission for the assignment needs to be submitted in the submission tab.<br/>{{ assignment.review_due_date | formatDate }}</p>
 
-                    <b-button variant="primary w-100" :href="assignmentFilePath" >Download Assignment</b-button>
+                    <b-button variant="primary w-100" :href="assignmentFilePath" target="_blank">Download Assignment
+                    </b-button>
                 </b-card>
             </b-col>
 

@@ -100,7 +100,8 @@
                                 <!--Show currently uploaded file-->
                                 <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
                                     <div>You currently have uploaded the file:
-                                        <br><a :href="assignmentFilePath" :download="assignment.filename">{{ assignment.filename }}</a>
+                                        <br><a :href="assignmentFilePath" :download="assignment.filename"
+                                               target="_blank">{{ assignment.filename }}</a>
                                     </div>
                                     <!--Buttons for toggling new assignment upload-->
                                     <b-button v-if="!uploadNewFile" variant="success" @click="uploadNewFile = true">Change file</b-button>

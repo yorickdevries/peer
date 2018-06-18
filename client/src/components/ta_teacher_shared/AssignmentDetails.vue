@@ -20,7 +20,7 @@
             <dd>{{ assignment.reviews_per_user }}</dd>
 
             <dt>Assignment File</dt>
-            <dd><a :href="assignmentFilePath">{{ assignment.filename }}</a></dd>
+            <dd><a :href="assignmentFilePath" target="_blank">{{ assignment.filename }}</a></dd>
         </dl>
     </b-card>
 </template>
