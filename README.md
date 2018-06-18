@@ -23,7 +23,7 @@
 3. Run 'npm install' in both './client' and './server'
 4. Run 'npm start' in the root
 
-On the site you can login using h.j@student.tudelft.nl:passwordHJ2
+On the site you can login using any student mail of the teammembers and password: passwordAB1
 
 ## Group Members ##
 | Name               | NetID          | Student Mail                        |
