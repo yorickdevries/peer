@@ -44,7 +44,7 @@ export default class GroupParser {
             if (currentStudent == "") {
                 throw new Error("One student has no username");
             }
-            const netId = student.Username.split("@")[0];
+            const netId = currentStudent.split("@")[0].toLowerCase();
             if (allStudents.indexOf(netId) >= 0) {
                 throw new Error("Duplicate student: " + netId);
             }
@@ -136,11 +136,11 @@ export default class GroupParser {
             // In case there is already a list in the map
             if (currentStudentList !== undefined) {
                 // add username without @ adress
-                const netid = currentStudent.split("@")[0];
+                const netid = currentStudent.split("@")[0].toLowerCase();
                 currentStudentList.push(netid);
             } else {
                 // initialize list with this student
-                const netid = currentStudent.split("@")[0];
+                const netid = currentStudent.split("@")[0].toLowerCase();
                 result.set(student[groupColumn], [netid]);
             }
         });
