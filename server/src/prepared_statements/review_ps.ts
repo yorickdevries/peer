@@ -57,16 +57,13 @@ export default class ReviewPS {
      */
     public static executeSubmitReview(reviewId: number) {
         const statement = new PreparedStatement("submit-review",
-            "UPDATE review " +
-            "SET done=true " +
-            "WHERE id = $1" +
-            "RETURNING *");
+            "UPDATE review SET done=true WHERE id = $1 RETURNING *");
         statement.values = [reviewId];
         return Database.executeQuery(statement);
     }
 
     /**
-     * Execute an 'add mpc answer' query.
+     * Execute an 'insert mpc answer' query.
      * @param {number} answerOption - a 1 char answer.
      * @param {number} questionId - a question id.
      * @param {number} reviewId - a review id.
@@ -83,7 +80,7 @@ export default class ReviewPS {
     }
 
     /**
-     * Execute an 'add open answer' query.
+     * Execute an 'insert open answer' query.
      * @param {number} answer - an open answer string.
      * @param {number} questionId - a question id.
      * @param {number} reviewId - a review id.
@@ -99,7 +96,7 @@ export default class ReviewPS {
     }
 
     /**
-     * Execute an 'update range answer' query.
+     * Execute an 'insert range answer' query.
      * @param {number} answer - a range answer.
      * @param {number} questionId - a question id.
      * @param {number} reviewId - a review id.

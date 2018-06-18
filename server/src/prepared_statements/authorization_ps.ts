@@ -142,7 +142,7 @@ export default class AuthorizationPS {
 
 
     /**
-     * Check if the review is of the user and not yet done.
+     * Check if the review is of the owner and not yet done.
      * @param {number} reviewId - review id.
      * @param {String} netId - net id of the user.
      * @return {any} true or false as pg promise.

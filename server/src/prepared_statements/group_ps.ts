@@ -12,7 +12,7 @@ export default class GroupsPS {
      * @returns {Promise<pgPromise.queryResult>} group as pg promise.
      */
     public static executeGetGroupById(id: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-group-id",
+        const statement = new PreparedStatement("get-group-by-id",
             'SELECT * FROM "grouplist" WHERE "id" = $1');
         statement.values = [id];
         return Database.executeQuerySingleResult(statement);

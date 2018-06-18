@@ -10,10 +10,10 @@ const router = express();
 router.use(bodyParser.json());
 
 /**
- * Route that creates a new course
+ * Route that creates a new course.
  * Route to get all courses.
- * @body description - description
- * @body name - name
+ * @body description - description.
+ * @body name - name.
  */
 router.post("/", async (req: any, res) => {
     try {

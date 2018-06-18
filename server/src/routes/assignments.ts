@@ -62,7 +62,6 @@ const uploadAssignmentFunction = function(req: any, res: any, next: any) {
  * if a new file is uploaded.
  * @param req - a request object.
  * @param res - a response object.
- * @param next - a next object.
  * @return {Promise<void>}
  */
 const updateAssignment = async function(req: any, res: any) {
@@ -98,6 +97,7 @@ const updateAssignment = async function(req: any, res: any) {
         }
         res.json(result);
     } catch (err) {
+        // Send appropriate error.
         res.status(400);
         res.json({ error: "An error occurred while updating the assignment" });
     }
@@ -158,7 +158,7 @@ const uploadGroups = multer({
 
 
 /**
- * Route to get all the information about an assignment
+ * Route to get all information about an assignment
  * @params assignment_id - assignment id
  */
 router.route("/:assignment_id")
@@ -199,9 +199,9 @@ router.get("/:assignment_id/file", index.authorization.enrolledAssignmentCheck, 
 });
 
 /**
- * Route to get all submissions of a certain assignment of your specific group
- * @userinfo given_name - netId
- * @params assignment_id - assignment_id
+ * Route to get all submissions of a certain assignment of your specific group.
+ * @userinfo given_name - netId.
+ * @params assignment_id - assignment_id.
  */
 router.route("/:assignment_id/submissions", )
     .get((req: any, res) => {
@@ -216,7 +216,7 @@ router.route("/:assignment_id/submissions", )
     });
 
 /**
- * Route to get the latest submission of a certain assignment of your specific group
+ * Route to get the latest submission of a certain assignment of an assignment id.
  */
 router.route("/:id/latestsubmission")
 .get(async (req: any, res) => {
@@ -236,7 +236,7 @@ router.route("/:id/latestsubmission")
 });
 
 /**
- * Route to get all the submissions per assignment
+ * Route to get all submissions per assignment
  * @params assignment_id - assignment_id
  */
 router.route("/:assignment_id/allsubmissions")
@@ -250,7 +250,7 @@ router.route("/:assignment_id/allsubmissions")
     });
 
 /**
- * Route to get all the submissions per assignment
+ * Route to get all latest submissions per assignment
  * @params assignment_id - assignment_id
  */
 router.route("/:assignment_id/alllatestsubmissions")

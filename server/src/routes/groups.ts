@@ -10,7 +10,7 @@ router.use(bodyParser.json());
 
 
 /**
- * Route to get a group with a specific id
+ * Route to get a group with a specific id.
  */
 router.get("/:id", index.authorization.isAuthorizedToViewGroup, (req: any, res) => {
     GroupsPS.executeGetGroupById(req.params.id)
@@ -22,7 +22,7 @@ router.get("/:id", index.authorization.isAuthorizedToViewGroup, (req: any, res) 
  });
 
 /**
- * Route to get he users of a group with a specific id
+ * Route to get the users of a group with a specific id.
  */
 router.get("/:id/users", index.authorization.isAuthorizedToViewGroup, (req: any, res) => {
     GroupsPS.executeGetUsersOfGroupById(req.params.id)
