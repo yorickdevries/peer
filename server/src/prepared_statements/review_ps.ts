@@ -7,17 +7,14 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 export default class ReviewPS {
 
     /**
-     * Creates a review
-     *
-     * @static
-     * @param {string} comment
-     * @param {string} userNetId
-     * @param {number} submissionId
-     * @param {number} rubricAssignmentId
-     * @returns {Promise<pgPromise.queryResult>}
-     * @memberof ReviewPS
+     * Creates a review.
+     * @param {string} userNetId - net id of the user.
+     * @param {number} submissionId - submission id related to the review.
+     * @param {number} rubricAssignmentId - assignment id.
+     * @returns {Promise<pgPromise.queryResult>} created review as pg promise.
      */
-    public static executeCreateReview(userNetId: string, submissionId: number, rubricAssignmentId: number): Promise<pgPromise.queryResult> {
+    public static executeCreateReview(userNetId: string, submissionId: number, rubricAssignmentId: number)
+        : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("create-review",
         "INSERT INTO review(user_netid, submission_id, rubric_assignment_id) VALUES ($1, $2, $3) RETURNING *");
         statement.values = [userNetId, submissionId, rubricAssignmentId];
@@ -41,14 +38,12 @@ export default class ReviewPS {
 
     /**
      * Gets all reviews made by a certain user for a certain assignment
-     *
-     * @static
-     * @param {string} userNetId
-     * @param {number} assignmentId
-     * @returns {Promise<pgPromise.queryResult>}
-     * @memberof ReviewPS
+     * @param {string} userNetId - net id of the user.
+     * @param {number} assignmentId - assignment id.
+     * @returns {Promise<pgPromise.queryResult>} - all reviews as pg promise.
      */
-    public static executeGetReviewsByUserIdAndAssignmentId(userNetId: string, assignmentId: number): Promise<pgPromise.queryResult> {
+    public static executeGetReviewsByUserIdAndAssignmentId(userNetId: string, assignmentId: number)
+        : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-reviews-by-user-id-and-assignment-id",
         "SELECT * FROM review WHERE user_netid = $1 AND rubric_assignment_id = $2");
         statement.values = [userNetId, assignmentId];
@@ -80,7 +75,8 @@ export default class ReviewPS {
     public static executeUpdateMpcAnswer(answerOption: number, questionId: number, reviewId: number)
         : Promise<pgPromise.queryResult> {
         const statement =  new PreparedStatement("add-mpc-answer",
-            "INSERT INTO mcanswer(answer, mcquestion_id, review_id) VALUES ($1, $2, $3) ON CONFLICT (mcquestion_id, review_id) " +
+            "INSERT INTO mcanswer(answer, mcquestion_id, review_id) VALUES ($1, $2, $3) " +
+            "ON CONFLICT (mcquestion_id, review_id) " +
             "DO UPDATE SET answer=$1 RETURNING answer");
         statement.values = [answerOption, questionId, reviewId];
         return Database.executeQuerySingleResult(statement);
@@ -133,7 +129,7 @@ export default class ReviewPS {
     }
 
     /**
-     * Execute a 'get mc answer by review id' query.
+     * Execute a 'get range answer by review id' query.
      * @param {number} reviewId - a review id.
      * @param {number} rangeQuestionId - a range question id.
      * @return {Promise<pgPromise.queryResult>} - a promise query result.
@@ -147,7 +143,7 @@ export default class ReviewPS {
     }
 
     /**
-     * Execute a 'get mc answer by review id' query.
+     * Execute a 'get open answer by review id' query.
      * @param {number} reviewId - a review id.
      * @param {number} openQuestionId - a open question id.
      * @return {Promise<pgPromise.queryResult>} - a promise query result.
@@ -179,7 +175,8 @@ export default class ReviewPS {
      * @param {string} comment - a comment.
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
-    public static executeAddReviewComment(reviewId: number, netId: string, comment: string): Promise<pgPromise.queryResult> {
+    public static executeAddReviewComment(reviewId: number, netId: string, comment: string)
+        : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("add-review-comments",
             "INSERT INTO reviewcomment(comment, review_id, netid) VALUES ($1, $2, $3) RETURNING *");
         statement.values = [comment, reviewId, netId];
@@ -212,27 +209,22 @@ export default class ReviewPS {
      }
 
     /**
-     * Gets the submission beloning to a reviewId
-     *
-     * @static
-     * @param {number} reviewId
-     * @returns {Promise<pgPromise.queryResult>}
-     * @memberof ReviewPS
+     * Gets the submission belonging to a reviewId.
+     * @param {number} reviewId.
+     * @returns {Promise<pgPromise.queryResult>} submission as database promise.
      */
     public static executeGetSubmissionByReviewId(reviewId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-submission-by-review-id",
-            "SELECT s.id, s.user_netid, s.group_id, s.file_path, s.date FROM review r JOIN submission s ON r.submission_id = s.id WHERE r.id = $1");
+            "SELECT s.id, s.user_netid, s.group_id, s.file_path, s.date FROM review r JOIN submission s " +
+            "ON r.submission_id = s.id WHERE r.id = $1");
         statement.values = [reviewId];
         return Database.executeQuerySingleResult(statement);
     }
 
     /**
-     * Gets all reviews made by submission id
-     *
-     * @static
-     * @param {number} submissionId - submission_id
-     * @returns {Promise<pgPromise.queryResult>}
-     * @memberof ReviewPS
+     * Gets all reviews made by submission id.
+     * @param {number} submissionId - submission_id.
+     * @returns {Promise<pgPromise.queryResult>} all reviews as pg promise.
      */
     public static executeGetReviewsBySubmissionId(submissionId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-reviews-by-group-id-and-assignment-id",
@@ -242,43 +234,29 @@ export default class ReviewPS {
     }
 
     /**
-     * Get a review by submission id and net id.
-     * @param {number} submissionId - a submission id.
-     * @param {string} netId - a net id.
-     * @return {Promise<pgPromise.queryResult>} - all reviews for a submission id and net id.
-     */
-    public static executeGetReviewBySubmissionIdNetId(submissionId: number, netId: string): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-reviews-by-assignment-id-net-id",
-            "SELECT id FROM review WHERE submission_id = $1 AND user_netid = $2");
-        statement.values = [submissionId, netId];
-        return Database.executeQuery(statement);
-    }
-
-
-    /**
-     * Gets all reviews for a certain assignment
-     *
-     * @static
-     * @param {number} assignmentId
-     * @returns {Promise<pgPromise.queryResult>}
-     * @memberof ReviewPS
+     * Gets all reviews for a certain assignment.
+     * @param {number} assignmentId - assignment id.
+     * @returns {Promise<pgPromise.queryResult>} - all reviews belonging to an assignment as pg promise.
      */
     public static executeGetReviewsByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-all-reviews-by-assignmentid",
-            "SELECT review.* FROM review JOIN rubric ON review.rubric_assignment_id = rubric.assignment_id WHERE rubric.assignment_id = $1");
+            "SELECT review.* FROM review JOIN rubric ON review.rubric_assignment_id = rubric.assignment_id " +
+            "WHERE rubric.assignment_id = $1");
         statement.values = [assignmentId];
         return Database.executeQuery(statement);
     }
 
     /**
-     * Gets all done reviews for a certain assignment
-     *
+     * Gets all done reviews for a certain assignment.
      * @param {number} assignmentId - an assignment id.
      * @return {Promise<pgPromise.queryResult>} - a promise of the database result.
      */
     public static executeGetAllDoneReviewsByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-all-done-reviews-by-assignmentid",
-            "SELECT review.user_netid as reviewer, submission.user_netid as submitter FROM review JOIN assignmentlist ON assignmentlist.id = review.rubric_assignment_id  JOIN submission ON submission.id = review.submission_id WHERE assignmentlist.id = $1 AND review.done = true");
+            "SELECT review.user_netid as reviewer, submission.user_netid as submitter " +
+            "FROM review JOIN assignmentlist ON assignmentlist.id = review.rubric_assignment_id " +
+            "JOIN submission ON submission.id = review.submission_id WHERE assignmentlist.id = $1 " +
+            "AND review.done = true");
         statement.values = [assignmentId];
         return Database.executeQuery(statement);
     }
