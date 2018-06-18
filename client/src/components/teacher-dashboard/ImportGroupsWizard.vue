@@ -1,5 +1,16 @@
 <template>
     <b-card header="Import groups">
+        <b-alert class="d-flex justify-content-between flex-wrap" show variant="primary">
+            <p>Please upload a comma separated file containing the groups e.g. Brightspace export</p>
+            <ul class="mb-0">
+                <li>The NetIDs of the users should be in column "Username" (case-sensitive)</li>
+                <li>NetIDs are also allowed to be in the form of netid@tudelft.nl</li>
+                <li>The name of the column in which the group names are should be entered below (case-sensitive)</li>
+                <li>File should have extension .csv</li>
+                <li>Max file size is 1MB</li>
+            </ul>
+
+        </b-alert>
         <!--Group name-->
         <b-form-group label="Enter name of group column">
             <b-form-input   v-model="groupColumn"
@@ -36,7 +47,7 @@
                 file: true,
                 fileProgress: 0,
                 uploadSuccess: null,
-                acceptFiles: ".csv",
+                acceptFiles: ".csv"
             }
         },
         methods: {
@@ -52,7 +63,7 @@
                     await api.client.post(`/assignments/${this.assignmentId}/importgroups`, formData)
                     this.showSuccessMessage()
                 } catch (e) {
-                    this.showErrorMessage()
+                    this.showErrorMessage({message: e.response.data.error})
                 }
             }
         }
