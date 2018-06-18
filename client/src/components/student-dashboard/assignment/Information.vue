@@ -28,6 +28,9 @@
                             <dt>Group ID</dt>
                             <dd>{{ groupInfo.group.group_groupid }}</dd>
 
+                            <dt>Group Name</dt>
+                            <dd>{{ groupName }}</dd>
+
                             <dt>Group Members</dt>
                             <dt><ul><li v-for="member in groupInfo.groupmembers" :key="member.user_netid" class="font-weight-light">{{ member.user_netid }}</li></ul></dt>
                         </dl>
@@ -60,7 +63,8 @@ export default {
                     group_groupid: null
                 },
                 groupmembers: []
-            }
+            },
+            groupName: ""
         }
     },
     computed: {
@@ -83,6 +87,10 @@ export default {
             // Fetch the group information.
             let res = await api.getGroupMembersOfAssignment(this.$route.params.assignmentId)
             this.groupInfo = res.data
+
+            // Fetch group name.
+            let nameRes = await api.getGroupInfo(this.groupInfo.group.group_groupid)
+            this.groupName = nameRes.data.group_name
         }
     }
 }
