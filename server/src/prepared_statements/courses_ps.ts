@@ -16,7 +16,7 @@ export default class CoursesPS {
     public static executeUpdateCourse(id: number, description: string, name: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-course",
             'UPDATE "courselist" SET ("description", "name") = ($1, $2) WHERE "id" = $3 ' +
-            'RETURNING id, description, name');
+            "RETURNING id, description, name");
         statement.values = [description, name, id];
         return Database.executeQuerySingleResult(statement);
     }
@@ -42,7 +42,7 @@ export default class CoursesPS {
     public static executeGetAllEnrolledCourses(userNetId: string) {
         const statement = new PreparedStatement("get-all-courses-you-are-enrolled,",
             'SELECT * FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" ' +
-            'WHERE user_netid LIKE $1)');
+            "WHERE user_netid LIKE $1)");
         statement.values = [userNetId];
         return Database.executeQuery(statement);
     }

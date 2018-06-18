@@ -51,7 +51,7 @@ export default class GroupsPS {
     public static executeAddGrouptoAssignment(groupId: number, assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("add-group-to-assignment",
             'INSERT INTO "assignmentgroup" ("assignment_id", "group_id") VALUES ($1, $2) ' +
-            'RETURNING assignment_id, group_id');
+            "RETURNING assignment_id, group_id");
         statement.values = [assignmentId, groupId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -65,7 +65,7 @@ export default class GroupsPS {
     public static executeAddStudenttoGroup(netId: string, groupId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("add-student-to-group",
             'INSERT INTO "groupusers" ("user_netid", "group_groupid") VALUES ($1, $2) ' +
-            'RETURNING user_netid, group_groupid');
+            "RETURNING user_netid, group_groupid");
         statement.values = [netId, groupId];
         return Database.executeQuerySingleResult(statement);
     }

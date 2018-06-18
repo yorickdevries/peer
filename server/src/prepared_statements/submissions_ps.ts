@@ -90,7 +90,7 @@ export default class SubmissionsPS {
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("create-submission",
         'INSERT INTO "submission" ("user_netid", "group_id", "assignment_id", "file_path") ' +
-            'VALUES ($1, $2, $3, $4) RETURNING *');
+            "VALUES ($1, $2, $3, $4) RETURNING *");
         statement.values = [netid, groupId, assignmentId, filePath];
         return Database.executeQuerySingleResult(statement);
     }

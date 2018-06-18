@@ -78,7 +78,7 @@ describe("AssignmentPreparedStatements Test", () => {
     it("add assignment", async () => {
         expect(await AssignmentPS.executeAddAssignment("New", "Description", 1, 2, "test_file.pdf",
         new Date("2017-07-01T20:30:00Z"), new Date("2018-07-01T20:30:00Z"), new Date("2019-07-01T20:30:00Z"), new Date("2020-07-01T20:30:00Z")
-    )).to.deep.equal({
+        )).to.deep.equal({
             id: 4,
             title: "New",
             description: "Description",
@@ -89,7 +89,7 @@ describe("AssignmentPreparedStatements Test", () => {
             due_date: new Date("2018-07-01T20:30:00Z"),
             review_publish_date: new Date("2019-07-01T20:30:00Z"),
             review_due_date: new Date("2020-07-01T20:30:00Z")
-    });
+        });
     });
 
     /**
@@ -110,7 +110,6 @@ describe("AssignmentPreparedStatements Test", () => {
         });
     });
 
-
     /**
      * Test get review assignment.
      */
@@ -124,11 +123,8 @@ describe("AssignmentPreparedStatements Test", () => {
             "grade": -1,
             "user_netid": "henkjan",
             "creation_date": result.creation_date
-
         });
     });
-
-
 
     /**
      * Test create review.

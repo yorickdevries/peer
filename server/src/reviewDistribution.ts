@@ -6,11 +6,9 @@ import RubricPS from "./prepared_statements/rubric_ps";
 
 /**
  * Class which takes care of the distribution of all reviews over the students
- *
- * @export
- * @class ReviewDistribution
  */
 export default class ReviewDistribution {
+
     /**
      * Distribute reviews for a specific assignment
      */
@@ -41,11 +39,8 @@ export default class ReviewDistribution {
 
     /**
      * This methods assigns reviews for a specific assignment
-     *
-     * @static
      * @param {number} assignmentId
      * @returns
-     * @memberof ReviewDistribution
      */
     public static async assignSubmissionstoUsers(assignmentId: number) {
         const assignment: any = await AssignmentPS.executeGetAssignmentById(assignmentId);
@@ -112,12 +107,9 @@ export default class ReviewDistribution {
 
     /**
      * Counts the amount of assigned reviews to a certain submission
-     *
-     * @static
      * @param {number} submissionId
      * @param {any[]} reviews
      * @returns
-     * @memberof ReviewDistribution
      */
     public static countReviews(submissionId: number, reviews: any[]) {
         let count = 0;
@@ -131,13 +123,10 @@ export default class ReviewDistribution {
 
     /**
      * Checks whether this user already reviews this submission
-     *
-     * @static
      * @param {(string | undefined)} netId
      * @param {number} submissionId
      * @param {any[]} reviews
      * @returns
-     * @memberof ReviewDistribution
      */
     public static reviewsSubmission(netId: string | undefined, submissionId: number, reviews: any[]) {
         for (const review of reviews) {
@@ -151,14 +140,11 @@ export default class ReviewDistribution {
     /**
      * Makes a list of reviewcounts
      * this method makes sure that the list doesnt include the already assigned submissions to this user
-     *
-     * @static
      * @param {(string | undefined)} currentnetId
      * @param {(number | undefined)} currentGroupId
      * @param {any[]} submissions
      * @param {any[]} reviews
      * @returns
-     * @memberof ReviewDistribution
      */
     public static makeCountList(currentnetId: string | undefined, currentGroupId: number | undefined, submissions: any[], reviews: any[]) {
         // make a list of all other submissions
@@ -176,11 +162,8 @@ export default class ReviewDistribution {
 
     /**
      * Sorts submissions based on the submissioncount
-     *
-     * @static
      * @param {any[]} submissions
      * @returns
-     * @memberof ReviewDistribution
      */
     public static sortSubmissionCount(submissions: any[]) {
         const compare = function(a: any, b: any) {
@@ -194,11 +177,11 @@ export default class ReviewDistribution {
         return;
     }
 
-/**
- * Shuffles array in place. ES6 version
- * source: https://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array
- * @param {Array} a items An array containing the items.
- */
+    /**
+     * Shuffles array in place. ES6 version
+     * source: https://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array
+     * @param {Array} a items An array containing the items.
+     */
     public static shuffle(a: any[]) {
         for (let i = a.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));

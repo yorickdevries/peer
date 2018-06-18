@@ -89,7 +89,7 @@ export default class AssignmentPS {
                                        reviewDueDate: Date): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("addAssignment",
         'INSERT INTO "assignmentlist" (title, description, course_id, reviews_per_user, filename, publish_date, ' +
-            'due_date, review_publish_date, review_due_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *');
+            "due_date, review_publish_date, review_due_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *");
         statement.values = [title, description, courseId, reviewsPerUser, filename, publishDate, dueDate,
             reviewPublishDate, reviewDueDate];
         return Database.executeQuerySingleResult(statement);
