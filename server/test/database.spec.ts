@@ -1,6 +1,6 @@
 import "mocha";
 import chai from "chai";
-import {expect} from "chai";
+import { expect } from "chai";
 import chaiAsPromised from "chai-as-promised";
 
 chai.use(chaiAsPromised);
@@ -8,7 +8,7 @@ chai.use(chaiAsPromised);
 import TestData from "./test_helpers/test_data";
 
 import Database from "../src/database";
-import pgp, {default as pgPromise, PreparedStatement} from "pg-promise";
+import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 
 describe("Database Test", () => {
     /**
