@@ -47,19 +47,17 @@
                             <b-form-group label="Due date and time">
                                 <b-form-input   v-model="assignment.due_day"
                                                 type="date"
-                                                :state="checkDue"
                                                 placeholder="Please enter date on which the assignment should be handed in"
                                                 required>
                                 </b-form-input>
                                 <b-form-input   v-model="assignment.due_time"
                                                 type="time"
-                                                :state="checkDue"
                                                 placeholder="Please enter time before which the assignment should be handed in"
                                                 required>
                                 </b-form-input>
-                                <b-form-invalid-feedback>
-                                    Due date should be past publish date!
-                                </b-form-invalid-feedback>
+                                <!--<b-form-invalid-feedback>-->
+                                    <!--Due date should be past publish date!-->
+                                <!--</b-form-invalid-feedback>-->
                             </b-form-group>
                             <!--Publish and due date of the peer review-->
                             <b-form-group label="Start date and time for peer review">
@@ -208,8 +206,9 @@ export default {
         let dtime = res.data.due_date.split('T')[1].substring(0,5)
         let rptime = res.data.review_publish_date.split('T')[1].substring(0,5)
         let rdtime = res.data.review_due_date.split('T')[1].substring(0,5)
+
         let pday = new Date(res.data.publish_date)
-        this.assignment.publish_day = pday.getFullYear().toString() + "-" + pday.getMonth().toString() + "-" + pday.getDate().toString()
+        this.assignment.publish_day = dateToInputFormat(pday)
 
         this.assignment.publish_time = ptime
         this.assignment.due_day = res.data.due_date.split('T')[0]
