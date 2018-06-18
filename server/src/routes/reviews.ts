@@ -1,5 +1,5 @@
 import ReviewsPS from "../prepared_statements/review_ps";
-import RubricPS from "../prepared_statements/rubric_ps";
+import ReviewUpdate from "../reviewUpdate";
 import bodyParser from "body-parser";
 import index from "../security/index";
 import path from "path";
@@ -17,35 +17,12 @@ router.use(bodyParser.json());
  */
 router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
     try {
-        const jsonItems: any = [];
-        const review = await ReviewsPS.executeGetReview(req.params.reviewId);
-        const questions = await RubricPS.getAllQuestionsByRubricId(review.rubric_assignment_id);
-
-        // Loop through the questions and add answers to them.
-        for (let i = 0; i < questions.length; i++) {
-            const question = questions[i];
-            let answer: any;
-
-            // Get the answers (from database) to the correct question type.
-            switch (question.type_question) {
-                case "mc": answer = await ReviewsPS.executeGetMCAnswer(+req.params.reviewId, question.id); break;
-                case "open": answer = await ReviewsPS.executeGetOpenAnswer(+req.params.reviewId, question.id); break;
-                case "range": answer = await ReviewsPS.executeGetRangeAnswer(+req.params.reviewId, question.id); break;
-                default: answer = { error: "unrecognized question type: " + question.type_question }; break;
-            }
-
-            // Create the correct JSON format (API documentation) and push to array.
-            jsonItems.push({question: question, answer: (answer[0]) ? answer[0] : {answer: ""}});
-        }
-
-        // Assemble correct json to send in the response.
-        res.json({
-            review: review,
-            form: jsonItems
-        });
-    } catch (e) {
-        console.log(e);
-        res.sendStatus(400);
+        const reviewId = req.params.reviewId;
+        const result = await ReviewUpdate.getReview(reviewId);
+        res.json(result);
+    } catch (error) {
+        res.status(400);
+        res.json({error: error.message});
     }
 });
 
@@ -57,44 +34,12 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
 router.route("/:reviewId").put(index.authorization.checkReviewOwner, async (req, res) => {
     try {
         const reviewId = req.params.reviewId;
-        const jsonQuestions: any = [];
-
         const inputForm = req.body.form;
-
-        // Loop through form and update the answers.
-        for (let i = 0; i < inputForm.length; i++) {
-            const item = inputForm[i];
-
-            // Don't insert or update if the answer is not specified.
-            if (item.answer === null) return;
-
-            // Update or insert a specific answer and add to questions array.
-            switch (item.question.type_question) {
-                case "range": jsonQuestions.push({
-                    question: item.question,
-                    answer: await ReviewsPS.executeUpdateRangeAnswer(item.answer.answer, item.question.id, reviewId)
-                }); break;
-
-                case "open": jsonQuestions.push({
-                    question: item.question,
-                    answer: await ReviewsPS.executeUpdateOpenAnswer(item.answer.answer, item.question.id, reviewId)
-                }); break;
-
-                case "mc": jsonQuestions.push({
-                    question: item.question,
-                    answer: await ReviewsPS.executeUpdateMpcAnswer(item.answer.answer, item.question.id, reviewId)
-                }); break;
-                default: jsonQuestions.push({ error: "Unrecognized type given: " + item.question.type_question }); break;
-            }
-        }
-
-        // Create and respond with the resulting JSON.
-        res.json({
-            review: await ReviewsPS.executeGetReview(reviewId),
-            form: jsonQuestions
-        });
-    } catch {
-        res.sendStatus(400);
+        const result = await ReviewUpdate.updateReview(reviewId, inputForm);
+        res.json(result);
+    } catch (error) {
+        res.status(400);
+        res.json({error: error.message});
     }
 });
 

@@ -140,8 +140,6 @@ router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck,
 
 /**
  * Route to fetch, for a specific course, all net ids with a given role.
- * @body courseId - id of the course.
- * @body role - role to filter on.
  * @return json with an array of all net ids.
  */
 router.get("/:courseId/users/:role/", index.authorization.enrolledCourseTeacherCheck, async (req: any, res) => {

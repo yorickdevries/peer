@@ -33,7 +33,7 @@ router.use("*", async function(req: any, res, next) {
         next();
     } else {
         // get userinfo
-        const netid = userinfo.given_name;
+        const netid = userinfo.given_name.toLowerCase();
         const email = userinfo.preferred_username;
         try {
             // check whether user is in the database
@@ -68,6 +68,7 @@ router.get("/authenticated", function (req: any, res) {
     res.json({ authenticated: req.isAuthenticated() });
 });
 
+// Check always whether someone is logged in
 router.use("*", security.authorization.authorizeCheck);
 
 // Routing

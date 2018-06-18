@@ -76,7 +76,7 @@ export default class AuthorizationPS {
      * Check if user is authorized to edit or delete option
      */
     public static executeAuthorizationMCOption(optionId: number, netId: String): any {
-        const statement = new PreparedStatement("check-authorization-mcquestion",
+        const statement = new PreparedStatement("check-authorization-mcoption",
             "SELECT EXISTS(SELECT * FROM mcoption, mcquestion, assignmentlist, enroll WHERE mcoption.mcquestion_id = mcquestion.id AND mcquestion.rubric_assignment_id = assignmentlist.id" +
             " AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher' OR enroll.role = 'TA') AND mcoption.id = $1 AND enroll.user_netid = $2)");
         statement.values = [optionId, netId];
@@ -88,7 +88,7 @@ export default class AuthorizationPS {
      * Check if user is authorized to edit or delete rangequestion
      */
     public static executeAuthorizationRangeQuestion(questionId: number, netId: String): any {
-        const statement = new PreparedStatement("check-authorization-mcquestion",
+        const statement = new PreparedStatement("check-authorization-rangequestion",
             "SELECT EXISTS(SELECT * FROM rangequestion, assignmentlist, enroll WHERE rangequestion.rubric_assignment_id = assignmentlist.id " +
             "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher' OR enroll.role = 'TA') AND rangequestion.id = $1 AND enroll.user_netid = $2)");
         statement.values = [questionId, netId];
@@ -99,7 +99,7 @@ export default class AuthorizationPS {
      * Check if user is authorized to edit or delete openquestion
      */
     public static executeAuthorizationOpenQuestion(questionId: number, netId: String): any {
-        const statement = new PreparedStatement("check-authorization-mcquestion",
+        const statement = new PreparedStatement("check-authorization-openquestion",
             "SELECT EXISTS(SELECT * FROM openquestion, assignmentlist, enroll WHERE openquestion.rubric_assignment_id = assignmentlist.id " +
             "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher' OR enroll.role = 'TA') AND openquestion.id = $1 AND enroll.user_netid = $2)");
         statement.values = [questionId, netId];

@@ -51,17 +51,16 @@ describe("API Course routes", () => {
         expect(res.text).to.equal(JSON.stringify({"id": 3, "description": "example", "name": "test name"}
         ));
 
-        const enrolled = await chai.request(router).get("/enrolled");
-        expect(enrolled.status).to.equal(200);
-        expect(enrolled.text).to.equal(JSON.stringify([{
-            "id": 1,
-            "description": "This is a beautiful course description!",
-            "name": "ED-3"
-        }, {"id": 2, "description": "Test-course", "name": "ED-4"}, {
+        const result = await chai.request(router).get("/enrolled");
+        expect(result.status).to.equal(200);
+
+        const enrolledlist: any = JSON.parse(result.text);
+        const newcourse = enrolledlist.find((object: any) => object.id == 3);
+        expect(newcourse).to.deep.equal({
             "id": 3,
             "description": "example",
             "name": "test name"
-        }]));
+        });
     });
 
     /**
@@ -85,7 +84,7 @@ describe("API Course routes", () => {
         // test the router
         const res = await chai.request(router).get("/1/assignments");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify([{
+        expect(JSON.parse(res.text)).to.deep.equal([{
                 "title": "Assignment 1",
                 "description": "Example assignment number one",
                 "due_date": "2018-05-01T20:30:00.000Z",
@@ -94,8 +93,8 @@ describe("API Course routes", () => {
                 "course_id": 1,
                 "reviews_per_user": 2,
                 "filename": "assignment1.pdf",
-                "review_due_date": "9999-05-01T20:30:00.000Z",
-                "review_publish_date": "2018-04-01T20:30:00.000Z"
+                "review_due_date": "2018-05-03T20:30:00.000Z",
+                "review_publish_date": "2018-05-02T20:30:00.000Z"
             }, {
                 "title": "Assignment 2",
                 "description": "Example assignment number two",
@@ -106,7 +105,7 @@ describe("API Course routes", () => {
                 "reviews_per_user": 1,
                 "filename": "assignment2.pdf",
                 "review_due_date": "9999-05-01T20:30:00.000Z",
-                "review_publish_date": "2018-04-01T20:30:00.000Z"
+                "review_publish_date": "2020-05-01T20:30:00.000Z"
             }, {
                 "title": "Assignment 3",
                 "description": "Example assignment number three",
@@ -117,9 +116,9 @@ describe("API Course routes", () => {
                 "reviews_per_user": 1,
                 "filename": "assignment3.pdf",
                 "review_due_date": "9999-05-01T20:30:00.000Z",
-                "review_publish_date": "2018-04-01T20:30:00.000Z"
+                "review_publish_date": "2020-05-01T20:30:00.000Z"
             }]
-        ));
+        );
     });
 
     /**
