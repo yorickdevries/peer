@@ -188,35 +188,44 @@ export default {
         let res = await api.getAssignment(aid)
         this.assignment = res.data
 
-        // Decompose datetime into date and time
         // Define functions for correct formatting of date and time
         function dateToInputFormat(date) {
             let str = "";
-            console.log(str)
+            // console.log(str)
             str = str + date.getFullYear().toString() + "-"
-            console.log(str)
-            str = date.getMonth() < 10 ? str + "0" + date.getMonth().toString() + "-" : str + date.getMonth().toString() + "-"
-            console.log(str)
+            // console.log(str)
+            str = date.getMonth() < 10 ? str + "0" + (date.getMonth() + 1).toString() + "-" : str + date.getMonth().toString() + "-"
+            // console.log(str)
             str = date.getDate() < 10 ? str + "0" + date.getDate().toString() : str + date.getDate().toString()
-            console.log(str)
+            // console.log(str)
             return str
         }
-        let ptime = new Date(res.data.publish_date)
-        ptime = ptime.getHours().toString() + ":" + ptime.getMinutes().toString()
-        let dtime = res.data.due_date.split('T')[1].substring(0,5)
-        let rptime = res.data.review_publish_date.split('T')[1].substring(0,5)
-        let rdtime = res.data.review_due_date.split('T')[1].substring(0,5)
 
-        let pday = new Date(res.data.publish_date)
-        this.assignment.publish_day = dateToInputFormat(pday)
+        function timeToInputFormat(time) {
+            let str = "";
+            str = str + time.getHours().toString() + ":" + time.getMinutes().toString()
+            return str
+        }
 
-        this.assignment.publish_time = ptime
-        this.assignment.due_day = res.data.due_date.split('T')[0]
-        this.assignment.due_time = dtime
-        this.assignment.review_publish_day = res.data.review_publish_date.split('T')[0]
-        this.assignment.review_publish_time = rptime
-        this.assignment.review_due_day = res.data.review_due_date.split('T')[0]
-        this.assignment.review_due_time = rdtime
+        // Set publish date and time
+        let pdate = new Date(res.data.publish_date)
+        this.assignment.publish_day = dateToInputFormat(pdate)
+        this.assignment.publish_time = timeToInputFormat(pdate)
+
+        // Set due date and time
+        let ddate = new Date(res.data.due_date)
+        this.assignment.due_day = dateToInputFormat(ddate)
+        this.assignment.due_time = timeToInputFormat(ddate)
+
+        // Set due date and time
+        let rpdate = new Date(res.data.review_publish_date)
+        this.assignment.review_publish_day = dateToInputFormat(rpdate)
+        this.assignment.review_publish_time = timeToInputFormat(rpdate)
+
+        // Set due date and time
+        let rddate = new Date(res.data.review_due_date)
+        this.assignment.review_due_day = dateToInputFormat(rddate)
+        this.assignment.review_due_time = timeToInputFormat(rddate)
     },
     methods: {
         async onSubmit() {
