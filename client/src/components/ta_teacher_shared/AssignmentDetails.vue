@@ -13,7 +13,7 @@
             <dt>Peer review publish date-time</dt>
             <dd>{{ assignment.review_publish_date | formatDate }}</dd>
 
-            <dt>Peer review due date-tie=me</dt>
+            <dt>Peer review due date-time</dt>
             <dd>{{ assignment.review_due_date | formatDate }}</dd>
 
             <dt>Amount of peer reviews assigned per student</dt>
