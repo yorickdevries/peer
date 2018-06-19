@@ -55,6 +55,19 @@ const enrolledCourseTeacherCheck = async (req: any, res: any, next: any) => {
 };
 
 /**
+ * Check whether a user in enrolled as teacher
+ */
+const enrolledAsTeacherAssignmentCheck = async (req: any, res: any, next: any) => {
+    try {
+        const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
+        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.userinfo.given_name);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
  * Check whether a user in enrolled as teacher for post and put
  */
 const enrolledAsTeacherAssignmentCheckForPost = async (req: any, res: any, next: any) => {
