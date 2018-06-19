@@ -127,7 +127,7 @@ export default {
             }
 
             // Show correct status message.
-            this.showSuccessMessage({message: `Successfully added ${this.netid} as a teaching assistant.`})
+            this.showSuccessMessage({message: `Successfully removed ${this.netid} as a teaching assistant.`})
 
             // Re-fetch teaching assistants.
             await this.fetchTeachingAssistants()
