@@ -87,5 +87,4 @@ describe("submission comment routes", () => {
             }
         ));
     });
-
 });

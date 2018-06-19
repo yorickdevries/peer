@@ -12,7 +12,6 @@ describe("RubricPreparedStatements Test", () => {
         await TestData.initializeDatabase();
     });
 
-
     /**
      * Test to create a rubric
      */
@@ -22,11 +21,10 @@ describe("RubricPreparedStatements Test", () => {
         });
     });
 
-
     /**
      * Test to create open question
      */
-    it("create open quetion", async () => {
+    it("create open question", async () => {
         expect(await RubricPS.executeCreateOpenQuestion("hi", 1, 1)).to.deep.equal({
             id: 3,
             question: "hi",
@@ -39,7 +37,7 @@ describe("RubricPreparedStatements Test", () => {
     /**
      * Test to create mc question
      */
-    it("create mc quetion", async () => {
+    it("create mc question", async () => {
         expect(await RubricPS.executeCreateMCQuestion("hi", 1, 1)).to.deep.equal({
             id: 3,
             question: "hi",
@@ -52,7 +50,7 @@ describe("RubricPreparedStatements Test", () => {
     /**
      * Test to create open question
      */
-    it("create range quetion", async () => {
+    it("create range question", async () => {
         expect(await RubricPS.executeCreateRangeQuestion("hi", 6, 1, 1)).to.deep.equal({
             id: 2,
             question: "hi",

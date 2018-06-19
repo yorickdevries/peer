@@ -72,7 +72,7 @@ router.route("/:reviewId/allComments").get(index.authorization.checkAuthorizatio
 });
 
 /**
- * Get all review comments.
+ * Update a review comment by its id.
  * @param reviewId - an id of a review.
  * @body comment - a comment of the review.
  * @return database return value.
@@ -87,7 +87,7 @@ router.route("/:reviewCommentId/comment").put(index.authorization.checkOwnerRevi
 });
 
 /**
- * Get all review comments.
+ * Post review comment for a review id.
  * @param reviewId - an id of a review.
  * @body comment - a comment of the review.
  * @return database return value.
@@ -102,7 +102,7 @@ router.route("/:reviewId/comment").post(index.authorization.checkReviewTAOrTeach
 });
 
 /**
- * Get all review comments.
+ * Delete a review comment by review comment id.
  * @param reviewId - an id of a review.
  * @return database return value.
  */

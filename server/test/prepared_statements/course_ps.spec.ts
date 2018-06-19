@@ -31,7 +31,7 @@ describe("CoursePreparedStatement Test", () => {
     });
 
     /**
-     * Get cousre by id
+     * Get course by id
      */
     it("get course by id", async () => {
         expect(await CoursePS.executeGetCourseById(1)).to.deep.equal({
@@ -51,7 +51,6 @@ describe("CoursePreparedStatement Test", () => {
             name: "super leuk"
         });
     });
-
 
     /**
      * Test update a course

@@ -4,10 +4,9 @@ import pgp, { errors, default as pgPromise, PreparedStatement } from "pg-promise
 
 /**
  * Database class responsible for the connection to the postgreSQL database.
- * @export
- * @class Database
  */
 export default class Database {
+
   /**
    * Connection object.
    *

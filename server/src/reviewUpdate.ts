@@ -3,18 +3,12 @@ import RubricPS from "./prepared_statements/rubric_ps";
 
 /**
  * Class which takes care of getting and updating a review in the database
- *
- * @export
- * @class ReviewUpdate
  */
 export default class ReviewUpdate {
     /**
      * Get a review
-     *
-     * @static
      * @param {number} reviewId
-     * @returns
-     * @memberof ReviewUpdate
+     * @returns json response with the review and answers.
      */
     public static async getReview(reviewId: number) {
         const jsonItems: any = [];
@@ -46,12 +40,9 @@ export default class ReviewUpdate {
 
     /**
      * Update a review
-     *
-     * @static
      * @param {number} reviewId
      * @param {any[]} inputForm
-     * @returns
-     * @memberof ReviewUpdate
+     * @returns the review as json.
      */
     public static async updateReview(reviewId: number, inputForm: any[]) {
         // check all questions
@@ -64,12 +55,9 @@ export default class ReviewUpdate {
 
     /**
      * Check the validity of all questions
-     *
-     * @static
      * @param {number} reviewId
      * @param {any[]} inputForm
-     * @returns
-     * @memberof ReviewUpdate
+     * @returns list of the questions or an error.
      */
     public static async checkQuestions(reviewId: number, inputForm: any[]) {
         const review = await ReviewsPS.executeGetReview(reviewId);
@@ -111,13 +99,10 @@ export default class ReviewUpdate {
 
     /**
      * Checks whether an answer for an range question is valid to add to the database
-     *
-     * @static
      * @param {number} questionId
      * @param {number} rubricId
      * @param {*} answerText
-     * @returns
-     * @memberof ReviewUpdate
+     * @returns range question json.
      */
     public static async checkRangeQuestion(questionId: number, rubricId: number, answerText: any) {
         // Initialize the question variable
@@ -141,13 +126,10 @@ export default class ReviewUpdate {
 
     /**
      * Checks whether an answer for an open question is valid to add to the database
-     *
-     * @static
      * @param {number} questionId
      * @param {number} rubricId
      * @param {*} answerText
-     * @returns
-     * @memberof ReviewUpdate
+     * @returns open question json.
      */
     public static async checkOpenQuestion(questionId: number, rubricId: number, answerText: any) {
         // Initialize the question variable
@@ -171,13 +153,10 @@ export default class ReviewUpdate {
 
     /**
      * Checks whether an answer for an MC question is valid to add to the database
-     *
-     * @static
      * @param {number} questionId
      * @param {number} rubricId
      * @param {*} answerText
-     * @returns
-     * @memberof ReviewUpdate
+     * @returns mc question json.
      */
     public static async checkMCQuestion(questionId: number, rubricId: number, answerText: any) {
         // Initialize the question variable
@@ -203,12 +182,8 @@ export default class ReviewUpdate {
 
     /**
      * Apply all questions to the database
-     *
-     * @static
      * @param {number} reviewId
      * @param {any[]} checkedQuestions
-     * @returns
-     * @memberof ReviewUpdate
      */
     public static async applyQuestions(reviewId: number, checkedQuestions: any[]) {
         // Loop through checkedQuestions and update the answers.
@@ -233,7 +208,6 @@ export default class ReviewUpdate {
                     default: throw new Error("Unrecognized question type: " + questionType);
                 }
             }
-            // Create and respond with the resulting JSON.
             return;
         } catch {
             throw new Error("An error occured while inserting the review to the database");

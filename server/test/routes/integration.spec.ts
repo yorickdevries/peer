@@ -236,6 +236,7 @@ describe("API integration test", () => {
 
         expect(reviewYorickRes.review.id).to.equal(yorickFeedbackId);
         expect(reviewYorickRes.form[0].answer.answer).to.equal(yorickFeedbackAnswer);
+        console.log("Student reviewed each other");
 
         // [9]
         // Submit the reviews
@@ -246,7 +247,7 @@ describe("API integration test", () => {
         MockLogin.initialize("paulvanderlaan");
         const submitReviewPaul = await chai.request(router).get("/reviews/" + paulFeedbackId + "/submit");
         expect(submitReviewYorick.status).to.equal(200);
-
+        console.log("Student created reviews");
 
         // [10]
         // Fetch the feedback ids.
@@ -259,6 +260,7 @@ describe("API integration test", () => {
         const feedbackPaulIds = await chai.request(router).get("/assignments/" + assignmentId + "/feedback");
         expect(feedbackPaulIds.status).to.equal(200);
         const feedBackPaulId = JSON.parse(feedbackPaulIds.text)[0].id;
+        console.log("Student submitted their reviews");
 
         // [11]
         // Fetch the feedback (answers).
@@ -271,5 +273,6 @@ describe("API integration test", () => {
         const feedbackYorick = await chai.request(router).get("/reviews/" + feedBackYorickId);
         expect(feedbackYorick.status).to.equal(200);
         expect(JSON.parse(feedbackYorick.text).form[0].answer.answer).to.equal(paulFeedbackAnswer);
+        console.log("Student fetched the reviews");
     });
 });

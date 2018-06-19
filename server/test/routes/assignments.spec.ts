@@ -49,7 +49,6 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv")
             .field("groupColumn", "Education Groups");
-        console.log(res.text);
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             [{groupId: 1, groupname: "ED 4"}, {groupId: 2, groupname: "ED 3"}]
