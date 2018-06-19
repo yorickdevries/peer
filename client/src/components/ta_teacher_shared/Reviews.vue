@@ -32,7 +32,7 @@
                  :filter="filter">
 
             <template slot="file_path" slot-scope="data">
-                <a :href="`/api/submissions/${data.item.id}/file`"> {{data.value}} </a>
+                <a :href="`/api/submissions/${data.item.id}/file`" target="_blank"> {{data.value}} </a>
             </template>
         </b-table>
 

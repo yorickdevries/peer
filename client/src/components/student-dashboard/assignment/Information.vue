@@ -14,7 +14,8 @@
                     <span class="font-weight-bold">Review Due Date</span>
                     <p>At this date the submission for the assignment needs to be submitted in the submission tab.<br/>{{ assignment.review_due_date | formatDate }}</p>
 
-                    <b-button variant="primary w-100" :href="assignmentFilePath" >Download Assignment</b-button>
+                    <b-button variant="primary w-100" :href="assignmentFilePath" target="_blank">Download Assignment
+                    </b-button>
                 </b-card>
             </b-col>
 
@@ -26,6 +27,9 @@
                         <dl>
                             <dt>Group ID</dt>
                             <dd>{{ groupInfo.group.group_groupid }}</dd>
+
+                            <dt>Group Name</dt>
+                            <dd>{{ groupName }}</dd>
 
                             <dt>Group Members</dt>
                             <dt><ul><li v-for="member in groupInfo.groupmembers" :key="member.user_netid" class="font-weight-light">{{ member.user_netid }}</li></ul></dt>
@@ -59,7 +63,8 @@ export default {
                     group_groupid: null
                 },
                 groupmembers: []
-            }
+            },
+            groupName: ""
         }
     },
     computed: {
@@ -82,6 +87,10 @@ export default {
             // Fetch the group information.
             let res = await api.getGroupMembersOfAssignment(this.$route.params.assignmentId)
             this.groupInfo = res.data
+
+            // Fetch group name.
+            let nameRes = await api.getGroupInfo(this.groupInfo.group.group_groupid)
+            this.groupName = nameRes.data.group_name
         }
     }
 }
