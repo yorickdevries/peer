@@ -395,6 +395,7 @@ export default {
     checkMCOptionPost,
     enrolledCourseTeacherCheck,
     isAuthorizedToViewGroup,
+    enrolledAsTeacherAssignmentCheck,
     enrolledAsTeacherAssignmentCheckForPost,
     enrolledAsTAOrTeacherAssignment,
     getSubmissionAuth,
