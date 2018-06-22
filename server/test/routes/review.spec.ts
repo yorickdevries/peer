@@ -67,9 +67,7 @@ describe("API review routes", () => {
                           }
                        ]
                     },
-                    "answer": {
-                       "answer": ""
-                    }
+                    "answer": {}
                  }, {
                     "question": {
                         "id": 1,
@@ -196,9 +194,7 @@ describe("API review routes", () => {
                   }
                 },
                 {
-                  "answer": {
-                    "answer": ""
-                  },
+                  "answer": {},
                   "question": {
                     "id": 2,
                     "option": [
