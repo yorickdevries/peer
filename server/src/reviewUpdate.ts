@@ -28,7 +28,7 @@ export default class ReviewUpdate {
                     default: throw new Error("unrecognized question type: " + question.type_question);
                 }
                 // Create the correct JSON format (API documentation) and push to array.
-                jsonItems.push({question: question, answer});
+                jsonItems.push({question: question, answer: answer});
             // in case no answer exists yet, return an empty answer
             } catch (error) {
                 jsonItems.push({question: question, answer: {answer: undefined}});
