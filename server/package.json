@@ -1,6 +1,6 @@
 {
-  "name": "peer_review",
-  "version": "0.0.0",
+  "name": "ed3_peer_review_server",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "npm run build && npm run data_init && npm run start_server",
