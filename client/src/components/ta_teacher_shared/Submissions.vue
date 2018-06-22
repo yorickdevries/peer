@@ -45,7 +45,7 @@
                  :filter="filter">
 
             <template slot="file_path" slot-scope="data">
-                <a :href="`/api/submissions/${data.item.id}/file`"> {{data.value }} </a>
+                <a :href="`/api/submissions/${data.item.id}/file`" target="_blank"> {{data.value }} </a>
             </template>
 
             <template slot="actions" slot-scope="row">
@@ -79,6 +79,7 @@
                 currentPage: 1,
                 fields: [
                     {key: 'user_netid', label: 'Username'},
+                    {key: 'group_id', label: 'Group ID'},
                     {key: 'date', label: 'Submitted'},
                     {key: 'file_path', label: 'Download'},
                     'actions'

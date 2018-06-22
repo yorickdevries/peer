@@ -2,7 +2,6 @@ import AuthorizationPS from "../prepared_statements/authorization_ps";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 import ReviewPS from "../prepared_statements/review_ps";
-import RubricPS from "../prepared_statements/rubric_ps";
 
 /**
  * Check whether the user who does the request is authenticated.
@@ -55,7 +54,6 @@ const enrolledCourseTeacherCheck = async (req: any, res: any, next: any) => {
     }
 };
 
-
 /**
  * Check whether a user in enrolled as teacher
  */
@@ -94,7 +92,6 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
     }
 };
 
-
 /**
  * Check authorization to edit a rubric
  */
@@ -107,8 +104,6 @@ const checkRubricAuthorizationPost = async (req: any, res: any, next: any) => {
         res.sendStatus(401);
     }
 };
-
-
 
 /**
  * Check authorization to edit a mc question
@@ -242,8 +237,6 @@ const checkOwnerReviewComment = async (req: any, res: any, next: any) => {
         res.sendStatus(401);
     }
 };
-
-
 
 /**
  * Check if the person is authorized to view the group.
@@ -401,8 +394,8 @@ export default {
     enrolledCourseCheck,
     checkMCOptionPost,
     enrolledCourseTeacherCheck,
-    enrolledAsTeacherAssignmentCheck,
     isAuthorizedToViewGroup,
+    enrolledAsTeacherAssignmentCheck,
     enrolledAsTeacherAssignmentCheckForPost,
     enrolledAsTAOrTeacherAssignment,
     getSubmissionAuth,

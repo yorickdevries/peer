@@ -13,7 +13,7 @@
                             <dt>This is the latest submission you have made:</dt>
                             <dd></dd>
                             <dt>File</dt>
-                            <dd><a :href="submissionFilePath" :download="submission.file_path">{{ submission.file_path }}</a></dd>
+                            <dd><a :href="submissionFilePath" target="_blank">{{ submission.file_path }}</a></dd>
                             <dt>Date</dt>
                             <dd>{{ submission.date | formatDate }}</dd>
                         </dl>

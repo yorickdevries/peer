@@ -3,34 +3,35 @@ import GroupPS from "./prepared_statements/group_ps";
 import UserPS from "./prepared_statements/user_ps";
 import AssignmentPS from "./prepared_statements/assignment_ps";
 import CoursesPS from "./prepared_statements/courses_ps";
+
 /**
  * Enables parsing of Group files in CSV format.
- *
- * @export
- * @class GroupParser
  */
 export default class GroupParser {
+
     /**
      * Parses the group data into the database
+     * @param {Buffer} filebuffer
+     * @param {string} groupColumn
+     * @param {number} assignmentId
+     * @return {Promise<any[]>}
      */
     public static async importGroups(filebuffer: Buffer, groupColumn: string, assignmentId: number) {
         // parse the file
         const studentlist = await neatCsv(filebuffer);
         await this.checkStudentList(studentlist, assignmentId);
         const studentmap = this.mapGroups(studentlist, groupColumn);
-        const groupnames = await this.addGroupsToDatabase(studentmap, assignmentId);
-        return groupnames;
+        return await this.addGroupsToDatabase(studentmap, assignmentId);
     }
+
     /**
      * Checks whether the studentlist is valid;
      * Checks whether there are duplicate students in this file
      * or whether a student already has a group for this assignment.
      * Makes sure the student always has at most one group for an assignment.
-     *
-     * @static
      * @param {any[]} studentlist
      * @param {number} assignmentId
-     * @memberof GroupParser
+     * @return {Promise<void>}
      */
     public static async checkStudentList(studentlist: any[], assignmentId: number) {
         const allStudents: string[] = [];
@@ -62,11 +63,8 @@ export default class GroupParser {
 
     /**
      * Checks whether an assignment exists
-     *
-     * @static
      * @param {number} assignmentId
-     * @returns
-     * @memberof GroupParser
+     * @returns true if the file exists.
      */
     public static async assignmentExists(assignmentId: number) {
         const res: any = await AssignmentPS.executeExistsAssignmentById(assignmentId);
@@ -75,11 +73,8 @@ export default class GroupParser {
 
     /**
      * Creates a student when the student doesn't exist.
-     *
-     * @static
      * @param {string} netId
-     * @returns
-     * @memberof GroupParser
+     * @return {Promise<void>}
      */
     public static async createStudentIfNotExists(netId: string) {
         const res: any = await UserPS.executeExistsUserById(netId);
@@ -87,38 +82,32 @@ export default class GroupParser {
         if (!res.exists) {
             // The email is not known while creating this student entry
             // Creating user
-            const newUser = await UserPS.executeAddUser(netId, undefined);
+            await UserPS.executeAddUser(netId, undefined);
         }
         return;
     }
 
     /**
      * Enrolls a student if not already enrolled.
-     *
-     * @static
      * @param {number} courseId
      * @param {string} netId
-     * @returns
-     * @memberof GroupParser
+     * @return {Promise<void>}
      */
     public static async enrollStudentIfNotEnrolled(courseId: number, netId: string) {
         const res: any = await CoursesPS.executeExistsEnrolledByCourseIdUserById(courseId, netId);
         // In case there is no student entry yet in the database, make one
         if (!res.exists) {
             // enrolling user
-            const newUser = await CoursesPS.executeEnrollInCourseId(courseId, netId, "student");
+            await CoursesPS.executeEnrollInCourseId(courseId, netId, "student");
         }
         return;
     }
 
     /**
      * Maps the groups to the students
-     *
-     * @static
      * @param {object[]} studentlist
      * @param {string} groupColumn
-     * @returns {Map<string, string[]>}
-     * @memberof GroupParser
+     * @returns {Map<string, string[]>} mapping of the groups.
      */
     public static mapGroups(studentlist: object[], groupColumn: string): Map<string, string[]> {
         // initialize result map
@@ -149,12 +138,9 @@ export default class GroupParser {
 
     /**
      * Puts the groups into the database
-     *
-     * @static
      * @param {Map<string, string[]>} studentmap
      * @param {number} assignmentId
-     * @returns
-     * @memberof GroupParser
+     * @returns list of the groups that are made.
      */
     public static async addGroupsToDatabase(studentmap: Map<string, string[]>, assignmentId: number) {
         const assignmentExists = await this.assignmentExists(assignmentId);

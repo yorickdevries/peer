@@ -12,8 +12,6 @@ describe("AuthorizationPreparedstatements Test", () => {
         await TestData.initializeDatabase();
     });
 
-
-
     /**
      * Test get submission by id prepared statement.
      */

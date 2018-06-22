@@ -15,72 +15,96 @@ describe("Database Test", () => {
      * Make a clean database before each test.
      */
     beforeEach(async () => {
-      await TestData.initializeDatabase();
-  });
+        await TestData.initializeDatabase();
+    });
 
-  it("connection port", () => {
-    const result = Database.connection.port;
-    expect(result).to.equal(5432);
-  });
+    /**
+     * Test the connection port.
+     */
+    it("connection port", () => {
+        const result = Database.connection.port;
+        expect(result).to.equal(5432);
+    });
 
-  it("connection user", () => {
-    const result = Database.connection.user;
-    expect(result).to.equal("postgres");
-  });
+    /**
+     * Test the user connection.
+     */
+    it("connection user", () => {
+        const result = Database.connection.user;
+        expect(result).to.equal("postgres");
+    });
 
-  it("database connection correct", async () => {
-    const db = Database.db;
-    let result;
-    const dbPromise = db.any("SELECT * FROM userlist")
-      .then(function (data: any) {
-        result = data[0].netid;
-      }).catch(function (err: Error) {
-        result = err.name;
-      });
+    /**
+     * Test the database connection.
+     */
+    it("database connection correct", async () => {
+        const db = Database.db;
+        let result;
+        const dbPromise = db.any("SELECT * FROM userlist")
+            .then(function (data: any) {
+                result = data[0].netid;
+            }).catch(function (err: Error) {
+                result = err.name;
+            });
 
-    // wait for database promise to finish
-    await dbPromise;
-    expect(result).to.equal("paulvanderlaan");
-  });
+        // wait for database promise to finish
+        await dbPromise;
+        expect(result).to.equal("paulvanderlaan");
+    });
 
-  it("database connection error", async () => {
-    const db = Database.db;
-    let result;
-    const dbPromise = db.any("SELECT * FROM invalidtable")
-      .then(function (data: any) {
-        result = data[0].netid;
-      }).catch(function (err: Error) {
-        result = err.name;
-      });
+    /**
+     * Test the database error handling.
+     */
+    it("database connection error", async () => {
+        const db = Database.db;
+        let result;
+        const dbPromise = db.any("SELECT * FROM invalidtable")
+            .then(function (data: any) {
+                result = data[0].netid;
+            }).catch(function (err: Error) {
+                result = err.name;
+            });
 
-    // wait for database promise to finish
-    await dbPromise;
-    expect(result).to.equal("error");
-  });
+        // wait for database promise to finish
+        await dbPromise;
+        expect(result).to.equal("error");
+    });
 
-  it("database query single result", async () => {
-    const statement = new PreparedStatement("user-count",
-    "SELECT COUNT(1) FROM userlist");
-    const result = await Database.executeQuerySingleResult(statement);
-    expect(result).to.deep.equal({ count: "4" });
-  });
+    /**
+     * Test the single result query.
+     */
+    it("database query single result", async () => {
+        const statement = new PreparedStatement("user-count",
+            "SELECT COUNT(1) FROM userlist");
+        const result = await Database.executeQuerySingleResult(statement);
+        expect(result).to.deep.equal({ count: "4" });
+    });
 
-  it("database query any result", async () => {
-    const statement = new PreparedStatement("get-all-users",
-    "SELECT * FROM userlist");
-    const result = await Database.executeQuery(statement);
-    expect(result.length).to.equal(4);
-  });
+    /**
+     * Tset the database query rany esult.
+     */
+    it("database query any result", async () => {
+        const statement = new PreparedStatement("get-all-users",
+            "SELECT * FROM userlist");
+        const result = await Database.executeQuery(statement);
+        expect(result.length).to.equal(4);
+    });
 
-  it("database error query single result", async () => {
-    const statement = new PreparedStatement("get-all-users2",
-    "SELECT * FROM userlist");
-    await expect(Database.executeQuerySingleResult(statement)).to.eventually.be.rejectedWith("Multiple rows were not expected.");
-  });
+    /**
+     * Test the database error single result.
+     */
+    it("database error query single result", async () => {
+        const statement = new PreparedStatement("get-all-users2",
+            "SELECT * FROM userlist");
+        await expect(Database.executeQuerySingleResult(statement)).to.eventually.be.rejectedWith("Multiple rows were not expected.");
+    });
 
-  it("database error query any result", async () => {
-    const statement = new PreparedStatement("invalid-query",
-    "THIS IS NOT A VALID QUERY");
-    await expect(Database.executeQuery(statement)).to.eventually.be.rejected;
-  });
+    /**
+     * Test the database error any result.
+     */
+    it("database error query any result", async () => {
+        const statement = new PreparedStatement("invalid-query",
+            "THIS IS NOT A VALID QUERY");
+        await expect(Database.executeQuery(statement)).to.eventually.be.rejected;
+    });
 });

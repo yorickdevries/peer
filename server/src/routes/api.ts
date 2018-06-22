@@ -58,6 +58,7 @@ router.use("*", async function(req: any, res, next) {
     }
 });
 
+// Route to logout.
 router.get("/logout", (req: any, res) => {
     req.logout();
     res.redirect("/");
@@ -79,12 +80,13 @@ router.use("/reviews", reviews);
 router.use("/rubric", rubrics);
 router.use("/submissions", submissions);
 
+// Route to get the userinfo
 router.get("/user", function (req: any, res, next) {
     res.json({
         user: req.userinfo
     });
 
-// error handler
+// Error handler
 router.use(function (err: any, req: any, res: any, next: any) {
     // set locals, only providing error in development
     res.locals.message = err.message;

@@ -267,5 +267,4 @@ describe("API rubric routes", () => {
             }
         ));
     });
-
 });

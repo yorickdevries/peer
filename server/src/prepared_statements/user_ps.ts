@@ -3,14 +3,12 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 
 /**
  * Executes User prepared statements in the database.
- *
- * @export
- * @class UserPS
  */
 export default class UserPS {
+
     /**
-     * Executes a 'get user by user id' query.
-     * @param {string} netId - an user id.
+     * Executes a 'get user by user net id' query.
+     * @param {string} netId - an userid.
      * @return {any} a query result.
      */
     public static executeGetUserById(netId: string): Promise<pgPromise.queryResult> {
@@ -22,7 +20,7 @@ export default class UserPS {
 
     /**
      * Checks whether an user exists in the database
-     * @param {string} netId - an user id.
+     * @param {string} netId - an user netid.
      * @return {any} a query result.
      */
     public static executeExistsUserById(netId: string): Promise<pgPromise.queryResult> {
@@ -32,10 +30,9 @@ export default class UserPS {
         return Database.executeQuerySingleResult(statement);
     }
 
-
     /**
      * Executes an 'add user query'.
-     * @param {string} netId - a net id.
+     * @param {string} netId - a netid.
      * @param {string} email - an email.
      * @return {any} a query result.
      */
@@ -47,10 +44,9 @@ export default class UserPS {
     }
 
     /**
-     * Update user email
-     *
-     * @param {string} netId
-     * @param {string} email
+     * Update user email.
+     * @param {string} netId - a netid.
+     * @param {string} email - an email.
      */
     public static executeUpdateEmailUser(netId: string, email: string): any {
         const statement = new PreparedStatement("update-user-to-database",
@@ -60,44 +56,8 @@ export default class UserPS {
     }
 
     /**
-     * Executes a 'get user by email' query.
-     * @param {string} email - an email.
-     * @return {any} a query result.
-     */
-    public static executeGetUserByEmail(email: string): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-user-by-email",
-        'SELECT * FROM "userlist" WHERE "email" LIKE $1');
-        statement.values = [email];
-        return Database.executeQuery(statement);
-    }
-
-    /**
-     * Executes a 'get courses ids by user id' query.
-     * @param {number} userId - a user id.
-     * @return {any} a query result.
-     */
-    public static executeGetCoursesIdById(userId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-courses-by-id",
-        'SELECT * FROM "enroll" WHERE "user_netid" LIKE $1');
-        statement.values = [userId];
-        return Database.executeQuery(statement);
-    }
-
-    /**
      * Executes a 'get group by user id' query.
-     * @param {number} userId - a user id.
-     * @return {any} a query result.
-     */
-    public static executeGetGroupsById(userId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-groups-by-id",
-        'SELECT * FROM "groupusers" WHERE "user_netid" LIKE $1');
-        statement.values = [userId];
-        return Database.executeQuery(statement);
-    }
-
-    /**
-     * Executes a 'get group by user id' query.
-     * @param {number} userId - a user id.
+     * @param {number} userId - a user netid.
      * @param {number} assignmentId - assignmentId
      * @return {any} a query result.
      */
@@ -111,24 +71,12 @@ export default class UserPS {
 
     /**
      * Executes a 'get submission by user id' query.
-     * @param {number} userId - a user id.
+     * @param {number} userId - a user netid.
      * @return {any} a query result.
      */
     public static executeGetSubmissionById(userId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-submissions-by-id",
         'SELECT * FROM "submission" WHERE "user_netid" LIKE $1');
-        statement.values = [userId];
-        return Database.executeQuery(statement);
-    }
-
-    /**
-     * Executes a 'get review by user id' query.
-     * @param {number} userId
-     * @return {any} a query result.
-     */
-    public static executeGetReviewById(userId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-reviews-by-id",
-        'SELECT * FROM "review" WHERE "user_netid" LIKE $1');
         statement.values = [userId];
         return Database.executeQuery(statement);
     }

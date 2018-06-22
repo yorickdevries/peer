@@ -25,7 +25,6 @@ describe("GroupParser tests", () => {
     /**
      * good weather test
      */
-
     it("normal import", async () => {
         // set up input data
         const file = path.join(__dirname, "../example_data/csv_test/example_export.csv");
@@ -51,7 +50,6 @@ describe("GroupParser tests", () => {
     /**
      * bad weather tests
      */
-
     it("No comma separated file is used", async () => {
         // set up input data
         const file = path.join(__dirname, "../example_data/csv_test/example_export_non_csv.csv");
