@@ -49,7 +49,7 @@
                                         <b-badge variant="success" v-if="isPeerReviewActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
-                                    <span class="text-muted">Due: {{ assignment.due_date | formatDate }}</span>
+                                    <span class="text-muted">Due: {{ assignment.review_due_date | formatDate }}</span>
                                 </div>
                             </b-button>
 
@@ -106,7 +106,7 @@ export default {
             return new Date() < new Date(this.assignment.due_date)
         },
         isPeerReviewActive() {
-            return new Date() < new Date(this.assignment.review_due_date)
+            return new Date() < new Date(this.assignment.review_due_date) && new Date() > new Date(this.assignment.review_publish_date)
         },
         isFeedbackActive() {
             return new Date() > new Date(this.assignment.review_due_date)
