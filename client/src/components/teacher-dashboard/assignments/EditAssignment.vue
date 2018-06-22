@@ -47,19 +47,14 @@
                             <b-form-group label="Due date and time">
                                 <b-form-input   v-model="assignment.due_day"
                                                 type="date"
-                                                :state="checkDue"
                                                 placeholder="Please enter date on which the assignment should be handed in"
                                                 required>
                                 </b-form-input>
                                 <b-form-input   v-model="assignment.due_time"
                                                 type="time"
-                                                :state="checkDue"
                                                 placeholder="Please enter time before which the assignment should be handed in"
                                                 required>
                                 </b-form-input>
-                                <b-form-invalid-feedback>
-                                    Due date should be past publish date!
-                                </b-form-invalid-feedback>
                             </b-form-group>
                             <!--Publish and due date of the peer review-->
                             <b-form-group label="Start date and time for peer review">
@@ -191,59 +186,95 @@ export default {
         let res = await api.getAssignment(aid)
         this.assignment = res.data
 
-        // Decompose datetime into date and time
-        let ptime = res.data.publish_date.split('T')[1].substring(0,5)
-        let dtime = res.data.due_date.split('T')[1].substring(0,5)
-        let rptime = res.data.review_publish_date.split('T')[1].substring(0,5)
-        let rdtime = res.data.review_due_date.split('T')[1].substring(0,5)
-        this.assignment.publish_day = res.data.publish_date.split('T')[0]
-        this.assignment.publish_time = ptime
-        this.assignment.due_day = res.data.due_date.split('T')[0]
-        this.assignment.due_time = dtime
-        this.assignment.review_publish_day = res.data.review_publish_date.split('T')[0]
-        this.assignment.review_publish_time = rptime
-        this.assignment.review_due_day = res.data.review_due_date.split('T')[0]
-        this.assignment.review_due_time = rdtime
+        // Define functions for correct formatting of date and time
+        function dateToInputFormat(date) {
+            let str = "";
+            // console.log(str)
+            str = str + date.getFullYear().toString() + "-"
+            // console.log(str)
+            str = date.getMonth() < 10 ? str + "0" + (date.getMonth() + 1).toString() + "-" : str + date.getMonth().toString() + "-"
+            // console.log(str)
+            str = date.getDate() < 10 ? str + "0" + date.getDate().toString() : str + date.getDate().toString()
+            // console.log(str)
+            return str
+        }
+
+        function timeToInputFormat(time) {
+            let str = "";
+            str = str + time.getHours().toString() + ":" + time.getMinutes().toString()
+            return str
+        }
+
+        // Set publish date and time
+        let pdate = new Date(res.data.publish_date)
+        this.assignment.publish_day = dateToInputFormat(pdate)
+        this.assignment.publish_time = timeToInputFormat(pdate)
+
+        // Set due date and time
+        let ddate = new Date(res.data.due_date)
+        this.assignment.due_day = dateToInputFormat(ddate)
+        this.assignment.due_time = timeToInputFormat(ddate)
+
+        // Set due date and time
+        let rpdate = new Date(res.data.review_publish_date)
+        this.assignment.review_publish_day = dateToInputFormat(rpdate)
+        this.assignment.review_publish_time = timeToInputFormat(rpdate)
+
+        // Set due date and time
+        let rddate = new Date(res.data.review_due_date)
+        this.assignment.review_due_day = dateToInputFormat(rddate)
+        this.assignment.review_due_time = timeToInputFormat(rddate)
     },
     methods: {
+        checkDates() {
+            if (this.assignment.publish_date > this.assignment.due_date || this.assignment.publish_date > this.assignment.review_publish_date || this.assignment.publish_date > this.assignment.review_due_date) {
+                return {error: 'Publish date is later than other dates!'}
+            } else if (this.assignment.due_date > this.assignment.review_publish_date || this.assignment.due_date > this.assignment.review_due_date) {
+                return {error: 'Due date is later than review dates!'}
+            } else if (this.assignment.review_publish_date > this.assignment.review_due_date) {
+                return {error: 'Review start date is later than review due dates!'}
+            } else {
+                return true
+            }
+
+        },
         async onSubmit() {
             // Compose datetime format from date and time
-            this.assignment.publish_date = this.assignment.publish_day + "T" + this.assignment.publish_time + ":00.000Z"
-            this.assignment.due_date = this.assignment.due_day + "T" + this.assignment.due_time + ":00.000Z"
-            this.assignment.review_publish_date = this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z"
-            this.assignment.review_due_date = this.assignment.review_due_day + "T" + this.assignment.review_due_time + ":00.000Z"
+            this.assignment.publish_date = new Date(this.assignment.publish_day + " " + this.assignment.publish_time).toJSON();
+            this.assignment.due_date = new Date(this.assignment.due_day + " " + this.assignment.due_time).toJSON();
+            this.assignment.review_publish_date = new Date(this.assignment.review_publish_day + " " + this.assignment.review_publish_time).toJSON();
+            this.assignment.review_due_date = new Date(this.assignment.review_due_day + " " + this.assignment.review_due_time).toJSON();
 
-            // Compose formdata object to send information to back-end
-            let formData = new FormData()
-            formData.append("title", this.assignment.title)
-            formData.append("description", this.assignment.description)
-            formData.append("course_id", this.assignment.course_id)
-            formData.append("publish_date", this.assignment.publish_day + "T" + this.assignment.publish_time + ":00.000Z")
-            formData.append("due_date", this.assignment.due_day + "T" + this.assignment.due_time + ":00.000Z")
-            formData.append("review_publish_date", this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z")
-            formData.append("review_due_date", this.assignment.review_due_day + "T" + this.assignment.review_due_time + ":00.000Z")
-            formData.append("reviews_per_user", this.assignment.reviews_per_user)
+            let validationResult = this.checkDates()
+            if (validationResult.error) {
+                this.showErrorMessage({message: validationResult.error})
+            } else {
+                // Compose formdata object to send information to back-end
+                let formData = new FormData()
+                formData.append("title", this.assignment.title)
+                formData.append("description", this.assignment.description)
+                formData.append("course_id", this.assignment.course_id)
+                formData.append("publish_date", this.assignment.publish_date)
+                formData.append("due_date", this.assignment.due_date)
+                formData.append("review_publish_date", this.assignment.review_publish_date)
+                formData.append("review_due_date", this.assignment.review_due_date)
+                formData.append("reviews_per_user", this.assignment.reviews_per_user)
 
-            // Add file if a new one has been uploaded
-            if (this.file != null) {
-                formData.append("assignmentFile", this.file)
+                // Add file if a new one has been uploaded
+                if (this.file != null) {
+                    formData.append("assignmentFile", this.file)
+                }
+                // Update assignment in database
+                try{
+                    let res = await api.saveAssignment(this.assignment.id, formData)
+                    this.showSuccessMessage({message: "Updated assignment successfully"})
+                    // Redirect to updated assignment
+                    this.$router.push({name: 'teacher-dashboard.assignments.assignment', params: {courseId: this.course.id, assignmentId: this.assignment.id} })
+                } catch (e) {
+                    this.showErrorMessage()
+                }
             }
-            // Update assignment in database
-            try{
-                let res = await api.saveAssignment(this.assignment.id, formData)
-                console.log(res)
-                this.showSuccessMessage({message: "Updated assignment successfully"})
-                // Redirect to updated assignment
-                this.$router.push({name: 'teacher-dashboard.assignments.assignment', params: {courseId: this.course.id, assignmentId: this.assignment.id} })
-            } catch (e) {
-                console.log(e)
-                this.showErrorMessage()
-            }
-        },
-        formatDate(date) {
-            // Formats the date to a readable format for the UI.
-            if (!(date instanceof Date)) date = new Date(date)
-            return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
+
         }
     }
 

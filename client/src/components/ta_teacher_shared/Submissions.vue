@@ -48,6 +48,10 @@
                 <a :href="`/api/submissions/${data.item.id}/file`" target="_blank"> {{data.value }} </a>
             </template>
 
+            <template slot="formattedDate" slot-scope="row">
+                {{ row.item.date | formatDate}}
+            </template>
+
             <template slot="actions" slot-scope="row">
                 <b-button @click.stop="row.toggleDetails" variant="primary" size="sm">{{ row.detailsShowing ? "Hide" :
                     "Show/Edit Comments"}}
@@ -80,9 +84,10 @@
                 fields: [
                     {key: 'user_netid', label: 'Username'},
                     {key: 'group_id', label: 'Group ID'},
-                    {key: 'date', label: 'Submitted'},
+                    'formattedDate',
                     {key: 'file_path', label: 'Download'},
                     'actions'
+
                 ],
                 perPage: 5,
                 latestSubmissionsActive: false,

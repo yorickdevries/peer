@@ -43,19 +43,14 @@
                             <b-form-group label="Hand in due date and time">
                                 <b-form-input   v-model="assignment.due_day"
                                                 type="date"
-                                                :state="checkDue"
                                                 placeholder="Please enter date on which the assignment should be handed in"
                                                 required>
                                 </b-form-input>
                                 <b-form-input   v-model="assignment.due_time"
                                                 type="time"
-                                                :state="checkDue"
                                                 placeholder="Please enter time before which the assignment should be handed in"
                                                 required>
                                 </b-form-input>
-                                <b-form-invalid-feedback>
-                                    Due date should be past publish date!
-                                </b-form-invalid-feedback>
                             </b-form-group>
                             <b-form-group label="Start date and time for peer review">
                                 <b-form-input   v-model="assignment.review_publish_day"
@@ -110,8 +105,10 @@
 
 <script>
 import api from "../../../api";
+import notifications from '../../../mixins/notifications'
 
 export default {
+    mixins: [notifications],
     data() {
         return {
             items: [{
@@ -131,12 +128,16 @@ export default {
                 course_id: null,
                 publish_day: null,
                 publish_time: "23:59",
+                publish_date: null,
                 due_day: null,
                 due_time: "23:59",
+                due_date: null,
                 review_publish_day: null,
                 review_publish_time: "23:59",
+                review_publish_date: null,
                 review_due_day: null,
                 review_due_time: "23:59",
+                review_due_date: null,
                 reviews_per_user: null
             }
         }
@@ -159,23 +160,58 @@ export default {
         this.assignment.course_id = this.$route.params.courseId
     },
     methods: {
+        checkDates() {
+            if (this.assignment.publish_date > this.assignment.due_date || this.assignment.publish_date > this.assignment.review_publish_date || this.assignment.publish_date > this.assignment.review_due_date) {
+                return {error: 'Publish date is later than other dates!'}
+            } else if (this.assignment.due_date > this.assignment.review_publish_date || this.assignment.due_date > this.assignment.review_due_date) {
+                return {error: 'Due date is later than review dates!'}
+            } else if (this.assignment.review_publish_date > this.assignment.review_due_date) {
+                return {error: 'Review start date is later than review due dates!'}
+            } else {
+                return true
+            }
+
+        },
         async onSubmit() {
 
-            let formData = new FormData()
-            formData.append("title", this.assignment.title)
-            formData.append("description", this.assignment.description)
-            formData.append("course_id", this.assignment.course_id)
-            formData.append("publish_date", this.assignment.publish_day + "T" + this.assignment.publish_time + ":00.000Z")
-            formData.append("due_date", this.assignment.due_day + "T" + this.assignment.due_time + ":00.000Z")
-            formData.append("review_publish_date", this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z")
-            formData.append("review_due_date", this.assignment.review_due_day + "T" + this.assignment.review_due_time + ":00.000Z")
-            formData.append("assignmentFile", this.file)
-            formData.append("reviews_per_user", this.assignment.reviews_per_user)
+            let pdate = new Date(this.assignment.publish_day + " " + this.assignment.publish_time).toJSON();
+            let ddate = new Date(this.assignment.due_day + " " + this.assignment.due_time).toJSON();
+            let rpdate = new Date(this.assignment.review_publish_day + " " + this.assignment.review_publish_time).toJSON();
+            let rddate = new Date(this.assignment.review_due_day + " " + this.assignment.review_due_time).toJSON();
 
-            let res = await api.createAssignment(formData)
-            console.log(this.assignment)
-            console.log(res)
-            this.$router.push({name: 'teacher-dashboard.assignments', params: {courseId: this.assignment.course_id}})
+            this.assignment.publish_date = pdate
+            this.assignment.due_date = ddate
+            this.assignment.review_publish_date = rpdate
+            this.assignment.review_due_date = rddate
+
+            let validationResult = this.checkDates()
+            if (validationResult.error) {
+                this.showErrorMessage({message: validationResult.error})
+            } else {
+                let formData = new FormData()
+                formData.append("title", this.assignment.title)
+                formData.append("description", this.assignment.description)
+                formData.append("course_id", this.assignment.course_id)
+
+                formData.append("publish_date", pdate)
+                formData.append("due_date", ddate)
+                formData.append("review_publish_date", rpdate)
+                formData.append("review_due_date", rddate)
+                formData.append("assignmentFile", this.file)
+                formData.append("reviews_per_user", this.assignment.reviews_per_user)
+
+
+                try {
+                    await api.createAssignment(formData)
+                    this.showSuccessMessage()
+                    this.$router.push({name: 'teacher-dashboard.assignments', params: {courseId: this.assignment.course_id}})
+                } catch (e) {
+                    this.showErrorMessage({message: e.response.data.error})
+                }
+            }
+
+
+
         }
     }
 }
