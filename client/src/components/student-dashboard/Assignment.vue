@@ -16,6 +16,7 @@
                         <b-col class="p-0 d-flex flex-wrap">
 
                             <b-button   variant="white"
+                                        active-class="bg-light"
                                         class="flex-fill p-0"
                                         :to="{ name: 'student-dashboard.course.assignment.information' }">
                                 <div class="text-center border-right border-bottom active py-3 h-100 align-middle">
