@@ -182,16 +182,6 @@ export default {
             } catch (e) {
                 this.showErrorMessage({message: e.response.data.error})
             }
-            // let res = await api.createAssignment(formData)
-            // console.log(this.assignment)
-            // console.log(res)
-
-        },
-        async renderDate() {
-            // let date = new Date(this.assignment.publish_day, this.assignment.publish_time)
-            // this.assignment.publish_date = date
-            // console.log(this.assignment.publish_date)
-
         }
     }
 }
