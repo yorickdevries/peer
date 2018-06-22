@@ -43,19 +43,14 @@
                             <b-form-group label="Hand in due date and time">
                                 <b-form-input   v-model="assignment.due_day"
                                                 type="date"
-                                                :state="checkDue"
                                                 placeholder="Please enter date on which the assignment should be handed in"
                                                 required>
                                 </b-form-input>
                                 <b-form-input   v-model="assignment.due_time"
                                                 type="time"
-                                                :state="checkDue"
                                                 placeholder="Please enter time before which the assignment should be handed in"
                                                 required>
                                 </b-form-input>
-                                <b-form-invalid-feedback>
-                                    Due date should be past publish date!
-                                </b-form-invalid-feedback>
                             </b-form-group>
                             <b-form-group label="Start date and time for peer review">
                                 <b-form-input   v-model="assignment.review_publish_day"
