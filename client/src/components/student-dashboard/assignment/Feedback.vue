@@ -100,7 +100,7 @@
                     <b-list-group v-if="comments.length > 0" flush>
 
                         <!--Single Comment-->
-                        <b-list-group-item v-for="(comment, index) in comments" :id="comment.id">
+                        <b-list-group-item v-for="comment in comments" :key="comment.id">
                             <dl class="mb-0">
                                 <dt>Comment</dt>
                                 <dd>
