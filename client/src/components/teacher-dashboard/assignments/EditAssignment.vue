@@ -270,12 +270,10 @@ export default {
                 // Update assignment in database
                 try{
                     let res = await api.saveAssignment(this.assignment.id, formData)
-                    console.log(res)
                     this.showSuccessMessage({message: "Updated assignment successfully"})
                     // Redirect to updated assignment
                     this.$router.push({name: 'teacher-dashboard.assignments.assignment', params: {courseId: this.course.id, assignmentId: this.assignment.id} })
                 } catch (e) {
-                    console.log(e)
                     this.showErrorMessage()
                 }
             }
