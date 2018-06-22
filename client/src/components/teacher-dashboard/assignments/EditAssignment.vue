@@ -232,9 +232,9 @@ export default {
         async onSubmit() {
             // Compose datetime format from date and time
             this.assignment.publish_date = new Date(this.assignment.publish_day + " " + this.assignment.publish_time).toJSON();
-            this.assignment.due_date = this.assignment.due_day + "T" + this.assignment.due_time + ":00.000Z"
-            this.assignment.review_publish_date = this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z"
-            this.assignment.review_due_date = this.assignment.review_due_day + "T" + this.assignment.review_due_time + ":00.000Z"
+            this.assignment.due_date = new Date(this.assignment.due_day + " " + this.assignment.due_time).toJSON();
+            this.assignment.review_publish_date = new Date(this.assignment.review_publish_day + " " + this.assignment.review_publish_time).toJSON();
+            this.assignment.review_due_date = new Date(this.assignment.review_due_day + " " + this.assignment.review_due_time).toJSON();
 
             // Compose formdata object to send information to back-end
             let formData = new FormData()
@@ -242,9 +242,9 @@ export default {
             formData.append("description", this.assignment.description)
             formData.append("course_id", this.assignment.course_id)
             formData.append("publish_date", this.assignment.publish_date)
-            formData.append("due_date", this.assignment.due_day + "T" + this.assignment.due_time + ":00.000Z")
-            formData.append("review_publish_date", this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z")
-            formData.append("review_due_date", this.assignment.review_due_day + "T" + this.assignment.review_due_time + ":00.000Z")
+            formData.append("due_date", this.assignment.due_date)
+            formData.append("review_publish_date", this.assignment.review_publish_date)
+            formData.append("review_due_date", this.assignment.review_due_date)
             formData.append("reviews_per_user", this.assignment.reviews_per_user)
 
             // Add file if a new one has been uploaded
