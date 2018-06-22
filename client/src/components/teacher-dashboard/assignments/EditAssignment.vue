@@ -55,9 +55,6 @@
                                                 placeholder="Please enter time before which the assignment should be handed in"
                                                 required>
                                 </b-form-input>
-                                <!--<b-form-invalid-feedback>-->
-                                    <!--Due date should be past publish date!-->
-                                <!--</b-form-invalid-feedback>-->
                             </b-form-group>
                             <!--Publish and due date of the peer review-->
                             <b-form-group label="Start date and time for peer review">
