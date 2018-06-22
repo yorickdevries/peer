@@ -36,8 +36,8 @@
                     <template slot="filename" slot-scope="data">
                         <a :href="`/api/assignments/${data.item.id}/file`" target="_blank"> {{data.value}} </a>
                     </template>
-                    <template slot="due_date" slot-scope="data"> {{ formatDate(data.value) }} </template>
-                    <template slot="publish_date" slot-scope="data"> {{ formatDate(data.value) }} </template>
+                    <template slot="due_date" slot-scope="data"> {{ data.value | formatDate }} </template>
+                    <template slot="publish_date" slot-scope="data"> {{ data.value | formatDate }} </template>
 
                     <template slot="actions" slot-scope="data">
                         <b-button size="sm"
@@ -115,11 +115,6 @@ export default {
     methods: {
         assignmentsCount() {
             return this.assignments.length;
-        },
-        formatDate(date) {
-            // Formats the date to a readable format for the UI.
-            if (!(date instanceof Date)) date = new Date(date)
-            return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
         }
     },
     async created() {
