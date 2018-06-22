@@ -3,12 +3,12 @@
 ## Documents
 | Reports & Documentation                                                                                                                                                |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Final Report Link (WIP)](https://www.google.nl/search?q=peer&source=lnms&tbm=isch&sa=X&ved=0ahUKEwj0trz0luTaAhWRy6QKHcnEDQQQ_AUICigB&biw=1920&bih=974) |
+| [Final Report Link (DRAFT)](https://drive.google.com/open?id=16AVe3_VqWfTnAQskc1eGn4TGT9LVbEyuI4RCZUbzGe0) |
 | [Product Vision](https://www.overleaf.com/15912852pwhkvtzxbyyx#/60665355/)                                                                                             |
 | [Product Planning](https://www.overleaf.com/15914315rjccsrysjscw#/60672325/)                                                                                           |
-| [Architecture Design (WIP)](https://drive.google.com/open?id=1h1dirajEcvkcRcdFhfo3CgOzBTrAspKalOY-8s0Ieu0)                                                                   |
-| [API Documentation (WIP)](https://docs.google.com/document/d/1T3CrurTxEPQj9gjq3f9S0LaflKdBjH1UjgnkIRom2xM/edit?usp=sharing)
-
+| [Architecture Design](https://drive.google.com/open?id=1h1dirajEcvkcRcdFhfo3CgOzBTrAspKalOY-8s0Ieu0)                                                                   |
+| API documentation can be found in architecture design appendix B
+| [Test documentation **(new)**](https://drive.google.com/open?id=1-MGFOcitYra8o5OZkXA85P8LIJjs8Tb7WbK2KXl74Wc) |
 | Sprint Documents & Meetings                                                                                                                                            |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Scrum Board](https://gitlab.ewi.tudelft.nl/TI2806/2017-2018/ED/ed3/ed3/boards)                                                                                        |
@@ -22,6 +22,7 @@
 2. Create a database called 'peer_database'
 3. Run 'npm install' in both './client' and './server'
 4. Run 'npm start' in the root
+5. Access the site through [http://localhost:3000](http://localhost:3000)
 
 On the site you can login using any student mail of the teammembers and password: passwordAB1
 
