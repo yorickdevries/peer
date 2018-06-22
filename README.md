@@ -3,12 +3,12 @@
 ## Documents
 | Reports & Documentation                                                                                                                                                |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Final Report Link (DRAFT)](https://drive.google.com/open?id=16AVe3_VqWfTnAQskc1eGn4TGT9LVbEyuI4RCZUbzGe0) |
-| [Product Vision](https://www.overleaf.com/15912852pwhkvtzxbyyx#/60665355/)                                                                                             |
-| [Product Planning](https://www.overleaf.com/15914315rjccsrysjscw#/60672325/)                                                                                           |
+| [Final Report Link (DRAFT)](https://drive.google.com/open?id=16AVe3_VqWfTnAQskc1eGn4TGT9LVbEyuI4RCZUbzGe0)                                                             |
+| [Product Vision](https://drive.google.com/open?id=13TeAu7Lhos5RLsbUAnmqIi6I5HRaUFbZ)                                                                                   |
+|  [Product Planning](https://drive.google.com/open?id=1pL6k2WVDsA8SeSgM6skcqGuZ2jaL2CDn)                                                                                |
 | [Architecture Design](https://drive.google.com/open?id=1h1dirajEcvkcRcdFhfo3CgOzBTrAspKalOY-8s0Ieu0)                                                                   |
-| API documentation can be found in architecture design appendix B
-| [Test documentation **(new)**](https://drive.google.com/open?id=1-MGFOcitYra8o5OZkXA85P8LIJjs8Tb7WbK2KXl74Wc) |
+| API documentation can be found in architecture design appendix B                                                                                                       |
+| [Test documentation **(new)**](https://drive.google.com/open?id=1-MGFOcitYra8o5OZkXA85P8LIJjs8Tb7WbK2KXl74Wc)                                                          |
 
 | Sprint Documents & Meetings                                                                                                                                            |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -16,7 +16,7 @@
 | [Sprint Backlogs](https://drive.google.com/drive/folders/1kS_IHHDY4CqKE_MdchDL0R154ksvGw92?usp=sharing)                                                                |
 | [Sprint Retrospectives](https://drive.google.com/open?id=1jiZvA1J_0j9eG9N1UwBpg7VX3x0uERFe)                                                                            |
 | [Meeting Notes](https://drive.google.com/drive/folders/18Ue9durm2Rlb11G2k1Eguk-3tjCSaxhM?usp=sharing)                                                                  |
-| [Guideline Documents](https://drive.google.com/drive/folders/18bxNphp1rjMX1WRGwLL45RZbZiS-jO3W?usp=sharing)                                                                 |
+| [Guideline Documents](https://drive.google.com/drive/folders/18bxNphp1rjMX1WRGwLL45RZbZiS-jO3W?usp=sharing)                                                            |
 
 ## Build Instructions
 1. Run a Postgres database on localhost:5432 with password 'password'
