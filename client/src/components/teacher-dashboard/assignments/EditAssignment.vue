@@ -262,11 +262,6 @@ export default {
                 console.log(e)
                 this.showErrorMessage()
             }
-        },
-        formatDate(date) {
-            // Formats the date to a readable format for the UI.
-            if (!(date instanceof Date)) date = new Date(date)
-            return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
         }
     }
 
