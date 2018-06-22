@@ -28,10 +28,10 @@ export default class ReviewUpdate {
                     default: throw new Error("unrecognized question type: " + question.type_question);
                 }
                 // Create the correct JSON format (API documentation) and push to array.
-                jsonItems.push({question: question, answer});
+                jsonItems.push({question: question, answer: answer});
             // in case no answer exists yet, return an empty answer
             } catch (error) {
-                jsonItems.push({question: question, answer: {answer: ""}});
+                jsonItems.push({question: question, answer: {answer: undefined}});
             }
         }
         // Assemble correct json to send in the response.
@@ -73,11 +73,15 @@ export default class ReviewUpdate {
             // Get important parameters
             const questionObject = item.question;
             const answerObject = item.answer;
-            if (questionObject == undefined || questionObject.id == undefined || answerObject == undefined || answerObject.answer == undefined) {
+            if (questionObject == undefined || questionObject.id == undefined || answerObject == undefined) {
                 throw new Error("Question isn't formatted properly at index: " + i);
             }
             const questionId = questionObject.id;
             const answerText = answerObject.answer;
+            // If the answer is undefined, skip
+            if (answerText == undefined) {
+                continue;
+            }
             const questionType = questionObject.type_question;
 
             // Check the answer based on the questiontype

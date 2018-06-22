@@ -41,7 +41,7 @@ describe("ReviewUpdate Class tests", () => {
             }];
         const result = await ReviewUpdate.updateReview(1, formdata);
         expect(result.form[0].answer.answer).to.equal(1);
-        expect(result.form[1].answer.answer).to.equal("");
+        expect(result.form[1].answer.answer).to.equal(undefined);
         expect(result.form[2].answer.answer).to.equal("Flesje water is beter dan flesje bier");
         expect(result.form[3].answer.answer).to.equal(4);
     });
@@ -147,19 +147,6 @@ describe("ReviewUpdate Class tests", () => {
         }];
         await expect(ReviewUpdate.updateReview(1, formdata))
         .to.eventually.be.rejectedWith("Unrecognized question type: undefined");
-    });
-
-    it("Question answer undefined", async () => {
-        // set up input data
-        const formdata = [{
-                question: {
-                    id: 1,
-                    type_question: "open"
-                },
-                answer: {answer: undefined}
-        }];
-        await expect(ReviewUpdate.updateReview(1, formdata))
-        .to.eventually.be.rejectedWith("Question isn't formatted properly at index: 0");
     });
 
     it("Wrong MC answer 1", async () => {
