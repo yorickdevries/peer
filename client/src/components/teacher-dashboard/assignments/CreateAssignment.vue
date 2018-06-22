@@ -110,8 +110,10 @@
 
 <script>
 import api from "../../../api";
+import notifications from '../../../mixins/notifications'
 
 export default {
+    mixins: [notifications],
     data() {
         return {
             items: [{
@@ -165,6 +167,7 @@ export default {
             formData.append("title", this.assignment.title)
             formData.append("description", this.assignment.description)
             formData.append("course_id", this.assignment.course_id)
+
             formData.append("publish_date", this.assignment.publish_day + "T" + this.assignment.publish_time + ":00.000Z")
             formData.append("due_date", this.assignment.due_day + "T" + this.assignment.due_time + ":00.000Z")
             formData.append("review_publish_date", this.assignment.review_publish_day + "T" + this.assignment.review_publish_time + ":00.000Z")
@@ -172,10 +175,23 @@ export default {
             formData.append("assignmentFile", this.file)
             formData.append("reviews_per_user", this.assignment.reviews_per_user)
 
-            let res = await api.createAssignment(formData)
-            console.log(this.assignment)
-            console.log(res)
-            this.$router.push({name: 'teacher-dashboard.assignments', params: {courseId: this.assignment.course_id}})
+            try {
+                await api.createAssignment(formData)
+                this.showSuccessMessage()
+                this.$router.push({name: 'teacher-dashboard.assignments', params: {courseId: this.assignment.course_id}})
+            } catch (e) {
+                this.showErrorMessage({message: e.response.data.error})
+            }
+            // let res = await api.createAssignment(formData)
+            // console.log(this.assignment)
+            // console.log(res)
+
+        },
+        async renderDate() {
+            // let date = new Date(this.assignment.publish_day, this.assignment.publish_time)
+            // this.assignment.publish_date = date
+            // console.log(this.assignment.publish_date)
+
         }
     }
 }
