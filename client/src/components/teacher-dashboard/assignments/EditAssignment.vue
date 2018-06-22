@@ -229,6 +229,18 @@ export default {
         this.assignment.review_due_time = timeToInputFormat(rddate)
     },
     methods: {
+        checkDates() {
+            if (this.assignment.publish_date > this.assignment.due_date || this.assignment.publish_date > this.assignment.review_publish_date || this.assignment.publish_date > this.assignment.review_due_date) {
+                return {error: 'Publish date is later than other dates!'}
+            } else if (this.assignment.due_date > this.assignment.review_publish_date || this.assignment.due_date > this.assignment.review_due_date) {
+                return {error: 'Due date is later than review dates!'}
+            } else if (this.assignment.review_publish_date > this.assignment.review_due_date) {
+                return {error: 'Review start date is later than review due dates!'}
+            } else {
+                return true
+            }
+
+        },
         async onSubmit() {
             // Compose datetime format from date and time
             this.assignment.publish_date = new Date(this.assignment.publish_day + " " + this.assignment.publish_time).toJSON();
@@ -236,32 +248,38 @@ export default {
             this.assignment.review_publish_date = new Date(this.assignment.review_publish_day + " " + this.assignment.review_publish_time).toJSON();
             this.assignment.review_due_date = new Date(this.assignment.review_due_day + " " + this.assignment.review_due_time).toJSON();
 
-            // Compose formdata object to send information to back-end
-            let formData = new FormData()
-            formData.append("title", this.assignment.title)
-            formData.append("description", this.assignment.description)
-            formData.append("course_id", this.assignment.course_id)
-            formData.append("publish_date", this.assignment.publish_date)
-            formData.append("due_date", this.assignment.due_date)
-            formData.append("review_publish_date", this.assignment.review_publish_date)
-            formData.append("review_due_date", this.assignment.review_due_date)
-            formData.append("reviews_per_user", this.assignment.reviews_per_user)
+            let validationResult = this.checkDates()
+            if (validationResult.error) {
+                this.showErrorMessage({message: validationResult.error})
+            } else {
+                // Compose formdata object to send information to back-end
+                let formData = new FormData()
+                formData.append("title", this.assignment.title)
+                formData.append("description", this.assignment.description)
+                formData.append("course_id", this.assignment.course_id)
+                formData.append("publish_date", this.assignment.publish_date)
+                formData.append("due_date", this.assignment.due_date)
+                formData.append("review_publish_date", this.assignment.review_publish_date)
+                formData.append("review_due_date", this.assignment.review_due_date)
+                formData.append("reviews_per_user", this.assignment.reviews_per_user)
 
-            // Add file if a new one has been uploaded
-            if (this.file != null) {
-                formData.append("assignmentFile", this.file)
+                // Add file if a new one has been uploaded
+                if (this.file != null) {
+                    formData.append("assignmentFile", this.file)
+                }
+                // Update assignment in database
+                try{
+                    let res = await api.saveAssignment(this.assignment.id, formData)
+                    console.log(res)
+                    this.showSuccessMessage({message: "Updated assignment successfully"})
+                    // Redirect to updated assignment
+                    this.$router.push({name: 'teacher-dashboard.assignments.assignment', params: {courseId: this.course.id, assignmentId: this.assignment.id} })
+                } catch (e) {
+                    console.log(e)
+                    this.showErrorMessage()
+                }
             }
-            // Update assignment in database
-            try{
-                let res = await api.saveAssignment(this.assignment.id, formData)
-                console.log(res)
-                this.showSuccessMessage({message: "Updated assignment successfully"})
-                // Redirect to updated assignment
-                this.$router.push({name: 'teacher-dashboard.assignments.assignment', params: {courseId: this.course.id, assignmentId: this.assignment.id} })
-            } catch (e) {
-                console.log(e)
-                this.showErrorMessage()
-            }
+
         }
     }
 
