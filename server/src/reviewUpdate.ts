@@ -31,7 +31,7 @@ export default class ReviewUpdate {
                 jsonItems.push({question: question, answer});
             // in case no answer exists yet, return an empty answer
             } catch (error) {
-                jsonItems.push({question: question, answer: {answer: ""}});
+                jsonItems.push({question: question, answer: {answer: undefined}});
             }
         }
         // Assemble correct json to send in the response.
@@ -78,6 +78,10 @@ export default class ReviewUpdate {
             }
             const questionId = questionObject.id;
             const answerText = answerObject.answer;
+            // If the answer is undefined, skip
+            if (answerText == undefined) {
+                continue;
+            }
             const questionType = questionObject.type_question;
 
             // Check the answer based on the questiontype
