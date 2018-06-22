@@ -73,7 +73,7 @@ export default class ReviewUpdate {
             // Get important parameters
             const questionObject = item.question;
             const answerObject = item.answer;
-            if (questionObject == undefined || questionObject.id == undefined || answerObject == undefined || answerObject.answer == undefined) {
+            if (questionObject == undefined || questionObject.id == undefined || answerObject == undefined) {
                 throw new Error("Question isn't formatted properly at index: " + i);
             }
             const questionId = questionObject.id;
