@@ -85,7 +85,7 @@
                                             <p>{{ course.description | truncate(200)}}</p>
                                         </div>
                                         <div>
-                                            <b-button variant="outline-primary" size="sm">
+                                            <b-button variant="outline-primary" size="sm" @click="enrollInCourse(course.id)">
                                                 Enroll in Course
                                             </b-button>
                                         </div>
@@ -108,6 +108,7 @@
 <script>
 import api from '../../api'
 import notifications from '../../mixins/notifications'
+
 export default {
     mixins: [notifications],
     data() {
@@ -157,8 +158,6 @@ export default {
 
         // Fetch course roles.
         await this.fetchAllCourseRoles()
-
-        this.unEnrolledCourses = this.courses
     },
     methods: {
         async fetchCourses() {
@@ -169,6 +168,13 @@ export default {
             for (let i = 0; i < this.courses.length; i++) {
                 let res = await api.getCurrentRoleForCourse(this.courses[i].id)
                 this.$set(this.courses[i], 'role', res.data.role)
+            }
+        },
+        async enrollInCourse(courseId) {
+            try {
+                await api.enrollInCourse(courseId)
+            } catch (e) {
+                this.showErrorMessage({message: "Could not enroll you in this course."})
             }
         }
     }

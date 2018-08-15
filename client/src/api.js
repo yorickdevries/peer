@@ -19,6 +19,9 @@ export default {
     getUnenrolledCourses() {
         return client.get(`courses/unenrolled`)
     },
+    enrollInCourse(courseId) {
+        return client.get(`courses/${courseId}/enroll`)
+    },
     createCourse: async(course) => {
         return client.post('courses', course)
     },
