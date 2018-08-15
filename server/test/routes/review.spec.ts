@@ -6,6 +6,7 @@ chai.use(chaiHttp);
 const router: any = require("../../src/routes/reviews").default;
 import MockLogin from "../test_helpers/mock_login";
 import TestData from "../test_helpers/test_data";
+import ReviewPS from "../../src/prepared_statements/review_ps";
 
 describe("API review routes", () => {
     /**
@@ -37,6 +38,7 @@ describe("API review routes", () => {
                     "id": 1,
                     "rubric_assignment_id": 1,
                     "file_path": "submission1.pdf",
+                    "approved": null,
                     "done": false
                 },
                 "form": [{
@@ -98,17 +100,7 @@ describe("API review routes", () => {
         MockLogin.initialize("henkjan");
         const res = await chai.request(router).get("/1/submit");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
-            [{
-                "id": 1,
-                "user_netid": "henkjan",
-                "submission_id": 1,
-                "rubric_assignment_id": 1,
-                "done": true,
-                "creation_date": JSON.parse(res.text)[0].creation_date,
-                "grade": -1
-            }]
-        ));
+        expect(JSON.parse(res.text)[0].id).to.equal(1);
     });
 
     /**
@@ -243,7 +235,8 @@ describe("API review routes", () => {
               "review": {
                 "done": false,
                 "file_path": "submission1.pdf",
-                "id": 1,
+                  "approved": null,
+                  "id": 1,
                 "rubric_assignment_id": 1
               }
             });
