@@ -139,17 +139,7 @@ describe("CoursePreparedStatement Test", () => {
     });
 
     /**
-     * Test get users by students.
-     */
-    it("Get all students of a course", async () => {
-        // Verify that the student has student as role
-        expect(await CoursePS.executeGetUsersByRole(1, Roles.student)).to.deep.equal([{
-            user_netid: "paulvanderlaan"
-        }]);
-    });
-
-    /**
-     * Test get users by students.
+     * Test get all unenrolled courses for a user.
      */
     it("Get all students of a course", async () => {
         // Verify that the student has student as role
