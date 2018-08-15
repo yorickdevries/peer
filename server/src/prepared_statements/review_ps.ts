@@ -29,7 +29,7 @@ export default class ReviewPS {
      */
     public static executeGetReview(reviewId: number): any {
         const statement = new PreparedStatement("get-review-by-id",
-            "SELECT review.id, rubric_assignment_id, file_path, done " +
+            "SELECT review.id, rubric_assignment_id, file_path, done, approved " +
             "FROM review JOIN submission ON submission.id = review.submission_id " +
             "WHERE review.id = $1");
         statement.values = [reviewId];
