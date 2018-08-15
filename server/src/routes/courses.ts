@@ -1,6 +1,7 @@
 import CoursesPS from "../prepared_statements/courses_ps";
 import AssignmentsPS from "../prepared_statements/assignment_ps";
 import bodyParser from "body-parser";
+import GroupParser from "../groupParser";
 import index from "../security/index";
 import { Roles } from "../roles";
 
@@ -150,6 +151,19 @@ router.get("/:courseId/users/:role/", index.authorization.enrolledCourseTeacherC
         }
         // Query and return all net ids as json.
         res.json(await CoursesPS.executeGetUsersByRole(req.params.courseId, req.params.role));
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Enroll as a student in a course.
+ * @param courseId - a course id.
+ */
+router.get("/:courseId/enroll", async (req: any, res) => {
+    try {
+        // Use method from group parser to enroll student (if not already enrolled)
+        await GroupParser.enrollStudentIfNotEnrolled(req.params.courseId, req.userinfo.given_name)
     } catch {
         res.sendStatus(400);
     }
