@@ -85,7 +85,7 @@ describe("API Course routes", () => {
         const res = await chai.request(router).get("/1/assignments");
         console.log(res.text);
         expect(res.status).to.equal(200);
-        expect(JSON.parse(res.text).title).to.equal("Assignment 2");
+        expect(JSON.parse(res.text)[0].title).to.equal("Assignment 1");
     });
 
     /**
