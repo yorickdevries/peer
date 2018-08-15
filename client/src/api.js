@@ -34,6 +34,9 @@ export default {
     getCourseAssignments(courseId) {
         return client.get(`courses/${courseId}/assignments`)
     },
+    getCourseEnrolledAssignments(courseId) {
+        return client.get(`courses/${courseId}/assignments/enrolled`)
+    },
     getCourseAssignmentsUnenrolled(courseId) {
         return client.get(`courses/${courseId}/assignments/unenrolled`)
     },
