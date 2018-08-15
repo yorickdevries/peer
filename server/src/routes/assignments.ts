@@ -390,4 +390,44 @@ router.get("/:assignment_id/groups", index.authorization.enrolledAsTAOrTeacherAs
     });
 });
 
+/**
+ * Route to enroll in an assignment as 1 person group.
+ * Only possible for assignments with 1 person groups.
+ * Student should be enrolled in the course.
+ * @param id - assignment id.
+ */
+router.get("/:assignment_id/enroll", async (req: any, res) => {
+    try {
+        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
+
+        // Enroll as long as the assignment is open for submission and the assignment is of one person groups.
+        // Only if one person groups is specified, students can enroll themselves.
+        if (new Date(assignment.due_date) > new Date() && assignment.one_person_groups) {
+
+            // Check whether student doesnt have a group yet
+            const groupAssignment: any =
+                await AssignmentPS.executeExistsGroupOfNetIdByAssignmentId(req.userinfo.given_name, req.params.assignment_id);
+            if (groupAssignment.exists) {
+                throw new Error(req.userinfo.given_name + " is already in a group");
+            }
+
+            // Make an group entry in the database.
+            const group: any = await GroupPS.executeAddGroup(req.userinfo.given_name);
+            // Add an assignment to the group.
+            const groupId = group.id;
+            await GroupPS.executeAddGrouptoAssignment(groupId, req.params.assignment_id);
+            // Add the student to the group.
+            await GroupPS.executeAddStudenttoGroup(req.userinfo.given_name, groupId)
+
+            res.sendStatus(200);
+        } else {
+            // Send error for due date deadline.
+            res.status(400);
+            res.json({error: "You can only enroll until the assignment due date deadline."});
+        }
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
 export default router;
