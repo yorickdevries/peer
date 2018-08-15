@@ -102,7 +102,7 @@ export default {
         },
         async fetch() {
             // Fetch assignments.
-            let resAssignment = await api.getCourseAssignments(this.$route.params.courseId)
+            let resAssignment = await api.getCourseEnrolledAssignments(this.$route.params.courseId)
             this.assignments = resAssignment.data
 
             // Fetch not yet enrolled assignments.
