@@ -22,6 +22,9 @@ export default {
     enrollInCourse(courseId) {
         return client.get(`courses/${courseId}/enroll`)
     },
+    enrollInAssignment(assignmentId) {
+        return client.get(`assignments/${assignmentId}/enroll`)
+    },
     createCourse: async(course) => {
         return client.post('courses', course)
     },
@@ -30,6 +33,9 @@ export default {
     },
     getCourseAssignments(courseId) {
         return client.get(`courses/${courseId}/assignments`)
+    },
+    getCourseAssignmentsUnenrolled(courseId) {
+        return client.get(`courses/${courseId}/assignments/unenrolled`)
     },
     getAssignment(assignmentId) {
         return client.get(`assignments/${assignmentId}`)
