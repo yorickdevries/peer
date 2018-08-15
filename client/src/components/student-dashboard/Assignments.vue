@@ -109,10 +109,6 @@ export default {
             try {
                 let { data: enrollableAssignments} =  await api.getCourseAssignmentsUnenrolled(this.$route.params.courseId)
                 this.enrollableAssignments = enrollableAssignments
-
-                // Temporary.
-                this.enrollableAssignments = this.assignments
-
             } catch (e) {
                 this.showErrorMessage({message: "Could not load assignments that you are not yet enrolled in."})
             }
