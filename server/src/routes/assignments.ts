@@ -400,26 +400,22 @@ router.get("/:assignment_id/enroll", async (req: any, res) => {
     try {
         const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
 
-        // Enroll as long as the assignment is open for submission and the assignment is of one person groups.
-        // Only if one person groups is specified, students can enroll themselves.
-        
-
-        if (new Date(assignment.due_date) > new Date() && assignment.one_person_groups === true) {
-
-            // Throw error if student is already in a group.
-            if (await GroupParser.studentIsInGroup(req.userinfo.given_name, req.params.assignment_id)) {
-                throw new Error(req.userinfo.given_name + " is already in a group");
-            }
-
+        // Check if the assignment due date is not passed, one person groups is enabled and student is without group.
+        // Send custom error json (not throwing error and displaying that) since database error messages are confidential.
+        if (new Date(assignment.due_date) <= new Date()) {
+            res.status(400);
+            res.json({error: "Student can only enroll until the assignment due date deadline."});
+        } else if (assignment.one_person_groups === false) {
+            res.status(400);
+            res.json({error: "Assignment has one person groups not enabled."});
+        } else if (await GroupParser.studentIsInGroup(req.userinfo.given_name, req.params.assignment_id) === false) {
+            res.status(400);
+            res.json({error: "Student is already in a group enrolled for this assignment."});
+        } else {
             // Create group and add assignment and student.
             const groupId = await GroupParser.createGroupForAssignment(req.userinfo.given_name, req.params.assignment_id);
             await GroupPS.executeAddStudenttoGroup(req.userinfo.given_name, groupId);
-
             res.sendStatus(200);
-        } else {
-            // Send error for due date deadline.
-            res.status(400);
-            res.json({error: "You can only enroll until the assignment due date deadline."});
         }
     } catch {
         res.sendStatus(400);
