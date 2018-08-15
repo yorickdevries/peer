@@ -81,7 +81,7 @@ describe("AssignmentPreparedStatements Test", () => {
      */
     it("add assignment", async () => {
         expect(await AssignmentPS.executeAddAssignment("New", "Description", 1, 2, "test_file.pdf",
-        new Date("2017-07-01T20:30:00Z"), new Date("2018-07-01T20:30:00Z"), new Date("2019-07-01T20:30:00Z"), new Date("2020-07-01T20:30:00Z")
+        new Date("2017-07-01T20:30:00Z"), new Date("2018-07-01T20:30:00Z"), new Date("2019-07-01T20:30:00Z"), new Date("2020-07-01T20:30:00Z"), false
         )).to.deep.equal({
             id: 4,
             "one_person_groups": false,

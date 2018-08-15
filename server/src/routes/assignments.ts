@@ -125,7 +125,8 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
             req.body.publish_date,
             req.body.due_date,
             req.body.review_publish_date,
-            req.body.review_due_date);
+            req.body.review_due_date,
+            req.body.one_person_groups);
         // Create rubric
         await RubricPS.executeCreateRubric(result.id);
         // writing the file if no error is there
