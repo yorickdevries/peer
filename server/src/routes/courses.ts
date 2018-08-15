@@ -67,10 +67,10 @@ router.get("/unenrolled", async (req: any, res) => {
 });
 
 /**
- * Get all assignments that belong to a specific course.
+ * Get all assignments that belong to a specific course where the user is enrolled in.
  * @param courseId - a course id.
  */
-router.get("/:courseId/assignments", index.authorization.enrolledCourseCheck, (req: any, res) => {
+router.get("/:courseId/assignments/enrolled", index.authorization.enrolledCourseCheck, (req: any, res) => {
     AssignmentsPS.executeGetEnrolledAssignmentsForUser(req.userinfo.given_name, req.params.courseId)
     .then((data) => {
         res.json(data);
@@ -78,6 +78,20 @@ router.get("/:courseId/assignments", index.authorization.enrolledCourseCheck, (r
         res.sendStatus(400);
     });
 });
+
+/**
+ * Get all assignments that belong to a specific course.
+ * @param courseId - a course id.
+ */
+router.get("/:courseId/assignments", index.authorization.enrolledCourseCheck, (req: any, res) => {
+    AssignmentsPS.executeGetAssignments(req.params.courseId)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
+
 
 /**
  * Update the course, given a course id.
