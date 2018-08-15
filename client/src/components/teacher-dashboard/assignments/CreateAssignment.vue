@@ -93,6 +93,9 @@
                                         v-if="uploadSuccess === null">
                                 </b-form-file>
                             </b-form-group>
+                            <b-form-group label="Whether the assignment will be made individually or not" description="This can not be changed after creating the assignment. No group imports can be made either">
+                                <b-form-checkbox v-model="assignment.one_person_groups">Individual assignment</b-form-checkbox>
+                            </b-form-group>
                             <b-button type="submit" variant="primary">Create the assignment</b-button>
                         </b-form>
                     </b-card>
@@ -138,7 +141,8 @@ export default {
                 review_due_day: null,
                 review_due_time: "23:59",
                 review_due_date: null,
-                reviews_per_user: null
+                reviews_per_user: null,
+                one_person_groups: false,
             }
         }
     },
@@ -199,7 +203,7 @@ export default {
                 formData.append("review_due_date", rddate)
                 formData.append("assignmentFile", this.file)
                 formData.append("reviews_per_user", this.assignment.reviews_per_user)
-
+                formData.append("one_person_groups", this.assignment.one_person_groups)
 
                 try {
                     await api.createAssignment(formData)
