@@ -86,7 +86,7 @@ describe("API Course routes", () => {
         console.log(res.text);
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text)).to.deep.equal(
-            {
+            [{
                 "title": "Assignment 2",
                 "description": "Example assignment number two",
                 "id": 2,
@@ -98,7 +98,7 @@ describe("API Course routes", () => {
                 "review_publish_date": "2020-05-01T20:30:00.000Z",
                 "review_due_date": "9999-05-01T20:30:00.000Z",
                 "one_person_groups": false
-            }
+            }]
         );
     });
 

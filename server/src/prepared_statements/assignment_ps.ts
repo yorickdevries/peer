@@ -210,7 +210,7 @@ export default class AssignmentPS {
             "JOIN groupusers g ON a.group_id = g.group_groupid " +
             "WHERE g.user_netid = $1 AND al.course_id = $2");
         statement.values = [netId, courseId];
-        return Database.executeQuerySingleResult(statement);
+        return Database.executeQuery(statement);
     }
 
     /**
@@ -227,6 +227,6 @@ export default class AssignmentPS {
             "JOIN groupusers g ON a.group_id = g.group_groupid " +
             "WHERE g.user_netid = $2 AND al.course_id = $1");
         statement.values = [courseId, netId];
-        return Database.executeQuerySingleResult(statement);
+        return Database.executeQuery(statement);
     }
 }
