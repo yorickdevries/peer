@@ -225,7 +225,7 @@ export default class AssignmentPS {
             "WHERE course_id = $1 AND id NOT IN (SELECT al.id FROM assignmentlist al " +
             "JOIN assignmentgroup a ON a.assignment_id = al.id " +
             "JOIN groupusers g ON a.group_id = g.group_groupid " +
-            "WHERE g.user_netid = $2 AND al.course_id = $1");
+            "WHERE g.user_netid = $2 AND al.course_id = $1) AND assignmentlist.one_person_groups = true");
         statement.values = [courseId, netId];
         return Database.executeQuery(statement);
     }
