@@ -135,7 +135,7 @@ CREATE TABLE Review (
     Rubric_Assignment_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
     creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    grade int NOT NULL DEFAULT -1,
+    approved boolean,
     CONSTRAINT Review_pk PRIMARY KEY (id)
 );
 
