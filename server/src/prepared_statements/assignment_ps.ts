@@ -183,4 +183,16 @@ export default class AssignmentPS {
         statement.values = [netId, assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
+
+    /**
+     * Checks whether an assignment is specified as one person groups assignment.
+     * @param {number} assignmentId - assignment id.
+     * @return {Promise<any>} true or false as pg promise.
+     */
+    public static executeIsOnePersonGroupAssignment(assignmentId: number) {
+        const statement = new PreparedStatement("exists-group-netid-assignment-id",
+            "SELECT one_person_groups FROM assignmentlist WHERE id = $1");
+        statement.values = [assignmentId];
+        return Database.executeQuerySingleResult(statement);
+    }
 }
