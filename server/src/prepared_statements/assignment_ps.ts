@@ -212,4 +212,21 @@ export default class AssignmentPS {
         statement.values = [netId, courseId];
         return Database.executeQuerySingleResult(statement);
     }
+
+    /**
+     * Get all not enrolled assignments for a user.
+     * @param {string} netId - a user net id.
+     * @param {number} courseId - a course id.
+     * @return {Promise<any>} - all not enrolled assignments.
+     */
+    public static executeGetUnenrolledAssignmentsForUser(netId: string, courseId: number) {
+        const statement = new PreparedStatement("get-not-enrolled-assignments-for-netid",
+            "SELECT * FROM assignmentlist " +
+            "WHERE course_id = $1 AND id NOT IN (SELECT al.id FROM assignmentlist al " +
+            "JOIN assignmentgroup a ON a.assignment_id = al.id " +
+            "JOIN groupusers g ON a.group_id = g.group_groupid " +
+            "WHERE g.user_netid = $2 AND al.course_id = $1");
+        statement.values = [courseId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
 }
