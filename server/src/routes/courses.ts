@@ -174,6 +174,19 @@ router.get("/:courseId/enroll", async (req: any, res) => {
  * Get all unenrolled courses of a student.
  * @param courseId - a course id.
  */
+router.get("/:courseId/unenrolled", async (req: any, res) => {
+    try {
+        // Use method from group parser to enroll student (if not already enrolled)
+        res.json(await CoursesPS.executeGetUnenrolledForUser(req.userinfo.given_name));
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Get all unenrolled assignments of a student for a course.
+ * @param courseId - a course id.
+ */
 router.get("/:courseId/assignments/unenrolled", async (req: any, res) => {
     try {
         // Use method from group parser to enroll student (if not already enrolled)
