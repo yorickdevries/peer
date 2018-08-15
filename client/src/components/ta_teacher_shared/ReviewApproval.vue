@@ -18,18 +18,14 @@
                             <dd>
                                 <b-button variant="danger" class="mr-2"
                                     @click="disapprove"
-                                    >
+                                    :disabled="peerReview.review.approved === false">
                                     Disapprove 👎
                                 </b-button>
                                 <b-button variant="success"
                                     @click="approve"
-                                    >
+                                    :disabled="peerReview.review.approved">
                                     Approve 👍
                                 </b-button>
-
-                                {{ peerReview.review.approved }}
-
-                                <b-button @click="peerReview.review.approved = !peerReview.review.approved">XD</b-button>
                             </dd>
                         </dl>
 
@@ -155,28 +151,35 @@ export default {
         try {
             const {data: peerReview} = await api.getPeerReview(this.$route.params.reviewId)
             this.peerReview = peerReview
-            this.peerReview.review.approved = false
         } catch (e) {
             this.showErrorMessage({message: 'Review could not be loaded.'})
         }
 
     },
     methods: {
-
         transformOptionsToHTMLOptions(options) {
             // Transforms the option array from the API to a HTML option array.
             return options.map(option => {
                 return {text: option.option, value: option.id}
             })
         },
-        disapprove() {
+        async disapprove() {
             this.peerReview.review.approved = false
-            console.log(this.peerReview.review.approved)
+            await this.updateApproval()
         },
-        approve() {
+        async approve() {
             this.peerReview.review.approved = true
-            console.log(this.peerReview.review.approved)
-
+            await this.updateApproval()
+        },
+        async updateApproval() {
+            try {
+                await api.client.post(`/reviews/${this.peerReview.review.id}/grade`, {
+                    approve: this.peerReview.review.approved
+                })
+                this.showSuccessMessage({message: 'Review approval status changed'})
+            } catch (e) {
+                this.showErrorMessage({message: 'Something went wrong with approving/disapproving this review'})
+            }
         }
 
     }

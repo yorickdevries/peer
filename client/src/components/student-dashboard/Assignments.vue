@@ -92,7 +92,7 @@ export default {
     methods: {
         async enrollInAssignment(assignmentId) {
             try {
-                let res = await api.enrollInAssignment(assignmentId)
+                await api.enrollInAssignment(assignmentId)
                 await this.fetch()
                 this.showSuccessMessage({message: "Enrolled in course."})
             } catch (e) {
