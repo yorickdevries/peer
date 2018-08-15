@@ -402,22 +402,18 @@ router.get("/:assignment_id/enroll", async (req: any, res) => {
 
         // Enroll as long as the assignment is open for submission and the assignment is of one person groups.
         // Only if one person groups is specified, students can enroll themselves.
-        if (new Date(assignment.due_date) > new Date() && assignment.one_person_groups) {
+        
 
-            // Check whether student doesnt have a group yet
-            const groupAssignment: any =
-                await AssignmentPS.executeExistsGroupOfNetIdByAssignmentId(req.userinfo.given_name, req.params.assignment_id);
-            if (groupAssignment.exists) {
+        if (new Date(assignment.due_date) > new Date() && assignment.one_person_groups === true) {
+
+            // Throw error if student is already in a group.
+            if (await GroupParser.studentIsInGroup(req.userinfo.given_name, req.params.assignment_id)) {
                 throw new Error(req.userinfo.given_name + " is already in a group");
             }
 
-            // Make an group entry in the database.
-            const group: any = await GroupPS.executeAddGroup(req.userinfo.given_name);
-            // Add an assignment to the group.
-            const groupId = group.id;
-            await GroupPS.executeAddGrouptoAssignment(groupId, req.params.assignment_id);
-            // Add the student to the group.
-            await GroupPS.executeAddStudenttoGroup(req.userinfo.given_name, groupId)
+            // Create group and add assignment and student.
+            const groupId = await GroupParser.createGroupForAssignment(req.userinfo.given_name, req.params.assignment_id);
+            await GroupPS.executeAddStudenttoGroup(req.userinfo.given_name, groupId);
 
             res.sendStatus(200);
         } else {

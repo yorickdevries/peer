@@ -137,6 +137,33 @@ export default class GroupParser {
     }
 
     /**
+     * Create a group and add an assignment to that group.
+     * @param {string} groupname - a group name.
+     * @param {number} assignmentId - an existing assignment id.
+     * @return {Promise<any>} the group id.
+     */
+    public static async createGroupForAssignment(groupname: string, assignmentId: number) {
+        // make an group entry in the database
+        const group: any = await GroupPS.executeAddGroup(groupname);
+        // add an assignment to the group
+        const groupId = group.id;
+        await GroupPS.executeAddGrouptoAssignment(groupId, assignmentId);
+
+        return groupId;
+    }
+
+    /**
+     * Check wheter a student is in a specific group.
+     * @param {string} studentNetId - student net id.
+     * @param {number} assignmentId - assignment id.
+     * @return {Promise<any>} true if already in a group.
+     */
+    public static async studentIsInGroup(studentNetId: string, assignmentId: number) {
+        const groupAssignment: any = await AssignmentPS.executeExistsGroupOfNetIdByAssignmentId(studentNetId, assignmentId);
+        return (groupAssignment.exists);
+    }
+
+    /**
      * Puts the groups into the database
      * @param {Map<string, string[]>} studentmap
      * @param {number} assignmentId
@@ -159,16 +186,10 @@ export default class GroupParser {
             // Get a list of all students in this group
             const students = studentmap.get(groupname);
             if (students !== undefined) {
-                // make an group entry in the database
-                const group: any = await GroupPS.executeAddGroup(groupname);
-                // add an assignment to the group
-                const groupId = group.id;
-                await GroupPS.executeAddGrouptoAssignment(groupId, assignmentId);
+                const groupId = await this.createGroupForAssignment(groupname, assignmentId);
                 // add all students to a group
                 for (const studentNetId of students) {
-                    // Check whether student doesnt have a group yet
-                    const groupAssignment: any = await AssignmentPS.executeExistsGroupOfNetIdByAssignmentId(studentNetId, assignmentId);
-                    if (groupAssignment.exists) {
+                    if (await this.studentIsInGroup(studentNetId, assignmentId)) {
                         throw new Error(studentNetId + " is already in a group");
                     }
                     // create student in database
