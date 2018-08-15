@@ -146,12 +146,7 @@ export default {
     },
     async created() {
         // Fetch courses that user has not yet enrolled in.
-        try {
-            const { data: unenrolledCourses } = await api.getUnenrolledCourses()
-            this.unEnrolledCourses = unenrolledCourses
-        } catch (e) {
-            this.showErrorMessage({message: 'Could not fetch not yet enrolled courses.'})
-        }
+        await this.fetchUnenrolledCourses()
 
         // Fetch enrolled courses.
         await this.fetchCourses()
@@ -170,12 +165,24 @@ export default {
                 this.$set(this.courses[i], 'role', res.data.role)
             }
         },
+        async fetchUnenrolledCourses() {
+            try {
+                const { data: unenrolledCourses } = await api.getUnenrolledCourses()
+                this.unEnrolledCourses = unenrolledCourses
+            } catch (e) {
+                this.showErrorMessage({message: 'Could not fetch not yet enrolled courses.'})
+            }
+        },
         async enrollInCourse(courseId) {
             try {
                 await api.enrollInCourse(courseId)
+                this.showSuccessMessage({message: "Successfully enrolled in course."})
             } catch (e) {
                 this.showErrorMessage({message: "Could not enroll you in this course."})
             }
+            await this.fetchUnenrolledCourses()
+            await this.fetchCourses()
+            await this.fetchAllCourseRoles()
         }
     }
 }

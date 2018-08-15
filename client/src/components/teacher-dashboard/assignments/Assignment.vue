@@ -28,16 +28,19 @@
                                             <dl class="mb-0">
                                                 <dt>Shuffle groups</dt>
                                                 <dd>This action will shuffle the groups and assign the groups to each
-                                                    other.
+                                                    other. Can only be done once.
                                                 </dd>
-                                                <b-button @click="shuffleGroups()" class="mb-3" variant="primary">
-                                                    Shuffle Groups
-                                                </b-button>
+                                                <b-button @click="shuffleGroups()" class="mb-3" variant="primary">Shuffle Groups</b-button>
 
-                                                <dt>Import groups</dt>
-                                                <dd>This action will import the groups in the assignment.</dd>
-                                                <b-button v-b-modal="'importGroups'" variant="primary">Import groups
-                                                </b-button>
+                                                <template v-if="!assignment.one_person_groups">
+                                                    <dt>Import groups</dt>
+                                                    <dd>This action will import the groups in the assignment.</dd>
+                                                    <b-button v-b-modal="'importGroups'" variant="primary">Import groups</b-button>
+                                                </template>
+                                                <template v-else>
+                                                    <dt>Import groups</dt>
+                                                    <dd>Not available. On creation of the assignment, this assignment has been set as individual. </dd>
+                                                </template>
                                             </dl>
 
                                             <b-modal id="importGroups" centered hide-header hide-footer class="p-0 m-0" size="lg">
@@ -104,6 +107,7 @@ export default {
         this.assignment.id = aid
         let res = await api.getAssignment(aid)
         this.assignment = res.data
+        this.assignment.one_person_groups = true
     },
     data() {
         return {
@@ -118,7 +122,8 @@ export default {
                 due_date: null,
                 review_publish_date: null,
                 review_due_date: null,
-                filename: null
+                filename: null,
+                one_person_groups: null
             },
         }
     },

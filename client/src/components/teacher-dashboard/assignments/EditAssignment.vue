@@ -90,8 +90,9 @@
                                                 required>
                                 </b-form-input>
                             </b-form-group>
+
                             <!--File upload-->
-                            <b-form-group label="Assignment file">
+                            <b-form-group label="Assignment file" class="mb-0">
                                 <!--Show currently uploaded file-->
                                 <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
                                     <div>You currently have uploaded the file:
@@ -109,6 +110,10 @@
                                               :state="Boolean(file)">
                                 </b-form-file>
                                 <p class="mb-0" v-if="uploadNewFile && file">File will be uploaded when you press the "save changes" button</p>
+                            </b-form-group>
+
+                            <b-form-group label="Whether the assignment will be made individually or not" description="This can not be changed after creating the assignment. No group imports can be made either">
+                                <b-form-checkbox v-model="assignment.one_person_groups" disabled>Individual assignment</b-form-checkbox>
                             </b-form-group>
                             <b-button type="submit" variant="primary">Save changes</b-button>
                         </b-form>
@@ -150,7 +155,8 @@ export default {
                 review_due_day: null,
                 review_due_time: null,
                 reviews_per_user: null,
-                filename: null
+                filename: null,
+                one_person_groups: null
             },
             course: {
                 id: null,
