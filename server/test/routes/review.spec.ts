@@ -312,4 +312,20 @@ describe("API review routes", () => {
             }
         ));
     });
+
+    /**
+     * Tests if a review can be approved.
+     */
+    it("review/:reviewId/grade", async () => {
+        const reviewId: number = 1;
+
+        const resultBefore = await ReviewPS.executeGetReview(reviewId);
+        expect(resultBefore.approved).to.equal(null);
+
+        await chai.request(router)
+            .post(`/${reviewId}/grade`)
+            .send({approved: true});
+        const resultAfter = await ReviewPS.executeGetReview(reviewId);
+        expect(resultAfter.approved).to.equal(true);
+    });
 });
