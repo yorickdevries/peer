@@ -49,9 +49,7 @@
                                         </b-card-body>
                                     </b-card>
                                 </b-tab>
-
                             </b-col>
-
 
                         </b-row>
                     </b-tabs>
@@ -89,30 +87,34 @@ export default {
         }
     },
     async created() {
-        // Fetch assignments.
-        let resAssignment = await api.getCourseAssignments(this.$route.params.courseId)
-        this.assignments = resAssignment.data
-
-        // Fetch not yet enrolled assignments.
-        try {
-            let { data: enrollableAssignments} =  await api.getCourseAssignmentsUnenrolled(this.$route.params.courseId)
-            this.enrollableAssignments = enrollableAssignments
-
-            // Temporary.
-            this.enrollableAssignments = this.assignments
-
-        } catch (e) {
-            this.showErrorMessage({message: "Could not load assignments that you are not yet enrolled in."})
-        }
+        await this.fetch()
     },
     methods: {
         async enrollInAssignment(assignmentId) {
             try {
                 let res = await api.enrollInAssignment(assignmentId)
-                console.log(res)
+                await this.fetch()
+                this.showSuccessMessage({message: "Enrolled in course."})
             } catch (e) {
                 this.showErrorMessage()
                 console.log(e)
+            }
+        },
+        async fetch() {
+            // Fetch assignments.
+            let resAssignment = await api.getCourseAssignments(this.$route.params.courseId)
+            this.assignments = resAssignment.data
+
+            // Fetch not yet enrolled assignments.
+            try {
+                let { data: enrollableAssignments} =  await api.getCourseAssignmentsUnenrolled(this.$route.params.courseId)
+                this.enrollableAssignments = enrollableAssignments
+
+                // Temporary.
+                this.enrollableAssignments = this.assignments
+
+            } catch (e) {
+                this.showErrorMessage({message: "Could not load assignments that you are not yet enrolled in."})
             }
         }
     }
