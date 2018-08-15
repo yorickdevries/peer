@@ -86,12 +86,12 @@ export default class AssignmentPS {
      */
     public static executeAddAssignment(title: string, description: string, courseId: number, reviewsPerUser: number,
                                        filename: string, publishDate: Date, dueDate: Date, reviewPublishDate: Date,
-                                       reviewDueDate: Date): Promise<pgPromise.queryResult> {
+                                       reviewDueDate: Date, onePersonGroups: boolean): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("addAssignment",
         'INSERT INTO "assignmentlist" (title, description, course_id, reviews_per_user, filename, publish_date, ' +
-            "due_date, review_publish_date, review_due_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *");
+            "due_date, review_publish_date, review_due_date, one_person_groups) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *");
         statement.values = [title, description, courseId, reviewsPerUser, filename, publishDate, dueDate,
-            reviewPublishDate, reviewDueDate];
+            reviewPublishDate, reviewDueDate, onePersonGroups];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -182,5 +182,51 @@ export default class AssignmentPS {
             "WHERE g.user_netid = $1 AND a.assignment_id = $2)");
         statement.values = [netId, assignmentId];
         return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Checks whether an assignment is specified as one person groups assignment.
+     * @param {number} assignmentId - assignment id.
+     * @return {Promise<any>} true or false as pg promise.
+     */
+    public static executeIsOnePersonGroupAssignment(assignmentId: number) {
+        const statement = new PreparedStatement("exists-group-netid-assignment-id",
+            "SELECT one_person_groups FROM assignmentlist WHERE id = $1");
+        statement.values = [assignmentId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Get all enrolled assignments for a user.
+     * @param {string} netId - a user net id.
+     * @param {number} courseId - a course id.
+     * @return {Promise<any>} - all enrolled assignments.
+     */
+    public static executeGetEnrolledAssignmentsForUser(netId: string, courseId: number) {
+        const statement = new PreparedStatement("get-enrolled-assignments-for-netid",
+            "SELECT al.* " +
+            "FROM assignmentlist al " +
+            "JOIN assignmentgroup a ON a.assignment_id = al.id " +
+            "JOIN groupusers g ON a.group_id = g.group_groupid " +
+            "WHERE g.user_netid = $1 AND al.course_id = $2");
+        statement.values = [netId, courseId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Get all not enrolled assignments for a user.
+     * @param {string} netId - a user net id.
+     * @param {number} courseId - a course id.
+     * @return {Promise<any>} - all not enrolled assignments.
+     */
+    public static executeGetUnenrolledAssignmentsForUser(netId: string, courseId: number) {
+        const statement = new PreparedStatement("get-not-enrolled-assignments-for-netid",
+            "SELECT * FROM assignmentlist " +
+            "WHERE course_id = $1 AND id NOT IN (SELECT al.id FROM assignmentlist al " +
+            "JOIN assignmentgroup a ON a.assignment_id = al.id " +
+            "JOIN groupusers g ON a.group_id = g.group_groupid " +
+            "WHERE g.user_netid = $2 AND al.course_id = $1) AND assignmentlist.one_person_groups = true");
+        statement.values = [courseId, netId];
+        return Database.executeQuery(statement);
     }
 }

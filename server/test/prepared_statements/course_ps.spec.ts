@@ -138,4 +138,13 @@ describe("CoursePreparedStatement Test", () => {
         }]);
     });
 
+    /**
+     * Test get all unenrolled courses for a user.
+     */
+    it("Get all students of a course", async () => {
+        // Verify that the student has student as role
+        const result: any = await CoursePS.executeGetUnenrolledForUser("paulvanderlaan");
+        console.log(result);
+        expect(result[0].id).to.equal(2);
+    });
 });

@@ -125,7 +125,8 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
             req.body.publish_date,
             req.body.due_date,
             req.body.review_publish_date,
-            req.body.review_due_date);
+            req.body.review_due_date,
+            req.body.one_person_groups);
         // Create rubric
         await RubricPS.executeCreateRubric(result.id);
         // writing the file if no error is there
@@ -388,6 +389,38 @@ router.get("/:assignment_id/groups", index.authorization.enrolledAsTAOrTeacherAs
     }).catch((error) => {
         res.sendStatus(400);
     });
+});
+
+/**
+ * Route to enroll in an assignment as 1 person group.
+ * Only possible for assignments with 1 person groups.
+ * Student should be enrolled in the course.
+ * @param id - assignment id.
+ */
+router.get("/:assignment_id/enroll", async (req: any, res) => {
+    try {
+        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
+
+        // Check if the assignment due date is not passed, one person groups is enabled and student is without group.
+        // Send custom error json (not throwing error and displaying that) since database error messages are confidential.
+        if (new Date(assignment.due_date) <= new Date()) {
+            res.status(400);
+            res.json({error: "Student can only enroll until the assignment due date deadline."});
+        } else if (assignment.one_person_groups === false) {
+            res.status(400);
+            res.json({error: "Assignment has one person groups not enabled."});
+        } else if (await GroupParser.studentIsInGroup(req.userinfo.given_name, req.params.assignment_id) === true) {
+            res.status(400);
+            res.json({error: "Student is already in a group enrolled for this assignment."});
+        } else {
+            // Create group and add assignment and student.
+            const groupId = await GroupParser.createGroupForAssignment(req.userinfo.given_name, req.params.assignment_id);
+            await GroupPS.executeAddStudenttoGroup(req.userinfo.given_name, groupId);
+            res.sendStatus(200);
+        }
+    } catch {
+        res.sendStatus(400);
+    }
 });
 
 export default router;

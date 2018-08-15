@@ -83,40 +83,21 @@ describe("API Course routes", () => {
     it("Get /:courseId/assignments", async () => {
         // test the router
         const res = await chai.request(router).get("/1/assignments");
+        console.log(res.text);
         expect(res.status).to.equal(200);
-        expect(JSON.parse(res.text)).to.deep.equal([{
-                "title": "Assignment 1",
-                "description": "Example assignment number one",
-                "due_date": "2018-05-01T20:30:00.000Z",
-                "publish_date": "2018-04-01T20:30:00.000Z",
-                "id": 1,
-                "course_id": 1,
-                "reviews_per_user": 2,
-                "filename": "assignment1.pdf",
-                "review_due_date": "2018-05-03T20:30:00.000Z",
-                "review_publish_date": "2018-05-02T20:30:00.000Z"
-            }, {
+        expect(JSON.parse(res.text)).to.deep.equal(
+            [{
                 "title": "Assignment 2",
                 "description": "Example assignment number two",
-                "due_date": "2018-05-01T20:30:00.000Z",
-                "publish_date": "2018-04-01T20:30:00.000Z",
                 "id": 2,
                 "course_id": 1,
                 "reviews_per_user": 1,
                 "filename": "assignment2.pdf",
-                "review_due_date": "9999-05-01T20:30:00.000Z",
-                "review_publish_date": "2020-05-01T20:30:00.000Z"
-            }, {
-                "title": "Assignment 3",
-                "description": "Example assignment number three",
-                "due_date": "2018-05-01T20:30:00.000Z",
                 "publish_date": "2018-04-01T20:30:00.000Z",
-                "id": 3,
-                "course_id": 1,
-                "reviews_per_user": 1,
-                "filename": "assignment3.pdf",
+                "due_date": "2018-05-01T20:30:00.000Z",
+                "review_publish_date": "2020-05-01T20:30:00.000Z",
                 "review_due_date": "9999-05-01T20:30:00.000Z",
-                "review_publish_date": "2020-05-01T20:30:00.000Z"
+                "one_person_groups": false
             }]
         );
     });

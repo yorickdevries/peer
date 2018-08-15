@@ -1,6 +1,7 @@
 import CoursesPS from "../prepared_statements/courses_ps";
 import AssignmentsPS from "../prepared_statements/assignment_ps";
 import bodyParser from "body-parser";
+import GroupParser from "../groupParser";
 import index from "../security/index";
 import { Roles } from "../roles";
 
@@ -53,17 +54,44 @@ router.get("/enrolled", (req: any, res) => {
 });
 
 /**
- * Get all assignments that belong to a specific course.
+ * Get all unenrolled courses of a student.
  * @param courseId - a course id.
  */
-router.get("/:courseId/assignments", index.authorization.enrolledCourseCheck, (req, res) => {
-    AssignmentsPS.executeGetAssignments(req.params.courseId)
+router.get("/unenrolled", async (req: any, res) => {
+    try {
+        // Use method from group parser to enroll student (if not already enrolled)
+        res.json(await CoursesPS.executeGetUnenrolledForUser(req.userinfo.given_name));
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Get all assignments that belong to a specific course where the user is enrolled in.
+ * @param courseId - a course id.
+ */
+router.get("/:courseId/assignments/enrolled", index.authorization.enrolledCourseCheck, (req: any, res) => {
+    AssignmentsPS.executeGetEnrolledAssignmentsForUser(req.userinfo.given_name, req.params.courseId)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
         res.sendStatus(400);
     });
 });
+
+/**
+ * Get all assignments that belong to a specific course.
+ * @param courseId - a course id.
+ */
+router.get("/:courseId/assignments", index.authorization.enrolledCourseCheck, (req: any, res) => {
+    AssignmentsPS.executeGetAssignments(req.params.courseId)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
+
 
 /**
  * Update the course, given a course id.
@@ -150,6 +178,33 @@ router.get("/:courseId/users/:role/", index.authorization.enrolledCourseTeacherC
         }
         // Query and return all net ids as json.
         res.json(await CoursesPS.executeGetUsersByRole(req.params.courseId, req.params.role));
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Enroll as a student in a course.
+ * @param courseId - a course id.
+ */
+router.get("/:courseId/enroll", async (req: any, res) => {
+    try {
+        // Use method from group parser to enroll student (if not already enrolled)
+        await GroupParser.enrollStudentIfNotEnrolled(req.params.courseId, req.userinfo.given_name);
+        res.sendStatus(200);
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Get all unenrolled assignments of a student for a course.
+ * @param courseId - a course id.
+ */
+router.get("/:courseId/assignments/unenrolled", async (req: any, res) => {
+    try {
+        // Use method from group parser to enroll student (if not already enrolled)
+        res.json(await AssignmentsPS.executeGetUnenrolledAssignmentsForUser(req.userinfo.given_name, req.params.courseId));
     } catch {
         res.sendStatus(400);
     }

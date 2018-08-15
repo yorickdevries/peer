@@ -16,6 +16,15 @@ export default {
     getEnrolledCourses() {
         return client.get(`courses/enrolled`)
     },
+    getUnenrolledCourses() {
+        return client.get(`courses/unenrolled`)
+    },
+    enrollInCourse(courseId) {
+        return client.get(`courses/${courseId}/enroll`)
+    },
+    enrollInAssignment(assignmentId) {
+        return client.get(`assignments/${assignmentId}/enroll`)
+    },
     createCourse: async(course) => {
         return client.post('courses', course)
     },
@@ -24,6 +33,12 @@ export default {
     },
     getCourseAssignments(courseId) {
         return client.get(`courses/${courseId}/assignments`)
+    },
+    getCourseEnrolledAssignments(courseId) {
+        return client.get(`courses/${courseId}/assignments/enrolled`)
+    },
+    getCourseAssignmentsUnenrolled(courseId) {
+        return client.get(`courses/${courseId}/assignments/unenrolled`)
     },
     getAssignment(assignmentId) {
         return client.get(`assignments/${assignmentId}`)
