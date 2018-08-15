@@ -409,7 +409,7 @@ router.get("/:assignment_id/enroll", async (req: any, res) => {
         } else if (assignment.one_person_groups === false) {
             res.status(400);
             res.json({error: "Assignment has one person groups not enabled."});
-        } else if (await GroupParser.studentIsInGroup(req.userinfo.given_name, req.params.assignment_id) === false) {
+        } else if (await GroupParser.studentIsInGroup(req.userinfo.given_name, req.params.assignment_id) === true) {
             res.status(400);
             res.json({error: "Student is already in a group enrolled for this assignment."});
         } else {
