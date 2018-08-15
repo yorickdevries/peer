@@ -21,6 +21,18 @@ describe("ReviewPreparedStatement Test", () => {
     });
 
     /**
+     * Test approve a review prepared statement.
+     */
+    it("Reviews of an assignment", async () => {
+        const resultBefore = await ReviewPS.executeGetReview(1);
+        expect(resultBefore.approved).to.equal(null);
+
+        await ReviewPS.executeSetApprovedForReview(false, 1);
+        const resultAfter = await ReviewPS.executeGetReview(1);
+        expect(resultAfter.approved).to.equal(false);
+    });
+
+    /**
      * Submit review by id.
      */
     it("submit review by id", async () => {

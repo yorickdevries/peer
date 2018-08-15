@@ -269,6 +269,6 @@ export default class ReviewPS {
         const statement = new PreparedStatement("update-approved-for-review",
             "UPDATE review SET approved=$1 WHERE id = $2");
         statement.values = [isApproved, reviewId];
-        return Database.executeQuerySingleResult(statement);
+        return Database.executeQuery(statement);
     }
 }
