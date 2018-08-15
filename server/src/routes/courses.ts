@@ -163,7 +163,8 @@ router.get("/:courseId/users/:role/", index.authorization.enrolledCourseTeacherC
 router.get("/:courseId/enroll", async (req: any, res) => {
     try {
         // Use method from group parser to enroll student (if not already enrolled)
-        await GroupParser.enrollStudentIfNotEnrolled(req.params.courseId, req.userinfo.given_name)
+        await GroupParser.enrollStudentIfNotEnrolled(req.params.courseId, req.userinfo.given_name);
+        res.sendStatus(200);
     } catch {
         res.sendStatus(400);
     }
