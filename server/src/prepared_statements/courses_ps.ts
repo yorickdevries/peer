@@ -145,7 +145,7 @@ export default class CoursesPS {
      * @return {any} - all not enrolled courses for that user.
      */
     public static executeGetUnenrolledForUser(netId: string): any {
-        const statement = new PreparedStatement("get-user-by-role",
+        const statement = new PreparedStatement("get-unenrolled-courses-for-netid",
             'SELECT * FROM "courselist" WHERE "id" NOT IN (SELECT "id" FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" WHERE user_netid LIKE $1))');
         statement.values = [netId];
         return Database.executeQuery(statement);
