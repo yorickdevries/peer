@@ -203,11 +203,11 @@ export default class AssignmentPS {
      * @return {Promise<any>} - all enrolled assignments.
      */
     public static executeGetEnrolledAssignmentsForUser(netId: string, courseId: number) {
-        const statement = new PreparedStatement("get-unenrolled-assignments",
-            "SELECT a.assignment_id, a.group_id " +
-            "FROM assignmentgroup a " +
+        const statement = new PreparedStatement("get-enrolled-assignments-for-netid",
+            "SELECT al.* " +
+            "FROM assignmentlist al " +
+            "JOIN assignmentgroup a ON a.assignment_id = al.id " +
             "JOIN groupusers g ON a.group_id = g.group_groupid " +
-            "JOIN assignmentlist al ON a.assignment_id = al.id " +
             "WHERE g.user_netid = $1 AND al.course_id = $2");
         statement.values = [netId, courseId];
         return Database.executeQuerySingleResult(statement);
