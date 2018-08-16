@@ -359,7 +359,7 @@ export default class RubricPS {
         const openQuestions = await RubricPS.executeGetAllOpenQuestionById(copyRubricId);
         const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(copyRubricId);
         const mcQuestions = await RubricPS.executeGetAllMCQuestionById(copyRubricId);
-        const mcOptions = await RubricPS.executeGetAllMCOptionById(copyRubricId);
+        let mcOptions;
 
         // Copy open questions
         for (let i = 0; i < openQuestions.length; i++) {
@@ -372,10 +372,12 @@ export default class RubricPS {
         // Copy mc questions
         for (let i = 0; i < mcQuestions.length; i++) {
             await this.executeCreateMCQuestion(mcQuestions[i].question, currentRubricId, mcQuestions[i].question_number);
-        }
-        // Copy mc options
-        for (let i = 0; i < mcOptions.length; i++) {
-            await this.executeCreateMCOption(mcOptions[i].option, mcOptions[i].mcquestion_id);
+
+            // Copy mc options
+            mcOptions = await RubricPS.executeGetAllMCOptionById(copyRubricId);
+            for (let i = 0; i < mcOptions.length; i++) {
+                await this.executeCreateMCOption(mcOptions[i].option, mcQuestions[i].id);
+            }
         }
     }
 
