@@ -35,7 +35,7 @@ export default class ExportResultsPS {
      */
     public static executeGetStudentReviewExportCourse(courseId: number): any {
         const statement = new PreparedStatement("get-result-aggregation",
-            '﻿SELECT netID AS "netID", approved, disproved, total - approved - disproved AS "waiting for TA", total AS "student total reviews"' +
+            '﻿SELECT netID AS "netID", approved, disapproved, total - approved - disproved AS "waiting for TA", total AS "student total reviews"' +
             'FROM (' +
             '    SELECT userlist.netid AS netID,' +
             '    SUM(CASE WHEN review.approved IN (true) THEN 1 ELSE 0 END) AS approved,' +
