@@ -86,7 +86,7 @@ export default class AuthorizationPS {
         const statement = new PreparedStatement("check-authorization-mcquestion",
             "SELECT EXISTS(SELECT * FROM mcquestion, assignmentlist, enroll " +
             "WHERE mcquestion.rubric_assignment_id = assignmentlist.id " +
-            "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher' OR enroll.role = 'TA') " +
+            "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher') " +
             "AND mcquestion.id = $1 AND enroll.user_netid = $2)");
         statement.values = [questionId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -102,7 +102,7 @@ export default class AuthorizationPS {
         const statement = new PreparedStatement("check-authorization-mcoption",
             "SELECT EXISTS(SELECT * FROM mcoption, mcquestion, assignmentlist, enroll " +
             "WHERE mcoption.mcquestion_id = mcquestion.id AND mcquestion.rubric_assignment_id = assignmentlist.id" +
-            " AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher' OR enroll.role = 'TA') " +
+            " AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher') " +
             "AND mcoption.id = $1 AND enroll.user_netid = $2)");
         statement.values = [optionId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -118,7 +118,7 @@ export default class AuthorizationPS {
         const statement = new PreparedStatement("check-authorization-rangequestion",
             "SELECT EXISTS(SELECT * FROM rangequestion, assignmentlist, enroll " +
             "WHERE rangequestion.rubric_assignment_id = assignmentlist.id " +
-            "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher' OR enroll.role = 'TA') " +
+            "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher') " +
             "AND rangequestion.id = $1 AND enroll.user_netid = $2)");
         statement.values = [questionId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -134,7 +134,7 @@ export default class AuthorizationPS {
         const statement = new PreparedStatement("check-authorization-openquestion",
             "SELECT EXISTS(SELECT * FROM openquestion, assignmentlist, enroll " +
             "WHERE openquestion.rubric_assignment_id = assignmentlist.id " +
-            "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher' OR enroll.role = 'TA') " +
+            "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher') " +
             "AND openquestion.id = $1 AND enroll.user_netid = $2)");
         statement.values = [questionId, netId];
         return Database.executeQuerySingleResult(statement);

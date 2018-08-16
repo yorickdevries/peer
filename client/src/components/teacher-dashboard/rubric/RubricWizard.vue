@@ -2,12 +2,32 @@
 <template>
     <b-container>
 
-        <b-row class="mb-3">
-            <b-col>
-                <b-button v-b-modal="'createModal'" size="sm" variant="primary" class="w-100">Add new Question
-                </b-button>
-            </b-col>
-        </b-row>
+        <b-card class="mb-3">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="text-muted">Create a new question.</div>
+                    <b-button v-b-modal="'createModal'"  variant="primary">Add new Question</b-button>
+                </div>
+                <div>
+                    <div class="text-muted">Copy questions from another rubric.</div>
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <b-button variant="primary" @click="copyRubric">Copy</b-button>
+                        </div>
+                        <b-form-select v-model="rubricToCopy" :options="rubricsMetaData"  plain></b-form-select>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-muted">Deletes all questions</div>
+                    <b-button variant="danger" v-b-modal.deleteAll>Delete all questions</b-button>
+                    <b-modal id="deleteAll" centered title="Warning" @ok="deleteAll">
+                        Are you sure you want to delete ALL questions? Deleting a question after students have submitted
+                        answers to this question will DELETE all the answers the students have given.
+                    </b-modal>
+                </div>
+            </div>
+        </b-card>
 
         <b-row>
             <b-col>
@@ -40,10 +60,24 @@
                         <b-button @click="saveQuestion(question)" variant="outline-primary" size="sm" class="mr-1">
                             Save
                         </b-button>
-                        <b-button @click="deleteQuestion(question)" variant="outline-danger" size="sm">Delete
-                        </b-button>
+
+                        <!--<b-button @click="deleteQuestion(question)" variant="outline-danger" size="sm">Delete</b-button>-->
+
+                        <span>
+                            <b-btn v-b-modal="`delete${question.id}`" variant="outline-danger" size="sm">Delete</b-btn>
+                            <b-modal :id="`delete${question.id}`" centered title="Warning" @ok="deleteQuestion(question)">
+                                Are you sure you want to delete? Deleting a question after students have submitted
+                                answers to this question will DELETE all the answers the students have given.
+                            </b-modal>
+                        </span>
+
                     </b-card-body>
                 </b-card>
+
+                <b-modal id="deleteModal" centered title="Warning" @ok="deleteQuestion(question)">
+                    Are you sure you want to delete? Deleting a question after students have submitted
+                    answers to this question will DELETE all the answers the students have given.
+                </b-modal>
 
                 <b-modal id="createModal" centered hide-header hide-footer class="p-0 m-0">
                     <CreateQuestionWizard :rubricId="rubric.id" @saved="fetchRubric"></CreateQuestionWizard>
@@ -68,6 +102,7 @@ let apiPrefixes = {
     range: '/rubric/rangequestion',
     mcoption: '/rubric/mcoption',
 }
+
 export default {
     mixins: [notifications],
     components: {
@@ -84,10 +119,13 @@ export default {
                 assignment_id: null,
                 question: []
             },
+            rubricsMetaData: [],
+            rubricToCopy: null
         }
     },
     async created() {
         await this.fetchRubric()
+        await this.fetchCourseRubricMetaData()
     },
     methods: {
         async fetchRubric() {
@@ -95,9 +133,20 @@ export default {
             this.rubric = res.data
             this.rubric.questions.sort((a, b) => a.question_number - b.question_number)
         },
+        async fetchCourseRubricMetaData() {
+            const {data} = await api.getCourseAssignments(this.$route.params.courseId)
+            const rubricsMetaData = data.map(assignment => {
+                return {value: assignment.id, text: assignment.title}
+            })
+            this.rubricsMetaData = rubricsMetaData
+        },
         async deleteQuestion(question) {
-            await api.client.delete(`${apiPrefixes[question.type_question]}/${question.id}`);
-            this.showSuccessMessage({message: 'Successfully deleted question.'})
+            try {
+                await api.client.delete(`${apiPrefixes[question.type_question]}/${question.id}`);
+                this.showSuccessMessage({message: 'Successfully deleted question.'})
+            } catch (e) {
+                this.showErrorMessage()
+            }
             await this.fetchRubric()
         },
         async saveQuestion(question) {
@@ -128,6 +177,29 @@ export default {
             this.showSuccessMessage({message: 'Successfully saved question.'})
             await this.fetchRubric()
         },
+        async copyRubric() {
+            if (this.rubricToCopy === null) return this.showErrorMessage({message: "Choose a rubric to copy first."})
+
+            try {
+                await api.client.get(`rubric/${this.rubric.id}/copy/${this.rubricToCopy}`)
+                this.showSuccessMessage({message: "Rubric successfully copied and appended to this rubric."})
+            } catch (e) {
+                this.showErrorMessage({message: "Rubric could not be copied."})
+            }
+
+            await this.fetchRubric()
+        },
+        async deleteAll() {
+            try {
+                await api.client.get(`rubric/${this.rubric.id}/deleteall`)
+                this.showSuccessMessage({message: "Deleted all questions."})
+            } catch (e) {
+                this.showErrorMessage({message: "Could not delete all questions."})
+            }
+
+            await this.fetchRubric()
+        }
+
     }
 }
 
