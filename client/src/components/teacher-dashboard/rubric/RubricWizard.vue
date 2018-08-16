@@ -102,6 +102,7 @@ let apiPrefixes = {
     range: '/rubric/rangequestion',
     mcoption: '/rubric/mcoption',
 }
+
 export default {
     mixins: [notifications],
     components: {
@@ -180,7 +181,7 @@ export default {
             if (this.rubricToCopy === null) return this.showErrorMessage({message: "Choose a rubric to copy first."})
 
             try {
-                await api.client.get(`rubrics/${this.rubric.id}/copy/${this.rubricToCopy}`)
+                await api.client.get(`rubric/${this.rubric.id}/copy/${this.rubricToCopy}`)
                 this.showSuccessMessage({message: "Rubric successfully copied and appended to this rubric."})
             } catch (e) {
                 this.showErrorMessage({message: "Rubric could not be copied."})
@@ -190,7 +191,7 @@ export default {
         },
         async deleteAll() {
             try {
-                await api.client.get(`rubrics/${this.rubric.id}/deleteall`)
+                await api.client.get(`rubric/${this.rubric.id}/deleteall`)
                 this.showSuccessMessage({message: "Deleted all questions."})
             } catch (e) {
                 this.showErrorMessage({message: "Could not delete all questions."})
