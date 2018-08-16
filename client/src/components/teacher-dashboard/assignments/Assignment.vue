@@ -46,7 +46,7 @@
 
                                                 <!--Exporting-->
                                                 <dt>Export CSV</dt>
-                                                <dd>Exports a CSV file with an aggregation of the review approval/disapproval amounts of each student.</dd>
+                                                <dd>Exports a CSV file with an aggregation of the review approval/disapproval amounts of each student for this assignment.</dd>
                                                 <b-button size="sm" variant="primary" @click="downloadExport">
                                                     Download CSV
                                                 </b-button>
