@@ -69,10 +69,6 @@
         async created() {
             let res = await api.getAssignmentReviews(this.assignmentId)
             this.reviews = res.data
-
-            this.reviews = this.reviews.map(review => {
-                return {...review, approved: true, id: 1}
-            })
         }
     }
 </script>
