@@ -213,9 +213,9 @@ router.get("/:assignment_id", index.authorization.enrolledAssignmentCheck, async
  * @params rubric_id - current rubric id to copy the questions to.
  * @params rubric_copy_id - rubric id to copy from.
  */
-router.get("/:rubric_id/copy/:rubric_copy_id", index.authorization.checkRubricAuthorizationPost, async (req, res) => {
+router.get("/:rubric_assignment_id/copy/:rubric_copy_id", index.authorization.checkRubricAuthorization, async (req, res) => {
     try {
-        await RubricPS.copyRubricQuestions(req.params.rubric_id, req.params.rubric_copy_id);
+        await RubricPS.copyRubricQuestions(req.params.rubric_assignment_id, req.params.rubric_copy_id);
         res.sendStatus(200);
     } catch {
         res.sendStatus(400);
@@ -226,9 +226,9 @@ router.get("/:rubric_id/copy/:rubric_copy_id", index.authorization.checkRubricAu
  * Route to delete all rubric questions.
  * @params rubric_id - current rubric id.
  */
-router.get("/:rubric_id/deleteAll", index.authorization.checkRubricAuthorizationPost, async (req, res) => {
+router.get("/:rubric_assignment_id/deleteAll", index.authorization.checkRubricAuthorization, async (req, res) => {
     try {
-        await RubricPS.deleteRubricQuestions(req.params.rubric_id);
+        await RubricPS.deleteRubricQuestions(req.params.rubric_assignment_id);
         res.sendStatus(200);
     } catch {
         res.sendStatus(400);
