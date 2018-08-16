@@ -11,14 +11,38 @@
 
             <b-col>
                 <b-card no-body>
-                    <b-tabs card>
+                    <b-tabs card fill>
                         <b-row>
 
                             <b-col>
 
+                                <!--Enrollable Assignments (Single User)-->
+                                <b-tab title="Enrollable" >
+
+                                    <b-card v-for="(assignment, index) in enrollableAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== enrollableAssignments.length - 1}">
+                                        <b-card-body>
+                                            <h4>{{ assignment.title | truncate(100)}}</h4>
+                                            <p>{{ assignment.description | truncate(100)}}</p>
+                                            <b-button variant="outline-primary" @click="enrollInAssignment(assignment.id)">Enroll in Assignment</b-button>
+                                        </b-card-body>
+                                    </b-card>
+                                </b-tab>
+
+
                                 <!--Active Assignments-->
-                                <b-tab title="Active Assignments" active>
-                                    <b-card v-for="assignment in activeAssignments" :key="assignment.id" no-body class="mb-3">
+                                <b-tab title="Ready for Submission" active>
+                                    <b-card v-for="(assignment, index) in activeAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== activeAssignments.length - 1 }">
+                                        <b-card-body>
+                                            <h4>{{ assignment.title }}</h4>
+                                            <p>{{ assignment.description | truncate(100)}}</p>
+                                            <b-button variant="primary" :to="{ name: 'student-dashboard.course.assignment', params: { courseId: assignment.course_id, assignmentId: assignment.id } }">View Assignment</b-button>
+                                        </b-card-body>
+                                    </b-card>
+                                </b-tab>
+
+                                <!--Review Assignments-->
+                                <b-tab title="Ready for Review">
+                                    <b-card v-for="(assignment, index) in readyForSubmissionAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== readyForSubmissionAssignments.length - 1 }">
                                         <b-card-body>
                                             <h4>{{ assignment.title }}</h4>
                                             <p>{{ assignment.description | truncate(100)}}</p>
@@ -28,8 +52,8 @@
                                 </b-tab>
 
                                 <!--Closed Assignments-->
-                                <b-tab title="Closed Assignments" >
-                                    <b-card v-for="assignment in closedAssignments" :key="assignment.id" no-body class="mb-3">
+                                <b-tab title="Feedback Available" >
+                                    <b-card v-for="(assignment, index) in closedAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== closedAssignments.length - 1}">
                                         <b-card-body>
                                             <h4>{{ assignment.title | truncate(100)}}</h4>
                                             <p>{{ assignment.description | truncate(100)}}</p>
@@ -38,17 +62,6 @@
                                     </b-card>
                                 </b-tab>
 
-                                <!--Enrollable Assignments (Single User)-->
-                                <b-tab title="Enrollable Assignments" >
-
-                                    <b-card v-for="assignment in enrollableAssignments" :key="assignment.id" no-body class="mb-3">
-                                        <b-card-body>
-                                            <h4>{{ assignment.title | truncate(100)}}</h4>
-                                            <p>{{ assignment.description | truncate(100)}}</p>
-                                            <b-button variant="outline-primary" @click="enrollInAssignment(assignment.id)">Enroll in Assignment</b-button>
-                                        </b-card-body>
-                                    </b-card>
-                                </b-tab>
                             </b-col>
 
                         </b-row>
@@ -76,14 +89,18 @@ export default {
         }
     },
     computed: {
+
         activeAssignments() {
             let now = new Date()
-            return this.assignments.filter(assignment => new Date(assignment.due_date) > now)
+            return this.assignments.filter(assignment => now < new Date(assignment.due_date))
+        },
+        readyForSubmissionAssignments() {
+            let now = new Date()
+            return this.assignments.filter(assignment => now < new Date(assignment.review_due_date))
         },
         closedAssignments() {
             let now = new Date()
-            return this.assignments.filter(assignment => new Date(assignment.due_date) < now)
-
+            return this.assignments.filter(assignment => now > new Date(assignment.review_due_date))
         }
     },
     async created() {
