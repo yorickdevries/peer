@@ -9,22 +9,30 @@
                 </b-button>
             </BreadcrumbTitle>
 
-            <!--Course description card-->
             <b-row>
-                <b-col>
-                    <b-card no-body>
-                        <b-card-body>
-                            <h4 class="card-title mb-0">Course description</h4>
-                        </b-card-body>
-                        <b-list-group flush>
-                            <b-list-group-item class="flex-column align-items-start">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <p class="mb-1">
-                                        {{course.description}}
-                                    </p>
-                                </div>
-                            </b-list-group-item>
-                        </b-list-group>
+
+                <!--Course description card-->
+                <b-col cols="8">
+                    <b-card header="Description">
+                        <div class="d-flex w-100 justify-content-between">
+                            <p class="mb-1">
+                                {{course.description}}
+                            </p>
+                        </div>
+                    </b-card>
+                </b-col>
+
+                <!--Export-->
+                <b-col cols="4">
+                    <b-card header="Export">
+                        <dl class="mb-0">
+                            <dt>Export Review Grades</dt>
+                            <dd>Exports a CSV file with an aggregation of the review approval/disapproval amounts of
+                                each student for all the assignments in the course.
+                            </dd>
+                            <b-button variant="primary" size="sm" @click="downloadExport">Download CSV</b-button>
+                        </dl>
+
                     </b-card>
                 </b-col>
             </b-row>
@@ -34,26 +42,36 @@
 </template>
 
 <script>
-import api from '../../api'
-import BreadcrumbTitle from '../BreadcrumbTitle'
+    import api from '../../api'
+    import BreadcrumbTitle from '../BreadcrumbTitle'
 
-export default {
-    components: {BreadcrumbTitle},
-    data() {
-        return {
-            course: {
-                id: null,
-                name: null,
-                description: null
-            },
+    export default {
+        components: {BreadcrumbTitle},
+        data() {
+            return {
+                course: {
+                    id: null,
+                    name: null,
+                    description: null
+                },
+            }
+        },
+        async created() {
+            let id = this.$route.params.courseId
+            this.course.id = id
+            let res = await api.getCourse(id)
+            this.course = res.data
+        },
+        methods: {
+            async downloadExport() {
+                const res = await api.client.get(`course/${this.course.id}/gradeExport`)
+                const data = res.data.data
+                const link = document.createElement('a')
+                link.setAttribute('href', data)
+                link.setAttribute('download', 'export.csv')
+                link.click()
+            }
         }
-    },
-    async created() {
-        let id = this.$route.params.courseId
-        this.course.id = id
-        let res = await api.getCourse(id)
-        this.course = res.data
-    }
 
-}
+    }
 </script>

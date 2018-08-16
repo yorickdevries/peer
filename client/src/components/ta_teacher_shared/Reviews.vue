@@ -31,8 +31,14 @@
                  :per-page="Number(perPage)"
                  :filter="filter">
 
-            <template slot="file_path" slot-scope="data">
-                <a :href="`/api/submissions/${data.item.id}/file`" target="_blank"> {{data.value}} </a>
+            <template slot="approved" slot-scope="row">
+                <span v-if="row.item.approved">Approved</span>
+                <span v-if="row.item.approved === false">Disapproved</span>
+                <span v-if="row.item.approved === null">No action yet by any TA.</span>
+            </template>
+
+            <template slot="actions" slot-scope="row">
+                <b-button variant="primary" size="sm" :to="{name: pathName, params: { reviewId: row.item.id }}">See review</b-button>
             </template>
         </b-table>
 
@@ -45,14 +51,16 @@
     import api from "../../api"
 
     export default {
-        props: ["assignmentId"],
+        props: ["assignmentId", "pathName"],
         data() {
             return {
                 reviews: [],
                 currentPage: 1,
                 fields: [
                     {key: 'reviewer', label: 'Reviewer'},
-                    {key: 'submitter', label: 'Submitter'}
+                    {key: 'submitter', label: 'Submitter'},
+                    {key: 'approved', label: 'Approval Status'},
+                    'actions'
                 ],
                 perPage: 5,
                 filter: null

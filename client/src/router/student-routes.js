@@ -8,7 +8,7 @@ export default [
             {
                 path: '',
                 name: 'student-dashboard.course.home',
-                component: () => import('../components/student-dashboard/Course'),
+                redirect: {name: 'student-dashboard.course.assignments'},
             },
             {
                 path: 'assignments',

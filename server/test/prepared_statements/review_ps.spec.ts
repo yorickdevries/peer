@@ -15,29 +15,31 @@ describe("ReviewPreparedStatement Test", () => {
     /**
      * Get review by id.
      */
-    it("get all review by id", async () => {
-        expect(await ReviewPS.executeGetReview(1)).to.deep.equal({
-            id: 1,
-            done: false,
-            file_path: "submission1.pdf",
-            rubric_assignment_id: 1
-        });
+    it("get the review by specific id", async () => {
+        const result: any = await ReviewPS.executeGetReview(1);
+        expect(result.id).to.equal(1);
+    });
+
+    /**
+     * Test approve a review prepared statement.
+     */
+    it("Approve reviews of an assignment", async () => {
+        const resultBefore = await ReviewPS.executeGetReview(1);
+        expect(resultBefore.approved).to.equal(null);
+
+        await ReviewPS.executeSetApprovedForReview(false, 1);
+        const resultAfter = await ReviewPS.executeGetReview(1);
+        expect(resultAfter.approved).to.equal(false);
     });
 
     /**
      * Submit review by id.
      */
     it("submit review by id", async () => {
-        const result = await ReviewPS.executeSubmitReview(1);
-        expect(result).to.deep.equal([{
-            id: 1,
-            rubric_assignment_id: 1,
-            submission_id: 1,
-            user_netid: "henkjan",
-            done: true,
-            "grade": -1,
-            "creation_date": result[0].creation_date
-        }]);
+        expect((await ReviewPS.executeGetReview(1)).done).to.equal(false);
+        const result: any = await ReviewPS.executeSubmitReview(1);
+        console.log(result);
+        expect(result[0].done).to.equal(true);
     });
 
     /**
@@ -167,6 +169,8 @@ describe("ReviewPreparedStatement Test", () => {
      */
     it("Reviews of an assignment", async () => {
         expect(await ReviewPS.executeGetAllDoneReviewsByAssignmentId(1)).to.deep.equal([{
+            "approved": null,
+            "id": 2,
             "reviewer": "paulvanderlaan",
             "submitter": "paulvanderlaan"
         }]);

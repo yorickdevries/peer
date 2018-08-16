@@ -29,7 +29,7 @@ export default class ReviewPS {
      */
     public static executeGetReview(reviewId: number): any {
         const statement = new PreparedStatement("get-review-by-id",
-            "SELECT review.id, rubric_assignment_id, file_path, done " +
+            "SELECT review.id, rubric_assignment_id, file_path, done, approved " +
             "FROM review JOIN submission ON submission.id = review.submission_id " +
             "WHERE review.id = $1");
         statement.values = [reviewId];
@@ -250,11 +250,25 @@ export default class ReviewPS {
      */
     public static executeGetAllDoneReviewsByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-all-done-reviews-by-assignmentid",
-            "SELECT review.user_netid as reviewer, submission.user_netid as submitter " +
+            "SELECT review.id, review.approved, review.user_netid as reviewer, submission.user_netid as submitter " +
             "FROM review JOIN assignmentlist ON assignmentlist.id = review.rubric_assignment_id " +
             "JOIN submission ON submission.id = review.submission_id WHERE assignmentlist.id = $1 " +
             "AND review.done = true");
         statement.values = [assignmentId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Set approved to true or false of a review.
+     * @param {boolean} approved - true or false.
+     * @param {number} reviewId - a review id.
+     * @return {any} - success or failure.
+     */
+    public static executeSetApprovedForReview(approved: boolean, reviewId: number): any {
+        const isApproved = (approved === true) ? "TRUE" : "FALSE";
+        const statement = new PreparedStatement("update-approved-for-review",
+            "UPDATE review SET approved=$1 WHERE id = $2");
+        statement.values = [isApproved, reviewId];
         return Database.executeQuery(statement);
     }
 }

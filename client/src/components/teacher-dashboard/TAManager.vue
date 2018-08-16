@@ -105,7 +105,7 @@ export default {
                     role: "TA"
                 })
             } catch (e) {
-                return this.showErrorMessage({message: "Something went wrong adding the TA."})
+                return this.showErrorMessage({message: e.response.data.error})
             }
 
             // Show correct status message.
@@ -122,8 +122,8 @@ export default {
                     role: "student"
                 })
             } catch (e) {
-                console.log(e)
-                return this.showErrorMessage({message: "Something went wrong removing the TA."})
+                console.log(e.response.data.error)
+                return this.showErrorMessage({message: e.response.data.error})
             }
 
             // Show correct status message.

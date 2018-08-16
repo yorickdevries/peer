@@ -7,6 +7,9 @@ import { Roles } from "../roles";
 
 // Router
 import express from "express";
+import ExportResultsPS from "../prepared_statements/export_results_ps";
+import CSVExport from "../CSVExport";
+import UserPS from "../prepared_statements/user_ps";
 const router = express();
 router.use(bodyParser.json());
 
@@ -147,6 +150,15 @@ router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck,
         if (!(req.body.role in Roles)) {
             throw new Error("Invalid role");
         }
+
+        // check whether user is in the database
+        const userExists: any = await UserPS.executeExistsUserById(req.body.netid);
+        if (!userExists.exists) {
+            res.status(400);
+            res.json({ error: `${req.body.netid} is not yet registered in the system. The user should have an account!`});
+        }
+
+
         // Fetch enrollments of the user to set the role from.
         const enrolled: any = await CoursesPS.executeExistsEnrolledByCourseIdUserById(req.params.courseId, req.body.netid);
 
@@ -177,7 +189,11 @@ router.get("/:courseId/users/:role/", index.authorization.enrolledCourseTeacherC
             throw new Error("Invalid role");
         }
         // Query and return all net ids as json.
-        res.json(await CoursesPS.executeGetUsersByRole(req.params.courseId, req.params.role));
+        if (req.params.role === "teacher" || req.params.role === "Teacher") {
+            res.json(await CoursesPS.executeGetUsersByRoleExcludeTeacher(req.params.courseId, req.userinfo.given_name));
+        } else {
+            res.json(await CoursesPS.executeGetUsersByRole(req.params.courseId, req.params.role));
+        }
     } catch {
         res.sendStatus(400);
     }
@@ -205,6 +221,19 @@ router.get("/:courseId/assignments/unenrolled", async (req: any, res) => {
     try {
         // Use method from group parser to enroll student (if not already enrolled)
         res.json(await AssignmentsPS.executeGetUnenrolledAssignmentsForUser(req.userinfo.given_name, req.params.courseId));
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Export the approved ratings of each student for a specific course.
+ * @param course_id - id of the course.
+ */
+router.get("/:course_id/gradeExport", index.authorization.enrolledCourseTeacherCheck, async (req: any, res) => {
+    try {
+        const exportData = await ExportResultsPS.executeGetStudentReviewExportCourse(req.params.course_id);
+        res.json({ data: CSVExport.downloadCSV({ exportData: exportData }) });
     } catch {
         res.sendStatus(400);
     }

@@ -35,6 +35,11 @@ export default [
                 component: () => import('../components/teacher-dashboard/assignments/Assignment')
             },
             {
+                path: 'courses/:courseId/assignments/:assignmentId/reviews/:reviewId',
+                name: 'teacher-dashboard.assignments.assignment.review',
+                component: () => import('../components/ta_teacher_shared/ReviewApproval')
+            },
+            {
                 path: 'courses/:courseId/assignments/:assignmentId/edit',
                 name: 'teacher-dashboard.assignments.assignment.edit',
                 component: () => import('../components/teacher-dashboard/assignments/EditAssignment')
