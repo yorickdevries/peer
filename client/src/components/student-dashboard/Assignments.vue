@@ -17,10 +17,12 @@
                             <b-col>
 
                                 <!--Enrollable Assignments (Single User)-->
-                                <b-tab title="Enrollable" >
-
+                                <b-tab title="Enrollable">
+                                    <p class="text-muted">On this tab, enrollable assignments are shown. In order to participate in an assignment you have to enroll.</p>
+                                    <span v-if="enrollableAssignments.length === 0">There are no enrollable assignments.</span>
                                     <b-card v-for="(assignment, index) in enrollableAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== enrollableAssignments.length - 1}">
                                         <b-card-body>
+                                            dsadsadsa
                                             <h4>{{ assignment.title | truncate(100)}}</h4>
                                             <p>{{ assignment.description | truncate(100)}}</p>
                                             <b-button variant="outline-primary" @click="enrollInAssignment(assignment.id)">Enroll in Assignment</b-button>
@@ -31,6 +33,8 @@
 
                                 <!--Active Assignments-->
                                 <b-tab title="Ready for Submission" active>
+                                    <p class="text-muted">Ready for submission means that the assignment is open for submitting a solution to the assignment.</p>
+                                    <span v-if="activeAssignments.length === 0">There are no active assignments.</span>
                                     <b-card v-for="(assignment, index) in activeAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== activeAssignments.length - 1 }">
                                         <b-card-body>
                                             <h4>{{ assignment.title }}</h4>
@@ -42,6 +46,8 @@
 
                                 <!--Review Assignments-->
                                 <b-tab title="Ready for Review">
+                                    <p class="text-muted">Ready for review means that the assignment is open for reviewing a solution from other students.</p>
+                                    <span v-if="readyForSubmissionAssignments.length === 0">There are no assignments for review.</span>
                                     <b-card v-for="(assignment, index) in readyForSubmissionAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== readyForSubmissionAssignments.length - 1 }">
                                         <b-card-body>
                                             <h4>{{ assignment.title }}</h4>
@@ -53,6 +59,8 @@
 
                                 <!--Closed Assignments-->
                                 <b-tab title="Feedback Available" >
+                                    <p class="text-muted">Ready for feedback means that the feedback is available for the submission you handed in.</p>
+                                    <span v-if="closedAssignments.length === 0">There are no assignments that are closed. </span>
                                     <b-card v-for="(assignment, index) in closedAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== closedAssignments.length - 1}">
                                         <b-card-body>
                                             <h4>{{ assignment.title | truncate(100)}}</h4>
