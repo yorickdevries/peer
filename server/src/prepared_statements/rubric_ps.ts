@@ -371,12 +371,12 @@ export default class RubricPS {
         }
         // Copy mc questions
         for (let i = 0; i < mcQuestions.length; i++) {
-            await this.executeCreateMCQuestion(mcQuestions[i].question, currentRubricId, mcQuestions[i].question_number);
+            let res: any = await this.executeCreateMCQuestion(mcQuestions[i].question, currentRubricId, mcQuestions[i].question_number);
 
             // Copy mc options
             mcOptions = await RubricPS.executeGetAllMCOptionById(mcQuestions[i].id);
             for (let i = 0; i < mcOptions.length; i++) {
-                await this.executeCreateMCOption(mcOptions[i].option, mcOptions[i].id);
+                await this.executeCreateMCOption(mcOptions[i].option, res.id);
             }
         }
     }
