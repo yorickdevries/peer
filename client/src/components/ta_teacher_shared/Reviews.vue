@@ -38,7 +38,7 @@
             </template>
 
             <template slot="actions" slot-scope="row">
-                <b-button variant="primary" size="sm" :to="{name: 'teacher-dashboard.assignments.assignment.review', params: { reviewId: row.item.id }}">See review</b-button>
+                <b-button variant="primary" size="sm" :to="{name: pathName, params: { reviewId: row.item.id }}">See review</b-button>
             </template>
         </b-table>
 
@@ -51,7 +51,7 @@
     import api from "../../api"
 
     export default {
-        props: ["assignmentId"],
+        props: ["assignmentId", "pathName"],
         data() {
             return {
                 reviews: [],

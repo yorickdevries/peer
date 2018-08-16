@@ -174,7 +174,7 @@ export default {
         async updateApproval() {
             try {
                 await api.client.post(`/reviews/${this.peerReview.review.id}/grade`, {
-                    approve: this.peerReview.review.approved
+                    approved: this.peerReview.review.approved
                 })
                 this.showSuccessMessage({message: 'Review approval status changed'})
             } catch (e) {
