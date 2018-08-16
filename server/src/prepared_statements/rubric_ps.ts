@@ -365,20 +365,42 @@ export default class RubricPS {
         for (let i = 0; i < openQuestions.length; i++) {
             await this.executeCreateOpenQuestion(openQuestions[i].question, currentRubricId, openQuestions[i].question_number);
         }
-
         // Copy range questions
         for (let i = 0; i < rangeQuestions.length; i++) {
             await this.executeCreateRangeQuestion(rangeQuestions[i].question, rangeQuestions[i].range, currentRubricId, rangeQuestions[i].question_number);
         }
-
         // Copy mc questions
         for (let i = 0; i < mcQuestions.length; i++) {
             await this.executeCreateMCQuestion(mcQuestions[i].question, currentRubricId, mcQuestions[i].question_number);
         }
-
         // Copy mc options
         for (let i = 0; i < mcOptions.length; i++) {
             await this.executeCreateMCOption(mcOptions[i].option, mcOptions[i].mcquestion_id);
+        }
+    }
+
+    public static async deleteRubricQuestions(rubricId: number) {
+        // Fetch the questions of each type.
+        const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubricId);
+        const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubricId);
+        const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubricId);
+        const mcOptions = await RubricPS.executeGetAllMCOptionById(rubricId);
+
+        // Copy open questions
+        for (let i = 0; i < openQuestions.length; i++) {
+            await this.executeDeleteOpenQuestion(openQuestions[i].id);
+        }
+        // Copy range questions
+        for (let i = 0; i < rangeQuestions.length; i++) {
+            await this.executeDeleteRangeQuestion(rangeQuestions[i].id);
+        }
+        // Copy mc questions
+        for (let i = 0; i < mcQuestions.length; i++) {
+            await this.executeDeleteMCQuestion(mcQuestions[i].id);
+        }
+        // Copy mc options
+        for (let i = 0; i < mcOptions.length; i++) {
+            await this.executeDeleteMCOption(mcOptions[i].id);
         }
     }
 }
