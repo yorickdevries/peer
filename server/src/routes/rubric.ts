@@ -228,7 +228,7 @@ router.get("/:rubric_id/copy/:rubric_copy_id", index.authorization.checkRubricAu
  */
 router.get("/:rubric_assignment_id/deleteAll", index.authorization.checkRubricAuthorizationPost, async (req, res) => {
     try {
-        await RubricPS.deleteRubricQuestions(req.params.rubric_id);
+        await RubricPS.deleteRubricQuestions(req.params.rubric_assignment_id);
         res.sendStatus(200);
     } catch {
         res.sendStatus(400);
