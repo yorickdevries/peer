@@ -428,7 +428,7 @@ router.get("/:assignment_id/enroll", async (req: any, res) => {
 router.get("/:assignment_id/gradeExport", async (req: any, res) => {
     try {
         const exportData = await ExportResultsPS.executeGetStudentReviewExport(req.params.assignment_id);
-        res.json({ uri: CSVExport.downloadCSV({ exportData: exportData }) });
+            res.json({ data: CSVExport.downloadCSV({ exportData: exportData }) });
     } catch {
         res.sendStatus(400);
     }
