@@ -43,6 +43,10 @@ export default {
             this.question = val
         }
     },
+    created() {
+        this.addMCOption(this.question)
+        this.addMCOption(this.question)
+    },
     methods: {
         addMCOption(question) {
             question.option.push({
