@@ -12,7 +12,7 @@
                     <div class="text-muted">Copy questions from another rubric.</div>
                     <div class="input-group mb-2">
                         <div class="input-group-prepend">
-                            <b-button variant="primary">Copy</b-button>
+                            <b-button variant="primary" @click="copyRubric">Copy</b-button>
                         </div>
                         <b-form-select v-model="rubricToCopy" :options="rubricsMetaData"  plain></b-form-select>
                     </div>
@@ -20,7 +20,7 @@
 
                 <div>
                     <div class="text-muted">Deletes all questions</div>
-                    <b-button variant="danger">Delete all questions</b-button>
+                    <b-button variant="danger" @click="deleteAll">Delete all questions</b-button>
                 </div>
             </div>
         </b-card>
@@ -155,6 +155,25 @@ export default {
             this.showSuccessMessage({message: 'Successfully saved question.'})
             await this.fetchRubric()
         },
+        async copyRubric() {
+            if (this.rubricToCopy === null) return this.showErrorMessage({message: "Choose a rubric to copy first."})
+
+            try {
+                await api.client.get(`rubrics/${this.rubric.id}/copy/${this.rubricToCopy}`)
+                this.showSuccessMessage({message: "Rubric successfully copied and appended to this rubric."})
+            } catch (e) {
+                this.showErrorMessage({message: "Rubric could not be copied."})
+            }
+        },
+        async deleteAll() {
+            try {
+                await api.client.get(`rubrics/${this.rubric.id}/deleteall`)
+                this.showErrorMessage({message: "Deleted all questions."})
+            } catch (e) {
+                this.showErrorMessage({message: "Could not delete all questions."})
+            }
+        }
+
     }
 }
 
