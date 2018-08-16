@@ -21,7 +21,7 @@
 
                     <!--Reviews-->
                     <b-tab title="Reviews">
-                        <Reviews :assignmentId="$route.params.assignmentId"></Reviews>
+                        <Reviews :assignmentId="$route.params.assignmentId" :pathName="'teaching-assistant-dashboard.course.assignment.reviews'"></Reviews>
                     </b-tab>
 
                     <!--Groups-->

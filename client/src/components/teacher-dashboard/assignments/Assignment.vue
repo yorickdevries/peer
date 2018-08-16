@@ -63,7 +63,7 @@
 
                             <!--Reviews-->
                             <b-tab title="Reviews">
-                                <Reviews :assignmentId="assignment.id"></Reviews>
+                                <Reviews :assignmentId="assignment.id" :pathName="'teacher-dashboard.assignments.assignment.review'"></Reviews>
                             </b-tab>
 
                             <!--Groups-->
