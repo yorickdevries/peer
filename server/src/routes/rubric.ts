@@ -208,4 +208,31 @@ router.get("/:assignment_id", index.authorization.enrolledAssignmentCheck, async
     }
 });
 
+/**
+ * Route to copy all rubric questions from another rubric, in the same course.
+ * @params rubric_id - current rubric id to copy the questions to.
+ * @params rubric_copy_id - rubric id to copy from.
+ */
+router.get("/:rubric_id/copy/:rubric_copy_id", index.authorization.checkRubricAuthorizationPost, async (req, res) => {
+    try {
+        await RubricPS.copyRubricQuestions(req.params.rubric_id, req.params.rubric_copy_id);
+        res.sendStatus(200);
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Route to delete all rubric questions.
+ * @params rubric_id - current rubric id.
+ */
+router.get("/:rubric_id/deleteAll", index.authorization.checkRubricAuthorizationPost, async (req, res) => {
+    try {
+        await RubricPS.deleteRubricQuestions(req.params.rubric_id);
+        res.sendStatus(200);
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
 export default router;
