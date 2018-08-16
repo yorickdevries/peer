@@ -376,7 +376,7 @@ export default class RubricPS {
             // Copy mc options
             mcOptions = await RubricPS.executeGetAllMCOptionById(mcQuestions[i].id);
             for (let i = 0; i < mcOptions.length; i++) {
-                await this.executeCreateMCOption(mcOptions[i].option, mcQuestions[i].id);
+                await this.executeCreateMCOption(mcOptions[i].option, mcOptions[i].id);
             }
         }
     }
