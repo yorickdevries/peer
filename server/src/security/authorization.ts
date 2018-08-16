@@ -106,6 +106,19 @@ const checkRubricAuthorizationPost = async (req: any, res: any, next: any) => {
 };
 
 /**
+ * Check authorization to edit a rubric
+ */
+const checkRubricAuthorization = async (req: any, res: any, next: any) => {
+    try {
+        const assignment = await AssignmentPS.executeGetAssignmentById(req.params.rubric_assignment_id);
+        const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
  * Check authorization to edit a mc question
  */
 const checkMCQuestionEdit = async (req: any, res: any, next: any) => {
@@ -402,5 +415,6 @@ export default {
     postSubmissionAuth,
     getSubmissionFileAuth,
     getSubmissionCommentAuth,
-    putSubmissionCommentAuth
+    putSubmissionCommentAuth,
+    checkRubricAuthorization
 };
