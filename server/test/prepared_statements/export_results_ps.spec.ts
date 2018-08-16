@@ -31,7 +31,6 @@ describe("CoursePreparedStatement Test", () => {
      * Get review of student export json for a course.
      */
     it("get student export stats", async () => {
-        console.log(await ExportResultsPS.executeGetStudentReviewExportCourse(1))
         expect(await ExportResultsPS.executeGetStudentReviewExportCourse(1)).to.deep.equal(
             [{
                 netID: 'paulvanderlaan',
