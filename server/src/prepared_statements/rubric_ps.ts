@@ -12,8 +12,8 @@ export default class RubricPS {
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeGetRubricById(assignmentId: number): Promise<pgPromise.queryResult> {
-        const statement =  new PreparedStatement("get-rubric-by-id",
-        "SELECT * FROM rubric WHERE assignment_id=$1");
+        const statement = new PreparedStatement("get-rubric-by-id",
+            "SELECT * FROM rubric WHERE assignment_id=$1");
         statement.values = [assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -24,8 +24,8 @@ export default class RubricPS {
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeExistsRubricByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
-        const statement =  new PreparedStatement("exists-rubric-by-assignmentid",
-        "SELECT EXISTS(SELECT * FROM rubric WHERE assignment_id=$1)");
+        const statement = new PreparedStatement("exists-rubric-by-assignmentid",
+            "SELECT EXISTS(SELECT * FROM rubric WHERE assignment_id=$1)");
         statement.values = [assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -348,4 +348,37 @@ export default class RubricPS {
         return questionJson;
     }
 
+    /**
+     * Copy rubric questions.
+     * @param {number} currentRubricId - id of the rubric.
+     * @param {number} copyRubricId - id of the rubric to copy.
+     * @return {Promise<void>} - void, but rubric will be copied in the database.
+     */
+    public static async copyRubricQuestions(currentRubricId: number, copyRubricId: number) {
+        // Fetch the questions of each type.
+        const openQuestions = await RubricPS.executeGetAllOpenQuestionById(copyRubricId);
+        const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(copyRubricId);
+        const mcQuestions = await RubricPS.executeGetAllMCQuestionById(copyRubricId);
+        const mcOptions = await RubricPS.executeGetAllMCOptionById(copyRubricId);
+
+        // Copy open questions
+        for (let i = 0; i < openQuestions.length; i++) {
+            await this.executeCreateOpenQuestion(openQuestions[i].question, currentRubricId, openQuestions[i].question_number);
+        }
+
+        // Copy range questions
+        for (let i = 0; i < rangeQuestions.length; i++) {
+            await this.executeCreateRangeQuestion(rangeQuestions[i].question, rangeQuestions[i].range, currentRubricId, rangeQuestions[i].question_number);
+        }
+
+        // Copy mc questions
+        for (let i = 0; i < mcQuestions.length; i++) {
+            await this.executeCreateMCQuestion(mcQuestions[i].question, currentRubricId, mcQuestions[i].question_number);
+        }
+
+        // Copy mc options
+        for (let i = 0; i < mcOptions.length; i++) {
+            await this.executeCreateMCOption(mcOptions[i].option, mcOptions[i].mcquestion_id);
+        }
+    }
 }
