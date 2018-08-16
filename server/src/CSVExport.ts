@@ -15,7 +15,7 @@ export default class CSVExport {
             return null;
         }
 
-        columnDelimiter = args.columnDelimiter || ',';
+        columnDelimiter = args.columnDelimiter || ';';
         lineDelimiter = args.lineDelimiter || '\n';
 
         keys = Object.keys(data[0]);
