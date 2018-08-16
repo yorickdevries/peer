@@ -38,4 +38,23 @@ export default class CSVExport {
 
         return result;
     }
+
+    /**
+     * Download csv function from: https://halistechnology.com/2015/05/28/use-javascript-to-export-your-data-as-csv/
+     * Slightly changed to make it workable in our use case.
+     * @param args - exportData - array of data.
+     * @return {string} csv file encoded in uri.
+     */
+    public static downloadCSV(args: any): string {
+        var data, filename: string;
+        var csv = CSVExport.convertArrayOfObjectsToCSV({
+            data: args.exportData
+        });
+        if (csv == null) throw new Error("Invalid csv file created.");
+
+        if (!csv.match(/^data:text\/csv/i)) {
+            csv = 'data:text/csv;charset=utf-8,' + csv;
+        }
+        return encodeURI(csv);
+    }
 }
