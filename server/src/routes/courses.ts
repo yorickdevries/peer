@@ -9,6 +9,7 @@ import { Roles } from "../roles";
 import express from "express";
 import ExportResultsPS from "../prepared_statements/export_results_ps";
 import CSVExport from "../CSVExport";
+import UserPS from "../prepared_statements/user_ps";
 const router = express();
 router.use(bodyParser.json());
 
