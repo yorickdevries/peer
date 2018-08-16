@@ -1,3 +1,6 @@
+/**
+ * Class that creates a csv file for export.
+ */
 export default class CSVExport {
 
     /**
@@ -8,19 +11,19 @@ export default class CSVExport {
      * @return {any}
      */
     public static convertArrayOfObjectsToCSV(args: any) {
-        var result: string, ctr: number, keys: string[], columnDelimiter: string, lineDelimiter: string, data;
+        let result: string, ctr: number, keys: string[], columnDelimiter: string, lineDelimiter: string, data;
 
         data = args.data || null;
         if (data == null || !data.length) {
             return null;
         }
 
-        columnDelimiter = args.columnDelimiter || ';';
-        lineDelimiter = args.lineDelimiter || '\n';
+        columnDelimiter = args.columnDelimiter || ";";
+        lineDelimiter = args.lineDelimiter || "\n";
 
         keys = Object.keys(data[0]);
 
-        result = '';
+        result = "";
         result += keys.join(columnDelimiter);
         result += lineDelimiter;
 
@@ -51,7 +54,7 @@ export default class CSVExport {
         if (csv == null) throw new Error("Invalid csv file created.");
 
         if (!csv.match(/^data:text\/csv/i)) {
-            csv = 'data:text/csv;charset=utf-8,' + csv;
+            csv = "data:text/csv;charset=utf-8," + csv;
         }
         return encodeURI(csv);
     }

@@ -155,7 +155,7 @@ router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck,
         const userExists: any = await UserPS.executeExistsUserById(req.userinfo.given_name);
         if (!userExists.exists) {
             res.status(400);
-            res.json({ error: `${req.body.netid} is not yet registered in the system. The user should have an account!`})
+            res.json({ error: `${req.body.netid} is not yet registered in the system. The user should have an account!`});
         }
 
         // Fetch enrollments of the user to set the role from.

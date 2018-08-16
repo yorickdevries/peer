@@ -139,7 +139,6 @@ export default class CoursesPS {
         return Database.executeQuery(statement);
     }
 
-
     /**
      * Get all teachers of a course with the requesting user excluded..
      * @param {number} courseId - a course id.
@@ -148,14 +147,12 @@ export default class CoursesPS {
      */
     public static executeGetUsersByRoleExcludeTeacher(courseId: number, teacherNetId: string): any {
         const statement = new PreparedStatement("get-user-by-role-without-teacher",
-            'SELECT user_netid ' +
-            'FROM enroll ' +
+            "SELECT user_netid " +
+            "FROM enroll " +
             "WHERE course_id=$1 AND enroll.role='teacher' AND enroll.user_netid NOT IN ($2)");
         statement.values = [courseId, teacherNetId];
         return Database.executeQuery(statement);
     }
-
-
 
     /**
      * Get not enrolled courses for a specific user.

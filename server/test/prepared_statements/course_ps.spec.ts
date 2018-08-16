@@ -143,8 +143,8 @@ describe("CoursePreparedStatement Test", () => {
      */
     it("Get all teachers of a course", async () => {
         // Verify that the student has student as role
-        const resultWith: any = await CoursePS.executeGetUsersByRoleExcludeTeacher(1, '');
-        const resultWithout: any = await CoursePS.executeGetUsersByRoleExcludeTeacher(1, 'bplanje');
+        const resultWith: any = await CoursePS.executeGetUsersByRoleExcludeTeacher(1, "");
+        const resultWithout: any = await CoursePS.executeGetUsersByRoleExcludeTeacher(1, "bplanje");
         expect(resultWith[0].user_netid).to.equal("bplanje");
         expect(resultWithout.user_netid).to.equal(undefined);
     });
