@@ -26,21 +26,31 @@
                                     <b-col cols="4">
                                         <b-card header="Actions">
                                             <dl class="mb-0">
+                                                <!--Shuffling-->
                                                 <dt>Shuffle groups</dt>
                                                 <dd>This action will shuffle the groups and assign the groups to each
                                                     other. Can only be done once.
                                                 </dd>
-                                                <b-button @click="shuffleGroups()" class="mb-3" variant="primary">Shuffle Groups</b-button>
+                                                <b-button @click="shuffleGroups()" class="mb-3" variant="primary" size="sm">Shuffle Groups</b-button>
 
+                                                <!--Importing-->
                                                 <template v-if="!assignment.one_person_groups">
                                                     <dt>Import groups</dt>
                                                     <dd>This action will import the groups in the assignment.</dd>
-                                                    <b-button v-b-modal="'importGroups'" variant="primary">Import groups</b-button>
+                                                    <b-button v-b-modal="'importGroups'" variant="primary" size="sm">Import groups</b-button>
                                                 </template>
                                                 <template v-else>
                                                     <dt>Import groups</dt>
                                                     <dd>Not available. On creation of the assignment, this assignment has been set as individual. </dd>
                                                 </template>
+
+                                                <!--Exporting-->
+                                                <dt>Export CSV</dt>
+                                                <dd>Exports a CSV file with an aggregation of the review approval/disapproval amounts of each student.</dd>
+                                                <b-button size="sm" variant="primary" @click="downloadExport">
+                                                    Download CSV
+                                                </b-button>
+
                                             </dl>
 
                                             <b-modal id="importGroups" centered hide-header hide-footer class="p-0 m-0" size="lg">
@@ -140,6 +150,14 @@ export default {
             } catch (e) {
                 this.showErrorMessage({message: e.response.data.error})
             }
+        },
+        async downloadExport() {
+            const res = await api.client.get(`assignments/${this.assignment.id}/gradeExport`)
+            const data = res.data.data
+            const link = document.createElement('a')
+            link.setAttribute('href', data)
+            link.setAttribute('download', 'export.csv')
+            link.click()
         }
     }
 }
