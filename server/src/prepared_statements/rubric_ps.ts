@@ -374,7 +374,7 @@ export default class RubricPS {
             await this.executeCreateMCQuestion(mcQuestions[i].question, currentRubricId, mcQuestions[i].question_number);
 
             // Copy mc options
-            mcOptions = await RubricPS.executeGetAllMCOptionById(copyRubricId);
+            mcOptions = await RubricPS.executeGetAllMCOptionById(mcQuestions[i].id);
             for (let i = 0; i < mcOptions.length; i++) {
                 await this.executeCreateMCOption(mcOptions[i].option, mcQuestions[i].id);
             }
@@ -391,7 +391,7 @@ export default class RubricPS {
         const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubricId);
         const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubricId);
         const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubricId);
-        const mcOptions = await RubricPS.executeGetAllMCOptionById(rubricId);
+        let mcOptions;
 
         // Copy open questions
         for (let i = 0; i < openQuestions.length; i++) {
@@ -404,10 +404,12 @@ export default class RubricPS {
         // Copy mc questions
         for (let i = 0; i < mcQuestions.length; i++) {
             await this.executeDeleteMCQuestion(mcQuestions[i].id);
-        }
-        // Copy mc options
-        for (let i = 0; i < mcOptions.length; i++) {
-            await this.executeDeleteMCOption(mcOptions[i].id);
+
+            // Copy mc options
+            mcOptions = await RubricPS.executeGetAllMCOptionById(mcQuestions[i].id);
+            for (let i = 0; i < mcOptions.length; i++) {
+                await this.executeDeleteMCOption(mcOptions[i].id);
+            }
         }
     }
 }
