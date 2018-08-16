@@ -22,7 +22,7 @@ describe("CoursePreparedStatement Test", () => {
                 approved: '0',
                 disproved: '0',
                 'waiting for TA': '1',
-                'total student reviews': '1'
+                'student total reviews': '1'
             }]
         );
     });
