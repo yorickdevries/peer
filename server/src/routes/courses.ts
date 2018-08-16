@@ -7,6 +7,8 @@ import { Roles } from "../roles";
 
 // Router
 import express from "express";
+import ExportResultsPS from "../prepared_statements/export_results_ps";
+import CSVExport from "../CSVExport";
 const router = express();
 router.use(bodyParser.json());
 
@@ -205,6 +207,19 @@ router.get("/:courseId/assignments/unenrolled", async (req: any, res) => {
     try {
         // Use method from group parser to enroll student (if not already enrolled)
         res.json(await AssignmentsPS.executeGetUnenrolledAssignmentsForUser(req.userinfo.given_name, req.params.courseId));
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Export the approved ratings of each student for a specific course.
+ * @param course_id - id of the course.
+ */
+router.get("/:course_id/gradeExport", index.authorization.enrolledCourseTeacherCheck, async (req: any, res) => {
+    try {
+        const exportData = await ExportResultsPS.executeGetStudentReviewExportCourse(req.params.course_id);
+        res.json({ data: CSVExport.downloadCSV({ exportData: exportData }) });
     } catch {
         res.sendStatus(400);
     }
