@@ -13,7 +13,7 @@ export default class ExportResultsPS {
      */
     public static executeGetStudentReviewExport(): any {
         const statement = new PreparedStatement("get-result-aggregation",
-            '﻿SELECT netID AS "netID", approved, disproved, total - approved - disproved AS "waiting for TA", total AS "total student reviews"\n' +
+            'SELECT netID AS "netID", approved, disproved, total - approved - disproved AS "waiting for TA", total AS "total student reviews"\n' +
             'FROM (' +
             '    SELECT userlist.netid AS netID,' +
             '    SUM(CASE WHEN review.approved IN (true) THEN 1 ELSE 0 END) AS approved,' +
@@ -23,6 +23,6 @@ export default class ExportResultsPS {
             '    JOIN review ON review.user_netid = userlist.netid' +
             '    GROUP BY userlist.netid' +
             ') AS aggregations');
-        return Database.executeQuerySingleResult(statement);
+        return Database.executeQuery(statement);
     }
 }
