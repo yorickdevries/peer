@@ -21,7 +21,6 @@ export default {
     data() {
         return {
             navbarItems: [
-                {to: {name: 'student-dashboard.course.home'}, text: 'Course Home'},
                 {to: {name: 'student-dashboard.course.assignments'}, text: 'Assignments'},
             ],
             course: {
