@@ -23,7 +23,7 @@ describe("ReviewPreparedStatement Test", () => {
     /**
      * Test approve a review prepared statement.
      */
-    it("Reviews of an assignment", async () => {
+    it("Approve reviews of an assignment", async () => {
         const resultBefore = await ReviewPS.executeGetReview(1);
         expect(resultBefore.approved).to.equal(null);
 
@@ -169,6 +169,8 @@ describe("ReviewPreparedStatement Test", () => {
      */
     it("Reviews of an assignment", async () => {
         expect(await ReviewPS.executeGetAllDoneReviewsByAssignmentId(1)).to.deep.equal([{
+            "approved": null,
+            "id": 2,
             "reviewer": "paulvanderlaan",
             "submitter": "paulvanderlaan"
         }]);

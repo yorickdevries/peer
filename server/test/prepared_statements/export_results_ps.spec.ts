@@ -13,16 +13,32 @@ describe("CoursePreparedStatement Test", () => {
     });
 
     /**
-     * Get review of student export json.
+     * Get review of student export json for an assignment.
      */
     it("get student export stats", async () => {
-        expect(await ExportResultsPS.executeGetStudentReviewExport(1)).to.deep.equal(
+        expect(await ExportResultsPS.executeGetStudentReviewExportAssignment(1)).to.deep.equal(
             [{
                 netID: 'paulvanderlaan',
                 approved: '0',
                 disproved: '0',
                 'waiting for TA': '1',
-                'total student reviews': '1'
+                'student total reviews': '1'
+            }]
+        );
+    });
+
+    /**
+     * Get review of student export json for a course.
+     */
+    it("get student export stats", async () => {
+        console.log(await ExportResultsPS.executeGetStudentReviewExportCourse(1))
+        expect(await ExportResultsPS.executeGetStudentReviewExportCourse(1)).to.deep.equal(
+            [{
+                netID: 'paulvanderlaan',
+                approved: '0',
+                disproved: '0',
+                'waiting for TA': '1',
+                'student total reviews': '1'
             }]
         );
     });
