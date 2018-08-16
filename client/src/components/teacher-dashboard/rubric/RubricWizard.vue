@@ -20,7 +20,11 @@
 
                 <div>
                     <div class="text-muted">Deletes all questions</div>
-                    <b-button variant="danger" @click="deleteAll">Delete all questions</b-button>
+                    <b-button variant="danger" v-b-modal.deleteAll>Delete all questions</b-button>
+                    <b-modal id="deleteAll" centered title="Warning" @ok="deleteAll">
+                        Are you sure you want to delete ALL questions? Deleting a question after students have submitted
+                        answers to this question will DELETE all the answers the students have given.
+                    </b-modal>
                 </div>
             </div>
         </b-card>
@@ -56,10 +60,24 @@
                         <b-button @click="saveQuestion(question)" variant="outline-primary" size="sm" class="mr-1">
                             Save
                         </b-button>
-                        <b-button @click="deleteQuestion(question)" variant="outline-danger" size="sm">Delete
-                        </b-button>
+
+                        <!--<b-button @click="deleteQuestion(question)" variant="outline-danger" size="sm">Delete</b-button>-->
+
+                        <span>
+                            <b-btn v-b-modal="`delete${question.id}`" variant="outline-danger" size="sm">Delete</b-btn>
+                            <b-modal :id="`delete${question.id}`" centered title="Warning" @ok="deleteQuestion(question)">
+                                Are you sure you want to delete? Deleting a question after students have submitted
+                                answers to this question will DELETE all the answers the students have given.
+                            </b-modal>
+                        </span>
+
                     </b-card-body>
                 </b-card>
+
+                <b-modal id="deleteModal" centered title="Warning" @ok="deleteQuestion(question)">
+                    Are you sure you want to delete? Deleting a question after students have submitted
+                    answers to this question will DELETE all the answers the students have given.
+                </b-modal>
 
                 <b-modal id="createModal" centered hide-header hide-footer class="p-0 m-0">
                     <CreateQuestionWizard :rubricId="rubric.id" @saved="fetchRubric"></CreateQuestionWizard>
@@ -119,12 +137,15 @@ export default {
             const rubricsMetaData = data.map(assignment => {
                 return {value: assignment.id, text: assignment.title}
             })
-            console.log(rubricsMetaData)
             this.rubricsMetaData = rubricsMetaData
         },
         async deleteQuestion(question) {
-            await api.client.delete(`${apiPrefixes[question.type_question]}/${question.id}`);
-            this.showSuccessMessage({message: 'Successfully deleted question.'})
+            try {
+                await api.client.delete(`${apiPrefixes[question.type_question]}/${question.id}`);
+                this.showSuccessMessage({message: 'Successfully deleted question.'})
+            } catch (e) {
+                this.showErrorMessage()
+            }
             await this.fetchRubric()
         },
         async saveQuestion(question) {
@@ -164,14 +185,18 @@ export default {
             } catch (e) {
                 this.showErrorMessage({message: "Rubric could not be copied."})
             }
+
+            await this.fetchRubric()
         },
         async deleteAll() {
             try {
                 await api.client.get(`rubrics/${this.rubric.id}/deleteall`)
-                this.showErrorMessage({message: "Deleted all questions."})
+                this.showSuccessMessage({message: "Deleted all questions."})
             } catch (e) {
                 this.showErrorMessage({message: "Could not delete all questions."})
             }
+
+            await this.fetchRubric()
         }
 
     }
