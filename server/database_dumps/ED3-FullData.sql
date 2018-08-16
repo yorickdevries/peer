@@ -33,7 +33,7 @@ INSERT INTO public.assignmentlist(
 	    ('Lab assignment 1', 'How to build a DFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z'),
 	    ('Lab assignment 2', 'How to build a NFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z'),
 	    ('Lab assignment 3', 'How to build a DFA given a NFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z'),
-	    ('Assignment 1', 'Example assignment number one', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z'),
+	    ('Assignment 1', 'Example assignment number one', 2, 2, 'assignment1.pdf', '2012-04-01T20:30:00Z', '2013-05-01T20:30:00Z', '2014-03-01T20:30:00Z', '2015-05-01T20:30:00Z'),
 	    ('Assignment 2', 'An example of a second assignment', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z'),
 	    ('Assignment 3', 'This is another example of a third assignment.', 2, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z'),
 	    ('A1', 'Example assignment number one', 3, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z'),
@@ -145,7 +145,7 @@ INSERT INTO public.mcoption(
 INSERT INTO public.enroll(
 	course_id, user_netid, role)
 	VALUES
-	    (2, 'paulvanderlaan', 'TA'),
+	    (2, 'paulvanderlaan', 'teacher'),
 	    (3, 'paulvanderlaan', 'TA'),
 	    (4, 'paulvanderlaan', 'TA'),
 	    (1, 'henkjan', 'student'),
