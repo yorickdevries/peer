@@ -8,6 +8,8 @@ import UserPS from "../prepared_statements/user_ps";
 import GroupPS from "../prepared_statements/group_ps";
 import ReviewPS from "../prepared_statements/review_ps";
 import RubricPS from "../prepared_statements/rubric_ps";
+import ExportResultsPS from "../prepared_statements/export_results_ps";
+import CSVExport from "../CSVExport";
 import GroupParser from "../groupParser";
 import reviewDistribution from "../reviewDistribution";
 import bodyParser from "body-parser";
@@ -418,6 +420,15 @@ router.get("/:assignment_id/enroll", async (req: any, res) => {
             await GroupPS.executeAddStudenttoGroup(req.userinfo.given_name, groupId);
             res.sendStatus(200);
         }
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+router.get("/:assignment_id/gradeExport", async (req: any, res) => {
+    try {
+        const exportData = await ExportResultsPS.executeGetStudentReviewExport(req.params.assignment_id);
+        res.json({ uri: CSVExport.downloadCSV({ exportData: exportData }) });
     } catch {
         res.sendStatus(400);
     }

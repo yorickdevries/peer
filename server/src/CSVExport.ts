@@ -1,4 +1,3 @@
-
 export default class CSVExport {
 
     /**
@@ -46,8 +45,7 @@ export default class CSVExport {
      * @return {string} csv file encoded in uri.
      */
     public static downloadCSV(args: any): string {
-        var data, filename: string;
-        var csv = CSVExport.convertArrayOfObjectsToCSV({
+        let csv = CSVExport.convertArrayOfObjectsToCSV({
             data: args.exportData
         });
         if (csv == null) throw new Error("Invalid csv file created.");

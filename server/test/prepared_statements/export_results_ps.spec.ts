@@ -16,14 +16,8 @@ describe("CoursePreparedStatement Test", () => {
      * Get review of student export json.
      */
     it("get student export stats", async () => {
-        expect(await ExportResultsPS.executeGetStudentReviewExport()).to.deep.equal(
+        expect(await ExportResultsPS.executeGetStudentReviewExport(1)).to.deep.equal(
             [{
-                netID: 'henkjan',
-                approved: '0',
-                disproved: '0',
-                'waiting for TA': '1',
-                'total student reviews': '1'
-            }, {
                 netID: 'paulvanderlaan',
                 approved: '0',
                 disproved: '0',
