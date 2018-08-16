@@ -425,9 +425,13 @@ router.get("/:assignment_id/enroll", async (req: any, res) => {
     }
 });
 
+/**
+ * Export the approved ratings of each student for a specific assignment.
+ * @param assignment_id - id of the assignment.
+ */
 router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
     try {
-        const exportData = await ExportResultsPS.executeGetStudentReviewExport(req.params.assignment_id);
+        const exportData = await ExportResultsPS.executeGetStudentReviewExportAssignment(req.params.assignment_id);
             res.json({ data: CSVExport.downloadCSV({ exportData: exportData }) });
     } catch {
         res.sendStatus(400);
