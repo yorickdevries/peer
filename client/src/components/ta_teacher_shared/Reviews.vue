@@ -31,8 +31,14 @@
                  :per-page="Number(perPage)"
                  :filter="filter">
 
-            <template slot="file_path" slot-scope="data">
-                <a :href="`/api/submissions/${data.item.id}/file`" target="_blank"> {{data.value}} </a>
+            <template slot="approved" slot-scope="row">
+                <span v-if="row.item.approved">Approved</span>
+                <span v-if="row.item.approved === false">Disapproved</span>
+                <span v-if="row.item.approved === null">No action yet by any TA.</span>
+            </template>
+
+            <template slot="actions" slot-scope="row">
+                <b-button variant="primary" size="sm" :to="{name: 'teacher-dashboard.assignments.assignment.review', params: { reviewId: row.item.id }}">See review</b-button>
             </template>
         </b-table>
 
@@ -52,7 +58,9 @@
                 currentPage: 1,
                 fields: [
                     {key: 'reviewer', label: 'Reviewer'},
-                    {key: 'submitter', label: 'Submitter'}
+                    {key: 'submitter', label: 'Submitter'},
+                    {key: 'approved', label: 'Approval Status'},
+                    'actions'
                 ],
                 perPage: 5,
                 filter: null
@@ -61,6 +69,10 @@
         async created() {
             let res = await api.getAssignmentReviews(this.assignmentId)
             this.reviews = res.data
+
+            this.reviews = this.reviews.map(review => {
+                return {...review, approved: true, id: 1}
+            })
         }
     }
 </script>
