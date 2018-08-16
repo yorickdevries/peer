@@ -98,7 +98,7 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
 const checkRubricAuthorizationPost = async (req: any, res: any, next: any) => {
     try {
         const assignment = await AssignmentPS.executeGetAssignmentById(req.body.rubric_assignment_id);
-        const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.userinfo.given_name);
         await response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -111,7 +111,7 @@ const checkRubricAuthorizationPost = async (req: any, res: any, next: any) => {
 const checkRubricAuthorization = async (req: any, res: any, next: any) => {
     try {
         const assignment = await AssignmentPS.executeGetAssignmentById(req.params.rubric_assignment_id);
-        const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.userinfo.given_name);
         await response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
