@@ -379,6 +379,11 @@ export default class RubricPS {
         }
     }
 
+    /**
+     * Delete all rubric questions in the database.
+     * @param {number} rubricId - rubric id containing questions.
+     * @return {Promise<void>} - delete all rubric questions.
+     */
     public static async deleteRubricQuestions(rubricId: number) {
         // Fetch the questions of each type.
         const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubricId);
