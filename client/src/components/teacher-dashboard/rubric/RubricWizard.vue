@@ -2,12 +2,28 @@
 <template>
     <b-container>
 
-        <b-row class="mb-3">
-            <b-col>
-                <b-button v-b-modal="'createModal'" size="sm" variant="primary" class="w-100">Add new Question
-                </b-button>
-            </b-col>
-        </b-row>
+        <b-card class="mb-3">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <div class="text-muted">Create a new question.</div>
+                    <b-button v-b-modal="'createModal'"  variant="primary">Add new Question</b-button>
+                </div>
+                <div>
+                    <div class="text-muted">Copy questions from another rubric.</div>
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <b-button variant="primary">Copy</b-button>
+                        </div>
+                        <b-form-select v-model="rubricToCopy" :options="rubricsMetaData"  plain></b-form-select>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-muted">Deletes all questions</div>
+                    <b-button variant="danger">Delete all questions</b-button>
+                </div>
+            </div>
+        </b-card>
 
         <b-row>
             <b-col>
@@ -84,16 +100,27 @@ export default {
                 assignment_id: null,
                 question: []
             },
+            rubricsMetaData: [],
+            rubricToCopy: null
         }
     },
     async created() {
         await this.fetchRubric()
+        await this.fetchCourseRubricMetaData()
     },
     methods: {
         async fetchRubric() {
             let res = await api.client.get(`/rubric/${this.rubricId}`)
             this.rubric = res.data
             this.rubric.questions.sort((a, b) => a.question_number - b.question_number)
+        },
+        async fetchCourseRubricMetaData() {
+            const {data} = await api.getCourseAssignments(this.$route.params.courseId)
+            const rubricsMetaData = data.map(assignment => {
+                return {value: assignment.id, text: assignment.title}
+            })
+            console.log(rubricsMetaData)
+            this.rubricsMetaData = rubricsMetaData
         },
         async deleteQuestion(question) {
             await api.client.delete(`${apiPrefixes[question.type_question]}/${question.id}`);
