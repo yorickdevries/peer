@@ -208,4 +208,17 @@ router.get("/:assignment_id", index.authorization.enrolledAssignmentCheck, async
     }
 });
 
+/**
+ * Router to get all questions of the rubric in format defined in the documentation
+ * @params assignment_id - rubric_id
+ */
+router.get("/:rubric_id/copy/:rubric_copy_id", index.authorization.checkRubricAuthorizationPost, async (req, res) => {
+    try {
+        await RubricPS.copyRubricQuestions(req.params.rubric_id, req.params.rubric_copy_id);
+        res.sendStatus(200);
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
 export default router;
