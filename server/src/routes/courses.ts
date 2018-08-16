@@ -179,7 +179,11 @@ router.get("/:courseId/users/:role/", index.authorization.enrolledCourseTeacherC
             throw new Error("Invalid role");
         }
         // Query and return all net ids as json.
-        res.json(await CoursesPS.executeGetUsersByRole(req.params.courseId, req.params.role));
+        if (req.params.role === "teacher" || req.params.role === "Teacher") {
+            res.json(await CoursesPS.executeGetUsersByRoleExcludeTeacher(req.params.courseId, req.userinfo.given_name));
+        } else {
+            res.json(await CoursesPS.executeGetUsersByRole(req.params.courseId, req.params.role));
+        }
     } catch {
         res.sendStatus(400);
     }
