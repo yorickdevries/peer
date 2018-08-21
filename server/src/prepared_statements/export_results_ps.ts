@@ -12,7 +12,7 @@ export default class ExportResultsPS {
      * and total amount of reviews by the student.
      */
     public static executeGetStudentReviewExportAssignment(assignmentId: number): any {
-        const statement = new PreparedStatement("get-result-aggregation",
+        const statement = new PreparedStatement("get-result-aggregation-assignment",
             'SELECT netID AS "netID", approved, disproved, total - approved - disproved AS "waiting for TA", total AS "student total reviews"' +
             "FROM (" +
             "    SELECT userlist.netid AS netID," +
@@ -34,8 +34,8 @@ export default class ExportResultsPS {
      * and total amount of reviews by the student.
      */
     public static executeGetStudentReviewExportCourse(courseId: number): any {
-        const statement = new PreparedStatement("get-result-aggregation",
-            '﻿SELECT netID AS "netID", approved, disapproved, total - approved - disproved AS "waiting for TA", total AS "student total reviews"' +
+        const statement = new PreparedStatement("get-result-aggregation-course",
+            'SELECT netID AS "netID", approved, disproved, total - approved - disproved AS "waiting for TA", total AS "student total reviews"' +
             "FROM (" +
             "    SELECT userlist.netid AS netID," +
             "    SUM(CASE WHEN review.approved IN (true) THEN 1 ELSE 0 END) AS approved," +
@@ -44,7 +44,7 @@ export default class ExportResultsPS {
             "    FROM userlist " +
             "    JOIN review ON review.user_netid = userlist.netid" +
             "    JOIN assignmentlist ON review.rubric_assignment_id = assignmentlist.id" +
-            "    WHERE review.done = TRUE AND assignmentlist.course_id = 2" +
+            "    WHERE review.done = TRUE AND assignmentlist.course_id = $1" +
             "    GROUP BY userlist.netid" +
             ") AS aggregations");
         statement.values = [courseId];

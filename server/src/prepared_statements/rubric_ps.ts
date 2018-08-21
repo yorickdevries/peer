@@ -371,7 +371,7 @@ export default class RubricPS {
         }
         // Copy mc questions
         for (let i = 0; i < mcQuestions.length; i++) {
-            let res: any = await this.executeCreateMCQuestion(mcQuestions[i].question, currentRubricId, mcQuestions[i].question_number);
+            const res: any = await this.executeCreateMCQuestion(mcQuestions[i].question, currentRubricId, mcQuestions[i].question_number);
 
             // Copy mc options
             mcOptions = await RubricPS.executeGetAllMCOptionById(mcQuestions[i].id);
