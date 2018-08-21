@@ -420,8 +420,8 @@ describe("API Assignment routes", () => {
     /**
      * Assignment grade export.
      */
-    it("Export submission", async () => {
-        // log in as henkjan
+    it("Export assignment grades", async () => {
+        // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).get("/1/gradeExport");
         console.log(JSON.parse(res.text));

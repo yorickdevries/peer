@@ -230,11 +230,12 @@ router.get("/:courseId/assignments/unenrolled", async (req: any, res) => {
  * Export the approved ratings of each student for a specific course.
  * @param course_id - id of the course.
  */
-router.get("/:course_id/gradeExport", index.authorization.enrolledCourseTeacherCheck, async (req: any, res) => {
+router.get("/:courseId/gradeExport", index.authorization.enrolledCourseTeacherCheck, async (req: any, res) => {
     try {
-        const exportData = await ExportResultsPS.executeGetStudentReviewExportCourse(req.params.course_id);
+        const exportData = await ExportResultsPS.executeGetStudentReviewExportCourse(req.params.courseId);
         res.json({ data: CSVExport.downloadCSV({ exportData: exportData }) });
-    } catch {
+    } catch (e) {
+        console.log(e);
         res.sendStatus(400);
     }
 });
