@@ -38,6 +38,7 @@ describe("API review routes", () => {
                     "id": 1,
                     "rubric_assignment_id": 1,
                     "file_path": "submission1.pdf",
+                    // tslint:disable-next-line
                     "approved": null,
                     "done": false
                 },
@@ -235,6 +236,7 @@ describe("API review routes", () => {
               "review": {
                 "done": false,
                 "file_path": "submission1.pdf",
+                  // tslint:disable-next-line
                   "approved": null,
                   "id": 1,
                 "rubric_assignment_id": 1
@@ -320,6 +322,7 @@ describe("API review routes", () => {
         const reviewId: number = 1;
 
         const resultBefore = await ReviewPS.executeGetReview(reviewId);
+        // tslint:disable-next-line
         expect(resultBefore.approved).to.equal(null);
 
         await chai.request(router)

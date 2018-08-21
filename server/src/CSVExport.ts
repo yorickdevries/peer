@@ -13,9 +13,9 @@ export default class CSVExport {
     public static convertArrayOfObjectsToCSV(args: any) {
         let result: string, ctr: number, keys: string[], columnDelimiter: string, lineDelimiter: string, data;
 
-        data = args.data || null;
-        if (data == null || !data.length) {
-            return null;
+        data = args.data || undefined;
+        if (data == undefined || !data.length) {
+            throw Error("Data is undefined");
         }
 
         columnDelimiter = args.columnDelimiter || ";";
@@ -51,7 +51,7 @@ export default class CSVExport {
         let csv = CSVExport.convertArrayOfObjectsToCSV({
             data: args.exportData
         });
-        if (csv == null) throw new Error("Invalid csv file created.");
+        if (csv == undefined) throw new Error("Invalid csv file created.");
 
         if (!csv.match(/^data:text\/csv/i)) {
             csv = "data:text/csv;charset=utf-8," + csv;
