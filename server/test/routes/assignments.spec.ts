@@ -416,4 +416,17 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).get("/1/alllatestsubmissions");
         expect(JSON.parse(res.text).length).to.equal(1);
     });
+
+    /**
+     * Assignment grade export.
+     */
+    it("Export submission", async () => {
+        // log in as henkjan
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).get("/1/gradeExport");
+        console.log(JSON.parse(res.text));
+        expect(JSON.parse(res.text)).to.deep.equal({
+            data: 'data:text/csv;charset=utf-8,netID;approved;disproved;waiting%20for%20TA;student%20total%20reviews%0Apaulvanderlaan;0;0;1;1%0A'
+        })
+    });
 });
