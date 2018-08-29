@@ -452,16 +452,16 @@ router.post("/:assignment_id/groups", index.authorization.enrolledAsTeacherAssig
 });
 
 /**
- * Route to create a group.
+ * Route to get a random review id.
  * @param assignment_id - id of the assignment.
  */
 router.get("/:assignment_id/randomReview", index.authorization.enrolledAsTAOrTeacherAssignment, async (req: any, res) => {
     try {
         const availableReviews: any = await ReviewPS.executeGetAllDoneReviewsByAssignmentIdUnreviewed(1);
-        const randomReview: number = Math.floor((Math.random() * availableReviews.length) + 1);
-
-        res.json({ id: availableReviews[randomReview].id })
-    } catch {
+        const randomReview: number = Math.floor((Math.random() * availableReviews.length));
+        res.json({ id: availableReviews[randomReview].id });
+    } catch (e) {
+        console.log(e);
         res.sendStatus(400);
     }
 });

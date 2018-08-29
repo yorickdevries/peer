@@ -439,4 +439,14 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).post("/1/groups").send({ group_name: "test_group" });
         expect(res.status).to.equal(200);
     });
+
+    /**
+     * Random review id
+     */
+    it("Random review id", async () => {
+        // log in as bplanje (teacher)cle
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).get("/1/randomReview");
+        expect(res.status).to.equal(200);
+    });
 });

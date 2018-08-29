@@ -183,6 +183,6 @@ describe("ReviewPreparedStatement Test", () => {
     it("Get all done and pending for approval review ids", async () => {
         expect(await ReviewPS.executeGetAllDoneReviewsByAssignmentIdUnreviewed(1)).to.deep.equal([{
             id: 2
-        }])
+        }]);
     });
 });
