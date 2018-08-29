@@ -5,7 +5,7 @@ import index from "../security/index";
 import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import UserPS from "../prepared_statements/user_ps";
-import GroupPS from "../prepared_statements/group_ps";
+import GroupPS, {default as GroupsPS} from "../prepared_statements/group_ps";
 import ReviewPS from "../prepared_statements/review_ps";
 import RubricPS from "../prepared_statements/rubric_ps";
 import ExportResultsPS from "../prepared_statements/export_results_ps";
@@ -432,7 +432,20 @@ router.get("/:assignment_id/enroll", async (req: any, res) => {
 router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
     try {
         const exportData = await ExportResultsPS.executeGetStudentReviewExportAssignment(req.params.assignment_id);
-            res.json({ data: CSVExport.downloadCSV({ exportData: exportData }) });
+        res.json({ data: CSVExport.downloadCSV({ exportData: exportData }) });
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Route to create a group.
+ * @param assignment_id - id of the assignment.
+ */
+router.post("/:assignment_id/groups", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
+    try {
+        await GroupsPS.executeAddGroup(req.body.group_name);
+        res.sendStatus(200);
     } catch {
         res.sendStatus(400);
     }
