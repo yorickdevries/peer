@@ -5,7 +5,7 @@ import index from "../security/index";
 import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import UserPS from "../prepared_statements/user_ps";
-import GroupPS, {default as GroupsPS} from "../prepared_statements/group_ps";
+import GroupPS, { default as GroupsPS } from "../prepared_statements/group_ps";
 import ReviewPS from "../prepared_statements/review_ps";
 import RubricPS from "../prepared_statements/rubric_ps";
 import ExportResultsPS from "../prepared_statements/export_results_ps";
