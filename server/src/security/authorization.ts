@@ -266,6 +266,19 @@ const isAuthorizedToViewGroup = async (req: any, res: any, next: any) => {
 };
 
 /**
+ * Check if the person is authorized to edit the group.
+ */
+const isAuthorizedToEditGroup = async (req: any, res: any, next: any) => {
+    try {
+        const authCheckTATeacher = await AuthorizationPS.isTAOrTeacherForGroup(req.userinfo.given_name, req.params.id);
+        const authCheck = authCheckTATeacher.exists;
+        await response(res, authCheck, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
  * Authorization for the fetching of a submission.
  * User should be TA, teacher or part of the group of the submission.
  * @param req - a request.
@@ -416,5 +429,6 @@ export default {
     getSubmissionFileAuth,
     getSubmissionCommentAuth,
     putSubmissionCommentAuth,
-    checkRubricAuthorization
+    checkRubricAuthorization,
+    isAuthorizedToEditGroup
 };

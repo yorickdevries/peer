@@ -79,7 +79,7 @@ export default class GroupsPS {
         const statement = new PreparedStatement("remove-group",
             "DELETE FROM grouplist WHERE id = $1");
         statement.values = [groupId];
-        return Database.executeQuerySingleResult(statement);
+        return Database.executeQuery(statement);
     }
 
     /**
@@ -92,6 +92,6 @@ export default class GroupsPS {
         const statement = new PreparedStatement("remove-group-member",
             "DELETE FROM groupusers WHERE user_netid = $1 AND group_groupid = $2");
         statement.values = [netid, groupId];
-        return Database.executeQuerySingleResult(statement);
+        return Database.executeQuery(statement);
     }
 }
