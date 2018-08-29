@@ -59,4 +59,17 @@ router.delete("/:id/users/:userNetID", index.authorization.isAuthorizedToEditGro
     }
  });
 
+/**
+ * Route to post a group member.
+ */
+router.post("/:id/users", index.authorization.isAuthorizedToEditGroup, async (req: any, res) => {
+    try {
+        await GroupsPS.executeAddStudenttoGroup(req.body.user_netid, req.params.id);
+        res.sendStatus(200);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(400);
+    }
+ });
+
 export default router;

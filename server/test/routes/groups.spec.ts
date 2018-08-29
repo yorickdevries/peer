@@ -70,7 +70,7 @@ describe("API Group routes", () => {
     /**
      * Test whether group members are deleted.
      */
-    it("Delete groups/:id", async () => {
+    it("Delete groups/:id/users/:netId", async () => {
         // test whether the group member exists
         const existRes = await chai.request(router).get("/10/users");
         expect(existRes.text).to.equal(JSON.stringify([
@@ -86,6 +86,30 @@ describe("API Group routes", () => {
         const notExistRes = await chai.request(router).get("/10/users");
         expect(notExistRes.text).to.equal(JSON.stringify([
             {user_netid: "henkjan", group_groupid: 10}
+        ]));
+    });
+
+    /**
+     * Test whether group members are added.
+     */
+    it("Post groups/:id/users", async () => {
+        // test whether the group member exists
+        const existRes = await chai.request(router).get("/10/users");
+        expect(existRes.text).to.equal(JSON.stringify([
+            {user_netid: "henkjan", group_groupid: 10},
+            {user_netid: "paulvanderlaan", group_groupid: 10}
+        ]));
+
+        // delete the group
+        const deleteRes = await chai.request(router).post("/10/users").send({ user_netid: "bplanje" });
+        expect(deleteRes.status).to.equal(200);
+
+        // test whether group does not exist
+        const notExistRes = await chai.request(router).get("/10/users");
+        expect(notExistRes.text).to.equal(JSON.stringify([
+            {user_netid: "henkjan", group_groupid: 10},
+            {user_netid: "paulvanderlaan", group_groupid: 10},
+            {user_netid: "bplanje", group_groupid: 10}
         ]));
     });
 });
