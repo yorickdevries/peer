@@ -259,6 +259,22 @@ export default class ReviewPS {
     }
 
     /**
+     * Gets all done reviews for a certain assignment which are not reviewed yet
+     * @param {number} assignmentId - an assignment id.
+     * @return {Promise<pgPromise.queryResult>} - a promise of the database result.
+     */
+    public static executeGetAllDoneReviewsByAssignmentIdUnreviewed(assignmentId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-all-done-reviews-by-assignmentid-unreviewed",
+            "SELECT review.id " +
+            "FROM review JOIN assignmentlist ON assignmentlist.id = review.rubric_assignment_id " +
+            "WHERE assignmentlist.id = $1 " +
+            "AND review.done = true " +
+            "AND review.approved IS NULL");
+        statement.values = [assignmentId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
      * Set approved to true or false of a review.
      * @param {boolean} approved - true or false.
      * @param {number} reviewId - a review id.
