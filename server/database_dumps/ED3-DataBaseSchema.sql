@@ -188,6 +188,7 @@ CREATE TABLE SubmissionComment (
 ALTER TABLE ReviewComment ADD CONSTRAINT ReviewComment_review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -196,6 +197,7 @@ ALTER TABLE ReviewComment ADD CONSTRAINT ReviewComment_review
 ALTER TABLE SubmissionComment ADD CONSTRAINT SubmissionComment_review
     FOREIGN KEY (Submission_id)
     REFERENCES Submission (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -369,6 +371,7 @@ ALTER TABLE Review ADD CONSTRAINT Review_Rubric
 ALTER TABLE Review ADD CONSTRAINT Review_Submission
     FOREIGN KEY (Submission_id)
     REFERENCES Submission (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
