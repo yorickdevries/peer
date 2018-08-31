@@ -5,8 +5,13 @@
             <!--Header-->
             <BreadcrumbTitle :items="['Assignment', 'Reviews']" class="mt-3"></BreadcrumbTitle>
 
-            <b-card header="Review Information">
-                <div class="d-flex justify-content-between">
+            <!--Next Review-->
+            <b-card no-body>
+                <b-card-header class="d-flex justify-content-between align-items-center">
+                    <div>Review Information</div>
+                    <b-button size="sm" variant="primary" @click="goToNextReview">Next (Random) Review</b-button>
+                </b-card-header>
+                <b-card-body class="d-flex justify-content-between">
 
                     <!--Approval-->
                     <div>
@@ -41,7 +46,7 @@
                             </a>
                         </dl>
                     </div>
-                </div>
+                </b-card-body>
 
             </b-card>
 
@@ -180,8 +185,17 @@ export default {
             } catch (e) {
                 this.showErrorMessage({message: 'Something went wrong with approving/disapproving this review'})
             }
+        },
+        async goToNextReview() {
+            try {
+                const { data } = await api.client.get(`assignments/${this.peerReview.review.rubric_assignment_id}/randomReview`)
+                const randomId = data.id
+                this.$router.push({name: this.$router.currentRoute.name, params: {reviewId: randomId} })
+                location.reload()
+            } catch (e) {
+                this.showErrorMessage({message: "All reviews have been reviewed already!"})
+            }
         }
-
     }
 
 }
