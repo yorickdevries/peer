@@ -41,7 +41,7 @@ import api from "../../api"
 import BreadcrumbTitle from '../BreadcrumbTitle'
 import Submissions from "../ta_teacher_shared/Submissions"
 import Reviews from '../ta_teacher_shared/Reviews'
-import Groups from '../ta_teacher_shared/Groups'
+import Groups from './Groups'
 import AssignmentDetails from '../ta_teacher_shared/AssignmentDetails'
 
 export default {
