@@ -457,7 +457,7 @@ router.post("/:assignment_id/groups", index.authorization.enrolledAsTeacherAssig
  */
 router.get("/:assignment_id/randomReview", index.authorization.enrolledAsTAOrTeacherAssignment, async (req: any, res) => {
     try {
-        const availableReviews: any = await ReviewPS.executeGetAllDoneReviewsByAssignmentIdUnreviewed(1);
+        const availableReviews: any = await ReviewPS.executeGetAllDoneReviewsByAssignmentIdUnreviewed(req.params.assignment_id);
         const randomReview: number = Math.floor((Math.random() * availableReviews.length));
         res.json({ id: availableReviews[randomReview].id });
     } catch (e) {
