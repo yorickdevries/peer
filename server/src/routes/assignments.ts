@@ -445,9 +445,10 @@ router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherA
 router.post("/:assignment_id/groups", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
     try {
         const group: any = await GroupsPS.executeAddGroup(req.body.group_name);
-        await GroupPS.executeAddGrouptoAssignment(group.id, req.body.assignment_id);
+        await GroupPS.executeAddGrouptoAssignment(group.id, req.params.assignment_id);
         res.sendStatus(200);
-    } catch {
+    } catch (e) {
+        console.log(e);
         res.sendStatus(400);
     }
 });
