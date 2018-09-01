@@ -4,7 +4,7 @@
         <b-row>
             <b-col>
 
-                <b-alert variant="danger" show>Modifying groups should be used with caution!</b-alert>
+                <b-alert variant="danger" show>Modifying groups should be done with caution!</b-alert>
 
                 <!--Table Options-->
                 <b-row>
