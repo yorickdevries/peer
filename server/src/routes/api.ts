@@ -14,7 +14,7 @@ import config from "../config";
 import passportConfiguration from "../passport";
 
 // configure passport
-if(config.delftSSO){
+if (config.delftSSO) {
     // Enables TUDelft SSO when set in config file
     passportConfiguration(passport);
 }
