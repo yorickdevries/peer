@@ -1,3 +1,4 @@
+import fs from "fs";
 import express from "express";
 import assignments from "./assignments";
 import courses from "./courses";
@@ -5,36 +6,70 @@ import groups from "./groups";
 import reviews from "./reviews";
 import rubrics from "./rubric";
 import submissions from "./submissions";
-import session from "express-session";
-import { oidc } from "../express-oidc";
 import security from "../security";
 import UserPS from "../prepared_statements/user_ps";
+import session from "express-session";
+import passport from "passport";
+import passportConfiguration from "../passport";
+
+// configure passport
+// Uncomment to enable TUDelft SSO
+// passportConfiguration(passport);
 
 const router = express();
-
-// Okta login
-// session support is required to use ExpressOIDC
+// session support is required to use Passport
 // needs a random secret
 router.use(session({
-    secret: "add something random here",
     resave: true,
-    saveUninitialized: false
+    saveUninitialized: true,
+    secret: "add something random here"
   }));
 
-// Login/login-redirect route from OIDC
-router.use(oidc.router);
+router.use(passport.initialize());
+router.use(passport.session());
+
+// Login route
+router.get("/login", passport.authenticate("saml",
+  {
+    successRedirect: "https://peer.ewi.tudelft.nl/",
+    failureRedirect: "/login"
+  })
+);
+
+// Callback of the login route
+router.post("/login/callback", passport.authenticate("saml",
+  {
+    failureRedirect: "/",
+    failureFlash: true
+  }), function (req, res) {
+    res.redirect("/");
+    }
+);
+
+// Route to logout.
+router.get("/logout", function (req, res) {
+    req.logout();
+    // TODO: invalidate session on IP
+    res.redirect("/");
+});
+
+// Retrieve SP metadata
+router.get("/metadata.xml", function(req, res) {
+  res.type("application/xml");
+  res.send(fs.readFileSync("./SP_Metadata.xml"));
+});
 
 // This route checks the user and updates it in the database
 router.use("*", async function(req: any, res, next) {
-    const userinfo = req.userinfo;
+    const userinfo = req.user;
     // check whether userinfo exists
-    if (userinfo == undefined || userinfo.given_name == undefined) {
+    if (userinfo == undefined || userinfo.netid == undefined) {
         // no user logged in
         next();
     } else {
         // get userinfo
-        const netid = userinfo.given_name.toLowerCase();
-        const email = userinfo.preferred_username;
+        const netid = userinfo.netid.toLowerCase();
+        const email = userinfo.email;
         try {
             // check whether user is in the database
             const userExists: any = await UserPS.executeExistsUserById(netid);
@@ -58,12 +93,6 @@ router.use("*", async function(req: any, res, next) {
     }
 });
 
-// Route to logout.
-router.get("/logout", (req: any, res) => {
-    req.logout();
-    res.redirect("/");
-});
-
 // Authentication route
 router.get("/authenticated", function (req: any, res) {
     res.json({ authenticated: req.isAuthenticated() });
@@ -83,7 +112,7 @@ router.use("/submissions", submissions);
 // Route to get the userinfo
 router.get("/user", function (req: any, res, next) {
     res.json({
-        user: req.userinfo
+        user: req.user
     });
 
 // Error handler

@@ -1,3 +1,4 @@
-declare module "@okta/oidc-middleware";
 declare module "neat-csv";
 declare module "fs-extra";
+declare module "file-system-cache";
+declare module "passport-saml-metadata";

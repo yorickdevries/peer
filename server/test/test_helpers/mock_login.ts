@@ -47,7 +47,7 @@ export default class MockLogin {
             console.log("invalid router object");
             return;
         }
-        // Set Okta userinfo
+        // Set SSO userinfo
         if (netid == undefined) {
             router.request.isAuthenticated = function () {
                 return false;
@@ -58,16 +58,15 @@ export default class MockLogin {
                 return true;
             };
             // Set userinfo
-            router.request.userinfo = {
-                sub: "1234567890",
-                name: "Full Name Here",
-                locale: "en-US",
-                preferred_username: email,
-                given_name: netid,
-                family_name: "Achternaam",
-                zoneinfo: "America/Los_Angeles",
-                updated_at: 0
-            };
+            router.request.user = {
+                netid: netid,
+                studentNumber: 1234567,
+                firstName: "First",
+                prefix: "and",
+                lastName: "Last",
+                email: email,
+                function: "student",
+                displayName: "First and Last"};
         }
     }
 }

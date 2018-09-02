@@ -7,8 +7,6 @@
 import app from "../app";
 import debug from "debug";
 import http from "http";
-// okta
-import { oidc } from "../express-oidc";
 
 debug("peer_review:server");
 
@@ -28,14 +26,7 @@ const server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
-
-oidc.on("ready", () => {
-  server.listen(3000);
-});
-oidc.on("error", (err: Error) => {
-  console.log("Unable to configure ExpressOIDC", err);
-});
-
+server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
 
