@@ -10,11 +10,14 @@ import security from "../security";
 import UserPS from "../prepared_statements/user_ps";
 import session from "express-session";
 import passport from "passport";
+import config from "../config";
 import passportConfiguration from "../passport";
 
 // configure passport
-// Uncomment to enable TUDelft SSO
-// passportConfiguration(passport);
+if(config.delftSSO){
+    // Enables TUDelft SSO when set in config file
+    passportConfiguration(passport);
+}
 
 const router = express();
 // session support is required to use Passport
@@ -22,7 +25,7 @@ const router = express();
 router.use(session({
     resave: true,
     saveUninitialized: true,
-    secret: "add something random here"
+    secret: config.session.secret
   }));
 
 router.use(passport.initialize());
