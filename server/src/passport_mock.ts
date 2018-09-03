@@ -1,7 +1,7 @@
 import MockStrategy from "passport-mock-strategy";
 
 const mockPassportConfiguration = function(passport: any, name: string, userFunction: string) {
-  const userobject = {
+  const userobject: any = {
     netid: name,
     studentNumber: 1234567,
     firstName: "givenName",
@@ -16,9 +16,9 @@ const mockPassportConfiguration = function(passport: any, name: string, userFunc
 
   const strategy = new MockStrategy({
     name: "mock",
-    user: undefined
+    user: userobject
     }, (profile: any, done: any) => {
-      return done(undefined, userobject);
+      return done(undefined, profile);
     });
     passport.use(strategy);
 
