@@ -3,35 +3,36 @@ import fs from "fs";
 import fileCache from "file-system-cache";
 import { fetch, toPassportConfig } from "passport-saml-metadata";
 import passport_saml from "passport-saml";
+import config from "./config";
 
 const samlStrategy = passport_saml.Strategy;
 const backupStore = fileCache({ basePath: os.tmpdir() });
 
 // URL of the TU Delft Metadata
-const url = "https://gatekeeper2.tudelft.nl/openaselect/profiles/saml2";
+const url = config.passport.idpUrl;
 
 const passportConfiguration = function(passport: any) {
   fetch({ url, backupStore })
   .then((reader: any) => {
     // Setup config object
-    const config = toPassportConfig(reader);
-    config.realm = "urn:nodejs:passport-saml-metadata-example-app";
-    config.protocol = "saml2";
-    config.issuer = "peer.ewi.tudelft.nl";
-    config.callbackUrl = "https://peer.ewi.tudelft.nl/api/login/callback";
+    const ppConfig = toPassportConfig(reader);
+    ppConfig.realm = config.passport.realm;
+    ppConfig.protocol = config.passport.protocol;
+    ppConfig.issuer = config.passport.issuer;
+    ppConfig.callbackUrl = config.passport.callbackUrl;
 
     // Certificate
-    const cert = fs.readFileSync("/var/www/peer/cert/peer_ewi_tudelft_nl.crt", "utf-8");
-    const key = fs.readFileSync("/var/www/peer/cert/peer.ewi.tudelft.nl.key", "utf-8");
+    const cert = fs.readFileSync(config.passport.certificate, "utf-8");
+    const key = fs.readFileSync(config.passport.key, "utf-8");
 
-    config.privateCert = key;
+    ppConfig.privateCert = key;
 
     // Informtation to make the Metadata.xml file
     const decryptionCert = cert;
-    config.decryptionPvk = key;
+    ppConfig.decryptionPvk = key;
 
     // Setup Strategy
-    const strategy = new samlStrategy(config,
+    const strategy = new samlStrategy(ppConfig,
       function (profile: any, done: any) {
           return done(undefined,
             {

@@ -3,6 +3,7 @@ import ReviewUpdate from "../reviewUpdate";
 import bodyParser from "body-parser";
 import index from "../security/index";
 import path from "path";
+import config from "../config";
 
 // Router
 import express from "express";
@@ -121,7 +122,7 @@ router.route("/:reviewCommentId/comment").delete(index.authorization.checkOwnerR
 router.route("/:reviewId/file").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
     try {
         const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(req.params.reviewId);
-        const filePath = path.join(__dirname, "../files/submissions", submission.file_path);
+        const filePath = path.join(config.submissions.fileFolder, submission.file_path);
         res.sendfile(filePath);
     } catch (err) {
         res.sendStatus(400);
