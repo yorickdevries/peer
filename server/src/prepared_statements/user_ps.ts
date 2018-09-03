@@ -45,7 +45,7 @@ export default class UserPS {
         userFunction?: string,
         displayName?: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("add-user",
-        'INSERT INTO "userlist" (netid, studentNumber, firstName, prefix, lastName, email, userFunction, displayName) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *');
+        'INSERT INTO "userlist" (netid, studentNumber, firstName, prefix, lastName, email, function, displayName) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *');
         statement.values = [netid, studentNumber, firstName, prefix, lastName, email, userFunction, displayName];
         return Database.executeQuerySingleResult(statement);
     }
@@ -64,7 +64,7 @@ export default class UserPS {
         userFunction?: string,
         displayName?: string): any {
         const statement = new PreparedStatement("update-user-to-database",
-        "UPDATE userlist SET studentNumber = $2, firstName = $3, prefix = $4, lastName = $5, email = $6, userFunction = $7, displayName = $8 WHERE netid = $1 RETURNING *");
+        "UPDATE userlist SET studentNumber = $2, firstName = $3, prefix = $4, lastName = $5, email = $6, function = $7, displayName = $8 WHERE netid = $1 RETURNING *");
         statement.values = [netid, studentNumber, firstName, prefix, lastName, email, userFunction, displayName];
         return Database.executeQuerySingleResult(statement);
     }
