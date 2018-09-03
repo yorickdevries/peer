@@ -13,18 +13,19 @@ import CSVExport from "../CSVExport";
 import GroupParser from "../groupParser";
 import reviewDistribution from "../reviewDistribution";
 import bodyParser from "body-parser";
+import config from "../config";
 
 // Router
 import express from "express";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 
 const router = express();
-const fileFolder = path.join(__dirname, "../files/assignments");
+const fileFolder = config.assignments.fileFolder;
 
 router.use(bodyParser.json());
 
 // PDF of max 30 MB (in bytes)
-const maxSizeAssignmentFile = 30 * 1024 * 1024;
+const maxSizeAssignmentFile = config.assignments.maxSizeAssignmentFile;
 const uploadAssignment = multer({
     limits: {fileSize: maxSizeAssignmentFile},
     fileFilter: function (req: any, file, callback) {

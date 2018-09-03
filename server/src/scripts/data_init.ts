@@ -3,13 +3,13 @@ import { QueryFile } from "pg-promise";
 import Database from "../database";
 
 import fs from "fs-extra";
-import path from "path";
+import config from "../config";
 
 // import database
 const importDatabase = async function () {
     // Database import files
-    const qfSchema = new QueryFile("../../database_dumps/ED3-DataBaseSchema.sql");
-    const qfData = new QueryFile("../../database_dumps/ED3-FullData.sql");
+    const qfSchema = new QueryFile(config.database.schemaQueryFile);
+    const qfData = new QueryFile(config.database.fullQueryFile);
     try {
         await Database.DatabaseDrop();
         await Database.DatabaseImport(qfSchema);
@@ -24,8 +24,8 @@ const importDatabase = async function () {
 // copy assignment files
 const copyExampleAssignmentData = async function () {
     // Assignment file folders
-    const exampleAssignmentFolder = path.join(__dirname, "../../example_data/assignments");
-    const assignmentFolder = path.join(__dirname, "../files/assignments");
+    const exampleAssignmentFolder = config.exampleData.exampleAssignmentFolder;
+    const assignmentFolder = config.assignments.fileFolder;
     try {
         // Make folder
         await fs.mkdirs(assignmentFolder);
@@ -42,8 +42,8 @@ const copyExampleAssignmentData = async function () {
 // copy submission files
 const copyExampleSubmissionData = async function () {
     // Submission file folders
-    const exampleSubmissionFolder = path.join(__dirname, "../../example_data/submissions");
-    const submissionFolder = path.join(__dirname, "../files/submissions");
+    const exampleSubmissionFolder = config.exampleData.exampleSubmissionFolder;
+    const submissionFolder = config.submissions.fileFolder;
     try {
         // Make folder
         await fs.mkdirs(submissionFolder);

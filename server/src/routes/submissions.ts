@@ -6,6 +6,7 @@ import SubmissionsPS from "../prepared_statements/submissions_ps";
 import bodyParser from "body-parser";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import index from "../security/index";
+import config from "../config";
 
 // Router
 import express from "express";
@@ -14,7 +15,7 @@ const router = express();
 router.use(bodyParser.json());
 
 // PDF of max 30 MB (in bytes)
-const maxSizeSubmissionFile = 30 * 1024 * 1024;
+const maxSizeSubmissionFile = config.submissions.maxSizeSubmissionFile;
 const uploadSubmission = multer({
     limits: {fileSize: maxSizeSubmissionFile},
     fileFilter: function (req: any, file, callback) {
@@ -56,7 +57,7 @@ const uploadSubmissionFunction = function(req: any, res: any, next: any) {
 // Function which adds the submission to the database.
 const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
     try {
-        const fileFolder = path.join(__dirname, "../files/submissions");
+        const fileFolder = config.submissions.fileFolder;
         const fileName = Date.now() + "-" + req.file.originalname;
         const filePath = path.join(fileFolder, fileName);
         const netId = req.user.netid;
@@ -104,7 +105,7 @@ router.post("/", uploadSubmissionFunction, index.authorization.postSubmissionAut
 router.get("/:id/file", index.authorization.getSubmissionFileAuth, async (req, res) => {
     try {
         const submission: any = await SubmissionsPS.executeGetSubmissionById(req.params.id);
-        const filePath = path.join(__dirname, "../files/submissions", submission.file_path);
+        const filePath = path.join(config.submissions.fileFolder, submission.file_path);
         res.sendfile(filePath);
     } catch (err) {
         res.sendStatus(400);
