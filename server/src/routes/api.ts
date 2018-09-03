@@ -12,12 +12,7 @@ import session from "express-session";
 import passport from "passport";
 import config from "../config";
 import passportConfiguration from "../passport";
-
-// configure passport
-if (config.delftSSO) {
-    // Enables TUDelft SSO when set in config file
-    passportConfiguration(passport);
-}
+import mockPassportConfiguration from "../passport_mock";
 
 const router = express();
 // session support is required to use Passport
@@ -30,6 +25,23 @@ router.use(session({
 
 router.use(passport.initialize());
 router.use(passport.session());
+
+// Depending of current mode, setup the login method
+if (process.env.NODE_ENV === "production" ) {
+    passportConfiguration(passport);
+  } else {
+    router.get("/mocklogin/:netid/:function",
+    function(req, res, next) {
+        console.log("Mocked login: " + req.params.netid + ", " + req.params.function);
+        // make Mocked passport configuration
+        mockPassportConfiguration(passport, req.params.netid, req.params.function);
+        next();
+    },
+    passport.authenticate("mock"),
+    function(req, res, next) {
+        res.redirect("/");
+    });
+}
 
 // Login route
 router.get("/login", passport.authenticate("saml",

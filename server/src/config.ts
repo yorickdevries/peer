@@ -11,7 +11,6 @@ const config = {
             port: 5432
           }
         },
-    delftSSO: false,
     session: {
         secret: "add something random here"
     }

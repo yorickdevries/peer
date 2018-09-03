@@ -10,6 +10,8 @@ import http from "http";
 
 debug("peer_review:server");
 
+console.log("Currently running in: " + app.get("env"));
+
 /**
  * Get port from environment and store in Express.
  */
