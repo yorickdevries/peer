@@ -36,10 +36,17 @@ export default class UserPS {
      * @param {string} email - an email.
      * @return {any} a query result.
      */
-    public static executeAddUser(netId: string, email: string | undefined): Promise<pgPromise.queryResult> {
+    public static executeAddUser(netid: string,
+        studentNumber?: number,
+        firstName?: string,
+        prefix?: string,
+        lastName?: string,
+        email?: string,
+        userFunction?: string,
+        displayName?: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("add-user",
-        'INSERT INTO "userlist" ("netid", "email") VALUES ($1, $2) RETURNING *');
-        statement.values = [netId, email];
+        'INSERT INTO "userlist" (netid, studentNumber, firstName, prefix, lastName, email, userFunction, displayName) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *');
+        statement.values = [netid, studentNumber, firstName, prefix, lastName, email, userFunction, displayName];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -48,10 +55,17 @@ export default class UserPS {
      * @param {string} netId - a netid.
      * @param {string} email - an email.
      */
-    public static executeUpdateEmailUser(netId: string, email: string): any {
+    public static executeUpdateUser(netid: string,
+        studentNumber?: number,
+        firstName?: string,
+        prefix?: string,
+        lastName?: string,
+        email?: string,
+        userFunction?: string,
+        displayName?: string): any {
         const statement = new PreparedStatement("update-user-to-database",
-        "UPDATE userlist SET email = $2 WHERE netid = $1 RETURNING *");
-        statement.values = [netId, email];
+        "UPDATE userlist SET studentNumber = $2, firstName = $3, prefix = $4, lastName = $5, email = $6, userFunction = $7, displayName = $8 WHERE netid = $1 RETURNING *");
+        statement.values = [netid, studentNumber, firstName, prefix, lastName, email, userFunction, displayName];
         return Database.executeQuerySingleResult(statement);
     }
 
