@@ -35,7 +35,7 @@ const passportConfiguration = function(passport: any) {
       function (profile: any, done: any) {
           return done(undefined,
             {
-              netid: profile["urn:mace:dir:attribute-def:uid"],
+              netid: profile["urn:mace:dir:attribute-def:uid"].toLowerCase(),
               studentNumber: profile["tudStudentNumber"],
               firstName: profile["givenName"],
               prefix: profile["tudPrefix"],

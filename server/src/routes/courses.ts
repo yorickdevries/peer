@@ -150,17 +150,17 @@ router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck,
         if (!(req.body.role in Roles)) {
             throw new Error("Invalid role");
         }
+        const netid = req.body.netid.toLowercase();
 
         // check whether user is in the database
-        const userExists: any = await UserPS.executeExistsUserById(req.body.netid);
+        const userExists: any = await UserPS.executeExistsUserById(netid);
         if (!userExists.exists) {
-            res.status(400);
-            res.json({ error: `${req.body.netid} is not yet registered in the system. The user should have an account!`});
+            // Adding user
+            await UserPS.executeAddUser(netid);
         }
 
-
         // Fetch enrollments of the user to set the role from.
-        const enrolled: any = await CoursesPS.executeExistsEnrolledByCourseIdUserById(req.params.courseId, req.body.netid);
+        const enrolled: any = await CoursesPS.executeExistsEnrolledByCourseIdUserById(req.params.courseId, netid);
 
         // Check if the student is enrolled in the course.
         const isEnrolled: boolean = enrolled.exists;
@@ -168,9 +168,9 @@ router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck,
         // Depending if the student is enrolled, update the role of the student.
         let enroll: any;
         if (!isEnrolled) {
-            enroll =  await CoursesPS.executeEnrollInCourseId(req.params.courseId, req.body.netid, req.body.role);
+            enroll =  await CoursesPS.executeEnrollInCourseId(req.params.courseId, netid, req.body.role);
         } else {
-            enroll = await CoursesPS.executeSetRole(req.params.courseId, req.body.netid, req.body.role);
+            enroll = await CoursesPS.executeSetRole(req.params.courseId, netid, req.body.role);
         }
         res.json({ courseId: enroll.course_id, role: enroll.role });
     } catch {
