@@ -7,7 +7,7 @@ import passport_saml from "passport-saml";
 const samlStrategy = passport_saml.Strategy;
 const backupStore = fileCache({ basePath: os.tmpdir() });
 
-// URL OF THE TU Delft METADATA
+// URL of the TU Delft Metadata
 const url = "https://gatekeeper2.tudelft.nl/openaselect/profiles/saml2";
 
 const passportConfiguration = function(passport: any) {
