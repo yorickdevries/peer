@@ -150,7 +150,7 @@ router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck,
         if (!(req.body.role in Roles)) {
             throw new Error("Invalid role");
         }
-        const netid = req.body.netid.toLowercase();
+        const netid = req.body.netid.toLowerCase();
 
         // check whether user is in the database
         const userExists: any = await UserPS.executeExistsUserById(netid);
