@@ -1,6 +1,6 @@
 import promise from "bluebird";
-import isCI from "is-ci";
 import pgp, { errors, default as pgPromise, PreparedStatement } from "pg-promise";
+import config from "./config";
 
 /**
  * Database class responsible for the connection to the postgreSQL database.
@@ -49,18 +49,8 @@ export default class Database {
     };
     const pgpObject = pgp(options);
 
-    this.connection = {
-      user: "postgres",
-      host: "localhost",
-      database: "peer_database",
-      password: "password",
-      port: 5432
-    };
-
-    if (isCI) {
-      console.log("The code is running on a CI server");
-      this.connection.host = "postgres";
-    }
+    // Get connection from config file
+    this.connection = config.database.connection;
     this.db = pgpObject(this.connection);
   }
 

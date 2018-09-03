@@ -25,7 +25,7 @@
                         <b-nav-item-dropdown right>
                             <!-- Using button-content slot -->
                             <template slot="button-content">
-                                <span class="p-3 align-middle">{{ user.name }}</span>
+                                <span class="p-3 align-middle">{{ user.displayName }}</span>
                             </template>
                             <b-dropdown-item href="/api/logout">Sign-out</b-dropdown-item>
                         </b-nav-item-dropdown>

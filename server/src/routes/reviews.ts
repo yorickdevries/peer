@@ -93,7 +93,7 @@ router.route("/:reviewCommentId/comment").put(index.authorization.checkOwnerRevi
  * @return database return value.
  */
 router.route("/:reviewId/comment").post(index.authorization.checkReviewTAOrTeacher, (req: any, res) => {
-    ReviewsPS.executeAddReviewComment(req.params.reviewId, req.userinfo.given_name, req.body.comment)
+    ReviewsPS.executeAddReviewComment(req.params.reviewId, req.user.netid, req.body.comment)
     .then((data) => {
         res.json(data);
     }).catch((error) => {

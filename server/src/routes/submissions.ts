@@ -59,7 +59,7 @@ const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
         const fileFolder = path.join(__dirname, "../files/submissions");
         const fileName = Date.now() + "-" + req.file.originalname;
         const filePath = path.join(fileFolder, fileName);
-        const netId = req.userinfo.given_name;
+        const netId = req.user.netid;
         const assignmentId = req.body.assignmentId;
         // get the groupId of this user for this assignment
         const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
@@ -151,7 +151,7 @@ router.put("/:submissionCommentId/comment", index.authorization.putSubmissionCom
  * @return database return value.
  */
 router.post("/:id/comment", index.authorization.getSubmissionAuth, (req: any, res) => {
-    SubmissionsPS.executeAddSubmissionComment(req.params.id,  req.userinfo.given_name, req.body.comment)
+    SubmissionsPS.executeAddSubmissionComment(req.params.id,  req.user.netid, req.body.comment)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
