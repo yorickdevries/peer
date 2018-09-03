@@ -3,7 +3,7 @@ import MockStrategy from "passport-mock-strategy";
 
 const mockPassportConfiguration = function(passport: any, netid: string, userFunction: string) {
   const userobject: any = {
-    netid: netid,
+    netid: netid.toLowerCase(),
     studentNumber: 1234567,
     firstName: "First",
     prefix: "and",
