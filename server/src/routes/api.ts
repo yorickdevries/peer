@@ -30,11 +30,11 @@ router.use(passport.session());
 if (process.env.NODE_ENV === "production" ) {
     passportConfiguration(passport);
   } else {
-    router.get("/mocklogin/:netid/:function",
+    router.get("/mocklogin/:netid/:affiliation",
     function(req, res, next) {
-        console.log("Mocked login: " + req.params.netid + ", " + req.params.function);
+        console.log("Mocked login: " + req.params.netid + ", " + req.params.affiliation);
         // make Mocked passport configuration
-        mockPassportConfiguration(passport, req.params.netid, req.params.function);
+        mockPassportConfiguration(passport, req.params.netid, req.params.affiliation);
         next();
     },
     passport.authenticate("mock"),
@@ -56,13 +56,13 @@ router.post("/login/callback", passport.authenticate("saml",
   {
     failureRedirect: "/",
     failureFlash: true
-  }), function (req, res) {
+  }), function(req, res) {
     res.redirect("/");
     }
 );
 
 // Route to logout.
-router.get("/logout", function (req, res) {
+router.get("/logout", function(req, res) {
     req.logout();
     // TODO: invalidate session on IP
     res.redirect("/");
@@ -89,7 +89,7 @@ router.use("*", async function(req: any, res, next) {
         const prefix = userinfo.prefix;
         const lastName = userinfo.lastName;
         const email = userinfo.email;
-        const userFunction = userinfo.function;
+        const affiliation = userinfo.affiliation;
         const displayName = userinfo.displayName;
         try {
             // check whether user is in the database
@@ -97,10 +97,10 @@ router.use("*", async function(req: any, res, next) {
             // in case the user is not in the database
             if (!userExists.exists) {
                 // Adding user
-                await UserPS.executeAddUser(netid, studentNumber, firstName, prefix, lastName, email, userFunction, displayName);
+                await UserPS.executeAddUser(netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName);
             } else {
                 // Updating userinfo
-                await UserPS.executeUpdateUser(netid, studentNumber, firstName, prefix, lastName, email, userFunction, displayName);
+                await UserPS.executeUpdateUser(netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName);
             }
             next();
         } catch (err) {
@@ -110,7 +110,7 @@ router.use("*", async function(req: any, res, next) {
 });
 
 // Authentication route
-router.get("/authenticated", function (req: any, res) {
+router.get("/authenticated", function(req: any, res) {
     res.json({ authenticated: req.isAuthenticated() });
 });
 
@@ -126,13 +126,13 @@ router.use("/rubric", rubrics);
 router.use("/submissions", submissions);
 
 // Route to get the userinfo
-router.get("/user", function (req: any, res, next) {
+router.get("/user", function(req: any, res, next) {
     res.json({
         user: req.user
     });
 
 // Error handler
-router.use(function (err: any, req: any, res: any, next: any) {
+router.use(function(err: any, req: any, res: any, next: any) {
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get("env") === "development" ? err : {};

@@ -42,7 +42,7 @@ const passportConfiguration = function(passport: any) {
               prefix: profile["tudPrefix"],
               lastName: profile["sn"],
               email: profile["mail"],
-              function: profile["urn:mace:dir:attribute-def:eduPersonAffiliation"],
+              affiliation: profile["urn:mace:dir:attribute-def:eduPersonAffiliation"],
               displayName: profile["displayName"],
               nameID: profile["nameID"],
               nameIDFormat: profile["nameIDFormat"]

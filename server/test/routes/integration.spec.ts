@@ -59,7 +59,7 @@ describe("API integration test", () => {
     it("Full integration test for assignments", async () => {
         // [1]
         // Log in as bplanje (teacher) and create a course.
-        MockLogin.initialize("bplanje");
+        MockLogin.initialize("bplanje", undefined, "employee");
         const course: any = await chai.request(router)
             .post("/courses/")
             .send({description: "example", name: "test name"});

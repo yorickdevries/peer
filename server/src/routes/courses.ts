@@ -19,7 +19,7 @@ router.use(bodyParser.json());
  * @body description - description.
  * @body name - name.
  */
-router.post("/", async (req: any, res) => {
+router.post("/", index.authorization.employeeCheck, async (req: any, res) => {
     try {
         // Create the course
         const course = await CoursesPS.executeCreateCourse(req.body.description, req.body.name);
