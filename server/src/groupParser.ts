@@ -82,7 +82,7 @@ export default class GroupParser {
         if (!res.exists) {
             // The email is not known while creating this student entry
             // Creating user
-            await UserPS.executeAddUser(netId, undefined);
+            await UserPS.executeAddUser(netId);
         }
         return;
     }

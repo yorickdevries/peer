@@ -25,7 +25,8 @@
 4. Run 'npm start' in the root
 5. Access the site through [http://localhost:3000](http://localhost:3000)
 
-On the site you can login using any student mail of the teammembers and password: passwordAB1
+- On the site you can mock a SSO login login using http://localhost:3000/api/mocklogin/[netid]/[function]
+- Function can be: "student" or "employee"
 
 ## Group Members ##
 | Name               | NetID          | Student Mail                        |

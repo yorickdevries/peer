@@ -1,3 +1,4 @@
+import fs from "fs";
 import express from "express";
 import assignments from "./assignments";
 import courses from "./courses";
@@ -5,63 +6,107 @@ import groups from "./groups";
 import reviews from "./reviews";
 import rubrics from "./rubric";
 import submissions from "./submissions";
-import session from "express-session";
-import { oidc } from "../express-oidc";
 import security from "../security";
 import UserPS from "../prepared_statements/user_ps";
+import session from "express-session";
+import passport from "passport";
+import config from "../config";
+import passportConfiguration from "../passport";
+import mockPassportConfiguration from "../passport_mock";
 
 const router = express();
-
-// Okta login
-// session support is required to use ExpressOIDC
+// session support is required to use Passport
 // needs a random secret
 router.use(session({
-    secret: "add something random here",
     resave: true,
-    saveUninitialized: false
+    saveUninitialized: true,
+    secret: config.session.secret
   }));
 
-// Login/login-redirect route from OIDC
-router.use(oidc.router);
+router.use(passport.initialize());
+router.use(passport.session());
+
+// Depending of current mode, setup the login method
+if (process.env.NODE_ENV === "production" ) {
+    passportConfiguration(passport);
+  } else {
+    router.get("/mocklogin/:netid/:function",
+    function(req, res, next) {
+        console.log("Mocked login: " + req.params.netid + ", " + req.params.function);
+        // make Mocked passport configuration
+        mockPassportConfiguration(passport, req.params.netid, req.params.function);
+        next();
+    },
+    passport.authenticate("mock"),
+    function(req, res, next) {
+        res.redirect("/");
+    });
+}
+
+// Login route
+router.get("/login", passport.authenticate("saml",
+  {
+    successRedirect: "https://peer.ewi.tudelft.nl/",
+    failureRedirect: "/login"
+  })
+);
+
+// Callback of the login route
+router.post("/login/callback", passport.authenticate("saml",
+  {
+    failureRedirect: "/",
+    failureFlash: true
+  }), function (req, res) {
+    res.redirect("/");
+    }
+);
+
+// Route to logout.
+router.get("/logout", function (req, res) {
+    req.logout();
+    // TODO: invalidate session on IP
+    res.redirect("/");
+});
+
+// Retrieve SP metadata
+router.get("/metadata.xml", function(req, res) {
+  res.type("application/xml");
+  res.send(fs.readFileSync("./SP_Metadata.xml"));
+});
 
 // This route checks the user and updates it in the database
 router.use("*", async function(req: any, res, next) {
-    const userinfo = req.userinfo;
+    const userinfo = req.user;
     // check whether userinfo exists
-    if (userinfo == undefined || userinfo.given_name == undefined) {
+    if (userinfo == undefined || userinfo.netid == undefined) {
         // no user logged in
         next();
     } else {
         // get userinfo
-        const netid = userinfo.given_name.toLowerCase();
-        const email = userinfo.preferred_username;
+        const netid = userinfo.netid;
+        const studentNumber = userinfo.studentNumber;
+        const firstName = userinfo.firstName;
+        const prefix = userinfo.prefix;
+        const lastName = userinfo.lastName;
+        const email = userinfo.email;
+        const userFunction = userinfo.function;
+        const displayName = userinfo.displayName;
         try {
             // check whether user is in the database
             const userExists: any = await UserPS.executeExistsUserById(netid);
             // in case the user is not in the database
             if (!userExists.exists) {
                 // Adding user
-                await UserPS.executeAddUser(netid, email);
+                await UserPS.executeAddUser(netid, studentNumber, firstName, prefix, lastName, email, userFunction, displayName);
             } else {
-                const user: any = await UserPS.executeGetUserById(netid);
-                // in case the new email is not undefined
-                // or different from what's in the database
-                if (email !== undefined && user.email !== email) {
-                    // Updating user email
-                    await UserPS.executeUpdateEmailUser(netid, email);
-                }
+                // Updating userinfo
+                await UserPS.executeUpdateUser(netid, studentNumber, firstName, prefix, lastName, email, userFunction, displayName);
             }
             next();
         } catch (err) {
             next(err);
         }
     }
-});
-
-// Route to logout.
-router.get("/logout", (req: any, res) => {
-    req.logout();
-    res.redirect("/");
 });
 
 // Authentication route
@@ -83,7 +128,7 @@ router.use("/submissions", submissions);
 // Route to get the userinfo
 router.get("/user", function (req: any, res, next) {
     res.json({
-        user: req.userinfo
+        user: req.user
     });
 
 // Error handler

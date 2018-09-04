@@ -47,7 +47,7 @@ describe("API root routes", () => {
         MockLogin.initialize("henkjan");
         const res = await chai.request(router).get("/user");
         expect(res.status).to.equal(200);
-        expect(JSON.parse(res.text).user.given_name).to.equal("henkjan");
+        expect(JSON.parse(res.text).user.netid).to.equal("henkjan");
     });
 
     /**
@@ -57,7 +57,7 @@ describe("API root routes", () => {
         MockLogin.initialize("henkjan", "h.j@dtudent.tudelft.nl");
         const res = await chai.request(router).get("/user");
         expect(res.status).to.equal(200);
-        expect(JSON.parse(res.text).user.preferred_username).to.equal("h.j@dtudent.tudelft.nl");
+        expect(JSON.parse(res.text).user.email).to.equal("h.j@dtudent.tudelft.nl");
     });
 
     /**

@@ -24,7 +24,7 @@ router.post("/", async (req: any, res) => {
         // Create the course
         const course = await CoursesPS.executeCreateCourse(req.body.description, req.body.name);
         // Enroll the teacher in the course
-        await CoursesPS.executeEnrollInCourseId(course.id, req.userinfo.given_name, Roles.teacher);
+        await CoursesPS.executeEnrollInCourseId(course.id, req.user.netid, Roles.teacher);
         // Respond with appropriate JSON
         res.json(course);
     } catch {
@@ -48,7 +48,7 @@ router.get("/", (req, res) => {
  * Router to get all courses you are enrolled in
  */
 router.get("/enrolled", (req: any, res) => {
-   CoursesPS.executeGetAllEnrolledCourses(req.userinfo.given_name)
+   CoursesPS.executeGetAllEnrolledCourses(req.user.netid)
    .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -63,7 +63,7 @@ router.get("/enrolled", (req: any, res) => {
 router.get("/unenrolled", async (req: any, res) => {
     try {
         // Use method from group parser to enroll student (if not already enrolled)
-        res.json(await CoursesPS.executeGetUnenrolledForUser(req.userinfo.given_name));
+        res.json(await CoursesPS.executeGetUnenrolledForUser(req.user.netid));
     } catch {
         res.sendStatus(400);
     }
@@ -74,7 +74,7 @@ router.get("/unenrolled", async (req: any, res) => {
  * @param courseId - a course id.
  */
 router.get("/:courseId/assignments/enrolled", index.authorization.enrolledCourseCheck, (req: any, res) => {
-    AssignmentsPS.executeGetEnrolledAssignmentsForUser(req.userinfo.given_name, req.params.courseId)
+    AssignmentsPS.executeGetEnrolledAssignmentsForUser(req.user.netid, req.params.courseId)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -129,7 +129,7 @@ router.get("/:courseId", index.authorization.enrolledCourseCheck, (req, res) => 
  * @param course_id - course id.
  */
 router.get("/:courseId/role", index.authorization.enrolledCourseCheck, async (req: any, res) => {
-    CoursesPS.executeGetRoleById(req.userinfo.given_name, req.params.courseId)
+    CoursesPS.executeGetRoleById(req.user.netid, req.params.courseId)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -150,17 +150,17 @@ router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck,
         if (!(req.body.role in Roles)) {
             throw new Error("Invalid role");
         }
+        const netid = req.body.netid.toLowerCase();
 
         // check whether user is in the database
-        const userExists: any = await UserPS.executeExistsUserById(req.body.netid);
+        const userExists: any = await UserPS.executeExistsUserById(netid);
         if (!userExists.exists) {
-            res.status(400);
-            res.json({ error: `${req.body.netid} is not yet registered in the system. The user should have an account!`});
+            // Adding user
+            await UserPS.executeAddUser(netid);
         }
 
-
         // Fetch enrollments of the user to set the role from.
-        const enrolled: any = await CoursesPS.executeExistsEnrolledByCourseIdUserById(req.params.courseId, req.body.netid);
+        const enrolled: any = await CoursesPS.executeExistsEnrolledByCourseIdUserById(req.params.courseId, netid);
 
         // Check if the student is enrolled in the course.
         const isEnrolled: boolean = enrolled.exists;
@@ -168,9 +168,9 @@ router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck,
         // Depending if the student is enrolled, update the role of the student.
         let enroll: any;
         if (!isEnrolled) {
-            enroll =  await CoursesPS.executeEnrollInCourseId(req.params.courseId, req.body.netid, req.body.role);
+            enroll =  await CoursesPS.executeEnrollInCourseId(req.params.courseId, netid, req.body.role);
         } else {
-            enroll = await CoursesPS.executeSetRole(req.params.courseId, req.body.netid, req.body.role);
+            enroll = await CoursesPS.executeSetRole(req.params.courseId, netid, req.body.role);
         }
         res.json({ courseId: enroll.course_id, role: enroll.role });
     } catch {
@@ -190,7 +190,7 @@ router.get("/:courseId/users/:role/", index.authorization.enrolledCourseTeacherC
         }
         // Query and return all net ids as json.
         if (req.params.role === "teacher" || req.params.role === "Teacher") {
-            res.json(await CoursesPS.executeGetUsersByRoleExcludeTeacher(req.params.courseId, req.userinfo.given_name));
+            res.json(await CoursesPS.executeGetUsersByRoleExcludeTeacher(req.params.courseId, req.user.netid));
         } else {
             res.json(await CoursesPS.executeGetUsersByRole(req.params.courseId, req.params.role));
         }
@@ -206,7 +206,7 @@ router.get("/:courseId/users/:role/", index.authorization.enrolledCourseTeacherC
 router.get("/:courseId/enroll", async (req: any, res) => {
     try {
         // Use method from group parser to enroll student (if not already enrolled)
-        await GroupParser.enrollStudentIfNotEnrolled(req.params.courseId, req.userinfo.given_name);
+        await GroupParser.enrollStudentIfNotEnrolled(req.params.courseId, req.user.netid);
         res.sendStatus(200);
     } catch {
         res.sendStatus(400);
@@ -220,7 +220,7 @@ router.get("/:courseId/enroll", async (req: any, res) => {
 router.get("/:courseId/assignments/unenrolled", async (req: any, res) => {
     try {
         // Use method from group parser to enroll student (if not already enrolled)
-        res.json(await AssignmentsPS.executeGetUnenrolledAssignmentsForUser(req.userinfo.given_name, req.params.courseId));
+        res.json(await AssignmentsPS.executeGetUnenrolledAssignmentsForUser(req.user.netid, req.params.courseId));
     } catch {
         res.sendStatus(400);
     }

@@ -16,10 +16,9 @@ describe("UserPreparedStatements Test", () => {
      * Test get user by id prepared statement.
      */
     it("get user by id", async () => {
-        expect(await UserPS.executeGetUserById("paulvanderlaan")).to.deep.equal({
-            netid: "paulvanderlaan",
-            email: "p.j.vanderlaan-1@student.tudelft.nl"
-        });
+        const user: any = await UserPS.executeGetUserById("paulvanderlaan");
+        expect(user.netid).to.equal("paulvanderlaan");
+        expect(user.email).to.equal("p.j.vanderlaan-1@student.tudelft.nl");
     });
 
 });

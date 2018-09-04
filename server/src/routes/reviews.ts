@@ -3,6 +3,7 @@ import ReviewUpdate from "../reviewUpdate";
 import bodyParser from "body-parser";
 import index from "../security/index";
 import path from "path";
+import config from "../config";
 
 // Router
 import express from "express";
@@ -93,7 +94,7 @@ router.route("/:reviewCommentId/comment").put(index.authorization.checkOwnerRevi
  * @return database return value.
  */
 router.route("/:reviewId/comment").post(index.authorization.checkReviewTAOrTeacher, (req: any, res) => {
-    ReviewsPS.executeAddReviewComment(req.params.reviewId, req.userinfo.given_name, req.body.comment)
+    ReviewsPS.executeAddReviewComment(req.params.reviewId, req.user.netid, req.body.comment)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -121,7 +122,7 @@ router.route("/:reviewCommentId/comment").delete(index.authorization.checkOwnerR
 router.route("/:reviewId/file").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
     try {
         const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(req.params.reviewId);
-        const filePath = path.join(__dirname, "../files/submissions", submission.file_path);
+        const filePath = path.join(config.submissions.fileFolder, submission.file_path);
         res.sendfile(filePath);
     } catch (err) {
         res.sendStatus(400);

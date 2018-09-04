@@ -13,18 +13,19 @@ import CSVExport from "../CSVExport";
 import GroupParser from "../groupParser";
 import reviewDistribution from "../reviewDistribution";
 import bodyParser from "body-parser";
+import config from "../config";
 
 // Router
 import express from "express";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 
 const router = express();
-const fileFolder = path.join(__dirname, "../files/assignments");
+const fileFolder = config.assignments.fileFolder;
 
 router.use(bodyParser.json());
 
 // PDF of max 30 MB (in bytes)
-const maxSizeAssignmentFile = 30 * 1024 * 1024;
+const maxSizeAssignmentFile = config.assignments.maxSizeAssignmentFile;
 const uploadAssignment = multer({
     limits: {fileSize: maxSizeAssignmentFile},
     fileFilter: function (req: any, file, callback) {
@@ -203,13 +204,13 @@ router.get("/:assignment_id/file", index.authorization.enrolledAssignmentCheck, 
 
 /**
  * Route to get all submissions of a certain assignment of your specific group.
- * @userinfo given_name - netId.
+ * @user netid - netId.
  * @params assignment_id - assignment_id.
  */
 router.route("/:assignment_id/submissions", )
     .get((req: any, res) => {
         AssignmentPS.executeGetSubmissionsByAssignmentId(
-            req.userinfo.given_name,
+            req.user.netid,
             req.params.assignment_id
         ).then((data) => {
             res.json(data);
@@ -223,7 +224,7 @@ router.route("/:assignment_id/submissions", )
  */
 router.route("/:id/latestsubmission")
 .get(async (req: any, res) => {
-    const netId = req.userinfo.given_name;
+    const netId = req.user.netid;
     const assignmentId = req.params.id;
     // get the groupId of this user for this assignment
     try {
@@ -269,12 +270,12 @@ router.route("/:assignment_id/alllatestsubmissions")
 
 /**
  * Route to request a list of reviews
- * @userinfo given_name - NetId
+ * @user.netid - NetId
  * @params assignment_id - assignment_Id
  */
 router.route("/:assignment_id/reviews")
     .get((req: any, res) => {
-        ReviewPS.executeGetReviewsByUserIdAndAssignmentId(req.userinfo.given_name, req.params.assignment_id)
+        ReviewPS.executeGetReviewsByUserIdAndAssignmentId(req.user.netid, req.params.assignment_id)
         .then((data) => {
             res.json(data);
         }).catch((error) => {
@@ -350,7 +351,7 @@ router.get("/:assignment_id/allreviews", index.authorization.enrolledAsTAOrTeach
  */
 router.get("/:id/group", async (req: any, res) => {
     try {
-        const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.userinfo.given_name, req.params.id);
+        const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.user.netid, req.params.id);
         const groupId = group.group_groupid;
         const groupmembers = await GroupPS.executeGetUsersOfGroupById(groupId);
         res.json({group, groupmembers});
@@ -370,7 +371,7 @@ router.get("/:id/feedback", async (req: any, res) => {
             res.json({ error: "You can only access the review after the review due date is passed." });
         } else {
             const assignmentId = req.params.id;
-            const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.userinfo.given_name, req.params.id);
+            const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.user.netid, req.params.id);
             const groupId = group.group_groupid;
             const submission: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
             const submissionId = submission.id;
@@ -411,13 +412,13 @@ router.get("/:assignment_id/enroll", async (req: any, res) => {
         } else if (assignment.one_person_groups === false) {
             res.status(400);
             res.json({error: "Assignment has one person groups not enabled."});
-        } else if (await GroupParser.studentIsInGroup(req.userinfo.given_name, req.params.assignment_id) === true) {
+        } else if (await GroupParser.studentIsInGroup(req.user.netid, req.params.assignment_id) === true) {
             res.status(400);
             res.json({error: "Student is already in a group enrolled for this assignment."});
         } else {
             // Create group and add assignment and student.
-            const groupId = await GroupParser.createGroupForAssignment(req.userinfo.given_name, req.params.assignment_id);
-            await GroupPS.executeAddStudenttoGroup(req.userinfo.given_name, groupId);
+            const groupId = await GroupParser.createGroupForAssignment(req.user.netid, req.params.assignment_id);
+            await GroupPS.executeAddStudenttoGroup(req.user.netid, groupId);
             res.sendStatus(200);
         }
     } catch {

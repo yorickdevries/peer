@@ -23,7 +23,7 @@ const authorizeCheck = (req: any, res: any, next: any) => {
 const enrolledAssignmentCheck = async (req: any, res: any, next: any) => {
     try {
         const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-        const authCheck = await AuthorizationPS.executeCheckEnrollment(assignment.course_id, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeCheckEnrollment(assignment.course_id, req.user.netid);
         response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -35,7 +35,7 @@ const enrolledAssignmentCheck = async (req: any, res: any, next: any) => {
  */
 const enrolledCourseCheck = async (req: any, res: any, next: any) => {
     try {
-        const authCheck = await AuthorizationPS.executeCheckEnrollment(req.params.courseId, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeCheckEnrollment(req.params.courseId, req.user.netid);
         response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -47,7 +47,7 @@ const enrolledCourseCheck = async (req: any, res: any, next: any) => {
  */
 const enrolledCourseTeacherCheck = async (req: any, res: any, next: any) => {
     try {
-        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(req.params.courseId, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(req.params.courseId, req.user.netid);
         response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -60,7 +60,7 @@ const enrolledCourseTeacherCheck = async (req: any, res: any, next: any) => {
 const enrolledAsTeacherAssignmentCheck = async (req: any, res: any, next: any) => {
     try {
         const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.user.netid);
         response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -72,7 +72,7 @@ const enrolledAsTeacherAssignmentCheck = async (req: any, res: any, next: any) =
  */
 const enrolledAsTeacherAssignmentCheckForPost = async (req: any, res: any, next: any) => {
     try {
-        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(req.body.course_id, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(req.body.course_id, req.user.netid);
         response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -85,7 +85,7 @@ const enrolledAsTeacherAssignmentCheckForPost = async (req: any, res: any, next:
 const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) => {
     try {
         const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-        const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.user.netid);
         await response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -98,7 +98,7 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
 const checkRubricAuthorizationPost = async (req: any, res: any, next: any) => {
     try {
         const assignment = await AssignmentPS.executeGetAssignmentById(req.body.rubric_assignment_id);
-        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.user.netid);
         await response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -111,7 +111,7 @@ const checkRubricAuthorizationPost = async (req: any, res: any, next: any) => {
 const checkRubricAuthorization = async (req: any, res: any, next: any) => {
     try {
         const assignment = await AssignmentPS.executeGetAssignmentById(req.params.rubric_assignment_id);
-        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.user.netid);
         await response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -123,7 +123,7 @@ const checkRubricAuthorization = async (req: any, res: any, next: any) => {
  */
 const checkMCQuestionEdit = async (req: any, res: any, next: any) => {
     try {
-        const authCheck = await AuthorizationPS.executeAuthorizationMCQuestion(req.params.question_id, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeAuthorizationMCQuestion(req.params.question_id, req.user.netid);
         await response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -135,7 +135,7 @@ const checkMCQuestionEdit = async (req: any, res: any, next: any) => {
  */
 const checkMCOptionPost = async (req: any, res: any, next: any) => {
     try {
-        const authCheck = await AuthorizationPS.executeAuthorizationMCQuestion(req.body.mcquestion_id, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeAuthorizationMCQuestion(req.body.mcquestion_id, req.user.netid);
         await response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -147,7 +147,7 @@ const checkMCOptionPost = async (req: any, res: any, next: any) => {
  */
 const checkMCOptionEdit = async (req: any, res: any, next: any) => {
     try {
-        const authCheck = await AuthorizationPS.executeAuthorizationMCOption(req.params.option_id, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeAuthorizationMCOption(req.params.option_id, req.user.netid);
         await response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -161,7 +161,7 @@ const checkMCOptionEdit = async (req: any, res: any, next: any) => {
  */
 const checkOpenQuestionEdit = async (req: any, res: any, next: any) => {
     try {
-        const authCheck = await AuthorizationPS.executeAuthorizationOpenQuestion(req.params.question_id, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeAuthorizationOpenQuestion(req.params.question_id, req.user.netid);
         await response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -173,7 +173,7 @@ const checkOpenQuestionEdit = async (req: any, res: any, next: any) => {
  */
 const checkRangeQuestionEdit = async (req: any, res: any, next: any) => {
     try {
-        const authCheck = await AuthorizationPS.executeAuthorizationRangeQuestion(req.params.question_id, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeAuthorizationRangeQuestion(req.params.question_id, req.user.netid);
         await response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -186,9 +186,9 @@ const checkRangeQuestionEdit = async (req: any, res: any, next: any) => {
  */
 const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
     try {
-        const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.userinfo.given_name);
-        const authCheckOwner = await AuthorizationPS.executeCheckReviewMaker(req.params.reviewId, req.userinfo.given_name);
-        const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(req.params.reviewId, req.userinfo.given_name);
+        const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.user.netid);
+        const authCheckOwner = await AuthorizationPS.executeCheckReviewMaker(req.params.reviewId, req.user.netid);
+        const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(req.params.reviewId, req.user.netid);
 
         // Check if past due date
         const review = await ReviewPS.executeGetReview(req.params.reviewId);
@@ -208,7 +208,7 @@ const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
  */
 const checkReviewOwner = async (req: any, res: any, next: any) => {
     try {
-        const authCheck = await AuthorizationPS.executeCheckReviewMakerNotDone(req.params.reviewId, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeCheckReviewMakerNotDone(req.params.reviewId, req.user.netid);
         response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -220,7 +220,7 @@ const checkReviewOwner = async (req: any, res: any, next: any) => {
  */
 const checkReviewOwnerDone = async (req: any, res: any, next: any) => {
     try {
-        const authCheck = await AuthorizationPS.executeCheckReviewMaker(req.params.reviewId, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeCheckReviewMaker(req.params.reviewId, req.user.netid);
         response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -232,7 +232,7 @@ const checkReviewOwnerDone = async (req: any, res: any, next: any) => {
  */
 const checkReviewTAOrTeacher = async (req: any, res: any, next: any) => {
     try {
-        const authCheck = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.user.netid);
         response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -244,7 +244,7 @@ const checkReviewTAOrTeacher = async (req: any, res: any, next: any) => {
  */
 const checkOwnerReviewComment = async (req: any, res: any, next: any) => {
     try {
-        const authCheck = await AuthorizationPS.executeCheckOwnerReviewComment(req.params.reviewCommentId, req.userinfo.given_name);
+        const authCheck = await AuthorizationPS.executeCheckOwnerReviewComment(req.params.reviewCommentId, req.user.netid);
         response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -256,8 +256,8 @@ const checkOwnerReviewComment = async (req: any, res: any, next: any) => {
  */
 const isAuthorizedToViewGroup = async (req: any, res: any, next: any) => {
     try {
-        const authCheckTATeacher = await AuthorizationPS.isTAOrTeacherForGroup(req.userinfo.given_name, req.params.id);
-        const authCheckStudent = await AuthorizationPS.isInGroup(req.userinfo.given_name, req.params.id);
+        const authCheckTATeacher = await AuthorizationPS.isTAOrTeacherForGroup(req.user.netid, req.params.id);
+        const authCheckStudent = await AuthorizationPS.isInGroup(req.user.netid, req.params.id);
         const authCheck = authCheckTATeacher.exists || authCheckStudent.exists;
         await response(res, authCheck, next);
     } catch (error) {
@@ -292,8 +292,8 @@ const getSubmissionAuth = async (req: any, res: any, next: any) => {
         const courseId = (<any> await SubmissionsPS.executeGetCourseId(req.params.id)).course_id;
 
         // Execute the database checks.
-        const roleCheck: any = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(courseId, req.userinfo.given_name);
-        const groupCheck: any = await AuthorizationPS.isGetSubmissionAuth(req.params.id, req.userinfo.given_name);
+        const roleCheck: any = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(courseId, req.user.netid);
+        const groupCheck: any = await AuthorizationPS.isGetSubmissionAuth(req.params.id, req.user.netid);
 
         // Verify the authorization.
         await response(res, roleCheck.exists || groupCheck.exists, next);
@@ -317,8 +317,8 @@ const getSubmissionCommentAuth = async (req: any, res: any, next: any) => {
         const courseId = (<any> await SubmissionsPS.executeGetCourseId(submissionId)).course_id;
 
         // Execute the database checks.
-        const roleCheck: any = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(courseId, req.userinfo.given_name);
-        const groupCheck: any = await AuthorizationPS.isGetSubmissionAuth(submissionId, req.userinfo.given_name);
+        const roleCheck: any = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(courseId, req.user.netid);
+        const groupCheck: any = await AuthorizationPS.isGetSubmissionAuth(submissionId, req.user.netid);
 
         // Verify the authorization.
         await response(res, roleCheck.exists || groupCheck.exists, next);
@@ -338,7 +338,7 @@ const getSubmissionCommentAuth = async (req: any, res: any, next: any) => {
 const postSubmissionAuth = async (req: any, res: any, next: any) => {
     try {
         // Check if the user in in a group.
-        const groupCheck: any = await AuthorizationPS.isPostSubmissionAuth(req.body.assignmentId, req.userinfo.given_name);
+        const groupCheck: any = await AuthorizationPS.isPostSubmissionAuth(req.body.assignmentId, req.user.netid);
         // Verify the authorization.
         await response(res, groupCheck.exists, next);
     } catch (error) {
@@ -357,7 +357,7 @@ const postSubmissionAuth = async (req: any, res: any, next: any) => {
 const putSubmissionCommentAuth = async (req: any, res: any, next: any) => {
     try {
         // Check if the user in in a group.
-        const authorCheck: any = await AuthorizationPS.isPutSubmissionCommentAuth(req.params.submissionCommentId, req.userinfo.given_name);
+        const authorCheck: any = await AuthorizationPS.isPutSubmissionCommentAuth(req.params.submissionCommentId, req.user.netid);
         // Verify the authorization.
         await response(res, authorCheck.exists, next);
     } catch (error) {
@@ -379,9 +379,9 @@ const getSubmissionFileAuth = async (req: any, res: any, next: any) => {
         const courseId = (<any> await SubmissionsPS.executeGetCourseId(req.params.id)).course_id;
 
         // Execute the database checks.
-        const roleCheck: any = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(courseId, req.userinfo.given_name);
-        const groupCheck: any = await AuthorizationPS.isGetSubmissionAuth(req.params.id, req.userinfo.given_name);
-        const reviewCheck: any = await AuthorizationPS.isSubmissionReviewerAuth(req.params.id, req.userinfo.given_name);
+        const roleCheck: any = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(courseId, req.user.netid);
+        const groupCheck: any = await AuthorizationPS.isGetSubmissionAuth(req.params.id, req.user.netid);
+        const reviewCheck: any = await AuthorizationPS.isSubmissionReviewerAuth(req.params.id, req.user.netid);
 
         // Verify the authorization.
         await response(res, roleCheck.exists || groupCheck.exists || reviewCheck.exists, next);
