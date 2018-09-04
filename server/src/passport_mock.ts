@@ -1,7 +1,7 @@
 // Mock the login of an user for development purposes
 import MockStrategy from "passport-mock-strategy";
 
-const mockPassportConfiguration = function(passport: any, netid: string, userFunction: string) {
+const mockPassportConfiguration = function(passport: any, netid: string, affiliation: string) {
   const userobject: any = {
     netid: netid.toLowerCase(),
     studentNumber: 1234567,
@@ -9,7 +9,7 @@ const mockPassportConfiguration = function(passport: any, netid: string, userFun
     prefix: "and",
     lastName: "Last",
     email: "mail@mail.com",
-    function: userFunction,
+    affiliation: affiliation,
     displayName: netid,
     nameID: "nameID",
     nameIDFormat: "nameIDFormat"
