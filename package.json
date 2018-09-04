@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "start": "npm run build && npm run start_server",
-    "build": "npm run build_server && npm run build_data && npm run build_client",
+    "start_newdata": "npm run build_newdata && npm run start_server",
+    "build": "npm run build_server && npm run build_client",
+    "build_newdata": "npm run build_server && npm run build_data && npm run build_client",
     "build_server": "npm run build --prefix ./server",
     "build_data": "npm run data_init --prefix ./server",
     "build_client": "npm run build --prefix ./client",
