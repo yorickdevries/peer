@@ -22,8 +22,7 @@
 1. Run a Postgres database on localhost:5432 with password 'password'
 2. Create a database called 'peer_database'
 3. Run 'npm install' in both './client' and './server'
-4a. Run 'npm run start_newdata' in the root to start with initializing sample data
-4b. Run 'npm start' in the root to start without initializing sample data
+4. Run 'npm run start_newdata' in the root to start with initializing sample data OR Run 'npm start' in the root to start without initializing sample data
 5. Access the site through [http://localhost:3000](http://localhost:3000)
 
 - On the site you can mock a SSO login login using http://localhost:3000/api/mocklogin/[netid]/[affiliation]
