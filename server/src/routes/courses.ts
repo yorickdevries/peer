@@ -233,7 +233,10 @@ router.get("/:courseId/assignments/unenrolled", async (req: any, res) => {
 router.get("/:courseId/gradeExport", index.authorization.enrolledCourseTeacherCheck, async (req: any, res) => {
     try {
         const exportData = await ExportResultsPS.executeGetStudentReviewExportCourse(req.params.courseId);
-        res.json({ data: CSVExport.downloadCSV({ exportData: exportData }) });
+
+        res.setHeader("Content-disposition", "attachment; filename=export.csv");
+        res.set("Content-Type", "text/csv");
+        res.status(200).send(CSVExport.downloadCSV({ exportData: exportData }));
     } catch (e) {
         console.log(e);
         res.sendStatus(400);

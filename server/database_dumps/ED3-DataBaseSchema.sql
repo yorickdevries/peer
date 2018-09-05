@@ -194,6 +194,7 @@ CREATE TABLE SubmissionComment (
 ALTER TABLE ReviewComment ADD CONSTRAINT ReviewComment_review
     FOREIGN KEY (Review_id)
     REFERENCES Review (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -202,6 +203,7 @@ ALTER TABLE ReviewComment ADD CONSTRAINT ReviewComment_review
 ALTER TABLE SubmissionComment ADD CONSTRAINT SubmissionComment_review
     FOREIGN KEY (Submission_id)
     REFERENCES Submission (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -242,6 +244,7 @@ ALTER TABLE AssignmentGroup ADD CONSTRAINT AssignmentGroup_Assignment
 ALTER TABLE AssignmentGroup ADD CONSTRAINT AssignmentGroup_Group
     FOREIGN KEY (Group_id)
     REFERENCES GroupList (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -250,6 +253,7 @@ ALTER TABLE AssignmentGroup ADD CONSTRAINT AssignmentGroup_Group
 ALTER TABLE GroupUsers ADD CONSTRAINT GroupUsers_Group
     FOREIGN KEY (Group_groupid)
     REFERENCES GroupList (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -373,6 +377,7 @@ ALTER TABLE Review ADD CONSTRAINT Review_Rubric
 ALTER TABLE Review ADD CONSTRAINT Review_Submission
     FOREIGN KEY (Submission_id)
     REFERENCES Submission (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -414,6 +419,7 @@ ALTER TABLE Submission ADD CONSTRAINT Submission_User
 ALTER TABLE Submission ADD CONSTRAINT Submission_Group
     FOREIGN KEY (Group_id)
     REFERENCES GroupList (id)
+    ON DELETE CASCADE
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;

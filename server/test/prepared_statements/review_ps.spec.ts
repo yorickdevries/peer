@@ -39,7 +39,6 @@ describe("ReviewPreparedStatement Test", () => {
     it("submit review by id", async () => {
         expect((await ReviewPS.executeGetReview(1)).done).to.equal(false);
         const result: any = await ReviewPS.executeSubmitReview(1);
-        console.log(result);
         expect(result[0].done).to.equal(true);
     });
 
@@ -175,6 +174,15 @@ describe("ReviewPreparedStatement Test", () => {
             "id": 2,
             "reviewer": "paulvanderlaan",
             "submitter": "paulvanderlaan"
+        }]);
+    });
+
+    /**
+     * Test get reviews for an assignment.
+     */
+    it("Get all done and pending for approval review ids", async () => {
+        expect(await ReviewPS.executeGetAllDoneReviewsByAssignmentIdUnreviewed(1)).to.deep.equal([{
+            id: 2
         }]);
     });
 });

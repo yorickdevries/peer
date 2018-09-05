@@ -33,4 +33,43 @@ router.get("/:id/users", index.authorization.isAuthorizedToViewGroup, (req: any,
     });
  });
 
+/**
+ * Route to delete a group.
+ */
+router.delete("/:id", index.authorization.isAuthorizedToEditGroup, async (req: any, res) => {
+    try {
+        await GroupsPS.executeDeleteGroup(req.params.id);
+        res.sendStatus(200);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(400);
+    }
+ });
+
+/**
+ * Route to delete a group member.
+ */
+router.delete("/:id/users/:userNetID", index.authorization.isAuthorizedToEditGroup, async (req: any, res) => {
+    try {
+        await GroupsPS.executeDeleteGroupMember(req.params.id, req.params.userNetID);
+        res.sendStatus(200);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(400);
+    }
+ });
+
+/**
+ * Route to post a group member.
+ */
+router.post("/:id/users", index.authorization.isAuthorizedToEditGroup, async (req: any, res) => {
+    try {
+        await GroupsPS.executeAddStudenttoGroup(req.body.user_netid, req.params.id);
+        res.sendStatus(200);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(400);
+    }
+ });
+
 export default router;

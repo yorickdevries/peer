@@ -5,9 +5,14 @@
             <!--Header-->
             <b-row>
                 <b-col>
-                    <div class="mt-5">
+                    <div class="mt-5 mb-3">
                         <span class="h2">Courses</span>
-                        <b-button variant="success" class="mb-3 float-right" :to="{ name: 'teacher-dashboard.courses.create' }">Create Course</b-button>
+                        <b-button variant="success"
+                                  class="float-right"
+                                  :to="{ name: 'teacher-dashboard.courses.create' }"
+                                  v-if="showCreateCourseButton">
+                            Create Course
+                        </b-button>
                     </div>
                 </b-col>
             </b-row>
@@ -122,7 +127,8 @@ export default {
                 }
             ],
             filter: "",
-            filterUnenrolled: ""
+            filterUnenrolled: "",
+            showCreateCourseButton: false
         }
     },
     computed: {
@@ -153,8 +159,19 @@ export default {
 
         // Fetch course roles.
         await this.fetchAllCourseRoles()
+
+        // Fetch user to see if create course button should be showed.
+        await this.fetchUser()
     },
     methods: {
+        async fetchUser() {
+            let res = await api.getUser()
+            if (res.data.user.affiliation === "employee") {
+                this.showCreateCourseButton = true
+            } else {
+                this.showCreateCourseButton = false
+            }
+        },
         async fetchCourses() {
             let res = await api.getEnrolledCourses()
             this.courses = res.data

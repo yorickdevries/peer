@@ -10,6 +10,7 @@ import TestData from "../test_helpers/test_data";
 // file system imports
 import fs from "fs-extra";
 import path from "path";
+import GroupsPS from "../../src/prepared_statements/group_ps";
 
 describe("API Assignment routes", () => {
     /**
@@ -418,14 +419,22 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Assignment grade export.
+     * Post a group
      */
-    it("Export assignment grades", async () => {
+    it("Create group", async () => {
         // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
-        const res = await chai.request(router).get("/1/gradeExport");
-        expect(JSON.parse(res.text)).to.deep.equal({
-            data: "data:text/csv;charset=utf-8,netID;studentnumber;approved;disproved;waiting%20for%20TA;student%20total%20reviews%0Apaulvanderlaan;null;0;0;1;1%0A"
-        });
+        const res = await chai.request(router).post("/1/groups").send({ group_name: "test_group" });
+        expect(res.status).to.equal(200);
+    });
+
+    /**
+     * Random review id
+     */
+    it("Random review id", async () => {
+        // log in as bplanje (teacher)cle
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).get("/1/randomReview");
+        expect(res.status).to.equal(200);
     });
 });

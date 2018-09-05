@@ -47,7 +47,7 @@
                                                 <!--Exporting-->
                                                 <dt>Export CSV</dt>
                                                 <dd>Exports a CSV file with an aggregation of the review approval/disapproval amounts of each student for this assignment.</dd>
-                                                <b-button size="sm" variant="primary" @click="downloadExport">
+                                                <b-button size="sm" variant="primary" :href="`/api/assignments/${assignment.id}/gradeExport`">
                                                     Download CSV
                                                 </b-button>
 
@@ -93,7 +93,7 @@ import api from '../../../api'
 import BreadcrumbTitle from '../../BreadcrumbTitle'
 import RubricWizard from '../rubric/RubricWizard'
 import ImportGroupsWizard from '../ImportGroupsWizard'
-import Groups from '../../ta_teacher_shared/Groups'
+import Groups from '../Groups'
 import Reviews from '../../ta_teacher_shared/Reviews'
 import Submissions from '../../ta_teacher_shared/Submissions'
 import AssignmentDetails from '../../ta_teacher_shared/AssignmentDetails'
@@ -150,14 +150,6 @@ export default {
             } catch (e) {
                 this.showErrorMessage({message: e.response.data.error})
             }
-        },
-        async downloadExport() {
-            const res = await api.client.get(`assignments/${this.assignment.id}/gradeExport`)
-            const data = res.data.data
-            const link = document.createElement('a')
-            link.setAttribute('href', data)
-            link.setAttribute('download', 'export.csv')
-            link.click()
         }
     }
 }

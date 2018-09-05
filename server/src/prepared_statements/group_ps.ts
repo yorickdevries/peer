@@ -69,4 +69,29 @@ export default class GroupsPS {
         statement.values = [netId, groupId];
         return Database.executeQuerySingleResult(statement);
     }
+
+    /**
+     * Prepared statement that add a student to a group
+     * @param {number} groupId - group_id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteGroup(groupId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("remove-group",
+            "DELETE FROM grouplist WHERE id = $1");
+        statement.values = [groupId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Prepared statement that add a student to a group
+     * @param {number} groupId - group_id.
+     * @param netid - net id of user.
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteGroupMember(groupId: number, netid: string): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("remove-group-member",
+            "DELETE FROM groupusers WHERE user_netid = $1 AND group_groupid = $2");
+        statement.values = [netid, groupId];
+        return Database.executeQuery(statement);
+    }
 }

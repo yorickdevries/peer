@@ -5,7 +5,7 @@ import index from "../security/index";
 import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import UserPS from "../prepared_statements/user_ps";
-import GroupPS from "../prepared_statements/group_ps";
+import GroupPS, { default as GroupsPS } from "../prepared_statements/group_ps";
 import ReviewPS from "../prepared_statements/review_ps";
 import RubricPS from "../prepared_statements/rubric_ps";
 import ExportResultsPS from "../prepared_statements/export_results_ps";
@@ -433,8 +433,41 @@ router.get("/:assignment_id/enroll", async (req: any, res) => {
 router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
     try {
         const exportData = await ExportResultsPS.executeGetStudentReviewExportAssignment(req.params.assignment_id);
-        res.json({ data: CSVExport.downloadCSV({ exportData: exportData }) });
+
+        res.setHeader("Content-disposition", "attachment; filename=export.csv");
+        res.set("Content-Type", "text/csv");
+        res.status(200).send(CSVExport.downloadCSV({ exportData: exportData }));
     } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Route to create a group.
+ * @param assignment_id - id of the assignment.
+ */
+router.post("/:assignment_id/groups", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
+    try {
+        const group: any = await GroupsPS.executeAddGroup(req.body.group_name);
+        await GroupPS.executeAddGrouptoAssignment(group.id, req.params.assignment_id);
+        res.sendStatus(200);
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Route to get a random review id.
+ * @param assignment_id - id of the assignment.
+ */
+router.get("/:assignment_id/randomReview", index.authorization.enrolledAsTAOrTeacherAssignment, async (req: any, res) => {
+    try {
+        const availableReviews: any = await ReviewPS.executeGetAllDoneReviewsByAssignmentIdUnreviewed(req.params.assignment_id);
+        const randomReview: number = Math.floor((Math.random() * availableReviews.length));
+        res.json({ id: availableReviews[randomReview].id });
+    } catch (e) {
+        console.log(e);
         res.sendStatus(400);
     }
 });

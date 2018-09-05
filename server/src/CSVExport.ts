@@ -48,14 +48,12 @@ export default class CSVExport {
      * @return {string} csv file encoded in uri.
      */
     public static downloadCSV(args: any): string {
-        let csv = CSVExport.convertArrayOfObjectsToCSV({
+        const csv = CSVExport.convertArrayOfObjectsToCSV({
             data: args.exportData
         });
+
         if (csv == undefined) throw new Error("Invalid csv file created.");
 
-        if (!csv.match(/^data:text\/csv/i)) {
-            csv = "data:text/csv;charset=utf-8," + csv;
-        }
-        return encodeURI(csv);
+        return csv;
     }
 }

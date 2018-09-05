@@ -30,7 +30,7 @@
                             <dd>Exports a CSV file with an aggregation of the review approval/disapproval amounts of
                                 each student for all the assignments in the course.
                             </dd>
-                            <b-button variant="primary" size="sm" @click="downloadExport">Download CSV</b-button>
+                            <b-button variant="primary" size="sm" :href="`/api/courses/${course.id}/gradeExport`">Download CSV</b-button>
                         </dl>
 
                     </b-card>
@@ -61,16 +61,6 @@
             this.course.id = id
             let res = await api.getCourse(id)
             this.course = res.data
-        },
-        methods: {
-            async downloadExport() {
-                const res = await api.client.get(`courses/${this.course.id}/gradeExport`)
-                const data = res.data.data
-                const link = document.createElement('a')
-                link.setAttribute('href', data)
-                link.setAttribute('download', 'export.csv')
-                link.click()
-            }
         }
 
     }
