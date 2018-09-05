@@ -64,7 +64,7 @@
         },
         methods: {
             async downloadExport() {
-                const res = await api.client.get(`course/${this.course.id}/gradeExport`)
+                const res = await api.client.get(`courses/${this.course.id}/gradeExport`)
                 const data = res.data.data
                 const link = document.createElement('a')
                 link.setAttribute('href', data)

@@ -22,13 +22,14 @@ export default class MockLogin {
      * @param {(string | undefined)} [email=undefined]
      * @memberof MockLogin
      */
-    static initialize(netid: string | undefined = undefined, email: string | undefined = undefined) {
-        this.initializeRouter(api, netid, email);
-        this.initializeRouter(assignments, netid, email);
-        this.initializeRouter(courses, netid, email);
-        this.initializeRouter(groups, netid, email);
-        this.initializeRouter(reviews, netid, email);
-        this.initializeRouter(submissions, netid, email);
+    static initialize(netid?: string, email?: string, affiliation?: string) {
+        this.initializeRouter(api, netid, email, affiliation);
+        this.initializeRouter(assignments, netid, email, affiliation);
+        this.initializeRouter(courses, netid, email, affiliation);
+        this.initializeRouter(groups, netid, email, affiliation);
+        this.initializeRouter(reviews, netid, email, affiliation);
+        this.initializeRouter(rubric, netid, email, affiliation);
+        this.initializeRouter(submissions, netid, email, affiliation);
     }
 
     /**
@@ -41,7 +42,7 @@ export default class MockLogin {
      * @returns
      * @memberof MockLogin
      */
-    static initializeRouter(router: any, netid: string | undefined = undefined, email: string | undefined = undefined) {
+    static initializeRouter(router: any, netid?: string, email?: string, affiliation: string = "student") {
         // Authenticated function
         if (router.request == undefined) {
             console.log("invalid router object");
@@ -65,7 +66,7 @@ export default class MockLogin {
                 prefix: "and",
                 lastName: "Last",
                 email: email,
-                function: "student",
+                affiliation: affiliation,
                 displayName: "First and Last"};
         }
     }

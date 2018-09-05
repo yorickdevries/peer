@@ -42,11 +42,11 @@ export default class UserPS {
         prefix?: string,
         lastName?: string,
         email?: string,
-        userFunction?: string,
+        affiliation?: string,
         displayName?: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("add-user",
-        'INSERT INTO "userlist" (netid, studentNumber, firstName, prefix, lastName, email, function, displayName) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *');
-        statement.values = [netid, studentNumber, firstName, prefix, lastName, email, userFunction, displayName];
+        'INSERT INTO "userlist" (netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *');
+        statement.values = [netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -61,11 +61,11 @@ export default class UserPS {
         prefix?: string,
         lastName?: string,
         email?: string,
-        userFunction?: string,
+        affiliation?: string,
         displayName?: string): any {
         const statement = new PreparedStatement("update-user-to-database",
-        "UPDATE userlist SET studentNumber = $2, firstName = $3, prefix = $4, lastName = $5, email = $6, function = $7, displayName = $8 WHERE netid = $1 RETURNING *");
-        statement.values = [netid, studentNumber, firstName, prefix, lastName, email, userFunction, displayName];
+        "UPDATE userlist SET studentNumber = $2, firstName = $3, prefix = $4, lastName = $5, email = $6, affiliation = $7, displayName = $8 WHERE netid = $1 RETURNING *");
+        statement.values = [netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName];
         return Database.executeQuerySingleResult(statement);
     }
 

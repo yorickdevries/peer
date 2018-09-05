@@ -165,7 +165,7 @@ CREATE TABLE UserList (
     prefix varchar(5000),
     lastName varchar(5000),
     email varchar(5000),
-    function varchar(5000),
+    affiliation varchar(5000),
     displayName varchar(5000),
     CONSTRAINT UserList_pk PRIMARY KEY (netid),
     CONSTRAINT netid_lower CHECK (netid = lower(netid))

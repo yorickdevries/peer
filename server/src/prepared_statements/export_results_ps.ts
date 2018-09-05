@@ -13,9 +13,10 @@ export default class ExportResultsPS {
      */
     public static executeGetStudentReviewExportAssignment(assignmentId: number): any {
         const statement = new PreparedStatement("get-result-aggregation-assignment",
-            'SELECT netID AS "netID", approved, disproved, total - approved - disproved AS "waiting for TA", total AS "student total reviews"' +
+            'SELECT netID AS "netID", studentNumber AS "studentnumber", approved, disproved, total - approved - disproved AS "waiting for TA", total AS "student total reviews"' +
             "FROM (" +
             "    SELECT userlist.netid AS netID," +
+            "    userlist.studentNumber AS studentNumber," +
             "    SUM(CASE WHEN review.approved IN (true) THEN 1 ELSE 0 END) AS approved," +
             "    SUM(CASE WHEN review.approved IN (false) THEN 1 ELSE 0 END) AS disproved," +
             "    COUNT(userlist.netid) AS total" +
@@ -35,9 +36,10 @@ export default class ExportResultsPS {
      */
     public static executeGetStudentReviewExportCourse(courseId: number): any {
         const statement = new PreparedStatement("get-result-aggregation-course",
-            'SELECT netID AS "netID", approved, disproved, total - approved - disproved AS "waiting for TA", total AS "student total reviews"' +
+            'SELECT netID AS "netID", studentNumber AS "studentnumber", approved, disproved, total - approved - disproved AS "waiting for TA", total AS "student total reviews"' +
             "FROM (" +
             "    SELECT userlist.netid AS netID," +
+            "    userlist.studentNumber AS studentNumber," +
             "    SUM(CASE WHEN review.approved IN (true) THEN 1 ELSE 0 END) AS approved," +
             "    SUM(CASE WHEN review.approved IN (false) THEN 1 ELSE 0 END) AS disproved," +
             "    COUNT(userlist.netid) AS total" +

@@ -18,6 +18,20 @@ const authorizeCheck = (req: any, res: any, next: any) => {
 };
 
 /**
+ * Checks whether a user is an employee
+ * @param req - a request.
+ * @param res - a response.
+ * @param next - next.
+ */
+const employeeCheck = (req: any, res: any, next: any) => {
+    if (req.user.affiliation === "employee") {
+        next();
+    } else {
+        res.sendStatus(401);
+    }
+};
+
+/**
  * Check whether a user is enrolled to the course of the assignment it wants to access
  */
 const enrolledAssignmentCheck = async (req: any, res: any, next: any) => {
@@ -406,6 +420,7 @@ const response = (res: any, bool: boolean, next: any) => {
  */
 export default {
     authorizeCheck,
+    employeeCheck,
     enrolledAssignmentCheck,
     checkOwnerReviewComment,
     checkReviewTAOrTeacher,
