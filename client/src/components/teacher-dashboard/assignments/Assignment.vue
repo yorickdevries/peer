@@ -47,7 +47,7 @@
                                                 <!--Exporting-->
                                                 <dt>Export CSV</dt>
                                                 <dd>Exports a CSV file with an aggregation of the review approval/disapproval amounts of each student for this assignment.</dd>
-                                                <b-button size="sm" variant="primary" @click="downloadExport">
+                                                <b-button size="sm" variant="primary" :href="`/api/assignments/${assignment.id}/gradeExport`">
                                                     Download CSV
                                                 </b-button>
 
@@ -150,14 +150,6 @@ export default {
             } catch (e) {
                 this.showErrorMessage({message: e.response.data.error})
             }
-        },
-        async downloadExport() {
-            const res = await api.client.get(`assignments/${this.assignment.id}/gradeExport`)
-            const data = res.data.data
-            const link = document.createElement('a')
-            link.setAttribute('href', data)
-            link.setAttribute('download', 'export.csv')
-            link.click()
         }
     }
 }

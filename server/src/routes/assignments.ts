@@ -433,7 +433,10 @@ router.get("/:assignment_id/enroll", async (req: any, res) => {
 router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
     try {
         const exportData = await ExportResultsPS.executeGetStudentReviewExportAssignment(req.params.assignment_id);
-        res.json({ data: CSVExport.downloadCSV({ exportData: exportData }) });
+
+        res.setHeader('Content-disposition', 'attachment; filename=export.csv');
+        res.set('Content-Type', 'text/csv');
+        res.status(200).send(CSVExport.downloadCSV({ exportData: exportData }));
     } catch {
         res.sendStatus(400);
     }
