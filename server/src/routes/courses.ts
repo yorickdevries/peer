@@ -234,8 +234,8 @@ router.get("/:courseId/gradeExport", index.authorization.enrolledCourseTeacherCh
     try {
         const exportData = await ExportResultsPS.executeGetStudentReviewExportCourse(req.params.courseId);
 
-        res.setHeader('Content-disposition', 'attachment; filename=export.csv');
-        res.set('Content-Type', 'text/csv');
+        res.setHeader("Content-disposition", "attachment; filename=export.csv");
+        res.set("Content-Type", "text/csv");
         res.status(200).send(CSVExport.downloadCSV({ exportData: exportData }));
     } catch (e) {
         console.log(e);

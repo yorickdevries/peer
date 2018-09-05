@@ -434,8 +434,8 @@ router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherA
     try {
         const exportData = await ExportResultsPS.executeGetStudentReviewExportAssignment(req.params.assignment_id);
 
-        res.setHeader('Content-disposition', 'attachment; filename=export.csv');
-        res.set('Content-Type', 'text/csv');
+        res.setHeader("Content-disposition", "attachment; filename=export.csv");
+        res.set("Content-Type", "text/csv");
         res.status(200).send(CSVExport.downloadCSV({ exportData: exportData }));
     } catch {
         res.sendStatus(400);

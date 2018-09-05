@@ -419,18 +419,6 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Assignment grade export.
-     */
-    it("Export assignment grades", async () => {
-        // log in as bplanje (teacher)cle
-        MockLogin.initialize("bplanje");
-        const res = await chai.request(router).get("/1/gradeExport");
-        expect(JSON.parse(res.text)).to.deep.equal({
-            data: "data:text/csv;charset=utf-8,netID;studentnumber;approved;disproved;waiting%20for%20TA;student%20total%20reviews%0Apaulvanderlaan;null;0;0;1;1%0A"
-        });
-    });
-
-    /**
      * Post a group
      */
     it("Create group", async () => {
