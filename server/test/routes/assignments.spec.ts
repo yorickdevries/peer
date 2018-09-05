@@ -424,9 +424,8 @@ describe("API Assignment routes", () => {
         // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).get("/1/gradeExport");
-        console.log(JSON.parse(res.text));
         expect(JSON.parse(res.text)).to.deep.equal({
-            data: "data:text/csv;charset=utf-8,netID;approved;disproved;waiting%20for%20TA;student%20total%20reviews%0Apaulvanderlaan;0;0;1;1%0A"
+            data: "data:text/csv;charset=utf-8,netID;studentnumber;approved;disproved;waiting%20for%20TA;student%20total%20reviews%0Apaulvanderlaan;null;0;0;1;1%0A"
         });
     });
 });
