@@ -14,7 +14,7 @@ CREATE TABLE AssignmentList (
     due_date timestamptz NOT NULL,
     review_publish_date timestamptz NOT NULL,
     review_due_date timestamptz NOT NULL,
-    one_person_groups boolean NOT NULL DEFAULT false,
+    one_person_groups boolean NOT NULL DEFAULT FALSE,
     CONSTRAINT AssignmentList_pk PRIMARY KEY (id),
     CONSTRAINT positive_review_per_user CHECK (reviews_per_user > 0),
     CONSTRAINT publish_before_due CHECK (publish_date < due_date),
@@ -431,6 +431,7 @@ ALTER TABLE Enroll ADD CONSTRAINT Enroll_Role
     INITIALLY IMMEDIATE
 ;
 
+-- Set roles
 INSERT INTO public.role(name)
 	VALUES ('student'),
     ('TA'),
