@@ -327,22 +327,27 @@ export default class RubricPS {
 
         // Fill with mc questions.
         for (let i = 0; i < mcQuestions.length; i++) {
+            const question = mcQuestions[i];
             questionJson.push({
-                id: mcQuestions[i].id,
-                type_question: mcQuestions[i].type_question,
-                rubric_assignment_id: mcQuestions[i].rubric_assignment_id,
-                question: mcQuestions[i].question,
-                question_number: mcQuestions[i].question_number,
-                option: await RubricPS.executeGetAllMCOptionById(mcQuestions[i].id)
+                id: question.id,
+                type_question: "mc",
+                rubric_assignment_id: question.rubric_assignment_id,
+                question: question.question,
+                question_number: question.question_number,
+                option: await RubricPS.executeGetAllMCOptionById(question.id)
             });
         }
         // Fill with open questions.
         for (let i = 0; i < openQuestions.length; i++) {
-            questionJson.push(openQuestions[i]);
+            const question = openQuestions[i];
+            question.type_question = "open";
+            questionJson.push(question);
         }
         // Fill with range questions.
         for (let i = 0; i < rangeQuestions.length; i++) {
-            questionJson.push(rangeQuestions[i]);
+            const question = rangeQuestions[i];
+            question.type_question = "range";
+            questionJson.push(question);
         }
 
         return questionJson;

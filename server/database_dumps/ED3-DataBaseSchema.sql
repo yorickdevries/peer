@@ -4,17 +4,17 @@
 -- tables
 -- Table: AssignmentList
 CREATE TABLE AssignmentList (
-    title varchar(5000) NOT NULL,
-    description varchar(5000) NOT NULL,
+    title varchar(500) NOT NULL,
+    description varchar(5000),
     id SERIAL,
     course_id int NOT NULL,
     reviews_per_user int NOT NULL,
-    filename varchar(5000) NOT NULL,
+    filename varchar(500),
     publish_date timestamptz NOT NULL,
     due_date timestamptz NOT NULL,
     review_publish_date timestamptz NOT NULL,
     review_due_date timestamptz NOT NULL,
-    one_person_groups boolean DEFAULT false,
+    one_person_groups boolean NOT NULL DEFAULT FALSE,
     CONSTRAINT AssignmentList_pk PRIMARY KEY (id),
     CONSTRAINT positive_review_per_user CHECK (reviews_per_user > 0),
     CONSTRAINT publish_before_due CHECK (publish_date < due_date),
@@ -25,18 +25,23 @@ CREATE TABLE AssignmentList (
 -- Table: CourseList
 CREATE TABLE CourseList (
     id SERIAL,
-    description varchar(5000) NOT NULL,
-    name varchar(5000) NOT NULL,
+    description varchar(5000),
+    name varchar(500) NOT NULL,
     CONSTRAINT CourseList_pk PRIMARY KEY (id)
 );
 
 -- Table: Enroll
 CREATE TABLE Enroll (
     Course_id int NOT NULL,
-    User_netid varchar(5000) NOT NULL,
+    User_netid varchar(500) NOT NULL,
     role varchar(100) NOT NULL,
-    CONSTRAINT Enroll_pk PRIMARY KEY (Course_id,User_netid),
-    CONSTRAINT Role_name CHECK (role = 'student' OR role = 'TA' OR role = 'teacher')
+    CONSTRAINT Enroll_pk PRIMARY KEY (Course_id,User_netid)
+);
+
+-- Table: Role
+CREATE TABLE Role (
+    name varchar(100) NOT NULL,
+    CONSTRAINT Role_pk PRIMARY KEY (name)
 );
 
 -- Table: AssignmentGroup
@@ -49,13 +54,13 @@ CREATE TABLE AssignmentGroup (
 -- Table: GroupList
 CREATE TABLE GroupList (
     id SERIAL,
-    group_name varchar(5000) NOT NULL,
+    group_name varchar(500) NOT NULL,
     CONSTRAINT GroupList_pk PRIMARY KEY (id)
 );
 
 -- Table: GroupUsers
 CREATE TABLE GroupUsers (
-    User_netid varchar(5000) NOT NULL,
+    User_netid varchar(500) NOT NULL,
     Group_groupid int NOT NULL,
     CONSTRAINT GroupUsers_pk PRIMARY KEY (User_netid,Group_groupid)
 );
@@ -82,9 +87,7 @@ CREATE TABLE MCQuestion (
     question varchar(5000) NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
-    type_question char(2) DEFAULT 'mc',
-    CONSTRAINT MCQuestion_pk PRIMARY KEY (id),
-    CONSTRAINT mc_question CHECK (type_question = 'mc')
+    CONSTRAINT MCQuestion_pk PRIMARY KEY (id)
 );
 
 -- Table: OpenAnswer
@@ -101,9 +104,7 @@ CREATE TABLE OpenQuestion (
     question varchar(5000) NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
-    type_question char(4) DEFAULT 'open',
-    CONSTRAINT OpenQuestion_pk PRIMARY KEY (id),
-    CONSTRAINT open_question CHECK (type_question = 'open')
+    CONSTRAINT OpenQuestion_pk PRIMARY KEY (id)
 );
 
 -- Table: RangeAnswer
@@ -121,16 +122,14 @@ CREATE TABLE RangeQuestion (
     range int NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
-    type_question char(5) DEFAULT 'range',
     CONSTRAINT RangeQuestion_pk PRIMARY KEY (id),
-    CONSTRAINT range_question CHECK (type_question = 'range'),
     CONSTRAINT positive_range CHECK (range > 0)
 );
 
 -- Table: Review
 CREATE TABLE Review (
     id SERIAL,
-    User_netid varchar(5000) NOT NULL,
+    User_netid varchar(500) NOT NULL,
     Submission_id int NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
@@ -148,10 +147,10 @@ CREATE TABLE Rubric (
 -- Table: Submission
 CREATE TABLE Submission (
     id SERIAL,
-    User_netid varchar(5000) NOT NULL,
+    User_netid varchar(500) NOT NULL,
     Group_id int NOT NULL,
     Assignment_id int NOT NULL,
-    file_path varchar(5000) NOT NULL,
+    file_path varchar(500) NOT NULL,
     date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     grade int NOT NULL DEFAULT -1,
     CONSTRAINT Submission_pk PRIMARY KEY (id)
@@ -159,14 +158,14 @@ CREATE TABLE Submission (
 
 -- Table: UserList
 CREATE TABLE UserList (
-    netid varchar(5000) NOT NULL,
+    netid varchar(500) NOT NULL,
     studentNumber int,
-    firstName varchar(5000),
-    prefix varchar(5000),
-    lastName varchar(5000),
-    email varchar(5000),
-    affiliation varchar(5000),
-    displayName varchar(5000),
+    firstName varchar(500),
+    prefix varchar(500),
+    lastName varchar(500),
+    email varchar(500),
+    affiliation varchar(500),
+    displayName varchar(500),
     CONSTRAINT UserList_pk PRIMARY KEY (netid),
     CONSTRAINT netid_lower CHECK (netid = lower(netid))
 );
@@ -176,7 +175,7 @@ CREATE TABLE ReviewComment (
     id SERIAL,
     comment varchar(5000) NOT NULL,
     review_id int NOT NULL,
-    netid varchar(5000) NOT NULL,
+    netid varchar(500) NOT NULL,
     CONSTRAINT ReviewComment_pk PRIMARY KEY (id)
 );
 
@@ -185,7 +184,7 @@ CREATE TABLE SubmissionComment (
     id SERIAL,
     comment varchar(5000) NOT NULL,
     submission_id int NOT NULL,
-    netid varchar(5000) NOT NULL,
+    netid varchar(500) NOT NULL,
     CONSTRAINT SubmissionComment_pk PRIMARY KEY (id)
 );
 
@@ -423,5 +422,19 @@ ALTER TABLE Submission ADD CONSTRAINT Submission_Group
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
+
+-- Reference: Enroll_Role (table: Enroll)
+ALTER TABLE Enroll ADD CONSTRAINT Enroll_Role
+    FOREIGN KEY (role)
+    REFERENCES Role (name)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Set roles
+INSERT INTO public.role(name)
+	VALUES ('student'),
+    ('TA'),
+	('teacher');
 
 -- End of file.
