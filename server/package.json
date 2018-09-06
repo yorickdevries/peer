@@ -59,7 +59,8 @@
     "passport-mock-strategy": "^1.1.1",
     "passport-saml": "^0.35.0",
     "passport-saml-metadata": "^1.5.1",
-    "pg-promise": "8.4.4"
+    "pg-promise": "8.4.4",
+    "session-file-store": "^1.2.0"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",
@@ -79,6 +80,7 @@
     "@types/node": "^10.0.8",
     "@types/passport": "^0.4.6",
     "@types/passport-saml": "^0.15.7",
+    "@types/session-file-store": "^1.2.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-http": "^4.0.0",
