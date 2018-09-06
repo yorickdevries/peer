@@ -9,18 +9,23 @@ import submissions from "./submissions";
 import security from "../security";
 import UserPS from "../prepared_statements/user_ps";
 import session from "express-session";
+import sessionFileStore from "session-file-store";
 import passport from "passport";
 import config from "../config";
 import passportConfiguration from "../passport";
 import mockPassportConfiguration from "../passport_mock";
 
+const fileStore = sessionFileStore(session);
+
 const router = express();
+
 // session support is required to use Passport
 // needs a random secret
 router.use(session({
     resave: true,
     saveUninitialized: true,
-    secret: config.session.secret
+    secret: config.session.secret,
+    store: new fileStore()
   }));
 
 router.use(passport.initialize());
