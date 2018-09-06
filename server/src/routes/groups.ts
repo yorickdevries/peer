@@ -1,4 +1,5 @@
 import GroupsPS from "../prepared_statements/group_ps";
+import UserPS from "../prepared_statements/user_ps";
 import bodyParser from "body-parser";
 import index from "../security/index";
 
@@ -64,7 +65,14 @@ router.delete("/:id/users/:userNetID", index.authorization.isAuthorizedToEditGro
  */
 router.post("/:id/users", index.authorization.isAuthorizedToEditGroup, async (req: any, res) => {
     try {
-        await GroupsPS.executeAddStudenttoGroup(req.body.user_netid, req.params.id);
+        const netid = req.body.user_netid;
+        // check whether user is in the database
+        const userExists: any = await UserPS.executeExistsUserById(netid);
+        if (!userExists.exists) {
+            // Adding user
+            await UserPS.executeAddUser(netid);
+        }
+        await GroupsPS.executeAddStudenttoGroup(netid, req.params.id);
         res.sendStatus(200);
     } catch (e) {
         console.log(e);
