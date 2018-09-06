@@ -4,12 +4,12 @@
 -- tables
 -- Table: AssignmentList
 CREATE TABLE AssignmentList (
-    title varchar(5000) NOT NULL,
+    title varchar(500) NOT NULL,
     description varchar(5000) NOT NULL,
     id SERIAL,
     course_id int NOT NULL,
     reviews_per_user int NOT NULL,
-    filename varchar(5000) NOT NULL,
+    filename varchar(500) NOT NULL,
     publish_date timestamptz NOT NULL,
     due_date timestamptz NOT NULL,
     review_publish_date timestamptz NOT NULL,
@@ -26,14 +26,14 @@ CREATE TABLE AssignmentList (
 CREATE TABLE CourseList (
     id SERIAL,
     description varchar(5000) NOT NULL,
-    name varchar(5000) NOT NULL,
+    name varchar(500) NOT NULL,
     CONSTRAINT CourseList_pk PRIMARY KEY (id)
 );
 
 -- Table: Enroll
 CREATE TABLE Enroll (
     Course_id int NOT NULL,
-    User_netid varchar(5000) NOT NULL,
+    User_netid varchar(500) NOT NULL,
     role varchar(100) NOT NULL,
     CONSTRAINT Enroll_pk PRIMARY KEY (Course_id,User_netid)
 );
@@ -54,13 +54,13 @@ CREATE TABLE AssignmentGroup (
 -- Table: GroupList
 CREATE TABLE GroupList (
     id SERIAL,
-    group_name varchar(5000) NOT NULL,
+    group_name varchar(500) NOT NULL,
     CONSTRAINT GroupList_pk PRIMARY KEY (id)
 );
 
 -- Table: GroupUsers
 CREATE TABLE GroupUsers (
-    User_netid varchar(5000) NOT NULL,
+    User_netid varchar(500) NOT NULL,
     Group_groupid int NOT NULL,
     CONSTRAINT GroupUsers_pk PRIMARY KEY (User_netid,Group_groupid)
 );
@@ -135,7 +135,7 @@ CREATE TABLE RangeQuestion (
 -- Table: Review
 CREATE TABLE Review (
     id SERIAL,
-    User_netid varchar(5000) NOT NULL,
+    User_netid varchar(500) NOT NULL,
     Submission_id int NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
@@ -153,10 +153,10 @@ CREATE TABLE Rubric (
 -- Table: Submission
 CREATE TABLE Submission (
     id SERIAL,
-    User_netid varchar(5000) NOT NULL,
+    User_netid varchar(500) NOT NULL,
     Group_id int NOT NULL,
     Assignment_id int NOT NULL,
-    file_path varchar(5000) NOT NULL,
+    file_path varchar(500) NOT NULL,
     date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     grade int NOT NULL DEFAULT -1,
     CONSTRAINT Submission_pk PRIMARY KEY (id)
@@ -164,14 +164,14 @@ CREATE TABLE Submission (
 
 -- Table: UserList
 CREATE TABLE UserList (
-    netid varchar(5000) NOT NULL,
+    netid varchar(500) NOT NULL,
     studentNumber int,
-    firstName varchar(5000),
-    prefix varchar(5000),
-    lastName varchar(5000),
-    email varchar(5000),
-    affiliation varchar(5000),
-    displayName varchar(5000),
+    firstName varchar(500),
+    prefix varchar(500),
+    lastName varchar(500),
+    email varchar(500),
+    affiliation varchar(500),
+    displayName varchar(500),
     CONSTRAINT UserList_pk PRIMARY KEY (netid),
     CONSTRAINT netid_lower CHECK (netid = lower(netid))
 );
@@ -181,7 +181,7 @@ CREATE TABLE ReviewComment (
     id SERIAL,
     comment varchar(5000) NOT NULL,
     review_id int NOT NULL,
-    netid varchar(5000) NOT NULL,
+    netid varchar(500) NOT NULL,
     CONSTRAINT ReviewComment_pk PRIMARY KEY (id)
 );
 
@@ -190,7 +190,7 @@ CREATE TABLE SubmissionComment (
     id SERIAL,
     comment varchar(5000) NOT NULL,
     submission_id int NOT NULL,
-    netid varchar(5000) NOT NULL,
+    netid varchar(500) NOT NULL,
     CONSTRAINT SubmissionComment_pk PRIMARY KEY (id)
 );
 
