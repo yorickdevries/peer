@@ -35,8 +35,13 @@ CREATE TABLE Enroll (
     Course_id int NOT NULL,
     User_netid varchar(5000) NOT NULL,
     role varchar(100) NOT NULL,
-    CONSTRAINT Enroll_pk PRIMARY KEY (Course_id,User_netid),
-    CONSTRAINT Role_name CHECK (role = 'student' OR role = 'TA' OR role = 'teacher')
+    CONSTRAINT Enroll_pk PRIMARY KEY (Course_id,User_netid)
+);
+
+-- Table: Role
+CREATE TABLE Role (
+    name varchar(100) NOT NULL,
+    CONSTRAINT Role_pk PRIMARY KEY (name)
 );
 
 -- Table: AssignmentGroup
@@ -423,5 +428,18 @@ ALTER TABLE Submission ADD CONSTRAINT Submission_Group
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
+
+-- Reference: Enroll_Role (table: Enroll)
+ALTER TABLE Enroll ADD CONSTRAINT Enroll_Role
+    FOREIGN KEY (role)
+    REFERENCES Role (name)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+INSERT INTO public.role(name)
+	VALUES ('student'),
+    ('TA'),
+	('teacher');
 
 -- End of file.
