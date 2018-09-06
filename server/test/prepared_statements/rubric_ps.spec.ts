@@ -29,8 +29,7 @@ describe("RubricPreparedStatements Test", () => {
             id: 3,
             question: "hi",
             question_number: 1,
-            rubric_assignment_id: 1,
-            type_question: "open"
+            rubric_assignment_id: 1
         });
     });
 
@@ -42,8 +41,7 @@ describe("RubricPreparedStatements Test", () => {
             id: 3,
             question: "hi",
             question_number: 1,
-            rubric_assignment_id: 1,
-            type_question: "mc"
+            rubric_assignment_id: 1
         });
     });
 
@@ -56,8 +54,7 @@ describe("RubricPreparedStatements Test", () => {
             question: "hi",
             question_number: 1,
             rubric_assignment_id: 1,
-            range: 6,
-            type_question: "range"
+            range: 6
         });
     });
 
@@ -69,7 +66,6 @@ describe("RubricPreparedStatements Test", () => {
             id: 5,
             mcquestion_id: 1,
             option: "hi"
-
         });
     });
 
@@ -81,8 +77,7 @@ describe("RubricPreparedStatements Test", () => {
             id: 1,
             question: "hi2",
             question_number: 1,
-            rubric_assignment_id: 1,
-            type_question: "open"
+            rubric_assignment_id: 1
         });
     });
 
@@ -95,8 +90,7 @@ describe("RubricPreparedStatements Test", () => {
             question: "hi2",
             question_number: 1,
             range: 6,
-            rubric_assignment_id: 1,
-            type_question: "range"
+            rubric_assignment_id: 1
         });
     });
 
@@ -108,8 +102,7 @@ describe("RubricPreparedStatements Test", () => {
             id: 1,
             question: "hi2",
             question_number: 1,
-            rubric_assignment_id: 1,
-            type_question: "mc"
+            rubric_assignment_id: 1
         });
     });
 
@@ -132,15 +125,13 @@ describe("RubricPreparedStatements Test", () => {
             id: 1,
             question: "What is the best way to insert queries?",
             question_number: 3,
-            rubric_assignment_id: 1,
-            type_question: "mc"
+            rubric_assignment_id: 1
         },
         {
             id: 2,
             question: "Is the right Answer A?",
             question_number: 4,
-            rubric_assignment_id: 1,
-            type_question: "mc"
+            rubric_assignment_id: 1
             }]);
     });
 
@@ -152,8 +143,7 @@ describe("RubricPreparedStatements Test", () => {
             id: 1,
             question: "How to insert queries?",
             question_number: 1,
-            rubric_assignment_id: 1,
-            type_question: "open"
+            rubric_assignment_id: 1
         }]);
     });
 
@@ -166,8 +156,7 @@ describe("RubricPreparedStatements Test", () => {
             question: "How much fun is inserting queries?",
             range: 7,
             question_number: 2,
-            rubric_assignment_id: 1,
-            type_question: "range"
+            rubric_assignment_id: 1
         }]);
     });
 
@@ -211,8 +200,7 @@ describe("RubricPreparedStatements Test", () => {
             rubric_assignment_id: 1,
             id: newq.id,
             question: "New Question",
-            question_number: 5,
-            type_question: "open"
+            question_number: 5
         });
     });
 
@@ -226,8 +214,7 @@ describe("RubricPreparedStatements Test", () => {
             id: newq.id,
             question: "New Question",
             question_number: 5,
-            range: 5,
-            type_question: "range"
+            range: 5
         });
     });
 
@@ -239,8 +226,7 @@ describe("RubricPreparedStatements Test", () => {
             rubric_assignment_id: 1,
             id: 2,
             question: "Is the right Answer A?",
-            question_number: 4,
-            type_question: "mc"
+            question_number: 4
         });
     });
 

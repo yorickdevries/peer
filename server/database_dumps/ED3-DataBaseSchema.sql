@@ -87,9 +87,7 @@ CREATE TABLE MCQuestion (
     question varchar(5000) NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
-    type_question char(2) DEFAULT 'mc',
-    CONSTRAINT MCQuestion_pk PRIMARY KEY (id),
-    CONSTRAINT mc_question CHECK (type_question = 'mc')
+    CONSTRAINT MCQuestion_pk PRIMARY KEY (id)
 );
 
 -- Table: OpenAnswer
@@ -106,9 +104,7 @@ CREATE TABLE OpenQuestion (
     question varchar(5000) NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
-    type_question char(4) DEFAULT 'open',
-    CONSTRAINT OpenQuestion_pk PRIMARY KEY (id),
-    CONSTRAINT open_question CHECK (type_question = 'open')
+    CONSTRAINT OpenQuestion_pk PRIMARY KEY (id)
 );
 
 -- Table: RangeAnswer
@@ -126,9 +122,7 @@ CREATE TABLE RangeQuestion (
     range int NOT NULL,
     Rubric_Assignment_id int NOT NULL,
     question_number int NOT NULL,
-    type_question char(5) DEFAULT 'range',
     CONSTRAINT RangeQuestion_pk PRIMARY KEY (id),
-    CONSTRAINT range_question CHECK (type_question = 'range'),
     CONSTRAINT positive_range CHECK (range > 0)
 );
 

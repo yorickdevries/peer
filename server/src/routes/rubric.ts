@@ -15,7 +15,8 @@ router.use(bodyParser.json());
  */
 router.delete("/openquestion/:question_id", index.authorization.checkOpenQuestionEdit, (req, res) => {
     RubricPS.executeDeleteOpenQuestion(req.params.question_id)
-    .then((data) => {
+    .then((data: any) => {
+        data.type_question = "open";
         res.json(data);
     }).catch((error) => {
         res.sendStatus(400);
@@ -28,7 +29,8 @@ router.delete("/openquestion/:question_id", index.authorization.checkOpenQuestio
  */
 router.delete("/rangequestion/:question_id", index.authorization.checkRangeQuestionEdit, (req, res) => {
     RubricPS.executeDeleteRangeQuestion(req.params.question_id)
-    .then((data) => {
+    .then((data: any) => {
+        data.type_question = "range";
         res.json(data);
     }).catch((error) => {
         res.sendStatus(400);
@@ -41,7 +43,8 @@ router.delete("/rangequestion/:question_id", index.authorization.checkRangeQuest
  */
 router.delete("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, (req, res) => {
     RubricPS.executeDeleteMCQuestion(req.params.question_id)
-    .then((data) => {
+    .then((data: any) => {
+        data.type_question = "mc";
         res.json(data);
     }).catch((error) => {
         res.sendStatus(400);
@@ -94,7 +97,8 @@ router.put("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (req, 
  */
 router.post("/mcquestion", index.authorization.checkRubricAuthorizationPost, (req, res) => {
     RubricPS.executeCreateMCQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number)
-    .then((data) => {
+    .then((data: any) => {
+        data.type_question = "mc";
         res.json(data);
     }).catch((error) => {
         res.sendStatus(400);
@@ -110,7 +114,8 @@ router.post("/mcquestion", index.authorization.checkRubricAuthorizationPost, (re
  */
 router.put("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, (req, res) => {
     rubricPS.executeUpdateMCQuestion(req.body.question, req.body.question_number, req.params.question_id)
-    .then((data) => {
+    .then((data: any) => {
+        data.type_question = "mc";
         res.json(data);
     }).catch((error) => {
         res.sendStatus(400);
@@ -126,7 +131,8 @@ router.put("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, 
  */
 router.post("/rangequestion", index.authorization.checkRubricAuthorizationPost, (req, res) => {
     RubricPS.executeCreateRangeQuestion(req.body.question, req.body.range, req.body.rubric_assignment_id, req.body.question_number)
-    .then((data) => {
+    .then((data: any) => {
+        data.type_question = "range";
         res.json(data);
     }).catch((error) => {
         res.sendStatus(400);
@@ -143,7 +149,8 @@ router.post("/rangequestion", index.authorization.checkRubricAuthorizationPost, 
  */
 router.put("/rangequestion/:question_id", index.authorization.checkRangeQuestionEdit, (req, res) => {
     rubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.question_number, req.params.question_id)
-    .then((data) => {
+    .then((data: any) => {
+        data.type_question = "range";
         res.json(data);
     }).catch((error) => {
         res.sendStatus(400);
@@ -158,7 +165,8 @@ router.put("/rangequestion/:question_id", index.authorization.checkRangeQuestion
  */
 router.post("/openquestion", index.authorization.checkRubricAuthorizationPost, (req, res) => {
     RubricPS.executeCreateOpenQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number)
-    .then((data) => {
+    .then((data: any) => {
+        data.type_question = "open";
         res.json(data);
     }).catch((error) => {
         res.sendStatus(400);
@@ -171,7 +179,8 @@ router.post("/openquestion", index.authorization.checkRubricAuthorizationPost, (
  */
 router.put("/openquestion/:question_id", index.authorization.checkOpenQuestionEdit, (req, res) => {
     rubricPS.executeUpdateOpenQuestion(req.body.question, req.body.question_number, req.params.question_id)
-    .then((data) => {
+    .then((data: any) => {
+        data.type_question = "open";
         res.json(data);
     }).catch((error) => {
         res.sendStatus(400);
