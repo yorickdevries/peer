@@ -123,7 +123,7 @@ router.route("/:reviewId/file").get(index.authorization.checkAuthorizationForRev
     try {
         const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(req.params.reviewId);
         const filePath = path.join(config.submissions.fileFolder, submission.file_path);
-        res.sendfile(filePath);
+        res.sendFile(filePath);
     } catch (err) {
         res.sendStatus(400);
     }
