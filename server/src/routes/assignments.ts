@@ -196,7 +196,7 @@ router.get("/:assignment_id/file", index.authorization.enrolledAssignmentCheck, 
     try {
         const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
         const fileName = path.join(fileFolder, assignment.filename);
-        res.sendfile(fileName);
+        res.sendFile(fileName);
     } catch (err) {
         res.sendStatus(400);
     }

@@ -106,7 +106,7 @@ router.get("/:id/file", index.authorization.getSubmissionFileAuth, async (req, r
     try {
         const submission: any = await SubmissionsPS.executeGetSubmissionById(req.params.id);
         const filePath = path.join(config.submissions.fileFolder, submission.file_path);
-        res.sendfile(filePath);
+        res.sendFile(filePath);
     } catch (err) {
         res.sendStatus(400);
     }
