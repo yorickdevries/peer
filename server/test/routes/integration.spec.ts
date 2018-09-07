@@ -86,7 +86,8 @@ describe("API integration test", () => {
             .field("publish_date", "2017-05-01T20:30:00.000Z")
             .field("due_date", "2017-06-01T20:30:00.000Z")
             .field("review_publish_date", "2018-05-01T20:30:00.000Z")
-            .field("review_due_date", "2018-06-01T20:30:00.000Z");
+            .field("review_due_date", "2018-06-01T20:30:00.000Z")
+            .field("one_person_groups", false);
         const assignmentId = JSON.parse(assignment.text).id;
         // Assertions to make sure the assignment is created.
         const assignmentResult = JSON.parse(assignment.text);

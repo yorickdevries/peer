@@ -34,14 +34,14 @@
                                                 <b-button @click="shuffleGroups()" class="mb-3" variant="primary" size="sm">Shuffle Groups</b-button>
 
                                                 <!--Importing-->
-                                                <template v-if="!assignment.one_person_groups">
+                                                <template v-if="assignment.one_person_groups">
                                                     <dt>Import groups</dt>
-                                                    <dd>This action will import the groups in the assignment.</dd>
-                                                    <b-button v-b-modal="'importGroups'" variant="primary" size="sm">Import groups</b-button>
+                                                    <dd>Not available. On creation of the assignment, this assignment has been set as individual. </dd>
                                                 </template>
                                                 <template v-else>
                                                     <dt>Import groups</dt>
-                                                    <dd>Not available. On creation of the assignment, this assignment has been set as individual. </dd>
+                                                    <dd>This action will import the groups in the assignment.</dd>
+                                                    <b-button v-b-modal="'importGroups'" variant="primary" size="sm">Import groups</b-button>
                                                 </template>
 
                                                 <!--Exporting-->
@@ -117,7 +117,6 @@ export default {
         this.assignment.id = aid
         let res = await api.getAssignment(aid)
         this.assignment = res.data
-        this.assignment.one_person_groups = true
     },
     data() {
         return {

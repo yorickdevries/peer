@@ -157,7 +157,8 @@ describe("API Assignment routes", () => {
             .field("publish_date", "2018-05-01T20:30:00.000Z")
             .field("due_date", "2018-06-01T20:30:00.000Z")
             .field("review_publish_date", "2018-07-01T20:30:00.000Z")
-            .field("review_due_date", "2018-08-01T20:30:00.000Z");
+            .field("review_due_date", "2018-08-01T20:30:00.000Z")
+            .field("one_person_groups", false);
         // assertions
         const result = JSON.parse(res.text);
 
@@ -182,7 +183,8 @@ describe("API Assignment routes", () => {
             .field("publish_date", "2018-05-01T20:30:00.000Z")
             .field("due_date", "2018-06-01T20:30:00.000Z")
             .field("review_publish_date", "2018-07-01T20:30:00.000Z")
-            .field("review_due_date", "2018-08-01T20:30:00.000Z");
+            .field("review_due_date", "2018-08-01T20:30:00.000Z")
+            .field("one_person_groups", false);
         // assertions
         const result = JSON.parse(res.text);
 
@@ -208,7 +210,8 @@ describe("API Assignment routes", () => {
             .field("publish_date", "2018-05-01T20:30:00.000Z")
             .field("due_date", "2018-05-01T20:31:00.000Z")
             .field("review_publish_date", "2018-05-01T20:32:00.000Z")
-            .field("review_due_date", "2018-05-01T20:33:00.000Z");
+            .field("review_due_date", "2018-05-01T20:33:00.000Z")
+            .field("one_person_groups", false);
 
         // Test the updating of the assignment just added.
         const res = await chai.request(router)
@@ -221,7 +224,8 @@ describe("API Assignment routes", () => {
             .field("publish_date", "2018-05-01T20:30:00.000Z")
             .field("due_date", "2018-05-01T20:31:00.000Z")
             .field("review_publish_date", "2018-05-01T20:32:00.000Z")
-            .field("review_due_date", "2018-05-01T20:33:00.000Z");
+            .field("review_due_date", "2018-05-01T20:33:00.000Z")
+            .field("one_person_groups", false);
 
         // assertions
         const result = JSON.parse(res.text);
@@ -252,7 +256,8 @@ describe("API Assignment routes", () => {
             .field("publish_date", "2018-05-01T20:30:00.000Z")
             .field("due_date", "2018-05-01T20:31:00.000Z")
             .field("review_publish_date", "2018-05-01T20:32:00.000Z")
-            .field("review_due_date", "2018-05-01T20:33:00.000Z");
+            .field("review_due_date", "2018-05-01T20:33:00.000Z")
+            .field("one_person_groups", false);
 
         // Test the updating of the assignment just added.
         const res = await chai.request(router)
@@ -264,7 +269,8 @@ describe("API Assignment routes", () => {
             .field("publish_date", "2018-05-01T20:30:00.000Z")
             .field("due_date", "2018-05-01T20:31:00.000Z")
             .field("review_publish_date", "2018-05-01T20:32:00.000Z")
-            .field("review_due_date", "2018-05-01T20:33:00.000Z");
+            .field("review_due_date", "2018-05-01T20:33:00.000Z")
+            .field("one_person_groups", false);
 
 
         // assertions
