@@ -21,12 +21,18 @@ const router = express();
 
 // session support is required to use Passport
 // needs a random secret
-router.use(session({
+const sessionConfig: any = {
     resave: true,
     saveUninitialized: true,
-    secret: config.session.secret,
-    store: new fileStore()
-  }));
+    secret: config.session.secret
+  };
+
+// Depending of current mode, setup the session store
+if (process.env.NODE_ENV === "production") {
+    sessionConfig.store = new fileStore();
+}
+
+router.use(session(sessionConfig));
 
 router.use(passport.initialize());
 router.use(passport.session());
