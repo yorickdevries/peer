@@ -72,11 +72,20 @@
                 </b-list-group-item>
             </b-list-group>
 
-            <!--Save/Submit Buttons-->
-            <b-card-body v-if="!peerReview.review.done">
-                <b-button type="submit" variant="success float-right" @click="submitPeerReview">Submit Review</b-button>
-                <b-button variant="secondary float-right mr-2" @click="savePeerReview">Save Review</b-button>
-            </b-card-body>
+            <template v-if="peerReview.review.id !== null">
+                <!--Save/Submit Buttons-->
+                <b-card-body v-if="!peerReview.review.done">
+                    <b-btn type="submit" variant="success float-right" v-b-modal="`submit${peerReview.review.id}`">Submit Review</b-btn>
+                    <b-button variant="secondary float-right mr-2" @click="savePeerReview">Save Review</b-button>
+                </b-card-body>
+
+                <!--Submit Modal-->
+                <b-modal    :id="`submit${peerReview.review.id}`"
+                            title="Submit Confirmation"
+                            @ok="submitPeerReview">
+                    Do you really want to submit? You can not submit a review again.
+                </b-modal>
+            </template>
 
         </b-card>
 
