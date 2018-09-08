@@ -50,7 +50,7 @@
                 <!--Group Information-->
                 <b-card header="Group Information" no-body>
                     <b-card-body>
-                        <p>This assignment is made in a group. The group members you are with for this assignment are displayed here.</p>
+                        <p>This assignment is made in a group. The group members you are with for this assignment are displayed here. As a group you share the same submission.</p>
                         <dl>
                             <dt>Group ID</dt>
                             <dd>{{ groupInfo.group.group_groupid }}</dd>
