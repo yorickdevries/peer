@@ -19,11 +19,38 @@
                 </b-card>
             </b-col>
 
-            <b-col cols="4">
+            <b-col cols="4" v-if="assignment.one_person_groups === true">
+                <!--Individual Information-->
+                <b-card header="Individual Information" no-body>
+                    <b-card-body>
+                        <p>This assignment is made individually.</p>
+                        <dl>
+                            <dt>Individual ID</dt>
+                            <dd>{{ groupInfo.group.group_groupid }}</dd>
+
+                            <dt>Name</dt>
+                            <dd>{{ groupName }}</dd>
+
+                            <dt>Latest Submission</dt>
+                            <dd>
+                                <div>Download the latest submission you have submitted here.</div>
+                                <template v-if="submission.file_path">
+                                    <a :href="submissionFilePath" target="_blank">{{ submission.file_path }}</a>
+                                </template>
+                                <template v-else>
+                                    <i>No submission done yet.</i>
+                                </template>
+                            </dd>
+                        </dl>
+                    </b-card-body>
+                </b-card>
+            </b-col>
+
+            <b-col cols="4" v-if="assignment.one_person_groups !== true">
                 <!--Group Information-->
                 <b-card header="Group Information" no-body>
                     <b-card-body>
-                        <p>Assignments are made in groups. The group members you are with for this assignment are displayed here.</p>
+                        <p>This assignment is made in a group. The group members you are with for this assignment are displayed here.</p>
                         <dl>
                             <dt>Group ID</dt>
                             <dd>{{ groupInfo.group.group_groupid }}</dd>
@@ -33,10 +60,24 @@
 
                             <dt>Group Members</dt>
                             <dt><ul><li v-for="member in groupInfo.groupmembers" :key="member.user_netid" class="font-weight-light">{{ member.user_netid }}</li></ul></dt>
+
+                            <dt>Latest Submission</dt>
+                            <dd>
+                                <div>Download the latest submission you have submitted with the group here.</div>
+                                <template v-if="submission.file_path">
+                                    <a :href="submissionFilePath" target="_blank">{{ submission.file_path }}</a>
+                                </template>
+                                <template v-else>
+                                    <i>No submission done yet.</i>
+                                </template>
+                            </dd>
                         </dl>
                     </b-card-body>
                 </b-card>
             </b-col>
+
+
+
         </b-row>
     </b-container>
 
@@ -56,7 +97,8 @@ export default {
                 review_due_date: null,
                 id: null,
                 course_id: null,
-                filename: ""
+                filename: "",
+                one_person_groups: null
             },
             groupInfo: {
                 group: {
@@ -64,17 +106,28 @@ export default {
                 },
                 groupmembers: []
             },
-            groupName: ""
+            groupName: "",
+            submission: {
+                user_netid: null,
+                assignment_id: null,
+                file_path: null,
+                date: null,
+            }
         }
     },
     computed: {
         assignmentFilePath() {
             // Get the assignment file path.
             return `/api/assignments/${this.assignment.id}/file`
-        }
+        },
+        submissionFilePath() {
+            // Get the submission file path.
+            return `/api/submissions/${this.submission.id}/file`
+        },
     },
     async created() {
         await this.fetchAssignment()
+        await this.fetchSubmission()
         await this.fetchGroupInformation()
     },
     methods: {
@@ -91,6 +144,23 @@ export default {
             // Fetch group name.
             let nameRes = await api.getGroupInfo(this.groupInfo.group.group_groupid)
             this.groupName = nameRes.data.group_name
+        },
+        async fetchSubmission() {
+            // Fetch the submission.
+            try {
+                let res = await api.getAssignmentLatestSubmission(this.assignment.id)
+                this.submission = res.data
+            } catch (e) {
+                this.onSubmissionReset()
+            }
+
+        },
+        onSubmissionReset() {
+            this.submission =  {
+                user_netid: null,
+                assignment_id: null,
+                file_path: null
+            }
         }
     }
 }
