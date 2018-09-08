@@ -15,11 +15,6 @@ export default [
                 component: () => import('../components/teacher-dashboard/courses/EditCourse')
             },
             {
-                path: 'create',
-                name: 'teacher-dashboard.courses.create',
-                component: () => import('../components/teacher-dashboard/courses/CreateCourse')
-            },
-            {
                 path: 'courses/:courseId/assignments',
                 name: 'teacher-dashboard.assignments',
                 component: () => import('../components/teacher-dashboard/Assignments')
