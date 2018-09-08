@@ -32,7 +32,7 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
  * @body a json object of the whole form, as specified in the doc.
  * @return JSON representation of a review.
  */
-router.route("/:reviewId").put(index.authorization.checkReviewOwner, async (req, res) => {
+router.route("/:reviewId").put(index.authorization.checkReviewOwner, index.authorization.checkReviewBetweenPublishDue, async (req, res) => {
     try {
         const reviewId = req.params.reviewId;
         const inputForm = req.body.form;
@@ -49,7 +49,7 @@ router.route("/:reviewId").put(index.authorization.checkReviewOwner, async (req,
  * @param reviewId - an id of a review.
  * @return database return value.
  */
-router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, (req, res) => {
+router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewBetweenPublishDue, (req, res) => {
     ReviewsPS.executeSubmitReview(req.params.reviewId)
     .then((data) => {
         res.json(data);

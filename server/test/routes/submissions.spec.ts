@@ -38,12 +38,26 @@ describe("Submission routes", () => {
         const exampleSubmissionFile = path.join(__dirname, "../../example_data/submissions/submission1.pdf");
         const res = await chai.request(router).post("/")
         .attach("submissionFile", fs.readFileSync(exampleSubmissionFile), "submission1.pdf")
-        .field("assignmentId", 1);
+        .field("assignmentId", 4);
         // assertions
         const result = JSON.parse(res.text);
         expect(res.status).to.equal(200);
         expect(result.user_netid).to.equal("henkjan");
-        expect(result.assignment_id).to.equal(1);
+        expect(result.assignment_id).to.equal(4);
+    });
+
+    /**
+     * Tests whether a submission can be made after the deadline
+     */
+    it("post submissions/ after deadline", async () => {
+        // log in as henkjan
+        MockLogin.initialize("henkjan");
+        const exampleSubmissionFile = path.join(__dirname, "../../example_data/submissions/submission1.pdf");
+        const res = await chai.request(router).post("/")
+        .attach("submissionFile", fs.readFileSync(exampleSubmissionFile), "submission1.pdf")
+        .field("assignmentId", 5);
+        // assertions
+        expect(res.status).to.equal(401);
     });
 
     /**
@@ -54,7 +68,7 @@ describe("Submission routes", () => {
         MockLogin.initialize("henkjan");
         const exampleSubmissionFile = path.join(__dirname, "../../example_data/submissions/submission1.pdf");
         const res = await chai.request(router).post("/")
-        .field("assignmentId", 1);
+        .field("assignmentId", 4);
         // assertions
         expect(res.status).to.equal(400);
         expect(res.text).to.equal(JSON.stringify({error: "No file uploaded"}));

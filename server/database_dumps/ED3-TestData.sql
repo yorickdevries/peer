@@ -18,7 +18,9 @@ INSERT INTO "userlist" (
 
 INSERT INTO public.courselist(
     description, name)
-    VALUES ('This is a beautiful course description!', 'ED-3'), ('Test-course', 'ED-4');
+    VALUES ('This is a beautiful course description!', 'ED-3'),
+	('Test-course', 'ED-4'),
+	('Test-course2', 'ED-5');
 
 INSERT INTO public.grouplist(
 	id, group_name)
@@ -36,9 +38,25 @@ INSERT INTO public.grouplist(
 	id, group_name)
 	VALUES (22, 'Group 22');
 
+INSERT INTO public.grouplist(
+	id, group_name)
+	VALUES (23, 'Group 23');
+
+INSERT INTO public.grouplist(
+	id, group_name)
+	VALUES (24, 'Group 24');
+
 INSERT INTO public.groupusers(
 	User_netid, Group_groupid)
 	VALUES ('henkjan', 10);
+
+INSERT INTO public.groupusers(
+	User_netid, Group_groupid)
+	VALUES ('henkjan', 23);
+
+INSERT INTO public.groupusers(
+	User_netid, Group_groupid)
+	VALUES ('henkjan', 24);
 
 INSERT INTO public.groupusers(
 	User_netid, Group_groupid)
@@ -64,7 +82,9 @@ INSERT INTO public.assignmentlist(
 	title, description, course_id, reviews_per_user, filename, publish_date, due_date, review_publish_date, review_due_date, one_person_groups)
 	VALUES ('Assignment 1', 'Example assignment number one', 1, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2018-05-02T20:30:00Z', '2018-05-03T20:30:00Z', false),
 	('Assignment 2', 'Example assignment number two', 1, 1, 'assignment2.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z', false),
-	('Assignment 3', 'Example assignment number three', 1, 1, 'assignment3.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z', false);
+	('Assignment 3', 'Example assignment number three', 1, 1, 'assignment3.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z', false),
+	('Assignment 4', 'Example assignment number four', 3, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2030-05-01T20:30:00Z',  '2030-05-02T20:30:00Z', '2030-05-03T20:30:00Z', false),
+	('Assignment 5', 'Example assignment number five', 3, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2018-05-02T20:30:00Z', '2030-05-03T20:30:00Z', false);
 
 INSERT INTO public.rubric(
 	assignment_id)
@@ -112,7 +132,11 @@ INSERT INTO public.mcoption(
 
 INSERT INTO public.enroll(
 	course_id, user_netid, role)
-	VALUES (1, 'paulvanderlaan', 'student'), (1, 'bplanje', 'teacher'), (2, 'bplanje', 'teacher');
+	VALUES (1, 'paulvanderlaan', 'student'),
+	(1, 'bplanje', 'teacher'),
+	(2, 'bplanje', 'teacher'),
+	(3, 'henkjan', 'student')
+	;
 
 INSERT INTO public.assignmentgroup(
 	assignment_id, group_id)
@@ -129,6 +153,14 @@ INSERT INTO public.assignmentgroup(
 INSERT INTO public.assignmentgroup(
 	assignment_id, group_id)
 	VALUES (2, 22);
+
+INSERT INTO public.assignmentgroup(
+	assignment_id, group_id)
+	VALUES (4, 23);
+
+INSERT INTO public.assignmentgroup(
+	assignment_id, group_id)
+	VALUES (5, 24);
 
 INSERT INTO public.submission(
 	user_netid, group_id, assignment_id, file_path, date)
