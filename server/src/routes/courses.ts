@@ -152,7 +152,7 @@ router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck,
         }
         const netid = req.body.netid.toLowerCase();
         if (netid === req.user.netid) {
-            throw new Error("You Cannot change your own role");
+            throw new Error("You cannot change your own role");
         }
 
         // check whether user is in the database
