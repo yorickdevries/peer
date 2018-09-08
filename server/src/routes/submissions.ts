@@ -95,7 +95,7 @@ router.get("/:id", index.authorization.getSubmissionAuth, (req, res) => {
  * Route to make a new submission.
  * @authorization the user should be part of a group in the course.
  */
-router.post("/", uploadSubmissionFunction, index.authorization.postSubmissionAuth, addSubmissionToDatabase);
+router.post("/", uploadSubmissionFunction, index.authorization.postSubmissionAuth, index.authorization.checkSubmissionBetweenPublishDue, addSubmissionToDatabase);
 
 /**
  * Route to get a file from a submission.

@@ -242,6 +242,38 @@ const checkReviewOwnerDone = async (req: any, res: any, next: any) => {
 };
 
 /**
+ * Check if the user is allowed to submit the review
+ */
+const checkReviewBetweenPublishDue = async (req: any, res: any, next: any) => {
+    try {
+        const review = await ReviewPS.executeGetReview(req.params.reviewId);
+        const assignmentId =  review.rubric_assignment_id;
+        const assignment = await AssignmentPS.executeGetAssignmentById(assignmentId);
+        // check whether the user is on time
+        const currentDate = new Date();
+        const withinTimeFrame = (new Date(assignment.review_publish_date) < currentDate && new Date(assignment.review_due_date) > currentDate);
+        response(res, withinTimeFrame, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check if the user is allowed to submit the submission
+ */
+const checkSubmissionBetweenPublishDue = async (req: any, res: any, next: any) => {
+    try {
+        const assignment = await AssignmentPS.executeGetAssignmentById(req.body.assignmentId);
+        // check whether the user is on time
+        const currentDate = new Date();
+        const withinTimeFrame = (new Date(assignment.publish_date) < currentDate && new Date(assignment.due_date) > currentDate);
+        response(res, withinTimeFrame, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
  * Check if the user is a ta or teacher for the course of this review
  */
 const checkReviewTAOrTeacher = async (req: any, res: any, next: any) => {
@@ -445,5 +477,7 @@ export default {
     getSubmissionCommentAuth,
     putSubmissionCommentAuth,
     checkRubricAuthorization,
-    isAuthorizedToEditGroup
+    isAuthorizedToEditGroup,
+    checkReviewBetweenPublishDue,
+    checkSubmissionBetweenPublishDue
 };
