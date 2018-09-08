@@ -66,7 +66,7 @@ router.delete("/:id/users/:userNetID", index.authorization.isAuthorizedToEditGro
  */
 router.post("/:id/users", index.authorization.isAuthorizedToEditGroup, async (req: any, res) => {
     try {
-        const netid = req.body.userNetID.toLowerCase();
+        const netid = req.body.user_netid.toLowerCase();
         // check whether user is in the database
         const userExists: any = await UserPS.executeExistsUserById(netid);
         if (!userExists.exists) {
