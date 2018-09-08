@@ -122,7 +122,7 @@
                     <!--Review Feedback-->
                     <b-card header="Review Feedback">
 
-                        <p class="text-muted">The feedback TA's will give on the peer reviews that you have given to other students will be shown here. It will be either approved/disapproved/no action taken yet.</p>
+                        <p class="text-muted">The feedback TA's will give on the peer reviews that you have given to other students will be shown here. It will be either approved, disapproved or there might not have been any action taken yet.</p>
 
                         <div v-for="(peerReview, index) in peerReviews" :key="peerReview.review.id">
 
