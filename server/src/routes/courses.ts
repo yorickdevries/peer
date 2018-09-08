@@ -151,6 +151,9 @@ router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck,
             throw new Error("Invalid role");
         }
         const netid = req.body.netid.toLowerCase();
+        if (netid === req.user.netid) {
+            throw new Error("You Cannot change your own role");
+        }
 
         // check whether user is in the database
         const userExists: any = await UserPS.executeExistsUserById(netid);
@@ -168,7 +171,7 @@ router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck,
         // Depending if the student is enrolled, update the role of the student.
         let enroll: any;
         if (!isEnrolled) {
-            enroll =  await CoursesPS.executeEnrollInCourseId(req.params.courseId, netid, req.body.role);
+            enroll = await CoursesPS.executeEnrollInCourseId(req.params.courseId, netid, req.body.role);
         } else {
             enroll = await CoursesPS.executeSetRole(req.params.courseId, netid, req.body.role);
         }
