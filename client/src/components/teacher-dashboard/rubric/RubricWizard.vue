@@ -33,7 +33,7 @@
             <b-col>
 
                 <b-card v-for="(question, index) in rubric.questions"
-                        :key="question.id"
+                        :key="`${question.id}-${question.type_question}`"
                         class="mb-3"
                         no-body>
 
