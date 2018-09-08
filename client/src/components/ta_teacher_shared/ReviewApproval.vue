@@ -3,12 +3,12 @@
         <b-container>
 
             <!--Header-->
-            <BreadcrumbTitle :items="['Assignment', 'Reviews']" class="mt-3"></BreadcrumbTitle>
+            <BreadcrumbTitle :items="[`Assignment ${assignment.title}`, `Review ${peerReview.review.id}`]" class="mt-3"></BreadcrumbTitle>
 
             <!--Next Review-->
             <b-card no-body>
                 <b-card-header class="d-flex justify-content-between align-items-center">
-                    <div>Review Information</div>
+                    <div>Review {{  }}Information</div>
                     <b-button size="sm" variant="primary" @click="goToNextReview">Next (Random) Review</b-button>
                 </b-card-header>
                 <b-card-body class="d-flex justify-content-between">
@@ -128,8 +128,11 @@ export default {
                     done: null,
                     approved: null,
                 },
-                form: []
+                form: [],
             },
+            assignment: {
+                title: ""
+            }
         }
     },
     computed: {
@@ -158,6 +161,14 @@ export default {
             this.peerReview = peerReview
         } catch (e) {
             this.showErrorMessage({message: 'Review could not be loaded.'})
+        }
+
+        // Load assignment info.
+        try {
+            const {data: assignment} = await api.getAssignment(this.peerReview.review.rubric_assignment_id)
+            this.assignment = assignment
+        } catch (e) {
+            this.showErrorMessage()
         }
 
     },
