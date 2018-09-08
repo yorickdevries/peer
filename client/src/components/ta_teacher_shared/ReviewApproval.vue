@@ -3,13 +3,16 @@
         <b-container>
 
             <!--Header-->
-            <BreadcrumbTitle :items="[`Assignment ${assignment.title}`, `Review ${peerReview.review.id}`]" class="mt-3"></BreadcrumbTitle>
+            <BreadcrumbTitle :items="['Assignments', assignment.title, 'Reviews', peerReview.review.id]" class="mt-3"></BreadcrumbTitle>
 
             <!--Next Review-->
             <b-card no-body>
                 <b-card-header class="d-flex justify-content-between align-items-center">
                     <div>Review {{  }}Information</div>
-                    <b-button size="sm" variant="primary" @click="goToNextReview">Next (Random) Review</b-button>
+                    <div>
+                        <b-button size="sm" variant="secondary" @click="backToReviewList" class="mr-2">Back to Assignment</b-button>
+                        <b-button size="sm" variant="primary" @click="goToNextReview">Next (Random) Review</b-button>
+                    </div>
                 </b-card-header>
                 <b-card-body class="d-flex justify-content-between">
 
@@ -205,6 +208,14 @@ export default {
                 location.reload()
             } catch (e) {
                 this.showErrorMessage({message: "All reviews have been reviewed already!"})
+            }
+        },
+        backToReviewList() {
+            console.log(this.$router.currentRoute)
+            if (this.$router.currentRoute.name.includes('teacher')) {
+                this.$router.push({name: 'teacher-dashboard.assignments.assignment', params: {assignmentId: this.peerReview.review.rubric_assignment_id} })
+            } else {
+                this.$router.push({name: 'teaching-assistant-dashboard.course.assignment', params: {assignmentId: this.peerReview.review.rubric_assignment_id} })
             }
         }
     }
