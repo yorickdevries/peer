@@ -75,7 +75,7 @@
             <!--Save/Submit Buttons-->
             <b-card-body v-if="!peerReview.review.done">
                 <b-button type="submit" variant="success float-right" @click="submitPeerReview">Submit Review</b-button>
-                <b-button variant="primary float-right mr-2" @click="savePeerReview">Save Review</b-button>
+                <b-button variant="secondary float-right mr-2" @click="savePeerReview">Save Review</b-button>
             </b-card-body>
 
         </b-card>
