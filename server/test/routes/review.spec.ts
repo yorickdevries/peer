@@ -2,6 +2,7 @@ import "mocha";
 import chai from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
+import mockDate from "mockdate";
 chai.use(chaiHttp);
 const router: any = require("../../src/routes/reviews").default;
 import MockLogin from "../test_helpers/mock_login";
@@ -17,6 +18,13 @@ describe("API review routes", () => {
         MockLogin.initialize("paulvanderlaan");
         await TestData.initializeDatabase();
     });
+
+    /**
+     * Reset the date to the non-mocked form
+     */
+    afterEach(function () {
+        mockDate.reset();
+     });
 
     /**
      * Tests if user has authorization to see the review
@@ -98,6 +106,7 @@ describe("API review routes", () => {
      * Tests whether review get submitted
      */
     it("submit review/", async () => {
+        mockDate.set("2018-05-02T21:00:00Z");
         MockLogin.initialize("henkjan");
         const res = await chai.request(router).get("/1/submit");
         expect(res.status).to.equal(200);
@@ -108,6 +117,7 @@ describe("API review routes", () => {
      * Put a review
      */
     it("Put review/", async () => {
+        mockDate.set("2018-05-02T21:00:00Z");
         MockLogin.initialize("henkjan");
 
         const res = await chai.request(router)

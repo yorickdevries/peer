@@ -21,11 +21,16 @@ describe("CoursePreparedStatement Test", () => {
             description: "This is a beautiful course description!",
             id: 1,
             name: "ED-3"
-        },
+            },
             {
-                "description": "Test-course",
-                "id": 2,
-                "name": "ED-4"
+            description: "Test-course",
+            id: 2,
+            name: "ED-4"
+            },
+            {
+            description: "Test-course2",
+            id: 3,
+            name: "ED-5"
             }
         ]);
     });
@@ -47,7 +52,7 @@ describe("CoursePreparedStatement Test", () => {
     it("createa a course", async () => {
         expect(await CoursePS.executeCreateCourse("hi", "super leuk")).to.deep.equal({
             description: "hi",
-            id: 3,
+            id: 4,
             name: "super leuk"
         });
     });

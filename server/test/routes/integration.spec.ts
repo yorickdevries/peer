@@ -84,9 +84,9 @@ describe("API integration test", () => {
             .field("course_id", courseId)
             .field("reviews_per_user", 1)
             .field("publish_date", "2017-05-01T20:30:00.000Z")
-            .field("due_date", "2017-06-01T20:30:00.000Z")
-            .field("review_publish_date", "2018-05-01T20:30:00.000Z")
-            .field("review_due_date", "2018-06-01T20:30:00.000Z")
+            .field("due_date", "2030-06-01T20:30:00.000Z")
+            .field("review_publish_date", "2030-07-01T20:30:00.000Z")
+            .field("review_due_date", "2030-08-01T20:30:00.000Z")
             .field("one_person_groups", false);
         const assignmentId = JSON.parse(assignment.text).id;
         // Assertions to make sure the assignment is created.
@@ -162,11 +162,39 @@ describe("API integration test", () => {
         // [7]
         // Distribute the reviews
         MockLogin.initialize("bplanje");
+        // set the assignment duedate
+        await chai.request(router)
+            .put("/assignments/" + assignmentId)
+            .field("title", "Example title")
+            .field("description", "Example description")
+            .field("course_id", courseId)
+            .field("reviews_per_user", 1)
+            .field("publish_date", "2017-05-01T20:30:00.000Z")
+            .field("due_date", "2017-06-01T20:30:00.000Z")
+            .field("review_publish_date", "2030-07-01T20:30:00.000Z")
+            .field("review_due_date", "2030-08-01T20:30:00.000Z")
+            .field("one_person_groups", false);
+        console.log("Assignment duedate is set in the past");
+
         const distribution = await chai.request(router).get("/assignments/" + assignmentId + "/distributeReviews");
         // Assertions to make sure the reviews are distributed.
         expect(distribution.status).to.equal(200);
         expect(JSON.parse(distribution.text).length).to.equal(2);
         console.log("Teacher distributed the reviews");
+
+        // set the review publish date
+        await chai.request(router)
+            .put("/assignments/" + assignmentId)
+            .field("title", "Example title")
+            .field("description", "Example description")
+            .field("course_id", courseId)
+            .field("reviews_per_user", 1)
+            .field("publish_date", "2017-05-01T20:30:00.000Z")
+            .field("due_date", "2017-06-01T20:30:00.000Z")
+            .field("review_publish_date", "2017-07-01T20:30:00.000Z")
+            .field("review_due_date", "2030-08-01T20:30:00.000Z")
+            .field("one_person_groups", false);
+        console.log("Review publishdate is set in the past");
 
 
         // [8]
@@ -255,6 +283,20 @@ describe("API integration test", () => {
         console.log("Student created reviews");
 
         // [10]
+        MockLogin.initialize("bplanje");
+        // set the review duedate
+        await chai.request(router)
+            .put("/assignments/" + assignmentId)
+            .field("title", "Example title")
+            .field("description", "Example description")
+            .field("course_id", courseId)
+            .field("reviews_per_user", 1)
+            .field("publish_date", "2017-05-01T20:30:00.000Z")
+            .field("due_date", "2017-06-01T20:30:00.000Z")
+            .field("review_publish_date", "2017-07-01T20:30:00.000Z")
+            .field("review_due_date", "2017-08-01T20:30:00.000Z")
+            .field("one_person_groups", false);
+        console.log("Review duedate is set in the past");
         // Fetch the feedback ids.
         MockLogin.initialize("yorickdevries");
         const feedbackYorickIds = await chai.request(router).get("/assignments/" + assignmentId + "/feedback");

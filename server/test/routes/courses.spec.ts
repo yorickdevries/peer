@@ -35,7 +35,8 @@ describe("API Course routes", () => {
                 "id": 2,
                 "description": "Test-course",
                 "name": "ED-4"
-            }
+            },
+            {"id": 3, "description" : "Test-course2", "name" : "ED-5"}
         ]));
     });
 
@@ -48,16 +49,16 @@ describe("API Course routes", () => {
             .send({description: "example", name: "test name"});
 
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify({"id": 3, "description": "example", "name": "test name"}
+        expect(res.text).to.equal(JSON.stringify({"id": 4, "description": "example", "name": "test name"}
         ));
 
         const result = await chai.request(router).get("/enrolled");
         expect(result.status).to.equal(200);
 
         const enrolledlist: any = JSON.parse(result.text);
-        const newcourse = enrolledlist.find((object: any) => object.id == 3);
+        const newcourse = enrolledlist.find((object: any) => object.id == 4);
         expect(newcourse).to.deep.equal({
-            "id": 3,
+            "id": 4,
             "description": "example",
             "name": "test name"
         });

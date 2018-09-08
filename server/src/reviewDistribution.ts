@@ -18,6 +18,11 @@ export default class ReviewDistribution {
         if (!rubricExists.exists) {
             throw new Error("No rubric is present for this assignment");
         }
+        const assignment = await AssignmentPS.executeGetAssignmentById(assignmentId);
+        // check whether the assignment is due
+        if (new Date(assignment.due_date) > new Date()) {
+            throw new Error("The assignment isn't due yet");
+        }
         // Distribution of reviews for assignment
         let reviews = undefined;
         // Calculate a solution until a valid solution is found or an error is thrown
