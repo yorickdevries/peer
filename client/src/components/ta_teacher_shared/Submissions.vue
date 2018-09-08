@@ -85,6 +85,7 @@
                     {key: 'user_netid', label: 'Username'},
                     {key: 'group_id', label: 'Group ID'},
                     'formattedDate',
+                    {key: 'comment_count', label: '# of comments'},
                     {key: 'file_path', label: 'Download'},
                     'actions'
 
