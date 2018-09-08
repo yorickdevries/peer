@@ -31,7 +31,15 @@
                                                 <dd>This action will shuffle the groups and assign the groups to each
                                                     other. Can only be done once.
                                                 </dd>
-                                                <b-button @click="shuffleGroups()" class="mb-3" variant="primary" size="sm">Shuffle Groups</b-button>
+                                                <b-button v-b-modal="`shufflingModal`" class="mb-3" variant="primary" size="sm">Shuffle Groups</b-button>
+                                                <b-modal id="shufflingModal" @ok="shuffleGroups()" title="Confirmation" centered>
+                                                    Are you sure you want to shuffle?
+                                                    <ul>
+                                                        <li>Can (and should be) done only 1 once per assignment.</li>
+                                                        <li>Make sure to shuffle after students have made their submission.</li>
+                                                    </ul>
+
+                                                </b-modal>
 
                                                 <!--Importing-->
                                                 <template v-if="assignment.one_person_groups">
