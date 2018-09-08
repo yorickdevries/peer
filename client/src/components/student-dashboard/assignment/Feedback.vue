@@ -91,37 +91,51 @@
                 </b-tab>
 
                 <!--TA Feedback Comments-->
-                <b-tab title="TA Feedback" no-body>
+                <b-tab title="TA Feedback">
 
-                    <b-card-body>
-                        This pages houses the feedback TA's have given on your submission.
-                    </b-card-body>
-                    <!--View Comments-->
-                    <b-list-group v-if="comments.length > 0" flush>
+                    <!--Submission Feedback-->
+                    <b-card header="Submission Feedback" class="mb-3">
 
-                        <!--Single Comment-->
-                        <b-list-group-item v-for="comment in comments" :key="comment.id">
-                            <dl class="mb-0">
-                                <dt>Comment</dt>
-                                <dd>
-                                    <b-form-textarea v-model="comment.comment"
-                                                     placeholder="Input your submission comment here."
-                                                     max-rows="10"
-                                                     readonly></b-form-textarea>
-                                </dd>
+                        <p class="text-muted">The feedback TA's will give on your submission will be shown here.</p>
 
-                                <dt>Created by</dt>
-                                <dd>{{ comment.netid }}</dd>
+                        <b-list-group v-if="comments.length > 0">
+
+                            <!--Single Comment-->
+                            <b-list-group-item v-for="(comment, index) in comments" :key="comment.id">
+                                <dl class="mb-0">
+                                    <dt>Comment {{ index + 1 }}</dt>
+                                    <dd>
+                                        <b-form-textarea v-model="comment.comment"
+                                                         placeholder="Input your submission comment here."
+                                                         max-rows="10"
+                                                         readonly></b-form-textarea>
+                                    </dd>
+
+                                    <dt>Created by TA</dt>
+                                    <dd>{{ comment.netid }}</dd>
+                                </dl>
+                            </b-list-group-item>
+                        </b-list-group>
+                        <div v-else>There has not yet been any feedback on your submission from a TA.</div>
+                    </b-card>
+
+                    <!--Review Feedback-->
+                    <b-card header="Review Feedback">
+
+                        <p class="text-muted">The feedback TA's will give on the peer reviews that you have given to other students will be shown here. It will be either approved/disapproved/no action taken yet.</p>
+
+                        <div v-for="(peerReview, index) in peerReviews" :key="peerReview.review.id">
+
+                            <dl :class="{ 'mb-0': index === peerReviews.length - 1}">
+                                <dt>Review {{ index + 1 }} Status</dt>
+                                <dd v-if="peerReview.review.approved">Approved 👍</dd>
+                                <dd v-if="peerReview.review.approved === false">Disapproved 👎</dd>
+                                <dd v-if="peerReview.review.approved === null || peerReview.undefined">No action taken yet by any TA.</dd>
                             </dl>
-                        </b-list-group-item>
-                    </b-list-group>
+                        </div>
 
-                    <!--No comment available text.-->
-                    <b-card-body v-else>
-                        <b-card>
-                            No comments have been made.
-                        </b-card>
-                    </b-card-body>
+
+                    </b-card>
 
                 </b-tab>
             </b-tabs>
