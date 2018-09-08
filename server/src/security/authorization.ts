@@ -107,6 +107,19 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
 };
 
 /**
+ * Check enrollment of a user as student for a given assignment
+ */
+const enrolledAsStudentAssignment = async (req: any, res: any, next: any) => {
+    try {
+        const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
+        const authCheck = await AuthorizationPS.executeCheckEnrollAsStudent(assignment.course_id, req.user.netid);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
  * Check authorization to edit a rubric
  */
 const checkRubricAuthorizationPost = async (req: any, res: any, next: any) => {
@@ -471,6 +484,7 @@ export default {
     enrolledAsTeacherAssignmentCheck,
     enrolledAsTeacherAssignmentCheckForPost,
     enrolledAsTAOrTeacherAssignment,
+    enrolledAsStudentAssignment,
     getSubmissionAuth,
     postSubmissionAuth,
     getSubmissionFileAuth,

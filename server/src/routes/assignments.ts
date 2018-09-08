@@ -398,7 +398,7 @@ router.get("/:assignment_id/groups", index.authorization.enrolledAsTAOrTeacherAs
  * Student should be enrolled in the course.
  * @param id - assignment id.
  */
-router.get("/:assignment_id/enroll", async (req: any, res) => {
+router.get("/:assignment_id/enroll", index.authorization.enrolledAsStudentAssignment, async (req: any, res) => {
     try {
         const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
 

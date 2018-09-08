@@ -47,6 +47,20 @@ export default class AuthorizationPS {
     }
 
     /**
+     * Check if the user is enrolled as student.
+     * @param {number} courseId - course id.
+     * @param {String} netId - net id
+     * @return {any} true or false as pg promise.
+     */
+    public static executeCheckEnrollAsStudent(courseId: number, netId: String): any {
+        const statement = new PreparedStatement("check-enrollment-student",
+            "SELECT EXISTS(SELECT 1 FROM ENROLL " +
+            "WHERE course_id = $1 AND user_netid = $2 AND role = 'student')");
+        statement.values = [courseId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Check if the user is a TA or Teacher for the course a certain review is for.
      * @param {number} reviewId - review id.
      * @param {String} netId - id of ta or teacher.
