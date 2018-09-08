@@ -52,7 +52,8 @@ router.delete("/:id", index.authorization.isAuthorizedToEditGroup, async (req: a
  */
 router.delete("/:id/users/:userNetID", index.authorization.isAuthorizedToEditGroup, async (req: any, res) => {
     try {
-        await GroupsPS.executeDeleteGroupMember(req.params.id, req.params.userNetID);
+        const netid = req.params.userNetID.toLowerCase();
+        await GroupsPS.executeDeleteGroupMember(req.params.id, netid);
         res.sendStatus(200);
     } catch (e) {
         console.log(e);
@@ -65,7 +66,7 @@ router.delete("/:id/users/:userNetID", index.authorization.isAuthorizedToEditGro
  */
 router.post("/:id/users", index.authorization.isAuthorizedToEditGroup, async (req: any, res) => {
     try {
-        const netid = req.body.user_netid;
+        const netid = req.body.user_netid.toLowerCase();
         // check whether user is in the database
         const userExists: any = await UserPS.executeExistsUserById(netid);
         if (!userExists.exists) {
