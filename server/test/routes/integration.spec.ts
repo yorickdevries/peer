@@ -97,6 +97,10 @@ describe("API integration test", () => {
         console.log("Teacher created an assignment");
 
         // [3]
+        // Create rubric
+        const res = await chai.request(router).post("/rubric/").send({"rubric_assignment_id": assignmentId});
+        console.log("Teacher created a rubric");
+
         // Add an option question to the rubric
         const openQuestion = await chai.request(router)
             .post("/rubric/openquestion")

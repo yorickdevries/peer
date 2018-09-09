@@ -5,6 +5,10 @@
         <b-card class="mb-3">
             <div class="d-flex justify-content-between">
                 <div>
+                    <div class="text-muted">Make Rubric</div>
+                    <b-button @click="makeRubric()" class="mb-3" variant="primary" size="sm">Make Rubric</b-button>
+                </div>
+                <div>
                     <div class="text-muted">Create a new question.</div>
                     <b-button v-b-modal="'createModal'"  variant="primary">Add new Question</b-button>
                 </div>
@@ -198,8 +202,15 @@ export default {
             }
 
             await this.fetchRubric()
+        },
+        async makeRubric() {
+            try {
+                await api.client.post(`rubric/`, {rubric_assignment_id: this.rubric.assignment_id})
+                this.showSuccessMessage({message: "Rubric made, you can now add questions."})
+            } catch (e) {
+                this.showErrorMessage({message: e.response.data.error})
+            }
         }
-
     }
 }
 
