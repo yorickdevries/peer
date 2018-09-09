@@ -407,6 +407,9 @@ router.get("/:assignment_id/enroll", index.authorization.enrolledAsStudentAssign
         if (new Date(assignment.due_date) <= new Date()) {
             res.status(400);
             res.json({error: "Student can only enroll until the assignment due date deadline."});
+        } else if (new Date(assignment.publish_date) >= new Date()) {
+            res.status(400);
+            res.json({error: "Student can only enroll until after the assignment publish date."});
         } else if (assignment.one_person_groups === false) {
             res.status(400);
             res.json({error: "Assignment has one person groups not enabled."});
