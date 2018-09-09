@@ -47,7 +47,8 @@
         methods: {
             async fetchMetaReviews() {
                 let {data} = await api.getAssignmentReviewsStudent(this.$route.params.assignmentId)
-                this.reviews = data
+                const sortedReviews = data.sort((a, b) => a.id - b.id)
+                this.reviews = sortedReviews
             }
         }
     }

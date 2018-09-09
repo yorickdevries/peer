@@ -7,12 +7,16 @@
                 <b-col>
                     <div class="mt-5 mb-3">
                         <span class="h2">Courses</span>
-                        <b-button variant="success"
-                                  class="float-right"
-                                  :to="{ name: 'teacher-dashboard.courses.create' }"
-                                  v-if="showCreateCourseButton">
+                        <b-button   variant="success"
+                                    class="float-right"
+                                    v-if="showCreateCourseButton"
+                                    v-b-modal="`createCourseModal`">
                             Create Course
                         </b-button>
+                        <b-modal id="createCourseModal" title="Create new course." centered hide-footer>
+                            <CreateCourse></CreateCourse>
+                        </b-modal>
+
                     </div>
                 </b-col>
             </b-row>
@@ -113,9 +117,13 @@
 <script>
 import api from '../../api'
 import notifications from '../../mixins/notifications'
+import CreateCourse from './CreateCourse'
 
 export default {
     mixins: [notifications],
+    components: {
+        CreateCourse
+    },
     data() {
         return {
             courses: [],

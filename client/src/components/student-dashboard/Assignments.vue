@@ -17,7 +17,7 @@
                             <b-col>
 
                                 <!--Enrollable Assignments (Single User)-->
-                                <b-tab title="Enrollable">
+                                <b-tab title="Enrollable" active>
                                     <p class="text-muted">On this tab, enrollable assignments are shown. In order to participate in an assignment you have to enroll.</p>
                                     <span v-if="enrollableAssignments.length === 0">There are no enrollable assignments.</span>
                                     <b-card v-for="(assignment, index) in enrollableAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== enrollableAssignments.length - 1}">
@@ -32,7 +32,7 @@
 
 
                                 <!--Active Assignments-->
-                                <b-tab title="Ready for Submission" active>
+                                <b-tab title="Ready for Submission">
                                     <p class="text-muted">Ready for submission means that the assignment is open for submitting a solution to the assignment.</p>
                                     <span v-if="activeAssignments.length === 0">There are no active assignments.</span>
                                     <b-card v-for="(assignment, index) in activeAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== activeAssignments.length - 1 }">
