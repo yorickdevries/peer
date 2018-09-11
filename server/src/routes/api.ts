@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "fs-extra";
 import express from "express";
 import assignments from "./assignments";
 import courses from "./courses";
@@ -80,9 +80,9 @@ router.get("/logout", function(req, res) {
 });
 
 // Retrieve SP metadata
-router.get("/metadata.xml", function(req, res) {
+router.get("/metadata.xml", async function(req, res) {
   res.type("application/xml");
-  res.send(fs.readFileSync("./SP_Metadata.xml"));
+  res.send(await fs.readFile("./SP_Metadata.xml"));
 });
 
 // This route checks the user and updates it in the database

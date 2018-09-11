@@ -95,8 +95,8 @@ const updateAssignment = async function(req: any, res: any) {
             const oldFilePath = path.join(fileFolder, oldFilename);
 
             // Remove the old file and write the new file.
-            fs.unlinkSync(oldFilePath);
-            fs.writeFileSync(newFilePath, req.file.buffer);
+            await fs.unlink(oldFilePath);
+            await fs.writeFile(newFilePath, req.file.buffer);
         }
         res.json(result);
     } catch (err) {
@@ -131,7 +131,7 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
             req.body.review_due_date,
             req.body.one_person_groups);
         // writing the file if no error is there
-        fs.writeFileSync(filePath, req.file.buffer);
+        await fs.writeFile(filePath, req.file.buffer);
         res.json(result);
     } catch (err) {
         res.status(400);
