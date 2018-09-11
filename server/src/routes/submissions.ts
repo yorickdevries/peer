@@ -69,7 +69,7 @@ const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
         // add to database
         const result: any = await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName);
         // writing the file if no error is there
-        fs.writeFileSync(filePath, req.file.buffer);
+        await fs.writeFile(filePath, req.file.buffer);
         res.json(result);
     } catch (err) {
         res.status(400);
