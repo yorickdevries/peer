@@ -92,7 +92,7 @@ CREATE TABLE MCQuestion (
 
 -- Table: OpenAnswer
 CREATE TABLE OpenAnswer (
-    answer varchar(5000) NOT NULL,
+    answer varchar(100000) NOT NULL,
     OpenQuestion_id int NOT NULL,
     Review_id int NOT NULL,
     CONSTRAINT OpenAnswer_pk PRIMARY KEY (OpenQuestion_id,Review_id)
@@ -173,7 +173,7 @@ CREATE TABLE UserList (
 -- Table: ReviewComment
 CREATE TABLE ReviewComment (
     id SERIAL,
-    comment varchar(5000) NOT NULL,
+    comment varchar(100000 NOT NULL,
     review_id int NOT NULL,
     netid varchar(500) NOT NULL,
     CONSTRAINT ReviewComment_pk PRIMARY KEY (id)
@@ -182,7 +182,7 @@ CREATE TABLE ReviewComment (
 -- Table: SubmissionComment
 CREATE TABLE SubmissionComment (
     id SERIAL,
-    comment varchar(5000) NOT NULL,
+    comment varchar(100000) NOT NULL,
     submission_id int NOT NULL,
     netid varchar(500) NOT NULL,
     CONSTRAINT SubmissionComment_pk PRIMARY KEY (id)
