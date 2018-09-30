@@ -173,7 +173,7 @@ CREATE TABLE UserList (
 -- Table: ReviewComment
 CREATE TABLE ReviewComment (
     id SERIAL,
-    comment varchar(100000 NOT NULL,
+    comment varchar(100000) NOT NULL,
     review_id int NOT NULL,
     netid varchar(500) NOT NULL,
     CONSTRAINT ReviewComment_pk PRIMARY KEY (id)
