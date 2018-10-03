@@ -272,7 +272,8 @@ router.get("/:rubric_assignment_id/submitallfilledreviews", index.authorization.
             }
             // in case the review is filled, but not submitted, submit it
             if (reviewFilled) {
-                ReviewPS.executeSubmitReview(req.params.reviewId);
+                await ReviewPS.executeSubmitReview(reviewId);
+                console.log("Submitted reviewId: " + reviewId);
                 counter++;
             }
         }
