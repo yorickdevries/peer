@@ -1,4 +1,6 @@
 import RubricPS, { default as rubricPS } from "../prepared_statements/rubric_ps";
+import ReviewPS from "../prepared_statements/review_ps";
+import ReviewUpdate from "../reviewUpdate";
 import bodyParser from "body-parser";
 import index from "../security/index";
 
@@ -239,6 +241,43 @@ router.get("/:rubric_assignment_id/deleteAll", index.authorization.checkRubricAu
     try {
         await RubricPS.deleteRubricQuestions(req.params.rubric_assignment_id);
         res.sendStatus(200);
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+
+/**
+ * Route to submit all filled in reviews
+ */
+router.get("/:rubric_assignment_id/submitallfilledreviews", index.authorization.checkRubricAuthorization, async (req, res) => {
+    try {
+        const rubricId = req.params.rubric_assignment_id
+        const allReviews: any = await ReviewPS.executeGetReviewsByAssignmentId(rubricId);
+        let counter = 0;
+        for (let i = 0; i < allReviews.length; i++) {
+            // if already done, skip
+            if(allReviews[i].done){
+                continue;
+            }
+            const reviewId = allReviews[i].id
+            const review: any = await ReviewUpdate.getReview(reviewId)
+            const reviewForm = review.form
+            let reviewFilled = true
+            for (let j = 0; j < reviewForm.length; j++) {
+                const answer = reviewForm[j].answer.answer
+                if(answer == undefined){
+                    reviewFilled = false
+                }
+            }
+            // in case the review is filled, but not submitted, submit it
+            if(reviewFilled){
+                ReviewPS.executeSubmitReview(req.params.reviewId)
+                counter++
+            }
+        }
+        console.log("submitted " + counter + " review(s) for rubric " + rubricId)
+        res.json({submittedReviews: counter})
     } catch {
         res.sendStatus(400);
     }
