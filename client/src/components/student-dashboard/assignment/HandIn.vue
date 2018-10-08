@@ -41,7 +41,8 @@
                             placeholder="Choose a file..."
                             accept=".pdf"
                             v-model="file"
-                            :state="Boolean(file)" />
+                            :state="Boolean(file)"
+                            ref="fileInput"/>
                         <b-button
                             variant="primary"
                             class="mt-3"
@@ -125,6 +126,9 @@
           this.$refs.uploadModal.hide()
         }
 
+        // Clear file.
+        this.onFileReset()
+
         // Re-fetch new submission.
         await this.fetchSubmission()
       },
@@ -149,7 +153,8 @@
       onFileReset() {
         // Reset the upload modal state.
         this.fileProgress = 0
-        this.file = false
+        this.file = null
+        this.$refs.fileInput.reset()
       },
       onSubmissionReset() {
         this.submission =  {
