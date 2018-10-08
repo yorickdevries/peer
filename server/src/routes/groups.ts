@@ -76,7 +76,9 @@ router.post("/:id/users", index.authorization.isAuthorizedToEditGroup, async (re
 
         // Check if the student already is in a group.
         if (await GroupParser.studentIsInGroup(netid, req.body.assignmentId)) {
-            throw new Error(netid + " is already in a group");
+            res.status(400);
+            res.json({error: netid + " is already in a group"});
+            return;
         }
 
         // check whether user is in the database and add if not existing.

@@ -188,7 +188,7 @@
                     this.showSuccessMessage()
                     this.netNetId = ""
                 } catch (e) {
-                    this.showErrorMessage()
+                    this.showErrorMessage({message: e.response.data.error})
                 }
             }
         }
