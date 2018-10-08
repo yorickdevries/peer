@@ -101,7 +101,12 @@ describe("API Group routes", () => {
         ]));
 
         // delete the group
-        const deleteRes = await chai.request(router).post("/10/users").send({ user_netid: "bplanje" });
+        const deleteRes = await chai.request(router)
+            .post("/10/users")
+            .send({
+                user_netid: "bplanje",
+                assignmentId: 1
+            });
         expect(deleteRes.status).to.equal(200);
 
         // test whether group does not exist

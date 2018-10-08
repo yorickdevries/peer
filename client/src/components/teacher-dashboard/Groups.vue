@@ -181,7 +181,8 @@
             async addGroupMember(groupId, memberNetId) {
                 try {
                     await api.client.post(`groups/${groupId}/users`, {
-                        user_netid: memberNetId
+                        user_netid: memberNetId,
+                        assignmentId: this.assignmentId
                     })
                     await this.fetchGroups()
                     this.showSuccessMessage()

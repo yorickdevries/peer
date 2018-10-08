@@ -1,11 +1,13 @@
 import GroupsPS from "../prepared_statements/group_ps";
 import UserPS from "../prepared_statements/user_ps";
+import GroupParser from "../groupParser";
 import bodyParser from "body-parser";
 import index from "../security/index";
 
 
 // Router
 import express from "express";
+import AssignmentPS from "../prepared_statements/assignment_ps";
 const router = express();
 router.use(bodyParser.json());
 
@@ -63,16 +65,31 @@ router.delete("/:id/users/:userNetID", index.authorization.isAuthorizedToEditGro
 
 /**
  * Route to post a group member.
+ * @body assignmentId - the current assignment id.
+ * @param id - the group id.
  */
 router.post("/:id/users", index.authorization.isAuthorizedToEditGroup, async (req: any, res) => {
     try {
         const netid = req.body.user_netid.toLowerCase();
+        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.body.assignmentId);
+        const courseid = assignment.course_id;
+
         // check whether user is in the database
         const userExists: any = await UserPS.executeExistsUserById(netid);
+
+        // Check if the student already is in a group.
+        if (await GroupParser.studentIsInGroup(netid, req.params.assignmentId)) {
+            throw new Error(netid + " is already in a group");
+        }
+
+        // Add user if not existing.
         if (!userExists.exists) {
-            // Adding user
             await UserPS.executeAddUser(netid);
         }
+
+        // Enroll student in course
+        await GroupParser.enrollStudentIfNotEnrolled(courseid, netid);
+
         await GroupsPS.executeAddStudenttoGroup(netid, req.params.id);
         res.sendStatus(200);
     } catch (e) {
