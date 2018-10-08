@@ -6,6 +6,8 @@ chai.use(chaiHttp);
 const router: any = require("../../src/routes/groups").default;
 import MockLogin from "../test_helpers/mock_login";
 import TestData from "../test_helpers/test_data";
+import {queryResult} from "pg-promise";
+import GroupParser from "../../src/groupParser";
 
 describe("API Group routes", () => {
     /**
@@ -100,7 +102,7 @@ describe("API Group routes", () => {
             {user_netid: "paulvanderlaan", group_groupid: 10}
         ]));
 
-        // delete the group
+        // add netid to the group
         const deleteRes = await chai.request(router)
             .post("/10/users")
             .send({
@@ -109,12 +111,38 @@ describe("API Group routes", () => {
             });
         expect(deleteRes.status).to.equal(200);
 
-        // test whether group does not exist
+        // test group is updated
         const notExistRes = await chai.request(router).get("/10/users");
         expect(notExistRes.text).to.equal(JSON.stringify([
             {user_netid: "henkjan", group_groupid: 10},
             {user_netid: "paulvanderlaan", group_groupid: 10},
             {user_netid: "bplanje", group_groupid: 10}
         ]));
+    });
+
+    /**
+     * Test whether netids already in a group are not added to other groups.
+     */
+    it("Post groups/:id/users", async () => {
+        // test whether the group member exists
+        const existRes = await chai.request(router).get("/10/users");
+        expect(existRes.text).to.equal(JSON.stringify([
+            {user_netid: "henkjan", group_groupid: 10},
+            {user_netid: "paulvanderlaan", group_groupid: 10}
+        ]));
+
+        // Add second group
+        const groupId = await GroupParser.createGroupForAssignment("testgroup", 1);
+
+        // add netid to the group
+        const deleteRes = await chai.request(router)
+            .post("/" + groupId + "/users")
+            .send({
+                user_netid: "henkjan",
+                assignmentId: 1
+            });
+
+        // Should go wrong since 'henkjan' belongs to the first group.
+        expect(deleteRes.status).to.equal(400);
     });
 });

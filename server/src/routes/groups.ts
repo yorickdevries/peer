@@ -74,15 +74,13 @@ router.post("/:id/users", index.authorization.isAuthorizedToEditGroup, async (re
         const assignment: any = await AssignmentPS.executeGetAssignmentById(req.body.assignmentId);
         const courseid = assignment.course_id;
 
-        // check whether user is in the database
-        const userExists: any = await UserPS.executeExistsUserById(netid);
-
         // Check if the student already is in a group.
-        if (await GroupParser.studentIsInGroup(netid, req.params.assignmentId)) {
+        if (await GroupParser.studentIsInGroup(netid, req.body.assignmentId)) {
             throw new Error(netid + " is already in a group");
         }
 
-        // Add user if not existing.
+        // check whether user is in the database and add if not existing.
+        const userExists: any = await UserPS.executeExistsUserById(netid);
         if (!userExists.exists) {
             await UserPS.executeAddUser(netid);
         }
