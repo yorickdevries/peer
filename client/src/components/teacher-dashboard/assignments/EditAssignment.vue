@@ -112,9 +112,19 @@
                                 <p class="mb-0" v-if="uploadNewFile && file">File will be uploaded when you press the "save changes" button</p>
                             </b-form-group>
 
-                            <b-form-group label="Whether the assignment will be made individually or not" description="This can not be changed after creating the assignment. No group imports can be made either">
-                                <b-form-checkbox v-model="assignment.one_person_groups" disabled>Individual assignment</b-form-checkbox>
+                            <b-form-group   label="Assignment Type"
+                                            description="This can not be changed after creating the assignment.">
+                                <b-form-radio-group v-model="assignment.one_person_groups"
+                                                    :options="[
+                                                        { value: true, text: 'Individual'},
+                                                        { value: false, text: 'Group'}
+                                                    ]"
+                                                    stacked
+                                                    disabled
+                                                    name="radiosStacked">
+                                </b-form-radio-group>
                             </b-form-group>
+
                             <b-button type="submit" variant="primary">Save changes</b-button>
                         </b-form>
                     </b-card>
@@ -126,163 +136,163 @@
 </template>
 
 <script>
-import api from "../../../api";
-import notifications from "../../../mixins/notifications";
+  import api from "../../../api";
+  import notifications from "../../../mixins/notifications";
 
-export default {
+  export default {
     mixins: [notifications],
     data() {
-        return {
-            file: null,
-            fileProgress: 0,
-            uploadNewFile: false,
-            acceptFiles: ".pdf",
-            assignment: {
-                id: null,
-                title: null,
-                description: null,
-                course_id: null,
-                publish_date: null,
-                publish_day: null,
-                publish_time: null,
-                due_date: null,
-                due_day: null,
-                due_time: null,
-                review_publish_date: null,
-                review_publish_day: null,
-                review_publish_time: null,
-                review_due_date: null,
-                review_due_day: null,
-                review_due_time: null,
-                reviews_per_user: null,
-                filename: null,
-                one_person_groups: null
-            },
-            course: {
-                id: null,
-                name: null,
-                description: null
-            }
+      return {
+        file: null,
+        fileProgress: 0,
+        uploadNewFile: false,
+        acceptFiles: ".pdf",
+        assignment: {
+          id: null,
+          title: null,
+          description: null,
+          course_id: null,
+          publish_date: null,
+          publish_day: null,
+          publish_time: null,
+          due_date: null,
+          due_day: null,
+          due_time: null,
+          review_publish_date: null,
+          review_publish_day: null,
+          review_publish_time: null,
+          review_due_date: null,
+          review_due_day: null,
+          review_due_time: null,
+          reviews_per_user: null,
+          filename: null,
+          one_person_groups: null
+        },
+        course: {
+          id: null,
+          name: null,
+          description: null
         }
+      }
     },
     computed: {
-        checkDue() {
-            if (this.assignment.due_date == null|| this.assignment.publish_date == null)
-                return null
-            else
-                return this.assignment.due_date > this.assignment.publish_date
-        },
-        checkPeerNumber() {
-            if (this.assignment.reviews_per_user == null)
-                return null
-            else
-                return this.assignment.reviews_per_user > 0
-        },
-        assignmentFilePath() {
-            // Get the assignment file path.
-            return `/api/assignments/${this.assignment.id}/file`
-        }
+      checkDue() {
+        if (this.assignment.due_date == null|| this.assignment.publish_date == null)
+          return null
+        else
+          return this.assignment.due_date > this.assignment.publish_date
+      },
+      checkPeerNumber() {
+        if (this.assignment.reviews_per_user == null)
+          return null
+        else
+          return this.assignment.reviews_per_user > 0
+      },
+      assignmentFilePath() {
+        // Get the assignment file path.
+        return `/api/assignments/${this.assignment.id}/file`
+      }
     },
     async created() {
-        // Load necessary data
-        let cid = this.$route.params.courseId
-        let aid = this.$route.params.assignmentId
-        this.course.id = cid
-        this.assignment.id = aid
-        let res = await api.getAssignment(aid)
-        this.assignment = res.data
+      // Load necessary data
+      let cid = this.$route.params.courseId
+      let aid = this.$route.params.assignmentId
+      this.course.id = cid
+      this.assignment.id = aid
+      let res = await api.getAssignment(aid)
+      this.assignment = res.data
 
-        // Define functions for correct formatting of date and time
-        function dateToInputFormat(date) {
-            let str = "";
-            // console.log(str)
-            str = str + date.getFullYear().toString() + "-"
-            // console.log(str)
-            str = date.getMonth() < 10 ? str + "0" + (date.getMonth() + 1).toString() + "-" : str + date.getMonth().toString() + "-"
-            // console.log(str)
-            str = date.getDate() < 10 ? str + "0" + date.getDate().toString() : str + date.getDate().toString()
-            // console.log(str)
-            return str
-        }
+      // Define functions for correct formatting of date and time
+      function dateToInputFormat(date) {
+        let str = "";
+        // console.log(str)
+        str = str + date.getFullYear().toString() + "-"
+        // console.log(str)
+        str = date.getMonth() < 10 ? str + "0" + (date.getMonth() + 1).toString() + "-" : str + date.getMonth().toString() + "-"
+        // console.log(str)
+        str = date.getDate() < 10 ? str + "0" + date.getDate().toString() : str + date.getDate().toString()
+        // console.log(str)
+        return str
+      }
 
-        function timeToInputFormat(time) {
-            let str = "";
-            str = str + time.getHours().toString() + ":" + time.getMinutes().toString()
-            return str
-        }
+      function timeToInputFormat(time) {
+        let str = "";
+        str = str + time.getHours().toString() + ":" + time.getMinutes().toString()
+        return str
+      }
 
-        // Set publish date and time
-        let pdate = new Date(res.data.publish_date)
-        this.assignment.publish_day = dateToInputFormat(pdate)
-        this.assignment.publish_time = timeToInputFormat(pdate)
+      // Set publish date and time
+      let pdate = new Date(res.data.publish_date)
+      this.assignment.publish_day = dateToInputFormat(pdate)
+      this.assignment.publish_time = timeToInputFormat(pdate)
 
-        // Set due date and time
-        let ddate = new Date(res.data.due_date)
-        this.assignment.due_day = dateToInputFormat(ddate)
-        this.assignment.due_time = timeToInputFormat(ddate)
+      // Set due date and time
+      let ddate = new Date(res.data.due_date)
+      this.assignment.due_day = dateToInputFormat(ddate)
+      this.assignment.due_time = timeToInputFormat(ddate)
 
-        // Set due date and time
-        let rpdate = new Date(res.data.review_publish_date)
-        this.assignment.review_publish_day = dateToInputFormat(rpdate)
-        this.assignment.review_publish_time = timeToInputFormat(rpdate)
+      // Set due date and time
+      let rpdate = new Date(res.data.review_publish_date)
+      this.assignment.review_publish_day = dateToInputFormat(rpdate)
+      this.assignment.review_publish_time = timeToInputFormat(rpdate)
 
-        // Set due date and time
-        let rddate = new Date(res.data.review_due_date)
-        this.assignment.review_due_day = dateToInputFormat(rddate)
-        this.assignment.review_due_time = timeToInputFormat(rddate)
+      // Set due date and time
+      let rddate = new Date(res.data.review_due_date)
+      this.assignment.review_due_day = dateToInputFormat(rddate)
+      this.assignment.review_due_time = timeToInputFormat(rddate)
     },
     methods: {
-        checkDates() {
-            if (this.assignment.publish_date > this.assignment.due_date || this.assignment.publish_date > this.assignment.review_publish_date || this.assignment.publish_date > this.assignment.review_due_date) {
-                return {error: 'Publish date is later than other dates!'}
-            } else if (this.assignment.due_date > this.assignment.review_publish_date || this.assignment.due_date > this.assignment.review_due_date) {
-                return {error: 'Due date is later than review dates!'}
-            } else if (this.assignment.review_publish_date > this.assignment.review_due_date) {
-                return {error: 'Review start date is later than review due dates!'}
-            } else {
-                return true
-            }
-
-        },
-        async onSubmit() {
-            // Compose datetime format from date and time
-            this.assignment.publish_date = new Date(this.assignment.publish_day + " " + this.assignment.publish_time).toJSON();
-            this.assignment.due_date = new Date(this.assignment.due_day + " " + this.assignment.due_time).toJSON();
-            this.assignment.review_publish_date = new Date(this.assignment.review_publish_day + " " + this.assignment.review_publish_time).toJSON();
-            this.assignment.review_due_date = new Date(this.assignment.review_due_day + " " + this.assignment.review_due_time).toJSON();
-
-            let validationResult = this.checkDates()
-            if (validationResult.error) {
-                this.showErrorMessage({message: validationResult.error})
-            } else {
-                // Compose formdata object to send information to back-end
-                let formData = new FormData()
-                formData.append("title", this.assignment.title)
-                formData.append("description", this.assignment.description)
-                formData.append("course_id", this.assignment.course_id)
-                formData.append("publish_date", this.assignment.publish_date)
-                formData.append("due_date", this.assignment.due_date)
-                formData.append("review_publish_date", this.assignment.review_publish_date)
-                formData.append("review_due_date", this.assignment.review_due_date)
-                formData.append("reviews_per_user", this.assignment.reviews_per_user)
-
-                // Add file if a new one has been uploaded
-                if (this.file != null) {
-                    formData.append("assignmentFile", this.file)
-                }
-                // Update assignment in database
-                try{
-                    await api.saveAssignment(this.assignment.id, formData)
-                    this.showSuccessMessage({message: "Updated assignment successfully"})
-                    // Redirect to updated assignment
-                    this.$router.push({name: 'teacher-dashboard.assignments.assignment', params: {courseId: this.course.id, assignmentId: this.assignment.id} })
-                } catch (e) {
-                    this.showErrorMessage()
-                }
-            }
-
+      checkDates() {
+        if (this.assignment.publish_date > this.assignment.due_date || this.assignment.publish_date > this.assignment.review_publish_date || this.assignment.publish_date > this.assignment.review_due_date) {
+          return {error: 'Publish date is later than other dates!'}
+        } else if (this.assignment.due_date > this.assignment.review_publish_date || this.assignment.due_date > this.assignment.review_due_date) {
+          return {error: 'Due date is later than review dates!'}
+        } else if (this.assignment.review_publish_date > this.assignment.review_due_date) {
+          return {error: 'Review start date is later than review due dates!'}
+        } else {
+          return true
         }
+
+      },
+      async onSubmit() {
+        // Compose datetime format from date and time
+        this.assignment.publish_date = new Date(this.assignment.publish_day + " " + this.assignment.publish_time).toJSON();
+        this.assignment.due_date = new Date(this.assignment.due_day + " " + this.assignment.due_time).toJSON();
+        this.assignment.review_publish_date = new Date(this.assignment.review_publish_day + " " + this.assignment.review_publish_time).toJSON();
+        this.assignment.review_due_date = new Date(this.assignment.review_due_day + " " + this.assignment.review_due_time).toJSON();
+
+        let validationResult = this.checkDates()
+        if (validationResult.error) {
+          this.showErrorMessage({message: validationResult.error})
+        } else {
+          // Compose formdata object to send information to back-end
+          let formData = new FormData()
+          formData.append("title", this.assignment.title)
+          formData.append("description", this.assignment.description)
+          formData.append("course_id", this.assignment.course_id)
+          formData.append("publish_date", this.assignment.publish_date)
+          formData.append("due_date", this.assignment.due_date)
+          formData.append("review_publish_date", this.assignment.review_publish_date)
+          formData.append("review_due_date", this.assignment.review_due_date)
+          formData.append("reviews_per_user", this.assignment.reviews_per_user)
+
+          // Add file if a new one has been uploaded
+          if (this.file != null) {
+            formData.append("assignmentFile", this.file)
+          }
+          // Update assignment in database
+          try{
+            await api.saveAssignment(this.assignment.id, formData)
+            this.showSuccessMessage({message: "Updated assignment successfully"})
+            // Redirect to updated assignment
+            this.$router.push({name: 'teacher-dashboard.assignments.assignment', params: {courseId: this.course.id, assignmentId: this.assignment.id} })
+          } catch (e) {
+            this.showErrorMessage()
+          }
+        }
+
+      }
     }
 
-}
+  }
 </script>
