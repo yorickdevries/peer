@@ -278,13 +278,14 @@ export default class ReviewPS {
      * Set approved to true or false of a review.
      * @param {boolean} approved - true or false.
      * @param {number} reviewId - a review id.
+     * @param taNetId - a ta net id.
      * @return {any} - success or failure.
      */
-    public static executeSetApprovedForReview(approved: boolean, reviewId: number): any {
+    public static executeSetApprovedForReview(approved: boolean, reviewId: number, taNetId: string): any {
         const isApproved = (approved === true) ? "TRUE" : "FALSE";
         const statement = new PreparedStatement("update-approved-for-review",
-            "UPDATE review SET approved=$1 WHERE id = $2");
-        statement.values = [isApproved, reviewId];
+            "UPDATE review SET approved=$1, TA_netid = $2 WHERE id = $3");
+        statement.values = [isApproved, taNetId, reviewId];
         return Database.executeQuery(statement);
     }
 }
