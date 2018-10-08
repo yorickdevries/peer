@@ -341,6 +341,7 @@ describe("API review routes", () => {
         const res = await chai.request(router)
             .post(`/${reviewId}/grade`)
             .send({approved: true});
+        expect(res.status).to.equal(200);
 
         const resultAfter = await ReviewPS.executeGetReview(reviewId);
         expect(resultAfter.approved).to.equal(true);
