@@ -35,7 +35,7 @@
                                                 <b-modal id="shufflingModal" @ok="shuffleGroups()" title="Confirmation" centered>
                                                     Are you sure you want to shuffle?
                                                     <ul>
-                                                        <li>Can (and should be) done only 1 once per assignment.</li>
+                                                        <li>Can (and should be) done only once per assignment.</li>
                                                         <li>Make sure to shuffle after students have made their submission.</li>
                                                     </ul>
 
