@@ -93,9 +93,19 @@
                                         v-if="uploadSuccess === null">
                                 </b-form-file>
                             </b-form-group>
-                            <b-form-group label="Whether the assignment will be made individually or not" description="This can not be changed after creating the assignment. No group imports can be made either">
-                                <b-form-checkbox v-model="assignment.one_person_groups">Individual assignment</b-form-checkbox>
+
+                            <b-form-group   label="Assignment Type"
+                                            description="This can not be changed after creating the assignment.">
+                                <b-form-radio-group v-model="assignment.one_person_groups"
+                                                    :options="[
+                                                        { value: true, text: 'Individual'},
+                                                        { value: false, text: 'Group'}
+                                                    ]"
+                                                    stacked
+                                                    name="radiosStacked">
+                                </b-form-radio-group>
                             </b-form-group>
+
                             <b-button type="submit" variant="primary">Create the assignment</b-button>
                         </b-form>
                     </b-card>
