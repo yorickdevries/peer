@@ -6,7 +6,7 @@ chai.use(chaiHttp);
 const router: any = require("../../src/routes/groups").default;
 import MockLogin from "../test_helpers/mock_login";
 import TestData from "../test_helpers/test_data";
-import {queryResult} from "pg-promise";
+import { queryResult } from "pg-promise";
 import GroupParser from "../../src/groupParser";
 
 describe("API Group routes", () => {
