@@ -465,7 +465,15 @@ router.post("/:assignment_id/groups", index.authorization.enrolledAsTeacherAssig
 router.get("/:assignment_id/randomReview", index.authorization.enrolledAsTAOrTeacherAssignment, async (req: any, res) => {
     try {
         const availableReviews: any = await ReviewPS.executeGetAllDoneReviewsByAssignmentIdUnreviewed(req.params.assignment_id);
-        const randomReview: number = Math.floor((Math.random() * availableReviews.length));
+
+        // Check if there are any reviews left. Send 400 to front-end to display 'There are no reviews left' message.
+        if (availableReviews.length == 0) {
+            res.sendStatus(400);
+            return;
+        }
+
+        // Get a random review and respond.
+        const randomReview: number = Math.floor(Math.random() * (availableReviews.length));
         res.json({ id: availableReviews[randomReview].id });
     } catch (e) {
         console.log(e);
