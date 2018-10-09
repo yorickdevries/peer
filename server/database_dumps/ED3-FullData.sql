@@ -24,7 +24,8 @@ INSERT INTO public.grouplist(
 	VALUES
 	(10, 'ED-3'),
 	(11, 'ED-4'),
-	(12, 'ED-5')
+	(12, 'ED-5'),
+	(13, 'ED-6')
 	;
 
 INSERT INTO public.assignmentlist(
@@ -157,7 +158,8 @@ INSERT INTO public.assignmentgroup(
 	assignment_id, group_id)
 	VALUES 
 	(1, 10),
-	(1, 11);
+	(1, 11),
+	(4, 13);
 
 INSERT INTO public.submission(
 	user_netid, group_id, assignment_id, file_path, date)
@@ -234,7 +236,7 @@ INSERT INTO public.rangeanswer(
 
 INSERT INTO public.groupusers(
 	User_netid, Group_groupid)
-	VALUES ('henkjan', 10);
+	VALUES ('henkjan', 10), ('henkjan', 13);
 
 INSERT INTO public.groupusers(
 	User_netid, Group_groupid)
