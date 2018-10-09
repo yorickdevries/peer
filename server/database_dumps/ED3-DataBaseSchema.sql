@@ -390,6 +390,14 @@ ALTER TABLE Review ADD CONSTRAINT Review_User
     INITIALLY IMMEDIATE
 ;
 
+-- Reference: Review_Ta_User (table: Review)
+ALTER TABLE Review ADD CONSTRAINT Review_Ta_User
+    FOREIGN KEY (ta_netid)
+    REFERENCES UserList (netid)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
 -- Reference: Rubric_Assignment (table: Rubric)
 ALTER TABLE Rubric ADD CONSTRAINT Rubric_Assignment
     FOREIGN KEY (Assignment_id)
