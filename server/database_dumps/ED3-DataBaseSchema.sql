@@ -135,7 +135,7 @@ CREATE TABLE Review (
     done BOOLEAN NOT NULL DEFAULT FALSE,
     creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     approved boolean,
-    ta_netid varchar(500),
+    ta_netid varchar(500) REFERENCES UserList (netid),
     CONSTRAINT Review_pk PRIMARY KEY (id)
 );
 
