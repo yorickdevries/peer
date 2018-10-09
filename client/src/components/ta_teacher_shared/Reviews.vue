@@ -37,6 +37,11 @@
                 <span v-if="row.item.approved === null">No action yet by any TA.</span>
             </template>
 
+            <template slot="ta_netid" slot-scope="row">
+                <span v-if="row.item.ta_netid">{{ row.item.ta_netid }}</span>
+                <span v-if="row.item.ta_netid === null">None.</span>
+            </template>
+
             <template slot="actions" slot-scope="row">
                 <b-button variant="primary" size="sm" :to="{name: pathName, params: { reviewId: row.item.id }}">See review</b-button>
             </template>
@@ -60,6 +65,7 @@
                     {key: 'reviewer', label: 'Reviewer'},
                     {key: 'submitter', label: 'Submitter'},
                     {key: 'approved', label: 'Approval Status'},
+                    {key: 'ta_netid', label: 'Graded by TA'},
                     'actions'
                 ],
                 perPage: 5,
