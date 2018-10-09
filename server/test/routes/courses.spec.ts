@@ -176,4 +176,14 @@ describe("API Course routes", () => {
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify([{ user_netid: "paulvanderlaan" }]));
     });
+
+    /**
+     * Random review id
+     */
+    it("Empty course grade export", async () => {
+        // log in as bplanje (teacher)cle
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).get("/2/gradeExport");
+        expect(res.status).to.equal(400);
+    });
 });

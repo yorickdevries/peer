@@ -443,4 +443,14 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).get("/1/randomReview");
         expect(res.status).to.equal(200);
     });
+
+    /**
+     * Random review id
+     */
+    it("Empty grade export", async () => {
+        // log in as bplanje (teacher)cle
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).get("/2/gradeExport");
+        expect(res.status).to.equal(400);
+    });
 });

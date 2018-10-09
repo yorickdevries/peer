@@ -435,10 +435,18 @@ router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherA
     try {
         const exportData = await ExportResultsPS.executeGetStudentReviewExportAssignment(req.params.assignment_id);
 
+        // Check if the export data contains data.
+        if (exportData.length == 0) {
+            res.status(400);
+            res.json({error: "No grades to export."});
+            return;
+        }
+
         res.setHeader("Content-disposition", "attachment; filename=export.csv");
         res.set("Content-Type", "text/csv");
         res.status(200).send(CSVExport.downloadCSV({ exportData: exportData }));
-    } catch {
+    } catch (e) {
+        console.log(e);
         res.sendStatus(400);
     }
 });
