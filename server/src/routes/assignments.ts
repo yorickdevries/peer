@@ -18,6 +18,7 @@ import config from "../config";
 // Router
 import express from "express";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
+import CoursesPS from "../prepared_statements/courses_ps";
 
 const router = express();
 const fileFolder = config.assignments.fileFolder;
@@ -442,7 +443,24 @@ router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherA
             return;
         }
 
-        res.setHeader("Content-disposition", "attachment; filename=export.csv");
+        // Properly format the file name.
+        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
+        const course: any = await CoursesPS.executeGetCourseById(assignment.course_id);
+        const date: Date = new Date();
+        const dd = (date.getDate() < 10) ? "0" + date.getDate() : date.getDate();
+        const mm = (date.getMonth() + 1 < 10) ? "0" + date.getMonth() + 1 : date.getMonth() + 1;
+        const hours = (date.getHours() < 10) ? "0" + date.getHours() : date.getHours();
+        const min = (date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes();
+
+        // Check if the course name is a valid file name.
+
+        const courseName = (/^([a-zA-Z_\-\s0-9]+)$/.test(course.name.replace(/ /g, "")))
+            ? course.name.replace(/ /g, "") : "";
+        const assignmentTitle = (/^([a-zA-Z_\-\s0-9]+)$/.test(assignment.title.replace(/ /g, "")))
+            ? assignment.title.replace(/ /g, "") : "";
+        const filename: string = `${courseName}--${assignmentTitle}--${dd}-${mm}-${date.getFullYear()}--${hours}-${min}`;
+
+        res.setHeader("Content-disposition", `attachment; filename=${filename}.csv`);
         res.set("Content-Type", "text/csv");
         res.status(200).send(CSVExport.downloadCSV({ exportData: exportData }));
     } catch (e) {
