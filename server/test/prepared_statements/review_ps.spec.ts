@@ -28,7 +28,7 @@ describe("ReviewPreparedStatement Test", () => {
         // tslint:disable-next-line
         expect(resultBefore.approved).to.equal(null);
 
-        await ReviewPS.executeSetApprovedForReview(false, 1);
+        await ReviewPS.executeSetApprovedForReview(false, 1, "bplanje");
         const resultAfter = await ReviewPS.executeGetReview(1);
         expect(resultAfter.approved).to.equal(false);
     });
@@ -173,7 +173,9 @@ describe("ReviewPreparedStatement Test", () => {
             "approved": null,
             "id": 2,
             "reviewer": "paulvanderlaan",
-            "submitter": "paulvanderlaan"
+            "submitter": "paulvanderlaan",
+            // tslint:disable-next-line
+            "ta_netid": null
         }]);
     });
 

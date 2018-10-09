@@ -329,15 +329,20 @@ describe("API review routes", () => {
      * Tests if a review can be approved.
      */
     it("review/:reviewId/grade", async () => {
+        MockLogin.initialize("bplanje");
         const reviewId: number = 1;
 
+        // Check if the approval and ta net id was previously null
         const resultBefore = await ReviewPS.executeGetReview(reviewId);
         // tslint:disable-next-line
         expect(resultBefore.approved).to.equal(null);
+        expect(resultBefore.ta_netid).to.equal(undefined);
 
-        await chai.request(router)
+        const res = await chai.request(router)
             .post(`/${reviewId}/grade`)
             .send({approved: true});
+        expect(res.status).to.equal(200);
+
         const resultAfter = await ReviewPS.executeGetReview(reviewId);
         expect(resultAfter.approved).to.equal(true);
     });

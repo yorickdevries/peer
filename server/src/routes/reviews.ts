@@ -132,9 +132,9 @@ router.route("/:reviewId/file").get(index.authorization.checkAuthorizationForRev
 /**
  * Grade a specific review by approving or disproving (true/false).
  */
-router.post("/:reviewId/grade", async (req: any, res) => {
+router.post("/:reviewId/grade", index.authorization.checkReviewTAOrTeacher, async (req: any, res) => {
     try {
-        await ReviewsPS.executeSetApprovedForReview(req.body.approved, req.params.reviewId);
+        await ReviewsPS.executeSetApprovedForReview(req.body.approved, req.params.reviewId, req.user.netid);
         res.sendStatus(200);
     } catch {
         res.sendStatus(400);

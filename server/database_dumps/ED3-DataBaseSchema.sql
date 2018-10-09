@@ -135,6 +135,7 @@ CREATE TABLE Review (
     done BOOLEAN NOT NULL DEFAULT FALSE,
     creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     approved boolean,
+    ta_netid varchar(500),
     CONSTRAINT Review_pk PRIMARY KEY (id)
 );
 
@@ -384,6 +385,14 @@ ALTER TABLE Review ADD CONSTRAINT Review_Submission
 -- Reference: Review_User (table: Review)
 ALTER TABLE Review ADD CONSTRAINT Review_User
     FOREIGN KEY (User_netid)
+    REFERENCES UserList (netid)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: Review_Ta_User (table: Review)
+ALTER TABLE Review ADD CONSTRAINT Review_Ta_User
+    FOREIGN KEY (ta_netid)
     REFERENCES UserList (netid)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
