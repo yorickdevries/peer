@@ -361,7 +361,7 @@ describe("API Assignment routes", () => {
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             // tslint:disable-next-line
-            [{"id": 2, "approved": null, "reviewer": "paulvanderlaan", "submitter": "paulvanderlaan"}]
+            [{"id": 2, "approved": null, "ta_netid": null, "reviewer": "paulvanderlaan", "submitter": "paulvanderlaan"}]
         ));
     });
 

@@ -250,7 +250,7 @@ export default class ReviewPS {
      */
     public static executeGetAllDoneReviewsByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-all-done-reviews-by-assignmentid",
-            "SELECT review.id, review.approved, review.user_netid as reviewer, submission.user_netid as submitter " +
+            "SELECT review.id, review.approved, review.ta_netid, review.user_netid as reviewer, submission.user_netid as submitter " +
             "FROM review JOIN assignmentlist ON assignmentlist.id = review.rubric_assignment_id " +
             "JOIN submission ON submission.id = review.submission_id WHERE assignmentlist.id = $1 " +
             "AND review.done = true");
