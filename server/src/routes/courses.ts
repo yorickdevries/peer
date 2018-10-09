@@ -244,7 +244,18 @@ router.get("/:courseId/gradeExport", index.authorization.enrolledCourseTeacherCh
             return;
         }
 
-        res.setHeader("Content-disposition", "attachment; filename=export.csv");
+        // Properly format the file name.
+        const course: any = await CoursesPS.executeGetCourseById(req.params.courseId);
+        const date: Date = new Date();
+        const dd = (date.getDate() < 10) ? "0" + date.getDate() : date.getDate();
+        const mm = (date.getMonth() + 1 < 10) ? "0" + date.getMonth() + 1 : date.getMonth() + 1;
+        const hours = (date.getHours() < 10) ? "0" + date.getHours() : date.getHours();
+        const min = (date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes();
+
+        const courseName = (/^([a-zA-Z_\-\s0-9]+)$/.test(course.name.replace(/ /g, ""))) ? course.name.replace(/ /g, "") : "";
+        const filename: string = `${courseName}--${dd}-${mm}-${date.getFullYear()}--${hours}-${min}`;
+
+        res.setHeader("Content-disposition", `attachment; filename=${filename}.csv`);
         res.set("Content-Type", "text/csv");
         res.status(200).send(CSVExport.downloadCSV({ exportData: exportData }));
     } catch (e) {
