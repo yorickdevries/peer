@@ -24,7 +24,9 @@ describe("CoursePreparedStatement Test", () => {
                 "waiting for TA": "1",
                 "student total reviews": "1",
                 // tslint:disable-next-line
-                "studentnumber": null
+                "studentnumber": null,
+                "assignment": "Assignment 1",
+                "course": "ED-3"
             }]
         );
     });
@@ -41,7 +43,9 @@ describe("CoursePreparedStatement Test", () => {
                 "waiting for TA": "1",
                 "student total reviews": "1",
                 // tslint:disable-next-line
-                "studentnumber": null
+                "studentnumber": null,
+                "assignment": "Assignment 1",
+                "course": "ED-3"
             }]
         );
     });
