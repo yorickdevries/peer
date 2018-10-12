@@ -124,7 +124,7 @@
 
                         <p class="text-muted">The feedback TA's will give on the peer reviews that you have given to other students will be shown here. It will be either approved, disapproved or there might not have been any action taken yet.</p>
 
-                        <div v-for="(peerReview, index) in peerReviews" :key="peerReview.review.id">
+                        <div v-for="(peerReview, index) in peerReviewsToOthers" :key="peerReview.review.id">
 
                             <dl :class="{ 'mb-0': index === peerReviews.length - 1}">
                                 <dt>Review {{ index + 1 }} Status</dt>
@@ -154,6 +154,7 @@ export default {
     data() {
         return {
             peerReviews: [],
+            peerReviewsToOthers: [],
             activeQuestion: {},
             comments: []
         }
@@ -167,15 +168,20 @@ export default {
         }
     },
     async created() {
-        // Get feedback array of reviews.
-        let idsRes = await api.getFeedbackOfAssignment(this.$route.params.assignmentId)
-        let ids = idsRes.data.map(value => value.id)
 
-        for (let i = 0; i < ids.length; i++) {
-            let {data} = await api.getPeerReview(ids[i])
-            this.peerReviews.push(data)
-        }
+        // Retrieve peer review RECEIVED.
+        const {data: receivedIds} = await api.getFeedbackOfAssignment(this.$route.params.assignmentId)
+        const receivedFlatIds = receivedIds.map(value => value.id)
 
+        this.peerReviews = await this.foreignKeyJoinOfPeerReviews(receivedFlatIds)
+
+        // Retrieve peer reviews GIVEN.
+        const {data: givenIds} = await api.getGivenFeedbackOfAssignment(this.$route.params.assignmentId)
+        const givenFlatIds = givenIds.map(value => value.id)
+
+        this.peerReviewsToOthers = await this.foreignKeyJoinOfPeerReviews(givenFlatIds)
+
+        // Set the default active question.
         if (this.sortedQuestionsList !== undefined)
             this.activeQuestion = this.sortedQuestionsList[0]
 
@@ -183,6 +189,18 @@ export default {
 
     },
     methods: {
+
+        async foreignKeyJoinOfPeerReviews(ids) {
+
+            let peerReviews = []
+            for (let i = 0; i < ids.length; i++) {
+                let {data} = await api.getPeerReview(ids[i])
+                peerReviews.push(data)
+            }
+            return peerReviews
+
+        },
+
         aggregateQuestionAnswer(targetQuestionNumber) {
             // Aggregates the answers for a particular question into an array of answers.
             let res = []
