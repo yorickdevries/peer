@@ -50,9 +50,9 @@
                                     <b-form-textarea
                                             id="textarea1"
                                             :value="pair.answer.answer"
-                                            :rows="3"
+                                            :rows="10"
                                             readonly
-                                            :max-rows="6"/>
+                                            :max-rows="15"/>
                                 </template>
 
 

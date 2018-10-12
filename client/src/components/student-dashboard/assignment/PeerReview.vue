@@ -38,8 +38,8 @@
                     <b-form-textarea v-if="pair.question.type_question === 'open'"
                                      id="textarea1"
                                      placeholder="Enter something"
-                                     :rows="3"
-                                     :max-rows="6"
+                                     :rows="10"
+                                     :max-rows="15"
                                      v-model="pair.answer.answer"
                                      :readonly="peerReview.review.done"
                                      required/>
