@@ -88,6 +88,9 @@ export default {
     getFeedbackOfAssignment(assignmentId) {
         return client.get(`assignments/${assignmentId}/feedback`)
     },
+    getGivenFeedbackOfAssignment(assignmentId) {
+        return client.get(`assignments/${assignmentId}/feedbackGivenToOthers`)
+    },
     getGroupMembersOfAssignment(assignmentId) {
         return client.get(`assignments/${assignmentId}/group`)
     },

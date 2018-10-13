@@ -259,6 +259,23 @@ export default class ReviewPS {
     }
 
     /**
+     * Gets all done reviews of an assignment and of a student.
+     * @param {number} assignmentId - an assignment id.
+     * @return {Promise<pgPromise.queryResult>} - a promise of the database result.
+     */
+    public static executeGetAllDoneReviewsOfStudent(assignmentId: number, student: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-all-done-reviews-of-student",
+            "SELECT review.id\n" +
+            "FROM review \n" +
+            "JOIN assignmentlist ON assignmentlist.id = review.rubric_assignment_id \n" +
+            "WHERE assignmentlist.id = $1 \n" +
+            "AND review.done = true\n" +
+            "AND review.user_netid = $2");
+        statement.values = [assignmentId, student];
+        return Database.executeQuery(statement);
+    }
+
+    /**
      * Gets all done reviews for a certain assignment which are not reviewed yet
      * @param {number} assignmentId - an assignment id.
      * @return {Promise<pgPromise.queryResult>} - a promise of the database result.
