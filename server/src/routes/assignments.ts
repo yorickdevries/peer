@@ -382,6 +382,24 @@ router.get("/:id/feedback", async (req: any, res) => {
 });
 
 /**
+ * Route to get review ids of the reviews a student gave.
+ */
+router.get("/:id/feedbackGivenToOthers", async (req: any, res) => {
+    try {
+        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.id);
+        if (new Date(assignment.review_due_date) > new Date()) {
+            res.status(401);
+            res.json({ error: "You can only access the review after the review due date is passed." });
+        } else {
+            res.json(await ReviewPS.executeGetAllDoneReviewsOfStudent(req.params.id, req.user.netid));
+        }
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+
+/**
  * Route to get all groups of an assignment
  */
 router.get("/:assignment_id/groups", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
