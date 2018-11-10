@@ -40,6 +40,12 @@
                                                     </ul>
 
                                                 </b-modal>
+                                                
+                                                <!--Submit Reviews-->
+                                                <dt>Submit Reviews</dt>
+                                                <dd>This action will set all reviews which are fully filled in to done.
+                                                </dd>
+                                                <b-button class="mb-3" variant="primary" size="sm" @click="submitAllFilledReviews">Submit Reviews</b-button>
 
                                                 <!--Importing-->
                                                 <template v-if="assignment.one_person_groups">
@@ -154,6 +160,15 @@ export default {
             try {
                 await api.shuffleGroups(this.$route.params.assignmentId)
                 this.showSuccessMessage({message: "Groups have successfully been shuffled and assigned submissions."})
+            } catch (e) {
+                this.showErrorMessage({message: e.response.data.error})
+            }
+        },
+        async submitAllFilledReviews() {
+            try {
+                const result = await api.submitAllFilledReviews(this.$route.params.assignmentId)
+                const submittedReviews = result.data.submittedReviews;
+                this.showSuccessMessage({message: "Submitted " + submittedReviews + " Reviews"})
             } catch (e) {
                 this.showErrorMessage({message: e.response.data.error})
             }
