@@ -63,6 +63,18 @@ export default class ReviewPS {
     }
 
     /**
+     * Execute as 'unsubmit review' query, where the done field is set to dalse.
+     * @param {number} reviewId - a review id.
+     * @return {Promise<pgPromise.queryResult>} - a corresponding review where the done field is set to false.
+     */
+    public static executeUnSubmitReview(reviewId: number) {
+        const statement = new PreparedStatement("unsubmit-review",
+            "UPDATE review SET done=false WHERE id = $1 RETURNING *");
+        statement.values = [reviewId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
      * Execute an 'insert mpc answer' query.
      * @param {number} answerOption - a 1 char answer.
      * @param {number} questionId - a question id.

@@ -77,14 +77,16 @@
                 <b-card-body v-if="!peerReview.review.done">
                     <b-btn type="submit" variant="success float-right" v-b-modal="`submit${peerReview.review.id}`">Submit Review</b-btn>
                     <b-button variant="secondary float-right mr-2" @click="savePeerReview">Save Review</b-button>
+                    <!--Submit Modal-->
+                    <b-modal    :id="`submit${peerReview.review.id}`"
+                                title="Submit Confirmation"
+                                @ok="submitPeerReview">
+                        Do you really want to submit? This marks the review as finished.
+                    </b-modal>
                 </b-card-body>
-
-                <!--Submit Modal-->
-                <b-modal    :id="`submit${peerReview.review.id}`"
-                            title="Submit Confirmation"
-                            @ok="submitPeerReview">
-                    Do you really want to submit? You can not submit a review again.
-                </b-modal>
+                <b-card-body v-else>
+                    <b-button variant="outline-success float-right" @click="unSubmitPeerReview">UnSubmit Review</b-button>
+                </b-card-body>
             </template>
 
         </b-card>
@@ -177,6 +179,16 @@ export default {
             }
             await this.fetchPeerReview()
             this.showSaveMessage()
+        },
+        async unSubmitPeerReview() {
+            // unSubmit peer review.
+            try {
+                await api.unSubmitPeerReview(this.peerReview)
+                await this.fetchPeerReview()
+                this.showUnSubmitMessage()
+            } catch (error) {
+                this.showErrorMessage({message: "Error unsubmitting peer review."})
+            }
         },
         transformOptionsToHTMLOptions(options) {
             // Transforms the option array from the API to a HTML option array.

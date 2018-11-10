@@ -64,6 +64,9 @@ export default {
     submitPeerReview(peerReview) {
         return client.get(`/reviews/${peerReview.review.id}/submit`)
     },
+    unSubmitPeerReview(peerReview) {
+        return client.get(`/reviews/${peerReview.review.id}/unsubmit`)
+    },
     getAuthenticated: async() => {
         return client.get('authenticated')
     },
