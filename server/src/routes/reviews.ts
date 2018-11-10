@@ -62,6 +62,17 @@ router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, 
 });
 
 /**
+ * Unsubmit a review by id.
+ * @param reviewId - an id of a review.
+ * @return database return value.
+ */
+router.route("/:reviewId/unsubmit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewBetweenPublishDue, async (req, res) => {
+    const reviewId = req.params.reviewId;
+    const result = await ReviewsPS.executeUnSubmitReview(reviewId);
+    res.json(result);
+});
+
+/**
  * Get all review comments.
  * @param reviewId - an id of a review.
  * @return database return value.
