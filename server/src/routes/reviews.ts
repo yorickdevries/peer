@@ -56,7 +56,8 @@ router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, 
         const result = await ReviewsPS.executeSubmitReview(reviewId);
         res.json(result);
     } else {
-        res.sendStatus(400);
+        res.status(400);
+        res.json({error: "Review not completely filled in"});
     }
 });
 
