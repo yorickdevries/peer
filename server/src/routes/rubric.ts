@@ -261,15 +261,7 @@ router.get("/:rubric_assignment_id/submitallfilledreviews", index.authorization.
                 continue;
             }
             const reviewId = allReviews[i].id;
-            const review: any = await ReviewUpdate.getReview(reviewId);
-            const reviewForm = review.form;
-            let reviewFilled = true;
-            for (let j = 0; j < reviewForm.length; j++) {
-                const answer = reviewForm[j].answer.answer;
-                if (answer == undefined) {
-                    reviewFilled = false;
-                }
-            }
+            const reviewFilled = ReviewUpdate.isCompletelyFilledIn(reviewId);
             // in case the review is filled, but not submitted, submit it
             if (reviewFilled) {
                 await ReviewPS.executeSubmitReview(reviewId);

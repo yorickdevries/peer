@@ -49,13 +49,15 @@ router.route("/:reviewId").put(index.authorization.checkReviewOwner, index.autho
  * @param reviewId - an id of a review.
  * @return database return value.
  */
-router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewBetweenPublishDue, (req, res) => {
-    ReviewsPS.executeSubmitReview(req.params.reviewId)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
+router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewBetweenPublishDue, async (req, res) => {
+    const reviewId = req.params.reviewId;
+    const reviewFilled = ReviewUpdate.isCompletelyFilledIn(reviewId);
+    if (reviewFilled) {
+        const res = await ReviewsPS.executeSubmitReview(reviewId);
+        res.json(res);
+    } else {
         res.sendStatus(400);
-    });
+    }
 });
 
 /**
