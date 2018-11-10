@@ -53,8 +53,8 @@ router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, 
     const reviewId = req.params.reviewId;
     const reviewFilled = await ReviewUpdate.isCompletelyFilledIn(reviewId);
     if (reviewFilled) {
-        const res = await ReviewsPS.executeSubmitReview(reviewId);
-        res.json(res);
+        const result = await ReviewsPS.executeSubmitReview(reviewId);
+        res.json(result);
     } else {
         res.sendStatus(400);
     }
