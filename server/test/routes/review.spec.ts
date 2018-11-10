@@ -103,20 +103,9 @@ describe("API review routes", () => {
     });
 
     /**
-     * Tests whether review get submitted
+     * Put and submit a review
      */
-    it("submit review/", async () => {
-        mockDate.set("2018-05-02T21:00:00Z");
-        MockLogin.initialize("henkjan");
-        const res = await chai.request(router).get("/1/submit");
-        expect(res.status).to.equal(200);
-        expect(JSON.parse(res.text)[0].id).to.equal(1);
-    });
-
-    /**
-     * Put a review
-     */
-    it("Put review/", async () => {
+    it("Put and submit review", async () => {
         mockDate.set("2018-05-02T21:00:00Z");
         MockLogin.initialize("henkjan");
 
@@ -142,6 +131,22 @@ describe("API review routes", () => {
                         }, {"id": 3, "option": "By asking Brian", "mcquestion_id": 1}]
                     }, "answer": {"answer": 1, "mcquestion_id": 1, "review_id": 1}
                 }, {
+                    "answer": {"answer": 4, "mcquestion_id": 2, "review_id": 1},
+                    "question": {
+                      "id": 2,
+                      "option": [
+                        {
+                          "id": 4,
+                          "mcquestion_id": 2,
+                          "option": "A"
+                        }
+                      ],
+                      "question": "Is the right Answer A?",
+                      "question_number": 4,
+                      "rubric_assignment_id": 1,
+                      "type_question": "mc"
+                    }
+                  }, {
                     "question": {
                         "id": 1,
                         "question": "How to insert queries?",
@@ -197,7 +202,7 @@ describe("API review routes", () => {
                   }
                 },
                 {
-                  "answer": {},
+                  "answer": {"answer": 4, "mcquestion_id": 2, "review_id": 1},
                   "question": {
                     "id": 2,
                     "option": [
@@ -252,6 +257,9 @@ describe("API review routes", () => {
                 "rubric_assignment_id": 1
               }
             });
+        const result2 = await chai.request(router).get("/1/submit");
+        expect(result2.status).to.equal(200);
+        expect(JSON.parse(result2.text)[0].id).to.equal(1);
     });
 
 
