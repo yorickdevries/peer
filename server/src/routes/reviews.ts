@@ -51,7 +51,7 @@ router.route("/:reviewId").put(index.authorization.checkReviewOwner, index.autho
  */
 router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewBetweenPublishDue, async (req, res) => {
     const reviewId = req.params.reviewId;
-    const reviewFilled = ReviewUpdate.isCompletelyFilledIn(reviewId);
+    const reviewFilled = await ReviewUpdate.isCompletelyFilledIn(reviewId);
     if (reviewFilled) {
         const res = await ReviewsPS.executeSubmitReview(reviewId);
         res.json(res);
