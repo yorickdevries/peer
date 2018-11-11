@@ -177,8 +177,9 @@ router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck,
             enroll = await CoursesPS.executeSetRole(req.params.courseId, netid, req.body.role);
         }
         res.json({ courseId: enroll.course_id, role: enroll.role });
-    } catch {
-        res.sendStatus(400);
+    } catch (e) {
+        res.status(400);
+        res.json({error: e.message});
     }
 });
 
