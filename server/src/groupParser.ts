@@ -3,6 +3,7 @@ import GroupPS from "./prepared_statements/group_ps";
 import UserPS from "./prepared_statements/user_ps";
 import AssignmentPS from "./prepared_statements/assignment_ps";
 import CoursesPS from "./prepared_statements/courses_ps";
+import ParseNetId from "./parseNetid";
 
 /**
  * Enables parsing of Group files in CSV format.
@@ -37,15 +38,7 @@ export default class GroupParser {
         const allStudents: string[] = [];
         for (const student of studentlist) {
             const currentStudent = student.Username;
-            // in case the student doesnt have a Username field
-            if (currentStudent == undefined) {
-                throw new Error("The file is improperly formatted");
-            }
-            // in case the student doesnt have a Username field
-            if (currentStudent == "") {
-                throw new Error("One student has no username");
-            }
-            const netId = currentStudent.split("@")[0].toLowerCase();
+            const netId = ParseNetId.parseNetId(currentStudent);
             if (allStudents.indexOf(netId) >= 0) {
                 throw new Error("Duplicate student: " + netId);
             }
@@ -125,11 +118,11 @@ export default class GroupParser {
             // In case there is already a list in the map
             if (currentStudentList !== undefined) {
                 // add username without @ adress
-                const netid = currentStudent.split("@")[0].toLowerCase();
+                const netid = ParseNetId.parseNetId(currentStudent);
                 currentStudentList.push(netid);
             } else {
                 // initialize list with this student
-                const netid = currentStudent.split("@")[0].toLowerCase();
+                const netid = ParseNetId.parseNetId(currentStudent);
                 result.set(student[groupColumn], [netid]);
             }
         });

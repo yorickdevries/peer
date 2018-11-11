@@ -4,6 +4,7 @@ import fileCache from "file-system-cache";
 import { fetch, toPassportConfig } from "passport-saml-metadata";
 import passport_saml from "passport-saml";
 import config from "./config";
+import ParseNetId from "./parseNetid";
 
 const samlStrategy = passport_saml.Strategy;
 const backupStore = fileCache({ basePath: os.tmpdir() });
@@ -36,7 +37,7 @@ const passportConfiguration = function(passport: any) {
       function (profile: any, done: any) {
           return done(undefined,
             {
-              netid: profile["urn:mace:dir:attribute-def:uid"].toLowerCase(),
+              netid: ParseNetId.parseNetId(profile["urn:mace:dir:attribute-def:uid"]),
               studentNumber: profile["tudStudentNumber"],
               firstName: profile["givenName"],
               prefix: profile["tudPrefix"],

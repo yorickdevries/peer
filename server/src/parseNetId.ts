@@ -15,7 +15,7 @@ export default class ParseNetId {
             throw new Error("NetId is an empty string");
         }
         const parsedNetId = netId.split("@")[0].toLowerCase();
-        if (/^[a-z]+$/.test(parsedNetId)) {
+        if (!/^[a-z]+$/.test(parsedNetId)) {
             throw new Error("NetId contains an invalid character: " + parsedNetId);
         }
         return parsedNetId;

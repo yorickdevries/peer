@@ -9,6 +9,7 @@ import index from "../security/index";
 import express from "express";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
+import ParseNetId from "../parseNetid";
 const router = express();
 router.use(bodyParser.json());
 
@@ -73,7 +74,7 @@ router.delete("/:id", index.authorization.isAuthorizedToEditGroup, async (req: a
  */
 router.delete("/:id/users/:userNetID", index.authorization.isAuthorizedToEditGroup, async (req: any, res) => {
     try {
-        const netid = req.params.userNetID.toLowerCase();
+        const netid = ParseNetId.parseNetId(req.params.userNetID);
         await GroupsPS.executeDeleteGroupMember(req.params.id, netid);
         res.sendStatus(200);
     } catch (e) {
@@ -89,7 +90,7 @@ router.delete("/:id/users/:userNetID", index.authorization.isAuthorizedToEditGro
  */
 router.post("/:id/users", index.authorization.isAuthorizedToEditGroup, async (req: any, res) => {
     try {
-        const netid = req.body.user_netid.toLowerCase();
+        const netid = ParseNetId.parseNetId(req.body.user_netid);
         if (netid.length == 0) {
             throw new Error("NetID is empty");
         }
