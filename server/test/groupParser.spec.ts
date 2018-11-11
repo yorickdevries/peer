@@ -32,8 +32,8 @@ describe("GroupParser tests", () => {
         const groupColumn = "Education Groups";
         const assignmentId = 3;
         const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
-        expect(result).to.deep.equal([{ groupId: 1, groupname: "ED 4" },
-        { groupId: 2, groupname: "ED 3" }]);
+        expect(result).to.deep.equal([{ groupId: 25, groupname: "ED 4" },
+        { groupId: 26, groupname: "ED 3" }]);
     });
 
     it("normal import with groupnumbers", async () => {
@@ -43,8 +43,8 @@ describe("GroupParser tests", () => {
         const groupColumn = "Education Groups";
         const assignmentId = 3;
         const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
-        expect(result).to.deep.equal([{ groupId: 1, groupname: "4" },
-        { groupId: 2, groupname: "ED 3" }]);
+        expect(result).to.deep.equal([{ groupId: 25, groupname: "4" },
+        { groupId: 26, groupname: "ED 3" }]);
     });
 
     /**
