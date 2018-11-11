@@ -13,7 +13,11 @@ export default class ReviewDistributionTwoAssignments {
      * Distribute reviews for two specific assignments
      */
     public static async distributeReviews(assignmentId1: number, assignmentId2: number, reviewsPerUser: number) {
-        // Check for a rubric entry for
+        if (assignmentId1 == assignmentId2) {
+            throw new Error("Two distinct assignments are required");
+        }
+
+        // Check for a rubric entry for both assignments
         const rubricExists1: any = await RubricPS.executeExistsRubricByAssignmentId(assignmentId1);
         const rubricExists2: any = await RubricPS.executeExistsRubricByAssignmentId(assignmentId2);
         if (!rubricExists1.exists || !rubricExists2.exists) {
@@ -24,7 +28,7 @@ export default class ReviewDistributionTwoAssignments {
         const assignment2 = await AssignmentPS.executeGetAssignmentById(assignmentId2);
         // check whether the assignments are due
         if (new Date(assignment1.due_date) > new Date() || new Date(assignment2.due_date) > new Date()) {
-            throw new Error("One of the assignments isn't due yet");
+            throw new Error("One or both of the assignments isn't due yet");
         }
 
         // Distribution of reviews for assignment
@@ -43,7 +47,7 @@ export default class ReviewDistributionTwoAssignments {
         const existingReviews1: any = await ReviewPS.executeGetReviewsByAssignmentId(assignmentId1);
         const existingReviews2: any = await ReviewPS.executeGetReviewsByAssignmentId(assignmentId2);
         if (existingReviews1.length !== 0 || existingReviews2.length !== 0) {
-            throw new Error("There are already reviews assigned for this assignment");
+            throw new Error("There are already reviews assigned for one or both assignments");
         }
 
         // Add the review assignments to the database
@@ -62,7 +66,7 @@ export default class ReviewDistributionTwoAssignments {
         const allSubmissions1: any = await SubmissionsPS.executeGetLatestSubmissionsByAssignmentId(assignmentId1);
         const allSubmissions2: any = await SubmissionsPS.executeGetLatestSubmissionsByAssignmentId(assignmentId2);
 
-        // all submissions
+        // List of all submissions
         const allSubmissions = [];
         for (const submission of allSubmissions1) {
             allSubmissions.push(submission);
@@ -71,29 +75,21 @@ export default class ReviewDistributionTwoAssignments {
             allSubmissions.push(submission);
         }
 
-        // If there are less submissions than required to review per person, then no division can be made
+        // When there are less submissions than required to review per person, then no division can be made
         if (allSubmissions1.length + allSubmissions2.length - 1 < reviewsPerUser) {
             throw new Error("There are not enough submissions to assign the required amount of reviewsPerUser: " + reviewsPerUser);
         }
 
-        // user tuple list
+        // user tuple list, including assignment number
         const allUsers1 = await this.allUsersOfSubmissions(allSubmissions1, assignmentId1);
         const allUsers2 = await this.allUsersOfSubmissions(allSubmissions2, assignmentId2);
-        // all users
-        const allUsers = [];
-        for (const user of allUsers1) {
-            allUsers.push(user);
-        }
-        for (const user of allUsers2) {
-            allUsers.push(user);
-        }
 
         // If there are less users * reviews per user than submissions
         // then no division can be made
         if ((allSubmissions1.length + allSubmissions2.length) > ((allUsers1.length + allUsers2.length) * reviewsPerUser)) {
-            throw new Error("There are not enough users for the amount of submissions");
+            throw new Error("There are not enough users for the number of submissions");
         }
-        // calculate the minimum amount of reviews per submission
+        // calculate the minimum number of reviews per submission
         const minimalNumberOfReviewsPerSubmission =
             Math.floor(
             ((allUsers1.length + allUsers2.length) * reviewsPerUser)
@@ -101,36 +97,37 @@ export default class ReviewDistributionTwoAssignments {
             (allSubmissions1.length + allSubmissions2.length)
             );
 
-        // Reviewers for A1
+        // Reviewers from A2 for submissions of A1
         const numberOfReviewsPerSubmission1 =
             (allUsers2.length * reviewsPerUser)
             /
             (allSubmissions1.length);
-        // Reviewers for A2
+        // Reviewers from A1 for submissions of A2
         const numberOfReviewsPerSubmission2 =
             (allUsers1.length * reviewsPerUser)
             /
             (allSubmissions2.length);
 
-        let reviews: any[] = [];
+        // assign reviews
+        const reviews: any[] = [];
         if (numberOfReviewsPerSubmission1 <= numberOfReviewsPerSubmission2) {
-            // start with dividing for assignment 1
-            reviews = this.assignReviews(allUsers2, allSubmissions1, reviewsPerUser, reviews);
-            // then divide the remaining reviews of allUsers1 over all submissions
-            reviews = this.assignReviews(allUsers1, allSubmissions, reviewsPerUser, reviews);
+            // start with distributing for assignment 1
+            this.assignReviews(allUsers2, allSubmissions1, reviewsPerUser, reviews);
+            // then distribute the remaining reviews of allUsers1 over all submissions
+            this.assignReviews(allUsers1, allSubmissions, reviewsPerUser, reviews);
         } else {
-            // start with dividing for assignment 2
-            reviews = this.assignReviews(allUsers1, allSubmissions2, reviewsPerUser, reviews);
-            // then divide the remaining reviews of allUsers1 over all submissions
-            reviews = this.assignReviews(allUsers2, allSubmissions, reviewsPerUser, reviews);
+            // start with distributing for assignment 2
+            this.assignReviews(allUsers1, allSubmissions2, reviewsPerUser, reviews);
+            // then distribute the remaining reviews of allUsers2 over all submissions
+            this.assignReviews(allUsers2, allSubmissions, reviewsPerUser, reviews);
         }
 
-        // Check afterwards
+        // Check afterwards for valid distribution
         // make a submissionCount of all submissions
         const submissionCount = this.makeCountList(undefined, undefined, allSubmissions, reviews);
         // sort submissions from low to high
         this.sortSubmissionCount(submissionCount);
-        // In case there is a submission without assignment return undefined
+        // In case there is a submission without assignment return undefined and try again
         if (submissionCount[0].count < minimalNumberOfReviewsPerSubmission) {
             return undefined;
         } else {
@@ -161,7 +158,7 @@ export default class ReviewDistributionTwoAssignments {
     }
 
     /**
-     * Counts the amount of assigned reviews to a certain submission
+     * Counts the number of assigned reviews to a certain submission
      * @param {number} submissionId
      * @param {any[]} reviews
      * @returns
@@ -216,15 +213,15 @@ export default class ReviewDistributionTwoAssignments {
     }
 
     /**
-     * Sorts submissions based on the submissioncount
+     * Sorts submissions based on the assignmentID, putting the specified assignmentId last in the list
      * @param {any[]} submissions
      * @returns
      */
     public static sortAssignmentIdCount(submissions: any[], assignmentId: number) {
         const compare = function(a: any, b: any) {
-            if (a.submission.rubric_assignment_id !== assignmentId && b.submission.rubric_assignment_id == assignmentId)
+            if (a.submission.assignment_id !== assignmentId && b.submission.assignment_id == assignmentId)
                 return -1;
-            if (a.submission.rubric_assignment_id == assignmentId && b.submission.rubric_assignment_id !== assignmentId)
+            if (a.submission.assignment_id == assignmentId && b.submission.assignment_id !== assignmentId)
                 return 1;
             return 0;
         };
@@ -252,25 +249,25 @@ export default class ReviewDistributionTwoAssignments {
     /**
      * Assign reviews
      */
-    public static assignReviews(allUsers: any[], allSubmissions: any[], reviewsPerUser: number, reviews: any[]) {
+    public static assignReviews(users: any[], submissions: any[], reviewsPerUser: number, reviews: any[]) {
         // Shuffle all the users
-        this.shuffle(allUsers);
+        this.shuffle(users);
         // make a certain amount of reviews per user
         for (let k = 0; k < reviewsPerUser; k++) {
-            for (const user of allUsers) {
+            for (const user of users) {
                 // make a list of all potential submissions
-                const otherSubmissions = this.makeCountList(user.userNetId, user.groupId, allSubmissions, reviews);
+                const otherSubmissions = this.makeCountList(user.userNetId, user.groupId, submissions, reviews);
                 // Shuffle all the submissions
                 this.shuffle(otherSubmissions);
                 // Sort entries based on the assignmentId, putting the assignments unequal to the user assignment first
                 this.sortAssignmentIdCount(otherSubmissions, user.assignmentId);
                 // Sort the submissions based on reviewcount
-                // Entries with the same reviewcount remain shuffled relative to eachother
+                // Entries with the same reviewcount/assignmentid remain shuffled relative to eachother
                 this.sortSubmissionCount(otherSubmissions);
                 // Get the first submission of the list
                 const submission = otherSubmissions[0].submission;
                 // Add reviews to result list
-                const review = {userNetId: user.userNetId, submissionId: submission.id, assignmentId: submission.rubric_assignment_id};
+                const review = {userNetId: user.userNetId, submissionId: submission.id, assignmentId: submission.assignment_id};
                 reviews.push(review);
             }
         }
