@@ -82,6 +82,23 @@ const enrolledAsTeacherAssignmentCheck = async (req: any, res: any, next: any) =
 };
 
 /**
+ * Check whether a user in enrolled as teacher
+ */
+const enrolledAsTeacherTwoAssignmentsCheck = async (req: any, res: any, next: any) => {
+    try {
+        const assignment1 = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id1);
+        const assignment2 = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id2);
+        if (assignment1.course_id != assignment2.course_id) {
+            throw new Error("Different courses");
+        }
+        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment1.course_id, req.user.netid);
+        response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
  * Check whether a user in enrolled as teacher for post and put
  */
 const enrolledAsTeacherAssignmentCheckForPost = async (req: any, res: any, next: any) => {
@@ -493,5 +510,6 @@ export default {
     checkRubricAuthorization,
     isAuthorizedToEditGroup,
     checkReviewBetweenPublishDue,
-    checkSubmissionBetweenPublishDue
+    checkSubmissionBetweenPublishDue,
+    enrolledAsTeacherTwoAssignmentsCheck
 };
