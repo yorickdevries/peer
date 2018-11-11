@@ -182,7 +182,7 @@ INSERT INTO public.submission(
 	    ('henkjan', 10, 1, 'submission2.pdf', '2018-05-01T20:30:16Z'),
 	    ('henkjan', 12, 2, 'submission2.pdf', '2018-05-01T20:30:17Z'),
 	    ('henkjan', 12, 3, 'submission2.pdf', '2018-05-01T20:30:18Z'),
-	    ('henkjan', 12, 4, 'submission2.pdf', '2018-05-01T20:30:19Z'),
+	    ('henkjan', 13, 4, 'submission2.pdf', '2018-05-01T20:30:19Z'),
 	    ('henkjan', 12, 5, 'submission2.pdf', '2018-05-01T20:30:20Z'),
 	    ('henkjan', 12, 6, 'submission2.pdf', '2018-05-01T20:30:21Z'),
 	    ('henkjan', 12, 7, 'submission2.pdf', '2018-05-01T20:30:22Z'),

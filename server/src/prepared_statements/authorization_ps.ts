@@ -213,6 +213,22 @@ export default class AuthorizationPS {
     }
 
     /**
+     * Checks if the user is a teacher for the course the group is in
+     * @param {String} netId - net id of the user.
+     * @param {number} groupId - group id.
+     * @return {any} true or false as pg promise.
+     */
+    public static isTeacherForGroup(netId: String, groupId: number): any {
+        const statement = new PreparedStatement("Check-if-netid-is-Teacher-for-group",
+            "SELECT EXISTS(SELECT * FROM grouplist, assignmentgroup, assignmentlist, enroll " +
+            "WHERE grouplist.id = assignmentgroup.group_id AND assignmentgroup.assignment_id = assignmentlist.id " +
+            "AND enroll.role = 'teacher' AND assignmentlist.course_id = enroll.course_id " +
+            "AND enroll.user_netid = $1 AND grouplist.id = $2)");
+        statement.values = [netId, groupId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Checks if the student is in a certain group
      * @param {String} netId - net id of the user.
      * @param {number} groupId - group id of the user.

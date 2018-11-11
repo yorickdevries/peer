@@ -135,6 +135,7 @@ INSERT INTO public.enroll(
 	VALUES (1, 'paulvanderlaan', 'student'),
 	(1, 'bplanje', 'teacher'),
 	(2, 'bplanje', 'teacher'),
+	(3, 'bplanje', 'teacher'),
 	(3, 'henkjan', 'student')
 	;
 

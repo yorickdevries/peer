@@ -31,6 +31,18 @@ export default class GroupsPS {
     }
 
     /**
+     * Prepared statement that gets assignment of a group
+     * @param {number} id - group_id.
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeGetAssignmentOfGroupById(id: number): any {
+        const statement = new PreparedStatement("get-assignment-of-group",
+            'SELECT * FROM "assignmentgroup" WHERE "group_id" = $1');
+        statement.values = [id];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Prepared statement function that adds a group to the database.
      * @param {string} name - name of the group.
      * @returns {Promise<pgPromise.queryResult>}
@@ -52,6 +64,19 @@ export default class GroupsPS {
         const statement = new PreparedStatement("add-group-to-assignment",
             'INSERT INTO "assignmentgroup" ("assignment_id", "group_id") VALUES ($1, $2) ' +
             "RETURNING assignment_id, group_id");
+        statement.values = [assignmentId, groupId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Prepared statement function that deletes a group from an assignment
+     * @param {number} groupId - group_id
+     * @param {number} assignmentId - assignment_id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteGroupfromAssignment(groupId: number, assignmentId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("delete-group-from-assignment",
+            'DELETE FROM "assignmentgroup" WHERE "assignment_id" = $1 AND "group_id" = $2 RETURNING *');
         statement.values = [assignmentId, groupId];
         return Database.executeQuerySingleResult(statement);
     }

@@ -329,8 +329,8 @@ const isAuthorizedToViewGroup = async (req: any, res: any, next: any) => {
  */
 const isAuthorizedToEditGroup = async (req: any, res: any, next: any) => {
     try {
-        const authCheckTATeacher = await AuthorizationPS.isTAOrTeacherForGroup(req.user.netid, req.params.id);
-        const authCheck = authCheckTATeacher.exists;
+        const authCheckTeacher = await AuthorizationPS.isTeacherForGroup(req.user.netid, req.params.id);
+        const authCheck = authCheckTeacher.exists;
         await response(res, authCheck, next);
     } catch (error) {
         res.sendStatus(401);
