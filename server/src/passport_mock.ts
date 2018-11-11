@@ -1,9 +1,10 @@
 // Mock the login of an user for development purposes
 import MockStrategy from "passport-mock-strategy";
+import ParseNetId from "./parseNetId";
 
 const mockPassportConfiguration = function(passport: any, netid: string, affiliation: string) {
   const userobject: any = {
-    netid: netid.toLowerCase(),
+    netid: ParseNetId.parseNetId(netid),
     studentNumber: 1234567,
     firstName: "First",
     prefix: "and",
