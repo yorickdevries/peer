@@ -46,11 +46,8 @@ INSERT INTO public.grouplist(group_name)
 	('Group 20'),
 	('Group 21'),
 	('Group 22'),
-	('Group 23');
-
-INSERT INTO public.grouplist(
-	id, group_name)
-	VALUES (24, 'Group 24');
+	('Group 23'),
+	('Group 24');
 
 INSERT INTO public.groupusers(
 	User_netid, Group_groupid)
