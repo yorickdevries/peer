@@ -9,7 +9,7 @@ import index from "../security/index";
 import express from "express";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
-import ParseNetId from "../parseNetid";
+import ParseNetId from "../parseNetId";
 const router = express();
 router.use(bodyParser.json());
 

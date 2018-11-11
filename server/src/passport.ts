@@ -4,7 +4,7 @@ import fileCache from "file-system-cache";
 import { fetch, toPassportConfig } from "passport-saml-metadata";
 import passport_saml from "passport-saml";
 import config from "./config";
-import ParseNetId from "./parseNetid";
+import ParseNetId from "./parseNetId";
 
 const samlStrategy = passport_saml.Strategy;
 const backupStore = fileCache({ basePath: os.tmpdir() });

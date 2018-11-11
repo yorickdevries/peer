@@ -10,7 +10,7 @@ import express from "express";
 import ExportResultsPS from "../prepared_statements/export_results_ps";
 import CSVExport from "../CSVExport";
 import UserPS from "../prepared_statements/user_ps";
-import ParseNetId from "../parseNetid";
+import ParseNetId from "../parseNetId";
 const router = express();
 router.use(bodyParser.json());
 

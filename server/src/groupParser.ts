@@ -3,7 +3,7 @@ import GroupPS from "./prepared_statements/group_ps";
 import UserPS from "./prepared_statements/user_ps";
 import AssignmentPS from "./prepared_statements/assignment_ps";
 import CoursesPS from "./prepared_statements/courses_ps";
-import ParseNetId from "./parseNetid";
+import ParseNetId from "./parseNetId";
 
 /**
  * Enables parsing of Group files in CSV format.
