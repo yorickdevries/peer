@@ -19,13 +19,21 @@ INSERT INTO public.courselist(
         ('Data modeling is a process used to define and analyze data requirements needed to support the business processes within the scope of corresponding information systems in organizations. Therefore, the process of data modeling involves professional data modelers working closely with business stakeholders, as well as potential users of the information system.', 'Information and Data Modeling'),
         ('In this real-world-tested curriculum, take a look at famous algorithms and equations, and see how yours stack up. See practical demos, compare “life scenarios” to their coding counterparts, and create an app for your final project.', 'Algorithms and Data structures');
 
-INSERT INTO public.grouplist(
-	id, group_name)
+INSERT INTO public.grouplist(group_name)
 	VALUES
-	(10, 'ED-3'),
-	(11, 'ED-4'),
-	(12, 'ED-5'),
-	(13, 'ED-6')
+	('Group 1'),
+	('Group 2'),
+	('Group 3'),
+	('Group 4'),
+	('Group 5'),
+	('Group 6'),
+	('Group 7'),
+	('Group 8'),
+	('Group 9'),
+	('ED-3'),
+	('ED-4'),
+	('ED-5'),
+	('ED-6')
 	;
 
 INSERT INTO public.assignmentlist(

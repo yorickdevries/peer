@@ -3,6 +3,7 @@ import GroupsPS from "./prepared_statements/group_ps";
 import AssignmentPS from "./prepared_statements/assignment_ps";
 import ReviewPS from "./prepared_statements/review_ps";
 import RubricPS from "./prepared_statements/rubric_ps";
+import GroupParser from "./groupParser";
 
 /**
  * Class which takes care of the distribution of all reviews over the students across TWO assignments
@@ -53,6 +54,13 @@ export default class ReviewDistributionTwoAssignments {
         // Add the review assignments to the database
         for (const review of reviews) {
             await ReviewPS.executeCreateReview(review.userNetId, review.submissionId, review.assignmentId);
+            // enroll in assignment if not already
+            const studentIsInGroup = await GroupParser.studentIsInGroup(review.userNetId, review.assignmentId);
+            if (!studentIsInGroup) {
+                // Create group and add assignment and student.
+                const groupId = await GroupParser.createGroupForAssignment(review.userNetId, review.assignmentId);
+                await GroupsPS.executeAddStudenttoGroup(review.userNetId, groupId);
+            }
         }
         // Return a list of made reviews
         return reviews;
