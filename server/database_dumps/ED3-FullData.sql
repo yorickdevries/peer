@@ -33,8 +33,7 @@ INSERT INTO public.grouplist(group_name)
 	('ED-3'),
 	('ED-4'),
 	('ED-5'),
-	('ED-6')
-	;
+	('ED-6');
 
 INSERT INTO public.assignmentlist(
 	title, description, course_id, reviews_per_user, filename, publish_date, due_date, review_publish_date, review_due_date, one_person_groups)
