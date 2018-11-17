@@ -12,6 +12,7 @@ import ExportResultsPS from "../prepared_statements/export_results_ps";
 import CSVExport from "../CSVExport";
 import GroupParser from "../groupParser";
 import reviewDistribution from "../reviewDistribution";
+import ReviewDistributionTwoAssignments from "../reviewDistributionTwoAssignments";
 import bodyParser from "body-parser";
 import config from "../config";
 
@@ -286,8 +287,22 @@ router.route("/:assignment_id/reviews")
  * Route to distribute reviews for a certain assignment
  */
 router.route("/:assignment_id/distributeReviews")
-    .get(index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
+    .get(index.authorization.enrolledAsTeacherAssignmentCheck, (req: any, res) => {
         reviewDistribution.distributeReviews(req.params.assignment_id)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.status(400);
+            res.json({error: error.message});
+        });
+    });
+
+/**
+ * Route to distribute reviews between two assignments
+ */
+router.route("/distributeReviewsTwoAssignments/:assignment_id1/:assignment_id2/:reviews_per_user")
+    .get(index.authorization.enrolledAsTeacherTwoAssignmentsCheck, (req: any, res) => {
+        ReviewDistributionTwoAssignments.distributeReviews(req.params.assignment_id1, req.params.assignment_id2, req.params.reviews_per_user)
         .then((data) => {
             res.json(data);
         }).catch((error) => {
@@ -299,7 +314,7 @@ router.route("/:assignment_id/distributeReviews")
 /**
  * Route to import groups for a specific assignment.
  */
-router.post("/:assignment_id/importgroups", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
+router.post("/:assignment_id/importgroups", index.authorization.enrolledAsTeacherAssignmentCheck, (req: any, res) => {
     // File upload handling
     uploadGroups(req, res, function (err) {
         // Error in case of wrong file type

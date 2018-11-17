@@ -39,6 +39,23 @@ export default class ReviewUpdate {
     }
 
     /**
+     * Get a boolean whether the review is completely filled in.
+     * @param {number} reviewId
+     * @returns boolean whether the review is completely filled in.
+     */
+    public static async isCompletelyFilledIn(reviewId: number) {
+        const review: any = await this.getReview(reviewId);
+        const reviewForm = review.form;
+        for (let j = 0; j < reviewForm.length; j++) {
+            const answer = reviewForm[j].answer.answer;
+            if (answer == undefined) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Update a review
      * @param {number} reviewId
      * @param {any[]} inputForm

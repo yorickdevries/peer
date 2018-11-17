@@ -32,8 +32,8 @@ describe("GroupParser tests", () => {
         const groupColumn = "Education Groups";
         const assignmentId = 3;
         const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
-        expect(result).to.deep.equal([{ groupId: 1, groupname: "ED 4" },
-        { groupId: 2, groupname: "ED 3" }]);
+        expect(result).to.deep.equal([{ groupId: 25, groupname: "ED 4" },
+        { groupId: 26, groupname: "ED 3" }]);
     });
 
     it("normal import with groupnumbers", async () => {
@@ -43,8 +43,8 @@ describe("GroupParser tests", () => {
         const groupColumn = "Education Groups";
         const assignmentId = 3;
         const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
-        expect(result).to.deep.equal([{ groupId: 1, groupname: "4" },
-        { groupId: 2, groupname: "ED 3" }]);
+        expect(result).to.deep.equal([{ groupId: 25, groupname: "4" },
+        { groupId: 26, groupname: "ED 3" }]);
     });
 
     /**
@@ -57,7 +57,7 @@ describe("GroupParser tests", () => {
         const groupColumn = "Education Groups";
         const assignmentId = 3;
         await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
-        .to.eventually.be.rejectedWith("The file is improperly formatted");
+        .to.eventually.be.rejectedWith("NetId is undefined");
     });
 
     it("students misses a group field", async () => {
@@ -77,7 +77,7 @@ describe("GroupParser tests", () => {
         const groupColumn = "Education Groups";
         const assignmentId = 3;
         await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
-        .to.eventually.be.rejectedWith("The file is improperly formatted");
+        .to.eventually.be.rejectedWith("NetId is undefined");
     });
 
     it("student has no username field", async () => {
@@ -87,7 +87,7 @@ describe("GroupParser tests", () => {
         const groupColumn = "Education Groups";
         const assignmentId = 3;
         await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
-        .to.eventually.be.rejectedWith("One student has no username");
+        .to.eventually.be.rejectedWith("NetId is an empty string");
     });
 
     it("some netids are without @ symbol", async () => {

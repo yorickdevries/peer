@@ -10,6 +10,7 @@ import express from "express";
 import ExportResultsPS from "../prepared_statements/export_results_ps";
 import CSVExport from "../CSVExport";
 import UserPS from "../prepared_statements/user_ps";
+import ParseNetId from "../parseNetId";
 const router = express();
 router.use(bodyParser.json());
 
@@ -150,7 +151,7 @@ router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck,
         if (!(req.body.role in Roles)) {
             throw new Error("Invalid role");
         }
-        const netid = req.body.netid.toLowerCase();
+        const netid = ParseNetId.parseNetId(req.body.netid);
         if (netid === req.user.netid) {
             throw new Error("You cannot change your own role");
         }
@@ -176,8 +177,9 @@ router.put("/:courseId/setRole", index.authorization.enrolledCourseTeacherCheck,
             enroll = await CoursesPS.executeSetRole(req.params.courseId, netid, req.body.role);
         }
         res.json({ courseId: enroll.course_id, role: enroll.role });
-    } catch {
-        res.sendStatus(400);
+    } catch (e) {
+        res.status(400);
+        res.json({error: e.message});
     }
 });
 

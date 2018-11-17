@@ -22,29 +22,32 @@ INSERT INTO public.courselist(
 	('Test-course', 'ED-4'),
 	('Test-course2', 'ED-5');
 
-INSERT INTO public.grouplist(
-	id, group_name)
-	VALUES (10, 'ED-3');
-
-INSERT INTO public.grouplist(
-	id, group_name)
-	VALUES (20, 'Group 20');
-
-INSERT INTO public.grouplist(
-	id, group_name)
-	VALUES (21, 'Group 21');
-
-INSERT INTO public.grouplist(
-	id, group_name)
-	VALUES (22, 'Group 22');
-
-INSERT INTO public.grouplist(
-	id, group_name)
-	VALUES (23, 'Group 23');
-
-INSERT INTO public.grouplist(
-	id, group_name)
-	VALUES (24, 'Group 24');
+INSERT INTO public.grouplist(group_name)
+	VALUES
+	('Group 1'),
+	('Group 2'),
+	('Group 3'),
+	('Group 4'),
+	('Group 5'),
+	('Group 6'),
+	('Group 7'),
+	('Group 8'),
+	('Group 9'),
+	('ED-3'),
+	('Group 11'),
+	('Group 12'),
+	('Group 13'),
+	('Group 14'),
+	('Group 15'),
+	('Group 16'),
+	('Group 17'),
+	('Group 18'),
+	('Group 19'),
+	('Group 20'),
+	('Group 21'),
+	('Group 22'),
+	('Group 23'),
+	('Group 24');
 
 INSERT INTO public.groupusers(
 	User_netid, Group_groupid)
@@ -135,6 +138,7 @@ INSERT INTO public.enroll(
 	VALUES (1, 'paulvanderlaan', 'student'),
 	(1, 'bplanje', 'teacher'),
 	(2, 'bplanje', 'teacher'),
+	(3, 'bplanje', 'teacher'),
 	(3, 'henkjan', 'student')
 	;
 

@@ -166,7 +166,7 @@
                     await this.fetchGroups()
                     this.showSuccessMessage()
                 } catch (e) {
-                    this.showErrorMessage()
+                    this.showErrorMessage({message: e.response.data.error})
                 }
             },
             async removeGroupMember(groupId, memberNetId) {

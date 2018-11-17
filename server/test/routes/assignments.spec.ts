@@ -52,7 +52,7 @@ describe("API Assignment routes", () => {
             .field("groupColumn", "Education Groups");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
-            [{groupId: 1, groupname: "ED 4"}, {groupId: 2, groupname: "ED 3"}]
+            [{groupId: 25, groupname: "ED 4"}, {groupId: 26, groupname: "ED 3"}]
         ));
     });
 

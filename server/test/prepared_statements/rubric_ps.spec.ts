@@ -222,6 +222,8 @@ describe("RubricPreparedStatements Test", () => {
      * Test to delete a mc question
      */
     it("delete mc question", async () => {
+        // delete the option associated with it
+        await RubricPS.executeDeleteMCOption(4);
         expect(await RubricPS.executeDeleteMCQuestion(2)).to.deep.equal({
             rubric_assignment_id: 1,
             id: 2,

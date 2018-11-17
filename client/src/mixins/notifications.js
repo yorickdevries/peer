@@ -29,8 +29,13 @@ export default {
         },
         showSubmitMessage: {
             type: VueNotifications.types.success,
-            title: 'Saved',
+            title: 'Submitted',
             message: 'The item has successfully been submitted.'
         },
+        showUnSubmitMessage: {
+            type: VueNotifications.types.success,
+            title: 'Unsubmitted',
+            message: 'The item has successfully been unsubmitted.'
+        }
     }
 }

@@ -57,15 +57,18 @@ describe("API Group routes", () => {
      */
     it("Delete groups/:id", async () => {
         // test whether the group exists
-        const existsRes = await chai.request(router).get("/10");
-        expect(existsRes.text).to.equal(JSON.stringify({id: 10, group_name: "ED-3"}));
+        const existsRes = await chai.request(router).get("/23");
+        expect(existsRes.text).to.equal(JSON.stringify({id: 23, group_name: "Group 23"}));
+
+        // delete the groupmember
+        await chai.request(router).del("/23/users/henkjan");
 
         // delete the group
-        const deleteRes = await chai.request(router).del("/10");
+        const deleteRes = await chai.request(router).del("/23");
         expect(deleteRes.status).to.equal(200);
 
         // test whether group does not exist
-        const notExistRes = await chai.request(router).get("/10");
+        const notExistRes = await chai.request(router).get("/23");
         expect(notExistRes.status).to.equal(401);
     });
 

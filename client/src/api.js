@@ -64,6 +64,9 @@ export default {
     submitPeerReview(peerReview) {
         return client.get(`/reviews/${peerReview.review.id}/submit`)
     },
+    unSubmitPeerReview(peerReview) {
+        return client.get(`/reviews/${peerReview.review.id}/unsubmit`)
+    },
     getAuthenticated: async() => {
         return client.get('authenticated')
     },
@@ -102,6 +105,9 @@ export default {
     },
     shuffleGroups(assignmentId) {
         return client.get(`/assignments/${assignmentId}/distributeReviews`)
+    },
+    submitAllFilledReviews(rubricId) {
+        return client.get(`/rubric/${rubricId}/submitallfilledreviews`)
     },
     getGroupInfo(groupId) {
         return client.get(`/groups/${groupId}`)

@@ -75,7 +75,8 @@ describe("API Course routes", () => {
             "id": 1,
             "description": "This is a beautiful course description!",
             "name": "ED-3"
-        }, {"id": 2, "description": "Test-course", "name": "ED-4"}]));
+        }, {"id": 2, "description": "Test-course", "name": "ED-4"},
+        {"id": 3, "description": "Test-course2", "name": "ED-5"}]));
     });
 
     /**

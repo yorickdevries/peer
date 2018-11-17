@@ -79,6 +79,20 @@ export default class SubmissionsPS {
     }
 
     /**
+     * Gets all the submissions of an assignment by a certain group.
+     * @param {number} assignmentId - assignment id.
+     * @param {number} groupId - group id.
+     * @return {Promise<pgPromise.queryResult>} all submissions as pg promise.
+     */
+    public static executeGetAllSubmissionByAssignmentIdByGroupId(assignmentId: number, groupId: number)
+        : any {
+        const statement = new PreparedStatement("get-latest-submission-by-assignmentid-by-groupid",
+        "SELECT * FROM submission s1 WHERE assignment_id = $1 AND group_id = $2");
+        statement.values = [assignmentId, groupId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
      * Executes a 'create submission' query.
      * @param {string} netid - net id of the submission.
      * @param {number} groupId - group id of the user.
