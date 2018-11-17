@@ -128,7 +128,7 @@ describe("API integration test", () => {
         // Assertions to make sure the groups are correctly imported.
         expect(groups.status).to.equal(200);
         expect(groups.text).to.equal(JSON.stringify(
-            [{groupId: 1, groupname: "ED 4"}, {groupId: 2, groupname: "ED 3"}]
+            [{groupId: 25, groupname: "ED 4"}, {groupId: 26, groupname: "ED 3"}]
         ));
         console.log("Teacher imported the groups");
 
