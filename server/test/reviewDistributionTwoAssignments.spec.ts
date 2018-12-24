@@ -15,7 +15,7 @@ import AssignmentPS from "../src/prepared_statements/assignment_ps";
 import TestData from "./test_helpers/test_data";
 import ReviewDistributionTwoAssignments from "../src/reviewDistributionTwoAssignments";
 
-describe("ReviewUpdate Class tests", () => {
+describe("DistributeReviews two assignments", () => {
     /**
      * Make a clean database before each test.
      */
@@ -188,6 +188,42 @@ describe("ReviewUpdate Class tests", () => {
                 expect(review.assignmentID).to.not.equal(assignment1.id);
             }
         }
+    });
+
+    it("shuffletest", async () => {
+        const submissions = [];
+        submissions.push({count: 0, submission: {assignment_id: 1}});
+        submissions.push({count: 0, submission: {assignment_id: 2}});
+        submissions.push({count: 1, submission: {assignment_id: 1}});
+        submissions.push({count: 1, submission: {assignment_id: 2}});
+        submissions.push({count: 2, submission: {assignment_id: 1}});
+        submissions.push({count: 2, submission: {assignment_id: 2}});
+        submissions.push({count: 3, submission: {assignment_id: 1}});
+        submissions.push({count: 3, submission: {assignment_id: 2}});
+        submissions.push({count: 4, submission: {assignment_id: 1}});
+        submissions.push({count: 4, submission: {assignment_id: 2}});
+        submissions.push({count: 0, submission: {assignment_id: 1}});
+        submissions.push({count: 0, submission: {assignment_id: 2}});
+        submissions.push({count: 1, submission: {assignment_id: 1}});
+        submissions.push({count: 1, submission: {assignment_id: 2}});
+        submissions.push({count: 2, submission: {assignment_id: 1}});
+        submissions.push({count: 2, submission: {assignment_id: 2}});
+        submissions.push({count: 3, submission: {assignment_id: 1}});
+        submissions.push({count: 3, submission: {assignment_id: 2}});
+        submissions.push({count: 4, submission: {assignment_id: 1}});
+        submissions.push({count: 4, submission: {assignment_id: 2}});
+        submissions.push({count: 0, submission: {assignment_id: 3}});
+        submissions.push({count: 1, submission: {assignment_id: 3}});
+
+        // random order
+        ReviewDistributionTwoAssignments.shuffle(submissions);
+        // sort SubmissionAssignmentIdCount
+        ReviewDistributionTwoAssignments.sortSubmissionAssignmentIdCount(submissions, 1);
+        
+        // assertaions
+        const first = submissions[0];
+        expect(first.count).to.equal(0);
+        expect(first.submission.assignment_id).to.not.equal(1);
     });
 
 });
