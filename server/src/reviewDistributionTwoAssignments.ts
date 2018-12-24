@@ -221,7 +221,7 @@ export default class ReviewDistributionTwoAssignments {
     }
 
     /**
-     * Sorts submissions based on the submissioncount. 
+     * Sorts submissions based on the submissioncount.
      * in case both have the same number of submissions, the entries with the other assignmentID will have priority
      * putting the specified assignmentId last in the list
      * @param {any[]} submissions

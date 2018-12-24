@@ -219,7 +219,6 @@ describe("DistributeReviews two assignments", () => {
         ReviewDistributionTwoAssignments.shuffle(submissions);
         // sort SubmissionAssignmentIdCount
         ReviewDistributionTwoAssignments.sortSubmissionAssignmentIdCount(submissions, 1);
-        
         // assertaions
         const first = submissions[0];
         expect(first.count).to.equal(0);
