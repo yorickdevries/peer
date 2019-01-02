@@ -221,17 +221,25 @@ export default class ReviewDistributionTwoAssignments {
     }
 
     /**
-     * Sorts submissions based on the assignmentID, putting the specified assignmentId last in the list
+     * Sorts submissions based on the submissioncount.
+     * in case both have the same number of submissions, the entries with the other assignmentID will have priority
+     * putting the specified assignmentId last in the list
      * @param {any[]} submissions
      * @returns
      */
-    public static sortAssignmentIdCount(submissions: any[], assignmentId: number) {
+    public static sortSubmissionAssignmentIdCount(submissions: any[], assignmentId: number) {
         const compare = function(a: any, b: any) {
-            if (a.submission.assignment_id !== assignmentId && b.submission.assignment_id == assignmentId)
+            if (a.count < b.count)
                 return -1;
-            if (a.submission.assignment_id == assignmentId && b.submission.assignment_id !== assignmentId)
+            if (a.count > b.count)
                 return 1;
-            return 0;
+            else {
+                if (a.submission.assignment_id !== assignmentId && b.submission.assignment_id == assignmentId)
+                    return -1;
+                if (a.submission.assignment_id == assignmentId && b.submission.assignment_id !== assignmentId)
+                    return 1;
+                return 0;
+            }
         };
         submissions.sort(compare);
         return;
@@ -267,11 +275,10 @@ export default class ReviewDistributionTwoAssignments {
                 const otherSubmissions = this.makeCountList(user.userNetId, user.groupId, submissions, reviews);
                 // Shuffle all the submissions
                 this.shuffle(otherSubmissions);
-                // Sort entries based on the assignmentId, putting the assignments unequal to the user assignment first
-                this.sortAssignmentIdCount(otherSubmissions, user.assignmentId);
                 // Sort the submissions based on reviewcount
+                // Sort entries based on the assignmentId, putting the assignments unequal to the user assignment first
                 // Entries with the same reviewcount/assignmentid remain shuffled relative to eachother
-                this.sortSubmissionCount(otherSubmissions);
+                this.sortSubmissionAssignmentIdCount(otherSubmissions, user.assignmentId);
                 // Get the first submission of the list
                 const submission = otherSubmissions[0].submission;
                 // Add reviews to result list

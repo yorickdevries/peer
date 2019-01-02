@@ -22,7 +22,6 @@
                                     <span v-if="enrollableAssignments.length === 0">There are no enrollable assignments.</span>
                                     <b-card v-for="(assignment, index) in enrollableAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== enrollableAssignments.length - 1}">
                                         <b-card-body>
-                                            dsadsadsa
                                             <h4>{{ assignment.title | truncate(100)}}</h4>
                                             <p>{{ assignment.description | truncate(100)}}</p>
                                             <b-button variant="outline-primary" @click="enrollInAssignment(assignment.id)">Enroll in Assignment</b-button>
