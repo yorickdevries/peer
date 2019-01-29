@@ -68,9 +68,12 @@ export default class AuthorizationPS {
      */
     public static executeCheckTAOrTeacherForReview(reviewId: number, netId: String): any {
         const statement = new PreparedStatement("check-enrollment-ta-teacher-via-review",
-            "SELECT EXISTS(SELECT * FROM review, submission, assignmentlist, enroll, courselist " +
-            "WHERE review.submission_id = submission.id AND submission.assignment_id = assignmentlist.id AND " +
-            "assignmentlist.course_id = courselist.id AND (enroll.role = 'TA' OR enroll.role = 'teacher') " +
+            "SELECT EXISTS(SELECT * FROM review, submission, assignmentlist, courselist, enroll " +
+            "WHERE review.submission_id = submission.id " +
+            "AND submission.assignment_id = assignmentlist.id " +
+            "AND assignmentlist.course_id = courselist.id " +
+            "AND courselist.id = enroll.course_id " +
+            "AND (enroll.role = 'TA' OR enroll.role = 'teacher') " +
             "AND review.id = $1 AND enroll.user_netid = $2)");
         statement.values = [reviewId, netId];
         return Database.executeQuerySingleResult(statement);
