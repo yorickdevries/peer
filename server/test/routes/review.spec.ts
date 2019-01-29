@@ -29,8 +29,26 @@ describe("API review routes", () => {
     /**
      * Tests if user has authorization to see the review
      */
-    it("get review auth", async() => {
+    it("get review auth review", async() => {
+        const res = await chai.request(router).get("/2");
+        expect(res.status).to.equal(200);
+    });
+
+    /**
+     * Tests if user has no authorization to see a non existing review
+     */
+    it("get review auth non-existing review", async() => {
         const res = await chai.request(router).get("/3");
+        expect(res.status).to.equal(401);
+    });
+
+    /**
+     * Tests if adversary user does not have authorization to see the review
+     */
+    it("get review unauthorized", async() => {
+        // initializes the router with user adversary
+        MockLogin.initialize("adversary");
+        const res = await chai.request(router).get("/2");
         expect(res.status).to.equal(401);
     });
 

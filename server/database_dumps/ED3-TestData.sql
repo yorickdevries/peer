@@ -16,6 +16,10 @@ INSERT INTO "userlist" (
 	"netid", "email")
 	VALUES ('bplanje', NULL);
 
+INSERT INTO "userlist" (
+	"netid", "email")
+	VALUES ('adversary', NULL);
+
 INSERT INTO public.courselist(
     description, name)
     VALUES ('This is a beautiful course description!', 'ED-3'),
@@ -139,7 +143,8 @@ INSERT INTO public.enroll(
 	(1, 'bplanje', 'teacher'),
 	(2, 'bplanje', 'teacher'),
 	(3, 'bplanje', 'teacher'),
-	(3, 'henkjan', 'student')
+	(3, 'henkjan', 'student'),
+	(3, 'adversary', 'TA')
 	;
 
 INSERT INTO public.assignmentgroup(
