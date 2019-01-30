@@ -1,4 +1,4 @@
-# Context Project Group ED3: Peer Review #
+# Peer Review #
 
 ## Documents
 | Reports & Documentation                                                                                                                                                |
@@ -28,7 +28,7 @@
 - On the site you can mock a SSO login login using http://localhost:3000/api/mocklogin/[netid]/[affiliation]
 - Affiliation can be: "student" or "employee"
 
-## Group Members ##
+## Original Developers in the ED3 context project of 2017/2018
 | Name               | NetID          | Student Mail                        |
 |--------------------|----------------|-------------------------------------|
 | Henk-Jan Wermelink | hwermelink     | j.a.h.wermelink@student.tudelft.nl  |
