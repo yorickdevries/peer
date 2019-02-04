@@ -1,5 +1,5 @@
 {
-  "name": "ed3_peer_review_server",
+  "name": "peer_review_server",
   "version": "1.0.0",
   "private": true,
   "scripts": {
