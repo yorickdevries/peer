@@ -176,7 +176,7 @@ describe("API integration test", () => {
             .field("one_person_groups", false);
         console.log("Assignment duedate is set in the past");
 
-        const distribution = await chai.request(router).get("/assignments/" + assignmentId + "/distributeReviews");
+        const distribution = await chai.request(router).get("/assignments/" + assignmentId + "/distributeReviews/0");
         // Assertions to make sure the reviews are distributed.
         expect(distribution.status).to.equal(200);
         expect(JSON.parse(distribution.text).length).to.equal(2);

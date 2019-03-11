@@ -286,9 +286,9 @@ router.route("/:assignment_id/reviews")
 /**
  * Route to distribute reviews for a certain assignment
  */
-router.route("/:assignment_id/distributeReviews")
+router.route("/:assignment_id/distributeReviews/:selfassign")
     .get(index.authorization.enrolledAsTeacherAssignmentCheck, (req: any, res) => {
-        reviewDistribution.distributeReviews(req.params.assignment_id, false)
+        reviewDistribution.distributeReviews(req.params.assignment_id, req.params.selfassign)
         .then((data) => {
             res.json(data);
         }).catch((error) => {
