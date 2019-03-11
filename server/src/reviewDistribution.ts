@@ -12,7 +12,7 @@ export default class ReviewDistribution {
     /**
      * Distribute reviews for a specific assignment
      */
-    public static async distributeReviews(assignmentId: number) {
+    public static async distributeReviews(assignmentId: number, bool: boolean) {
         // Check for a rubric entry
         const rubricExists: any = await RubricPS.executeExistsRubricByAssignmentId(assignmentId);
         if (!rubricExists.exists) {
@@ -28,7 +28,7 @@ export default class ReviewDistribution {
         // Calculate a solution until a valid solution is found or an error is thrown
         while (reviews == undefined) {
             // Assigning reviews
-            reviews = await this.assignSubmissionstoUsers(assignmentId);
+            reviews = await this.assignSubmissionstoUsers(assignmentId, bool);
         }
         const existingReviews: any = await ReviewPS.executeGetReviewsByAssignmentId(assignmentId);
         if (existingReviews.length !== 0) {
@@ -47,7 +47,7 @@ export default class ReviewDistribution {
      * @param {number} assignmentId
      * @returns
      */
-    public static async assignSubmissionstoUsers(assignmentId: number) {
+    public static async assignSubmissionstoUsers(assignmentId: number, bool: boolean) {
         const assignment: any = await AssignmentPS.executeGetAssignmentById(assignmentId);
         const reviewsPerUser = assignment.reviews_per_user;
         // Get the latest versions of all submissions per group
@@ -72,6 +72,11 @@ export default class ReviewDistribution {
                 const userNetId = user.user_netid;
                 const userGroup = {userNetId: userNetId, groupId: groupId};
                 allUsers.push(userGroup);
+                // Assign reviews to themselves
+                if (bool) {
+                    const review = {userNetId:  userNetId, submissionId: submission.id};
+                    reviews.push(review)
+                }
             }
         }
         // If there are less users * reviews per user than submissions

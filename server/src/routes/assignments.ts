@@ -288,7 +288,7 @@ router.route("/:assignment_id/reviews")
  */
 router.route("/:assignment_id/distributeReviews")
     .get(index.authorization.enrolledAsTeacherAssignmentCheck, (req: any, res) => {
-        reviewDistribution.distributeReviews(req.params.assignment_id)
+        reviewDistribution.distributeReviews(req.params.assignment_id, false)
         .then((data) => {
             res.json(data);
         }).catch((error) => {
