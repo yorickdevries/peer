@@ -75,7 +75,7 @@ export default class ReviewDistribution {
                 // Assign reviews to themselves
                 if (bool) {
                     const review = {userNetId:  userNetId, submissionId: submission.id};
-                    reviews.push(review)
+                    reviews.push(review);
                 }
             }
         }
