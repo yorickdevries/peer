@@ -7,19 +7,20 @@ import AssignmentPS from "../prepared_statements/assignment_ps";
 import UserPS from "../prepared_statements/user_ps";
 import GroupPS, { default as GroupsPS } from "../prepared_statements/group_ps";
 import ReviewPS from "../prepared_statements/review_ps";
-import RubricPS from "../prepared_statements/rubric_ps";
 import ExportResultsPS from "../prepared_statements/export_results_ps";
-import CSVExport from "../CSVExport";
 import GroupParser from "../groupParser";
 import reviewDistribution from "../reviewDistribution";
 import ReviewDistributionTwoAssignments from "../reviewDistributionTwoAssignments";
 import bodyParser from "body-parser";
 import config from "../config";
 
+const json2csv = require("json2csv").parse;
+
 // Router
 import express from "express";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 import CoursesPS from "../prepared_statements/courses_ps";
+import ReviewUpdate from "../reviewUpdate";
 
 const router = express();
 const fileFolder = config.assignments.fileFolder;
@@ -495,7 +496,75 @@ router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherA
 
         res.setHeader("Content-disposition", `attachment; filename=${filename}.csv`);
         res.set("Content-Type", "text/csv");
-        res.status(200).send(CSVExport.downloadCSV({ exportData: exportData }));
+        // Get the fields for the csv file. Export data contains at least 1 item at this point.
+        const csvFields = Object.keys(exportData[0]);
+
+        res.status(200).send(json2csv(exportData, { csvFields }));
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Export the approved reviews of each student for a specific assignment.
+ * json format for excel csv export [{netID: '', studentnumber: 0, question1: answer, question2: answer}]
+ * @param assignment_id - id of the assignment.
+ */
+router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
+    try {
+        const exportData: Array<any> = [];
+        const reviews: any = await ReviewPS.executeGetReviewsByAssignmentId(req.params.assignment_id);
+
+        for (let i = 0; i < reviews.length; i++) {
+            const reviewId: number = reviews[i].id;
+            const review: any = await ReviewUpdate.getReview(reviewId);
+            const user: any = await UserPS.executeGetUserById(reviews[i].user_netid);
+
+            const reviewJson: any = {};
+            reviewJson["netID"] = reviews[i].user_netid;
+            reviewJson["studentnumber"] = user.studentnumber;
+
+            // Loop through the questions and add (question, answer) to the review json object.
+            for (let questionNumber = 0; questionNumber < review.form.length; questionNumber++) {
+                const item = review.form[questionNumber];
+                reviewJson[item.question.question] = item.answer.answer;
+            }
+
+            exportData.push(reviewJson);
+        }
+
+        // Check if the export data contains data.
+        if (exportData.length == 0) {
+            res.status(400);
+            res.json({error: "No grades to export."});
+            return;
+        }
+
+        // Properly format the file name.
+        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
+        const course: any = await CoursesPS.executeGetCourseById(assignment.course_id);
+        const date: Date = new Date();
+        const dd = (date.getDate() < 10) ? "0" + date.getDate() : date.getDate();
+        const mm = (date.getMonth() + 1 < 10) ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
+        const hours = (date.getHours() < 10) ? "0" + date.getHours() : date.getHours();
+        const min = (date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes();
+
+        // Check if the course name is a valid file name.
+
+        const courseName = (/^([a-zA-Z_\-\s0-9]+)$/.test(course.name.replace(/ /g, "")))
+            ? course.name.replace(/ /g, "") : "";
+        const assignmentTitle = (/^([a-zA-Z_\-\s0-9]+)$/.test(assignment.title.replace(/ /g, "")))
+            ? assignment.title.replace(/ /g, "") : "";
+        const filename: string = `${courseName}--${assignmentTitle}--${dd}-${mm}-${date.getFullYear()}--${hours}-${min}`;
+
+        res.setHeader("Content-disposition", `attachment; filename=${filename}.csv`);
+        res.set("Content-Type", "text/csv");
+
+        // Get the fields for the csv file. Export data contains at least 1 item at this point.
+        const csvFields = Object.keys(exportData[0]);
+
+        res.status(200).send(json2csv(exportData, { csvFields }));
     } catch (e) {
         console.log(e);
         res.sendStatus(400);

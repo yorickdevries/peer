@@ -5,10 +5,11 @@ import GroupParser from "../groupParser";
 import index from "../security/index";
 import { Roles } from "../roles";
 
+const json2csv = require("json2csv").parse;
+
 // Router
 import express from "express";
 import ExportResultsPS from "../prepared_statements/export_results_ps";
-import CSVExport from "../CSVExport";
 import UserPS from "../prepared_statements/user_ps";
 import ParseNetId from "../parseNetId";
 const router = express();
@@ -259,7 +260,10 @@ router.get("/:courseId/gradeExport", index.authorization.enrolledCourseTeacherCh
 
         res.setHeader("Content-disposition", `attachment; filename=${filename}.csv`);
         res.set("Content-Type", "text/csv");
-        res.status(200).send(CSVExport.downloadCSV({ exportData: exportData }));
+        // Get the fields for the csv file. Export data contains at least 1 item at this point.
+        const csvFields = Object.keys(exportData[0]);
+
+        res.status(200).send(json2csv(exportData, { csvFields }));
     } catch (e) {
         console.log(e);
         res.sendStatus(400);

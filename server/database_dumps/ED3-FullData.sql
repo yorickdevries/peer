@@ -227,7 +227,7 @@ INSERT INTO public.mcanswer(
 
 INSERT INTO public.openanswer(
 	answer, openquestion_id, review_id)
-	VALUES ('Flesje water is beter dan flesje bier', 1, 1);
+	VALUES ('Flesje water is beter dan flesje bier', 1, 1), ('Very, , , ,! good hoor!', 8, 1);;
 
 INSERT INTO public.openanswer(
 	answer, openquestion_id, review_id)
@@ -235,7 +235,7 @@ INSERT INTO public.openanswer(
 
 INSERT INTO public.rangeanswer(
 	answer, rangequestion_id, review_id)
-	VALUES (4, 1, 1);
+	VALUES (4, 1, 1), (2, 6, 1);
 
 INSERT INTO public.rangeanswer(
 	answer, rangequestion_id, review_id)

@@ -11,5 +11,8 @@
     "build_client": "npm run build --prefix ./client",
     "start_server": "npm run start_server --prefix ./server",
     "test_all": "npm run tslint --prefix ./server && npm run build_newdata && npm run coverage --prefix ./server"
+  },
+  "dependencies": {
+    "json2csv": "^4.3.5"
   }
 }

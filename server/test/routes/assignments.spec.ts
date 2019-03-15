@@ -447,22 +447,29 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Random review id
+     * Test of the csv export.
      */
-    it("Random review id", async () => {
+    it("Grade export valid", async () => {
         // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
-        const res = await chai.request(router).get("/1/randomReview");
-        expect(res.status).to.equal(200);
+        const gradeExport: any = await chai.request(router).get("/1/gradeExport");
+
+        expect(gradeExport.status).to.equal(200);
+        // Make sure it includes at least the paul review.
+        expect(gradeExport.text.includes("\"paulvanderlaan\",,\"0\",\"0\",\"1\",\"1\"")).to.equal(true);
     });
 
     /**
-     * Random review id
+     * Test of the csv export.
      */
-    it("Empty grade export", async () => {
+    it("Grade export valid", async () => {
         // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
-        const res = await chai.request(router).get("/2/gradeExport");
-        expect(res.status).to.equal(400);
+        const gradeExport: any = await chai.request(router).get("/1/reviewsExport");
+
+        expect(gradeExport.status).to.equal(200);
+        // Make sure it includes at least the henkjan review and paul review.
+        expect(gradeExport.text.includes("\"henkjan\",,1,,\"Flesje water is beter dan flesje bier\",4")).to.equal(true);
+        expect(gradeExport.text.includes("\"paulvanderlaan\",,,,,")).to.equal(true);
     });
 });
