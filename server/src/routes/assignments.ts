@@ -482,7 +482,7 @@ router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherA
         const course: any = await CoursesPS.executeGetCourseById(assignment.course_id);
         const date: Date = new Date();
         const dd = (date.getDate() < 10) ? "0" + date.getDate() : date.getDate();
-        const mm = (date.getMonth() + 1 < 10) ? "0" + date.getMonth() + 1 : date.getMonth() + 1;
+        const mm = (date.getMonth() + 1 < 10) ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
         const hours = (date.getHours() < 10) ? "0" + date.getHours() : date.getHours();
         const min = (date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes();
 
