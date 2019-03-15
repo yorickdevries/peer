@@ -447,7 +447,7 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Test of the csv export.
+     * Test of the csv grade export.
      */
     it("Grade export valid", async () => {
         // log in as bplanje (teacher)cle
@@ -460,9 +460,9 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Test of the csv export.
+     * Test of the csv reviews export.
      */
-    it("Grade export valid", async () => {
+    it("Reviews export valid", async () => {
         // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
         const gradeExport: any = await chai.request(router).get("/1/reviewsExport");
