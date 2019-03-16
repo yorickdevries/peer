@@ -36,7 +36,7 @@
                                                         name="selfAssign"
                                                         v-model="selfAssign"
                                                 >
-                                                    I want to assign the students to themselves.
+                                                    I want to let students review their own assignments.
                                                 </b-form-checkbox>
                                                 <b-button v-b-modal="`shufflingModal`" class="mb-3" variant="primary" size="sm">Shuffle Groups</b-button>
                                                 <b-modal id="shufflingModal" @ok="shuffleGroups()" title="Confirmation" centered>
