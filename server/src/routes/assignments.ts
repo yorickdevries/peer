@@ -44,6 +44,30 @@ const uploadAssignment = multer({
     }
 }).single("assignmentFile");
 
+/**
+ * Create and fetch a filename for a specific assignment.
+ * @param {number} assignmentId - an id of an assignment.
+ * @return {Promise<string>} - a string as promise.
+ */
+async function filenameForAssignment(assignmentId: number): Promise<string> {
+    // Properly format the file name.
+    const assignment: any = await AssignmentPS.executeGetAssignmentById(assignmentId);
+    const course: any = await CoursesPS.executeGetCourseById(assignment.course_id);
+    const date: Date = new Date();
+    const dd = (date.getDate() < 10) ? "0" + date.getDate() : date.getDate();
+    const mm = (date.getMonth() + 1 < 10) ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
+    const hours = (date.getHours() < 10) ? "0" + date.getHours() : date.getHours();
+    const min = (date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes();
+
+    // Check if the course name is a valid file name.
+    const courseName = (/^([a-zA-Z_\-\s0-9]+)$/.test(course.name.replace(/ /g, "")))
+        ? course.name.replace(/ /g, "") : "";
+    const assignmentTitle = (/^([a-zA-Z_\-\s0-9]+)$/.test(assignment.title.replace(/ /g, "")))
+        ? assignment.title.replace(/ /g, "") : "";
+
+    return `${courseName}--${assignmentTitle}--${dd}-${mm}-${date.getFullYear()}--${hours}-${min}`;
+}
+
 // File upload handling
 const uploadAssignmentFunction = function(req: any, res: any, next: any) {
     uploadAssignment(req, res, function (err) {
@@ -477,28 +501,12 @@ router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherA
             return;
         }
 
-        // Properly format the file name.
-        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-        const course: any = await CoursesPS.executeGetCourseById(assignment.course_id);
-        const date: Date = new Date();
-        const dd = (date.getDate() < 10) ? "0" + date.getDate() : date.getDate();
-        const mm = (date.getMonth() + 1 < 10) ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
-        const hours = (date.getHours() < 10) ? "0" + date.getHours() : date.getHours();
-        const min = (date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes();
-
-        // Check if the course name is a valid file name.
-
-        const courseName = (/^([a-zA-Z_\-\s0-9]+)$/.test(course.name.replace(/ /g, "")))
-            ? course.name.replace(/ /g, "") : "";
-        const assignmentTitle = (/^([a-zA-Z_\-\s0-9]+)$/.test(assignment.title.replace(/ /g, "")))
-            ? assignment.title.replace(/ /g, "") : "";
-        const filename: string = `${courseName}--${assignmentTitle}--${dd}-${mm}-${date.getFullYear()}--${hours}-${min}`;
+        // Get the fields for the csv file. Export data contains at least 1 item at this point.
+        const csvFields = Object.keys(exportData[0]);
+        const filename: string = await filenameForAssignment(req.params.assignment_id);
 
         res.setHeader("Content-disposition", `attachment; filename=${filename}.csv`);
         res.set("Content-Type", "text/csv");
-        // Get the fields for the csv file. Export data contains at least 1 item at this point.
-        const csvFields = Object.keys(exportData[0]);
-
         res.status(200).send(json2csv(exportData, { csvFields }));
     } catch (e) {
         console.log(e);
@@ -516,9 +524,9 @@ router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeache
         const exportData: Array<any> = [];
         const reviews: any = await ReviewPS.executeGetReviewsByAssignmentId(req.params.assignment_id);
 
+        // Loop through the reviews, add to export data.
         for (let i = 0; i < reviews.length; i++) {
-            const reviewId: number = reviews[i].id;
-            const review: any = await ReviewUpdate.getReview(reviewId);
+            const review: any = await ReviewUpdate.getReview(reviews[i].id);
             const user: any = await UserPS.executeGetUserById(reviews[i].user_netid);
 
             const reviewJson: any = {};
@@ -541,29 +549,12 @@ router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeache
             return;
         }
 
-        // Properly format the file name.
-        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-        const course: any = await CoursesPS.executeGetCourseById(assignment.course_id);
-        const date: Date = new Date();
-        const dd = (date.getDate() < 10) ? "0" + date.getDate() : date.getDate();
-        const mm = (date.getMonth() + 1 < 10) ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
-        const hours = (date.getHours() < 10) ? "0" + date.getHours() : date.getHours();
-        const min = (date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes();
-
-        // Check if the course name is a valid file name.
-
-        const courseName = (/^([a-zA-Z_\-\s0-9]+)$/.test(course.name.replace(/ /g, "")))
-            ? course.name.replace(/ /g, "") : "";
-        const assignmentTitle = (/^([a-zA-Z_\-\s0-9]+)$/.test(assignment.title.replace(/ /g, "")))
-            ? assignment.title.replace(/ /g, "") : "";
-        const filename: string = `${courseName}--${assignmentTitle}--${dd}-${mm}-${date.getFullYear()}--${hours}-${min}`;
+        // Get the fields for the csv file. Export data contains at least 1 item at this point.
+        const csvFields = Object.keys(exportData[0]);
+        const filename: string = await filenameForAssignment(req.params.assignment_id);
 
         res.setHeader("Content-disposition", `attachment; filename=${filename}.csv`);
         res.set("Content-Type", "text/csv");
-
-        // Get the fields for the csv file. Export data contains at least 1 item at this point.
-        const csvFields = Object.keys(exportData[0]);
-
         res.status(200).send(json2csv(exportData, { csvFields }));
     } catch (e) {
         console.log(e);
