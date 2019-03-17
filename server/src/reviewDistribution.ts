@@ -48,7 +48,6 @@ export default class ReviewDistribution {
      * @returns
      */
     public static async assignSubmissionstoUsers(assignmentId: number, selfassign: number) {
-        console.log(selfassign);
         const assignment: any = await AssignmentPS.executeGetAssignmentById(assignmentId);
         const reviewsPerUser = assignment.reviews_per_user;
         // Get the latest versions of all submissions per group
@@ -76,7 +75,6 @@ export default class ReviewDistribution {
                 // Assign reviews to themselves
                 if (selfassign == 1) {
                     const review = {userNetId:  userNetId, submissionId: submission.id};
-                    console.log("push");
                     reviews.push(review);
                 }
             }
