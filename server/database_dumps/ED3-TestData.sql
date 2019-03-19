@@ -18,13 +18,17 @@ INSERT INTO "userlist" (
 
 INSERT INTO "userlist" (
 	"netid", "email")
+	VALUES ('newstudent', NULL);
+
+INSERT INTO "userlist" (
+	"netid", "email")
 	VALUES ('adversary', NULL);
 
 INSERT INTO public.courselist(
-    description, name)
-    VALUES ('This is a beautiful course description!', 'ED-3'),
-	('Test-course', 'ED-4'),
-	('Test-course2', 'ED-5');
+    description, name, enrollable)
+    VALUES ('This is a beautiful course description!', 'ED-3', true),
+	('Test-course', 'ED-4', true),
+	('Test-course2', 'ED-5', false);
 
 INSERT INTO public.grouplist(group_name)
 	VALUES
