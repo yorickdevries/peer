@@ -31,6 +31,13 @@
                                                 <dd>This action will shuffle the groups and assign the groups to each
                                                     other. Can only be done once.
                                                 </dd>
+                                                <b-form-checkbox
+                                                        id="selfAssign"
+                                                        name="selfAssign"
+                                                        v-model="selfAssign"
+                                                >
+                                                    I want to let students review their own assignments.
+                                                </b-form-checkbox>
                                                 <b-button v-b-modal="`shufflingModal`" class="mb-3" variant="primary" size="sm">Shuffle Groups</b-button>
                                                 <b-modal id="shufflingModal" @ok="shuffleGroups()" title="Confirmation" centered>
                                                     Are you sure you want to shuffle?
@@ -40,7 +47,7 @@
                                                     </ul>
 
                                                 </b-modal>
-                                                
+
                                                 <!--Submit Reviews-->
                                                 <dt>Submit Reviews</dt>
                                                 <dd>This action will set all reviews which are fully filled in to done.
@@ -103,76 +110,84 @@
 </template>
 
 <script>
-import api from '../../../api'
-import BreadcrumbTitle from '../../BreadcrumbTitle'
-import RubricWizard from '../rubric/RubricWizard'
-import ImportGroupsWizard from '../ImportGroupsWizard'
-import Groups from '../Groups'
-import Reviews from '../../ta_teacher_shared/Reviews'
-import Submissions from '../../ta_teacher_shared/Submissions'
-import AssignmentDetails from '../../ta_teacher_shared/AssignmentDetails'
-import notifications from '../../../mixins/notifications'
+    import api from '../../../api'
+    import BreadcrumbTitle from '../../BreadcrumbTitle'
+    import RubricWizard from '../rubric/RubricWizard'
+    import ImportGroupsWizard from '../ImportGroupsWizard'
+    import Groups from '../Groups'
+    import Reviews from '../../ta_teacher_shared/Reviews'
+    import Submissions from '../../ta_teacher_shared/Submissions'
+    import AssignmentDetails from '../../ta_teacher_shared/AssignmentDetails'
+    import notifications from '../../../mixins/notifications'
 
-export default {
-    mixins: [notifications],
-    components: {
-        BreadcrumbTitle,
-        RubricWizard,
-        Groups,
-        ImportGroupsWizard,
-        Reviews,
-        Submissions,
-        AssignmentDetails
-    },
-    async created() {
-        let cid = this.$route.params.courseId
-        let aid = this.$route.params.assignmentId
-        this.course.id = cid
-        this.assignment.id = aid
-        let res = await api.getAssignment(aid)
-        this.assignment = res.data
-    },
-    data() {
-        return {
-            course: {
-                id: null
-            },
-            assignment: {
-                id: null,
-                title: null,
-                description: null,
-                publish_date: null,
-                due_date: null,
-                review_publish_date: null,
-                review_due_date: null,
-                filename: null,
-                one_person_groups: null
-            },
-        }
-    },
-    methods: {
-        formatDate(date) {
-            // Formats the date to a readable format for the UI.
-            if (!(date instanceof Date)) date = new Date(date)
-            return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
+    export default {
+        mixins: [notifications],
+        components: {
+            BreadcrumbTitle,
+            RubricWizard,
+            Groups,
+            ImportGroupsWizard,
+            Reviews,
+            Submissions,
+            AssignmentDetails
         },
-        async shuffleGroups() {
-            try {
-                await api.shuffleGroups(this.$route.params.assignmentId)
-                this.showSuccessMessage({message: "Groups have successfully been shuffled and assigned submissions."})
-            } catch (e) {
-                this.showErrorMessage({message: e.response.data.error})
+        async created() {
+            let cid = this.$route.params.courseId
+            let aid = this.$route.params.assignmentId
+            this.course.id = cid
+            this.assignment.id = aid
+            let res = await api.getAssignment(aid)
+            this.assignment = res.data
+        },
+        data() {
+            return {
+                selfAssign: false,
+                course: {
+                    id: null
+                },
+                assignment: {
+                    id: null,
+                    title: null,
+                    description: null,
+                    publish_date: null,
+                    due_date: null,
+                    review_publish_date: null,
+                    review_due_date: null,
+                    filename: null,
+                    one_person_groups: null
+                },
             }
         },
-        async submitAllFilledReviews() {
-            try {
-                const result = await api.submitAllFilledReviews(this.$route.params.assignmentId)
-                const submittedReviews = result.data.submittedReviews;
-                this.showSuccessMessage({message: "Submitted " + submittedReviews + " Reviews"})
-            } catch (e) {
-                this.showErrorMessage({message: e.response.data.error})
+        methods: {
+            formatDate(date) {
+                // Formats the date to a readable format for the UI.
+                if (!(date instanceof Date)) date = new Date(date)
+                return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
+            },
+            async shuffleGroups() {
+                try {
+
+                    // Check if the user wants to self-assign shuffle instead.
+                    if (this.selfAssign) {
+                        await api.client.get(`/assignments/${this.$route.params.assignmentId}/distributeReviews/1`)
+                    } else {
+                        await api.client.get(`/assignments/${this.$route.params.assignmentId}/distributeReviews/0`)
+                    }
+
+                    this.showSuccessMessage({message: "Groups have successfully been shuffled and assigned submissions."})
+                } catch (e) {
+                    this.showErrorMessage({message: e.response.data.error})
+                }
+            },
+            async submitAllFilledReviews() {
+                try {
+                    const result = await api.submitAllFilledReviews(this.$route.params.assignmentId)
+                    const submittedReviews = result.data.submittedReviews;
+                    this.showSuccessMessage({message: "Submitted " + submittedReviews + " Reviews"})
+                } catch (e) {
+                    this.showErrorMessage({message: e.response.data.error})
+                }
             }
         }
     }
-}
 </script>
