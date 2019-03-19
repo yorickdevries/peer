@@ -66,7 +66,13 @@
                                                 </template>
 
                                                 <!--Exporting-->
-                                                <dt>Export CSV</dt>
+                                                <dt>Export Reviews CSV</dt>
+                                                <dd>Exports a CSV file with all reviews for this assignment.</dd>
+                                                <b-button size="sm" variant="primary" :href="`/api/assignments/${assignment.id}/reviewsExport`">
+                                                    Download CSV
+                                                </b-button>
+
+                                                <dt>Export Grades CSV</dt>
                                                 <dd>Exports a CSV file with an aggregation of the review approval/disapproval amounts of each student for this assignment.</dd>
                                                 <b-button size="sm" variant="primary" :href="`/api/assignments/${assignment.id}/gradeExport`">
                                                     Download CSV
