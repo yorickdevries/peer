@@ -459,6 +459,26 @@ describe("API Assignment routes", () => {
     });
 
     /**
+     * Random review id
+     */
+    it("Random review id", async () => {
+        // log in as bplanje (teacher)cle
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).get("/1/randomReview");
+        expect(res.status).to.equal(200);
+    });
+
+    /**
+     * Empty grade export
+     */
+    it("Empty grade export", async () => {
+        // log in as bplanje (teacher)cle
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).get("/2/gradeExport");
+        expect(res.status).to.equal(400);
+    });
+
+    /**
      * Test of the csv grade export.
      */
     it("Grade export valid", async () => {
