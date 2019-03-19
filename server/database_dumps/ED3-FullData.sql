@@ -153,6 +153,10 @@ INSERT INTO public.mcoption(
 INSERT INTO public.enroll(
 	course_id, user_netid, role)
 	VALUES
+		(1, 'teacheraccount', 'teacher'),
+		(2, 'teacheraccount', 'teacher'),
+		(3, 'teacheraccount', 'teacher'),
+		(4, 'teacheraccount', 'teacher'),
 	    (2, 'paulvanderlaan', 'teacher'),
 	    (3, 'paulvanderlaan', 'TA'),
 	    (4, 'paulvanderlaan', 'TA'),
