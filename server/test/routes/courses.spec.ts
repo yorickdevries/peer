@@ -65,6 +65,32 @@ describe("API Course routes", () => {
     });
 
     /**
+     * Tests whether course can be made when the affiliation is ["employee","faculty"]
+     */
+    it("create course as [employee,faculty]", async () => {
+        MockLogin.initialize("bplanje", undefined, ["employee", "faculty"]);
+        const res = await chai.request(router)
+            .post("/")
+            .send({description: "example", name: "test name"});
+
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify({"id": 4, "description": "example", "name": "test name"}
+        ));
+    });
+
+    /**
+     * Tests whether course cannot be made when the affiliation is student
+     */
+    it("Create course as student", async () => {
+        MockLogin.initialize("bplanje", undefined, "student");
+        const res = await chai.request(router)
+            .post("/")
+            .send({description: "example", name: "test name"});
+
+        expect(res.status).to.equal(400);
+    });
+
+    /**
      * Test whether userinfo is returned
      */
     it("Get courses/enrolled", async () => {
