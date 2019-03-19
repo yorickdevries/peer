@@ -7,9 +7,6 @@ const client = axios.create({
 
 export default {
     client,
-    getCourses: async () => {
-        return client.get('courses')
-    },
     getCourse: async (id) => {
         return client.get(`courses/${id}`)
     },

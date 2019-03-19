@@ -14,20 +14,28 @@
                 <b-col>
                     <b-card>
                         <b-form @submit.prevent="onSubmit">
-                            <b-form-group label="Name">
+                            <b-form-group label="Course code">
                                 <b-form-input   v-model="course.name"
                                                 type="text"
                                                 placeholder="Please enter the course name here"
                                                 required>
                                 </b-form-input>
                             </b-form-group>
-                            <b-form-group label="Description">
+                            <b-form-group label="Course description">
                                 <b-form-textarea    v-model="course.description"
                                                     id="textareadescription"
                                                     placeholder="Please enter the course description here"
                                                     :rows="4"
                                                     required>
                                 </b-form-textarea>
+                            </b-form-group>
+                            <b-form-group label="Enrollable">
+                                <b-form-checkbox
+                                        id="enrollable"
+                                        v-model="course.enrollable"
+                                >
+                                    This course is enrollable by students
+                                </b-form-checkbox>
                             </b-form-group>
                             <b-button type="submit" variant="primary">Save changes</b-button>
                         </b-form>
@@ -48,7 +56,8 @@ export default {
             course: {
                 id: null,
                 name: null,
-                description: null
+                description: null,
+                enrollable: false
             }
         }
     },
