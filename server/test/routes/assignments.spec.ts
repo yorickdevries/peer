@@ -10,7 +10,6 @@ import TestData from "../test_helpers/test_data";
 // file system imports
 import fs from "fs-extra";
 import path from "path";
-import GroupsPS from "../../src/prepared_statements/group_ps";
 
 describe("API Assignment routes", () => {
     /**
@@ -383,9 +382,22 @@ describe("API Assignment routes", () => {
     it("Distribute reviews", async () => {
         // log in as teacher
         MockLogin.initialize("bplanje");
-        const res = await chai.request(router).get("/2/distributeReviews");
+        const res = await chai.request(router).get("/2/distributeReviews/0");
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).length).to.equal(3);
+        console.log(JSON.parse(res.text));
+    });
+
+    /**
+     * Check whether reviews can be distributed to itself
+     */
+    it("Distribute reviews also to itself", async () => {
+        // log in as teacher
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).get("/2/distributeReviews/1");
+        expect(res.status).to.equal(200);
+        console.log(JSON.parse(res.text));
+        expect(JSON.parse(res.text).length).to.equal(6);
     });
 
     /**
@@ -394,10 +406,10 @@ describe("API Assignment routes", () => {
     it("Distribute reviews twice", async () => {
         // log in as teacher
         MockLogin.initialize("bplanje");
-        const res = await chai.request(router).get("/2/distributeReviews");
+        const res = await chai.request(router).get("/2/distributeReviews/0");
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).length).to.equal(3);
-        const res2 = await chai.request(router).get("/2/distributeReviews");
+        const res2 = await chai.request(router).get("/2/distributeReviews/0");
         expect(res2.status).to.equal(400);
         expect(JSON.parse(res2.text).error).to.equal("There are already reviews assigned for this assignment");
     });
