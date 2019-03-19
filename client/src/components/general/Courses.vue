@@ -174,7 +174,7 @@ export default {
     methods: {
         async fetchUser() {
             let res = await api.getUser()
-            if (res.data.user.affiliation === "employee") {
+            if (res.data.user.affiliation === "employee" || res.data.user.affiliation.contains("employee")) {
                 this.showCreateCourseButton = true
             } else {
                 this.showCreateCourseButton = false
