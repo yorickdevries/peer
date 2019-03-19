@@ -87,7 +87,7 @@ describe("API Course routes", () => {
             .post("/")
             .send({description: "example", name: "test name"});
 
-        expect(res.status).to.equal(400);
+        expect(res.status).to.equal(401);
     });
 
     /**
