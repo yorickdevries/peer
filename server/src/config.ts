@@ -38,7 +38,8 @@ const config = {
         callbackUrl: "https://peer.ewi.tudelft.nl/api/login/callback",
         certificate: "/var/www/peer/cert/peer_ewi_tudelft_nl.crt",
         key: "/var/www/peer/cert/peer.ewi.tudelft.nl.key"
-    }
+    },
+    allowed_extensions: [".pdf", ".zip"]
 };
 
 // In case of CI, change hostname to postgres
