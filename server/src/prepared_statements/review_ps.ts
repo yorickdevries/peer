@@ -317,4 +317,16 @@ export default class ReviewPS {
         statement.values = [isApproved, taNetId, reviewId];
         return Database.executeQuery(statement);
     }
+
+    /**
+     * Get a single review by the review id.
+     * @param {number} reviewId - the id.
+     * @return {Promise<pgPromise.queryResult>} a single review as promise.
+     */
+    public static executeGetReviewById(reviewId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-all-done-reviews-by-assignmentid-unreviewed",
+            "SELECT * FROM Review WHERE id = $1");
+        statement.values = [reviewId];
+        return Database.executeQuerySingleResult(statement);
+    }
 }

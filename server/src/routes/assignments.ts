@@ -526,16 +526,37 @@ router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeache
 
         // Loop through the reviews, add to export data.
         for (let i = 0; i < reviews.length; i++) {
-            const review: any = await ReviewUpdate.getReview(reviews[i].id);
-            const user: any = await UserPS.executeGetUserById(reviews[i].user_netid);
+            // Get the questions and review entry of this review.
+            const questions: any = (await ReviewUpdate.getReview(reviews[i].id)).form;
+            const reviewEntry: any = await ReviewPS.executeGetReviewById(reviews[i].id);
 
+            // Get information about reviewer and submitter.
+            const submission: any = await SubmissionsPS.executeGetSubmissionById(reviewEntry.submission_id);
+            const reviewer: any = await UserPS.executeGetUserById(reviewEntry.user_netid);
+            const submitter: any = await UserPS.executeGetUserById(submission.user_netid);
+            const reviewGroup: any = await GroupPS.executeGetGroupNameForUserAndAssignment(reviewer.netid, reviewEntry.rubric_assignment_id);
+            const submitterGroup: any = await GroupPS.executeGetGroupNameForUserAndAssignment(submitter.netid, reviewEntry.rubric_assignment_id);
+
+            // Create and fill current review json item.
             const reviewJson: any = {};
-            reviewJson["netID"] = reviews[i].user_netid;
-            reviewJson["studentnumber"] = user.studentnumber;
+            reviewJson["Reviewer netID"] = reviewer.netid;
+            reviewJson["Reviewer studentnumber"] = reviewer.studentnumber;
+            if (reviewGroup[0] != undefined) {
+                reviewJson["Reviewer group"] = reviewGroup[0].group_name;
+            }
+
+            reviewJson["Submitter netID"] = submitter.netid;
+            reviewJson["Submitter studentnumber"] = submitter.studentnumber;
+            if (submitterGroup[0] != undefined) {
+                reviewJson["Submitter group"] = submitterGroup[0].group_name;
+            }
+
+            reviewJson["Approval status"] = reviews[i].approved;
+            reviewJson["TA netid"] = reviews[i].ta_netid;
 
             // Loop through the questions and add (question, answer) to the review json object.
-            for (let questionNumber = 0; questionNumber < review.form.length; questionNumber++) {
-                const item = review.form[questionNumber];
+            for (let questionNumber = 0; questionNumber < questions.length; questionNumber++) {
+                const item = questions[questionNumber];
                 reviewJson[item.question.question] = item.answer.answer;
             }
 
