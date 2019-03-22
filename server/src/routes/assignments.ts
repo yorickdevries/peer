@@ -572,7 +572,7 @@ router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeache
         // Check if the export data contains data.
         if (exportData.length == 0) {
             res.status(400);
-            res.json({error: "No grades to export."});
+            res.json({error: "No reviews to export."});
             return;
         }
 
