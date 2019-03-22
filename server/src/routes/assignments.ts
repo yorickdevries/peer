@@ -516,7 +516,13 @@ router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherA
 
 /**
  * Export the approved reviews of each student for a specific assignment.
- * json format for excel csv export [{netID: '', studentnumber: 0, question1: answer, question2: answer}]
+ * json format for excel csv export
+ * [{
+ * Reviewer net id, Reviewer studentnumber, Reviewer group,
+ * Submitter net id, Submitter studentnumber, Submitter group,
+ * Approval status, TA net id
+ * question1: answer, ..., question(n): answer
+ * }]
  * @param assignment_id - id of the assignment.
  */
 router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
@@ -528,14 +534,14 @@ router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeache
         for (let i = 0; i < reviews.length; i++) {
             // Get the questions and review entry of this review.
             const questions: any = (await ReviewUpdate.getReview(reviews[i].id)).form;
-            const reviewEntry: any = await ReviewPS.executeGetReviewById(reviews[i].id);
+            const review: any = reviews[0];
+            const submission: any = await SubmissionsPS.executeGetSubmissionById(review.submission_id);
 
             // Get information about reviewer and submitter.
-            const submission: any = await SubmissionsPS.executeGetSubmissionById(reviewEntry.submission_id);
-            const reviewer: any = await UserPS.executeGetUserById(reviewEntry.user_netid);
+            const reviewer: any = await UserPS.executeGetUserById(review.user_netid);
             const submitter: any = await UserPS.executeGetUserById(submission.user_netid);
-            const reviewGroup: any = await GroupPS.executeGetGroupNameForUserAndAssignment(reviewer.netid, reviewEntry.rubric_assignment_id);
-            const submitterGroup: any = await GroupPS.executeGetGroupNameForUserAndAssignment(submitter.netid, reviewEntry.rubric_assignment_id);
+            const reviewGroup: any = await GroupPS.executeGetGroupNameForUserAndAssignment(reviewer.netid, req.params.assignment_id);
+            const submitterGroup: any = await GroupPS.executeGetGroupNameForUserAndAssignment(submitter.netid, req.params.assignment_id);
 
             // Create and fill current review json item.
             const reviewJson: any = {};
