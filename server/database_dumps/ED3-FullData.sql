@@ -221,12 +221,12 @@ INSERT INTO public.mcanswer(
 	answer, mcquestion_id, review_id)
 	VALUES
 	    (1, 1, 1),
-	    (1, 2, 1),
-	    (2, 3, 1),
-	    (2, 4, 1),
-	    (2, 5, 1),
-	    (2, 6, 1),
-	    (2, 7, 1)
+	    (5, 2, 1),
+	    (7, 3, 1),
+	    (10, 4, 1),
+	    (14, 5, 1),
+	    (16, 6, 1),
+	    (19, 7, 1)
 	;
 
 INSERT INTO public.openanswer(
