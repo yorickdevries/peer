@@ -533,32 +533,34 @@ router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeache
         // Loop through the reviews, add to export data.
         for (let i = 0; i < reviews.length; i++) {
             // Get the questions and review entry of this review.
-            const questions: any = (await ReviewUpdate.getReview(reviews[i].id)).form;
             const review: any = reviews[i];
+            const questions: any = (await ReviewUpdate.getReview(review.id)).form;
             const submission: any = await SubmissionsPS.executeGetSubmissionById(review.submission_id);
 
             // Get information about reviewer and submitter.
             const reviewer: any = await UserPS.executeGetUserById(review.user_netid);
             const submitter: any = await UserPS.executeGetUserById(submission.user_netid);
             const reviewGroup: any = await GroupPS.executeGetGroupNameForUserAndAssignment(reviewer.netid, req.params.assignment_id);
-            const submitterGroup: any = await GroupPS.executeGetGroupNameForUserAndAssignment(submitter.netid, req.params.assignment_id);
+            const submitterGroup: any = await GroupPS.executeGetGroupById(submission.group_id);
 
             // Create and fill current review json item.
             const reviewJson: any = {};
             reviewJson["Reviewer netID"] = reviewer.netid;
             reviewJson["Reviewer studentnumber"] = reviewer.studentnumber;
             if (reviewGroup[0] != undefined) {
-                reviewJson["Reviewer group"] = reviewGroup[0].group_name;
+                reviewJson["Reviewer group ID"] = reviewGroup[0].group_id;
+                reviewJson["Reviewer group Name"] = reviewGroup[0].group_name;
             }
 
             reviewJson["Submitter netID"] = submitter.netid;
             reviewJson["Submitter studentnumber"] = submitter.studentnumber;
-            if (submitterGroup[0] != undefined) {
-                reviewJson["Submitter group"] = submitterGroup[0].group_name;
-            }
+            // submission info
+            reviewJson["Submitter group ID"] = submitterGroup.id;
+            reviewJson["Submitter group Name"] = submitterGroup.group_name;
 
-            reviewJson["Approval status"] = reviews[i].approved;
-            reviewJson["TA netid"] = reviews[i].ta_netid;
+            reviewJson["Done"] = review.done;
+            reviewJson["Approval status"] = review.approved;
+            reviewJson["TA netid"] = review.ta_netid;
 
             // Loop through the questions and add (question, answer) to the review json object.
             for (let questionNumber = 0; questionNumber < questions.length; questionNumber++) {

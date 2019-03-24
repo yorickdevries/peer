@@ -128,7 +128,7 @@ export default class GroupsPS {
      */
     public static executeGetGroupNameForUserAndAssignment(netId: string, assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-groupname-by-netid-assignmentid",
-            "SELECT group_name " +
+            "SELECT group_id, group_name " +
             "FROM GroupList " +
             "JOIN GroupUsers on GroupUsers.group_groupid = GroupList.id " +
             "JOIN AssignmentGroup on AssignmentGroup.group_id = GroupList.id " +
