@@ -318,15 +318,4 @@ export default class ReviewPS {
         return Database.executeQuery(statement);
     }
 
-    /**
-     * Get a single review by the review id.
-     * @param {number} reviewId - the id.
-     * @return {Promise<pgPromise.queryResult>} a single review as promise.
-     */
-    public static executeGetReviewById(reviewId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-whole-review-by-id",
-            "SELECT * FROM Review WHERE id = $1");
-        statement.values = [reviewId];
-        return Database.executeQuerySingleResult(statement);
-    }
 }
