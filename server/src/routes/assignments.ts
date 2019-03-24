@@ -534,7 +534,7 @@ router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeache
         for (let i = 0; i < reviews.length; i++) {
             // Get the questions and review entry of this review.
             const questions: any = (await ReviewUpdate.getReview(reviews[i].id)).form;
-            const review: any = reviews[0];
+            const review: any = reviews[i];
             const submission: any = await SubmissionsPS.executeGetSubmissionById(review.submission_id);
 
             // Get information about reviewer and submitter.
