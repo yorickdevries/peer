@@ -7,7 +7,7 @@
 
                 <!--Submission Information-->
                 <b-card header="Submission" class="h-100">
-                    <b-alert show variant="secondary">PDF files only.</b-alert>
+                    <b-alert show variant="secondary">PDF/ZIP files only.</b-alert>
                     <b-alert v-if="hasUploadedSubmission" show variant="success">
                         <dl class="mb-0">
                             <dt>This is the latest submission you have made:</dt>
@@ -39,7 +39,7 @@
 
                         <b-form-file
                             placeholder="Choose a file..."
-                            accept=".pdf"
+                            accept= ".pdf,.zip"
                             v-model="file"
                             :state="Boolean(file)"
                             ref="fileInput"/>
@@ -66,7 +66,7 @@
       return {
         file: null,
         fileProgress: 0,
-        acceptFiles: ".pdf",
+        acceptFiles: ".pdf,.zip",
         submission: {
           user_netid: null,
           assignment_id: null,

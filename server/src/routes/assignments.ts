@@ -26,14 +26,15 @@ const fileFolder = config.assignments.fileFolder;
 
 router.use(bodyParser.json());
 
-// PDF of max 30 MB (in bytes)
+// File of max 30 MB (in bytes)
 const maxSizeAssignmentFile = config.assignments.maxSizeAssignmentFile;
 const uploadAssignment = multer({
     limits: {fileSize: maxSizeAssignmentFile},
     fileFilter: function (req: any, file, callback) {
         const ext = path.extname(file.originalname);
-        if (ext !== ".pdf") {
-            req.fileValidationError = "File should be a .pdf file";
+        const extensions: any = config.allowed_extensions;
+        if (!(extensions.includes(ext))) {
+            req.fileValidationError = "Extension not allowed";
             // tslint:disable-next-line
             return callback(null, false);
         } else {
@@ -196,7 +197,7 @@ router.get("/:assignment_id/file", index.authorization.enrolledAssignmentCheck, 
     try {
         const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
         const fileName = path.join(fileFolder, assignment.filename);
-        res.sendFile(fileName);
+        res.download(fileName);
     } catch (err) {
         res.sendStatus(400);
     }
