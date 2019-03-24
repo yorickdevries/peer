@@ -545,18 +545,18 @@ router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeache
 
             // Create and fill current review json item.
             const reviewJson: any = {};
-            reviewJson["Reviewer netID"] = reviewer.netid;
+            reviewJson["Reviewer netid"] = reviewer.netid;
             reviewJson["Reviewer studentnumber"] = reviewer.studentnumber;
             if (reviewGroup[0] != undefined) {
-                reviewJson["Reviewer group ID"] = reviewGroup[0].group_id;
-                reviewJson["Reviewer group Name"] = reviewGroup[0].group_name;
+                reviewJson["Reviewer group id"] = reviewGroup[0].group_id;
+                reviewJson["Reviewer group name"] = reviewGroup[0].group_name;
             }
 
-            reviewJson["Submitter netID"] = submitter.netid;
+            reviewJson["Submitter netid"] = submitter.netid;
             reviewJson["Submitter studentnumber"] = submitter.studentnumber;
             // submission info
-            reviewJson["Submitter group ID"] = submitterGroup.id;
-            reviewJson["Submitter group Name"] = submitterGroup.group_name;
+            reviewJson["Submitter group id"] = submitterGroup.id;
+            reviewJson["Submitter group name"] = submitterGroup.group_name;
 
             reviewJson["Done"] = review.done;
             reviewJson["Approval status"] = review.approved;
