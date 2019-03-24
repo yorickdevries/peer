@@ -317,4 +317,5 @@ export default class ReviewPS {
         statement.values = [isApproved, taNetId, reviewId];
         return Database.executeQuery(statement);
     }
+
 }

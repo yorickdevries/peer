@@ -7,19 +7,20 @@ import AssignmentPS from "../prepared_statements/assignment_ps";
 import UserPS from "../prepared_statements/user_ps";
 import GroupPS, { default as GroupsPS } from "../prepared_statements/group_ps";
 import ReviewPS from "../prepared_statements/review_ps";
-import RubricPS from "../prepared_statements/rubric_ps";
 import ExportResultsPS from "../prepared_statements/export_results_ps";
-import CSVExport from "../CSVExport";
 import GroupParser from "../groupParser";
 import reviewDistribution from "../reviewDistribution";
 import ReviewDistributionTwoAssignments from "../reviewDistributionTwoAssignments";
 import bodyParser from "body-parser";
 import config from "../config";
 
+const json2csv = require("json2csv").parse;
+
 // Router
 import express from "express";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 import CoursesPS from "../prepared_statements/courses_ps";
+import ReviewUpdate from "../reviewUpdate";
 
 const router = express();
 const fileFolder = config.assignments.fileFolder;
@@ -43,6 +44,30 @@ const uploadAssignment = multer({
         }
     }
 }).single("assignmentFile");
+
+/**
+ * Create and fetch a filename for a specific assignment.
+ * @param {number} assignmentId - an id of an assignment.
+ * @return {Promise<string>} - a string as promise.
+ */
+async function filenameForAssignment(assignmentId: number): Promise<string> {
+    // Properly format the file name.
+    const assignment: any = await AssignmentPS.executeGetAssignmentById(assignmentId);
+    const course: any = await CoursesPS.executeGetCourseById(assignment.course_id);
+    const date: Date = new Date();
+    const dd = (date.getDate() < 10) ? "0" + date.getDate() : date.getDate();
+    const mm = (date.getMonth() + 1 < 10) ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
+    const hours = (date.getHours() < 10) ? "0" + date.getHours() : date.getHours();
+    const min = (date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes();
+
+    // Check if the course name is a valid file name.
+    const courseName = (/^([a-zA-Z_\-\s0-9]+)$/.test(course.name.replace(/ /g, "")))
+        ? course.name.replace(/ /g, "") : "";
+    const assignmentTitle = (/^([a-zA-Z_\-\s0-9]+)$/.test(assignment.title.replace(/ /g, "")))
+        ? assignment.title.replace(/ /g, "") : "";
+
+    return `${courseName}--${assignmentTitle}--${dd}-${mm}-${date.getFullYear()}--${hours}-${min}`;
+}
 
 // File upload handling
 const uploadAssignmentFunction = function(req: any, res: any, next: any) {
@@ -477,26 +502,103 @@ router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherA
             return;
         }
 
-        // Properly format the file name.
-        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-        const course: any = await CoursesPS.executeGetCourseById(assignment.course_id);
-        const date: Date = new Date();
-        const dd = (date.getDate() < 10) ? "0" + date.getDate() : date.getDate();
-        const mm = (date.getMonth() + 1 < 10) ? "0" + date.getMonth() + 1 : date.getMonth() + 1;
-        const hours = (date.getHours() < 10) ? "0" + date.getHours() : date.getHours();
-        const min = (date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes();
-
-        // Check if the course name is a valid file name.
-
-        const courseName = (/^([a-zA-Z_\-\s0-9]+)$/.test(course.name.replace(/ /g, "")))
-            ? course.name.replace(/ /g, "") : "";
-        const assignmentTitle = (/^([a-zA-Z_\-\s0-9]+)$/.test(assignment.title.replace(/ /g, "")))
-            ? assignment.title.replace(/ /g, "") : "";
-        const filename: string = `${courseName}--${assignmentTitle}--${dd}-${mm}-${date.getFullYear()}--${hours}-${min}`;
+        // Get the fields for the csv file. Export data contains at least 1 item at this point.
+        const csvFields = Object.keys(exportData[0]);
+        const filename: string = await filenameForAssignment(req.params.assignment_id);
 
         res.setHeader("Content-disposition", `attachment; filename=${filename}.csv`);
         res.set("Content-Type", "text/csv");
-        res.status(200).send(CSVExport.downloadCSV({ exportData: exportData }));
+        res.status(200).send(json2csv(exportData, { csvFields }));
+    } catch (e) {
+        console.log(e);
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Export the approved reviews of each student for a specific assignment.
+ * json format for excel csv export
+ * [{
+ * Reviewer net id, Reviewer studentnumber, Reviewer group,
+ * Submitter net id, Submitter studentnumber, Submitter group,
+ * Approval status, TA net id
+ * question1: answer, ..., question(n): answer
+ * }]
+ * @param assignment_id - id of the assignment.
+ */
+router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
+    try {
+        const exportData: Array<any> = [];
+        const reviews: any = await ReviewPS.executeGetReviewsByAssignmentId(req.params.assignment_id);
+
+        // Loop through the reviews, add to export data.
+        for (let i = 0; i < reviews.length; i++) {
+            // Get the questions and review entry of this review.
+            const review: any = reviews[i];
+            const questions: any = (await ReviewUpdate.getReview(review.id)).form;
+            const submission: any = await SubmissionsPS.executeGetSubmissionById(review.submission_id);
+
+            // Get information about reviewer and submitter.
+            const reviewer: any = await UserPS.executeGetUserById(review.user_netid);
+            const submitter: any = await UserPS.executeGetUserById(submission.user_netid);
+            const reviewGroup: any = await GroupPS.executeGetGroupNameForUserAndAssignment(reviewer.netid, req.params.assignment_id);
+            const submitterGroup: any = await GroupPS.executeGetGroupById(submission.group_id);
+
+            // Create and fill current review json item.
+            const reviewJson: any = {};
+            reviewJson["Reviewer netid"] = reviewer.netid;
+            reviewJson["Reviewer studentnumber"] = reviewer.studentnumber;
+            if (reviewGroup[0] != undefined) {
+                reviewJson["Reviewer group id"] = reviewGroup[0].group_id;
+                reviewJson["Reviewer group name"] = reviewGroup[0].group_name;
+            }
+
+            reviewJson["Submitter netid"] = submitter.netid;
+            reviewJson["Submitter studentnumber"] = submitter.studentnumber;
+            // submission info
+            reviewJson["Submitter group id"] = submitterGroup.id;
+            reviewJson["Submitter group name"] = submitterGroup.group_name;
+
+            reviewJson["Done"] = review.done;
+            reviewJson["Approval status"] = review.approved;
+            reviewJson["TA netid"] = review.ta_netid;
+
+            // Loop through the questions and add (question, answer) to the review json object.
+            for (let questionNumber = 0; questionNumber < questions.length; questionNumber++) {
+                const item = questions[questionNumber];
+                if (item.question.type_question == "mc") {
+                    const answer = item.answer.answer;
+                    // find the right chosen option in the list
+                    let chosenOption = undefined;
+                    const options = item.question.option;
+                    for (let j = 0; j < options.length; j++) {
+                        if (options[j].id == answer) {
+                            chosenOption = options[j].option;
+                        }
+                    }
+                    reviewJson[item.question.question] = chosenOption;
+                } else {
+                    reviewJson[item.question.question] = item.answer.answer;
+                }
+            }
+
+            exportData.push(reviewJson);
+        }
+
+        // Check if the export data contains data.
+        if (exportData.length == 0) {
+            res.status(400);
+            res.json({error: "No reviews to export."});
+            return;
+        }
+
+        // Get the fields for the csv file. Export data contains at least 1 item at this point.
+        const csvFields = Object.keys(exportData[0]);
+        const filename: string = await filenameForAssignment(req.params.assignment_id);
+
+        res.setHeader("Content-disposition", `attachment; filename=${filename}.csv`);
+        res.set("Content-Type", "text/csv");
+        res.status(200).send(json2csv(exportData, { csvFields }));
     } catch (e) {
         console.log(e);
         res.sendStatus(400);

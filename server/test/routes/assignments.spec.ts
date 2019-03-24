@@ -469,12 +469,40 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Random review id
+     * Empty grade export
      */
     it("Empty grade export", async () => {
         // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).get("/2/gradeExport");
         expect(res.status).to.equal(400);
+    });
+
+    /**
+     * Test of the csv grade export.
+     */
+    it("Grade export valid", async () => {
+        // log in as bplanje (teacher)cle
+        MockLogin.initialize("bplanje");
+        const gradeExport: any = await chai.request(router).get("/1/gradeExport");
+
+        expect(gradeExport.status).to.equal(200);
+        // Make sure it includes at least the paul review.
+        expect(gradeExport.text.includes("\"paulvanderlaan\",,\"0\",\"0\",\"1\",\"1\"")).to.equal(true);
+    });
+
+    /**
+     * Test of the csv reviews export.
+     */
+    it("Reviews export valid", async () => {
+        // log in as bplanje (teacher)cle
+        MockLogin.initialize("bplanje");
+        const gradeExport: any = await chai.request(router).get("/1/reviewsExport");
+
+        expect(gradeExport.status).to.equal(200);
+        // Make sure it includes at least the henkjan review and paul review.
+        expect(gradeExport.text.includes("\"Reviewer netid\",\"Reviewer studentnumber\",\"Reviewer group id\",\"Reviewer group name\",\"Submitter netid\",\"Submitter studentnumber\",\"Submitter group id\",\"Submitter group name\",\"Done\",\"Approval status\",\"TA netid\",\"What is the best way to insert queries?\",\"Is the right Answer A?\",\"How to insert queries?\",\"How much fun is inserting queries?\""
+        )).to.equal(true);
+        expect(gradeExport.text.includes("\"henkjan\",,10,\"ED-3\",\"paulvanderlaan\",,10,\"ED-3\"")).to.equal(true);
     });
 });
