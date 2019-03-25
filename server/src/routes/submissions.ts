@@ -14,14 +14,15 @@ import express from "express";
 const router = express();
 router.use(bodyParser.json());
 
-// PDF of max 30 MB (in bytes)
+// File of max 30 MB (in bytes)
 const maxSizeSubmissionFile = config.submissions.maxSizeSubmissionFile;
 const uploadSubmission = multer({
     limits: {fileSize: maxSizeSubmissionFile},
     fileFilter: function (req: any, file, callback) {
         const ext = path.extname(file.originalname);
-        if (ext !== ".pdf") {
-            req.fileValidationError = "File should be a .pdf file";
+        const extensions: any = config.allowed_extensions;
+        if (!(extensions.includes(ext))) {
+            req.fileValidationError = "Extension not allowed";
             // tslint:disable-next-line
             return callback(null, false);
         } else {
@@ -106,7 +107,7 @@ router.get("/:id/file", index.authorization.getSubmissionFileAuth, async (req, r
     try {
         const submission: any = await SubmissionsPS.executeGetSubmissionById(req.params.id);
         const filePath = path.join(config.submissions.fileFolder, submission.file_path);
-        res.sendFile(filePath);
+        res.download(filePath);
     } catch (err) {
         res.sendStatus(400);
     }

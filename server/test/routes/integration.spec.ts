@@ -59,17 +59,18 @@ describe("API integration test", () => {
     it("Full integration test for assignments", async () => {
         // [1]
         // Log in as bplanje (teacher) and create a course.
-        MockLogin.initialize("bplanje", undefined, "employee");
+        MockLogin.initialize("bplanje", undefined, ["employee", "faculty"]);
         const course: any = await chai.request(router)
             .post("/courses/")
-            .send({description: "example", name: "test name"});
+            .send({description: "example", name: "test name", enrollable: true});
         const courseId = JSON.parse(course.text).id;
         // Assertions to make sure the course is created.
         expect(course.status).to.equal(200);
         expect(course.text).to.equal(JSON.stringify({
                 id: courseId,
                 description: "example",
-                name: "test name"
+                name: "test name",
+                enrollable: true
             }
         ));
         console.log("Teacher created a course");
@@ -176,7 +177,7 @@ describe("API integration test", () => {
             .field("one_person_groups", false);
         console.log("Assignment duedate is set in the past");
 
-        const distribution = await chai.request(router).get("/assignments/" + assignmentId + "/distributeReviews");
+        const distribution = await chai.request(router).get("/assignments/" + assignmentId + "/distributeReviews/0");
         // Assertions to make sure the reviews are distributed.
         expect(distribution.status).to.equal(200);
         expect(JSON.parse(distribution.text).length).to.equal(2);

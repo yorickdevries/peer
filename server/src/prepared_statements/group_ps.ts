@@ -119,4 +119,23 @@ export default class GroupsPS {
         statement.values = [netid, groupId];
         return Database.executeQuery(statement);
     }
+
+    /**
+     * Prepared statement to get the group name for a specific user id and assignment id.
+     * @param {string} netId - a net id of a user.
+     * @param {number} assignmentId - an assignment id.
+     * @return {Promise<pgPromise.queryResult>} - group name as promise single result.
+     */
+    public static executeGetGroupNameForUserAndAssignment(netId: string, assignmentId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-groupname-by-netid-assignmentid",
+            "SELECT group_id, group_name " +
+            "FROM GroupList " +
+            "JOIN GroupUsers on GroupUsers.group_groupid = GroupList.id " +
+            "JOIN AssignmentGroup on AssignmentGroup.group_id = GroupList.id " +
+            "JOIN AssignmentList on AssignmentList.id = AssignmentGroup.assignment_id " +
+            "WHERE GroupUsers.user_netid = $1 " +
+            "AND AssignmentList.id = $2");
+        statement.values = [netId, assignmentId];
+        return Database.executeQuery(statement);
+    }
 }

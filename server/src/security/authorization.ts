@@ -2,6 +2,7 @@ import AuthorizationPS from "../prepared_statements/authorization_ps";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 import ReviewPS from "../prepared_statements/review_ps";
+import CoursesPS from "../prepared_statements/courses_ps";
 
 /**
  * Check whether the user who does the request is authenticated.
@@ -24,7 +25,7 @@ const authorizeCheck = (req: any, res: any, next: any) => {
  * @param next - next.
  */
 const employeeCheck = (req: any, res: any, next: any) => {
-    if (req.user.affiliation === "employee") {
+    if (req.user.affiliation === "employee" || req.user.affiliation.includes("employee")) {
         next();
     } else {
         res.sendStatus(401);
@@ -467,6 +468,20 @@ const getSubmissionFileAuth = async (req: any, res: any, next: any) => {
 };
 
 /**
+ * Check whether a course is enrollable
+ */
+const courseEnrollable = async (req: any, res: any, next: any) => {
+    try {
+        // Fetch the parameters required for the check.
+        const course: any = await CoursesPS.executeGetCourseById(req.params.courseId);
+        // Verify the authorization.
+        await response(res, course.enrollable, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
  * Response method that handles the response
  */
 const response = (res: any, bool: boolean, next: any) => {
@@ -511,5 +526,6 @@ export default {
     isAuthorizedToEditGroup,
     checkReviewBetweenPublishDue,
     checkSubmissionBetweenPublishDue,
-    enrolledAsTeacherTwoAssignmentsCheck
+    enrolledAsTeacherTwoAssignmentsCheck,
+    courseEnrollable
 };

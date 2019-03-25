@@ -10,7 +10,6 @@ import TestData from "../test_helpers/test_data";
 // file system imports
 import fs from "fs-extra";
 import path from "path";
-import GroupsPS from "../../src/prepared_statements/group_ps";
 
 describe("API Assignment routes", () => {
     /**
@@ -383,9 +382,22 @@ describe("API Assignment routes", () => {
     it("Distribute reviews", async () => {
         // log in as teacher
         MockLogin.initialize("bplanje");
-        const res = await chai.request(router).get("/2/distributeReviews");
+        const res = await chai.request(router).get("/2/distributeReviews/0");
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).length).to.equal(3);
+        console.log(JSON.parse(res.text));
+    });
+
+    /**
+     * Check whether reviews can be distributed to itself
+     */
+    it("Distribute reviews also to itself", async () => {
+        // log in as teacher
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).get("/2/distributeReviews/1");
+        expect(res.status).to.equal(200);
+        console.log(JSON.parse(res.text));
+        expect(JSON.parse(res.text).length).to.equal(6);
     });
 
     /**
@@ -394,10 +406,10 @@ describe("API Assignment routes", () => {
     it("Distribute reviews twice", async () => {
         // log in as teacher
         MockLogin.initialize("bplanje");
-        const res = await chai.request(router).get("/2/distributeReviews");
+        const res = await chai.request(router).get("/2/distributeReviews/0");
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).length).to.equal(3);
-        const res2 = await chai.request(router).get("/2/distributeReviews");
+        const res2 = await chai.request(router).get("/2/distributeReviews/0");
         expect(res2.status).to.equal(400);
         expect(JSON.parse(res2.text).error).to.equal("There are already reviews assigned for this assignment");
     });
@@ -457,12 +469,40 @@ describe("API Assignment routes", () => {
     });
 
     /**
-     * Random review id
+     * Empty grade export
      */
     it("Empty grade export", async () => {
         // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).get("/2/gradeExport");
         expect(res.status).to.equal(400);
+    });
+
+    /**
+     * Test of the csv grade export.
+     */
+    it("Grade export valid", async () => {
+        // log in as bplanje (teacher)cle
+        MockLogin.initialize("bplanje");
+        const gradeExport: any = await chai.request(router).get("/1/gradeExport");
+
+        expect(gradeExport.status).to.equal(200);
+        // Make sure it includes at least the paul review.
+        expect(gradeExport.text.includes("\"paulvanderlaan\",,\"0\",\"0\",\"1\",\"1\"")).to.equal(true);
+    });
+
+    /**
+     * Test of the csv reviews export.
+     */
+    it("Reviews export valid", async () => {
+        // log in as bplanje (teacher)cle
+        MockLogin.initialize("bplanje");
+        const gradeExport: any = await chai.request(router).get("/1/reviewsExport");
+
+        expect(gradeExport.status).to.equal(200);
+        // Make sure it includes at least the henkjan review and paul review.
+        expect(gradeExport.text.includes("\"Reviewer netid\",\"Reviewer studentnumber\",\"Reviewer group id\",\"Reviewer group name\",\"Submitter netid\",\"Submitter studentnumber\",\"Submitter group id\",\"Submitter group name\",\"Done\",\"Approval status\",\"TA netid\",\"What is the best way to insert queries?\",\"Is the right Answer A?\",\"How to insert queries?\",\"How much fun is inserting queries?\""
+        )).to.equal(true);
+        expect(gradeExport.text.includes("\"henkjan\",,10,\"ED-3\",\"paulvanderlaan\",,10,\"ED-3\"")).to.equal(true);
     });
 });

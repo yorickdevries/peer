@@ -2,7 +2,7 @@
 import MockStrategy from "passport-mock-strategy";
 import ParseNetId from "./parseNetId";
 
-const mockPassportConfiguration = function(passport: any, netid: string, affiliation: string) {
+const mockPassportConfiguration = function(passport: any, netid: string, affiliation: any) {
   const userobject: any = {
     netid: ParseNetId.parseNetId(netid),
     studentNumber: 1234567,

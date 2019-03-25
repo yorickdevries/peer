@@ -20,36 +20,15 @@ describe("API Course routes", () => {
     });
 
     /**
-     * Tests whether courses are returned
-     */
-    it("Get courses/", async () => {
-        const res = await chai.request(router).get("/");
-        expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify([
-            {
-                id: 1,
-                description: "This is a beautiful course description!",
-                name: "ED-3"
-            },
-            {
-                "id": 2,
-                "description": "Test-course",
-                "name": "ED-4"
-            },
-            {"id": 3, "description" : "Test-course2", "name" : "ED-5"}
-        ]));
-    });
-
-    /**
      * Tests whether courses are posted and returned
      */
     it("Put courses/", async () => {
         const res = await chai.request(router)
             .post("/")
-            .send({description: "example", name: "test name"});
+            .send({description: "example", name: "test name", enrollable: "true"});
 
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify({"id": 4, "description": "example", "name": "test name"}
+        expect(res.text).to.equal(JSON.stringify({"id": 4, "description": "example", "name": "test name", "enrollable": true}
         ));
 
         const result = await chai.request(router).get("/enrolled");
@@ -60,8 +39,35 @@ describe("API Course routes", () => {
         expect(newcourse).to.deep.equal({
             "id": 4,
             "description": "example",
-            "name": "test name"
+            "name": "test name",
+            "enrollable": true
         });
+    });
+
+    /**
+     * Tests whether course can be made when the affiliation is ["employee","faculty"]
+     */
+    it("create course as [employee,faculty]", async () => {
+        MockLogin.initialize("bplanje", undefined, ["employee", "faculty"]);
+        const res = await chai.request(router)
+            .post("/")
+            .send({description: "example", name: "test name", "enrollable": true});
+
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify({"id": 4, "description": "example", "name": "test name", "enrollable": true}
+        ));
+    });
+
+    /**
+     * Tests whether course cannot be made when the affiliation is student
+     */
+    it("Create course as student", async () => {
+        MockLogin.initialize("bplanje", undefined, "student");
+        const res = await chai.request(router)
+            .post("/")
+            .send({description: "example", name: "test name"});
+
+        expect(res.status).to.equal(401);
     });
 
     /**
@@ -74,9 +80,10 @@ describe("API Course routes", () => {
         expect(res.text).to.equal(JSON.stringify([{
             "id": 1,
             "description": "This is a beautiful course description!",
-            "name": "ED-3"
-        }, {"id": 2, "description": "Test-course", "name": "ED-4"},
-        {"id": 3, "description": "Test-course2", "name": "ED-5"}]));
+            "name": "ED-3",
+            "enrollable": true
+        }, {"id": 2, "description": "Test-course", "name": "ED-4", "enrollable": true},
+        {"id": 3, "description": "Test-course2", "name": "ED-5", "enrollable": false}]));
     });
 
     /**
@@ -97,12 +104,13 @@ describe("API Course routes", () => {
         // test the router
         const res = await chai.request(router)
             .put("/1")
-            .send({courseId: 1, description: "example", name: "test name"});
+            .send({courseId: 1, description: "example", name: "test name", "enrollable": true});
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify({
             id: 1,
             description: "example",
-            name: "test name"
+            name: "test name",
+            enrollable: true
         }));
     });
 
@@ -116,7 +124,8 @@ describe("API Course routes", () => {
         expect(res.text).to.equal(JSON.stringify({
             id: 1,
             description: "This is a beautiful course description!",
-            name: "ED-3"
+            name: "ED-3",
+            enrollable: true
         }));
     });
 
@@ -186,5 +195,32 @@ describe("API Course routes", () => {
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).get("/2/gradeExport");
         expect(res.status).to.equal(400);
+    });
+
+    /**
+     * enroll in an enrollable course
+     */
+    it("Enroll in an enrollable course", async () => {
+        MockLogin.initialize("newstudent");
+        const res = await chai.request(router).get("/1/enroll");
+        expect(res.status).to.equal(200);
+    });
+
+    /**
+     * enroll in an unenrollable course
+     */
+    it("Enroll in an unenrollable course", async () => {
+        MockLogin.initialize("newstudent");
+        const res = await chai.request(router).get("/3/enroll");
+        expect(res.status).to.equal(401);
+    });
+
+    /**
+     * enroll in a nonexisting course
+     */
+    it("Enroll in a nonexisting course", async () => {
+        MockLogin.initialize("newstudent");
+        const res = await chai.request(router).get("/3456/enroll");
+        expect(res.status).to.equal(401);
     });
 });

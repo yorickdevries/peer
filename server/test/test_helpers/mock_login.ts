@@ -22,7 +22,7 @@ export default class MockLogin {
      * @param {(string | undefined)} [email=undefined]
      * @memberof MockLogin
      */
-    static initialize(netid?: string, email?: string, affiliation?: string) {
+    static initialize(netid?: string, email?: string, affiliation?: any) {
         this.initializeRouter(api, netid, email, affiliation);
         this.initializeRouter(assignments, netid, email, affiliation);
         this.initializeRouter(courses, netid, email, affiliation);

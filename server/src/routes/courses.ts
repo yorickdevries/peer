@@ -5,10 +5,11 @@ import GroupParser from "../groupParser";
 import index from "../security/index";
 import { Roles } from "../roles";
 
+const json2csv = require("json2csv").parse;
+
 // Router
 import express from "express";
 import ExportResultsPS from "../prepared_statements/export_results_ps";
-import CSVExport from "../CSVExport";
 import UserPS from "../prepared_statements/user_ps";
 import ParseNetId from "../parseNetId";
 const router = express();
@@ -23,7 +24,7 @@ router.use(bodyParser.json());
 router.post("/", index.authorization.employeeCheck, async (req: any, res) => {
     try {
         // Create the course
-        const course = await CoursesPS.executeCreateCourse(req.body.description, req.body.name);
+        const course = await CoursesPS.executeCreateCourse(req.body.description, req.body.name, req.body.enrollable);
         // Enroll the teacher in the course
         await CoursesPS.executeEnrollInCourseId(course.id, req.user.netid, Roles.teacher);
         // Respond with appropriate JSON
@@ -31,18 +32,6 @@ router.post("/", index.authorization.employeeCheck, async (req: any, res) => {
     } catch {
         res.sendStatus(400);
     }
-});
-
-/**
- * Route to get all courses.
- */
-router.get("/", (req, res) => {
-    CoursesPS.executeGetAllCourses()
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
-        res.sendStatus(400);
-    });
 });
 
 /**
@@ -104,7 +93,7 @@ router.get("/:courseId/assignments", index.authorization.enrolledCourseCheck, (r
  * @body name - a new course name.
  */
 router.put("/:courseId", index.authorization.enrolledCourseTeacherCheck, (req, res) => {
-    CoursesPS.executeUpdateCourse(req.params.courseId, req.body.description, req.body.name)
+    CoursesPS.executeUpdateCourse(req.params.courseId, req.body.description, req.body.name, req.body.enrollable)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -208,7 +197,7 @@ router.get("/:courseId/users/:role/", index.authorization.enrolledCourseTeacherC
  * Enroll as a student in a course.
  * @param courseId - a course id.
  */
-router.get("/:courseId/enroll", async (req: any, res) => {
+router.get("/:courseId/enroll", index.authorization.courseEnrollable, async (req: any, res) => {
     try {
         // Use method from group parser to enroll student (if not already enrolled)
         await GroupParser.enrollStudentIfNotEnrolled(req.params.courseId, req.user.netid);
@@ -250,7 +239,7 @@ router.get("/:courseId/gradeExport", index.authorization.enrolledCourseTeacherCh
         const course: any = await CoursesPS.executeGetCourseById(req.params.courseId);
         const date: Date = new Date();
         const dd = (date.getDate() < 10) ? "0" + date.getDate() : date.getDate();
-        const mm = (date.getMonth() + 1 < 10) ? "0" + date.getMonth() + 1 : date.getMonth() + 1;
+        const mm = (date.getMonth() + 1 < 10) ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
         const hours = (date.getHours() < 10) ? "0" + date.getHours() : date.getHours();
         const min = (date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes();
 
@@ -259,7 +248,10 @@ router.get("/:courseId/gradeExport", index.authorization.enrolledCourseTeacherCh
 
         res.setHeader("Content-disposition", `attachment; filename=${filename}.csv`);
         res.set("Content-Type", "text/csv");
-        res.status(200).send(CSVExport.downloadCSV({ exportData: exportData }));
+        // Get the fields for the csv file. Export data contains at least 1 item at this point.
+        const csvFields = Object.keys(exportData[0]);
+
+        res.status(200).send(json2csv(exportData, { csvFields }));
     } catch (e) {
         console.log(e);
         res.sendStatus(400);

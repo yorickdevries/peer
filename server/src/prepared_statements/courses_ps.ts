@@ -13,11 +13,11 @@ export default class CoursesPS {
      * @param {string} name - name.
      * @returns {Promise<pgPromise.queryResult>} the updated course as pg promise.
      */
-    public static executeUpdateCourse(id: number, description: string, name: string): Promise<pgPromise.queryResult> {
+    public static executeUpdateCourse(id: number, description: string, name: string, enrollable: boolean): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-course",
-            'UPDATE "courselist" SET ("description", "name") = ($1, $2) WHERE "id" = $3 ' +
-            "RETURNING id, description, name");
-        statement.values = [description, name, id];
+            'UPDATE "courselist" SET ("description", "name", "enrollable") = ($1, $2, $3) WHERE "id" = $4 ' +
+            "RETURNING id, description, name, enrollable");
+        statement.values = [description, name, enrollable, id];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -27,10 +27,10 @@ export default class CoursesPS {
      * @param {string} name - name of the course.
      * @returns {Promise<pgPromise.queryResult>} course that is inserted as pg promise.
      */
-    public static executeCreateCourse(description: string, name: string): any {
+    public static executeCreateCourse(description: string, name: string, enrollable: boolean): any {
         const statement = new PreparedStatement("create-course",
-            'INSERT INTO "courselist" ("description", "name") VALUES ($1, $2) RETURNING id, description, name');
-        statement.values = [description, name];
+            'INSERT INTO "courselist" ("description", "name", "enrollable") VALUES ($1, $2, $3) RETURNING id, description, name, enrollable');
+        statement.values = [description, name, enrollable];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -44,16 +44,6 @@ export default class CoursesPS {
             'SELECT * FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" ' +
             "WHERE user_netid LIKE $1)");
         statement.values = [userNetId];
-        return Database.executeQuery(statement);
-    }
-
-    /**
-     * Executes a 'get all courses' query.
-     * @return {any} a query result.
-     */
-    public static executeGetAllCourses(): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-all-courses",
-            'SELECT * FROM "courselist"');
         return Database.executeQuery(statement);
     }
 
@@ -161,7 +151,8 @@ export default class CoursesPS {
      */
     public static executeGetUnenrolledForUser(netId: string): any {
         const statement = new PreparedStatement("get-unenrolled-courses-for-netid",
-            'SELECT * FROM "courselist" WHERE "id" NOT IN (SELECT "id" FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" WHERE user_netid LIKE $1))');
+            'SELECT * FROM "courselist" WHERE "id" NOT IN ' +
+            '(SELECT "id" FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" WHERE user_netid LIKE $1)) AND enrollable = TRUE');
         statement.values = [netId];
         return Database.executeQuery(statement);
     }

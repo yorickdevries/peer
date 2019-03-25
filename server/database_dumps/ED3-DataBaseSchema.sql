@@ -27,6 +27,7 @@ CREATE TABLE CourseList (
     id SERIAL,
     description varchar(5000),
     name varchar(500) NOT NULL,
+    enrollable boolean NOT NULL,
     CONSTRAINT CourseList_pk PRIMARY KEY (id)
 );
 

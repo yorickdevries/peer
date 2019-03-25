@@ -14,35 +14,14 @@ describe("CoursePreparedStatement Test", () => {
     });
 
     /**
-     * Get all courses
-     */
-    it("get all courses", async () => {
-        expect(await CoursePS.executeGetAllCourses()).to.deep.equal([{
-            description: "This is a beautiful course description!",
-            id: 1,
-            name: "ED-3"
-            },
-            {
-            description: "Test-course",
-            id: 2,
-            name: "ED-4"
-            },
-            {
-            description: "Test-course2",
-            id: 3,
-            name: "ED-5"
-            }
-        ]);
-    });
-
-    /**
      * Get course by id
      */
     it("get course by id", async () => {
         expect(await CoursePS.executeGetCourseById(1)).to.deep.equal({
             description: "This is a beautiful course description!",
             "id": 1,
-            name: "ED-3"
+            name: "ED-3",
+            enrollable: true
         });
     });
 
@@ -50,10 +29,11 @@ describe("CoursePreparedStatement Test", () => {
      * Test create a course
      */
     it("createa a course", async () => {
-        expect(await CoursePS.executeCreateCourse("hi", "super leuk")).to.deep.equal({
+        expect(await CoursePS.executeCreateCourse("hi", "super leuk", true)).to.deep.equal({
             description: "hi",
             id: 4,
-            name: "super leuk"
+            name: "super leuk",
+            enrollable: true
         });
     });
 
@@ -61,10 +41,11 @@ describe("CoursePreparedStatement Test", () => {
      * Test update a course
      */
     it("update a course", async () => {
-        expect(await CoursePS.executeUpdateCourse(1, "hi", "super leuk")).to.deep.equal({
+        expect(await CoursePS.executeUpdateCourse(1, "hi", "super leuk", false)).to.deep.equal({
             description: "hi",
             id: 1,
-            name: "super leuk"
+            name: "super leuk",
+            enrollable: false
         });
     });
 
@@ -75,7 +56,8 @@ describe("CoursePreparedStatement Test", () => {
         expect([{
             description: "This is a beautiful course description!",
             id: 1,
-            name: "ED-3"
+            name: "ED-3",
+            enrollable: true
         }]).to.deep.equal(await CoursePS.executeGetAllEnrolledCourses("paulvanderlaan"));
     });
 
