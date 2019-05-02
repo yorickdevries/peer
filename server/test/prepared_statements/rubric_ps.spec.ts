@@ -164,21 +164,23 @@ describe("RubricPreparedStatements Test", () => {
      * Test to get all mc option by an id
      */
     it("get mc option", async () => {
-        expect(await RubricPS.executeGetAllMCOptionById(1)).to.deep.equal([{
-            id: 1,
-            mcquestion_id: 1,
-            option: "By using pgAdmin"
-        },
+        expect(await RubricPS.executeGetAllMCOptionById(1)).to.deep.equal([
+            {
+                id: 3,
+                mcquestion_id: 1,
+                option: "By asking Brian"
+            },
             {
                 id: 2,
                 mcquestion_id: 1,
                 option: "By using command line"
             },
             {
-                id: 3,
+                id: 1,
                 mcquestion_id: 1,
-                option: "By asking Brian"
-            }]);
+                option: "By using pgAdmin"
+            }
+        ]);
     });
 
     /**
@@ -252,19 +254,19 @@ describe("RubricPreparedStatements Test", () => {
                     "id": 1,
                     "option": [
                         {
-                            "id": 1,
-                            "mcquestion_id": 1,
-                            "option": "By using pgAdmin"
+                            id: 3,
+                            mcquestion_id: 1,
+                            option: "By asking Brian"
                         },
                         {
-                            "id": 2,
-                            "mcquestion_id": 1,
-                            "option": "By using command line"
+                            id: 2,
+                            mcquestion_id: 1,
+                            option: "By using command line"
                         },
                         {
-                            "id": 3,
-                            "mcquestion_id": 1,
-                            "option": "By asking Brian"
+                            id: 1,
+                            mcquestion_id: 1,
+                            option: "By using pgAdmin"
                         }
                     ],
                     "question": "What is the best way to insert queries?",
