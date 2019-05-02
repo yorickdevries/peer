@@ -99,7 +99,7 @@ router.put("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (req, 
         }).catch((error) => {
             res.sendStatus(400);
         });
-    }  
+    }
 });
 
 /**
