@@ -71,12 +71,17 @@ router.delete("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (re
  * @body option, mcquestion_id
  */
 router.post("/mcoption", index.authorization.checkMCOptionPost, (req, res) => {
-    RubricPS.executeCreateMCOption(req.body.option, req.body.mcquestion_id)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
+    if (req.body.option == "") {
+        // Option cannot be empty
         res.sendStatus(400);
-    });
+    } else {
+        RubricPS.executeCreateMCOption(req.body.option, req.body.mcquestion_id)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.sendStatus(400);
+        });
+    }
 });
 
 /**
@@ -84,12 +89,17 @@ router.post("/mcoption", index.authorization.checkMCOptionPost, (req, res) => {
  *
  */
 router.put("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (req, res) => {
-    RubricPS.executeUpdateMCOption(req.body.option, req.params.option_id)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
+    if (req.body.option == "") {
+        // Option cannot be empty
         res.sendStatus(400);
-    });
+    } else {
+        RubricPS.executeUpdateMCOption(req.body.option, req.params.option_id)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.sendStatus(400);
+        });
+    }  
 });
 
 /**
