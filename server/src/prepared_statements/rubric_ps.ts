@@ -230,8 +230,9 @@ export default class RubricPS {
      * @returns {any}
      */
     public static executeGetAllMCOptionById(id: number): any {
+        // order the options alphabetically
         const statement = new PreparedStatement("get-all-options",
-            "SELECT * FROM mcoption WHERE mcquestion_id = $1");
+            "SELECT * FROM mcoption WHERE mcquestion_id = $1 ORDER BY option");
         statement.values = [id];
         return Database.executeQuery(statement);
     }
