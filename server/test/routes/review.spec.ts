@@ -75,11 +75,11 @@ describe("API review routes", () => {
                         "rubric_assignment_id": 1,
                         "question": "What is the best way to insert queries?",
                         "question_number": 3,
-                        "option": [{"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}, {
-                            "id": 2,
-                            "option": "By using command line",
-                            "mcquestion_id": 1
-                        }, {"id": 3, "option": "By asking Brian", "mcquestion_id": 1}]
+                        "option": [
+                          {"id": 3, "option": "By asking Brian", "mcquestion_id": 1},
+                          {"id": 2, "option": "By using command line", "mcquestion_id": 1},
+                          {"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}
+                        ]
                     }, "answer": {"answer": 1, "mcquestion_id": 1, "review_id": 1}
                 }, {
                     "question": {
@@ -142,11 +142,11 @@ describe("API review routes", () => {
                         "type_question": "mc",
                         "question": "What is the best way to insert queries?",
                         "question_number": 3,
-                        "option": [{"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}, {
-                            "id": 2,
-                            "option": "By using command line",
-                            "mcquestion_id": 1
-                        }, {"id": 3, "option": "By asking Brian", "mcquestion_id": 1}]
+                        "option": [
+                          {"id": 3, "option": "By asking Brian", "mcquestion_id": 1},
+                          {"id": 2, "option": "By using command line", "mcquestion_id": 1},
+                          {"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}
+                        ]
                     }, "answer": {"answer": 1, "mcquestion_id": 1, "review_id": 1}
                 }, {
                     "answer": {"answer": 4, "mcquestion_id": 2, "review_id": 1},
@@ -197,21 +197,9 @@ describe("API review routes", () => {
                   "question": {
                     "id": 1,
                     "option": [
-                      {
-                        "id": 1,
-                        "mcquestion_id": 1,
-                        "option": "By using pgAdmin"
-                      },
-                      {
-                        "id": 2,
-                        "mcquestion_id": 1,
-                        "option": "By using command line"
-                      },
-                      {
-                        "id": 3,
-                        "mcquestion_id": 1,
-                        "option": "By asking Brian"
-                      }
+                      {"id": 3, "option": "By asking Brian", "mcquestion_id": 1},
+                      {"id": 2, "option": "By using command line", "mcquestion_id": 1},
+                      {"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}
                     ],
                     "question": "What is the best way to insert queries?",
                     "question_number": 3,
