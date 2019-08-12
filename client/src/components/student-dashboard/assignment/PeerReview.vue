@@ -70,7 +70,7 @@
                     </b-form-group>
 
                     <!-- UPLOAD QUESTION -->
-                    <div v-if="pair.question.question_number === 'upload'">
+                    <div v-if="pair.question.type_question === 'upload'">
 
                         <!--File upload-->
                         <b-form-group label="Question file" class="mb-0">
@@ -90,7 +90,6 @@
                                           :state="Boolean(files[pair.question.id])">
                             </b-form-file>
 
-                            <p class="mb-0" v-if="uploadNewFile && file">File will be uploaded when you press the "save changes" button</p>
                         </b-form-group>
 
                     </div>
