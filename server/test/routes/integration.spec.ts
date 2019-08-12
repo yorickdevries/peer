@@ -227,14 +227,14 @@ describe("API integration test", () => {
                     "file_path": "assignment1.pdf",
                     "done": false
                 },
-                "form": [{
+                "form": JSON.stringify([{
                     "question": {
                         "id": openQuestionId,
                         "type_question": "open",
                         "question": "opt",
                         "question_number": 1,
                     }, "answer": {"answer": paulFeedbackAnswer, "openquestion_id": openQuestionId, "review_id": paulFeedbackId}
-                }]
+                }])
             });
 
         // Assertions to make sure the feedback was correctly inserted.
@@ -254,14 +254,14 @@ describe("API integration test", () => {
                     "file_path": "assignment1.pdf",
                     "done": false
                 },
-                "form": [{
+                "form": JSON.stringify([{
                     "question": {
                         "id": openQuestionId,
                         "type_question": "open",
                         "question": "opt",
                         "question_number": 1,
                     }, "answer": {"answer": yorickFeedbackAnswer, "openquestion_id": openQuestionId, "review_id": yorickFeedbackId}
-                }]
+                }])
             });
 
         // Assertions to make sure the feedback was correctly inserted.

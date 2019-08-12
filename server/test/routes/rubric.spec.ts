@@ -105,6 +105,26 @@ describe("API rubric routes", () => {
     });
 
     /**
+     * Test if an uploadquestion can be created
+     */
+    it("rubric/uploadquestion", async () => {
+        const res = await chai.request(router)
+            .post("/uploadquestion")
+            .send({ question: "opt", extension: "pdf", rubric_assignment_id: 1, question_number: 1 });
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            {
+                "id": 1,
+                "question": "opt",
+                "extension": "pdf",
+                "rubric_assignment_id": 1,
+                "question_number": 1,
+                "type_question": "upload"
+            }
+        ));
+    });
+
+    /**
      * Test if a rangequestion can be created
      */
     it("rubric/rangequestion", async () => {

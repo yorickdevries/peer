@@ -136,7 +136,7 @@ describe("API review routes", () => {
                     "file_path": "submission1.pdf",
                     "done": false
                 },
-                "form": [{
+                "form": JSON.stringify([{
                     "question": {
                         "id": 1,
                         "type_question": "mc",
@@ -182,7 +182,7 @@ describe("API review routes", () => {
                         "question_number": 2,
                         "type_question": "range"
                     }, "answer": {"answer": 4, "rangequestion_id": 1, "review_id": 1}
-                }]
+                }])
             });
 
         expect(res.status).to.equal(200);

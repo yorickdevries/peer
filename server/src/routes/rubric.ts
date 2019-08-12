@@ -26,6 +26,20 @@ router.delete("/openquestion/:question_id", index.authorization.checkOpenQuestio
 });
 
 /**
+ * Route to delete an upload question
+ * @params id - id
+ */
+router.delete("/uploadquestion/:question_id", index.authorization.checkUploadQuestionEdit, (req, res) => {
+    RubricPS.executeDeleteUploadQuestion(req.params.question_id)
+        .then((data: any) => {
+            data.type_question = "upload";
+            res.json(data);
+        }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
+
+/**
  * Route to delete a range question
  * @params id - id
  */
@@ -117,6 +131,38 @@ router.post("/mcquestion", index.authorization.checkRubricAuthorizationPost, (re
     });
 });
 
+/**
+ * create uploadquestion
+ * @body question - question
+ * @body question_number - question_number
+ */
+router.post("/uploadquestion", index.authorization.checkRubricAuthorizationPost, (req, res) => {
+    RubricPS.executeCreateUploadQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number, req.body.extension)
+        .then((data: any) => {
+            data.type_question = "upload";
+            res.json(data);
+        }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
+
+/**
+ * Update uploadquestion
+ * @params question_id - question_id
+ * @body question - question
+ * @body rubric_id - rubric_id
+ * @body question_number - question_number
+ * @body extension - the file extension
+ */
+router.put("/uploadquestion/:question_id", index.authorization.checkUploadQuestionEdit, (req, res) => {
+    RubricPS.executeUpdateUploadQuestion(req.body.question, req.body.question_number, req.params.question_id, req.body.extension)
+        .then((data: any) => {
+            data.type_question = "upload";
+            res.json(data);
+        }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
 
 /**
  * Update mcquestion
@@ -150,6 +196,7 @@ router.post("/rangequestion", index.authorization.checkRubricAuthorizationPost, 
         res.sendStatus(400);
     });
 });
+
 
 /**
  * Update rangequestion
