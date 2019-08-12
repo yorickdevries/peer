@@ -113,6 +113,9 @@ export default class ReviewUpdate {
                 case "mc":
                     questionList.push(await this.checkMCQuestion(questionId, rubricId, answerText));
                 break;
+                case "upload":
+                    questionList.push(await this.checkUploadQuestion(questionId, rubricId, answerText));
+                break;
                 default: throw new Error("Unrecognized question type: " + questionType);
             }
         }
@@ -174,6 +177,33 @@ export default class ReviewUpdate {
     }
 
     /**
+     * Checks whether an answer for an upload question is valid to add to the database
+     * @param {number} questionId
+     * @param {number} rubricId
+     * @param {*} answerText
+     * @returns open question json.
+     */
+    public static async checkUploadQuestion(questionId: number, rubricId: number, answerText: any) {
+        // Initialize the question variable
+        let question;
+        try {
+            question = await RubricPS.executeGetUploadQuestionByIdAndRubricId(questionId, rubricId);
+        } catch (error) {
+            throw new Error("Wrong Upload Question: " + questionId);
+        }
+        // answer validation
+        if (!(typeof answerText === "string") || answerText == "") {
+            throw new Error("The following Upload Question has an invalid answer: " + questionId);
+        } else {
+            return {
+                questionType: "upload",
+                questionId: questionId,
+                answer: answerText
+            };
+        }
+    }
+
+    /**
      * Checks whether an answer for an MC question is valid to add to the database
      * @param {number} questionId
      * @param {number} rubricId
@@ -226,6 +256,9 @@ export default class ReviewUpdate {
                     break;
                     case "mc":
                         await ReviewsPS.executeUpdateMpcAnswer(answer, questionId, reviewId);
+                    break;
+                    case "upload":
+                        await ReviewsPS.executeUpdateUploadAnswer(answer, questionId, reviewId);
                     break;
                     default: throw new Error("Unrecognized question type: " + questionType);
                 }
