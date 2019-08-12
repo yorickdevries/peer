@@ -98,31 +98,31 @@ INSERT INTO public.assignmentlist(
 	('Assignment 5', 'Example assignment number five', 3, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2018-05-02T20:30:00Z', '2030-05-03T20:30:00Z', false);
 
 INSERT INTO public.rubric(
-	assignment_id)
-	VALUES (1);
+	assignment_id, type)
+	VALUES (1, 'assignment');
 
 INSERT INTO public.rubric(
-	assignment_id)
-	VALUES (2);
+	assignment_id, type)
+	VALUES (2, 'assignment');
 
 INSERT INTO public.openquestion(
-	question, rubric_assignment_id, question_number)
+	question, rubric_id, question_number)
 	VALUES ('How to insert queries?', 1, 1);
 
 INSERT INTO public.openquestion(
-	question, rubric_assignment_id, question_number)
+	question, rubric_id, question_number)
 	VALUES ('This is a question for assignment 2?', 2, 1);
 
 INSERT INTO public.rangequestion(
-	question, range, rubric_assignment_id, question_number)
+	question, range, rubric_id, question_number)
 	VALUES ('How much fun is inserting queries?', 7, 1, 2);
 
 INSERT INTO public.mcquestion(
-	question, rubric_assignment_id, question_number)
+	question, rubric_id, question_number)
 	VALUES ('What is the best way to insert queries?', 1, 3);
 
 INSERT INTO public.mcquestion(
-	question, rubric_assignment_id, question_number)
+	question, rubric_id, question_number)
 	VALUES ('Is the right Answer A?', 1, 4);
 
 INSERT INTO public.mcoption(
@@ -196,7 +196,7 @@ INSERT INTO public.submission(
 	VALUES ('yorickdevries', 21, 2, 'submission2.pdf', '2018-05-01T22:30:04Z');
 
 INSERT INTO public.review(
-	user_netid, submission_id, rubric_assignment_id, done)
+	user_netid, submission_id, rubric_id, done)
 	VALUES ('henkjan', 1, 1, false), ('paulvanderlaan', 1, 1, true);
 
 INSERT INTO public.mcanswer(
