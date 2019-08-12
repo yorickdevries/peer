@@ -70,9 +70,28 @@
                     </b-form-group>
 
                     <!-- UPLOAD QUESTION -->
-                    <div v-if="pair.question.question_number === 6">
+                    <div v-if="pair.question.question_number === 'upload'">
 
-                        <UploadQuestionForm :question="pair.question"></UploadQuestionForm>
+                        <!--File upload-->
+                        <b-form-group label="Question file" class="mb-0">
+                            <!--Show currently uploaded file-->
+                            <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
+                                <!--Buttons for toggling new assignment upload-->
+                                <div>
+                                    <div v-if="pair.answer.answer">You currently have uploaded the file: {{ pair.answer.answer }}</div>
+                                    <div v-else>You currently have no file uploaded.</div>
+                                </div>
+                            </b-alert>
+
+                            <b-form-file  v-if="!pair.answer.answer"
+                                          placeholder="Choose a new file..."
+                                          accept=".pdf,.zip"
+                                          v-model="files[pair.question.id]"
+                                          :state="Boolean(files[pair.question.id])">
+                            </b-form-file>
+
+                            <p class="mb-0" v-if="uploadNewFile && file">File will be uploaded when you press the "save changes" button</p>
+                        </b-form-group>
 
                     </div>
 
@@ -108,7 +127,6 @@
 import api from "../../../api"
 import { StarRating } from 'vue-rate-it';
 import notifications from '../../../mixins/notifications'
-import UploadQuestionForm from './UploadQuestionForm'
 import SessionCheck from '../../general/SessionCheck'
 
 export default {
@@ -116,7 +134,6 @@ export default {
     components: {
         StarRating,
         SessionCheck,
-        UploadQuestionForm
     },
     props: ["reviewId"],
     data() {
@@ -131,6 +148,7 @@ export default {
                 },
                 form: []
             },
+            files: {},
         }
     },
     computed: {
@@ -194,6 +212,11 @@ export default {
             const formData = new FormData()
             formData.append("review", JSON.stringify(this.peerReview.review))
             formData.append("form", JSON.stringify(this.peerReview.form))
+
+            // Iterate over all files and add to root object.
+            Object.entries(files).forEach(([key, value]) => {
+                formData.append(key, value)
+            })
 
             try {
                 await api.savePeerReview(this.peerReview.review.id, formData)
