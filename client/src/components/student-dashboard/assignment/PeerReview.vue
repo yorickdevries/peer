@@ -34,6 +34,8 @@
                         <p>{{ pair.question.question }}</p>
                     </div>
 
+                    {{ pair }}
+
                     <!-- OPEN QUESTION -->
                     <b-form-textarea v-if="pair.question.type_question === 'open'"
                                      id="textarea1"
@@ -69,8 +71,18 @@
                         </b-form-radio-group>
                     </b-form-group>
 
+                    <!-- UPLOAD QUESTION -->
+                    <div v-if="pair.question.question_number === 6">
+
+                        <UploadQuestionForm :question="pair.question"></UploadQuestionForm>
+
+                    </div>
+
                 </b-list-group-item>
             </b-list-group>
+
+
+            <SessionCheck ref="sessionCheck"></SessionCheck>
 
             <template v-if="peerReview.review.id !== null">
                 <!--Save/Submit Buttons-->
@@ -98,11 +110,15 @@
 import api from "../../../api"
 import { StarRating } from 'vue-rate-it';
 import notifications from '../../../mixins/notifications'
+import UploadQuestionForm from './UploadQuestionForm'
+import SessionCheck from '../../general/SessionCheck'
 
 export default {
     mixins: [notifications],
     components: {
-        StarRating
+        StarRating,
+        SessionCheck,
+        UploadQuestionForm
     },
     props: ["reviewId"],
     data() {
@@ -168,10 +184,15 @@ export default {
             } else {
                 this.showErrorMessage({message: "All fields are required."})
             }
-
         },
         async savePeerReview() {
-            // Submit the peer review.
+
+            // Session check.
+            const inSession = await this.$refs.sessionCheck.sessionGuardCheck()
+            if (!inSession) {
+                return
+            }
+
             try {
                 await api.savePeerReview(this.peerReview.review.id, this.peerReview)
             } catch (error) {
