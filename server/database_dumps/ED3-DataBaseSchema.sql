@@ -127,6 +127,25 @@ CREATE TABLE RangeQuestion (
     CONSTRAINT positive_range CHECK (range > 0)
 );
 
+-- Table UploadAnswer
+CREATE TABLE UploadAnswer (
+    answer varchar(500) NOT NULL,
+    filename varchar(500) NOT NULL,
+    UploadQuestion_id int NOT NULL,
+    Review_id int NOT NULL,
+    CONSTRAINT UploadAnswer_pk PRIMARY KEY (UploadQuestion_id,Review_id)
+);
+
+-- Table: UploadQuestion
+CREATE TABLE UploadQuestion (
+    id SERIAL,
+    question varchar(5000) NOT NULL,
+    extension varchar(10) NOT NULL,
+    Rubric_Assignment_id int NOT NULL,
+    question_number int NOT NULL,
+    CONSTRAINT UploadQuestion_pk PRIMARY KEY (id)
+);
+
 -- Table: Review
 CREATE TABLE Review (
     id SERIAL,
