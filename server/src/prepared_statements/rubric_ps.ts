@@ -379,7 +379,7 @@ export default class RubricPS {
         const uploadQuestions = await RubricPS.executeGetAllUploadQuestionById(rubricId);
 
         // Construct and fill the questions array.
-        const questionJson: any[] = [];
+        let questionJson: any[] = [];
 
         // Fill with mc questions.
         for (let i = 0; i < mcQuestions.length; i++) {
@@ -395,15 +395,15 @@ export default class RubricPS {
         }
         // Fill with open questions.
         const openQuestionsWithType = RubricPS.addTypeToQuestions(openQuestions, "open");
-        questionJson.concat(openQuestionsWithType);
+        questionJson = questionJson.concat(openQuestionsWithType);
 
         // Fill with range questions.
-        const rangeQuestionsWithType = RubricPS.addTypeToQuestions(openQuestions, "range");
-        questionJson.concat(rangeQuestionsWithType);
+        const rangeQuestionsWithType = RubricPS.addTypeToQuestions(rangeQuestions, "range");
+        questionJson = questionJson.concat(rangeQuestionsWithType);
 
         // Fill with upload questions
-        const uploadQuestionsWithType = RubricPS.addTypeToQuestions(openQuestions, "upload");
-        questionJson.concat(uploadQuestionsWithType);
+        const uploadQuestionsWithType = RubricPS.addTypeToQuestions(uploadQuestions, "upload");
+        questionJson = questionJson.concat(uploadQuestionsWithType);
 
         return questionJson;
     }
@@ -420,6 +420,7 @@ export default class RubricPS {
             question.type_question = type;
             result.push(question);
         }
+        return result;
     }
 
     /**
