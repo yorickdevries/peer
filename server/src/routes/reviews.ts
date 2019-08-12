@@ -77,18 +77,18 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
         const inputForm = JSON.parse(req.body.form);
         const result = await ReviewUpdate.updateReview(reviewId, inputForm);
 
-        // Remove the old file and add the new file if a file is uploaded
-        // (ie. name of the file is not undefined).
-        if (req.file) {
-            // Assemble the file path. Updated file name is the new file name.
-            // It can never be the old since req.file would be undefined.
-            const newFilePath = path.join(fileFolder, updatedFileName);
-            const oldFilePath = path.join(fileFolder, oldFilename);
-
-            // Remove the old file and write the new file.
-            await fs.unlink(oldFilePath);
-            await fs.writeFile(newFilePath, req.file.buffer);
-        }
+        // // Remove the old file and add the new file if a file is uploaded
+        // // (ie. name of the file is not undefined).
+        // if (req.file) {
+        //     // Assemble the file path. Updated file name is the new file name.
+        //     // It can never be the old since req.file would be undefined.
+        //     const newFilePath = path.join(fileFolder, updatedFileName);
+        //     const oldFilePath = path.join(fileFolder, oldFilename);
+        //
+        //     // Remove the old file and write the new file.
+        //     await fs.unlink(oldFilePath);
+        //     await fs.writeFile(newFilePath, req.file.buffer);
+        // }
 
         res.json(result);
     } catch (error) {
