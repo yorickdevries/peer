@@ -18,6 +18,10 @@ const config = {
     session: {
         secret: "add something random here"
     },
+    reviews: {
+        fileFolder: path.join(__dirname, "./files/reviews"),
+        maxSizeReviewFile: 30 * 1024 * 1024
+    },
     assignments: {
         fileFolder: path.join(__dirname, "./files/assignments"),
         maxSizeAssignmentFile: 30 * 1024 * 1024

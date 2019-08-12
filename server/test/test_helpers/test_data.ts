@@ -35,6 +35,11 @@ export default class TestData {
     static assignmentFolder = path.join(__dirname, "../../src/files/assignments");
 
     /**
+     * Review file folder
+     */
+    static reviewFolder = path.join(__dirname, "../../src/files/reviews");
+
+    /**
      * initializes the database with testdata
      *
      * @static
