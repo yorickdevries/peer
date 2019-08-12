@@ -72,7 +72,7 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
 router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkReviewOwner, index.authorization.checkReviewBetweenPublishDue, async (req, res) => {
     try {
         const reviewId = req.params.reviewId;
-        const inputForm = req.body.form;
+        const inputForm = JSON.parse(req.body.form);
         const result = await ReviewUpdate.updateReview(reviewId, inputForm);
         res.json(result);
     } catch (error) {

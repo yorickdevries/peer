@@ -34,8 +34,6 @@
                         <p>{{ pair.question.question }}</p>
                     </div>
 
-                    {{ pair }}
-
                     <!-- OPEN QUESTION -->
                     <b-form-textarea v-if="pair.question.type_question === 'open'"
                                      id="textarea1"
@@ -193,8 +191,12 @@ export default {
                 return
             }
 
+            const formData = new FormData()
+            formData.append("review", JSON.stringify(this.peerReview.review))
+            formData.append("form", JSON.stringify(this.peerReview.form))
+
             try {
-                await api.savePeerReview(this.peerReview.review.id, this.peerReview)
+                await api.savePeerReview(this.peerReview.review.id, formData)
             } catch (error) {
                 this.showErrorMessage({message: "Error saving peer review."})
             }
