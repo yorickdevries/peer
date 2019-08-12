@@ -19,8 +19,8 @@ export default class ReviewDistributionTwoAssignments {
         }
 
         // Check for a rubric entry for both assignments
-        const rubricExists1: any = await RubricPS.executeExistsRubricByAssignmentId(assignmentId1);
-        const rubricExists2: any = await RubricPS.executeExistsRubricByAssignmentId(assignmentId2);
+        const rubricExists1: any = await RubricPS.executeExistsSubmissionRubricByAssignmentId(assignmentId1);
+        const rubricExists2: any = await RubricPS.executeExistsSubmissionRubricByAssignmentId(assignmentId2);
         if (!rubricExists1.exists || !rubricExists2.exists) {
             throw new Error("No rubric is present for one of the assignments");
         }
@@ -45,20 +45,23 @@ export default class ReviewDistributionTwoAssignments {
             counter++;
         }
 
-        const existingReviews1: any = await ReviewPS.executeGetReviewsByAssignmentId(assignmentId1);
-        const existingReviews2: any = await ReviewPS.executeGetReviewsByAssignmentId(assignmentId2);
+        const existingReviews1: any = await ReviewPS.executeGetSubmissionReviewsByAssignmentId(assignmentId1);
+        const existingReviews2: any = await ReviewPS.executeGetSubmissionReviewsByAssignmentId(assignmentId2);
         if (existingReviews1.length !== 0 || existingReviews2.length !== 0) {
             throw new Error("There are already reviews assigned for one or both assignments");
         }
 
         // Add the review assignments to the database
         for (const review of reviews) {
-            await ReviewPS.executeCreateReview(review.userNetId, review.submissionId, review.assignmentId);
+            const submission: any = await SubmissionsPS.executeGetSubmissionById(review.submissionId);
+            const rubric: any = await RubricPS.executeGetSubmissionRubricByAssignmentId(submission.assignment_id);
+
+            await ReviewPS.executeCreateReview(review.userNetId, review.submissionId, rubric.id);
             // enroll in assignment if not already
-            const studentIsInGroup = await GroupParser.studentIsInGroup(review.userNetId, review.assignmentId);
+            const studentIsInGroup = await GroupParser.studentIsInGroup(review.userNetId, submission.assignment_id);
             if (!studentIsInGroup) {
                 // Create group and add assignment and student.
-                const groupId = await GroupParser.createGroupForAssignment(review.userNetId, review.assignmentId);
+                const groupId = await GroupParser.createGroupForAssignment(review.userNetId, submission.assignment_id);
                 await GroupsPS.executeAddStudenttoGroup(review.userNetId, groupId);
             }
         }
@@ -282,7 +285,7 @@ export default class ReviewDistributionTwoAssignments {
                 // Get the first submission of the list
                 const submission = otherSubmissions[0].submission;
                 // Add reviews to result list
-                const review = {userNetId: user.userNetId, submissionId: submission.id, assignmentId: submission.assignment_id};
+                const review = {userNetId: user.userNetId, submissionId: submission.id};
                 reviews.push(review);
             }
         }

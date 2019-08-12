@@ -16,8 +16,10 @@ describe("RubricPreparedStatements Test", () => {
      * Test to create a rubric
      */
     it("create rubric", async () => {
-        expect(await RubricPS.executeCreateRubric(3)).to.deep.equal({
-            assignment_id: 3
+        expect(await RubricPS.executeCreateRubric(3, "submission")).to.deep.equal({
+            assignment_id: 3,
+            id: 3,
+            type: "submission"
         });
     });
 
@@ -29,7 +31,7 @@ describe("RubricPreparedStatements Test", () => {
             id: 3,
             question: "hi",
             question_number: 1,
-            rubric_assignment_id: 1
+            rubric_id: 1
         });
     });
 
@@ -41,7 +43,7 @@ describe("RubricPreparedStatements Test", () => {
             id: 3,
             question: "hi",
             question_number: 1,
-            rubric_assignment_id: 1
+            rubric_id: 1
         });
     });
 
@@ -53,7 +55,7 @@ describe("RubricPreparedStatements Test", () => {
             id: 2,
             question: "hi",
             question_number: 1,
-            rubric_assignment_id: 1,
+            rubric_id: 1,
             range: 6
         });
     });
@@ -77,7 +79,7 @@ describe("RubricPreparedStatements Test", () => {
             id: 1,
             question: "hi2",
             question_number: 1,
-            rubric_assignment_id: 1
+            rubric_id: 1
         });
     });
 
@@ -90,7 +92,7 @@ describe("RubricPreparedStatements Test", () => {
             question: "hi2",
             question_number: 1,
             range: 6,
-            rubric_assignment_id: 1
+            rubric_id: 1
         });
     });
 
@@ -102,7 +104,7 @@ describe("RubricPreparedStatements Test", () => {
             id: 1,
             question: "hi2",
             question_number: 1,
-            rubric_assignment_id: 1
+            rubric_id: 1
         });
     });
 
@@ -125,13 +127,13 @@ describe("RubricPreparedStatements Test", () => {
             id: 1,
             question: "What is the best way to insert queries?",
             question_number: 3,
-            rubric_assignment_id: 1
+            rubric_id: 1
         },
         {
             id: 2,
             question: "Is the right Answer A?",
             question_number: 4,
-            rubric_assignment_id: 1
+            rubric_id: 1
             }]);
     });
 
@@ -143,7 +145,7 @@ describe("RubricPreparedStatements Test", () => {
             id: 1,
             question: "How to insert queries?",
             question_number: 1,
-            rubric_assignment_id: 1
+            rubric_id: 1
         }]);
     });
 
@@ -156,7 +158,7 @@ describe("RubricPreparedStatements Test", () => {
             question: "How much fun is inserting queries?",
             range: 7,
             question_number: 2,
-            rubric_assignment_id: 1
+            rubric_id: 1
         }]);
     });
 
@@ -187,9 +189,11 @@ describe("RubricPreparedStatements Test", () => {
      * Test to delete a rubric
      */
     it("delete rubric", async () => {
-        await RubricPS.executeCreateRubric(3);
+        await RubricPS.executeCreateRubric(3, "submission");
         expect(await RubricPS.executeDeleteRubric(3)).to.deep.equal({
-            assignment_id: 3
+            assignment_id: 3,
+            id: 3,
+            type: "submission"
         });
     });
 
@@ -199,7 +203,7 @@ describe("RubricPreparedStatements Test", () => {
     it("delete open question", async () => {
         const newq: any = await RubricPS.executeCreateOpenQuestion("New Question", 1, 5);
         expect(await RubricPS.executeDeleteOpenQuestion(newq.id)).to.deep.equal({
-            rubric_assignment_id: 1,
+            rubric_id: 1,
             id: newq.id,
             question: "New Question",
             question_number: 5
@@ -212,7 +216,7 @@ describe("RubricPreparedStatements Test", () => {
     it("delete range question", async () => {
         const newq: any = await RubricPS.executeCreateRangeQuestion("New Question", 5, 1, 5);
         expect(await RubricPS.executeDeleteRangeQuestion(newq.id)).to.deep.equal({
-            rubric_assignment_id: 1,
+            rubric_id: 1,
             id: newq.id,
             question: "New Question",
             question_number: 5,
@@ -227,7 +231,7 @@ describe("RubricPreparedStatements Test", () => {
         // delete the option associated with it
         await RubricPS.executeDeleteMCOption(4);
         expect(await RubricPS.executeDeleteMCQuestion(2)).to.deep.equal({
-            rubric_assignment_id: 1,
+            rubric_id: 1,
             id: 2,
             question: "Is the right Answer A?",
             question_number: 4
@@ -271,7 +275,7 @@ describe("RubricPreparedStatements Test", () => {
                     ],
                     "question": "What is the best way to insert queries?",
                     "question_number": 3,
-                    "rubric_assignment_id": 1,
+                    "rubric_id": 1,
                     "type_question": "mc",
                 },
                 {
@@ -285,14 +289,14 @@ describe("RubricPreparedStatements Test", () => {
                     ],
                     "question": "Is the right Answer A?",
                     "question_number": 4,
-                    "rubric_assignment_id": 1,
+                    "rubric_id": 1,
                     "type_question": "mc"
                 },
                 {
                     "id": 1,
                     "question": "How to insert queries?",
                     "question_number": 1,
-                    "rubric_assignment_id": 1,
+                    "rubric_id": 1,
                     "type_question": "open"
                 },
                 {
@@ -300,7 +304,7 @@ describe("RubricPreparedStatements Test", () => {
                     "question": "How much fun is inserting queries?",
                     "question_number": 2,
                     "range": 7,
-                    "rubric_assignment_id": 1,
+                    "rubric_id": 1,
                     "type_question": "range"
                 }
             ]

@@ -117,14 +117,6 @@ describe("AssignmentPreparedStatements Test", () => {
     });
 
     /**
-     * Test get review assignment.
-     */
-    it("get review", async () => {
-        const result: any = await AssignmentPS.executeGetReviewByAssignmentId(1, "henkjan");
-        expect(result.id).to.equal(1);
-    });
-
-    /**
      * Test create review.
      */
     it("create review", async () => {

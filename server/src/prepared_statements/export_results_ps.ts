@@ -11,7 +11,7 @@ export default class ExportResultsPS {
      * @return {any} - CSV file with columns: net id, approval/disapproval rate of their reviews, pending TA reviews
      * and total amount of reviews by the student.
      */
-    public static executeGetStudentReviewExportAssignment(assignmentId: number): any {
+    public static executeGetStudentSubmissionReviewExportAssignment(assignmentId: number): any {
         const statement = new PreparedStatement("get-result-aggregation-assignment",
             'SELECT netID AS "netID", studentNumber AS "studentnumber", approved, disproved, total - approved - disproved AS "waiting for TA", total AS "student total reviews"' +
             "FROM (" +
@@ -22,7 +22,9 @@ export default class ExportResultsPS {
             "    COUNT(userlist.netid) AS total" +
             "    FROM userlist " +
             "    JOIN review ON review.user_netid = userlist.netid" +
-            "    WHERE review.rubric_assignment_id = $1 AND review.done = TRUE" +
+            "    JOIN rubric ON review.rubric_id = rubric.id" +
+            "    WHERE rubric.assignment_id = $1 AND review.done = TRUE" +
+            "    AND rubric.type = 'submission'" +
             "    GROUP BY userlist.netid" +
             ") AS aggregations");
         statement.values = [assignmentId];
@@ -34,7 +36,7 @@ export default class ExportResultsPS {
      * @return {any} - CSV file with columns: net id, approval/disapproval rate of their reviews, pending TA reviews
      * and total amount of reviews by the student.
      */
-    public static executeGetStudentReviewExportCourse(courseId: number): any {
+    public static executeGetStudentSubmissionReviewExportCourse(courseId: number): any {
         const statement = new PreparedStatement("get-result-aggregation-course",
             'SELECT netID AS "netID", studentNumber AS "studentnumber", approved, disproved, total - approved - disproved AS "waiting for TA", total AS "student total reviews"' +
             "FROM (" +
@@ -45,8 +47,10 @@ export default class ExportResultsPS {
             "    COUNT(userlist.netid) AS total" +
             "    FROM userlist " +
             "    JOIN review ON review.user_netid = userlist.netid" +
-            "    JOIN assignmentlist ON review.rubric_assignment_id = assignmentlist.id" +
+            "    JOIN rubric ON review.rubric_id = rubric.id" +
+            "    JOIN assignmentlist ON rubric.assignment_id = assignmentlist.id" +
             "    WHERE review.done = TRUE AND assignmentlist.course_id = $1" +
+            "    AND rubric.type = 'submission'" +
             "    GROUP BY userlist.netid" +
             ") AS aggregations");
         statement.values = [courseId];

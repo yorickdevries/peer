@@ -110,7 +110,7 @@ export default {
             peerReview: {
                 review: {
                     id: null,
-                    rubric_assignment_id: null,
+                    rubric_id: null,
                     file_path: "",
                     comment: null,
                     done: null,

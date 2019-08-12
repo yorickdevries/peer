@@ -205,7 +205,7 @@ export default {
         },
         async makeRubric() {
             try {
-                await api.client.post(`rubric/`, {rubric_assignment_id: this.rubric.assignment_id})
+                await api.client.post(`rubric/`, {rubric_id: this.rubric.assignment_id, type:'submission'})
                 this.showSuccessMessage({message: "Rubric made, you can now add questions."})
             } catch (e) {
                 this.showErrorMessage({message: e.response.data.error})

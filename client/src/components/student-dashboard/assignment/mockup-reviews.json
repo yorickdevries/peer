@@ -2,7 +2,7 @@
   {
     "review": {
       "id": 1,
-      "rubric_assignment_id": 4,
+      "rubric_id": 4,
       "file_path": "submission1.pdf",
       "done": false
     },
@@ -41,7 +41,7 @@
         "question": {
           "id": 8,
           "question": "Some open question5",
-          "rubric_assignment_id": 4,
+          "rubric_id": 4,
           "question_number": 1,
           "type_question": "open"
         },
@@ -56,7 +56,7 @@
           "id": 6,
           "question": "Give a rating",
           "range": 7,
-          "rubric_assignment_id": 4,
+          "rubric_id": 4,
           "question_number": 2,
           "type_question": "range"
         },
@@ -71,7 +71,7 @@
   {
     "review": {
       "id": 1,
-      "rubric_assignment_id": 4,
+      "rubric_id": 4,
       "file_path": "submission1.pdf",
       "done": false
     },
@@ -110,7 +110,7 @@
         "question": {
           "id": 8,
           "question": "Some open question5",
-          "rubric_assignment_id": 4,
+          "rubric_id": 4,
           "question_number": 1,
           "type_question": "open"
         },
@@ -125,7 +125,7 @@
           "id": 6,
           "question": "Give a rating",
           "range": 7,
-          "rubric_assignment_id": 4,
+          "rubric_id": 4,
           "question_number": 2,
           "type_question": "range"
         },

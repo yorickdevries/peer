@@ -301,7 +301,7 @@ router.route("/:assignment_id/alllatestsubmissions")
  */
 router.route("/:assignment_id/reviews")
     .get((req: any, res) => {
-        ReviewPS.executeGetReviewsByUserIdAndAssignmentId(req.user.netid, req.params.assignment_id)
+        ReviewPS.executeGetSubmissionReviewsByUserIdAndAssignmentId(req.user.netid, req.params.assignment_id)
         .then((data) => {
             res.json(data);
         }).catch((error) => {
@@ -377,7 +377,7 @@ router.post("/:assignment_id/importgroups", index.authorization.enrolledAsTeache
  * @param id - assignment id.
  */
 router.get("/:assignment_id/allreviews", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
-    ReviewPS.executeGetAllDoneReviewsByAssignmentId(req.params.assignment_id)
+    ReviewPS.executeGetAllDoneSubmissionReviewsByAssignmentId(req.params.assignment_id)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -432,7 +432,7 @@ router.get("/:id/feedbackGivenToOthers", async (req: any, res) => {
             res.status(401);
             res.json({ error: "You can only access the review after the review due date is passed." });
         } else {
-            res.json(await ReviewPS.executeGetAllDoneReviewsOfStudent(req.params.id, req.user.netid));
+            res.json(await ReviewPS.executeGetAllDoneSubmissionReviewsOfStudent(req.params.id, req.user.netid));
         }
     } catch {
         res.sendStatus(400);
@@ -493,7 +493,7 @@ router.get("/:assignment_id/enroll", index.authorization.enrolledAsStudentAssign
  */
 router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
     try {
-        const exportData = await ExportResultsPS.executeGetStudentReviewExportAssignment(req.params.assignment_id);
+        const exportData = await ExportResultsPS.executeGetStudentSubmissionReviewExportAssignment(req.params.assignment_id);
 
         // Check if the export data contains data.
         if (exportData.length == 0) {
@@ -529,7 +529,7 @@ router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherA
 router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
     try {
         const exportData: Array<any> = [];
-        const reviews: any = await ReviewPS.executeGetReviewsByAssignmentId(req.params.assignment_id);
+        const reviews: any = await ReviewPS.executeGetSubmissionReviewsByAssignmentId(req.params.assignment_id);
 
         // Loop through the reviews, add to export data.
         for (let i = 0; i < reviews.length; i++) {
@@ -626,7 +626,7 @@ router.post("/:assignment_id/groups", index.authorization.enrolledAsTeacherAssig
  */
 router.get("/:assignment_id/randomReview", index.authorization.enrolledAsTAOrTeacherAssignment, async (req: any, res) => {
     try {
-        const availableReviews: any = await ReviewPS.executeGetAllDoneReviewsByAssignmentIdUnreviewed(req.params.assignment_id);
+        const availableReviews: any = await ReviewPS.executeGetAllDoneSubmissionReviewsByAssignmentIdUnreviewed(req.params.assignment_id);
 
         // Check if there are any reviews left. Send 400 to front-end to display 'There are no reviews left' message.
         if (availableReviews.length == 0) {
