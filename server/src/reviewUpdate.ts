@@ -25,6 +25,7 @@ export default class ReviewUpdate {
                     case "mc": answer = await ReviewsPS.executeGetMCAnswer(reviewId, question.id); break;
                     case "open": answer = await ReviewsPS.executeGetOpenAnswer(reviewId, question.id); break;
                     case "range": answer = await ReviewsPS.executeGetRangeAnswer(reviewId, question.id); break;
+                    case "upload": answer = await ReviewsPS.executeGetUploadAnswer(reviewId, question.id); break;
                     default: throw new Error("unrecognized question type: " + question.type_question);
                 }
                 // Create the correct JSON format (API documentation) and push to array.

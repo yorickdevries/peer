@@ -61,6 +61,22 @@ describe("ReviewPreparedStatement Test", () => {
     });
 
     /**
+     * Update upload answer.
+     */
+    it("update upload answer", async () => {
+        const answer = "serious_answer.pdf";
+
+        await ReviewPS.executeUpdateUploadAnswer("kappa.pdf", 2, 2);
+        const updated: any = await ReviewPS.executeUpdateUploadAnswer(answer, 1, 1);
+
+        expect({
+            answer: updated.answer,
+        }).to.deep.equal({
+            answer
+        });
+    });
+
+    /**
      * Update range answer.
      */
     it("update range answer", async () => {
@@ -88,6 +104,24 @@ describe("ReviewPreparedStatement Test", () => {
             answer: "Flesje water is beter dan flesje bier",
             openquestion_id: 1,
             review_id: 1
+        });
+    });
+
+    /**
+     * Get open answer.
+     */
+    it("get upload answer by id", async () => {
+        const answer = "serious_answer.pdf";
+        const questionId = 10;
+        const reviewId = 11;
+
+        const created: any = await ReviewPS.executeUpdateUploadAnswer(answer, questionId, reviewId);
+        const fetched: any = await ReviewPS.executeGetUploadAnswer(reviewId, questionId);
+
+        expect({
+            answer: fetched.answer,
+        }).to.deep.equal({
+            answer
         });
     });
 
