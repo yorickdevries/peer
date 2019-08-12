@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import index from "../security/index";
 import path from "path";
 import multer from "multer";
+import fs from "fs-extra";
 import config from "../config";
 
 // Router
@@ -11,9 +12,10 @@ import express from "express";
 const router = express();
 router.use(bodyParser.json());
 
+const fileFolder = config.reviews.fileFolder;
 
 // File of max 30 MB (in bytes)
-const maxSizeAssignmentFile = config.assignments.maxSizeAssignmentFile;
+const maxSizeAssignmentFile = config.reviews.maxSizeReviewFile;
 const uploadReview = multer({
     limits: {fileSize: maxSizeAssignmentFile},
     fileFilter: function (req: any, file, callback) {
@@ -28,7 +30,7 @@ const uploadReview = multer({
             return callback(null, true);
         }
     }
-}).single("assignmentFile");
+}).single("reviewFile");
 
 // File upload handling
 const uploadReviewFunction = function(req: any, res: any, next: any) {
@@ -74,6 +76,20 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
         const reviewId = req.params.reviewId;
         const inputForm = req.body.form;
         const result = await ReviewUpdate.updateReview(reviewId, inputForm);
+
+        // Remove the old file and add the new file if a file is uploaded
+        // (ie. name of the file is not undefined).
+        if (req.file) {
+            // Assemble the file path. Updated file name is the new file name.
+            // It can never be the old since req.file would be undefined.
+            const newFilePath = path.join(fileFolder, updatedFileName);
+            const oldFilePath = path.join(fileFolder, oldFilename);
+
+            // Remove the old file and write the new file.
+            await fs.unlink(oldFilePath);
+            await fs.writeFile(newFilePath, req.file.buffer);
+        }
+
         res.json(result);
     } catch (error) {
         res.status(400);
