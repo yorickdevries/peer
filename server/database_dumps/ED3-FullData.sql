@@ -56,17 +56,17 @@ INSERT INTO public.assignmentlist(
 INSERT INTO public.rubric(
 	assignment_id, type)
 	VALUES 
-	(1, 'assignment'),
-	(2, 'assignment'),
-	(3, 'assignment'),
-	(4, 'assignment'),
-	(5, 'assignment'),
-	(6, 'assignment'),
-	(7, 'assignment'),
-	(8, 'assignment'),
-	(9, 'assignment'),
-	(10, 'assignment'),
-	(11, 'assignment');
+	(1, 'submission'),
+	(2, 'submission'),
+	(3, 'submission'),
+	(4, 'submission'),
+	(5, 'submission'),
+	(6, 'submission'),
+	(7, 'submission'),
+	(8, 'submission'),
+	(9, 'submission'),
+	(10, 'submission'),
+	(11, 'submission');
 
 INSERT INTO public.openquestion(
 	question, rubric_id, question_number)

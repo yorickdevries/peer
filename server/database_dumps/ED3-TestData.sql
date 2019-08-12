@@ -99,11 +99,11 @@ INSERT INTO public.assignmentlist(
 
 INSERT INTO public.rubric(
 	assignment_id, type)
-	VALUES (1, 'assignment');
+	VALUES (1, 'submission');
 
 INSERT INTO public.rubric(
 	assignment_id, type)
-	VALUES (2, 'assignment');
+	VALUES (2, 'submission');
 
 INSERT INTO public.openquestion(
 	question, rubric_id, question_number)

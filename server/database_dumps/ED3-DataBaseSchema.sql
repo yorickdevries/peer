@@ -447,7 +447,7 @@ INSERT INTO public.role(name)
 
 -- Set roles
 INSERT INTO public.rubrictype(name)
-	VALUES ('assignment'),
+	VALUES ('submission'),
     ('review');
 
 -- End of file.
