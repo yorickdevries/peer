@@ -130,7 +130,6 @@ CREATE TABLE RangeQuestion (
 -- Table UploadAnswer
 CREATE TABLE UploadAnswer (
     answer varchar(500) NOT NULL,
-    filename varchar(500) NOT NULL,
     UploadQuestion_id int NOT NULL,
     Review_id int NOT NULL,
     CONSTRAINT UploadAnswer_pk PRIMARY KEY (UploadQuestion_id,Review_id)

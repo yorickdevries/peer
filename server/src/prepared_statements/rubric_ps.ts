@@ -91,11 +91,11 @@ export default class RubricPS {
     }
 
     /**
-     * Query 'upload question'.
+     * Query 'delete upload question'.
      * @param {number} id - id.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeUploadQuestion(id: number): Promise<pgPromise.queryResult> {
+    public static executeDeleteUploadQuestion(id: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("delete-upload-question",
             "DELETE FROM uploadquestion WHERE id=$1 RETURNING *");
         statement.values = [id];
@@ -159,6 +159,22 @@ export default class RubricPS {
         const statement = new PreparedStatement("update-open-question",
             "UPDATE openquestion SET (question, question_number) = ($1, $2) WHERE id = $3 RETURNING *");
         statement.values = [question, questionNumber, id];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'update upload question' query.
+     * @param {string} question - question.
+     * @param {number} questionNumber - question_number.
+     * @param {number} id - id.
+     * @param {string} extension - the file extension.
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeUpdateUploadQuestion(question: string, questionNumber: number, id: number, extension: string)
+        : Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("update-upload-question",
+            "UPDATE uploadquestion SET (question, question_number, extension) = ($1, $2, $4) WHERE id = $3 RETURNING *");
+        statement.values = [question, questionNumber, id, extension];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -393,6 +409,7 @@ export default class RubricPS {
                 option: await RubricPS.executeGetAllMCOptionById(question.id)
             });
         }
+
         // Fill with open questions.
         const openQuestionsWithType = RubricPS.addTypeToQuestions(openQuestions, "open");
         questionJson = questionJson.concat(openQuestionsWithType);
@@ -434,6 +451,7 @@ export default class RubricPS {
         const openQuestions = await RubricPS.executeGetAllOpenQuestionById(copyRubricId);
         const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(copyRubricId);
         const mcQuestions = await RubricPS.executeGetAllMCQuestionById(copyRubricId);
+        const uploadQuestions = await RubricPS.executeGetAllUploadQuestionById(copyRubricId);
         let mcOptions;
 
         // Copy open questions
@@ -443,6 +461,10 @@ export default class RubricPS {
         // Copy range questions
         for (let i = 0; i < rangeQuestions.length; i++) {
             await this.executeCreateRangeQuestion(rangeQuestions[i].question, rangeQuestions[i].range, currentRubricId, rangeQuestions[i].question_number);
+        }
+        // Copy upload questions
+        for (let i = 0; i < uploadQuestions.length; i++) {
+            await this.executeCreateUploadQuestion(uploadQuestions[i].question, currentRubricId, uploadQuestions[i].question_number, uploadQuestions[i].extension);
         }
         // Copy mc questions
         for (let i = 0; i < mcQuestions.length; i++) {
@@ -466,17 +488,22 @@ export default class RubricPS {
         const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubricId);
         const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubricId);
         const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubricId);
+        const uploadQuestions = await RubricPS.executeGetAllUploadQuestionById(rubricId);
         let mcOptions;
 
-        // Copy open questions
+        // Delete open questions
         for (let i = 0; i < openQuestions.length; i++) {
             await this.executeDeleteOpenQuestion(openQuestions[i].id);
         }
-        // Copy range questions
+        // Delete range questions
         for (let i = 0; i < rangeQuestions.length; i++) {
             await this.executeDeleteRangeQuestion(rangeQuestions[i].id);
         }
-        // Copy mc questions
+        // Delete rubric questions
+        for (let i = 0; i < uploadQuestions.length; i++) {
+            await this.executeDeleteUploadQuestion(uploadQuestions[i].id);
+        }
+        // Delete mc questions
         for (let i = 0; i < mcQuestions.length; i++) {
             await this.executeDeleteMCQuestion(mcQuestions[i].id);
 
