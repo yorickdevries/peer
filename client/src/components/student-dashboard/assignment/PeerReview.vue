@@ -34,6 +34,8 @@
                         <p>{{ pair.question.question }}</p>
                     </div>
 
+                    {{ pair }}
+
                     <!-- OPEN QUESTION -->
                     <b-form-textarea v-if="pair.question.type_question === 'open'"
                                      id="textarea1"
@@ -69,6 +71,13 @@
                         </b-form-radio-group>
                     </b-form-group>
 
+                    <!-- UPLOAD QUESTION -->
+                    <div v-if="pair.question.question_number === 6">
+
+                        <UploadQuestionForm :question="pair.question"></UploadQuestionForm>
+
+                    </div>
+
                 </b-list-group-item>
             </b-list-group>
 
@@ -101,13 +110,15 @@
 import api from "../../../api"
 import { StarRating } from 'vue-rate-it';
 import notifications from '../../../mixins/notifications'
+import UploadQuestionForm from './UploadQuestionForm'
 import SessionCheck from '../../general/SessionCheck'
 
 export default {
     mixins: [notifications],
     components: {
         StarRating,
-        SessionCheck
+        SessionCheck,
+        UploadQuestionForm
     },
     props: ["reviewId"],
     data() {

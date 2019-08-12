@@ -61,6 +61,10 @@
                             <MCQuestion v-model="rubric.questions[index]"></MCQuestion>
                         </template>
 
+                        <template v-if="question.type_question === 'upload'">
+                            <UploadQuestion v-model="rubric.questions[index]"></UploadQuestion>
+                        </template>
+
                         <b-button @click="saveQuestion(question)" variant="outline-primary" size="sm" class="mr-1">
                             Save
                         </b-button>
@@ -98,6 +102,7 @@ import notifications from '../../../mixins/notifications'
 import OpenQuestion from './OpenQuestion'
 import RangeQuestion from './RangeQuestion'
 import MCQuestion from './MCQuestion'
+import UploadQuestion from './UploadQuestion'
 import CreateQuestionWizard from './CreateQuestionWizard'
 
 let apiPrefixes = {
@@ -105,6 +110,7 @@ let apiPrefixes = {
     mc: '/rubric/mcquestion',
     range: '/rubric/rangequestion',
     mcoption: '/rubric/mcoption',
+    upload: '/rubric/openquestion'
 }
 
 export default {
@@ -113,7 +119,8 @@ export default {
         OpenQuestion,
         RangeQuestion,
         MCQuestion,
-        CreateQuestionWizard
+        CreateQuestionWizard,
+        UploadQuestion
     },
     props: ['rubricId'],
     data() {

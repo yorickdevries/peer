@@ -18,12 +18,18 @@
             <MCQuestion v-model="mcQuestion"></MCQuestion>
             <b-button @click="createQuestion(mcQuestion, selectedType)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
         </template>
+
+        <template v-if="selectedType === 'upload'">
+            <UploadQuestion v-model="uploadQuestion"></UploadQuestion>
+            <b-button @click="createQuestion(uploadQuestion, selectedType)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
+        </template>
     </b-card>
 </template>
 
 <script>
 import OpenQuestion from './OpenQuestion'
 import RangeQuestion from './RangeQuestion'
+import UploadQuestion from './UploadQuestion'
 import MCQuestion from './MCQuestion'
 import api from "../../../api"
 import notifications from '../../../mixins/notifications'
@@ -33,6 +39,7 @@ let apiPrefixes = {
     mc: '/rubric/mcquestion',
     range: '/rubric/rangequestion',
     mcoption: '/rubric/mcoption',
+    upload: 'rubric/openquestion',
 }
 
 export default {
@@ -41,6 +48,7 @@ export default {
         OpenQuestion,
         RangeQuestion,
         MCQuestion,
+        UploadQuestion
     },
     props: ['id', 'rubricId'],
     data() {
@@ -50,6 +58,7 @@ export default {
                 { value: 'mc', text: 'Multiple Choice' },
                 { value: 'range', text: 'Range' },
                 { value: 'open', text: 'Open' },
+                { value: 'upload', text: 'Upload Question' },
             ],
             openQuestion: {
                 question: '',
@@ -67,7 +76,12 @@ export default {
                 rubric_assignment_id: this.rubricId,
                 question_number: null,
                 option: []
-            }
+            },
+            uploadQuestion: {
+                question: '',
+                rubric_assignment_id: this.rubricId,
+                question_number: null
+            },
         }
     },
     watch: {
@@ -75,6 +89,7 @@ export default {
             this.openQuestion.rubric_assignment_id = val
             this.rangeQuestion.rubric_assignment_id = val
             this.mcQuestion.rubric_assignment_id = val
+            this.uploadQuestion.rubric_assignment_id = val
         }
     },
     methods: {
@@ -116,8 +131,8 @@ export default {
             this.selectedType = ''
             this.openQuestion = {
                 question: '',
-                    rubric_assignment_id: this.rubricId,
-                    question_number: null
+                rubric_assignment_id: this.rubricId,
+                question_number: null
             }
             this.rangeQuestion = {
                 question: '',
@@ -130,6 +145,11 @@ export default {
                 rubric_assignment_id: this.rubricId,
                 question_number: null,
                 option: []
+            }
+            this.uploadQuestion = {
+                question: '',
+                rubric_assignment_id: this.rubricId,
+                question_number: null,
             }
         }
     },
