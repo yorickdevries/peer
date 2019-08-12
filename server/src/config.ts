@@ -1,7 +1,7 @@
 import isCI from "is-ci";
 import path from "path";
 
-// configuration
+// configuration file
 const config = {
     database: {
         connection: {
