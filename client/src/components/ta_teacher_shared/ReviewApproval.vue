@@ -168,7 +168,7 @@ export default {
 
         // Load assignment info.
         try {
-            const rubric = await api.getRubric(this.peerReview.review.rubric_id)
+            const rubric = (await api.getRubric(this.peerReview.review.rubric_id)).data
             const {data: assignment} = await api.getAssignment(rubric.assignment_id)
             this.assignment = assignment
         } catch (e) {

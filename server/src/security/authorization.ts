@@ -34,13 +34,36 @@ const employeeCheck = (req: any, res: any, next: any) => {
 };
 
 /**
- * Check whether a user is enrolled to the course of the assignment it wants to access
+ * Check whether a user is enrolled in a group of the assignment it wants to access
+ * or is manager of the course
  */
 const enrolledAssignmentCheck = async (req: any, res: any, next: any) => {
     try {
         const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-        const authCheck = await AuthorizationPS.executeCheckEnrollment(assignment.course_id, req.user.netid);
-        response(res, authCheck.exists, next);
+        // Student in assignment or teacher/TA in course
+        const selfEnrollment = assignment.one_person_groups;
+        const inGroup = await AuthorizationPS.executeCheckAssignmentEnrollment(assignment.id, req.user.netid);
+        const taOrTeacherInCourse = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.user.netid);
+        const authCheck = selfEnrollment || inGroup.exists || taOrTeacherInCourse.exists;
+        response(res, authCheck, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check whether a user iis allowed to get a rubric
+ */
+const getRubricCheck = async (req: any, res: any, next: any) => {
+    try {
+        const rubric = await RubricPS.executeGetRubricById(req.params.rubric_id);
+        const assignment = await AssignmentPS.executeGetAssignmentById(rubric.assignment_id);
+
+        // Student in assignment or teacher/TA in course
+        const inGroup = await AuthorizationPS.executeCheckAssignmentEnrollment(assignment.id, req.user.netid);
+        const taOrTeacherInCourse = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.user.netid);
+        const authCheck = inGroup.exists || taOrTeacherInCourse.exists;
+        response(res, authCheck, next);
     } catch (error) {
         res.sendStatus(401);
     }
@@ -519,6 +542,7 @@ export default {
     authorizeCheck,
     employeeCheck,
     enrolledAssignmentCheck,
+    getRubricCheck,
     checkOwnerReviewComment,
     checkReviewTAOrTeacher,
     checkReviewOwnerDone,

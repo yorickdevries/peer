@@ -238,6 +238,20 @@ router.get("/submissionrubric/:assignment_id", index.authorization.enrolledAssig
 });
 
 /**
+ * Router to get a rubric
+ */
+router.get("/:rubric_id", index.authorization.getRubricCheck, async (req, res) => {
+    try {
+        const rubric = await RubricPS.executeGetRubricById(req.params.rubric_id);
+        const questionJson = await RubricPS.getAllQuestionsByRubricId(rubric.id);
+        rubric.questions = questionJson;
+        res.json(rubric);
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
  * Route to copy all rubric questions from another rubric, in the same course.
  * @params rubric_id - current rubric id to copy the questions to.
  * @params rubric_copy_id - rubric id to copy from.

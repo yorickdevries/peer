@@ -20,6 +20,22 @@ export default class AuthorizationPS {
     }
 
     /**
+     * Check whether a user is enrolled in an assignment.
+     */
+    public static executeCheckAssignmentEnrollment(assignmentId: number, netId: String): any {
+        const statement = new PreparedStatement("check-enrollment",
+            "SELECT EXISTS(" +
+            "SELECT * FROM assignmentlist " +
+            "JOIN assignmentgroup ON assignmentlist.id = assignmentgroup.assignment_id " +
+            "JOIN groupusers ON assignmentgroup.group_id = groupusers.group_groupid " +
+            "WHERE assignmentlist.id = $1 " +
+            "AND groupusers.user_netid = $2" +
+            ")");
+        statement.values = [assignmentId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Check if the user is enrolled as teacher for the course of the assignment
      * @param {number} courseId - course to check.
      * @param {String} netId - net id of teacher.
