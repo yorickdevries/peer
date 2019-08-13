@@ -18,17 +18,6 @@ describe("API rubric routes", () => {
     });
 
     /**
-     * Test if a rubric can be fetched
-     */
-    it("rubric/:rubric_id", async () => {
-        const res = await chai.request(router).get("/1");
-        expect(res.status).to.equal(200);
-
-        const result = JSON.parse(res.text);
-        expect(result.id).to.equal("1");
-    });
-
-    /**
      * Test if a rubric can be created
      */
     it("rubric/", async () => {

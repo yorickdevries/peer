@@ -203,27 +203,31 @@ router.put("/openquestion/:question_id", index.authorization.checkOpenQuestionEd
  * Router to make a rubric
  * @body rubric_id
  */
-router.post("/", index.authorization.checkRubricAuthorizationPost, (req, res) => {
-    RubricPS.executeCreateRubric(req.body.assignment_id, req.body.rubric_type)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
+router.post("/", index.authorization.checkRubricAuthorizationPost, async (req, res) => {
+    try {
+        const rubricExists: any = await RubricPS.executeExistsSubmissionRubricByAssignmentId(req.body.assignment_id);
+        if (rubricExists.exists) {
+            throw new Error("Rubric already exists");
+        } else {
+            const data = await RubricPS.executeCreateRubric(req.body.assignment_id, req.body.rubric_type);
+            res.json(data);
+        }
+    } catch (error) {
         res.sendStatus(400);
-    });
+    }
 });
 
 /**
- * Router to get all questions of the rubric in format defined in the documentation
+ * Router to get all questions of the submission rubric of the assignment
  * @params assignment_id - rubric_id
  */
-router.get("/:assignment_id", index.authorization.enrolledAssignmentCheck, async (req, res) => {
+router.get("/submissionrubric/:assignment_id", index.authorization.enrolledAssignmentCheck, async (req, res) => {
     try {
-    const questionJson = await RubricPS.getAllQuestionsByRubricId(req.params.assignment_id);
+        const rubric = await RubricPS.executeGetSubmissionRubricByAssignmentId(req.params.assignment_id);
+        const questionJson = await RubricPS.getAllQuestionsByRubricId(rubric.id);
+        rubric.questions = questionJson;
 
-    res.json({
-        id: req.params.assignment_id,
-        assignment_id: req.params.assignment_id,
-        questions: questionJson});
+    res.json(rubric);
     } catch {
         res.sendStatus(400);
     }
