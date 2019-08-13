@@ -221,11 +221,11 @@ export default {
 
             try {
                 await api.savePeerReview(this.peerReview.review.id, formData)
+                this.showSaveMessage()
             } catch (error) {
                 this.showErrorMessage({message: "Error saving peer review."})
             }
             await this.fetchPeerReview()
-            this.showSaveMessage()
         },
         async unSubmitPeerReview() {
             // unSubmit peer review.
