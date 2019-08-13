@@ -21,6 +21,7 @@ describe("API integration test", () => {
         await TestData.initializeDatabase();
         await TestData.initializeSubmissionFiles();
         await TestData.initializeAssignmentFiles();
+        await TestData.initializeReviewFiles();
     });
 
     /**
@@ -29,6 +30,7 @@ describe("API integration test", () => {
     afterEach(async () => {
         await TestData.removeSubmissionFiles();
         await TestData.removeAssignmentFiles();
+        await TestData.removeReviewFiles();
     });
 
     /**

@@ -57,9 +57,28 @@ const copyExampleSubmissionData = async function () {
     }
 };
 
+// copy review files
+const copyExampleReviewData = async function () {
+    // Submission file folders
+    const exampleReviewFolder = config.exampleData.exampleReviewFolder;
+    const reviewFolder = config.reviews.fileFolder;
+    try {
+        // Make folder
+        await fs.mkdirs(reviewFolder);
+        console.log("Created folder: " + reviewFolder);
+        // Copy example data
+        await fs.copy(exampleReviewFolder, reviewFolder);
+        console.log("Done copying example review data!");
+    } catch (error) {
+        console.log(error);
+        process.exit(1);
+    }
+};
+
 // running the initialisation functions
 console.log("Importing database");
 importDatabase();
 console.log("Copying example data");
 copyExampleAssignmentData();
 copyExampleSubmissionData();
+copyExampleReviewData();

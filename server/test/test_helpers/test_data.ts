@@ -22,6 +22,10 @@ export default class TestData {
      */
     static exampleSubmissionFolder = path.join(__dirname, "../../example_data/submissions");
     /**
+     * Excample Review files
+     */
+    static exampleReviewFolder = path.join(__dirname, "../../example_data/reviews");
+    /**
      * Submission file folder
      */
     static submissionFolder = path.join(__dirname, "../../src/files/submissions");
@@ -71,6 +75,24 @@ export default class TestData {
      */
     static async removeSubmissionFiles() {
         await fs.remove(this.submissionFolder);
+    }
+
+    /**
+     * Initializes the review folder with review test data.
+     * @return {Promise<void>}
+     */
+    static async initializeReviewFiles() {
+        await fs.mkdirs(this.reviewFolder);
+        // Copy example data
+        await fs.copy(this.exampleReviewFolder, this.reviewFolder);
+    }
+
+    /**
+     * Removes the review test data.
+     * @return {Promise<void>}
+     */
+    static async removeReviewFiles() {
+        await fs.remove(this.reviewFolder);
     }
 
     /**
