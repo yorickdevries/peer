@@ -42,7 +42,8 @@
                                      :max-rows="15"
                                      v-model="pair.answer.answer"
                                      :readonly="peerReview.review.done"
-                                     required/>
+                                     required
+                                     maxlength="90000"/>
 
                     <!-- RANGE QUESTION -->
                     <StarRating v-else-if="pair.question.type_question === 'range'"
@@ -92,7 +93,8 @@
                             <b-form-file  placeholder="Choose a new file..."
                                           v-model="files[pair.question.id]"
                                           :state="Boolean(files[pair.question.id])"
-                                          :accept="`.${pair.question.extension}`">
+                                          :accept="`.${pair.question.extension}`"
+                                          :disabled="peerReview.review.done">
                             </b-form-file>
 
                         </b-form-group>
