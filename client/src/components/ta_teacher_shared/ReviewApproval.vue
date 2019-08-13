@@ -44,7 +44,7 @@
                         <dl>
                             <dt>Download</dt>
                             <dd>The download for the submission this review is about.</dd>
-                            <a :href="peerReviewFilePath" target="_blank">
+                            <a target="_blank" :href="peerReviewFilePath" target="_blank">
                                 <button type="button" class="btn btn-success success">Download Submission</button>
                             </a>
                         </dl>
@@ -225,7 +225,7 @@ export default {
             }
         },
         uploadQuestionFilePath(reviewId, questionId) {
-            return `/reviews/${reviewId}/questions/:${questionId}/file`
+            return `/api/reviews/${reviewId}/questions/${questionId}/file`
         }
     }
 

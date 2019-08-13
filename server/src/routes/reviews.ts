@@ -89,7 +89,7 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
                     const filename = path.join(fileFolder, `${file.fieldname}.${splittedFilename[1]}`);
                     questionIds.push(parseInt(file.fieldname));
 
-                    await fs.writeFile(filename, req.file.buffer);
+                    await fs.writeFile(filename, file.buffer);
                 } else {
                     res.status(400);
                     res.json({error: "Invalid file extension"});
@@ -112,9 +112,9 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
  * Route to get a file from an review.
  * @param id - review id.
  */
-router.get("/:id/questions/:question_id/file", index.authorization.enrolledAssignmentCheck, async (req, res) => {
+router.get("/:reviewId/questions/:question_id/file", index.authorization.checkAuthorizationForReview, async (req, res) => {
     try {
-        const review: any = await ReviewsPS.executeGetUploadAnswer(req.params.id, req.params.question_id);
+        const review: any = await ReviewsPS.executeGetUploadAnswer(req.params.reviewId, req.params.question_id);
         const fileName = path.join(fileFolder, `${review.answer}`);
         res.download(fileName);
     } catch (err) {

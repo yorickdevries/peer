@@ -121,7 +121,10 @@ export default class ReviewUpdate {
                     questionList.push(await this.checkMCQuestion(questionId, rubricId, answerText));
                 break;
                 case "upload":
-                    questionList.push(await this.checkUploadQuestion(questionId, rubricId, answerText, fileUploadQuestionIds));
+                    // If the question id is not contained, the user did not upload a file. Skip this one.
+                    if (fileUploadQuestionIds.some(x => x === questionId)) {
+                        questionList.push(await this.checkUploadQuestion(questionId, rubricId, answerText));
+                    }
                 break;
                 default: throw new Error("Unrecognized question type: " + questionType);
             }
@@ -188,11 +191,9 @@ export default class ReviewUpdate {
      * @param {number} questionId
      * @param {number} rubricId
      * @param {*} answerText
-     * @param fileUploadQuestionIds
      * @returns open question json.
      */
-    public static async checkUploadQuestion(questionId: number, rubricId: number, answerText: any,
-                                            fileUploadQuestionIds: number[]) {
+    public static async checkUploadQuestion(questionId: number, rubricId: number, answerText: any) {
         // Initialize the question variable
         let question;
         try {
@@ -201,15 +202,11 @@ export default class ReviewUpdate {
             throw new Error("Wrong Upload Question: " + questionId);
         }
 
-        if (fileUploadQuestionIds.some(x => x === questionId)) {
-            return {
-                questionType: "upload",
-                questionId: questionId,
-                answer: answerText
-            };
-        } else {
-            throw new Error("The following Upload Question has an invalid answer: " + questionId);
-        }
+        return {
+            questionType: "upload",
+            questionId: questionId,
+            answer: answerText
+        };
     }
 
     /**

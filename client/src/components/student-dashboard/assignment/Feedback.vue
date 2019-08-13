@@ -79,7 +79,7 @@
 
                                 <!--&lt;!&ndash; UPLOAD QUESTION &ndash;&gt;-->
                                 <template v-if="activeQuestion.type_question === 'upload'">
-                                    <a :href="uploadQuestionFilePath(pair.peerReviewId, pair.question.id)">{{ activeQuestion.answer.answer }}</a>
+                                    <a target="_blank" :href="uploadQuestionFilePath(pair.peerReviewId, pair.question.id)">{{ activeQuestion.answer.answer }}</a>
                                 </template>
 
 
@@ -236,7 +236,7 @@ export default {
             }
         },
         uploadQuestionFilePath(reviewId, questionId) {
-            return `/reviews/${reviewId}/questions/:${questionId}/file`
+            return `/api/reviews/${reviewId}/questions/${questionId}/file`
         }
     },
 }

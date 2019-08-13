@@ -4,7 +4,7 @@
         <!--Download-->
         <b-row>
             <b-col>
-                <a :href="peerReviewFilePath" target="_blank">
+                <a target="_blank" :href="peerReviewFilePath" target="_blank">
                     <button type="button" class="btn btn-success success w-100"
                             style="height: 3rem">Download Hand-In
                     </button>
@@ -239,7 +239,7 @@ export default {
             })
         },
         uploadQuestionFilePath(reviewId, questionId) {
-            return `/reviews/${reviewId}/questions/:${questionId}/file`
+            return `/api/reviews/${reviewId}/questions/${questionId}/file`
         }
     },
 }
