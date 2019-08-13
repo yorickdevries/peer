@@ -104,7 +104,7 @@
                         </b-form-group>
 
                         <!-- UPLOAD QUESTION -->
-                        <template v-if="activeQuestion.type_question === 'upload'">
+                        <template v-if="pair.question.type_question === 'upload'">
                             <a :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">{{ pair.answer.answer }}</a>
                         </template>
 
