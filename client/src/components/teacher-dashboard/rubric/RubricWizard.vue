@@ -1,8 +1,11 @@
 
 <template>
-    <b-container>
+    <div>
+    <b-alert :show="blockRubricEditing" variant="info">Rubric editing is not allowed anymore since the peer review publish date has already elapsed.</b-alert>
 
-        <b-card class="mb-3">
+    <b-container v-bind:class="{ 'disabled-view': blockRubricEditing }">
+
+        <b-card class="mb-3 mt-3">
             <div class="d-flex justify-content-between">
                 <div>
                     <div class="text-muted">Make Rubric</div>
@@ -94,6 +97,8 @@
             </b-col>
         </b-row>
     </b-container>
+    </div>
+
 </template>
 
 <script>
@@ -122,7 +127,7 @@ export default {
         CreateQuestionWizard,
         UploadQuestion
     },
-    props: ['rubricId'],
+    props: ['rubricId', 'review_publish_date'],
     data() {
         return {
             rubric: {
@@ -132,6 +137,11 @@ export default {
             },
             rubricsMetaData: [],
             rubricToCopy: null
+        }
+    },
+    computed: {
+        blockRubricEditing() {
+            return new Date() > new Date(this.review_publish_date);
         }
     },
     async created() {

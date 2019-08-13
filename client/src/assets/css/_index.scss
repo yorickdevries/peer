@@ -81,3 +81,10 @@ body {
   opacity: 0;
   transform: translate(-1em, 0);
 }
+
+// Disables a div from being clickable (used in rubric screen)
+.disabled-view {
+  pointer-events: none;
+  background-color: black;
+  opacity: .5;
+}
