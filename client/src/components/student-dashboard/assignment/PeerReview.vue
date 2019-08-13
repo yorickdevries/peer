@@ -83,8 +83,7 @@
                                 </div>
                             </b-alert>
 
-                            <b-form-file  v-if="!pair.answer.answer"
-                                          placeholder="Choose a new file..."
+                            <b-form-file  placeholder="Choose a new file..."
                                           accept=".pdf,.zip"
                                           v-model="files[pair.question.id]"
                                           :state="Boolean(files[pair.question.id])">
