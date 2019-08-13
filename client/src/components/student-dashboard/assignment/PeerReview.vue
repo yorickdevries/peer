@@ -73,7 +73,7 @@
                     <div v-if="pair.question.type_question === 'upload'">
 
                         <!--File upload-->
-                        <b-form-group description="" class="mb-0">
+                        <b-form-group description="Select a file and press save down below the page. Note: it overwrites files." class="mb-0">
                             <!--Show currently uploaded file-->
                             <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
                                 <!--Buttons for toggling new assignment upload-->
@@ -83,6 +83,8 @@
                                     <div v-else>You currently have no file uploaded.</div>
                                 </div>
                             </b-alert>
+
+                            <b-alert v-if="pair.answer.answer" show variant="warning">Note: uploading an new files will overwrite your current file.</b-alert>
 
                             <b-form-file  placeholder="Choose a new file..."
                                           accept=".pdf,.zip"
