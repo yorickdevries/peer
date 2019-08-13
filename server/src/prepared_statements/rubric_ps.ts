@@ -49,18 +49,6 @@ export default class RubricPS {
     }
 
     /**
-     * Query 'delete rubric'.
-     * @param {number} id - assignment_id.
-     * @returns {Promise<pgPromise.queryResult>}
-     */
-    public static executeDeleteRubric(id: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("delete-rubric",
-            "DELETE FROM rubric WHERE id=$1 RETURNING *");
-        statement.values = [id];
-        return Database.executeQuerySingleResult(statement);
-    }
-
-    /**
      * Query 'delete mc option'.
      * @param {number} id - id.
      * @returns {Promise<pgPromise.queryResult>}

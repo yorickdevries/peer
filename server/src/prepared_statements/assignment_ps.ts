@@ -19,22 +19,6 @@ export default class AssignmentPS {
     }
 
     /**
-     * Create a review for a given assignment.
-     * @param {string} netId - net id of the reviewer.
-     * @param {number} submissionId - submission id that is reviewed.
-     * @param {number} assignmentId - assignment id where the review is about.
-     * @returns {Promise<pgPromise.queryResult>} relevant columns of the created review as pg promise.
-     */
-    public static executeCreateReviewByAssignmentId(netId: string, submissionId: number, assignmentId: number)
-        : Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("make-review-for-user",
-            "INSERT INTO review (user_netid, submission_id, rubric_id) VALUES ($1, $2, $3) " +
-            "RETURNING id, user_netid, submission_id, rubric_id, done");
-        statement.values = [netId, submissionId, assignmentId];
-        return Database.executeQuerySingleResult(statement);
-    }
-
-    /**
      * Get all assignments that belong to a specific course.
      * @param {string} courseId - a course id of which all assignments are fetched.
      * @return {any} all assignments of the course as pg promise..

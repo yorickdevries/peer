@@ -186,18 +186,6 @@ describe("RubricPreparedStatements Test", () => {
     });
 
     /**
-     * Test to delete a rubric
-     */
-    it("delete rubric", async () => {
-        await RubricPS.executeCreateRubric(3, "submission");
-        expect(await RubricPS.executeDeleteRubric(3)).to.deep.equal({
-            assignment_id: 3,
-            id: 3,
-            type: "submission"
-        });
-    });
-
-    /**
      * Test to delete a open question
      */
     it("delete open question", async () => {

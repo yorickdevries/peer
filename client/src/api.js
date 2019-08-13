@@ -40,9 +40,6 @@ export default {
     getAssignment(assignmentId) {
         return client.get(`assignments/${assignmentId}`)
     },
-    getRubric(rubricId) {
-        return client.get(`rubric/${rubricId}`)
-    },
     createAssignment: async(assignment) => {
         return client.post('/assignments', assignment)
     },
