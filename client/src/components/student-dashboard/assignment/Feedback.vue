@@ -79,7 +79,7 @@
 
                                 <!--&lt;!&ndash; UPLOAD QUESTION &ndash;&gt;-->
                                 <template v-if="activeQuestion.type_question === 'upload'">
-                                    <a target="_blank" :href="uploadQuestionFilePath(pair.peerReviewId, pair.question.id)">{{ activeQuestion.answer.answer }}</a>
+                                    <a target="_blank" :href="uploadQuestionFilePath(pair.peerReviewId, pair.question.id)">{{ pair.answer.answer }}</a>
                                 </template>
 
 
@@ -211,7 +211,7 @@ export default {
             this.peerReviews.forEach(peerReview => {
                 let pair = peerReview.form.find(questionAnswerPair => questionAnswerPair.question.question_number === targetQuestionNumber)
                 res.push({
-                    pair,
+                    ...pair,
                     // Add for later use when you need to gather the link for the upload question.
                     peerReviewId: peerReview.review.id
                 })
