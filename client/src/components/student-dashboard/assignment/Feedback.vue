@@ -44,11 +44,6 @@
 
                             <b-list-group-item v-for="(pair, index) in aggregateQuestionAnswer(activeQuestion.question_number)" :key="index">
 
-                                <!--&lt;!&ndash; UPLOAD QUESTION &ndash;&gt;-->
-                                <template v-if="activeQuestion.type_question === 'upload'">
-                                    <a :href="uploadQuestionFilePath(pair.peerReviewId, pair.question.id)">{{ activeQuestion.answer.answer }}</a>
-                                </template>
-
                                 <!--&lt;!&ndash; OPEN QUESTION &ndash;&gt;-->
                                 <template v-if="activeQuestion.type_question === 'open'">
 
@@ -81,6 +76,12 @@
                                             stacked>
                                     </b-form-radio-group>
                                 </b-form-group>
+
+                                <!--&lt;!&ndash; UPLOAD QUESTION &ndash;&gt;-->
+                                <template v-if="activeQuestion.type_question === 'upload'">
+                                    <a :href="uploadQuestionFilePath(pair.peerReviewId, pair.question.id)">{{ activeQuestion.answer.answer }}</a>
+                                </template>
+
 
                             </b-list-group-item>
 
@@ -212,7 +213,7 @@ export default {
                 res.push({
                     pair,
                     // Add for later use when you need to gather the link for the upload question.
-                    peerReviewId: peerReview.id
+                    peerReviewId: peerReview.review.id
                 })
             })
             return res

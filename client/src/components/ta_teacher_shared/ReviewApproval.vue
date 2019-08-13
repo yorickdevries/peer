@@ -103,6 +103,12 @@
                             </b-form-radio-group>
                         </b-form-group>
 
+                        <!-- UPLOAD QUESTION -->
+                        <template v-if="activeQuestion.type_question === 'upload'">
+                            <a :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">{{ pair.answer.answer }}</a>
+                        </template>
+
+
                     </b-list-group-item>
                 </b-list-group>
             </b-card>
@@ -217,6 +223,9 @@ export default {
             } else {
                 this.$router.push({name: 'teaching-assistant-dashboard.course.assignment', params: {assignmentId: this.peerReview.review.rubric_assignment_id} })
             }
+        },
+        uploadQuestionFilePath(reviewId, questionId) {
+            return `/reviews/${reviewId}/questions/:${questionId}/file`
         }
     }
 
