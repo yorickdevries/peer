@@ -74,7 +74,7 @@ const getRubricCheck = async (req: any, res: any, next: any) => {
  */
 const enrolledCourseCheck = async (req: any, res: any, next: any) => {
     try {
-        const authCheck = await AuthorizationPS.executeCheckEnrollment(req.params.courseId, req.user.netid);
+        const authCheck = await AuthorizationPS.executeCheckCourseEnrollment(req.params.courseId, req.user.netid);
         response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);

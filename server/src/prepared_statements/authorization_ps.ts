@@ -12,8 +12,8 @@ export default class AuthorizationPS {
      * @param {String} netId - netId.
      * @returns {Promise<pgPromise.queryResult>} true or false as pg promise.
      */
-    public static executeCheckEnrollment(courseId: number, netId: String): any {
-        const statement = new PreparedStatement("check-enrollment",
+    public static executeCheckCourseEnrollment(courseId: number, netId: String): any {
+        const statement = new PreparedStatement("check-course-enrollment",
             "SELECT EXISTS(SELECT 1 FROM ENROLL WHERE course_id = $1 AND user_netid = $2)");
         statement.values = [courseId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -23,7 +23,7 @@ export default class AuthorizationPS {
      * Check whether a user is enrolled in an assignment.
      */
     public static executeCheckAssignmentEnrollment(assignmentId: number, netId: String): any {
-        const statement = new PreparedStatement("check-enrollment",
+        const statement = new PreparedStatement("check-assignment-enrollment",
             "SELECT EXISTS(" +
             "SELECT * FROM assignmentlist " +
             "JOIN assignmentgroup ON assignmentlist.id = assignmentgroup.assignment_id " +
