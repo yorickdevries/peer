@@ -132,6 +132,8 @@ export default class ReviewUpdate {
                 break;
                 case "upload":
                     // If the question id is not contained, the user did not upload a file. Skip this one.
+                    // Usually, this is handled by the front-end. However, this was hard to do (easier here)
+                    // due to the file-upload functionality of Vue, which would add a lot of logic in the front-end.
                     if (fileUploadQuestionIds.some(x => x === questionId)) {
                         questionList.push(await this.checkUploadQuestion(questionId, rubricId, answerText));
                     }
@@ -204,14 +206,8 @@ export default class ReviewUpdate {
      * @returns open question json.
      */
     public static async checkUploadQuestion(questionId: number, rubricId: number, answerText: any) {
-        // Initialize the question variable
-        let question;
-        try {
-            question = await RubricPS.executeGetUploadQuestionByIdAndRubricId(questionId, rubricId);
-        } catch (error) {
-            throw new Error("Wrong Upload Question: " + questionId);
-        }
-
+        // The upload check is done before the reviewUpdate step, to filter out false extension types.
+        // The answer corresponds to the filename, which is automatically set and is therefore always correct.
         return {
             questionType: "upload",
             questionId: questionId,

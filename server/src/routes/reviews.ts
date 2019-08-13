@@ -93,9 +93,7 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
                     // Rename the file to the question id.
                     const filename = path.join(fileFolder, `${req.params.reviewId}-${file.fieldname}.${submittedExtension}`);
 
-                    const currentUploadQuestion = inputForm.find((x: any) => {
-                        return x.question.id === questionId;
-                    });
+                    const currentUploadQuestion = inputForm.find((x: any) => x.question.id === questionId);
 
                     // Make sure that the extension is allowed.
                     if (currentUploadQuestion && currentUploadQuestion.question.extension === submittedExtension) {
