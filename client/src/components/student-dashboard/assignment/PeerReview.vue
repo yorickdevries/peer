@@ -78,7 +78,8 @@
                             <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
                                 <!--Buttons for toggling new assignment upload-->
                                 <div>
-                                    <div v-if="pair.answer.answer">You currently have uploaded the file: {{ pair.answer.answer }}</div>
+                                    <div v-if="pair.answer.answer">You currently have uploaded the file: <a
+                                            :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">{{ pair.answer.answer }}</a></div>
                                     <div v-else>You currently have no file uploaded.</div>
                                 </div>
                             </b-alert>
@@ -207,11 +208,11 @@ export default {
                 return
             }
 
+            // Set up the form data (files in ROOT of formData) to send to server.
             const formData = new FormData()
             formData.append("review", JSON.stringify(this.peerReview.review))
             formData.append("form", JSON.stringify(this.peerReview.form))
-
-            formData.append("reviewFile", this.files['2'])
+            Object.entries(this.files).forEach(([key, value]) => formData.append(key, value))
 
             try {
                 await api.savePeerReview(this.peerReview.review.id, formData)
@@ -237,6 +238,9 @@ export default {
                 return {text: option.option, value: option.id}
             })
         },
+        uploadQuestionFilePath(reviewId, questionId) {
+            return `/reviews/${reviewId}/questions/:${questionId}/file`
+        }
     },
 }
 </script>
