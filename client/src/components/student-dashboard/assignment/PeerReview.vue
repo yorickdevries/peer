@@ -42,7 +42,8 @@
                                      :max-rows="15"
                                      v-model="pair.answer.answer"
                                      :readonly="peerReview.review.done"
-                                     required/>
+                                     required
+                                     maxlength="90000"/>
 
                     <!-- RANGE QUESTION -->
                     <StarRating v-else-if="pair.question.type_question === 'range'"
