@@ -111,7 +111,9 @@ describe("API rubric routes", () => {
         const res = await chai.request(router)
             .post("/uploadquestion")
             .send({ question: "opt", extension: "pdf", rubric_assignment_id: 1, question_number: 1 });
+
         expect(res.status).to.equal(200);
+
         expect(res.text).to.equal(JSON.stringify(
             {
                 "id": 1,
@@ -122,6 +124,55 @@ describe("API rubric routes", () => {
                 "type_question": "upload"
             }
         ));
+    });
+
+    /**
+     * Test if an uploadquestion can be updated
+     */
+    it("rubric/uploadquestion update", async () => {
+        const updatedQuestion = "new question";
+        const updatedExtension = "zip";
+        const updatedQuestionNumber = 2;
+
+        const created = await chai.request(router)
+            .post("/uploadquestion")
+            .send({ question: "opt", extension: "pdf", rubric_assignment_id: 1, question_number: 1 });
+
+        expect(created.status).to.equal(200);
+
+        const updated = await chai.request(router)
+            .put(`/uploadquestion/${created.body.id}`)
+            .send({ question: updatedQuestion, extension: updatedExtension, question_number: updatedQuestionNumber });
+
+        expect({
+            updatedQuestion: updated.body.question,
+            updatedExtension: updated.body.extension,
+            updatedQuestionNumber: updated.body.question_number
+        }).to.deep.equal({
+            updatedQuestion,
+            updatedExtension,
+            updatedQuestionNumber
+        });
+    });
+
+    /**
+     * Test if an uploadquestion can be deleted
+     */
+    it("rubric/uploadquestion deleted", async () => {
+        const updatedQuestion = "new question";
+        const updatedExtension = "zip";
+        const updatedQuestionNumber = 2;
+
+        const created = await chai.request(router)
+            .post("/uploadquestion")
+            .send({ question: "opt", extension: "pdf", rubric_assignment_id: 1, question_number: 1 });
+
+        expect(created.status).to.equal(200);
+
+        const deleted = await chai.request(router)
+            .del(`/uploadquestion/${created.body.id}`);
+
+        expect(deleted.status).to.equal(200);
     });
 
     /**
