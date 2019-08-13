@@ -42,7 +42,7 @@
                                             </div>
                                         </b-list-group-item>
 
-                            <b-list-group-item v-for="(pair, index) in aggregateQuestionAnswer(activeQuestion.question_number)" :key="index">
+                            <b-list-group-item v-for="(pair, index) in aggregateQuestionAnswer(activeQuestion.id)" :key="index">
 
                                 <!--&lt;!&ndash; OPEN QUESTION &ndash;&gt;-->
                                 <template v-if="activeQuestion.type_question === 'open'">
@@ -201,11 +201,11 @@ export default {
 
         },
 
-        aggregateQuestionAnswer(targetQuestionNumber) {
+        aggregateQuestionAnswer(targetQuestionId) {
             // Aggregates the answers for a particular question into an array of answers.
             let res = []
             this.peerReviews.forEach(peerReview => {
-                let pair = peerReview.form.find(questionAnswerPair => questionAnswerPair.question.question_number === targetQuestionNumber)
+                let pair = peerReview.form.find(questionAnswerPair => questionAnswerPair.question.id === targetQuestionId)
                 res.push(pair)
             })
             return res
