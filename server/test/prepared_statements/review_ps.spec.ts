@@ -3,6 +3,8 @@ import { expect } from "chai";
 import TestData from "../test_helpers/test_data";
 
 import ReviewPS from "../../src/prepared_statements/review_ps";
+import RubricPS from "../../src/prepared_statements/rubric_ps";
+import AssignmentPS from "../../src/prepared_statements/assignment_ps";
 
 describe("ReviewPreparedStatement Test", () => {
     /**
@@ -11,6 +13,25 @@ describe("ReviewPreparedStatement Test", () => {
     beforeEach(async () => {
         await TestData.initializeDatabase();
     });
+
+    /**
+     * Function that creates a rubric for testing purposes.
+     * Required due to foreign key constraints in the database.
+     * @return {Promise<pgPromise.queryResult>} a rubric that is also added to the database.
+     */
+    async function createTestRubric() {
+        const assignment: any = await AssignmentPS.executeAddAssignment(
+            "TestAssignment 1",
+            "Description",
+            1, 2,
+            "filename",
+            new Date("2016-05-01T20:30:00.000Z"),
+            new Date("2017-05-01T21:30:00.000Z"),
+            new Date("2018-05-01T22:30:00.000Z"),
+            new Date("2019-05-01T23:30:00.000Z"),
+            false);
+        return await RubricPS.executeCreateRubric(assignment.id);
+    }
 
     /**
      * Get review by id.
@@ -66,8 +87,10 @@ describe("ReviewPreparedStatement Test", () => {
     it("update upload answer", async () => {
         const answer = "serious_answer.pdf";
 
-        await ReviewPS.executeUpdateUploadAnswer("kappa.pdf", 2, 2);
-        const updated: any = await ReviewPS.executeUpdateUploadAnswer(answer, 1, 1);
+        const rubric: any = await createTestRubric();
+        const question: any = await RubricPS.executeCreateUploadQuestion("something", rubric.assignment_id, 0, "pdf");
+        await ReviewPS.executeUpdateUploadAnswer("kappa.pdf", question.id, 2);
+        const updated: any = await ReviewPS.executeUpdateUploadAnswer(answer, question.id, 2);
 
         expect({
             answer: updated.answer,
@@ -112,11 +135,13 @@ describe("ReviewPreparedStatement Test", () => {
      */
     it("get upload answer by id", async () => {
         const answer = "serious_answer.pdf";
-        const questionId = 10;
-        const reviewId = 11;
+        const reviewId = 1;
 
-        const created: any = await ReviewPS.executeUpdateUploadAnswer(answer, questionId, reviewId);
-        const fetched: any = await ReviewPS.executeGetUploadAnswer(reviewId, questionId);
+        const rubric: any = await createTestRubric();
+        const question: any = await RubricPS.executeCreateUploadQuestion("something", rubric.assignment_id, 0, "pdf");
+
+        const created: any = await ReviewPS.executeUpdateUploadAnswer(answer, question.id, reviewId);
+        const fetched: any = await ReviewPS.executeGetUploadAnswer(reviewId, question.id);
 
         expect({
             answer: fetched.answer,

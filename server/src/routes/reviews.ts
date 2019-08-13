@@ -78,23 +78,28 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
         const inputForm = JSON.parse(req.body.form);
         const questionIds = [];
 
-        // Upload the file.
+        // Upload the files of the upload questions, if present.
         if (req.files) {
             for (const file of req.files as Express.Multer.File[]) {
                 // Try to fetch the file extension
                 const re = /(?:\.([^.]+))?$/;
                 const splittedFilename = re.exec(file.originalname);
 
+                // Make sure that there is a file extension
                 if (splittedFilename && splittedFilename.length > 0) {
                     const submittedExtension = splittedFilename[1];
-                    // Rename the file to the fieldname, which is the question id.
+                    const questionId = parseInt(file.fieldname);
+
+                    // Rename the file to the question id.
                     const filename = path.join(fileFolder, `${req.params.reviewId}-${file.fieldname}.${submittedExtension}`);
 
-                    // Make sure that the extension is allowed.
-                    const currentUploadQuestion = inputForm.find((x: any) => x.question.id === reviewId);
+                    const currentUploadQuestion = inputForm.find((x: any) => {
+                        return x.question.id === questionId;
+                    });
 
+                    // Make sure that the extension is allowed.
                     if (currentUploadQuestion && currentUploadQuestion.question.extension === submittedExtension) {
-                        questionIds.push(parseInt(file.fieldname));
+                        questionIds.push(questionId);
 
                         await fs.writeFile(filename, file.buffer);
                     } else {
