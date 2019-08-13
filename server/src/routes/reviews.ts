@@ -68,6 +68,7 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
 
 /**
  * Route to update or insert and answer by review id.
+ * The fieldnames of files should correspond to question ids.
  * @body a json object of the whole form, as specified in the doc.
  * @return JSON representation of a review.
  */
@@ -86,7 +87,7 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
 
                 if (splittedFilename && splittedFilename.length > 0) {
                     // Rename the file to the fieldname, which is the question id.
-                    const filename = path.join(fileFolder, `${file.fieldname}.${splittedFilename[1]}`);
+                    const filename = path.join(fileFolder, `${req.params.reviewId}-${file.fieldname}.${splittedFilename[1]}`);
                     questionIds.push(parseInt(file.fieldname));
 
                     await fs.writeFile(filename, file.buffer);
@@ -98,7 +99,7 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
         }
 
         // Update the review in the database.
-        const result = await ReviewUpdate.updateReview(reviewId, inputForm, questionIds);
+        const result = await ReviewUpdate.updateReviewWithFileUpload(reviewId, inputForm, questionIds);
 
         res.json(result);
     } catch (error) {

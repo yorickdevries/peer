@@ -60,10 +60,20 @@ export default class ReviewUpdate {
      * Update a review
      * @param {number} reviewId
      * @param {any[]} inputForm
-     * @param fileUploadQuestionIds
      * @returns the review as json.
      */
-    public static async updateReview(reviewId: number, inputForm: any[], fileUploadQuestionIds: number[]) {
+    public static async updateReview(reviewId: number, inputForm: any[]) {
+        return this.updateReviewWithFileUpload(reviewId, inputForm, []);
+    }
+
+    /**
+     * Update a review with file upload questions.
+     * @param {number} reviewId - the review id.
+     * @param {any[]} inputForm - the input form.
+     * @param {number[]} fileUploadQuestionIds - the question ids of each file upload question.
+     * @return {Promise<{review: any; form: any}>}
+     */
+    public static async updateReviewWithFileUpload(reviewId: number, inputForm: any[], fileUploadQuestionIds: number[]) {
         // check all questions
         const checkedQuestions = await this.checkQuestions(reviewId, inputForm, fileUploadQuestionIds);
         // If no error, apply all questions to the database
@@ -100,7 +110,7 @@ export default class ReviewUpdate {
             let answerText = answerObject.answer;
 
             if (questionObject.type_question === "upload") {
-                answerText = `${questionId}.${questionObject.extension}`;
+                answerText = `${reviewId}-${questionId}.${questionObject.extension}`;
             }
 
             // If the answer is undefined, skip
