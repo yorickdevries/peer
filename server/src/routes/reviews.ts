@@ -86,14 +86,24 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
                 const splittedFilename = re.exec(file.originalname);
 
                 if (splittedFilename && splittedFilename.length > 0) {
+                    const submittedExtension = splittedFilename[1];
                     // Rename the file to the fieldname, which is the question id.
-                    const filename = path.join(fileFolder, `${req.params.reviewId}-${file.fieldname}.${splittedFilename[1]}`);
-                    questionIds.push(parseInt(file.fieldname));
+                    const filename = path.join(fileFolder, `${req.params.reviewId}-${file.fieldname}.${submittedExtension}`);
 
-                    await fs.writeFile(filename, file.buffer);
+                    // Make sure that the extension is allowed.
+                    const currentUploadQuestion = inputForm.find((x: any) => x.question.id === reviewId);
+
+                    if (currentUploadQuestion && currentUploadQuestion.question.extension === submittedExtension) {
+                        questionIds.push(parseInt(file.fieldname));
+
+                        await fs.writeFile(filename, file.buffer);
+                    } else {
+                        res.status(400);
+                        res.json({error: "Invalid file extension"});
+                    }
                 } else {
                     res.status(400);
-                    res.json({error: "Invalid file extension"});
+                    res.json({error: "File extension is missing"});
                 }
             }
         }
@@ -158,9 +168,9 @@ router.route("/:reviewId/unsubmit").get(index.authorization.checkReviewOwnerDone
  */
 router.route("/:reviewId/allComments").get(index.authorization.checkAuthorizationForReview, (req, res) => {
     ReviewsPS.executeGetAllReviewComments(req.params.reviewId)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
         res.sendStatus(400);
     });
 });
@@ -173,9 +183,9 @@ router.route("/:reviewId/allComments").get(index.authorization.checkAuthorizatio
  */
 router.route("/:reviewCommentId/comment").put(index.authorization.checkOwnerReviewComment, (req, res) => {
     ReviewsPS.executeUpdateReviewComment(req.params.reviewCommentId, req.body.comment)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
         res.sendStatus(400);
     });
 });
@@ -188,9 +198,9 @@ router.route("/:reviewCommentId/comment").put(index.authorization.checkOwnerRevi
  */
 router.route("/:reviewId/comment").post(index.authorization.checkReviewTAOrTeacher, (req: any, res) => {
     ReviewsPS.executeAddReviewComment(req.params.reviewId, req.user.netid, req.body.comment)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
         res.sendStatus(400);
     });
 });
@@ -202,9 +212,9 @@ router.route("/:reviewId/comment").post(index.authorization.checkReviewTAOrTeach
  */
 router.route("/:reviewCommentId/comment").delete(index.authorization.checkOwnerReviewComment, (req, res) => {
     ReviewsPS.executeDeleteReviewComment(req.params.reviewCommentId)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
         res.sendStatus(400);
     });
 });
