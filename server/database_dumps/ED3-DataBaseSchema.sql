@@ -345,6 +345,30 @@ ALTER TABLE OpenQuestion ADD CONSTRAINT OpenQuestion_Rubric
     INITIALLY IMMEDIATE
 ;
 
+-- Reference: UploadAnswer_UploadQuestion (table: UploadAnswer)
+ALTER TABLE UploadAnswer ADD CONSTRAINT UploadAnswer_UploadQuestion
+    FOREIGN KEY (UploadQuestion_id)
+    REFERENCES UploadQuestion (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: UploadAnswer_Review (table: UploadAnswer)
+ALTER TABLE UploadAnswer ADD CONSTRAINT UploadAnswer_Review
+    FOREIGN KEY (Review_id)
+    REFERENCES Review (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: UploadQuestion_Rubric (table: UploadQuestion)
+ALTER TABLE UploadQuestion ADD CONSTRAINT UploadQuestion_Rubric
+    FOREIGN KEY (Rubric_Assignment_id)
+    REFERENCES Rubric (Assignment_id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
 -- Reference: RangeAnswer_RangeQuestion (table: RangeAnswer)
 ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_RangeQuestion
     FOREIGN KEY (RangeQuestion_id)
