@@ -107,11 +107,7 @@ export default class ReviewUpdate {
                 throw new Error("Question isn't formatted properly at index: " + i);
             }
             const questionId = questionObject.id;
-            let answerText = answerObject.answer;
-
-            if (questionObject.type_question === "upload") {
-                answerText = `${reviewId}-${questionId}.${questionObject.extension}`;
-            }
+            const answerText = answerObject.answer;
 
             // If the answer is undefined, skip
             if (answerText == undefined) {
