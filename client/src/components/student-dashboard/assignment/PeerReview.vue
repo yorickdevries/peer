@@ -207,11 +207,11 @@ export default {
                 return
             }
 
+            // Set up the form data (files in ROOT of formData) to send to server.
             const formData = new FormData()
             formData.append("review", JSON.stringify(this.peerReview.review))
             formData.append("form", JSON.stringify(this.peerReview.form))
-
-            formData.append("reviewFile", this.files['2'])
+            Object.entries(this.files).forEach(([key, value]) => formData.append(key, value))
 
             try {
                 await api.savePeerReview(this.peerReview.review.id, formData)
