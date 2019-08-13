@@ -91,7 +91,7 @@
 
                 ],
                 perPage: 5,
-                latestSubmissionsActive: false,
+                latestSubmissionsActive: true,
                 filter: null
             }
         },
