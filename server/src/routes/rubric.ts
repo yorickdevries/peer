@@ -43,7 +43,11 @@ router.delete("/rangequestion/:question_id", index.authorization.checkRangeQuest
  * Route to delete mc question
  * @params id - id
  */
-router.delete("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, (req, res) => {
+router.delete("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, async (req, res) => {
+    const mcOptions: any = await RubricPS.executeGetAllMCOptionById(req.params.question_id);
+    for (let i = 0; i < mcOptions.length; i++) {
+        await RubricPS.executeDeleteMCOption(mcOptions[i].id);
+    }
     RubricPS.executeDeleteMCQuestion(req.params.question_id)
     .then((data: any) => {
         data.type_question = "mc";

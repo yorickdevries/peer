@@ -417,23 +417,22 @@ export default class RubricPS {
         const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubricId);
         let mcOptions;
 
-        // Copy open questions
+        // Delete open questions
         for (let i = 0; i < openQuestions.length; i++) {
             await this.executeDeleteOpenQuestion(openQuestions[i].id);
         }
-        // Copy range questions
+        // Delete range questions
         for (let i = 0; i < rangeQuestions.length; i++) {
             await this.executeDeleteRangeQuestion(rangeQuestions[i].id);
         }
-        // Copy mc questions
+        // Delete mc questions
         for (let i = 0; i < mcQuestions.length; i++) {
-            await this.executeDeleteMCQuestion(mcQuestions[i].id);
-
-            // Copy mc options
+            // Delete mc options
             mcOptions = await RubricPS.executeGetAllMCOptionById(mcQuestions[i].id);
             for (let i = 0; i < mcOptions.length; i++) {
                 await this.executeDeleteMCOption(mcOptions[i].id);
             }
+            await this.executeDeleteMCQuestion(mcQuestions[i].id);
         }
     }
 }
