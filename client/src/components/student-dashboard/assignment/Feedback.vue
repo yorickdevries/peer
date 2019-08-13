@@ -38,11 +38,16 @@
                                             <div class="">
                                                 <h5 class="text-primary">Question {{ activeQuestion.question_number
                                                     }}</h5>
-                                                {{ activeQuestion.question}}
+                                                {{ activeQuestion.question }}
                                             </div>
                                         </b-list-group-item>
 
                             <b-list-group-item v-for="(pair, index) in aggregateQuestionAnswer(activeQuestion.question_number)" :key="index">
+
+                                <!--&lt;!&ndash; UPLOAD QUESTION &ndash;&gt;-->
+                                <template v-if="activeQuestion.type_question === 'upload'">
+                                    <a :href="uploadQuestionFilePath(pair.peerReviewId, pair.question.id)">{{ activeQuestion.answer.answer }}</a>
+                                </template>
 
                                 <!--&lt;!&ndash; OPEN QUESTION &ndash;&gt;-->
                                 <template v-if="activeQuestion.type_question === 'open'">
@@ -54,7 +59,6 @@
                                             readonly
                                             :max-rows="15"/>
                                 </template>
-
 
                                 <!--&lt;!&ndash; RANGE QUESTION &ndash;&gt;-->
                                 <StarRating v-else-if="activeQuestion.type_question === 'range'"
@@ -205,7 +209,11 @@ export default {
             let res = []
             this.peerReviews.forEach(peerReview => {
                 let pair = peerReview.form.find(questionAnswerPair => questionAnswerPair.question.question_number === targetQuestionNumber)
-                res.push(pair)
+                res.push({
+                    pair,
+                    // Add for later use when you need to gather the link for the upload question.
+                    peerReviewId: peerReview.id
+                })
             })
             return res
         },
@@ -226,6 +234,9 @@ export default {
                 this.showErrorMessage()
             }
         },
+        uploadQuestionFilePath(reviewId, questionId) {
+            return `/reviews/${reviewId}/questions/:${questionId}/file`
+        }
     },
 }
 </script>
