@@ -92,7 +92,8 @@
                             <b-form-file  placeholder="Choose a new file..."
                                           v-model="files[pair.question.id]"
                                           :state="Boolean(files[pair.question.id])"
-                                          :accept="`.${pair.question.extension}`">
+                                          :accept="`.${pair.question.extension}`"
+                                          :disabled="peerReview.review.done">
                             </b-form-file>
 
                         </b-form-group>
