@@ -4,7 +4,7 @@
         <!--Download-->
         <b-row>
             <b-col>
-                <a target="_blank" :href="peerReviewFilePath" target="_blank">
+                <a target="_blank" :href="peerReviewFilePath">
                     <button type="button" class="btn btn-success success w-100"
                             style="height: 3rem">Download Hand-In
                     </button>

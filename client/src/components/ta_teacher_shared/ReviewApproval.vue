@@ -44,7 +44,7 @@
                         <dl>
                             <dt>Download</dt>
                             <dd>The download for the submission this review is about.</dd>
-                            <a target="_blank" :href="peerReviewFilePath" target="_blank">
+                            <a target="_blank" :href="peerReviewFilePath">
                                 <button type="button" class="btn btn-success success">Download Submission</button>
                             </a>
                         </dl>
