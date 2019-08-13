@@ -80,7 +80,8 @@ export default {
             uploadQuestion: {
                 question: '',
                 rubric_assignment_id: this.rubricId,
-                question_number: null
+                question_number: null,
+                extension: null
             },
         }
     },
@@ -150,6 +151,7 @@ export default {
                 question: '',
                 rubric_assignment_id: this.rubricId,
                 question_number: null,
+                extension: null
             }
         }
     },

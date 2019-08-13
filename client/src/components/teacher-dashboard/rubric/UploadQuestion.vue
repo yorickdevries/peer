@@ -6,6 +6,10 @@
         <b-form-group label="Question Text" description="Text above the upload question.">
             <b-form-textarea v-model="question.question"/>
         </b-form-group>
+        <b-form-group label="Allowed file extension" description="The extension type allowed.">
+            <b-form-select :options="extensionTypes" v-model="question.extension"></b-form-select>
+        </b-form-group>
+
     </div>
 </template>
 
@@ -14,7 +18,11 @@ export default {
     props: ['value'],
     data() {
         return {
-            question: this.value
+            question: this.value,
+            extensionTypes: [
+                { value: 'pdf', text: 'PDF' },
+                { value: 'zip', text: 'Zip' },
+            ],
         }
     },
     watch: {

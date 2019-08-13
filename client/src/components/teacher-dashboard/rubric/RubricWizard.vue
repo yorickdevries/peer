@@ -110,7 +110,7 @@ let apiPrefixes = {
     mc: '/rubric/mcquestion',
     range: '/rubric/rangequestion',
     mcoption: '/rubric/mcoption',
-    upload: '/rubric/openquestion'
+    upload: '/rubric/uploadquestion'
 }
 
 export default {
