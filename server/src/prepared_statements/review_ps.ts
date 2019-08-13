@@ -252,7 +252,8 @@ export default class ReviewPS {
      */
     public static executeGetSubmissionReviewsByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("get-all-reviews-by-assignmentid",
-            "SELECT review.* FROM review JOIN rubric ON review.rubric_id = rubric.assignment_id " +
+            "SELECT review.* FROM review " +
+            "JOIN rubric ON rubric.id = review.rubric_id " +
             "WHERE rubric.assignment_id = $1 " +
             "AND rubric.type = 'submission'"
             );
