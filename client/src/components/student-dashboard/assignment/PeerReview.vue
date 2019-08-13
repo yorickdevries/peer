@@ -74,6 +74,7 @@
 
                         <!--File upload-->
                         <b-form-group description="Select a file and press save down below the page. Note: it overwrites files." class="mb-0">
+
                             <!--Show currently uploaded file-->
                             <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
                                 <!--Buttons for toggling new assignment upload-->
@@ -84,12 +85,14 @@
                                 </div>
                             </b-alert>
 
+                            <b-alert show variant="danger">{{ pair.question.extension.toUpperCase() }} files allowed only.</b-alert>
+
                             <b-alert v-if="pair.answer.answer" show variant="warning">Note: uploading an new files will overwrite your current file.</b-alert>
 
                             <b-form-file  placeholder="Choose a new file..."
-                                          accept=".pdf,.zip"
                                           v-model="files[pair.question.id]"
-                                          :state="Boolean(files[pair.question.id])">
+                                          :state="Boolean(files[pair.question.id])"
+                                          :accept="`.${pair.question.extension}`">
                             </b-form-file>
 
                         </b-form-group>
