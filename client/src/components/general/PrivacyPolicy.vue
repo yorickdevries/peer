@@ -36,39 +36,34 @@
                                 <li>Personal identification information (Name, Email, Student number, NetID and affiliation)</li>
                             </ul>
 
-                            <!--We should update this to reflect the data of peer-->
-                            <!--<h3>Student</h3>-->
-                            <!--For a student we collect the following data:-->
-                            <!--<ul>-->
-                                <!--<li>That you made a request (asked a question or asked to be signed off). This contains the following items:</li>-->
-                                <!--<ul>-->
-                                    <!--<li>The course</li>-->
-                                    <!--<li>The lab</li>-->
-                                    <!--<li>The assignment</li>-->
-                                    <!--<li>The room</li>-->
-                                    <!--<li>The comments students placed in their reply</li>-->
-                                    <!--<li>The time the request was made</li>-->
-                                <!--</ul>-->
-                            <!--</ul>-->
+                            <h3>Student</h3>
+                            For a student we collect the following data:
+                            <ul>
+                                <li>The courses and assignments that you are enrolled in</li>
+                                <li>The responses that you enter and the files that you upload. These include:</li>
+                                <ul>
+                                    <li>The files that you upload</li>
+                                    <li>The time that you upload the file</li>
+                                    <li>The responses you enter</li>
+                                    <li>The time that you save the response</li>
+                                </ul>
+                            </ul>
 
-                            <!--<h3>TA</h3>-->
-                            <!--For a TA (teaching assistent), we collect the following data:-->
-                            <!--<ul>-->
-                                <!--<li>The requests handled by the TA</li>-->
-                                <!--<li>The time the request was assigned</li>-->
-                                <!--<li>The time the request was handled by the TA</li>-->
-                            <!--</ul>-->
-                            <!--<p>This data then enables us to see at which labs the TA attended.</p>-->
+                            <h3>TA</h3>
+                            For a TA (teaching assistent), we collect the following data:
+                            <ul>
+                                <li>The comments given by a TA/li>
+                                <li>The time that the comment was given</li>
+                                <li>The courses and assignments that you are enrolled in</li>
+                            </ul>
 
                             <h2>How do we collect your data</h2>
                             <p>Almost all data we collect is collected when using Peer. We collect this data when you perform an action in the system where it can be reasonably expected that the result needs to be stored. For example:</p>
-                            <!--<ul>-->
-                                <!--<li>Asking a question</li>-->
-                                <!--<li>Logging in for the first time</li>-->
-                                <!--<li>Enrolling for a course</li>-->
-                                <!--<li>Joining a lab</li>-->
-                                <!--<li>Signing off a student</li>-->
-                            <!--</ul>-->
+                            <ul>
+                                <li>Uploading files</li>
+                                <li>Entering responses</li>
+                                <li>Enrolling for a course or assignment</li>
+                            </ul>
 
                             <h2>How will we use your data</h2>
                             <p>At this moment, we only use the data given to support the functionality Peer promises, giving students an easy way to ask questions and sign off work and giving teaching staff an easy to use system to support signing off and answering questions.</p>
