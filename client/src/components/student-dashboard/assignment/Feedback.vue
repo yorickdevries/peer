@@ -56,7 +56,6 @@
                                 </template>
 
 
-
                                 <!--&lt;!&ndash; RANGE QUESTION &ndash;&gt;-->
                                 <StarRating v-else-if="activeQuestion.type_question === 'range'"
                                             class="align-middle"

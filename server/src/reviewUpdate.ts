@@ -97,7 +97,7 @@ export default class ReviewUpdate {
             const questionId = questionObject.id;
             const answerText = answerObject.answer;
             // If the answer is undefined, skip
-            if (answerText == undefined) {
+            if (answerText == undefined && questionObject.type_question != "upload") {
                 continue;
             }
             const questionType = questionObject.type_question;
@@ -192,15 +192,16 @@ export default class ReviewUpdate {
             throw new Error("Wrong Upload Question: " + questionId);
         }
         // answer validation
-        if (!(typeof answerText === "string") || answerText == "") {
-            throw new Error("The following Upload Question has an invalid answer: " + questionId);
-        } else {
+        // if (!(typeof answerText === "string") || answerText == "") {
+        // if (answerText == "") {
+        //     throw new Error("The following Upload Question has an invalid answer: " + questionId);
+        // } else {
             return {
                 questionType: "upload",
                 questionId: questionId,
                 answer: answerText
             };
-        }
+        // }
     }
 
     /**
@@ -258,7 +259,8 @@ export default class ReviewUpdate {
                         await ReviewsPS.executeUpdateMpcAnswer(answer, questionId, reviewId);
                     break;
                     case "upload":
-                        await ReviewsPS.executeUpdateUploadAnswer(answer, questionId, reviewId);
+                        console.log("ITS GOING TO BE SAVED HERE!!!! UPLOAD QUESTION YEY")
+                        await ReviewsPS.executeUpdateUploadAnswer("there is no answer haha", questionId, reviewId);
                     break;
                     default: throw new Error("Unrecognized question type: " + questionType);
                 }

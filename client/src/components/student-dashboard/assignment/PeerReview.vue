@@ -73,7 +73,7 @@
                     <div v-if="pair.question.type_question === 'upload'">
 
                         <!--File upload-->
-                        <b-form-group label="Question file" class="mb-0">
+                        <b-form-group description="" class="mb-0">
                             <!--Show currently uploaded file-->
                             <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
                                 <!--Buttons for toggling new assignment upload-->
@@ -212,10 +212,7 @@ export default {
             formData.append("review", JSON.stringify(this.peerReview.review))
             formData.append("form", JSON.stringify(this.peerReview.form))
 
-            // Iterate over all files and add to root object.
-            Object.entries(files).forEach(([key, value]) => {
-                formData.append(key, value)
-            })
+            formData.append("reviewFile", this.files['2'])
 
             try {
                 await api.savePeerReview(this.peerReview.review.id, formData)

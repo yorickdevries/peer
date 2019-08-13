@@ -82,10 +82,10 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
         if (req.file) {
             // Assemble the file path. Updated file name is the new file name.
             // It can never be the old since req.file would be undefined.
-            const filename = path.join(fileFolder, req.file.filename);
+            const filename = path.join(fileFolder, req.file.originalname);
 
             // Remove the old file and write the new file.
-            await fs.unlink(filename);
+            // await fs.unlink(filename);
             await fs.writeFile(filename, req.file.buffer);
         }
 
