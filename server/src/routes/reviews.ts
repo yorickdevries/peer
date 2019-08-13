@@ -30,7 +30,7 @@ const uploadReview = multer({
             return callback(null, true);
         }
     }
-}).single("reviewFile");
+}).any();
 
 // File upload handling
 const uploadReviewFunction = function(req: any, res: any, next: any) {
@@ -75,24 +75,50 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
     try {
         const reviewId = req.params.reviewId;
         const inputForm = JSON.parse(req.body.form);
-        const result = await ReviewUpdate.updateReview(reviewId, inputForm);
+        const questionIds = [];
 
-        // // Remove the old file and add the new file if a file is uploaded
-        // // (ie. name of the file is not undefined).
-        if (req.file) {
-            // Assemble the file path. Updated file name is the new file name.
-            // It can never be the old since req.file would be undefined.
-            const filename = path.join(fileFolder, req.file.originalname);
+        // Upload the file.
+        if (req.files) {
+            for (const file of req.files as Express.Multer.File[]) {
+                // Try to fetch the file extension
+                const re = /(?:\.([^.]+))?$/;
+                const splittedFilename = re.exec(file.originalname);
 
-            // Remove the old file and write the new file.
-            // await fs.unlink(filename);
-            await fs.writeFile(filename, req.file.buffer);
+                if (splittedFilename && splittedFilename.length > 0) {
+                    // Rename the file to the fieldname, which is the question id.
+                    const filename = path.join(fileFolder, `${file.fieldname}.${splittedFilename[1]}`);
+                    questionIds.push(parseInt(file.fieldname));
+
+                    await fs.writeFile(filename, req.file.buffer);
+                } else {
+                    res.status(400);
+                    res.json({error: "Invalid file extension"});
+                }
+            }
         }
+
+        // Update the review in the database.
+        const result = await ReviewUpdate.updateReview(reviewId, inputForm, questionIds);
 
         res.json(result);
     } catch (error) {
         res.status(400);
         res.json({error: error.message});
+    }
+});
+
+
+/**
+ * Route to get a file from an review.
+ * @param id - review id.
+ */
+router.get("/:id/questions/:question_id/file", index.authorization.enrolledAssignmentCheck, async (req, res) => {
+    try {
+        const review: any = await ReviewsPS.executeGetUploadAnswer(req.params.id, req.params.question_id);
+        const fileName = path.join(fileFolder, `${review.answer}`);
+        res.download(fileName);
+    } catch (err) {
+        res.sendStatus(400);
     }
 });
 

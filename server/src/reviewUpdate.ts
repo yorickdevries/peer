@@ -60,11 +60,12 @@ export default class ReviewUpdate {
      * Update a review
      * @param {number} reviewId
      * @param {any[]} inputForm
+     * @param fileUploadQuestionIds
      * @returns the review as json.
      */
-    public static async updateReview(reviewId: number, inputForm: any[]) {
+    public static async updateReview(reviewId: number, inputForm: any[], fileUploadQuestionIds: number[]) {
         // check all questions
-        const checkedQuestions = await this.checkQuestions(reviewId, inputForm);
+        const checkedQuestions = await this.checkQuestions(reviewId, inputForm, fileUploadQuestionIds);
         // If no error, apply all questions to the database
         await this.applyQuestions(reviewId, checkedQuestions);
         // Get and return the new review
@@ -75,9 +76,10 @@ export default class ReviewUpdate {
      * Check the validity of all questions
      * @param {number} reviewId
      * @param {any[]} inputForm
+     * @param fileUploadQuestionIds
      * @returns list of the questions or an error.
      */
-    public static async checkQuestions(reviewId: number, inputForm: any[]) {
+    public static async checkQuestions(reviewId: number, inputForm: any[], fileUploadQuestionIds: number[]) {
         const review = await ReviewsPS.executeGetReview(reviewId);
         const rubric: any = await RubricPS.executeGetRubricById(review.rubric_assignment_id);
         const rubricId = rubric.assignment_id;
@@ -95,9 +97,14 @@ export default class ReviewUpdate {
                 throw new Error("Question isn't formatted properly at index: " + i);
             }
             const questionId = questionObject.id;
-            const answerText = answerObject.answer;
+            let answerText = answerObject.answer;
+
+            if (questionObject.type_question === "upload") {
+                answerText = `${questionId}.${questionObject.extension}`;
+            }
+
             // If the answer is undefined, skip
-            if (answerText == undefined && questionObject.type_question != "upload") {
+            if (answerText == undefined) {
                 continue;
             }
             const questionType = questionObject.type_question;
@@ -114,7 +121,7 @@ export default class ReviewUpdate {
                     questionList.push(await this.checkMCQuestion(questionId, rubricId, answerText));
                 break;
                 case "upload":
-                    questionList.push(await this.checkUploadQuestion(questionId, rubricId, answerText));
+                    questionList.push(await this.checkUploadQuestion(questionId, rubricId, answerText, fileUploadQuestionIds));
                 break;
                 default: throw new Error("Unrecognized question type: " + questionType);
             }
@@ -181,9 +188,11 @@ export default class ReviewUpdate {
      * @param {number} questionId
      * @param {number} rubricId
      * @param {*} answerText
+     * @param fileUploadQuestionIds
      * @returns open question json.
      */
-    public static async checkUploadQuestion(questionId: number, rubricId: number, answerText: any) {
+    public static async checkUploadQuestion(questionId: number, rubricId: number, answerText: any,
+                                            fileUploadQuestionIds: number[]) {
         // Initialize the question variable
         let question;
         try {
@@ -191,17 +200,16 @@ export default class ReviewUpdate {
         } catch (error) {
             throw new Error("Wrong Upload Question: " + questionId);
         }
-        // answer validation
-        // if (!(typeof answerText === "string") || answerText == "") {
-        // if (answerText == "") {
-        //     throw new Error("The following Upload Question has an invalid answer: " + questionId);
-        // } else {
+
+        if (fileUploadQuestionIds.some(x => x === questionId)) {
             return {
                 questionType: "upload",
                 questionId: questionId,
                 answer: answerText
             };
-        // }
+        } else {
+            throw new Error("The following Upload Question has an invalid answer: " + questionId);
+        }
     }
 
     /**
@@ -259,8 +267,7 @@ export default class ReviewUpdate {
                         await ReviewsPS.executeUpdateMpcAnswer(answer, questionId, reviewId);
                     break;
                     case "upload":
-                        console.log("ITS GOING TO BE SAVED HERE!!!! UPLOAD QUESTION YEY")
-                        await ReviewsPS.executeUpdateUploadAnswer("there is no answer haha", questionId, reviewId);
+                        await ReviewsPS.executeUpdateUploadAnswer(answer, questionId, reviewId);
                     break;
                     default: throw new Error("Unrecognized question type: " + questionType);
                 }
