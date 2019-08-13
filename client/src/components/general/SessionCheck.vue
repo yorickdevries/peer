@@ -9,7 +9,10 @@
             Your session has expired and you might lose your current progress.
             Please log back in here:
         </div>
-        <b-button variant="primary" size="sm" class="mt-3" href="/api/login" target="_blank">Log in page.</b-button>
+        <b-button variant="primary" size="sm" class="mt-3" href="/api/login" target="_blank">Login page</b-button>
+        <div>
+            After logging in, come back to this page and press the OK button to resume your session.
+        </div>
     </b-modal>
 </template>
 
