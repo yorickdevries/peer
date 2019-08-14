@@ -79,7 +79,7 @@ export default {
             },
             uploadQuestion: {
                 question: '',
-                rubric_assignment_id: this.rubricId,
+                rubric_id: this.rubricId,
                 question_number: null,
                 extension: null
             },
@@ -90,6 +90,7 @@ export default {
             this.openQuestion.rubric_id = val
             this.rangeQuestion.rubric_id = val
             this.mcQuestion.rubric_id = val
+            this.uploadQuestion.rubric_id = val
         }
     },
     methods: {
@@ -148,7 +149,7 @@ export default {
             }
             this.uploadQuestion = {
                 question: '',
-                rubric_assignment_id: this.rubricId,
+                rubric_id: this.rubricId,
                 question_number: null,
                 extension: null
             }
