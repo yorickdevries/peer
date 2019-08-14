@@ -94,7 +94,8 @@
                                           v-model="files[pair.question.id]"
                                           :state="Boolean(files[pair.question.id])"
                                           :accept="`.${pair.question.extension}`"
-                                          :disabled="peerReview.review.done">
+                                          :disabled="peerReview.review.done"
+                                          :ref="'fileForm' + pair.question.id">
                             </b-form-file>
 
                         </b-form-group>
@@ -228,6 +229,7 @@ export default {
                 this.showErrorMessage({message: "Error saving peer review."})
             }
             await this.fetchPeerReview()
+            this.clearFiles()
         },
         async unSubmitPeerReview() {
             // unSubmit peer review.
@@ -247,6 +249,14 @@ export default {
         },
         uploadQuestionFilePath(reviewId, questionId) {
             return `/api/reviews/${reviewId}/questions/${questionId}/file`
+        },
+        clearFiles() {
+            Object.entries(this.files).forEach(([key, _]) => {
+                const name = 'fileForm' + key
+                this.$refs[name][0].reset()
+                this.files[key] = null
+            })
+            this.files = {}
         }
     },
 }
