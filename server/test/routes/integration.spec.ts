@@ -99,20 +99,23 @@ describe("API integration test", () => {
 
         // [3]
         // Create rubric
-        const res = await chai.request(router).post("/rubric/").send({"rubric_assignment_id": assignmentId});
+        const res = await chai.request(router).post("/rubric/").send(
+            {"assignment_id": assignmentId,
+            "rubric_type": "submission"});
+        const rubric = JSON.parse(res.text);
         console.log("Teacher created a rubric");
 
         // Add an option question to the rubric
         const openQuestion = await chai.request(router)
             .post("/rubric/openquestion")
-            .send({ question: "opt", rubric_assignment_id: assignmentId, question_number: 1 });
+            .send({ question: "opt", rubric_id: rubric.id, question_number: 1 });
         const openQuestionId = JSON.parse(openQuestion.text).id;
         expect(openQuestion.status).to.equal(200);
         expect(openQuestion.text).to.equal(JSON.stringify(
             {
                 "id": openQuestionId,
                 "question": "opt",
-                "rubric_assignment_id": assignmentId,
+                "rubric_id": rubric.id,
                 "question_number": 1,
                 "type_question": "open"
             }
@@ -211,9 +214,11 @@ describe("API integration test", () => {
         expect(yorickFeedback.status).to.equal(200);
 
         const yorickFeedbackId = JSON.parse(yorickFeedback.text)[0].id;
+        const yorickRubricId = JSON.parse(yorickFeedback.text)[0].rubric_id;
         const yorickFeedbackAnswer = "you did great paul :)";
 
         const paulFeedbackId = JSON.parse(paulFeedback.text)[0].id;
+        const paulRubricId = JSON.parse(paulFeedback.text)[0].rubric_id;
         const paulFeedbackAnswer = "maybe look at it again";
 
         // Paulvanderlaan reviews yorickdevries.
@@ -223,7 +228,7 @@ describe("API integration test", () => {
             .send({
                 "review": {
                     "id": paulFeedbackId,
-                    "rubric_assignment_id": assignmentId,
+                    "rubric_id": paulRubricId,
                     "file_path": "assignment1.pdf",
                     "done": false
                 },
@@ -250,7 +255,7 @@ describe("API integration test", () => {
             .send({
                 "review": {
                     "id": yorickFeedbackId,
-                    "rubric_assignment_id": assignmentId,
+                    "rubric_id": yorickRubricId,
                     "file_path": "assignment1.pdf",
                     "done": false
                 },

@@ -54,11 +54,22 @@ INSERT INTO public.assignmentlist(
 
 
 INSERT INTO public.rubric(
-	assignment_id)
-	VALUES (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), (11);
+	assignment_id, type)
+	VALUES 
+	(1, 'submission'),
+	(2, 'submission'),
+	(3, 'submission'),
+	(4, 'submission'),
+	(5, 'submission'),
+	(6, 'submission'),
+	(7, 'submission'),
+	(8, 'submission'),
+	(9, 'submission'),
+	(10, 'submission'),
+	(11, 'submission');
 
 INSERT INTO public.openquestion(
-	question, rubric_assignment_id, question_number)
+	question, rubric_id, question_number)
 	VALUES
 	    ('Did the author pay attention to the DFA?', 1, 1),
 	    ('How did the author do overall?', 1, 2),
@@ -78,7 +89,7 @@ INSERT INTO public.openquestion(
 	;
 
 INSERT INTO public.rangequestion(
-	question, range, rubric_assignment_id, question_number)
+	question, range, rubric_id, question_number)
 	VALUES
 	    ('Rate the DFA', 7, 1, 3),
 	    ('Rate the design', 10, 1, 4),
@@ -96,7 +107,7 @@ INSERT INTO public.rangequestion(
 	;
 
 INSERT INTO public.mcquestion(
-	question, rubric_assignment_id, question_number)
+	question, rubric_id, question_number)
 	VALUES
 	    ('What is the best way to insert queries?', 1, 4),
 	    ('Choose what best relates to the author', 1, 5),
@@ -202,7 +213,7 @@ INSERT INTO public.submission(
 	;
 
 INSERT INTO public.review(
-	user_netid, submission_id, rubric_assignment_id, done)
+	user_netid, submission_id, rubric_id, done)
 	VALUES
 	    ('henkjan', 1, 4, true),
 	    ('henkjan', 2, 5, false),

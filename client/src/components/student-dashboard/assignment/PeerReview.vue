@@ -72,6 +72,9 @@
                 </b-list-group-item>
             </b-list-group>
 
+
+            <SessionCheck ref="sessionCheck"></SessionCheck>
+
             <template v-if="peerReview.review.id !== null">
                 <!--Save/Submit Buttons-->
                 <b-card-body v-if="!peerReview.review.done">
@@ -98,11 +101,13 @@
 import api from "../../../api"
 import { StarRating } from 'vue-rate-it';
 import notifications from '../../../mixins/notifications'
+import SessionCheck from '../../general/SessionCheck'
 
 export default {
     mixins: [notifications],
     components: {
-        StarRating
+        StarRating,
+        SessionCheck
     },
     props: ["reviewId"],
     data() {
@@ -110,7 +115,7 @@ export default {
             peerReview: {
                 review: {
                     id: null,
-                    rubric_assignment_id: null,
+                    rubric_id: null,
                     file_path: "",
                     comment: null,
                     done: null,
@@ -168,10 +173,15 @@ export default {
             } else {
                 this.showErrorMessage({message: "All fields are required."})
             }
-
         },
         async savePeerReview() {
-            // Submit the peer review.
+
+            // Session check.
+            const inSession = await this.$refs.sessionCheck.sessionGuardCheck()
+            if (!inSession) {
+                return
+            }
+
             try {
                 await api.savePeerReview(this.peerReview.review.id, this.peerReview)
             } catch (error) {

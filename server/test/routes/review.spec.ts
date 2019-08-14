@@ -62,7 +62,7 @@ describe("API review routes", () => {
             {
                 "review": {
                     "id": 1,
-                    "rubric_assignment_id": 1,
+                    "rubric_id": 1,
                     "file_path": "submission1.pdf",
                     // tslint:disable-next-line
                     "approved": null,
@@ -72,7 +72,7 @@ describe("API review routes", () => {
                     "question": {
                         "id": 1,
                         "type_question": "mc",
-                        "rubric_assignment_id": 1,
+                        "rubric_id": 1,
                         "question": "What is the best way to insert queries?",
                         "question_number": 3,
                         "option": [
@@ -85,7 +85,7 @@ describe("API review routes", () => {
                     "question": {
                        "id": 2,
                        "type_question": "mc",
-                       "rubric_assignment_id": 1,
+                       "rubric_id": 1,
                        "question": "Is the right Answer A?",
                        "question_number": 4,
                        "option": [
@@ -101,7 +101,7 @@ describe("API review routes", () => {
                     "question": {
                         "id": 1,
                         "question": "How to insert queries?",
-                        "rubric_assignment_id": 1,
+                        "rubric_id": 1,
                         "question_number": 1,
                         "type_question": "open"
                     },
@@ -111,7 +111,7 @@ describe("API review routes", () => {
                         "id": 1,
                         "question": "How much fun is inserting queries?",
                         "range": 7,
-                        "rubric_assignment_id": 1,
+                        "rubric_id": 1,
                         "question_number": 2,
                         "type_question": "range"
                     }, "answer": {"answer": 4, "rangequestion_id": 1, "review_id": 1}
@@ -132,7 +132,7 @@ describe("API review routes", () => {
             .send({
                 "review": {
                     "id": 2,
-                    "rubric_assignment_id": 1,
+                    "rubric_id": 1,
                     "file_path": "submission1.pdf",
                     "done": false
                 },
@@ -161,14 +161,14 @@ describe("API review routes", () => {
                       ],
                       "question": "Is the right Answer A?",
                       "question_number": 4,
-                      "rubric_assignment_id": 1,
+                      "rubric_id": 1,
                       "type_question": "mc"
                     }
                   }, {
                     "question": {
                         "id": 1,
                         "question": "How to insert queries?",
-                        "rubric_assignment_id": 1,
+                        "rubric_id": 1,
                         "question_number": 1,
                         "type_question": "open"
                     },
@@ -178,7 +178,7 @@ describe("API review routes", () => {
                         "id": 1,
                         "question": "How much fun is inserting queries?",
                         "range": 7,
-                        "rubric_assignment_id": 1,
+                        "rubric_id": 1,
                         "question_number": 2,
                         "type_question": "range"
                     }, "answer": {"answer": 4, "rangequestion_id": 1, "review_id": 1}
@@ -203,7 +203,7 @@ describe("API review routes", () => {
                     ],
                     "question": "What is the best way to insert queries?",
                     "question_number": 3,
-                    "rubric_assignment_id": 1,
+                    "rubric_id": 1,
                     "type_question": "mc"
                   }
                 },
@@ -220,7 +220,7 @@ describe("API review routes", () => {
                     ],
                     "question": "Is the right Answer A?",
                     "question_number": 4,
-                    "rubric_assignment_id": 1,
+                    "rubric_id": 1,
                     "type_question": "mc"
                   }
                 },
@@ -234,7 +234,7 @@ describe("API review routes", () => {
                     "id": 1,
                     "question": "How to insert queries?",
                     "question_number": 1,
-                    "rubric_assignment_id": 1,
+                    "rubric_id": 1,
                     "type_question": "open"
                   }
                 },
@@ -249,7 +249,7 @@ describe("API review routes", () => {
                     "question": "How much fun is inserting queries?",
                     "question_number": 2,
                     "range": 7,
-                    "rubric_assignment_id": 1,
+                    "rubric_id": 1,
                     "type_question": "range"
                   }
                 }
@@ -260,7 +260,7 @@ describe("API review routes", () => {
                   // tslint:disable-next-line
                   "approved": null,
                   "id": 1,
-                "rubric_assignment_id": 1
+                "rubric_id": 1
               }
             });
         const result2 = await chai.request(router).get("/1/submit");
