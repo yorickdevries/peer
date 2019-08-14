@@ -1,7 +1,6 @@
 <template>
     <div>
-        {{submissions}}
-        {{groups}}
+
         <!--Table Options-->
         <b-row>
             <b-col cols="6" class="mb-3">
@@ -12,7 +11,6 @@
                             <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
                         </b-input-group-append>
                     </b-input-group>
-
 
                     <b-button-group class="mx-auto">
                         <button @click="setLatestSubmissionsActive(false)"
@@ -34,7 +32,6 @@
                 </b-form-group>
             </b-col>
         </b-row>
-
 
         <!--Table-->
         <b-table striped
@@ -84,6 +81,7 @@
             return {
                 submissions: [],
                 groups: [],
+                submissionsAndGroups: [],
                 currentPage: 1,
                 fields: [
                     {key: 'user_netid', label: 'Username'},
@@ -103,6 +101,7 @@
         async created() {
             await this.fetchSubmissions()
             await this.fetchGroups()
+            this.concatenateArrays(this.submissions, this.groups)
         },
         methods: {
             async fetchSubmissions() {
@@ -125,6 +124,16 @@
             async fetchGroups() {
                 let res = await api.getAssignmentGroups(this.assignmentId)
                 this.groups = res.data
+            },
+            concatenateArrays(submissions, groups) {
+                this.submissionsAndGroups = this.submissions
+                for(let i=0; i<submissions.length; i++ ) {
+                    for(let j=0; j<groups.length; j++){
+                        if (groups[j].id === submissions[i].group_id){
+                            this.submissionsAndGroups[i].group_name = groups[j].group_name
+                        }
+                    }
+                }
             }
         }
     }
