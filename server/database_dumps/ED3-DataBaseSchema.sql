@@ -45,6 +45,12 @@ CREATE TABLE Role (
     CONSTRAINT Role_pk PRIMARY KEY (name)
 );
 
+-- Table: RubricType
+CREATE TABLE RubricType (
+    name varchar(100) NOT NULL,
+    CONSTRAINT RubricType_pk PRIMARY KEY (name)
+);
+
 -- Table: AssignmentGroup
 CREATE TABLE AssignmentGroup (
     Assignment_id int NOT NULL,
@@ -86,7 +92,7 @@ CREATE TABLE MCOption (
 CREATE TABLE MCQuestion (
     id SERIAL,
     question varchar(5000) NOT NULL,
-    Rubric_Assignment_id int NOT NULL,
+    Rubric_id int NOT NULL,
     question_number int NOT NULL,
     CONSTRAINT MCQuestion_pk PRIMARY KEY (id)
 );
@@ -103,7 +109,7 @@ CREATE TABLE OpenAnswer (
 CREATE TABLE OpenQuestion (
     id SERIAL,
     question varchar(5000) NOT NULL,
-    Rubric_Assignment_id int NOT NULL,
+    Rubric_id int NOT NULL,
     question_number int NOT NULL,
     CONSTRAINT OpenQuestion_pk PRIMARY KEY (id)
 );
@@ -121,7 +127,7 @@ CREATE TABLE RangeQuestion (
     id SERIAL,
     question varchar(5000) NOT NULL,
     range int NOT NULL,
-    Rubric_Assignment_id int NOT NULL,
+    Rubric_id int NOT NULL,
     question_number int NOT NULL,
     CONSTRAINT RangeQuestion_pk PRIMARY KEY (id),
     CONSTRAINT positive_range CHECK (range > 0)
@@ -140,7 +146,7 @@ CREATE TABLE UploadQuestion (
     id SERIAL,
     question varchar(5000) NOT NULL,
     extension varchar(10) NOT NULL,
-    Rubric_Assignment_id int NOT NULL,
+    Rubric_id int NOT NULL,
     question_number int NOT NULL,
     CONSTRAINT UploadQuestion_pk PRIMARY KEY (id)
 );
@@ -150,7 +156,7 @@ CREATE TABLE Review (
     id SERIAL,
     User_netid varchar(500) NOT NULL,
     Submission_id int NOT NULL,
-    Rubric_Assignment_id int NOT NULL,
+    Rubric_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
     creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     approved boolean,
@@ -160,8 +166,10 @@ CREATE TABLE Review (
 
 -- Table: Rubric
 CREATE TABLE Rubric (
+    id SERIAL,
     Assignment_id int NOT NULL,
-    CONSTRAINT Rubric_pk PRIMARY KEY (Assignment_id)
+    type varchar(100) NOT NULL,
+    CONSTRAINT Rubric_pk PRIMARY KEY (id)
 );
 
 -- Table: Submission
@@ -315,8 +323,8 @@ ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_MCOption
 
 -- Reference: MCQuestion_Rubric (table: MCQuestion)
 ALTER TABLE MCQuestion ADD CONSTRAINT MCQuestion_Rubric
-    FOREIGN KEY (Rubric_Assignment_id)
-    REFERENCES Rubric (Assignment_id)
+    FOREIGN KEY (Rubric_id)
+    REFERENCES Rubric (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -339,8 +347,8 @@ ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_Review
 
 -- Reference: OpenQuestion_Rubric (table: OpenQuestion)
 ALTER TABLE OpenQuestion ADD CONSTRAINT OpenQuestion_Rubric
-    FOREIGN KEY (Rubric_Assignment_id)
-    REFERENCES Rubric (Assignment_id)
+    FOREIGN KEY (Rubric_id)
+    REFERENCES Rubric (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -363,8 +371,8 @@ ALTER TABLE UploadAnswer ADD CONSTRAINT UploadAnswer_Review
 
 -- Reference: UploadQuestion_Rubric (table: UploadQuestion)
 ALTER TABLE UploadQuestion ADD CONSTRAINT UploadQuestion_Rubric
-    FOREIGN KEY (Rubric_Assignment_id)
-    REFERENCES Rubric (Assignment_id)
+    FOREIGN KEY (Rubric_id)
+    REFERENCES Rubric (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -387,16 +395,16 @@ ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_Review
 
 -- Reference: RangeQuestion_Rubric (table: RangeQuestion)
 ALTER TABLE RangeQuestion ADD CONSTRAINT RangeQuestion_Rubric
-    FOREIGN KEY (Rubric_Assignment_id)
-    REFERENCES Rubric (Assignment_id)
+    FOREIGN KEY (Rubric_id)
+    REFERENCES Rubric (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: Review_Rubric (table: Review)
 ALTER TABLE Review ADD CONSTRAINT Review_Rubric
-    FOREIGN KEY (Rubric_Assignment_id)
-    REFERENCES Rubric (Assignment_id)
+    FOREIGN KEY (Rubric_id)
+    REFERENCES Rubric (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -465,10 +473,23 @@ ALTER TABLE Enroll ADD CONSTRAINT Enroll_Role
     INITIALLY IMMEDIATE
 ;
 
+-- Reference: Rubric_Type (table: Rubric)
+ALTER TABLE Rubric ADD CONSTRAINT Rubric_Type
+    FOREIGN KEY (type)
+    REFERENCES RubricType (name)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
 -- Set roles
 INSERT INTO public.role(name)
 	VALUES ('student'),
     ('TA'),
 	('teacher');
+
+-- Set roles
+INSERT INTO public.rubrictype(name)
+	VALUES ('submission'),
+    ('review');
 
 -- End of file.

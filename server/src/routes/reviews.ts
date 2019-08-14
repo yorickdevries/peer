@@ -76,43 +76,35 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
     try {
         const reviewId = req.params.reviewId;
         const inputForm = JSON.parse(req.body.form);
-        const questionIds = [];
+        const uploadQuestionIds = [];
 
         // Upload the files of the upload questions, if present.
+        // Only files with the correct file extensions are included.
         if (req.files) {
             for (const file of req.files as Express.Multer.File[]) {
-                // Try to fetch the file extension
-                const re = /(?:\.([^.]+))?$/;
-                const splittedFilename = re.exec(file.originalname);
+                const questionId = parseInt(file.fieldname);
 
-                // Make sure that there is a file extension
-                if (splittedFilename && splittedFilename.length > 0) {
-                    const submittedExtension = splittedFilename[1];
-                    const questionId = parseInt(file.fieldname);
+                // Get the correct extension of the upload question.
+                const currentUploadQuestion = inputForm.find((x: any) => x.question.id === questionId);
+                const correctExtension = currentUploadQuestion.question.extension;
 
-                    // Rename the file to the question id.
-                    const filename = path.join(fileFolder, `${req.params.reviewId}-${file.fieldname}.${submittedExtension}`);
-
-                    const currentUploadQuestion = inputForm.find((x: any) => x.question.id === questionId);
-
-                    // Make sure that the extension is allowed.
-                    if (currentUploadQuestion && currentUploadQuestion.question.extension === submittedExtension) {
-                        questionIds.push(questionId);
-
-                        await fs.writeFile(filename, file.buffer);
-                    } else {
-                        res.status(400);
-                        res.json({error: "Invalid file extension"});
-                    }
-                } else {
-                    res.status(400);
-                    res.json({error: "File extension is missing"});
+                // Check if the extension is correct
+                if (!file.mimetype.includes(correctExtension)) {
+                    res.status(400).send({error: "Invalid file extension"});
                 }
+
+                // Create and save a unique filename based on the review and question.
+                const filename = `${req.params.reviewId}-${file.fieldname}.${correctExtension}`;
+                const filepath = path.join(fileFolder, filename);
+                currentUploadQuestion.answer.answer = filename;
+                uploadQuestionIds.push(questionId);
+
+                await fs.writeFile(filepath, file.buffer);
             }
         }
 
         // Update the review in the database.
-        const result = await ReviewUpdate.updateReviewWithFileUpload(reviewId, inputForm, questionIds);
+        const result = await ReviewUpdate.updateReviewWithFileUpload(reviewId, inputForm, uploadQuestionIds);
 
         res.json(result);
     } catch (error) {

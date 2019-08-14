@@ -226,7 +226,7 @@ router.get("/:courseId/assignments/unenrolled", async (req: any, res) => {
  */
 router.get("/:courseId/gradeExport", index.authorization.enrolledCourseTeacherCheck, async (req: any, res) => {
     try {
-        const exportData = await ExportResultsPS.executeGetStudentReviewExportCourse(req.params.courseId);
+        const exportData = await ExportResultsPS.executeGetStudentSubmissionReviewExportCourse(req.params.courseId);
 
         // Check if the export data contains data.
         if (exportData.length == 0) {

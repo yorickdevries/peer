@@ -62,24 +62,24 @@ export default {
             ],
             openQuestion: {
                 question: '',
-                rubric_assignment_id: this.rubricId,
+                rubric_id: this.rubricId,
                 question_number: null
             },
             rangeQuestion: {
                 question: '',
                 range: null,
-                rubric_assignment_id: this.rubricId,
+                rubric_id: this.rubricId,
                 question_number: null
             },
             mcQuestion: {
                 question: '',
-                rubric_assignment_id: this.rubricId,
+                rubric_id: this.rubricId,
                 question_number: null,
                 option: []
             },
             uploadQuestion: {
                 question: '',
-                rubric_assignment_id: this.rubricId,
+                rubric_id: this.rubricId,
                 question_number: null,
                 extension: null
             },
@@ -87,10 +87,10 @@ export default {
     },
     watch: {
         rubricId(val) {
-            this.openQuestion.rubric_assignment_id = val
-            this.rangeQuestion.rubric_assignment_id = val
-            this.mcQuestion.rubric_assignment_id = val
-            this.uploadQuestion.rubric_assignment_id = val
+            this.openQuestion.rubric_id = val
+            this.rangeQuestion.rubric_id = val
+            this.mcQuestion.rubric_id = val
+            this.uploadQuestion.rubric_id = val
         }
     },
     methods: {
@@ -108,7 +108,7 @@ export default {
             // Create the MC question itself.
             let res = await api.client.post(`${apiPrefixes['mc']}`, {
                 question: question.question,
-                rubric_assignment_id: question.rubric_assignment_id,
+                rubric_id: question.rubric_id,
                 question_number: question.question_number
             })
 
@@ -132,24 +132,24 @@ export default {
             this.selectedType = ''
             this.openQuestion = {
                 question: '',
-                rubric_assignment_id: this.rubricId,
+                rubric_id: this.rubricId,
                 question_number: null
             }
             this.rangeQuestion = {
                 question: '',
                 range: null,
-                rubric_assignment_id: this.rubricId,
+                rubric_id: this.rubricId,
                 question_number: null
             }
             this.mcQuestion = {
                 question: '',
-                rubric_assignment_id: this.rubricId,
+                rubric_id: this.rubricId,
                 question_number: null,
                 option: []
             }
             this.uploadQuestion = {
                 question: '',
-                rubric_assignment_id: this.rubricId,
+                rubric_id: this.rubricId,
                 question_number: null,
                 extension: null
             }

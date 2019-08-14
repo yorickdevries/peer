@@ -14,10 +14,11 @@ export default class ReviewDistribution {
      */
     public static async distributeReviews(assignmentId: number, selfassign: number) {
         // Check for a rubric entry
-        const rubricExists: any = await RubricPS.executeExistsRubricByAssignmentId(assignmentId);
+        const rubricExists: any = await RubricPS.executeExistsSubmissionRubricByAssignmentId(assignmentId);
         if (!rubricExists.exists) {
             throw new Error("No rubric is present for this assignment");
         }
+        const rubric: any = await RubricPS.executeGetSubmissionRubricByAssignmentId(assignmentId);
         const assignment = await AssignmentPS.executeGetAssignmentById(assignmentId);
         // check whether the assignment is due
         if (new Date(assignment.due_date) > new Date()) {
@@ -30,13 +31,13 @@ export default class ReviewDistribution {
             // Assigning reviews
             reviews = await this.assignSubmissionstoUsers(assignmentId, selfassign);
         }
-        const existingReviews: any = await ReviewPS.executeGetReviewsByAssignmentId(assignmentId);
+        const existingReviews: any = await ReviewPS.executeGetSubmissionReviewsByAssignmentId(assignmentId);
         if (existingReviews.length !== 0) {
             throw new Error("There are already reviews assigned for this assignment");
         }
         // Add the review assignments to the database
         for (const review of reviews) {
-            await ReviewPS.executeCreateReview(review.userNetId, review.submissionId, assignmentId);
+            await ReviewPS.executeCreateReview(review.userNetId, review.submissionId, rubric.id);
         }
         // Return a list of made reviews
         return reviews;

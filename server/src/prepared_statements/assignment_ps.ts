@@ -7,19 +7,6 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 export default class AssignmentPS {
 
     /**
-     * Get the review that was assigned to a certain user.
-     * @param {number} assignmentId - id of an assignment.
-     * @param {string} netId - net id to get the review from.
-     * @return {any} all columns of the review as a pg promise.
-     */
-    public static executeGetReviewByAssignmentId(assignmentId: number, netId: string): any {
-        const statement = new PreparedStatement("get-review",
-            "SELECT * FROM review WHERE done=FALSE AND rubric_assignment_id=$1 AND user_netid=$2");
-        statement.values = [assignmentId, netId];
-        return Database.executeQuerySingleResult(statement);
-    }
-
-    /**
      * Checks whether an assignment exists in the database.
      * @param {number} assignmentId - id of an assignment.
      * @returns tuple with true or false depending on exists as pg promise.
@@ -28,22 +15,6 @@ export default class AssignmentPS {
         const statement = new PreparedStatement("exists-assignment-by-id",
         'SELECT EXISTS(SELECT * FROM "assignmentlist" WHERE "id" = $1)');
         statement.values = [assignmentId];
-        return Database.executeQuerySingleResult(statement);
-    }
-
-    /**
-     * Create a review for a given assignment.
-     * @param {string} netId - net id of the reviewer.
-     * @param {number} submissionId - submission id that is reviewed.
-     * @param {number} assignmentId - assignment id where the review is about.
-     * @returns {Promise<pgPromise.queryResult>} relevant columns of the created review as pg promise.
-     */
-    public static executeCreateReviewByAssignmentId(netId: string, submissionId: number, assignmentId: number)
-        : Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("make-review-for-user",
-            "INSERT INTO review (user_netid, submission_id, rubric_assignment_id) VALUES ($1, $2, $3) " +
-            "RETURNING id, user_netid, submission_id, rubric_assignment_id, done");
-        statement.values = [netId, submissionId, assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
 
