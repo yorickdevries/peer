@@ -114,6 +114,35 @@ export default {
     },
     getSubmission(submissionId) {
         return client.get(`/submissions/${submissionId}`)
-    },
+    }
+    ReviewEvaluation: {
+        check(reviewId, exists) {
+            // Either:
+            //  200 with review
+            //  400 indicating no review
+            // return client.get(`/reviews/${reviewId}/reviewEvaluation`)
+            if (exists) {
+                return {
+                    review: {
+                        id: 9000
+                    },
+                    form: {}
+                }
+            } else {
+                return new Error()
+            }
+        },
+        create(reviewId) {
+            // Either:
+            //  200 with { id: }
+            //  400 indicating review already has been made and can not be created again
+            // return client.post(`/reviews/${reviewId}/reviewEvaluation`)
+
+            return {
+                id: 9000
+            }
+        }
+
+    }
 }
 
