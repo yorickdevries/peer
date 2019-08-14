@@ -48,7 +48,9 @@ export async function generateRubric(config: RubricConfiguration, assignmentId: 
     const rubric: any = await RubricPS.executeCreateRubric(assignmentId, config.rubric_type);
 
     // Add the questions to the rubric
-    config.questions.forEach(async (rubricQuestion, index) => {
+    for (let index = 0; index < config.questions.length; index++) {
+        const rubricQuestion = config.questions[index];
+
         const questionNumber = index + 1;
 
         switch (getQuestionType(rubricQuestion)) {
@@ -69,5 +71,7 @@ export async function generateRubric(config: RubricConfiguration, assignmentId: 
                 }
                 break;
         }
-    });
+    }
+
+    return rubric;
 }
