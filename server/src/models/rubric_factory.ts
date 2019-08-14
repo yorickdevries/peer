@@ -1,4 +1,4 @@
-import RubricPS from "../../prepared_statements/rubric_ps";
+import RubricPS from "../prepared_statements/rubric_ps";
 
 interface OpenQuestion {
     question: string;

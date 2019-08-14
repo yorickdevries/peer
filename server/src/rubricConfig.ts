@@ -1,4 +1,4 @@
-import {RubricConfiguration} from "./models/factories/rubric_factory";
+import {RubricConfiguration} from "./models/rubric_factory";
 
 // configuration file
 const rubricConfig: RubricConfiguration = {
