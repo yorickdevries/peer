@@ -249,17 +249,17 @@ export default class RubricPS {
     /**
      * Executes 'create upload question' query.
      * @param {string} question - question.
-     * @param {number} assignmentId - assignment_id.
+     * @param {number} rubricId - rubricId.
      * @param {number} questionNr - question_number.
      * @param {string} extension - extension of the file.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateUploadQuestion(question: string, assignmentId: number, questionNr: number, extension: string)
+    public static executeCreateUploadQuestion(question: string, rubricId: number, questionNr: number, extension: string)
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("make-upload-question",
-            "INSERT INTO uploadquestion (question, extension, rubric_assignment_id, question_number) VALUES ($1, $2, $3, $4) " +
+            "INSERT INTO uploadquestion (question, extension, rubric_id, question_number) VALUES ($1, $2, $3, $4) " +
             "RETURNING *");
-        statement.values = [question, extension, assignmentId, questionNr];
+        statement.values = [question, extension, rubricId, questionNr];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -352,12 +352,12 @@ export default class RubricPS {
 
     /**
      * Executes 'get all Upload questions' query.
-     * @param {number} id - assignment_id
+     * @param {number} id - rubric_id
      * @returns {any}
      */
     public static executeGetAllUploadQuestionById(id: number): any {
         const statement = new PreparedStatement("get-all-upload-questions",
-            "SELECT * FROM uploadquestion WHERE rubric_assignment_id = $1");
+            "SELECT * FROM uploadquestion WHERE rubric_id = $1");
         statement.values = [id];
         return Database.executeQuery(statement);
     }
@@ -383,7 +383,7 @@ export default class RubricPS {
      */
     public static executeGetUploadQuestionByIdAndRubricId(questionId: number, rubricId: number): any {
         const statement = new PreparedStatement("get-one-uploadquestion",
-            "SELECT * FROM uploadquestion WHERE id = $1 AND rubric_assignment_id = $2");
+            "SELECT * FROM uploadquestion WHERE id = $1 AND rubric_id = $2");
         statement.values = [questionId, rubricId];
         return Database.executeQuerySingleResult(statement);
     }

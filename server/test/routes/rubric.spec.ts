@@ -101,7 +101,7 @@ describe("API rubric routes", () => {
     it("rubric/uploadquestion", async () => {
         const res = await chai.request(router)
             .post("/uploadquestion")
-            .send({ question: "opt", extension: "pdf", rubric_assignment_id: 1, question_number: 1 });
+            .send({ question: "opt", extension: "pdf", rubric_id: 1, question_number: 1 });
 
         expect(res.status).to.equal(200);
 
@@ -110,7 +110,7 @@ describe("API rubric routes", () => {
                 "id": 1,
                 "question": "opt",
                 "extension": "pdf",
-                "rubric_assignment_id": 1,
+                "rubric_id": 1,
                 "question_number": 1,
                 "type_question": "upload"
             }
@@ -127,7 +127,7 @@ describe("API rubric routes", () => {
 
         const created = await chai.request(router)
             .post("/uploadquestion")
-            .send({ question: "opt", extension: "pdf", rubric_assignment_id: 1, question_number: 1 });
+            .send({ question: "opt", extension: "pdf", rubric_id: 1, question_number: 1 });
 
         expect(created.status).to.equal(200);
 
@@ -156,7 +156,7 @@ describe("API rubric routes", () => {
 
         const created = await chai.request(router)
             .post("/uploadquestion")
-            .send({ question: "opt", extension: "pdf", rubric_assignment_id: 1, question_number: 1 });
+            .send({ question: "opt", extension: "pdf", rubric_id: 1, question_number: 1 });
 
         expect(created.status).to.equal(200);
 

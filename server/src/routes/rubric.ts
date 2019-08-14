@@ -140,8 +140,8 @@ router.post("/mcquestion", index.authorization.checkRubricAuthorizationPostQuest
  * @body question - question
  * @body question_number - question_number
  */
-router.post("/uploadquestion", index.authorization.checkRubricAuthorizationPost, (req, res) => {
-    RubricPS.executeCreateUploadQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number, req.body.extension)
+router.post("/uploadquestion", index.authorization.checkRubricAuthorizationPostQuestion, (req, res) => {
+    RubricPS.executeCreateUploadQuestion(req.body.question, req.body.rubric_id, req.body.question_number, req.body.extension)
         .then((data: any) => {
             data.type_question = "upload";
             res.json(data);

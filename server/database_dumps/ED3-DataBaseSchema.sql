@@ -146,7 +146,7 @@ CREATE TABLE UploadQuestion (
     id SERIAL,
     question varchar(5000) NOT NULL,
     extension varchar(10) NOT NULL,
-    Rubric_Assignment_id int NOT NULL,
+    Rubric_id int NOT NULL,
     question_number int NOT NULL,
     CONSTRAINT UploadQuestion_pk PRIMARY KEY (id)
 );
@@ -371,8 +371,8 @@ ALTER TABLE UploadAnswer ADD CONSTRAINT UploadAnswer_Review
 
 -- Reference: UploadQuestion_Rubric (table: UploadQuestion)
 ALTER TABLE UploadQuestion ADD CONSTRAINT UploadQuestion_Rubric
-    FOREIGN KEY (Rubric_Assignment_id)
-    REFERENCES Rubric (Assignment_id)
+    FOREIGN KEY (Rubric_id)
+    REFERENCES Rubric (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;

@@ -85,12 +85,12 @@ describe("RubricPreparedStatements Test", () => {
         const created: any = await RubricPS.executeCreateUploadQuestion(question, assignmentId, questionNr, extension);
 
         // Get upload question
-        const fetched = await RubricPS.executeGetUploadQuestionByIdAndRubricId(created.id, created.rubric_assignment_id);
+        const fetched = await RubricPS.executeGetUploadQuestionByIdAndRubricId(created.id, assignmentId);
 
         // Verify results
         expect({
             question: fetched.question,
-            assignmentId: fetched.rubric_assignment_id,
+            assignmentId: fetched.id,
             questionNr: fetched.question_number,
             extension: fetched.extension
         }).to.deep.equal({
@@ -308,7 +308,7 @@ describe("RubricPreparedStatements Test", () => {
         const created: any = await RubricPS.executeCreateUploadQuestion(question, assignmentId, questionNr, extension);
 
         // Get upload question
-        const fetched = await RubricPS.executeGetUploadQuestionByIdAndRubricId(created.id, created.rubric_assignment_id);
+        const fetched = await RubricPS.executeGetUploadQuestionByIdAndRubricId(created.id, created.rubric_id);
 
         // Delete question
         const deleted = await RubricPS.executeDeleteUploadQuestion(created.id);

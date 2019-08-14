@@ -186,8 +186,9 @@ export default class AuthorizationPS {
      */
     public static executeAuthorizationUploadQuestion(questionId: number, netId: String): any {
         const statement = new PreparedStatement("check-authorization-uploadquestion",
-            "SELECT EXISTS(SELECT * FROM uploadquestion, assignmentlist, enroll " +
-            "WHERE uploadquestion.rubric_assignment_id = assignmentlist.id " +
+            "SELECT EXISTS(SELECT * FROM uploadquestion, rubric, assignmentlist, enroll " +
+            "WHERE uploadquestion.rubric_id = rubric.id " +
+            "AND rubric.assignment_id = assignmentlist.id " +
             "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher') " +
             "AND uploadquestion.id = $1 AND enroll.user_netid = $2)");
         statement.values = [questionId, netId];

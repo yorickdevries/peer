@@ -30,7 +30,7 @@ describe("ReviewPreparedStatement Test", () => {
             new Date("2018-05-01T22:30:00.000Z"),
             new Date("2019-05-01T23:30:00.000Z"),
             false);
-        return await RubricPS.executeCreateRubric(assignment.id);
+        return await RubricPS.executeCreateRubric(assignment.id, "submission");
     }
 
     /**
@@ -88,7 +88,7 @@ describe("ReviewPreparedStatement Test", () => {
         const answer = "serious_answer.pdf";
 
         const rubric: any = await createTestRubric();
-        const question: any = await RubricPS.executeCreateUploadQuestion("something", rubric.assignment_id, 0, "pdf");
+        const question: any = await RubricPS.executeCreateUploadQuestion("something", rubric.id, 0, "pdf");
         await ReviewPS.executeUpdateUploadAnswer("kappa.pdf", question.id, 2);
         const updated: any = await ReviewPS.executeUpdateUploadAnswer(answer, question.id, 2);
 
@@ -138,7 +138,7 @@ describe("ReviewPreparedStatement Test", () => {
         const reviewId = 1;
 
         const rubric: any = await createTestRubric();
-        const question: any = await RubricPS.executeCreateUploadQuestion("something", rubric.assignment_id, 0, "pdf");
+        const question: any = await RubricPS.executeCreateUploadQuestion("something", rubric.id, 0, "pdf");
 
         const created: any = await ReviewPS.executeUpdateUploadAnswer(answer, question.id, reviewId);
         const fetched: any = await ReviewPS.executeGetUploadAnswer(reviewId, question.id);
