@@ -3,11 +3,18 @@ import chai from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 import mockDate from "mockdate";
+import fs from "fs-extra";
+import path from "path";
 chai.use(chaiHttp);
 const router: any = require("../../src/routes/reviews").default;
 import MockLogin from "../test_helpers/mock_login";
 import TestData from "../test_helpers/test_data";
 import ReviewPS from "../../src/prepared_statements/review_ps";
+import SubmissionPS from "../../src/prepared_statements/submissions_ps";
+import RubricPS from "../../src/prepared_statements/rubric_ps";
+import config from "../../src/config";
+
+const fileFolder = config.reviews.fileFolder;
 
 describe("API review routes", () => {
     /**
@@ -17,14 +24,16 @@ describe("API review routes", () => {
         // initializes the router with user paul
         MockLogin.initialize("paulvanderlaan");
         await TestData.initializeDatabase();
+        await TestData.initializeReviewFiles();
     });
 
     /**
      * Reset the date to the non-mocked form
      */
-    afterEach(function () {
+    afterEach(async () => {
         mockDate.reset();
-     });
+        await TestData.removeReviewFiles();
+    });
 
     /**
      * Tests if user has authorization to see the review
@@ -118,6 +127,83 @@ describe("API review routes", () => {
                 }]
             }
         );
+    });
+
+    /**
+     * Put and submit a review with a valid file upload
+     */
+    it("Put review with valid file upload", async () => {
+        mockDate.set("2018-05-02T21:00:00Z");
+        MockLogin.initialize("paulvanderlaan");
+        const exampleReviewFile = path.join(__dirname, "../../example_data/reviews/review1.pdf");
+
+        const submission: any = await SubmissionPS.executeCreateSubmission("paulvanderlaan", 10, 1, "none.pdf")
+        const rubric: any = await RubricPS.executeCreateRubric(1, "submission");
+        const review: any = await ReviewPS.executeCreateReview("paulvanderlaan", submission.id, 1);
+        const uploadQuestion: any = await RubricPS.executeCreateUploadQuestion("Hi there?", rubric.id, 1, "pdf");
+
+        // Submit a review with a uploaded file
+        await chai.request(router)
+            .put(`/${review.id}`)
+            .attach(`${uploadQuestion.id}`, fs.readFileSync(exampleReviewFile), "review1.pdf")
+            .field("review", JSON.stringify({
+                    "id": review.id,
+                    "rubric_id": rubric.id,
+                    "file_path": "none.pdf",
+                    "done": false
+                }))
+            .field("form", JSON.stringify([{
+                "question": {
+                    "id": uploadQuestion.id,
+                    "type_question": "upload",
+                    "question": "Hi there?",
+                    "question_number": 1,
+                    "extension": "pdf"
+                }, "answer": {}
+            }]));
+
+        const filename = `${review.id}-${uploadQuestion.id}.pdf`;
+        const filepath = path.join(fileFolder, filename);
+
+        expect(fs.existsSync(filepath)).to.be.true;
+    });
+
+    /**
+     * Put and submit a review with a invalid file upload
+     */
+    it("Put review with invalid file upload", async () => {
+        mockDate.set("2018-05-02T21:00:00Z");
+        MockLogin.initialize("paulvanderlaan");
+        const exampleReviewFile = path.join(__dirname, "../../example_data/reviews/review2.zip");
+
+        const submission: any = await SubmissionPS.executeCreateSubmission("paulvanderlaan", 10, 1, "none.pdf")
+        const rubric: any = await RubricPS.executeCreateRubric(1, "submission");
+        const review: any = await ReviewPS.executeCreateReview("paulvanderlaan", submission.id, 1);
+        const uploadQuestion: any = await RubricPS.executeCreateUploadQuestion("Hi there?", rubric.id, 1, "pdf");
+
+        // Submit a review with a uploaded file
+        await chai.request(router)
+            .put(`/${review.id}`)
+            .attach(`${uploadQuestion.id}`, fs.readFileSync(exampleReviewFile), "review2.zip")
+            .field("review", JSON.stringify({
+                "id": review.id,
+                "rubric_id": rubric.id,
+                "file_path": "none.pdf",
+                "done": false
+            }))
+            .field("form", JSON.stringify([{
+                "question": {
+                    "id": uploadQuestion.id,
+                    "type_question": "upload",
+                    "question": "Hi there?",
+                    "question_number": 1,
+                    "extension": "pdf"
+                }, "answer": {}
+            }]));
+
+        const filename = `${review.id}-${uploadQuestion.id}.zip`;
+        const filepath = path.join(fileFolder, filename);
+        expect(await fs.existsSync(filepath)).to.be.false;
     });
 
     /**

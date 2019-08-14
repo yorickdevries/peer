@@ -83,8 +83,6 @@ export default class TestData {
      */
     static async initializeReviewFiles() {
         await fs.mkdirs(this.reviewFolder);
-        // Copy example data
-        await fs.copy(this.exampleReviewFolder, this.reviewFolder);
     }
 
     /**
