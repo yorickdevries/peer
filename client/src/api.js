@@ -114,7 +114,7 @@ export default {
     },
     getSubmission(submissionId) {
         return client.get(`/submissions/${submissionId}`)
-    }
+    },
     ReviewEvaluation: {
         check(reviewId, exists) {
             // Either:
