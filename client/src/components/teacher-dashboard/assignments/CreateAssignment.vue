@@ -228,7 +228,7 @@ export default {
 
                 try {
                     await api.createAssignment(formData)
-                    this.showSuccessMessage()
+                    this.showSuccessMessage({message: "Assignment was successfully created"})
                     this.$router.push({name: 'teacher-dashboard.assignments', params: {courseId: this.assignment.course_id}})
                 } catch (e) {
                     this.showErrorMessage({message: e.response.data.error})
