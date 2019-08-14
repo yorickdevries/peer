@@ -226,8 +226,7 @@ describe("API Assignment routes", () => {
             .field("review_publish_date", "2018-05-01T20:32:00.000Z")
             .field("review_due_date", "2018-05-01T20:33:00.000Z")
             .field("one_person_groups", false)
-            .field("review_evaluation", false)
-            ;
+            .field("review_evaluation", false);
 
         // Test the updating of the assignment just added.
         const res = await chai.request(router)
