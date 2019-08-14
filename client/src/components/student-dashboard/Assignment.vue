@@ -67,6 +67,21 @@
                                     <span class="text-muted">Opens after {{ assignment.review_due_date | formatDate }}</span>
                                 </div>
                             </b-button>
+
+                            <!--TODO: change this to hide when not applicable-->
+                            <b-button   variant="white"
+                                        active-class="bg-light"
+                                        class="flex-fill p-0"
+                                        :to="{ name: 'student-dashboard.course.assignment.review-evaluation' }"
+                                        :disabled="!isFeedbackActive">
+                                <div class="text-center border-bottom py-3">
+                                    <div class="lead font-weight-bold ">Review Evaluation
+                                        <b-badge variant="success" v-if="isFeedbackActive">Open</b-badge>
+                                        <b-badge variant="danger" v-else>Closed</b-badge>
+                                    </div>
+                                    <span class="text-muted">Opens after {{ assignment.review_due_date | formatDate }}</span>
+                                </div>
+                            </b-button>
                         </b-col>
 
                     </b-row>
@@ -98,7 +113,8 @@ export default {
             assignment: {
                 title: null,
                 due_date: null,
-                review_due_date: null
+                review_due_date: null,
+                review_on_review: null
             },
         }
     },
