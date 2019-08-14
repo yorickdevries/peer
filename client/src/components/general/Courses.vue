@@ -34,6 +34,13 @@
                             </b-col>
                         </b-row>
 
+                        <!--No courses message-->
+                        <b-row>
+                            <b-col>
+                                <h6 v-if="showNoCoursesText">It seems that you have not been enrolled in any course. Enroll yourself in the next tab or contact your teacher.</h6>
+                            </b-col>
+                        </b-row>
+
                         <!--Course Cards-->
                         <b-row>
                             <b-col cols="6" v-for="course in filteredCourses" :key="course.id" class="d-flex align-items-stretch">
@@ -77,6 +84,13 @@
                         <b-row>
                             <b-col class="mb-3" cols="6">
                                 <b-input placeholder="Filter courses" v-model="filterUnenrolled"></b-input>
+                            </b-col>
+                        </b-row>
+
+                        <!--No courses message-->
+                        <b-row>
+                            <b-col>
+                                <h6 v-if="showNoUnenrolledCoursesText">You have been enrolled in all available courses at this moment.</h6>
                             </b-col>
                         </b-row>
 
@@ -136,7 +150,9 @@ export default {
             ],
             filter: "",
             filterUnenrolled: "",
-            showCreateCourseButton: false
+            showCreateCourseButton: false,
+            showNoCoursesText: false,
+            showNoUnenrolledCoursesText: false,
         }
     },
     computed: {
@@ -183,6 +199,7 @@ export default {
         async fetchCourses() {
             let res = await api.getEnrolledCourses()
             this.courses = res.data
+            this.showNoCoursesText = (this.courses.length === 0)
         },
         async fetchAllCourseRoles() {
             for (let i = 0; i < this.courses.length; i++) {
@@ -194,7 +211,9 @@ export default {
             try {
                 const { data: unenrolledCourses } = await api.getUnenrolledCourses()
                 this.unEnrolledCourses = unenrolledCourses
+                this.showNoUnenrolledCoursesText = (this.unEnrolledCourses.length === 0)
             } catch (e) {
+                this.showNoUnenrolledCoursesText = (this.unEnrolledCourses.length === 0)
                 this.showErrorMessage({message: 'Could not fetch not yet enrolled courses.'})
             }
         },
