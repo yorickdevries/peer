@@ -7,7 +7,7 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 export default class ReviewPS {
 
     /**
-     * Creates a review.
+     * Creates a submissionreview.
      * @param {string} userNetId - net id of the user.
      * @param {number} submissionId - submission id related to the review.
      * @param {number} rubricId - rubric id.
@@ -18,6 +18,31 @@ export default class ReviewPS {
         const statement = new PreparedStatement("create-review",
         "INSERT INTO review(user_netid, submission_id, rubric_id) VALUES ($1, $2, $3) RETURNING *");
         statement.values = [userNetId, submissionId, rubricId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Creates a reviewEvaluation.
+     */
+    public static executeCreateReviewEvaluation(userNetId: string, evaluatedReviewId: number, evaluationRubricId: number)
+        : Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("create-review-evaluation",
+        "INSERT INTO review(user_netid, evaluated_review_id, rubric_id) VALUES ($1, $2, $3) RETURNING *");
+        statement.values = [userNetId, evaluatedReviewId, evaluationRubricId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Checks whether a reviewevaluation already exists
+     */
+    public static executeCheckExistsReviewEvaluation(evaluatedReviewId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("check-review-evaluation-presence",
+        "SELECT EXISTS(" +
+        "SELECT * FROM review " +
+        "WHERE evaluated_review_id = $1" +
+        ")"
+        );
+        statement.values = [evaluatedReviewId];
         return Database.executeQuerySingleResult(statement);
     }
 

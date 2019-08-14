@@ -138,7 +138,8 @@ CREATE TABLE RangeQuestion (
 CREATE TABLE Review (
     id SERIAL,
     User_netid varchar(500) NOT NULL,
-    Submission_id int NOT NULL,
+    Submission_id int,
+    evaluated_review_id int,
     Rubric_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
     creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -372,6 +373,14 @@ ALTER TABLE Review ADD CONSTRAINT Review_Rubric
 ALTER TABLE Review ADD CONSTRAINT Review_Submission
     FOREIGN KEY (Submission_id)
     REFERENCES Submission (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: Review_ReviewedReview (table: Review)
+ALTER TABLE Review ADD CONSTRAINT Review_ReviewedReview
+    FOREIGN KEY (evaluated_review_id)
+    REFERENCES Review (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;

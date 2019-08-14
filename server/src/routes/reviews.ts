@@ -1,4 +1,5 @@
 import ReviewsPS from "../prepared_statements/review_ps";
+import RubricPS from "../prepared_statements/rubric_ps";
 import ReviewUpdate from "../reviewUpdate";
 import bodyParser from "body-parser";
 import index from "../security/index";
@@ -21,6 +22,33 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
         const reviewId = req.params.reviewId;
         const result = await ReviewUpdate.getReview(reviewId);
         res.json(result);
+    } catch (error) {
+        res.status(400);
+        res.json({error: error.message});
+    }
+});
+
+/**
+ * Route to make a review evaluation for a specific review
+ */
+router.route("/:reviewId/reviewevaluation").post(index.authorization.checkAuthorizationForCreatingReviewEvaluation, async (req, res) => {
+    try {
+        const reviewId = req.params.reviewId;
+        const reviewEvaluationExists: any = await ReviewsPS.executeCheckExistsReviewEvaluation(reviewId);
+        if (reviewEvaluationExists.exists) {
+            throw new Error("Review evaluation already exists");
+        } else {
+            const review =  await ReviewsPS.executeGetReview(reviewId);
+            const submissionRubric = await RubricPS.executeGetRubricById(review.rubric_id);
+            const assignmentId = submissionRubric.assignment_id;
+
+            // get the rubric belonging to the reviewEvaluation
+            const reviewEvaluationRubric = await RubricPS.executeGetReviewEvaluationRubricByAssignmentId(assignmentId);
+
+            // create the review
+            const reviewEvaluation: any = await ReviewsPS.executeCreateReviewEvaluation(req.user.netid, reviewId, reviewEvaluationRubric.id);
+            res.json(reviewEvaluation);
+        }
     } catch (error) {
         res.status(400);
         res.json({error: error.message});

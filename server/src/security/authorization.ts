@@ -291,6 +291,47 @@ const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
 };
 
 /**
+ * Check if the user can evaluate this review
+ */
+const checkAuthorizationForCreatingReviewEvaluation = async (req: any, res: any, next: any) => {
+    try {
+        const reviewId = req.params.reviewId;
+        // check whether the user belongs to the group of the submission
+        const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(reviewId, req.user.netid);
+        if (!authCheckSubmissionOwner.exists) {
+            throw new Error("This review is not about you");
+        }
+        const review = await ReviewPS.executeGetReview(reviewId);
+
+        // the review should be done in the first place
+        if (!review.done) {
+            throw new Error("This review isn't submitted");
+        }
+
+        const rubric = await RubricPS.executeGetRubricById(review.rubric_id);
+        // the review should be about a submission
+        if (rubric.type !== "submission") {
+            throw new Error("This review isn't from a submission");
+        }
+
+        const assignment: any = await AssignmentPS.executeGetAssignmentById(rubric.assignment_id);
+        // review evaluation should be enabled
+        if (!assignment.review_evaluation) {
+            throw new Error("This assignment does not have review evaluation enabled");
+        }
+
+        // check whether it is the past due date of review
+        if (new Date(assignment.review_due_date) < new Date()) {
+            throw new Error("You can only evaluate the review after the review due date is passed.");
+        }
+
+        await response(res, true, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
  * Check if the user is allowed to change the review
  */
 const checkReviewOwner = async (req: any, res: any, next: any) => {
@@ -554,6 +595,7 @@ export default {
     checkRubricAuthorizationPost,
     checkRubricAuthorizationPostQuestion,
     checkAuthorizationForReview,
+    checkAuthorizationForCreatingReviewEvaluation,
     enrolledCourseCheck,
     checkMCOptionPost,
     enrolledCourseTeacherCheck,
