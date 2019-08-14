@@ -18,28 +18,19 @@ describe("API rubric routes", () => {
     });
 
     /**
-     * Test if a rubric can be fetched
-     */
-    it("rubric/:rubric_id", async () => {
-        const res = await chai.request(router).get("/1");
-        expect(res.status).to.equal(200);
-
-        const result = JSON.parse(res.text);
-        expect(result.id).to.equal("1");
-    });
-
-    /**
      * Test if a rubric can be created
      */
     it("rubric/", async () => {
         const res = await chai.request(router)
             .post("/")
-            .send({ rubric_assignment_id: 3 });
+            .send({ assignment_id: 3,
+                rubric_type: "submission"
+            });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
-            {
-                "assignment_id": 3
-            }
+            {id: 3,
+            assignment_id: 3,
+            type: "submission"}
         ));
     });
 
@@ -79,11 +70,11 @@ describe("API rubric routes", () => {
     it("rubric/mcquestion", async () => {
         const res = await chai.request(router)
             .post("/mcquestion")
-            .send({ question: "opt", rubric_assignment_id: 1, question_number: 1 });
+            .send({ question: "opt", rubric_id: 1, question_number: 1 });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                "id": 3, "question": "opt", "rubric_assignment_id": 1, "question_number": 1, "type_question": "mc"
+                "id": 3, "question": "opt", "rubric_id": 1, "question_number": 1, "type_question": "mc"
             }
         ));
     });
@@ -99,7 +90,7 @@ describe("API rubric routes", () => {
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
-                "id": 1, "question": "optNew", "rubric_assignment_id": 1, "question_number": 2, "type_question": "mc"
+                "id": 1, "question": "optNew", "rubric_id": 1, "question_number": 2, "type_question": "mc"
             }
         ));
     });
@@ -110,14 +101,14 @@ describe("API rubric routes", () => {
     it("rubric/rangequestion", async () => {
         const res = await chai.request(router)
             .post("/rangequestion")
-            .send({ question: "opt", range: 3, rubric_assignment_id: 1, question_number: 1 });
+            .send({ question: "opt", range: 3, rubric_id: 1, question_number: 1 });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
                 "id": 2,
                 "question": "opt",
                 "range": 3,
-                "rubric_assignment_id": 1,
+                "rubric_id": 1,
                 "question_number": 1,
                 "type_question": "range"
             }
@@ -137,7 +128,7 @@ describe("API rubric routes", () => {
                 "id": 1,
                 "question": "optNew",
                 "range": 4,
-                "rubric_assignment_id": 1,
+                "rubric_id": 1,
                 "question_number": 2,
                 "type_question": "range"
             }
@@ -150,13 +141,13 @@ describe("API rubric routes", () => {
     it("rubric/openquestion", async () => {
         const res = await chai.request(router)
             .post("/openquestion")
-            .send({ question: "opt", rubric_assignment_id: 1, question_number: 1 });
+            .send({ question: "opt", rubric_id: 1, question_number: 1 });
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             {
                 "id": 3,
                 "question": "opt",
-                "rubric_assignment_id": 1,
+                "rubric_id": 1,
                 "question_number": 1,
                 "type_question": "open"
             }
@@ -175,7 +166,7 @@ describe("API rubric routes", () => {
         expect(res.text).to.equal(JSON.stringify({
                 "id": 1,
                 "question": "optNew",
-                "rubric_assignment_id": 1,
+                "rubric_id": 1,
                 "question_number": 2,
                 "type_question": "open"
             }
@@ -189,7 +180,7 @@ describe("API rubric routes", () => {
         // Create a question
         const res1 = await chai.request(router)
         .post("/openquestion")
-        .send({ question: "opt", rubric_assignment_id: 1, question_number: 1 });
+        .send({ question: "opt", rubric_id: 1, question_number: 1 });
         const newq = JSON.parse(res1.text);
 
         // Delete a question
@@ -199,7 +190,7 @@ describe("API rubric routes", () => {
             {
                 "id": newq.id,
                 "question": "opt",
-                "rubric_assignment_id": 1,
+                "rubric_id": 1,
                 "question_number": 1,
                 "type_question": "open"
             }
@@ -213,7 +204,7 @@ describe("API rubric routes", () => {
         // Create a question
         const res1 = await chai.request(router)
         .post("/mcquestion")
-        .send({ question: "opt", rubric_assignment_id: 1, question_number: 1 });
+        .send({ question: "opt", rubric_id: 1, question_number: 1 });
         const newq = JSON.parse(res1.text);
 
         // Delete a question
@@ -223,7 +214,7 @@ describe("API rubric routes", () => {
             {
                 "id": newq.id,
                 "question": "opt",
-                "rubric_assignment_id": 1,
+                "rubric_id": 1,
                 "question_number": 1,
                 "type_question": "mc"
             }
@@ -237,7 +228,7 @@ describe("API rubric routes", () => {
         // Create a question
         const res1 = await chai.request(router)
         .post("/rangequestion")
-        .send({ question: "optNew", range: 4, rubric_assignment_id: 2, question_number: 2 });
+        .send({ question: "optNew", range: 4, rubric_id: 2, question_number: 2 });
         const newq = JSON.parse(res1.text);
 
         // Delete a question
@@ -248,7 +239,7 @@ describe("API rubric routes", () => {
                 "id": newq.id,
                 "question": "optNew",
                 "range": 4,
-                "rubric_assignment_id": 2,
+                "rubric_id": 2,
                 "question_number": 2,
                 "type_question": "range"
             }

@@ -18,7 +18,7 @@
                         <div class="input-group-prepend">
                             <b-button variant="primary" @click="copyRubric">Copy</b-button>
                         </div>
-                        <b-form-select v-model="rubricToCopy" :options="rubricsMetaData"  plain></b-form-select>
+                        <b-form-select v-model="assignmentIdSubmissionRubricToCopy" :options="assignmentsMetaData"  plain></b-form-select>
                     </div>
                 </div>
 
@@ -115,16 +115,17 @@ export default {
         MCQuestion,
         CreateQuestionWizard
     },
-    props: ['rubricId'],
+    props: ['assignmentId'],
     data() {
         return {
             rubric: {
                 id: null,
                 assignment_id: null,
+                type: null,
                 question: []
             },
-            rubricsMetaData: [],
-            rubricToCopy: null
+            assignmentsMetaData: [],
+            assignmentIdSubmissionRubricToCopy: null
         }
     },
     async created() {
@@ -133,16 +134,16 @@ export default {
     },
     methods: {
         async fetchRubric() {
-            let res = await api.client.get(`/rubric/${this.rubricId}`)
+            let res = await api.client.get(`rubric/submissionrubric/${this.assignmentId}`)
             this.rubric = res.data
             this.rubric.questions.sort((a, b) => a.question_number - b.question_number)
         },
         async fetchCourseRubricMetaData() {
             const {data} = await api.getCourseAssignments(this.$route.params.courseId)
-            const rubricsMetaData = data.map(assignment => {
+            const assignmentsMetaData = data.map(assignment => {
                 return {value: assignment.id, text: assignment.title}
             })
-            this.rubricsMetaData = rubricsMetaData
+            this.assignmentsMetaData = assignmentsMetaData
         },
         async deleteQuestion(question) {
             try {
@@ -182,10 +183,11 @@ export default {
             await this.fetchRubric()
         },
         async copyRubric() {
-            if (this.rubricToCopy === null) return this.showErrorMessage({message: "Choose a rubric to copy first."})
-
+            if (this.assignmentIdSubmissionRubricToCopy === null) return this.showErrorMessage({message: "Choose an Assignment rubric to copy first."})
+            const rubricToCopy = await api.client.get(`rubric/submissionrubric/${this.assignmentIdSubmissionRubricToCopy}`)
+            const rubricToCopyId = rubricToCopy.data.id
             try {
-                await api.client.get(`rubric/${this.rubric.id}/copy/${this.rubricToCopy}`)
+                await api.client.get(`rubric/${this.rubric.id}/copy/${rubricToCopyId}`)
                 this.showSuccessMessage({message: "Rubric successfully copied and appended to this rubric."})
             } catch (e) {
                 this.showErrorMessage({message: "Rubric could not be copied."})
@@ -205,11 +207,13 @@ export default {
         },
         async makeRubric() {
             try {
-                await api.client.post(`rubric/`, {rubric_assignment_id: this.rubric.assignment_id})
+                await api.client.post(`rubric/`, {assignment_id: this.assignmentId, rubric_type: 'submission'})
                 this.showSuccessMessage({message: "Rubric made, you can now add questions."})
             } catch (e) {
-                this.showErrorMessage({message: e.response.data.error})
+                this.showErrorMessage({message: 'Couldn\'t make Rubric'})
             }
+            await this.fetchRubric()
+            await this.fetchCourseRubricMetaData()
         }
     }
 }

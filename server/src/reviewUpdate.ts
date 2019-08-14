@@ -13,7 +13,7 @@ export default class ReviewUpdate {
     public static async getReview(reviewId: number) {
         const jsonItems: any = [];
         const review = await ReviewsPS.executeGetReview(reviewId);
-        const questions = await RubricPS.getAllQuestionsByRubricId(review.rubric_assignment_id);
+        const questions = await RubricPS.getAllQuestionsByRubricId(review.rubric_id);
 
         // Loop through the questions and add answers to them.
         for (let i = 0; i < questions.length; i++) {
@@ -78,8 +78,8 @@ export default class ReviewUpdate {
      */
     public static async checkQuestions(reviewId: number, inputForm: any[]) {
         const review = await ReviewsPS.executeGetReview(reviewId);
-        const rubric: any = await RubricPS.executeGetRubricById(review.rubric_assignment_id);
-        const rubricId = rubric.assignment_id;
+        const rubric: any = await RubricPS.executeGetRubricById(review.rubric_id);
+        const rubricId = rubric.id;
 
         // build up the questionlist
         const questionList: any = [];

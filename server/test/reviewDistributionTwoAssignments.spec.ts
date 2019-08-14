@@ -63,8 +63,8 @@ describe("DistributeReviews two assignments", () => {
             false);
 
         // create rubrics
-        await RubricPS.executeCreateRubric(assignment1.id);
-        await RubricPS.executeCreateRubric(assignment2.id);
+        await RubricPS.executeCreateRubric(assignment1.id, "submission");
+        await RubricPS.executeCreateRubric(assignment2.id, "submission");
 
         // make students
         const student1 = await UserPS.executeAddUser("studentone");
@@ -140,8 +140,8 @@ describe("DistributeReviews two assignments", () => {
             false);
 
         // create rubrics
-        await RubricPS.executeCreateRubric(assignment1.id);
-        await RubricPS.executeCreateRubric(assignment2.id);
+        await RubricPS.executeCreateRubric(assignment1.id, "submission");
+        await RubricPS.executeCreateRubric(assignment2.id, "submission");
 
         // make students
         const student1 = await UserPS.executeAddUser("studentone");

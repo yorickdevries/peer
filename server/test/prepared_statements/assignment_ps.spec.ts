@@ -115,21 +115,4 @@ describe("AssignmentPreparedStatements Test", () => {
             title: "Updated"
         });
     });
-
-    /**
-     * Test get review assignment.
-     */
-    it("get review", async () => {
-        const result: any = await AssignmentPS.executeGetReviewByAssignmentId(1, "henkjan");
-        expect(result.id).to.equal(1);
-    });
-
-    /**
-     * Test create review.
-     */
-    it("create review", async () => {
-        const result: any = await AssignmentPS.executeCreateReviewByAssignmentId("paulvanderlaan", 1, 1);
-        expect(result.id).to.equal(3);
-    });
-
 });

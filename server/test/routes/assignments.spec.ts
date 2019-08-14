@@ -36,7 +36,8 @@ describe("API Assignment routes", () => {
         // log in as henkjan
         MockLogin.initialize("henkjan");
         const res = await chai.request(router).get("/1");
-        expect(res.status).to.equal(401);
+        // henkjan is in a group of assignment 1
+        expect(res.status).to.equal(200);
     });
 
     /**

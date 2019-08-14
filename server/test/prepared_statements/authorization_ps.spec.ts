@@ -16,7 +16,7 @@ describe("AuthorizationPreparedstatements Test", () => {
      * Test get submission by id prepared statement.
      */
     it("checkenrollment by id", async () => {
-        expect(await AuthorizationPS.executeCheckEnrollment(1, "paulvanderlaan")).to.deep.equal({
+        expect(await AuthorizationPS.executeCheckCourseEnrollment(1, "paulvanderlaan")).to.deep.equal({
             "exists": true
         });
     });
@@ -25,7 +25,7 @@ describe("AuthorizationPreparedstatements Test", () => {
      * Test get submission by id prepared statement, failing.
      */
     it("checkenrollment by id fail", async () => {
-        expect(await AuthorizationPS.executeCheckEnrollment(1, "henkjan")).to.deep.equal({
+        expect(await AuthorizationPS.executeCheckCourseEnrollment(1, "henkjan")).to.deep.equal({
             "exists": false
         });
     });
