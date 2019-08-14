@@ -137,7 +137,7 @@ describe("API review routes", () => {
         MockLogin.initialize("paulvanderlaan");
         const exampleReviewFile = path.join(__dirname, "../../example_data/reviews/review1.pdf");
 
-        const submission: any = await SubmissionPS.executeCreateSubmission("paulvanderlaan", 10, 1, "none.pdf")
+        const submission: any = await SubmissionPS.executeCreateSubmission("paulvanderlaan", 10, 1, "none.pdf");
         const rubric: any = await RubricPS.executeCreateRubric(1, "submission");
         const review: any = await ReviewPS.executeCreateReview("paulvanderlaan", submission.id, 1);
         const uploadQuestion: any = await RubricPS.executeCreateUploadQuestion("Hi there?", rubric.id, 1, "pdf");
@@ -176,7 +176,7 @@ describe("API review routes", () => {
         MockLogin.initialize("paulvanderlaan");
         const exampleReviewFile = path.join(__dirname, "../../example_data/reviews/review2.zip");
 
-        const submission: any = await SubmissionPS.executeCreateSubmission("paulvanderlaan", 10, 1, "none.pdf")
+        const submission: any = await SubmissionPS.executeCreateSubmission("paulvanderlaan", 10, 1, "none.pdf");
         const rubric: any = await RubricPS.executeCreateRubric(1, "submission");
         const review: any = await ReviewPS.executeCreateReview("paulvanderlaan", submission.id, 1);
         const uploadQuestion: any = await RubricPS.executeCreateUploadQuestion("Hi there?", rubric.id, 1, "pdf");
