@@ -15,6 +15,7 @@ CREATE TABLE AssignmentList (
     review_publish_date timestamptz NOT NULL,
     review_due_date timestamptz NOT NULL,
     one_person_groups boolean NOT NULL,
+    review_evaluation boolean NOT NULL,
     CONSTRAINT AssignmentList_pk PRIMARY KEY (id),
     CONSTRAINT positive_review_per_user CHECK (reviews_per_user > 0),
     CONSTRAINT publish_before_due CHECK (publish_date < due_date),

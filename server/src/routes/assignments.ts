@@ -157,7 +157,8 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
             req.body.due_date,
             req.body.review_publish_date,
             req.body.review_due_date,
-            req.body.one_person_groups);
+            req.body.one_person_groups,
+            req.body.review_evaluation);
         // writing the file if no error is there
         await fs.writeFile(filePath, req.file.buffer);
         res.json(result);

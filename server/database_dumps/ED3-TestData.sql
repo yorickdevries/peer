@@ -91,11 +91,11 @@ INSERT INTO public.groupusers(
 
 INSERT INTO public.assignmentlist(
 	title, description, course_id, reviews_per_user, filename, publish_date, due_date, review_publish_date, review_due_date, one_person_groups)
-	VALUES ('Assignment 1', 'Example assignment number one', 1, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2018-05-02T20:30:00Z', '2018-05-03T20:30:00Z', false),
-	('Assignment 2', 'Example assignment number two', 1, 1, 'assignment2.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z', false),
-	('Assignment 3', 'Example assignment number three', 1, 1, 'assignment3.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z', false),
-	('Assignment 4', 'Example assignment number four', 3, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2030-05-01T20:30:00Z',  '2030-05-02T20:30:00Z', '2030-05-03T20:30:00Z', false),
-	('Assignment 5', 'Example assignment number five', 3, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2018-05-02T20:30:00Z', '2030-05-03T20:30:00Z', false);
+	VALUES ('Assignment 1', 'Example assignment number one', 1, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2018-05-02T20:30:00Z', '2018-05-03T20:30:00Z', false, false),
+	('Assignment 2', 'Example assignment number two', 1, 1, 'assignment2.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z', false, false),
+	('Assignment 3', 'Example assignment number three', 1, 1, 'assignment3.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z', false, false),
+	('Assignment 4', 'Example assignment number four', 3, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2030-05-01T20:30:00Z',  '2030-05-02T20:30:00Z', '2030-05-03T20:30:00Z', false, false),
+	('Assignment 5', 'Example assignment number five', 3, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2018-05-02T20:30:00Z', '2030-05-03T20:30:00Z', false, false);
 
 INSERT INTO public.rubric(
 	assignment_id, type)
