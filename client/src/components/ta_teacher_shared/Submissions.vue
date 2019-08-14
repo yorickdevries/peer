@@ -1,6 +1,7 @@
 <template>
     <div>
-
+        {{submissions}}
+        {{groups}}
         <!--Table Options-->
         <b-row>
             <b-col cols="6" class="mb-3">
@@ -11,6 +12,7 @@
                             <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
                         </b-input-group-append>
                     </b-input-group>
+
 
                     <b-button-group class="mx-auto">
                         <button @click="setLatestSubmissionsActive(false)"
@@ -32,6 +34,7 @@
                 </b-form-group>
             </b-col>
         </b-row>
+
 
         <!--Table-->
         <b-table striped
@@ -80,10 +83,12 @@
         data() {
             return {
                 submissions: [],
+                groups: [],
                 currentPage: 1,
                 fields: [
                     {key: 'user_netid', label: 'Username'},
                     {key: 'group_id', label: 'Group ID'},
+                    {key: 'group_name', label: 'Group name'},
                     'formattedDate',
                     {key: 'comment_count', label: '# of comments'},
                     {key: 'file_path', label: 'Download'},
@@ -97,6 +102,7 @@
         },
         async created() {
             await this.fetchSubmissions()
+            await this.fetchGroups()
         },
         methods: {
             async fetchSubmissions() {
@@ -115,6 +121,10 @@
             async setLatestSubmissionsActive(boolean) {
                 this.latestSubmissionsActive = boolean
                 await this.fetchSubmissions()
+            },
+            async fetchGroups() {
+                let res = await api.getAssignmentGroups(this.assignmentId)
+                this.groups = res.data
             }
         }
     }
