@@ -57,7 +57,11 @@ router.delete("/rangequestion/:question_id", index.authorization.checkRangeQuest
  * Route to delete mc question
  * @params id - id
  */
-router.delete("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, (req, res) => {
+router.delete("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, async (req, res) => {
+    const mcOptions: any = await RubricPS.executeGetAllMCOptionById(req.params.question_id);
+    for (let i = 0; i < mcOptions.length; i++) {
+        await RubricPS.executeDeleteMCOption(mcOptions[i].id);
+    }
     RubricPS.executeDeleteMCQuestion(req.params.question_id)
     .then((data: any) => {
         data.type_question = "mc";
@@ -121,8 +125,8 @@ router.put("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (req, 
  * @body question - question
  * @body question_number - question_number
  */
-router.post("/mcquestion", index.authorization.checkRubricAuthorizationPost, (req, res) => {
-    RubricPS.executeCreateMCQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number)
+router.post("/mcquestion", index.authorization.checkRubricAuthorizationPostQuestion, (req, res) => {
+    RubricPS.executeCreateMCQuestion(req.body.question, req.body.rubric_id, req.body.question_number)
     .then((data: any) => {
         data.type_question = "mc";
         res.json(data);
@@ -187,8 +191,8 @@ router.put("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, 
  * @body rubric_id - rubric_id
  * @body question_number - question_number
  */
-router.post("/rangequestion", index.authorization.checkRubricAuthorizationPost, (req, res) => {
-    RubricPS.executeCreateRangeQuestion(req.body.question, req.body.range, req.body.rubric_assignment_id, req.body.question_number)
+router.post("/rangequestion", index.authorization.checkRubricAuthorizationPostQuestion, (req, res) => {
+    RubricPS.executeCreateRangeQuestion(req.body.question, req.body.range, req.body.rubric_id, req.body.question_number)
     .then((data: any) => {
         data.type_question = "range";
         res.json(data);
@@ -222,8 +226,8 @@ router.put("/rangequestion/:question_id", index.authorization.checkRangeQuestion
  * @body rubric_id - rubric_id
  * @body question_number - question_number
  */
-router.post("/openquestion", index.authorization.checkRubricAuthorizationPost, (req, res) => {
-    RubricPS.executeCreateOpenQuestion(req.body.question, req.body.rubric_assignment_id, req.body.question_number)
+router.post("/openquestion", index.authorization.checkRubricAuthorizationPostQuestion, (req, res) => {
+    RubricPS.executeCreateOpenQuestion(req.body.question, req.body.rubric_id, req.body.question_number)
     .then((data: any) => {
         data.type_question = "open";
         res.json(data);
@@ -250,27 +254,45 @@ router.put("/openquestion/:question_id", index.authorization.checkOpenQuestionEd
  * Router to make a rubric
  * @body rubric_id
  */
-router.post("/", index.authorization.checkRubricAuthorizationPost, (req, res) => {
-    RubricPS.executeCreateRubric(req.body.rubric_assignment_id)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
+router.post("/", index.authorization.checkRubricAuthorizationPost, async (req, res) => {
+    try {
+        const rubricExists: any = await RubricPS.executeExistsSubmissionRubricByAssignmentId(req.body.assignment_id);
+        if (rubricExists.exists) {
+            throw new Error("Rubric already exists");
+        } else {
+            const data = await RubricPS.executeCreateRubric(req.body.assignment_id, req.body.rubric_type);
+            res.json(data);
+        }
+    } catch (error) {
         res.sendStatus(400);
-    });
+    }
 });
 
 /**
- * Router to get all questions of the rubric in format defined in the documentation
+ * Router to get all questions of the submission rubric of the assignment
  * @params assignment_id - rubric_id
  */
-router.get("/:assignment_id", index.authorization.enrolledAssignmentCheck, async (req, res) => {
+router.get("/submissionrubric/:assignment_id", index.authorization.enrolledAssignmentCheck, async (req, res) => {
     try {
-    const questionJson = await RubricPS.getAllQuestionsByRubricId(req.params.assignment_id);
+        const rubric = await RubricPS.executeGetSubmissionRubricByAssignmentId(req.params.assignment_id);
+        const questionJson = await RubricPS.getAllQuestionsByRubricId(rubric.id);
+        rubric.questions = questionJson;
 
-    res.json({
-        id: req.params.assignment_id,
-        assignment_id: req.params.assignment_id,
-        questions: questionJson});
+    res.json(rubric);
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Router to get a rubric
+ */
+router.get("/:rubric_id", index.authorization.getRubricCheck, async (req, res) => {
+    try {
+        const rubric = await RubricPS.executeGetRubricById(req.params.rubric_id);
+        const questionJson = await RubricPS.getAllQuestionsByRubricId(rubric.id);
+        rubric.questions = questionJson;
+        res.json(rubric);
     } catch {
         res.sendStatus(400);
     }
@@ -281,9 +303,9 @@ router.get("/:assignment_id", index.authorization.enrolledAssignmentCheck, async
  * @params rubric_id - current rubric id to copy the questions to.
  * @params rubric_copy_id - rubric id to copy from.
  */
-router.get("/:rubric_assignment_id/copy/:rubric_copy_id", index.authorization.checkRubricAuthorization, async (req, res) => {
+router.get("/:rubric_id/copy/:rubric_copy_id", index.authorization.checkRubricAuthorization, async (req, res) => {
     try {
-        await RubricPS.copyRubricQuestions(req.params.rubric_assignment_id, req.params.rubric_copy_id);
+        await RubricPS.copyRubricQuestions(req.params.rubric_id, req.params.rubric_copy_id);
         res.sendStatus(200);
     } catch {
         res.sendStatus(400);
@@ -294,9 +316,9 @@ router.get("/:rubric_assignment_id/copy/:rubric_copy_id", index.authorization.ch
  * Route to delete all rubric questions.
  * @params rubric_id - current rubric id.
  */
-router.get("/:rubric_assignment_id/deleteAll", index.authorization.checkRubricAuthorization, async (req, res) => {
+router.get("/:rubric_id/deleteAll", index.authorization.checkRubricAuthorization, async (req, res) => {
     try {
-        await RubricPS.deleteRubricQuestions(req.params.rubric_assignment_id);
+        await RubricPS.deleteRubricQuestions(req.params.rubric_id);
         res.sendStatus(200);
     } catch {
         res.sendStatus(400);
@@ -307,10 +329,10 @@ router.get("/:rubric_assignment_id/deleteAll", index.authorization.checkRubricAu
 /**
  * Route to submit all filled in reviews
  */
-router.get("/:rubric_assignment_id/submitallfilledreviews", index.authorization.checkRubricAuthorization, async (req, res) => {
+router.get("/:rubric_id/submitallfilledreviews", index.authorization.checkRubricAuthorization, async (req, res) => {
     try {
-        const rubricId = req.params.rubric_assignment_id;
-        const allReviews: any = await ReviewPS.executeGetReviewsByAssignmentId(rubricId);
+        const rubricId = req.params.rubric_id;
+        const allReviews: any = await ReviewPS.executeGetReviewsByRubricId(rubricId);
         let counter = 0;
         for (let i = 0; i < allReviews.length; i++) {
             // if already done, skip

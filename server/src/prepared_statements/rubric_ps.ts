@@ -7,13 +7,31 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 export default class RubricPS {
 
     /**
-     * Executes 'get rubric by id' query.
-     * @param {number} assignmentId - assignment_id.
-     * @returns {Promise<pgPromise.queryResult>}
+     * Executes 'get rubric by RubricId' query.
      */
-    public static executeGetRubricById(assignmentId: number): Promise<pgPromise.queryResult> {
+    public static executeGetRubricById(id: number): Promise<any> {
         const statement = new PreparedStatement("get-rubric-by-id",
-            "SELECT * FROM rubric WHERE assignment_id=$1");
+            "SELECT * FROM rubric WHERE id=$1");
+        statement.values = [id];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'get Submission rubric by AssignmentId' query.
+     */
+    public static executeGetSubmissionRubricByAssignmentId(assignmentId: number): Promise<any> {
+        const statement = new PreparedStatement("get-submission-rubric-by-assignment-id",
+            "SELECT * FROM rubric WHERE assignment_id=$1 AND type = 'submission'");
+        statement.values = [assignmentId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'get Review rubric by AssignmentId' query.
+     */
+    public static executeGetReviewRubricByAssignmentId(assignmentId: number): Promise<any> {
+        const statement = new PreparedStatement("get-review-rubric-by-assignment-id",
+            "SELECT * FROM rubric WHERE assignment_id=$1 AND type = 'review'");
         statement.values = [assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -23,22 +41,10 @@ export default class RubricPS {
      * @param {number} assignmentId - assignment_id.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeExistsRubricByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
+    public static executeExistsSubmissionRubricByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("exists-rubric-by-assignmentid",
-            "SELECT EXISTS(SELECT * FROM rubric WHERE assignment_id=$1)");
+            "SELECT EXISTS(SELECT * FROM rubric WHERE assignment_id=$1 AND type = 'submission')");
         statement.values = [assignmentId];
-        return Database.executeQuerySingleResult(statement);
-    }
-
-    /**
-     * Query 'delete rubric'.
-     * @param {number} id - assignment_id.
-     * @returns {Promise<pgPromise.queryResult>}
-     */
-    public static executeDeleteRubric(id: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("delete-rubric",
-            "DELETE FROM rubric WHERE assignment_id=$1 RETURNING *");
-        statement.values = [id];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -195,48 +201,48 @@ export default class RubricPS {
      * Executes 'create range question' query.
      * @param {string} question - question.
      * @param {number} range - range.
-     * @param {number} rubricAssignmentId - rubric_assignment_id.
+     * @param {number} rubricId - rubric_id.
      * @param {number} questionNumber - question_number.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateRangeQuestion(question: string, range: number, rubricAssignmentId: number,
+    public static executeCreateRangeQuestion(question: string, range: number, rubricId: number,
                                              questionNumber: number): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("make-range-question",
-            "INSERT INTO rangequestion (question, range, rubric_assignment_id, question_number) " +
+            "INSERT INTO rangequestion (question, range, rubric_id, question_number) " +
             "VALUES ($1, $2, $3, $4) RETURNING *");
-        statement.values = [question, range, rubricAssignmentId, questionNumber];
+        statement.values = [question, range, rubricId, questionNumber];
         return Database.executeQuerySingleResult(statement);
     }
 
     /**
      * Executes 'create mc question' query.
      * @param {string} question - question.
-     * @param {number} rubricAssignmentId - rubric_assignment_id.
+     * @param {number} rubricId - rubric_id.
      * @param {number} questionNumber - question_number.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateMCQuestion(question: string, rubricAssignmentId: number, questionNumber: number)
+    public static executeCreateMCQuestion(question: string, rubricId: number, questionNumber: number)
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("make-MC-question",
-            "INSERT INTO mcquestion (question, rubric_assignment_id, question_number) VALUES ($1, $2, $3) " +
+            "INSERT INTO mcquestion (question, rubric_id, question_number) VALUES ($1, $2, $3) " +
             "RETURNING *");
-        statement.values = [question, rubricAssignmentId, questionNumber];
+        statement.values = [question, rubricId, questionNumber];
         return Database.executeQuerySingleResult(statement);
     }
 
     /**
      * Executes 'create open question' query.
      * @param {string} question - question.
-     * @param {number} assignmentId - assignment_id.
+     * @param {number} rubricId - rubricId
      * @param {number} questionNr - questino_number.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateOpenQuestion(question: string, assignmentId: number, questionNr: number)
+    public static executeCreateOpenQuestion(question: string, rubricId: number, questionNr: number)
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("make-open-question",
-            "INSERT INTO openquestion (question, rubric_assignment_id, question_number) VALUES ($1, $2, $3) " +
+            "INSERT INTO openquestion (question, rubric_id, question_number) VALUES ($1, $2, $3) " +
             "RETURNING *");
-        statement.values = [question, assignmentId, questionNr];
+        statement.values = [question, rubricId, questionNr];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -262,10 +268,10 @@ export default class RubricPS {
      * @param {number} assignmentId - assignment_id.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateRubric(assignmentId: number): Promise<pgPromise.queryResult> {
+    public static executeCreateRubric(assignmentId: number, rubricType: string): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("create-rubric",
-            'INSERT INTO "rubric" ("assignment_id") VALUES ($1) RETURNING *');
-        statement.values = [assignmentId];
+            'INSERT INTO "rubric" ("assignment_id", "type") VALUES ($1, $2) RETURNING *');
+        statement.values = [assignmentId, rubricType];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -289,7 +295,7 @@ export default class RubricPS {
      */
     public static executeGetAllRangeQuestionById(id: number): any {
         const statement = new PreparedStatement("get-all-rangequestion",
-            "SELECT * FROM rangequestion WHERE rubric_assignment_id = $1");
+            "SELECT * FROM rangequestion WHERE rubric_id = $1");
         statement.values = [id];
         return Database.executeQuery(statement);
     }
@@ -302,7 +308,7 @@ export default class RubricPS {
      */
     public static executeGetRangeQuestionByIdAndRubricId(questionId: number, rubricId: number): any {
         const statement = new PreparedStatement("get-one-rangequestion",
-            "SELECT * FROM rangequestion WHERE id = $1 AND rubric_assignment_id = $2");
+            "SELECT * FROM rangequestion WHERE id = $1 AND rubric_id = $2");
         statement.values = [questionId, rubricId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -314,7 +320,7 @@ export default class RubricPS {
      */
     public static executeGetAllOpenQuestionById(id: number): any {
         const statement = new PreparedStatement("get-all-openquestions",
-            "SELECT * FROM openquestion WHERE rubric_assignment_id = $1");
+            "SELECT * FROM openquestion WHERE rubric_id = $1");
         statement.values = [id];
         return Database.executeQuery(statement);
     }
@@ -327,7 +333,7 @@ export default class RubricPS {
      */
     public static executeGetOpenQuestionByIdAndRubricId(questionId: number, rubricId: number): any {
         const statement = new PreparedStatement("get-one-openquestion",
-            "SELECT * FROM openquestion WHERE id = $1 AND rubric_assignment_id = $2");
+            "SELECT * FROM openquestion WHERE id = $1 AND rubric_id = $2");
         statement.values = [questionId, rubricId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -339,7 +345,7 @@ export default class RubricPS {
      */
     public static executeGetAllMCQuestionById(id: number): any {
         const statement = new PreparedStatement("get-all-MC-questions",
-            "SELECT * FROM mcquestion WHERE rubric_assignment_id = $1");
+            "SELECT * FROM mcquestion WHERE rubric_id = $1");
         statement.values = [id];
         return Database.executeQuery(statement);
     }
@@ -364,7 +370,7 @@ export default class RubricPS {
      */
     public static executeGetMCQuestionByIdAndRubricId(questionId: number, rubricId: number): any {
         const statement = new PreparedStatement("get-one-mcquestion",
-            "SELECT * FROM mcquestion WHERE id = $1 AND rubric_assignment_id = $2");
+            "SELECT * FROM mcquestion WHERE id = $1 AND rubric_id = $2");
         statement.values = [questionId, rubricId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -403,7 +409,7 @@ export default class RubricPS {
             questionJson.push({
                 id: question.id,
                 type_question: "mc",
-                rubric_assignment_id: question.rubric_assignment_id,
+                rubric_id: question.rubric_id,
                 question: question.question,
                 question_number: question.question_number,
                 option: await RubricPS.executeGetAllMCOptionById(question.id)
@@ -505,13 +511,12 @@ export default class RubricPS {
         }
         // Delete mc questions
         for (let i = 0; i < mcQuestions.length; i++) {
-            await this.executeDeleteMCQuestion(mcQuestions[i].id);
-
-            // Copy mc options
+            // Delete mc options
             mcOptions = await RubricPS.executeGetAllMCOptionById(mcQuestions[i].id);
             for (let i = 0; i < mcOptions.length; i++) {
                 await this.executeDeleteMCOption(mcOptions[i].id);
             }
+            await this.executeDeleteMCQuestion(mcQuestions[i].id);
         }
     }
 }

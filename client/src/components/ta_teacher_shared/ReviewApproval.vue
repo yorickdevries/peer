@@ -151,7 +151,7 @@ export default {
             peerReview: {
                 review: {
                     id: null,
-                    rubric_assignment_id: null,
+                    rubric_id: null,
                     file_path: "",
                     comment: null,
                     done: null,
@@ -194,7 +194,8 @@ export default {
 
         // Load assignment info.
         try {
-            const {data: assignment} = await api.getAssignment(this.peerReview.review.rubric_assignment_id)
+            const rubric = (await api.getRubric(this.peerReview.review.rubric_id)).data
+            const {data: assignment} = await api.getAssignment(rubric.assignment_id)
             this.assignment = assignment
         } catch (e) {
             this.showErrorMessage()
@@ -228,7 +229,7 @@ export default {
         },
         async goToNextReview() {
             try {
-                const { data } = await api.client.get(`assignments/${this.peerReview.review.rubric_assignment_id}/randomReview`)
+                const { data } = await api.client.get(`assignments/${this.assignment.id}/randomReview`)
                 const randomId = data.id
                 this.$router.push({name: this.$router.currentRoute.name, params: {reviewId: randomId} })
                 location.reload()
@@ -239,9 +240,9 @@ export default {
         backToReviewList() {
             console.log(this.$router.currentRoute)
             if (this.$router.currentRoute.name.includes('teacher')) {
-                this.$router.push({name: 'teacher-dashboard.assignments.assignment', params: {assignmentId: this.peerReview.review.rubric_assignment_id} })
+                this.$router.push({name: 'teacher-dashboard.assignments.assignment', params: {assignmentId: this.assignment.id} })
             } else {
-                this.$router.push({name: 'teaching-assistant-dashboard.course.assignment', params: {assignmentId: this.peerReview.review.rubric_assignment_id} })
+                this.$router.push({name: 'teaching-assistant-dashboard.course.assignment', params: {assignmentId: this.assignment.id} })
             }
         },
         uploadQuestionFilePath(reviewId, questionId) {

@@ -90,7 +90,7 @@
 
                             <!--Rubric Wizard-->
                             <b-tab title="Rubric">
-                                <RubricWizard :rubricId="assignment.id" :review_publish_date="assignment.review_publish_date"></RubricWizard>
+                                <RubricWizard :assignmentId="assignment.id" :review_publish_date="assignment.review_publish_date"></RubricWizard>
                             </b-tab>
 
                             <!--Submissions-->
@@ -187,7 +187,9 @@
             },
             async submitAllFilledReviews() {
                 try {
-                    const result = await api.submitAllFilledReviews(this.$route.params.assignmentId)
+                    let res = await api.client.get(`rubric/submissionrubric/${this.$route.params.assignmentId}`)
+                    const rubricId = res.data.id
+                    const result = await api.submitAllFilledReviews(rubricId)
                     const submittedReviews = result.data.submittedReviews;
                     this.showSuccessMessage({message: "Submitted " + submittedReviews + " Reviews"})
                 } catch (e) {

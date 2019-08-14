@@ -9,15 +9,20 @@
             Your session has expired and you might lose your current progress.
             Please log back in here:
         </div>
-        <b-button variant="primary" size="sm" class="mt-3" href="/api/login" target="_blank">Log in page.</b-button>
+        <b-button variant="primary" size="sm" class="mt-3" href="/api/login" target="_blank">Login page</b-button>
+        <div>
+            After logging in, come back to this page and press the OK button to resume your session.
+        </div>
     </b-modal>
 </template>
 
 <script>
     import api from "../../api"
+    import notifications from '../../mixins/notifications'
 
     export default {
         name: "SessionCheck",
+        mixins: [notifications],
         methods: {
             async sessionGuardCheck() {
                 // Submit the peer review.
@@ -31,6 +36,7 @@
                     }
                 } catch (error) {
                     this.showErrorMessage({message: "You are not logged in anymore, please log back in."})
+                    this.$refs.sessionExpiredModal.show()
                     return false
                 }
                 return true

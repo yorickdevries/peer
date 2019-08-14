@@ -227,7 +227,7 @@ describe("ReviewPreparedStatement Test", () => {
      * Test get reviews for an assignment.
      */
     it("Reviews of an assignment", async () => {
-        expect(await ReviewPS.executeGetAllDoneReviewsByAssignmentId(1)).to.deep.equal([{
+        expect(await ReviewPS.executeGetAllDoneSubmissionReviewsByAssignmentId(1)).to.deep.equal([{
             // tslint:disable-next-line
             "approved": null,
             "id": 2,
@@ -242,7 +242,7 @@ describe("ReviewPreparedStatement Test", () => {
      * Test get reviews for an assignment.
      */
     it("Get all done and pending for approval review ids", async () => {
-        expect(await ReviewPS.executeGetAllDoneReviewsByAssignmentIdUnreviewed(1)).to.deep.equal([{
+        expect(await ReviewPS.executeGetAllDoneSubmissionReviewsByAssignmentIdUnreviewed(1)).to.deep.equal([{
             id: 2
         }]);
     });
