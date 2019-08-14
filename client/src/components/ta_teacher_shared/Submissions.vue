@@ -38,7 +38,7 @@
                  outlined
                  show-empty
                  stacked="md"
-                 :items=submissions
+                 :items=submissionsAndGroups
                  :fields="fields"
                  :current-page="currentPage"
                  :per-page="Number(perPage)"
@@ -100,8 +100,6 @@
         },
         async created() {
             await this.fetchSubmissions()
-            await this.fetchGroups()
-            this.concatenateArrays(this.submissions, this.groups)
         },
         methods: {
             async fetchSubmissions() {
@@ -113,6 +111,7 @@
                         res = await api.getAssignmentAllSubmissions(this.assignmentId)
                     }
                     this.submissions = res.data
+                    await this.fetchGroups()
                 } catch (error) {
                     console.log(error)
                 }
@@ -124,6 +123,7 @@
             async fetchGroups() {
                 let res = await api.getAssignmentGroups(this.assignmentId)
                 this.groups = res.data
+                this.concatenateArrays(this.submissions, this.groups)
             },
             concatenateArrays(submissions, groups) {
                 this.submissionsAndGroups = this.submissions
