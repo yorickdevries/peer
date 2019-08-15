@@ -372,7 +372,6 @@ const checkAuthorizationForCreatingReviewEvaluation = async (req: any, res: any,
 
         await response(res, true, next);
     } catch (error) {
-        console.log(error)
         res.sendStatus(401);
     }
 };
