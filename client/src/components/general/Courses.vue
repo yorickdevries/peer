@@ -55,7 +55,7 @@
 
                         <!--Course Cards-->
                         <b-row>
-                            <b-col cols="6" v-for="course in filteredCourses" :key="course.id" class="d-flex align-items-stretch">
+                            <b-col cols="6" v-for="course in filteredCourses" :key="course.id" class="d-flex align-items-stretch mb-3">
 
                                 <!--Single Card-->
                                 <b-card no-body class="w-100">
@@ -122,7 +122,7 @@
 
                         <!--Course Cards-->
                         <b-row>
-                            <b-col cols="6" v-for="course in filteredUnenrolledCourses" :key="course.id" class="d-flex align-items-stretch">
+                            <b-col cols="6" v-for="course in filteredUnenrolledCourses" :key="course.id" class="d-flex align-items-stretch mb-3">
 
                                 <!--Single Card-->
                                 <b-card no-body class="mb-3 w-100">

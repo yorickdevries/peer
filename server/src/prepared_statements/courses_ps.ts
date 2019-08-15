@@ -193,8 +193,21 @@ export default class CoursesPS {
      */
     public static executeGetUnenrolledForUser(netId: string): any {
         const statement = new PreparedStatement("get-unenrolled-courses-for-netid",
-            'SELECT * FROM "courselist" WHERE "id" NOT IN ' +
-            '(SELECT "id" FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" WHERE user_netid LIKE $1)) AND enrollable = TRUE');
+            `
+                SELECT * FROM "courselist"
+                JOIN academicyearlist on courselist.academic_year = academicyearlist.year
+                WHERE "id" NOT IN
+                (
+                    SELECT "id" FROM "courselist"
+                    WHERE "id" IN
+                    (
+                        SELECT "course_id" FROM "enroll"
+                        WHERE user_netid LIKE $1
+                    )
+                )
+                AND enrollable = TRUE
+                AND active = TRUE
+            `);
         statement.values = [netId];
         return Database.executeQuery(statement);
     }
