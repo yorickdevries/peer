@@ -1,5 +1,12 @@
 <template>
     <div>
+        <!--Notification whether evaluation is submitted or not.-->
+        <div v-if="evaluationExists">
+            <b-alert variant="info" :show="evaluation.review.done">
+                This evaluation has been submitted.
+            </b-alert>
+        </div>
+
         <!--See Peer Review-->
         <div v-if="review.review.id">
             <b-row>
@@ -16,6 +23,9 @@
             </b-row>
 
             <b-modal title="Peer Review" :id="`modal_${review.review.id}`" size="lg" hide-footer>
+                <b-alert variant="info" show>
+                    This is a review you have received from one of your peers on your submission.
+                </b-alert>
                 <PeerReview :reviewId="review.review.id" :readOnly="true"></PeerReview>
             </b-modal>
         </div>
@@ -153,9 +163,9 @@
                     </b-modal>
                 </b-card-body>
                 <b-card-body v-else>
-                    <b-button variant="outline-success float-right" @click="unSubmitEvaluation"
-                        >Unsubmit Evaluation</b-button
-                    >
+                    <b-button variant="outline-success float-right" @click="unSubmitEvaluation">
+                        Unsubmit Evaluation
+                    </b-button>
                 </b-card-body>
             </template>
         </b-card>

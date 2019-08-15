@@ -123,7 +123,7 @@
                     </b-modal>
                 </b-card-body>
                 <b-card-body v-else>
-                    <b-button variant="outline-success float-right" @click="unSubmitPeerReview">UnSubmit Review</b-button>
+                    <b-button variant="outline-success float-right" @click="unSubmitPeerReview">Unsubmit Review</b-button>
                 </b-card-body>
             </template>
 
