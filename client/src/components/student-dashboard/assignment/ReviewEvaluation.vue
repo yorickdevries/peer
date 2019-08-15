@@ -16,8 +16,8 @@
                 </b-col>
             </b-row>
 
-            <b-modal title="Peer Review" :id="`modal_${review.review.id}`" hide-footer>
-                    <PeerReview :reviewId="review.review.id"></PeerReview>
+            <b-modal title="Peer Review" :id="`modal_${review.review.id}`" size="lg" hide-footer>
+                    <PeerReview :reviewId="review.review.id" :readOnly="true"></PeerReview>
             </b-modal>
         </div>
 

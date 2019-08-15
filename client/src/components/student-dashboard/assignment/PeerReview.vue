@@ -74,7 +74,7 @@
                     <div v-if="pair.question.type_question === 'upload'">
 
                         <!--File upload-->
-                        <b-form-group description="Select a file and press save down below the page. Note: it overwrites files." class="mb-0">
+                        <b-form-group :description="readOnly ? '' : 'Select a file and press save down below the page. Note: it overwrites files.'" class="mb-0">
 
                             <!--Show currently uploaded file-->
                             <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
@@ -86,17 +86,19 @@
                                 </div>
                             </b-alert>
 
-                            <b-alert show variant="danger">{{ pair.question.extension.toUpperCase() }} files allowed only.</b-alert>
+                            <div v-if="!readOnly">
+                                <b-alert show variant="danger">{{ pair.question.extension.toUpperCase() }} files allowed only.</b-alert>
 
-                            <b-alert v-if="pair.answer.answer" show variant="warning">Note: uploading an new files will overwrite your current file.</b-alert>
+                                <b-alert v-if="pair.answer.answer" show variant="warning">Note: uploading an new files will overwrite your current file.</b-alert>
 
-                            <b-form-file  placeholder="Choose a new file..."
-                                          v-model="files[pair.question.id]"
-                                          :state="Boolean(files[pair.question.id])"
-                                          :accept="`.${pair.question.extension}`"
-                                          :disabled="peerReview.review.done || readOnly"
-                                          :ref="'fileForm' + pair.question.id + peerReview.review.id">
-                            </b-form-file>
+                                <b-form-file  placeholder="Choose a new file..."
+                                              v-model="files[pair.question.id]"
+                                              :state="Boolean(files[pair.question.id])"
+                                              :accept="`.${pair.question.extension}`"
+                                              :disabled="peerReview.review.done || readOnly"
+                                              :ref="'fileForm' + pair.question.id + peerReview.review.id">
+                                </b-form-file>
+                            </div>
 
                         </b-form-group>
 
