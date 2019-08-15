@@ -407,12 +407,18 @@ const checkReviewBetweenPublishDue = async (req: any, res: any, next: any) => {
     try {
         const review = await ReviewPS.executeGetReview(req.params.reviewId);
         const rubric = await RubricPS.executeGetRubricById(review.rubric_id);
-        const assignmentId =  rubric.assignment_id;
-        const assignment = await AssignmentPS.executeGetAssignmentById(assignmentId);
-        // check whether the user is on time
-        const currentDate = new Date();
-        const withinTimeFrame = (new Date(assignment.review_publish_date) < currentDate && new Date(assignment.review_due_date) > currentDate);
-        response(res, withinTimeFrame, next);
+
+        // in case the rubric is a submission, the time needs to be checked
+        if (rubric.type == "submission") {
+            const assignmentId =  rubric.assignment_id;
+            const assignment = await AssignmentPS.executeGetAssignmentById(assignmentId);
+            // check whether the user is on time
+            const currentDate = new Date();
+            const withinTimeFrame = (new Date(assignment.review_publish_date) < currentDate && new Date(assignment.review_due_date) > currentDate);
+            response(res, withinTimeFrame, next);
+        } else {
+            response(res, true, next);
+        }
     } catch (error) {
         res.sendStatus(401);
     }
