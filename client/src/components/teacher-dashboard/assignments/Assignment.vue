@@ -101,7 +101,7 @@
                                                 <dt>Export Reviews CSV</dt>
                                                 <dd>Exports a CSV file with all reviews for this assignment.</dd>
                                                 <dd>
-                                                    Also includes any evaluations whichstudents have given to each
+                                                    Also includes any evaluations which students have given to each
                                                     other's reviews.
                                                 </dd>
                                                 <b-button
