@@ -221,7 +221,10 @@ export default {
             try {
                 await api.ReviewEvaluation.create(this.review.review.id)
             } catch (e) {
-                this.showErrorMessage({ message: "Can't create a new evaluation, one already exists." })
+                this.showErrorMessage({
+                    message:
+                        "A group member has already evaluated this review. Only 1 group member can evaluate a review."
+                })
             }
         },
         async fetchEvaluation() {
