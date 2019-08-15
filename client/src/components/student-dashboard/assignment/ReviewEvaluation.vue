@@ -40,11 +40,11 @@
         </div>
 
         <!--Evaluation Rubric-->
-        <b-card v-if="true" no-body class="mt-3">
+        <b-card v-if="evaluationExists" no-body class="mt-3">
             <!--Title-->
             <b-card-body>
                 <h4>Review Evaluation</h4>
-                <h6 class="card-subtitle text-muted">Evaluate the review you have gotten from of your peers here.</h6>
+                <h6 class="card-subtitle text-muted">Evaluate the review you have gotten from one of your peers here.</h6>
             </b-card-body>
 
             <!--Form-->
