@@ -70,7 +70,7 @@ export default class CoursesPS {
      * @return {Promise<any>}
      */
     public static executeGetActiveAcademicYear() {
-        const statement = new PreparedStatement("get-academic-years", `
+        const statement = new PreparedStatement("get-active-academic-years", `
         SELECT * FROM academicyearlist WHERE active is TRUE
         `);
         return Database.executeQuery(statement);

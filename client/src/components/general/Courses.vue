@@ -97,7 +97,19 @@
                         <!--Filter Input-->
                         <b-row>
                             <b-col class="mb-3" cols="6">
-                                <b-input placeholder="Filter courses" v-model="filterUnenrolled"></b-input>
+                                <b-form-group label="" description="Search a course">
+                                    <b-input placeholder="Filter courses" v-model="filterUnenrolled"></b-input>
+                                </b-form-group>
+                            </b-col>
+                            <b-col class="mb-3" cols="3">
+                                <b-form-group label="" description="Select the faculty">
+                                    <b-form-select :options="faculties" v-model="filterOptions.faculty"></b-form-select>
+                                </b-form-group>
+                            </b-col>
+                            <b-col class="mb-3" cols="3">
+                                <b-form-group label="" description="The active academic year">
+                                    <b-form-select :options="[academic_year_active]" v-model="academic_year_active"></b-form-select>
+                                </b-form-group>
                             </b-col>
                         </b-row>
 
@@ -118,6 +130,8 @@
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <h4 class="card-title m-0">{{ course.name }}</h4>
                                         </div>
+                                        <p class="card-title mt-0 text-muted">{{ course.academic_year }} - {{ course.faculty }} - {{ course.course_code }}</p>
+
                                         <div class="mb-auto">
                                             <p>{{ course.description | truncate(200)}}</p>
                                         </div>
@@ -173,6 +187,7 @@ export default {
             showNoUnenrolledCoursesText: false,
             faculties: [],
             academic_years: [],
+            academic_year_active: null
         }
     },
     computed: {
@@ -184,11 +199,10 @@ export default {
             })
         },
         filteredUnenrolledCourses() {
-            // Filters unenrolled course based on text filter.
-            if (this.filterUnenrolled === "") return this.unEnrolledCourses
-
             return this.unEnrolledCourses.filter(course => {
-                return course.name.toLowerCase().includes(this.filterUnenrolled.toLowerCase())
+                return (course.name.toLowerCase().includes(this.filterUnenrolled.toLowerCase()) || this.filterUnenrolled === "")
+                && (this.filterOptions.faculty == null || course.faculty === this.filterOptions.faculty)
+                && course.academic_year === this.academic_year_active
             })
         },
 
@@ -206,15 +220,16 @@ export default {
         // Fetch user to see if create course button should be showed.
         await this.fetchUser()
 
-        await this.fetchFaculties();
-        await this.fetchActiveAcademicYear();
         await this.fetchAcademicYears();
+        await this.fetchActiveAcademicYear();
+        await this.fetchFaculties();
     },
     methods: {
         async fetchActiveAcademicYear() {
             try {
                 let res = await api.getActiveAcademicYear();
-                this.filterOptions.academic_year = res.data[0].year;
+                this.academic_year_active = res.data[0].year;
+                this.filterOptions.academic_year = this.academic_year_active;
             } catch (e) {
                 console.log(e);
             }
