@@ -214,7 +214,12 @@ export default {
                 await this.savePeerReview()
 
                 // Submit peer review.
-                await api.submitPeerReview(this.peerReview)
+                try {
+                    await api.submitPeerReview(this.peerReview)
+                } catch (e) {
+                    this.showErrorMessage({message: "Submitting the review has failed. Make sure to fill in all fields."})
+                }
+
                 await this.fetchPeerReview()
                 this.showSubmitMessage()
             } else {
