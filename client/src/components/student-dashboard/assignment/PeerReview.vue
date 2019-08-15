@@ -216,12 +216,12 @@ export default {
                 // Submit peer review.
                 try {
                     await api.submitPeerReview(this.peerReview)
+                    await this.fetchPeerReview()
+                    this.showSubmitMessage()
                 } catch (e) {
                     this.showErrorMessage({message: "Submitting the review has failed. Make sure to fill in all fields."})
                 }
 
-                await this.fetchPeerReview()
-                this.showSubmitMessage()
             } else {
                 this.showErrorMessage({message: "All fields are required."})
             }
