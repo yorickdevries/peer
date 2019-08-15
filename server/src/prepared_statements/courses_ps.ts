@@ -66,6 +66,17 @@ export default class CoursesPS {
     }
 
     /**
+     * Get the active academic year.
+     * @return {Promise<any>}
+     */
+    public static executeGetActiveAcademicYear() {
+        const statement = new PreparedStatement("get-academic-years", `
+        SELECT * FROM academicyearlist WHERE active is TRUE
+        `);
+        return Database.executeQuery(statement);
+    }
+
+    /**
      * Executes a 'get all courses' query where you are enrolled.
      * @param {string} userNetId - a netid of the current user.
      * @return {any} a query result.

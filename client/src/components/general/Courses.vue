@@ -58,12 +58,14 @@
                             <b-col cols="6" v-for="course in filteredCourses" :key="course.id" class="d-flex align-items-stretch">
 
                                 <!--Single Card-->
-                                <b-card no-body class="mb-3 w-100">
+                                <b-card no-body class="w-100">
                                     <b-card-body class="d-flex flex-column">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex justify-content-between align-items-center mb-0">
                                             <h4 class="card-title m-0">{{ course.name }}</h4>
                                             <b-badge v-if="course.role" show variant="primary font-weight-bold">{{ course.role.toUpperCase() }}</b-badge>
                                         </div>
+                                        <p class="card-title mt-0 text-muted">{{ course.academic_year }} - {{ course.faculty }} - {{ course.course_code }}</p>
+
                                         <div class="mb-auto">
                                             <p>{{ course.description | truncate(200)}}</p>
                                         </div>
@@ -205,9 +207,19 @@ export default {
         await this.fetchUser()
 
         await this.fetchFaculties();
+        await this.fetchActiveAcademicYear();
         await this.fetchAcademicYears();
     },
     methods: {
+        async fetchActiveAcademicYear() {
+            try {
+                let res = await api.getActiveAcademicYear();
+                this.filterOptions.academic_year = res.data[0].year;
+            } catch (e) {
+                console.log(e);
+            }
+        },
+
         async fetchFaculties() {
             try {
                 let res = await api.getFaculties();

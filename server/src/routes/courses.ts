@@ -242,6 +242,14 @@ router.get("/data/academicYears", async (req: any, res) => {
     }
 });
 
+router.get("/data/activeAcademicYear", async (req: any, res) => {
+    try {
+        res.json(await CoursesPS.executeGetActiveAcademicYear());
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
 /**
  * Export the approved ratings of each student for a specific course.
  * @param course_id - id of the course.
