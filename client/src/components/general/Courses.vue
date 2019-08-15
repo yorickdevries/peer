@@ -30,7 +30,19 @@
                         <!--Filter Input-->
                         <b-row>
                             <b-col class="mb-3" cols="6">
-                                <b-input placeholder="Filter courses" v-model="filter"></b-input>
+                                <b-form-group label="" description="Search a course">
+                                    <b-input placeholder="Filter courses" v-model="filter"></b-input>
+                                </b-form-group>
+                            </b-col>
+                            <b-col class="mb-3" cols="3">
+                                <b-form-group label="" description="Select the faculty">
+                                    <b-form-select :options="faculties" v-model="filterOptions.faculty"></b-form-select>
+                                </b-form-group>
+                            </b-col>
+                            <b-col class="mb-3" cols="3">
+                                <b-form-group label="" description="Select the academic year">
+                                    <b-form-select :options="academic_years" v-model="filterOptions.academic_year"></b-form-select>
+                                </b-form-group>
                             </b-col>
                         </b-row>
 
@@ -149,19 +161,24 @@ export default {
                 }
             ],
             filter: "",
+            filterOptions: {
+                faculty: null,
+                academic_year: null
+            },
             filterUnenrolled: "",
             showCreateCourseButton: false,
             showNoCoursesText: false,
             showNoUnenrolledCoursesText: false,
+            faculties: [],
+            academic_years: [],
         }
     },
     computed: {
         filteredCourses() {
-            // Filters course based on text filter.
-            if (this.filter === "") return this.courses
-
             return this.courses.filter(course => {
-                return course.name.toLowerCase().includes(this.filter.toLowerCase())
+                return (course.name.toLowerCase().includes(this.filter.toLowerCase()) || this.filter === "")
+                && (this.filterOptions.faculty == null || course.faculty === this.filterOptions.faculty)
+                && (this.filterOptions.academic_year == null || course.academic_year === this.filterOptions.academic_year);
             })
         },
         filteredUnenrolledCourses() {
@@ -186,8 +203,30 @@ export default {
 
         // Fetch user to see if create course button should be showed.
         await this.fetchUser()
+
+        await this.fetchFaculties();
+        await this.fetchAcademicYears();
     },
     methods: {
+        async fetchFaculties() {
+            try {
+                let res = await api.getFaculties();
+
+                this.faculties = res.data.map(entry => { return { value: entry.faculty, text: entry.faculty }});
+            } catch (e) {
+                console.log(e)
+            }
+        },
+
+        async fetchAcademicYears() {
+            try {
+                let res = await api.getAcademicYears();
+                this.academic_years = res.data.map(entry => { return { value: entry.year, text: entry.year }});
+            } catch (e) {
+                console.log(e)
+            }
+        },
+
         async fetchUser() {
             let res = await api.getUser()
             if (res.data.user.affiliation === "employee" || res.data.user.affiliation.includes("employee")) {
