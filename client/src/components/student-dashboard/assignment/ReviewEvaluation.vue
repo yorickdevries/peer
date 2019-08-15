@@ -1,12 +1,5 @@
 <template>
     <div>
-        <!--Debug-->
-        <div>{{ evaluationExists }}</div>
-        <div>{{ evaluation }}</div>
-        <div>{{ review }}</div>
-
-        <b-button @click="debug">Debug</b-button>
-
         <!--See Peer Review-->
         <div v-if="review.review.id">
             <b-row>
@@ -44,7 +37,9 @@
             <!--Title-->
             <b-card-body>
                 <h4>Review Evaluation</h4>
-                <h6 class="card-subtitle text-muted">Evaluate the review you have gotten from one of your peers here.</h6>
+                <h6 class="card-subtitle text-muted">
+                    Evaluate the review you have gotten from one of your peers here.
+                </h6>
             </b-card-body>
 
             <!--Form-->
@@ -52,13 +47,13 @@
                 <!--Questions-->
                 <b-list-group-item
                     class="py-4"
-                    v-for="pair in review.form"
+                    v-for="pair in evaluationSorted.form"
                     :key="pair.question.id + pair.question.type_question"
                 >
                     <!--Question Information-->
                     <div class="mb-2">
                         <h5 class="text-primary">
-                            Question {{ pair.question.question_number }} of {{ review.form.length }}
+                            Question {{ pair.question.question_number }} of {{ evaluation.form.length }}
                         </h5>
                         <p>{{ pair.question.question }}</p>
                     </div>
@@ -71,7 +66,7 @@
                         :rows="10"
                         :max-rows="15"
                         v-model="pair.answer.answer"
-                        :readonly="review.review.done"
+                        :readonly="evaluation.review.done"
                         required
                         maxlength="90000"
                     />
@@ -88,7 +83,7 @@
                         inline
                         :max-rating="Number(pair.question.range)"
                         :show-rating="false"
-                        :read-only="review.review.done"
+                        :read-only="evaluation.review.done"
                         v-model="pair.answer.answer"
                     />
 
@@ -99,7 +94,7 @@
                             v-model="pair.answer.answer"
                             stacked
                             required
-                            :disabled="review.review.done"
+                            :disabled="evaluation.review.done"
                         ></b-form-radio-group>
                     </b-form-group>
 
@@ -116,7 +111,7 @@
                                 <div>
                                     <div v-if="pair.answer.answer">
                                         You currently have uploaded the file:
-                                        <a :href="uploadQuestionFilePath(review.review.id, pair.question.id)">
+                                        <a :href="uploadQuestionFilePath(evaluation.review.id, pair.question.id)">
                                             {{ pair.answer.answer }}
                                         </a>
                                     </div>
@@ -137,13 +132,32 @@
                                 v-model="files[pair.question.id]"
                                 :state="Boolean(files[pair.question.id])"
                                 :accept="`.${pair.question.extension}`"
-                                :disabled="review.review.done"
-                                :ref="'fileForm' + pair.question.id + review.review.id"
+                                :disabled="evaluation.review.done"
+                                :ref="'fileForm' + pair.question.id + evaluation.review.id"
                             ></b-form-file>
                         </b-form-group>
                     </div>
                 </b-list-group-item>
             </b-list-group>
+
+            <template v-if="evaluation.review.id !== null">
+                <!--Save/Submit Buttons-->
+                <b-card-body v-if="!evaluation.review.done">
+                    <b-btn type="submit" variant="success float-right" v-b-modal="`submit${evaluation.review.id}`"
+                        >Submit Evaluation</b-btn
+                    >
+                    <b-button variant="secondary float-right mr-2" @click="saveEvaluation">Save Evaluation</b-button>
+                    <!--Submit Modal-->
+                    <b-modal :id="`submit${evaluation.review.id}`" title="Submit Confirmation" @ok="submitEvaluation">
+                        Do you really want to submit? This marks the evaluation as finished.
+                    </b-modal>
+                </b-card-body>
+                <b-card-body v-else>
+                    <b-button variant="outline-success float-right" @click="unSubmitEvaluation"
+                        >Unsubmit Evaluation</b-button
+                    >
+                </b-card-body>
+            </template>
         </b-card>
     </div>
 </template>
@@ -156,7 +170,7 @@ import PeerReview from "./PeerReview"
 
 export default {
     mixins: [notifications],
-    components: { PeerReview },
+    components: { PeerReview, StarRating },
     props: ["reviewId"],
     data() {
         return {
@@ -174,6 +188,15 @@ export default {
     computed: {
         evaluationExists() {
             return !!(this.evaluation && this.evaluation.review && this.evaluation.review.id)
+        },
+        evaluationSorted() {
+            // Returns the evaluation object, but sorted on question number.
+            return {
+                review: this.evaluation.review,
+                form: this.evaluation.form.slice().sort((a, b) => {
+                    return a.question.question_number - b.question.question_number
+                })
+            }
         }
     },
     async created() {
@@ -193,10 +216,13 @@ export default {
         },
         async fetchEvaluation() {
             try {
-                const res = await api.ReviewEvaluation.get(this.review.review.id, true)
+                const res_meta = await api.ReviewEvaluation.get(this.review.review.id, true)
+                const id = res_meta.data.id
+                const res = await api.getPeerReview(id)
                 this.evaluation = res.data
             } catch (e) {
-                this.showErrorMessage({ message: "Evaluation has not yet been made or can not be fetched." })
+                // Normal behaviour, since 401 means that the evaluation does not yet exist.
+                // this.showErrorMessage({ message: "Evaluation has not yet been made or can not be fetched." })
             }
         },
         async fetchReview() {
@@ -229,6 +255,16 @@ export default {
                 return { text: option.option, value: option.id }
             })
         },
+        async unSubmitEvaluation() {
+            // unSubmit peer review.
+            try {
+                await api.unSubmitPeerReview(this.evaluation)
+                await this.fetchEvaluation()
+                this.showUnSubmitMessage()
+            } catch (error) {
+                this.showErrorMessage({ message: "Error unsubmitting evaluation." })
+            }
+        },
         async submitEvaluation() {
             // Validate all fields (required).
             let validated = true
@@ -243,10 +279,10 @@ export default {
 
             // Give validation error/success based on validation.
             if (validated) {
-                // Save the peer review.
+                // Save the evaluation.
                 await this.saveEvaluation()
 
-                // Submit peer review.
+                // Submit evaluation.
                 await api.submitPeerReview(this.evaluation)
                 await this.fetchEvaluation()
                 this.showSubmitMessage()
@@ -255,7 +291,6 @@ export default {
             }
         },
         async saveEvaluation() {
-
             // Set up the form data (files in ROOT of formData) to send to server.
             const formData = new FormData()
             formData.append("review", JSON.stringify(this.evaluation.review))
@@ -270,45 +305,6 @@ export default {
             }
             await this.fetchEvaluation()
             this.clearFiles()
-        },
-        debug() {
-            this.evaluation = {
-                review: {
-                    id: 13,
-                    rubric_id: 13,
-                    file_path: "1565865349775-scannsies.zip",
-                    done: true,
-                    approved: null
-                },
-                form: [
-                    {
-                        question: { id: 17, question: "100", rubric_id: 13, question_number: 1, type_question: "open" },
-                        answer: { answer: "asda", openquestion_id: 17, review_id: 13 }
-                    },
-                    {
-                        question: {
-                            id: 2,
-                            question: "2312",
-                            extension: "zip",
-                            rubric_id: 13,
-                            question_number: 1,
-                            type_question: "upload"
-                        },
-                        answer: { answer: "13-2.zip", uploadquestion_id: 2, review_id: 13 }
-                    },
-                    {
-                        question: {
-                            id: 1,
-                            question: "sadaklj",
-                            extension: "pdf",
-                            rubric_id: 13,
-                            question_number: 3,
-                            type_question: "upload"
-                        },
-                        answer: { answer: "13-1.pdf", uploadquestion_id: 1, review_id: 13 }
-                    }
-                ]
-            }
         }
     }
 }
