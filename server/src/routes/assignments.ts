@@ -588,7 +588,7 @@ router.get("/:assignment_id/reviewsExport/", index.authorization.enrolledAsTeach
             reviewJson["Submitter group id"] = submitterGroup.id;
             reviewJson["Submitter group name"] = submitterGroup.group_name;
 
-            reviewJson["Done"] = review.done;
+            reviewJson["Submission review done"] = review.done;
             reviewJson["Approval status"] = review.approved;
             reviewJson["TA netid"] = review.ta_netid;
 
@@ -597,10 +597,12 @@ router.get("/:assignment_id/reviewsExport/", index.authorization.enrolledAsTeach
             // get the evaluation (if present)
             try {
                 const reviewEvaluation: any = (await ReviewPS.executeGetReviewEvaluation(review.id));
+                reviewJson["Review evaluation done"] = reviewEvaluation.done;
                 const reviewEvaluationQuestions = (await ReviewUpdate.getReview(reviewEvaluation.id)).form;
                 addQuestionsToReviewJson(reviewEvaluationQuestions, reviewJson);
             } catch (error) {
-                // skip this part as there is no evaluation
+                // set to not done as there is no evaluation
+                reviewJson["Review evaluation done"] = false;
             }
 
             exportData.push(reviewJson);
