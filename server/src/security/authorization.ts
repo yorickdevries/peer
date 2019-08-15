@@ -366,12 +366,13 @@ const checkAuthorizationForCreatingReviewEvaluation = async (req: any, res: any,
         }
 
         // check whether it is the past due date of review
-        if (new Date(assignment.review_due_date) < new Date()) {
+        if (new Date(assignment.review_due_date) > new Date()) {
             throw new Error("You can only evaluate the review after the review due date is passed.");
         }
 
         await response(res, true, next);
     } catch (error) {
+        console.log(error)
         res.sendStatus(401);
     }
 };
