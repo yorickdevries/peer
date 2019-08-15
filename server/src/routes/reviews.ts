@@ -1,4 +1,5 @@
 import ReviewsPS from "../prepared_statements/review_ps";
+import RubricPS from "../prepared_statements/rubric_ps";
 import ReviewUpdate from "../reviewUpdate";
 import bodyParser from "body-parser";
 import index from "../security/index";
@@ -74,8 +75,14 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
  */
 router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkReviewOwner, index.authorization.checkReviewBetweenPublishDue, async (req, res) => {
     try {
+        // input
         const reviewId = req.params.reviewId;
         const inputForm = JSON.parse(req.body.form);
+
+        // get review
+        const review: any = await ReviewsPS.executeGetReview(reviewId);
+        const rubricUploadQuestions: any = await RubricPS.executeGetAllUploadQuestionById(review.rubric_id);
+
         const uploadQuestionIds = [];
 
         // Upload the files of the upload questions, if present.
@@ -85,8 +92,8 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
                 const questionId = parseInt(file.fieldname);
 
                 // Get the correct extension of the upload question.
-                const currentUploadQuestion = inputForm.find((x: any) => x.question.id === questionId);
-                const correctExtension = currentUploadQuestion.question.extension;
+                const currentRubricUploadQuestion = rubricUploadQuestions.find((x: any) => x.id === questionId);
+                const correctExtension = currentRubricUploadQuestion.extension;
 
                 // Check if the extension is correct
                 if (!file.mimetype.includes(correctExtension)) {
@@ -96,7 +103,11 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
                 // Create and save a unique filename based on the review and question.
                 const filename = `${req.params.reviewId}-${file.fieldname}.${correctExtension}`;
                 const filepath = path.join(fileFolder, filename);
-                currentUploadQuestion.answer.answer = filename;
+
+                // get the question in the form
+                const currentFormUploadQuestion = inputForm.find((x: any) => x.question.id === questionId);
+                // set the filename in the form
+                currentFormUploadQuestion.answer.answer = filename;
                 uploadQuestionIds.push(questionId);
 
                 await fs.writeFile(filepath, file.buffer);

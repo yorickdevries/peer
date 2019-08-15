@@ -13,6 +13,8 @@ import ReviewPS from "../../src/prepared_statements/review_ps";
 import SubmissionPS from "../../src/prepared_statements/submissions_ps";
 import RubricPS from "../../src/prepared_statements/rubric_ps";
 import config from "../../src/config";
+import AssignmentPS from "../../src/prepared_statements/assignment_ps";
+import GroupsPS from "../../src/prepared_statements/group_ps";
 
 const fileFolder = config.reviews.fileFolder;
 
@@ -133,17 +135,21 @@ describe("API review routes", () => {
      * Put and submit a review with a valid file upload
      */
     it("Put review with valid file upload", async () => {
-        mockDate.set("2018-05-02T21:00:00Z");
+        mockDate.set("2019-10-02T21:00:00Z");
         MockLogin.initialize("paulvanderlaan");
         const exampleReviewFile = path.join(__dirname, "../../example_data/reviews/review1.pdf");
 
-        const submission: any = await SubmissionPS.executeCreateSubmission("paulvanderlaan", 10, 1, "none.pdf");
-        const rubric: any = await RubricPS.executeCreateRubric(1, "submission");
-        const review: any = await ReviewPS.executeCreateReview("paulvanderlaan", submission.id, 1);
+        const assignment: any = await AssignmentPS.executeAddAssignment("New", "Description", 1, 2, "test_file.pdf",
+        new Date("2017-07-01T20:30:00Z"), new Date("2018-07-01T20:30:00Z"), new Date("2019-07-01T20:30:00Z"), new Date("2020-07-01T20:30:00Z"), false
+        );
+        const group: any = await GroupsPS.executeAddGroup("groupname");
+        const submission: any = await SubmissionPS.executeCreateSubmission("henkjan", group.id, assignment.id, "none.pdf");
+        const rubric: any = await RubricPS.executeCreateRubric(assignment.id, "submission");
+        const review: any = await ReviewPS.executeCreateReview("paulvanderlaan", submission.id, rubric.id);
         const uploadQuestion: any = await RubricPS.executeCreateUploadQuestion("Hi there?", rubric.id, 1, "pdf");
 
         // Submit a review with a uploaded file
-        await chai.request(router)
+        const res = await chai.request(router)
             .put(`/${review.id}`)
             .attach(`${uploadQuestion.id}`, fs.readFileSync(exampleReviewFile), "review1.pdf")
             .field("review", JSON.stringify({
@@ -161,6 +167,7 @@ describe("API review routes", () => {
                     "extension": "pdf"
                 }, "answer": {}
             }]));
+        expect(res.status).to.equal(200);
 
         const filename = `${review.id}-${uploadQuestion.id}.pdf`;
         const filepath = path.join(fileFolder, filename);
