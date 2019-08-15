@@ -19,10 +19,24 @@ export default class GroupParser {
      */
     public static async importGroups(filebuffer: Buffer, groupColumn: string, assignmentId: number) {
         // parse the file
-        const studentlist = await neatCsv(filebuffer);
-        await this.checkStudentList(studentlist, assignmentId);
+        let studentlist = await neatCsv(filebuffer);
+        studentlist = await this.checkStudentList(studentlist, assignmentId);
         const studentmap = this.mapGroups(studentlist, groupColumn);
         return await this.addGroupsToDatabase(studentmap, assignmentId);
+    }
+
+    /**
+     * Checks if a group is empty.
+     * @param csvEntry - an entry of the brightspace csv export.
+     * @return {boolean} - true if the group is empty.
+     */
+    public static isEmptyGroup(csvEntry: any): boolean {
+        const studentNumber = csvEntry["OrgDefinedId"];
+        const netId = csvEntry.Username;
+        const lastName = csvEntry["Last Name"];
+        const firstName = csvEntry["First Name"];
+        const email = csvEntry["Email"];
+        return studentNumber === "" && netId === "" && netId === "" && lastName === "" && firstName === "" && email === "";
     }
 
     /**
@@ -36,9 +50,15 @@ export default class GroupParser {
      */
     public static async checkStudentList(studentlist: any[], assignmentId: number) {
         const allStudents: string[] = [];
+        const validStudents: string[] = [];
         for (const student of studentlist) {
+            // Skip empty groups
+            if (this.isEmptyGroup(student)) {
+                continue;
+            }
             const currentStudent = student.Username;
             const netId = ParseNetId.parseNetId(currentStudent);
+
             if (allStudents.indexOf(netId) >= 0) {
                 throw new Error("Duplicate student: " + netId);
             }
@@ -50,8 +70,11 @@ export default class GroupParser {
             } else {
                 // Add student to list
                 allStudents.push(netId);
+                validStudents.push(student);
             }
         }
+
+        return validStudents;
     }
 
     /**
