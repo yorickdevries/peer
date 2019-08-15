@@ -50,8 +50,7 @@ describe("DistributeReviews two assignments", () => {
             new Date("2018-05-01T22:30:00.000Z"),
             new Date("2019-05-01T23:30:00.000Z"),
             false,
-            false
-            );
+            false);
 
         const assignment2: any = await AssignmentPS.executeAddAssignment(
             "TestAssignment 2",

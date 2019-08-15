@@ -31,6 +31,20 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
 /**
  * Route to make a review evaluation for a specific review
  */
+router.route("/:reviewId/reviewevaluation").get(index.authorization.checkAuthorizationForGettingReviewEvaluation, async (req, res) => {
+    try {
+        const reviewId = req.params.reviewId;
+        const reviewEvaluation: any = await ReviewsPS.executeGetReviewEvaluation(reviewId);
+        res.json(reviewEvaluation);
+    } catch (error) {
+        res.status(400);
+        res.json({error: error.message});
+    }
+});
+
+/**
+ * Route to make a review evaluation for a specific review
+ */
 router.route("/:reviewId/reviewevaluation").post(index.authorization.checkAuthorizationForCreatingReviewEvaluation, async (req, res) => {
     try {
         const reviewId = req.params.reviewId;

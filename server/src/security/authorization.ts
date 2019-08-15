@@ -291,6 +291,27 @@ const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
 };
 
 /**
+ * Check if the user can get the evaluation of this review
+ */
+const checkAuthorizationForGettingReviewEvaluation = async (req: any, res: any, next: any) => {
+    try {
+        const reviewId = req.params.reviewId;
+        const reviewEvaluation: any = await ReviewPS.executeGetReviewEvaluation(reviewId);
+
+        // check ownership
+        const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(reviewEvaluation.id, req.user.netid);
+        const authCheckOwner = await AuthorizationPS.executeCheckReviewMaker(reviewEvaluation.id, req.user.netid);
+
+        const bool = authCheckTAOrTeacher.exists || authCheckOwner.exists;
+        await response(res, bool, next);
+
+
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
  * Check if the user can evaluate this review
  */
 const checkAuthorizationForCreatingReviewEvaluation = async (req: any, res: any, next: any) => {
@@ -596,6 +617,7 @@ export default {
     checkRubricAuthorizationPostQuestion,
     checkAuthorizationForReview,
     checkAuthorizationForCreatingReviewEvaluation,
+    checkAuthorizationForGettingReviewEvaluation,
     enrolledCourseCheck,
     checkMCOptionPost,
     enrolledCourseTeacherCheck,

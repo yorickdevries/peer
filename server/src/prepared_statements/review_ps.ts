@@ -33,6 +33,17 @@ export default class ReviewPS {
     }
 
     /**
+     * Gets an reviewevaluation for a certain review
+     */
+    public static executeGetReviewEvaluation(evaluatedReviewId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-review-evaluation-with-evaluated-review-id",
+        "SELECT * FROM review WHERE evaluated_review_id = $1"
+        );
+        statement.values = [evaluatedReviewId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Checks whether a reviewevaluation already exists
      */
     public static executeCheckExistsReviewEvaluation(evaluatedReviewId: number): Promise<pgPromise.queryResult> {
