@@ -2,7 +2,7 @@ import { RubricConfiguration } from "./models/rubric_factory";
 
 // configuration file
 const rubricConfig: RubricConfiguration = {
-    rubric_type: "submission",
+    rubric_type: "review",
     questions: [
         {
             question: "Was the review comprehensive and complete, covering all relevant aspects of the work?",
