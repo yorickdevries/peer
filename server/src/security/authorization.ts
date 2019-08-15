@@ -254,6 +254,18 @@ const checkOpenQuestionEdit = async (req: any, res: any, next: any) => {
 };
 
 /**
+ * Check authorization to edit a upload question
+ */
+const checkUploadQuestionEdit = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeAuthorizationUploadQuestion(req.params.question_id, req.user.netid);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
  * Check authorization to edit a range question
  */
 const checkRangeQuestionEdit = async (req: any, res: any, next: any) => {
@@ -624,6 +636,7 @@ export default {
     checkOpenQuestionEdit,
     checkRangeQuestionEdit,
     checkMCQuestionEdit,
+    checkUploadQuestionEdit,
     checkMCOptionEdit,
     checkRubricAuthorizationPost,
     checkRubricAuthorizationPostQuestion,

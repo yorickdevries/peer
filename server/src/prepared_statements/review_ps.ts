@@ -147,6 +147,22 @@ export default class ReviewPS {
     }
 
     /**
+     * Execute an 'insert upload answer' query.
+     * @param {number} answer - an open answer string.
+     * @param {number} questionId - a question id.
+     * @param {number} reviewId - a review id.
+     * @return {Promise<pgPromise.queryResult>} - a database query result, empty if succeeded.
+     */
+    public static executeUpdateUploadAnswer(answer: string, questionId: number, reviewId: number)
+        : Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("add-upload-answer",
+            "INSERT INTO uploadanswer(answer, uploadquestion_id, review_id) VALUES ($1, $2, $3) " +
+            "ON CONFLICT (uploadquestion_id, review_id) DO UPDATE SET answer=$1 RETURNING answer");
+        statement.values = [answer, questionId, reviewId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Execute an 'insert range answer' query.
      * @param {number} answer - a range answer.
      * @param {number} questionId - a question id.
@@ -173,6 +189,20 @@ export default class ReviewPS {
         const statement = new PreparedStatement("get-mc-answer-by-id",
             "SELECT * FROM mcanswer WHERE review_id = $1 AND mcquestion_id = $2");
         statement.values = [reviewId, mcQuestionId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Execute a 'get upload answer by review id' query.
+     * @param {number} reviewId - a review id.
+     * @param {number} uploadQuestionId - a mc question id.
+     * @return {Promise<pgPromise.queryResult>} - a promise query result.
+     */
+    public static executeGetUploadAnswer(reviewId: number, uploadQuestionId: number)
+        : Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-upload-answer-by-id",
+            "SELECT * FROM uploadanswer WHERE review_id = $1 AND uploadquestion_id = $2");
+        statement.values = [reviewId, uploadQuestionId];
         return Database.executeQuerySingleResult(statement);
     }
 

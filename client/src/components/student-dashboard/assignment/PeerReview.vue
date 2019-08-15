@@ -4,7 +4,7 @@
         <!--Download-->
         <b-row>
             <b-col>
-                <a :href="peerReviewFilePath" target="_blank">
+                <a target="_blank" :href="peerReviewFilePath">
                     <button type="button" class="btn btn-success success w-100"
                             style="height: 3rem">Download Hand-In
                     </button>
@@ -42,7 +42,8 @@
                                      :max-rows="15"
                                      v-model="pair.answer.answer"
                                      :readonly="peerReview.review.done"
-                                     required/>
+                                     required
+                                     maxlength="90000"/>
 
                     <!-- RANGE QUESTION -->
                     <StarRating v-else-if="pair.question.type_question === 'range'"
@@ -68,6 +69,38 @@
                                 :disabled="peerReview.review.done">
                         </b-form-radio-group>
                     </b-form-group>
+
+                    <!-- UPLOAD QUESTION -->
+                    <div v-if="pair.question.type_question === 'upload'">
+
+                        <!--File upload-->
+                        <b-form-group description="Select a file and press save down below the page. Note: it overwrites files." class="mb-0">
+
+                            <!--Show currently uploaded file-->
+                            <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
+                                <!--Buttons for toggling new assignment upload-->
+                                <div>
+                                    <div v-if="pair.answer.answer">You currently have uploaded the file: <a
+                                            :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">{{ pair.answer.answer }}</a></div>
+                                    <div v-else>You currently have no file uploaded.</div>
+                                </div>
+                            </b-alert>
+
+                            <b-alert show variant="danger">{{ pair.question.extension.toUpperCase() }} files allowed only.</b-alert>
+
+                            <b-alert v-if="pair.answer.answer" show variant="warning">Note: uploading an new files will overwrite your current file.</b-alert>
+
+                            <b-form-file  placeholder="Choose a new file..."
+                                          v-model="files[pair.question.id]"
+                                          :state="Boolean(files[pair.question.id])"
+                                          :accept="`.${pair.question.extension}`"
+                                          :disabled="peerReview.review.done"
+                                          :ref="'fileForm' + pair.question.id">
+                            </b-form-file>
+
+                        </b-form-group>
+
+                    </div>
 
                 </b-list-group-item>
             </b-list-group>
@@ -107,7 +140,7 @@ export default {
     mixins: [notifications],
     components: {
         StarRating,
-        SessionCheck
+        SessionCheck,
     },
     props: ["reviewId"],
     data() {
@@ -122,6 +155,7 @@ export default {
                 },
                 form: []
             },
+            files: {},
         }
     },
     computed: {
@@ -182,13 +216,20 @@ export default {
                 return
             }
 
+            // Set up the form data (files in ROOT of formData) to send to server.
+            const formData = new FormData()
+            formData.append("review", JSON.stringify(this.peerReview.review))
+            formData.append("form", JSON.stringify(this.peerReview.form))
+            Object.entries(this.files).forEach(([key, value]) => formData.append(key, value))
+
             try {
-                await api.savePeerReview(this.peerReview.review.id, this.peerReview)
+                await api.savePeerReview(this.peerReview.review.id, formData)
+                this.showSaveMessage()
             } catch (error) {
                 this.showErrorMessage({message: "Error saving peer review."})
             }
             await this.fetchPeerReview()
-            this.showSaveMessage()
+            this.clearFiles()
         },
         async unSubmitPeerReview() {
             // unSubmit peer review.
@@ -206,6 +247,17 @@ export default {
                 return {text: option.option, value: option.id}
             })
         },
+        uploadQuestionFilePath(reviewId, questionId) {
+            return `/api/reviews/${reviewId}/questions/${questionId}/file`
+        },
+        clearFiles() {
+            Object.entries(this.files).forEach(([key, _]) => {
+                const name = 'fileForm' + key
+                this.$refs[name][0].reset()
+                this.files[key] = null
+            })
+            this.files = {}
+        }
     },
 }
 </script>

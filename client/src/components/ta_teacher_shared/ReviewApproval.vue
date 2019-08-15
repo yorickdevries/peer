@@ -14,41 +14,36 @@
                         <b-button size="sm" variant="primary" @click="goToNextReview">Next (Random) Review</b-button>
                     </div>
                 </b-card-header>
-                <b-card-body class="d-flex justify-content-between">
+                    <b-card-body>
+                        <b-row>
 
-                    <!--Approval-->
-                    <div>
-                        <dl>
-                            <dt>Current approval status</dt>
-                            <dd v-if="peerReview.review.approved">Approved</dd>
-                            <dd v-if="peerReview.review.approved === false">Disapproved</dd>
-                            <dd v-if="peerReview.review.approved === null || peerReview.undefined">No action yet by any TA.</dd>
-                            <dd>
-                                <b-button variant="danger" class="mr-2"
-                                    @click="disapprove"
-                                    :disabled="peerReview.review.approved === false">
-                                    Disapprove 👎
-                                </b-button>
-                                <b-button variant="success"
-                                    @click="approve"
-                                    :disabled="peerReview.review.approved">
-                                    Approve 👍
-                                </b-button>
-                            </dd>
-                        </dl>
+                        <!--Download-->
+                        <b-col cols="6">
+                            <div>
+                                <dl>
+                                    <dt>Download</dt>
+                                    <dd>The download for the submission this review is about.</dd>
+                                    <a target="_blank" :href="peerReviewFilePath">
+                                        <button type="button" class="btn btn-success success">Download Submission</button>
+                                    </a>
+                                </dl>
+                            </div>
+                        </b-col>
 
-                    </div>
+                        <!--Approval-->
+                        <b-col cols="6">
+                            <div>
+                                <dl>
+                                    <dt>Current approval status</dt>
+                                    <dd v-if="peerReview.review.approved">Approved</dd>
+                                    <dd v-if="peerReview.review.approved === false">Disapproved</dd>
+                                    <dd v-if="peerReview.review.approved === null || peerReview.undefined">No action yet by any TA.</dd>
+                                    <dd><small>(You can change this on the bottom of the page)</small></dd>
+                                </dl>
+                            </div>
+                        </b-col>
 
-                    <!--Download-->
-                    <div>
-                        <dl>
-                            <dt>Download</dt>
-                            <dd>The download for the submission this review is about.</dd>
-                            <a :href="peerReviewFilePath" target="_blank">
-                                <button type="button" class="btn btn-success success">Download Submission</button>
-                            </a>
-                        </dl>
-                    </div>
+                </b-row>
                 </b-card-body>
 
             </b-card>
@@ -103,8 +98,39 @@
                             </b-form-radio-group>
                         </b-form-group>
 
+                        <!-- UPLOAD QUESTION -->
+                        <template v-if="pair.question.type_question === 'upload'">
+                            <a :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">{{ pair.answer.answer }}</a>
+                        </template>
+
+
                     </b-list-group-item>
                 </b-list-group>
+            </b-card>
+
+            <b-card class="mt-3">
+                <!--Approval-->
+                <div>
+                    <dl>
+                        <dt>Current approval status</dt>
+                        <dd v-if="peerReview.review.approved">Approved</dd>
+                        <dd v-if="peerReview.review.approved === false">Disapproved</dd>
+                        <dd v-if="peerReview.review.approved === null || peerReview.undefined">No action yet by any TA.</dd>
+                        <dd>
+                            <b-button variant="danger" class="mr-2"
+                                      @click="disapprove"
+                                      :disabled="peerReview.review.approved === false">
+                                Disapprove 👎
+                            </b-button>
+                            <b-button variant="success"
+                                      @click="approve"
+                                      :disabled="peerReview.review.approved">
+                                Approve 👍
+                            </b-button>
+                        </dd>
+                    </dl>
+
+                </div>
             </b-card>
 
         </b-container>
@@ -218,6 +244,9 @@ export default {
             } else {
                 this.$router.push({name: 'teaching-assistant-dashboard.course.assignment', params: {assignmentId: this.assignment.id} })
             }
+        },
+        uploadQuestionFilePath(reviewId, questionId) {
+            return `/api/reviews/${reviewId}/questions/${questionId}/file`
         }
     }
 

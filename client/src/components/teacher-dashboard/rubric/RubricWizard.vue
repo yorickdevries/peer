@@ -1,8 +1,11 @@
 
 <template>
-    <b-container>
+    <div>
+    <b-alert :show="blockRubricEditing" variant="info">Rubric editing is not allowed anymore since the peer review publish date has already elapsed.</b-alert>
 
-        <b-card class="mb-3">
+    <b-container v-bind:class="{ 'disabled-view': blockRubricEditing }">
+
+        <b-card class="mb-3 mt-3">
             <div class="d-flex justify-content-between">
                 <div>
                     <div class="text-muted">Make Rubric</div>
@@ -61,6 +64,10 @@
                             <MCQuestion v-model="rubric.questions[index]"></MCQuestion>
                         </template>
 
+                        <template v-if="question.type_question === 'upload'">
+                            <UploadQuestion v-model="rubric.questions[index]"></UploadQuestion>
+                        </template>
+
                         <b-button @click="saveQuestion(question)" variant="outline-primary" size="sm" class="mr-1">
                             Save
                         </b-button>
@@ -90,6 +97,8 @@
             </b-col>
         </b-row>
     </b-container>
+    </div>
+
 </template>
 
 <script>
@@ -98,6 +107,7 @@ import notifications from '../../../mixins/notifications'
 import OpenQuestion from './OpenQuestion'
 import RangeQuestion from './RangeQuestion'
 import MCQuestion from './MCQuestion'
+import UploadQuestion from './UploadQuestion'
 import CreateQuestionWizard from './CreateQuestionWizard'
 
 let apiPrefixes = {
@@ -105,6 +115,7 @@ let apiPrefixes = {
     mc: '/rubric/mcquestion',
     range: '/rubric/rangequestion',
     mcoption: '/rubric/mcoption',
+    upload: '/rubric/uploadquestion'
 }
 
 export default {
@@ -113,9 +124,10 @@ export default {
         OpenQuestion,
         RangeQuestion,
         MCQuestion,
-        CreateQuestionWizard
+        CreateQuestionWizard,
+        UploadQuestion
     },
-    props: ['assignmentId'],
+    props: ['assignmentId', 'review_publish_date'],
     data() {
         return {
             rubric: {
@@ -126,6 +138,11 @@ export default {
             },
             assignmentsMetaData: [],
             assignmentIdSubmissionRubricToCopy: null
+        }
+    },
+    computed: {
+        blockRubricEditing() {
+            return new Date() > new Date(this.review_publish_date);
         }
     },
     async created() {
