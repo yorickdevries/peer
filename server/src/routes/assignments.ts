@@ -575,6 +575,7 @@ router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeache
             // Loop through the questions and add (question, answer) to the review json object.
             for (let questionNumber = 0; questionNumber < questions.length; questionNumber++) {
                 const item = questions[questionNumber];
+                const questionText = String(item.question.question_number) + ". " + item.question.question;
                 if (item.question.type_question == "mc") {
                     const answer = item.answer.answer;
                     // find the right chosen option in the list
@@ -585,9 +586,9 @@ router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeache
                             chosenOption = options[j].option;
                         }
                     }
-                    reviewJson[item.question.question] = chosenOption;
+                    reviewJson[questionText] = chosenOption;
                 } else {
-                    reviewJson[item.question.question] = item.answer.answer;
+                    reviewJson[questionText] = item.answer.answer;
                 }
             }
 
