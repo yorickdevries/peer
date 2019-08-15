@@ -161,7 +161,7 @@ describe("CoursePreparedStatement Test", () => {
      * Test get all faculties.
      */
     it("Get all faculties", async () => {
-        const faculties: any = await CoursePS.executeGetFaculties()m;
+        const faculties: any = await CoursePS.executeGetFaculties();
 
         expect(faculties.length > 0).to.be.true;
     });
