@@ -529,8 +529,12 @@ const courseEnrollable = async (req: any, res: any, next: any) => {
     try {
         // Fetch the parameters required for the check.
         const course: any = await CoursesPS.executeGetCourseById(req.params.courseId);
+        const activeYears: any = await CoursesPS.executeGetActiveAcademicYear();
+
         // Verify the authorization.
-        await response(res, course.enrollable, next);
+        const isEnrollable = course.enrollable && activeYears.length > 0 && course.academic_year === activeYears[0].year;
+
+        await response(res, isEnrollable, next);
     } catch (error) {
         res.sendStatus(401);
     }
