@@ -109,8 +109,7 @@
                             <b-form-group   label="Students can evaluate their recieved reviews"
                                             description="This can not be changed after creating the assignment.">
                                 <b-form-checkbox
-                                        v-model="assignment.review_evaluation"
-                                >
+                                        v-model="assignment.review_evaluation">
                                     Enable Review evaluation.
                                 </b-form-checkbox>
                             </b-form-group>

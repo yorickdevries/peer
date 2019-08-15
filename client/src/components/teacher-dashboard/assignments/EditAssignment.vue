@@ -177,7 +177,7 @@
           reviews_per_user: null,
           filename: null,
           one_person_groups: null,
-          review_on_review: null
+          review_evaluation: null
         },
         course: {
           id: null,
@@ -286,7 +286,7 @@
           formData.append("review_publish_date", this.assignment.review_publish_date)
           formData.append("review_due_date", this.assignment.review_due_date)
           formData.append("reviews_per_user", this.assignment.reviews_per_user)
-          formData.append("review_on_review", this.assignment.review_on_review)
+          formData.append("review_evaluation", this.assignment.review_evaluation)
 
           // Add file if a new one has been uploaded
           if (this.file != null) {

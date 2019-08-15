@@ -68,8 +68,8 @@
                                 </div>
                             </b-button>
 
-                            <!--TODO: change this to hide when not applicable-->
-                            <b-button   variant="white"
+                            <b-button   v-if="review_on_review"
+                                        variant="white"
                                         active-class="bg-light"
                                         class="flex-fill p-0"
                                         :to="{ name: 'student-dashboard.course.assignment.review-evaluation' }"
