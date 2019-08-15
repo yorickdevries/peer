@@ -68,7 +68,7 @@
                                 </div>
                             </b-button>
 
-                            <b-button   v-if="review_on_review"
+                            <b-button   v-if="review_evaluation"
                                         variant="white"
                                         active-class="bg-light"
                                         class="flex-fill p-0"
@@ -114,7 +114,7 @@ export default {
                 title: null,
                 due_date: null,
                 review_due_date: null,
-                review_on_review: null
+                review_evaluation: null
             },
         }
     },

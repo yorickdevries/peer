@@ -95,7 +95,7 @@
                                           :state="Boolean(files[pair.question.id])"
                                           :accept="`.${pair.question.extension}`"
                                           :disabled="peerReview.review.done || readOnly"
-                                          :ref="'fileForm' + pair.question.id">
+                                          :ref="'fileForm' + pair.question.id + peerReview.review.id">
                             </b-form-file>
 
                         </b-form-group>
@@ -260,7 +260,7 @@ export default {
         },
         clearFiles() {
             Object.entries(this.files).forEach(([key, _]) => {
-                const name = 'fileForm' + key
+                const name = 'fileForm' + pair.question.id + peerReview.review.id
                 this.$refs[name][0].reset()
                 this.files[key] = null
             })
