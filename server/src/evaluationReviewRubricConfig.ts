@@ -7,8 +7,8 @@ const evaluationReviewRubricConfig: RubricConfiguration = {
         {
             question: "Was the review comprehensive and complete, covering all relevant aspects of the work?",
             options: [
-                "yes",
-                "no"
+                "Yes",
+                "No"
             ]
         },
         {
