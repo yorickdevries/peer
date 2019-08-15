@@ -38,7 +38,7 @@
                                             <div class="">
                                                 <h5 class="text-primary">Question {{ activeQuestion.question_number
                                                     }}</h5>
-                                                {{ activeQuestion.question}}
+                                                {{ activeQuestion.question }}
                                             </div>
                                         </b-list-group-item>
 
@@ -54,8 +54,6 @@
                                             readonly
                                             :max-rows="15"/>
                                 </template>
-
-
 
                                 <!--&lt;!&ndash; RANGE QUESTION &ndash;&gt;-->
                                 <StarRating v-else-if="activeQuestion.type_question === 'range'"
@@ -78,6 +76,12 @@
                                             stacked>
                                     </b-form-radio-group>
                                 </b-form-group>
+
+                                <!--&lt;!&ndash; UPLOAD QUESTION &ndash;&gt;-->
+                                <template v-if="activeQuestion.type_question === 'upload'">
+                                    <a target="_blank" :href="uploadQuestionFilePath(pair.peerReviewId, pair.question.id)">{{ pair.answer.answer }}</a>
+                                </template>
+
 
                             </b-list-group-item>
 
@@ -204,9 +208,14 @@ export default {
         aggregateQuestionAnswer(targetQuestionId) {
             // Aggregates the answers for a particular question into an array of answers.
             let res = []
+
             this.peerReviews.forEach(peerReview => {
                 let pair = peerReview.form.find(questionAnswerPair => questionAnswerPair.question.id === targetQuestionId)
-                res.push(pair)
+                res.push({
+                    ...pair,
+                    // Add for later use when you need to gather the link for the upload question.
+                    peerReviewId: peerReview.review.id
+                })
             })
             return res
         },
@@ -227,6 +236,9 @@ export default {
                 this.showErrorMessage()
             }
         },
+        uploadQuestionFilePath(reviewId, questionId) {
+            return `/api/reviews/${reviewId}/questions/${questionId}/file`
+        }
     },
 }
 </script>

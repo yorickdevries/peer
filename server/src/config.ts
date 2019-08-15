@@ -18,6 +18,10 @@ const config = {
     session: {
         secret: "add something random here"
     },
+    reviews: {
+        fileFolder: path.join(__dirname, "./files/reviews"),
+        maxSizeReviewFile: 30 * 1024 * 1024
+    },
     assignments: {
         fileFolder: path.join(__dirname, "./files/assignments"),
         maxSizeAssignmentFile: 30 * 1024 * 1024
@@ -28,7 +32,8 @@ const config = {
     },
     exampleData: {
         exampleAssignmentFolder: path.join(__dirname, "../example_data/assignments"),
-        exampleSubmissionFolder: path.join(__dirname, "../example_data/submissions")
+        exampleSubmissionFolder: path.join(__dirname, "../example_data/submissions"),
+        exampleReviewFolder: path.join(__dirname, "../example_data/reviews")
     },
     passport: {
         idpUrl: "https://gatekeeper2.tudelft.nl/openaselect/profiles/saml2",

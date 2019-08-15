@@ -97,6 +97,18 @@ export default class RubricPS {
     }
 
     /**
+     * Query 'delete upload question'.
+     * @param {number} id - id.
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteUploadQuestion(id: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("delete-upload-question",
+            "DELETE FROM uploadquestion WHERE id=$1 RETURNING *");
+        statement.values = [id];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Executes 'update mc option' query.
      * @param {string} option
      * @param {number} id
@@ -153,6 +165,22 @@ export default class RubricPS {
         const statement = new PreparedStatement("update-open-question",
             "UPDATE openquestion SET (question, question_number) = ($1, $2) WHERE id = $3 RETURNING *");
         statement.values = [question, questionNumber, id];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'update upload question' query.
+     * @param {string} question - question.
+     * @param {number} questionNumber - question_number.
+     * @param {number} id - id.
+     * @param {string} extension - the file extension.
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeUpdateUploadQuestion(question: string, questionNumber: number, id: number, extension: string)
+        : Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("update-upload-question",
+            "UPDATE uploadquestion SET (question, question_number, extension) = ($1, $2, $4) WHERE id = $3 RETURNING *");
+        statement.values = [question, questionNumber, id, extension];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -215,6 +243,23 @@ export default class RubricPS {
             "INSERT INTO openquestion (question, rubric_id, question_number) VALUES ($1, $2, $3) " +
             "RETURNING *");
         statement.values = [question, rubricId, questionNr];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'create upload question' query.
+     * @param {string} question - question.
+     * @param {number} rubricId - rubricId.
+     * @param {number} questionNr - question_number.
+     * @param {string} extension - extension of the file.
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeCreateUploadQuestion(question: string, rubricId: number, questionNr: number, extension: string)
+        : Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("make-upload-question",
+            "INSERT INTO uploadquestion (question, extension, rubric_id, question_number) VALUES ($1, $2, $3, $4) " +
+            "RETURNING *");
+        statement.values = [question, extension, rubricId, questionNr];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -306,6 +351,18 @@ export default class RubricPS {
     }
 
     /**
+     * Executes 'get all Upload questions' query.
+     * @param {number} id - rubric_id
+     * @returns {any}
+     */
+    public static executeGetAllUploadQuestionById(id: number): any {
+        const statement = new PreparedStatement("get-all-upload-questions",
+            "SELECT * FROM uploadquestion WHERE rubric_id = $1");
+        statement.values = [id];
+        return Database.executeQuery(statement);
+    }
+
+    /**
      * Gets One MC question by Id and RubricId.
      * @param {number} questionId - question id.
      * @param {number} rubricId - rubric id.
@@ -314,6 +371,19 @@ export default class RubricPS {
     public static executeGetMCQuestionByIdAndRubricId(questionId: number, rubricId: number): any {
         const statement = new PreparedStatement("get-one-mcquestion",
             "SELECT * FROM mcquestion WHERE id = $1 AND rubric_id = $2");
+        statement.values = [questionId, rubricId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Gets One Upload question by Id and RubricId.
+     * @param {number} questionId - question id.
+     * @param {number} rubricId - rubric id.
+     * @return {any}
+     */
+    public static executeGetUploadQuestionByIdAndRubricId(questionId: number, rubricId: number): any {
+        const statement = new PreparedStatement("get-one-uploadquestion",
+            "SELECT * FROM uploadquestion WHERE id = $1 AND rubric_id = $2");
         statement.values = [questionId, rubricId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -328,9 +398,10 @@ export default class RubricPS {
         const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubricId);
         const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubricId);
         const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubricId);
+        const uploadQuestions = await RubricPS.executeGetAllUploadQuestionById(rubricId);
 
         // Construct and fill the questions array.
-        const questionJson: any[] = [];
+        let questionJson: any[] = [];
 
         // Fill with mc questions.
         for (let i = 0; i < mcQuestions.length; i++) {
@@ -344,20 +415,35 @@ export default class RubricPS {
                 option: await RubricPS.executeGetAllMCOptionById(question.id)
             });
         }
+
         // Fill with open questions.
-        for (let i = 0; i < openQuestions.length; i++) {
-            const question = openQuestions[i];
-            question.type_question = "open";
-            questionJson.push(question);
-        }
+        const openQuestionsWithType = RubricPS.addTypeToQuestions(openQuestions, "open");
+        questionJson = questionJson.concat(openQuestionsWithType);
+
         // Fill with range questions.
-        for (let i = 0; i < rangeQuestions.length; i++) {
-            const question = rangeQuestions[i];
-            question.type_question = "range";
-            questionJson.push(question);
-        }
+        const rangeQuestionsWithType = RubricPS.addTypeToQuestions(rangeQuestions, "range");
+        questionJson = questionJson.concat(rangeQuestionsWithType);
+
+        // Fill with upload questions
+        const uploadQuestionsWithType = RubricPS.addTypeToQuestions(uploadQuestions, "upload");
+        questionJson = questionJson.concat(uploadQuestionsWithType);
 
         return questionJson;
+    }
+
+    /**
+     * Add a type string to the question object.
+     * @param questions - question array.
+     * @param {string} type - type of the question.
+     * @return {any}
+     */
+    public static addTypeToQuestions(questions: any[], type: string): any {
+        const result = [];
+        for (const question of questions) {
+            question.type_question = type;
+            result.push(question);
+        }
+        return result;
     }
 
     /**
@@ -371,6 +457,7 @@ export default class RubricPS {
         const openQuestions = await RubricPS.executeGetAllOpenQuestionById(copyRubricId);
         const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(copyRubricId);
         const mcQuestions = await RubricPS.executeGetAllMCQuestionById(copyRubricId);
+        const uploadQuestions = await RubricPS.executeGetAllUploadQuestionById(copyRubricId);
         let mcOptions;
 
         // Copy open questions
@@ -380,6 +467,10 @@ export default class RubricPS {
         // Copy range questions
         for (let i = 0; i < rangeQuestions.length; i++) {
             await this.executeCreateRangeQuestion(rangeQuestions[i].question, rangeQuestions[i].range, currentRubricId, rangeQuestions[i].question_number);
+        }
+        // Copy upload questions
+        for (let i = 0; i < uploadQuestions.length; i++) {
+            await this.executeCreateUploadQuestion(uploadQuestions[i].question, currentRubricId, uploadQuestions[i].question_number, uploadQuestions[i].extension);
         }
         // Copy mc questions
         for (let i = 0; i < mcQuestions.length; i++) {
@@ -403,6 +494,7 @@ export default class RubricPS {
         const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubricId);
         const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubricId);
         const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubricId);
+        const uploadQuestions = await RubricPS.executeGetAllUploadQuestionById(rubricId);
         let mcOptions;
 
         // Delete open questions
@@ -412,6 +504,10 @@ export default class RubricPS {
         // Delete range questions
         for (let i = 0; i < rangeQuestions.length; i++) {
             await this.executeDeleteRangeQuestion(rangeQuestions[i].id);
+        }
+        // Delete rubric questions
+        for (let i = 0; i < uploadQuestions.length; i++) {
+            await this.executeDeleteUploadQuestion(uploadQuestions[i].id);
         }
         // Delete mc questions
         for (let i = 0; i < mcQuestions.length; i++) {
