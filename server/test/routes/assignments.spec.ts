@@ -56,6 +56,19 @@ describe("API Assignment routes", () => {
         ));
     });
 
+    it("Import groups - containing empty groups", async () => {
+        const file = path.join(__dirname, "../../example_data/csv_test/example_export_empty_groups.csv");
+        // log in as teacheraccount
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).post("/3/importgroups")
+            .attach("groupFile", fs.readFileSync(file), "export.csv")
+            .field("groupColumn", "Education Groups");
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            [{groupId: 25, groupname: "ED 4"}, {groupId: 26, groupname: "ED 3"}]
+        ));
+    });
+
     it("Import groups - wrong extension", async () => {
         const file = path.join(__dirname, "../../example_data/csv_test/text_file.txt");
         // log in as teacheraccount
