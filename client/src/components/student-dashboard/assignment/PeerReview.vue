@@ -148,7 +148,7 @@ export default {
         },
         readOnly: {
             type: Boolean,
-            default: true
+            default: false
         }
     },
     data() {
