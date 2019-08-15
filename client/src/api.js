@@ -117,39 +117,10 @@ export default {
     },
     ReviewEvaluation: {
         get(reviewId, exists) {
-            // Either:
-            //  200 with review
-            //  400 indicating no review
-            // return client.get(`/reviews/${reviewId}/reviewEvaluation`)
-            if (exists) {
-                return {
-                    data: {
-                        review: {
-                            id: 9000
-                        },
-                        form: {}
-                    }
-                }
-            } else {
-                return {
-                    data: {
-                        review: {},
-                        form: {},
-                    }
-                }
-            }
+            return client.get(`/reviews/${reviewId}/reviewEvaluation`)
         },
         create(reviewId) {
-            // Either:
-            //  200 with { id: }
-            //  400 indicating review already has been made and can not be created again
-            // return client.post(`/reviews/${reviewId}/reviewEvaluation`)
-
-            return {
-                data: {
-                    id: 9000
-                }
-            }
+            return client.post(`/reviews/${reviewId}/reviewEvaluation`)
         }
 
     }

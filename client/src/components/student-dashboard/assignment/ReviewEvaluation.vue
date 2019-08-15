@@ -21,13 +21,11 @@
             </b-modal>
         </div>
 
-
-
         <div v-if="!evaluationExists" class="mt-3">
             <b-alert show variant="info">
                 You can give an evaluation of a review that you have received by clicking the button down below.
                 <div>
-                    <b-button variant="primary" class="mt-2">
+                    <b-button @click="createEvaluationButton()" variant="primary" class="mt-2">
                         I want to evaluate this review
                     </b-button>
                 </div>
@@ -78,15 +76,15 @@ export default {
             try {
                 await api.ReviewEvaluation.create(this.review.review.id)
             } catch(e) {
-                this.showErrorMessage("Can't create a new evaluation, one already exists.")
+                this.showErrorMessage({message: "Can't create a new evaluation, one already exists."})
             }
         },
         async fetchEvaluation() {
             try {
-                const res = await api.ReviewEvaluation.get(this.review.id, true)
+                const res = await api.ReviewEvaluation.get(this.review.review.id, true)
                 this.evaluation = res.data
             } catch (e) {
-                this.showErrorMessage("Evaluation has not yet been made or can not be fetched.")
+                this.showErrorMessage({message: "Evaluation has not yet been made or can not be fetched."})
             }
         },
         async fetchReview() {
@@ -95,12 +93,12 @@ export default {
                 const res = await api.getPeerReview(this.reviewId)
                 this.review = res.data
             } catch (e) {
-                this.showErrorMessage("Review could not be fetched.")
+                this.showErrorMessage({message: "Review could not be fetched."})
             }
         },
         async createEvaluationButton() {
-            await createEvaluation()
-            await fetchEvaluation()
+            await this.createEvaluation()
+            await this.fetchEvaluation()
         }
     }
 }

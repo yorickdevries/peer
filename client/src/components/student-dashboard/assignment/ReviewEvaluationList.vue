@@ -45,8 +45,6 @@ export default {
         const {data: receivedIds} = await api.getFeedbackOfAssignment(this.$route.params.assignmentId)
         const receivedFlatIds = receivedIds.map(value => value.id)
 
-        console.log(receivedFlatIds)
-
         this.peerReviews = await this.foreignKeyJoinOfPeerReviews(receivedFlatIds)
     },
     methods: {
