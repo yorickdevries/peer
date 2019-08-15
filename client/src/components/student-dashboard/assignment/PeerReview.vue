@@ -199,6 +199,9 @@ export default {
             let validated = true;
             this.peerReview.form.forEach(pair => {
                 if (pair.answer.answer === null || pair.answer.answer === undefined || pair.answer.answer === "") {
+                    if (pair.question.type_question === 'upload') {
+                        return
+                    }
                     validated = false
                 }
             })
@@ -260,7 +263,7 @@ export default {
         },
         clearFiles() {
             Object.entries(this.files).forEach(([key, _]) => {
-                const name = 'fileForm' + pair.question.id + peerReview.review.id
+                const name = 'fileForm' + String(key) + this.peerReview.review.id
                 this.$refs[name][0].reset()
                 this.files[key] = null
             })

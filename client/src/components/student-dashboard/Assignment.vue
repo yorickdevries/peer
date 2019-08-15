@@ -68,7 +68,7 @@
                                 </div>
                             </b-button>
 
-                            <b-button   v-if="review_evaluation"
+                            <b-button   v-if="assignment.review_evaluation"
                                         variant="white"
                                         active-class="bg-light"
                                         class="flex-fill p-0"
