@@ -28,11 +28,11 @@
                             </b-form-input>
                         </b-form-group>
 
-                        <b-form-group label="Faculty" description="Select the faculty">
+                        <b-form-group label="Faculty" description="">
                             <b-form-select :options="faculties" v-model="course.faculty"></b-form-select>
                         </b-form-group>
 
-                        <b-form-group label="Academic Year" description="Select the academic year">
+                        <b-form-group label="Academic Year" description="">
                             <b-form-select :options="academic_years" v-model="course.academic_year"></b-form-select>
                         </b-form-group>
 
@@ -76,8 +76,18 @@ export default {
     async created() {
         await this.fetchFaculties();
         await this.fetchAcademicYears();
+        await this.fetchActiveAcademicYear();
     },
     methods: {
+        async fetchActiveAcademicYear() {
+            try {
+                let res = await api.getActiveAcademicYear();
+                this.course.academic_year = res.data[0].year;
+            } catch (e) {
+                console.log(e);
+            }
+        },
+
         async fetchFaculties() {
             try {
                 let res = await api.getFaculties();

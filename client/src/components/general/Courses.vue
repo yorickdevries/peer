@@ -13,7 +13,7 @@
                                     v-b-modal="`createCourseModal`">
                             Create Course
                         </b-button>
-                        <b-modal id="createCourseModal" title="Create new course." centered hide-footer>
+                        <b-modal id="createCourseModal" title="Create new course" centered hide-footer>
                             <CreateCourse></CreateCourse>
                         </b-modal>
 

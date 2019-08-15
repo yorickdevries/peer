@@ -36,11 +36,11 @@
                                                     required>
                                 </b-form-textarea>
                             </b-form-group>
-                            <b-form-group label="Faculty" description="Select the faculty">
+                            <b-form-group label="Faculty" description="">
                                 <b-form-select :options="faculties" v-model="course.faculty"></b-form-select>
                             </b-form-group>
 
-                            <b-form-group label="Academic Year" description="Select the academic year">
+                            <b-form-group label="Academic Year" description="">
                                 <b-form-select :options="academic_years" v-model="course.academic_year"></b-form-select>
                             </b-form-group>
                             <b-form-group label="">
