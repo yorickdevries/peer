@@ -65,9 +65,7 @@ export default class ReviewPS {
      */
     public static executeGetReview(reviewId: number): any {
         const statement = new PreparedStatement("get-review-by-id",
-            "SELECT review.id, rubric_id, file_path, done, approved " +
-            "FROM review JOIN submission ON submission.id = review.submission_id " +
-            "WHERE review.id = $1");
+            "SELECT id, rubric_id, done, approved FROM review WHERE id = $1");
         statement.values = [reviewId];
         return Database.executeQuerySingleResult(statement);
     }

@@ -299,7 +299,7 @@ const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
             }
             const bool = authCheckTAOrTeacher.exists || authCheckOwner.exists || authCheckSubmissionOwner.exists;
             await response(res, bool, next);
-        } else if (review.type == "review") {
+        } else if (rubric.type == "review") {
             // check ownership
             const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(review.id, req.user.netid);
             const authCheckOwner = await AuthorizationPS.executeCheckReviewMaker(review.id, req.user.netid);
