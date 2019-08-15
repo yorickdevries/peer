@@ -9,28 +9,37 @@ export default class CoursesPS {
     /**
      * Executes an 'update course' query.
      * @param {number} id - course id.
+     * @param faculty
+     * @param academicYear
+     * @param courseCode
      * @param {string} description - description.
      * @param {string} name - name.
+     * @param enrollable
      * @returns {Promise<pgPromise.queryResult>} the updated course as pg promise.
      */
-    public static executeUpdateCourse(id: number, description: string, name: string, enrollable: boolean): Promise<pgPromise.queryResult> {
+    public static executeUpdateCourse(id: number, faculty: string, academicYear: string, courseCode: string, description: string, name: string, enrollable: boolean): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-course",
-            'UPDATE "courselist" SET ("description", "name", "enrollable") = ($1, $2, $3) WHERE "id" = $4 ' +
-            "RETURNING id, description, name, enrollable");
-        statement.values = [description, name, enrollable, id];
+            'UPDATE "courselist" SET ("faculty", "academic_year", "course_code", "description", "name", "enrollable") = ($1, $2, $3, $4, $5, $6) WHERE "id" = $7 ' +
+            "RETURNING id, faculty, academic_year, course_code, description, name, enrollable");
+        statement.values = [faculty, academicYear, courseCode, description, name, enrollable, id];
         return Database.executeQuerySingleResult(statement);
     }
 
     /**
      * Executes a 'create course' query.
+     * @param faculty
+     * @param academicYear
+     * @param courseCode
      * @param {string} description - description fo the course.
      * @param {string} name - name of the course.
+     * @param enrollable
      * @returns {Promise<pgPromise.queryResult>} course that is inserted as pg promise.
      */
-    public static executeCreateCourse(description: string, name: string, enrollable: boolean): any {
+    public static executeCreateCourse(faculty: string, academicYear: string, courseCode: string, description: string, name: string, enrollable: boolean): any {
         const statement = new PreparedStatement("create-course",
-            'INSERT INTO "courselist" ("description", "name", "enrollable") VALUES ($1, $2, $3) RETURNING id, description, name, enrollable');
-        statement.values = [description, name, enrollable];
+            'INSERT INTO "courselist" ("faculty", "academic_year", "course_code", "description", "name", "enrollable")' +
+            " VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, faculty, academic_year, course_code, description, name, enrollable");
+        statement.values = [faculty, academicYear, courseCode, description, name, enrollable];
         return Database.executeQuerySingleResult(statement);
     }
 

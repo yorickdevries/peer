@@ -24,11 +24,16 @@ INSERT INTO "userlist" (
 	"netid", "email")
 	VALUES ('adversary', NULL);
 
+INSERT INTO public.facultylist(faculty) VALUES ('EWI'), ('3ME');
+
+INSERT INTO public.academicyearlist(year, active) VALUES ('2018/2019', false), ('2019/2020', true), ('2020/2021', false), ('2021/2022', false);
+
 INSERT INTO public.courselist(
-    description, name, enrollable)
-    VALUES ('This is a beautiful course description!', 'ED-3', true),
-	('Test-course', 'ED-4', true),
-	('Test-course2', 'ED-5', false);
+    faculty, academic_year, course_code, description, name, enrollable)
+    VALUES
+    ('EWI', '2019/2020', 'ED1-1631', 'This is a beautiful course description!', 'ED-3', true),
+	('EWI', '2019/2020', 'ED2-1138', 'Test-course', 'ED-4', true),
+	('EWI', '2019/2020', 'ED3-1336', 'Test-course2', 'ED-5', false);
 
 INSERT INTO public.grouplist(group_name)
 	VALUES

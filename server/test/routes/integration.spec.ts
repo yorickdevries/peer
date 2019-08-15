@@ -62,19 +62,22 @@ describe("API integration test", () => {
         // [1]
         // Log in as bplanje (teacher) and create a course.
         MockLogin.initialize("bplanje", undefined, ["employee", "faculty"]);
+        const courseUpdateData = {
+            faculty: "EWI",
+            academic_year: "2019/2020",
+            course_code: "ED1-1631",
+            description: "example",
+            name: "test name",
+            enrollable: true
+        };
+
         const course: any = await chai.request(router)
             .post("/courses/")
-            .send({description: "example", name: "test name", enrollable: true});
-        const courseId = JSON.parse(course.text).id;
+            .send(courseUpdateData);
+        const courseId = course.body.id;
         // Assertions to make sure the course is created.
         expect(course.status).to.equal(200);
-        expect(course.text).to.equal(JSON.stringify({
-                id: courseId,
-                description: "example",
-                name: "test name",
-                enrollable: true
-            }
-        ));
+        expect(course.body).to.deep.include(courseUpdateData);
         console.log("Teacher created a course");
 
         // [2]

@@ -17,9 +17,8 @@ describe("CoursePreparedStatement Test", () => {
      * Get course by id
      */
     it("get course by id", async () => {
-        expect(await CoursePS.executeGetCourseById(1)).to.deep.equal({
+        expect(await CoursePS.executeGetCourseById(1)).to.deep.include({
             description: "This is a beautiful course description!",
-            "id": 1,
             name: "ED-3",
             enrollable: true
         });
@@ -28,10 +27,9 @@ describe("CoursePreparedStatement Test", () => {
     /**
      * Test create a course
      */
-    it("createa a course", async () => {
-        expect(await CoursePS.executeCreateCourse("hi", "super leuk", true)).to.deep.equal({
+    it("create a course", async () => {
+        expect(await CoursePS.executeCreateCourse("EWI", "2019/2020", "12",  "hi", "super leuk", true)).to.deep.include({
             description: "hi",
-            id: 4,
             name: "super leuk",
             enrollable: true
         });
@@ -41,9 +39,10 @@ describe("CoursePreparedStatement Test", () => {
      * Test update a course
      */
     it("update a course", async () => {
-        expect(await CoursePS.executeUpdateCourse(1, "hi", "super leuk", false)).to.deep.equal({
+        expect(
+            await CoursePS.executeUpdateCourse(1, "EWI", "2019/2020", "12", "hi", "super leuk", false)
+        ).to.deep.include({
             description: "hi",
-            id: 1,
             name: "super leuk",
             enrollable: false
         });
@@ -53,12 +52,16 @@ describe("CoursePreparedStatement Test", () => {
      * Test get enrolled courses.
      */
     it("get all enrolled courses", async () => {
-        expect([{
+        const courses: any = await CoursePS.executeGetAllEnrolledCourses("paulvanderlaan");
+        expect(courses.length).to.equal(1);
+        expect(courses[0]).to.include({
+            faculty: "EWI",
+            academic_year: "2019/2020",
+            course_code: "ED1-1631",
             description: "This is a beautiful course description!",
-            id: 1,
             name: "ED-3",
             enrollable: true
-        }]).to.deep.equal(await CoursePS.executeGetAllEnrolledCourses("paulvanderlaan"));
+        });
     });
 
     /**
@@ -142,7 +145,6 @@ describe("CoursePreparedStatement Test", () => {
     it("Get all students of a course", async () => {
         // Verify that the student has student as role
         const result: any = await CoursePS.executeGetUnenrolledForUser("paulvanderlaan");
-        console.log(result);
         expect(result[0].id).to.equal(2);
     });
 });

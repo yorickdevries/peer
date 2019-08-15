@@ -25,10 +25,26 @@ CREATE TABLE AssignmentList (
 -- Table: CourseList
 CREATE TABLE CourseList (
     id SERIAL,
+    faculty varchar(100) NOT NULL,
+    academic_year varchar(9) NOT NULL,
+    course_code varchar(20) NOT NULL,
     description varchar(5000),
     name varchar(500) NOT NULL,
     enrollable boolean NOT NULL,
     CONSTRAINT CourseList_pk PRIMARY KEY (id)
+);
+
+-- Table: FacultyList
+CREATE TABLE FacultyList (
+    faculty varchar(100) NOT NULL,
+    CONSTRAINT FacultyList_pk PRIMARY KEY (faculty)
+);
+
+-- Table: AcademicYearList
+CREATE TABLE AcademicYearList (
+    year varchar(9) NOT NULL,
+    active BOOLEAN NOT NULL,
+    CONSTRAINT AcademicYearList_pk PRIMARY KEY (year)
 );
 
 -- Table: Enroll
@@ -237,6 +253,22 @@ ALTER TABLE SubmissionComment ADD CONSTRAINT SubmissionComment_review
 ALTER TABLE AssignmentList ADD CONSTRAINT Assignment_Course
     FOREIGN KEY (Course_id)
     REFERENCES CourseList (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: CourseList_Faculty (table: CourseList)
+ALTER TABLE CourseList ADD CONSTRAINT CourseList_Faculty
+    FOREIGN KEY (faculty)
+    REFERENCES FacultyList (faculty)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: CourseList_AcademicYear (table: CourseList)
+ALTER TABLE CourseList ADD CONSTRAINT CourseList_AcademicYear
+    FOREIGN KEY (academic_year)
+    REFERENCES AcademicYearList (year)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
