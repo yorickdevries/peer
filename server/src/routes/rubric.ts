@@ -291,7 +291,7 @@ router.get("/:rubric_id", index.authorization.getRubricCheck, async (req, res) =
     try {
         const rubric = await RubricPS.executeGetRubricById(req.params.rubric_id);
         const questionJson = await RubricPS.getAllQuestionsByRubricId(rubric.id);
-        questionJson.sort(function(a, b) {return a.question_number - b.question_number;});
+        questionJson.sort(function(a, b) {return a.question_number - b.question_number; });
 
         rubric.questions = questionJson;
         res.json(rubric);

@@ -14,7 +14,7 @@ export default class ReviewUpdate {
         const jsonItems: any = [];
         const review = await ReviewsPS.executeGetReview(reviewId);
         const questions = await RubricPS.getAllQuestionsByRubricId(review.rubric_id);
-        questions.sort(function(a, b) {return a.question_number - b.question_number;});
+        questions.sort(function(a, b) {return a.question_number - b.question_number; });
 
         // Loop through the questions and add answers to them.
         for (let i = 0; i < questions.length; i++) {
