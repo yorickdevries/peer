@@ -3,7 +3,7 @@ import { expect } from "chai";
 import TestData from "../test_helpers/test_data";
 
 import RubricPS from "../../src/prepared_statements/rubric_ps";
-import {generateRubric, RubricConfiguration} from "../../src/models/rubric_factory";
+import { generateRubric, RubricConfiguration } from "../../src/models/rubric_factory";
 import rubricConfig from "../../src/rubricConfig";
 import AssignmentPS from "../../src/prepared_statements/assignment_ps";
 
@@ -102,7 +102,7 @@ describe("RubricPreparedStatements Test", () => {
 
         expect(mcOptions.length).to.equal(2);
 
-        expect(mcOptions[0]).to.deep.include({ option: '1' });
-        expect(mcOptions[1]).to.deep.include({ option: '2' });
+        expect(mcOptions[0]).to.deep.include({ option: "1" });
+        expect(mcOptions[1]).to.deep.include({ option: "2" });
     });
 });

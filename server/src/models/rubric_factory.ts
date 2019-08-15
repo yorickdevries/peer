@@ -6,7 +6,7 @@ interface OpenQuestion {
 
 interface MultipleChoiceQuestion {
     question: string;
-    options: string[]
+    options: string[];
 }
 
 interface RangeQuestion {
@@ -54,12 +54,12 @@ export async function generateRubric(config: RubricConfiguration, assignmentId: 
         const questionNumber = index + 1;
 
         switch (getQuestionType(rubricQuestion)) {
-            // After this point, we know for sure which QuestionType 'rubricQuestion' is, so it will be casted appropriately.
+            // After this point, we know for sure which QuestionType 'rubricQuestion' is, so it will be type casted appropriately.
             case "open":
                 await RubricPS.executeCreateOpenQuestion(rubricQuestion.question, rubric.id, questionNumber);
                 break;
             case "range":
-                await RubricPS.executeCreateRangeQuestion(rubricQuestion.question, (<RangeQuestion> rubricQuestion).range, rubric.id, questionNumber)
+                await RubricPS.executeCreateRangeQuestion(rubricQuestion.question, (<RangeQuestion> rubricQuestion).range, rubric.id, questionNumber);
                 break;
             case "mc":
                 const mcQuestion = <MultipleChoiceQuestion> rubricQuestion;
@@ -67,7 +67,7 @@ export async function generateRubric(config: RubricConfiguration, assignmentId: 
 
                 // Add the options to the multiple choice question.
                 for (const option of mcQuestion.options) {
-                    await RubricPS.executeCreateMCOption(option, mcQuestionDb.id)
+                    await RubricPS.executeCreateMCOption(option, mcQuestionDb.id);
                 }
                 break;
         }
