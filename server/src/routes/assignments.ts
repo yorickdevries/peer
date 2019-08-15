@@ -165,7 +165,7 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
         await fs.writeFile(filePath, req.file.buffer);
 
         // Generate a default review evaluation rubric if review evaluation is turned on.
-        if (req.body.review_evaluation) {
+        if (result.review_evaluation) {
             await generateRubric(rubricConfig, result.id);
         }
 
