@@ -122,7 +122,19 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
 
         // get review
         const review: any = await ReviewsPS.executeGetReview(reviewId);
-        const rubricUploadQuestions: any = await RubricPS.executeGetAllUploadQuestionById(review.rubric_id);
+        const rubricQuestions: any = await RubricPS.getAllQuestionsByRubricId(review.rubric_id);
+
+        // remove values for all uploadquestions as these are files
+        for (const formElement of inputForm) {
+            const questionId = formElement.question.id;
+
+            // Get the correct question in case of an upload question
+            const currentRubricQuestion = rubricQuestions.find((x: any) => x.id === questionId);
+            // in case of an uploadquestion, delete the answer
+            if (currentRubricQuestion.type_question == "upload") {
+                formElement.answer.answer = undefined;
+            }
+        }
 
         const uploadQuestionIds = [];
 
@@ -133,7 +145,10 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
                 const questionId = parseInt(file.fieldname);
 
                 // Get the correct extension of the upload question.
-                const currentRubricUploadQuestion = rubricUploadQuestions.find((x: any) => x.id === questionId);
+                const currentRubricUploadQuestion = rubricQuestions.find((x: any) => x.id === questionId);
+                if (currentRubricUploadQuestion.type_question !== "upload") {
+                    throw new Error("File uploaded for a non-upload question");
+                }
                 const correctExtension = currentRubricUploadQuestion.extension;
 
                 // Check if the extension is correct
