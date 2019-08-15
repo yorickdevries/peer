@@ -4,7 +4,6 @@ import TestData from "../test_helpers/test_data";
 
 import RubricPS from "../../src/prepared_statements/rubric_ps";
 import { generateRubric, RubricConfiguration } from "../../src/models/rubric_factory";
-import rubricConfig from "../../src/rubricConfig";
 import AssignmentPS from "../../src/prepared_statements/assignment_ps";
 
 describe("RubricPreparedStatements Test", () => {
