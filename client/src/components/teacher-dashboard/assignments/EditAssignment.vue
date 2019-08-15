@@ -128,7 +128,7 @@
                             <b-form-group   label="Review on Review"
                                             description="This can not be changed after creating the assignment.">
                                     <b-form-checkbox
-                                            v-model="assignment.review_on_review"
+                                            v-model="assignment.review_evaluation"
                                             disabled
                                     >
                                        Enable Review on review (makes students review each other reviews).
