@@ -1,7 +1,7 @@
 import { RubricConfiguration } from "./models/rubric_factory";
 
 // configuration file
-const rubricConfig: RubricConfiguration = {
+const evaluationReviewRubricConfig: RubricConfiguration = {
     rubric_type: "review",
     questions: [
         {
@@ -80,4 +80,4 @@ const rubricConfig: RubricConfiguration = {
 };
 
 
-export default rubricConfig;
+export default evaluationReviewRubricConfig;

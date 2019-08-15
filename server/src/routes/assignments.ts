@@ -22,7 +22,7 @@ import SubmissionsPS from "../prepared_statements/submissions_ps";
 import CoursesPS from "../prepared_statements/courses_ps";
 import ReviewUpdate from "../reviewUpdate";
 import { generateRubric } from "../models/rubric_factory";
-import rubricConfig from "../rubricConfig";
+import evaluationReviewRubricConfig from "../evaluationReviewRubricConfig";
 
 const router = express();
 const fileFolder = config.assignments.fileFolder;
@@ -166,7 +166,7 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
 
         // Generate a default review evaluation rubric if review evaluation is turned on.
         if (result.review_evaluation) {
-            await generateRubric(rubricConfig, result.id);
+            await generateRubric(evaluationReviewRubricConfig, result.id);
         }
 
         res.json(result);
