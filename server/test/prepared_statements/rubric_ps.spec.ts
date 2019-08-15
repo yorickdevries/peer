@@ -71,6 +71,64 @@ describe("RubricPreparedStatements Test", () => {
         });
     });
 
+
+    /**
+     * Test to create an upload question
+     */
+    it("create upload question", async () => {
+        const question = "upload your file";
+        const assignmentId = 1;
+        const questionNr = 12;
+        const extension = "pdf";
+
+        // Create upload question
+        const created: any = await RubricPS.executeCreateUploadQuestion(question, assignmentId, questionNr, extension);
+
+        // Get upload question
+        const fetched = await RubricPS.executeGetUploadQuestionByIdAndRubricId(created.id, assignmentId);
+
+        // Verify results
+        expect({
+            question: fetched.question,
+            assignmentId: fetched.id,
+            questionNr: fetched.question_number,
+            extension: fetched.extension
+        }).to.deep.equal({
+            question,
+            assignmentId,
+            questionNr,
+            extension
+        });
+    });
+
+    /**
+     * Test to update an upload question
+     */
+    it("update upload question", async () => {
+        const question = "upload your file!";
+        const questionNr = 5;
+        const extension = "zip";
+
+        // Create upload question
+        const created: any = await RubricPS.executeCreateUploadQuestion("", 2, 4, "not");
+
+        // Update question
+        const updated: any = await RubricPS.executeUpdateUploadQuestion(question, questionNr, created.id, extension);
+
+        // Verify results
+        expect({
+            question: updated.question,
+            id: updated.id,
+            questionNr: updated.question_number,
+            extension: updated.extension
+        }).to.deep.equal({
+            question,
+            id: created.id,
+            questionNr,
+            extension
+        });
+    });
+
     /**
      * Test to update an open question
      */
@@ -234,6 +292,42 @@ describe("RubricPreparedStatements Test", () => {
             id: 2,
             mcquestion_id: 1,
             option: "By using command line"
+        });
+    });
+
+    /**
+     * Test to delete a upload question
+     */
+    it("delete upload question", async () => {
+        const question = "upload your file";
+        const assignmentId = 1;
+        const questionNr = 12;
+        const extension = "pdf";
+
+        // Create upload question
+        const created: any = await RubricPS.executeCreateUploadQuestion(question, assignmentId, questionNr, extension);
+
+        // Get upload question
+        const fetched = await RubricPS.executeGetUploadQuestionByIdAndRubricId(created.id, created.rubric_id);
+
+        // Delete question
+        const deleted = await RubricPS.executeDeleteUploadQuestion(created.id);
+
+        // Verify
+        expect(fetched).to.deep.equal(deleted);
+    });
+
+    /**
+     * Test get whole rubric includes upload questions
+     */
+    it("get whole rubric includes", async () => {
+        const assignmentId = 1;
+        const created: any = await RubricPS.executeCreateUploadQuestion("question", assignmentId, 12, "pdf");
+        const fetched: any = await RubricPS.getAllQuestionsByRubricId(assignmentId);
+
+        expect(fetched).to.deep.include({
+            ...created,
+            type_question: "upload"
         });
     });
 

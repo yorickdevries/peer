@@ -133,6 +133,24 @@ CREATE TABLE RangeQuestion (
     CONSTRAINT positive_range CHECK (range > 0)
 );
 
+-- Table UploadAnswer
+CREATE TABLE UploadAnswer (
+    answer varchar(500) NOT NULL,
+    UploadQuestion_id int NOT NULL,
+    Review_id int NOT NULL,
+    CONSTRAINT UploadAnswer_pk PRIMARY KEY (UploadQuestion_id,Review_id)
+);
+
+-- Table: UploadQuestion
+CREATE TABLE UploadQuestion (
+    id SERIAL,
+    question varchar(5000) NOT NULL,
+    extension varchar(10) NOT NULL,
+    Rubric_id int NOT NULL,
+    question_number int NOT NULL,
+    CONSTRAINT UploadQuestion_pk PRIMARY KEY (id)
+);
+
 -- Table: Review
 CREATE TABLE Review (
     id SERIAL,
@@ -329,6 +347,30 @@ ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_Review
 
 -- Reference: OpenQuestion_Rubric (table: OpenQuestion)
 ALTER TABLE OpenQuestion ADD CONSTRAINT OpenQuestion_Rubric
+    FOREIGN KEY (Rubric_id)
+    REFERENCES Rubric (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: UploadAnswer_UploadQuestion (table: UploadAnswer)
+ALTER TABLE UploadAnswer ADD CONSTRAINT UploadAnswer_UploadQuestion
+    FOREIGN KEY (UploadQuestion_id)
+    REFERENCES UploadQuestion (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: UploadAnswer_Review (table: UploadAnswer)
+ALTER TABLE UploadAnswer ADD CONSTRAINT UploadAnswer_Review
+    FOREIGN KEY (Review_id)
+    REFERENCES Review (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: UploadQuestion_Rubric (table: UploadQuestion)
+ALTER TABLE UploadQuestion ADD CONSTRAINT UploadQuestion_Rubric
     FOREIGN KEY (Rubric_id)
     REFERENCES Rubric (id)
     NOT DEFERRABLE

@@ -90,7 +90,7 @@
 
                             <!--Rubric Wizard-->
                             <b-tab title="Rubric">
-                                <RubricWizard :assignmentId="assignment.id"></RubricWizard>
+                                <RubricWizard :assignmentId="assignment.id" :review_publish_date="assignment.review_publish_date"></RubricWizard>
                             </b-tab>
 
                             <!--Submissions-->
