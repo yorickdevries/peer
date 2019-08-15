@@ -535,7 +535,28 @@ router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherA
  * }]
  * @param assignment_id - id of the assignment.
  */
-router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
+router.get("/:assignment_id/reviewsExport/", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
+    const addQuestionsToReviewJson = (questions: any, reviewJson: any) => {
+        // Loop through the questions and add (question, answer) to the review json object.
+        for (let questionNumber = 0; questionNumber < questions.length; questionNumber++) {
+            const item = questions[questionNumber];
+            const questionText = String(item.question.question_number) + ". " + item.question.question;
+            if (item.question.type_question == "mc") {
+                const answer = item.answer.answer;
+                // find the right chosen option in the list
+                let chosenOption = undefined;
+                const options = item.question.option;
+                for (let j = 0; j < options.length; j++) {
+                    if (options[j].id == answer) {
+                        chosenOption = options[j].option;
+                    }
+                }
+                reviewJson[questionText] = chosenOption;
+            } else {
+                reviewJson[questionText] = item.answer.answer;
+            }
+        }
+    };
     try {
         const exportData: Array<any> = [];
         const reviews: any = await ReviewPS.executeGetSubmissionReviewsByAssignmentId(req.params.assignment_id);
@@ -544,9 +565,8 @@ router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeache
         for (let i = 0; i < reviews.length; i++) {
             // Get the questions and review entry of this review.
             const review: any = reviews[i];
-            const questions: any = (await ReviewUpdate.getReview(review.id)).form;
+            const reviewQuestions: any = (await ReviewUpdate.getReview(review.id)).form;
             const submission: any = await SubmissionsPS.executeGetSubmissionById(review.submission_id);
-
             // Get information about reviewer and submitter.
             const reviewer: any = await UserPS.executeGetUserById(review.user_netid);
             const submitter: any = await UserPS.executeGetUserById(submission.user_netid);
@@ -572,24 +592,15 @@ router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeache
             reviewJson["Approval status"] = review.approved;
             reviewJson["TA netid"] = review.ta_netid;
 
-            // Loop through the questions and add (question, answer) to the review json object.
-            for (let questionNumber = 0; questionNumber < questions.length; questionNumber++) {
-                const item = questions[questionNumber];
-                const questionText = String(item.question.question_number) + ". " + item.question.question;
-                if (item.question.type_question == "mc") {
-                    const answer = item.answer.answer;
-                    // find the right chosen option in the list
-                    let chosenOption = undefined;
-                    const options = item.question.option;
-                    for (let j = 0; j < options.length; j++) {
-                        if (options[j].id == answer) {
-                            chosenOption = options[j].option;
-                        }
-                    }
-                    reviewJson[questionText] = chosenOption;
-                } else {
-                    reviewJson[questionText] = item.answer.answer;
-                }
+            addQuestionsToReviewJson(reviewQuestions, reviewJson);
+
+            // get the evaluation (if present)
+            try {
+                const reviewEvaluation: any = (await ReviewPS.executeGetReviewEvaluation(review.id));
+                const reviewEvaluationQuestions = (await ReviewUpdate.getReview(reviewEvaluation.id)).form;
+                addQuestionsToReviewJson(reviewEvaluationQuestions, reviewJson);
+            } catch (error) {
+                // skip this part as there is no evaluation
             }
 
             exportData.push(reviewJson);
