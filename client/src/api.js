@@ -116,20 +116,27 @@ export default {
         return client.get(`/submissions/${submissionId}`)
     },
     ReviewEvaluation: {
-        check(reviewId, exists) {
+        get(reviewId, exists) {
             // Either:
             //  200 with review
             //  400 indicating no review
             // return client.get(`/reviews/${reviewId}/reviewEvaluation`)
             if (exists) {
                 return {
-                    review: {
-                        id: 9000
-                    },
-                    form: {}
+                    data: {
+                        review: {
+                            id: 9000
+                        },
+                        form: {}
+                    }
                 }
             } else {
-                return new Error()
+                return {
+                    data: {
+                        review: {},
+                        form: {},
+                    }
+                }
             }
         },
         create(reviewId) {
@@ -139,7 +146,9 @@ export default {
             // return client.post(`/reviews/${reviewId}/reviewEvaluation`)
 
             return {
-                id: 9000
+                data: {
+                    id: 9000
+                }
             }
         }
 

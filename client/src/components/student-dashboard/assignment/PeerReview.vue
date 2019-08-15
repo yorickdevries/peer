@@ -15,7 +15,7 @@
         <!--Form-->
         <b-card no-body class="mt-3">
             <!--Title-->
-            <b-card-body>
+            <b-card-body v-if="readOnly === false">
                 <h4>Assignment Criteria</h4>
                 <h6 class="card-subtitle text-muted">Give the peer review to one of your peers here.</h6>
             </b-card-body>
@@ -41,7 +41,7 @@
                                      :rows="10"
                                      :max-rows="15"
                                      v-model="pair.answer.answer"
-                                     :readonly="peerReview.review.done"
+                                     :readonly="peerReview.review.done || readOnly"
                                      required/>
 
                     <!-- RANGE QUESTION -->
@@ -55,7 +55,7 @@
                                 inline
                                 :max-rating="Number(pair.question.range)"
                                 :show-rating="false"
-                                :read-only="peerReview.review.done"
+                                :read-only="peerReview.review.done || readOnly"
                                 v-model="pair.answer.answer"/>
 
                     <!-- MPC QUESTION -->
@@ -65,7 +65,7 @@
                                 v-model="pair.answer.answer"
                                 stacked
                                 required
-                                :disabled="peerReview.review.done">
+                                :disabled="peerReview.review.done || readOnly">
                         </b-form-radio-group>
                     </b-form-group>
 
@@ -75,7 +75,7 @@
 
             <SessionCheck ref="sessionCheck"></SessionCheck>
 
-            <template v-if="peerReview.review.id !== null">
+            <template v-if="peerReview.review.id !== null && readOnly === false">
                 <!--Save/Submit Buttons-->
                 <b-card-body v-if="!peerReview.review.done">
                     <b-btn type="submit" variant="success float-right" v-b-modal="`submit${peerReview.review.id}`">Submit Review</b-btn>
@@ -109,7 +109,15 @@ export default {
         StarRating,
         SessionCheck
     },
-    props: ["reviewId"],
+    props: {
+        reviewId: {
+            type: Number
+        },
+        readOnly: {
+            type: Boolean,
+            default: true
+        }
+    },
     data() {
         return {
             peerReview: {
@@ -145,6 +153,7 @@ export default {
     },
     async created() {
         await this.fetchPeerReview()
+        this.peerReview.review.done = false
     },
     methods: {
         async fetchPeerReview() {
