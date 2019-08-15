@@ -44,6 +44,28 @@ export default class CoursesPS {
     }
 
     /**
+     * Get the available academic years.
+     * @return {Promise<any>}
+     */
+    public static executeGetAcademicYears() {
+        const statement = new PreparedStatement("get-academic-years", `
+        SELECT * FROM academicyearlist
+        `);
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Get the available faculties.
+     * @return {Promise<any>}
+     */
+    public static executeGetFaculties() {
+        const statement = new PreparedStatement("get-faculties", `
+        SELECT * FROM facultylist
+        `);
+        return Database.executeQuery(statement);
+    }
+
+    /**
      * Executes a 'get all courses' query where you are enrolled.
      * @param {string} userNetId - a netid of the current user.
      * @return {any} a query result.

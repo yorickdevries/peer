@@ -147,4 +147,22 @@ describe("CoursePreparedStatement Test", () => {
         const result: any = await CoursePS.executeGetUnenrolledForUser("paulvanderlaan");
         expect(result[0].id).to.equal(2);
     });
+
+    /**
+     * Test get all academic years.
+     */
+    it("Get all academic years", async () => {
+        const years: any = await CoursePS.executeGetAcademicYears();
+
+        expect(years.length > 0).to.be.true;
+    });
+
+    /**
+     * Test get all faculties.
+     */
+    it("Get all faculties", async () => {
+        const faculties: any = await CoursePS.executeGetFaculties()m;
+
+        expect(faculties.length > 0).to.be.true;
+    });
 });

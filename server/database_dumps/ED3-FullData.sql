@@ -16,7 +16,7 @@ INSERT INTO public.facultylist(faculty) VALUES ('EWI'), ('3ME');
 INSERT INTO public.academicyearlist(year, active) VALUES ('2018/2019', false), ('2019/2020', true), ('2020/2021', false), ('2021/2022', false);
 
 INSERT INTO public.courselist(
-    description, name, enrollable)
+    faculty, academic_year, course_code, description, name, enrollable)
     VALUES
         ('EWI', '2019/2020', 'ED1-2681', 'Automata theory is the study of abstract machines and automata, as well as the computational problems that can be solved using them. It is a theory in theoretical computer science and discrete mathematics (a subject of study in both mathematics and computer science). The word automata (the plural of automaton) comes from the Greek word αὐτόματα, which means "self-acting".', 'Automata', true),
         ('EWI', '2019/2020', 'ED1-6631', 'Concepts of Programming Languages describes the fundamental concepts of programming languages by presenting design issues, examining design choices, and critically comparing design alternatives without being language specific.', 'Concepts of Programming Languages', true),
