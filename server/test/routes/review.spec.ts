@@ -74,12 +74,29 @@ describe("API review routes", () => {
                 "review": {
                     "id": 1,
                     "rubric_id": 1,
-                    "file_path": "submission1.pdf",
                     // tslint:disable-next-line
                     "approved": null,
                     "done": false
                 },
                 "form": [{
+                    "question": {
+                        "id": 1,
+                        "question": "How to insert queries?",
+                        "rubric_id": 1,
+                        "question_number": 1,
+                        "type_question": "open"
+                    },
+                    "answer": {"answer": "Flesje water is beter dan flesje bier", "openquestion_id": 1, "review_id": 1}
+                }, {
+                    "question": {
+                        "id": 1,
+                        "question": "How much fun is inserting queries?",
+                        "range": 7,
+                        "rubric_id": 1,
+                        "question_number": 2,
+                        "type_question": "range"
+                    }, "answer": {"answer": 4, "rangequestion_id": 1, "review_id": 1}
+                }, {
                     "question": {
                         "id": 1,
                         "type_question": "mc",
@@ -108,25 +125,7 @@ describe("API review routes", () => {
                        ]
                     },
                     "answer": {}
-                 }, {
-                    "question": {
-                        "id": 1,
-                        "question": "How to insert queries?",
-                        "rubric_id": 1,
-                        "question_number": 1,
-                        "type_question": "open"
-                    },
-                    "answer": {"answer": "Flesje water is beter dan flesje bier", "openquestion_id": 1, "review_id": 1}
-                }, {
-                    "question": {
-                        "id": 1,
-                        "question": "How much fun is inserting queries?",
-                        "range": 7,
-                        "rubric_id": 1,
-                        "question_number": 2,
-                        "type_question": "range"
-                    }, "answer": {"answer": 4, "rangequestion_id": 1, "review_id": 1}
-                }]
+                 }]
             }
         );
     });
@@ -282,42 +281,6 @@ describe("API review routes", () => {
               "form": [
                 {
                   "answer": {
-                    "answer": 1,
-                    "mcquestion_id": 1,
-                    "review_id": 1
-                  },
-                  "question": {
-                    "id": 1,
-                    "option": [
-                      {"id": 3, "option": "By asking Brian", "mcquestion_id": 1},
-                      {"id": 2, "option": "By using command line", "mcquestion_id": 1},
-                      {"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}
-                    ],
-                    "question": "What is the best way to insert queries?",
-                    "question_number": 3,
-                    "rubric_id": 1,
-                    "type_question": "mc"
-                  }
-                },
-                {
-                  "answer": {"answer": 4, "mcquestion_id": 2, "review_id": 1},
-                  "question": {
-                    "id": 2,
-                    "option": [
-                      {
-                        "id": 4,
-                        "mcquestion_id": 2,
-                        "option": "A"
-                      }
-                    ],
-                    "question": "Is the right Answer A?",
-                    "question_number": 4,
-                    "rubric_id": 1,
-                    "type_question": "mc"
-                  }
-                },
-                {
-                  "answer": {
                     "answer": "Flesje water is beter dan flesje bier",
                     "openquestion_id": 1,
                     "review_id": 1
@@ -344,11 +307,46 @@ describe("API review routes", () => {
                     "rubric_id": 1,
                     "type_question": "range"
                   }
-                }
+                },
+                {
+                    "answer": {
+                      "answer": 1,
+                      "mcquestion_id": 1,
+                      "review_id": 1
+                    },
+                    "question": {
+                      "id": 1,
+                      "option": [
+                        {"id": 3, "option": "By asking Brian", "mcquestion_id": 1},
+                        {"id": 2, "option": "By using command line", "mcquestion_id": 1},
+                        {"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}
+                      ],
+                      "question": "What is the best way to insert queries?",
+                      "question_number": 3,
+                      "rubric_id": 1,
+                      "type_question": "mc"
+                    }
+                  },
+                  {
+                    "answer": {"answer": 4, "mcquestion_id": 2, "review_id": 1},
+                    "question": {
+                      "id": 2,
+                      "option": [
+                        {
+                          "id": 4,
+                          "mcquestion_id": 2,
+                          "option": "A"
+                        }
+                      ],
+                      "question": "Is the right Answer A?",
+                      "question_number": 4,
+                      "rubric_id": 1,
+                      "type_question": "mc"
+                    }
+                  }
               ],
               "review": {
                 "done": false,
-                "file_path": "submission1.pdf",
                   // tslint:disable-next-line
                   "approved": null,
                   "id": 1,
