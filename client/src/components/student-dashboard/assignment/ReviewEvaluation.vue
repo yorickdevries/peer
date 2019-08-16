@@ -50,7 +50,7 @@
         <!--Button/info if no evaluation exists yet.-->
         <div v-if="!evaluationExists" class="mt-3">
             <b-alert show variant="info">
-                You can give an evaluation of a review that you have received by clicking the button down below.
+                You can give an evaluation of a review that you have received by clicking the button down below. Note: if you are in a group, only 1 group member can evaluate this review.
                 <div>
                     <b-button @click="createEvaluationButton()" variant="primary" class="mt-2">
                         I want to evaluate this review
