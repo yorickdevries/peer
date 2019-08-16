@@ -14,7 +14,8 @@
                                             v-for="question in sortedQuestionsList"
                                             :key="question.question_number"
                                             @click="activeQuestion = question"
-                                            :active="activeQuestion === question">
+                                            :active="activeQuestion === question"
+                                            style="cursor: pointer;">
                                         Question #{{ question.question_number}}
                                     </b-list-group-item>
                                 </b-list-group>
