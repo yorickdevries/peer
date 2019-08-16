@@ -69,7 +69,7 @@ export default class CoursesPS {
      * Get the active academic year.
      * @return {Promise<any>}
      */
-    public static executeGetActiveAcademicYear() {
+    public static executeGetactiveAcademicYears() {
         const statement = new PreparedStatement("get-active-academic-years", `
         SELECT * FROM academicyearlist WHERE active is TRUE
         `);

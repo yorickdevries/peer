@@ -221,13 +221,13 @@ export default {
         await this.fetchUser()
 
         await this.fetchAcademicYears();
-        await this.fetchActiveAcademicYear();
+        await this.fetchactiveAcademicYears();
         await this.fetchFaculties();
     },
     methods: {
-        async fetchActiveAcademicYear() {
+        async fetchactiveAcademicYears() {
             try {
-                let res = await api.getActiveAcademicYear();
+                let res = await api.getactiveAcademicYears();
                 this.academic_year_active = res.data[0].year;
                 this.filterOptions.academic_year = this.academic_year_active;
             } catch (e) {

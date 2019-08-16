@@ -242,9 +242,9 @@ router.get("/data/academicYears", async (req: any, res) => {
     }
 });
 
-router.get("/data/activeAcademicYear", async (req: any, res) => {
+router.get("/data/activeAcademicYears", async (req: any, res) => {
     try {
-        res.json(await CoursesPS.executeGetActiveAcademicYear());
+        res.json(await CoursesPS.executeGetactiveAcademicYears());
     } catch {
         res.sendStatus(400);
     }

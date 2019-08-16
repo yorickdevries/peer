@@ -76,12 +76,12 @@ export default {
     async created() {
         await this.fetchFaculties();
         await this.fetchAcademicYears();
-        await this.fetchActiveAcademicYear();
+        await this.fetchactiveAcademicYears();
     },
     methods: {
-        async fetchActiveAcademicYear() {
+        async fetchactiveAcademicYears() {
             try {
-                let res = await api.getActiveAcademicYear();
+                let res = await api.getactiveAcademicYears();
                 this.course.academic_year = res.data[0].year;
             } catch (e) {
                 console.log(e);

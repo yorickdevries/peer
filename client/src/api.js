@@ -121,8 +121,8 @@ export default {
     getFaculties() {
         return client.get('/courses/data/faculties')
     },
-    getActiveAcademicYear() {
-        return client.get('/courses/data/activeAcademicYear')
+    getactiveAcademicYears() {
+        return client.get('/courses/data/activeAcademicYears')
     }
 }
 
