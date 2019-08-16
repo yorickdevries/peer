@@ -293,7 +293,7 @@ const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
 
             // Check if past due date
             const assignment: any = await AssignmentPS.executeGetAssignmentById(rubric.assignment_id);
-            // If you are being reviewed and are not reviewing yourself, 
+            // If you are being reviewed and are not reviewing yourself,
             // you can only access the review after the due date and when its marked as done
             if (
                 authCheckSubmissionOwner.exists
