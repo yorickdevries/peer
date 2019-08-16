@@ -288,7 +288,7 @@ const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
 
         if (rubric.type == "submission") {
             const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.user.netid);
-            const authCheckOwner = await AuthorizationPS.executeCheckReviewMaker(req.params.reviewId, req.user.netid);
+            const authCheckOwner = (review.user_netid == req.user.netid);
             const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(req.params.reviewId, req.user.netid);
 
             // Check if past due date
@@ -298,14 +298,14 @@ const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
             if (
                 authCheckSubmissionOwner.exists
                 &&
-                !authCheckOwner.exists
+                !authCheckOwner
                 &&
                 (new Date(assignment.review_due_date) > new Date() || !review.done)
                 ) {
                 throw new Error("You can only access the review after the review due date is passed and the review is marked as done.");
             }
 
-            const bool = authCheckTAOrTeacher.exists || authCheckOwner.exists || authCheckSubmissionOwner.exists;
+            const bool = authCheckTAOrTeacher.exists || authCheckOwner || authCheckSubmissionOwner.exists;
             await response(res, bool, next);
         } else if (rubric.type == "review") {
             // check ownership
