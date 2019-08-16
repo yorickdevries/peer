@@ -10,6 +10,7 @@ import TestData from "../test_helpers/test_data";
 // file system imports
 import fs from "fs-extra";
 import path from "path";
+import AssignmentPS from "../../src/prepared_statements/assignment_ps";
 
 describe("API Assignment routes", () => {
     /**
@@ -516,5 +517,53 @@ describe("API Assignment routes", () => {
         expect(gradeExport.text.includes("\"Reviewer netid\",\"Reviewer studentnumber\",\"Reviewer group id\",\"Reviewer group name\",\"Submitter netid\",\"Submitter studentnumber\",\"Submitter group id\",\"Submitter group name\",\"Done\",\"Approval status\",\"TA netid\",\"What is the best way to insert queries?\",\"Is the right Answer A?\",\"How to insert queries?\",\"How much fun is inserting queries?\""
         )).to.equal(true);
         expect(gradeExport.text.includes("\"henkjan\",,10,\"ED-3\",\"paulvanderlaan\",,10,\"ED-3\"")).to.equal(true);
+    });
+
+    /**
+     * Test to copy groups from one assignment to another.
+     */
+    it("Copy groups of assignment to another assignment", async () => {
+        MockLogin.initialize("bplanje");
+        const assignmentId = 2;
+        const assignmentToCopyFrom = await AssignmentPS.executeGetAssignmentById(assignmentId);
+        const assignmentToCopyTo: any = await AssignmentPS.executeAddAssignment(
+            "New",
+            "Description",
+            assignmentToCopyFrom.course_id,
+            2,
+            "test_file.pdf",
+            new Date("2017-07-01T20:30:00Z"),
+            new Date("2018-07-01T20:30:00Z"),
+            new Date("2019-07-01T20:30:00Z"),
+            new Date("2020-07-01T20:30:00Z"),
+            false);
+
+        let assignmentToCopyToGroups: any = await AssignmentPS.executeGetGroupsByAssignmentId(assignmentToCopyTo.id);
+
+        // There should be no groups in the new assignment
+        const expectedGroups: any = await AssignmentPS.executeGetGroupsByAssignmentId(assignmentToCopyFrom.id);
+        expect(assignmentToCopyToGroups.length).to.equal(0);
+
+        // Copy the groups
+        await chai.request(router).post(`/${assignmentToCopyFrom.id}/copygroups`).send({
+            target_assignment_id: assignmentToCopyTo.id
+        });
+
+        // Make sure there are the same amount of groups
+        assignmentToCopyToGroups = await AssignmentPS.executeGetGroupsByAssignmentId(assignmentToCopyTo.id);
+        expect(assignmentToCopyToGroups.length).to.equal(expectedGroups.length);
+
+        // Check if the group names and users match
+        // Since the id's of groups are different, only the group_name and user_netids needs to be compared.
+        for (let index = 0; index < assignmentToCopyToGroups.length; index++) {
+            expect(assignmentToCopyToGroups[index].group_name).to.equal(expectedGroups[index].group_name);
+
+            const toCopyUsers: any = await AssignmentPS.executeGetUsersOfGroup(expectedGroups[index].id);
+            const copiedUsers: any = await AssignmentPS.executeGetUsersOfGroup(assignmentToCopyToGroups[index].id);
+            expect(copiedUsers.length).to.equal(toCopyUsers.length);
+            for (let index2 = 0; index2 < toCopyUsers; index2++) {
+                expect(copiedUsers[index2].user_netid).to.equal(toCopyUsers[index2].user_netid);
+            }
+        }
     });
 });

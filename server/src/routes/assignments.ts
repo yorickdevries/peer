@@ -400,6 +400,49 @@ router.post("/:assignment_id/importgroups", index.authorization.enrolledAsTeache
 });
 
 /**
+ * Route to copy the groups from one assignment to another.
+ * @param assignment_id - the assignment to copy the groups from.
+ * @body targetAssignmentId - the assignment to copy the groups to.
+ */
+router.post("/:assignment_id/copygroups", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
+    try {
+        const assignmentToCopyId = req.params.assignment_id;
+        const targetAssignmentId = req.body.target_assignment_id;
+
+        const targetAssignment: any = await AssignmentPS.executeGetAssignmentById(targetAssignmentId);
+        const existingGroups: any = await AssignmentPS.executeGetGroupsByAssignmentId(assignmentToCopyId);
+
+        for (const group of existingGroups) {
+            // Copy the group
+            const newGroupId = await GroupParser.createGroupForAssignment(group.group_name, targetAssignmentId);
+
+            // Copy the group users
+            const existingGroupUsers: any = await AssignmentPS.executeGetUsersOfGroup(group.id);
+            for (const groupUser of existingGroupUsers) {
+                await GroupParser.addStudentToGroup(groupUser.user_netid, targetAssignmentId, targetAssignment.course_id, newGroupId);
+            }
+        }
+
+        res.sendStatus(200);
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Route to get the reviews belonging to an assignment.
+ * @param id - assignment id.
+ */
+router.get("/:assignment_id/allreviews", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
+    ReviewPS.executeGetAllDoneSubmissionReviewsByAssignmentId(req.params.assignment_id)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
+
+/**
  * Route to get your group for this assignment
  * @param id - assignment id.
  */
