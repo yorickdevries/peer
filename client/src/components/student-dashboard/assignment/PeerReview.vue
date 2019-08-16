@@ -227,9 +227,11 @@ export default {
                 }
 
                 try {
-                    await this.fetchPeerReview()
+                    let {data} = await api.getPeerReview(this.reviewId)
+                    this.peerReview = data
                 } catch (e) {
-                    this.showErrorMessage({message: "Error saving peer review."})
+                    this.showErrorMessage({message: "Could not fetch the review."})
+                    return
                 }
 
                 this.showSubmitMessage()
