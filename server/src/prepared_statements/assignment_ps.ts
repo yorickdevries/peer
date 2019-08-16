@@ -56,7 +56,7 @@ export default class AssignmentPS {
      * @return {any} all columns of the created assignment as pg promise.
      */
     public static executeAddAssignment(title: string, description: string, courseId: number, reviewsPerUser: number,
-                                       filename: string, publishDate: Date, dueDate: Date, reviewPublishDate: Date,
+                                       filename: string | null, publishDate: Date, dueDate: Date, reviewPublishDate: Date,
                                        reviewDueDate: Date, onePersonGroups: boolean): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("addAssignment",
         'INSERT INTO "assignmentlist" (title, description, course_id, reviews_per_user, filename, publish_date, ' +

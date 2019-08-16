@@ -120,10 +120,12 @@ const updateAssignment = async function(req: any, res: any) {
             // Assemble the file path. Updated file name is the new file name.
             // It can never be the old since req.file would be undefined.
             const newFilePath = path.join(fileFolder, updatedFileName);
-            const oldFilePath = path.join(fileFolder, oldFilename);
 
             // Remove the old file and write the new file.
-            await fs.unlink(oldFilePath);
+            if (oldFilename) {
+                const oldFilePath = path.join(fileFolder, oldFilename);
+                await fs.unlink(oldFilePath);
+            }
             await fs.writeFile(newFilePath, req.file.buffer);
         }
         res.json(result);
@@ -137,16 +139,17 @@ const updateAssignment = async function(req: any, res: any) {
 // Function which adds the assignment to the database.
 const addAssignmentToDatabase = async function(req: any, res: any) {
     try {
-        // Error in case of no file
+        let fileName: string | null;
+        let filePath: string | undefined = undefined;
+
         if (req.file == undefined) {
-            res.status(400);
-            res.json({ error: "No file uploaded" });
-            return;
+            // tslint:disable-next-line
+            fileName = null;
+        } else {
+            fileName = Date.now() + "-" + req.file.originalname;
+            filePath = path.join(fileFolder, fileName);
         }
 
-        const fileName = Date.now() + "-" + req.file.originalname;
-        const filePath = path.join(fileFolder, fileName);
-        // add to database
         const result: any = await AssignmentPS.executeAddAssignment(
             req.body.title,
             req.body.description,
@@ -157,9 +160,14 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
             req.body.due_date,
             req.body.review_publish_date,
             req.body.review_due_date,
-            req.body.one_person_groups);
-        // writing the file if no error is there
-        await fs.writeFile(filePath, req.file.buffer);
+            req.body.one_person_groups
+        );
+
+        if (filePath) {
+            // writing the file if no error is there
+            await fs.writeFile(filePath, req.file.buffer);
+        }
+
         res.json(result);
     } catch (err) {
         res.status(400);
