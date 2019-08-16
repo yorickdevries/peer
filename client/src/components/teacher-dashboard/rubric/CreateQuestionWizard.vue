@@ -1,6 +1,6 @@
 <template>
     <b-card header="Create new Question">
-        <b-form-group label="Question Type" description="Choose out one of the questions.">
+        <b-form-group label="Question Type" description="Choose from on the question types.">
             <b-form-select :options="questionTypes" v-model="selectedType"></b-form-select>
         </b-form-group>
 
