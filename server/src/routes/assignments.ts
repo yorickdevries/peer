@@ -437,19 +437,6 @@ router.post("/:assignment_id/copygroups", index.authorization.enrolledAsTeacherA
 });
 
 /**
- * Route to get the reviews belonging to an assignment.
- * @param id - assignment id.
- */
-router.get("/:assignment_id/allreviews", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
-    ReviewPS.executeGetAllDoneSubmissionReviewsByAssignmentId(req.params.assignment_id)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
-        res.sendStatus(400);
-    });
-});
-
-/**
  * Route to get your group for this assignment
  * @param id - assignment id.
  */
