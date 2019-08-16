@@ -124,6 +124,18 @@ export default class AssignmentPS {
     }
 
     /**
+     * Get the users that are in a certain group.
+     * @param {number} groupId
+     * @return {Promise<pgPromise.queryResult>}
+     */
+    public static executeGetUsersOfGroup(groupId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-all-groups-users-for-assignment",
+            "SELECT * from groupusers WHERE group_groupid = $1");
+        statement.values = [groupId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
      * Gets the group of a user for a specific assignment
      * @param {string} netId
      * @param {number} assignmentId

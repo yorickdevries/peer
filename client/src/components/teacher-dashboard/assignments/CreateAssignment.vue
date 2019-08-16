@@ -31,24 +31,24 @@
                             <b-form-group label="Publish date and time">
                                 <b-form-input   v-model="assignment.publish_day"
                                                 type="date"
-                                                placeholder="Please enter date on which the assignment should be published"
+                                                placeholder="dd/mm/yyyy"
                                                 required>
                                 </b-form-input>
                                 <b-form-input   v-model="assignment.publish_time"
                                                 type="time"
-                                                placeholder="Please enter time on which the assignment should be published"
+                                                placeholder="dd/mm/yyyy"
                                                 required>
                                 </b-form-input>
                             </b-form-group>
                             <b-form-group label="Hand in due date and time">
                                 <b-form-input   v-model="assignment.due_day"
                                                 type="date"
-                                                placeholder="Please enter date on which the assignment should be handed in"
+                                                placeholder="dd/mm/yyyy"
                                                 required>
                                 </b-form-input>
                                 <b-form-input   v-model="assignment.due_time"
                                                 type="time"
-                                                placeholder="Please enter time before which the assignment should be handed in"
+                                                placeholder="dd/mm/yyyy"
                                                 required>
                                 </b-form-input>
                             </b-form-group>

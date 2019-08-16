@@ -205,20 +205,33 @@ export default class GroupParser {
                 const groupId = await this.createGroupForAssignment(groupname, assignmentId);
                 // add all students to a group
                 for (const studentNetId of students) {
-                    if (await this.studentIsInGroup(studentNetId, assignmentId)) {
-                        throw new Error(studentNetId + " is already in a group");
-                    }
-                    // create student in database
-                    await this.createStudentIfNotExists(studentNetId);
-                    // Enroll student in course
-                    await this.enrollStudentIfNotEnrolled(courseId, studentNetId);
-                    // add student to a group
-                    await GroupPS.executeAddStudenttoGroup(studentNetId, groupId);
+                    await this.addStudentToGroup(studentNetId, assignmentId, courseId, groupId);
                 }
                 importedGroups.push({groupId: groupId, groupname: groupname});
             }
         }
-    // return a list of the groups made
-    return importedGroups;
+        // return a list of the groups made
+        return importedGroups;
+    }
+
+    /**
+     * Add a student to a group.
+     * Note that the group id should exist!
+     * @param {string} studentNetId
+     * @param {number} assignmentId
+     * @param {number} courseId
+     * @param {number} groupId
+     * @return {Promise<void>}
+     */
+    public static async addStudentToGroup(studentNetId: string, assignmentId: number, courseId: number, groupId: number) {
+        if (await this.studentIsInGroup(studentNetId, assignmentId)) {
+            throw new Error(studentNetId + " is already in a group");
+        }
+        // create student in database
+        await this.createStudentIfNotExists(studentNetId);
+        // Enroll student in course
+        await this.enrollStudentIfNotEnrolled(courseId, studentNetId);
+        // add student to a group
+        await GroupPS.executeAddStudenttoGroup(studentNetId, groupId);
     }
 }

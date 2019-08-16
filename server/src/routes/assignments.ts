@@ -339,6 +339,25 @@ router.route("/:assignment_id/distributeReviews/:selfassign")
     });
 
 /**
+ * Route to get the reviews belonging to an assignment.
+ * @param id - assignment id.
+ */
+router.get("/:assignment_id/allreviews/:done", index.authorization.enrolledAsTAOrTeacherAssignment, async (req: any, res) => {
+    let isDone: boolean | undefined = undefined;
+    if (req.params.done === "true") {
+        isDone = true;
+    } else if (req.params.done === "false") {
+        isDone = false;
+    }
+
+    try {
+        res.json(await ReviewPS.executeGetAllSubmissionReviewsByAssignmentId(req.params.assignment_id, isDone));
+    } catch (e) {
+        res.sendStatus(400);
+    }
+});
+
+/**
  * Route to distribute reviews between two assignments
  */
 router.route("/distributeReviewsTwoAssignments/:assignment_id1/:assignment_id2/:reviews_per_user")
@@ -385,6 +404,36 @@ router.post("/:assignment_id/importgroups", index.authorization.enrolledAsTeache
             });
         }
     });
+});
+
+/**
+ * Route to copy the groups from one assignment to another.
+ * @param assignment_id - the assignment to copy the groups from.
+ * @body targetAssignmentId - the assignment to copy the groups to.
+ */
+router.post("/:assignment_id/copygroups", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
+    try {
+        const assignmentToCopyId = req.params.assignment_id;
+        const targetAssignmentId = req.body.target_assignment_id;
+
+        const targetAssignment: any = await AssignmentPS.executeGetAssignmentById(targetAssignmentId);
+        const existingGroups: any = await AssignmentPS.executeGetGroupsByAssignmentId(assignmentToCopyId);
+
+        for (const group of existingGroups) {
+            // Copy the group
+            const newGroupId = await GroupParser.createGroupForAssignment(group.group_name, targetAssignmentId);
+
+            // Copy the group users
+            const existingGroupUsers: any = await AssignmentPS.executeGetUsersOfGroup(group.id);
+            for (const groupUser of existingGroupUsers) {
+                await GroupParser.addStudentToGroup(groupUser.user_netid, targetAssignmentId, targetAssignment.course_id, newGroupId);
+            }
+        }
+
+        res.sendStatus(200);
+    } catch {
+        res.sendStatus(400);
+    }
 });
 
 /**

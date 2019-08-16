@@ -95,6 +95,17 @@
                                                     </b-button>
                                                 </template>
 
+                                                <!--Copying-->
+                                                <template v-if="assignment.one_person_groups">
+                                                    <dt>Copy groups</dt>
+                                                    <dd>Not available. On creation of the assignment, this assignment has been set as individual. </dd>
+                                                </template>
+                                                <template v-else>
+                                                    <dt>Copy groups</dt>
+                                                    <dd>This action will import the groups of another assignment to this assignment.</dd>
+                                                    <b-button v-b-modal="'copyGroups'" variant="primary" size="sm">Copy groups</b-button>
+                                                </template>
+
                                                 <hr />
 
                                                 <!--Exporting Grade CSV-->
@@ -138,6 +149,10 @@
                                                 size="lg"
                                             >
                                                 <ImportGroupsWizard :assignmentId="assignment.id"></ImportGroupsWizard>
+                                            </b-modal>
+
+                                            <b-modal id="copyGroups" centered hide-header hide-footer class="p-0 m-0" size="lg">
+                                                <CopyGroupsWizard :assignmentId="assignment.id" :courseId="course.id"></CopyGroupsWizard>
                                             </b-modal>
                                         </b-card>
                                     </b-col>
@@ -187,10 +202,13 @@ import Reviews from "../../ta_teacher_shared/Reviews"
 import Submissions from "../../ta_teacher_shared/Submissions"
 import AssignmentDetails from "../../ta_teacher_shared/AssignmentDetails"
 import notifications from "../../../mixins/notifications"
+import CopyGroupsWizard from "../CopyGroupsWizard";
+
 
 export default {
     mixins: [notifications],
     components: {
+        CopyGroupsWizard,
         BreadcrumbTitle,
         RubricWizard,
         Groups,
