@@ -324,6 +324,25 @@ router.route("/:assignment_id/distributeReviews/:selfassign")
     });
 
 /**
+ * Route to get the reviews belonging to an assignment.
+ * @param id - assignment id.
+ */
+router.get("/:assignment_id/allreviews/:done", index.authorization.enrolledAsTAOrTeacherAssignment, async (req: any, res) => {
+    let isDone: boolean | undefined = undefined;
+    if (req.params.done === "true") {
+        isDone = true;
+    } else if (req.params.done === "false") {
+        isDone = false;
+    }
+
+    try {
+        res.json(await ReviewPS.executeGetAllSubmissionReviewsByAssignmentId(req.params.assignment_id, isDone));
+    } catch (e) {
+        res.sendStatus(400);
+    }
+});
+
+/**
  * Route to distribute reviews between two assignments
  */
 router.route("/distributeReviewsTwoAssignments/:assignment_id1/:assignment_id2/:reviews_per_user")
@@ -369,26 +388,6 @@ router.post("/:assignment_id/importgroups", index.authorization.enrolledAsTeache
                 res.json({error: error.message});
             });
         }
-    });
-});
-
-/**
- * Route to get the reviews belonging to an assignment.
- * @param id - assignment id.
- */
-router.get("/:assignment_id/allreviews/:done", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
-    let isDone: boolean | undefined = undefined;
-    if (req.params.done === "true") {
-        isDone = true;
-    } else if (req.params.done === "false") {
-        isDone = false;
-    }
-
-    ReviewPS.executeGetAllSubmissionReviewsByAssignmentId(req.params.assignment_id, isDone)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
-        res.sendStatus(400);
     });
 });
 
