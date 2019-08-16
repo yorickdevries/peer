@@ -380,7 +380,7 @@ router.post("/:assignment_id/importgroups", index.authorization.enrolledAsTeache
 router.post("/:assignment_id/copygroups", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
     try {
         const assignmentToCopyId = req.params.assignment_id;
-        const targetAssignmentId = req.body.targetAssignmentId;
+        const targetAssignmentId = req.body.target_assignment_id;
 
         const targetAssignment: any = await AssignmentPS.executeGetAssignmentById(targetAssignmentId);
         const existingGroups: any = await AssignmentPS.executeGetGroupsByAssignmentId(assignmentToCopyId);
