@@ -302,9 +302,9 @@ const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
         } else if (rubric.type == "review") {
             // check ownership
             const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(review.id, req.user.netid);
-            const authCheckOwner = await AuthorizationPS.executeCheckReviewMaker(review.id, req.user.netid);
+            const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(review.evaluated_review_id, req.user.netid);
 
-            const bool = authCheckTAOrTeacher.exists || authCheckOwner.exists;
+            const bool = authCheckTAOrTeacher.exists || authCheckSubmissionOwner.exists;
             await response(res, bool, next);
         } else {
             throw new Error("No or invalid Rubric type");
