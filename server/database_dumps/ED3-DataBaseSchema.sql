@@ -36,8 +36,8 @@ CREATE TABLE CourseList (
 
 -- Table: FacultyList
 CREATE TABLE FacultyList (
-    faculty varchar(100) NOT NULL,
-    CONSTRAINT FacultyList_pk PRIMARY KEY (faculty)
+    name varchar(100) NOT NULL,
+    CONSTRAINT FacultyList_pk PRIMARY KEY (name)
 );
 
 -- Table: AcademicYearList
@@ -260,7 +260,7 @@ ALTER TABLE AssignmentList ADD CONSTRAINT Assignment_Course
 -- Reference: CourseList_Faculty (table: CourseList)
 ALTER TABLE CourseList ADD CONSTRAINT CourseList_Faculty
     FOREIGN KEY (faculty)
-    REFERENCES FacultyList (faculty)
+    REFERENCES FacultyList (name)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;

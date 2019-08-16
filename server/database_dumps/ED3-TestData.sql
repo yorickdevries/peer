@@ -24,7 +24,7 @@ INSERT INTO "userlist" (
 	"netid", "email")
 	VALUES ('adversary', NULL);
 
-INSERT INTO public.facultylist(faculty) VALUES ('EWI'), ('3ME');
+INSERT INTO public.facultylist(name) VALUES ('EWI'), ('3ME');
 
 INSERT INTO public.academicyearlist(year, active) VALUES ('2018/2019', false), ('2019/2020', true), ('2020/2021', false), ('2021/2022', false);
 

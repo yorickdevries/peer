@@ -239,7 +239,7 @@ export default {
             try {
                 let res = await api.getFaculties();
 
-                this.faculties = res.data.map(entry => { return { value: entry.faculty, text: entry.faculty }});
+                this.faculties = res.data.map(entry => { return { value: entry.name, text: entry.name }});
             } catch (e) {
                 console.log(e)
             }
