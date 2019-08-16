@@ -61,7 +61,7 @@ const evaluationReviewRubricConfig: RubricConfiguration = {
             ]
         },
         {
-            question: "Overall, do you agree with the reviewer’s assessment of the work?",
+            question: "Overall, do you agree with the reviewer's assessment of the work?",
             options: [
                 "Yes, fully",
                 "Yes, mostly",
@@ -74,7 +74,7 @@ const evaluationReviewRubricConfig: RubricConfiguration = {
             range: 10
         },
         {
-            question: "What do you think about the review overall? If you did not choose \"Yes, fully” in question 2, then please list the factual mistakes of the review here, in a way that can be read without referring to the original submission or the review.",
+            question: "What do you think about the review overall? If you did not choose \"Yes, fully\" in question 2, then please list the factual mistakes of the review here, in a way that can be read without referring to the original submission or the review.",
         }
     ]
 };
