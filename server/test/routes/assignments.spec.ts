@@ -548,7 +548,7 @@ describe("API Assignment routes", () => {
 
         // Copy the groups
         await chai.request(router).post(`/${assignmentToCopyFrom.id}/copygroups`).send({
-            targetAssignmentId: assignmentToCopyTo.id
+            target_assignment_id: assignmentToCopyTo.id
         });
 
         // Make sure there are the same amount of groups
