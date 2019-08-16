@@ -1,10 +1,11 @@
 <template>
     <b-card header="Copy groups">
         <b-alert class="d-flex justify-content-between flex-wrap pb-0" show variant="warning">
-            <p>Important to note with copying groups from another assignment:</p>
+            <p class="mb-1">Important notes regarding the copying of groups of other assignments:</p>
             <ul>
                 <li>After copying the groups, the new groups will be visible <span class="font-weight-bold">after you reload the page</span></li>
                 <li>Make sure to select the <span class="font-weight-bold">correct</span> assignment to copy groups from</li>
+                <li>To best avoid errors during copying, only use this function when there <span class="font-weight-bold">are no groups present</span>. However, if there are no collisions between the current groups and the groups-to-copy, the copying will succeed!</li>
             </ul>
         </b-alert>
 

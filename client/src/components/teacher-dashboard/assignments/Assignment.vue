@@ -66,8 +66,12 @@
                                                 </template>
 
                                                 <!--Copying-->
-                                                <template>
-                                                    <dt>Copy groups of other assignment</dt>
+                                                <template v-if="assignment.one_person_groups">
+                                                    <dt>Copy groups</dt>
+                                                    <dd>Not available. On creation of the assignment, this assignment has been set as individual. </dd>
+                                                </template>
+                                                <template v-else>
+                                                    <dt>Copy groups</dt>
                                                     <dd>This action will import the groups of another assignment to this assignment.</dd>
                                                     <b-button v-b-modal="'copyGroups'" variant="primary" size="sm">Copy groups</b-button>
                                                 </template>
