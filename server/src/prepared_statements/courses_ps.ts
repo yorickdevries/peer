@@ -9,29 +9,71 @@ export default class CoursesPS {
     /**
      * Executes an 'update course' query.
      * @param {number} id - course id.
+     * @param faculty
+     * @param academicYear
+     * @param courseCode
      * @param {string} description - description.
      * @param {string} name - name.
+     * @param enrollable
      * @returns {Promise<pgPromise.queryResult>} the updated course as pg promise.
      */
-    public static executeUpdateCourse(id: number, description: string, name: string, enrollable: boolean): Promise<pgPromise.queryResult> {
+    public static executeUpdateCourse(id: number, faculty: string, academicYear: string, courseCode: string, description: string, name: string, enrollable: boolean): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-course",
-            'UPDATE "courselist" SET ("description", "name", "enrollable") = ($1, $2, $3) WHERE "id" = $4 ' +
-            "RETURNING id, description, name, enrollable");
-        statement.values = [description, name, enrollable, id];
+            'UPDATE "courselist" SET ("faculty", "academic_year", "course_code", "description", "name", "enrollable") = ($1, $2, $3, $4, $5, $6) WHERE "id" = $7 ' +
+            "RETURNING id, faculty, academic_year, course_code, description, name, enrollable");
+        statement.values = [faculty, academicYear, courseCode, description, name, enrollable, id];
         return Database.executeQuerySingleResult(statement);
     }
 
     /**
      * Executes a 'create course' query.
+     * @param faculty
+     * @param academicYear
+     * @param courseCode
      * @param {string} description - description fo the course.
      * @param {string} name - name of the course.
+     * @param enrollable
      * @returns {Promise<pgPromise.queryResult>} course that is inserted as pg promise.
      */
-    public static executeCreateCourse(description: string, name: string, enrollable: boolean): any {
+    public static executeCreateCourse(faculty: string, academicYear: string, courseCode: string, description: string, name: string, enrollable: boolean): any {
         const statement = new PreparedStatement("create-course",
-            'INSERT INTO "courselist" ("description", "name", "enrollable") VALUES ($1, $2, $3) RETURNING id, description, name, enrollable');
-        statement.values = [description, name, enrollable];
+            'INSERT INTO "courselist" ("faculty", "academic_year", "course_code", "description", "name", "enrollable")' +
+            " VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, faculty, academic_year, course_code, description, name, enrollable");
+        statement.values = [faculty, academicYear, courseCode, description, name, enrollable];
         return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Get the available academic years.
+     * @return {Promise<any>}
+     */
+    public static executeGetAcademicYears() {
+        const statement = new PreparedStatement("get-academic-years", `
+        SELECT * FROM academicyearlist
+        `);
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Get the available faculties.
+     * @return {Promise<any>}
+     */
+    public static executeGetFaculties() {
+        const statement = new PreparedStatement("get-faculties", `
+        SELECT * FROM facultylist
+        `);
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Get the active academic year.
+     * @return {Promise<any>}
+     */
+    public static executeGetactiveAcademicYears() {
+        const statement = new PreparedStatement("get-active-academic-years", `
+        SELECT * FROM academicyearlist WHERE active is TRUE
+        `);
+        return Database.executeQuery(statement);
     }
 
     /**
@@ -151,8 +193,21 @@ export default class CoursesPS {
      */
     public static executeGetUnenrolledForUser(netId: string): any {
         const statement = new PreparedStatement("get-unenrolled-courses-for-netid",
-            'SELECT * FROM "courselist" WHERE "id" NOT IN ' +
-            '(SELECT "id" FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" WHERE user_netid LIKE $1)) AND enrollable = TRUE');
+            `
+                SELECT * FROM "courselist"
+                JOIN academicyearlist on courselist.academic_year = academicyearlist.year
+                WHERE "id" NOT IN
+                (
+                    SELECT "id" FROM "courselist"
+                    WHERE "id" IN
+                    (
+                        SELECT "course_id" FROM "enroll"
+                        WHERE user_netid LIKE $1
+                    )
+                )
+                AND enrollable = TRUE
+                AND active = TRUE
+            `);
         statement.values = [netId];
         return Database.executeQuery(statement);
     }

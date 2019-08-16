@@ -115,5 +115,14 @@ export default {
     getSubmission(submissionId) {
         return client.get(`/submissions/${submissionId}`)
     },
+    getAcademicYears() {
+        return client.get('/courses/data/academicYears')
+    },
+    getFaculties() {
+        return client.get('/courses/data/faculties')
+    },
+    getactiveAcademicYears() {
+        return client.get('/courses/data/activeAcademicYears')
+    }
 }
 
