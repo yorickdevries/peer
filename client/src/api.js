@@ -115,6 +115,14 @@ export default {
     getSubmission(submissionId) {
         return client.get(`/submissions/${submissionId}`)
     },
+    ReviewEvaluation: {
+        get(reviewId, exists) {
+            return client.get(`/reviews/${reviewId}/reviewEvaluation`)
+        },
+        create(reviewId) {
+            return client.post(`/reviews/${reviewId}/reviewEvaluation`)
+        }
+    },
     getAcademicYears() {
         return client.get('/courses/data/academicYears')
     },

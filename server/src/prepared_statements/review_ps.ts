@@ -7,7 +7,7 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 export default class ReviewPS {
 
     /**
-     * Creates a review.
+     * Creates a submissionreview.
      * @param {string} userNetId - net id of the user.
      * @param {number} submissionId - submission id related to the review.
      * @param {number} rubricId - rubric id.
@@ -22,16 +22,61 @@ export default class ReviewPS {
     }
 
     /**
+     * Creates a reviewEvaluation.
+     */
+    public static executeCreateReviewEvaluation(userNetId: string, evaluatedReviewId: number, evaluationRubricId: number)
+        : Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("create-review-evaluation",
+        "INSERT INTO review(user_netid, evaluated_review_id, rubric_id) VALUES ($1, $2, $3) RETURNING *");
+        statement.values = [userNetId, evaluatedReviewId, evaluationRubricId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Gets an reviewevaluation for a certain review
+     */
+    public static executeGetFullReviewEvaluation(evaluatedReviewId: number): any {
+        const statement = new PreparedStatement("get-review-evaluation-with-evaluated-review-id",
+        "SELECT * FROM review WHERE evaluated_review_id = $1"
+        );
+        statement.values = [evaluatedReviewId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Checks whether a reviewevaluation already exists
+     */
+    public static executeCheckExistsReviewEvaluation(evaluatedReviewId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("check-review-evaluation-presence",
+        "SELECT EXISTS(" +
+        "SELECT * FROM review " +
+        "WHERE evaluated_review_id = $1" +
+        ")"
+        );
+        statement.values = [evaluatedReviewId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
      * Execute a 'get review' query, where all reviews are fetched.
+     * Only certain fields are displayed as students should not get them all
      * Additionally, the file_path is fetched from the corresponding submission table.
      * @param {number} reviewId - a review id.
      * @return {Promise<pgPromise.queryResult>} - a result, containing tuples following the API documentation.
      */
     public static executeGetReview(reviewId: number): any {
         const statement = new PreparedStatement("get-review-by-id",
-            "SELECT review.id, rubric_id, file_path, done, approved " +
-            "FROM review JOIN submission ON submission.id = review.submission_id " +
-            "WHERE review.id = $1");
+            "SELECT id, rubric_id, done, approved FROM review WHERE id = $1");
+        statement.values = [reviewId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Gets a full review including all fields
+     */
+    public static executeGetFullReview(reviewId: number): any {
+        const statement = new PreparedStatement("get-full-review-by-id",
+            "SELECT * FROM review WHERE id = $1");
         statement.values = [reviewId];
         return Database.executeQuerySingleResult(statement);
     }

@@ -40,22 +40,20 @@ INSERT INTO public.grouplist(group_name)
 	('ED-6');
 
 INSERT INTO public.assignmentlist(
-	title, description, course_id, reviews_per_user, filename, publish_date, due_date, review_publish_date, review_due_date, one_person_groups)
+	title, description, course_id, reviews_per_user, filename, publish_date, due_date, review_publish_date, review_due_date, one_person_groups, review_evaluation)
 	VALUES
-	    ('Lab assignment 1', 'How to build a DFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('Lab assignment 2', 'How to build a NFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('Lab assignment 3', 'How to build a DFA given a NFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('Assignment 1', 'Example assignment number one', 2, 2, 'assignment1.pdf', '2012-04-01T20:30:00Z', '2013-05-01T20:30:00Z', '2014-03-01T20:30:00Z', '2015-05-01T20:30:00Z', false),
-	    ('Assignment 2', 'An example of a second assignment', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('Assignment 3', 'This is another example of a third assignment.', 2, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('A1', 'Example assignment number one', 3, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('A2', 'An example of a second assignment', 3, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('Assignment one', 'Example assignment number one', 4, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('Assignment two', 'An example of a second assignment', 4, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('Assignment three', 'This is another example of a third assignment.', 4, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-		('Bonus Assignment', 'bonus description', 2, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2019-05-01T20:30:00Z', '2020-03-01T20:30:00Z', '2021-05-01T20:30:00Z', false)
-	    ;
-
+	    ('Lab assignment 1', 'How to build a DFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('Lab assignment 2', 'How to build a NFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('Lab assignment 3', 'How to build a DFA given a NFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('Assignment 1', 'Example assignment number one', 2, 2, 'assignment1.pdf', '2012-04-01T20:30:00Z', '2013-05-01T20:30:00Z', '2014-03-01T20:30:00Z', '2015-05-01T20:30:00Z', false, false),
+	    ('Assignment 2', 'An example of a second assignment', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('Assignment 3', 'This is another example of a third assignment.', 2, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('A1', 'Example assignment number one', 3, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('A2', 'An example of a second assignment', 3, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('Assignment one', 'Example assignment number one', 4, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('Assignment two', 'An example of a second assignment', 4, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('Assignment three', 'This is another example of a third assignment.', 4, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+		('Bonus Assignment', 'bonus description', 2, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2019-05-01T20:30:00Z', '2020-03-01T20:30:00Z', '2021-05-01T20:30:00Z', false, false);
 
 INSERT INTO public.rubric(
 	assignment_id, type)

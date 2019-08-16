@@ -67,68 +67,9 @@ describe("API review routes", () => {
      * Tests whether reviews are returned
      */
     it("Get review/", async () => {
-        const res = await chai.request(router).get("/1");
+        const res = await chai.request(router).get("/2");
         expect(res.status).to.equal(200);
-        expect(JSON.parse(res.text)).to.deep.equal(
-            {
-                "review": {
-                    "id": 1,
-                    "rubric_id": 1,
-                    "file_path": "submission1.pdf",
-                    // tslint:disable-next-line
-                    "approved": null,
-                    "done": false
-                },
-                "form": [{
-                    "question": {
-                        "id": 1,
-                        "type_question": "mc",
-                        "rubric_id": 1,
-                        "question": "What is the best way to insert queries?",
-                        "question_number": 3,
-                        "option": [
-                          {"id": 3, "option": "By asking Brian", "mcquestion_id": 1},
-                          {"id": 2, "option": "By using command line", "mcquestion_id": 1},
-                          {"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}
-                        ]
-                    }, "answer": {"answer": 1, "mcquestion_id": 1, "review_id": 1}
-                }, {
-                    "question": {
-                       "id": 2,
-                       "type_question": "mc",
-                       "rubric_id": 1,
-                       "question": "Is the right Answer A?",
-                       "question_number": 4,
-                       "option": [
-                          {
-                             "id": 4,
-                             "option": "A",
-                             "mcquestion_id": 2
-                          }
-                       ]
-                    },
-                    "answer": {}
-                 }, {
-                    "question": {
-                        "id": 1,
-                        "question": "How to insert queries?",
-                        "rubric_id": 1,
-                        "question_number": 1,
-                        "type_question": "open"
-                    },
-                    "answer": {"answer": "Flesje water is beter dan flesje bier", "openquestion_id": 1, "review_id": 1}
-                }, {
-                    "question": {
-                        "id": 1,
-                        "question": "How much fun is inserting queries?",
-                        "range": 7,
-                        "rubric_id": 1,
-                        "question_number": 2,
-                        "type_question": "range"
-                    }, "answer": {"answer": 4, "rangequestion_id": 1, "review_id": 1}
-                }]
-            }
-        );
+        expect(JSON.parse(res.text).review.id).to.equal(2);
     });
 
     /**
@@ -140,8 +81,7 @@ describe("API review routes", () => {
         const exampleReviewFile = path.join(__dirname, "../../example_data/reviews/review1.pdf");
 
         const assignment: any = await AssignmentPS.executeAddAssignment("New", "Description", 1, 2, "test_file.pdf",
-        new Date("2017-07-01T20:30:00Z"), new Date("2018-07-01T20:30:00Z"), new Date("2019-07-01T20:30:00Z"), new Date("2020-07-01T20:30:00Z"), false
-        );
+        new Date("2017-07-01T20:30:00Z"), new Date("2018-07-01T20:30:00Z"), new Date("2019-07-01T20:30:00Z"), new Date("2020-07-01T20:30:00Z"), false, false);
         const group: any = await GroupsPS.executeAddGroup("groupname");
         const submission: any = await SubmissionPS.executeCreateSubmission("henkjan", group.id, assignment.id, "none.pdf");
         const rubric: any = await RubricPS.executeCreateRubric(assignment.id, "submission");
@@ -283,42 +223,6 @@ describe("API review routes", () => {
               "form": [
                 {
                   "answer": {
-                    "answer": 1,
-                    "mcquestion_id": 1,
-                    "review_id": 1
-                  },
-                  "question": {
-                    "id": 1,
-                    "option": [
-                      {"id": 3, "option": "By asking Brian", "mcquestion_id": 1},
-                      {"id": 2, "option": "By using command line", "mcquestion_id": 1},
-                      {"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}
-                    ],
-                    "question": "What is the best way to insert queries?",
-                    "question_number": 3,
-                    "rubric_id": 1,
-                    "type_question": "mc"
-                  }
-                },
-                {
-                  "answer": {"answer": 4, "mcquestion_id": 2, "review_id": 1},
-                  "question": {
-                    "id": 2,
-                    "option": [
-                      {
-                        "id": 4,
-                        "mcquestion_id": 2,
-                        "option": "A"
-                      }
-                    ],
-                    "question": "Is the right Answer A?",
-                    "question_number": 4,
-                    "rubric_id": 1,
-                    "type_question": "mc"
-                  }
-                },
-                {
-                  "answer": {
                     "answer": "Flesje water is beter dan flesje bier",
                     "openquestion_id": 1,
                     "review_id": 1
@@ -345,11 +249,46 @@ describe("API review routes", () => {
                     "rubric_id": 1,
                     "type_question": "range"
                   }
-                }
+                },
+                {
+                    "answer": {
+                      "answer": 1,
+                      "mcquestion_id": 1,
+                      "review_id": 1
+                    },
+                    "question": {
+                      "id": 1,
+                      "option": [
+                        {"id": 3, "option": "By asking Brian", "mcquestion_id": 1},
+                        {"id": 2, "option": "By using command line", "mcquestion_id": 1},
+                        {"id": 1, "option": "By using pgAdmin", "mcquestion_id": 1}
+                      ],
+                      "question": "What is the best way to insert queries?",
+                      "question_number": 3,
+                      "rubric_id": 1,
+                      "type_question": "mc"
+                    }
+                  },
+                  {
+                    "answer": {"answer": 4, "mcquestion_id": 2, "review_id": 1},
+                    "question": {
+                      "id": 2,
+                      "option": [
+                        {
+                          "id": 4,
+                          "mcquestion_id": 2,
+                          "option": "A"
+                        }
+                      ],
+                      "question": "Is the right Answer A?",
+                      "question_number": 4,
+                      "rubric_id": 1,
+                      "type_question": "mc"
+                    }
+                  }
               ],
               "review": {
                 "done": false,
-                "file_path": "submission1.pdf",
                   // tslint:disable-next-line
                   "approved": null,
                   "id": 1,
@@ -366,6 +305,7 @@ describe("API review routes", () => {
      * Tests if all comments are fetched for a specific review.
      */
     it("GET review/:reviewId/allComments", async () => {
+        MockLogin.initialize("henkjan");
         const res = await chai.request(router).get("/1/allComments");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(

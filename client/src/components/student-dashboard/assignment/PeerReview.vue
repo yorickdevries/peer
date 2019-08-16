@@ -15,7 +15,7 @@
         <!--Form-->
         <b-card no-body class="mt-3">
             <!--Title-->
-            <b-card-body>
+            <b-card-body v-if="readOnly === false">
                 <h4>Assignment Criteria</h4>
                 <h6 class="card-subtitle text-muted">Give the peer review to one of your peers here.</h6>
             </b-card-body>
@@ -41,7 +41,7 @@
                                      :rows="10"
                                      :max-rows="15"
                                      v-model="pair.answer.answer"
-                                     :readonly="peerReview.review.done"
+                                     :readonly="peerReview.review.done || readOnly"
                                      required
                                      maxlength="90000"/>
 
@@ -56,7 +56,7 @@
                                 inline
                                 :max-rating="Number(pair.question.range)"
                                 :show-rating="false"
-                                :read-only="peerReview.review.done"
+                                :read-only="peerReview.review.done || readOnly"
                                 v-model="pair.answer.answer"/>
 
                     <!-- MPC QUESTION -->
@@ -66,7 +66,7 @@
                                 v-model="pair.answer.answer"
                                 stacked
                                 required
-                                :disabled="peerReview.review.done">
+                                :disabled="peerReview.review.done || readOnly">
                         </b-form-radio-group>
                     </b-form-group>
 
@@ -74,7 +74,7 @@
                     <div v-if="pair.question.type_question === 'upload'">
 
                         <!--File upload-->
-                        <b-form-group description="Select a file and press save down below the page. Note: it overwrites files." class="mb-0">
+                        <b-form-group :description="readOnly ? '' : 'Select a file and press save down below the page. Note: it overwrites files.'" class="mb-0">
 
                             <!--Show currently uploaded file-->
                             <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
@@ -86,17 +86,19 @@
                                 </div>
                             </b-alert>
 
-                            <b-alert show variant="danger">{{ pair.question.extension.toUpperCase() }} files allowed only.</b-alert>
+                            <div v-if="!readOnly">
+                                <b-alert show variant="danger">{{ pair.question.extension.toUpperCase() }} files allowed only.</b-alert>
 
-                            <b-alert v-if="pair.answer.answer" show variant="warning">Note: uploading an new files will overwrite your current file.</b-alert>
+                                <b-alert v-if="pair.answer.answer" show variant="warning">Note: uploading an new files will overwrite your current file.</b-alert>
 
-                            <b-form-file  placeholder="Choose a new file..."
-                                          v-model="files[pair.question.id]"
-                                          :state="Boolean(files[pair.question.id])"
-                                          :accept="`.${pair.question.extension}`"
-                                          :disabled="peerReview.review.done"
-                                          :ref="'fileForm' + pair.question.id">
-                            </b-form-file>
+                                <b-form-file  placeholder="Choose a new file..."
+                                              v-model="files[pair.question.id]"
+                                              :state="Boolean(files[pair.question.id])"
+                                              :accept="`.${pair.question.extension}`"
+                                              :disabled="peerReview.review.done || readOnly"
+                                              :ref="'fileForm' + pair.question.id + peerReview.review.id">
+                                </b-form-file>
+                            </div>
 
                         </b-form-group>
 
@@ -108,7 +110,7 @@
 
             <SessionCheck ref="sessionCheck"></SessionCheck>
 
-            <template v-if="peerReview.review.id !== null">
+            <template v-if="peerReview.review.id !== null && readOnly === false">
                 <!--Save/Submit Buttons-->
                 <b-card-body v-if="!peerReview.review.done">
                     <b-btn type="submit" variant="success float-right" v-b-modal="`submit${peerReview.review.id}`">Submit Review</b-btn>
@@ -121,7 +123,7 @@
                     </b-modal>
                 </b-card-body>
                 <b-card-body v-else>
-                    <b-button variant="outline-success float-right" @click="unSubmitPeerReview">UnSubmit Review</b-button>
+                    <b-button variant="outline-success float-right" @click="unSubmitPeerReview">Unsubmit Review</b-button>
                 </b-card-body>
             </template>
 
@@ -142,7 +144,15 @@ export default {
         StarRating,
         SessionCheck,
     },
-    props: ["reviewId"],
+    props: {
+        reviewId: {
+            type: Number
+        },
+        readOnly: {
+            type: Boolean,
+            default: false
+        }
+    },
     data() {
         return {
             peerReview: {
@@ -182,8 +192,13 @@ export default {
     },
     methods: {
         async fetchPeerReview() {
-            let {data} = await api.getPeerReview(this.reviewId)
-            this.peerReview = data
+            try {
+                let {data} = await api.getPeerReview(this.reviewId)
+                this.peerReview = data
+            } catch (e) {
+                this.showErrorMessage({message: "Could not fetch the review."})
+            }
+
         },
         async submitPeerReview() {
 
@@ -191,6 +206,9 @@ export default {
             let validated = true;
             this.peerReview.form.forEach(pair => {
                 if (pair.answer.answer === null || pair.answer.answer === undefined || pair.answer.answer === "") {
+                    if (pair.question.type_question === 'upload') {
+                        return
+                    }
                     validated = false
                 }
             })
@@ -201,8 +219,21 @@ export default {
                 await this.savePeerReview()
 
                 // Submit peer review.
-                await api.submitPeerReview(this.peerReview)
-                await this.fetchPeerReview()
+                try {
+                    await api.submitPeerReview(this.peerReview)
+                } catch (e) {
+                    this.showErrorMessage({message: "Submitting the review has failed. Make sure to fill in all fields."})
+                    return
+                }
+
+                try {
+                    let {data} = await api.getPeerReview(this.reviewId)
+                    this.peerReview = data
+                } catch (e) {
+                    this.showErrorMessage({message: "Could not fetch the review."})
+                    return
+                }
+
                 this.showSubmitMessage()
             } else {
                 this.showErrorMessage({message: "All fields are required."})
@@ -252,7 +283,7 @@ export default {
         },
         clearFiles() {
             Object.entries(this.files).forEach(([key, _]) => {
-                const name = 'fileForm' + key
+                const name = 'fileForm' + String(key) + this.peerReview.review.id
                 this.$refs[name][0].reset()
                 this.files[key] = null
             })

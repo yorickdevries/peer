@@ -68,6 +68,53 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
 });
 
 /**
+ * Route to make a review evaluation for a specific review
+ */
+router.route("/:reviewId/reviewevaluation").get(index.authorization.checkAuthorizationForGettingReviewEvaluation, async (req, res) => {
+    try {
+        const reviewId = req.params.reviewId;
+        const reviewEvaluation: any = await ReviewsPS.executeGetFullReviewEvaluation(reviewId);
+        res.json({
+            id: reviewEvaluation.id,
+            user_netid: reviewEvaluation.user_netid
+            });
+    } catch (error) {
+        res.status(400);
+        res.json({error: "Does not exists"});
+    }
+});
+
+/**
+ * Route to make a review evaluation for a specific review
+ */
+router.route("/:reviewId/reviewevaluation").post(index.authorization.checkAuthorizationForCreatingReviewEvaluation, async (req, res) => {
+    try {
+        const reviewId = req.params.reviewId;
+        const reviewEvaluationExists: any = await ReviewsPS.executeCheckExistsReviewEvaluation(reviewId);
+        if (reviewEvaluationExists.exists) {
+            throw new Error("Review evaluation already exists");
+        } else {
+            const review =  await ReviewsPS.executeGetReview(reviewId);
+            const submissionRubric = await RubricPS.executeGetRubricById(review.rubric_id);
+            const assignmentId = submissionRubric.assignment_id;
+
+            // get the rubric belonging to the reviewEvaluation
+            const reviewEvaluationRubric = await RubricPS.executeGetReviewEvaluationRubricByAssignmentId(assignmentId);
+
+            // create the review
+            const reviewEvaluation: any = await ReviewsPS.executeCreateReviewEvaluation(req.user.netid, reviewId, reviewEvaluationRubric.id);
+            res.json({
+                id: reviewEvaluation.id,
+                user_netid: reviewEvaluation.net_id
+                });
+        }
+    } catch (error) {
+        res.status(400);
+        res.json({error: error.message});
+    }
+});
+
+/**
  * Route to update or insert and answer by review id.
  * The fieldnames of files should correspond to question ids.
  * @body a json object of the whole form, as specified in the doc.
@@ -81,7 +128,19 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
 
         // get review
         const review: any = await ReviewsPS.executeGetReview(reviewId);
-        const rubricUploadQuestions: any = await RubricPS.executeGetAllUploadQuestionById(review.rubric_id);
+        const rubricQuestions: any = await RubricPS.getAllQuestionsByRubricId(review.rubric_id);
+
+        // remove values for all uploadquestions as these are files
+        for (const formElement of inputForm) {
+            const questionId = formElement.question.id;
+
+            // Get the correct question in case of an upload question
+            const currentRubricQuestion = rubricQuestions.find((x: any) => x.id === questionId);
+            // in case of an uploadquestion, delete the answer
+            if (currentRubricQuestion.type_question == "upload") {
+                formElement.answer.answer = undefined;
+            }
+        }
 
         const uploadQuestionIds = [];
 
@@ -92,7 +151,10 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
                 const questionId = parseInt(file.fieldname);
 
                 // Get the correct extension of the upload question.
-                const currentRubricUploadQuestion = rubricUploadQuestions.find((x: any) => x.id === questionId);
+                const currentRubricUploadQuestion = rubricQuestions.find((x: any) => x.id === questionId);
+                if (currentRubricUploadQuestion.type_question !== "upload") {
+                    throw new Error("File uploaded for a non-upload question");
+                }
                 const correctExtension = currentRubricUploadQuestion.extension;
 
                 // Check if the extension is correct

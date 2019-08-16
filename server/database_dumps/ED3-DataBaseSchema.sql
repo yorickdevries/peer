@@ -15,6 +15,7 @@ CREATE TABLE AssignmentList (
     review_publish_date timestamptz NOT NULL,
     review_due_date timestamptz NOT NULL,
     one_person_groups boolean NOT NULL,
+    review_evaluation boolean NOT NULL,
     CONSTRAINT AssignmentList_pk PRIMARY KEY (id),
     CONSTRAINT positive_review_per_user CHECK (reviews_per_user > 0),
     CONSTRAINT publish_before_due CHECK (publish_date < due_date),
@@ -171,7 +172,8 @@ CREATE TABLE UploadQuestion (
 CREATE TABLE Review (
     id SERIAL,
     User_netid varchar(500) NOT NULL,
-    Submission_id int NOT NULL,
+    Submission_id int,
+    evaluated_review_id int,
     Rubric_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
     creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -445,6 +447,14 @@ ALTER TABLE Review ADD CONSTRAINT Review_Rubric
 ALTER TABLE Review ADD CONSTRAINT Review_Submission
     FOREIGN KEY (Submission_id)
     REFERENCES Submission (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: Review_EvaluatedReview (table: Review)
+ALTER TABLE Review ADD CONSTRAINT Review_EvaluatedReview
+    FOREIGN KEY (evaluated_review_id)
+    REFERENCES Review (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;

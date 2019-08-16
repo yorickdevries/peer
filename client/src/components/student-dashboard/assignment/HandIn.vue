@@ -14,6 +14,8 @@
                             <dd></dd>
                             <dt>File</dt>
                             <dd><a :href="submissionFilePath" target="_blank">{{ submission.file_path }}</a></dd>
+                            <dt>Submitted by</dt>
+                            <dd>{{ submission.user_netid }}</dd>
                             <dt>Date</dt>
                             <dd>{{ submission.date | formatDate }}</dd>
                         </dl>

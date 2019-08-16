@@ -29,7 +29,7 @@ export default class RubricPS {
     /**
      * Executes 'get Review rubric by AssignmentId' query.
      */
-    public static executeGetReviewRubricByAssignmentId(assignmentId: number): Promise<any> {
+    public static executeGetReviewEvaluationRubricByAssignmentId(assignmentId: number): Promise<any> {
         const statement = new PreparedStatement("get-review-rubric-by-assignment-id",
             "SELECT * FROM rubric WHERE assignment_id=$1 AND type = 'review'");
         statement.values = [assignmentId];
