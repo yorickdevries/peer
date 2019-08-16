@@ -2,8 +2,25 @@
     <div>
         <!--Notification whether evaluation is submitted or not.-->
         <div v-if="evaluationExists">
-            <b-alert variant="info" :show="evaluation.review.done">
+            <b-alert variant="success" :show="evaluation.review.done">
                 This evaluation has been submitted.
+            </b-alert>
+            <b-alert variant="danger" :show="!evaluation.review.done">
+                This evaluation has not yet been submitted.
+            </b-alert>
+        </div>
+
+        <!--Notification if owner-->
+        <div v-if="evaluationExists">
+            <b-alert variant="secondary" :show="isEvaluationOwner">
+                You are the owner of this evaluation. You can edit/save/submit this evaluation.
+            </b-alert>
+        </div>
+
+        <!--Notification is not owner-->
+        <div v-if="evaluationExists">
+            <b-alert variant="secondary" :show="!isEvaluationOwner">
+                Another group member ({{ evaluation_meta_data.user_netid }}) is the owner if this evaluation. Only they can edit/save/submit this evaluation.
             </b-alert>
         </div>
 
@@ -76,7 +93,7 @@
                         :rows="10"
                         :max-rows="15"
                         v-model="pair.answer.answer"
-                        :readonly="evaluation.review.done"
+                        :readonly="evaluation.review.done || !isEvaluationOwner"
                         required
                         maxlength="90000"
                     />
@@ -93,7 +110,7 @@
                         inline
                         :max-rating="Number(pair.question.range)"
                         :show-rating="false"
-                        :read-only="evaluation.review.done"
+                        :read-only="evaluation.review.done || !isEvaluationOwner"
                         v-model="pair.answer.answer"
                     />
 
@@ -104,7 +121,7 @@
                             v-model="pair.answer.answer"
                             stacked
                             required
-                            :disabled="evaluation.review.done"
+                            :disabled="evaluation.review.done || !isEvaluationOwner"
                         ></b-form-radio-group>
                     </b-form-group>
 
@@ -112,7 +129,11 @@
                     <div v-if="pair.question.type_question === 'upload'">
                         <!--File upload-->
                         <b-form-group
-                            description="Select a file and press save down below the page. Note: it overwrites files."
+                            :description="
+                                isEvaluationOwner
+                                    ? ''
+                                    : 'Select a file and press save down below the page. Note: it overwrites files.'
+                            "
                             class="mb-0"
                         >
                             <!--Show currently uploaded file-->
@@ -129,28 +150,30 @@
                                 </div>
                             </b-alert>
 
-                            <b-alert show variant="danger">
-                                {{ pair.question.extension.toUpperCase() }} files allowed only.
-                            </b-alert>
+                            <div v-if="isEvaluationOwner">
+                                <b-alert show variant="danger">
+                                    {{ pair.question.extension.toUpperCase() }} files allowed only.
+                                </b-alert>
 
-                            <b-alert v-if="pair.answer.answer" show variant="warning">
-                                Note: uploading an new files will overwrite your current file.
-                            </b-alert>
+                                <b-alert v-if="pair.answer.answer" show variant="warning">
+                                    Note: uploading an new files will overwrite your current file.
+                                </b-alert>
 
-                            <b-form-file
-                                placeholder="Choose a new file..."
-                                v-model="files[pair.question.id]"
-                                :state="Boolean(files[pair.question.id])"
-                                :accept="`.${pair.question.extension}`"
-                                :disabled="evaluation.review.done"
-                                :ref="'fileForm' + pair.question.id + evaluation.review.id"
-                            ></b-form-file>
+                                <b-form-file
+                                    placeholder="Choose a new file..."
+                                    v-model="files[pair.question.id]"
+                                    :state="Boolean(files[pair.question.id])"
+                                    :accept="`.${pair.question.extension}`"
+                                    :disabled="evaluation.review.done || !isEvaluationOwner"
+                                    :ref="'fileForm' + pair.question.id + evaluation.review.id"
+                                ></b-form-file>
+                            </div>
                         </b-form-group>
                     </div>
                 </b-list-group-item>
             </b-list-group>
 
-            <template v-if="evaluation.review.id !== null">
+            <template v-if="evaluation.review.id !== null && isEvaluationOwner">
                 <!--Save/Submit Buttons-->
                 <b-card-body v-if="!evaluation.review.done">
                     <b-btn type="submit" variant="success float-right" v-b-modal="`submit${evaluation.review.id}`"
@@ -192,6 +215,10 @@ export default {
                 review: {},
                 form: {}
             },
+            evaluation_meta_data: {
+                user_netid:""
+            },
+            isEvaluationOwner: false,
             files: {}
         }
     },
@@ -228,15 +255,42 @@ export default {
             }
         },
         async fetchEvaluation() {
+            // Fetch evaluation meta_data.
+            let evaluation_id
+            let evaluation_owner_net_id
             try {
-                const res_meta = await api.ReviewEvaluation.get(this.review.review.id, true)
-                const id = res_meta.data.id
-                const res = await api.getPeerReview(id)
+                const res = await api.ReviewEvaluation.get(this.review.review.id, true)
+                evaluation_owner_net_id = res.data.user_netid
+                evaluation_id = res.data.id
+                this.evaluation_meta_data.user_netid = evaluation_owner_net_id
+            } catch (e) {
+                console.log(e)
+                // Normal behaviour: always returnss 401 when evaluation has not yet been created.
+                // -> will render button to create an evaluation
+                return
+            }
+
+            // Fetch evaluation.
+            try {
+                const res = await api.getPeerReview(evaluation_id)
                 this.evaluation = res.data
             } catch (e) {
-                // Normal behaviour, since 401 means that the evaluation does not yet exist.
-                // this.showErrorMessage({ message: "Evaluation has not yet been made or can not be fetched." })
+                this.showErrorMessage({ message: "Could not fetch the evaluation." })
+                return
             }
+
+            // Fetch user.
+            let net_id
+            try {
+                const res = await api.getUser()
+                net_id = res.data.user.netid
+            } catch (e) {
+                this.showErrorMessage({ message: "Could not fetch the user." })
+                return
+            }
+
+            // Check whether user is owner of evaluation.
+            this.isEvaluationOwner = net_id === evaluation_owner_net_id
         },
         async fetchReview() {
             // Retrieve the review.
