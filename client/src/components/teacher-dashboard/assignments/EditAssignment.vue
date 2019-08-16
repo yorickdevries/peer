@@ -15,7 +15,7 @@
                     <b-card>
                         <b-form @submit.prevent="onSubmit">
                             <!--Assignment title-->
-                            <b-form-group label="Name">
+                            <b-form-group label="Assignment title">
                                 <b-form-input   v-model="assignment.title"
                                                 type="text"
                                                 placeholder="Please enter the course name here"
@@ -31,56 +31,74 @@
                                                     required>
                                 </b-form-textarea>
                             </b-form-group>
+
                             <!--Publish and due date of the assignment-->
-                            <b-form-group label="Publish date and time">
-                                <b-form-input   v-model="assignment.publish_day"
-                                                type="date"
-                                                placeholder="Please enter date on which the assignment should be published"
-                                                required>
-                                </b-form-input>
-                                <b-form-input   v-model="assignment.publish_time"
-                                                type="time"
-                                                placeholder="Please enter time on which the assignment should be published"
-                                                required>
-                                </b-form-input>
-                            </b-form-group>
-                            <b-form-group label="Due date and time">
-                                <b-form-input   v-model="assignment.due_day"
-                                                type="date"
-                                                placeholder="Please enter date on which the assignment should be handed in"
-                                                required>
-                                </b-form-input>
-                                <b-form-input   v-model="assignment.due_time"
-                                                type="time"
-                                                placeholder="Please enter time before which the assignment should be handed in"
-                                                required>
-                                </b-form-input>
-                            </b-form-group>
+                            <b-row class="mb-3">
+                                <b-col>
+                                    <b-form-group>
+                                        <template slot="label"><b-badge variant="info">1</b-badge> Publish date and time</template>
+                                        <b-form-input   v-model="assignment.publish_day"
+                                                        type="date"
+                                                        placeholder="Please enter date on which the assignment should be published"
+                                                        required>
+                                        </b-form-input>
+                                        <b-form-input   v-model="assignment.publish_time"
+                                                        type="time"
+                                                        placeholder="Please enter time on which the assignment should be published"
+                                                        required>
+                                        </b-form-input>
+                                    </b-form-group>
+                                </b-col>
+                                <b-col>
+                                    <b-form-group>
+                                        <template slot="label"><b-badge variant="info">2</b-badge> Hand-in due date and time</template>
+                                        <b-form-input   v-model="assignment.due_day"
+                                                        type="date"
+                                                        placeholder="Please enter date on which the assignment should be handed in"
+                                                        required>
+                                        </b-form-input>
+                                        <b-form-input   v-model="assignment.due_time"
+                                                        type="time"
+                                                        placeholder="Please enter time before which the assignment should be handed in"
+                                                        required>
+                                        </b-form-input>
+                                    </b-form-group>
+                                </b-col>
+                            </b-row>
+
                             <!--Publish and due date of the peer review-->
-                            <b-form-group label="Start date and time for peer review">
-                                <b-form-input   v-model="assignment.review_publish_day"
-                                                type="date"
-                                                placeholder="Please enter start date of the peer review"
-                                                required>
-                                </b-form-input>
-                                <b-form-input   v-model="assignment.review_publish_time"
-                                                type="time"
-                                                placeholder="Please enter start time of the peer review"
-                                                required>
-                                </b-form-input>
-                            </b-form-group>
-                            <b-form-group label="Due date and time for peer review">
-                                <b-form-input   v-model="assignment.review_due_day"
-                                                type="date"
-                                                placeholder="Please enter due date of the peer review"
-                                                required>
-                                </b-form-input>
-                                <b-form-input   v-model="assignment.review_due_time"
-                                                type="time"
-                                                placeholder="Please enter due time of the peer review"
-                                                required>
-                                </b-form-input>
-                            </b-form-group>
+                            <b-row>
+                                <b-col>
+                                    <b-form-group>
+                                        <template slot="label"><b-badge variant="info">3</b-badge> Start date and time for peer review</template>
+                                        <b-form-input   v-model="assignment.review_publish_day"
+                                                        type="date"
+                                                        placeholder="Please enter start date of the peer review"
+                                                        required>
+                                        </b-form-input>
+                                        <b-form-input   v-model="assignment.review_publish_time"
+                                                        type="time"
+                                                        placeholder="Please enter start time of the peer review"
+                                                        required>
+                                        </b-form-input>
+                                    </b-form-group>
+                                </b-col>
+                                <b-col>
+                                    <b-form-group>
+                                        <template slot="label"><b-badge variant="info">4</b-badge> Due date and time for peer review</template>
+                                        <b-form-input   v-model="assignment.review_due_day"
+                                                        type="date"
+                                                        placeholder="Please enter due date of the peer review"
+                                                        required>
+                                        </b-form-input>
+                                        <b-form-input   v-model="assignment.review_due_time"
+                                                        type="time"
+                                                        placeholder="Please enter due time of the peer review"
+                                                        required>
+                                        </b-form-input>
+                                    </b-form-group>
+                                </b-col>
+                            </b-row>
                             <!--Number of peer reviews per student-->
                             <b-form-group label="Number of reviews that each student needs to do">
                                 <b-form-input   v-model="assignment.reviews_per_user"
