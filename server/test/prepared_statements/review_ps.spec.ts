@@ -3,6 +3,8 @@ import { expect } from "chai";
 import TestData from "../test_helpers/test_data";
 
 import ReviewPS from "../../src/prepared_statements/review_ps";
+import RubricPS from "../../src/prepared_statements/rubric_ps";
+import AssignmentPS from "../../src/prepared_statements/assignment_ps";
 
 describe("ReviewPreparedStatement Test", () => {
     /**
@@ -11,6 +13,26 @@ describe("ReviewPreparedStatement Test", () => {
     beforeEach(async () => {
         await TestData.initializeDatabase();
     });
+
+    /**
+     * Function that creates a rubric for testing purposes.
+     * Required due to foreign key constraints in the database.
+     * @return {Promise<pgPromise.queryResult>} a rubric that is also added to the database.
+     */
+    async function createTestRubric() {
+        const assignment: any = await AssignmentPS.executeAddAssignment(
+            "TestAssignment 1",
+            "Description",
+            1, 2,
+            "filename",
+            new Date("2016-05-01T20:30:00.000Z"),
+            new Date("2017-05-01T21:30:00.000Z"),
+            new Date("2018-05-01T22:30:00.000Z"),
+            new Date("2019-05-01T23:30:00.000Z"),
+            false,
+            false);
+        return await RubricPS.executeCreateRubric(assignment.id, "submission");
+    }
 
     /**
      * Get review by id.
@@ -61,6 +83,24 @@ describe("ReviewPreparedStatement Test", () => {
     });
 
     /**
+     * Update upload answer.
+     */
+    it("update upload answer", async () => {
+        const answer = "serious_answer.pdf";
+
+        const rubric: any = await createTestRubric();
+        const question: any = await RubricPS.executeCreateUploadQuestion("something", rubric.id, 0, "pdf");
+        await ReviewPS.executeUpdateUploadAnswer("kappa.pdf", question.id, 2);
+        const updated: any = await ReviewPS.executeUpdateUploadAnswer(answer, question.id, 2);
+
+        expect({
+            answer: updated.answer,
+        }).to.deep.equal({
+            answer
+        });
+    });
+
+    /**
      * Update range answer.
      */
     it("update range answer", async () => {
@@ -88,6 +128,26 @@ describe("ReviewPreparedStatement Test", () => {
             answer: "Flesje water is beter dan flesje bier",
             openquestion_id: 1,
             review_id: 1
+        });
+    });
+
+    /**
+     * Get open answer.
+     */
+    it("get upload answer by id", async () => {
+        const answer = "serious_answer.pdf";
+        const reviewId = 1;
+
+        const rubric: any = await createTestRubric();
+        const question: any = await RubricPS.executeCreateUploadQuestion("something", rubric.id, 0, "pdf");
+
+        const created: any = await ReviewPS.executeUpdateUploadAnswer(answer, question.id, reviewId);
+        const fetched: any = await ReviewPS.executeGetUploadAnswer(reviewId, question.id);
+
+        expect({
+            answer: fetched.answer,
+        }).to.deep.equal({
+            answer
         });
     });
 
@@ -168,14 +228,15 @@ describe("ReviewPreparedStatement Test", () => {
      * Test get reviews for an assignment.
      */
     it("Reviews of an assignment", async () => {
-        expect(await ReviewPS.executeGetAllDoneSubmissionReviewsByAssignmentId(1)).to.deep.equal([{
+        expect(await ReviewPS.executeGetAllSubmissionReviewsByAssignmentId(1, true)).to.deep.equal([{
             // tslint:disable-next-line
             "approved": null,
             "id": 2,
             "reviewer": "paulvanderlaan",
             "submitter": "paulvanderlaan",
             // tslint:disable-next-line
-            "ta_netid": null
+            "ta_netid": null,
+            done: true
         }]);
     });
 

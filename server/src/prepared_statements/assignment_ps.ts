@@ -56,13 +56,13 @@ export default class AssignmentPS {
      * @return {any} all columns of the created assignment as pg promise.
      */
     public static executeAddAssignment(title: string, description: string, courseId: number, reviewsPerUser: number,
-                                       filename: string, publishDate: Date, dueDate: Date, reviewPublishDate: Date,
-                                       reviewDueDate: Date, onePersonGroups: boolean): Promise<pgPromise.queryResult> {
+                                       filename: string | null, publishDate: Date, dueDate: Date, reviewPublishDate: Date,
+                                       reviewDueDate: Date, onePersonGroups: boolean, reviewEvaluation: boolean): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("addAssignment",
         'INSERT INTO "assignmentlist" (title, description, course_id, reviews_per_user, filename, publish_date, ' +
-            "due_date, review_publish_date, review_due_date, one_person_groups) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *");
+            "due_date, review_publish_date, review_due_date, one_person_groups, review_evaluation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *");
         statement.values = [title, description, courseId, reviewsPerUser, filename, publishDate, dueDate,
-            reviewPublishDate, reviewDueDate, onePersonGroups];
+            reviewPublishDate, reviewDueDate, onePersonGroups, reviewEvaluation];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -120,6 +120,18 @@ export default class AssignmentPS {
         "SELECT g.id, g.group_name FROM assignmentgroup a JOIN grouplist g ON a.group_id = g.id " +
             "WHERE assignment_id = $1");
         statement.values = [id];
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Get the users that are in a certain group.
+     * @param {number} groupId
+     * @return {Promise<pgPromise.queryResult>}
+     */
+    public static executeGetUsersOfGroup(groupId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-all-groups-users-for-assignment",
+            "SELECT * from groupusers WHERE group_groupid = $1");
+        statement.values = [groupId];
         return Database.executeQuery(statement);
     }
 

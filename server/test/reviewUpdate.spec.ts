@@ -40,10 +40,10 @@ describe("ReviewUpdate Class tests", () => {
                 }, answer: {answer: 4}
             }];
         const result = await ReviewUpdate.updateReview(1, formdata);
-        expect(result.form[0].answer.answer).to.equal(1);
-        expect(result.form[1].answer.answer).to.equal(undefined);
-        expect(result.form[2].answer.answer).to.equal("Flesje water is beter dan flesje bier");
-        expect(result.form[3].answer.answer).to.equal(4);
+        expect(result.form[0].answer.answer).to.equal("Flesje water is beter dan flesje bier");
+        expect(result.form[1].answer.answer).to.equal(4);
+        expect(result.form[2].answer.answer).to.equal(1);
+        expect(result.form[3].answer.answer).to.equal(undefined);
     });
 
     /**

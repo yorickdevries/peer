@@ -46,8 +46,8 @@ export default {
     createAssignment: async(assignment) => {
         return client.post('/assignments', assignment)
     },
-    getAssignmentReviews(assignmentId) {
-        return client.get(`/assignments/${assignmentId}/allreviews`)
+    getAssignmentReviews(assignmentId, done) {
+        return client.get(`/assignments/${assignmentId}/allreviews/${done}`)
     },
     saveAssignment(assignmentId, assignment) {
         return client.put(`assignments/${assignmentId}`, assignment)
@@ -115,5 +115,22 @@ export default {
     getSubmission(submissionId) {
         return client.get(`/submissions/${submissionId}`)
     },
+    ReviewEvaluation: {
+        get(reviewId, exists) {
+            return client.get(`/reviews/${reviewId}/reviewEvaluation`)
+        },
+        create(reviewId) {
+            return client.post(`/reviews/${reviewId}/reviewEvaluation`)
+        }
+    },
+    getAcademicYears() {
+        return client.get('/courses/data/academicYears')
+    },
+    getFaculties() {
+        return client.get('/courses/data/faculties')
+    },
+    getactiveAcademicYears() {
+        return client.get('/courses/data/activeAcademicYears')
+    }
 }
 

@@ -14,6 +14,7 @@ export default class ReviewUpdate {
         const jsonItems: any = [];
         const review = await ReviewsPS.executeGetReview(reviewId);
         const questions = await RubricPS.getAllQuestionsByRubricId(review.rubric_id);
+        questions.sort(function(a, b) {return a.question_number - b.question_number; });
 
         // Loop through the questions and add answers to them.
         for (let i = 0; i < questions.length; i++) {
@@ -25,6 +26,7 @@ export default class ReviewUpdate {
                     case "mc": answer = await ReviewsPS.executeGetMCAnswer(reviewId, question.id); break;
                     case "open": answer = await ReviewsPS.executeGetOpenAnswer(reviewId, question.id); break;
                     case "range": answer = await ReviewsPS.executeGetRangeAnswer(reviewId, question.id); break;
+                    case "upload": answer = await ReviewsPS.executeGetUploadAnswer(reviewId, question.id); break;
                     default: throw new Error("unrecognized question type: " + question.type_question);
                 }
                 // Create the correct JSON format (API documentation) and push to array.
@@ -62,8 +64,19 @@ export default class ReviewUpdate {
      * @returns the review as json.
      */
     public static async updateReview(reviewId: number, inputForm: any[]) {
+        return this.updateReviewWithFileUpload(reviewId, inputForm, []);
+    }
+
+    /**
+     * Update a review with file upload questions.
+     * @param {number} reviewId - the review id.
+     * @param {any[]} inputForm - the input form.
+     * @param {number[]} fileUploadQuestionIds - the question ids of each file upload question.
+     * @return {Promise<{review: any; form: any}>}
+     */
+    public static async updateReviewWithFileUpload(reviewId: number, inputForm: any[], fileUploadQuestionIds: number[]) {
         // check all questions
-        const checkedQuestions = await this.checkQuestions(reviewId, inputForm);
+        const checkedQuestions = await this.checkQuestions(reviewId, inputForm, fileUploadQuestionIds);
         // If no error, apply all questions to the database
         await this.applyQuestions(reviewId, checkedQuestions);
         // Get and return the new review
@@ -74,9 +87,10 @@ export default class ReviewUpdate {
      * Check the validity of all questions
      * @param {number} reviewId
      * @param {any[]} inputForm
+     * @param fileUploadQuestionIds
      * @returns list of the questions or an error.
      */
-    public static async checkQuestions(reviewId: number, inputForm: any[]) {
+    public static async checkQuestions(reviewId: number, inputForm: any[], fileUploadQuestionIds: number[]) {
         const review = await ReviewsPS.executeGetReview(reviewId);
         const rubric: any = await RubricPS.executeGetRubricById(review.rubric_id);
         const rubricId = rubric.id;
@@ -95,6 +109,7 @@ export default class ReviewUpdate {
             }
             const questionId = questionObject.id;
             const answerText = answerObject.answer;
+
             // If the answer is undefined, skip
             if (answerText == undefined) {
                 continue;
@@ -111,6 +126,14 @@ export default class ReviewUpdate {
                 break;
                 case "mc":
                     questionList.push(await this.checkMCQuestion(questionId, rubricId, answerText));
+                break;
+                case "upload":
+                    // If the question id is not contained, the user did not upload a file. Skip this one.
+                    // Usually, this is handled by the front-end. However, this was hard to do (easier here)
+                    // due to the file-upload functionality of Vue, which would add a lot of logic in the front-end.
+                    if (fileUploadQuestionIds.some(x => x === questionId)) {
+                        questionList.push(await this.checkUploadQuestion(questionId, rubricId, answerText));
+                    }
                 break;
                 default: throw new Error("Unrecognized question type: " + questionType);
             }
@@ -173,6 +196,23 @@ export default class ReviewUpdate {
     }
 
     /**
+     * Checks whether an answer for an upload question is valid to add to the database
+     * @param {number} questionId
+     * @param {number} rubricId
+     * @param {*} answerText
+     * @returns open question json.
+     */
+    public static async checkUploadQuestion(questionId: number, rubricId: number, answerText: any) {
+        // The upload check is done before the reviewUpdate step, to filter out false extension types.
+        // The answer corresponds to the filename, which is automatically set and is therefore always correct.
+        return {
+            questionType: "upload",
+            questionId: questionId,
+            answer: answerText
+        };
+    }
+
+    /**
      * Checks whether an answer for an MC question is valid to add to the database
      * @param {number} questionId
      * @param {number} rubricId
@@ -225,6 +265,9 @@ export default class ReviewUpdate {
                     break;
                     case "mc":
                         await ReviewsPS.executeUpdateMpcAnswer(answer, questionId, reviewId);
+                    break;
+                    case "upload":
+                        await ReviewsPS.executeUpdateUploadAnswer(answer, questionId, reviewId);
                     break;
                     default: throw new Error("Unrecognized question type: " + questionType);
                 }

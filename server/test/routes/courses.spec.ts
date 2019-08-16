@@ -23,25 +23,27 @@ describe("API Course routes", () => {
      * Tests whether courses are posted and returned
      */
     it("Put courses/", async () => {
+        const updateData = {
+            academic_year: "2018/2019",
+            course_code: "2",
+            description: "example",
+            enrollable: true,
+            faculty: "3ME",
+            name: "test name"
+        };
+
         const res = await chai.request(router)
             .post("/")
-            .send({description: "example", name: "test name", enrollable: "true"});
+            .send(updateData);
 
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify({"id": 4, "description": "example", "name": "test name", "enrollable": true}
-        ));
+        expect(res.body).to.deep.include({ description: "example", name: "test name", enrollable: true });
 
         const result = await chai.request(router).get("/enrolled");
-        expect(result.status).to.equal(200);
+        const newCourse = result.body.find((object: any) => object.id == 4);
 
-        const enrolledlist: any = JSON.parse(result.text);
-        const newcourse = enrolledlist.find((object: any) => object.id == 4);
-        expect(newcourse).to.deep.equal({
-            "id": 4,
-            "description": "example",
-            "name": "test name",
-            "enrollable": true
-        });
+        expect(result.status).to.equal(200);
+        expect(newCourse).to.deep.include(updateData);
     });
 
     /**
@@ -51,11 +53,25 @@ describe("API Course routes", () => {
         MockLogin.initialize("bplanje", undefined, ["employee", "faculty"]);
         const res = await chai.request(router)
             .post("/")
-            .send({description: "example", name: "test name", "enrollable": true});
+            .send({
+                faculty: "3ME",
+                academic_year: "2018/2019",
+                course_code: "2",
+                description: "example",
+                name: "test name",
+                enrollable: true
+            });
 
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify({"id": 4, "description": "example", "name": "test name", "enrollable": true}
-        ));
+        expect(res.body).to.deep.include({
+                faculty: "3ME",
+                academic_year: "2018/2019",
+                course_code: "2",
+                description: "example",
+                name: "test name",
+                enrollable: true
+            }
+        );
     });
 
     /**
@@ -65,7 +81,9 @@ describe("API Course routes", () => {
         MockLogin.initialize("bplanje", undefined, "student");
         const res = await chai.request(router)
             .post("/")
-            .send({description: "example", name: "test name"});
+            .send({
+                faculty: "3ME", academic_year: "2018/2019", course_code: "2", description: "example", name: "test name"
+            });
 
         expect(res.status).to.equal(401);
     });
@@ -77,13 +95,33 @@ describe("API Course routes", () => {
         // test the router
         const res = await chai.request(router).get("/enrolled");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify([{
-            "id": 1,
-            "description": "This is a beautiful course description!",
-            "name": "ED-3",
-            "enrollable": true
-        }, {"id": 2, "description": "Test-course", "name": "ED-4", "enrollable": true},
-        {"id": 3, "description": "Test-course2", "name": "ED-5", "enrollable": false}]));
+        expect(res.body.length).to.equal(3);
+        expect(res.body[0]).to.deep.include({
+            faculty: "EWI",
+            academic_year: "2019/2020",
+            course_code: "ED1-1631",
+            description: "This is a beautiful course description!",
+            name: "ED-3",
+            enrollable: true
+        });
+
+        expect(res.body[1]).to.deep.include({
+            faculty: "EWI",
+            academic_year: "2019/2020",
+            course_code: "ED2-1138",
+            description: "Test-course",
+            name: "ED-4",
+            enrollable: true
+        });
+
+        expect(res.body[2]).to.deep.include({
+            faculty: "EWI",
+            academic_year: "2019/2020",
+            course_code: "ED3-1336",
+            description: "Test-course2",
+            name: "ED-5",
+            enrollable: false
+        });
     });
 
     /**
@@ -92,7 +130,6 @@ describe("API Course routes", () => {
     it("Get /:courseId/assignments", async () => {
         // test the router
         const res = await chai.request(router).get("/1/assignments");
-        console.log(res.text);
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text)[0].title).to.equal("Assignment 1");
     });
@@ -104,14 +141,26 @@ describe("API Course routes", () => {
         // test the router
         const res = await chai.request(router)
             .put("/1")
-            .send({courseId: 1, description: "example", name: "test name", "enrollable": true});
+            .send({
+                faculty: "3ME",
+                academic_year: "2018/2019",
+                course_code: "2",
+                courseId: 1,
+                description: "example",
+                name: "test name",
+                enrollable: true
+            });
+
+
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify({
-            id: 1,
+        expect(res.body).to.deep.include({
+            faculty: "3ME",
+            academic_year: "2018/2019",
+            course_code: "2",
             description: "example",
             name: "test name",
             enrollable: true
-        }));
+        });
     });
 
     /**
@@ -121,12 +170,14 @@ describe("API Course routes", () => {
         // test the router
         const res = await chai.request(router).get("/1");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify({
-            id: 1,
+        expect(res.body).to.deep.include({
+            faculty: "EWI",
+            academic_year: "2019/2020",
+            course_code: "ED1-1631",
             description: "This is a beautiful course description!",
             name: "ED-3",
             enrollable: true
-        }));
+        });
     });
 
     /**

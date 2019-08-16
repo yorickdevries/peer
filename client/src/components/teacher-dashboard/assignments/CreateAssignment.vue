@@ -134,12 +134,11 @@
                                 </b-form-radio-group>
                             </b-form-group>
 
-                            <b-form-group   label="Review on Review"
+                            <b-form-group   label="Students can evaluate their recieved reviews"
                                             description="This can not be changed after creating the assignment.">
                                 <b-form-checkbox
-                                        v-model="assignment.review_on_review"
-                                >
-                                    Enable Review on review (makes students review each other reviews).
+                                        v-model="assignment.review_evaluation">
+                                    Enable Review evaluation.
                                 </b-form-checkbox>
                             </b-form-group>
 
@@ -194,7 +193,7 @@ export default {
                 review_due_date: null,
                 reviews_per_user: null,
                 one_person_groups: false,
-                review_on_review: false
+                review_evaluation: false
             }
         }
     },
@@ -256,7 +255,7 @@ export default {
                 formData.append("assignmentFile", this.file)
                 formData.append("reviews_per_user", this.assignment.reviews_per_user)
                 formData.append("one_person_groups", this.assignment.one_person_groups)
-                formData.append("review_on_review", this.assignment.review_on_review)
+                formData.append("review_evaluation", this.assignment.review_evaluation)
 
                 try {
                     await api.createAssignment(formData)

@@ -13,12 +13,12 @@ export default class ExportResultsPS {
      */
     public static executeGetStudentSubmissionReviewExportAssignment(assignmentId: number): any {
         const statement = new PreparedStatement("get-result-aggregation-assignment",
-            'SELECT netID AS "netID", studentNumber AS "studentnumber", approved, disproved, total - approved - disproved AS "waiting for TA", total AS "student total reviews"' +
+            'SELECT netID AS "netID", studentNumber AS "studentnumber", approved, disapproved, total - approved - disapproved AS "waiting for TA", total AS "student total reviews"' +
             "FROM (" +
             "    SELECT userlist.netid AS netID," +
             "    userlist.studentNumber AS studentNumber," +
             "    SUM(CASE WHEN review.approved IN (true) THEN 1 ELSE 0 END) AS approved," +
-            "    SUM(CASE WHEN review.approved IN (false) THEN 1 ELSE 0 END) AS disproved," +
+            "    SUM(CASE WHEN review.approved IN (false) THEN 1 ELSE 0 END) AS disapproved," +
             "    COUNT(userlist.netid) AS total" +
             "    FROM userlist " +
             "    JOIN review ON review.user_netid = userlist.netid" +
@@ -38,12 +38,12 @@ export default class ExportResultsPS {
      */
     public static executeGetStudentSubmissionReviewExportCourse(courseId: number): any {
         const statement = new PreparedStatement("get-result-aggregation-course",
-            'SELECT netID AS "netID", studentNumber AS "studentnumber", approved, disproved, total - approved - disproved AS "waiting for TA", total AS "student total reviews"' +
+            'SELECT netID AS "netID", studentNumber AS "studentnumber", approved, disapproved, total - approved - disapproved AS "waiting for TA", total AS "student total reviews"' +
             "FROM (" +
             "    SELECT userlist.netid AS netID," +
             "    userlist.studentNumber AS studentNumber," +
             "    SUM(CASE WHEN review.approved IN (true) THEN 1 ELSE 0 END) AS approved," +
-            "    SUM(CASE WHEN review.approved IN (false) THEN 1 ELSE 0 END) AS disproved," +
+            "    SUM(CASE WHEN review.approved IN (false) THEN 1 ELSE 0 END) AS disapproved," +
             "    COUNT(userlist.netid) AS total" +
             "    FROM userlist " +
             "    JOIN review ON review.user_netid = userlist.netid" +
