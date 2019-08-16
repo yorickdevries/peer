@@ -98,10 +98,14 @@ export default {
             // Special function to create MC question.
             if (type === 'mc') return this.createMCQuestion(question)
 
-            await api.client.post(`${apiPrefixes[type]}`, question)
-            this.showSuccessMessage({message: "Successfully created question."})
-            this.$emit('saved')
-            this.onReset()
+            try {
+                await api.client.post(`${apiPrefixes[type]}`, question)
+                this.showSuccessMessage({message: "Successfully created question."})
+                this.$emit('saved')
+                this.onReset()
+            } catch (e) {
+                this.showErrorMessage({ message: "Error making question. Please make sure you have filled in all the fields."})
+            }
         },
         async createMCQuestion(question) {
 
