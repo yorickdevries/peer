@@ -90,7 +90,7 @@
                                                 <template v-else>
                                                     <dt>Import groups</dt>
                                                     <dd>This action will import the groups in the assignment.</dd>
-                                                    <b-button v-b-modal="'importGroups'" variant="primary" size="sm">
+                                                    <b-button v-b-modal="'importGroups'" variant="primary" size="sm" class="mb-3">
                                                         Import groups
                                                     </b-button>
                                                 </template>
