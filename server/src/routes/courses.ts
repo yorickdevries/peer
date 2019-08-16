@@ -24,7 +24,7 @@ router.use(bodyParser.json());
 router.post("/", index.authorization.employeeCheck, async (req: any, res) => {
     try {
         // Create the course
-        const course = await CoursesPS.executeCreateCourse(req.body.description, req.body.name, req.body.enrollable);
+        const course = await CoursesPS.executeCreateCourse(req.body.faculty, req.body.academic_year, req.body.course_code, req.body.description, req.body.name, req.body.enrollable);
         // Enroll the teacher in the course
         await CoursesPS.executeEnrollInCourseId(course.id, req.user.netid, Roles.teacher);
         // Respond with appropriate JSON
@@ -93,7 +93,7 @@ router.get("/:courseId/assignments", index.authorization.enrolledCourseCheck, (r
  * @body name - a new course name.
  */
 router.put("/:courseId", index.authorization.enrolledCourseTeacherCheck, (req, res) => {
-    CoursesPS.executeUpdateCourse(req.params.courseId, req.body.description, req.body.name, req.body.enrollable)
+    CoursesPS.executeUpdateCourse(req.params.courseId, req.body.faculty, req.body.academic_year, req.body.course_code, req.body.description, req.body.name, req.body.enrollable)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -215,6 +215,36 @@ router.get("/:courseId/assignments/unenrolled", async (req: any, res) => {
     try {
         // Use method from group parser to enroll student (if not already enrolled)
         res.json(await AssignmentsPS.executeGetUnenrolledAssignmentsForUser(req.user.netid, req.params.courseId));
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Get all faculties.
+ */
+router.get("/data/faculties", async (req: any, res) => {
+    try {
+        res.json(await CoursesPS.executeGetFaculties());
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+/**
+ * Get all faculties.
+ */
+router.get("/data/academicYears", async (req: any, res) => {
+    try {
+        res.json(await CoursesPS.executeGetAcademicYears());
+    } catch {
+        res.sendStatus(400);
+    }
+});
+
+router.get("/data/activeAcademicYears", async (req: any, res) => {
+    try {
+        res.json(await CoursesPS.executeGetactiveAcademicYears());
     } catch {
         res.sendStatus(400);
     }

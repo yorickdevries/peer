@@ -122,7 +122,15 @@ export default {
         create(reviewId) {
             return client.post(`/reviews/${reviewId}/reviewEvaluation`)
         }
-
+    },
+    getAcademicYears() {
+        return client.get('/courses/data/academicYears')
+    },
+    getFaculties() {
+        return client.get('/courses/data/faculties')
+    },
+    getactiveAcademicYears() {
+        return client.get('/courses/data/activeAcademicYears')
     }
 }
 

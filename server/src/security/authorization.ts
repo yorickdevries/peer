@@ -283,7 +283,7 @@ const checkRangeQuestionEdit = async (req: any, res: any, next: any) => {
  */
 const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
     try {
-        const review = await ReviewPS.executeGetReview(req.params.reviewId);
+        const review = await ReviewPS.executeGetFullReview(req.params.reviewId);
         const rubric = await RubricPS.executeGetRubricById(review.rubric_id);
 
         if (rubric.type == "submission") {
@@ -345,7 +345,7 @@ const checkAuthorizationForCreatingReviewEvaluation = async (req: any, res: any,
         if (!authCheckSubmissionOwner.exists) {
             throw new Error("This review is not about you");
         }
-        const review = await ReviewPS.executeGetReview(reviewId);
+        const review = await ReviewPS.executeGetFullReview(reviewId);
 
         // the review should be done in the first place
         if (!review.done) {
@@ -404,7 +404,7 @@ const checkReviewOwnerDone = async (req: any, res: any, next: any) => {
  */
 const checkReviewBetweenPublishDue = async (req: any, res: any, next: any) => {
     try {
-        const review = await ReviewPS.executeGetReview(req.params.reviewId);
+        const review = await ReviewPS.executeGetFullReview(req.params.reviewId);
         const rubric = await RubricPS.executeGetRubricById(review.rubric_id);
 
         // in case the rubric is a submission, the time needs to be checked
@@ -608,8 +608,13 @@ const courseEnrollable = async (req: any, res: any, next: any) => {
     try {
         // Fetch the parameters required for the check.
         const course: any = await CoursesPS.executeGetCourseById(req.params.courseId);
+        const activeYears: any[] = await CoursesPS.executeGetactiveAcademicYears();
+
         // Verify the authorization.
-        await response(res, course.enrollable, next);
+        const isEnrollable = course.enrollable;
+        const isActive = activeYears.filter(activeYear => {return activeYear.year === course.academic_year; }).length > 0;
+
+        await response(res, isEnrollable && isActive, next);
     } catch (error) {
         res.sendStatus(401);
     }

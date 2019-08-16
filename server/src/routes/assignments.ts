@@ -596,7 +596,7 @@ router.get("/:assignment_id/reviewsExport/", index.authorization.enrolledAsTeach
 
             // get the evaluation (if present)
             try {
-                const reviewEvaluation: any = (await ReviewPS.executeGetReviewEvaluation(review.id));
+                const reviewEvaluation: any = (await ReviewPS.executeGetFullReviewEvaluation(review.id));
                 reviewJson["Review evaluation done"] = reviewEvaluation.done;
                 const reviewEvaluationQuestions = (await ReviewUpdate.getReview(reviewEvaluation.id)).form;
                 addQuestionsToReviewJson(reviewEvaluationQuestions, reviewJson);

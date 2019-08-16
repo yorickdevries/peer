@@ -401,7 +401,6 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).get("/2/distributeReviews/0");
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).length).to.equal(3);
-        console.log(JSON.parse(res.text));
     });
 
     /**
@@ -412,7 +411,6 @@ describe("API Assignment routes", () => {
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).get("/2/distributeReviews/1");
         expect(res.status).to.equal(200);
-        console.log(JSON.parse(res.text));
         expect(JSON.parse(res.text).length).to.equal(6);
     });
 

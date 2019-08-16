@@ -73,7 +73,7 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
 router.route("/:reviewId/reviewevaluation").get(index.authorization.checkAuthorizationForGettingReviewEvaluation, async (req, res) => {
     try {
         const reviewId = req.params.reviewId;
-        const reviewEvaluation: any = await ReviewsPS.executeGetReviewEvaluation(reviewId);
+        const reviewEvaluation: any = await ReviewsPS.executeGetFullReviewEvaluation(reviewId);
         res.json({
             id: reviewEvaluation.id,
             user_netid: reviewEvaluation.net_id
@@ -103,7 +103,10 @@ router.route("/:reviewId/reviewevaluation").post(index.authorization.checkAuthor
 
             // create the review
             const reviewEvaluation: any = await ReviewsPS.executeCreateReviewEvaluation(req.user.netid, reviewId, reviewEvaluationRubric.id);
-            res.json(reviewEvaluation);
+            res.json({
+                id: reviewEvaluation.id,
+                user_netid: reviewEvaluation.net_id
+                });
         }
     } catch (error) {
         res.status(400);
