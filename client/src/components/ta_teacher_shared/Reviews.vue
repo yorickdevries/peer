@@ -1,10 +1,6 @@
 <template>
     <div>
-        <!--<b-row>{{allReviews}}</b-row>-->
-        <!--<b-row>{{doneReviews}}</b-row>-->
-        <!--<b-row>{{notDoneReviews}}</b-row>-->
-        <!--<b-row>{{reviews}}</b-row>-->
-        <!--{{showOnlyDoneReviews}}-->
+
         <!--Table Options-->
         <b-row>
             <b-col cols="6" class="mb-3">
@@ -117,7 +113,6 @@
                   } else {
                       this.notDoneReviews.push(this.allReviews[i])
                   }
-
               }
             },
             async setShowOnlyDoneReviews(state) {
