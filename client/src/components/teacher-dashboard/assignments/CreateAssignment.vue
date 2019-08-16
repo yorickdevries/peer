@@ -31,12 +31,16 @@
                                 </b-form-input>
                             </b-form-group>
 
+                            <hr />
+
                             <!--Publish and due date of the assignment-->
                             <b-row class="mb-3">
                                 <b-col>
                                     <!--{{assignment.publish_day}}-->
                                     <b-form-group>
-                                        <template slot="label"><b-badge variant="info">1</b-badge> Publish date and time</template>
+                                        <template slot="label"> Publish date and time
+                                            <b-badge v-b-tooltip.hover title="The date and time on which the assignment becomes available to the students" variant="primary">?</b-badge>
+                                        </template>
                                         <datepicker placeholder="Select Date" v-model="assignment.publish_day"></datepicker>
                                         <!--<b-form-input   v-model="assignment.publish_day"-->
                                                         <!--type="date"-->
@@ -53,7 +57,9 @@
                                 </b-col>
                                 <b-col>
                                     <b-form-group>
-                                        <template slot="label"><b-badge variant="info">2</b-badge> Hand-in due date and time</template>
+                                        <template slot="label">Hand-in due date and time
+                                            <b-badge v-b-tooltip.hover title="The date and time before which the students have to hand in their submission" variant="primary">?</b-badge>
+                                        </template>
                                         <datepicker placeholder="Select Date" v-model="assignment.due_day"></datepicker>
                                         <!--<b-form-input   v-model="assignment.due_day"-->
                                                         <!--type="date"-->
@@ -73,7 +79,9 @@
                             <b-row>
                                 <b-col>
                                     <b-form-group>
-                                        <template slot="label"><b-badge variant="info">3</b-badge> Start date and time for peer review</template>
+                                        <template slot="label">Start date and time for peer review(s)
+                                            <b-badge v-b-tooltip.hover title="The date and time on which the students can start peer reviewing" variant="primary">?</b-badge>
+                                        </template>
                                         <datepicker placeholder="Select Date" v-model="assignment.review_publish_day"></datepicker>
                                         <!--<b-form-input   v-model="assignment.review_publish_day"-->
                                                         <!--type="date"-->
@@ -89,7 +97,9 @@
                                 </b-col>
                                 <b-col>
                                     <b-form-group>
-                                        <template slot="label"><b-badge variant="info">4</b-badge> Due date and time for peer review</template>
+                                        <template slot="label">Due date and time for peer review(s)
+                                            <b-badge v-b-tooltip.hover title="The date and time before which the students have to submit their review(s)" variant="primary">?</b-badge>
+                                        </template>
                                         <datepicker placeholder="Select Date" v-model="assignment.review_due_day"></datepicker>
                                         <!--<b-form-input   v-model="assignment.review_due_day"-->
                                                         <!--type="date"-->
@@ -104,6 +114,9 @@
                                     </b-form-group>
                                 </b-col>
                             </b-row>
+
+                            <hr />
+
                             <b-form-group label="Number of reviews that each student needs to do">
                                 <b-form-input   v-model="assignment.reviews_per_user"
                                                 type="number"
@@ -134,7 +147,7 @@
                                 </b-form-radio-group>
                             </b-form-group>
 
-                            <b-form-group   label="Students can evaluate their recieved reviews"
+                            <b-form-group   label="Students can evaluate their received reviews"
                                             description="This can not be changed after creating the assignment.">
                                 <b-form-checkbox
                                         v-model="assignment.review_evaluation">
