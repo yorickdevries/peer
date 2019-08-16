@@ -92,7 +92,7 @@
                             </b-form-group>
 
                             <!--File upload-->
-                            <b-form-group label="Assignment file" class="mb-0">
+                            <b-form-group label="Assignment file" class="mb-3">
                                 <!--Show currently uploaded file-->
                                 <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
                                     <div v-if="assignment.filename">You currently have uploaded the file:

@@ -120,10 +120,12 @@ const updateAssignment = async function(req: any, res: any) {
             // Assemble the file path. Updated file name is the new file name.
             // It can never be the old since req.file would be undefined.
             const newFilePath = path.join(fileFolder, updatedFileName);
-            const oldFilePath = path.join(fileFolder, oldFilename);
 
             // Remove the old file and write the new file.
-            await fs.unlink(oldFilePath);
+            if (oldFilename) {
+                const oldFilePath = path.join(fileFolder, oldFilename);
+                await fs.unlink(oldFilePath);
+            }
             await fs.writeFile(newFilePath, req.file.buffer);
         }
         res.json(result);
@@ -141,13 +143,14 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
         let filePath: string | undefined = undefined;
 
         if (req.file == undefined) {
+            // tslint:disable-next-line
             fileName = null;
         } else {
             fileName = Date.now() + "-" + req.file.originalname;
             filePath = path.join(fileFolder, fileName);
         }
 
-        let result: any = await AssignmentPS.executeAddAssignment(
+        const result: any = await AssignmentPS.executeAddAssignment(
             req.body.title,
             req.body.description,
             req.body.course_id,
