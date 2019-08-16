@@ -80,7 +80,7 @@ router.route("/:reviewId/reviewevaluation").get(index.authorization.checkAuthori
             });
     } catch (error) {
         res.status(400);
-        res.json({error: error.message});
+        res.json({error: "Does not exists"});
     }
 });
 

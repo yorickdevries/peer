@@ -320,13 +320,12 @@ const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
 const checkAuthorizationForGettingReviewEvaluation = async (req: any, res: any, next: any) => {
     try {
         const reviewId = req.params.reviewId;
-        const reviewEvaluation: any = await ReviewPS.executeGetReviewEvaluation(reviewId);
 
-        // check ownership
-        const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(reviewEvaluation.id, req.user.netid);
-        const authCheckOwner = await AuthorizationPS.executeCheckReviewMaker(reviewEvaluation.id, req.user.netid);
+        // check ownership of the review (regardles of whether the evaluationReview exists)
+        const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(reviewId, req.user.netid);
+        const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(reviewId, req.user.netid);
 
-        const bool = authCheckTAOrTeacher.exists || authCheckOwner.exists;
+        const bool = authCheckTAOrTeacher.exists || authCheckSubmissionOwner.exists;
         await response(res, bool, next);
 
 
