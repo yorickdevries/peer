@@ -419,8 +419,8 @@ ALTER TABLE Review ADD CONSTRAINT Review_Submission
     INITIALLY IMMEDIATE
 ;
 
--- Reference: Review_ReviewedReview (table: Review)
-ALTER TABLE Review ADD CONSTRAINT Review_ReviewedReview
+-- Reference: Review_EvaluatedReview (table: Review)
+ALTER TABLE Review ADD CONSTRAINT Review_EvaluatedReview
     FOREIGN KEY (evaluated_review_id)
     REFERENCES Review (id)
     NOT DEFERRABLE
