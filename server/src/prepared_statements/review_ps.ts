@@ -286,10 +286,12 @@ export default class ReviewPS {
             "JOIN submission ON submission.id = review.submission_id WHERE assignmentlist.id = $1 " +
             "AND rubric.type = 'submission' ";
 
-        if (done && done === true) {
-            queryString += "AND review.done = true";
-        } else if (done && done === false) {
-            queryString += "AND review.done = false";
+        if (done != undefined) {
+            if (done === true) {
+                queryString += "AND review.done = true";
+            } else if (done === false) {
+                queryString += "AND review.done = false";
+            }
         }
 
         const statement = new PreparedStatement("get-all-done-reviews-by-assignmentid", queryString);
