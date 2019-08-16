@@ -274,19 +274,25 @@ export default class ReviewPS {
     }
 
     /**
-     * Gets all done reviews for a certain assignment.
+     * Gets all reviews of an assignment.
      * @param {number} assignmentId - an assignment id.
+     * @param done - optional. True/false if the review should be done or not.
      * @return {Promise<pgPromise.queryResult>} - a promise of the database result.
      */
-    public static executeGetAllDoneSubmissionReviewsByAssignmentId(assignmentId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-all-done-reviews-by-assignmentid",
-            "SELECT review.id, review.approved, review.ta_netid, review.user_netid as reviewer, submission.user_netid as submitter " +
+    public static executeGetAllSubmissionReviewsByAssignmentId(assignmentId: number, done?: boolean): Promise<pgPromise.queryResult> {
+        let queryString = "SELECT review.id, review.approved, review.ta_netid, review.user_netid as reviewer, submission.user_netid as submitter " +
             "FROM review JOIN rubric ON review.rubric_id = rubric.id " +
             "JOIN assignmentlist ON assignmentlist.id = rubric.assignment_id " +
             "JOIN submission ON submission.id = review.submission_id WHERE assignmentlist.id = $1 " +
-            "AND review.done = true " +
-            "AND rubric.type = 'submission'"
-            );
+            "AND rubric.type = 'submission' ";
+
+        if (done && done === true) {
+            queryString += "AND review.done = true";
+        } else if (done && done === false) {
+            queryString += "AND review.done = false";
+        }
+
+        const statement = new PreparedStatement("get-all-done-reviews-by-assignmentid", queryString);
         statement.values = [assignmentId];
         return Database.executeQuery(statement);
     }
