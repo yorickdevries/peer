@@ -74,7 +74,10 @@ router.route("/:reviewId/reviewevaluation").get(index.authorization.checkAuthori
     try {
         const reviewId = req.params.reviewId;
         const reviewEvaluation: any = await ReviewsPS.executeGetReviewEvaluation(reviewId);
-        res.json(reviewEvaluation);
+        res.json({
+            id: reviewEvaluation.id,
+            user_netid: reviewEvaluation.net_id
+            });
     } catch (error) {
         res.status(400);
         res.json({error: error.message});
