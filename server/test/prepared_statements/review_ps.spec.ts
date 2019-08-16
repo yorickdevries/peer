@@ -227,14 +227,15 @@ describe("ReviewPreparedStatement Test", () => {
      * Test get reviews for an assignment.
      */
     it("Reviews of an assignment", async () => {
-        expect(await ReviewPS.executeGetAllDoneSubmissionReviewsByAssignmentId(1)).to.deep.equal([{
+        expect(await ReviewPS.executeGetAllSubmissionReviewsByAssignmentId(1, true)).to.deep.equal([{
             // tslint:disable-next-line
             "approved": null,
             "id": 2,
             "reviewer": "paulvanderlaan",
             "submitter": "paulvanderlaan",
             // tslint:disable-next-line
-            "ta_netid": null
+            "ta_netid": null,
+            done: true
         }]);
     });
 

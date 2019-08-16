@@ -35,24 +35,24 @@
                             <b-form-group label="Publish date and time">
                                 <b-form-input   v-model="assignment.publish_day"
                                                 type="date"
-                                                placeholder="Please enter date on which the assignment should be published"
+                                                placeholder="dd/mm/yyyy"
                                                 required>
                                 </b-form-input>
                                 <b-form-input   v-model="assignment.publish_time"
                                                 type="time"
-                                                placeholder="Please enter time on which the assignment should be published"
+                                                placeholder="dd/mm/yyyy"
                                                 required>
                                 </b-form-input>
                             </b-form-group>
                             <b-form-group label="Due date and time">
                                 <b-form-input   v-model="assignment.due_day"
                                                 type="date"
-                                                placeholder="Please enter date on which the assignment should be handed in"
+                                                placeholder="dd/mm/yyyy"
                                                 required>
                                 </b-form-input>
                                 <b-form-input   v-model="assignment.due_time"
                                                 type="time"
-                                                placeholder="Please enter time before which the assignment should be handed in"
+                                                placeholder="dd/mm/yyyy"
                                                 required>
                                 </b-form-input>
                             </b-form-group>
@@ -92,13 +92,15 @@
                             </b-form-group>
 
                             <!--File upload-->
-                            <b-form-group label="Assignment file" class="mb-0">
+                            <b-form-group label="Assignment file" class="mb-3">
                                 <!--Show currently uploaded file-->
                                 <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
-                                    <div>You currently have uploaded the file:
+                                    <div v-if="assignment.filename">You currently have uploaded the file:
                                         <br><a :href="assignmentFilePath" :download="assignment.filename"
                                                target="_blank">{{ assignment.filename }}</a>
                                     </div>
+                                    <p v-else class="text-danger mb-0">You did not upload a file yet
+                                    </p>
                                     <!--Buttons for toggling new assignment upload-->
                                     <b-button v-if="!uploadNewFile" variant="success" @click="uploadNewFile = true">Change file</b-button>
                                     <b-button v-else variant="danger" @click="uploadNewFile = false; file = null; fileProgress = 0">Cancel</b-button>
