@@ -192,8 +192,13 @@ export default {
     },
     methods: {
         async fetchPeerReview() {
-            let {data} = await api.getPeerReview(this.reviewId)
-            this.peerReview = data
+            try {
+                let {data} = await api.getPeerReview(this.reviewId)
+                this.peerReview = data
+            } catch (e) {
+                this.showErrorMessage({message: "Could not fetch the review."})
+            }
+
         },
         async submitPeerReview() {
 
@@ -216,12 +221,18 @@ export default {
                 // Submit peer review.
                 try {
                     await api.submitPeerReview(this.peerReview)
-                    await this.fetchPeerReview()
-                    this.showSubmitMessage()
                 } catch (e) {
                     this.showErrorMessage({message: "Submitting the review has failed. Make sure to fill in all fields."})
+                    return
                 }
 
+                try {
+                    await this.fetchPeerReview()
+                } catch (e) {
+                    this.showErrorMessage({message: "Error saving peer review."})
+                }
+
+                this.showSubmitMessage()
             } else {
                 this.showErrorMessage({message: "All fields are required."})
             }
