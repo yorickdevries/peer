@@ -382,12 +382,12 @@ describe("API Assignment routes", () => {
     it("GET /:id/allreviews", async () => {
         // test the router
         MockLogin.initialize("bplanje");
-        const res = await chai.request(router).get("/1/allreviews");
+        const res = await chai.request(router).get("/1/allreviews/true");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
+        expect(res.body[0]).to.deep.include(
             // tslint:disable-next-line
-            [{"id": 2, "approved": null, "ta_netid": null, "reviewer": "paulvanderlaan", "submitter": "paulvanderlaan"}]
-        ));
+            {"approved": null, "ta_netid": null, "reviewer": "paulvanderlaan", "submitter": "paulvanderlaan", done: true}
+        );
     });
 
     /**

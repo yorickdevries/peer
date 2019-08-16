@@ -46,8 +46,8 @@ export default {
     createAssignment: async(assignment) => {
         return client.post('/assignments', assignment)
     },
-    getAssignmentReviews(assignmentId) {
-        return client.get(`/assignments/${assignmentId}/allreviews`)
+    getAssignmentReviews(assignmentId, done) {
+        return client.get(`/assignments/${assignmentId}/allreviews/${done}`)
     },
     saveAssignment(assignmentId, assignment) {
         return client.put(`assignments/${assignmentId}`, assignment)
