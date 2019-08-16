@@ -1,7 +1,11 @@
 <template>
     <b-card header="Copy groups">
-        <b-alert class="d-flex justify-content-between flex-wrap pb-0" show variant="primary">
-            <p>Make sure to select the correct assignment to copy groups from</p>
+        <b-alert class="d-flex justify-content-between flex-wrap pb-0" show variant="warning">
+            <p>Important to note with copying groups from another assignment:</p>
+            <ul>
+                <li>After copying the groups, the new groups will be visible <span class="font-weight-bold">after you reload the page</span></li>
+                <li>Make sure to select the <span class="font-weight-bold">correct</span> assignment to copy groups from</li>
+            </ul>
         </b-alert>
 
         <b-form-group label="Select the assignment to copy groups from">
@@ -26,7 +30,7 @@
         async created() {
             const assignmentsRes = (await api.getCourseAssignments(this.courseId)).data
             this.assignments = assignmentsRes
-                .filter(x => x.id != this.assignmentId)
+                .filter(x => x.id !== this.assignmentId)
                 .map(x => { return { value: x.id, text: x.title }})
         },
         data() {
@@ -42,9 +46,9 @@
                     await api.client.post(`/assignments/${this.assignmentToCopy}/copygroups`, {
                         target_assignment_id: this.assignmentId
                     })
-                    this.showSuccessMessage()
+                    this.showSuccessMessage({ message: "Copying succesful. Make sure to reload the page." })
                 } catch (e) {
-                    this.showErrorMessage({message: e.response.data.error})
+                    this.showErrorMessage()
                 }
             },
         }
