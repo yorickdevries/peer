@@ -376,8 +376,8 @@ router.post("/:assignment_id/importgroups", index.authorization.enrolledAsTeache
  * Route to get the reviews belonging to an assignment.
  * @param id - assignment id.
  */
-router.get("/:assignment_id/allreviews", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
-    ReviewPS.executeGetAllSubmissionReviewsByAssignmentId(req.params.assignment_id, req.body.done)
+router.get("/:assignment_id/allreviews/:done", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
+    ReviewPS.executeGetAllSubmissionReviewsByAssignmentId(req.params.assignment_id, req.params.done)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
