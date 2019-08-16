@@ -35,7 +35,7 @@ export default class ReviewPS {
     /**
      * Gets an reviewevaluation for a certain review
      */
-    public static executeGetReviewEvaluation(evaluatedReviewId: number): any {
+    public static executeGetFullReviewEvaluation(evaluatedReviewId: number): any {
         const statement = new PreparedStatement("get-review-evaluation-with-evaluated-review-id",
         "SELECT * FROM review WHERE evaluated_review_id = $1"
         );
@@ -59,6 +59,7 @@ export default class ReviewPS {
 
     /**
      * Execute a 'get review' query, where all reviews are fetched.
+     * Only certain fields are displayed as students should not get them all
      * Additionally, the file_path is fetched from the corresponding submission table.
      * @param {number} reviewId - a review id.
      * @return {Promise<pgPromise.queryResult>} - a result, containing tuples following the API documentation.
@@ -66,6 +67,16 @@ export default class ReviewPS {
     public static executeGetReview(reviewId: number): any {
         const statement = new PreparedStatement("get-review-by-id",
             "SELECT id, rubric_id, done, approved FROM review WHERE id = $1");
+        statement.values = [reviewId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Gets a full review including all fields
+     */
+    public static executeGetFullReview(reviewId: number): any {
+        const statement = new PreparedStatement("get-full-review-by-id",
+            "SELECT * FROM review WHERE id = $1");
         statement.values = [reviewId];
         return Database.executeQuerySingleResult(statement);
     }
