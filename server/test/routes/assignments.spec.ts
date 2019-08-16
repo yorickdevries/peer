@@ -366,14 +366,14 @@ describe("API Assignment routes", () => {
     /**
      * Test to get all reviews of an assignment.
      */
-    it("GET /:id/allreviews", async () => {
+    it("GET /:id/allreviews/:done", async () => {
         // test the router
         MockLogin.initialize("bplanje");
-        const res = await chai.request(router).get("/1/allreviews");
+        const res = await chai.request(router).get("/1/allreviews/undefined");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             // tslint:disable-next-line
-            [{"id": 2, "approved": null, "ta_netid": null, "reviewer": "paulvanderlaan", "submitter": "paulvanderlaan"}]
+            [{"id": 2, "approved": null, "ta_netid": null, "reviewer": "paulvanderlaan", "submitter": "paulvanderlaan"}, {"done":true}]
         ));
     });
 
