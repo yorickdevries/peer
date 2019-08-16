@@ -175,7 +175,8 @@ describe("ReviewPreparedStatement Test", () => {
             "reviewer": "paulvanderlaan",
             "submitter": "paulvanderlaan",
             // tslint:disable-next-line
-            "ta_netid": null
+            "ta_netid": null,
+            done: true
         }]);
     });
 
