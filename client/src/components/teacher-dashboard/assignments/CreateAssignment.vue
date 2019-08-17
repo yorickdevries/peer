@@ -294,7 +294,7 @@ export default {
             if (validationResult1.error) {
                 this.showErrorMessage({message: validationResult1.error})
             } else {
-                this.showSuccessMessage({message: "Dates are all filled in!"})
+                // this.showSuccessMessage({message: "Dates are all filled in!"})
                 console.log("From datepicker: " + this.assignment.publish_day)
                 console.log("From datepicker: " + this.assignment.due_day)
                 console.log("From datepicker: " + this.assignment.review_publish_day)
@@ -304,9 +304,10 @@ export default {
                 let rpdate = this.assignment.review_publish_day
                 let rddate = this.assignment.review_due_day
 
-                let validationResult2 = this.checkDST()
-                if (validationResult2.error) {
-                    this.showErrorMessage({message: validationResult2.error})
+                let validationResult2 = this.checkDST(pdate, ddate, rpdate, rddate)
+                if (validationResult2.title) {
+                    this.showErrorMessage({title: validationResult2.title,
+                        message: "Due to switching to daylight saving time, you cannot choose a time between 03:00 and 03:59 on this date"})
                 } else {
                     this.showSuccessMessage({message: "No DST error"})
                     pdate.setHours(this.assignment.publish_time.substring(0,2))
@@ -324,14 +325,14 @@ export default {
                     console.log("After setting time: " + rpdate)
                     console.log("After setting time: " + rddate)
 
-                    let validationResult3 = this.checkDatesLogical()
-                    if (validationResult3.error) {
-                        this.showErrorMessage({message: validationResult3.error})
-                    } else {
-                        this.showSuccessMessage({message: "Dates are all correct!"})
-                        this.assignment.publish_date = pdate.toJSON()
-                        // console.log("After toJSON(): " + this.assignment.publish_date)
-                    }
+                    // let validationResult3 = this.checkDatesLogical()
+                    // if (validationResult3.error) {
+                    //     this.showErrorMessage({message: validationResult3.error})
+                    // } else {
+                    //     this.showSuccessMessage({message: "Dates are all correct!"})
+                    //     this.assignment.publish_date = pdate.toJSON()
+                    //     // console.log("After toJSON(): " + this.assignment.publish_date)
+                    // }
                 }
             }
 
@@ -369,8 +370,24 @@ export default {
                 return true
             }
         },
-        checkDST() {
-
+        checkDST(pdate, ddate, rpdate, rddate) {
+            console.log(pdate)
+            console.log(ddate)
+            console.log(rpdate)
+            console.log(rpdate)
+            console.log(pdate.setHours(this.assignment.publish_time.substring(0,2)))
+            console.log(pdate.setHours(this.assignment.publish_time.substring(0,2)-1))
+            if (pdate.setHours(this.assignment.publish_time.substring(0,2)) === pdate.setHours(this.assignment.publish_time.substring(0,2)-1)) {
+                return {title: "Error in publish time"}
+            } else if (ddate.setHours(this.assignment.due_time.substring(0,2)) === ddate.setHours(this.assignment.due_time.substring(0,2)-1)) {
+                return {title: "Error in hand-in time"}
+            } else if (rpdate.setHours(this.assignment.review_publish_time.substring(0,2)) === rpdate.setHours(this.assignment.review_publish_time.substring(0,2)-1)) {
+                return {title: "Error in review publish time"}
+            } else if (rddate.setHours(this.assignment.review_due_time.substring(0,2)) === rddate.setHours(this.assignment.review_due_time.substring(0,2)-1)) {
+                return {title: "Error in review due time"}
+            } else {
+                return true
+            }
         },
         checkDatesLogical() {
             // Check whether dates are logical

@@ -250,8 +250,8 @@
         let str = "";
         str = time.getHours() < 10 ? str + "0" + time.getHours().toString() + ":" : str + time.getHours().toString() + ":"
         str = time.getMinutes() < 10 ? str + "0" + time.getMinutes().toString() : str + time.getMinutes().toString()
-          console.log("time " + time)
-          console.log("str " + str)
+          // console.log("time " + time)
+          // console.log("str " + str)
         return str
       }
 
@@ -274,6 +274,15 @@
       let rddate = new Date(res.data.review_due_date)
       this.assignment.review_due_day = dateToInputFormat(rddate)
       this.assignment.review_due_time = timeToInputFormat(rddate)
+
+        console.log("Received from server: " + res.data.publish_date)
+        console.log("Received from server: " + res.data.due_date)
+        console.log("Received from server: " + res.data.review_publish_date)
+        console.log("Received from server: " + res.data.review_due_date)
+        console.log("After New Date(): " + pdate)
+        console.log("After New Date(): " + ddate)
+        console.log("After New Date(): " + rpdate)
+        console.log("After New Date(): " + rddate)
     },
     methods: {
       checkDates() {
@@ -294,6 +303,11 @@
         this.assignment.due_date = new Date(this.assignment.due_day + " " + this.assignment.due_time).toJSON();
         this.assignment.review_publish_date = new Date(this.assignment.review_publish_day + " " + this.assignment.review_publish_time).toJSON();
         this.assignment.review_due_date = new Date(this.assignment.review_due_day + " " + this.assignment.review_due_time).toJSON();
+
+        console.log("After formatting for submit: " + this.assignment.publish_date)
+        console.log("After formatting for submit: " + this.assignment.due_date)
+        console.log("After formatting for submit: " + this.assignment.review_publish_date)
+        console.log("After formatting for submit: " + this.assignment.review_due_date)
 
         let validationResult = this.checkDates()
         if (validationResult.error) {
