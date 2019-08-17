@@ -248,7 +248,10 @@
 
       function timeToInputFormat(time) {
         let str = "";
-        str = str + time.getHours().toString() + ":" + time.getMinutes().toString()
+        str = time.getHours() < 10 ? str + "0" + time.getHours().toString() + ":" : str + time.getHours().toString() + ":"
+        str = time.getMinutes() < 10 ? str + "0" + time.getMinutes().toString() : str + time.getMinutes().toString()
+          console.log("time " + time)
+          console.log("str " + str)
         return str
       }
 
