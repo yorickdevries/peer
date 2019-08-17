@@ -239,7 +239,7 @@
         // console.log(str)
         str = str + date.getFullYear().toString() + "-"
         // console.log(str)
-        str = date.getMonth() < 10 ? str + "0" + (date.getMonth() + 1).toString() + "-" : str + date.getMonth().toString() + "-"
+        str = (date.getMonth()+1) < 10 ? str + "0" + (date.getMonth() + 1).toString() + "-" : str + (date.getMonth()+1).toString() + "-"
         // console.log(str)
         str = date.getDate() < 10 ? str + "0" + date.getDate().toString() : str + date.getDate().toString()
         // console.log(str)
