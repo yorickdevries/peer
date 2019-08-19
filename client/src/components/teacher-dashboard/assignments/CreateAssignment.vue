@@ -95,6 +95,7 @@
 
                             <hr />
 
+                            <!--Number of peer reviews per student-->
                             <b-form-group label="Number of reviews that each student needs to do">
                                 <b-form-input   v-model="assignment.reviews_per_user"
                                                 type="number"
@@ -103,6 +104,8 @@
                                                 required>
                                 </b-form-input>
                             </b-form-group>
+
+                            <!--File upload-->
                             <b-form-group label="Assignment file">
                                 <b-form-file
                                         placeholder="Choose a file..."
