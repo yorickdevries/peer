@@ -6,12 +6,6 @@
             <b-row>
                 <b-col>
                     <h1 class="mt-5">Create a new assignment</h1>
-                    <!--<b-button @click="renderDate" variant="primary">Create the assignment</b-button>-->
-                <!--</b-col>-->
-                <!--<b-col>-->
-                    <!--<b-button @click="checkDST(assignment.publish_day,assignment.due_day,assignment.review_publish_day,assignment.review_due_day)" variant="primary">Create the assignment</b-button>-->
-                    <!--{{ isDST }}-->
-                    <!--{{ dstError }}-->
                 </b-col>
             </b-row>
 
@@ -42,18 +36,11 @@
                             <!--Publish and due date of the assignment-->
                             <b-row class="mb-3">
                                 <b-col>
-                                    <!--{{assignment.publish_day}}-->
                                     <b-form-group>
                                         <template slot="label"> Publish date and time
                                             <b-badge v-b-tooltip.hover title="The date and time on which the assignment becomes available to the students" variant="primary">?</b-badge>
                                         </template>
                                         <datepicker placeholder="Select date" v-model="assignment.publish_day"></datepicker>
-                                        <!--<b-form-input   v-model="assignment.publish_day"-->
-                                                        <!--type="date"-->
-                                                        <!--placeholder="Please enter date on which the assignment should be published"-->
-                                                        <!--required>-->
-                                        <!--</b-form-input>-->
-                                        <!--{{assignment.publish_time}}-->
                                         <b-form-input   v-model="assignment.publish_time"
                                                         type="time"
                                                         placeholder="Please enter time on which the assignment should be published"
@@ -67,11 +54,6 @@
                                             <b-badge v-b-tooltip.hover title="The date and time before which the students have to hand in their submission" variant="primary">?</b-badge>
                                         </template>
                                         <datepicker placeholder="Select date" v-model="assignment.due_day"></datepicker>
-                                        <!--<b-form-input   v-model="assignment.due_day"-->
-                                                        <!--type="date"-->
-                                                        <!--placeholder="Please enter date on which the assignment should be handed in"-->
-                                                        <!--required>-->
-                                        <!--</b-form-input>-->
                                         <b-form-input   v-model="assignment.due_time"
                                                         type="time"
                                                         placeholder="Please enter time before which the assignment should be handed in"
@@ -84,17 +66,11 @@
                             <!--Publish and due date of the peer review-->
                             <b-row>
                                 <b-col>
-                                    <!--{{assignment.review_publish_day}}-->
                                     <b-form-group>
                                         <template slot="label">Start date and time for peer review(s)
                                             <b-badge v-b-tooltip.hover title="The date and time on which the students can start peer reviewing" variant="primary">?</b-badge>
                                         </template>
                                         <datepicker placeholder="Select date" v-model="assignment.review_publish_day"></datepicker>
-                                        <!--<b-form-input   v-model="assignment.review_publish_day"-->
-                                                        <!--type="date"-->
-                                                        <!--placeholder="Please enter start date of the peer review"-->
-                                                        <!--required>-->
-                                        <!--</b-form-input>-->
                                         <b-form-input   v-model="assignment.review_publish_time"
                                                         type="time"
                                                         placeholder="Please enter start time of the peer review"
@@ -108,11 +84,6 @@
                                             <b-badge v-b-tooltip.hover title="The date and time before which the students have to submit their review(s)" variant="primary">?</b-badge>
                                         </template>
                                         <datepicker placeholder="Select date" v-model="assignment.review_due_day"></datepicker>
-                                        <!--<b-form-input   v-model="assignment.review_due_day"-->
-                                                        <!--type="date"-->
-                                                        <!--placeholder="Please enter due date of the peer review"-->
-                                                        <!--required>-->
-                                        <!--</b-form-input>-->
                                         <b-form-input   v-model="assignment.review_due_time"
                                                         type="time"
                                                         placeholder="Please enter due time of the peer review"
@@ -142,8 +113,7 @@
                                 </b-form-file>
                             </b-form-group>
 
-                            <b-form-group   label="Assignment Type"
-                                            description="This can not be changed after creating the assignment.">
+                            <b-form-group label="Assignment Type" description="This can not be changed after creating the assignment.">
                                 <b-form-radio-group v-model="assignment.one_person_groups"
                                                     :options="[
                                                         { value: true, text: 'Individual'},
@@ -154,8 +124,7 @@
                                 </b-form-radio-group>
                             </b-form-group>
 
-                            <b-form-group   label="Students can evaluate their received reviews"
-                                            description="This can not be changed after creating the assignment.">
+                            <b-form-group label="Students can evaluate their received reviews" description="This can not be changed after creating the assignment.">
                                 <b-form-checkbox
                                         v-model="assignment.review_evaluation">
                                     Enable Review evaluation.
@@ -214,9 +183,7 @@ export default {
                 reviews_per_user: null,
                 one_person_groups: false,
                 review_evaluation: false
-            },
-            isDST: false,
-            dstError: false,
+            }
         }
     },
     computed: {
@@ -255,11 +222,6 @@ export default {
             if (validationResult1.error) {
                 this.showErrorMessage({message: validationResult1.error})
             } else {
-                // this.showSuccessMessage({message: "Dates are all filled in!"})
-                // console.log("From datepicker: " + this.assignment.publish_day)
-                // console.log("From datepicker: " + this.assignment.due_day)
-                // console.log("From datepicker: " + this.assignment.review_publish_day)
-                // console.log("From datepicker: " + this.assignment.review_due_day)
                 let pdate = this.assignment.publish_day
                 let ddate = this.assignment.due_day
                 let rpdate = this.assignment.review_publish_day
@@ -271,7 +233,6 @@ export default {
                     this.showErrorMessage({title: validationResult2.title,
                         message: "Due to switching to daylight saving time, you cannot choose a time between 03:00 and 03:59 on this date"})
                 } else {
-                    // this.showSuccessMessage({message: "No DST error"})
                     pdate.setHours(this.assignment.publish_time.substring(0,2))
                     ddate.setHours(this.assignment.due_time.substring(0,2))
                     rpdate.setHours(this.assignment.review_publish_time.substring(0,2))
@@ -281,11 +242,6 @@ export default {
                     ddate.setMinutes(this.assignment.due_time.substring(3,5))
                     rpdate.setMinutes(this.assignment.review_publish_time.substring(3,5))
                     rddate.setMinutes(this.assignment.review_due_time.substring(3,5))
-
-                    // console.log("After setting time: " + pdate)
-                    // console.log("After setting time: " + ddate)
-                    // console.log("After setting time: " + rpdate)
-                    // console.log("After setting time: " + rddate)
 
                     this.assignment.publish_date = pdate
                     this.assignment.due_date = ddate
@@ -323,132 +279,9 @@ export default {
                         } catch (e) {
                             this.showErrorMessage({message: e.response.data.error})
                         }
-                        // console.log(this.assignment.publish_date)
-                        // console.log(this.assignment.due_date)
-                        // console.log(this.assignment.review_publish_date)
-                        // console.log(this.assignment.review_due_date)
-                        // this.showSuccessMessage({message: "Dates are all correct!"})
-
-                        // console.log("After toJSON(): " + this.assignment.publish_date)
                     }
                 }
             }
-            // console.log(this.assignment.publish_day)
-            //
-            // let pdate = new Date(this.assignment.publish_day.getDate() + " " + this.assignment.publish_time).toJSON();
-            // let ddate = new Date(this.assignment.due_day + " " + this.assignment.due_time).toJSON();
-            // let rpdate = new Date(this.assignment.review_publish_day + " " + this.assignment.review_publish_time).toJSON();
-            // let rddate = new Date(this.assignment.review_due_day + " " + this.assignment.review_due_time).toJSON();
-            //
-            // console.log("After New Date(): " + pdate)
-            // console.log("After New Date(): " + ddate)
-            // console.log("After New Date(): " + rpdate)
-            // console.log("After New Date(): " + rddate)
-            //
-            // this.assignment.publish_date = pdate
-            // this.assignment.due_date = ddate
-            // this.assignment.review_publish_date = rpdate
-            // this.assignment.review_due_date = rddate
-            //
-            // let validationResult = this.checkDates()
-            // if (validationResult.error) {
-            //     this.showErrorMessage({message: validationResult.error})
-            // } else {
-            //     let formData = new FormData()
-            //     formData.append("title", this.assignment.title)
-            //     formData.append("description", this.assignment.description)
-            //     formData.append("course_id", this.assignment.course_id)
-            //
-            //     formData.append("publish_date", pdate)
-            //     formData.append("due_date", ddate)
-            //     formData.append("review_publish_date", rpdate)
-            //     formData.append("review_due_date", rddate)
-            //     formData.append("assignmentFile", this.file)
-            //     formData.append("reviews_per_user", this.assignment.reviews_per_user)
-            //     formData.append("one_person_groups", this.assignment.one_person_groups)
-            //     formData.append("review_evaluation", this.assignment.review_evaluation)
-            //
-            //     try {
-            //         await api.createAssignment(formData)
-            //         this.showSuccessMessage({message: "Assignment was successfully created"})
-            //         this.$router.push({name: 'teacher-dashboard.assignments', params: {courseId: this.assignment.course_id}})
-            //     } catch (e) {
-            //         this.showErrorMessage({message: e.response.data.error})
-            //     }
-            // }
-        },
-
-        renderDate() {
-            let validationResult1 = this.checkDatesEmpty()
-            if (validationResult1.error) {
-                this.showErrorMessage({message: validationResult1.error})
-            } else {
-                // this.showSuccessMessage({message: "Dates are all filled in!"})
-                console.log("From datepicker: " + this.assignment.publish_day)
-                console.log("From datepicker: " + this.assignment.due_day)
-                console.log("From datepicker: " + this.assignment.review_publish_day)
-                console.log("From datepicker: " + this.assignment.review_due_day)
-                let pdate = this.assignment.publish_day
-                let ddate = this.assignment.due_day
-                let rpdate = this.assignment.review_publish_day
-                let rddate = this.assignment.review_due_day
-
-                let validationResult2 = this.checkDST(pdate, ddate, rpdate, rddate)
-                if (validationResult2.title) {
-                    this.showErrorMessage({title: validationResult2.title,
-                        message: "Due to switching to daylight saving time, you cannot choose a time between 03:00 and 03:59 on this date"})
-                } else {
-                    this.showSuccessMessage({message: "No DST error"})
-                    pdate.setHours(this.assignment.publish_time.substring(0,2))
-                    ddate.setHours(this.assignment.due_time.substring(0,2))
-                    rpdate.setHours(this.assignment.review_publish_time.substring(0,2))
-                    rddate.setHours(this.assignment.review_due_time.substring(0,2))
-
-                    pdate.setMinutes(this.assignment.publish_time.substring(3,5))
-                    ddate.setMinutes(this.assignment.due_time.substring(3,5))
-                    rpdate.setMinutes(this.assignment.review_publish_time.substring(3,5))
-                    rddate.setMinutes(this.assignment.review_due_time.substring(3,5))
-
-                    console.log("After setting time: " + pdate)
-                    console.log("After setting time: " + ddate)
-                    console.log("After setting time: " + rpdate)
-                    console.log("After setting time: " + rddate)
-
-                    this.assignment.publish_date = pdate
-                    this.assignment.due_date = ddate
-                    this.assignment.review_publish_date = rpdate
-                    this.assignment.review_due_date = rddate
-
-                    let validationResult3 = this.checkDatesLogical()
-                    if (validationResult3.error) {
-                        this.showErrorMessage({message: validationResult3.error})
-                    } else {
-                        this.showSuccessMessage({message: "Dates are all correct!"})
-                        this.assignment.publish_date = pdate.toJSON()
-                        // console.log("After toJSON(): " + this.assignment.publish_date)
-                    }
-                }
-            }
-
-
-
-
-            // console.log(this.assignment.publish_time)
-
-            // let pdate = new Date(this.assignment.publish_day.getDate() + " " + this.assignment.publish_time).toJSON();
-            // let pdate = this.assignment.publish_day
-            // pdate.setHours(this.assignment.publish_time.substring(0,2))
-            // pdate.setMinutes(this.assignment.publish_time.substring(3,5))
-            // this.assignment.publish_date = pdate.toJSON();
-            // let ddate = new Date(this.assignment.due_day + " " + this.assignment.due_time).toJSON();
-            // let rpdate = new Date(this.assignment.review_publish_day + " " + this.assignment.review_publish_time).toJSON();
-            // let rddate = new Date(this.assignment.review_due_day + " " + this.assignment.review_due_time).toJSON();
-            //
-            // console.log("After New Date(): " + pdate)
-            // console.log(this.assignment.publish_date)
-            // console.log("After New Date(): " + ddate)
-            // console.log("After New Date(): " + rpdate)
-            // console.log("After New Date(): " + rddate)
         },
         checkDatesEmpty() {
             // Check whether all dates and time are nonempty
@@ -473,12 +306,6 @@ export default {
             }
         },
         checkDST(pdate, ddate, rpdate, rddate) {
-            // console.log(pdate)
-            // console.log(ddate)
-            // console.log(rpdate)
-            // console.log(rpdate)
-            // console.log(pdate.setHours(this.assignment.publish_time.substring(0,2)))
-            // console.log(pdate.setHours(this.assignment.publish_time.substring(0,2)-1))
             if (pdate.setHours(this.assignment.publish_time.substring(0,2)) === pdate.setHours(this.assignment.publish_time.substring(0,2)-1)) {
                 return {title: "Error in publish time"}
             } else if (ddate.setHours(this.assignment.due_time.substring(0,2)) === ddate.setHours(this.assignment.due_time.substring(0,2)-1)) {
@@ -503,26 +330,6 @@ export default {
                 return true
             }
         }
-        // renderDate() {
-        //     // console.log(this.assignment.publish_time)
-        //
-        //     // let pdate = new Date(this.assignment.publish_day.getDate() + " " + this.assignment.publish_time).toJSON();
-        //     let pdate = this.assignment.publish_day
-        //     // console.log(this.assignment.publish_time.substring(0,2))
-        //     console.log(this.assignment.publish_time.substring(3,5))
-        //     pdate.setHours(this.assignment.publish_time.substring(0,2))
-        //     pdate.setMinutes(this.assignment.publish_time.substring(3,5))
-        //     this.assignment.publish_date = pdate.toJSON();
-        //     let ddate = new Date(this.assignment.due_day + " " + this.assignment.due_time).toJSON();
-        //     let rpdate = new Date(this.assignment.review_publish_day + " " + this.assignment.review_publish_time).toJSON();
-        //     let rddate = new Date(this.assignment.review_due_day + " " + this.assignment.review_due_time).toJSON();
-        //
-        //     console.log("After New Date(): " + pdate)
-        //     console.log(this.assignment.publish_date)
-        //     // console.log("After New Date(): " + ddate)
-        //     // console.log("After New Date(): " + rpdate)
-        //     // console.log("After New Date(): " + rddate)
-        // }
     }
 }
 </script>
