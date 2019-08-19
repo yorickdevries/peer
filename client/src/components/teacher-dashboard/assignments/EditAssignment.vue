@@ -355,20 +355,20 @@ export default {
                         this.assignment.review_publish_date = rpdate.toJSON()
                         this.assignment.review_due_date = rddate.toJSON()
                         // Compose datetime format from date and time
-                        this.assignment.publish_date = new Date(this.assignment.publish_day + " " + this.assignment.publish_time).toJSON();
-                        this.assignment.due_date = new Date(this.assignment.due_day + " " + this.assignment.due_time).toJSON();
-                        this.assignment.review_publish_date = new Date(this.assignment.review_publish_day + " " + this.assignment.review_publish_time).toJSON();
-                        this.assignment.review_due_date = new Date(this.assignment.review_due_day + " " + this.assignment.review_due_time).toJSON();
-
-                        console.log("After formatting for submit: " + this.assignment.publish_date)
-                        console.log("After formatting for submit: " + this.assignment.due_date)
-                        console.log("After formatting for submit: " + this.assignment.review_publish_date)
-                        console.log("After formatting for submit: " + this.assignment.review_due_date)
-
-                        let validationResult = this.checkDates()
-                        if (validationResult.error) {
-                            this.showErrorMessage({ message: validationResult.error })
-                        } else {
+                        // this.assignment.publish_date = new Date(this.assignment.publish_day + " " + this.assignment.publish_time).toJSON();
+                        // this.assignment.due_date = new Date(this.assignment.due_day + " " + this.assignment.due_time).toJSON();
+                        // this.assignment.review_publish_date = new Date(this.assignment.review_publish_day + " " + this.assignment.review_publish_time).toJSON();
+                        // this.assignment.review_due_date = new Date(this.assignment.review_due_day + " " + this.assignment.review_due_time).toJSON();
+                        //
+                        // console.log("After formatting for submit: " + this.assignment.publish_date)
+                        // console.log("After formatting for submit: " + this.assignment.due_date)
+                        // console.log("After formatting for submit: " + this.assignment.review_publish_date)
+                        // console.log("After formatting for submit: " + this.assignment.review_due_date)
+                        //
+                        // let validationResult = this.checkDates()
+                        // if (validationResult.error) {
+                        //     this.showErrorMessage({ message: validationResult.error })
+                        // } else {
                             // Compose formdata object to send information to back-end
                             let formData = new FormData()
                             formData.append("title", this.assignment.title)
@@ -400,8 +400,7 @@ export default {
                         }
                     }
                 }
-            }
-        },
+            },
         checkDatesEmpty() {
             // Check whether all dates and time are nonempty
             if (this.assignment.publish_day === null) {
