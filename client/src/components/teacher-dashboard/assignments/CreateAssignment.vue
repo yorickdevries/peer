@@ -325,14 +325,19 @@ export default {
                     console.log("After setting time: " + rpdate)
                     console.log("After setting time: " + rddate)
 
-                    // let validationResult3 = this.checkDatesLogical()
-                    // if (validationResult3.error) {
-                    //     this.showErrorMessage({message: validationResult3.error})
-                    // } else {
-                    //     this.showSuccessMessage({message: "Dates are all correct!"})
-                    //     this.assignment.publish_date = pdate.toJSON()
-                    //     // console.log("After toJSON(): " + this.assignment.publish_date)
-                    // }
+                    this.assignment.publish_date = pdate
+                    this.assignment.due_date = ddate
+                    this.assignment.review_publish_date = rpdate
+                    this.assignment.review_due_date = rddate
+
+                    let validationResult3 = this.checkDatesLogical()
+                    if (validationResult3.error) {
+                        this.showErrorMessage({message: validationResult3.error})
+                    } else {
+                        this.showSuccessMessage({message: "Dates are all correct!"})
+                        this.assignment.publish_date = pdate.toJSON()
+                        // console.log("After toJSON(): " + this.assignment.publish_date)
+                    }
                 }
             }
 
@@ -357,15 +362,23 @@ export default {
             // console.log("After New Date(): " + rddate)
         },
         checkDatesEmpty() {
-            // Check whether all dates are nonempty
+            // Check whether all dates and time are nonempty
             if (this.assignment.publish_day === null) {
                 return {error: "Publish date cannot be empty!"}
             } else if (this.assignment.due_day === null) {
                 return {error: "Hand-in date cannot be empty!"}
             } else if (this.assignment.review_publish_day === null) {
-                return {error: "Review publish date cannot be empty!"}
+                return {error: "Review start date cannot be empty!"}
             } else if (this.assignment.review_due_day === null) {
                 return {error: "Review due date cannot be empty!"}
+            } else if (this.assignment.publish_time === "") {
+                return {error: "Publish time cannot be empty!"}
+            } else if (this.assignment.due_time === "") {
+                return {error: "Hand-in time cannot be empty!"}
+            } else if (this.assignment.review_publish_time === "") {
+                return {error: "Review start time cannot be empty!"}
+            } else if (this.assignment.review_due_time === "") {
+                return {error: "Review due time cannot be empty!"}
             } else {
                 return true
             }
@@ -382,7 +395,7 @@ export default {
             } else if (ddate.setHours(this.assignment.due_time.substring(0,2)) === ddate.setHours(this.assignment.due_time.substring(0,2)-1)) {
                 return {title: "Error in hand-in time"}
             } else if (rpdate.setHours(this.assignment.review_publish_time.substring(0,2)) === rpdate.setHours(this.assignment.review_publish_time.substring(0,2)-1)) {
-                return {title: "Error in review publish time"}
+                return {title: "Error in review start time"}
             } else if (rddate.setHours(this.assignment.review_due_time.substring(0,2)) === rddate.setHours(this.assignment.review_due_time.substring(0,2)-1)) {
                 return {title: "Error in review due time"}
             } else {
@@ -426,6 +439,7 @@ export default {
 </script>
 
 <style>
+    /*Style for the datepicker component to look like our style*/
     input,
     select {
         display: block;
