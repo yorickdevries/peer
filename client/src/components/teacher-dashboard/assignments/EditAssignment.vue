@@ -249,17 +249,17 @@ export default {
       this.assignment = res.data
 
       // Define functions for correct formatting of date and time
-      function dateToInputFormat(date) {
-        let str = "";
-        // console.log(str)
-        str = str + date.getFullYear().toString() + "-"
-        // console.log(str)
-        str = (date.getMonth()+1) < 10 ? str + "0" + (date.getMonth() + 1).toString() + "-" : str + (date.getMonth()+1).toString() + "-"
-        // console.log(str)
-        str = date.getDate() < 10 ? str + "0" + date.getDate().toString() : str + date.getDate().toString()
-        // console.log(str)
-        return str
-      }
+      // function dateToInputFormat(date) {
+      //   let str = "";
+      //   // console.log(str)
+      //   str = str + date.getFullYear().toString() + "-"
+      //   // console.log(str)
+      //   str = (date.getMonth()+1) < 10 ? str + "0" + (date.getMonth() + 1).toString() + "-" : str + (date.getMonth()+1).toString() + "-"
+      //   // console.log(str)
+      //   str = date.getDate() < 10 ? str + "0" + date.getDate().toString() : str + date.getDate().toString()
+      //   // console.log(str)
+      //   return str
+      // }
 
       function timeToInputFormat(time) {
         let str = "";
@@ -272,22 +272,22 @@ export default {
 
       // Set publish date and time
       let pdate = new Date(res.data.publish_date)
-      this.assignment.publish_day = dateToInputFormat(pdate)
+      this.assignment.publish_day = pdate
       this.assignment.publish_time = timeToInputFormat(pdate)
 
       // Set due date and time
       let ddate = new Date(res.data.due_date)
-      this.assignment.due_day = dateToInputFormat(ddate)
+      this.assignment.due_day = ddate
       this.assignment.due_time = timeToInputFormat(ddate)
 
       // Set due date and time
       let rpdate = new Date(res.data.review_publish_date)
-      this.assignment.review_publish_day = dateToInputFormat(rpdate)
+      this.assignment.review_publish_day = rpdate
       this.assignment.review_publish_time = timeToInputFormat(rpdate)
 
       // Set due date and time
       let rddate = new Date(res.data.review_due_date)
-      this.assignment.review_due_day = dateToInputFormat(rddate)
+      this.assignment.review_due_day = rddate
       this.assignment.review_due_time = timeToInputFormat(rddate)
 
         console.log("Received from server: " + res.data.publish_date)
@@ -354,8 +354,54 @@ export default {
             this.showErrorMessage({message: e.response.data.error})
           }
         }
-
-      }
+      },
+        checkDatesEmpty() {
+            // Check whether all dates and time are nonempty
+            if (this.assignment.publish_day === null) {
+                return {error: "Publish date cannot be empty!"}
+            } else if (this.assignment.due_day === null) {
+                return {error: "Hand-in date cannot be empty!"}
+            } else if (this.assignment.review_publish_day === null) {
+                return {error: "Review start date cannot be empty!"}
+            } else if (this.assignment.review_due_day === null) {
+                return {error: "Review due date cannot be empty!"}
+            } else if (this.assignment.publish_time === "") {
+                return {error: "Publish time cannot be empty!"}
+            } else if (this.assignment.due_time === "") {
+                return {error: "Hand-in time cannot be empty!"}
+            } else if (this.assignment.review_publish_time === "") {
+                return {error: "Review start time cannot be empty!"}
+            } else if (this.assignment.review_due_time === "") {
+                return {error: "Review due time cannot be empty!"}
+            } else {
+                return true
+            }
+        },
+        checkDST(pdate, ddate, rpdate, rddate) {
+            if (pdate.setHours(this.assignment.publish_time.substring(0,2)) === pdate.setHours(this.assignment.publish_time.substring(0,2)-1)) {
+                return {title: "Error in publish time"}
+            } else if (ddate.setHours(this.assignment.due_time.substring(0,2)) === ddate.setHours(this.assignment.due_time.substring(0,2)-1)) {
+                return {title: "Error in hand-in time"}
+            } else if (rpdate.setHours(this.assignment.review_publish_time.substring(0,2)) === rpdate.setHours(this.assignment.review_publish_time.substring(0,2)-1)) {
+                return {title: "Error in review start time"}
+            } else if (rddate.setHours(this.assignment.review_due_time.substring(0,2)) === rddate.setHours(this.assignment.review_due_time.substring(0,2)-1)) {
+                return {title: "Error in review due time"}
+            } else {
+                return true
+            }
+        },
+        checkDatesLogical() {
+            // Check whether dates are logical
+            if (this.assignment.publish_date > this.assignment.due_date || this.assignment.publish_date > this.assignment.review_publish_date || this.assignment.publish_date > this.assignment.review_due_date) {
+                return {error: 'Publish date is later than other dates!'}
+            } else if (this.assignment.due_date > this.assignment.review_publish_date || this.assignment.due_date > this.assignment.review_due_date) {
+                return {error: 'Hand-in due date is later than review start or due date!'}
+            } else if (this.assignment.review_publish_date > this.assignment.review_due_date) {
+                return {error: 'Review start date is later than review due date!'}
+            } else {
+                return true
+            }
+        }
     }
 }
 </script>
