@@ -190,12 +190,6 @@ export default {
         }
     },
     computed: {
-        checkDue() {
-            if (this.assignment.due_date == null|| this.assignment.publish_date == null)
-                return null
-            else
-                return this.assignment.due_date > this.assignment.publish_date
-        },
         checkPeerNumber() {
             if (this.assignment.reviews_per_user == null)
                 return null
