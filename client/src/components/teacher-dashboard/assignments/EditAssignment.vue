@@ -41,11 +41,12 @@
                                         <template slot="label"> Publish date and time
                                             <b-badge v-b-tooltip.hover title="The date and time on which the assignment becomes available to the students" variant="primary">?</b-badge>
                                         </template>
-                                        <b-form-input   v-model="assignment.publish_day"
-                                                        type="date"
-                                                        placeholder="Please enter date on which the assignment should be published"
-                                                        required>
-                                        </b-form-input>
+                                        <datepicker placeholder="Select date" v-model="assignment.publish_day"></datepicker>
+                                        <!--<b-form-input   v-model="assignment.publish_day"-->
+                                                        <!--type="date"-->
+                                                        <!--placeholder="Please enter date on which the assignment should be published"-->
+                                                        <!--required>-->
+                                        <!--</b-form-input>-->
                                         <b-form-input   v-model="assignment.publish_time"
                                                         type="time"
                                                         placeholder="Please enter time on which the assignment should be published"
@@ -58,11 +59,12 @@
                                         <template slot="label">Hand-in due date and time
                                             <b-badge v-b-tooltip.hover title="The date and time before which the students have to hand in their submission" variant="primary">?</b-badge>
                                         </template>
-                                        <b-form-input   v-model="assignment.due_day"
-                                                        type="date"
-                                                        placeholder="Please enter date on which the assignment should be handed in"
-                                                        required>
-                                        </b-form-input>
+                                        <datepicker placeholder="Select date" v-model="assignment.due_day"></datepicker>
+                                        <!--<b-form-input   v-model="assignment.due_day"-->
+                                                        <!--type="date"-->
+                                                        <!--placeholder="Please enter date on which the assignment should be handed in"-->
+                                                        <!--required>-->
+                                        <!--</b-form-input>-->
                                         <b-form-input   v-model="assignment.due_time"
                                                         type="time"
                                                         placeholder="Please enter time before which the assignment should be handed in"
@@ -79,11 +81,12 @@
                                         <template slot="label">Start date and time for peer review(s)
                                             <b-badge v-b-tooltip.hover title="The date and time on which the students can start peer reviewing" variant="primary">?</b-badge>
                                         </template>
-                                        <b-form-input   v-model="assignment.review_publish_day"
-                                                        type="date"
-                                                        placeholder="Please enter start date of the peer review"
-                                                        required>
-                                        </b-form-input>
+                                        <datepicker placeholder="Select date" v-model="assignment.review_publish_day"></datepicker>
+                                        <!--<b-form-input   v-model="assignment.review_publish_day"-->
+                                                        <!--type="date"-->
+                                                        <!--placeholder="Please enter start date of the peer review"-->
+                                                        <!--required>-->
+                                        <!--</b-form-input>-->
                                         <b-form-input   v-model="assignment.review_publish_time"
                                                         type="time"
                                                         placeholder="Please enter start time of the peer review"
@@ -96,11 +99,12 @@
                                         <template slot="label">Due date and time for peer review(s)
                                             <b-badge v-b-tooltip.hover title="The date and time before which the students have to submit their review(s)" variant="primary">?</b-badge>
                                         </template>
-                                        <b-form-input   v-model="assignment.review_due_day"
-                                                        type="date"
-                                                        placeholder="Please enter due date of the peer review"
-                                                        required>
-                                        </b-form-input>
+                                        <datepicker placeholder="Select date" v-model="assignment.review_due_day"></datepicker>
+                                        <!--<b-form-input   v-model="assignment.review_due_day"-->
+                                                        <!--type="date"-->
+                                                        <!--placeholder="Please enter due date of the peer review"-->
+                                                        <!--required>-->
+                                        <!--</b-form-input>-->
                                         <b-form-input   v-model="assignment.review_due_time"
                                                         type="time"
                                                         placeholder="Please enter due time of the peer review"
@@ -179,11 +183,15 @@
 </template>
 
 <script>
-  import api from "../../../api";
-  import notifications from "../../../mixins/notifications";
+import api from "../../../api";
+import notifications from "../../../mixins/notifications";
+import Datepicker from 'vuejs-datepicker'
 
 export default {
     mixins: [notifications],
+    components: {
+        Datepicker
+    },
     data() {
       return {
         file: null,
@@ -349,6 +357,23 @@ export default {
 
       }
     }
-
-  }
+}
 </script>
+
+<style>
+    /*Style for the datepicker component to look like our style*/
+    input,
+    select {
+        display: block;
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+</style>
