@@ -42,11 +42,6 @@
                                             <b-badge v-b-tooltip.hover title="The date and time on which the assignment becomes available to the students" variant="primary">?</b-badge>
                                         </template>
                                         <datepicker placeholder="Select date" v-model="assignment.publish_day"></datepicker>
-                                        <!--<b-form-input   v-model="assignment.publish_day"-->
-                                                        <!--type="date"-->
-                                                        <!--placeholder="Please enter date on which the assignment should be published"-->
-                                                        <!--required>-->
-                                        <!--</b-form-input>-->
                                         <b-form-input   v-model="assignment.publish_time"
                                                         type="time"
                                                         placeholder="Please enter time on which the assignment should be published"
@@ -60,11 +55,6 @@
                                             <b-badge v-b-tooltip.hover title="The date and time before which the students have to hand in their submission" variant="primary">?</b-badge>
                                         </template>
                                         <datepicker placeholder="Select date" v-model="assignment.due_day"></datepicker>
-                                        <!--<b-form-input   v-model="assignment.due_day"-->
-                                                        <!--type="date"-->
-                                                        <!--placeholder="Please enter date on which the assignment should be handed in"-->
-                                                        <!--required>-->
-                                        <!--</b-form-input>-->
                                         <b-form-input   v-model="assignment.due_time"
                                                         type="time"
                                                         placeholder="Please enter time before which the assignment should be handed in"
@@ -82,11 +72,6 @@
                                             <b-badge v-b-tooltip.hover title="The date and time on which the students can start peer reviewing" variant="primary">?</b-badge>
                                         </template>
                                         <datepicker placeholder="Select date" v-model="assignment.review_publish_day"></datepicker>
-                                        <!--<b-form-input   v-model="assignment.review_publish_day"-->
-                                                        <!--type="date"-->
-                                                        <!--placeholder="Please enter start date of the peer review"-->
-                                                        <!--required>-->
-                                        <!--</b-form-input>-->
                                         <b-form-input   v-model="assignment.review_publish_time"
                                                         type="time"
                                                         placeholder="Please enter start time of the peer review"
@@ -100,11 +85,6 @@
                                             <b-badge v-b-tooltip.hover title="The date and time before which the students have to submit their review(s)" variant="primary">?</b-badge>
                                         </template>
                                         <datepicker placeholder="Select date" v-model="assignment.review_due_day"></datepicker>
-                                        <!--<b-form-input   v-model="assignment.review_due_day"-->
-                                                        <!--type="date"-->
-                                                        <!--placeholder="Please enter due date of the peer review"-->
-                                                        <!--required>-->
-                                        <!--</b-form-input>-->
                                         <b-form-input   v-model="assignment.review_due_time"
                                                         type="time"
                                                         placeholder="Please enter due time of the peer review"
@@ -166,8 +146,7 @@
                                             description="This can not be changed after creating the assignment.">
                                     <b-form-checkbox
                                             v-model="assignment.review_evaluation"
-                                            disabled
-                                    >
+                                            disabled>
                                        Enable Review on review (makes students review each other reviews).
                                     </b-form-checkbox>
                             </b-form-group>
@@ -248,25 +227,11 @@ export default {
         let res = await api.getAssignment(aid)
         this.assignment = res.data
 
-        // Define functions for correct formatting of date and time
-        // function dateToInputFormat(date) {
-        //   let str = "";
-        //   // console.log(str)
-        //   str = str + date.getFullYear().toString() + "-"
-        //   // console.log(str)
-        //   str = (date.getMonth()+1) < 10 ? str + "0" + (date.getMonth() + 1).toString() + "-" : str + (date.getMonth()+1).toString() + "-"
-        //   // console.log(str)
-        //   str = date.getDate() < 10 ? str + "0" + date.getDate().toString() : str + date.getDate().toString()
-        //   // console.log(str)
-        //   return str
-        // }
-
+        // Define function for correct formatting time
         function timeToInputFormat(time) {
         let str = "";
         str = time.getHours() < 10 ? str + "0" + time.getHours().toString() + ":" : str + time.getHours().toString() + ":"
         str = time.getMinutes() < 10 ? str + "0" + time.getMinutes().toString() : str + time.getMinutes().toString()
-          // console.log("time " + time)
-          // console.log("str " + str)
         return str
         }
 
@@ -289,15 +254,6 @@ export default {
         let rddate = new Date(res.data.review_due_date)
         this.assignment.review_due_day = rddate
         this.assignment.review_due_time = timeToInputFormat(rddate)
-
-        console.log("Received from server: " + res.data.publish_date)
-        console.log("Received from server: " + res.data.due_date)
-        console.log("Received from server: " + res.data.review_publish_date)
-        console.log("Received from server: " + res.data.review_due_date)
-        console.log("After New Date(): " + pdate)
-        console.log("After New Date(): " + ddate)
-        console.log("After New Date(): " + rpdate)
-        console.log("After New Date(): " + rddate)
     },
     methods: {
         checkDates() {
@@ -354,53 +310,38 @@ export default {
                         this.assignment.due_date = ddate.toJSON()
                         this.assignment.review_publish_date = rpdate.toJSON()
                         this.assignment.review_due_date = rddate.toJSON()
-                        // Compose datetime format from date and time
-                        // this.assignment.publish_date = new Date(this.assignment.publish_day + " " + this.assignment.publish_time).toJSON();
-                        // this.assignment.due_date = new Date(this.assignment.due_day + " " + this.assignment.due_time).toJSON();
-                        // this.assignment.review_publish_date = new Date(this.assignment.review_publish_day + " " + this.assignment.review_publish_time).toJSON();
-                        // this.assignment.review_due_date = new Date(this.assignment.review_due_day + " " + this.assignment.review_due_time).toJSON();
-                        //
-                        // console.log("After formatting for submit: " + this.assignment.publish_date)
-                        // console.log("After formatting for submit: " + this.assignment.due_date)
-                        // console.log("After formatting for submit: " + this.assignment.review_publish_date)
-                        // console.log("After formatting for submit: " + this.assignment.review_due_date)
-                        //
-                        // let validationResult = this.checkDates()
-                        // if (validationResult.error) {
-                        //     this.showErrorMessage({ message: validationResult.error })
-                        // } else {
-                            // Compose formdata object to send information to back-end
-                            let formData = new FormData()
-                            formData.append("title", this.assignment.title)
-                            formData.append("description", this.assignment.description)
-                            formData.append("course_id", this.assignment.course_id)
-                            formData.append("publish_date", this.assignment.publish_date)
-                            formData.append("due_date", this.assignment.due_date)
-                            formData.append("review_publish_date", this.assignment.review_publish_date)
-                            formData.append("review_due_date", this.assignment.review_due_date)
-                            formData.append("reviews_per_user", this.assignment.reviews_per_user)
-                            formData.append("review_evaluation", this.assignment.review_evaluation)
 
-                            // Add file if a new one has been uploaded
-                            if (this.file != null) {
-                                formData.append("assignmentFile", this.file)
-                            }
-                            // Update assignment in database
-                            try {
-                                await api.saveAssignment(this.assignment.id, formData)
-                                this.showSuccessMessage({ message: "Updated assignment successfully" })
-                                // Redirect to updated assignment
-                                this.$router.push({
-                                    name: 'teacher-dashboard.assignments.assignment',
-                                    params: { courseId: this.course.id, assignmentId: this.assignment.id }
-                                })
-                            } catch (e) {
-                                this.showErrorMessage({ message: e.response.data.error })
-                            }
+                        let formData = new FormData()
+                        formData.append("title", this.assignment.title)
+                        formData.append("description", this.assignment.description)
+                        formData.append("course_id", this.assignment.course_id)
+                        formData.append("publish_date", this.assignment.publish_date)
+                        formData.append("due_date", this.assignment.due_date)
+                        formData.append("review_publish_date", this.assignment.review_publish_date)
+                        formData.append("review_due_date", this.assignment.review_due_date)
+                        formData.append("reviews_per_user", this.assignment.reviews_per_user)
+                        formData.append("review_evaluation", this.assignment.review_evaluation)
+
+                        // Add file if a new one has been uploaded
+                        if (this.file != null) {
+                            formData.append("assignmentFile", this.file)
+                        }
+                        // Update assignment in database
+                        try {
+                            await api.saveAssignment(this.assignment.id, formData)
+                            this.showSuccessMessage({ message: "Updated assignment successfully" })
+                            // Redirect to updated assignment
+                            this.$router.push({
+                                name: 'teacher-dashboard.assignments.assignment',
+                                params: { courseId: this.course.id, assignmentId: this.assignment.id }
+                            })
+                        } catch (e) {
+                            this.showErrorMessage({ message: e.response.data.error })
                         }
                     }
                 }
-            },
+            }
+        },
         checkDatesEmpty() {
             // Check whether all dates and time are nonempty
             if (this.assignment.publish_day === null) {
