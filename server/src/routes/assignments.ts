@@ -28,6 +28,9 @@ const router = express();
 const fileFolder = config.assignments.fileFolder;
 
 router.use(bodyParser.json());
+// excel export support
+import json2xls from "json2xls";
+router.use(json2xls.middleware);
 
 // File of max 30 MB (in bytes)
 const maxSizeAssignmentFile = config.assignments.maxSizeAssignmentFile;
@@ -542,9 +545,10 @@ router.get("/:assignment_id/enroll", index.authorization.enrolledAsStudentAssign
  * Export the approved ratings of each student for a specific assignment.
  * @param assignment_id - id of the assignment.
  */
-router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
+router.get("/:assignment_id/gradeExport/:exporttype", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res: any) => {
     try {
         const exportData = await ExportResultsPS.executeGetStudentSubmissionReviewExportAssignment(req.params.assignment_id);
+        const filename: string = await filenameForAssignment(req.params.assignment_id);
 
         // Check if the export data contains data.
         if (exportData.length == 0) {
@@ -552,16 +556,20 @@ router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherA
             res.json({error: "No grades to export."});
             return;
         }
+        const exportType = req.params.exporttype;
+        if (exportType == "csv") {
+            // Get the fields for the csv file. Export data contains at least 1 item at this point.
+            const csvFields = Object.keys(exportData[0]);
 
-        // Get the fields for the csv file. Export data contains at least 1 item at this point.
-        const csvFields = Object.keys(exportData[0]);
-        const filename: string = await filenameForAssignment(req.params.assignment_id);
-
-        res.setHeader("Content-disposition", `attachment; filename=${filename}.csv`);
-        res.set("Content-Type", "text/csv");
-        res.status(200).send(json2csv(exportData, { csvFields }));
+            res.setHeader("Content-disposition", `attachment; filename=${filename}.csv`);
+            res.set("Content-Type", "text/csv");
+            res.status(200).send(json2csv(exportData, { csvFields }));
+        } else if (exportType == "xls") {
+            res.xls(`${filename}.xls`, exportData);
+        } else {
+            throw new Error("invalid export type");
+        }
     } catch (e) {
-        console.log(e);
         res.sendStatus(400);
     }
 });
