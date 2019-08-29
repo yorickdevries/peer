@@ -5,7 +5,7 @@
         <b-card v-else no-body>
 
             <b-tabs card>
-                <b-tab v-for="(review, index) in reviews" :key="review.id">
+                <b-tab v-for="(review, index) in reviews" :key="review.id" :title-link-class="{ }">
                     <template slot="title">
                         <div class="d-flex align-items-center">
                             <b-badge v-if="review.done" variant="success" class="mr-2">DONE</b-badge>
@@ -14,7 +14,7 @@
                         </div>
                     </template>
 
-                    <PeerReview :reviewId="review.id"></PeerReview>
+                    <PeerReview :reviewId="review.id" @submitEvent="fetchMetaReviews()"></PeerReview>
                 </b-tab>
             </b-tabs>
 
@@ -24,6 +24,10 @@
 </template>
 
 <script>
+
+    // Reason for :title-link-class="{ }" on b-tab.
+    // https://github.com/bootstrap-vue/bootstrap-vue/issues/2148
+
     import PeerReview from './PeerReview'
     import api from "../../../api"
 
