@@ -22,7 +22,7 @@ export default class ReviewPS {
     }
 
     /**
-     * Update the started_at date of a review. Only updated if the current value is null.
+     * Update the started_at date of a review to the current date. Only updated if the current value is null.
      * @param {number} reviewId - a review id.
      * @return {Promise<pgPromise.queryResult>} - a corresponding review where the done field is set to true.
      */
@@ -33,9 +33,38 @@ export default class ReviewPS {
         return Database.executeQuery(statement);
     }
 
+    /**
+     * Update the downloaded_at date of a review to the current date. Only updated if the current value is null.
+     * @param {number} reviewId - a review id.
+     * @return {Promise<pgPromise.queryResult>} - a corresponding review where the done field is set to true.
+     */
     public static executeUpdateDownloadedAt(reviewId: number) {
         const statement = new PreparedStatement("update-updated-at-analytics",
             "UPDATE review SET downloaded_at=$1 WHERE id = $2 AND downloaded_at IS NULL RETURNING *");
+        statement.values = [new Date(), reviewId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Update the submitted_at date of a review to the current date. Always updated.
+     * @param {number} reviewId - a review id.
+     * @return {Promise<pgPromise.queryResult>} - a corresponding review where the done field is set to true.
+     */
+    public static executeUpdateSubmittedAt(reviewId: number) {
+        const statement = new PreparedStatement("update-submitted-at-analytics",
+            "UPDATE review SET submitted_at=$1 WHERE id = $2 RETURNING *");
+        statement.values = [new Date(), reviewId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Update the saved_at date of a review to the current date. Always updated.
+     * @param {number} reviewId - a review id.
+     * @return {Promise<pgPromise.queryResult>} - a corresponding review where the done field is set to true.
+     */
+    public static executeUpdateSavedAt(reviewId: number) {
+        const statement = new PreparedStatement("update-saved-at-analytics",
+            "UPDATE review SET saved_at=$1 WHERE id = $2 RETURNING *");
         statement.values = [new Date(), reviewId];
         return Database.executeQuery(statement);
     }
