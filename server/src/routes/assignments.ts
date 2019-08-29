@@ -103,6 +103,13 @@ const updateAssignment = async function(req: any, res: any) {
         // Determine whether a file is uploaded and set the filename accordingly.
         const updatedFileName: string = (req.file) ? Date.now() + "-" + req.file.originalname : oldFilename;
 
+        const current: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
+
+        if (current.review_evaluation && !req.body.review_evaluation_due_date) {
+            res.status(400);
+            res.json({ error: "If the review evaluation is turned on, you should enter a review evaluation due date." });
+        }
+
         // Update the assignment in the database.
         const result: any = await AssignmentPS.executeUpdateAssignmentById(
             req.body.title,
@@ -151,6 +158,11 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
         } else {
             fileName = Date.now() + "-" + req.file.originalname;
             filePath = path.join(fileFolder, fileName);
+        }
+
+        if (req.body.review_evaluation && !req.body.review_evaluation_due_date) {
+            res.status(400);
+            res.json({ error: "If the review evaluation is turned on, you should enter a review evaluation due date." });
         }
 
         const result: any = await AssignmentPS.executeAddAssignment(
