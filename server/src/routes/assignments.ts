@@ -105,9 +105,12 @@ const updateAssignment = async function(req: any, res: any) {
 
         const current: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
 
-        if (current.review_evaluation && !req.body.review_evaluation_due_date) {
-            res.status(400);
-            res.json({ error: "If the review evaluation is turned on, you should enter a review evaluation due date." });
+        if (current.review_evaluation === true) {
+            if (req.body.review_evaluation_due_date == undefined) {
+                res.status(400);
+                res.json({ error: "If the review evaluation is turned on, you should enter a review evaluation due date." });
+                return;
+            }
         }
 
         // Update the assignment in the database.
@@ -141,7 +144,6 @@ const updateAssignment = async function(req: any, res: any) {
         res.json(result);
     } catch (err) {
         // Send appropriate error.
-        console.log(err)
         res.status(400);
         res.json({ error: "An error occurred while updating the assignment" });
     }
@@ -161,9 +163,12 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
             filePath = path.join(fileFolder, fileName);
         }
 
-        if (req.body.review_evaluation && !req.body.review_evaluation_due_date) {
-            res.status(400);
-            res.json({ error: "If the review evaluation is turned on, you should enter a review evaluation due date." });
+        if (req.body.review_evaluation === true) {
+            if (req.body.review_evaluation_due_date == undefined) {
+                res.status(400);
+                res.json({ error: "If the review evaluation is turned on, you should enter a review evaluation due date." });
+                return;
+            }
         }
 
         const result: any = await AssignmentPS.executeAddAssignment(
