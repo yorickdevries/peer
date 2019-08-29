@@ -22,6 +22,7 @@ tslint:
   - npm run tslint --prefix ./server
   only:
   - merge_requests
+  - pushes
 
 build_server:
   stage: build
@@ -32,6 +33,7 @@ build_server:
   - npm run data_init --prefix ./server
   only:
   - merge_requests
+  - pushes
 
 build_client:
   stage: build
@@ -41,6 +43,7 @@ build_client:
   - npm run build --prefix ./client
   only:
   - merge_requests
+  - pushes
 
 test:
   stage: test
@@ -52,6 +55,7 @@ test:
   - longJob
   only:
   - merge_requests
+  - pushes
 
 coverage:
   stage: coverage
@@ -63,6 +67,7 @@ coverage:
   - longJob
   only:
   - merge_requests
+  - pushes
 
 sast:
   stage: sast
@@ -84,4 +89,5 @@ sast:
       sast: gl-sast-report.json
   only:
   - merge_requests
+  - pushes
 
