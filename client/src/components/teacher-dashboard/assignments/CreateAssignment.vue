@@ -137,6 +137,8 @@
                                     </b-form-group>
                                     {{assignment.review_evaluation_due_day}}
                                     {{assignment.review_evaluation_due_time}}
+                                    {{assignment.review_due_day}}
+                                    {{assignment.review_due_time}}
                                 <!--</b-col>-->
                                 <!--<b-col>-->
                                     <b-form-group v-if="assignment.review_evaluation">
@@ -225,12 +227,20 @@ export default {
     },
     methods: {
         checkDates() {
-            if (this.assignment.publish_date >= this.assignment.due_date || this.assignment.publish_date >= this.assignment.review_publish_date || this.assignment.publish_date >= this.assignment.review_due_date) {
+            if (this.assignment.publish_date >= this.assignment.due_date ||
+                this.assignment.publish_date >= this.assignment.review_publish_date ||
+                this.assignment.publish_date >= this.assignment.review_due_date ||
+                this.assignment.publish_date >= this.assignment.review_evaluation_due_date) {
                 return {error: 'Publish date is later than other dates!'}
-            } else if (this.assignment.due_date >= this.assignment.review_publish_date || this.assignment.due_date >= this.assignment.review_due_date) {
+            } else if (this.assignment.due_date >= this.assignment.review_publish_date ||
+                this.assignment.due_date >= this.assignment.review_due_date ||
+                this.assignment.due_date >= this.assignment.review_evaluation_due_date) {
                 return {error: 'Due date is later than review dates!'}
-            } else if (this.assignment.review_publish_date >= this.assignment.review_due_date) {
+            } else if (this.assignment.review_publish_date >= this.assignment.review_due_date ||
+                this.assignment.review_publish_date >= this.assignment.review_evaluation_due_date) {
                 return {error: 'Review start date is later than review due dates!'}
+            } else if (this.assignment.review_due_date >= this.review_evaluation_due_date) {
+                return {error: 'Review due date is later than review evaluation date'}
             } else {
                 return true
             }
