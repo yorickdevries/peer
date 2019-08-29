@@ -50,7 +50,7 @@ export default {
         MCQuestion,
         UploadQuestion
     },
-    props: ['id', 'rubricId'],
+    props: ['id', 'rubricId', 'nextNewQuestionNumber'],
     data() {
         return {
             selectedType: '',
@@ -91,6 +91,12 @@ export default {
             this.rangeQuestion.rubric_id = val
             this.mcQuestion.rubric_id = val
             this.uploadQuestion.rubric_id = val
+        },
+        nextNewQuestionNumber(val) {
+            this.openQuestion.question_number = val
+            this.rangeQuestion.question_number = val
+            this.mcQuestion.question_number = val
+            this.uploadQuestion.question_number = val
         }
     },
     methods: {
@@ -137,24 +143,24 @@ export default {
             this.openQuestion = {
                 question: '',
                 rubric_id: this.rubricId,
-                question_number: null
+                question_number: this.nextNewQuestionNumber
             }
             this.rangeQuestion = {
                 question: '',
                 range: null,
                 rubric_id: this.rubricId,
-                question_number: null
+                question_number: this.nextNewQuestionNumber
             }
             this.mcQuestion = {
                 question: '',
                 rubric_id: this.rubricId,
-                question_number: null,
+                question_number: this.nextNewQuestionNumber,
                 option: []
             }
             this.uploadQuestion = {
                 question: '',
                 rubric_id: this.rubricId,
-                question_number: null,
+                question_number: this.nextNewQuestionNumber,
                 extension: null
             }
         }
