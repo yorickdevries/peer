@@ -225,11 +225,11 @@ export default {
     },
     methods: {
         checkDates() {
-            if (this.assignment.publish_date > this.assignment.due_date || this.assignment.publish_date > this.assignment.review_publish_date || this.assignment.publish_date > this.assignment.review_due_date) {
+            if (this.assignment.publish_date >= this.assignment.due_date || this.assignment.publish_date >= this.assignment.review_publish_date || this.assignment.publish_date >= this.assignment.review_due_date) {
                 return {error: 'Publish date is later than other dates!'}
-            } else if (this.assignment.due_date > this.assignment.review_publish_date || this.assignment.due_date > this.assignment.review_due_date) {
+            } else if (this.assignment.due_date >= this.assignment.review_publish_date || this.assignment.due_date >= this.assignment.review_due_date) {
                 return {error: 'Due date is later than review dates!'}
-            } else if (this.assignment.review_publish_date > this.assignment.review_due_date) {
+            } else if (this.assignment.review_publish_date >= this.assignment.review_due_date) {
                 return {error: 'Review start date is later than review due dates!'}
             } else {
                 return true
