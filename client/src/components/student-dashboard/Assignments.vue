@@ -110,7 +110,7 @@ export default {
         },
         readyForSubmissionAssignments() {
             let now = new Date()
-            return this.assignments.filter(assignment => now > new Date(assignment.review_publish_date) && now < new Date(assignment.review_due_date))
+            return this.assignments.filter(assignment => now > new Date(assignment.due_date) && now < new Date(assignment.review_due_date))
         },
         closedAssignments() {
             let now = new Date()
