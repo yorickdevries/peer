@@ -118,6 +118,7 @@
 
               // Perform upload.
               try {
+                  await api.client.post("/submissions", formData, config)
                   this.showSuccessMessage({message: 'Successfully submitted new submission.'})
                   this.$refs.uploadModal.hide()
               } catch (e) {
