@@ -140,8 +140,7 @@ const updateAssignment = async function(req: any, res: any) {
         }
         res.json(result);
     } catch (err) {
-        // Send appropriate error.
-        console.log(err)
+        // Send appropriate error
         res.status(400);
         res.json({ error: "An error occurred while updating the assignment" });
     }
