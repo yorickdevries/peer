@@ -279,17 +279,6 @@ export default {
         this.assignment.review_evaluation_due_time = timeToInputFormat(reddate)
     },
     methods: {
-        // checkDates() {
-        //     if (this.assignment.publish_date > this.assignment.due_date || this.assignment.publish_date > this.assignment.review_publish_date || this.assignment.publish_date > this.assignment.review_due_date) {
-        //         return {error: 'Publish date is later than other dates!'}
-        //     } else if (this.assignment.due_date > this.assignment.review_publish_date || this.assignment.due_date > this.assignment.review_due_date) {
-        //         return {error: 'Due date is later than review dates!'}
-        //     } else if (this.assignment.review_publish_date > this.assignment.review_due_date) {
-        //         return {error: 'Review start date is later than review due dates!'}
-        //     } else {
-        //         return true
-        //     }
-        // },
         async onSubmit() {
             // Check for empty date and time fields
             let validationResult1 = this.checkDatesEmpty()
