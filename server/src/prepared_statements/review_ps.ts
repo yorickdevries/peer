@@ -22,6 +22,25 @@ export default class ReviewPS {
     }
 
     /**
+     * Update the started_at date of a review. Only updated if the current value is null.
+     * @param {number} reviewId - a review id.
+     * @return {Promise<pgPromise.queryResult>} - a corresponding review where the done field is set to true.
+     */
+    public static executeUpdateStartedAt(reviewId: number) {
+        const statement = new PreparedStatement("update-started-at-analytics",
+            "UPDATE review SET started_at=$1 WHERE id = $2 AND started_at IS NULL RETURNING *");
+        statement.values = [new Date(), reviewId];
+        return Database.executeQuery(statement);
+    }
+
+    public static executeUpdateDownloadedAt(reviewId: number) {
+        const statement = new PreparedStatement("update-updated-at-analytics",
+            "UPDATE review SET downloaded_at=$1 WHERE id = $2 AND downloaded_at IS NULL RETURNING *");
+        statement.values = [new Date(), reviewId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
      * Creates a reviewEvaluation.
      */
     public static executeCreateReviewEvaluation(userNetId: string, evaluatedReviewId: number, evaluationRubricId: number)
