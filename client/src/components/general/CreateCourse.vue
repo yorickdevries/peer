@@ -6,11 +6,18 @@
             <b-row>
                 <b-col>
                     <b-form @submit.prevent="onSubmit">
-                        <b-form-group label="Course code">
+                        <b-form-group label="Course name">
                             <b-form-input   v-model="course.name"
                                             type="text"
-                                            placeholder="Please enter the course code here"
+                                            placeholder="Please enter the course name"
                                             required>
+                            </b-form-input>
+                        </b-form-group>
+                        <b-form-group label="Course code">
+                            <b-form-input   v-model="course.course_code"
+                                            type="text"
+                                            placeholder="Please enter the course code"
+                            >
                             </b-form-input>
                         </b-form-group>
                         <b-form-group label="Course description">
@@ -20,7 +27,16 @@
                                             >
                             </b-form-input>
                         </b-form-group>
-                        <b-form-group label="Enrollable">
+
+                        <b-form-group label="Faculty" description="">
+                            <b-form-select :options="faculties" v-model="course.faculty"></b-form-select>
+                        </b-form-group>
+
+                        <b-form-group label="Academic Year" description="">
+                            <b-form-select :options="academic_years" v-model="course.academic_year"></b-form-select>
+                        </b-form-group>
+
+                        <b-form-group label="">
                             <b-form-checkbox
                                     id="enrollable"
                                     v-model="course.enrollable"
@@ -48,15 +64,53 @@ export default {
             course: {
                 name: null,
                 description: null,
-                enrollable: false
-            }
+                enrollable: false,
+                faculty: null,
+                academic_year: null,
+                course_code: null
+            },
+            faculties: [],
+            academic_years: [],
         }
     },
+    async created() {
+        await this.fetchFaculties();
+        await this.fetchAcademicYears();
+        await this.fetchactiveAcademicYears();
+    },
     methods: {
+        async fetchactiveAcademicYears() {
+            try {
+                let res = await api.getactiveAcademicYears();
+                this.course.academic_year = res.data[0].year;
+            } catch (e) {
+                console.log(e);
+            }
+        },
+
+        async fetchFaculties() {
+            try {
+                let res = await api.getFaculties();
+
+                this.faculties = res.data.map(entry => { return { value: entry.name, text: entry.name }});
+            } catch (e) {
+                console.log(e)
+            }
+        },
+
+        async fetchAcademicYears() {
+            try {
+                let res = await api.getAcademicYears();
+                this.academic_years = res.data.map(entry => { return { value: entry.year, text: entry.year }});
+            } catch (e) {
+                console.log(e)
+            }
+        },
+
         async onSubmit() {
             try {
-                await api.createCourse(this.course)
-                this.$router.push({name: 'courses'})
+                await api.createCourse(this.course);
+                this.$router.push({name: 'courses'});
                 location.reload()
             } catch (e) {
                 this.showErrorMessage()

@@ -24,11 +24,16 @@ INSERT INTO "userlist" (
 	"netid", "email")
 	VALUES ('adversary', NULL);
 
+INSERT INTO public.facultylist(name) VALUES ('EWI'), ('3ME');
+
+INSERT INTO public.academicyearlist(year, active) VALUES ('2018/2019', false), ('2019/2020', true), ('2020/2021', false), ('2021/2022', false);
+
 INSERT INTO public.courselist(
-    description, name, enrollable)
-    VALUES ('This is a beautiful course description!', 'ED-3', true),
-	('Test-course', 'ED-4', true),
-	('Test-course2', 'ED-5', false);
+    faculty, academic_year, course_code, description, name, enrollable)
+    VALUES
+    ('EWI', '2019/2020', 'ED1-1631', 'This is a beautiful course description!', 'ED-3', true),
+	('EWI', '2019/2020', 'ED2-1138', 'Test-course', 'ED-4', true),
+	('EWI', '2019/2020', 'ED3-1336', 'Test-course2', 'ED-5', false);
 
 INSERT INTO public.grouplist(group_name)
 	VALUES
@@ -90,39 +95,39 @@ INSERT INTO public.groupusers(
 	VALUES ('paulvanderlaan', 22);
 
 INSERT INTO public.assignmentlist(
-	title, description, course_id, reviews_per_user, filename, publish_date, due_date, review_publish_date, review_due_date, one_person_groups)
-	VALUES ('Assignment 1', 'Example assignment number one', 1, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2018-05-02T20:30:00Z', '2018-05-03T20:30:00Z', false),
-	('Assignment 2', 'Example assignment number two', 1, 1, 'assignment2.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z', false),
-	('Assignment 3', 'Example assignment number three', 1, 1, 'assignment3.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z', false),
-	('Assignment 4', 'Example assignment number four', 3, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2030-05-01T20:30:00Z',  '2030-05-02T20:30:00Z', '2030-05-03T20:30:00Z', false),
-	('Assignment 5', 'Example assignment number five', 3, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2018-05-02T20:30:00Z', '2030-05-03T20:30:00Z', false);
+	title, description, course_id, reviews_per_user, filename, publish_date, due_date, review_publish_date, review_due_date, one_person_groups, review_evaluation)
+	VALUES ('Assignment 1', 'Example assignment number one', 1, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2018-05-02T20:30:00Z', '2018-05-03T20:30:00Z', false, false),
+	('Assignment 2', 'Example assignment number two', 1, 1, 'assignment2.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z', false, false),
+	('Assignment 3', 'Example assignment number three', 1, 1, 'assignment3.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2020-05-01T20:30:00Z', '9999-05-01T20:30:00Z', false, false),
+	('Assignment 4', 'Example assignment number four', 3, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2030-05-01T20:30:00Z',  '2030-05-02T20:30:00Z', '2030-05-03T20:30:00Z', false, false),
+	('Assignment 5', 'Example assignment number five', 3, 2, 'assignment1.pdf', '2018-04-01T20:30:00Z', '2018-05-01T20:30:00Z',  '2018-05-02T20:30:00Z', '2030-05-03T20:30:00Z', false, false);
 
 INSERT INTO public.rubric(
-	assignment_id)
-	VALUES (1);
+	assignment_id, type)
+	VALUES (1, 'submission');
 
 INSERT INTO public.rubric(
-	assignment_id)
-	VALUES (2);
+	assignment_id, type)
+	VALUES (2, 'submission');
 
 INSERT INTO public.openquestion(
-	question, rubric_assignment_id, question_number)
+	question, rubric_id, question_number)
 	VALUES ('How to insert queries?', 1, 1);
 
 INSERT INTO public.openquestion(
-	question, rubric_assignment_id, question_number)
+	question, rubric_id, question_number)
 	VALUES ('This is a question for assignment 2?', 2, 1);
 
 INSERT INTO public.rangequestion(
-	question, range, rubric_assignment_id, question_number)
+	question, range, rubric_id, question_number)
 	VALUES ('How much fun is inserting queries?', 7, 1, 2);
 
 INSERT INTO public.mcquestion(
-	question, rubric_assignment_id, question_number)
+	question, rubric_id, question_number)
 	VALUES ('What is the best way to insert queries?', 1, 3);
 
 INSERT INTO public.mcquestion(
-	question, rubric_assignment_id, question_number)
+	question, rubric_id, question_number)
 	VALUES ('Is the right Answer A?', 1, 4);
 
 INSERT INTO public.mcoption(
@@ -196,7 +201,7 @@ INSERT INTO public.submission(
 	VALUES ('yorickdevries', 21, 2, 'submission2.pdf', '2018-05-01T22:30:04Z');
 
 INSERT INTO public.review(
-	user_netid, submission_id, rubric_assignment_id, done)
+	user_netid, submission_id, rubric_id, done)
 	VALUES ('henkjan', 1, 1, false), ('paulvanderlaan', 1, 1, true);
 
 INSERT INTO public.mcanswer(

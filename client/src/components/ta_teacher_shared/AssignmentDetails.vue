@@ -20,7 +20,8 @@
             <dd>{{ assignment.reviews_per_user }}</dd>
 
             <dt>Assignment File</dt>
-            <dd><a :href="assignmentFilePath" target="_blank">{{ assignment.filename }}</a></dd>
+            <dd v-if="assignment.filename == null" class="text-danger"> No assignment file uploaded </dd>
+            <dd v-else><a :href="assignmentFilePath" target="_blank">{{ assignment.filename }}</a></dd>
         </dl>
     </b-card>
 </template>

@@ -44,8 +44,11 @@ export default {
         }
     },
     created() {
-        this.addMCOption(this.question)
-        this.addMCOption(this.question)
+        // only add empty options when there are none yet
+        if (this.question.option.length == 0) {
+            this.addMCOption(this.question)
+            this.addMCOption(this.question)
+        }
     },
     methods: {
         addMCOption(question) {

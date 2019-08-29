@@ -1,8 +1,11 @@
 
 <template>
-    <b-container>
+    <div>
+    <b-alert :show="blockRubricEditing" variant="info">Rubric editing is not allowed anymore since the peer review publish date has already elapsed.</b-alert>
 
-        <b-card class="mb-3">
+    <b-container v-bind:class="{ 'disabled-view': blockRubricEditing }">
+
+        <b-card class="mb-3 mt-3">
             <div class="d-flex justify-content-between">
                 <div>
                     <div class="text-muted">Make Rubric</div>
@@ -18,7 +21,7 @@
                         <div class="input-group-prepend">
                             <b-button variant="primary" @click="copyRubric">Copy</b-button>
                         </div>
-                        <b-form-select v-model="rubricToCopy" :options="rubricsMetaData"  plain></b-form-select>
+                        <b-form-select v-model="assignmentIdSubmissionRubricToCopy" :options="assignmentsMetaData"  plain></b-form-select>
                     </div>
                 </div>
 
@@ -61,6 +64,10 @@
                             <MCQuestion v-model="rubric.questions[index]"></MCQuestion>
                         </template>
 
+                        <template v-if="question.type_question === 'upload'">
+                            <UploadQuestion v-model="rubric.questions[index]"></UploadQuestion>
+                        </template>
+
                         <b-button @click="saveQuestion(question)" variant="outline-primary" size="sm" class="mr-1">
                             Save
                         </b-button>
@@ -90,6 +97,8 @@
             </b-col>
         </b-row>
     </b-container>
+    </div>
+
 </template>
 
 <script>
@@ -98,6 +107,7 @@ import notifications from '../../../mixins/notifications'
 import OpenQuestion from './OpenQuestion'
 import RangeQuestion from './RangeQuestion'
 import MCQuestion from './MCQuestion'
+import UploadQuestion from './UploadQuestion'
 import CreateQuestionWizard from './CreateQuestionWizard'
 
 let apiPrefixes = {
@@ -105,6 +115,7 @@ let apiPrefixes = {
     mc: '/rubric/mcquestion',
     range: '/rubric/rangequestion',
     mcoption: '/rubric/mcoption',
+    upload: '/rubric/uploadquestion'
 }
 
 export default {
@@ -113,18 +124,25 @@ export default {
         OpenQuestion,
         RangeQuestion,
         MCQuestion,
-        CreateQuestionWizard
+        CreateQuestionWizard,
+        UploadQuestion
     },
-    props: ['rubricId'],
+    props: ['assignmentId', 'review_publish_date'],
     data() {
         return {
             rubric: {
                 id: null,
                 assignment_id: null,
+                type: null,
                 question: []
             },
-            rubricsMetaData: [],
-            rubricToCopy: null
+            assignmentsMetaData: [],
+            assignmentIdSubmissionRubricToCopy: null
+        }
+    },
+    computed: {
+        blockRubricEditing() {
+            return new Date() > new Date(this.review_publish_date);
         }
     },
     async created() {
@@ -133,16 +151,16 @@ export default {
     },
     methods: {
         async fetchRubric() {
-            let res = await api.client.get(`/rubric/${this.rubricId}`)
+            let res = await api.client.get(`rubric/submissionrubric/${this.assignmentId}`)
             this.rubric = res.data
             this.rubric.questions.sort((a, b) => a.question_number - b.question_number)
         },
         async fetchCourseRubricMetaData() {
             const {data} = await api.getCourseAssignments(this.$route.params.courseId)
-            const rubricsMetaData = data.map(assignment => {
+            const assignmentsMetaData = data.map(assignment => {
                 return {value: assignment.id, text: assignment.title}
             })
-            this.rubricsMetaData = rubricsMetaData
+            this.assignmentsMetaData = assignmentsMetaData
         },
         async deleteQuestion(question) {
             try {
@@ -182,10 +200,11 @@ export default {
             await this.fetchRubric()
         },
         async copyRubric() {
-            if (this.rubricToCopy === null) return this.showErrorMessage({message: "Choose a rubric to copy first."})
-
+            if (this.assignmentIdSubmissionRubricToCopy === null) return this.showErrorMessage({message: "Choose an Assignment rubric to copy first."})
+            const rubricToCopy = await api.client.get(`rubric/submissionrubric/${this.assignmentIdSubmissionRubricToCopy}`)
+            const rubricToCopyId = rubricToCopy.data.id
             try {
-                await api.client.get(`rubric/${this.rubric.id}/copy/${this.rubricToCopy}`)
+                await api.client.get(`rubric/${this.rubric.id}/copy/${rubricToCopyId}`)
                 this.showSuccessMessage({message: "Rubric successfully copied and appended to this rubric."})
             } catch (e) {
                 this.showErrorMessage({message: "Rubric could not be copied."})
@@ -205,11 +224,13 @@ export default {
         },
         async makeRubric() {
             try {
-                await api.client.post(`rubric/`, {rubric_assignment_id: this.rubric.assignment_id})
+                await api.client.post(`rubric/`, {assignment_id: this.assignmentId, rubric_type: 'submission'})
                 this.showSuccessMessage({message: "Rubric made, you can now add questions."})
             } catch (e) {
-                this.showErrorMessage({message: e.response.data.error})
+                this.showErrorMessage({message: 'Couldn\'t make Rubric'})
             }
+            await this.fetchRubric()
+            await this.fetchCourseRubricMetaData()
         }
     }
 }

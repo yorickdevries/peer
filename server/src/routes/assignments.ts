@@ -21,6 +21,8 @@ import express from "express";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 import CoursesPS from "../prepared_statements/courses_ps";
 import ReviewUpdate from "../reviewUpdate";
+import { generateRubric } from "../models/rubric_factory";
+import evaluationReviewRubricConfig from "../evaluationReviewRubricConfig";
 
 const router = express();
 const fileFolder = config.assignments.fileFolder;
@@ -120,10 +122,12 @@ const updateAssignment = async function(req: any, res: any) {
             // Assemble the file path. Updated file name is the new file name.
             // It can never be the old since req.file would be undefined.
             const newFilePath = path.join(fileFolder, updatedFileName);
-            const oldFilePath = path.join(fileFolder, oldFilename);
 
             // Remove the old file and write the new file.
-            await fs.unlink(oldFilePath);
+            if (oldFilename) {
+                const oldFilePath = path.join(fileFolder, oldFilename);
+                await fs.unlink(oldFilePath);
+            }
             await fs.writeFile(newFilePath, req.file.buffer);
         }
         res.json(result);
@@ -137,16 +141,17 @@ const updateAssignment = async function(req: any, res: any) {
 // Function which adds the assignment to the database.
 const addAssignmentToDatabase = async function(req: any, res: any) {
     try {
-        // Error in case of no file
+        let fileName: string | null;
+        let filePath: string | undefined = undefined;
+
         if (req.file == undefined) {
-            res.status(400);
-            res.json({ error: "No file uploaded" });
-            return;
+            // tslint:disable-next-line
+            fileName = null;
+        } else {
+            fileName = Date.now() + "-" + req.file.originalname;
+            filePath = path.join(fileFolder, fileName);
         }
 
-        const fileName = Date.now() + "-" + req.file.originalname;
-        const filePath = path.join(fileFolder, fileName);
-        // add to database
         const result: any = await AssignmentPS.executeAddAssignment(
             req.body.title,
             req.body.description,
@@ -157,9 +162,19 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
             req.body.due_date,
             req.body.review_publish_date,
             req.body.review_due_date,
-            req.body.one_person_groups);
-        // writing the file if no error is there
-        await fs.writeFile(filePath, req.file.buffer);
+            req.body.one_person_groups,
+            req.body.review_evaluation);
+
+        if (filePath) {
+            // writing the file if no error is there
+            await fs.writeFile(filePath, req.file.buffer);
+        }
+
+        // Generate a default review evaluation rubric if review evaluation is turned on.
+        if (result.review_evaluation) {
+            await generateRubric(evaluationReviewRubricConfig, result.id);
+        }
+
         res.json(result);
     } catch (err) {
         res.status(400);
@@ -301,7 +316,7 @@ router.route("/:assignment_id/alllatestsubmissions")
  */
 router.route("/:assignment_id/reviews")
     .get((req: any, res) => {
-        ReviewPS.executeGetReviewsByUserIdAndAssignmentId(req.user.netid, req.params.assignment_id)
+        ReviewPS.executeGetSubmissionReviewsByUserIdAndAssignmentId(req.user.netid, req.params.assignment_id)
         .then((data) => {
             res.json(data);
         }).catch((error) => {
@@ -322,6 +337,25 @@ router.route("/:assignment_id/distributeReviews/:selfassign")
             res.json({error: error.message});
         });
     });
+
+/**
+ * Route to get the reviews belonging to an assignment.
+ * @param id - assignment id.
+ */
+router.get("/:assignment_id/allreviews/:done", index.authorization.enrolledAsTAOrTeacherAssignment, async (req: any, res) => {
+    let isDone: boolean | undefined = undefined;
+    if (req.params.done === "true") {
+        isDone = true;
+    } else if (req.params.done === "false") {
+        isDone = false;
+    }
+
+    try {
+        res.json(await ReviewPS.executeGetAllSubmissionReviewsByAssignmentId(req.params.assignment_id, isDone));
+    } catch (e) {
+        res.sendStatus(400);
+    }
+});
 
 /**
  * Route to distribute reviews between two assignments
@@ -373,16 +407,33 @@ router.post("/:assignment_id/importgroups", index.authorization.enrolledAsTeache
 });
 
 /**
- * Route to get the reviews belonging to an assignment.
- * @param id - assignment id.
+ * Route to copy the groups from one assignment to another.
+ * @param assignment_id - the assignment to copy the groups from.
+ * @body targetAssignmentId - the assignment to copy the groups to.
  */
-router.get("/:assignment_id/allreviews", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
-    ReviewPS.executeGetAllDoneReviewsByAssignmentId(req.params.assignment_id)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
+router.post("/:assignment_id/copygroups", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
+    try {
+        const assignmentToCopyId = req.params.assignment_id;
+        const targetAssignmentId = req.body.target_assignment_id;
+
+        const targetAssignment: any = await AssignmentPS.executeGetAssignmentById(targetAssignmentId);
+        const existingGroups: any = await AssignmentPS.executeGetGroupsByAssignmentId(assignmentToCopyId);
+
+        for (const group of existingGroups) {
+            // Copy the group
+            const newGroupId = await GroupParser.createGroupForAssignment(group.group_name, targetAssignmentId);
+
+            // Copy the group users
+            const existingGroupUsers: any = await AssignmentPS.executeGetUsersOfGroup(group.id);
+            for (const groupUser of existingGroupUsers) {
+                await GroupParser.addStudentToGroup(groupUser.user_netid, targetAssignmentId, targetAssignment.course_id, newGroupId);
+            }
+        }
+
+        res.sendStatus(200);
+    } catch {
         res.sendStatus(400);
-    });
+    }
 });
 
 /**
@@ -432,7 +483,7 @@ router.get("/:id/feedbackGivenToOthers", async (req: any, res) => {
             res.status(401);
             res.json({ error: "You can only access the review after the review due date is passed." });
         } else {
-            res.json(await ReviewPS.executeGetAllDoneReviewsOfStudent(req.params.id, req.user.netid));
+            res.json(await ReviewPS.executeGetAllDoneSubmissionReviewsOfStudent(req.params.id, req.user.netid));
         }
     } catch {
         res.sendStatus(400);
@@ -493,7 +544,7 @@ router.get("/:assignment_id/enroll", index.authorization.enrolledAsStudentAssign
  */
 router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
     try {
-        const exportData = await ExportResultsPS.executeGetStudentReviewExportAssignment(req.params.assignment_id);
+        const exportData = await ExportResultsPS.executeGetStudentSubmissionReviewExportAssignment(req.params.assignment_id);
 
         // Check if the export data contains data.
         if (exportData.length == 0) {
@@ -526,18 +577,38 @@ router.get("/:assignment_id/gradeExport", index.authorization.enrolledAsTeacherA
  * }]
  * @param assignment_id - id of the assignment.
  */
-router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
+router.get("/:assignment_id/reviewsExport/", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
+    const addQuestionsToReviewJson = (questions: any, reviewJson: any) => {
+        // Loop through the questions and add (question, answer) to the review json object.
+        for (let questionNumber = 0; questionNumber < questions.length; questionNumber++) {
+            const item = questions[questionNumber];
+            const questionText = String(item.question.question_number) + ". " + item.question.question;
+            if (item.question.type_question == "mc") {
+                const answer = item.answer.answer;
+                // find the right chosen option in the list
+                let chosenOption = undefined;
+                const options = item.question.option;
+                for (let j = 0; j < options.length; j++) {
+                    if (options[j].id == answer) {
+                        chosenOption = options[j].option;
+                    }
+                }
+                reviewJson[questionText] = chosenOption;
+            } else {
+                reviewJson[questionText] = item.answer.answer;
+            }
+        }
+    };
     try {
         const exportData: Array<any> = [];
-        const reviews: any = await ReviewPS.executeGetReviewsByAssignmentId(req.params.assignment_id);
+        const reviews: any = await ReviewPS.executeGetSubmissionReviewsByAssignmentId(req.params.assignment_id);
 
         // Loop through the reviews, add to export data.
         for (let i = 0; i < reviews.length; i++) {
             // Get the questions and review entry of this review.
             const review: any = reviews[i];
-            const questions: any = (await ReviewUpdate.getReview(review.id)).form;
+            const reviewQuestions: any = (await ReviewUpdate.getReview(review.id)).form;
             const submission: any = await SubmissionsPS.executeGetSubmissionById(review.submission_id);
-
             // Get information about reviewer and submitter.
             const reviewer: any = await UserPS.executeGetUserById(review.user_netid);
             const submitter: any = await UserPS.executeGetUserById(submission.user_netid);
@@ -559,27 +630,21 @@ router.get("/:assignment_id/reviewsExport", index.authorization.enrolledAsTeache
             reviewJson["Submitter group id"] = submitterGroup.id;
             reviewJson["Submitter group name"] = submitterGroup.group_name;
 
-            reviewJson["Done"] = review.done;
+            reviewJson["Submission review done"] = review.done;
             reviewJson["Approval status"] = review.approved;
             reviewJson["TA netid"] = review.ta_netid;
 
-            // Loop through the questions and add (question, answer) to the review json object.
-            for (let questionNumber = 0; questionNumber < questions.length; questionNumber++) {
-                const item = questions[questionNumber];
-                if (item.question.type_question == "mc") {
-                    const answer = item.answer.answer;
-                    // find the right chosen option in the list
-                    let chosenOption = undefined;
-                    const options = item.question.option;
-                    for (let j = 0; j < options.length; j++) {
-                        if (options[j].id == answer) {
-                            chosenOption = options[j].option;
-                        }
-                    }
-                    reviewJson[item.question.question] = chosenOption;
-                } else {
-                    reviewJson[item.question.question] = item.answer.answer;
-                }
+            addQuestionsToReviewJson(reviewQuestions, reviewJson);
+
+            // get the evaluation (if present)
+            try {
+                const reviewEvaluation: any = (await ReviewPS.executeGetFullReviewEvaluation(review.id));
+                reviewJson["Review evaluation done"] = reviewEvaluation.done;
+                const reviewEvaluationQuestions = (await ReviewUpdate.getReview(reviewEvaluation.id)).form;
+                addQuestionsToReviewJson(reviewEvaluationQuestions, reviewJson);
+            } catch (error) {
+                // set to not done as there is no evaluation
+                reviewJson["Review evaluation done"] = false;
             }
 
             exportData.push(reviewJson);
@@ -626,7 +691,7 @@ router.post("/:assignment_id/groups", index.authorization.enrolledAsTeacherAssig
  */
 router.get("/:assignment_id/randomReview", index.authorization.enrolledAsTAOrTeacherAssignment, async (req: any, res) => {
     try {
-        const availableReviews: any = await ReviewPS.executeGetAllDoneReviewsByAssignmentIdUnreviewed(req.params.assignment_id);
+        const availableReviews: any = await ReviewPS.executeGetAllDoneSubmissionReviewsByAssignmentIdUnreviewed(req.params.assignment_id);
 
         // Check if there are any reviews left. Send 400 to front-end to display 'There are no reviews left' message.
         if (availableReviews.length == 0) {

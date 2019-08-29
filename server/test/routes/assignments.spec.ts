@@ -10,6 +10,7 @@ import TestData from "../test_helpers/test_data";
 // file system imports
 import fs from "fs-extra";
 import path from "path";
+import AssignmentPS from "../../src/prepared_statements/assignment_ps";
 
 describe("API Assignment routes", () => {
     /**
@@ -36,7 +37,8 @@ describe("API Assignment routes", () => {
         // log in as henkjan
         MockLogin.initialize("henkjan");
         const res = await chai.request(router).get("/1");
-        expect(res.status).to.equal(401);
+        // henkjan is in a group of assignment 1
+        expect(res.status).to.equal(200);
     });
 
     /**
@@ -44,6 +46,19 @@ describe("API Assignment routes", () => {
      */
     it("Import groups - good weather", async () => {
         const file = path.join(__dirname, "../../example_data/csv_test/example_export.csv");
+        // log in as teacheraccount
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).post("/3/importgroups")
+            .attach("groupFile", fs.readFileSync(file), "export.csv")
+            .field("groupColumn", "Education Groups");
+        expect(res.status).to.equal(200);
+        expect(res.text).to.equal(JSON.stringify(
+            [{groupId: 25, groupname: "ED 4"}, {groupId: 26, groupname: "ED 3"}]
+        ));
+    });
+
+    it("Import groups - containing empty groups", async () => {
+        const file = path.join(__dirname, "../../example_data/csv_test/example_export_empty_groups.csv");
         // log in as teacheraccount
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
@@ -169,7 +184,8 @@ describe("API Assignment routes", () => {
             .field("due_date", "2018-06-01T20:30:00.000Z")
             .field("review_publish_date", "2018-07-01T20:30:00.000Z")
             .field("review_due_date", "2018-08-01T20:30:00.000Z")
-            .field("one_person_groups", false);
+            .field("one_person_groups", false)
+            .field("review_evaluation", false);
         // assertions
         const result = JSON.parse(res.text);
 
@@ -195,7 +211,8 @@ describe("API Assignment routes", () => {
             .field("due_date", "2018-06-01T20:30:00.000Z")
             .field("review_publish_date", "2018-07-01T20:30:00.000Z")
             .field("review_due_date", "2018-08-01T20:30:00.000Z")
-            .field("one_person_groups", false);
+            .field("one_person_groups", false)
+            .field("review_evaluation", false);
         // assertions
         const result = JSON.parse(res.text);
 
@@ -222,7 +239,8 @@ describe("API Assignment routes", () => {
             .field("due_date", "2018-05-01T20:31:00.000Z")
             .field("review_publish_date", "2018-05-01T20:32:00.000Z")
             .field("review_due_date", "2018-05-01T20:33:00.000Z")
-            .field("one_person_groups", false);
+            .field("one_person_groups", false)
+            .field("review_evaluation", false);
 
         // Test the updating of the assignment just added.
         const res = await chai.request(router)
@@ -235,8 +253,7 @@ describe("API Assignment routes", () => {
             .field("publish_date", "2018-05-01T20:30:00.000Z")
             .field("due_date", "2018-05-01T20:31:00.000Z")
             .field("review_publish_date", "2018-05-01T20:32:00.000Z")
-            .field("review_due_date", "2018-05-01T20:33:00.000Z")
-            .field("one_person_groups", false);
+            .field("review_due_date", "2018-05-01T20:33:00.000Z");
 
         // assertions
         const result = JSON.parse(res.text);
@@ -268,7 +285,8 @@ describe("API Assignment routes", () => {
             .field("due_date", "2018-05-01T20:31:00.000Z")
             .field("review_publish_date", "2018-05-01T20:32:00.000Z")
             .field("review_due_date", "2018-05-01T20:33:00.000Z")
-            .field("one_person_groups", false);
+            .field("one_person_groups", false)
+            .field("review_evaluation", false);
 
         // Test the updating of the assignment just added.
         const res = await chai.request(router)
@@ -280,8 +298,7 @@ describe("API Assignment routes", () => {
             .field("publish_date", "2018-05-01T20:30:00.000Z")
             .field("due_date", "2018-05-01T20:31:00.000Z")
             .field("review_publish_date", "2018-05-01T20:32:00.000Z")
-            .field("review_due_date", "2018-05-01T20:33:00.000Z")
-            .field("one_person_groups", false);
+            .field("review_due_date", "2018-05-01T20:33:00.000Z");
 
 
         // assertions
@@ -368,12 +385,12 @@ describe("API Assignment routes", () => {
     it("GET /:id/allreviews", async () => {
         // test the router
         MockLogin.initialize("bplanje");
-        const res = await chai.request(router).get("/1/allreviews");
+        const res = await chai.request(router).get("/1/allreviews/true");
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
+        expect(res.body[0]).to.deep.include(
             // tslint:disable-next-line
-            [{"id": 2, "approved": null, "ta_netid": null, "reviewer": "paulvanderlaan", "submitter": "paulvanderlaan"}]
-        ));
+            {"approved": null, "ta_netid": null, "reviewer": "paulvanderlaan", "submitter": "paulvanderlaan", done: true}
+        );
     });
 
     /**
@@ -385,7 +402,6 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).get("/2/distributeReviews/0");
         expect(res.status).to.equal(200);
         expect(JSON.parse(res.text).length).to.equal(3);
-        console.log(JSON.parse(res.text));
     });
 
     /**
@@ -396,7 +412,6 @@ describe("API Assignment routes", () => {
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).get("/2/distributeReviews/1");
         expect(res.status).to.equal(200);
-        console.log(JSON.parse(res.text));
         expect(JSON.parse(res.text).length).to.equal(6);
     });
 
@@ -501,8 +516,57 @@ describe("API Assignment routes", () => {
 
         expect(gradeExport.status).to.equal(200);
         // Make sure it includes at least the henkjan review and paul review.
-        expect(gradeExport.text.includes("\"Reviewer netid\",\"Reviewer studentnumber\",\"Reviewer group id\",\"Reviewer group name\",\"Submitter netid\",\"Submitter studentnumber\",\"Submitter group id\",\"Submitter group name\",\"Done\",\"Approval status\",\"TA netid\",\"What is the best way to insert queries?\",\"Is the right Answer A?\",\"How to insert queries?\",\"How much fun is inserting queries?\""
+        expect(gradeExport.text.includes("\"Reviewer netid\",\"Reviewer studentnumber\",\"Reviewer group id\",\"Reviewer group name\",\"Submitter netid\",\"Submitter studentnumber\",\"Submitter group id\",\"Submitter group name\",\"Submission review done\",\"Approval status\",\"TA netid\""
         )).to.equal(true);
         expect(gradeExport.text.includes("\"henkjan\",,10,\"ED-3\",\"paulvanderlaan\",,10,\"ED-3\"")).to.equal(true);
+    });
+
+    /**
+     * Test to copy groups from one assignment to another.
+     */
+    it("Copy groups of assignment to another assignment", async () => {
+        MockLogin.initialize("bplanje");
+        const assignmentId = 2;
+        const assignmentToCopyFrom = await AssignmentPS.executeGetAssignmentById(assignmentId);
+        const assignmentToCopyTo: any = await AssignmentPS.executeAddAssignment(
+            "New",
+            "Description",
+            assignmentToCopyFrom.course_id,
+            2,
+            "test_file.pdf",
+            new Date("2017-07-01T20:30:00Z"),
+            new Date("2018-07-01T20:30:00Z"),
+            new Date("2019-07-01T20:30:00Z"),
+            new Date("2020-07-01T20:30:00Z"),
+            false,
+            false);
+
+        let assignmentToCopyToGroups: any = await AssignmentPS.executeGetGroupsByAssignmentId(assignmentToCopyTo.id);
+
+        // There should be no groups in the new assignment
+        const expectedGroups: any = await AssignmentPS.executeGetGroupsByAssignmentId(assignmentToCopyFrom.id);
+        expect(assignmentToCopyToGroups.length).to.equal(0);
+
+        // Copy the groups
+        await chai.request(router).post(`/${assignmentToCopyFrom.id}/copygroups`).send({
+            target_assignment_id: assignmentToCopyTo.id
+        });
+
+        // Make sure there are the same amount of groups
+        assignmentToCopyToGroups = await AssignmentPS.executeGetGroupsByAssignmentId(assignmentToCopyTo.id);
+        expect(assignmentToCopyToGroups.length).to.equal(expectedGroups.length);
+
+        // Check if the group names and users match
+        // Since the id's of groups are different, only the group_name and user_netids needs to be compared.
+        for (let index = 0; index < assignmentToCopyToGroups.length; index++) {
+            expect(assignmentToCopyToGroups[index].group_name).to.equal(expectedGroups[index].group_name);
+
+            const toCopyUsers: any = await AssignmentPS.executeGetUsersOfGroup(expectedGroups[index].id);
+            const copiedUsers: any = await AssignmentPS.executeGetUsersOfGroup(assignmentToCopyToGroups[index].id);
+            expect(copiedUsers.length).to.equal(toCopyUsers.length);
+            for (let index2 = 0; index2 < toCopyUsers; index2++) {
+                expect(copiedUsers[index2].user_netid).to.equal(toCopyUsers[index2].user_netid);
+            }
+        }
     });
 });
