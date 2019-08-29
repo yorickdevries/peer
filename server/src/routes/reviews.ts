@@ -60,6 +60,10 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
     try {
         const reviewId = req.params.reviewId;
         const result = await ReviewUpdate.getReview(reviewId);
+
+        // Update the started_at date of the review
+        await ReviewsPS.executeUpdateStartedAtIfNull(reviewId);
+
         res.json(result);
     } catch (error) {
         res.status(400);
@@ -179,6 +183,9 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
         // Update the review in the database.
         const result = await ReviewUpdate.updateReviewWithFileUpload(reviewId, inputForm, uploadQuestionIds);
 
+        // Update the saved_at date of the review.
+        await ReviewsPS.executeUpdateSavedAt(reviewId);
+
         res.json(result);
     } catch (error) {
         res.status(400);
@@ -211,6 +218,10 @@ router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, 
     const reviewFilled = await ReviewUpdate.isCompletelyFilledIn(reviewId);
     if (reviewFilled) {
         const result = await ReviewsPS.executeSubmitReview(reviewId);
+
+        // Update the submitted_at date of the review
+        await ReviewsPS.executeUpdateSubmittedAt(reviewId);
+
         res.json(result);
     } else {
         res.status(400);
@@ -292,8 +303,14 @@ router.route("/:reviewCommentId/comment").delete(index.authorization.checkOwnerR
  */
 router.route("/:reviewId/file").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
     try {
-        const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(req.params.reviewId);
+        const reviewId = req.params.reviewId;
+
+        const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(reviewId);
         const filePath = path.join(config.submissions.fileFolder, submission.file_path);
+
+        // Update the downloaded_at date of the review
+        await ReviewsPS.executeUpdateDownloadedAtIfNull(reviewId);
+
         res.download(filePath);
     } catch (err) {
         res.sendStatus(400);

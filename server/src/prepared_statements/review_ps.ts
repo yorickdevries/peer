@@ -26,9 +26,9 @@ export default class ReviewPS {
      * @param {number} reviewId - a review id.
      * @return {Promise<pgPromise.queryResult>} - a corresponding review where the done field is set to true.
      */
-    public static executeUpdateStartedAt(reviewId: number) {
+    public static executeUpdateStartedAtIfNull(reviewId: number) {
         const statement = new PreparedStatement("update-started-at-analytics",
-            "UPDATE review SET started_at=$1 WHERE id = $2 AND started_at IS NULL RETURNING *");
+            "UPDATE review SET started_at=$1 WHERE id = $2 AND started_at IS NULL");
         statement.values = [new Date(), reviewId];
         return Database.executeQuery(statement);
     }
@@ -38,9 +38,9 @@ export default class ReviewPS {
      * @param {number} reviewId - a review id.
      * @return {Promise<pgPromise.queryResult>} - a corresponding review where the done field is set to true.
      */
-    public static executeUpdateDownloadedAt(reviewId: number) {
+    public static executeUpdateDownloadedAtIfNull(reviewId: number) {
         const statement = new PreparedStatement("update-updated-at-analytics",
-            "UPDATE review SET downloaded_at=$1 WHERE id = $2 AND downloaded_at IS NULL RETURNING *");
+            "UPDATE review SET downloaded_at=$1 WHERE id = $2 AND downloaded_at IS NULL");
         statement.values = [new Date(), reviewId];
         return Database.executeQuery(statement);
     }
@@ -52,7 +52,7 @@ export default class ReviewPS {
      */
     public static executeUpdateSubmittedAt(reviewId: number) {
         const statement = new PreparedStatement("update-submitted-at-analytics",
-            "UPDATE review SET submitted_at=$1 WHERE id = $2 RETURNING *");
+            "UPDATE review SET submitted_at=$1 WHERE id = $2");
         statement.values = [new Date(), reviewId];
         return Database.executeQuery(statement);
     }
@@ -64,7 +64,7 @@ export default class ReviewPS {
      */
     public static executeUpdateSavedAt(reviewId: number) {
         const statement = new PreparedStatement("update-saved-at-analytics",
-            "UPDATE review SET saved_at=$1 WHERE id = $2 RETURNING *");
+            "UPDATE review SET saved_at=$1 WHERE id = $2");
         statement.values = [new Date(), reviewId];
         return Database.executeQuery(statement);
     }
