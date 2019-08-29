@@ -86,7 +86,7 @@
                                 </div>
                             </b-alert>
 
-                            <div v-if="!readOnly">
+                            <div v-if="!readOnly && !peerReview.review.done">
                                 <b-alert show variant="danger">{{ pair.question.extension.toUpperCase() }} files allowed only.</b-alert>
 
                                 <b-alert v-if="pair.answer.answer" show variant="warning">Note: uploading an new files will overwrite your current file.</b-alert>
