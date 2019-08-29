@@ -256,7 +256,7 @@ export default {
                 let ddate = this.assignment.due_day
                 let rpdate = this.assignment.review_publish_day
                 let rddate = this.assignment.review_due_day
-                let reddate = this.assignment.review_due_day
+                let reddate = this.assignment.review_evaluation_due_day
 
                 // Check for daylight saving time issues
                 let validationResult2 = this.checkDST(pdate, ddate, rpdate, rddate, reddate)
@@ -280,7 +280,7 @@ export default {
                     this.assignment.due_date = ddate
                     this.assignment.review_publish_date = rpdate
                     this.assignment.review_due_date = rddate
-                    this.assignment.review_evalutation_due_date = reddate
+                    this.assignment.review_evaluation_due_date = reddate
 
                     // Check order of dates
                     let validationResult3 = this.checkDatesLogical()
@@ -291,12 +291,7 @@ export default {
                         this.assignment.due_date = ddate.toJSON()
                         this.assignment.review_publish_date = rpdate.toJSON()
                         this.assignment.review_due_date = rddate.toJSON()
-
-                        if (this.assignment.review_evaluation) {
-                            this.assignment.review_evaluation_due_date = reddate.toJSON()
-                        } else {
-                            this.assignment.review_evaluation_due_date = null
-                        }
+                        this.assignment.review_evaluation_due_date = reddate.toJSON()
 
                         let formData = new FormData()
                         formData.append("title", this.assignment.title)
@@ -307,7 +302,11 @@ export default {
                         formData.append("due_date",  this.assignment.due_date)
                         formData.append("review_publish_date", this.assignment.review_publish_date)
                         formData.append("review_due_date", this.assignment.review_due_date)
-                        formData.append("review_evaluation_due_date", this.assignment.review_evaluation_due_date)
+
+                        if (this.assignment.review_evaluation){
+                            formData.append("review_evaluation_due_date", this.assignment.review_evaluation_due_date)
+                        }
+
                         formData.append("assignmentFile", this.file)
                         formData.append("reviews_per_user", this.assignment.reviews_per_user)
                         formData.append("one_person_groups", this.assignment.one_person_groups)
@@ -334,7 +333,7 @@ export default {
                 return {error: "Review start date cannot be empty!"}
             } else if (this.assignment.review_due_day === null) {
                 return {error: "Review due date cannot be empty!"}
-            } else if (this.assignment.review_evaluation_due_day === null) {
+            } else if (this.assignment.review_evaluation && this.assignment.review_evaluation_due_day === null) {
                 return {error: "Review evaluation due date cannot be empty!"}
             } else if (this.assignment.publish_time === "") {
                 return {error: "Publish time cannot be empty!"}
@@ -344,13 +343,13 @@ export default {
                 return {error: "Review start time cannot be empty!"}
             } else if (this.assignment.review_due_time === "") {
                 return {error: "Review due time cannot be empty!"}
-            } else if (this.assignment.review_evaluation_due_time === "") {
+            } else if (this.assignment.review_evaluation && this.assignment.review_evaluation_due_time === "") {
                 return {error: "Review evaluation due time cannot be empty!"}
             } else {
                 return true
             }
         },
-        checkDST(pdate, ddate, rpdate, rddate) {
+        checkDST(pdate, ddate, rpdate, rddate, reddate) {
             if (pdate.setHours(this.assignment.publish_time.substring(0,2)) === pdate.setHours(this.assignment.publish_time.substring(0,2)-1)) {
                 return {title: "Error in publish time"}
             } else if (ddate.setHours(this.assignment.due_time.substring(0,2)) === ddate.setHours(this.assignment.due_time.substring(0,2)-1)) {
@@ -359,7 +358,8 @@ export default {
                 return {title: "Error in review start time"}
             } else if (rddate.setHours(this.assignment.review_due_time.substring(0,2)) === rddate.setHours(this.assignment.review_due_time.substring(0,2)-1)) {
                 return {title: "Error in review due time"}
-            } else if (reddate.setHours(this.assignment.review_evaluation_due_time.substring(0,2)) === reddate.setHours(this.assignment.review_evaluation_due_time.substring(0,2)-1)) {
+            } else if (this.assignment.review_evaluation &&
+                reddate.setHours(this.assignment.review_evaluation_due_time.substring(0,2)) === reddate.setHours(this.assignment.review_evaluation_due_time.substring(0,2)-1)) {
                 return {title: "Error in review evaluation due time"}
             } else {
                 return true
@@ -369,17 +369,17 @@ export default {
             if (this.assignment.publish_date >= this.assignment.due_date ||
                 this.assignment.publish_date >= this.assignment.review_publish_date ||
                 this.assignment.publish_date >= this.assignment.review_due_date ||
-                this.assignment.publish_date >= this.assignment.review_evaluation_due_date) {
-                return {error: 'Publish date is later than other dates!'}
+                (this.assignment.review_evaluation && this.assignment.publish_date >= this.assignment.review_evaluation_due_date)) {
+                return {error: 'Publish date should be before other dates!'}
             } else if (this.assignment.due_date >= this.assignment.review_publish_date ||
                 this.assignment.due_date >= this.assignment.review_due_date ||
-                this.assignment.due_date >= this.assignment.review_evaluation_due_date) {
-                return {error: 'Due date is later than review dates!'}
+                (this.assignment.review_evaluation && this.assignment.due_date >= this.assignment.review_evaluation_due_date)) {
+                return {error: 'Due date should be before review dates!'}
             } else if (this.assignment.review_publish_date >= this.assignment.review_due_date ||
-                this.assignment.review_publish_date >= this.assignment.review_evaluation_due_date) {
-                return {error: 'Review start date is later than review due dates!'}
-            } else if (this.assignment.review_due_date >= this.review_evaluation_due_date) {
-                return {error: 'Review due date is later than review evaluation date'}
+                (this.assignment.review_evaluation && this.assignment.review_publish_date >= this.assignment.review_evaluation_due_date)) {
+                return {error: 'Review start date should be before review due dates!'}
+            } else if (this.assignment.review_evaluation && this.assignment.review_due_date >= this.review_evaluation_due_date) {
+                return {error: 'Review due date should be before review evaluation date'}
             } else {
                 return true
             }
