@@ -151,7 +151,6 @@ export default {
                 // Get max question number.
                 let max = 1
                 this.rubric.questions.forEach(question => {
-                    console.log(question.question_number)
                     if (question.question_number > max) {
                         max = question.question_number
                     }
