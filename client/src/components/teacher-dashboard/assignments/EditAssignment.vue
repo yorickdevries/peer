@@ -212,6 +212,7 @@ export default {
                 review_due_time: null,
                 review_evaluation_due_day: null,
                 review_evaluation_due_time: null,
+                review_evaluation_due_date: null,
                 reviews_per_user: null,
                 filename: null,
                 one_person_groups: null,
@@ -332,11 +333,16 @@ export default {
                         formData.append("title", this.assignment.title)
                         formData.append("description", this.assignment.description)
                         formData.append("course_id", this.assignment.course_id)
+
                         formData.append("publish_date", this.assignment.publish_date)
                         formData.append("due_date", this.assignment.due_date)
                         formData.append("review_publish_date", this.assignment.review_publish_date)
                         formData.append("review_due_date", this.assignment.review_due_date)
-                        formData.append("review_evaluation_due_date", this.assignment.review_evaluation_due_date)
+
+                        // Send review date only when selected
+                        if (this.assignment.review_evaluation){
+                            formData.append("review_evaluation_due_date", this.assignment.review_evaluation_due_date)
+                        }
                         formData.append("reviews_per_user", this.assignment.reviews_per_user)
                         formData.append("review_evaluation", this.assignment.review_evaluation)
 
