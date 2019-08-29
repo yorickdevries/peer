@@ -84,9 +84,6 @@
                             </b-button>
                         </b-col>
 
-                        {{assignment.review_due_date}}
-                        {{assignment.review_evaluation_due_date}}
-
                     </b-row>
 
                     <b-card-body>
