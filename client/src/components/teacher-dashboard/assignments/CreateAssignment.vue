@@ -127,12 +127,32 @@
                                 </b-form-radio-group>
                             </b-form-group>
 
-                            <b-form-group label="Students can evaluate their received reviews" description="This can not be changed after creating the assignment.">
-                                <b-form-checkbox
-                                        v-model="assignment.review_evaluation">
-                                    Enable Review evaluation.
-                                </b-form-checkbox>
-                            </b-form-group>
+                            <b-row>
+                                <b-col>
+                                    <b-form-group label="Students can evaluate their received reviews" description="This can not be changed after creating the assignment.">
+                                        <b-form-checkbox
+                                                v-model="assignment.review_evaluation">
+                                            Enable review evaluation
+                                        </b-form-checkbox>
+                                    </b-form-group>
+                                    {{assignment.review_evaluation_due_day}}
+                                    {{assignment.review_evaluation_due_time}}
+                                <!--</b-col>-->
+                                <!--<b-col>-->
+                                    <b-form-group v-if="assignment.review_evaluation">
+                                        <template slot="label">Review evaluation due date and time
+                                            <b-badge v-b-tooltip.hover title="The date and time before which the students have to evaluate reviews" variant="primary">?</b-badge>
+                                        </template>
+                                        <datepicker placeholder="Select date" v-model="assignment.review_evaluation_due_day"></datepicker>
+                                        <b-form-input   v-model="assignment.review_evaluation_due_time"
+                                                        type="time"
+                                                        placeholder="Please enter time before which the reviews should be evaluated"
+                                                        required>
+                                        </b-form-input>
+                                    </b-form-group>
+                                </b-col>
+                                <b-col></b-col>
+                            </b-row>
 
                             <b-button type="submit" variant="primary">Create the assignment</b-button>
                         </b-form>
@@ -183,6 +203,9 @@ export default {
                 review_due_day: null,
                 review_due_time: "23:59",
                 review_due_date: null,
+                review_evaluation_due_day: null,
+                review_evaluation_due_time: "23:59",
+                review_evaluation_due_date: null,
                 reviews_per_user: null,
                 one_person_groups: false,
                 review_evaluation: false
@@ -264,6 +287,7 @@ export default {
                         formData.append("due_date",  this.assignment.due_date)
                         formData.append("review_publish_date", this.assignment.review_publish_date)
                         formData.append("review_due_date", this.assignment.review_due_date)
+                        formData.append("review_evaluation_due_date", this.assignment.review_evaluation_due_date)
                         formData.append("assignmentFile", this.file)
                         formData.append("reviews_per_user", this.assignment.reviews_per_user)
                         formData.append("one_person_groups", this.assignment.one_person_groups)
