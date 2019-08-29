@@ -52,6 +52,7 @@
                                     <span v-if="readyForSubmissionAssignments.length === 0">There are no assignments for review.</span>
                                     <b-card v-for="(assignment, index) in readyForSubmissionAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== readyForSubmissionAssignments.length - 1 }">
                                         <b-card-body>
+                                            <b-badge v-if="assignmentIsBetweenHandInDueAndReviewStart(assignment)" class="mb-2" variant="danger">Review opens at: {{ assignment.review_publish_date | formatDate }}</b-badge>
                                             <h4>{{ assignment.title }}</h4>
                                             <p>{{ assignment.description | truncate(100)}}</p>
                                             <b-button variant="primary" :to="{ name: 'student-dashboard.course.assignment', params: { courseId: assignment.course_id, assignmentId: assignment.id } }">View Assignment</b-button>
@@ -143,6 +144,10 @@ export default {
             } catch (e) {
                 this.showErrorMessage({message: "Could not load assignments that you are not yet enrolled in."})
             }
+        },
+            assignmentIsBetweenHandInDueAndReviewStart(assignment) {
+            let now = new Date()
+            return now > new Date(assignment.due_date) && now < new Date(assignment.review_publish_date)
         }
     }
 }
