@@ -98,6 +98,10 @@
                 <!--TA Feedback Comments-->
                 <b-tab title="TA Feedback">
 
+                    <b-alert show variant="info">
+                        Consult with your teacher whether TA feedback will be given in this course.
+                    </b-alert>
+
                     <!--Submission Feedback-->
                     <b-card header="Submission Feedback" class="mb-3">
 
