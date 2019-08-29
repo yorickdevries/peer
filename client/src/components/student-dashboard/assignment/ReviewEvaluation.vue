@@ -141,7 +141,7 @@
                                 <!--Buttons for toggling new assignment upload-->
                                 <div>
                                     <div v-if="pair.answer.answer">
-                                        You currently have uploaded the file:
+                                        File uploaded:
                                         <a :href="uploadQuestionFilePath(evaluation.review.id, pair.question.id)">
                                             {{ pair.answer.answer }}
                                         </a>

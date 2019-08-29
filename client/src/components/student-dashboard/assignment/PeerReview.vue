@@ -80,7 +80,7 @@
                             <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
                                 <!--Buttons for toggling new assignment upload-->
                                 <div>
-                                    <div v-if="pair.answer.answer">You currently have uploaded the file: <a
+                                    <div v-if="pair.answer.answer">File uploaded: <a
                                             :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">{{ pair.answer.answer }}</a></div>
                                     <div v-else>You currently have no file uploaded.</div>
                                 </div>
