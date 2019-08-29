@@ -20,6 +20,9 @@ tslint:
   stage: static-analysis
   script:
   - npm run tslint --prefix ./server
+  only:
+  - merge_requests
+
 build_server:
   stage: build
   services:
@@ -27,12 +30,18 @@ build_server:
   script:
   - npm run build --prefix ./server
   - npm run data_init --prefix ./server
+  only:
+  - merge_requests
+
 build_client:
   stage: build
   services:
   - postgres:10.3
   script:
   - npm run build --prefix ./client
+  only:
+  - merge_requests
+
 test:
   stage: test
   services:
@@ -41,6 +50,9 @@ test:
   - npm run test --prefix ./server
   tags:
   - longJob
+  only:
+  - merge_requests
+
 coverage:
   stage: coverage
   services:
@@ -49,6 +61,8 @@ coverage:
   - npm run coverage --prefix ./server
   tags:
   - longJob
+  only:
+  - merge_requests
 
 sast:
   stage: sast
@@ -68,4 +82,6 @@ sast:
   artifacts:
     reports:
       sast: gl-sast-report.json
+  only:
+  - merge_requests
 
