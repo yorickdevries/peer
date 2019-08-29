@@ -8,7 +8,7 @@
             <!--Next Review-->
             <b-card no-body>
                 <b-card-header class="d-flex justify-content-between align-items-center">
-                    <div>Review {{  }}Information</div>
+                    <div>Review {{  }}information</div>
                     <div>
                         <b-button size="sm" variant="secondary" @click="backToReviewList" class="mr-2">Back to Assignment</b-button>
                         <b-button size="sm" variant="primary" @click="goToNextReview">Next (Random) Review</b-button>

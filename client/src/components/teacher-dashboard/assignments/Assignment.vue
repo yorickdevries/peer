@@ -109,7 +109,7 @@
                                                 <hr />
 
                                                 <!--Exporting Grade CSV-->
-                                                <dt>Export Reviews CSV</dt>
+                                                <dt>Export reviews CSV</dt>
                                                 <dd>Exports a CSV file with all reviews for this assignment.</dd>
                                                 <dd>
                                                     Also includes any evaluations which students have given to each
@@ -121,11 +121,11 @@
                                                     :href="`/api/assignments/${assignment.id}/reviewsExport`"
                                                     class="mb-3"
                                                 >
-                                                    Download Grades CSV
+                                                    Download reviews CSV
                                                 </b-button>
 
                                                 <!--Exporting Review CSV-->
-                                                <dt>Export Grades CSV</dt>
+                                                <dt>Export grades CSV</dt>
                                                 <dd>
                                                     Exports a CSV file with an aggregation of the review
                                                     approval/disapproval amounts of each student for this assignment.
@@ -135,7 +135,7 @@
                                                     variant="primary"
                                                     :href="`/api/assignments/${assignment.id}/gradeExport`"
                                                 >
-                                                    Download Reviews CSV
+                                                    Download grades CSV
                                                 </b-button>
                                             </dl>
 
