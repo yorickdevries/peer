@@ -129,7 +129,8 @@
 
                             <b-row>
                                 <b-col>
-                                    <b-form-group label="Students can evaluate their received reviews" description="This can not be changed after creating the assignment.">
+                                    <b-form-group label="Students can evaluate their received reviews"
+                                                  description="This can not be changed after creating the assignment.">
                                         <b-form-checkbox
                                                 v-model="assignment.review_evaluation">
                                             Enable review evaluation
@@ -353,7 +354,7 @@ export default {
             } else if (this.assignment.review_publish_date >= this.assignment.review_due_date ||
                 (this.assignment.review_evaluation && this.assignment.review_publish_date >= this.assignment.review_evaluation_due_date)) {
                 return {error: 'Review start date should be before review due dates!'}
-            } else if (this.assignment.review_evaluation && this.assignment.review_due_date >= this.review_evaluation_due_date) {
+            } else if (this.assignment.review_evaluation && this.assignment.review_due_date >= this.assignment.review_evaluation_due_date) {
                 return {error: 'Review due date should be before review evaluation date'}
             } else {
                 return true
