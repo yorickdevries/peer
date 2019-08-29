@@ -135,15 +135,9 @@
                                             Enable review evaluation
                                         </b-form-checkbox>
                                     </b-form-group>
-                                    {{assignment.review_evaluation_due_day}}
-                                    {{assignment.review_evaluation_due_time}}
-                                    {{assignment.review_due_day}}
-                                    {{assignment.review_due_time}}
-                                <!--</b-col>-->
-                                <!--<b-col>-->
                                     <b-form-group v-if="assignment.review_evaluation">
                                         <template slot="label">Review evaluation due date and time
-                                            <b-badge v-b-tooltip.hover title="The date and time before which the students have to evaluate reviews" variant="primary">?</b-badge>
+                                            <b-badge v-b-tooltip.hover title="The date and time before which the students have to evaluate reviews. Evaluations can be done once the review deadline has passed" variant="primary">?</b-badge>
                                         </template>
                                         <datepicker placeholder="Select date" v-model="assignment.review_evaluation_due_day"></datepicker>
                                         <b-form-input   v-model="assignment.review_evaluation_due_time"
@@ -226,26 +220,6 @@ export default {
         this.assignment.course_id = this.$route.params.courseId
     },
     methods: {
-        // checkDates() {
-        //     if (this.assignment.publish_date >= this.assignment.due_date ||
-        //         this.assignment.publish_date >= this.assignment.review_publish_date ||
-        //         this.assignment.publish_date >= this.assignment.review_due_date ||
-        //         this.assignment.publish_date >= this.assignment.review_evaluation_due_date) {
-        //         return {error: 'Publish date is later than other dates!'}
-        //     } else if (this.assignment.due_date >= this.assignment.review_publish_date ||
-        //         this.assignment.due_date >= this.assignment.review_due_date ||
-        //         this.assignment.due_date >= this.assignment.review_evaluation_due_date) {
-        //         return {error: 'Due date is later than review dates!'}
-        //     } else if (this.assignment.review_publish_date >= this.assignment.review_due_date ||
-        //         this.assignment.review_publish_date >= this.assignment.review_evaluation_due_date) {
-        //         return {error: 'Review start date is later than review due dates!'}
-        //     } else if (this.assignment.review_due_date >= this.review_evaluation_due_date) {
-        //         return {error: 'Review due date is later than review evaluation date'}
-        //     } else {
-        //         return true
-        //     }
-        //
-        // },
         async onSubmit() {
             // Check for empty date and time fields
             let validationResult1 = this.checkDatesEmpty()
@@ -303,6 +277,7 @@ export default {
                         formData.append("review_publish_date", this.assignment.review_publish_date)
                         formData.append("review_due_date", this.assignment.review_due_date)
 
+                        // Send review date only when selected
                         if (this.assignment.review_evaluation){
                             formData.append("review_evaluation_due_date", this.assignment.review_evaluation_due_date)
                         }
