@@ -567,9 +567,9 @@ router.get("/:assignment_id/gradeExport/:exporttype", index.authorization.enroll
         } else if (exportType == "xls") {
             res.xls(`${filename}.xls`, exportData);
         } else {
-            throw new Error("invalid export type");
+            throw new Error("Invalid export type");
         }
-    } catch (e) {
+    } catch {
         res.sendStatus(400);
     }
 });
