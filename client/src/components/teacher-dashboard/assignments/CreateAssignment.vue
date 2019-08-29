@@ -256,9 +256,10 @@ export default {
                 let ddate = this.assignment.due_day
                 let rpdate = this.assignment.review_publish_day
                 let rddate = this.assignment.review_due_day
+                let reddate = this.assignment.review_due_day
 
                 // Check for daylight saving time issues
-                let validationResult2 = this.checkDST(pdate, ddate, rpdate, rddate)
+                let validationResult2 = this.checkDST(pdate, ddate, rpdate, rddate, reddate)
                 if (validationResult2.title) {
                     this.showErrorMessage({title: validationResult2.title,
                         message: "Due to switching to daylight saving time, you cannot choose a time between 03:00 and 03:59 on this date"})
@@ -267,16 +268,19 @@ export default {
                     ddate.setHours(this.assignment.due_time.substring(0,2))
                     rpdate.setHours(this.assignment.review_publish_time.substring(0,2))
                     rddate.setHours(this.assignment.review_due_time.substring(0,2))
+                    reddate.setHours(this.assignment.review_evaluation_due_time.substring(0,2))
 
                     pdate.setMinutes(this.assignment.publish_time.substring(3,5))
                     ddate.setMinutes(this.assignment.due_time.substring(3,5))
                     rpdate.setMinutes(this.assignment.review_publish_time.substring(3,5))
                     rddate.setMinutes(this.assignment.review_due_time.substring(3,5))
+                    reddate.setMinutes(this.assignment.review_evaluation_due_time.substring(3,5))
 
                     this.assignment.publish_date = pdate
                     this.assignment.due_date = ddate
                     this.assignment.review_publish_date = rpdate
                     this.assignment.review_due_date = rddate
+                    this.assignment.review_evalutation_due_date = reddate
 
                     // Check order of dates
                     let validationResult3 = this.checkDatesLogical()
@@ -287,6 +291,12 @@ export default {
                         this.assignment.due_date = ddate.toJSON()
                         this.assignment.review_publish_date = rpdate.toJSON()
                         this.assignment.review_due_date = rddate.toJSON()
+
+                        if (this.assignment.review_evaluation) {
+                            this.assignment.review_evaluation_due_date = reddate.toJSON()
+                        } else {
+                            this.assignment.review_evaluation_due_date = null
+                        }
 
                         let formData = new FormData()
                         formData.append("title", this.assignment.title)
@@ -324,6 +334,8 @@ export default {
                 return {error: "Review start date cannot be empty!"}
             } else if (this.assignment.review_due_day === null) {
                 return {error: "Review due date cannot be empty!"}
+            } else if (this.assignment.review_evaluation_due_day === null) {
+                return {error: "Review evaluation due date cannot be empty!"}
             } else if (this.assignment.publish_time === "") {
                 return {error: "Publish time cannot be empty!"}
             } else if (this.assignment.due_time === "") {
@@ -332,6 +344,8 @@ export default {
                 return {error: "Review start time cannot be empty!"}
             } else if (this.assignment.review_due_time === "") {
                 return {error: "Review due time cannot be empty!"}
+            } else if (this.assignment.review_evaluation_due_time === "") {
+                return {error: "Review evaluation due time cannot be empty!"}
             } else {
                 return true
             }
@@ -345,6 +359,8 @@ export default {
                 return {title: "Error in review start time"}
             } else if (rddate.setHours(this.assignment.review_due_time.substring(0,2)) === rddate.setHours(this.assignment.review_due_time.substring(0,2)-1)) {
                 return {title: "Error in review due time"}
+            } else if (reddate.setHours(this.assignment.review_evaluation_due_time.substring(0,2)) === reddate.setHours(this.assignment.review_evaluation_due_time.substring(0,2)-1)) {
+                return {title: "Error in review evaluation due time"}
             } else {
                 return true
             }
