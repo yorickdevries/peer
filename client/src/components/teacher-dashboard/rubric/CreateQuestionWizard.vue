@@ -99,6 +99,9 @@ export default {
             this.uploadQuestion.question_number = val
         }
     },
+    created() {
+        this.onReset()
+    },
     methods: {
         async createQuestion(question, type) {
             // Special function to create MC question.
