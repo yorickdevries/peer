@@ -145,7 +145,7 @@ export default {
                 this.showErrorMessage({message: "Could not load assignments that you are not yet enrolled in."})
             }
         },
-            assignmentIsBetweenHandInDueAndReviewStart(assignment) {
+        assignmentIsBetweenHandInDueAndReviewStart(assignment) {
             let now = new Date()
             return now > new Date(assignment.due_date) && now < new Date(assignment.review_publish_date)
         }
