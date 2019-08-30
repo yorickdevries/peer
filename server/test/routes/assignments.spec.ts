@@ -489,7 +489,7 @@ describe("API Assignment routes", () => {
     it("Empty grade export", async () => {
         // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
-        const res = await chai.request(router).get("/2/gradeExport");
+        const res = await chai.request(router).get("/2/gradeExport/csv");
         expect(res.status).to.equal(400);
     });
 
@@ -499,11 +499,11 @@ describe("API Assignment routes", () => {
     it("Grade export valid", async () => {
         // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
-        const gradeExport: any = await chai.request(router).get("/1/gradeExport");
+        const gradeExport: any = await chai.request(router).get("/1/gradeExport/csv");
 
         expect(gradeExport.status).to.equal(200);
         // Make sure it includes at least the paul review.
-        expect(gradeExport.text.includes("\"paulvanderlaan\",,\"0\",\"0\",\"1\",\"1\"")).to.equal(true);
+        expect(gradeExport.text.includes("\"paulvanderlaan\",\"null\",\"0\",\"0\",\"1\",\"1\"")).to.equal(true);
     });
 
     /**
@@ -512,7 +512,7 @@ describe("API Assignment routes", () => {
     it("Reviews export valid", async () => {
         // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
-        const gradeExport: any = await chai.request(router).get("/1/reviewsExport");
+        const gradeExport: any = await chai.request(router).get("/1/reviewsExport/csv");
 
         expect(gradeExport.status).to.equal(200);
         // Make sure it includes at least the henkjan review and paul review.
