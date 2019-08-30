@@ -15,6 +15,8 @@ import bodyParser from "body-parser";
 import config from "../config";
 import exportFromJSON from "export-from-json";
 
+const json2csv = require("json2csv").parse;
+
 const makeJSONExportResult = function(data: any, fileName: any, exportType: any, res: any) {
     const result = exportFromJSON({
         data,
@@ -621,6 +623,7 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
         const exportData: Array<any> = [];
         const filename: string = await filenameForAssignment(req.params.assignment_id);
         const reviews: any = await ReviewPS.executeGetSubmissionReviewsByAssignmentId(req.params.assignment_id);
+        let exampleReview: any = undefined;
 
         // Loop through the reviews, add to export data.
         for (let i = 0; i < reviews.length; i++) {
@@ -661,11 +664,12 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
                 reviewJson["Review evaluation done"] = reviewEvaluation.done;
                 const reviewEvaluationQuestions = (await ReviewUpdate.getReview(reviewEvaluation.id)).form;
                 addQuestionsToReviewJson(reviewEvaluationQuestions, reviewJson);
+                // set this review as examplereview as it is fully evaluated
+                exampleReview = reviewJson;
             } catch (error) {
                 // set to not done as there is no evaluation
                 reviewJson["Review evaluation done"] = false;
             }
-
             exportData.push(reviewJson);
         }
 
@@ -676,8 +680,26 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
             return;
         }
 
-        // export in required format
-        makeJSONExportResult(exportData, filename, req.params.exporttype, res);
+        // in case the example_review is still undefined, set the first one for the header
+        if (exampleReview == undefined) {
+            exampleReview = exportData[0];
+        }
+
+        const exportType = req.params.exporttype;
+        if (exportType == "csv") {
+            // Get the fields for the csv file. Export data contains at least 1 item at this point.
+            const csvFields = Object.keys(exampleReview);
+            const filename: string = await filenameForAssignment(req.params.assignment_id);
+
+            res.setHeader("Content-disposition", `attachment; filename=${filename}.csv`);
+            res.set("Content-Type", "text/csv");
+            res.status(200).send(json2csv(exportData, { csvFields }));
+        } else if (exportType == "xls") {
+            // export in required format
+            makeJSONExportResult(exportData, filename, req.params.exporttype, res);
+        } else {
+            throw new Error("Invalid export type");
+        }
     } catch {
         res.sendStatus(400);
     }
