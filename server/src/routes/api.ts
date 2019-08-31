@@ -141,6 +141,12 @@ router.get("/user", function(req: any, res, next) {
     res.json({
         user: req.user
     });
+});
+
+// If no other routes apply, send a 404
+router.use("*", function(req, res) {
+    res.sendStatus(404);
+});
 
 // Error handler
 router.use(function(err: any, req: any, res: any, next: any) {
@@ -153,8 +159,7 @@ router.use(function(err: any, req: any, res: any, next: any) {
     // render the error page
     res.status(err.status || 500);
     res.json({ error: "There is an error in your API request" });
-  });
-
 });
+
 
 export default router;

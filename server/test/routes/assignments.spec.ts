@@ -489,7 +489,7 @@ describe("API Assignment routes", () => {
     it("Empty grade export", async () => {
         // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
-        const res = await chai.request(router).get("/2/gradeExport");
+        const res = await chai.request(router).get("/2/gradeExport/csv");
         expect(res.status).to.equal(400);
     });
 
@@ -499,7 +499,7 @@ describe("API Assignment routes", () => {
     it("Grade export valid", async () => {
         // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
-        const gradeExport: any = await chai.request(router).get("/1/gradeExport");
+        const gradeExport: any = await chai.request(router).get("/1/gradeExport/csv");
 
         expect(gradeExport.status).to.equal(200);
         // Make sure it includes at least the paul review.
@@ -512,13 +512,13 @@ describe("API Assignment routes", () => {
     it("Reviews export valid", async () => {
         // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
-        const gradeExport: any = await chai.request(router).get("/1/reviewsExport");
+        const gradeExport: any = await chai.request(router).get("/1/reviewsExport/csv");
 
         expect(gradeExport.status).to.equal(200);
         // Make sure it includes at least the henkjan review and paul review.
-        expect(gradeExport.text.includes("\"Reviewer netid\",\"Reviewer studentnumber\",\"Reviewer group id\",\"Reviewer group name\",\"Submitter netid\",\"Submitter studentnumber\",\"Submitter group id\",\"Submitter group name\",\"Submission review done\",\"Approval status\",\"TA netid\""
+        expect(gradeExport.text.includes("\"Submitter netid\",\"Submitter studentnumber\",\"Submitter group id\",\"Submitter group name\",\"Reviewer netid\",\"Reviewer studentnumber\",\"Reviewer group id\",\"Reviewer group name\",\"Submission review done\",\"Approval status\",\"TA netid\""
         )).to.equal(true);
-        expect(gradeExport.text.includes("\"henkjan\",,10,\"ED-3\",\"paulvanderlaan\",,10,\"ED-3\"")).to.equal(true);
+        expect(gradeExport.text.includes("\"paulvanderlaan\",,10,\"ED-3\",\"henkjan\",,10,\"ED-3\"")).to.equal(true);
     });
 
     /**

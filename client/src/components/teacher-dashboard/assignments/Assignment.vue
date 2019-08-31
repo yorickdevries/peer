@@ -29,7 +29,7 @@
                                         <b-card header="Actions">
                                             <dl class="mb-0">
                                                 <!--Shuffling-->
-                                                <dt>Shuffle groups</dt>
+                                                <dt>Assign reviews</dt>
                                                 <dd>
                                                     This action will shuffle the groups and assign the groups to each
                                                     other.
@@ -50,7 +50,7 @@
                                                     class="mb-3"
                                                     variant="primary"
                                                     size="sm"
-                                                    >Shuffle Groups
+                                                    >Assign reviews
                                                 </b-button>
                                                 <b-modal
                                                     id="shufflingModal"
@@ -58,11 +58,11 @@
                                                     title="Confirmation"
                                                     centered
                                                 >
-                                                    Are you sure you want to shuffle?
+                                                    Are you sure you want to assign the reviews?
                                                     <ul>
                                                         <li>Can (and should be) done only once per assignment.</li>
                                                         <li>
-                                                            Make sure to shuffle after students have made their
+                                                            Make sure to assign reviews after students have made their
                                                             submission.
                                                         </li>
                                                     </ul>
@@ -108,9 +108,9 @@
 
                                                 <hr />
 
-                                                <!--Exporting Grade CSV-->
-                                                <dt>Export reviews CSV</dt>
-                                                <dd>Exports a CSV file with all reviews for this assignment.</dd>
+                                                <!--Exporting Reviews-->
+                                                <dt>Export reviews</dt>
+                                                <dd>Exports a file with all reviews for this assignment.</dd>
                                                 <dd>
                                                     Also includes any evaluations which students have given to each
                                                     other's reviews.
@@ -118,24 +118,39 @@
                                                 <b-button
                                                     size="sm"
                                                     variant="primary"
-                                                    :href="`/api/assignments/${assignment.id}/reviewsExport`"
+                                                    :href="`/api/assignments/${assignment.id}/reviewsExport/csv`"
                                                     class="mb-3"
                                                 >
-                                                    Download reviews CSV
+                                                    Download reviews .csv
+                                                </b-button>
+                                                <b-button
+                                                    size="sm"
+                                                    variant="primary"
+                                                    :href="`/api/assignments/${assignment.id}/reviewsExport/xls`"
+                                                    class="mb-3"
+                                                >
+                                                    Download reviews .xls
                                                 </b-button>
 
-                                                <!--Exporting Review CSV-->
-                                                <dt>Export grades CSV</dt>
+                                                <!--Exporting Grades-->
+                                                <dt>Export grades</dt>
                                                 <dd>
-                                                    Exports a CSV file with an aggregation of the review
+                                                    Exports a file with an aggregation of the review
                                                     approval/disapproval amounts of each student for this assignment.
                                                 </dd>
                                                 <b-button
                                                     size="sm"
                                                     variant="primary"
-                                                    :href="`/api/assignments/${assignment.id}/gradeExport`"
+                                                    :href="`/api/assignments/${assignment.id}/gradeExport/csv`"
                                                 >
-                                                    Download grades CSV
+                                                    Download grades .csv
+                                                </b-button>
+                                                <b-button
+                                                    size="sm"
+                                                    variant="primary"
+                                                    :href="`/api/assignments/${assignment.id}/gradeExport/xls`"
+                                                >
+                                                    Download grades .xls
                                                 </b-button>
                                             </dl>
 

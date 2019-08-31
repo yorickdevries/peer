@@ -127,7 +127,7 @@ router.route("/:reviewId/reviewevaluation").post(index.authorization.checkAuthor
  * @body a json object of the whole form, as specified in the doc.
  * @return JSON representation of a review.
  */
-router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkReviewOwner, index.authorization.checkReviewBetweenPublishDue, async (req, res) => {
+router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkReviewOwner, index.authorization.checkReviewEditAllowed, async (req, res) => {
     try {
         // input
         const reviewId = req.params.reviewId;
@@ -218,7 +218,7 @@ router.get("/:reviewId/questions/:question_id/file", index.authorization.checkAu
  * @param reviewId - an id of a review.
  * @return database return value.
  */
-router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewBetweenPublishDue, async (req, res) => {
+router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewEditAllowed, async (req, res) => {
     const reviewId = req.params.reviewId;
     const reviewFilled = await ReviewUpdate.isCompletelyFilledIn(reviewId);
     if (reviewFilled) {
@@ -242,7 +242,7 @@ router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, 
  * @param reviewId - an id of a review.
  * @return database return value.
  */
-router.route("/:reviewId/unsubmit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewBetweenPublishDue, async (req, res) => {
+router.route("/:reviewId/unsubmit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewEditAllowed, async (req, res) => {
     const reviewId = req.params.reviewId;
     const result = await ReviewsPS.executeUnSubmitReview(reviewId);
     res.json(result);

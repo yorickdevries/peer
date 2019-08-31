@@ -377,6 +377,11 @@ const checkAuthorizationForCreatingReviewEvaluation = async (req: any, res: any,
             throw new Error("You can only evaluate the review after the review due date is passed.");
         }
 
+        // check whether it is before the review evaluation due date
+        if (new Date() < new Date(assignment.review_evaluation_due_date)) {
+            throw new Error("You can only evaluate the review until the review evaluation due date.");
+        }
+
         await response(res, true, next);
     } catch (error) {
         res.sendStatus(401);
@@ -410,18 +415,20 @@ const checkReviewOwnerDone = async (req: any, res: any, next: any) => {
 /**
  * Check if the user is allowed to submit the review
  */
-const checkReviewBetweenPublishDue = async (req: any, res: any, next: any) => {
+const checkReviewEditAllowed = async (req: any, res: any, next: any) => {
     try {
         const review = await ReviewPS.executeGetFullReview(req.params.reviewId);
         const rubric = await RubricPS.executeGetRubricById(review.rubric_id);
+        const assignmentId =  rubric.assignment_id;
+        const assignment = await AssignmentPS.executeGetAssignmentById(assignmentId);
+        const currentDate = new Date();
 
-        // in case the rubric is a submission, the time needs to be checked
         if (rubric.type == "submission") {
-            const assignmentId =  rubric.assignment_id;
-            const assignment = await AssignmentPS.executeGetAssignmentById(assignmentId);
             // check whether the user is on time
-            const currentDate = new Date();
             const withinTimeFrame = (new Date(assignment.review_publish_date) < currentDate && new Date(assignment.review_due_date) > currentDate);
+            response(res, withinTimeFrame, next);
+        } else if (rubric.type == "review") {
+            const withinTimeFrame = (new Date(assignment.review_due_date) < currentDate && currentDate < new Date(assignment.review_evaluation_due_date));
             response(res, withinTimeFrame, next);
         } else {
             response(res, true, next);
@@ -676,7 +683,7 @@ export default {
     putSubmissionCommentAuth,
     checkRubricAuthorization,
     isAuthorizedToEditGroup,
-    checkReviewBetweenPublishDue,
+    checkReviewEditAllowed,
     checkSubmissionBetweenPublishDue,
     enrolledAsTeacherTwoAssignmentsCheck,
     courseEnrollable
