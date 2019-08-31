@@ -503,7 +503,7 @@ describe("API Assignment routes", () => {
 
         expect(gradeExport.status).to.equal(200);
         // Make sure it includes at least the paul review.
-        expect(gradeExport.text.includes("\"paulvanderlaan\",\"null\",\"0\",\"0\",\"1\",\"1\"")).to.equal(true);
+        expect(gradeExport.text.includes("\"paulvanderlaan\",,\"0\",\"0\",\"1\",\"1\"")).to.equal(true);
     });
 
     /**
