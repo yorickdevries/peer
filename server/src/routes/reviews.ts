@@ -313,6 +313,7 @@ router.route("/:reviewId/file").get(index.authorization.checkAuthorizationForRev
     try {
         const reviewId = req.params.reviewId;
 
+        // errors in case of submission is null
         const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(reviewId);
         const filePath = path.join(config.submissions.fileFolder, submission.file_path);
 
