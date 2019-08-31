@@ -243,13 +243,17 @@ export default {
                     ddate.setHours(this.assignment.due_time.substring(0,2))
                     rpdate.setHours(this.assignment.review_publish_time.substring(0,2))
                     rddate.setHours(this.assignment.review_due_time.substring(0,2))
-                    reddate.setHours(this.assignment.review_evaluation_due_time.substring(0,2))
+                    if (reddate != null) {
+                        reddate.setHours(this.assignment.review_evaluation_due_time.substring(0,2))
+                    }
 
                     pdate.setMinutes(this.assignment.publish_time.substring(3,5))
                     ddate.setMinutes(this.assignment.due_time.substring(3,5))
                     rpdate.setMinutes(this.assignment.review_publish_time.substring(3,5))
                     rddate.setMinutes(this.assignment.review_due_time.substring(3,5))
-                    reddate.setMinutes(this.assignment.review_evaluation_due_time.substring(3,5))
+                    if (reddate != null) {
+                        reddate.setMinutes(this.assignment.review_evaluation_due_time.substring(3,5))
+                    }
 
                     this.assignment.publish_date = pdate
                     this.assignment.due_date = ddate
@@ -266,7 +270,9 @@ export default {
                         this.assignment.due_date = ddate.toJSON()
                         this.assignment.review_publish_date = rpdate.toJSON()
                         this.assignment.review_due_date = rddate.toJSON()
-                        this.assignment.review_evaluation_due_date = reddate.toJSON()
+                        if (reddate != null) {
+                            this.assignment.review_evaluation_due_date = reddate.toJSON()
+                        }
 
                         let formData = new FormData()
                         formData.append("title", this.assignment.title)
