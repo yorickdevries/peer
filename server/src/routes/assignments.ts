@@ -615,7 +615,11 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
                 reviewJson["Reviewer group name"] = reviewGroup[0].group_name;
             }
 
-            // other info
+            // review info
+            reviewJson["Submission review started_at"] = review.started_at;
+            reviewJson["Submission review downloaded_at"] = review.downloaded_at;
+            reviewJson["Submission review saved_at"] = review.saved_at;
+            reviewJson["Submission review submitted_at"] = review.submitted_at;
             reviewJson["Submission review done"] = review.done;
             reviewJson["Approval status"] = review.approved;
             reviewJson["TA netid"] = review.ta_netid;
@@ -629,10 +633,16 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
                 // if this line below fails, then the error is caught
                 const reviewEvaluation: any = (await ReviewPS.executeGetFullReviewEvaluation(review.id));
                 const evaluator: any = await UserPS.executeGetUserById(reviewEvaluation.user_netid);
-                // info about evaluation
-                reviewJson["Review evaluation done"] = reviewEvaluation.done;
+                // info about evaluator
                 reviewJson["Evaluator netid"] = evaluator.netid;
                 reviewJson["Evaluator studentnumber"] = evaluator.studentnumber;
+
+                // info about evaluation
+                reviewJson["Review evaluation started_at"] = reviewEvaluation.started_at;
+                reviewJson["Review evaluation downloaded_at"] = reviewEvaluation.downloaded_at;
+                reviewJson["Review evaluation saved_at"] = reviewEvaluation.saved_at;
+                reviewJson["Review evaluation submitted_at"] = reviewEvaluation.submitted_at;
+                reviewJson["Review evaluation done"] = reviewEvaluation.done;
 
                 const reviewEvaluationQuestions = (await ReviewUpdate.getReview(reviewEvaluation.id)).form;
                 // E for evaluation
