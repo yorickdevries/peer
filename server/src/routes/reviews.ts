@@ -62,8 +62,8 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
         const result = await ReviewUpdate.getReview(reviewId);
 
         // Update the started_at date of the review
-        const review: any = await ReviewsPS.executeGetReview(reviewId);
-        if (req.user.netid == review.user_netid) {
+        const fullReview: any = await ReviewsPS.executeGetFullReview(reviewId);
+        if (req.user.netid == fullReview.user_netid) {
             await ReviewsPS.executeUpdateStartedAtIfNull(reviewId);
         }
 
@@ -187,7 +187,8 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
         const result = await ReviewUpdate.updateReviewWithFileUpload(reviewId, inputForm, uploadQuestionIds);
 
         // Update the saved_at date of the review.
-        if (req.user.netid == review.user_netid) {
+        const fullReview: any = await ReviewsPS.executeGetFullReview(reviewId);
+        if (req.user.netid == fullReview.user_netid) {
             await ReviewsPS.executeUpdateSavedAt(reviewId);
         }
 
@@ -225,8 +226,8 @@ router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, 
         const result = await ReviewsPS.executeSubmitReview(reviewId);
 
         // Update the submitted_at date of the review
-        const review: any = await ReviewsPS.executeGetReview(reviewId);
-        if (req.user.netid == review.user_netid) {
+        const fullReview: any = await ReviewsPS.executeGetFullReview(reviewId);
+        if (req.user.netid == fullReview.user_netid) {
             await ReviewsPS.executeUpdateSubmittedAt(reviewId);
         }
 
@@ -318,8 +319,8 @@ router.route("/:reviewId/file").get(index.authorization.checkAuthorizationForRev
         const filePath = path.join(config.submissions.fileFolder, submission.file_path);
 
         // Update the downloaded_at date of the review
-        const review: any = await ReviewsPS.executeGetReview(reviewId);
-        if (req.user.netid == review.user_netid) {
+        const fullReview: any = await ReviewsPS.executeGetFullReview(reviewId);
+        if (req.user.netid == fullReview.user_netid) {
             await ReviewsPS.executeUpdateDownloadedAtIfNull(reviewId);
         }
 
