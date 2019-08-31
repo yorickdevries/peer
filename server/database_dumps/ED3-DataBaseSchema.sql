@@ -179,6 +179,10 @@ CREATE TABLE Review (
     Rubric_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
     creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    started_at timestamptz,
+    downloaded_at timestamptz,
+    submitted_at timestamptz,
+    saved_at timestamptz,
     approved boolean,
     ta_netid varchar(500),
     CONSTRAINT Review_pk PRIMARY KEY (id)
