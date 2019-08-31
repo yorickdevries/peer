@@ -79,7 +79,7 @@
                                         <b-badge variant="success" v-if="isEvaluationActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
-                                    <span class="text-muted">Opens after {{ assignment.review_due_date | formatDate }}</span>
+                                    <span class="text-muted">Due: {{ assignment.review_evaluation_due_date | formatDate }}</span>
                                 </div>
                             </b-button>
                         </b-col>
