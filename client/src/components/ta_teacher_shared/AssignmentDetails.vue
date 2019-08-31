@@ -4,17 +4,20 @@
             <dt>Description</dt>
             <dd>{{ assignment.description }}</dd>
 
-            <dt>Publish date-time</dt>
+            <dt>Publish date and time</dt>
             <dd>{{ assignment.publish_date | formatDate }}</dd>
 
-            <dt>Assignment due date-time</dt>
+            <dt>Assignment due date and time</dt>
             <dd>{{ assignment.due_date | formatDate }}</dd>
 
-            <dt>Peer review publish date-time</dt>
+            <dt>Peer review publish date and time</dt>
             <dd>{{ assignment.review_publish_date | formatDate }}</dd>
 
-            <dt>Peer review due date-time</dt>
+            <dt>Peer review due date and time</dt>
             <dd>{{ assignment.review_due_date | formatDate }}</dd>
+
+            <dt v-if="assignment.review_evaluation_due_date != null">Review evaluation due date and time</dt>
+            <dd v-if="assignment.review_evaluation_due_date != null">{{ assignment.review_evaluation_due_date | formatDate }}</dd>
 
             <dt>Amount of peer reviews assigned per student</dt>
             <dd>{{ assignment.reviews_per_user }}</dd>

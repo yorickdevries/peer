@@ -73,10 +73,10 @@
                                         active-class="bg-light"
                                         class="flex-fill p-0"
                                         :to="{ name: 'student-dashboard.course.assignment.review-evaluation' }"
-                                        :disabled="!isFeedbackActive">
+                                        :disabled="!isEvaluationActive">
                                 <div class="text-center border-bottom py-3">
                                     <div class="lead font-weight-bold ">Review Evaluation
-                                        <b-badge variant="success" v-if="isFeedbackActive">Open</b-badge>
+                                        <b-badge variant="success" v-if="isEvaluationActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
                                     <span class="text-muted">Opens after {{ assignment.review_due_date | formatDate }}</span>
@@ -130,6 +130,9 @@ export default {
         },
         isFeedbackActive() {
             return new Date() > new Date(this.assignment.review_due_date)
+        },
+        isEvaluationActive() {
+            return new Date() > new Date(this.assignment.review_due_date) && new Date() < new Date(this.assignment.review_evaluation_due_date)
         }
     },
     async created() {

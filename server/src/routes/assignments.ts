@@ -103,6 +103,16 @@ const updateAssignment = async function(req: any, res: any) {
         // Determine whether a file is uploaded and set the filename accordingly.
         const updatedFileName: string = (req.file) ? Date.now() + "-" + req.file.originalname : oldFilename;
 
+        const current: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
+
+        if (current.review_evaluation === true) {
+            if (req.body.review_evaluation_due_date == undefined) {
+                res.status(400);
+                res.json({ error: "If the review evaluation is turned on, you should enter a review evaluation due date." });
+                return;
+            }
+        }
+
         // Update the assignment in the database.
         const result: any = await AssignmentPS.executeUpdateAssignmentById(
             req.body.title,
@@ -113,7 +123,8 @@ const updateAssignment = async function(req: any, res: any) {
             req.body.due_date,
             req.body.review_publish_date,
             req.body.review_due_date,
-            req.params.assignment_id
+            req.params.assignment_id,
+            req.body.review_evaluation_due_date
         );
 
         // Remove the old file and add the new file if a file is uploaded
@@ -152,6 +163,14 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
             filePath = path.join(fileFolder, fileName);
         }
 
+        if (req.body.review_evaluation === true) {
+            if (req.body.review_evaluation_due_date == undefined) {
+                res.status(400);
+                res.json({ error: "If the review evaluation is turned on, you should enter a review evaluation due date." });
+                return;
+            }
+        }
+
         const result: any = await AssignmentPS.executeAddAssignment(
             req.body.title,
             req.body.description,
@@ -163,7 +182,9 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
             req.body.review_publish_date,
             req.body.review_due_date,
             req.body.one_person_groups,
-            req.body.review_evaluation);
+            req.body.review_evaluation,
+            req.body.review_evaluation_due_date
+        );
 
         if (filePath) {
             // writing the file if no error is there
