@@ -62,7 +62,10 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
         const result = await ReviewUpdate.getReview(reviewId);
 
         // Update the started_at date of the review
-        await ReviewsPS.executeUpdateStartedAtIfNull(reviewId);
+        const review: any = await ReviewsPS.executeGetReview(reviewId);
+        if (req.user.netid == review.user_netid) {
+            await ReviewsPS.executeUpdateStartedAtIfNull(reviewId);
+        }
 
         res.json(result);
     } catch (error) {
@@ -184,7 +187,9 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
         const result = await ReviewUpdate.updateReviewWithFileUpload(reviewId, inputForm, uploadQuestionIds);
 
         // Update the saved_at date of the review.
-        await ReviewsPS.executeUpdateSavedAt(reviewId);
+        if (req.user.netid == review.user_netid) {
+            await ReviewsPS.executeUpdateSavedAt(reviewId);
+        }
 
         res.json(result);
     } catch (error) {
@@ -220,7 +225,10 @@ router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, 
         const result = await ReviewsPS.executeSubmitReview(reviewId);
 
         // Update the submitted_at date of the review
-        await ReviewsPS.executeUpdateSubmittedAt(reviewId);
+        const review: any = await ReviewsPS.executeGetReview(reviewId);
+        if (req.user.netid == review.user_netid) {
+            await ReviewsPS.executeUpdateSubmittedAt(reviewId);
+        }
 
         res.json(result);
     } else {
@@ -309,7 +317,10 @@ router.route("/:reviewId/file").get(index.authorization.checkAuthorizationForRev
         const filePath = path.join(config.submissions.fileFolder, submission.file_path);
 
         // Update the downloaded_at date of the review
-        await ReviewsPS.executeUpdateDownloadedAtIfNull(reviewId);
+        const review: any = await ReviewsPS.executeGetReview(reviewId);
+        if (req.user.netid == review.user_netid) {
+            await ReviewsPS.executeUpdateDownloadedAtIfNull(reviewId);
+        }
 
         res.download(filePath);
     } catch (err) {
