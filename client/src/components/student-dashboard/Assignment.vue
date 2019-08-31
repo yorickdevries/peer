@@ -44,7 +44,7 @@
                                         active-class="bg-light"
                                         class="flex-fill p-0"
                                     :to="{ name: 'student-dashboard.course.assignment.peer-review' }"
-                                    :disabled="!isPeerReviewActive">
+                                    :disabled="!isPeerReviewVisible">
                                 <div class="text-center border-right border-bottom py-3">
                                     <div class="lead font-weight-bold">Peer Review
                                         <b-badge variant="success" v-if="isPeerReviewActive">Open</b-badge>
@@ -121,6 +121,9 @@ export default {
     computed: {
         isHandInActive() {
             return new Date() < new Date(this.assignment.due_date)
+        },
+        isPeerReviewVisible() {
+            return new Date() > new Date(this.assignment.review_publish_date)
         },
         isPeerReviewActive() {
             return new Date() < new Date(this.assignment.review_due_date) && new Date() > new Date(this.assignment.review_publish_date)

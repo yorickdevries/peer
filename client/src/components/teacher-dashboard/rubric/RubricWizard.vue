@@ -91,7 +91,7 @@
                 </b-modal>
 
                 <b-modal id="createModal" centered hide-header hide-footer class="p-0 m-0">
-                    <CreateQuestionWizard :rubricId="rubric.id" @saved="fetchRubric"></CreateQuestionWizard>
+                    <CreateQuestionWizard :rubricId="rubric.id" :nextNewQuestionNumber="nextNewQuestionNumber" @saved="fetchRubric"></CreateQuestionWizard>
                 </b-modal>
 
             </b-col>
@@ -134,7 +134,7 @@ export default {
                 id: null,
                 assignment_id: null,
                 type: null,
-                question: []
+                questions: []
             },
             assignmentsMetaData: [],
             assignmentIdSubmissionRubricToCopy: null
@@ -143,6 +143,20 @@ export default {
     computed: {
         blockRubricEditing() {
             return new Date() > new Date(this.review_publish_date);
+        },
+        nextNewQuestionNumber() {
+            if (this.rubric.questions === undefined || this.rubric.questions.length === 0) {
+                return 1
+            } else {
+                // Get max question number.
+                let max = 1
+                this.rubric.questions.forEach(question => {
+                    if (question.question_number > max) {
+                        max = question.question_number
+                    }
+                })
+                return max + 1
+            }
         }
     },
     async created() {

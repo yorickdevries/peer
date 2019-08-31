@@ -52,7 +52,7 @@
                             <h3>TA</h3>
                             For a TA (teaching assistent), we collect the following data:
                             <ul>
-                                <li>The comments given by a TA/li>
+                                <li>The comments given by a TA</li>
                                 <li>The time that the comment was given</li>
                                 <li>The courses and assignments that you are enrolled in</li>
                             </ul>
@@ -83,7 +83,7 @@
                             <p><b>The right to restrict processing</b> – You have the right to request that the TU Delft restrict the processing of your personal data, under certain conditions.</p>
                             <p><b>The right to object to processing</b> – You have the right to object to the TU Delft’s processing of your personal data, under certain conditions.</p>
                             <p><b>The right to data portability</b> – You have the right to request that the TU Delft transfer the data that we have collected to another organization, or directly to you, under certain conditions.</p>
-                            <p>If you make a request, we have one month to respond to you. If you would like to exercise any of these rights, please contact us at our email: <a href="mailto:O.W.Visser@tudelft.nl">O.W.Visser@tudelft.nl</a></p>
+                            <p>If you make a request, we have one month to respond to you. If you would like to exercise any of these rights, please contact us at our email: <a href="mailto:privacy-tud@tudelft.nl">privacy-tud@tudelft.nl</a></p>
 
                             <h3>The right to erasure</h3>
                             As there is no precedent for a request for deletion of the data, there is no clear answer to what happens when this is requested. As some data might be used to determine a grade, this might either:
@@ -116,7 +116,7 @@
                             <p>The TU Delft keeps its privacy policy under regular review and places any updates on this web page. This privacy policy was last updated on 31th of July 2019.</p>
 
                             <h2>How to contact us</h2>
-                            <p>If you have any questions about the TU Delft’s privacy policy, the data we hold on you, or you would like to exercise one of your data protection rights, please do not hesitate to contact us. Email us at: <a href="mailto:O.W.Visser@tudelft.nl">O.W.Visser@tudelft.nl</a>
+                            <p>If you have any questions about the TU Delft’s privacy policy, the data we hold on you, or you would like to exercise one of your data protection rights, please do not hesitate to contact us. Email us at: <a href="mailto:privacy-tud@tudelft.nl">privacy-tud@tudelft.nl</a>
                             </p>
 
                             <h2>How to contact the appropriate authority</h2>

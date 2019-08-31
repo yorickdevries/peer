@@ -116,7 +116,7 @@ export default {
         return client.get(`/submissions/${submissionId}`)
     },
     ReviewEvaluation: {
-        get(reviewId, exists) {
+        get(reviewId) {
             return client.get(`/reviews/${reviewId}/reviewEvaluation`)
         },
         create(reviewId) {
