@@ -516,9 +516,9 @@ describe("API Assignment routes", () => {
 
         expect(gradeExport.status).to.equal(200);
         // Make sure it includes at least the henkjan review and paul review.
-        expect(gradeExport.text.includes("\"Reviewer netid\",\"Reviewer studentnumber\",\"Reviewer group id\",\"Reviewer group name\",\"Submitter netid\",\"Submitter studentnumber\",\"Submitter group id\",\"Submitter group name\",\"Submission review done\",\"Approval status\",\"TA netid\""
+        expect(gradeExport.text.includes("\"Submitter netid\",\"Submitter studentnumber\",\"Submitter group id\",\"Submitter group name\",\"Reviewer netid\",\"Reviewer studentnumber\",\"Reviewer group id\",\"Reviewer group name\",\"Submission review done\",\"Approval status\",\"TA netid\""
         )).to.equal(true);
-        expect(gradeExport.text.includes("\"henkjan\",,10,\"ED-3\",\"paulvanderlaan\",,10,\"ED-3\"")).to.equal(true);
+        expect(gradeExport.text.includes("\"paulvanderlaan\",,10,\"ED-3\",\"henkjan\",,10,\"ED-3\"")).to.equal(true);
     });
 
     /**
