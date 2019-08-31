@@ -579,6 +579,14 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
 
             // Create and fill current review json item.
             const reviewJson: any = {};
+
+            // submitter info
+            reviewJson["Submitter netid"] = submitter.netid;
+            reviewJson["Submitter studentnumber"] = submitter.studentnumber;
+            reviewJson["Submitter group id"] = submitterGroup.id;
+            reviewJson["Submitter group name"] = submitterGroup.group_name;
+
+            // reviewer info
             reviewJson["Reviewer netid"] = reviewer.netid;
             reviewJson["Reviewer studentnumber"] = reviewer.studentnumber;
             if (reviewGroup[0] != undefined) {
@@ -586,12 +594,7 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
                 reviewJson["Reviewer group name"] = reviewGroup[0].group_name;
             }
 
-            reviewJson["Submitter netid"] = submitter.netid;
-            reviewJson["Submitter studentnumber"] = submitter.studentnumber;
-            // submission info
-            reviewJson["Submitter group id"] = submitterGroup.id;
-            reviewJson["Submitter group name"] = submitterGroup.group_name;
-
+            // other info
             reviewJson["Submission review done"] = review.done;
             reviewJson["Approval status"] = review.approved;
             reviewJson["TA netid"] = review.ta_netid;
@@ -602,8 +605,14 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
 
             // get the evaluation (if present)
             try {
+                // if this line below fails, then the error is caught
                 const reviewEvaluation: any = (await ReviewPS.executeGetFullReviewEvaluation(review.id));
+                const evaluator: any = await UserPS.executeGetUserById(reviewEvaluation.user_netid);
+                // info about evaluation
                 reviewJson["Review evaluation done"] = reviewEvaluation.done;
+                reviewJson["Evaluator netid"] = evaluator.netid;
+                reviewJson["Evaluator studentnumber"] = evaluator.studentnumber;
+
                 const reviewEvaluationQuestions = (await ReviewUpdate.getReview(reviewEvaluation.id)).form;
                 // E for evaluation
                 const reviewType = "E";
