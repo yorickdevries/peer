@@ -378,7 +378,7 @@ const checkAuthorizationForCreatingReviewEvaluation = async (req: any, res: any,
         }
 
         // check whether it is before the review evaluation due date
-        if (new Date() < new Date(assignment.review_evaluation_due_date)) {
+        if (new Date(assignment.review_evaluation_due_date) < new Date()) {
             throw new Error("You can only evaluate the review until the review evaluation due date.");
         }
 
