@@ -4,32 +4,7 @@ import bodyParser from "body-parser";
 import GroupParser from "../groupParser";
 import index from "../security/index";
 import { Roles } from "../roles";
-
-import exportFromJSON from "export-from-json";
-
-const makeJSONExportResult = function(data: any, fileName: any, exportType: any, res: any) {
-    const result = exportFromJSON({
-        data,
-        fileName,
-        exportType,
-        processor (content, type, fileName) {
-            switch (type) {
-                case "csv":
-                    res.setHeader("Content-Type", "text/csv");
-                    break;
-                case "xls":
-                    res.setHeader("Content-Type", "application/vnd.ms-excel");
-                    break;
-                default:
-                    throw new Error("Invalid export type");
-            }
-            res.setHeader("Content-disposition", "attachment;filename=" + fileName);
-            return content;
-        }
-    });
-    res.write(result);
-    res.end();
-};
+import FileExport from "../fileExport";
 
 // Router
 import express from "express";
@@ -282,13 +257,6 @@ router.get("/:courseId/gradeExport/:exporttype", index.authorization.enrolledCou
     try {
         const exportData = await ExportResultsPS.executeGetStudentSubmissionReviewExportCourse(req.params.courseId);
 
-        // Check if the export data contains data.
-        if (exportData.length == 0) {
-            res.status(400);
-            res.json({error: "No grades to export."});
-            return;
-        }
-
         // Properly format the file name.
         const course: any = await CoursesPS.executeGetCourseById(req.params.courseId);
         const date: Date = new Date();
@@ -300,15 +268,8 @@ router.get("/:courseId/gradeExport/:exporttype", index.authorization.enrolledCou
         const courseName = (/^([a-zA-Z_\-\s0-9]+)$/.test(course.name.replace(/ /g, ""))) ? course.name.replace(/ /g, "") : "";
         const filename: string = `${courseName}--${dd}-${mm}-${date.getFullYear()}--${hours}-${min}`;
 
-        // Check if the export data contains data.
-        if (exportData.length == 0) {
-            res.status(400);
-            res.json({error: "No grades to export."});
-            return;
-        }
-
         // export in required format
-        makeJSONExportResult(exportData, filename, req.params.exporttype, res);
+        FileExport.exportJSONToFile(exportData, filename, req.params.exporttype, res);
     } catch (e) {
         console.log(e);
         res.sendStatus(400);
