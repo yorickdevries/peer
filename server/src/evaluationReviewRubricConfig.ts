@@ -7,66 +7,66 @@ const evaluationReviewRubricConfig: RubricConfiguration = {
         {
             question: "Was the review comprehensive and complete, covering all relevant aspects of the work?",
             options: [
-                "Yes",
-                "No"
+                "A: Yes",
+                "B: No"
             ]
         },
         {
             question: "Was the input factually correct?",
             options: [
-                "Yes, fully",
-                "Yes, mostly",
-                "No, mostly not",
-                "No, not at all"
+                "A: Yes, fully",
+                "B: Yes, mostly",
+                "C: No, mostly not",
+                "D: No, not at all"
             ]
         },
         {
             question: "Did you, during later revision of the original submission, spot any mistakes that the reviewer overlooked?",
             options: [
-                "Yes, major mistakes",
-                "Yes, minor mistakes",
-                "No"
+                "A: Yes, major mistakes",
+                "B: Yes, minor mistakes",
+                "C: No"
             ]
         },
         {
             question: "Did the reviewer submit any open feedback (text or pdf)?",
             options: [
-                "Yes",
-                "No"
+                "A: Yes",
+                "B: No"
             ]
         },
         {
             question: "If there was any open feedback, how much?",
             options: [
-                "Too little",
-                "An acceptable amount",
-                "Much",
-                "Not applicable"
+                "A: Too little",
+                "B: An acceptable amount",
+                "C: Much",
+                "D: Not applicable"
             ]
         },
         {
             question: "If there was any open feedback, did you find it formulated in a clear and understandable way?",
             options: [
-                "Yes",
-                "No",
-                "Not applicable"
+                "A: Yes",
+                "B: No",
+                "C: Not applicable"
             ]
         },
         {
             question: "If there was any open feedback, did you find it formulated in a constructive way, so giving an idea how to improve the work?",
             options: [
-                "Yes",
-                "No",
-                "Not applicable"
+                "A: Yes",
+                "B: No",
+                "C: Not applicable"
             ]
         },
         {
             question: "Overall, do you agree with the reviewer's assessment of the work?",
             options: [
-                "Yes, fully",
-                "Yes, mostly",
-                "No, mostly not",
-                "No, not at all"
+                "A: Yes, fully",
+                "B: Yes, mostly",
+                "C: No, mostly not",
+                "D: No, not at all"
             ]
         },
         {

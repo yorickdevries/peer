@@ -29,7 +29,7 @@
                                         <b-card header="Actions">
                                             <dl class="mb-0">
                                                 <!--Shuffling-->
-                                                <dt>Shuffle groups</dt>
+                                                <dt>Assign reviews</dt>
                                                 <dd>
                                                     This action will shuffle the groups and assign the groups to each
                                                     other.
@@ -50,7 +50,7 @@
                                                     class="mb-3"
                                                     variant="primary"
                                                     size="sm"
-                                                    >Shuffle Groups
+                                                    >Assign reviews
                                                 </b-button>
                                                 <b-modal
                                                     id="shufflingModal"
@@ -58,11 +58,11 @@
                                                     title="Confirmation"
                                                     centered
                                                 >
-                                                    Are you sure you want to shuffle?
+                                                    Are you sure you want to assign the reviews?
                                                     <ul>
                                                         <li>Can (and should be) done only once per assignment.</li>
                                                         <li>
-                                                            Make sure to shuffle after students have made their
+                                                            Make sure to assign reviews after students have made their
                                                             submission.
                                                         </li>
                                                     </ul>

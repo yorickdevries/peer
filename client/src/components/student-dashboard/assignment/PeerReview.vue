@@ -80,13 +80,13 @@
                             <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
                                 <!--Buttons for toggling new assignment upload-->
                                 <div>
-                                    <div v-if="pair.answer.answer">You currently have uploaded the file: <a
+                                    <div v-if="pair.answer.answer">File uploaded: <a
                                             :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">{{ pair.answer.answer }}</a></div>
                                     <div v-else>You currently have no file uploaded.</div>
                                 </div>
                             </b-alert>
 
-                            <div v-if="!readOnly">
+                            <div v-if="!readOnly && !peerReview.review.done">
                                 <b-alert show variant="danger">{{ pair.question.extension.toUpperCase() }} files allowed only.</b-alert>
 
                                 <b-alert v-if="pair.answer.answer" show variant="warning">Note: uploading an new files will overwrite your current file.</b-alert>
@@ -234,6 +234,7 @@ export default {
                     return
                 }
 
+                this.$emit("submitEvent")
                 this.showSubmitMessage()
             } else {
                 this.showErrorMessage({message: "All fields are required."})
@@ -267,6 +268,7 @@ export default {
             try {
                 await api.unSubmitPeerReview(this.peerReview)
                 await this.fetchPeerReview()
+                this.$emit("submitEvent")
                 this.showUnSubmitMessage()
             } catch (error) {
                 this.showErrorMessage({message: "Error unsubmitting peer review."})

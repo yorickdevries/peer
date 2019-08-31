@@ -98,10 +98,14 @@
                 <!--TA Feedback Comments-->
                 <b-tab title="TA Feedback">
 
+                    <b-alert show variant="info">
+                        Consult with your teacher whether TA feedback will be given in this course.
+                    </b-alert>
+
                     <!--Submission Feedback-->
                     <b-card header="Submission Feedback" class="mb-3">
 
-                        <p class="text-muted">The feedback TA's will give on your submission will be shown here.</p>
+                        <p class="text-muted">The feedback TAs will give on your submission will be shown here.</p>
 
                         <b-list-group v-if="comments.length > 0">
 
@@ -127,7 +131,7 @@
                     <!--Review Feedback-->
                     <b-card header="Review Feedback">
 
-                        <p class="text-muted">The feedback TA's will give on the peer reviews that you have given to other students will be shown here. It will be either approved, disapproved or there might not have been any action taken yet.</p>
+                        <p class="text-muted">The feedback TAs will give on the peer reviews that you have given to other students will be shown here. It will be either approved, disapproved or there might not have been any action taken yet.</p>
 
                         <div v-for="(peerReview, index) in peerReviewsToOthers" :key="peerReview.review.id">
 

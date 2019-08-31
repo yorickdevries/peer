@@ -141,7 +141,7 @@
                                 <!--Buttons for toggling new assignment upload-->
                                 <div>
                                     <div v-if="pair.answer.answer">
-                                        You currently have uploaded the file:
+                                        File uploaded:
                                         <a :href="uploadQuestionFilePath(evaluation.review.id, pair.question.id)">
                                             {{ pair.answer.answer }}
                                         </a>
@@ -173,6 +173,8 @@
                 </b-list-group-item>
             </b-list-group>
 
+            <SessionCheck ref="sessionCheck"></SessionCheck>
+
             <template v-if="evaluation.review.id !== null && isEvaluationOwner">
                 <!--Save/Submit Buttons-->
                 <b-card-body v-if="!evaluation.review.done">
@@ -200,10 +202,11 @@ import api from "../../../api"
 import { StarRating } from "vue-rate-it"
 import notifications from "../../../mixins/notifications"
 import PeerReview from "./PeerReview"
+import SessionCheck from '../../general/SessionCheck'
 
 export default {
     mixins: [notifications],
-    components: { PeerReview, StarRating },
+    components: { PeerReview, StarRating, SessionCheck },
     props: ["reviewId"],
     data() {
         return {
@@ -358,6 +361,13 @@ export default {
             }
         },
         async saveEvaluation() {
+
+            // Session check.
+            const inSession = await this.$refs.sessionCheck.sessionGuardCheck()
+            if (!inSession) {
+                return
+            }
+
             // Set up the form data (files in ROOT of formData) to send to server.
             const formData = new FormData()
             formData.append("review", JSON.stringify(this.evaluation.review))
