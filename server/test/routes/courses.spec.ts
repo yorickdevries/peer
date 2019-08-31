@@ -244,7 +244,7 @@ describe("API Course routes", () => {
     it("Empty course grade export", async () => {
         // log in as bplanje (teacher)cle
         MockLogin.initialize("bplanje");
-        const res = await chai.request(router).get("/2/gradeExport");
+        const res = await chai.request(router).get("/2/gradeExport/csv");
         expect(res.status).to.equal(400);
     });
 

@@ -27,10 +27,11 @@
                     <b-card header="Export">
                         <dl class="mb-0">
                             <dt>Export Review Grades</dt>
-                            <dd>Exports a CSV file with an aggregation of the review approval/disapproval amounts of
+                            <dd>Exports a file with an aggregation of the review approval/disapproval amounts of
                                 each student for all the assignments in the course.
                             </dd>
-                            <b-button variant="primary" size="sm" :href="`/api/courses/${course.id}/gradeExport`">Download CSV</b-button>
+                            <b-button variant="primary" size="sm" :href="`/api/courses/${course.id}/gradeExport/csv`">Download .csv</b-button>
+                            <b-button variant="primary" size="sm" :href="`/api/courses/${course.id}/gradeExport/xls`">Download .xls</b-button>
                         </dl>
 
                     </b-card>

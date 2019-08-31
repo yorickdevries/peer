@@ -4,8 +4,7 @@ import bodyParser from "body-parser";
 import GroupParser from "../groupParser";
 import index from "../security/index";
 import { Roles } from "../roles";
-
-const json2csv = require("json2csv").parse;
+import FileExport from "../fileExport";
 
 // Router
 import express from "express";
@@ -254,16 +253,9 @@ router.get("/data/activeAcademicYears", async (req: any, res) => {
  * Export the approved ratings of each student for a specific course.
  * @param course_id - id of the course.
  */
-router.get("/:courseId/gradeExport", index.authorization.enrolledCourseTeacherCheck, async (req: any, res) => {
+router.get("/:courseId/gradeExport/:exporttype", index.authorization.enrolledCourseTeacherCheck, async (req: any, res) => {
     try {
         const exportData = await ExportResultsPS.executeGetStudentSubmissionReviewExportCourse(req.params.courseId);
-
-        // Check if the export data contains data.
-        if (exportData.length == 0) {
-            res.status(400);
-            res.json({error: "No grades to export."});
-            return;
-        }
 
         // Properly format the file name.
         const course: any = await CoursesPS.executeGetCourseById(req.params.courseId);
@@ -276,12 +268,8 @@ router.get("/:courseId/gradeExport", index.authorization.enrolledCourseTeacherCh
         const courseName = (/^([a-zA-Z_\-\s0-9]+)$/.test(course.name.replace(/ /g, ""))) ? course.name.replace(/ /g, "") : "";
         const filename: string = `${courseName}--${dd}-${mm}-${date.getFullYear()}--${hours}-${min}`;
 
-        res.setHeader("Content-disposition", `attachment; filename=${filename}.csv`);
-        res.set("Content-Type", "text/csv");
-        // Get the fields for the csv file. Export data contains at least 1 item at this point.
-        const csvFields = Object.keys(exportData[0]);
-
-        res.status(200).send(json2csv(exportData, { csvFields }));
+        // export in required format
+        FileExport.exportJSONToFile(exportData, filename, req.params.exporttype, res);
     } catch (e) {
         console.log(e);
         res.sendStatus(400);

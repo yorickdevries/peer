@@ -108,9 +108,9 @@
 
                                                 <hr />
 
-                                                <!--Exporting Grade CSV-->
-                                                <dt>Export reviews CSV</dt>
-                                                <dd>Exports a CSV file with all reviews for this assignment.</dd>
+                                                <!--Exporting Reviews-->
+                                                <dt>Export reviews</dt>
+                                                <dd>Exports a file with all reviews for this assignment.</dd>
                                                 <dd>
                                                     Also includes any evaluations which students have given to each
                                                     other's reviews.
@@ -118,24 +118,39 @@
                                                 <b-button
                                                     size="sm"
                                                     variant="primary"
-                                                    :href="`/api/assignments/${assignment.id}/reviewsExport`"
+                                                    :href="`/api/assignments/${assignment.id}/reviewsExport/csv`"
                                                     class="mb-3"
                                                 >
-                                                    Download reviews CSV
+                                                    Download reviews .csv
+                                                </b-button>
+                                                <b-button
+                                                    size="sm"
+                                                    variant="primary"
+                                                    :href="`/api/assignments/${assignment.id}/reviewsExport/xls`"
+                                                    class="mb-3"
+                                                >
+                                                    Download reviews .xls
                                                 </b-button>
 
-                                                <!--Exporting Review CSV-->
-                                                <dt>Export grades CSV</dt>
+                                                <!--Exporting Grades-->
+                                                <dt>Export grades</dt>
                                                 <dd>
-                                                    Exports a CSV file with an aggregation of the review
+                                                    Exports a file with an aggregation of the review
                                                     approval/disapproval amounts of each student for this assignment.
                                                 </dd>
                                                 <b-button
                                                     size="sm"
                                                     variant="primary"
-                                                    :href="`/api/assignments/${assignment.id}/gradeExport`"
+                                                    :href="`/api/assignments/${assignment.id}/gradeExport/csv`"
                                                 >
-                                                    Download grades CSV
+                                                    Download grades .csv
+                                                </b-button>
+                                                <b-button
+                                                    size="sm"
+                                                    variant="primary"
+                                                    :href="`/api/assignments/${assignment.id}/gradeExport/xls`"
+                                                >
+                                                    Download grades .xls
                                                 </b-button>
                                             </dl>
 
