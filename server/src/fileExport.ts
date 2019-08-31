@@ -15,7 +15,7 @@ export default class FileExport {
         // Check if the export data contains data.
         if (data.length == 0) {
             res.status(400);
-            res.json({error: "No grades to export."});
+            res.json({error: "Nothing to export."});
             return;
         }
 
