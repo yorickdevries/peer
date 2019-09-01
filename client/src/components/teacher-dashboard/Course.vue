@@ -29,7 +29,7 @@
                             <dd>Exports a file with an aggregation of the review approval/disapproval amounts of
                                 each student for all the assignments in the course.
                             </dd>
-                            <b-button variant="primary" size="sm" :href="`/api/courses/${course.id}/gradeExport/csv`">Download .csv</b-button>
+                            <b-button class="mr-2" variant="primary" size="sm" :href="`/api/courses/${course.id}/gradeExport/csv`">Download .csv</b-button>
                             <b-button variant="primary" size="sm" :href="`/api/courses/${course.id}/gradeExport/xls`">Download .xls</b-button>
                         </dl>
 
