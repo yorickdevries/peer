@@ -75,7 +75,7 @@ router.get("/:courseId/assignments/enrolled", index.authorization.enrolledCourse
  * Get all assignments that belong to a specific course.
  * @param courseId - a course id.
  */
-router.get("/:courseId/assignments", index.authorization.enrolledCourseCheck, (req: any, res) => {
+router.get("/:courseId/assignments", index.authorization.enrolledAsTAOrTeacherCourse, (req: any, res) => {
     AssignmentsPS.executeGetAssignments(req.params.courseId)
         .then((data) => {
             res.json(data);

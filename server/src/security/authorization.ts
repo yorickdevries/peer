@@ -148,6 +148,15 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
     }
 };
 
+const enrolledAsTAOrTeacherCourse = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(req.params.courseId, req.user.netid);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
 /**
  * Check enrollment of a user as student for a given assignment
  */
@@ -686,5 +695,6 @@ export default {
     checkReviewEditAllowed,
     checkSubmissionBetweenPublishDue,
     enrolledAsTeacherTwoAssignmentsCheck,
-    courseEnrollable
+    courseEnrollable,
+    enrolledAsTAOrTeacherCourse
 };
