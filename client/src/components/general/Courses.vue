@@ -67,7 +67,8 @@
                                         <p class="card-title mt-0 text-muted">{{ course.academic_year }} - {{ course.faculty }} - {{ course.course_code }}</p>
 
                                         <div class="mb-auto">
-                                            <p>{{ course.description | truncate(200)}}</p>
+                                            <p v-if="course.description != null">{{ course.description | truncate(200)}}</p>
+                                            <p v-else><i>No course description</i></p>
                                         </div>
                                         <div>
                                             <b-button   v-if="course.role === 'student'" variant="outline-primary" size="sm"
@@ -133,7 +134,8 @@
                                         <p class="card-title mt-0 text-muted">{{ course.academic_year }} - {{ course.faculty }} - {{ course.course_code }}</p>
 
                                         <div class="mb-auto">
-                                            <p>{{ course.description | truncate(200)}}</p>
+                                            <p v-if="course.description != null">{{ course.description | truncate(200)}}</p>
+                                            <p v-else><i>No course description</i></p>
                                         </div>
                                         <div>
                                             <b-button variant="outline-primary" size="sm" @click="enrollInCourse(course.id)">

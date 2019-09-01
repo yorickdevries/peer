@@ -15,9 +15,8 @@
                 <b-col cols="8">
                     <b-card header="Description">
                         <div class="d-flex w-100 justify-content-between">
-                            <p class="mb-1">
-                                {{course.description}}
-                            </p>
+                            <p class="mb-1" v-if="course.description != null">{{ course.description }}</p>
+                            <p v-else><i>No course description</i></p>
                         </div>
                     </b-card>
                 </b-col>
