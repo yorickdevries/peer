@@ -22,7 +22,10 @@ describe("AssignmentPreparedStatements Test", () => {
             "due_date": new Date("2018-05-01T20:30:00Z"),
             "filename": "assignment1.pdf",
             "id": 1,
-            "one_person_groups": false,
+            // tslint:disable-next-line
+            review_evaluation_due_date: null,
+            one_person_groups: false,
+            review_evaluation: false,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             "review_due_date": new Date("2018-05-03T20:30:00Z"),
             "review_publish_date": new Date("2018-05-02T20:30:00Z"),
@@ -35,7 +38,10 @@ describe("AssignmentPreparedStatements Test", () => {
             "due_date": new Date("2018-05-01T20:30:00Z"),
             "filename": "assignment2.pdf",
             "id": 2,
-            "one_person_groups": false,
+            // tslint:disable-next-line
+            review_evaluation_due_date: null,
+            one_person_groups: false,
+            review_evaluation: false,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             "review_due_date": new Date("9999-05-01T20:30:00Z"),
             "review_publish_date": new Date("2020-05-01T20:30:00Z"),
@@ -48,7 +54,10 @@ describe("AssignmentPreparedStatements Test", () => {
             "due_date": new Date("2018-05-01T20:30:00Z"),
             "filename": "assignment3.pdf",
             "id": 3,
-            "one_person_groups": false,
+            // tslint:disable-next-line
+            review_evaluation_due_date: null,
+            one_person_groups: false,
+            review_evaluation: false,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             "review_due_date": new Date("9999-05-01T20:30:00Z"),
             "review_publish_date": new Date("2020-05-01T20:30:00Z"),
@@ -67,7 +76,10 @@ describe("AssignmentPreparedStatements Test", () => {
             "due_date": new Date("2018-05-01T20:30:00Z"),
             "filename": "assignment1.pdf",
             "id": 1,
-            "one_person_groups": false,
+            // tslint:disable-next-line
+            review_evaluation_due_date: null,
+            one_person_groups: false,
+            review_evaluation: false,
             "publish_date": new Date("2018-04-01T20:30:00Z"),
             course_id: 1,
             "reviews_per_user": 2,
@@ -81,13 +93,16 @@ describe("AssignmentPreparedStatements Test", () => {
      */
     it("add assignment", async () => {
         expect(await AssignmentPS.executeAddAssignment("New", "Description", 1, 2, "test_file.pdf",
-        new Date("2017-07-01T20:30:00Z"), new Date("2018-07-01T20:30:00Z"), new Date("2019-07-01T20:30:00Z"), new Date("2020-07-01T20:30:00Z"), false
+        new Date("2017-07-01T20:30:00Z"), new Date("2018-07-01T20:30:00Z"), new Date("2019-07-01T20:30:00Z"), new Date("2020-07-01T20:30:00Z"), false, false
         )).to.deep.equal({
             id: 6,
-            "one_person_groups": false,
+            one_person_groups: false,
+            review_evaluation: false,
             title: "New",
             description: "Description",
             course_id: 1,
+            // tslint:disable-next-line
+            review_evaluation_due_date: null,
             filename: "test_file.pdf",
             reviews_per_user: 2,
             publish_date: new Date("2017-07-01T20:30:00Z"),
@@ -95,6 +110,41 @@ describe("AssignmentPreparedStatements Test", () => {
             review_publish_date: new Date("2019-07-01T20:30:00Z"),
             review_due_date: new Date("2020-07-01T20:30:00Z")
         });
+    });
+
+    /**
+     * Test add assignments with all fields.
+     */
+    it("add assignment all fields", async () => {
+        // Arrange
+        const courseId = 1;
+        const existing: any = await AssignmentPS.executeGetAssignments(courseId);
+
+        // Act
+        const created: any = await AssignmentPS.executeAddAssignment(
+            "New",
+            "Description",
+            courseId,
+            2,
+            "test_file.pdf",
+            new Date("2017-07-01T20:30:00Z"),
+            new Date("2018-07-01T20:30:00Z"),
+            new Date("2019-07-01T20:30:00Z"),
+            new Date("2020-07-01T20:30:00Z"),
+            false,
+            false,
+            new Date("2021-07-01T20:30:00Z"),
+        );
+
+        const newAssignment: any = await AssignmentPS.executeGetAssignmentById(created.id);
+        const current: any = await AssignmentPS.executeGetAssignments(courseId);
+
+        // Assert
+        // Make sure a new assignment is added in the database
+        expect(current.length).to.equal(existing.length + 1);
+
+        // Add assignment returns the created assignment (created), as tested in an other test
+        expect(newAssignment).to.deep.equal(created);
     });
 
     /**
@@ -106,7 +156,10 @@ describe("AssignmentPreparedStatements Test", () => {
             description: "updated",
             filename: "filename",
             id: 1,
-            "one_person_groups": false,
+            // tslint:disable-next-line
+            review_evaluation_due_date: null,
+            one_person_groups: false,
+            review_evaluation: false,
             publish_date: new Date("2018-06-01T20:30:00Z"),
             due_date: new Date("2018-06-01T20:31:00Z"),
             review_publish_date: new Date("2018-06-01T20:32:00.000Z"),
@@ -115,21 +168,4 @@ describe("AssignmentPreparedStatements Test", () => {
             title: "Updated"
         });
     });
-
-    /**
-     * Test get review assignment.
-     */
-    it("get review", async () => {
-        const result: any = await AssignmentPS.executeGetReviewByAssignmentId(1, "henkjan");
-        expect(result.id).to.equal(1);
-    });
-
-    /**
-     * Test create review.
-     */
-    it("create review", async () => {
-        const result: any = await AssignmentPS.executeCreateReviewByAssignmentId("paulvanderlaan", 1, 1);
-        expect(result.id).to.equal(3);
-    });
-
 });

@@ -38,7 +38,7 @@ const uploadSubmissionFunction = function(req: any, res: any, next: any) {
         // Error in case of too large file size
         if (err) {
             res.status(400);
-            res.json({ error: "File is too large" });
+            res.json({ error: "File is too large (max 30MB!)" });
         }
         // Error in case of no file
         else if (req.file == undefined) {

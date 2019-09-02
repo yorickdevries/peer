@@ -16,11 +16,11 @@ describe("CoursePreparedStatement Test", () => {
      * Get review of student export json for an assignment.
      */
     it("get student export stats", async () => {
-        expect(await ExportResultsPS.executeGetStudentReviewExportAssignment(1)).to.deep.equal(
+        expect(await ExportResultsPS.executeGetStudentSubmissionReviewExportAssignment(1)).to.deep.equal(
             [{
                 netID: "paulvanderlaan",
                 approved: "0",
-                disproved: "0",
+                disapproved: "0",
                 "waiting for TA": "1",
                 "student total reviews": "1",
                 // tslint:disable-next-line
@@ -33,11 +33,11 @@ describe("CoursePreparedStatement Test", () => {
      * Get review of student export json for a course.
      */
     it("get student export stats", async () => {
-        expect(await ExportResultsPS.executeGetStudentReviewExportCourse(1)).to.deep.equal(
+        expect(await ExportResultsPS.executeGetStudentSubmissionReviewExportCourse(1)).to.deep.equal(
             [{
                 netID: "paulvanderlaan",
                 approved: "0",
-                disproved: "0",
+                disapproved: "0",
                 "waiting for TA": "1",
                 "student total reviews": "1",
                 // tslint:disable-next-line

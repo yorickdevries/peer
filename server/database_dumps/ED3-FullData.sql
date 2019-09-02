@@ -11,13 +11,17 @@ INSERT INTO "userlist" (
 		('yorickdevries', NULL),
 		('teacheraccount', 'email@adress.nl');
 
+INSERT INTO public.facultylist(name) VALUES ('EWI'), ('3ME');
+
+INSERT INTO public.academicyearlist(year, active) VALUES ('2018/2019', false), ('2019/2020', true), ('2020/2021', false), ('2021/2022', false);
+
 INSERT INTO public.courselist(
-    description, name, enrollable)
+    faculty, academic_year, course_code, description, name, enrollable)
     VALUES
-        ('Automata theory is the study of abstract machines and automata, as well as the computational problems that can be solved using them. It is a theory in theoretical computer science and discrete mathematics (a subject of study in both mathematics and computer science). The word automata (the plural of automaton) comes from the Greek word αὐτόματα, which means "self-acting".', 'Automata', true),
-        ('Concepts of Programming Languages describes the fundamental concepts of programming languages by presenting design issues, examining design choices, and critically comparing design alternatives without being language specific.', 'Concepts of Programming Languages', true),
-        ('Data modeling is a process used to define and analyze data requirements needed to support the business processes within the scope of corresponding information systems in organizations. Therefore, the process of data modeling involves professional data modelers working closely with business stakeholders, as well as potential users of the information system.', 'Information and Data Modeling', true),
-        ('In this real-world-tested curriculum, take a look at famous algorithms and equations, and see how yours stack up. See practical demos, compare “life scenarios” to their coding counterparts, and create an app for your final project.', 'Algorithms and Data structures', false);
+        ('EWI', '2019/2020', 'ED1-2681', 'Automata theory is the study of abstract machines and automata, as well as the computational problems that can be solved using them. It is a theory in theoretical computer science and discrete mathematics (a subject of study in both mathematics and computer science). The word automata (the plural of automaton) comes from the Greek word αὐτόματα, which means "self-acting".', 'Automata', true),
+        ('EWI', '2019/2020', 'ED1-6631', 'Concepts of Programming Languages describes the fundamental concepts of programming languages by presenting design issues, examining design choices, and critically comparing design alternatives without being language specific.', 'Concepts of Programming Languages', true),
+        ('EWI', '2019/2020', 'ED1-5611', 'Data modeling is a process used to define and analyze data requirements needed to support the business processes within the scope of corresponding information systems in organizations. Therefore, the process of data modeling involves professional data modelers working closely with business stakeholders, as well as potential users of the information system.', 'Information and Data Modeling', true),
+        ('EWI', '2019/2020', 'ED1-2661', 'In this real-world-tested curriculum, take a look at famous algorithms and equations, and see how yours stack up. See practical demos, compare “life scenarios” to their coding counterparts, and create an app for your final project.', 'Algorithms and Data structures', false);
 
 INSERT INTO public.grouplist(group_name)
 	VALUES
@@ -36,29 +40,38 @@ INSERT INTO public.grouplist(group_name)
 	('ED-6');
 
 INSERT INTO public.assignmentlist(
-	title, description, course_id, reviews_per_user, filename, publish_date, due_date, review_publish_date, review_due_date, one_person_groups)
+	title, description, course_id, reviews_per_user, filename, publish_date, due_date, review_publish_date, review_due_date, one_person_groups, review_evaluation)
 	VALUES
-	    ('Lab assignment 1', 'How to build a DFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('Lab assignment 2', 'How to build a NFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('Lab assignment 3', 'How to build a DFA given a NFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('Assignment 1', 'Example assignment number one', 2, 2, 'assignment1.pdf', '2012-04-01T20:30:00Z', '2013-05-01T20:30:00Z', '2014-03-01T20:30:00Z', '2015-05-01T20:30:00Z', false),
-	    ('Assignment 2', 'An example of a second assignment', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('Assignment 3', 'This is another example of a third assignment.', 2, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('A1', 'Example assignment number one', 3, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('A2', 'An example of a second assignment', 3, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('Assignment one', 'Example assignment number one', 4, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('Assignment two', 'An example of a second assignment', 4, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-	    ('Assignment three', 'This is another example of a third assignment.', 4, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false),
-		('Bonus Assignment', 'bonus description', 2, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2019-05-01T20:30:00Z', '2020-03-01T20:30:00Z', '2021-05-01T20:30:00Z', false)
-	    ;
-
+	    ('Lab assignment 1', 'How to build a DFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('Lab assignment 2', 'How to build a NFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('Lab assignment 3', 'How to build a DFA given a NFA', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('Assignment 1', 'Example assignment number one', 2, 2, 'assignment1.pdf', '2012-04-01T20:30:00Z', '2013-05-01T20:30:00Z', '2014-03-01T20:30:00Z', '2015-05-01T20:30:00Z', false, false),
+	    ('Assignment 2', 'An example of a second assignment', 2, 2, 'assignment1.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('Assignment 3', 'This is another example of a third assignment.', 2, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('A1', 'Example assignment number one', 3, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('A2', 'An example of a second assignment', 3, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('Assignment one', 'Example assignment number one', 4, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('Assignment two', 'An example of a second assignment', 4, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+	    ('Assignment three', 'This is another example of a third assignment.', 4, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2018-05-01T20:30:00Z', '2019-03-01T20:30:00Z', '2020-05-01T20:30:00Z', false, false),
+		('Bonus Assignment', 'bonus description', 2, 2, 'assignment2.pdf', '2017-04-01T20:30:00Z', '2019-05-01T20:30:00Z', '2020-03-01T20:30:00Z', '2021-05-01T20:30:00Z', false, false);
 
 INSERT INTO public.rubric(
-	assignment_id)
-	VALUES (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), (11);
+	assignment_id, type)
+	VALUES 
+	(1, 'submission'),
+	(2, 'submission'),
+	(3, 'submission'),
+	(4, 'submission'),
+	(5, 'submission'),
+	(6, 'submission'),
+	(7, 'submission'),
+	(8, 'submission'),
+	(9, 'submission'),
+	(10, 'submission'),
+	(11, 'submission');
 
 INSERT INTO public.openquestion(
-	question, rubric_assignment_id, question_number)
+	question, rubric_id, question_number)
 	VALUES
 	    ('Did the author pay attention to the DFA?', 1, 1),
 	    ('How did the author do overall?', 1, 2),
@@ -78,7 +91,7 @@ INSERT INTO public.openquestion(
 	;
 
 INSERT INTO public.rangequestion(
-	question, range, rubric_assignment_id, question_number)
+	question, range, rubric_id, question_number)
 	VALUES
 	    ('Rate the DFA', 7, 1, 3),
 	    ('Rate the design', 10, 1, 4),
@@ -96,7 +109,7 @@ INSERT INTO public.rangequestion(
 	;
 
 INSERT INTO public.mcquestion(
-	question, rubric_assignment_id, question_number)
+	question, rubric_id, question_number)
 	VALUES
 	    ('What is the best way to insert queries?', 1, 4),
 	    ('Choose what best relates to the author', 1, 5),
@@ -202,7 +215,7 @@ INSERT INTO public.submission(
 	;
 
 INSERT INTO public.review(
-	user_netid, submission_id, rubric_assignment_id, done)
+	user_netid, submission_id, rubric_id, done)
 	VALUES
 	    ('henkjan', 1, 4, true),
 	    ('henkjan', 2, 5, false),

@@ -44,7 +44,7 @@
                                         active-class="bg-light"
                                         class="flex-fill p-0"
                                     :to="{ name: 'student-dashboard.course.assignment.peer-review' }"
-                                    :disabled="!isPeerReviewActive">
+                                    :disabled="!isPeerReviewVisible">
                                 <div class="text-center border-right border-bottom py-3">
                                     <div class="lead font-weight-bold">Peer Review
                                         <b-badge variant="success" v-if="isPeerReviewActive">Open</b-badge>
@@ -65,6 +65,21 @@
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
                                     <span class="text-muted">Opens after {{ assignment.review_due_date | formatDate }}</span>
+                                </div>
+                            </b-button>
+
+                            <b-button   v-if="assignment.review_evaluation"
+                                        variant="white"
+                                        active-class="bg-light"
+                                        class="flex-fill p-0"
+                                        :to="{ name: 'student-dashboard.course.assignment.review-evaluation' }"
+                                        :disabled="!isEvaluationActive">
+                                <div class="text-center border-bottom py-3">
+                                    <div class="lead font-weight-bold ">Review Evaluation
+                                        <b-badge variant="success" v-if="isEvaluationActive">Open</b-badge>
+                                        <b-badge variant="danger" v-else>Closed</b-badge>
+                                    </div>
+                                    <span class="text-muted">Due: {{ assignment.review_evaluation_due_date | formatDate }}</span>
                                 </div>
                             </b-button>
                         </b-col>
@@ -98,7 +113,8 @@ export default {
             assignment: {
                 title: null,
                 due_date: null,
-                review_due_date: null
+                review_due_date: null,
+                review_evaluation: null
             },
         }
     },
@@ -106,11 +122,17 @@ export default {
         isHandInActive() {
             return new Date() < new Date(this.assignment.due_date)
         },
+        isPeerReviewVisible() {
+            return new Date() > new Date(this.assignment.review_publish_date)
+        },
         isPeerReviewActive() {
             return new Date() < new Date(this.assignment.review_due_date) && new Date() > new Date(this.assignment.review_publish_date)
         },
         isFeedbackActive() {
             return new Date() > new Date(this.assignment.review_due_date)
+        },
+        isEvaluationActive() {
+            return new Date() > new Date(this.assignment.review_due_date) && new Date() < new Date(this.assignment.review_evaluation_due_date)
         }
     },
     async created() {

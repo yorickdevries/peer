@@ -7,19 +7,6 @@ import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
 export default class AssignmentPS {
 
     /**
-     * Get the review that was assigned to a certain user.
-     * @param {number} assignmentId - id of an assignment.
-     * @param {string} netId - net id to get the review from.
-     * @return {any} all columns of the review as a pg promise.
-     */
-    public static executeGetReviewByAssignmentId(assignmentId: number, netId: string): any {
-        const statement = new PreparedStatement("get-review",
-            "SELECT * FROM review WHERE done=FALSE AND rubric_assignment_id=$1 AND user_netid=$2");
-        statement.values = [assignmentId, netId];
-        return Database.executeQuerySingleResult(statement);
-    }
-
-    /**
      * Checks whether an assignment exists in the database.
      * @param {number} assignmentId - id of an assignment.
      * @returns tuple with true or false depending on exists as pg promise.
@@ -28,22 +15,6 @@ export default class AssignmentPS {
         const statement = new PreparedStatement("exists-assignment-by-id",
         'SELECT EXISTS(SELECT * FROM "assignmentlist" WHERE "id" = $1)');
         statement.values = [assignmentId];
-        return Database.executeQuerySingleResult(statement);
-    }
-
-    /**
-     * Create a review for a given assignment.
-     * @param {string} netId - net id of the reviewer.
-     * @param {number} submissionId - submission id that is reviewed.
-     * @param {number} assignmentId - assignment id where the review is about.
-     * @returns {Promise<pgPromise.queryResult>} relevant columns of the created review as pg promise.
-     */
-    public static executeCreateReviewByAssignmentId(netId: string, submissionId: number, assignmentId: number)
-        : Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("make-review-for-user",
-            "INSERT INTO review (user_netid, submission_id, rubric_assignment_id) VALUES ($1, $2, $3) " +
-            "RETURNING id, user_netid, submission_id, rubric_assignment_id, done");
-        statement.values = [netId, submissionId, assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -82,16 +53,20 @@ export default class AssignmentPS {
      * @param filename - filename of the assignment.
      * @param reviewPublishDate - after this date, students can start reviewing.
      * @param reviewDueDate - after this date, reviewing is closed.
+     * @param onePersonGroups - true if the groups should contain 1 person each.
+     * @param reviewEvaluation - true if the submitter should be able to review the review.
+     * @param reviewEvaluationDueDate - the due date for the review evaluation.
      * @return {any} all columns of the created assignment as pg promise.
      */
     public static executeAddAssignment(title: string, description: string, courseId: number, reviewsPerUser: number,
-                                       filename: string, publishDate: Date, dueDate: Date, reviewPublishDate: Date,
-                                       reviewDueDate: Date, onePersonGroups: boolean): Promise<pgPromise.queryResult> {
+                                       filename: string | null, publishDate: Date, dueDate: Date, reviewPublishDate: Date,
+                                       reviewDueDate: Date, onePersonGroups: boolean, reviewEvaluation: boolean,
+                                       reviewEvaluationDueDate?: Date): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("addAssignment",
         'INSERT INTO "assignmentlist" (title, description, course_id, reviews_per_user, filename, publish_date, ' +
-            "due_date, review_publish_date, review_due_date, one_person_groups) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *");
+            "due_date, review_publish_date, review_due_date, one_person_groups, review_evaluation, review_evaluation_due_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *");
         statement.values = [title, description, courseId, reviewsPerUser, filename, publishDate, dueDate,
-            reviewPublishDate, reviewDueDate, onePersonGroups];
+            reviewPublishDate, reviewDueDate, onePersonGroups, reviewEvaluation, reviewEvaluationDueDate];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -106,20 +81,22 @@ export default class AssignmentPS {
      * @param filename - filename of the assignment.
      * @param reviewPublishDate - after this date, students can start reviewing.
      * @param reviewDueDate - after this date, reviewing is closed.
+     * @param reviewEvaluationDueDate - the due date for the review evaluation.
      * @return {any} a query result.
      */
     public static executeUpdateAssignmentById(title: string, description: string, reviewsPerUser: number,
                                               filename: string, publishDate: Date, dueDate: Date,
-                                              reviewPublishDate: Date, reviewDueDate: Date, assignmentId: number)
+                                              reviewPublishDate: Date, reviewDueDate: Date, assignmentId: number,
+                                              reviewEvaluationDueDate?: Date)
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-assignment-by-id",
             "UPDATE assignmentlist " +
             "SET title=$1, description=$2, reviews_per_user=$3, filename=$4, publish_date=$5, due_date=$6, " +
-            "review_publish_date=$7, review_due_date=$8 " +
+            "review_publish_date=$7, review_due_date=$8, review_evaluation_due_date=$10 " +
             "WHERE id = $9 RETURNING *");
 
         statement.values = [title, description, reviewsPerUser, filename, publishDate, dueDate, reviewPublishDate,
-            reviewDueDate, assignmentId];
+            reviewDueDate, assignmentId, reviewEvaluationDueDate];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -149,6 +126,18 @@ export default class AssignmentPS {
         "SELECT g.id, g.group_name FROM assignmentgroup a JOIN grouplist g ON a.group_id = g.id " +
             "WHERE assignment_id = $1");
         statement.values = [id];
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Get the users that are in a certain group.
+     * @param {number} groupId
+     * @return {Promise<pgPromise.queryResult>}
+     */
+    public static executeGetUsersOfGroup(groupId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-all-groups-users-for-assignment",
+            "SELECT * from groupusers WHERE group_groupid = $1");
+        statement.values = [groupId];
         return Database.executeQuery(statement);
     }
 

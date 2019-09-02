@@ -14,7 +14,8 @@
                                             v-for="question in sortedQuestionsList"
                                             :key="question.question_number"
                                             @click="activeQuestion = question"
-                                            :active="activeQuestion === question">
+                                            :active="activeQuestion === question"
+                                            style="cursor: pointer;">
                                         Question #{{ question.question_number}}
                                     </b-list-group-item>
                                 </b-list-group>
@@ -38,11 +39,11 @@
                                             <div class="">
                                                 <h5 class="text-primary">Question {{ activeQuestion.question_number
                                                     }}</h5>
-                                                {{ activeQuestion.question}}
+                                                {{ activeQuestion.question }}
                                             </div>
                                         </b-list-group-item>
 
-                            <b-list-group-item v-for="(pair, index) in aggregateQuestionAnswer(activeQuestion.question_number)" :key="index">
+                            <b-list-group-item v-for="(pair, index) in aggregateQuestionAnswer(activeQuestion.id)" :key="index">
 
                                 <!--&lt;!&ndash; OPEN QUESTION &ndash;&gt;-->
                                 <template v-if="activeQuestion.type_question === 'open'">
@@ -54,8 +55,6 @@
                                             readonly
                                             :max-rows="15"/>
                                 </template>
-
-
 
                                 <!--&lt;!&ndash; RANGE QUESTION &ndash;&gt;-->
                                 <StarRating v-else-if="activeQuestion.type_question === 'range'"
@@ -79,6 +78,12 @@
                                     </b-form-radio-group>
                                 </b-form-group>
 
+                                <!--&lt;!&ndash; UPLOAD QUESTION &ndash;&gt;-->
+                                <template v-if="activeQuestion.type_question === 'upload'">
+                                    <a target="_blank" :href="uploadQuestionFilePath(pair.peerReviewId, pair.question.id)">{{ pair.answer.answer }}</a>
+                                </template>
+
+
                             </b-list-group-item>
 
                         </b-list-group>
@@ -93,10 +98,14 @@
                 <!--TA Feedback Comments-->
                 <b-tab title="TA Feedback">
 
+                    <b-alert show variant="info">
+                        Consult with your teacher whether TA feedback will be given in this course.
+                    </b-alert>
+
                     <!--Submission Feedback-->
                     <b-card header="Submission Feedback" class="mb-3">
 
-                        <p class="text-muted">The feedback TA's will give on your submission will be shown here.</p>
+                        <p class="text-muted">The feedback TAs will give on your submission will be shown here.</p>
 
                         <b-list-group v-if="comments.length > 0">
 
@@ -122,7 +131,7 @@
                     <!--Review Feedback-->
                     <b-card header="Review Feedback">
 
-                        <p class="text-muted">The feedback TA's will give on the peer reviews that you have given to other students will be shown here. It will be either approved, disapproved or there might not have been any action taken yet.</p>
+                        <p class="text-muted">The feedback TAs will give on the peer reviews that you have given to other students will be shown here. It will be either approved, disapproved or there might not have been any action taken yet.</p>
 
                         <div v-for="(peerReview, index) in peerReviewsToOthers" :key="peerReview.review.id">
 
@@ -201,12 +210,17 @@ export default {
 
         },
 
-        aggregateQuestionAnswer(targetQuestionNumber) {
+        aggregateQuestionAnswer(targetQuestionId) {
             // Aggregates the answers for a particular question into an array of answers.
             let res = []
+
             this.peerReviews.forEach(peerReview => {
-                let pair = peerReview.form.find(questionAnswerPair => questionAnswerPair.question.question_number === targetQuestionNumber)
-                res.push(pair)
+                let pair = peerReview.form.find(questionAnswerPair => questionAnswerPair.question.id === targetQuestionId)
+                res.push({
+                    ...pair,
+                    // Add for later use when you need to gather the link for the upload question.
+                    peerReviewId: peerReview.review.id
+                })
             })
             return res
         },
@@ -227,6 +241,9 @@ export default {
                 this.showErrorMessage()
             }
         },
+        uploadQuestionFilePath(reviewId, questionId) {
+            return `/api/reviews/${reviewId}/questions/${questionId}/file`
+        }
     },
 }
 </script>

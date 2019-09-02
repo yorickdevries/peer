@@ -76,6 +76,7 @@
                 try {
                     await api.client.post(`submissions/${this.submissionId}/comment`, this.newComment)
                     this.getSubmissionComments()
+                    this.newComment.comment = null
                     this.showSuccessMessage({message: "Successfully created a comment."})
                 } catch (e) {
                     this.showErrorMessage()

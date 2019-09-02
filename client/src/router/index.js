@@ -30,6 +30,11 @@ export default new Router({
                     name: 'courses',
                     component: () => import('../components/general/Courses')
                 },
+                {
+                    path: '/privacy',
+                    name: 'privacy-statement',
+                    component: () => import('../components/general/PrivacyPolicy')
+                }
             ]
         },
         ...StudentRoutes,

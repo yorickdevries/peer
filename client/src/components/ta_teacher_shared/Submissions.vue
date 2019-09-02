@@ -38,7 +38,7 @@
                  outlined
                  show-empty
                  stacked="md"
-                 :items=submissions
+                 :items=submissionsAndGroups
                  :fields="fields"
                  :current-page="currentPage"
                  :per-page="Number(perPage)"
@@ -80,10 +80,13 @@
         data() {
             return {
                 submissions: [],
+                groups: [],
+                submissionsAndGroups: [],
                 currentPage: 1,
                 fields: [
                     {key: 'user_netid', label: 'Username'},
                     {key: 'group_id', label: 'Group ID'},
+                    {key: 'group_name', label: 'Group name'},
                     'formattedDate',
                     {key: 'comment_count', label: '# of comments'},
                     {key: 'file_path', label: 'Download'},
@@ -91,7 +94,7 @@
 
                 ],
                 perPage: 5,
-                latestSubmissionsActive: false,
+                latestSubmissionsActive: true,
                 filter: null
             }
         },
@@ -108,6 +111,7 @@
                         res = await api.getAssignmentAllSubmissions(this.assignmentId)
                     }
                     this.submissions = res.data
+                    await this.fetchGroups()
                 } catch (error) {
                     console.log(error)
                 }
@@ -115,6 +119,21 @@
             async setLatestSubmissionsActive(boolean) {
                 this.latestSubmissionsActive = boolean
                 await this.fetchSubmissions()
+            },
+            async fetchGroups() {
+                let res = await api.getAssignmentGroups(this.assignmentId)
+                this.groups = res.data
+                this.concatenateArrays(this.submissions, this.groups)
+            },
+            concatenateArrays(submissions, groups) {
+                this.submissionsAndGroups = this.submissions
+                for(let i=0; i<submissions.length; i++ ) {
+                    for(let j=0; j<groups.length; j++){
+                        if (groups[j].id === submissions[i].group_id){
+                            this.submissionsAndGroups[i].group_name = groups[j].group_name
+                        }
+                    }
+                }
             }
         }
     }

@@ -14,21 +14,40 @@ CREATE TABLE AssignmentList (
     due_date timestamptz NOT NULL,
     review_publish_date timestamptz NOT NULL,
     review_due_date timestamptz NOT NULL,
+    review_evaluation_due_date timestamptz,
     one_person_groups boolean NOT NULL,
+    review_evaluation boolean NOT NULL,
     CONSTRAINT AssignmentList_pk PRIMARY KEY (id),
     CONSTRAINT positive_review_per_user CHECK (reviews_per_user > 0),
     CONSTRAINT publish_before_due CHECK (publish_date < due_date),
     CONSTRAINT due_before_review_publish CHECK (due_date < review_publish_date),
-    CONSTRAINT review_publish_before_review_due CHECK (review_publish_date < review_due_date)
+    CONSTRAINT review_publish_before_review_due CHECK (review_publish_date < review_due_date),
+    CONSTRAINT review_due_before_review_evaluation_due CHECK (review_due_date < review_evaluation_due_date)
 );
 
 -- Table: CourseList
 CREATE TABLE CourseList (
     id SERIAL,
+    faculty varchar(100) NOT NULL,
+    academic_year varchar(9) NOT NULL,
+    course_code varchar(20) NOT NULL,
     description varchar(5000),
     name varchar(500) NOT NULL,
     enrollable boolean NOT NULL,
     CONSTRAINT CourseList_pk PRIMARY KEY (id)
+);
+
+-- Table: FacultyList
+CREATE TABLE FacultyList (
+    name varchar(100) NOT NULL,
+    CONSTRAINT FacultyList_pk PRIMARY KEY (name)
+);
+
+-- Table: AcademicYearList
+CREATE TABLE AcademicYearList (
+    year varchar(9) NOT NULL,
+    active BOOLEAN NOT NULL,
+    CONSTRAINT AcademicYearList_pk PRIMARY KEY (year)
 );
 
 -- Table: Enroll
@@ -43,6 +62,12 @@ CREATE TABLE Enroll (
 CREATE TABLE Role (
     name varchar(100) NOT NULL,
     CONSTRAINT Role_pk PRIMARY KEY (name)
+);
+
+-- Table: RubricType
+CREATE TABLE RubricType (
+    name varchar(100) NOT NULL,
+    CONSTRAINT RubricType_pk PRIMARY KEY (name)
 );
 
 -- Table: AssignmentGroup
@@ -86,7 +111,7 @@ CREATE TABLE MCOption (
 CREATE TABLE MCQuestion (
     id SERIAL,
     question varchar(5000) NOT NULL,
-    Rubric_Assignment_id int NOT NULL,
+    Rubric_id int NOT NULL,
     question_number int NOT NULL,
     CONSTRAINT MCQuestion_pk PRIMARY KEY (id)
 );
@@ -103,7 +128,7 @@ CREATE TABLE OpenAnswer (
 CREATE TABLE OpenQuestion (
     id SERIAL,
     question varchar(5000) NOT NULL,
-    Rubric_Assignment_id int NOT NULL,
+    Rubric_id int NOT NULL,
     question_number int NOT NULL,
     CONSTRAINT OpenQuestion_pk PRIMARY KEY (id)
 );
@@ -121,20 +146,43 @@ CREATE TABLE RangeQuestion (
     id SERIAL,
     question varchar(5000) NOT NULL,
     range int NOT NULL,
-    Rubric_Assignment_id int NOT NULL,
+    Rubric_id int NOT NULL,
     question_number int NOT NULL,
     CONSTRAINT RangeQuestion_pk PRIMARY KEY (id),
     CONSTRAINT positive_range CHECK (range > 0)
+);
+
+-- Table UploadAnswer
+CREATE TABLE UploadAnswer (
+    answer varchar(500) NOT NULL,
+    UploadQuestion_id int NOT NULL,
+    Review_id int NOT NULL,
+    CONSTRAINT UploadAnswer_pk PRIMARY KEY (UploadQuestion_id,Review_id)
+);
+
+-- Table: UploadQuestion
+CREATE TABLE UploadQuestion (
+    id SERIAL,
+    question varchar(5000) NOT NULL,
+    extension varchar(10) NOT NULL,
+    Rubric_id int NOT NULL,
+    question_number int NOT NULL,
+    CONSTRAINT UploadQuestion_pk PRIMARY KEY (id)
 );
 
 -- Table: Review
 CREATE TABLE Review (
     id SERIAL,
     User_netid varchar(500) NOT NULL,
-    Submission_id int NOT NULL,
-    Rubric_Assignment_id int NOT NULL,
+    Submission_id int,
+    evaluated_review_id int,
+    Rubric_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
     creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    started_at timestamptz,
+    downloaded_at timestamptz,
+    submitted_at timestamptz,
+    saved_at timestamptz,
     approved boolean,
     ta_netid varchar(500),
     CONSTRAINT Review_pk PRIMARY KEY (id)
@@ -142,8 +190,10 @@ CREATE TABLE Review (
 
 -- Table: Rubric
 CREATE TABLE Rubric (
+    id SERIAL,
     Assignment_id int NOT NULL,
-    CONSTRAINT Rubric_pk PRIMARY KEY (Assignment_id)
+    type varchar(100) NOT NULL,
+    CONSTRAINT Rubric_pk PRIMARY KEY (id)
 );
 
 -- Table: Submission
@@ -211,6 +261,22 @@ ALTER TABLE SubmissionComment ADD CONSTRAINT SubmissionComment_review
 ALTER TABLE AssignmentList ADD CONSTRAINT Assignment_Course
     FOREIGN KEY (Course_id)
     REFERENCES CourseList (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: CourseList_Faculty (table: CourseList)
+ALTER TABLE CourseList ADD CONSTRAINT CourseList_Faculty
+    FOREIGN KEY (faculty)
+    REFERENCES FacultyList (name)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: CourseList_AcademicYear (table: CourseList)
+ALTER TABLE CourseList ADD CONSTRAINT CourseList_AcademicYear
+    FOREIGN KEY (academic_year)
+    REFERENCES AcademicYearList (year)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -297,8 +363,8 @@ ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_MCOption
 
 -- Reference: MCQuestion_Rubric (table: MCQuestion)
 ALTER TABLE MCQuestion ADD CONSTRAINT MCQuestion_Rubric
-    FOREIGN KEY (Rubric_Assignment_id)
-    REFERENCES Rubric (Assignment_id)
+    FOREIGN KEY (Rubric_id)
+    REFERENCES Rubric (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -321,8 +387,32 @@ ALTER TABLE OpenAnswer ADD CONSTRAINT OpenAnswer_Review
 
 -- Reference: OpenQuestion_Rubric (table: OpenQuestion)
 ALTER TABLE OpenQuestion ADD CONSTRAINT OpenQuestion_Rubric
-    FOREIGN KEY (Rubric_Assignment_id)
-    REFERENCES Rubric (Assignment_id)
+    FOREIGN KEY (Rubric_id)
+    REFERENCES Rubric (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: UploadAnswer_UploadQuestion (table: UploadAnswer)
+ALTER TABLE UploadAnswer ADD CONSTRAINT UploadAnswer_UploadQuestion
+    FOREIGN KEY (UploadQuestion_id)
+    REFERENCES UploadQuestion (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: UploadAnswer_Review (table: UploadAnswer)
+ALTER TABLE UploadAnswer ADD CONSTRAINT UploadAnswer_Review
+    FOREIGN KEY (Review_id)
+    REFERENCES Review (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: UploadQuestion_Rubric (table: UploadQuestion)
+ALTER TABLE UploadQuestion ADD CONSTRAINT UploadQuestion_Rubric
+    FOREIGN KEY (Rubric_id)
+    REFERENCES Rubric (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -345,16 +435,16 @@ ALTER TABLE RangeAnswer ADD CONSTRAINT RangeAnswer_Review
 
 -- Reference: RangeQuestion_Rubric (table: RangeQuestion)
 ALTER TABLE RangeQuestion ADD CONSTRAINT RangeQuestion_Rubric
-    FOREIGN KEY (Rubric_Assignment_id)
-    REFERENCES Rubric (Assignment_id)
+    FOREIGN KEY (Rubric_id)
+    REFERENCES Rubric (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: Review_Rubric (table: Review)
 ALTER TABLE Review ADD CONSTRAINT Review_Rubric
-    FOREIGN KEY (Rubric_Assignment_id)
-    REFERENCES Rubric (Assignment_id)
+    FOREIGN KEY (Rubric_id)
+    REFERENCES Rubric (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -363,6 +453,14 @@ ALTER TABLE Review ADD CONSTRAINT Review_Rubric
 ALTER TABLE Review ADD CONSTRAINT Review_Submission
     FOREIGN KEY (Submission_id)
     REFERENCES Submission (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: Review_EvaluatedReview (table: Review)
+ALTER TABLE Review ADD CONSTRAINT Review_EvaluatedReview
+    FOREIGN KEY (evaluated_review_id)
+    REFERENCES Review (id)
     NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
@@ -423,10 +521,23 @@ ALTER TABLE Enroll ADD CONSTRAINT Enroll_Role
     INITIALLY IMMEDIATE
 ;
 
+-- Reference: Rubric_Type (table: Rubric)
+ALTER TABLE Rubric ADD CONSTRAINT Rubric_Type
+    FOREIGN KEY (type)
+    REFERENCES RubricType (name)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
 -- Set roles
 INSERT INTO public.role(name)
 	VALUES ('student'),
     ('TA'),
 	('teacher');
+
+-- Set roles
+INSERT INTO public.rubrictype(name)
+	VALUES ('submission'),
+    ('review');
 
 -- End of file.

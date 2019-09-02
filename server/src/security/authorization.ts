@@ -1,4 +1,5 @@
 import AuthorizationPS from "../prepared_statements/authorization_ps";
+import RubricPS from "../prepared_statements/rubric_ps";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 import ReviewPS from "../prepared_statements/review_ps";
@@ -33,13 +34,36 @@ const employeeCheck = (req: any, res: any, next: any) => {
 };
 
 /**
- * Check whether a user is enrolled to the course of the assignment it wants to access
+ * Check whether a user is enrolled in a group of the assignment it wants to access
+ * or is manager of the course
  */
 const enrolledAssignmentCheck = async (req: any, res: any, next: any) => {
     try {
         const assignment = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-        const authCheck = await AuthorizationPS.executeCheckEnrollment(assignment.course_id, req.user.netid);
-        response(res, authCheck.exists, next);
+        // Student in assignment or teacher/TA in course
+        const selfEnrollment = assignment.one_person_groups;
+        const inGroup = await AuthorizationPS.executeCheckAssignmentEnrollment(assignment.id, req.user.netid);
+        const taOrTeacherInCourse = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.user.netid);
+        const authCheck = selfEnrollment || inGroup.exists || taOrTeacherInCourse.exists;
+        response(res, authCheck, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check whether a user iis allowed to get a rubric
+ */
+const getRubricCheck = async (req: any, res: any, next: any) => {
+    try {
+        const rubric = await RubricPS.executeGetRubricById(req.params.rubric_id);
+        const assignment = await AssignmentPS.executeGetAssignmentById(rubric.assignment_id);
+
+        // Student in assignment or teacher/TA in course
+        const inGroup = await AuthorizationPS.executeCheckAssignmentEnrollment(assignment.id, req.user.netid);
+        const taOrTeacherInCourse = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(assignment.course_id, req.user.netid);
+        const authCheck = inGroup.exists || taOrTeacherInCourse.exists;
+        response(res, authCheck, next);
     } catch (error) {
         res.sendStatus(401);
     }
@@ -50,7 +74,7 @@ const enrolledAssignmentCheck = async (req: any, res: any, next: any) => {
  */
 const enrolledCourseCheck = async (req: any, res: any, next: any) => {
     try {
-        const authCheck = await AuthorizationPS.executeCheckEnrollment(req.params.courseId, req.user.netid);
+        const authCheck = await AuthorizationPS.executeCheckCourseEnrollment(req.params.courseId, req.user.netid);
         response(res, authCheck.exists, next);
     } catch (error) {
         res.sendStatus(401);
@@ -124,6 +148,15 @@ const enrolledAsTAOrTeacherAssignment = async (req: any, res: any, next: any) =>
     }
 };
 
+const enrolledAsTAOrTeacherCourse = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(req.params.courseId, req.user.netid);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
 /**
  * Check enrollment of a user as student for a given assignment
  */
@@ -138,11 +171,11 @@ const enrolledAsStudentAssignment = async (req: any, res: any, next: any) => {
 };
 
 /**
- * Check authorization to edit a rubric
+ * Check authorization to add a rubric
  */
 const checkRubricAuthorizationPost = async (req: any, res: any, next: any) => {
     try {
-        const assignment = await AssignmentPS.executeGetAssignmentById(req.body.rubric_assignment_id);
+        const assignment = await AssignmentPS.executeGetAssignmentById(req.body.assignment_id);
         const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.user.netid);
         await response(res, authCheck.exists, next);
     } catch (error) {
@@ -151,11 +184,27 @@ const checkRubricAuthorizationPost = async (req: any, res: any, next: any) => {
 };
 
 /**
+ * Check authorization to add a rubric question
+ */
+const checkRubricAuthorizationPostQuestion = async (req: any, res: any, next: any) => {
+    try {
+        const rubric = await RubricPS.executeGetRubricById(req.body.rubric_id);
+        const assignment = await AssignmentPS.executeGetAssignmentById(rubric.assignment_id);
+        const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.user.netid);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+
+/**
  * Check authorization to edit a rubric
  */
 const checkRubricAuthorization = async (req: any, res: any, next: any) => {
     try {
-        const assignment = await AssignmentPS.executeGetAssignmentById(req.params.rubric_assignment_id);
+        const rubric = await RubricPS.executeGetRubricById(req.params.rubric_id);
+        const assignment = await AssignmentPS.executeGetAssignmentById(rubric.assignment_id);
         const authCheck = await AuthorizationPS.executeCheckEnrollmentAsTeacher(assignment.course_id, req.user.netid);
         await response(res, authCheck.exists, next);
     } catch (error) {
@@ -214,6 +263,18 @@ const checkOpenQuestionEdit = async (req: any, res: any, next: any) => {
 };
 
 /**
+ * Check authorization to edit a upload question
+ */
+const checkUploadQuestionEdit = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeAuthorizationUploadQuestion(req.params.question_id, req.user.netid);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
  * Check authorization to edit a range question
  */
 const checkRangeQuestionEdit = async (req: any, res: any, next: any) => {
@@ -231,19 +292,106 @@ const checkRangeQuestionEdit = async (req: any, res: any, next: any) => {
  */
 const checkAuthorizationForReview = async (req: any, res: any, next: any) => {
     try {
-        const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.user.netid);
-        const authCheckOwner = await AuthorizationPS.executeCheckReviewMaker(req.params.reviewId, req.user.netid);
-        const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(req.params.reviewId, req.user.netid);
+        const review = await ReviewPS.executeGetFullReview(req.params.reviewId);
+        const rubric = await RubricPS.executeGetRubricById(review.rubric_id);
 
-        // Check if past due date
-        const review = await ReviewPS.executeGetReview(req.params.reviewId);
-        const assignment: any = await AssignmentPS.executeGetAssignmentById(review.rubric_assignment_id);
-        // If you are being reviewed and are not reviewing yourself, you can only access the review after the due date
-        if (authCheckSubmissionOwner.exists && !authCheckOwner.exists && (new Date(assignment.review_due_date) > new Date())) {
-            throw new Error("You can only access the review after the review due date is passed.");
+        if (rubric.type == "submission") {
+            const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(req.params.reviewId, req.user.netid);
+            const authCheckOwner = (review.user_netid == req.user.netid);
+            const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(req.params.reviewId, req.user.netid);
+
+            // Check if past due date
+            const assignment: any = await AssignmentPS.executeGetAssignmentById(rubric.assignment_id);
+            // If you are being reviewed and are not reviewing yourself,
+            // you can only access the review after the due date and when its marked as done
+            if (
+                authCheckSubmissionOwner.exists
+                &&
+                !authCheckOwner
+                &&
+                (new Date(assignment.review_due_date) > new Date() || !review.done)
+                ) {
+                throw new Error("You can only access the review after the review due date is passed and the review is marked as done.");
+            }
+
+            const bool = authCheckTAOrTeacher.exists || authCheckOwner || authCheckSubmissionOwner.exists;
+            await response(res, bool, next);
+        } else if (rubric.type == "review") {
+            // check ownership
+            const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(review.id, req.user.netid);
+            const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(review.evaluated_review_id, req.user.netid);
+
+            const bool = authCheckTAOrTeacher.exists || authCheckSubmissionOwner.exists;
+            await response(res, bool, next);
+        } else {
+            throw new Error("No or invalid Rubric type");
         }
-        const bool = authCheckTAOrTeacher.exists || authCheckOwner.exists || authCheckSubmissionOwner.exists;
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check if the user can get the evaluation of this review
+ */
+const checkAuthorizationForGettingReviewEvaluation = async (req: any, res: any, next: any) => {
+    try {
+        const reviewId = req.params.reviewId;
+
+        // check ownership of the review (regardles of whether the evaluationReview exists)
+        const authCheckTAOrTeacher = await AuthorizationPS.executeCheckTAOrTeacherForReview(reviewId, req.user.netid);
+        const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(reviewId, req.user.netid);
+
+        const bool = authCheckTAOrTeacher.exists || authCheckSubmissionOwner.exists;
         await response(res, bool, next);
+
+
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check if the user can evaluate this review
+ */
+const checkAuthorizationForCreatingReviewEvaluation = async (req: any, res: any, next: any) => {
+    try {
+        const reviewId = req.params.reviewId;
+        // check whether the user belongs to the group of the submission
+        const authCheckSubmissionOwner = await AuthorizationPS.executeCheckGroupBelongingToReview(reviewId, req.user.netid);
+        if (!authCheckSubmissionOwner.exists) {
+            throw new Error("This review is not about you");
+        }
+        const review = await ReviewPS.executeGetFullReview(reviewId);
+
+        // the review should be done in the first place
+        if (!review.done) {
+            throw new Error("This review isn't submitted");
+        }
+
+        const rubric = await RubricPS.executeGetRubricById(review.rubric_id);
+        // the review should be about a submission
+        if (rubric.type !== "submission") {
+            throw new Error("This review isn't from a submission");
+        }
+
+        const assignment: any = await AssignmentPS.executeGetAssignmentById(rubric.assignment_id);
+        // review evaluation should be enabled
+        if (!assignment.review_evaluation) {
+            throw new Error("This assignment does not have review evaluation enabled");
+        }
+
+        // check whether it is the past due date of review
+        if (new Date(assignment.review_due_date) > new Date()) {
+            throw new Error("You can only evaluate the review after the review due date is passed.");
+        }
+
+        // check whether it is before the review evaluation due date
+        if (new Date(assignment.review_evaluation_due_date) < new Date()) {
+            throw new Error("You can only evaluate the review until the review evaluation due date.");
+        }
+
+        await response(res, true, next);
     } catch (error) {
         res.sendStatus(401);
     }
@@ -276,15 +424,24 @@ const checkReviewOwnerDone = async (req: any, res: any, next: any) => {
 /**
  * Check if the user is allowed to submit the review
  */
-const checkReviewBetweenPublishDue = async (req: any, res: any, next: any) => {
+const checkReviewEditAllowed = async (req: any, res: any, next: any) => {
     try {
-        const review = await ReviewPS.executeGetReview(req.params.reviewId);
-        const assignmentId =  review.rubric_assignment_id;
+        const review = await ReviewPS.executeGetFullReview(req.params.reviewId);
+        const rubric = await RubricPS.executeGetRubricById(review.rubric_id);
+        const assignmentId =  rubric.assignment_id;
         const assignment = await AssignmentPS.executeGetAssignmentById(assignmentId);
-        // check whether the user is on time
         const currentDate = new Date();
-        const withinTimeFrame = (new Date(assignment.review_publish_date) < currentDate && new Date(assignment.review_due_date) > currentDate);
-        response(res, withinTimeFrame, next);
+
+        if (rubric.type == "submission") {
+            // check whether the user is on time
+            const withinTimeFrame = (new Date(assignment.review_publish_date) < currentDate && new Date(assignment.review_due_date) > currentDate);
+            response(res, withinTimeFrame, next);
+        } else if (rubric.type == "review") {
+            const withinTimeFrame = (new Date(assignment.review_due_date) < currentDate && currentDate < new Date(assignment.review_evaluation_due_date));
+            response(res, withinTimeFrame, next);
+        } else {
+            response(res, true, next);
+        }
     } catch (error) {
         res.sendStatus(401);
     }
@@ -475,8 +632,13 @@ const courseEnrollable = async (req: any, res: any, next: any) => {
     try {
         // Fetch the parameters required for the check.
         const course: any = await CoursesPS.executeGetCourseById(req.params.courseId);
+        const activeYears: any[] = await CoursesPS.executeGetactiveAcademicYears();
+
         // Verify the authorization.
-        await response(res, course.enrollable, next);
+        const isEnrollable = course.enrollable;
+        const isActive = activeYears.filter(activeYear => {return activeYear.year === course.academic_year; }).length > 0;
+
+        await response(res, isEnrollable && isActive, next);
     } catch (error) {
         res.sendStatus(401);
     }
@@ -500,6 +662,7 @@ export default {
     authorizeCheck,
     employeeCheck,
     enrolledAssignmentCheck,
+    getRubricCheck,
     checkOwnerReviewComment,
     checkReviewTAOrTeacher,
     checkReviewOwnerDone,
@@ -507,9 +670,13 @@ export default {
     checkOpenQuestionEdit,
     checkRangeQuestionEdit,
     checkMCQuestionEdit,
+    checkUploadQuestionEdit,
     checkMCOptionEdit,
     checkRubricAuthorizationPost,
+    checkRubricAuthorizationPostQuestion,
     checkAuthorizationForReview,
+    checkAuthorizationForCreatingReviewEvaluation,
+    checkAuthorizationForGettingReviewEvaluation,
     enrolledCourseCheck,
     checkMCOptionPost,
     enrolledCourseTeacherCheck,
@@ -525,8 +692,9 @@ export default {
     putSubmissionCommentAuth,
     checkRubricAuthorization,
     isAuthorizedToEditGroup,
-    checkReviewBetweenPublishDue,
+    checkReviewEditAllowed,
     checkSubmissionBetweenPublishDue,
     enrolledAsTeacherTwoAssignmentsCheck,
-    courseEnrollable
+    courseEnrollable,
+    enrolledAsTAOrTeacherCourse
 };

@@ -14,6 +14,8 @@
                             <dd></dd>
                             <dt>File</dt>
                             <dd><a :href="submissionFilePath" target="_blank">{{ submission.file_path }}</a></dd>
+                            <dt>Submitted by</dt>
+                            <dd>{{ submission.user_netid }}</dd>
                             <dt>Date</dt>
                             <dd>{{ submission.date | formatDate }}</dd>
                         </dl>
@@ -61,108 +63,104 @@
   import notifications from "../../../mixins/notifications"
 
   export default {
-    mixins: [notifications],
-    data() {
-      return {
-        file: null,
-        fileProgress: 0,
-        acceptFiles: ".pdf,.zip",
-        submission: {
-          user_netid: null,
-          assignment_id: null,
-          file_path: null,
-          date: null,
-        },
-        assignment: {
-          title: null,
-          description: null,
-          due_date: null,
-          publish_date: null,
-          id: null,
-          course_id: null,
-          filename: ""
-        }
-      }
-    },
-    computed: {
-      submissionFilePath() {
-        // Get the submission file path.
-        return `/api/submissions/${this.submission.id}/file`
-      },
-      hasUploadedSubmission() {
-        // Returns whether an submission has been uploaded or not.
-        return this.submission.id !== undefined
-      }
-    },
-    async created() {
-      // Fetch assignment & submission.
-      await this.fetchAssignment()
-      await this.fetchSubmission()
-    },
-    methods: {
-      async submitSubmission() {
-
-        // Create the form data with the file.
-        let formData = new FormData()
-        formData.append("assignmentId", this.assignment.id)
-        formData.append("submissionFile", this.file)
-
-        // Config set for the HTTP request & updating the progress field.
-        let config = {
-          'Content-Type': 'multipart/form-data',
-          onUploadProgress: (progressEvent) => {
-            this.fileProgress = Math.round( (progressEvent.loaded * 100) / progressEvent.total );
+      mixins: [notifications],
+      data() {
+          return {
+              file: null,
+              fileProgress: 0,
+              acceptFiles: ".pdf,.zip",
+              submission: {
+                  user_netid: null,
+                  assignment_id: null,
+                  file_path: null,
+                  date: null,
+              },
+              assignment: {
+                  title: null,
+                  description: null,
+                  due_date: null,
+                  publish_date: null,
+                  id: null,
+                  course_id: null,
+                  filename: ""
+              }
           }
-        };
-
-        // Perform upload.
-        let res
-        try {
-          res = await api.client.post("/submissions", formData, config)
-          this.showSuccessMessage({message: 'Successfully submitted new submission.'})
-          this.$refs.uploadModal.hide()
-        } catch (e) {
-          this.showErrorMessage({message: `Did not upload file. ${e.response.data.error}`})
-          this.$refs.uploadModal.hide()
-        }
-
-        // Clear file.
-        this.onFileReset()
-
-        // Re-fetch new submission.
-        await this.fetchSubmission()
       },
-      async fetchAssignment() {
-        // Fetch the assignment.
-        let res = await api.getAssignment(this.$route.params.assignmentId)
-        this.assignment = res.data
+      computed: {
+          submissionFilePath() {
+              // Get the submission file path.
+              return `/api/submissions/${this.submission.id}/file`
+          },
+          hasUploadedSubmission() {
+              // Returns whether an submission has been uploaded or not.
+              return this.submission.id !== undefined
+          }
       },
-      async fetchSubmission() {
-        // Fetch the submission.
-        let res = await api.getAssignmentLatestSubmission(this.assignment.id)
+      async created() {
+          // Fetch assignment & submission.
+          await this.fetchAssignment()
+          await this.fetchSubmission()
+      },
+      methods: {
+          async submitSubmission() {
+              // Create the form data with the file.
+              let formData = new FormData()
+              formData.append("assignmentId", this.assignment.id)
+              formData.append("submissionFile", this.file)
 
-        // If submission is not available, clear it.
-        if (!res.data.error) {
-          this.submission = res.data
-        }
-        else {
-          this.onSubmissionReset()
-        }
+              // Config set for the HTTP request & updating the progress field.
+              let config = {
+                  'Content-Type': 'multipart/form-data',
+                  onUploadProgress: (progressEvent) => {
+                      this.fileProgress = Math.round( (progressEvent.loaded * 100) / progressEvent.total );
+                  }
+              };
 
-      },
-      onFileReset() {
-        // Reset the upload modal state.
-        this.fileProgress = 0
-        this.file = null
-        this.$refs.fileInput.reset()
-      },
-      onSubmissionReset() {
-        this.submission =  {
-          user_netid: null,
-          assignment_id: null,
-          file_path: null
-        }
+              // Perform upload.
+              try {
+                  await api.client.post("/submissions", formData, config)
+                  this.showSuccessMessage({message: 'Successfully submitted new submission.'})
+                  this.$refs.uploadModal.hide()
+              } catch (e) {
+                  this.showErrorMessage({message: `Did not upload file. ${e.response.data.error}`})
+                  this.$refs.uploadModal.hide()
+              }
+
+              // Clear file.
+              this.onFileReset()
+
+              // Re-fetch new submission.
+              await this.fetchSubmission()
+          },
+          async fetchAssignment() {
+              // Fetch the assignment.
+              let res = await api.getAssignment(this.$route.params.assignmentId)
+              this.assignment = res.data
+          },
+          async fetchSubmission() {
+              // Fetch the submission.
+              let res = await api.getAssignmentLatestSubmission(this.assignment.id)
+
+              // If submission is not available, clear it.
+              if (!res.data.error) {
+                  this.submission = res.data
+              } else {
+                  this.onSubmissionReset()
+              }
+          },
+          onFileReset() {
+              // Reset the upload modal state.
+              this.fileProgress = 0
+              this.file = null
+              this.$refs.fileInput.reset()
+          },
+          onSubmissionReset() {
+              this.submission =  {
+                  user_netid: null,
+                  assignment_id: null,
+                  file_path: null
+              }
+          }
       }
-    }
   }
 </script>

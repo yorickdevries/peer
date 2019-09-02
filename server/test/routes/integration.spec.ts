@@ -21,6 +21,7 @@ describe("API integration test", () => {
         await TestData.initializeDatabase();
         await TestData.initializeSubmissionFiles();
         await TestData.initializeAssignmentFiles();
+        await TestData.initializeReviewFiles();
     });
 
     /**
@@ -29,6 +30,7 @@ describe("API integration test", () => {
     afterEach(async () => {
         await TestData.removeSubmissionFiles();
         await TestData.removeAssignmentFiles();
+        await TestData.removeReviewFiles();
     });
 
     /**
@@ -60,19 +62,22 @@ describe("API integration test", () => {
         // [1]
         // Log in as bplanje (teacher) and create a course.
         MockLogin.initialize("bplanje", undefined, ["employee", "faculty"]);
+        const courseUpdateData = {
+            faculty: "EWI",
+            academic_year: "2019/2020",
+            course_code: "ED1-1631",
+            description: "example",
+            name: "test name",
+            enrollable: true
+        };
+
         const course: any = await chai.request(router)
             .post("/courses/")
-            .send({description: "example", name: "test name", enrollable: true});
-        const courseId = JSON.parse(course.text).id;
+            .send(courseUpdateData);
+        const courseId = course.body.id;
         // Assertions to make sure the course is created.
         expect(course.status).to.equal(200);
-        expect(course.text).to.equal(JSON.stringify({
-                id: courseId,
-                description: "example",
-                name: "test name",
-                enrollable: true
-            }
-        ));
+        expect(course.body).to.deep.include(courseUpdateData);
         console.log("Teacher created a course");
 
         // [2]
@@ -88,7 +93,8 @@ describe("API integration test", () => {
             .field("due_date", "2030-06-01T20:30:00.000Z")
             .field("review_publish_date", "2030-07-01T20:30:00.000Z")
             .field("review_due_date", "2030-08-01T20:30:00.000Z")
-            .field("one_person_groups", false);
+            .field("one_person_groups", false)
+            .field("review_evaluation", false);
         const assignmentId = JSON.parse(assignment.text).id;
         // Assertions to make sure the assignment is created.
         const assignmentResult = JSON.parse(assignment.text);
@@ -99,20 +105,23 @@ describe("API integration test", () => {
 
         // [3]
         // Create rubric
-        const res = await chai.request(router).post("/rubric/").send({"rubric_assignment_id": assignmentId});
+        const res = await chai.request(router).post("/rubric/").send(
+            {"assignment_id": assignmentId,
+            "rubric_type": "submission"});
+        const rubric = JSON.parse(res.text);
         console.log("Teacher created a rubric");
 
         // Add an option question to the rubric
         const openQuestion = await chai.request(router)
             .post("/rubric/openquestion")
-            .send({ question: "opt", rubric_assignment_id: assignmentId, question_number: 1 });
+            .send({ question: "opt", rubric_id: rubric.id, question_number: 1 });
         const openQuestionId = JSON.parse(openQuestion.text).id;
         expect(openQuestion.status).to.equal(200);
         expect(openQuestion.text).to.equal(JSON.stringify(
             {
                 "id": openQuestionId,
                 "question": "opt",
-                "rubric_assignment_id": assignmentId,
+                "rubric_id": rubric.id,
                 "question_number": 1,
                 "type_question": "open"
             }
@@ -211,9 +220,11 @@ describe("API integration test", () => {
         expect(yorickFeedback.status).to.equal(200);
 
         const yorickFeedbackId = JSON.parse(yorickFeedback.text)[0].id;
+        const yorickRubricId = JSON.parse(yorickFeedback.text)[0].rubric_id;
         const yorickFeedbackAnswer = "you did great paul :)";
 
         const paulFeedbackId = JSON.parse(paulFeedback.text)[0].id;
+        const paulRubricId = JSON.parse(paulFeedback.text)[0].rubric_id;
         const paulFeedbackAnswer = "maybe look at it again";
 
         // Paulvanderlaan reviews yorickdevries.
@@ -223,18 +234,18 @@ describe("API integration test", () => {
             .send({
                 "review": {
                     "id": paulFeedbackId,
-                    "rubric_assignment_id": assignmentId,
+                    "rubric_id": paulRubricId,
                     "file_path": "assignment1.pdf",
                     "done": false
                 },
-                "form": [{
+                "form": JSON.stringify([{
                     "question": {
                         "id": openQuestionId,
                         "type_question": "open",
                         "question": "opt",
                         "question_number": 1,
                     }, "answer": {"answer": paulFeedbackAnswer, "openquestion_id": openQuestionId, "review_id": paulFeedbackId}
-                }]
+                }])
             });
 
         // Assertions to make sure the feedback was correctly inserted.
@@ -250,18 +261,18 @@ describe("API integration test", () => {
             .send({
                 "review": {
                     "id": yorickFeedbackId,
-                    "rubric_assignment_id": assignmentId,
+                    "rubric_id": yorickRubricId,
                     "file_path": "assignment1.pdf",
                     "done": false
                 },
-                "form": [{
+                "form": JSON.stringify([{
                     "question": {
                         "id": openQuestionId,
                         "type_question": "open",
                         "question": "opt",
                         "question_number": 1,
                     }, "answer": {"answer": yorickFeedbackAnswer, "openquestion_id": openQuestionId, "review_id": yorickFeedbackId}
-                }]
+                }])
             });
 
         // Assertions to make sure the feedback was correctly inserted.
