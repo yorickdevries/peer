@@ -53,7 +53,8 @@
                     <b-card-body>
                         <h4 class="card-title">Course Information</h4>
                         <span class="font-weight-bold">Description</span>
-                        <p> {{course.description}}</p>
+                        <p v-if="course.description != null">{{ course.description | truncate(200)}}</p>
+                        <p v-else><i>No course description</i></p>
 
                     </b-card-body>
                 </b-card>

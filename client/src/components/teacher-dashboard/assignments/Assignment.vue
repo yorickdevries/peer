@@ -119,7 +119,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="`/api/assignments/${assignment.id}/reviewsExport/csv`"
-                                                    class="mb-3"
+                                                    class="mb-3 mr-2"
                                                 >
                                                     Download reviews .csv
                                                 </b-button>
@@ -139,6 +139,7 @@
                                                     approval/disapproval amounts of each student for this assignment.
                                                 </dd>
                                                 <b-button
+                                                    class="mr-2"
                                                     size="sm"
                                                     variant="primary"
                                                     :href="`/api/assignments/${assignment.id}/gradeExport/csv`"

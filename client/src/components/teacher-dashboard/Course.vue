@@ -15,9 +15,8 @@
                 <b-col cols="8">
                     <b-card header="Description">
                         <div class="d-flex w-100 justify-content-between">
-                            <p class="mb-1">
-                                {{course.description}}
-                            </p>
+                            <p class="mb-1" v-if="course.description != null">{{ course.description }}</p>
+                            <p v-else><i>No course description</i></p>
                         </div>
                     </b-card>
                 </b-col>
@@ -30,7 +29,7 @@
                             <dd>Exports a file with an aggregation of the review approval/disapproval amounts of
                                 each student for all the assignments in the course.
                             </dd>
-                            <b-button variant="primary" size="sm" :href="`/api/courses/${course.id}/gradeExport/csv`">Download .csv</b-button>
+                            <b-button class="mr-2" variant="primary" size="sm" :href="`/api/courses/${course.id}/gradeExport/csv`">Download .csv</b-button>
                             <b-button variant="primary" size="sm" :href="`/api/courses/${course.id}/gradeExport/xls`">Download .xls</b-button>
                         </dl>
 
