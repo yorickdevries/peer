@@ -31,6 +31,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "review_publish_date": new Date("2018-05-02T20:30:00Z"),
             "title": "Assignment 1",
             "reviews_per_user": 2,
+            external_assignment_link: null
         },
         {
             "course_id": 1,
@@ -46,7 +47,8 @@ describe("AssignmentPreparedStatements Test", () => {
             "review_due_date": new Date("9999-05-01T20:30:00Z"),
             "review_publish_date": new Date("2020-05-01T20:30:00Z"),
             "title": "Assignment 2",
-            "reviews_per_user": 1
+            "reviews_per_user": 1,
+            external_assignment_link: null
         },
         {
             "course_id": 1,
@@ -62,7 +64,8 @@ describe("AssignmentPreparedStatements Test", () => {
             "review_due_date": new Date("9999-05-01T20:30:00Z"),
             "review_publish_date": new Date("2020-05-01T20:30:00Z"),
             "title": "Assignment 3",
-            "reviews_per_user": 1
+            "reviews_per_user": 1,
+            external_assignment_link: null
         }]).to.deep.equal(await AssignmentPS.executeGetAssignments(1));
     });
 
@@ -84,7 +87,8 @@ describe("AssignmentPreparedStatements Test", () => {
             course_id: 1,
             "reviews_per_user": 2,
             "review_due_date": new Date("2018-05-03T20:30:00Z"),
-            "review_publish_date": new Date("2018-05-02T20:30:00Z")
+            "review_publish_date": new Date("2018-05-02T20:30:00Z"),
+            external_assignment_link: null
         });
     });
 
@@ -108,7 +112,8 @@ describe("AssignmentPreparedStatements Test", () => {
             publish_date: new Date("2017-07-01T20:30:00Z"),
             due_date: new Date("2018-07-01T20:30:00Z"),
             review_publish_date: new Date("2019-07-01T20:30:00Z"),
-            review_due_date: new Date("2020-07-01T20:30:00Z")
+            review_due_date: new Date("2020-07-01T20:30:00Z"),
+            external_assignment_link: ""
         });
     });
 
@@ -133,6 +138,7 @@ describe("AssignmentPreparedStatements Test", () => {
             new Date("2020-07-01T20:30:00Z"),
             false,
             false,
+            "",
             new Date("2021-07-01T20:30:00Z"),
         );
 
@@ -151,7 +157,7 @@ describe("AssignmentPreparedStatements Test", () => {
      * Test update assignments.
      */
     it("update assignment", async () => {
-        expect(await AssignmentPS.executeUpdateAssignmentById("Updated", "updated", 1, "filename", new Date("2018-06-01T20:30:00Z"), new Date("2018-06-01T20:31:00Z"), new Date("2018-06-01T20:32:00Z"), new Date("2018-06-01T20:33:00Z"), 1)).to.deep.equal({
+        expect(await AssignmentPS.executeUpdateAssignmentById("Updated", "updated", 1, "filename", new Date("2018-06-01T20:30:00Z"), new Date("2018-06-01T20:31:00Z"), new Date("2018-06-01T20:32:00Z"), new Date("2018-06-01T20:33:00Z"), 1, "")).to.deep.equal({
             course_id: 1,
             description: "updated",
             filename: "filename",
@@ -165,7 +171,8 @@ describe("AssignmentPreparedStatements Test", () => {
             review_publish_date: new Date("2018-06-01T20:32:00.000Z"),
             review_due_date: new Date("2018-06-01T20:33:00.000Z"),
             reviews_per_user: 1,
-            title: "Updated"
+            title: "Updated",
+            external_assignment_link: ""
         });
     });
 });
