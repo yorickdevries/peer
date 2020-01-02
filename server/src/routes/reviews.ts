@@ -10,6 +10,7 @@ import config from "../config";
 
 // Router
 import express from "express";
+import AssignmentPS from "../prepared_statements/assignment_ps";
 const router = express();
 router.use(bodyParser.json());
 
@@ -221,7 +222,8 @@ router.get("/:reviewId/questions/:question_id/file", index.authorization.checkAu
  */
 router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewEditAllowed, async (req, res) => {
     const reviewId = req.params.reviewId;
-    const flagged = JSON.parse(req.body.review).flagged;
+    
+    const flagged = await ReviewsPS.executeGetReview(reviewId).flagged;
 
     const reviewFilled = await ReviewUpdate.isCompletelyFilledIn(reviewId);
     if (reviewFilled || flagged == true) {
