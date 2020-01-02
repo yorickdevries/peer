@@ -418,7 +418,7 @@ export default class ReviewPS {
      * @return {Promise<pgPromise.queryResult>} - a promise of the database result.
      */
     public static executeGetAllSubmissionReviewsByAssignmentId(assignmentId: number, done?: boolean): Promise<pgPromise.queryResult> {
-        let queryString = "SELECT review.id, review.approved, review.ta_netid, review.user_netid as reviewer, submission.user_netid as submitter, review.done " +
+        let queryString = "SELECT review.id, review.approved, review.ta_netid, review.user_netid as reviewer, submission.user_netid as submitter, review.done, review.flagged " +
             "FROM review JOIN rubric ON review.rubric_id = rubric.id " +
             "JOIN assignmentlist ON assignmentlist.id = rubric.assignment_id " +
             "JOIN submission ON submission.id = review.submission_id WHERE assignmentlist.id = $1 " +
