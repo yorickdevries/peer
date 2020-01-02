@@ -163,12 +163,13 @@ describe("API review routes", () => {
         const res = await chai.request(router)
             .put("/1")
             .send({
-                "review": {
+                "review": JSON.stringify({
                     "id": 2,
                     "rubric_id": 1,
                     "file_path": "submission1.pdf",
-                    "done": false
-                },
+                    "done": false,
+                    "flagged": false
+                }),
                 "form": JSON.stringify([{
                     "question": {
                         "id": 1,

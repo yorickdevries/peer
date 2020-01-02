@@ -28,8 +28,6 @@ export default class ExportResultsPS {
             "    AND rubric.type = 'submission'" +
             "    GROUP BY userlist.netid" +
             ") AS aggregations");
-        console.log("course export");
-        console.log(statement);
         statement.values = [assignmentId];
         return Database.executeQuery(statement);
     }
@@ -57,8 +55,6 @@ export default class ExportResultsPS {
             "    AND rubric.type = 'submission'" +
             "    GROUP BY userlist.netid" +
             ") AS aggregations");
-        console.log("course export");
-        console.log(statement);
         statement.values = [courseId];
         return Database.executeQuery(statement);
     }

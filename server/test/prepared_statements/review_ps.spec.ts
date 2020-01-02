@@ -253,6 +253,7 @@ describe("ReviewPreparedStatement Test", () => {
             "submitter": "paulvanderlaan",
             // tslint:disable-next-line
             "ta_netid": null,
+            "flagged": false,
             done: true
         }]);
     });
