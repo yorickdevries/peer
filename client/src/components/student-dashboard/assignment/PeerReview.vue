@@ -116,7 +116,7 @@
                     <b-btn type="submit" variant="success float-right" v-b-modal="`submit${peerReview.review.id}`">Submit Review</b-btn>
                     <b-button variant="secondary float-right mr-2" @click="savePeerReview">Save Review</b-button>
                     <div>
-                        <b-form-checkbox v-model="peerReview.review.reported" name="reportButton" class="float-left">
+                        <b-form-checkbox v-model="peerReview.review.flagged" name="reportButton" class="float-left">
                             Report this submission.
                         </b-form-checkbox>
                         <br />
@@ -169,7 +169,7 @@ export default {
                     file_path: "",
                     comment: null,
                     done: null,
-                    reported: null,
+                    flagged: null,
                 },
                 form: []
             },
@@ -222,7 +222,7 @@ export default {
             })
 
             // Give validation error/success based on validation.
-            if (validated || this.peerReview.review.reported) {
+            if (validated || this.peerReview.review.flagged) {
                 // Save the peer review.
                 await this.savePeerReview()
 
