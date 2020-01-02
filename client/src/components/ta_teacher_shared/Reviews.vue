@@ -91,6 +91,7 @@
                     {key: 'done', label: 'Status'},
                     {key: 'approved', label: 'Approval Status'},
                     {key: 'ta_netid', label: 'Graded by TA'},
+                    {key: 'flagged', label: 'Reviewer reported the submission'},
                     'actions'
                 ],
                 perPage: 5,
