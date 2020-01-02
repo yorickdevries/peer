@@ -623,6 +623,7 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
             reviewJson["Submission review done"] = review.done;
             reviewJson["Approval status"] = review.approved;
             reviewJson["TA netid"] = review.ta_netid;
+            reviewJson["Reviewer reported the submission"] = review.flagged;
 
             // R for review
             const reviewType = "R";
@@ -643,7 +644,6 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
                 reviewJson["Review evaluation saved_at"] = reviewEvaluation.saved_at;
                 reviewJson["Review evaluation submitted_at"] = reviewEvaluation.submitted_at;
                 reviewJson["Review evaluation done"] = reviewEvaluation.done;
-
                 const reviewEvaluationQuestions = (await ReviewUpdate.getReview(reviewEvaluation.id)).form;
                 // E for evaluation
                 const reviewType = "E";
