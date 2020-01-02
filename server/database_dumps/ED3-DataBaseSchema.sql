@@ -176,6 +176,7 @@ CREATE TABLE Review (
     User_netid varchar(500) NOT NULL,
     Submission_id int,
     evaluated_review_id int,
+    flagged BOOLEAN NOT NULL DEFAULT FALSE,
     Rubric_id int NOT NULL,
     done BOOLEAN NOT NULL DEFAULT FALSE,
     creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,

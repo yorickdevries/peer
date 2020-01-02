@@ -114,7 +114,7 @@ export default class ReviewPS {
      */
     public static executeGetReview(reviewId: number): any {
         const statement = new PreparedStatement("get-review-by-id",
-            "SELECT id, rubric_id, done, approved FROM review WHERE id = $1");
+            "SELECT id, rubric_id, done, approved, flagged FROM review WHERE id = $1");
         statement.values = [reviewId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -167,6 +167,21 @@ export default class ReviewPS {
         const statement = new PreparedStatement("unsubmit-review",
             "UPDATE review SET done=false WHERE id = $1 RETURNING *");
         statement.values = [reviewId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Flag a review.
+     * @param {number} reviewId - review id.
+     * @param {boolean} flagged - whether is should be flagged or not.
+     * @return {Promise<any>}
+     */
+    public static executeFlagReview(reviewId: number, flagged: boolean) {
+        const flaggedString = (flagged == true) ? "true" : "false";
+
+        const statement = new PreparedStatement("flag-review-boolean",
+            "UPDATE review SET flagged=$1 WHERE id = $2 RETURNING *");
+        statement.values = [flaggedString, reviewId];
         return Database.executeQuery(statement);
     }
 
