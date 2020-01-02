@@ -87,17 +87,17 @@ export default class AssignmentPS {
      */
     public static executeUpdateAssignmentById(title: string, description: string, reviewsPerUser: number,
                                               filename: string, publishDate: Date, dueDate: Date,
-                                              reviewPublishDate: Date, reviewDueDate: Date, assignmentId: number,
+                                              reviewPublishDate: Date, reviewDueDate: Date, assignmentId: number, externalAssignmentLink: string,
                                               reviewEvaluationDueDate?: Date)
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-assignment-by-id",
             "UPDATE assignmentlist " +
             "SET title=$1, description=$2, reviews_per_user=$3, filename=$4, publish_date=$5, due_date=$6, " +
-            "review_publish_date=$7, review_due_date=$8, review_evaluation_due_date=$10 " +
+            "review_publish_date=$7, review_due_date=$8, review_evaluation_due_date=$10, external_assignment_link=$11 " +
             "WHERE id = $9 RETURNING *");
 
         statement.values = [title, description, reviewsPerUser, filename, publishDate, dueDate, reviewPublishDate,
-            reviewDueDate, assignmentId, reviewEvaluationDueDate];
+            reviewDueDate, assignmentId, reviewEvaluationDueDate, externalAssignmentLink];
         return Database.executeQuerySingleResult(statement);
     }
 

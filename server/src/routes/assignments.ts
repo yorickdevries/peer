@@ -98,6 +98,7 @@ const updateAssignment = async function(req: any, res: any) {
             req.body.review_publish_date,
             req.body.review_due_date,
             req.params.assignment_id,
+            req.body.external_assignment_link,
             req.body.review_evaluation_due_date
         );
 
