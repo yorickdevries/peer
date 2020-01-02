@@ -299,6 +299,7 @@
                             formData.append("reviews_per_user", this.assignment.reviews_per_user)
                             formData.append("one_person_groups", this.assignment.one_person_groups)
                             formData.append("review_evaluation", this.assignment.review_evaluation)
+                            formData.append("external_assignment_link", this.assignment.external_assignment_link)
 
                             try {
                                 await api.createAssignment(formData)

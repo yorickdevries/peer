@@ -9,6 +9,8 @@
                 </b-col>
             </b-row>
 
+
+            {{ assignment }}
             <!--Edit course card-->
             <b-row>
                 <b-col>
@@ -351,6 +353,7 @@
                             }
                             formData.append("reviews_per_user", this.assignment.reviews_per_user)
                             formData.append("review_evaluation", this.assignment.review_evaluation)
+                            formData.append("external_assignment_link", this.assignment.external_assignment_link)
 
                             // Add file if a new one has been uploaded
                             if (this.file != null) {
@@ -453,5 +456,4 @@
         border-radius: 0.25rem;
         transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     }
-</style>
 </style>
