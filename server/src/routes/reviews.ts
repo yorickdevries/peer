@@ -132,7 +132,7 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
         // input
         const reviewId = req.params.reviewId;
         const inputForm = JSON.parse(req.body.form);
-        const flagged = req.body.review.flagged;
+        const flagged = JSON.parse(req.body.review).flagged;
         // get review
         const review: any = await ReviewsPS.executeGetReview(reviewId);
         const rubricQuestions: any = await RubricPS.getAllQuestionsByRubricId(review.rubric_id);
@@ -221,7 +221,7 @@ router.get("/:reviewId/questions/:question_id/file", index.authorization.checkAu
  */
 router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewEditAllowed, async (req, res) => {
     const reviewId = req.params.reviewId;
-    const flagged = req.body.review.flagged;
+    const flagged = JSON.parse(req.body.review).flagged;
 
     const reviewFilled = await ReviewUpdate.isCompletelyFilledIn(reviewId);
     if (reviewFilled || flagged == true) {
