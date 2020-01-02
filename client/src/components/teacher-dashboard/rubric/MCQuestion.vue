@@ -24,6 +24,11 @@
             </template>
             <b-button @click="addMCOption(question)" variant="success" size="sm">Add new option</b-button>
         </b-form-group>
+        <b-form-group label="Optional Question" description="Make this question optional for the student.">
+            <b-form-checkbox v-model="question.optional">
+                Make this question optional.
+            </b-form-checkbox>
+        </b-form-group>
     </div>
 </template>
 

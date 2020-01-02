@@ -9,7 +9,11 @@
         <b-form-group label="Allowed file extension" description="The extension type allowed.">
             <b-form-select :options="extensionTypes" v-model="question.extension"></b-form-select>
         </b-form-group>
-
+        <b-form-group label="Optional Question" description="Make this question optional for the student.">
+            <b-form-checkbox v-model="question.optional">
+                Make this question optional.
+            </b-form-checkbox>
+        </b-form-group>
     </div>
 </template>
 
