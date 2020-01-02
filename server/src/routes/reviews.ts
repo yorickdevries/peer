@@ -222,9 +222,7 @@ router.get("/:reviewId/questions/:question_id/file", index.authorization.checkAu
  */
 router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewEditAllowed, async (req, res) => {
     const reviewId = req.params.reviewId;
-
     const flagged = await ReviewsPS.executeGetReview(reviewId).flagged;
-
     const reviewFilled = await ReviewUpdate.isCompletelyFilledIn(reviewId);
     if (reviewFilled || flagged === true) {
         const result = await ReviewsPS.executeSubmitReview(reviewId);
