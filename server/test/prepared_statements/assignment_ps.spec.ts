@@ -31,6 +31,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "review_publish_date": new Date("2018-05-02T20:30:00Z"),
             "title": "Assignment 1",
             "reviews_per_user": 2,
+            // tslint:disable-next-line
             external_assignment_link: null
         },
         {
@@ -48,6 +49,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "review_publish_date": new Date("2020-05-01T20:30:00Z"),
             "title": "Assignment 2",
             "reviews_per_user": 1,
+            // tslint:disable-next-line
             external_assignment_link: null
         },
         {
@@ -65,6 +67,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "review_publish_date": new Date("2020-05-01T20:30:00Z"),
             "title": "Assignment 3",
             "reviews_per_user": 1,
+            // tslint:disable-next-line
             external_assignment_link: null
         }]).to.deep.equal(await AssignmentPS.executeGetAssignments(1));
     });
@@ -88,6 +91,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "reviews_per_user": 2,
             "review_due_date": new Date("2018-05-03T20:30:00Z"),
             "review_publish_date": new Date("2018-05-02T20:30:00Z"),
+            // tslint:disable-next-line
             external_assignment_link: null
         });
     });
