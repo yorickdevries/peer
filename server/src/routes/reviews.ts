@@ -132,7 +132,7 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
         // input
         const reviewId = req.params.reviewId;
         const inputForm = JSON.parse(req.body.form);
-        const flagged = req.params.flagged;
+        const flagged = req.body.review.flagged;
         // get review
         const review: any = await ReviewsPS.executeGetReview(reviewId);
         const rubricQuestions: any = await RubricPS.getAllQuestionsByRubricId(review.rubric_id);

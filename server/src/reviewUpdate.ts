@@ -10,7 +10,7 @@ export default class ReviewUpdate {
      * @param {number} reviewId
      * @returns json response with the review and answers.
      */
-    public static async getReview(reviewId: number, flagged: boolean = false) {
+    public static async getReview(reviewId: number) {
         const jsonItems: any = [];
         const review = await ReviewsPS.executeGetReview(reviewId);
         const questions = await RubricPS.getAllQuestionsByRubricId(review.rubric_id);
@@ -72,6 +72,7 @@ export default class ReviewUpdate {
      * @param {number} reviewId - the review id.
      * @param {any[]} inputForm - the input form.
      * @param {number[]} fileUploadQuestionIds - the question ids of each file upload question.
+     * @param flagged - whether the review is flagged or not
      * @return {Promise<{review: any; form: any}>}
      */
     public static async updateReviewWithFileUpload(reviewId: number, inputForm: any[], fileUploadQuestionIds: number[], flagged: boolean = false) {

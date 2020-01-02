@@ -292,7 +292,8 @@ describe("API review routes", () => {
                   // tslint:disable-next-line
                   "approved": null,
                   "id": 1,
-                "rubric_id": 1
+                "rubric_id": 1,
+                  "flagged": false
               }
             });
         const result2 = await chai.request(router).get("/1/submit");
