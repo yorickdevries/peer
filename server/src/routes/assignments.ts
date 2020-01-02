@@ -157,6 +157,7 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
             req.body.review_due_date,
             req.body.one_person_groups,
             req.body.review_evaluation,
+            req.body.external_assignment_link,
             req.body.review_evaluation_due_date
         );
 

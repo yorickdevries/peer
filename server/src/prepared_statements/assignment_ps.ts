@@ -55,18 +55,19 @@ export default class AssignmentPS {
      * @param reviewDueDate - after this date, reviewing is closed.
      * @param onePersonGroups - true if the groups should contain 1 person each.
      * @param reviewEvaluation - true if the submitter should be able to review the review.
+     * @param external_assignment_link - url to the assignment.
      * @param reviewEvaluationDueDate - the due date for the review evaluation.
      * @return {any} all columns of the created assignment as pg promise.
      */
     public static executeAddAssignment(title: string, description: string, courseId: number, reviewsPerUser: number,
                                        filename: string | null, publishDate: Date, dueDate: Date, reviewPublishDate: Date,
-                                       reviewDueDate: Date, onePersonGroups: boolean, reviewEvaluation: boolean,
+                                       reviewDueDate: Date, onePersonGroups: boolean, reviewEvaluation: boolean, external_assignment_link: string,
                                        reviewEvaluationDueDate?: Date): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("addAssignment",
         'INSERT INTO "assignmentlist" (title, description, course_id, reviews_per_user, filename, publish_date, ' +
-            "due_date, review_publish_date, review_due_date, one_person_groups, review_evaluation, review_evaluation_due_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *");
+            "due_date, review_publish_date, review_due_date, one_person_groups, review_evaluation, review_evaluation_due_date, external_assignment_link) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *");
         statement.values = [title, description, courseId, reviewsPerUser, filename, publishDate, dueDate,
-            reviewPublishDate, reviewDueDate, onePersonGroups, reviewEvaluation, reviewEvaluationDueDate];
+            reviewPublishDate, reviewDueDate, onePersonGroups, reviewEvaluation, reviewEvaluationDueDate, external_assignment_link];
         return Database.executeQuerySingleResult(statement);
     }
 
