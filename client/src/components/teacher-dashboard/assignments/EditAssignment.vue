@@ -129,6 +129,11 @@
                                 <p class="mb-0" v-if="uploadNewFile && file">File will be uploaded when you press the "save changes" button</p>
                             </b-form-group>
 
+                            <!--File link-->
+                            <b-form-group label="Assignment link" description="Add a link where the assignment can be found for the student (optional).">
+                                <b-form-input v-model="assignment.external_assignment_link"></b-form-input>
+                            </b-form-group>
+
                             <b-form-group   label="Assignment Type"
                                             description="This can not be changed after creating the assignment.">
                                 <b-form-radio-group v-model="assignment.one_person_groups"
@@ -216,7 +221,8 @@ export default {
                 reviews_per_user: null,
                 filename: null,
                 one_person_groups: null,
-                review_evaluation: null
+                review_evaluation: null,
+                external_assignment_link: null
             },
             course: {
                 id: null,

@@ -106,7 +106,7 @@
                             </b-form-group>
 
                             <!--File upload-->
-                            <b-form-group label="Assignment file">
+                            <b-form-group label="Assignment file" description="Add a file for the assignment (optional).">
                                 <b-form-file
                                         placeholder="Choose a file..."
                                         accept=".pdf,.zip"
@@ -114,6 +114,11 @@
                                         :state="Boolean(file)"
                                         v-if="uploadSuccess === null">
                                 </b-form-file>
+                            </b-form-group>
+
+                            <!--File link-->
+                            <b-form-group label="Assignment link" description="Add a link where the assignment can be found for the student (optional).">
+                                <b-form-input v-model="assignment.external_assignment_link"></b-form-input>
                             </b-form-group>
 
                             <b-form-group label="Assignment Type" description="This can not be changed after creating the assignment.">
@@ -205,7 +210,8 @@ export default {
                 review_evaluation_due_date: null,
                 reviews_per_user: null,
                 one_person_groups: false,
-                review_evaluation: false
+                review_evaluation: false,
+                external_assignment_link: null
             }
         }
     },
