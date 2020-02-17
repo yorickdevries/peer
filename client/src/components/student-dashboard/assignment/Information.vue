@@ -90,85 +90,85 @@
 </template>
 
 <script>
-    import api from "../../../api"
+import api from "../../../api"
 
-    export default {
-        data() {
-            return {
-                assignment: {
-                    title: null,
-                    description: null,
-                    due_date: null,
-                    publish_date: null,
-                    review_due_date: null,
-                    id: null,
-                    course_id: null,
-                    filename: "",
-                    one_person_groups: null,
-                    external_assignment_link: null
+export default {
+    data() {
+        return {
+            assignment: {
+                title: null,
+                description: null,
+                due_date: null,
+                publish_date: null,
+                review_due_date: null,
+                id: null,
+                course_id: null,
+                filename: "",
+                one_person_groups: null,
+                external_assignment_link: null
+            },
+            groupInfo: {
+                group: {
+                    group_groupid: null
                 },
-                groupInfo: {
-                    group: {
-                        group_groupid: null
-                    },
-                    groupmembers: []
-                },
-                groupName: "",
-                submission: {
-                    user_netid: null,
-                    assignment_id: null,
-                    file_path: null,
-                    date: null,
-                }
+                groupmembers: []
+            },
+            groupName: "",
+            submission: {
+                user_netid: null,
+                assignment_id: null,
+                file_path: null,
+                date: null,
             }
+        }
+    },
+    computed: {
+        assignmentFilePath() {
+            // Get the assignment file path.
+            return `/api/assignments/${this.assignment.id}/file`
         },
-        computed: {
-            assignmentFilePath() {
-                // Get the assignment file path.
-                return `/api/assignments/${this.assignment.id}/file`
-            },
-            submissionFilePath() {
-                // Get the submission file path.
-                return `/api/submissions/${this.submission.id}/file`
-            },
+        submissionFilePath() {
+            // Get the submission file path.
+            return `/api/submissions/${this.submission.id}/file`
         },
-        async created() {
-            await this.fetchAssignment()
-            await this.fetchSubmission()
-            await this.fetchGroupInformation()
+    },
+    async created() {
+        await this.fetchAssignment()
+        await this.fetchSubmission()
+        await this.fetchGroupInformation()
+    },
+    methods: {
+        async fetchAssignment() {
+            // Fetch the assignment.
+            let res = await api.getAssignment(this.$route.params.assignmentId)
+            this.assignment = res.data
         },
-        methods: {
-            async fetchAssignment() {
-                // Fetch the assignment.
-                let res = await api.getAssignment(this.$route.params.assignmentId)
-                this.assignment = res.data
-            },
-            async fetchGroupInformation() {
-                // Fetch the group information.
-                let res = await api.getGroupMembersOfAssignment(this.$route.params.assignmentId)
-                this.groupInfo = res.data
+        async fetchGroupInformation() {
+            // Fetch the group information.
+            let res = await api.getGroupMembersOfAssignment(this.$route.params.assignmentId)
+            this.groupInfo = res.data
 
-                // Fetch group name.
-                let nameRes = await api.getGroupInfo(this.groupInfo.group.group_groupid)
-                this.groupName = nameRes.data.group_name
-            },
-            async fetchSubmission() {
-                // Fetch the submission.
-                try {
-                    let res = await api.getAssignmentLatestSubmission(this.assignment.id)
-                    this.submission = res.data
-                } catch (e) {
-                    this.onSubmissionReset()
-                }
+            // Fetch group name.
+            let nameRes = await api.getGroupInfo(this.groupInfo.group.group_groupid)
+            this.groupName = nameRes.data.group_name
+        },
+        async fetchSubmission() {
+            // Fetch the submission.
+            try {
+                let res = await api.getAssignmentLatestSubmission(this.assignment.id)
+                this.submission = res.data
+            } catch (e) {
+                this.onSubmissionReset()
+            }
 
-            },
-            onSubmissionReset() {
-                this.submission =  {
-                    user_netid: null,
-                    assignment_id: null,
-                    file_path: null
-                }
+        },
+        onSubmissionReset() {
+            this.submission =  {
+                user_netid: null,
+                assignment_id: null,
+                file_path: null
             }
         }
     }
+}
 </script>
