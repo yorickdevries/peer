@@ -213,12 +213,10 @@ describe("API integration test", () => {
         MockLogin.initialize("paulvanderlaan");
         const paulFeedback: any = await chai.request(router).get("/assignments/" + assignmentId + "/reviews");
         expect(paulFeedback.status).to.equal(200);
-
         // Get the review id that yorick should give feedback to.
         MockLogin.initialize("yorickdevries");
         const yorickFeedback: any = await chai.request(router).get("/assignments/" + assignmentId + "/reviews");
         expect(yorickFeedback.status).to.equal(200);
-
         const yorickFeedbackId = JSON.parse(yorickFeedback.text)[0].id;
         const yorickRubricId = JSON.parse(yorickFeedback.text)[0].rubric_id;
         const yorickFeedbackAnswer = "you did great paul :)";
@@ -232,12 +230,13 @@ describe("API integration test", () => {
         const reviewPaul = await chai.request(router)
             .put("/reviews/" + paulFeedbackId)
             .send({
-                "review": {
+                "review": JSON.stringify({
                     "id": paulFeedbackId,
                     "rubric_id": paulRubricId,
                     "file_path": "assignment1.pdf",
+                    "flagged": false,
                     "done": false
-                },
+                }),
                 "form": JSON.stringify([{
                     "question": {
                         "id": openQuestionId,
@@ -247,7 +246,6 @@ describe("API integration test", () => {
                     }, "answer": {"answer": paulFeedbackAnswer, "openquestion_id": openQuestionId, "review_id": paulFeedbackId}
                 }])
             });
-
         // Assertions to make sure the feedback was correctly inserted.
         expect(reviewPaul.status).to.equal(200);
         const reviewPaulRes = JSON.parse(reviewPaul.text);
@@ -259,12 +257,13 @@ describe("API integration test", () => {
         const reviewYorick = await chai.request(router)
             .put("/reviews/" + yorickFeedbackId)
             .send({
-                "review": {
+                "review": JSON.stringify({
                     "id": yorickFeedbackId,
                     "rubric_id": yorickRubricId,
                     "file_path": "assignment1.pdf",
+                    "flagged": false,
                     "done": false
-                },
+                }),
                 "form": JSON.stringify([{
                     "question": {
                         "id": openQuestionId,

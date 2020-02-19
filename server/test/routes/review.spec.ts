@@ -163,12 +163,13 @@ describe("API review routes", () => {
         const res = await chai.request(router)
             .put("/1")
             .send({
-                "review": {
+                "review": JSON.stringify({
                     "id": 2,
                     "rubric_id": 1,
                     "file_path": "submission1.pdf",
-                    "done": false
-                },
+                    "done": false,
+                    "flagged": false
+                }),
                 "form": JSON.stringify([{
                     "question": {
                         "id": 1,
@@ -292,7 +293,8 @@ describe("API review routes", () => {
                   // tslint:disable-next-line
                   "approved": null,
                   "id": 1,
-                "rubric_id": 1
+                "rubric_id": 1,
+                  "flagged": false
               }
             });
         const result2 = await chai.request(router).get("/1/submit");

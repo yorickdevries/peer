@@ -43,6 +43,23 @@ describe("ReviewPreparedStatement Test", () => {
     });
 
     /**
+     * Flag a review
+     */
+    it("flag the review", async () => {
+        // Setup
+        const result: any = await ReviewPS.executeGetReview(1);
+        const initial = result.flagged;
+        const updatedFlag = !initial;
+
+        // Act
+        await ReviewPS.executeFlagReview(result.id, updatedFlag);
+
+        // Test
+        const updatedResult: any = await ReviewPS.executeGetReview(1);
+        expect(updatedResult.flagged).to.equal(updatedFlag);
+    });
+
+    /**
      * Test approve a review prepared statement.
      */
     it("Approve reviews of an assignment", async () => {
@@ -236,6 +253,7 @@ describe("ReviewPreparedStatement Test", () => {
             "submitter": "paulvanderlaan",
             // tslint:disable-next-line
             "ta_netid": null,
+            "flagged": false,
             done: true
         }]);
     });

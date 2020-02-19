@@ -20,6 +20,7 @@ describe("CoursePreparedStatement Test", () => {
             [{
                 netID: "paulvanderlaan",
                 approved: "0",
+                flagged: "0",
                 disapproved: "0",
                 "waiting for TA": "1",
                 "student total reviews": "1",
@@ -41,7 +42,8 @@ describe("CoursePreparedStatement Test", () => {
                 "waiting for TA": "1",
                 "student total reviews": "1",
                 // tslint:disable-next-line
-                "studentnumber": null
+                "studentnumber": null,
+                "flagged": "0"
             }]
         );
     });

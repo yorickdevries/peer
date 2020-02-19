@@ -10,6 +10,7 @@ import config from "../config";
 
 // Router
 import express from "express";
+import AssignmentPS from "../prepared_statements/assignment_ps";
 const router = express();
 router.use(bodyParser.json());
 
@@ -132,7 +133,7 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
         // input
         const reviewId = req.params.reviewId;
         const inputForm = JSON.parse(req.body.form);
-
+        const flagged = JSON.parse(req.body.review).flagged;
         // get review
         const review: any = await ReviewsPS.executeGetReview(reviewId);
         const rubricQuestions: any = await RubricPS.getAllQuestionsByRubricId(review.rubric_id);
@@ -184,7 +185,7 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
         }
 
         // Update the review in the database.
-        const result = await ReviewUpdate.updateReviewWithFileUpload(reviewId, inputForm, uploadQuestionIds);
+        const result = await ReviewUpdate.updateReviewWithFileUpload(reviewId, inputForm, uploadQuestionIds, flagged);
 
         // Update the saved_at date of the review.
         const fullReview: any = await ReviewsPS.executeGetFullReview(reviewId);
@@ -221,8 +222,9 @@ router.get("/:reviewId/questions/:question_id/file", index.authorization.checkAu
  */
 router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewEditAllowed, async (req, res) => {
     const reviewId = req.params.reviewId;
+    const flagged = (await ReviewsPS.executeGetReview(reviewId)).flagged;
     const reviewFilled = await ReviewUpdate.isCompletelyFilledIn(reviewId);
-    if (reviewFilled) {
+    if (reviewFilled || flagged === true) {
         const result = await ReviewsPS.executeSubmitReview(reviewId);
 
         // Update the submitted_at date of the review
