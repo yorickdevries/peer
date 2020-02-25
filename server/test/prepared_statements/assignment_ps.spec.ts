@@ -117,7 +117,8 @@ describe("AssignmentPreparedStatements Test", () => {
             due_date: new Date("2018-07-01T20:30:00Z"),
             review_publish_date: new Date("2019-07-01T20:30:00Z"),
             review_due_date: new Date("2020-07-01T20:30:00Z"),
-            external_assignment_link: ""
+            // tslint:disable-next-line
+            external_assignment_link: null
         });
     });
 
