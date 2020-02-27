@@ -51,7 +51,8 @@ describe("RubricPreparedStatements Test", () => {
             new Date("2018-05-01T22:30:00.000Z"),
             new Date("2019-05-01T23:30:00.000Z"),
             false,
-            false);
+            false,
+            undefined);
 
         const rubric: any = await generateRubric(config, assignment.id);
         const questions: any = await RubricPS.getAllQuestionsByRubricId(rubric.id);
