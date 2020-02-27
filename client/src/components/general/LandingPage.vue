@@ -15,7 +15,7 @@
                     </b-row>
 
                     <b-row class="mh-100">
-                        <b-col>
+                        <b-col cols="12" md="4" class="mb-4 mb-md-0">
                             <b-card title="Submit your assignment" header="Step 1." class="h-100">
                                 <p class="card-text">
                                     Create and upload your solution either for your group or yourself.
@@ -23,7 +23,7 @@
                             </b-card>
                         </b-col>
 
-                        <b-col>
+                        <b-col cols="12" md="4" class="mb-4 mb-md-0">
                             <b-card title="Peer review your students" header="Step 2." class="h-100">
                                 <p class="card-text">
                                     Asses your fellow students submissions and help them improving their skills.
@@ -31,7 +31,7 @@
                             </b-card>
                         </b-col>
 
-                        <b-col>
+                        <b-col cols="12" md="4" class="mb-4 mb-md-0">
                             <b-card title="Review how you did!" header="Step 3." class="h-100">
                                 <p class="card-text">
                                     Receive feedback on your own submission from other students and see how you did!
