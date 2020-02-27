@@ -299,7 +299,9 @@ export default {
                         formData.append("reviews_per_user", this.assignment.reviews_per_user)
                         formData.append("one_person_groups", this.assignment.one_person_groups)
                         formData.append("review_evaluation", this.assignment.review_evaluation)
-                        formData.append("external_link", this.assignment.external_link)
+                        if (this.assignment.external_link != null && this.assignment.external_link != ''){
+                            formData.append("external_link", this.assignment.external_link)
+                        }
 
                         try {
                             await api.createAssignment(formData)

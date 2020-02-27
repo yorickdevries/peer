@@ -351,7 +351,9 @@ export default {
                         }
                         formData.append("reviews_per_user", this.assignment.reviews_per_user)
                         formData.append("review_evaluation", this.assignment.review_evaluation)
-                        formData.append("external_link", this.assignment.external_link)
+                        if (this.assignment.external_link != null && this.assignment.external_link != ''){
+                            formData.append("external_link", this.assignment.external_link)
+                        }
 
                         // Add file if a new one has been uploaded
                         if (this.file != null) {
