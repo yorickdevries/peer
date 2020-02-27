@@ -9,7 +9,7 @@
                             <h1 class="display-5 font-weight-bold">Peer Review done right.</h1>
                             <p class="lead">
                                 Peer reviewing can now be done without any hassle with paper. Submit, review and manage your course
-                                all within one program/website!
+                                all within one app!
                             </p>
                         </b-col>
                     </b-row>
