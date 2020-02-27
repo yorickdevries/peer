@@ -87,6 +87,12 @@ const updateAssignment = async function(req: any, res: any) {
             }
         }
 
+        if (req.body.external_link != undefined && !req.body.external_link.startsWith("http")) {
+            res.status(400);
+            res.json({ error: "Invalid external link" });
+            return;
+        }
+
         // Update the assignment in the database.
         const result: any = await AssignmentPS.executeUpdateAssignmentById(
             req.body.title,
@@ -144,6 +150,12 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
                 res.json({ error: "If the review evaluation is turned on, you should enter a review evaluation due date." });
                 return;
             }
+        }
+
+        if (req.body.external_link != undefined && !req.body.external_link.startsWith("http")) {
+            res.status(400);
+            res.json({ error: "Invalid external link" });
+            return;
         }
 
         const result: any = await AssignmentPS.executeAddAssignment(
