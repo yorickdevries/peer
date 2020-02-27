@@ -9,7 +9,7 @@
                             <h1 class="display-5 font-weight-bold">Peer Review done right.</h1>
                             <p class="lead">
                                 Peer reviewing can now be done without any hassle with paper. Submit, review and manage your course
-                                all within one programme!
+                                all within one program/website!
                             </p>
                         </b-col>
                     </b-row>
@@ -26,7 +26,7 @@
                         <b-col cols="12" md="4" class="mb-4 mb-md-0">
                             <b-card title="Peer review your students" header="Step 2." class="h-100">
                                 <p class="card-text">
-                                    Asses your fellow students submissions and help them improving their skills.
+                                    Assess your fellow students submissions and help them improve their skills.
                                 </p>
                             </b-card>
                         </b-col>
