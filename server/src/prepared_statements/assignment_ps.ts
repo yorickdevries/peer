@@ -61,7 +61,7 @@ export default class AssignmentPS {
      */
     public static executeAddAssignment(title: string, description: string, courseId: number, reviewsPerUser: number,
                                        filename: string | null, publishDate: Date, dueDate: Date, reviewPublishDate: Date,
-                                       reviewDueDate: Date, onePersonGroups: boolean, reviewEvaluation: boolean, externalLink: string | null,
+                                       reviewDueDate: Date, onePersonGroups: boolean, reviewEvaluation: boolean, externalLink: string | undefined,
                                        reviewEvaluationDueDate?: Date): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("addAssignment",
         'INSERT INTO "assignmentlist" (title, description, course_id, reviews_per_user, filename, publish_date, ' +

@@ -30,7 +30,8 @@ describe("ReviewPreparedStatement Test", () => {
             new Date("2018-05-01T22:30:00.000Z"),
             new Date("2019-05-01T23:30:00.000Z"),
             false,
-            false);
+            false,
+            undefined);
         return await RubricPS.executeCreateRubric(assignment.id, "submission");
     }
 

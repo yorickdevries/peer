@@ -539,7 +539,8 @@ describe("API Assignment routes", () => {
             new Date("2019-07-01T20:30:00Z"),
             new Date("2020-07-01T20:30:00Z"),
             false,
-            false);
+            false,
+            undefined);
 
         let assignmentToCopyToGroups: any = await AssignmentPS.executeGetGroupsByAssignmentId(assignmentToCopyTo.id);
 

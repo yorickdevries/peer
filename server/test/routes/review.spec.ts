@@ -81,7 +81,7 @@ describe("API review routes", () => {
         const exampleReviewFile = path.join(__dirname, "../../example_data/reviews/review1.pdf");
 
         const assignment: any = await AssignmentPS.executeAddAssignment("New", "Description", 1, 2, "test_file.pdf",
-        new Date("2017-07-01T20:30:00Z"), new Date("2018-07-01T20:30:00Z"), new Date("2019-07-01T20:30:00Z"), new Date("2020-07-01T20:30:00Z"), false, false);
+        new Date("2017-07-01T20:30:00Z"), new Date("2018-07-01T20:30:00Z"), new Date("2019-07-01T20:30:00Z"), new Date("2020-07-01T20:30:00Z"), false, false, undefined);
         const group: any = await GroupsPS.executeAddGroup("groupname");
         const submission: any = await SubmissionPS.executeCreateSubmission("henkjan", group.id, assignment.id, "none.pdf");
         const rubric: any = await RubricPS.executeCreateRubric(assignment.id, "submission");
