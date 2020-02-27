@@ -10,7 +10,6 @@ import config from "../config";
 
 // Router
 import express from "express";
-import AssignmentPS from "../prepared_statements/assignment_ps";
 const router = express();
 router.use(bodyParser.json());
 
