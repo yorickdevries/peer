@@ -133,7 +133,7 @@
 
                             <!--File link-->
                             <b-form-group label="Assignment link" description="Add a link where the assignment can be found for the student (optional).">
-                                <b-form-input v-model="assignment.external_assignment_link"></b-form-input>
+                                <b-form-input v-model="assignment.external_link"></b-form-input>
                             </b-form-group>
 
                             <b-form-group   label="Assignment Type"
@@ -224,7 +224,7 @@ export default {
                 filename: null,
                 one_person_groups: null,
                 review_evaluation: null,
-                external_assignment_link: null
+                external_link: null
             },
             course: {
                 id: null,
@@ -353,7 +353,7 @@ export default {
                         }
                         formData.append("reviews_per_user", this.assignment.reviews_per_user)
                         formData.append("review_evaluation", this.assignment.review_evaluation)
-                        formData.append("external_assignment_link", this.assignment.external_assignment_link)
+                        formData.append("external_link", this.assignment.external_link)
 
                         // Add file if a new one has been uploaded
                         if (this.file != null) {

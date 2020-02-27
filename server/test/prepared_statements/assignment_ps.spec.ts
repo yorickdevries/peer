@@ -32,7 +32,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "title": "Assignment 1",
             "reviews_per_user": 2,
             // tslint:disable-next-line
-            external_assignment_link: null
+            external_link: null
         },
         {
             "course_id": 1,
@@ -50,7 +50,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "title": "Assignment 2",
             "reviews_per_user": 1,
             // tslint:disable-next-line
-            external_assignment_link: null
+            external_link: null
         },
         {
             "course_id": 1,
@@ -68,7 +68,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "title": "Assignment 3",
             "reviews_per_user": 1,
             // tslint:disable-next-line
-            external_assignment_link: null
+            external_link: null
         }]).to.deep.equal(await AssignmentPS.executeGetAssignments(1));
     });
 
@@ -92,7 +92,7 @@ describe("AssignmentPreparedStatements Test", () => {
             "review_due_date": new Date("2018-05-03T20:30:00Z"),
             "review_publish_date": new Date("2018-05-02T20:30:00Z"),
             // tslint:disable-next-line
-            external_assignment_link: null
+            external_link: null
         });
     });
 
@@ -118,7 +118,7 @@ describe("AssignmentPreparedStatements Test", () => {
             review_publish_date: new Date("2019-07-01T20:30:00Z"),
             review_due_date: new Date("2020-07-01T20:30:00Z"),
             // tslint:disable-next-line
-            external_assignment_link: null
+            external_link: null
         });
     });
 
@@ -177,7 +177,7 @@ describe("AssignmentPreparedStatements Test", () => {
             review_due_date: new Date("2018-06-01T20:33:00.000Z"),
             reviews_per_user: 1,
             title: "Updated",
-            external_assignment_link: ""
+            external_link: ""
         });
     });
 });

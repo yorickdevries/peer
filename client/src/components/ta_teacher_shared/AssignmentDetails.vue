@@ -27,8 +27,8 @@
             <dd v-else><a :href="assignmentFilePath" target="_blank">{{ assignment.filename }}</a></dd>
 
             <dt>Assignment Link</dt>
-            <dd v-if="assignment.external_assignment_link == null"> No assignment link given</dd>
-            <dd v-else><a :href="assignment.external_assignment_link" target="_blank">{{ assignment.external_assignment_link }}</a></dd>
+            <dd v-if="assignment.external_link == null"> No assignment link given</dd>
+            <dd v-else><a :href="assignment.external_link" target="_blank">{{ assignment.external_link }}</a></dd>
         </dl>
     </b-card>
 </template>

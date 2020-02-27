@@ -118,7 +118,7 @@
 
                             <!--File link-->
                             <b-form-group label="Assignment link" description="Add a link where the assignment can be found for the student (optional).">
-                                <b-form-input v-model="assignment.external_assignment_link"></b-form-input>
+                                <b-form-input v-model="assignment.external_link"></b-form-input>
                             </b-form-group>
 
                             <b-form-group label="Assignment Type" description="This can not be changed after creating the assignment.">
@@ -211,7 +211,7 @@ export default {
                 reviews_per_user: null,
                 one_person_groups: false,
                 review_evaluation: false,
-                external_assignment_link: null
+                external_link: null
             }
         }
     },
@@ -299,7 +299,7 @@ export default {
                         formData.append("reviews_per_user", this.assignment.reviews_per_user)
                         formData.append("one_person_groups", this.assignment.one_person_groups)
                         formData.append("review_evaluation", this.assignment.review_evaluation)
-                        formData.append("external_assignment_link", this.assignment.external_assignment_link)
+                        formData.append("external_link", this.assignment.external_link)
 
                         try {
                             await api.createAssignment(formData)

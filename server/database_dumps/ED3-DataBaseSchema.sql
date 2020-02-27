@@ -10,7 +10,7 @@ CREATE TABLE AssignmentList (
     course_id int NOT NULL,
     reviews_per_user int NOT NULL,
     filename varchar(500),
-    external_assignment_link varchar(1000),
+    external_link varchar(1000),
     publish_date timestamptz NOT NULL,
     due_date timestamptz NOT NULL,
     review_publish_date timestamptz NOT NULL,
