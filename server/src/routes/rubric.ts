@@ -342,9 +342,10 @@ router.get("/:rubric_id/submitallfilledreviews", index.authorization.checkRubric
                 continue;
             }
             const reviewId = allReviews[i].id;
+            const flagged = (await ReviewPS.executeGetReview(reviewId)).flagged;
             const reviewFilled = await ReviewUpdate.isCompletelyFilledIn(reviewId);
             // in case the review is filled, but not submitted, submit it
-            if (reviewFilled) {
+            if (reviewFilled || flagged === true) {
                 await ReviewPS.executeSubmitReview(reviewId);
                 await ReviewPS.executeUpdateSubmittedAt(reviewId);
                 console.log("Submitted reviewId: " + reviewId);

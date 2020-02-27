@@ -30,7 +30,8 @@ describe("ReviewPreparedStatement Test", () => {
             new Date("2018-05-01T22:30:00.000Z"),
             new Date("2019-05-01T23:30:00.000Z"),
             false,
-            false);
+            false,
+            undefined);
         return await RubricPS.executeCreateRubric(assignment.id, "submission");
     }
 
@@ -40,6 +41,23 @@ describe("ReviewPreparedStatement Test", () => {
     it("get the review by specific id", async () => {
         const result: any = await ReviewPS.executeGetReview(1);
         expect(result.id).to.equal(1);
+    });
+
+    /**
+     * Flag a review
+     */
+    it("flag the review", async () => {
+        // Setup
+        const result: any = await ReviewPS.executeGetReview(1);
+        const initial = result.flagged;
+        const updatedFlag = !initial;
+
+        // Act
+        await ReviewPS.executeFlagReview(result.id, updatedFlag);
+
+        // Test
+        const updatedResult: any = await ReviewPS.executeGetReview(1);
+        expect(updatedResult.flagged).to.equal(updatedFlag);
     });
 
     /**
@@ -236,6 +254,7 @@ describe("ReviewPreparedStatement Test", () => {
             "submitter": "paulvanderlaan",
             // tslint:disable-next-line
             "ta_netid": null,
+            "flagged": false,
             done: true
         }]);
     });

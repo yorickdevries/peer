@@ -72,13 +72,16 @@ export default class ReviewUpdate {
      * @param {number} reviewId - the review id.
      * @param {any[]} inputForm - the input form.
      * @param {number[]} fileUploadQuestionIds - the question ids of each file upload question.
+     * @param flagged - whether the review is flagged or not
      * @return {Promise<{review: any; form: any}>}
      */
-    public static async updateReviewWithFileUpload(reviewId: number, inputForm: any[], fileUploadQuestionIds: number[]) {
+    public static async updateReviewWithFileUpload(reviewId: number, inputForm: any[], fileUploadQuestionIds: number[], flagged: boolean = false) {
         // check all questions
         const checkedQuestions = await this.checkQuestions(reviewId, inputForm, fileUploadQuestionIds);
         // If no error, apply all questions to the database
         await this.applyQuestions(reviewId, checkedQuestions);
+        // Update the flag state of the review
+        await ReviewsPS.executeFlagReview(reviewId, flagged);
         // Get and return the new review
         return this.getReview(reviewId);
     }

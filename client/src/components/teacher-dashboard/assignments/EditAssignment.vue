@@ -129,6 +129,11 @@
                                 <p class="mb-0" v-if="uploadNewFile && file">File will be uploaded when you press the "save changes" button</p>
                             </b-form-group>
 
+                            <!--File link-->
+                            <b-form-group label="Assignment link" description="Add a link where the assignment can be found for the student (optional).">
+                                <b-form-input v-model="assignment.external_link"></b-form-input>
+                            </b-form-group>
+
                             <b-form-group   label="Assignment Type"
                                             description="This can not be changed after creating the assignment.">
                                 <b-form-radio-group v-model="assignment.one_person_groups"
@@ -216,7 +221,8 @@ export default {
                 reviews_per_user: null,
                 filename: null,
                 one_person_groups: null,
-                review_evaluation: null
+                review_evaluation: null,
+                external_link: null
             },
             course: {
                 id: null,
@@ -227,14 +233,14 @@ export default {
     },
     computed: {
         checkPeerNumber() {
-        if (this.assignment.reviews_per_user == null)
-            return null
-        else
-            return this.assignment.reviews_per_user > 0
+            if (this.assignment.reviews_per_user == null)
+                return null
+            else
+                return this.assignment.reviews_per_user > 0
         },
         assignmentFilePath() {
-        // Get the assignment file path.
-        return `/api/assignments/${this.assignment.id}/file`
+            // Get the assignment file path.
+            return `/api/assignments/${this.assignment.id}/file`
         }
     },
     async created() {
@@ -248,10 +254,10 @@ export default {
 
         // Define function for correct formatting time
         function timeToInputFormat(time) {
-        let str = "";
-        str = time.getHours() < 10 ? str + "0" + time.getHours().toString() + ":" : str + time.getHours().toString() + ":"
-        str = time.getMinutes() < 10 ? str + "0" + time.getMinutes().toString() : str + time.getMinutes().toString()
-        return str
+            let str = "";
+            str = time.getHours() < 10 ? str + "0" + time.getHours().toString() + ":" : str + time.getHours().toString() + ":"
+            str = time.getMinutes() < 10 ? str + "0" + time.getMinutes().toString() : str + time.getMinutes().toString()
+            return str
         }
 
         // Set publish date and time
@@ -345,6 +351,9 @@ export default {
                         }
                         formData.append("reviews_per_user", this.assignment.reviews_per_user)
                         formData.append("review_evaluation", this.assignment.review_evaluation)
+                        if (this.assignment.external_link != null && this.assignment.external_link != ''){
+                            formData.append("external_link", this.assignment.external_link)
+                        }
 
                         // Add file if a new one has been uploaded
                         if (this.file != null) {
