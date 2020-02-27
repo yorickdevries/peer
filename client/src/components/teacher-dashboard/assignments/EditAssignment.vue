@@ -9,8 +9,6 @@
                 </b-col>
             </b-row>
 
-
-            {{ assignment }}
             <!--Edit course card-->
             <b-row>
                 <b-col>
