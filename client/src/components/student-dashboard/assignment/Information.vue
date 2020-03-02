@@ -17,7 +17,9 @@
                     <b-button variant="primary w-100" v-if="assignment.filename" :href="assignmentFilePath" target="_blank">Download Assignment
                     </b-button>
 
-                    <p class="text-muted" v-else>The teacher did not upload an assignment file for this assignment.</p>
+                    <b-button variant="primary w-100" v-if="assignment.external_link != null" :href="assignment.external_link" target="_blank">Go to Assignment (redirect)
+                    </b-button>
+
                 </b-card>
             </b-col>
 
@@ -100,7 +102,8 @@ export default {
                 id: null,
                 course_id: null,
                 filename: "",
-                one_person_groups: null
+                one_person_groups: null,
+                external_link: null
             },
             groupInfo: {
                 group: {

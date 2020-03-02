@@ -81,7 +81,7 @@ describe("API review routes", () => {
         const exampleReviewFile = path.join(__dirname, "../../example_data/reviews/review1.pdf");
 
         const assignment: any = await AssignmentPS.executeAddAssignment("New", "Description", 1, 2, "test_file.pdf",
-        new Date("2017-07-01T20:30:00Z"), new Date("2018-07-01T20:30:00Z"), new Date("2019-07-01T20:30:00Z"), new Date("2020-07-01T20:30:00Z"), false, false);
+        new Date("2017-07-01T20:30:00Z"), new Date("2018-07-01T20:30:00Z"), new Date("2019-07-01T20:30:00Z"), new Date("2020-07-01T20:30:00Z"), false, false, undefined);
         const group: any = await GroupsPS.executeAddGroup("groupname");
         const submission: any = await SubmissionPS.executeCreateSubmission("henkjan", group.id, assignment.id, "none.pdf");
         const rubric: any = await RubricPS.executeCreateRubric(assignment.id, "submission");
@@ -163,12 +163,13 @@ describe("API review routes", () => {
         const res = await chai.request(router)
             .put("/1")
             .send({
-                "review": {
+                "review": JSON.stringify({
                     "id": 2,
                     "rubric_id": 1,
                     "file_path": "submission1.pdf",
-                    "done": false
-                },
+                    "done": false,
+                    "flagged": false
+                }),
                 "form": JSON.stringify([{
                     "question": {
                         "id": 1,
@@ -292,7 +293,8 @@ describe("API review routes", () => {
                   // tslint:disable-next-line
                   "approved": null,
                   "id": 1,
-                "rubric_id": 1
+                "rubric_id": 1,
+                  "flagged": false
               }
             });
         const result2 = await chai.request(router).get("/1/submit");

@@ -87,6 +87,12 @@ const updateAssignment = async function(req: any, res: any) {
             }
         }
 
+        if (req.body.external_link != undefined && !req.body.external_link.startsWith("http")) {
+            res.status(400);
+            res.json({ error: "Invalid external link" });
+            return;
+        }
+
         // Update the assignment in the database.
         const result: any = await AssignmentPS.executeUpdateAssignmentById(
             req.body.title,
@@ -98,6 +104,7 @@ const updateAssignment = async function(req: any, res: any) {
             req.body.review_publish_date,
             req.body.review_due_date,
             req.params.assignment_id,
+            req.body.external_link,
             req.body.review_evaluation_due_date
         );
 
@@ -145,6 +152,12 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
             }
         }
 
+        if (req.body.external_link != undefined && !req.body.external_link.startsWith("http")) {
+            res.status(400);
+            res.json({ error: "Invalid external link" });
+            return;
+        }
+
         const result: any = await AssignmentPS.executeAddAssignment(
             req.body.title,
             req.body.description,
@@ -157,6 +170,7 @@ const addAssignmentToDatabase = async function(req: any, res: any) {
             req.body.review_due_date,
             req.body.one_person_groups,
             req.body.review_evaluation,
+            req.body.external_link,
             req.body.review_evaluation_due_date
         );
 
@@ -623,6 +637,7 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
             reviewJson["Submission review done"] = review.done;
             reviewJson["Approval status"] = review.approved;
             reviewJson["TA netid"] = review.ta_netid;
+            reviewJson["Reviewer reported the submission"] = review.flagged;
 
             // R for review
             const reviewType = "R";
@@ -643,7 +658,6 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
                 reviewJson["Review evaluation saved_at"] = reviewEvaluation.saved_at;
                 reviewJson["Review evaluation submitted_at"] = reviewEvaluation.submitted_at;
                 reviewJson["Review evaluation done"] = reviewEvaluation.done;
-
                 const reviewEvaluationQuestions = (await ReviewUpdate.getReview(reviewEvaluation.id)).form;
                 // E for evaluation
                 const reviewType = "E";

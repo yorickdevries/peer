@@ -2,13 +2,13 @@
     <nav class="shadow-sm">
 
         <!--Head Navbar-->
-        <b-navbar toggleable="md" type="dark"  class="py-3" :class="headNavbarClass">
+        <b-navbar toggleable="md" type="dark" class="py-3" :class="headNavbarClass">
             <b-container>
 
                 <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
                 <!--Logo Image-->
-                <router-link :to="{ name: 'landing-page' }"><b-navbar-brand class="font-weight-bold d-flex align-items-center"><img src="../assets/images/logo.svg" alt="logo" height="20px" class="mr-1 mb-1"><div>PR</div></b-navbar-brand></router-link>
+                <router-link :to="{ name: 'landing-page' }"><b-navbar-brand class="font-weight-bold d-flex align-items-center"><img src="../assets/images/logo.svg" alt="logo" height="20px" class="mr-1 mb-1"><div>Peer Review</div></b-navbar-brand></router-link>
 
                 <!--Course/Role Text-->
                 <h5 class="text-white font-weight-bold my-0">{{ title }}</h5>
