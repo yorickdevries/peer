@@ -6,7 +6,7 @@
             <b-col>
                 <a target="_blank" :href="peerReviewFilePath">
                     <button type="button" class="btn btn-success success w-100"
-                            style="height: 3rem">Download Hand-In
+                            style="height: 3rem">Click here to download the file that you have to review
                     </button>
                 </a>
             </b-col>
