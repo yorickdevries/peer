@@ -7,7 +7,7 @@
              centered>
         <div>
             Your session has expired. <br>
-            Click the button below to log back in. Do not close this page. <br>
+            Click the button below to log back in. Do <b>not</b> close this page. <br>
             Afterwards, come back to this page and press OK to resume.
         </div>
         <b-button variant="primary" size="sm" class="my-3" href="/api/login" target="_blank">Login page</b-button>
