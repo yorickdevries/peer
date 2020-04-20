@@ -229,16 +229,15 @@ export default {
                 // Submit peer review.
                 try {
                     await api.submitPeerReview(this.peerReview)
+                    try {
+                        let {data} = await api.getPeerReview(this.reviewId)
+                        this.peerReview = data
+                    } catch (e) {
+                        this.showErrorMessage({message: "Could not fetch the review."})
+                        return
+                    }
                 } catch (e) {
                     this.showErrorMessage({message: "Submitting the review has failed. Make sure to fill in all fields."})
-                    return
-                }
-
-                try {
-                    let {data} = await api.getPeerReview(this.reviewId)
-                    this.peerReview = data
-                } catch (e) {
-                    this.showErrorMessage({message: "Could not fetch the review."})
                     return
                 }
 
@@ -265,11 +264,11 @@ export default {
             try {
                 await api.savePeerReview(this.peerReview.review.id, formData)
                 this.showSaveMessage()
+                await this.fetchPeerReview()
+                this.clearFiles()
             } catch (error) {
                 this.showErrorMessage({message: "Error saving peer review."})
             }
-            await this.fetchPeerReview()
-            this.clearFiles()
         },
         async unSubmitPeerReview() {
             // unSubmit peer review.
