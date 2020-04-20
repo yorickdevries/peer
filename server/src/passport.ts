@@ -37,16 +37,16 @@ const passportConfiguration = function(passport: any) {
       function (profile: any, done: any) {
           return done(undefined,
             {
-              netid: ParseNetId.parseNetId(profile["urn:mace:dir:attribute-def:uid"]),
+              netid: ParseNetId.parseNetId(profile["uid"]),
               studentNumber: profile["tudStudentNumber"],
               firstName: profile["givenName"],
               prefix: profile["tudPrefix"],
               lastName: profile["sn"],
               email: profile["mail"],
-              affiliation: profile["urn:mace:dir:attribute-def:eduPersonAffiliation"],
+              affiliation: profile["eduPersonAffiliation"],
               displayName: profile["displayName"],
-              nameID: profile["nameID"],
-              nameIDFormat: profile["nameIDFormat"]
+              study: profile["nlEduPersonStudyBranch"],
+              organisationUnit: profile["nlEduPersonOrgUnit"]
             });
       });
 

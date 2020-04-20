@@ -36,7 +36,7 @@ const config = {
         exampleReviewFolder: path.join(__dirname, "../example_data/reviews")
     },
     passport: {
-        idpUrl: "https://gatekeeper2.tudelft.nl/openaselect/profiles/saml2",
+        idpUrl: "https://login.tudelft.nl/sso/saml2/idp/metadata.php",
         realm: "urn:nodejs:passport-saml-metadata-example-app",
         protocol: "saml2",
         issuer: "peer.ewi.tudelft.nl",

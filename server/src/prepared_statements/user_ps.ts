@@ -43,10 +43,13 @@ export default class UserPS {
         lastName?: string,
         email?: string,
         affiliation?: string,
-        displayName?: string): Promise<pgPromise.queryResult> {
+        displayName?: string,
+        study?: string,
+        organisationUnit?: string        
+        ): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("add-user",
-        'INSERT INTO "userlist" (netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *');
-        statement.values = [netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName];
+        'INSERT INTO "userlist" (netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName, study, organisationUnit) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *');
+        statement.values = [netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName, study, organisationUnit];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -62,10 +65,13 @@ export default class UserPS {
         lastName?: string,
         email?: string,
         affiliation?: string,
-        displayName?: string): any {
+        displayName?: string,
+        study?: string,
+        organisationUnit?: string        
+        ): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-user-to-database",
-        "UPDATE userlist SET studentNumber = $2, firstName = $3, prefix = $4, lastName = $5, email = $6, affiliation = $7, displayName = $8 WHERE netid = $1 RETURNING *");
-        statement.values = [netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName];
+        "UPDATE userlist SET studentNumber = $2, firstName = $3, prefix = $4, lastName = $5, email = $6, affiliation = $7, displayName = $8, study = $9, organisationUnit = $10 WHERE netid = $1 RETURNING *");
+        statement.values = [netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName, study, organisationUnit];
         return Database.executeQuerySingleResult(statement);
     }
 
