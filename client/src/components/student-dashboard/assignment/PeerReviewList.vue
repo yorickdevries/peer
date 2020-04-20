@@ -3,7 +3,7 @@
         <b-card v-if="noReviews">No reviews available.</b-card>
 
         <div v-else>
-            <b-alert variant="info" :show="readOnly">The review due date has passed, you can only view them.</b-alert>
+            <b-alert variant="info" :show="readOnly">The review due date has passed, you can only view your response(s).</b-alert>
 
             <b-card  no-body>
 
