@@ -58,7 +58,7 @@
                             <b-col cols="6" v-for="course in filteredCourses" :key="course.id" class="d-flex align-items-stretch mb-3">
 
                                 <!--Single Card-->
-                                <b-card no-body class="w-100">
+                                <b-card no-body class="mb-3 w-100">
                                     <b-card-body class="d-flex flex-column">
                                         <div class="d-flex justify-content-between align-items-center mb-0">
                                             <h4 class="card-title m-0">{{ course.name }}</h4>
