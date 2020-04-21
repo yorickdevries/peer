@@ -98,16 +98,16 @@ export default class ReviewDistributionThreeAssignments {
 
         // assign reviews
         const reviews: any[] = [];
-        
+
         // start with distributing for assignment 1
-        try{
+        try {
             await this.assignReviews(allUsers2.concat(allUsers3), allSubmissions1, reviewsPerUserPerOtherAssignment, reviews);
             // start with distributing for assignment 2
             await this.assignReviews(allUsers1.concat(allUsers3), allSubmissions2, reviewsPerUserPerOtherAssignment, reviews);
             // start with distributing for assignment 3
             await this.assignReviews(allUsers1.concat(allUsers2), allSubmissions3, reviewsPerUserPerOtherAssignment, reviews);
             return reviews;
-        } catch(e){
+        } catch (e) {
             return undefined;
         }
     }
@@ -217,7 +217,7 @@ export default class ReviewDistributionThreeAssignments {
                 // make a list of all potential submissions
                 const otherSubmissions = await this.makeCountList(userNetId, submissions, reviews);
                 // when no submission can be picked, throw an error
-                if (otherSubmissions.length == 0){
+                if (otherSubmissions.length == 0) {
                     throw new Error("Review distribution is not possible");
                 }
                 // Shuffle all the submissions
