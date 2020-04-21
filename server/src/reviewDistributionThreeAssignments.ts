@@ -86,7 +86,7 @@ export default class ReviewDistributionThreeAssignments {
         const allSubmissions2: any = await SubmissionsPS.executeGetLatestSubmissionsByAssignmentId(assignmentId2);
         const allSubmissions3: any = await SubmissionsPS.executeGetLatestSubmissionsByAssignmentId(assignmentId3);
 
-        // When there are assignments without submissions, then no division can be made
+        // When there are assignments with too less submissions, then no division can be made
         if (allSubmissions1.length < reviewsPerUserPerOtherAssignment || allSubmissions2.length < reviewsPerUserPerOtherAssignment || allSubmissions3.length < reviewsPerUserPerOtherAssignment) {
             throw new Error("There are not enough submissions for one of the assignments");
         }
