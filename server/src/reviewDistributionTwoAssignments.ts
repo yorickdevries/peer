@@ -7,6 +7,7 @@ import GroupParser from "./groupParser";
 
 /**
  * Class which takes care of the distribution of all reviews over the students across TWO assignments
+ * What happens here is that all students from Assignment A review as much of students from Assignment B and vice versa
  */
 export default class ReviewDistributionTwoAssignments {
 
