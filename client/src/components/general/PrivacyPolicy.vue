@@ -33,7 +33,7 @@
                             <p>To help you, as a user, make use of the system, we collect the following data:
                             </p>
                             <ul>
-                                <li>Personal identification information (Name, Email, Student number, NetID and affiliation)</li>
+                                <li>Personal identification information (Name, Email, Student number, NetID, Study, Organisation Unit and affiliation)</li>
                             </ul>
 
                             <h3>Student</h3>

@@ -12,8 +12,8 @@ const mockPassportConfiguration = function(passport: any, netid: string, affilia
     email: "mail@mail.com",
     affiliation: affiliation,
     displayName: netid,
-    nameID: "nameID",
-    nameIDFormat: "nameIDFormat"
+    study: "M Computer Science",
+    organisationUnit: "Electrical Engineering, Mathematics and Computer Science"
   };
 
   const strategy = new MockStrategy({

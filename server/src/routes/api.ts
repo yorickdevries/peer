@@ -102,16 +102,18 @@ router.use("*", async function(req: any, res, next) {
         const email = userinfo.email;
         const affiliation = userinfo.affiliation;
         const displayName = userinfo.displayName;
+        const study = userinfo.study;
+        const organisationUnit = userinfo.organisationUnit;
         try {
             // check whether user is in the database
             const userExists: any = await UserPS.executeExistsUserById(netid);
             // in case the user is not in the database
             if (!userExists.exists) {
                 // Adding user
-                await UserPS.executeAddUser(netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName);
+                await UserPS.executeAddUser(netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName, study, organisationUnit);
             } else {
                 // Updating userinfo
-                await UserPS.executeUpdateUser(netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName);
+                await UserPS.executeUpdateUser(netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName, study, organisationUnit);
             }
             next();
         } catch (err) {
