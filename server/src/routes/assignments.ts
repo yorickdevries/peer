@@ -11,6 +11,7 @@ import ExportResultsPS from "../prepared_statements/export_results_ps";
 import GroupParser from "../groupParser";
 import reviewDistribution from "../reviewDistribution";
 import ReviewDistributionTwoAssignments from "../reviewDistributionTwoAssignments";
+import ReviewDistributionThreeAssignments from "../reviewDistributionThreeAssignments";
 import bodyParser from "body-parser";
 import config from "../config";
 import FileExport from "../fileExport";
@@ -368,10 +369,26 @@ router.get("/:assignment_id/allreviews/:done", index.authorization.enrolledAsTAO
 
 /**
  * Route to distribute reviews between two assignments
+ * See Class for implementation details
  */
 router.route("/distributeReviewsTwoAssignments/:assignment_id1/:assignment_id2/:reviews_per_user")
     .get(index.authorization.enrolledAsTeacherTwoAssignmentsCheck, (req: any, res) => {
         ReviewDistributionTwoAssignments.distributeReviews(req.params.assignment_id1, req.params.assignment_id2, req.params.reviews_per_user)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.status(400);
+            res.json({error: error.message});
+        });
+    });
+
+/**
+ * Route to distribute reviews between three assignments
+ * See Class for implementation details
+ */
+router.route("/distributeReviewsThreeAssignments/:assignment_id1/:assignment_id2/:assignment_id3/:reviews_per_user_per_other_assignment")
+    .get(index.authorization.enrolledAsTeacherTwoAssignmentsCheck, (req: any, res) => {
+        ReviewDistributionThreeAssignments.distributeReviews(req.params.assignment_id1, req.params.assignment_id2, req.params.assignment_id3, req.params.reviews_per_user_per_other_assignment)
         .then((data) => {
             res.json(data);
         }).catch((error) => {
