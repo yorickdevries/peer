@@ -176,10 +176,18 @@ export default class ReviewDistributionThreeAssignments {
         // make a list of all other submissions
         const otherSubmissions = [];
         for (const submission of submissions) {
-            // get users of group
+            // Check whether the current user is in the group of this submission
             const submissionGroupUsers: any = await GroupsPS.executeGetUsersOfGroupById(submission.group_id);
+            let currentNetIdInGroup = false;
+            for (const groupUser of submissionGroupUsers) {
+                const userNetId = groupUser.user_netid;
+                if (currentnetId == userNetId) {
+                    currentNetIdInGroup = true;
+                }
+            }
+            
             // skip the current submission if the user is the same group or if the user already reviews this submission
-            if (!submissionGroupUsers.includes(currentnetId) && !this.reviewsSubmission(currentnetId, submission.id, reviews)) {
+            if (!currentNetIdInGroup && !this.reviewsSubmission(currentnetId, submission.id, reviews)) {
                 const count = this.countReviews(submission.id, reviews);
                 const submissionCount = {submission: submission, count: count};
                 otherSubmissions.push(submissionCount);
