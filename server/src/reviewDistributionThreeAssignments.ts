@@ -87,8 +87,8 @@ export default class ReviewDistributionThreeAssignments {
         const allSubmissions3: any = await SubmissionsPS.executeGetLatestSubmissionsByAssignmentId(assignmentId3);
 
         // When there are assignments without submissions, then no division can be made
-        if (allSubmissions1.length == 0 || allSubmissions2.length == 0 || allSubmissions3.length == 0) {
-            throw new Error("There are no submissions for one of the assignments");
+        if (allSubmissions1.length < reviewsPerUserPerOtherAssignment || allSubmissions2.length < reviewsPerUserPerOtherAssignment || allSubmissions3.length < reviewsPerUserPerOtherAssignment) {
+            throw new Error("There are not enough submissions for one of the assignments");
         }
 
         // userlists, just netids in a list
