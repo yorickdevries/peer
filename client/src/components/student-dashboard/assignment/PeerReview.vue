@@ -6,7 +6,7 @@
             <b-col>
                 <a target="_blank" :href="peerReviewFilePath">
                     <button type="button" class="btn btn-success success w-100"
-                            style="height: 3rem">Download Hand-In
+                            style="height: 3rem">Click here to download the file that you have to review
                     </button>
                 </a>
             </b-col>
@@ -263,7 +263,7 @@ export default {
 
             try {
                 await api.savePeerReview(this.peerReview.review.id, formData)
-                this.showSaveMessage()
+                this.showSaveMessage({ message: "Your review has been saved successfully. NOTE: Saving does not count as a submission!"})
                 await this.fetchPeerReview()
                 this.clearFiles()
             } catch (error) {
