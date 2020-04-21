@@ -1,12 +1,13 @@
-import SubmissionsPS from "./prepared_statements/submissions_ps";
-import GroupsPS from "./prepared_statements/group_ps";
-import AssignmentPS from "./prepared_statements/assignment_ps";
-import ReviewPS from "./prepared_statements/review_ps";
-import RubricPS from "./prepared_statements/rubric_ps";
-import GroupParser from "./groupParser";
+import SubmissionsPS from "../prepared_statements/submissions_ps";
+import GroupsPS from "../prepared_statements/group_ps";
+import AssignmentPS from "../prepared_statements/assignment_ps";
+import ReviewPS from "../prepared_statements/review_ps";
+import RubricPS from "../prepared_statements/rubric_ps";
+import GroupParser from "../groupParser";
 
 /**
  * Class which takes care of the distribution of all reviews over the students across TWO assignments
+ * What happens here is that all students from Assignment A review as much of students from Assignment B and vice versa
  */
 export default class ReviewDistributionTwoAssignments {
 
@@ -123,19 +124,19 @@ export default class ReviewDistributionTwoAssignments {
         const reviews: any[] = [];
         if (numberOfReviewsPerSubmission1 <= numberOfReviewsPerSubmission2) {
             // start with distributing for assignment 1
-            this.assignReviews(allUsers2, allSubmissions1, reviewsPerUser, reviews);
+            await this.assignReviews(allUsers2, allSubmissions1, reviewsPerUser, reviews);
             // then distribute the remaining reviews of allUsers1 over all submissions
-            this.assignReviews(allUsers1, allSubmissions, reviewsPerUser, reviews);
+            await this.assignReviews(allUsers1, allSubmissions, reviewsPerUser, reviews);
         } else {
             // start with distributing for assignment 2
-            this.assignReviews(allUsers1, allSubmissions2, reviewsPerUser, reviews);
+            await this.assignReviews(allUsers1, allSubmissions2, reviewsPerUser, reviews);
             // then distribute the remaining reviews of allUsers2 over all submissions
-            this.assignReviews(allUsers2, allSubmissions, reviewsPerUser, reviews);
+            await this.assignReviews(allUsers2, allSubmissions, reviewsPerUser, reviews);
         }
 
         // Check afterwards for valid distribution
         // make a submissionCount of all submissions
-        const submissionCount = this.makeCountList(undefined, undefined, allSubmissions, reviews);
+        const submissionCount = await this.makeCountList(undefined, allSubmissions, reviews);
         // sort submissions from low to high
         this.sortSubmissionCount(submissionCount);
         // In case there is a submission without assignment return undefined and try again
@@ -161,7 +162,7 @@ export default class ReviewDistributionTwoAssignments {
             // Assign submissions to every user
             for (const user of users) {
                 const userNetId = user.user_netid;
-                const userGroup = {userNetId: userNetId, groupId: groupId, assignmentId: assignmentId};
+                const userGroup = {userNetId: userNetId, assignmentId: assignmentId};
                 allUsers.push(userGroup);
             }
         }
@@ -209,12 +210,21 @@ export default class ReviewDistributionTwoAssignments {
      * @param {any[]} reviews
      * @returns
      */
-    public static makeCountList(currentnetId: string | undefined, currentGroupId: number | undefined, submissions: any[], reviews: any[]) {
+    public static async makeCountList(currentnetId: string | undefined, submissions: any[], reviews: any[]) {
         // make a list of all other submissions
         const otherSubmissions = [];
         for (const submission of submissions) {
+            // Check whether the current user is in the group of this submission
+            const submissionGroupUsers: any = await GroupsPS.executeGetUsersOfGroupById(submission.group_id);
+            let currentNetIdInGroup = false;
+            for (const groupUser of submissionGroupUsers) {
+                const userNetId = groupUser.user_netid;
+                if (currentnetId == userNetId) {
+                    currentNetIdInGroup = true;
+                }
+            }
             // skip the current submission if the user is the same group or if the user already reviews this submission
-            if (submission.group_id !== currentGroupId && !this.reviewsSubmission(currentnetId, submission.id, reviews)) {
+            if (!currentNetIdInGroup && !this.reviewsSubmission(currentnetId, submission.id, reviews)) {
                 const count = this.countReviews(submission.id, reviews);
                 const submissionCount = {submission: submission, count: count};
                 otherSubmissions.push(submissionCount);
@@ -268,14 +278,18 @@ export default class ReviewDistributionTwoAssignments {
     /**
      * Assign reviews
      */
-    public static assignReviews(users: any[], submissions: any[], reviewsPerUser: number, reviews: any[]) {
+    public static async assignReviews(users: any[], submissions: any[], reviewsPerUser: number, reviews: any[]) {
         // Shuffle all the users
         this.shuffle(users);
         // make a certain amount of reviews per user
         for (let k = 0; k < reviewsPerUser; k++) {
             for (const user of users) {
                 // make a list of all potential submissions
-                const otherSubmissions = this.makeCountList(user.userNetId, user.groupId, submissions, reviews);
+                const otherSubmissions = await this.makeCountList(user.userNetId, submissions, reviews);
+                // when no submission can be picked, throw an error
+                if (otherSubmissions.length == 0) {
+                    throw new Error("Review distribution is not possible");
+                }
                 // Shuffle all the submissions
                 this.shuffle(otherSubmissions);
                 // Sort the submissions based on reviewcount

@@ -13,7 +13,7 @@ import GroupsPS from "../src/prepared_statements/group_ps";
 import SubmissionsPS from "../src/prepared_statements/submissions_ps";
 import AssignmentPS from "../src/prepared_statements/assignment_ps";
 import TestData from "./test_helpers/test_data";
-import ReviewDistributionTwoAssignments from "../src/reviewDistributionTwoAssignments";
+import ReviewDistributionTwoAssignments from "../src/review_distribution/reviewDistributionTwoAssignments";
 
 describe("DistributeReviews two assignments", () => {
     /**
