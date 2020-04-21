@@ -185,7 +185,6 @@ export default class ReviewDistributionThreeAssignments {
                     currentNetIdInGroup = true;
                 }
             }
-            
             // skip the current submission if the user is the same group or if the user already reviews this submission
             if (!currentNetIdInGroup && !this.reviewsSubmission(currentnetId, submission.id, reviews)) {
                 const count = this.countReviews(submission.id, reviews);
