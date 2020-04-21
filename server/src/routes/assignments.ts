@@ -387,7 +387,7 @@ router.route("/distributeReviewsTwoAssignments/:assignment_id1/:assignment_id2/:
  * See Class for implementation details
  */
 router.route("/distributeReviewsThreeAssignments/:assignment_id1/:assignment_id2/:assignment_id3/:reviews_per_user_per_other_assignment")
-    .get(index.authorization.enrolledAsTeacherTwoAssignmentsCheck, (req: any, res) => {
+    .get(index.authorization.enrolledAsTeacherThreeAssignmentsCheck, (req: any, res) => {
         ReviewDistributionThreeAssignments.distributeReviews(req.params.assignment_id1, req.params.assignment_id2, req.params.assignment_id3, req.params.reviews_per_user_per_other_assignment)
         .then((data) => {
             res.json(data);
