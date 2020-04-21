@@ -15,7 +15,7 @@
   },
   "nyc": {
     "check-coverage": true,
-    "lines": 75,
+    "lines": 70,
     "all": true,
     "extension": [
       ".js",
