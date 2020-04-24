@@ -220,6 +220,8 @@ CREATE TABLE UserList (
     email varchar(500),
     affiliation varchar(500),
     displayName varchar(500),
+    study varchar(500),
+    organisationUnit varchar(500),
     CONSTRAINT UserList_pk PRIMARY KEY (netid),
     CONSTRAINT netid_lower CHECK (netid = lower(netid))
 );

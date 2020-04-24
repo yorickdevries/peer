@@ -1,8 +1,8 @@
-import SubmissionsPS from "./prepared_statements/submissions_ps";
-import GroupsPS from "./prepared_statements/group_ps";
-import AssignmentPS from "./prepared_statements/assignment_ps";
-import ReviewPS from "./prepared_statements/review_ps";
-import RubricPS from "./prepared_statements/rubric_ps";
+import SubmissionsPS from "../prepared_statements/submissions_ps";
+import GroupsPS from "../prepared_statements/group_ps";
+import AssignmentPS from "../prepared_statements/assignment_ps";
+import ReviewPS from "../prepared_statements/review_ps";
+import RubricPS from "../prepared_statements/rubric_ps";
 
 /**
  * Class which takes care of the distribution of all reviews over the students

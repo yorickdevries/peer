@@ -58,13 +58,13 @@
                             <b-col cols="6" v-for="course in filteredCourses" :key="course.id" class="d-flex align-items-stretch mb-3">
 
                                 <!--Single Card-->
-                                <b-card no-body class="w-100">
+                                <b-card no-body class="mb-3 w-100">
                                     <b-card-body class="d-flex flex-column">
                                         <div class="d-flex justify-content-between align-items-center mb-0">
                                             <h4 class="card-title m-0">{{ course.name }}</h4>
                                             <b-badge v-if="course.role" show variant="primary font-weight-bold">{{ course.role.toUpperCase() }}</b-badge>
                                         </div>
-                                        <p class="card-title mt-0 text-muted">{{ course.academic_year }} - {{ course.faculty }} - {{ course.course_code }}</p>
+                                        <p class="card-title mt-0 text-muted">{{ course.course_code }} - {{ course.faculty }} - {{ course.academic_year }}</p>
 
                                         <div class="mb-auto">
                                             <p v-if="course.description != null">{{ course.description | truncate(200)}}</p>
@@ -131,7 +131,7 @@
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <h4 class="card-title m-0">{{ course.name }}</h4>
                                         </div>
-                                        <p class="card-title mt-0 text-muted">{{ course.academic_year }} - {{ course.faculty }} - {{ course.course_code }}</p>
+                                        <p class="card-title mt-0 text-muted">{{ course.course_code }} - {{ course.faculty }} - {{ course.academic_year }}</p>
 
                                         <div class="mb-auto">
                                             <p v-if="course.description != null">{{ course.description | truncate(200)}}</p>
