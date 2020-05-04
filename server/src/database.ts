@@ -61,7 +61,7 @@ export default class Database {
      * @constructor - default constructor.
      */
   static async DatabaseImport(qf: pgp.QueryFile) {
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === "production") {
       throw Error("You are running in production!"); 
     } else {
       await this.db.any(qf);

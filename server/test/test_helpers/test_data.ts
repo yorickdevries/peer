@@ -115,8 +115,8 @@ class TestData {
     }
 }
 
-if (process.env.NODE_ENV === 'production') {
-    throw Error("You cannot run tests in production!"); 
+if (process.env.NODE_ENV === "production") {
+    throw Error("You cannot run tests in production!");
 }
 
 export default TestData;
