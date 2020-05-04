@@ -13,8 +13,7 @@ stages:
     - sast
     
 before_script:
-- cd server && npm install && cd ..
-- cd client && npm install && cd ..
+- npm install
 
 tslint:
   stage: static-analysis
