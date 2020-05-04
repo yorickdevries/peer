@@ -8,7 +8,7 @@ import path from "path";
 /**
  * Class responsible for the initialisation of data used for testing
  */
-export default class TestData {
+class TestData {
     /**
      * Database schema
      */
@@ -114,3 +114,9 @@ export default class TestData {
         await fs.remove(this.assignmentFolder);
     }
 }
+
+if (process.env.NODE_ENV === "production") {
+    throw Error("You cannot run tests in production!");
+}
+
+export default TestData;

@@ -12,7 +12,7 @@ import submissions from "../../src/routes/submissions";
  * @export
  * @class MockLogin
  */
-export default class MockLogin {
+class MockLogin {
 
     /**
      * Adds sample data to all routers
@@ -71,3 +71,9 @@ export default class MockLogin {
         }
     }
 }
+
+if (process.env.NODE_ENV === "production") {
+    throw Error("You cannot run tests in production!");
+}
+
+export default MockLogin;
