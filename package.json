@@ -2,6 +2,7 @@
   "name": "peer_review",
   "version": "1.0.0",
   "scripts": {
+    "install": "cd server && npm install && cd ../client && npm install & cd ..",
     "start": "npm run build && npm run start_server",
     "start_newdata": "npm run build_newdata && npm run start_server",
     "build": "npm run build_server && npm run build_client",
