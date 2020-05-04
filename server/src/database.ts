@@ -62,7 +62,7 @@ export default class Database {
      */
   static async DatabaseImport(qf: pgp.QueryFile) {
     if (process.env.NODE_ENV === "production") {
-      throw Error("You are running in production!"); 
+      throw Error("You are running in production!");
     } else {
       await this.db.any(qf);
     }
@@ -74,8 +74,8 @@ export default class Database {
      * @constructor - default constructor.
      */
     static async DatabaseDrop() {
-      if (process.env.NODE_ENV === 'production') {
-        throw Error("You are running in production!"); 
+      if (process.env.NODE_ENV === "production") {
+        throw Error("You are running in production!");
       } else {
         await this.db.any("DROP SCHEMA IF EXISTS public CASCADE");
         await this.db.any("CREATE SCHEMA public");
