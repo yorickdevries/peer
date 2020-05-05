@@ -1,7 +1,6 @@
 import GroupsPS from "../prepared_statements/group_ps";
 import UserPS from "../prepared_statements/user_ps";
 import GroupParser from "../groupParser";
-import bodyParser from "body-parser";
 import index from "../security/index";
 
 
@@ -11,7 +10,6 @@ import AssignmentPS from "../prepared_statements/assignment_ps";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 import ParseNetId from "../parseNetId";
 const router = express();
-router.use(bodyParser.json());
 
 
 /**

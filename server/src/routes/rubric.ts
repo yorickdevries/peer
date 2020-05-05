@@ -1,7 +1,6 @@
 import RubricPS, { default as rubricPS } from "../prepared_statements/rubric_ps";
 import ReviewPS from "../prepared_statements/review_ps";
 import ReviewUpdate from "../reviewUpdate";
-import bodyParser from "body-parser";
 import index from "../security/index";
 
 
@@ -9,7 +8,6 @@ import index from "../security/index";
 import express from "express";
 
 const router = express();
-router.use(bodyParser.json());
 
 /**
  * Route to delete an open question
