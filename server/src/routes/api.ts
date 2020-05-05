@@ -14,26 +14,35 @@ import passport from "passport";
 import config from "../config";
 import passportConfiguration from "../passport";
 import mockPassportConfiguration from "../passport_mock";
-
-const fileStore = sessionFileStore(session);
+import logger from "morgan";
 
 const router = express();
+// Add logger for all API
+logger.token("netid", function(req, res) {
+    if (req.user !== undefined) {
+        return req.user.netid;
+    } else {
+        return undefined;
+    }
+});
+// slightly formatted common string
+router.use(logger("(:netid) - :remote-addr - :remote-user [:date[clf]] \":method :url HTTP/:http-version\" :status :res[content-length]"));
 
 // session support is required to use Passport
+const fileStore = sessionFileStore(session);
 // needs a random secret
 const sessionConfig: any = {
     resave: true,
     saveUninitialized: true,
     secret: config.session.secret
   };
-
 // Depending of current mode, setup the session store
 if (process.env.NODE_ENV === "production") {
     sessionConfig.store = new fileStore();
 }
-
 router.use(session(sessionConfig));
 
+// initialize passport middleware
 router.use(passport.initialize());
 router.use(passport.session());
 
@@ -86,7 +95,7 @@ router.get("/metadata.xml", async function(req, res) {
 });
 
 // This route checks the user and updates it in the database
-router.use("*", async function(req: any, res, next) {
+router.use(async function(req: any, res, next) {
     const userinfo = req.user;
     // check whether userinfo exists
     if (userinfo == undefined || userinfo.netid == undefined) {
