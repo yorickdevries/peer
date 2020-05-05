@@ -11,6 +11,8 @@ import ExportResultsPS from "../prepared_statements/export_results_ps";
 import UserPS from "../prepared_statements/user_ps";
 import ParseNetId from "../parseNetId";
 const router = express();
+// Needed for the tests (tests need to change)
+router.use(express.json());
 
 /**
  * Route that creates a new course.

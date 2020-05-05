@@ -10,6 +10,8 @@ import config from "../config";
 // Router
 import express from "express";
 const router = express();
+// Needed for the tests (tests need to change)
+router.use(express.json());
 
 const fileFolder = config.reviews.fileFolder;
 

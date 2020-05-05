@@ -8,6 +8,8 @@ import index from "../security/index";
 import express from "express";
 
 const router = express();
+// Needed for the tests (tests need to change)
+router.use(express.json());
 
 /**
  * Route to delete an open question

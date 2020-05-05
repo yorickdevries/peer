@@ -10,6 +10,8 @@ import AssignmentPS from "../prepared_statements/assignment_ps";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 import ParseNetId from "../parseNetId";
 const router = express();
+// Needed for the tests (tests need to change)
+router.use(express.json());
 
 
 /**

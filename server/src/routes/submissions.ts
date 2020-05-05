@@ -11,6 +11,8 @@ import config from "../config";
 import express from "express";
 
 const router = express();
+// Needed for the tests (tests need to change)
+router.use(express.json());
 
 // File of max 30 MB (in bytes)
 const maxSizeSubmissionFile = config.submissions.maxSizeSubmissionFile;

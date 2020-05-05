@@ -23,6 +23,9 @@ import { generateRubric } from "../models/rubric_factory";
 import evaluationReviewRubricConfig from "../evaluationReviewRubricConfig";
 
 const router = express();
+// Needed for the tests (tests need to change)
+router.use(express.json());
+
 const fileFolder = config.assignments.fileFolder;
 
 // File of max 30 MB (in bytes)
