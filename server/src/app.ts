@@ -3,8 +3,11 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import api from "./routes/api";
 import logger from "morgan";
+import helmet from "helmet";
 
 const app: express.Express = express();
+app.use(helmet());
+
 // Add logger for errors
 logger.token("netid", function(req, res) {
     if (req.user !== undefined) {
