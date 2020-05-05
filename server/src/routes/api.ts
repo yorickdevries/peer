@@ -137,7 +137,7 @@ router.get("/authenticated", function(req: any, res) {
 });
 
 // Check always whether someone is logged in
-router.use("*", security.authorization.authorizeCheck);
+router.use(security.authorization.authorizeCheck);
 
 // Routing
 router.use("/assignments", assignments);
@@ -155,22 +155,8 @@ router.get("/user", function(req: any, res, next) {
 });
 
 // If no other routes apply, send a 404
-router.use("*", function(req, res) {
+router.use(function(req, res) {
     res.sendStatus(404);
 });
-
-// Error handler
-router.use(function(err: any, req: any, res: any, next: any) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get("env") === "development" ? err : {};
-    // Print error to console
-    console.log("Error: " + err.message);
-
-    // render the error page
-    res.status(err.status || 500);
-    res.json({ error: "There is an error in your API request" });
-});
-
 
 export default router;
