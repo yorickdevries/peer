@@ -3,7 +3,6 @@ import path from "path";
 import fs from "fs-extra";
 import multer from "multer";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
-import bodyParser from "body-parser";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import index from "../security/index";
 import config from "../config";
@@ -12,7 +11,8 @@ import config from "../config";
 import express from "express";
 
 const router = express();
-router.use(bodyParser.json());
+// Needed for the tests (tests need to change)
+router.use(express.json());
 
 // File of max 30 MB (in bytes)
 const maxSizeSubmissionFile = config.submissions.maxSizeSubmissionFile;

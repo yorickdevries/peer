@@ -1,7 +1,6 @@
 import ReviewsPS from "../prepared_statements/review_ps";
 import RubricPS from "../prepared_statements/rubric_ps";
 import ReviewUpdate from "../reviewUpdate";
-import bodyParser from "body-parser";
 import index from "../security/index";
 import path from "path";
 import multer from "multer";
@@ -11,7 +10,8 @@ import config from "../config";
 // Router
 import express from "express";
 const router = express();
-router.use(bodyParser.json());
+// Needed for the tests (tests need to change)
+router.use(express.json());
 
 const fileFolder = config.reviews.fileFolder;
 

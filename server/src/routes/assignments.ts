@@ -12,7 +12,6 @@ import GroupParser from "../groupParser";
 import reviewDistribution from "../review_distribution/reviewDistribution";
 import ReviewDistributionTwoAssignments from "../review_distribution/reviewDistributionTwoAssignments";
 import ReviewDistributionThreeAssignments from "../review_distribution/reviewDistributionThreeAssignments";
-import bodyParser from "body-parser";
 import config from "../config";
 import FileExport from "../fileExport";
 
@@ -24,9 +23,10 @@ import { generateRubric } from "../models/rubric_factory";
 import evaluationReviewRubricConfig from "../evaluationReviewRubricConfig";
 
 const router = express();
-const fileFolder = config.assignments.fileFolder;
+// Needed for the tests (tests need to change)
+router.use(express.json());
 
-router.use(bodyParser.json());
+const fileFolder = config.assignments.fileFolder;
 
 // File of max 30 MB (in bytes)
 const maxSizeAssignmentFile = config.assignments.maxSizeAssignmentFile;

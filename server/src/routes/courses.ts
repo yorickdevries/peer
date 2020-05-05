@@ -1,6 +1,5 @@
 import CoursesPS from "../prepared_statements/courses_ps";
 import AssignmentsPS from "../prepared_statements/assignment_ps";
-import bodyParser from "body-parser";
 import GroupParser from "../groupParser";
 import index from "../security/index";
 import { Roles } from "../roles";
@@ -12,7 +11,8 @@ import ExportResultsPS from "../prepared_statements/export_results_ps";
 import UserPS from "../prepared_statements/user_ps";
 import ParseNetId from "../parseNetId";
 const router = express();
-router.use(bodyParser.json());
+// Needed for the tests (tests need to change)
+router.use(express.json());
 
 /**
  * Route that creates a new course.
