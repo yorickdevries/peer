@@ -16,8 +16,8 @@ stages:
 tslint:
   stage: static-analysis
   script:
-  - cd server && npm install && cd ..
-  - npm run tslint --prefix ./server
+  - cd server && npm install
+  - npm run tslint
   only:
   - merge_requests
   - pushes
@@ -29,10 +29,10 @@ build_server:
   services:
   - postgres:10.3
   script:
-  - cd server && npm install && cd ..
-  - npm run build --prefix ./server
+  - cd server && npm install
+  - npm run build
   - export NODE_ENV="development"
-  - npm run data_init --prefix ./server
+  - npm run data_init
   only:
   - merge_requests
   - pushes
@@ -44,8 +44,8 @@ build_client:
   services:
   - postgres:10.3
   script:
-  - cd client && npm install && cd ..
-  - npm run build --prefix ./client
+  - cd client && npm install
+  - npm run build
   only:
   - merge_requests
   - pushes
@@ -55,8 +55,8 @@ test:
   services:
   - postgres:10.3
   script:
-  - cd server && npm install && cd ..
-  - npm run test --prefix ./server
+  - cd server && npm install
+  - npm run test
   tags:
   - longJob
   only:
@@ -68,8 +68,8 @@ coverage:
   services:
   - postgres:10.3
   script:
-  - cd server && npm install && cd ..
-  - npm run coverage --prefix ./server
+  - cd server && npm install
+  - npm run coverage
   tags:
   - longJob
   only:
