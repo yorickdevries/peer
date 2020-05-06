@@ -31,6 +31,7 @@ build_server:
   script:
   - cd server && npm install && cd ..
   - npm run build --prefix ./server
+  - export NODE_ENV="development"
   - npm run data_init --prefix ./server
   only:
   - merge_requests
