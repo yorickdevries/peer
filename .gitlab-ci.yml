@@ -14,6 +14,8 @@ stages:
     - sast
 
 tslint:
+  variables:
+    NODE_ENV: development
   stage: static-analysis
   script:
   - cd server && npm install && cd ..
