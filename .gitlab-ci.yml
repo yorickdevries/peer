@@ -4,6 +4,7 @@ variables:
   POSTGRES_DB: peer_database
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: password
+  NODE_ENV: production
 
 stages:
     - static-analysis
@@ -11,15 +12,11 @@ stages:
     - test
     - coverage
     - sast
-    
-before_script:
-- export NODE_ENV="production"
-- cd server && npm install && cd ..
-- cd client && npm install && cd ..
 
 tslint:
   stage: static-analysis
   script:
+  - cd server && npm install && cd ..
   - npm run tslint --prefix ./server
   only:
   - merge_requests
@@ -30,6 +27,7 @@ build_server:
   services:
   - postgres:10.3
   script:
+  - cd server && npm install && cd ..
   - npm run build --prefix ./server
   - npm run data_init --prefix ./server
   only:
@@ -41,6 +39,7 @@ build_client:
   services:
   - postgres:10.3
   script:
+  - cd client && npm install && cd ..
   - npm run build --prefix ./client
   only:
   - merge_requests
@@ -51,6 +50,7 @@ test:
   services:
   - postgres:10.3
   script:
+  - cd server && npm install && cd ..
   - npm run test --prefix ./server
   tags:
   - longJob
@@ -63,6 +63,7 @@ coverage:
   services:
   - postgres:10.3
   script:
+  - cd server && npm install && cd ..
   - npm run coverage --prefix ./server
   tags:
   - longJob
