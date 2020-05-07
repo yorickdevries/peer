@@ -9,7 +9,7 @@ logger.token("netid", function(req, res) {
     }
 });
 
-const loggerFormat = "(:netid) - :remote-addr - :remote-user [:date[clf]] \":method :url HTTP/:http-version\" :status :res[content-length]"
+const loggerFormat = "(:netid) - :remote-addr - :remote-user [:date[clf]] \":method :url HTTP/:http-version\" :status :res[content-length]";
 
 // logger for all events
 const eventLogger = logger(loggerFormat);
