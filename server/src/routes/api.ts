@@ -19,7 +19,7 @@ import logger from "morgan";
 const router = express();
 // Add logger for all API
 logger.token("netid", function(req, res) {
-    if (req.user !== undefined) {
+    if (req.user != undefined) {
         return req.user.netid;
     } else {
         return undefined;
