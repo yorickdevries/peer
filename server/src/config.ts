@@ -16,7 +16,8 @@ const config = {
         testQueryFile: path.join(__dirname, "../database_dumps/ED3-TestData.sql")
         },
     session: {
-        secret: "add something random here"
+        secret: "add something random here",
+        maxAge: 12*60*60*1000   // 12 hours in ms
     },
     reviews: {
         fileFolder: path.join(__dirname, "./files/reviews"),

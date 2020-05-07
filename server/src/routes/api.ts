@@ -32,6 +32,7 @@ router.use(logger("(:netid) - :remote-addr - :remote-user [:date[clf]] \":method
 const fileStore = sessionFileStore(session);
 // needs a random secret
 const sessionConfig: any = {
+    cookie: {maxAge: config.session.maxAge},
     resave: true,
     saveUninitialized: true,
     secret: config.session.secret
