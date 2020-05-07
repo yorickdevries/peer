@@ -1,4 +1,5 @@
 import express from "express";
+require("express-async-errors");
 import path from "path";
 import cookieParser from "cookie-parser";
 import api from "./routes/api";
