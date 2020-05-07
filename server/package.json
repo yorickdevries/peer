@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "npm run build && npm run start_server",
-    "start_dev": "nodemon",
+    "dev": "nodemon",
     "start_newdata": "npm run build && npm run data_init && npm run start_server",
     "start_server": "node ./dist/bin/www.js",
     "tslint": "tslint --project ./tsconfig_tslint.json",
@@ -60,6 +60,7 @@
     "debug": "~2.6.9",
     "export-from-json": "^1.1.4",
     "express": "^4.16.4",
+    "express-async-errors": "^3.1.1",
     "express-session": "^1.15.6",
     "file-system-cache": "^1.0.5",
     "fs-extra": "^6.0.1",

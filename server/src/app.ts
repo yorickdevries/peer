@@ -1,4 +1,5 @@
 import express from "express";
+require("express-async-errors");
 import path from "path";
 import cookieParser from "cookie-parser";
 import api from "./routes/api";
@@ -8,7 +9,7 @@ import helmet from "helmet";
 const app: express.Express = express();
 app.use(helmet());
 
-// Add logger for errors
+// Add logger for server errors
 logger.token("netid", function(req, res) {
     if (req.user != undefined) {
         return req.user.netid;
@@ -19,7 +20,7 @@ logger.token("netid", function(req, res) {
 // slightly formatted common string
 app.use(logger("(:netid) - :remote-addr - :remote-user [:date[clf]] \":method :url HTTP/:http-version\" :status :res[content-length]",
     {
-    skip: function (req, res) { return res.statusCode < 400; },
+    skip: function (req, res) { return res.statusCode < 500; },
     stream: process.stderr
   }
 ));
