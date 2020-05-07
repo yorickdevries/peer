@@ -14,19 +14,10 @@ import passport from "passport";
 import config from "../config";
 import passportConfiguration from "../passport";
 import mockPassportConfiguration from "../passport_mock";
-import logger from "morgan";
+import { eventLogger } from "../logger";
 
 const router = express();
-// Add logger for all API
-logger.token("netid", function(req, res) {
-    if (req.user != undefined) {
-        return req.user.netid;
-    } else {
-        return undefined;
-    }
-});
-// slightly formatted common string
-router.use(logger("(:netid) - :remote-addr - :remote-user [:date[clf]] \":method :url HTTP/:http-version\" :status :res[content-length]"));
+router.use(eventLogger);
 
 // session support is required to use Passport
 const fileStore = sessionFileStore(session);
