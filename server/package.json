@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "npm run build && npm run start_server",
-    "start_dev": "nodemon",
+    "dev": "nodemon",
     "start_newdata": "npm run build && npm run data_init && npm run start_server",
     "start_server": "node ./dist/bin/www.js",
     "tslint": "tslint --project ./tsconfig_tslint.json",
