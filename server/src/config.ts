@@ -17,7 +17,7 @@ const config = {
         },
     session: {
         secret: "add something random here",
-        maxAge: 12*60*60*1000   // 12 hours in ms
+        maxAge: 12 * 60 * 60 * 1000   // 12 hours in ms
     },
     reviews: {
         fileFolder: path.join(__dirname, "./files/reviews"),
