@@ -91,8 +91,9 @@ router.get("/logout", function(req, res) {
 
 // Retrieve SP metadata
 router.get("/metadata.xml", async function(req, res) {
+  const file = await fs.readFile("./SP_Metadata.xml");
   res.type("application/xml");
-  res.send(await fs.readFile("./SP_Metadata.xml"));
+  res.send(file);
 });
 
 // This route checks the user and updates it in the database
