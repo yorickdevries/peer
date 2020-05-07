@@ -10,7 +10,7 @@ app.use(helmet());
 
 // Add logger for errors
 logger.token("netid", function(req, res) {
-    if (req.user !== undefined) {
+    if (req.user != undefined) {
         return req.user.netid;
     } else {
         return undefined;
@@ -26,10 +26,10 @@ app.use(logger("(:netid) - :remote-addr - :remote-user [:date[clf]] \":method :u
 
 const clientWebsite = path.join(__dirname, "../dist/public");
 
+app.use(express.static(clientWebsite));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static(clientWebsite));
 
 // Routing
 app.use("/api", api);
