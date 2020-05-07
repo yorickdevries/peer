@@ -10,7 +10,7 @@ app.use(helmet());
 
 // Add logger for errors
 logger.token("netid", function(req, res) {
-    if (req.user !== undefined) {
+    if (req.user != undefined) {
         return req.user.netid;
     } else {
         return undefined;
