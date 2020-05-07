@@ -3,30 +3,14 @@ require("express-async-errors");
 import path from "path";
 import cookieParser from "cookie-parser";
 import api from "./routes/api";
-import logger from "morgan";
+import { errorLogger } from "./logger";
 import helmet from "helmet";
 
 const app: express.Express = express();
 app.use(helmet());
-
-// Add logger for server errors
-logger.token("netid", function(req, res) {
-    if (req.user != undefined) {
-        return req.user.netid;
-    } else {
-        return undefined;
-    }
-});
-// slightly formatted common string
-app.use(logger("(:netid) - :remote-addr - :remote-user [:date[clf]] \":method :url HTTP/:http-version\" :status :res[content-length]",
-    {
-    skip: function (req, res) { return res.statusCode < 500; },
-    stream: process.stderr
-  }
-));
+app.use(errorLogger);
 
 const clientWebsite = path.join(__dirname, "../dist/public");
-
 app.use(express.static(clientWebsite));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
