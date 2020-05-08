@@ -32,8 +32,6 @@ build_server:
   script:
   - cd server && npm install
   - npm run build
-  - export NODE_ENV="development"
-  - npm run data_init
   only:
   - merge_requests
   - pushes
@@ -88,7 +86,6 @@ start_server:
   - npm run build
   - export NODE_ENV="development"
   - npm run data_init
-  - export NODE_ENV="production"
   - timeout 30s npm run start_server
   only:
   - merge_requests
