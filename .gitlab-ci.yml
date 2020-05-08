@@ -86,7 +86,7 @@ start_server:
   - npm run build
   - export NODE_ENV="development"
   - npm run data_init
-  - timeout --preserve-status 30s npm run start_server
+  - timeout 30s npm run start_server || if [ $? -eq 1 ]; then echo "success"; fi
   only:
   - merge_requests
   - pushes
