@@ -9,7 +9,7 @@ import compression from "compression";
 
 const app: express.Express = express();
 app.use(helmet());
-app.use(compression);
+app.use(compression());
 app.use(errorLogger);
 
 const clientWebsite = path.join(__dirname, "../dist/public");
