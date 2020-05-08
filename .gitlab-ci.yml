@@ -11,6 +11,7 @@ stages:
     - build
     - test
     - coverage
+    - start
     - sast
 
 tslint:
@@ -31,8 +32,6 @@ build_server:
   script:
   - cd server && npm install
   - npm run build
-  - export NODE_ENV="development"
-  - npm run data_init
   only:
   - merge_requests
   - pushes
@@ -72,6 +71,22 @@ coverage:
   - npm run coverage
   tags:
   - longJob
+  only:
+  - merge_requests
+  - pushes
+
+start_server:
+  stage: start
+  variables:
+    NODE_ENV: production
+  services:
+  - postgres:10.3
+  script:
+  - cd server && npm install
+  - npm run build
+  - export NODE_ENV="development"
+  - npm run data_init
+  - timeout 30s npm run start_server || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
   only:
   - merge_requests
   - pushes
