@@ -1,4 +1,4 @@
-if (!process.env.NODE_ENV || process.env.NODE_ENV in ["development", "test"]) {
+if (!process.env.NODE_ENV || ["development", "test"].includes(process.env.NODE_ENV)) {
     process.env.NODE_ENV = "test";
 }
 else {
