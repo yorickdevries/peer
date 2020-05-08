@@ -9,7 +9,7 @@
     "start_server": "node ./dist/bin/www.js",
     "tslint": "tslint --project ./tsconfig_tslint.json",
     "build": "tsc",
-    "test": "mocha --timeout 10000",
+    "test": "mocha",
     "coverage": "nyc npm run test",
     "data_init": "node ./dist/scripts/data_init.js"
   },
