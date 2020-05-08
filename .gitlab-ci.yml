@@ -86,7 +86,7 @@ start_server:
   - npm run build
   - export NODE_ENV="development"
   - npm run data_init
-  - timeout 30s --preserve-status npm run start_server
+  - timeout --preserve-status 30s npm run start_server
   only:
   - merge_requests
   - pushes
