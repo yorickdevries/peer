@@ -28,7 +28,7 @@ const fileFolder = config.assignments.fileFolder;
 
 router.use(bodyParser.json());
 
-// File of max 30 MB (in bytes)
+// File of max 50 MB (in bytes)
 const maxSizeAssignmentFile = config.assignments.maxSizeAssignmentFile;
 const uploadAssignment = multer({
     limits: {fileSize: maxSizeAssignmentFile},

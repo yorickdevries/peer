@@ -15,7 +15,7 @@ router.use(bodyParser.json());
 
 const fileFolder = config.reviews.fileFolder;
 
-// File of max 30 MB (in bytes)
+// File of max 50 MB (in bytes)
 const maxSizeAssignmentFile = config.reviews.maxSizeReviewFile;
 const uploadReview = multer({
     limits: {fileSize: maxSizeAssignmentFile},
