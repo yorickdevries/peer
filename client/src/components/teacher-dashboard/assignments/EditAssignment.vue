@@ -34,11 +34,11 @@
                             <hr />
 
                             <!--Publish and due date of the assignment-->
+                            <b-alert v-model="$browserDetect.isSafari" variant="warning">
+                                If you are using Safari, make sure you enter 4 digits for the time input.
+                                Not doing so may result in not being able to create the assignment.
+                            </b-alert>
                             <b-row class="mb-3">
-                                <b-alert v-model="$browserDetect.isSafari" variant="warning">
-                                    If you are using Safari, make sure you enter 4 digits for the time input.
-                                    Not doing so may result in not being able to create the assignment.
-                                </b-alert>
                                 <b-col>
                                     <b-form-group>
                                         <template slot="label"> Publish date and time
