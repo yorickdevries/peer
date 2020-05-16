@@ -248,8 +248,10 @@ export default {
                 // Check for daylight saving time issues
                 let validationResult2 = this.checkDST(pdate, ddate, rpdate, rddate, reddate)
                 if (validationResult2.title) {
-                    this.showErrorMessage({title: validationResult2.title,
-                        message: "Due to switching to daylight saving time, you cannot choose a time between 02:00 and 02:59 on this date"})
+                    this.showErrorMessage({
+                        title: validationResult2.title,
+                        message: "Due to switching to daylight saving time, you cannot choose a time between 02:00 and 02:59 on this date"
+                    })
                 } else {
                     // Get the hours from the input field and set in variable
                     pdate.setHours(this.assignment.publish_time.substring(0,2))
@@ -302,7 +304,7 @@ export default {
                         formData.append("review_publish_date", this.assignment.review_publish_date)
                         formData.append("review_due_date", this.assignment.review_due_date)
 
-                        // Send review date only when selected
+                        // Send review evaluation date only when selected
                         if (this.assignment.review_evaluation){
                             formData.append("review_evaluation_due_date", this.assignment.review_evaluation_due_date)
                         }

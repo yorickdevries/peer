@@ -1,6 +1,7 @@
 <template>
     <div>
         <b-container>
+
             <!--Header-->
             <b-row>
                 <b-col>
@@ -81,7 +82,6 @@
                                                         required>
                                         </b-form-input>
                                     </b-form-group>
-                                    <b-button @click="renderDates" variant="primary">Render</b-button>
                                 </b-col>
                                 <b-col>
                                     <b-form-group>
@@ -91,7 +91,8 @@
                                         <datepicker placeholder="Select date" v-model="assignment.review_due_day"></datepicker>
                                         <b-form-input   v-model="assignment.review_due_time"
                                                         type="time"
-                                                        placeholder="Please enter due time of the peer review">
+                                                        placeholder="Please enter due time of the peer review"
+                                                        required>
                                         </b-form-input>
                                     </b-form-group>
                                 </b-col>
@@ -180,6 +181,7 @@
                     </b-card>
                 </b-col>
             </b-row>
+
         </b-container>
     </div>
 </template>
@@ -262,86 +264,45 @@ export default {
             return str
         }
 
-        // For testing purposes
-        this.server_date = res.data.review_publish_date
-
-        // Set publish date and time
+        // Load publish date and time
         let pdate = new Date(res.data.publish_date)
         this.assignment.publish_day = pdate
         this.assignment.publish_time = timeToInputFormat(pdate)
 
-        // Set due date and time
+        // Load due date and time
         let ddate = new Date(res.data.due_date)
         this.assignment.due_day = ddate
         this.assignment.due_time = timeToInputFormat(ddate)
 
-        // Set review publish date and time
+        // Load review publish date and time
         let rpdate = new Date(res.data.review_publish_date)
         this.assignment.review_publish_day = rpdate
         this.assignment.review_publish_time = timeToInputFormat(rpdate)
 
-        // Set review due date and time
+        // Load review due date and time
         let rddate = new Date(res.data.review_due_date)
         this.assignment.review_due_day = rddate
         this.assignment.review_due_time = timeToInputFormat(rddate)
 
-        // Set review evaluation due date and time
+        // Load review evaluation due date and time
         let reddate = new Date(res.data.review_evaluation_due_date)
         this.assignment.review_evaluation_due_day = reddate
         this.assignment.review_evaluation_due_time = timeToInputFormat(reddate)
     },
     methods: {
-        // Function for testing purposes
-        async renderDates() {
-            this.showDSTPublishDate = !this.showDSTPublishDate
-            console.clear()
-            console.log(this.server_date + " - from server")
-            let rpdate = this.assignment.review_publish_day
-            console.log(this.assignment.review_publish_day + " - from date field")
-            // console.log(this.checkDatesEmpty())
-
-            this.checkDatesEmpty()
-            this.checkDST()
-            this.checkDatesLogical()
-
-            console.log(rpdate.toISOString() + " - from date field ISO")
-            console.log(this.checkDST(null, null, rpdate, null, null))
-            // console.log(this.checkDatesLogical())
-            console.log(rpdate + " - after check")
-            console.log(rpdate.toISOString() + " - after check ISO")
-
-
-            rpdate.setHours(this.assignment.review_publish_time.substring(0, 2))
-
-            console.log(rpdate + " - after setting hours")
-            console.log(rpdate.toISOString() + " - after setting hours ISO")
-
-            rpdate.setMinutes(this.assignment.review_publish_time.substring(3, 5))
-
-            console.log(rpdate + " - after setting minutes")
-            console.log(rpdate.toISOString() + " - after setting minutes ISO")
-
-            // console.log(parseInt(this.assignment.review_publish_time.substring(0,2))-1)
-            // console.log(parseInt(this.assignment.review_publish_time.substring(0,2))+1)
-        },
         async onSubmit() {
             // Check for empty date and time fields
             let validationResult1 = this.checkDatesEmpty()
             if (validationResult1.error) {
                 this.showErrorMessage({ message: validationResult1.error })
             } else {
+                // Load date from fields in variables of type Date
+                // Note that these are only the dates, not the times, as these are in different input fields
                 let pdate = this.assignment.publish_day
                 let ddate = this.assignment.due_day
                 let rpdate = this.assignment.review_publish_day
                 let rddate = this.assignment.review_due_day
                 let reddate = this.assignment.review_evaluation_due_day
-
-                console.log("from date field: " + this.assignment.review_publish_day)
-                console.log("from date field converted: " + rpdate)
-                console.log("from date field ISO: " + rpdate.toISOString())
-
-                console.log("Send JSON: " + rpdate.toJSON())
-                console.log("Send ISO: " + rpdate.toISOString())
 
                 // Check for daylight saving time issues
                 let validationResult2 = this.checkDST(pdate, ddate, rpdate, rddate, reddate)
@@ -351,25 +312,22 @@ export default {
                         message: "Due to switching to daylight saving time, you cannot choose a time between 02:00 and 02:59 on this date"
                     })
                 } else {
-                    console.log("after check " + rpdate)
-                    console.log("after check ISO: " + rpdate.toISOString())
+                    // Get the hours from the input field and set in variable
                     pdate.setHours(this.assignment.publish_time.substring(0, 2))
                     ddate.setHours(this.assignment.due_time.substring(0, 2))
                     rpdate.setHours(this.assignment.review_publish_time.substring(0, 2))
                     rddate.setHours(this.assignment.review_due_time.substring(0, 2))
                     reddate.setHours(this.assignment.review_evaluation_due_time.substring(0, 2))
 
-                    console.log(typeof this.assignment.review_publish_time + this.assignment.review_publish_time)
-
+                    // Get the minutes from the input field and set in variable
                     pdate.setMinutes(this.assignment.publish_time.substring(3, 5))
                     ddate.setMinutes(this.assignment.due_time.substring(3, 5))
                     rpdate.setMinutes(this.assignment.review_publish_time.substring(3, 5))
                     rddate.setMinutes(this.assignment.review_due_time.substring(3, 5))
                     reddate.setMinutes(this.assignment.review_evaluation_due_time.substring(3, 5))
 
-                    console.log("after setting minutes: " + rpdate)
-                    console.log("after setting minutes ISO: " + rpdate.toISOString())
-
+                    // Set the date fields of the assignment. These are now Date objects
+                    // These values are the day and time of the deadline
                     this.assignment.publish_date = pdate
                     this.assignment.due_date = ddate
                     this.assignment.review_publish_date = rpdate
@@ -387,9 +345,7 @@ export default {
                         this.assignment.review_due_date = rddate.toJSON()
                         this.assignment.review_evaluation_due_date = reddate.toJSON()
 
-                        console.log("Send JSON: " + rpdate.toJSON())
-                        console.log("Send ISO: " + rpdate.toISOString())
-
+                        // Create formData and append data
                         let formData = new FormData()
                         formData.append("title", this.assignment.title)
                         formData.append("description", this.assignment.description)
@@ -400,7 +356,7 @@ export default {
                         formData.append("review_publish_date", this.assignment.review_publish_date)
                         formData.append("review_due_date", this.assignment.review_due_date)
 
-                        // Send review date only when selected
+                        // Send review evaluation date only if applicable
                         if (this.assignment.review_evaluation){
                             formData.append("review_evaluation_due_date", this.assignment.review_evaluation_due_date)
                         }
@@ -463,46 +419,36 @@ export default {
             let rpdate2 = new Date(rpdate)
             let rddate2 = new Date(rddate)
             let reddate2 = new Date(reddate)
-            // console.log("in check0: " + rpdate)
-            // console.log("in check0: " + rpdate2)
-            // console.log("ISO: " + rpdate2.toISOString())
-            // rpdate2.setHours(this.assignment.review_publish_time.substring(0,2))
-            // console.log(rpdate2)
-            // console.log("ISO: " + rpdate2.toISOString())
-            // rpdate2.setHours(this.assignment.review_publish_time.substring(0,2)-1)
-            // console.log(rpdate2)
-            // console.log("ISO: " + rpdate2.toISOString())
+
+            // Checking whether Daylight Saving Time is starting on the given day (changing from GMT+1 to GMT+2)
+            // This causes deadlines set between 02:00 and 02:59 to be equal to 03:00-03:59 when converting to UTC
+            // As a result, a deadline set at 02:00, will actually be set at 03:00
+            // For some reason, Safari handles Daylight Saving Time differently. We should have a look if MomentJS can help with this issue
             if (pdate2.setHours(this.assignment.publish_time.substring(0,2)) === pdate2.setHours(parseInt(this.assignment.publish_time.substring(0,2))+1)) {
-                // console.log("in check1: " + rpdate)
                 return {title: "Error in publish time"}
             } else if (ddate2.setHours(this.assignment.due_time.substring(0,2)) === ddate2.setHours(parseInt(this.assignment.due_time.substring(0,2))+1)) {
-                // console.log("in check2: " + rpdate)
                 return {title: "Error in hand-in time"}
             } else if (rpdate2.setHours(this.assignment.review_publish_time.substring(0,2)) === rpdate2.setHours(parseInt(this.assignment.review_publish_time.substring(0,2))+1)) {
-                // console.log("in check3: " + rpdate)
                 return {title: "Error in review start time"}
             } else if (rddate2.setHours(this.assignment.review_due_time.substring(0,2)) === rddate2.setHours(parseInt(this.assignment.review_due_time.substring(0,2))+1)) {
-                // console.log("in check4: " + rpdate)
                 return {title: "Error in review due time"}
             } else if (this.assignment.review_evaluation &&
                 reddate2.setHours(this.assignment.review_evaluation_due_time.substring(0,2)) === reddate2.setHours(parseInt(this.assignment.review_evaluation_due_time.substring(0,2))+1)) {
-                // console.log("in check5: " + rpdate)
                 return {title: "Error in review evaluation due time"}
             } else {
-                // console.log("in check6: " + rpdate)
-                // console.log("in check6: " + rpdate2)
                 return true
             }
         },
         checkDatesLogical() {
-            // Check publish date ordering
+            // Checks whether deadlines have been entered in chronological order
+            // Check publish date
             if (this.assignment.publish_date >= this.assignment.due_date ||
                 this.assignment.publish_date >= this.assignment.review_publish_date ||
                 this.assignment.publish_date >= this.assignment.review_due_date ||
                 (this.assignment.review_evaluation && this.assignment.publish_date >= this.assignment.review_evaluation_due_date)) {
                 return {error: 'Publish date should be before other dates!'}
             }
-            // Check due date ordering
+            // Check due date
             else if (this.assignment.due_date >= this.assignment.review_publish_date ||
                 this.assignment.due_date >= this.assignment.review_due_date) {
                 return {error: 'Due date should be before review dates!'}
@@ -511,7 +457,7 @@ export default {
             else if (this.assignment.review_evaluation && this.assignment.due_date >= this.assignment.review_evaluation_due_date) {
                 return {error: 'Due date should be before review evaluation date!'}
             }
-            // Check review publish date ordering
+            // Check review publish date
             else if (this.assignment.review_publish_date >= this.assignment.review_due_date) {
                 return {error: 'Review start date should be before review due date!'}
             }
@@ -519,11 +465,11 @@ export default {
             else if (this.assignment.review_evaluation && this.assignment.review_publish_date >= this.assignment.review_evaluation_due_date) {
                 return {error: 'Review start date should be before review evaluation due date!'}
             }
-            // Check review evaluation date ordering
+            // Check review evaluation date
             else if (this.assignment.review_evaluation && this.assignment.review_due_date >= this.assignment.review_evaluation_due_date) {
                 return {error: 'Review due date should be before review evaluation date'}
             }
-            // Return true if all dates have the right ordering
+            // Return true if all dates have been chronologically ordered
             else {
                 return true
             }
