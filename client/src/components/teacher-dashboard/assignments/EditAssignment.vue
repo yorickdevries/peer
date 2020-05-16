@@ -1,7 +1,6 @@
 <template>
     <div>
         <b-container>
-            {{assignment}}
             <!--Header-->
             <b-row>
                 <b-col>
@@ -13,18 +12,13 @@
             <b-row>
                 <b-col>
                     <b-card>
-                        {{answer}}
-                        <b-alert variant="danger" show>
-                            {{answer}}
-                        </b-alert>
                         <b-form @submit.prevent="onSubmit">
                             <!--Assignment title-->
                             <b-form-group label="Assignment title">
                                 <b-form-input   v-model="assignment.title"
                                                 type="text"
                                                 placeholder="Please enter the course name here"
-                                                required
-                                v-on:change="cDST()">
+                                                required>
                                 </b-form-input>
                             </b-form-group>
                             <!--Assignment description-->
@@ -50,13 +44,9 @@
                                         <b-form-input   v-model="assignment.publish_time"
                                                         type="time"
                                                         placeholder="Please enter time on which the assignment should be published"
-                                                        required
-                                                        v-on:change="toggleDST('publish_date')">
+                                                        required>
                                         </b-form-input>
                                     </b-form-group>
-                                    <b-alert v-model="showDSTPublishDate" variant="warning">
-                                        {{answer}}
-                                    </b-alert>
                                 </b-col>
                                 <b-col>
                                     <b-form-group>
@@ -67,13 +57,9 @@
                                         <b-form-input   v-model="assignment.due_time"
                                                         type="time"
                                                         placeholder="Please enter time before which the assignment should be handed in"
-                                                        required
-                                                        v-on:change="toggleDST('due_date')">
+                                                        required>
                                         </b-form-input>
                                     </b-form-group>
-                                    <b-alert v-model="showDSTPublishDate" variant="warning">
-                                        {{answer}}
-                                    </b-alert>
                                 </b-col>
                             </b-row>
 
@@ -88,16 +74,10 @@
                                         <b-form-input   v-model="assignment.review_publish_time"
                                                         type="time"
                                                         placeholder="Please enter start time of the peer review"
-                                                        required
-                                                        v-on:change="toggleDST('review_publish_date')">
+                                                        required>
                                         </b-form-input>
                                     </b-form-group>
                                     <b-button @click="renderDates" variant="primary">Render</b-button>
-                                    {{assignment.review_publish_time}}
-                                    <b-alert v-model="showDSTPublishDate" variant="warning">
-                                        {{answer}}
-                                    </b-alert>
-                                    {{assignment.publish_date}}
                                 </b-col>
                                 <b-col>
                                     <b-form-group>
@@ -107,13 +87,9 @@
                                         <datepicker placeholder="Select date" v-model="assignment.review_due_day"></datepicker>
                                         <b-form-input   v-model="assignment.review_due_time"
                                                         type="time"
-                                                        placeholder="Please enter due time of the peer review"
-                                                        v-on:change="toggleDST('review_due_date')">
+                                                        placeholder="Please enter due time of the peer review">
                                         </b-form-input>
                                     </b-form-group>
-                                    <b-alert v-model="showDSTPublishDate" variant="warning">
-                                        {{answer}}
-                                    </b-alert>
                                 </b-col>
                             </b-row>
 
@@ -187,8 +163,7 @@
                                         <b-form-input   v-model="assignment.review_evaluation_due_time"
                                                         type="time"
                                                         placeholder="Please enter time before which the reviews should be evaluated"
-                                                        required
-                                                        v-on:change="toggleDST('review_evaluation_due_date')">
+                                                        required>
                                         </b-form-input>
                                     </b-form-group>
                                 </b-col>
@@ -201,15 +176,6 @@
                     </b-card>
                 </b-col>
             </b-row>
-
-            <div id="watch-example">
-                <p>
-                    Ask a yes/no question:
-                    <input v-model="question">
-                </p>
-                <p>{{ answer }}</p>
-            </div>
-
         </b-container>
     </div>
 </template>
@@ -231,13 +197,6 @@ export default {
             uploadNewFile: false,
             acceptFiles: ".pdf,.zip",
             server_date: null,
-            question: "",
-            answer: 'I cannot give you an answer until you ask a question!',
-            showDSTPublishDate: false,
-            showDSTDueDate: false,
-            showDSTReviewPublishDate: false,
-            showDSTReviewDueDate: false,
-            showDSTReviewEvaluationDueDate: false,
             assignment: {
                 id: null,
                 title: null,
@@ -281,22 +240,6 @@ export default {
         assignmentFilePath() {
             // Get the assignment file path.
             return `/api/assignments/${this.assignment.id}/file`
-        },
-        comp() {
-            return this.assignment.title
-        }
-    },
-    watch: {
-        // assignment: function (){
-        //     // return timestamp.this.assignment.review_publish_time.substring(0,2) === timestamp.setHours(parseInt(this.assignment.review_publish_time.substring(0,2))+1);
-        //     return this.assignment.review_publish_time
-        // },
-        // whenever question changes, this function will run
-        comp: {
-            function() {
-                console.log("CHAGNED!!")
-                this.answer = this.cDST()
-            }
         }
     },
     async created() {
@@ -346,86 +289,6 @@ export default {
         this.assignment.review_evaluation_due_time = timeToInputFormat(reddate)
     },
     methods: {
-        toggleDST(date) {
-            // showDSTPublishDate: false,
-            //     showDSTDueDate: false,
-            //     showDSTReviewPublishDate: false,
-            //     showDSTReviewDueDate: false,
-            //     showDSTReviewEvaluationDueDate: false,
-            switch(date) {
-                case "publish_date":
-                    this.answer = 1
-                    console.log(this.assignment.publish_date.setHours(this.assignment.publish_time.substring(0,2)))
-                    // console.log(this.assignment.publish_day)
-                    console.log(this.assignment.publish_time)
-                    // if (assignment.publish_date.setHours(assignment.publish_time.substring(0,2)) ===
-                    //     assignment.publish_date.setHours(parseInt(assignment.publish_time.substring(0,2))+1))
-                    // {
-                    //     this.showDSTPublishDate = true
-                    // } else {
-                    //     this.showDSTPublishDate = false
-                    // }
-                    break;
-                case "due_date":
-                    this.answer = 2
-                    break;
-                case "review_publish_date":
-                    this.answer = 3
-                    break;
-                case "review_due_date":
-                    this.answer = 4
-                    break;
-                case "review_evaluation_due_date":
-                    this.answer = 5
-                    break;
-            }
-            // Instantiate new dates to avoid changing the passed value
-            // let pdate2 = new Date(pdate)
-            // let ddate2 = new Date(ddate)
-            // let rpdate2 = new Date(rpdate)
-            // let rddate2 = new Date(rddate)
-            // let reddate2 = new Date(reddate)
-            // if (pdate2.setHours(this.assignment.publish_time.substring(0,2)) === pdate2.setHours(parseInt(this.assignment.publish_time.substring(0,2))+1)) {
-            //     return {title: "Error in publish time"}
-            // } else if (ddate2.setHours(this.assignment.due_time.substring(0,2)) === ddate2.setHours(parseInt(this.assignment.due_time.substring(0,2))+1)) {
-            //     return {title: "Error in hand-in time"}
-            // } else if (rpdate2.setHours(this.assignment.review_publish_time.substring(0,2)) === rpdate2.setHours(parseInt(this.assignment.review_publish_time.substring(0,2))+1)) {
-            //     return {title: "Error in review start time"}
-            // } else if (rddate2.setHours(this.assignment.review_due_time.substring(0,2)) === rddate2.setHours(parseInt(this.assignment.review_due_time.substring(0,2))+1)) {
-            //     return {title: "Error in review due time"}
-            // } else if (this.assignment.review_evaluation &&
-            //     reddate2.setHours(this.assignment.review_evaluation_due_time.substring(0,2)) === reddate2.setHours(parseInt(this.assignment.review_evaluation_due_time.substring(0,2))+1)) {
-            //     return {title: "Error in review evaluation due time"}
-            // } else {
-            //     // console.log("in check6: " + rpdate)
-            //     // console.log("in check6: " + rpdate2)
-            //     return true
-            // }
-        },
-        cDST: function() {
-          if(new Date(this.assignment.review_publish_day).setHours(this.assignment.review_publish_time.substring(0,2)) ===
-              new Date(this.assignment.review_publish_day).setHours(parseInt(this.assignment.review_publish_time.substring(0,2))+1)) {
-              this.answer = 'DST!'
-          } else {
-              this.answer = "Due to daylight saving time, the due date will be set to 03:00"
-              // this.answer = this.assignment.review_publish_day.setHours(this.assignment.review_publish_time.substring(0,2)) + '\n' + this.assignment.review_publish_day.setHours(parseInt(this.assignment.review_publish_time.substring(0,2))+1)
-          }
-        },
-        getAnswer: function () {
-            if (this.question.indexOf('?') === -1) {
-                this.answer = 'Questions usually contain a question mark. ;-)'
-                return
-            }
-            this.answer = 'Thinking...'
-            var vm = this
-            axios.get('https://yesno.wtf/api')
-                .then(function (response) {
-                    vm.answer = _.capitalize(response.data.answer)
-                })
-                .catch(function (error) {
-                    vm.answer = 'Error! Could not reach the API. ' + error
-                })
-        },
         // Function for testing purposes
         async renderDates() {
             this.showDSTPublishDate = !this.showDSTPublishDate
