@@ -9,6 +9,11 @@
         <b-form-group label="Range" description="Maximum stars a student can give.">
             <b-form-input v-model="question.range" type="number"/>
         </b-form-group>
+        <b-form-group label="Optional Question" description="Make this question optional for the student.">
+            <b-form-checkbox v-model="question.optional">
+                Make this question optional.
+            </b-form-checkbox>
+        </b-form-group>
     </div>
 </template>
 
