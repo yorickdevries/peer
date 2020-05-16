@@ -53,6 +53,9 @@
                                                         required>
                                         </b-form-input>
                                     </b-form-group>
+                                    <b-alert v-model="showDSTPublishDate" variant="warning">
+                                        {{answer}}
+                                    </b-alert>
                                 </b-col>
                                 <b-col>
                                     <b-form-group>
@@ -66,6 +69,9 @@
                                                         required>
                                         </b-form-input>
                                     </b-form-group>
+                                    <b-alert v-model="showDSTPublishDate" variant="warning">
+                                        {{answer}}
+                                    </b-alert>
                                 </b-col>
                             </b-row>
 
@@ -86,7 +92,7 @@
                                     </b-form-group>
                                     <b-button @click="renderDates" variant="primary">Render</b-button>
                                     {{assignment.review_publish_time}}
-                                    <b-alert variant="danger" show>
+                                    <b-alert v-model="showDSTPublishDate" variant="warning">
                                         {{answer}}
                                     </b-alert>
                                     {{assignment.publish_date}}
@@ -103,6 +109,9 @@
                                                         required>
                                         </b-form-input>
                                     </b-form-group>
+                                    <b-alert v-model="showDSTPublishDate" variant="warning">
+                                        {{answer}}
+                                    </b-alert>
                                 </b-col>
                             </b-row>
 
@@ -221,6 +230,11 @@ export default {
             server_date: null,
             question: "",
             answer: 'I cannot give you an answer until you ask a question!',
+            showDSTPublishDate: false,
+            showDSTDueDate: false,
+            showDSTReviewPublishDate: false,
+            showDSTReviewDueDate: false,
+            showDSTReviewEvaluationDueDate: false,
             assignment: {
                 id: null,
                 title: null,
@@ -355,6 +369,7 @@ export default {
         },
         // Function for testing purposes
         async renderDates() {
+            this.showDSTPublishDate = !this.showDSTPublishDate
             console.clear()
             console.log(this.server_date + " - from server")
             let rpdate = this.assignment.review_publish_day
