@@ -200,7 +200,6 @@ export default {
             fileProgress: 0,
             uploadNewFile: false,
             acceptFiles: ".pdf,.zip",
-            server_date: null,
             assignment: {
                 id: null,
                 title: null,
@@ -247,7 +246,7 @@ export default {
         }
     },
     async created() {
-        // Load necessary date
+        // Load necessary data
         let cid = this.$route.params.courseId
         let aid = this.$route.params.assignmentId
         this.course.id = cid
@@ -384,7 +383,7 @@ export default {
                     } else {
                         this.assignment.publish_date = pdate.toJSON()
                         this.assignment.due_date = ddate.toJSON()
-                        this.assignment.review_publish_date = rpdate.toISOString()
+                        this.assignment.review_publish_date = rpdate.toJSON()
                         this.assignment.review_due_date = rddate.toJSON()
                         this.assignment.review_evaluation_due_date = reddate.toJSON()
 
