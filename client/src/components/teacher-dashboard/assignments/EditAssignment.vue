@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-container>
-
+            {{assignment}}
             <!--Header-->
             <b-row>
                 <b-col>
@@ -13,13 +13,18 @@
             <b-row>
                 <b-col>
                     <b-card>
+                        {{answer}}
+                        <b-alert variant="danger" show>
+                            {{answer}}
+                        </b-alert>
                         <b-form @submit.prevent="onSubmit">
                             <!--Assignment title-->
                             <b-form-group label="Assignment title">
                                 <b-form-input   v-model="assignment.title"
                                                 type="text"
                                                 placeholder="Please enter the course name here"
-                                                required>
+                                                required
+                                v-on:change="cDST()">
                                 </b-form-input>
                             </b-form-group>
                             <!--Assignment description-->
@@ -185,6 +190,14 @@
                 </b-col>
             </b-row>
 
+            <div id="watch-example">
+                <p>
+                    Ask a yes/no question:
+                    <input v-model="question">
+                </p>
+                <p>{{ answer }}</p>
+            </div>
+
         </b-container>
     </div>
 </template>
@@ -251,10 +264,27 @@ export default {
         assignmentFilePath() {
             // Get the assignment file path.
             return `/api/assignments/${this.assignment.id}/file`
+        },
+        comp() {
+            return this.assignment.title
+        }
+    },
+    watch: {
+        // assignment: function (){
+        //     // return timestamp.this.assignment.review_publish_time.substring(0,2) === timestamp.setHours(parseInt(this.assignment.review_publish_time.substring(0,2))+1);
+        //     return this.assignment.review_publish_time
+        // },
+        // whenever question changes, this function will run
+        comp: {
+            function() {
+                console.log("CHAGNED!!")
+                this.answer = this.cDST()
+            }
         }
     },
     async created() {
-        // Load necessary data
+        // this.debouncedGetAnswer = function () {_.debounce(this.getAnswer, 500)}
+        // Load necessary date
         let cid = this.$route.params.courseId
         let aid = this.$route.params.assignmentId
         this.course.id = cid
@@ -269,6 +299,9 @@ export default {
             str = time.getMinutes() < 10 ? str + "0" + time.getMinutes().toString() : str + time.getMinutes().toString()
             return str
         }
+
+        // For testing purposes
+        this.server_date = res.data.review_publish_date
 
         // Set publish date and time
         let pdate = new Date(res.data.publish_date)
@@ -364,6 +397,15 @@ export default {
                 let rddate = this.assignment.review_due_day
                 let reddate = this.assignment.review_evaluation_due_day
 
+                console.log("from date field: " + this.assignment.review_publish_day)
+                console.log("from date field converted: " + rpdate)
+                console.log("from date field ISO: " + rpdate.toISOString())
+
+                console.log("Send JSON: " + rpdate.toJSON())
+                console.log("Send ISO: " + rpdate.toISOString())
+
+
+
                 // Check for daylight saving time issues
                 let validationResult2 = this.checkDST(pdate, ddate, rpdate, rddate, reddate)
                 if (validationResult2.title) {
@@ -372,17 +414,24 @@ export default {
                         message: "Due to switching to daylight saving time, you cannot choose a time between 02:00 and 02:59 on this date"
                     })
                 } else {
+                    console.log("after check " + rpdate)
+                    console.log("after check ISO: " + rpdate.toISOString())
                     pdate.setHours(this.assignment.publish_time.substring(0, 2))
                     ddate.setHours(this.assignment.due_time.substring(0, 2))
                     rpdate.setHours(this.assignment.review_publish_time.substring(0, 2))
                     rddate.setHours(this.assignment.review_due_time.substring(0, 2))
                     reddate.setHours(this.assignment.review_evaluation_due_time.substring(0, 2))
 
+                    console.log(typeof this.assignment.review_publish_time + this.assignment.review_publish_time)
+
                     pdate.setMinutes(this.assignment.publish_time.substring(3, 5))
                     ddate.setMinutes(this.assignment.due_time.substring(3, 5))
                     rpdate.setMinutes(this.assignment.review_publish_time.substring(3, 5))
                     rddate.setMinutes(this.assignment.review_due_time.substring(3, 5))
                     reddate.setMinutes(this.assignment.review_evaluation_due_time.substring(3, 5))
+
+                    console.log("after setting minutes: " + rpdate)
+                    console.log("after setting minutes ISO: " + rpdate.toISOString())
 
                     this.assignment.publish_date = pdate
                     this.assignment.due_date = ddate
@@ -400,6 +449,9 @@ export default {
                         this.assignment.review_publish_date = rpdate.toISOString()
                         this.assignment.review_due_date = rddate.toJSON()
                         this.assignment.review_evaluation_due_date = reddate.toJSON()
+
+                        console.log("Send JSON: " + rpdate.toJSON())
+                        console.log("Send ISO: " + rpdate.toISOString())
 
                         let formData = new FormData()
                         formData.append("title", this.assignment.title)
