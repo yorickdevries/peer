@@ -467,15 +467,15 @@ export default class RubricPS {
         }
         // Copy range questions
         for (let i = 0; i < rangeQuestions.length; i++) {
-            await this.executeCreateRangeQuestion(rangeQuestions[i].question, rangeQuestions[i].range, currentRubricId, rangeQuestions[i].question_number, openQuestions[i].optional);
+            await this.executeCreateRangeQuestion(rangeQuestions[i].question, rangeQuestions[i].range, currentRubricId, rangeQuestions[i].question_number, rangeQuestions[i].optional);
         }
         // Copy upload questions
         for (let i = 0; i < uploadQuestions.length; i++) {
-            await this.executeCreateUploadQuestion(uploadQuestions[i].question, currentRubricId, uploadQuestions[i].question_number, uploadQuestions[i].extension, openQuestions[i].optional);
+            await this.executeCreateUploadQuestion(uploadQuestions[i].question, currentRubricId, uploadQuestions[i].question_number, uploadQuestions[i].extension, uploadQuestions[i].optional);
         }
         // Copy mc questions
         for (let i = 0; i < mcQuestions.length; i++) {
-            const res: any = await this.executeCreateMCQuestion(mcQuestions[i].question, currentRubricId, mcQuestions[i].question_number, openQuestions[i].optional);
+            const res: any = await this.executeCreateMCQuestion(mcQuestions[i].question, currentRubricId, mcQuestions[i].question_number, mcQuestions[i].optional);
 
             // Copy mc options
             mcOptions = await RubricPS.executeGetAllMCOptionById(mcQuestions[i].id);
