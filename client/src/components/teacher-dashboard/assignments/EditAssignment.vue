@@ -50,7 +50,8 @@
                                         <b-form-input   v-model="assignment.publish_time"
                                                         type="time"
                                                         placeholder="Please enter time on which the assignment should be published"
-                                                        required>
+                                                        required
+                                                        v-on:change="toggleDST('publish_date')">
                                         </b-form-input>
                                     </b-form-group>
                                     <b-alert v-model="showDSTPublishDate" variant="warning">
@@ -66,7 +67,8 @@
                                         <b-form-input   v-model="assignment.due_time"
                                                         type="time"
                                                         placeholder="Please enter time before which the assignment should be handed in"
-                                                        required>
+                                                        required
+                                                        v-on:change="toggleDST('due_date')">
                                         </b-form-input>
                                     </b-form-group>
                                     <b-alert v-model="showDSTPublishDate" variant="warning">
@@ -87,7 +89,7 @@
                                                         type="time"
                                                         placeholder="Please enter start time of the peer review"
                                                         required
-                                        v-on:change="cDST()">
+                                                        v-on:change="toggleDST('review_publish_date')">
                                         </b-form-input>
                                     </b-form-group>
                                     <b-button @click="renderDates" variant="primary">Render</b-button>
@@ -106,7 +108,7 @@
                                         <b-form-input   v-model="assignment.review_due_time"
                                                         type="time"
                                                         placeholder="Please enter due time of the peer review"
-                                                        required>
+                                                        v-on:change="toggleDST('review_due_date')">
                                         </b-form-input>
                                     </b-form-group>
                                     <b-alert v-model="showDSTPublishDate" variant="warning">
@@ -185,7 +187,8 @@
                                         <b-form-input   v-model="assignment.review_evaluation_due_time"
                                                         type="time"
                                                         placeholder="Please enter time before which the reviews should be evaluated"
-                                                        required>
+                                                        required
+                                                        v-on:change="toggleDST('review_evaluation_due_date')">
                                         </b-form-input>
                                     </b-form-group>
                                 </b-col>
@@ -343,6 +346,62 @@ export default {
         this.assignment.review_evaluation_due_time = timeToInputFormat(reddate)
     },
     methods: {
+        toggleDST(date) {
+            // showDSTPublishDate: false,
+            //     showDSTDueDate: false,
+            //     showDSTReviewPublishDate: false,
+            //     showDSTReviewDueDate: false,
+            //     showDSTReviewEvaluationDueDate: false,
+            switch(date) {
+                case "publish_date":
+                    this.answer = 1
+                    console.log(this.assignment.publish_date.setHours(this.assignment.publish_time.substring(0,2)))
+                    // console.log(this.assignment.publish_day)
+                    console.log(this.assignment.publish_time)
+                    // if (assignment.publish_date.setHours(assignment.publish_time.substring(0,2)) ===
+                    //     assignment.publish_date.setHours(parseInt(assignment.publish_time.substring(0,2))+1))
+                    // {
+                    //     this.showDSTPublishDate = true
+                    // } else {
+                    //     this.showDSTPublishDate = false
+                    // }
+                    break;
+                case "due_date":
+                    this.answer = 2
+                    break;
+                case "review_publish_date":
+                    this.answer = 3
+                    break;
+                case "review_due_date":
+                    this.answer = 4
+                    break;
+                case "review_evaluation_due_date":
+                    this.answer = 5
+                    break;
+            }
+            // Instantiate new dates to avoid changing the passed value
+            // let pdate2 = new Date(pdate)
+            // let ddate2 = new Date(ddate)
+            // let rpdate2 = new Date(rpdate)
+            // let rddate2 = new Date(rddate)
+            // let reddate2 = new Date(reddate)
+            // if (pdate2.setHours(this.assignment.publish_time.substring(0,2)) === pdate2.setHours(parseInt(this.assignment.publish_time.substring(0,2))+1)) {
+            //     return {title: "Error in publish time"}
+            // } else if (ddate2.setHours(this.assignment.due_time.substring(0,2)) === ddate2.setHours(parseInt(this.assignment.due_time.substring(0,2))+1)) {
+            //     return {title: "Error in hand-in time"}
+            // } else if (rpdate2.setHours(this.assignment.review_publish_time.substring(0,2)) === rpdate2.setHours(parseInt(this.assignment.review_publish_time.substring(0,2))+1)) {
+            //     return {title: "Error in review start time"}
+            // } else if (rddate2.setHours(this.assignment.review_due_time.substring(0,2)) === rddate2.setHours(parseInt(this.assignment.review_due_time.substring(0,2))+1)) {
+            //     return {title: "Error in review due time"}
+            // } else if (this.assignment.review_evaluation &&
+            //     reddate2.setHours(this.assignment.review_evaluation_due_time.substring(0,2)) === reddate2.setHours(parseInt(this.assignment.review_evaluation_due_time.substring(0,2))+1)) {
+            //     return {title: "Error in review evaluation due time"}
+            // } else {
+            //     // console.log("in check6: " + rpdate)
+            //     // console.log("in check6: " + rpdate2)
+            //     return true
+            // }
+        },
         cDST: function() {
           if(new Date(this.assignment.review_publish_day).setHours(this.assignment.review_publish_time.substring(0,2)) ===
               new Date(this.assignment.review_publish_day).setHours(parseInt(this.assignment.review_publish_time.substring(0,2))+1)) {
