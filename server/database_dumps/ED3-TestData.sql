@@ -111,24 +111,24 @@ INSERT INTO public.rubric(
 	VALUES (2, 'submission');
 
 INSERT INTO public.openquestion(
-	question, rubric_id, question_number)
-	VALUES ('How to insert queries?', 1, 1);
+	question, rubric_id, question_number, optional)
+	VALUES ('How to insert queries?', 1, 1, false);
 
 INSERT INTO public.openquestion(
-	question, rubric_id, question_number)
-	VALUES ('This is a question for assignment 2?', 2, 1);
+	question, rubric_id, question_number, optional)
+	VALUES ('This is a question for assignment 2?', 2, 1, false);
 
 INSERT INTO public.rangequestion(
-	question, range, rubric_id, question_number)
-	VALUES ('How much fun is inserting queries?', 7, 1, 2);
+	question, range, rubric_id, question_number, optional)
+	VALUES ('How much fun is inserting queries?', 7, 1, 2, false);
 
 INSERT INTO public.mcquestion(
-	question, rubric_id, question_number)
-	VALUES ('What is the best way to insert queries?', 1, 3);
+	question, rubric_id, question_number, optional)
+	VALUES ('What is the best way to insert queries?', 1, 3, false);
 
 INSERT INTO public.mcquestion(
-	question, rubric_id, question_number)
-	VALUES ('Is the right Answer A?', 1, 4);
+	question, rubric_id, question_number, optional)
+	VALUES ('Is the right Answer A?', 1, 4, false);
 
 INSERT INTO public.mcoption(
 	option, mcquestion_id)

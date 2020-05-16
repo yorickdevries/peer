@@ -71,58 +71,58 @@ INSERT INTO public.rubric(
 	(11, 'submission');
 
 INSERT INTO public.openquestion(
-	question, rubric_id, question_number)
+	question, rubric_id, question_number, optional)
 	VALUES
-	    ('Did the author pay attention to the DFA?', 1, 1),
-	    ('How did the author do overall?', 1, 2),
-	    ('Did the author pay attention to the DFA?', 1, 3),
-	    ('Indicate the improvements', 2, 1),
-	    ('Did the author pay attention to the DFA?', 2, 3),
-	    ('Some open question1', 3, 2),
-	    ('Some open question_2', 3, 1),
-	    ('Some open question5', 4, 1),
-	    ('Some open question4', 5, 1),
-	    ('Some open question3', 6, 1),
-	    ('Some open question1', 7, 1),
-	    ('Some open question2', 8, 1),
-	    ('open question', 9, 1),
-	    ('Some question', 10, 1),
-	    ('Some open question two', 11, 1)
+	    ('Did the author pay attention to the DFA?', 1, 1, false),
+	    ('How did the author do overall?', 1, 2, false),
+	    ('Did the author pay attention to the DFA?', 1, 3, false),
+	    ('Indicate the improvements', 2, 1, false),
+	    ('Did the author pay attention to the DFA?', 2, 3, false),
+	    ('Some open question1', 3, 2, false),
+	    ('Some open question_2', 3, 1, false),
+	    ('Some open question5', 4, 1, false),
+	    ('Some open question4', 5, 1, false),
+	    ('Some open question3', 6, 1, false),
+	    ('Some open question1', 7, 1, false),
+	    ('Some open question2', 8, 1, false),
+	    ('open question', 9, 1, false),
+	    ('Some question', 10, 1, false),
+	    ('Some open question two', 11, 1, false)
 	;
 
 INSERT INTO public.rangequestion(
-	question, range, rubric_id, question_number)
+	question, range, rubric_id, question_number, optional)
 	VALUES
-	    ('Rate the DFA', 7, 1, 3),
-	    ('Rate the design', 10, 1, 4),
-	    ('Rate the assignment', 5, 2, 2),
-	    ('Rate the assignment', 7, 3, 1),
-	    ('Rate the assignment (again, but different)', 6, 3, 3),
-	    ('Give a rating', 7, 4, 2),
-	    ('Give a rating1', 3, 5, 2),
-	    ('Give a rating2', 4, 6, 2),
-	    ('Give a rating3', 8, 7, 2),
-	    ('Give a rating4', 7, 8, 2),
-	    ('Give a rating5', 4, 9, 2),
-	    ('Give a rating6', 2, 10, 2),
-	    ('Give a rating7', 5, 11, 2)
+	    ('Rate the DFA', 7, 1, 3, false),
+	    ('Rate the design', 10, 1, 4, false),
+	    ('Rate the assignment', 5, 2, 2, false),
+	    ('Rate the assignment', 7, 3, 1, false),
+	    ('Rate the assignment (again, but different)', 6, 3, 3, false),
+	    ('Give a rating', 7, 4, 2, false),
+	    ('Give a rating1', 3, 5, 2, false),
+	    ('Give a rating2', 4, 6, 2, false),
+	    ('Give a rating3', 8, 7, 2, false),
+	    ('Give a rating4', 7, 8, 2, false),
+	    ('Give a rating5', 4, 9, 2, false),
+	    ('Give a rating6', 2, 10, 2, false),
+	    ('Give a rating7', 5, 11, 2, false)
 	;
 
 INSERT INTO public.mcquestion(
-	question, rubric_id, question_number)
+	question, rubric_id, question_number, optional)
 	VALUES
-	    ('What is the best way to insert queries?', 1, 4),
-	    ('Choose what best relates to the author', 1, 5),
-	    ('Choose an option', 2, 4),
-	    ('Choose an option1', 3, 5),
-	    ('Choose an option2', 4, 3),
-	    ('Choose an option3', 5, 3),
-	    ('Choose an option4', 6, 3),
-	    ('Choose an option5', 7, 3),
-	    ('Choose an option6', 8, 3),
-	    ('Choose an option7', 9, 3),
-	    ('Choose an option8', 10, 3),
-	    ('Choose an option9', 11, 3)
+	    ('What is the best way to insert queries?', 1, 4, false),
+	    ('Choose what best relates to the author', 1, 5, false),
+	    ('Choose an option', 2, 4, false),
+	    ('Choose an option1', 3, 5, false),
+	    ('Choose an option2', 4, 3, false),
+	    ('Choose an option3', 5, 3, false),
+	    ('Choose an option4', 6, 3, false),
+	    ('Choose an option5', 7, 3, false),
+	    ('Choose an option6', 8, 3, false),
+	    ('Choose an option7', 9, 3, false),
+	    ('Choose an option8', 10, 3, false),
+	    ('Choose an option9', 11, 3, false)
 	    ;
 
 INSERT INTO public.mcoption(
