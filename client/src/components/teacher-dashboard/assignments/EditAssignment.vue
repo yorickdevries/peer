@@ -35,6 +35,10 @@
 
                             <!--Publish and due date of the assignment-->
                             <b-row class="mb-3">
+                                <b-alert v-model="$browserDetect.isSafari" variant="warning">
+                                    If you are using Safari, make sure you enter 4 digits for the time input.
+                                    Not doing so may result in not being able to create the assignment.
+                                </b-alert>
                                 <b-col>
                                     <b-form-group>
                                         <template slot="label"> Publish date and time
@@ -304,22 +308,22 @@ export default {
             console.log(rpdate.toISOString() + " - from date field ISO")
             console.log(this.checkDST(null, null, rpdate, null, null))
             // console.log(this.checkDatesLogical())
-            // console.log(rpdate + " - after check")
+            console.log(rpdate + " - after check")
             console.log(rpdate.toISOString() + " - after check ISO")
 
 
             rpdate.setHours(this.assignment.review_publish_time.substring(0, 2))
 
-            // console.log(rpdate + " - after setting hours")
+            console.log(rpdate + " - after setting hours")
             console.log(rpdate.toISOString() + " - after setting hours ISO")
 
             rpdate.setMinutes(this.assignment.review_publish_time.substring(3, 5))
 
-            // console.log(rpdate + " - after setting minutes")
+            console.log(rpdate + " - after setting minutes")
             console.log(rpdate.toISOString() + " - after setting minutes ISO")
 
-            console.log(parseInt(this.assignment.review_publish_time.substring(0,2))-1)
-            console.log(parseInt(this.assignment.review_publish_time.substring(0,2))+1)
+            // console.log(parseInt(this.assignment.review_publish_time.substring(0,2))-1)
+            // console.log(parseInt(this.assignment.review_publish_time.substring(0,2))+1)
         },
         async onSubmit() {
             // Check for empty date and time fields
@@ -339,8 +343,6 @@ export default {
 
                 console.log("Send JSON: " + rpdate.toJSON())
                 console.log("Send ISO: " + rpdate.toISOString())
-
-
 
                 // Check for daylight saving time issues
                 let validationResult2 = this.checkDST(pdate, ddate, rpdate, rddate, reddate)
@@ -494,21 +496,36 @@ export default {
             }
         },
         checkDatesLogical() {
+            // Check publish date ordering
             if (this.assignment.publish_date >= this.assignment.due_date ||
                 this.assignment.publish_date >= this.assignment.review_publish_date ||
                 this.assignment.publish_date >= this.assignment.review_due_date ||
                 (this.assignment.review_evaluation && this.assignment.publish_date >= this.assignment.review_evaluation_due_date)) {
                 return {error: 'Publish date should be before other dates!'}
-            } else if (this.assignment.due_date >= this.assignment.review_publish_date ||
-                this.assignment.due_date >= this.assignment.review_due_date ||
-                (this.assignment.review_evaluation && this.assignment.due_date >= this.assignment.review_evaluation_due_date)) {
-                return {error: 'Due date should be before review (evaluation) dates!'}
-            } else if (this.assignment.review_publish_date >= this.assignment.review_due_date ||
-                (this.assignment.review_evaluation && this.assignment.review_publish_date >= this.assignment.review_evaluation_due_date)) {
-                return {error: 'Review start date should be before review (evaluation) due dates!'}
-            } else if (this.assignment.review_evaluation && this.assignment.review_due_date >= this.assignment.review_evaluation_due_date) {
+            }
+            // Check due date ordering
+            else if (this.assignment.due_date >= this.assignment.review_publish_date ||
+                this.assignment.due_date >= this.assignment.review_due_date) {
+                return {error: 'Due date should be before review dates!'}
+            }
+            // Show different warning in case of error with review evaluation date
+            else if (this.assignment.review_evaluation && this.assignment.due_date >= this.assignment.review_evaluation_due_date) {
+                return {error: 'Due date should be before review evaluation date!'}
+            }
+            // Check review publish date ordering
+            else if (this.assignment.review_publish_date >= this.assignment.review_due_date) {
+                return {error: 'Review start date should be before review due date!'}
+            }
+            // Show different warning in case of error with review evaluation date
+            else if (this.assignment.review_evaluation && this.assignment.review_publish_date >= this.assignment.review_evaluation_due_date) {
+                return {error: 'Review start date should be before review evaluation due date!'}
+            }
+            // Check review evaluation date ordering
+            else if (this.assignment.review_evaluation && this.assignment.review_due_date >= this.assignment.review_evaluation_due_date) {
                 return {error: 'Review due date should be before review evaluation date'}
-            } else {
+            }
+            // Return true if all dates have the right ordering
+            else {
                 return true
             }
         }

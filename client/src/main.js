@@ -6,6 +6,10 @@ import router from './router'
 import BootstrapVue from 'bootstrap-vue'
 Vue.use(BootstrapVue)
 
+// Use Vue Browser Detect Plugin
+import browserDetect from "vue-browser-detect-plugin";
+Vue.use(browserDetect);
+
 // Use Vue-Awesome
 import 'vue-awesome/icons'
 import Icon from 'vue-awesome/components/Icon'
