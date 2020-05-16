@@ -331,7 +331,7 @@ export default {
                     } else {
                         this.assignment.publish_date = pdate.toJSON()
                         this.assignment.due_date = ddate.toJSON()
-                        this.assignment.review_publish_date = rpdate.toJSON()
+                        this.assignment.review_publish_date = rpdate.toISOString()
                         this.assignment.review_due_date = rddate.toJSON()
                         this.assignment.review_evaluation_due_date = reddate.toJSON()
 
@@ -402,18 +402,40 @@ export default {
             }
         },
         checkDST(pdate, ddate, rpdate, rddate, reddate) {
-            if (pdate.setHours(this.assignment.publish_time.substring(0,2)) === pdate.setHours(this.assignment.publish_time.substring(0,2)-1)) {
+            // Instantiate new dates to avoid changing the passed value
+            let pdate2 = new Date(pdate)
+            let ddate2 = new Date(ddate)
+            let rpdate2 = new Date(rpdate)
+            let rddate2 = new Date(rddate)
+            let reddate2 = new Date(reddate)
+            // console.log("in check0: " + rpdate)
+            // console.log("in check0: " + rpdate2)
+            // console.log("ISO: " + rpdate2.toISOString())
+            // rpdate2.setHours(this.assignment.review_publish_time.substring(0,2))
+            // console.log(rpdate2)
+            // console.log("ISO: " + rpdate2.toISOString())
+            // rpdate2.setHours(this.assignment.review_publish_time.substring(0,2)-1)
+            // console.log(rpdate2)
+            // console.log("ISO: " + rpdate2.toISOString())
+            if (pdate2.setHours(this.assignment.publish_time.substring(0,2)) === pdate2.setHours(parseInt(this.assignment.publish_time.substring(0,2))+1)) {
+                // console.log("in check1: " + rpdate)
                 return {title: "Error in publish time"}
-            } else if (ddate.setHours(this.assignment.due_time.substring(0,2)) === ddate.setHours(this.assignment.due_time.substring(0,2)-1)) {
+            } else if (ddate2.setHours(this.assignment.due_time.substring(0,2)) === ddate2.setHours(parseInt(this.assignment.due_time.substring(0,2))+1)) {
+                // console.log("in check2: " + rpdate)
                 return {title: "Error in hand-in time"}
-            } else if (rpdate.setHours(this.assignment.review_publish_time.substring(0,2)) === rpdate.setHours(this.assignment.review_publish_time.substring(0,2)-1)) {
+            } else if (rpdate2.setHours(this.assignment.review_publish_time.substring(0,2)) === rpdate2.setHours(parseInt(this.assignment.review_publish_time.substring(0,2))+1)) {
+                // console.log("in check3: " + rpdate)
                 return {title: "Error in review start time"}
-            } else if (rddate.setHours(this.assignment.review_due_time.substring(0,2)) === rddate.setHours(this.assignment.review_due_time.substring(0,2)-1)) {
+            } else if (rddate2.setHours(this.assignment.review_due_time.substring(0,2)) === rddate2.setHours(parseInt(this.assignment.review_due_time.substring(0,2))+1)) {
+                // console.log("in check4: " + rpdate)
                 return {title: "Error in review due time"}
             } else if (this.assignment.review_evaluation &&
-                reddate.setHours(this.assignment.review_evaluation_due_time.substring(0,2)) === reddate.setHours(this.assignment.review_evaluation_due_time.substring(0,2)-1)) {
+                reddate2.setHours(this.assignment.review_evaluation_due_time.substring(0,2)) === reddate2.setHours(parseInt(this.assignment.review_evaluation_due_time.substring(0,2))+1)) {
+                // console.log("in check5: " + rpdate)
                 return {title: "Error in review evaluation due time"}
             } else {
+                // console.log("in check6: " + rpdate)
+                // console.log("in check6: " + rpdate2)
                 return true
             }
         },
