@@ -114,6 +114,7 @@ CREATE TABLE MCQuestion (
     question varchar(5000) NOT NULL,
     Rubric_id int NOT NULL,
     question_number int NOT NULL,
+    optional boolean NOT NULL,
     CONSTRAINT MCQuestion_pk PRIMARY KEY (id)
 );
 
@@ -131,6 +132,7 @@ CREATE TABLE OpenQuestion (
     question varchar(5000) NOT NULL,
     Rubric_id int NOT NULL,
     question_number int NOT NULL,
+    optional boolean NOT NULL,
     CONSTRAINT OpenQuestion_pk PRIMARY KEY (id)
 );
 
@@ -149,6 +151,7 @@ CREATE TABLE RangeQuestion (
     range int NOT NULL,
     Rubric_id int NOT NULL,
     question_number int NOT NULL,
+    optional boolean NOT NULL,
     CONSTRAINT RangeQuestion_pk PRIMARY KEY (id),
     CONSTRAINT positive_range CHECK (range > 0)
 );
@@ -168,6 +171,7 @@ CREATE TABLE UploadQuestion (
     extension varchar(10) NOT NULL,
     Rubric_id int NOT NULL,
     question_number int NOT NULL,
+    optional boolean NOT NULL,
     CONSTRAINT UploadQuestion_pk PRIMARY KEY (id)
 );
 
