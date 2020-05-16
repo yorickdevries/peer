@@ -243,7 +243,6 @@ export default {
         }
     },
     async created() {
-        // this.debouncedGetAnswer = function () {_.debounce(this.getAnswer, 500)}
         // Load necessary date
         let cid = this.$route.params.courseId
         let aid = this.$route.params.assignmentId
