@@ -50,7 +50,8 @@ export default class ReviewUpdate {
         const reviewForm = review.form;
         for (let j = 0; j < reviewForm.length; j++) {
             const answer = reviewForm[j].answer.answer;
-            if (answer == undefined) {
+            const optional = reviewForm[j].question.optional;
+            if (!optional && answer == undefined) {
                 return false;
             }
         }
