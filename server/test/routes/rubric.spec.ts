@@ -70,13 +70,13 @@ describe("API rubric routes", () => {
     it("rubric/mcquestion", async () => {
         const res = await chai.request(router)
             .post("/mcquestion")
-            .send({ question: "opt", rubric_id: 1, question_number: 1 });
+            .send({ question: "opt", rubric_id: 1, question_number: 1, optional: false });
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
+        expect(JSON.parse(res.text)).to.deep.equal(
             {
-                "id": 3, "question": "opt", "rubric_id": 1, "question_number": 1, "type_question": "mc"
+                "id": 3, "question": "opt", "rubric_id": 1, "question_number": 1, "type_question": "mc", optional: false
             }
-        ));
+        );
     });
 
 
@@ -86,13 +86,13 @@ describe("API rubric routes", () => {
     it("rubric/mcquestion/:question_id", async () => {
         const res = await chai.request(router)
             .put("/mcquestion/1")
-            .send({ question: "optNew", question_number: 2 });
+            .send({ question: "optNew", question_number: 2, optional: false });
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
+        expect(JSON.parse(res.text)).to.deep.equal(
             {
-                "id": 1, "question": "optNew", "rubric_id": 1, "question_number": 2, "type_question": "mc"
+                "id": 1, "question": "optNew", "rubric_id": 1, "question_number": 2, "type_question": "mc", optional: false
             }
-        ));
+        );
     });
 
     /**
@@ -101,20 +101,21 @@ describe("API rubric routes", () => {
     it("rubric/uploadquestion", async () => {
         const res = await chai.request(router)
             .post("/uploadquestion")
-            .send({ question: "opt", extension: "pdf", rubric_id: 1, question_number: 1 });
+            .send({ question: "opt", extension: "pdf", rubric_id: 1, question_number: 1, optional: false });
 
         expect(res.status).to.equal(200);
 
-        expect(res.text).to.equal(JSON.stringify(
+        expect(JSON.parse(res.text)).to.deep.equal(
             {
                 "id": 1,
                 "question": "opt",
                 "extension": "pdf",
                 "rubric_id": 1,
                 "question_number": 1,
-                "type_question": "upload"
+                "type_question": "upload",
+                optional: false
             }
-        ));
+        );
     });
 
     /**
@@ -124,25 +125,28 @@ describe("API rubric routes", () => {
         const updatedQuestion = "new question";
         const updatedExtension = "zip";
         const updatedQuestionNumber = 2;
+        const updatedOptional = true;
 
         const created = await chai.request(router)
             .post("/uploadquestion")
-            .send({ question: "opt", extension: "pdf", rubric_id: 1, question_number: 1 });
+            .send({ question: "opt", extension: "pdf", rubric_id: 1, question_number: 1, optional: false });
 
         expect(created.status).to.equal(200);
 
         const updated = await chai.request(router)
             .put(`/uploadquestion/${created.body.id}`)
-            .send({ question: updatedQuestion, extension: updatedExtension, question_number: updatedQuestionNumber });
+            .send({ question: updatedQuestion, extension: updatedExtension, question_number: updatedQuestionNumber, optional: updatedOptional });
 
         expect({
             updatedQuestion: updated.body.question,
             updatedExtension: updated.body.extension,
-            updatedQuestionNumber: updated.body.question_number
+            updatedQuestionNumber: updated.body.question_number,
+            updatedOptional: updated.body.optional
         }).to.deep.equal({
             updatedQuestion,
             updatedExtension,
-            updatedQuestionNumber
+            updatedQuestionNumber,
+            updatedOptional
         });
     });
 
@@ -156,7 +160,7 @@ describe("API rubric routes", () => {
 
         const created = await chai.request(router)
             .post("/uploadquestion")
-            .send({ question: "opt", extension: "pdf", rubric_id: 1, question_number: 1 });
+            .send({ question: "opt", extension: "pdf", rubric_id: 1, question_number: 1, optional: false });
 
         expect(created.status).to.equal(200);
 
@@ -172,18 +176,19 @@ describe("API rubric routes", () => {
     it("rubric/rangequestion", async () => {
         const res = await chai.request(router)
             .post("/rangequestion")
-            .send({ question: "opt", range: 3, rubric_id: 1, question_number: 1 });
+            .send({ question: "opt", range: 3, rubric_id: 1, question_number: 1, optional: false });
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
+        expect(JSON.parse(res.text)).to.deep.equal(
             {
                 "id": 2,
                 "question": "opt",
                 "range": 3,
                 "rubric_id": 1,
                 "question_number": 1,
-                "type_question": "range"
+                "type_question": "range",
+                optional: false
             }
-        ));
+        );
     });
 
 
@@ -193,17 +198,18 @@ describe("API rubric routes", () => {
     it("rubric/rangequestion/:question_id", async () => {
         const res = await chai.request(router)
             .put("/rangequestion/1")
-            .send({ question: "optNew", range: 4, question_number: 2 });
+            .send({ question: "optNew", range: 4, question_number: 2, optional: false });
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify({
+        expect(JSON.parse(res.text)).to.deep.equal({
                 "id": 1,
                 "question": "optNew",
                 "range": 4,
                 "rubric_id": 1,
                 "question_number": 2,
-                "type_question": "range"
+                "type_question": "range",
+                optional: false
             }
-        ));
+        );
     });
 
     /**
@@ -212,17 +218,18 @@ describe("API rubric routes", () => {
     it("rubric/openquestion", async () => {
         const res = await chai.request(router)
             .post("/openquestion")
-            .send({ question: "opt", rubric_id: 1, question_number: 1 });
+            .send({ question: "opt", rubric_id: 1, question_number: 1, optional: false });
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
+        expect(JSON.parse(res.text)).to.deep.equal(
             {
                 "id": 3,
                 "question": "opt",
                 "rubric_id": 1,
                 "question_number": 1,
-                "type_question": "open"
+                "type_question": "open",
+                optional: false
             }
-        ));
+        );
     });
 
 
@@ -232,16 +239,17 @@ describe("API rubric routes", () => {
     it("rubric/openquestion/:question_id", async () => {
         const res = await chai.request(router)
             .put("/openquestion/1")
-            .send({ question: "optNew", question_number: 2 });
+            .send({ question: "optNew", question_number: 2, optional: false });
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify({
+        expect(JSON.parse(res.text)).to.deep.equal({
                 "id": 1,
                 "question": "optNew",
                 "rubric_id": 1,
                 "question_number": 2,
-                "type_question": "open"
+                "type_question": "open",
+                optional: false
             }
-        ));
+        );
     });
 
     /**
@@ -251,21 +259,22 @@ describe("API rubric routes", () => {
         // Create a question
         const res1 = await chai.request(router)
         .post("/openquestion")
-        .send({ question: "opt", rubric_id: 1, question_number: 1 });
+        .send({ question: "opt", rubric_id: 1, question_number: 1, optional: false });
         const newq = JSON.parse(res1.text);
 
         // Delete a question
         const res2 = await chai.request(router).del("/openquestion/" + newq.id);
         expect(res2.status).to.equal(200);
-        expect(res2.text).to.equal(JSON.stringify(
+        expect(JSON.parse(res2.text)).to.deep.equal(
             {
                 "id": newq.id,
                 "question": "opt",
                 "rubric_id": 1,
                 "question_number": 1,
-                "type_question": "open"
+                "type_question": "open",
+                optional: false
             }
-        ));
+        );
     });
 
     /**
@@ -275,21 +284,22 @@ describe("API rubric routes", () => {
         // Create a question
         const res1 = await chai.request(router)
         .post("/mcquestion")
-        .send({ question: "opt", rubric_id: 1, question_number: 1 });
+        .send({ question: "opt", rubric_id: 1, question_number: 1, optional: false });
         const newq = JSON.parse(res1.text);
 
         // Delete a question
         const res = await chai.request(router).del("/mcquestion/" + newq.id);
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
+        expect(JSON.parse(res.text)).to.deep.equal(
             {
                 "id": newq.id,
                 "question": "opt",
                 "rubric_id": 1,
                 "question_number": 1,
-                "type_question": "mc"
+                "type_question": "mc",
+                optional: false
             }
-        ));
+        );
     });
 
     /**
@@ -299,22 +309,23 @@ describe("API rubric routes", () => {
         // Create a question
         const res1 = await chai.request(router)
         .post("/rangequestion")
-        .send({ question: "optNew", range: 4, rubric_id: 2, question_number: 2 });
+        .send({ question: "optNew", range: 4, rubric_id: 2, question_number: 2, optional: false });
         const newq = JSON.parse(res1.text);
 
         // Delete a question
         const res = await chai.request(router).del("/rangequestion/" + newq.id);
         expect(res.status).to.equal(200);
-        expect(res.text).to.equal(JSON.stringify(
+        expect(JSON.parse(res.text)).to.deep.equal(
             {
                 "id": newq.id,
                 "question": "optNew",
                 "range": 4,
                 "rubric_id": 2,
                 "question_number": 2,
-                "type_question": "range"
+                "type_question": "range",
+                optional: false
             }
-        ));
+        );
     });
 
     /**

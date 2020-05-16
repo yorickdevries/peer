@@ -114,7 +114,7 @@ describe("API integration test", () => {
         // Add an option question to the rubric
         const openQuestion = await chai.request(router)
             .post("/rubric/openquestion")
-            .send({ question: "opt", rubric_id: rubric.id, question_number: 1 });
+            .send({ question: "opt", rubric_id: rubric.id, question_number: 1 , optional: false});
         const openQuestionId = JSON.parse(openQuestion.text).id;
         expect(openQuestion.status).to.equal(200);
         expect(openQuestion.text).to.equal(JSON.stringify(
@@ -123,6 +123,7 @@ describe("API integration test", () => {
                 "question": "opt",
                 "rubric_id": rubric.id,
                 "question_number": 1,
+                optional: false,
                 "type_question": "open"
             }
         ));
