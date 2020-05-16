@@ -75,9 +75,16 @@
                                         <b-form-input   v-model="assignment.review_publish_time"
                                                         type="time"
                                                         placeholder="Please enter start time of the peer review"
-                                                        required>
+                                                        required
+                                        v-on:change="cDST()">
                                         </b-form-input>
                                     </b-form-group>
+                                    <b-button @click="renderDates" variant="primary">Render</b-button>
+                                    {{assignment.review_publish_time}}
+                                    <b-alert variant="danger" show>
+                                        {{answer}}
+                                    </b-alert>
+                                    {{assignment.publish_date}}
                                 </b-col>
                                 <b-col>
                                     <b-form-group>
@@ -198,6 +205,9 @@ export default {
             fileProgress: 0,
             uploadNewFile: false,
             acceptFiles: ".pdf,.zip",
+            server_date: null,
+            question: "",
+            answer: 'I cannot give you an answer until you ask a question!',
             assignment: {
                 id: null,
                 title: null,
@@ -286,6 +296,62 @@ export default {
         this.assignment.review_evaluation_due_time = timeToInputFormat(reddate)
     },
     methods: {
+        cDST: function() {
+          if(new Date(this.assignment.review_publish_day).setHours(this.assignment.review_publish_time.substring(0,2)) ===
+              new Date(this.assignment.review_publish_day).setHours(parseInt(this.assignment.review_publish_time.substring(0,2))+1)) {
+              this.answer = 'DST!'
+          } else {
+              this.answer = "Due to daylight saving time, the due date will be set to 03:00"
+              // this.answer = this.assignment.review_publish_day.setHours(this.assignment.review_publish_time.substring(0,2)) + '\n' + this.assignment.review_publish_day.setHours(parseInt(this.assignment.review_publish_time.substring(0,2))+1)
+          }
+        },
+        getAnswer: function () {
+            if (this.question.indexOf('?') === -1) {
+                this.answer = 'Questions usually contain a question mark. ;-)'
+                return
+            }
+            this.answer = 'Thinking...'
+            var vm = this
+            axios.get('https://yesno.wtf/api')
+                .then(function (response) {
+                    vm.answer = _.capitalize(response.data.answer)
+                })
+                .catch(function (error) {
+                    vm.answer = 'Error! Could not reach the API. ' + error
+                })
+        },
+        // Function for testing purposes
+        async renderDates() {
+            console.clear()
+            console.log(this.server_date + " - from server")
+            let rpdate = this.assignment.review_publish_day
+            console.log(this.assignment.review_publish_day + " - from date field")
+            // console.log(this.checkDatesEmpty())
+
+            this.checkDatesEmpty()
+            this.checkDST()
+            this.checkDatesLogical()
+
+            console.log(rpdate.toISOString() + " - from date field ISO")
+            console.log(this.checkDST(null, null, rpdate, null, null))
+            // console.log(this.checkDatesLogical())
+            // console.log(rpdate + " - after check")
+            console.log(rpdate.toISOString() + " - after check ISO")
+
+
+            rpdate.setHours(this.assignment.review_publish_time.substring(0, 2))
+
+            // console.log(rpdate + " - after setting hours")
+            console.log(rpdate.toISOString() + " - after setting hours ISO")
+
+            rpdate.setMinutes(this.assignment.review_publish_time.substring(3, 5))
+
+            // console.log(rpdate + " - after setting minutes")
+            console.log(rpdate.toISOString() + " - after setting minutes ISO")
+
+            console.log(parseInt(this.assignment.review_publish_time.substring(0,2))-1)
+            console.log(parseInt(this.assignment.review_publish_time.substring(0,2))+1)
+        },
         async onSubmit() {
             // Check for empty date and time fields
             let validationResult1 = this.checkDatesEmpty()
@@ -303,7 +369,7 @@ export default {
                 if (validationResult2.title) {
                     this.showErrorMessage({
                         title: validationResult2.title,
-                        message: "Due to switching to daylight saving time, you cannot choose a time between 03:00 and 03:59 on this date"
+                        message: "Due to switching to daylight saving time, you cannot choose a time between 02:00 and 02:59 on this date"
                     })
                 } else {
                     pdate.setHours(this.assignment.publish_time.substring(0, 2))
