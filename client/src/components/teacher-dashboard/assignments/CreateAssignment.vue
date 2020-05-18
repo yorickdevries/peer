@@ -47,7 +47,7 @@
                                         <datepicker placeholder="Select date" v-model="assignment.publish_day"></datepicker>
                                         <b-form-input   v-model="assignment.publish_time"
                                                         type="time"
-                                                        placeholder="Please enter time on which the assignment should be published"
+                                                        placeholder="00:00"
                                                         required>
                                         </b-form-input>
                                     </b-form-group>
@@ -60,7 +60,7 @@
                                         <datepicker placeholder="Select date" v-model="assignment.due_day"></datepicker>
                                         <b-form-input   v-model="assignment.due_time"
                                                         type="time"
-                                                        placeholder="Please enter time before which the assignment should be handed in"
+                                                        placeholder="00:00"
                                                         required>
                                         </b-form-input>
                                     </b-form-group>
@@ -77,7 +77,7 @@
                                         <datepicker placeholder="Select date" v-model="assignment.review_publish_day"></datepicker>
                                         <b-form-input   v-model="assignment.review_publish_time"
                                                         type="time"
-                                                        placeholder="Please enter start time of the peer review"
+                                                        placeholder="00:00"
                                                         required>
                                         </b-form-input>
                                     </b-form-group>
@@ -90,7 +90,7 @@
                                         <datepicker placeholder="Select date" v-model="assignment.review_due_day"></datepicker>
                                         <b-form-input   v-model="assignment.review_due_time"
                                                         type="time"
-                                                        placeholder="Please enter due time of the peer review"
+                                                        placeholder="00:00"
                                                         required>
                                         </b-form-input>
                                     </b-form-group>
@@ -152,7 +152,7 @@
                                         <datepicker placeholder="Select date" v-model="assignment.review_evaluation_due_day"></datepicker>
                                         <b-form-input   v-model="assignment.review_evaluation_due_time"
                                                         type="time"
-                                                        placeholder="Please enter time before which the reviews should be evaluated"
+                                                        placeholder="00:00"
                                                         required>
                                         </b-form-input>
                                     </b-form-group>
@@ -233,7 +233,7 @@ export default {
     methods: {
         async onSubmit() {
             // Check for empty date and time fields
-            let validationResult1 = this.checkDatesEmpty()
+            let validationResult1 = this.checkFormat()
             if (validationResult1.error) {
                 this.showErrorMessage({message: validationResult1.error})
             } else {
@@ -329,8 +329,8 @@ export default {
                 }
             }
         },
-        checkDatesEmpty() {
-            // Check whether all dates and time are nonempty
+        checkFormat() {
+            // Check whether all dates and time are nonempty and conform time input format
             if (this.assignment.publish_day === null) {
                 return {error: "Publish date cannot be empty!"}
             } else if (this.assignment.due_day === null) {
@@ -343,17 +343,32 @@ export default {
                 return {error: "Review evaluation due date cannot be empty!"}
             } else if (this.assignment.publish_time === "") {
                 return {error: "Publish time cannot be empty!"}
+            } else if (!this.checkTimeFormat(this.assignment.publish_time)) {
+                return {error: "There is an error in your publish time! Format should be like 00:00"}
             } else if (this.assignment.due_time === "") {
                 return {error: "Hand-in time cannot be empty!"}
+            } else if (!this.checkTimeFormat(this.assignment.due_time)) {
+                return {error: "There is an error in your hand-in time! Format should be like 00:00"}
             } else if (this.assignment.review_publish_time === "") {
                 return {error: "Review start time cannot be empty!"}
+            } else if (!this.checkTimeFormat(this.assignment.review_publish_time)) {
+                return {error: "There is an error in your review start time! Format should be like 00:00"}
             } else if (this.assignment.review_due_time === "") {
                 return {error: "Review due time cannot be empty!"}
+            } else if (!this.checkTimeFormat(this.assignment.review_due_time)) {
+                return {error: "There is an error in your review due time! Format should be like 00:00"}
             } else if (this.assignment.review_evaluation && this.assignment.review_evaluation_due_time === "") {
                 return {error: "Review evaluation due time cannot be empty!"}
+            } else if (this.assignment.review_evaluation &&!this.checkTimeFormat(this.assignment.review_due_time)) {
+                return {error: "There is an error in your review evaluation due time! Format should be like 00:00"}
             } else {
                 return true
             }
+        },
+        checkTimeFormat(time) {
+            var re = /^[0-2][0-9]:[0-5][0-9]$/
+            console.log(re.test(time))
+            return re.test(time);
         },
         checkDST(pdate, ddate, rpdate, rddate, reddate) {
             // Instantiate new dates to avoid changing the passed value
