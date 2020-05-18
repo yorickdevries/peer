@@ -12,9 +12,7 @@ export default function upload(fieldName: string, allowedExtensions: string[], m
     function fileFilter (req: any, file: any, callback: any) {
         const extension = path.extname(file.originalname);
         if (!(allowedExtensions.includes(extension))) {
-            req.fileValidationError = `Extension not allowed: ${extension}`;
-            // tslint:disable-next-line
-            return callback(null, false);
+            return callback(new Error(`Extension not allowed: ${extension}`), false);
         } else {
             // tslint:disable-next-line
             return callback(null, true);
@@ -29,26 +27,29 @@ export default function upload(fieldName: string, allowedExtensions: string[], m
     };
 
     // upload middleware
-    const uploader = multer(options).single(fieldName);
+    const uploadFile = multer(options).single(fieldName);
 
     /**
      * Validates the uploaded file
      */
-    function uploadValidation(err: any, req: any, res: any, next: any) {
-        // Send error in case of too large file size
-        if (err) {
-            console.log(err);
-            res.status(400);
-            res.json({ error: `File is too large, max size: ${maxSizeFile}` });
-        }
-        // Error in case of wrong file type
-        else if (req.fileValidationError) {
-            res.status(400);
-            res.json({ error: req.fileValidationError });
-        } else {
-            next();
-        }
+    function upload(req: any, res: any, next: any) {
+        uploadFile(req, res, function (err) {
+            // Send error in case of too large file size
+            if (err) {
+                if (err.code === "LIMIT_FILE_SIZE") {
+                    res.status(400);
+                    res.json({ error: `File too large, max size: ${maxSizeFile / (1024 * 1024)} MB` });
+                }
+                // Error in case of wrong file type
+                else {
+                    res.status(400);
+                    res.json({ error: err.message });
+                }
+            } else {
+                next();
+            }
+        });
     }
 
-    return [uploader, uploadValidation];
+    return upload;
 }
