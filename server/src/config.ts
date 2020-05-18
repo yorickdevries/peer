@@ -20,15 +20,15 @@ const config = {
         maxAge: 12 * 60 * 60 * 1000   // 12 hours in ms
     },
     reviews: {
-        fileFolder: path.join(__dirname, "../dist/files/reviews"),
+        fileFolder: path.join(__dirname, "../files/reviews"),
         maxSizeReviewFile: 50 * 1024 * 1024
     },
     assignments: {
-        fileFolder: path.join(__dirname, "../dist/files/assignments"),
+        fileFolder: path.join(__dirname, "../files/assignments"),
         maxSizeAssignmentFile: 50 * 1024 * 1024
     },
     submissions: {
-        fileFolder: path.join(__dirname, "../dist/files/submissions"),
+        fileFolder: path.join(__dirname, "../files/submissions"),
         maxSizeSubmissionFile: 50 * 1024 * 1024
     },
     exampleData: {
