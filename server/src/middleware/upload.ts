@@ -1,9 +1,14 @@
 import path from "path";
 import multer from "multer";
 
+/**
+ * Middleware to parse the multipart data into a file and body
+ */
 export default function upload(fieldName: string, allowedExtensions: string[], maxSizeFile: number) {
-    // Filefilter for the upload
     //          Check whether I can throw an error here instead !!!!
+    /**
+     * Filefilter for the upload
+     */
     function fileFilter (req: any, file: any, callback: any) {
         const extension = path.extname(file.originalname);
         if (!(allowedExtensions.includes(extension))) {
@@ -26,12 +31,15 @@ export default function upload(fieldName: string, allowedExtensions: string[], m
     // upload middleware
     const uploader = multer(options).single(fieldName);
 
+    /**
+     * Validates the uploaded file
+     */
     function uploadValidation(err: any, req: any, res: any, next: any) {
         // Send error in case of too large file size
         if (err) {
             console.log(err);
             res.status(400);
-            res.json({ error: "File is too large" });
+            res.json({ error: `File is too large, max size: ${maxSizeFile}` });
         }
         // Error in case of wrong file type
         else if (req.fileValidationError) {
