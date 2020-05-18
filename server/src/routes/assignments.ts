@@ -29,25 +29,6 @@ router.use(express.json());
 
 const fileFolder = config.assignments.fileFolder;
 
-// CSV of max 1 MB (in bytes)
-const maxSizeGroupsfile = 1 * 1024 * 1024;
-// The file will be stored into the memory
-const uploadGroups = multer({
-    limits: {fileSize: maxSizeGroupsfile},
-    fileFilter: function (req: any, file, callback) {
-        const ext = path.extname(file.originalname);
-        if (ext !== ".csv") {
-            req.fileValidationError = "File should be a .csv file";
-            // tslint:disable-next-line
-            return callback(null, false);
-        } else {
-            // tslint:disable-next-line
-            return callback(null, true);
-        }
-    }
-}).single("groupFile");
-
-
 /**
  * Route to get all information about an assignment
  * @params assignment_id - assignment id
@@ -351,36 +332,28 @@ router.route("/distributeReviewsThreeAssignments/:assignment_id1/:assignment_id2
 /**
  * Route to import groups for a specific assignment.
  */
-router.post("/:assignment_id/importgroups", index.authorization.enrolledAsTeacherAssignmentCheck, (req: any, res) => {
-    // File upload handling
-    uploadGroups(req, res, function (err) {
-        // Error in case of wrong file type
-        if (req.fileValidationError) {
+
+ // CSV of max 1 MB (in bytes)
+const maxSizeGroupsfile = 1 * 1024 * 1024;
+router.post("/:assignment_id/importgroups", upload("groupFile", [".csv"], maxSizeGroupsfile), index.authorization.enrolledAsTeacherAssignmentCheck, (req: any, res) => {
+    // error if no file was uploaded or no group column defined
+    if (req.file == undefined) {
+        res.status(400);
+        res.json({error: "No file uploaded"});
+    } else if (req.body.groupColumn == undefined) {
+        res.status(400);
+        res.json({error: "No groupcolumn defined"});
+    } else {
+        const groupColumn = req.body.groupColumn;
+        const assignmentId = req.params.assignment_id;
+        GroupParser.importGroups(req.file.buffer, groupColumn, assignmentId)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
             res.status(400);
-            res.json({ error: req.fileValidationError });
-            // Error (in case of too large file size)
-        } else if (err) {
-            res.status(400);
-            res.json({ error: "File is too large" });
-            // error if no file was uploaded or no group column defined
-        } else if (req.file == undefined) {
-            res.status(400);
-            res.json({error: "No file uploaded"});
-        } else if (req.body.groupColumn == undefined) {
-            res.status(400);
-            res.json({error: "No groupcolumn defined"});
-        } else {
-            const groupColumn = req.body.groupColumn;
-            const assignmentId = req.params.assignment_id;
-            GroupParser.importGroups(req.file.buffer, groupColumn, assignmentId)
-            .then((data) => {
-                res.json(data);
-            }).catch((error) => {
-                res.status(400);
-                res.json({error: error.message});
-            });
-        }
-    });
+            res.json({error: error.message});
+        });
+    }
 });
 
 /**
