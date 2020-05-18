@@ -14,8 +14,25 @@ const router = express();
 // Needed for the tests (tests need to change)
 router.use(express.json());
 
-// Function which adds the submission to the database.
-const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
+/**
+ * Route to get one submission with a specific id.
+ * @param id - submission id.
+ * @authorization user should be TA, teacher or part of the group which has submitted.
+ */
+router.get("/:id", index.authorization.getSubmissionAuth, (req, res) => {
+    SubmissionsPS.executeGetSubmissionById(req.params.id)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
+
+/**
+ * Route to make a new submission.
+ * @authorization the user should be part of a group in the course.
+ */
+router.post("/", upload("submissionFile", config.allowed_extensions, config.submissions.maxSizeSubmissionFile), index.authorization.postSubmissionAuth, index.authorization.checkSubmissionBetweenPublishDue, async function(req: any, res: any, next: any) {
     try {
         const fileFolder = config.submissions.fileFolder;
         const fileName = Date.now() + "-" + req.file.originalname;
@@ -35,27 +52,7 @@ const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
         res.status(400);
         res.json({ error: "An error occurred while creating the submission" });
     }
-};
-
-/**
- * Route to get one submission with a specific id.
- * @param id - submission id.
- * @authorization user should be TA, teacher or part of the group which has submitted.
- */
-router.get("/:id", index.authorization.getSubmissionAuth, (req, res) => {
-    SubmissionsPS.executeGetSubmissionById(req.params.id)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
-        res.sendStatus(400);
-    });
 });
-
-/**
- * Route to make a new submission.
- * @authorization the user should be part of a group in the course.
- */
-router.post("/", upload("submissionFile", config.allowed_extensions, config.submissions.maxSizeSubmissionFile), index.authorization.postSubmissionAuth, index.authorization.checkSubmissionBetweenPublishDue, addSubmissionToDatabase);
 
 /**
  * Route to get a file from a submission.
