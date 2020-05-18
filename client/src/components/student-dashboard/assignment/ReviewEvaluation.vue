@@ -312,6 +312,7 @@ export default {
             return `/api/reviews/${reviewId}/questions/${questionId}/file`
         },
         clearFiles() {
+            // eslint-disable-next-line
             Object.entries(this.files).forEach(([key, _]) => {
                 const name = "fileForm" + String(key) + this.evaluation.review.id
                 this.$refs[name][0].reset()
