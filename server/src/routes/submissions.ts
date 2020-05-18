@@ -33,24 +33,30 @@ router.get("/:id", index.authorization.getSubmissionAuth, (req, res) => {
  * @authorization the user should be part of a group in the course.
  */
 router.post("/", upload("submissionFile", config.allowed_extensions, config.submissions.maxSizeSubmissionFile), index.authorization.postSubmissionAuth, index.authorization.checkSubmissionBetweenPublishDue, async function(req: any, res: any, next: any) {
-    try {
-        const fileFolder = config.submissions.fileFolder;
-        const fileName = Date.now() + "-" + req.file.originalname;
-        const filePath = path.join(fileFolder, fileName);
-        const netId = req.user.netid;
-        const assignmentId = req.body.assignmentId;
-        // get the groupId of this user for this assignment
-        const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
-        const groupId = groupAssignment.group_id;
-
-        // add to database
-        const result: any = await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName);
-        // writing the file if no error is there
-        await fs.writeFile(filePath, req.file.buffer);
-        res.json(result);
-    } catch (err) {
+    // error if no file was uploaded or no group column defined
+    if (req.file == undefined) {
         res.status(400);
-        res.json({ error: "An error occurred while creating the submission" });
+        res.json({error: "No file uploaded"});
+    } else {
+        try {
+            const fileFolder = config.submissions.fileFolder;
+            const fileName = Date.now() + "-" + req.file.originalname;
+            const filePath = path.join(fileFolder, fileName);
+            const netId = req.user.netid;
+            const assignmentId = req.body.assignmentId;
+            // get the groupId of this user for this assignment
+            const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
+            const groupId = groupAssignment.group_id;
+
+            // add to database
+            const result: any = await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName);
+            // writing the file if no error is there
+            await fs.writeFile(filePath, req.file.buffer);
+            res.json(result);
+        } catch (err) {
+            res.status(400);
+            res.json({ error: "An error occurred while creating the submission" });
+        }
     }
 });
 
