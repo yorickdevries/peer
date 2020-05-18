@@ -2,7 +2,6 @@
 import path from "path";
 import fs from "fs-extra";
 import index from "../security/index";
-import multer from "multer";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import UserPS from "../prepared_statements/user_ps";
 import GroupPS, { default as GroupsPS } from "../prepared_statements/group_ps";

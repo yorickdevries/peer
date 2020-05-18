@@ -4,7 +4,7 @@ import multer from "multer";
 /**
  * Middleware creator to parse the multipart data into a file and body
  */
-export default function upload(fieldName: string, allowedExtensions: string[], maxSizeFile: number) {
+export default function upload(fieldName: string | undefined, allowedExtensions: string[], maxSizeFile: number) {
     /**
      * Filefilter for the upload
      */
@@ -25,13 +25,18 @@ export default function upload(fieldName: string, allowedExtensions: string[], m
         limits: {fileSize: maxSizeFile},
     };
 
-    const uploadFile = multer(options).single(fieldName);
+    let uploader: any;
+    if (fieldName) {
+        uploader = multer(options).single(fieldName);
+    } else {
+        uploader = multer(options).any();
+    }
 
     /**
      * Middleware which parses and validates the uploaded file
      */
     function upload(req: any, res: any, next: any) {
-        uploadFile(req, res, function (err) {
+        uploader(req, res, function (err: any) {
             // Send error in case of too large file size
             if (err) {
                 if (err.code === "LIMIT_FILE_SIZE") {
