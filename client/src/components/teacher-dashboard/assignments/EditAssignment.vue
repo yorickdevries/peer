@@ -122,7 +122,7 @@
                                 </b-alert>
                                 <b-form-file  v-if="uploadNewFile"
                                               placeholder="Choose a new file..."
-                                              accept=".pdf,.zip"
+                                              accept=".pdf,.zip,.doc,.docx"
                                               v-model="file"
                                               :state="Boolean(file)">
                                 </b-form-file>
@@ -197,7 +197,7 @@ export default {
             file: null,
             fileProgress: 0,
             uploadNewFile: false,
-            acceptFiles: ".pdf,.zip",
+            acceptFiles: ".pdf,.zip,.doc,.docx",
             assignment: {
                 id: null,
                 title: null,

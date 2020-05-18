@@ -123,18 +123,28 @@ router.route("/:reviewId").put(upload(undefined, config.allowed_extensions, conf
 
                 // Get the correct extension of the upload question.
                 const currentRubricUploadQuestion = rubricQuestions.find((x: any) => x.id === questionId);
+                // Find the corresponding question
+                let previousFile: string | undefined = undefined;
+                const review: any = await ReviewUpdate.getReview(reviewId);
+                const reviewForm = review.form;
+                for (let j = 0; j < reviewForm.length; j++) {
+                    if (currentRubricUploadQuestion.id == reviewForm[j].question.id) {
+                        previousFile = reviewForm[j].answer.answer;
+                    }
+                }
+
                 if (currentRubricUploadQuestion.type_question !== "upload") {
                     throw new Error("File uploaded for a non-upload question");
                 }
-                const correctExtension = currentRubricUploadQuestion.extension;
+                const correctExtensions: string[] = currentRubricUploadQuestion.extension.split(",");
 
                 // Check if the extension is correct
-                if (!file.mimetype.includes(correctExtension)) {
-                    res.status(400).send({error: "Invalid file extension"});
+                const extension = path.extname(file.originalname);
+                if (!correctExtensions.includes(extension)) {
+                    throw new Error("Invalid file extension");
                 }
-
                 // Create and save a unique filename based on the review and question.
-                const filename = `${req.params.reviewId}-${file.fieldname}.${correctExtension}`;
+                const filename = `${req.params.reviewId}-${file.fieldname}${extension}`;
                 const filepath = path.join(fileFolder, filename);
 
                 // get the question in the form
@@ -143,6 +153,10 @@ router.route("/:reviewId").put(upload(undefined, config.allowed_extensions, conf
                 currentFormUploadQuestion.answer.answer = filename;
                 uploadQuestionIds.push(questionId);
 
+                if (previousFile) {
+                    const previousFilePath = path.join(fileFolder, previousFile);
+                    await fs.unlink(previousFilePath);
+                }
                 await fs.writeFile(filepath, file.buffer);
             }
         }
