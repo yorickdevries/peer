@@ -2,10 +2,9 @@ import path from "path";
 import multer from "multer";
 
 /**
- * Middleware to parse the multipart data into a file and body
+ * Middleware creator to parse the multipart data into a file and body
  */
 export default function upload(fieldName: string, allowedExtensions: string[], maxSizeFile: number) {
-    //          Check whether I can throw an error here instead !!!!
     /**
      * Filefilter for the upload
      */
@@ -26,11 +25,10 @@ export default function upload(fieldName: string, allowedExtensions: string[], m
         limits: {fileSize: maxSizeFile},
     };
 
-    // upload middleware
     const uploadFile = multer(options).single(fieldName);
 
     /**
-     * Validates the uploaded file
+     * Middleware which parses and validates the uploaded file
      */
     function upload(req: any, res: any, next: any) {
         uploadFile(req, res, function (err) {
@@ -40,7 +38,7 @@ export default function upload(fieldName: string, allowedExtensions: string[], m
                     res.status(400);
                     res.json({ error: `File too large, max size: ${maxSizeFile / (1024 * 1024)} MB` });
                 }
-                // Error in case of wrong file type
+                // Error in case of wrong file extension
                 else {
                     res.status(400);
                     res.json({ error: err.message });
