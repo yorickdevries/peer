@@ -313,18 +313,18 @@ export default {
                     })
                 } else {
                     // Get the hours from the input field and set in variable
-                    pdate.setHours(this.assignment.publish_time.substring(0, 2))
-                    ddate.setHours(this.assignment.due_time.substring(0, 2))
-                    rpdate.setHours(this.assignment.review_publish_time.substring(0, 2))
-                    rddate.setHours(this.assignment.review_due_time.substring(0, 2))
-                    reddate.setHours(this.assignment.review_evaluation_due_time.substring(0, 2))
+                    pdate.setHours(this.assignment.publish_time.split(':')[0])
+                    ddate.setHours(this.assignment.due_time.split(':')[0])
+                    rpdate.setHours(this.assignment.review_publish_time.split(':')[0])
+                    rddate.setHours(this.assignment.review_due_time.split(':')[0])
+                    reddate.setHours(this.assignment.review_evaluation_due_time.split(':')[0])
 
                     // Get the minutes from the input field and set in variable
-                    pdate.setMinutes(this.assignment.publish_time.substring(3, 5))
-                    ddate.setMinutes(this.assignment.due_time.substring(3, 5))
-                    rpdate.setMinutes(this.assignment.review_publish_time.substring(3, 5))
-                    rddate.setMinutes(this.assignment.review_due_time.substring(3, 5))
-                    reddate.setMinutes(this.assignment.review_evaluation_due_time.substring(3, 5))
+                    pdate.setMinutes(this.assignment.publish_time.split(':')[1])
+                    ddate.setMinutes(this.assignment.due_time.split(':')[1])
+                    rpdate.setMinutes(this.assignment.review_publish_time.split(':')[1])
+                    rddate.setMinutes(this.assignment.review_due_time.split(':')[1])
+                    reddate.setMinutes(this.assignment.review_evaluation_due_time.split(':')[1])
 
                     // Set the date fields of the assignment. These are now Date objects
                     // These values are the day and time of the deadline
@@ -424,16 +424,16 @@ export default {
             // This causes deadlines set between 02:00 and 02:59 to be equal to 03:00-03:59 when converting to UTC
             // As a result, a deadline set at 02:00, will actually be set at 03:00
             // For some reason, Safari handles Daylight Saving Time differently. We should have a look if MomentJS can help with this issue
-            if (pdate2.setHours(this.assignment.publish_time.substring(0,2)) === pdate2.setHours(parseInt(this.assignment.publish_time.substring(0,2))+1)) {
+            if (pdate2.setHours(this.assignment.publish_time.split(':')[0]) === pdate2.setHours(parseInt(this.assignment.publish_time.split(':')[0])+1)) {
                 return {title: "Error in publish time"}
-            } else if (ddate2.setHours(this.assignment.due_time.substring(0,2)) === ddate2.setHours(parseInt(this.assignment.due_time.substring(0,2))+1)) {
+            } else if (ddate2.setHours(this.assignment.due_time.split(':')[0]) === ddate2.setHours(parseInt(this.assignment.due_time.split(':')[0])+1)) {
                 return {title: "Error in hand-in time"}
-            } else if (rpdate2.setHours(this.assignment.review_publish_time.substring(0,2)) === rpdate2.setHours(parseInt(this.assignment.review_publish_time.substring(0,2))+1)) {
+            } else if (rpdate2.setHours(this.assignment.review_publish_time.split(':')[0]) === rpdate2.setHours(parseInt(this.assignment.review_publish_time.split(':')[0])+1)) {
                 return {title: "Error in review start time"}
-            } else if (rddate2.setHours(this.assignment.review_due_time.substring(0,2)) === rddate2.setHours(parseInt(this.assignment.review_due_time.substring(0,2))+1)) {
+            } else if (rddate2.setHours(this.assignment.review_due_time.split(':')[0]) === rddate2.setHours(parseInt(this.assignment.review_due_time.split(':')[0])+1)) {
                 return {title: "Error in review due time"}
             } else if (this.assignment.review_evaluation &&
-                reddate2.setHours(this.assignment.review_evaluation_due_time.substring(0,2)) === reddate2.setHours(parseInt(this.assignment.review_evaluation_due_time.substring(0,2))+1)) {
+                reddate2.setHours(this.assignment.review_evaluation_due_time.split(':')[0]) === reddate2.setHours(parseInt(this.assignment.review_evaluation_due_time.split(':')[0])+1)) {
                 return {title: "Error in review evaluation due time"}
             } else {
                 return true
