@@ -45,7 +45,7 @@ const config = {
         certificate: "/var/www/peer/cert/peer_ewi_tudelft_nl.crt",
         key: "/var/www/peer/cert/peer.ewi.tudelft.nl.key"
     },
-    allowed_extensions: [".pdf", ".zip"]
+    allowed_extensions: [".pdf", ".zip", ".doc", ".docx"]
 };
 
 // In case of CI, change hostname to postgres
