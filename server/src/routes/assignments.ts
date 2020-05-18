@@ -14,7 +14,7 @@ import ReviewDistributionTwoAssignments from "../review_distribution/reviewDistr
 import ReviewDistributionThreeAssignments from "../review_distribution/reviewDistributionThreeAssignments";
 import config from "../config";
 import FileExport from "../fileExport";
-import upload from "../middleware/upload"
+import upload from "../middleware/upload";
 
 // Router
 import express from "express";
