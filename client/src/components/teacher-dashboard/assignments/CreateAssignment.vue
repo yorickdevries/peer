@@ -33,6 +33,7 @@
 
                             <hr />
 
+                            <!--Publish and due date of the assignment-->
                             <b-row class="mb-3">
                                 <b-col>
                                     <b-form-group>
