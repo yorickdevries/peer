@@ -1,11 +1,11 @@
 // Imports
 import path from "path";
 import fs from "fs-extra";
-import multer from "multer";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import index from "../security/index";
 import config from "../config";
+import upload from "../middleware/upload";
 
 // Router
 import express from "express";
@@ -13,47 +13,6 @@ import express from "express";
 const router = express();
 // Needed for the tests (tests need to change)
 router.use(express.json());
-
-// File of max 50 MB (in bytes)
-const maxSizeSubmissionFile = config.submissions.maxSizeSubmissionFile;
-const uploadSubmission = multer({
-    limits: {fileSize: maxSizeSubmissionFile},
-    fileFilter: function (req: any, file, callback) {
-        const ext = path.extname(file.originalname);
-        const extensions: any = config.allowed_extensions;
-        if (!(extensions.includes(ext))) {
-            req.fileValidationError = "Extension not allowed";
-            // tslint:disable-next-line
-            return callback(null, false);
-        } else {
-            // tslint:disable-next-line
-            return callback(null, true);
-        }
-    }
-}).single("submissionFile");
-
-// File upload handling
-const uploadSubmissionFunction = function(req: any, res: any, next: any) {
-    uploadSubmission(req, res, function (err) {
-        // Error in case of too large file size
-        if (err) {
-            res.status(400);
-            res.json({ error: "File is too large (max 50MB!)" });
-        }
-        // Error in case of no file
-        else if (req.file == undefined) {
-            res.status(400);
-            res.json({ error: "No file uploaded" });
-        }
-        // Error in case of wrong file type
-        else if (req.fileValidationError) {
-            res.status(400);
-            res.json({ error: req.fileValidationError });
-        } else {
-            next();
-        }
-    });
-};
 
 // Function which adds the submission to the database.
 const addSubmissionToDatabase = async function(req: any, res: any, next: any) {
@@ -96,7 +55,7 @@ router.get("/:id", index.authorization.getSubmissionAuth, (req, res) => {
  * Route to make a new submission.
  * @authorization the user should be part of a group in the course.
  */
-router.post("/", uploadSubmissionFunction, index.authorization.postSubmissionAuth, index.authorization.checkSubmissionBetweenPublishDue, addSubmissionToDatabase);
+router.post("/", upload("submissionFile", config.allowed_extensions, config.submissions.maxSizeSubmissionFile), index.authorization.postSubmissionAuth, index.authorization.checkSubmissionBetweenPublishDue, addSubmissionToDatabase);
 
 /**
  * Route to get a file from a submission.
