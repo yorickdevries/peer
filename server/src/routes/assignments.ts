@@ -626,8 +626,7 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
         const exportType = req.params.exporttype;
         // export in required format
         FileExport.exportJSONToFile(exportData, filename, exportType, res);
-    } catch (error) {
-        console.log(error);
+    } catch {
         res.sendStatus(400);
     }
 });
