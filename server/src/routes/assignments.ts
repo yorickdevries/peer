@@ -530,7 +530,17 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
                     }
                 }
                 reviewJson[questionText] = chosenOption;
-            } else {
+            } else if (item.question.type_question == "checkbox") {
+                const chosenOptionIds = item.answer.answer;
+                const chosenOptions = []
+                const options = item.question.option;
+                for(const chosenOptionId of chosenOptionIds){
+                    const chosenOption = options.find((option: any) => option.id == chosenOption);
+                    chosenOptions.push(chosenOption.option);
+                }
+                reviewJson[questionText] = chosenOptions;
+            }
+            else {
                 reviewJson[questionText] = item.answer.answer;
             }
         }
