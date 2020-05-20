@@ -335,4 +335,41 @@ export default class AuthorizationPS {
         statement.values = [submissionId, netId];
         return Database.executeQuerySingleResult(statement);
     }
+
+    /**
+     * Check if user is authorized to edit or delete checkboxquestion.
+     * @param {number} questionId - question id.
+     * @param {String} netId - net id of the user to check authorization.
+     * @return {any} true or false as pg promise.
+     */
+    public static executeAuthorizationCheckboxQuestion(questionId: number, netId: String): any {
+        const statement = new PreparedStatement("check-authorization-checkboxquestion",
+            "SELECT EXISTS(SELECT * FROM checkboxquestion, rubric, assignmentlist, enroll " +
+            "WHERE checkboxquestion.rubric_id = rubric.id " +
+            "AND rubric.assignment_id = assignmentlist.id " +
+            "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher') " +
+            "AND checkboxquestion.id = $1 AND enroll.user_netid = $2)");
+        statement.values = [questionId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+
+    /**
+     * Check if user is authorized to edit or delete checkbox option.
+     * @param {number} optionId - option id of a checkbox question.
+     * @param {String} netId - netid of the user to check authorization.
+     * @return {any}
+     */
+    public static executeAuthorizationCheckboxOption(optionId: number, netId: String): any {
+        const statement = new PreparedStatement("check-authorization-checkboxoption",
+            "SELECT EXISTS(SELECT * FROM checkboxoption, checkboxquestion, rubric, assignmentlist, enroll " +
+            "WHERE checkboxoption.checkboxquestion_id = checkboxquestion.id " +
+            "AND checkboxquestion.rubric_id = rubric.id " +
+            "AND rubric.assignment_id = assignmentlist.id " +
+            "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher') " +
+            "AND checkboxoption.id = $1 AND enroll.user_netid = $2)");
+        statement.values = [optionId, netId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
 }

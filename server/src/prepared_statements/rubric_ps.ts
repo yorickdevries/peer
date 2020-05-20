@@ -519,4 +519,99 @@ export default class RubricPS {
             await this.executeDeleteMCQuestion(mcQuestions[i].id);
         }
     }
+
+    /**
+     * Executes 'create checkbox question' query.
+     * @param {string} question - question.
+     * @param {number} rubricId - rubric_id.
+     * @param {number} questionNumber - question_number.
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeCreateCheckboxQuestion(question: string, rubricId: number, questionNumber: number)
+        : Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("make-Checkbox-question",
+            "INSERT INTO checkboxquestion (question, rubric_id, question_number) VALUES ($1, $2, $3) " +
+            "RETURNING *");
+        statement.values = [question, rubricId, questionNumber];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'update checkbox question' query.
+     * @param {string} question - question.
+     * @param {number} questionNumber - question_number.
+     * @param {number} id - id.
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeUpdateCheckboxQuestion(question: string, questionNumber: number, id: number)
+        : Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("update-checkbox-question",
+            "UPDATE checkboxquestion SET (question, question_number) = ($1, $2) WHERE id = $3 RETURNING *");
+        statement.values = [question, questionNumber, id];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Query 'delete Checkbox question'
+     * @param {number} id - id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteCheckboxQuestion(id: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("delete-checkbox-question",
+            "DELETE FROM checkboxquestion WHERE id=$1 RETURNING *");
+        statement.values = [id];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'create Checkbox option' query.
+     * @param {string} option - option.
+     * @param {number} checkboxQuestionId - checkboxquestion_id.
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeCreateCheckboxOption(option: string, checkboxQuestionId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("make-Checkbox-option",
+            "INSERT INTO checkboxoption (option, checkboxquestion_id) VALUES ($1, $2) RETURNING *");
+        statement.values = [option, checkboxQuestionId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'update checkbox option' query.
+     * @param {string} option
+     * @param {number} id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeUpdateCheckboxOption(option: string, id: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("updat-checkbox-option",
+            "UPDATE checkboxoption SET option=$1 WHERE id = $2 RETURNING *");
+        statement.values = [option, id];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Query 'delete checkbox option'.
+     * @param {number} id - id.
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteCheckboxOption(id: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("delte-checkbox-option",
+            "DELETE FROM checkboxoption WHERE id=$1 RETURNING *");
+        statement.values = [id];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'get all options by id' query.
+     * @param {number} id - checkboxquestion_id.
+     * @returns {any}
+     */
+    public static executeGetAllCheckboxOptionsByQuestionId(checkBoxQuestionId: number): any {
+        // order the options alphabetically
+        const statement = new PreparedStatement("get-all-checkbox-options",
+            "SELECT * FROM checkboxoption WHERE checkboxquestion_id = $1 ORDER BY option");
+        statement.values = [checkBoxQuestionId];
+        return Database.executeQuery(statement);
+    }
+
 }
