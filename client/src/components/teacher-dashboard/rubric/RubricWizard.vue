@@ -196,6 +196,8 @@ export default {
         async saveQuestion(question) {
             // Special save function to save MC questions.
             if (question.type_question === 'mc') return this.saveMCQuestion(question)
+            // Special save function to save Checkbox questions.
+            if (question.type_question === 'checkbox') return this.saveCheckboxQuestion(question)
 
             await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
             this.showSuccessMessage({message: 'Successfully saved question.'})
@@ -213,6 +215,26 @@ export default {
                     await api.client.post(`${apiPrefixes['mcoption']}`, option)
                 else if (option.id)
                     await api.client.put(`${apiPrefixes['mcoption']}/${option.id}`, option)
+
+            })
+
+            // Save question text.
+            await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
+            this.showSuccessMessage({message: 'Successfully saved question.'})
+            await this.fetchRubric()
+        },
+        async saveCheckboxQuestion(question) {
+            let options = question.option
+
+            // Save options first to the API (delete/post/put).
+            options.forEach(async option => {
+
+                if (option.delete === true)
+                    await api.client.delete(`${apiPrefixes['checkboxoption']}/${option.id}`)
+                else if (option.id === undefined)
+                    await api.client.post(`${apiPrefixes['checkboxoption']}`, option)
+                else if (option.id)
+                    await api.client.put(`${apiPrefixes['checkboxoption']}/${option.id}`, option)
 
             })
 
