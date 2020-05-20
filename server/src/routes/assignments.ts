@@ -535,7 +535,7 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
                 const chosenOptions = [];
                 const options = item.question.option;
                 for (const chosenOptionId of chosenOptionIds) {
-                    const chosenOption = options.find((option: any) => option.id == chosenOption);
+                    const chosenOption = options.find((option: any) => option.id == chosenOptionId);
                     chosenOptions.push(chosenOption.option);
                 }
                 reviewJson[questionText] = chosenOptions;
