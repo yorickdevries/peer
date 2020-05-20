@@ -396,6 +396,7 @@ export default class RubricPS {
     public static async getAllQuestionsByRubricId(rubricId: number) {
         // Fetch the questions of each type.
         const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubricId);
+        const checkboxQuestions = await RubricPS.executeGetAllCheckboxQuestionById(rubricId);
         const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubricId);
         const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubricId);
         const uploadQuestions = await RubricPS.executeGetAllUploadQuestionById(rubricId);
@@ -413,6 +414,19 @@ export default class RubricPS {
                 question: question.question,
                 question_number: question.question_number,
                 option: await RubricPS.executeGetAllMCOptionById(question.id)
+            });
+        }
+
+        // Fill with checkbox questions.
+        for (let i = 0; i < checkboxQuestions.length; i++) {
+            const question = checkboxQuestions[i];
+            questionJson.push({
+                id: question.id,
+                type_question: "checkbox",
+                rubric_id: question.rubric_id,
+                question: question.question,
+                question_number: question.question_number,
+                option: await RubricPS.executeGetAllCheckboxOptionsByQuestionId(question.id)
             });
         }
 
@@ -457,8 +471,10 @@ export default class RubricPS {
         const openQuestions = await RubricPS.executeGetAllOpenQuestionById(copyRubricId);
         const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(copyRubricId);
         const mcQuestions = await RubricPS.executeGetAllMCQuestionById(copyRubricId);
+        const checkboxQuestions = await RubricPS.executeGetAllCheckboxQuestionById(copyRubricId);
         const uploadQuestions = await RubricPS.executeGetAllUploadQuestionById(copyRubricId);
         let mcOptions;
+        let checkboxOptions;
 
         // Copy open questions
         for (let i = 0; i < openQuestions.length; i++) {
@@ -482,6 +498,17 @@ export default class RubricPS {
                 await this.executeCreateMCOption(mcOptions[i].option, res.id);
             }
         }
+
+        // Copy checkbox questions
+        for (let i = 0; i < checkboxQuestions.length; i++) {
+            const res: any = await this.executeCreateCheckboxQuestion(checkboxQuestions[i].question, currentRubricId, checkboxQuestions[i].question_number);
+
+            // Copy checkbox options
+            checkboxOptions = await RubricPS.executeGetAllCheckboxOptionsByQuestionId(checkboxQuestions[i].id);
+            for (let i = 0; i < checkboxOptions.length; i++) {
+                await this.executeCreateCheckboxOption(checkboxOptions[i].option, res.id);
+            }
+        }
     }
 
     /**
@@ -494,8 +521,10 @@ export default class RubricPS {
         const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubricId);
         const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubricId);
         const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubricId);
+        const checkboxQuestions = await RubricPS.executeGetAllCheckboxQuestionById(rubricId);
         const uploadQuestions = await RubricPS.executeGetAllUploadQuestionById(rubricId);
         let mcOptions;
+        let checkboxOptions;
 
         // Delete open questions
         for (let i = 0; i < openQuestions.length; i++) {
@@ -517,6 +546,15 @@ export default class RubricPS {
                 await this.executeDeleteMCOption(mcOptions[i].id);
             }
             await this.executeDeleteMCQuestion(mcQuestions[i].id);
+        }
+        // Delete checkbox questions
+        for (let i = 0; i < checkboxQuestions.length; i++) {
+            // Delete checkbox options
+            checkboxOptions = await RubricPS.executeGetAllCheckboxOptionsByQuestionId(checkboxQuestions[i].id);
+            for (let i = 0; i < checkboxOptions.length; i++) {
+                await this.executeDeleteCheckboxOption(checkboxOptions[i].id);
+            }
+            await this.executeDeleteCheckboxQuestion(checkboxQuestions[i].id);
         }
     }
 
@@ -611,6 +649,31 @@ export default class RubricPS {
         const statement = new PreparedStatement("get-all-checkbox-options",
             "SELECT * FROM checkboxoption WHERE checkboxquestion_id = $1 ORDER BY option");
         statement.values = [checkBoxQuestionId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Gets One Checkbox question by Id and RubricId.
+     * @param {number} questionId - question id.
+     * @param {number} rubricId - rubric id.
+     * @return {any}
+     */
+    public static executeGetCheckboxQuestionByIdAndRubricId(questionId: number, rubricId: number): any {
+        const statement = new PreparedStatement("get-one-checkboxquestion",
+            "SELECT * FROM checkboxquestion WHERE id = $1 AND rubric_id = $2");
+        statement.values = [questionId, rubricId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'get all Checkbox questions' query.
+     * @param {number} id - assignment_id
+     * @returns {any}
+     */
+    public static executeGetAllCheckboxQuestionById(id: number): any {
+        const statement = new PreparedStatement("get-all-checkbox-questions",
+            "SELECT * FROM checkboxquestion WHERE rubric_id = $1");
+        statement.values = [id];
         return Database.executeQuery(statement);
     }
 
