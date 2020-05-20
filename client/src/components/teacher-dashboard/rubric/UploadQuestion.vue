@@ -24,8 +24,10 @@ export default {
         return {
             question: this.value,
             extensionTypes: [
-                { value: 'pdf', text: 'PDF' },
-                { value: 'zip', text: 'Zip' },
+                { value: '.pdf', text: '.pdf' },
+                { value: '.zip', text: '.zip' },
+                { value: '.doc,.docx', text: '.doc,.docx' },
+                { value: '.pdf,.zip,.doc,.docx', text: '.pdf,.zip,.doc,.docx' },
             ],
         }
     },

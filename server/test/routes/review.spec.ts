@@ -86,7 +86,7 @@ describe("API review routes", () => {
         const submission: any = await SubmissionPS.executeCreateSubmission("henkjan", group.id, assignment.id, "none.pdf");
         const rubric: any = await RubricPS.executeCreateRubric(assignment.id, "submission");
         const review: any = await ReviewPS.executeCreateReview("paulvanderlaan", submission.id, rubric.id);
-        const uploadQuestion: any = await RubricPS.executeCreateUploadQuestion("Hi there?", rubric.id, 1, "pdf", false);
+        const uploadQuestion: any = await RubricPS.executeCreateUploadQuestion("Hi there?", rubric.id, 1, ".pdf", false);
 
         // Submit a review with a uploaded file
         const res = await chai.request(router)
@@ -104,7 +104,7 @@ describe("API review routes", () => {
                     "type_question": "upload",
                     "question": "Hi there?",
                     "question_number": 1,
-                    "extension": "pdf"
+                    "extension": ".pdf"
                 }, "answer": {}
             }]));
         expect(res.status).to.equal(200);

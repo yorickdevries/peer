@@ -109,7 +109,7 @@
                             <b-form-group label="Assignment file" description="Add a file for the assignment (optional).">
                                 <b-form-file
                                         placeholder="Choose a file..."
-                                        accept=".pdf,.zip"
+                                        accept=".pdf,.zip,.doc,.docx"
                                         v-model="file"
                                         :state="Boolean(file)"
                                         v-if="uploadSuccess === null">
@@ -188,7 +188,7 @@ export default {
             file: true,
             fileProgress: 0,
             uploadSuccess: null,
-            acceptFiles: ".pdf,.zip",
+            acceptFiles: ".pdf,.zip,.doc,.docx",
             assignment: {
                 title: null,
                 description: null,

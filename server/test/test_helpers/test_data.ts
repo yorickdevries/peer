@@ -1,5 +1,6 @@
 import { QueryFile } from "pg-promise";
 import Database from "../../src/database";
+import config from "../../src/config";
 
 // file system imports
 import fs from "fs-extra";
@@ -26,22 +27,22 @@ class TestData {
      */
     static exampleReviewFolder = path.join(__dirname, "../../example_data/reviews");
     /**
-     * Submission file folder
-     */
-    static submissionFolder = path.join(__dirname, "../../src/files/submissions");
-    /**
      * Example Assignment files
      */
     static exampleAssignmentFolder = path.join(__dirname, "../../example_data/assignments");
     /**
+     * Submission file folder
+     */
+    static submissionFolder = config.submissions.fileFolder;
+    /**
      * Assignment file folder
      */
-    static assignmentFolder = path.join(__dirname, "../../src/files/assignments");
+    static assignmentFolder = config.assignments.fileFolder;
 
     /**
      * Review file folder
      */
-    static reviewFolder = path.join(__dirname, "../../src/files/reviews");
+    static reviewFolder = config.reviews.fileFolder;
 
     /**
      * initializes the database with testdata

@@ -168,7 +168,7 @@ CREATE TABLE UploadAnswer (
 CREATE TABLE UploadQuestion (
     id SERIAL,
     question varchar(5000) NOT NULL,
-    extension varchar(10) NOT NULL,
+    extension varchar(100) NOT NULL,
     Rubric_id int NOT NULL,
     question_number int NOT NULL,
     optional boolean NOT NULL,
