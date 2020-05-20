@@ -532,13 +532,17 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
                 reviewJson[questionText] = chosenOption;
             } else if (item.question.type_question == "checkbox") {
                 const chosenOptionIds = item.answer.answer;
-                const chosenOptions = [];
-                const options = item.question.option;
-                for (const chosenOptionId of chosenOptionIds) {
-                    const chosenOption = options.find((option: any) => option.id == chosenOptionId);
-                    chosenOptions.push(chosenOption.option);
+                if (chosenOptionIds) {
+                    const chosenOptions = [];
+                    const options = item.question.option;
+                    for (const chosenOptionId of chosenOptionIds) {
+                        const chosenOption = options.find((option: any) => option.id == chosenOptionId);
+                        chosenOptions.push(chosenOption.option);
+                    }
+                    reviewJson[questionText] = chosenOptions;
+                } else {
+                    reviewJson[questionText] = undefined;
                 }
-                reviewJson[questionText] = chosenOptions;
             }
             else {
                 reviewJson[questionText] = item.answer.answer;
@@ -622,7 +626,8 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
         const exportType = req.params.exporttype;
         // export in required format
         FileExport.exportJSONToFile(exportData, filename, exportType, res);
-    } catch {
+    } catch (error) {
+        console.log(error);
         res.sendStatus(400);
     }
 });
