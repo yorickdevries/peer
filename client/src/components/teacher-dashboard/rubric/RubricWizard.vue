@@ -64,6 +64,10 @@
                             <MCQuestion v-model="rubric.questions[index]"></MCQuestion>
                         </template>
 
+                        <template v-if="question.type_question === 'checkbox'">
+                            <CheckboxQuestion v-model="rubric.questions[index]"></CheckboxQuestion>
+                        </template>
+
                         <template v-if="question.type_question === 'upload'">
                             <UploadQuestion v-model="rubric.questions[index]"></UploadQuestion>
                         </template>
@@ -107,14 +111,17 @@ import notifications from '../../../mixins/notifications'
 import OpenQuestion from './OpenQuestion'
 import RangeQuestion from './RangeQuestion'
 import MCQuestion from './MCQuestion'
+import CheckboxQuestion from './CheckboxQuestion'
 import UploadQuestion from './UploadQuestion'
 import CreateQuestionWizard from './CreateQuestionWizard'
 
 let apiPrefixes = {
     open: '/rubric/openquestion',
-    mc: '/rubric/mcquestion',
     range: '/rubric/rangequestion',
+    mc: '/rubric/mcquestion',
     mcoption: '/rubric/mcoption',
+    checkbox: '/rubric/checkboxquestion',
+    checkboxoption: '/rubric/checkboxoption',
     upload: '/rubric/uploadquestion'
 }
 
@@ -124,6 +131,7 @@ export default {
         OpenQuestion,
         RangeQuestion,
         MCQuestion,
+        CheckboxQuestion,
         CreateQuestionWizard,
         UploadQuestion
     },
