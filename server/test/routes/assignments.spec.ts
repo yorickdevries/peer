@@ -77,7 +77,6 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "text_file.txt");
         expect(res.status).to.equal(400);
-        expect(res.text).to.equal(JSON.stringify({error: "File should be a .csv file"}));
     });
 
     it("Import groups - file larger than 1MB", async () => {
@@ -87,7 +86,6 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv");
         expect(res.status).to.equal(400);
-        expect(res.text).to.equal(JSON.stringify({error: "File is too large" }));
     });
 
     it("Import groups - no file", async () => {

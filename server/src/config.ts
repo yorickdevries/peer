@@ -20,15 +20,15 @@ const config = {
         maxAge: 12 * 60 * 60 * 1000   // 12 hours in ms
     },
     reviews: {
-        fileFolder: path.join(__dirname, "./files/reviews"),
+        fileFolder: path.join(__dirname, "../files/reviews"),
         maxSizeReviewFile: 50 * 1024 * 1024
     },
     assignments: {
-        fileFolder: path.join(__dirname, "./files/assignments"),
+        fileFolder: path.join(__dirname, "../files/assignments"),
         maxSizeAssignmentFile: 50 * 1024 * 1024
     },
     submissions: {
-        fileFolder: path.join(__dirname, "./files/submissions"),
+        fileFolder: path.join(__dirname, "../files/submissions"),
         maxSizeSubmissionFile: 50 * 1024 * 1024
     },
     exampleData: {
@@ -45,7 +45,7 @@ const config = {
         certificate: "/var/www/peer/cert/peer_ewi_tudelft_nl.crt",
         key: "/var/www/peer/cert/peer.ewi.tudelft.nl.key"
     },
-    allowed_extensions: [".pdf", ".zip"]
+    allowed_extensions: [".pdf", ".zip", ".doc", ".docx"]
 };
 
 // In case of CI, change hostname to postgres

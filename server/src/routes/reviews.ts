@@ -3,7 +3,7 @@ import RubricPS from "../prepared_statements/rubric_ps";
 import ReviewUpdate from "../reviewUpdate";
 import index from "../security/index";
 import path from "path";
-import multer from "multer";
+import upload from "../middleware/upload";
 import fs from "fs-extra";
 import config from "../config";
 
@@ -14,42 +14,6 @@ const router = express();
 router.use(express.json());
 
 const fileFolder = config.reviews.fileFolder;
-
-// File of max 50 MB (in bytes)
-const maxSizeAssignmentFile = config.reviews.maxSizeReviewFile;
-const uploadReview = multer({
-    limits: {fileSize: maxSizeAssignmentFile},
-    fileFilter: function (req: any, file, callback) {
-        const ext = path.extname(file.originalname);
-        const extensions: any = config.allowed_extensions;
-        if (!(extensions.includes(ext))) {
-            req.fileValidationError = "Extension not allowed";
-            // tslint:disable-next-line
-            return callback(null, false);
-        } else {
-            // tslint:disable-next-line
-            return callback(null, true);
-        }
-    }
-}).any();
-
-// File upload handling
-const uploadReviewFunction = function(req: any, res: any, next: any) {
-    uploadReview(req, res, function (err) {
-        // Error in case of too large file size
-        if (err) {
-            res.status(400);
-            res.json({ error: "File is too large" });
-        }
-        // Error in case of wrong file type
-        else if (req.fileValidationError) {
-            res.status(400);
-            res.json({ error: req.fileValidationError });
-        } else {
-            next();
-        }
-    });
-};
 
 /**
  * Route to get a review by review id.
@@ -127,7 +91,7 @@ router.route("/:reviewId/reviewevaluation").post(index.authorization.checkAuthor
  * @body a json object of the whole form, as specified in the doc.
  * @return JSON representation of a review.
  */
-router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkReviewOwner, index.authorization.checkReviewEditAllowed, async (req, res) => {
+router.route("/:reviewId").put(upload(undefined, config.allowed_extensions, config.reviews.maxSizeReviewFile), index.authorization.checkReviewOwner, index.authorization.checkReviewEditAllowed, async (req, res) => {
     try {
         // input
         const reviewId = req.params.reviewId;
@@ -159,18 +123,28 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
 
                 // Get the correct extension of the upload question.
                 const currentRubricUploadQuestion = rubricQuestions.find((x: any) => x.id === questionId);
+                // Find the corresponding question
+                let previousFile: string | undefined = undefined;
+                const review: any = await ReviewUpdate.getReview(reviewId);
+                const reviewForm = review.form;
+                for (let j = 0; j < reviewForm.length; j++) {
+                    if (currentRubricUploadQuestion.id == reviewForm[j].question.id) {
+                        previousFile = reviewForm[j].answer.answer;
+                    }
+                }
+
                 if (currentRubricUploadQuestion.type_question !== "upload") {
                     throw new Error("File uploaded for a non-upload question");
                 }
-                const correctExtension = currentRubricUploadQuestion.extension;
+                const correctExtensions: string[] = currentRubricUploadQuestion.extension.split(",");
 
                 // Check if the extension is correct
-                if (!file.mimetype.includes(correctExtension)) {
-                    res.status(400).send({error: "Invalid file extension"});
+                const extension = path.extname(file.originalname);
+                if (!correctExtensions.includes(extension)) {
+                    throw new Error("Invalid file extension");
                 }
-
                 // Create and save a unique filename based on the review and question.
-                const filename = `${req.params.reviewId}-${file.fieldname}.${correctExtension}`;
+                const filename = `${req.params.reviewId}-${file.fieldname}${extension}`;
                 const filepath = path.join(fileFolder, filename);
 
                 // get the question in the form
@@ -179,6 +153,10 @@ router.route("/:reviewId").put(uploadReviewFunction, index.authorization.checkRe
                 currentFormUploadQuestion.answer.answer = filename;
                 uploadQuestionIds.push(questionId);
 
+                if (previousFile) {
+                    const previousFilePath = path.join(fileFolder, previousFile);
+                    await fs.unlink(previousFilePath);
+                }
                 await fs.writeFile(filepath, file.buffer);
             }
         }
