@@ -49,8 +49,7 @@ describe("API Assignment routes", () => {
         // log in as teacheraccount
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
-            .attach("groupFile", fs.readFileSync(file), "export.csv")
-            .field("groupColumn", "Education Groups");
+            .attach("groupFile", fs.readFileSync(file), "export.csv");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             [{groupId: 25, groupname: "ED 4"}, {groupId: 26, groupname: "ED 3"}]
@@ -62,8 +61,8 @@ describe("API Assignment routes", () => {
         // log in as teacheraccount
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
-            .attach("groupFile", fs.readFileSync(file), "export.csv")
-            .field("groupColumn", "Education Groups");
+            .attach("groupFile", fs.readFileSync(file), "export.csv");
+        console.log(res.text);
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             [{groupId: 25, groupname: "ED 4"}, {groupId: 26, groupname: "ED 3"}]
@@ -97,13 +96,22 @@ describe("API Assignment routes", () => {
     });
 
     it("Import groups - good file + no groupcolumn", async () => {
-        const file = path.join(__dirname, "../../example_data/csv_test/example_export.csv");
+        const file = path.join(__dirname, "../../example_data/csv_test/example_export_no_groupcolumn.csv");
         // log in as teacheraccount
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv");
         expect(res.status).to.equal(400);
-        expect(res.text).to.equal(JSON.stringify({error: "No groupcolumn defined"}));
+    });
+
+    it("Import groups - no usercolumn", async () => {
+        const file = path.join(__dirname, "../../example_data/csv_test/example_export_no_usercolumn.csv");
+        // log in as teacheraccount
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).post("/3/importgroups")
+            .attach("groupFile", fs.readFileSync(file), "export.csv");
+        expect(res.status).to.equal(400);
+        expect(res.text).to.equal(JSON.stringify({error: "NetId is undefined"}));
     });
 
     /**
