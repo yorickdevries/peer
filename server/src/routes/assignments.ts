@@ -339,13 +339,9 @@ router.post("/:assignment_id/importgroups", upload("groupFile", [".csv"], maxSiz
     if (req.file == undefined) {
         res.status(400);
         res.json({error: "No file uploaded"});
-    } else if (req.body.groupColumn == undefined) {
-        res.status(400);
-        res.json({error: "No groupcolumn defined"});
     } else {
-        const groupColumn = req.body.groupColumn;
         const assignmentId = req.params.assignment_id;
-        GroupParser.importGroups(req.file.buffer, groupColumn, assignmentId)
+        GroupParser.importGroups(req.file.buffer, assignmentId)
         .then((data) => {
             res.json(data);
         }).catch((error) => {
