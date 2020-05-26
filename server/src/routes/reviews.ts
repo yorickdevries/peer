@@ -122,14 +122,14 @@ router.route("/:reviewId").put(upload(undefined, config.allowed_extensions, conf
                 const questionId = parseInt(file.fieldname);
 
                 // Get the correct extension of the upload question.
-                const currentRubricUploadQuestion = rubricQuestions.find((x: any) => x.id === questionId && x.type_question === 'upload');
+                const currentRubricUploadQuestion = rubricQuestions.find((x: any) => x.id === questionId && x.type_question === "upload");
 
                 // Find the corresponding question
                 let previousFile: string | undefined = undefined;
                 const review: any = await ReviewUpdate.getReview(reviewId);
                 const reviewForm = review.form;
                 for (let j = 0; j < reviewForm.length; j++) {
-                    if (currentRubricUploadQuestion.id == reviewForm[j].question.id && reviewForm[j].question.type_question === 'upload') {
+                    if (currentRubricUploadQuestion.id == reviewForm[j].question.id && reviewForm[j].question.type_question === "upload") {
                         previousFile = reviewForm[j].answer.answer;
                     }
                 }
@@ -149,7 +149,7 @@ router.route("/:reviewId").put(upload(undefined, config.allowed_extensions, conf
                 const filepath = path.join(fileFolder, filename);
 
                 // get the question in the form
-                const currentFormUploadQuestion = inputForm.find((x: any) => x.question.id === questionId &&  x.question.type_question === 'upload');
+                const currentFormUploadQuestion = inputForm.find((x: any) => x.question.id === questionId && x.question.type_question === "upload");
                 // set the filename in the form
                 currentFormUploadQuestion.answer.answer = filename;
                 uploadQuestionIds.push(questionId);
