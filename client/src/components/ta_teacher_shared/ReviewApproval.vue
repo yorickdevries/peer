@@ -60,6 +60,12 @@
                         <div class="mb-2">
                             <h5 class="text-primary">Question {{ pair.question.question_number }} of {{
                                 totalAmountOfQuestions }}</h5>
+                            <b-badge pill v-if="pair.question.optional"  variant="secondary" class="ml-2 float-right p-1">
+                                OPTIONAL
+                            </b-badge>
+                            <b-badge v-else variant="danger" class="ml-2 float-right p-1">
+                                REQUIRED
+                            </b-badge>
                             <p>{{ pair.question.question }}</p>
                         </div>
 
