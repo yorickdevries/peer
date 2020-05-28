@@ -189,12 +189,18 @@ export default {
     },
     computed: {
         peerReviewSorted() {
+            const tempForm = this.peerReview.form.slice().sort((a, b) => {
+                return a.question.question_number - b.question.question_number
+            })
+            tempForm.forEach(element => {
+                if (element.question.type_question === "checkbox" && !element.answer.answer) {
+                    element.answer.answer = []
+                }
+            })
             // Returns the review object, but sorted on question number.
             return {
                 review: this.peerReview.review,
-                form: this.peerReview.form.slice().sort((a, b) => {
-                    return a.question.question_number - b.question.question_number
-                })
+                form: tempForm
             }
         },
         totalAmountOfQuestions() {
@@ -225,7 +231,7 @@ export default {
             let validated = true;
             this.peerReview.form.forEach(pair => {
                 if (pair.answer.answer === null || pair.answer.answer === undefined || pair.answer.answer === "") {
-                    if (pair.question.type_question === 'upload') {
+                    if (pair.question.type_question === 'checkbox' || pair.question.type_question === 'upload') {
                         return
                     }
                     validated = false
