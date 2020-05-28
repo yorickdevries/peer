@@ -213,11 +213,13 @@ export default {
             // Validate all fields (required).
             let validated = true;
             this.peerReview.form.forEach(pair => {
-                if (pair.answer.answer === null || pair.answer.answer === undefined || pair.answer.answer === "") {
-                    if (pair.question.type_question === 'upload') {
-                        return
+                if(!pair.question.optional){
+                    if (pair.answer.answer === null || pair.answer.answer === undefined || pair.answer.answer === "") {
+                        if (pair.question.type_question === 'upload') {
+                            return
+                        }
+                        validated = false
                     }
-                    validated = false
                 }
             })
 
