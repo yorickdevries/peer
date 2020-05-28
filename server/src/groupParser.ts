@@ -17,11 +17,11 @@ export default class GroupParser {
      * @param {number} assignmentId
      * @return {Promise<any[]>}
      */
-    public static async importGroups(filebuffer: Buffer, groupColumn: string, assignmentId: number) {
+    public static async importGroups(filebuffer: Buffer, assignmentId: number) {
         // parse the file
         let studentlist = await neatCsv(filebuffer);
         studentlist = await this.checkStudentList(studentlist, assignmentId);
-        const studentmap = this.mapGroups(studentlist, groupColumn);
+        const studentmap = this.mapGroups(studentlist);
         return await this.addGroupsToDatabase(studentmap, assignmentId);
     }
 
@@ -33,8 +33,8 @@ export default class GroupParser {
     public static isEmptyGroup(csvEntry: any): boolean {
         const studentNumber = csvEntry["OrgDefinedId"];
         const netId = csvEntry.Username;
-        const lastName = csvEntry["Last Name"];
-        const firstName = csvEntry["First Name"];
+        const lastName = csvEntry["LastName"];
+        const firstName = csvEntry["FirstName"];
         const email = csvEntry["Email"];
         return studentNumber === "" && netId === "" && netId === "" && lastName === "" && firstName === "" && email === "";
     }
@@ -125,13 +125,13 @@ export default class GroupParser {
      * @param {string} groupColumn
      * @returns {Map<string, string[]>} mapping of the groups.
      */
-    public static mapGroups(studentlist: object[], groupColumn: string): Map<string, string[]> {
+    public static mapGroups(studentlist: object[]): Map<string, string[]> {
         // initialize result map
         const result: Map<string, string[]> = new Map<string, string[]>();
         // iterate over all students
         studentlist.forEach(function(student: any) {
             const currentStudent = student.Username;
-            const currentGroup = student[groupColumn];
+            const currentGroup = student.GroupName;
             // in case the student doesnt have a groupColumn field
             if (currentGroup == undefined || currentGroup == "") {
                 throw new Error(currentStudent + " does not have a group");
@@ -146,7 +146,7 @@ export default class GroupParser {
             } else {
                 // initialize list with this student
                 const netid = ParseNetId.parseNetId(currentStudent);
-                result.set(student[groupColumn], [netid]);
+                result.set(currentGroup, [netid]);
             }
         });
         return result;

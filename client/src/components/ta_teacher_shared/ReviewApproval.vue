@@ -98,6 +98,17 @@
                             </b-form-radio-group>
                         </b-form-group>
 
+                        <!-- CHECKBOX QUESTION -->
+                        <b-form-group v-else-if="pair.question.type_question === 'checkbox'">
+                            <b-form-checkbox-group
+                                    :options="transformOptionsToHTMLOptions(pair.question.option)"
+                                    v-model="pair.answer.answer"
+                                    stacked
+                                    required
+                                    :disabled="peerReview.review.done">
+                            </b-form-checkbox-group>
+                        </b-form-group>
+
                         <!-- UPLOAD QUESTION -->
                         <template v-if="pair.question.type_question === 'upload'">
                             <a :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">{{ pair.answer.answer }}</a>

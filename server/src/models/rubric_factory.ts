@@ -1,5 +1,7 @@
 import RubricPS from "../prepared_statements/rubric_ps";
 
+// This file needs to be revised with new questiontypes
+
 interface OpenQuestion {
     question: string;
     optional: boolean;

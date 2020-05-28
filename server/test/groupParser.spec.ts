@@ -29,9 +29,8 @@ describe("GroupParser tests", () => {
         // set up input data
         const file = path.join(__dirname, "../example_data/csv_test/example_export.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
-        const groupColumn = "Education Groups";
         const assignmentId = 3;
-        const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
+        const result = await GroupParser.importGroups(filebuffer, assignmentId);
         expect(result).to.deep.equal([{ groupId: 25, groupname: "ED 4" },
         { groupId: 26, groupname: "ED 3" }]);
     });
@@ -40,9 +39,8 @@ describe("GroupParser tests", () => {
         // set up input data
         const file = path.join(__dirname, "../example_data/csv_test/example_export_groupnumbers.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
-        const groupColumn = "Education Groups";
         const assignmentId = 3;
-        const result = await GroupParser.importGroups(filebuffer, groupColumn, assignmentId);
+        const result = await GroupParser.importGroups(filebuffer, assignmentId);
         expect(result).to.deep.equal([{ groupId: 25, groupname: "4" },
         { groupId: 26, groupname: "ED 3" }]);
     });
@@ -54,9 +52,8 @@ describe("GroupParser tests", () => {
         // set up input data
         const file = path.join(__dirname, "../example_data/csv_test/example_export_non_csv.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
-        const groupColumn = "Education Groups";
         const assignmentId = 3;
-        await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
+        await expect(GroupParser.importGroups(filebuffer, assignmentId))
         .to.eventually.be.rejectedWith("NetId is undefined");
     });
 
@@ -64,9 +61,8 @@ describe("GroupParser tests", () => {
         // set up input data
         const file = path.join(__dirname, "../example_data/csv_test/example_export_missing_group.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
-        const groupColumn = "Education Groups";
         const assignmentId = 3;
-        await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
+        await expect(GroupParser.importGroups(filebuffer, assignmentId))
         .to.eventually.be.rejectedWith("bplanje@tudelft.nl does not have a group");
     });
 
@@ -74,9 +70,8 @@ describe("GroupParser tests", () => {
         // set up input data
         const file = path.join(__dirname, "../example_data/csv_test/example_export_missing_username.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
-        const groupColumn = "Education Groups";
         const assignmentId = 3;
-        await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
+        await expect(GroupParser.importGroups(filebuffer, assignmentId))
         .to.eventually.be.rejectedWith("NetId is undefined");
     });
 
@@ -84,9 +79,8 @@ describe("GroupParser tests", () => {
         // set up input data
         const file = path.join(__dirname, "../example_data/csv_test/example_export_empty_username.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
-        const groupColumn = "Education Groups";
         const assignmentId = 3;
-        await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
+        await expect(GroupParser.importGroups(filebuffer, assignmentId))
         .to.eventually.be.rejectedWith("NetId is an empty string");
     });
 
@@ -94,9 +88,8 @@ describe("GroupParser tests", () => {
         // set up input data
         const file = path.join(__dirname, "../example_data/csv_test/example_export_usernames_without_at.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
-        const groupColumn = "Education Groups";
         const studentlist = await neatCsv(filebuffer);
-        const result = await GroupParser.mapGroups(studentlist, groupColumn);
+        const result = await GroupParser.mapGroups(studentlist);
         expect(result.get("ED 3")).to.deep.equal(["paulvanderlaan", "hwermelink"]);
         expect(result.get("ED 4")).to.deep.equal(["pmoelchand", "bplanje", "yorickdevries"]);
     });
@@ -105,9 +98,8 @@ describe("GroupParser tests", () => {
         // set up input data
         const file = path.join(__dirname, "../example_data/csv_test/example_export.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
-        const groupColumn = "Education Groups";
         const assignmentId = -1;
-        await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
+        await expect(GroupParser.importGroups(filebuffer, assignmentId))
         .to.eventually.be.rejectedWith("Assignment doesn't exist in the database");
     });
 
@@ -115,9 +107,8 @@ describe("GroupParser tests", () => {
         // set up input data
         const file = path.join(__dirname, "../example_data/csv_test/duplicate_student.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
-        const groupColumn = "Education Groups";
         const assignmentId = 3;
-        await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
+        await expect(GroupParser.importGroups(filebuffer, assignmentId))
         .to.eventually.be.rejectedWith("Duplicate student: bplanje");
     });
 
@@ -125,9 +116,8 @@ describe("GroupParser tests", () => {
         // set up input data
         const file = path.join(__dirname, "../example_data/csv_test/example_export.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
-        const groupColumn = "Education Groups";
         const assignmentId = 1;
-        await expect(GroupParser.importGroups(filebuffer, groupColumn, assignmentId))
+        await expect(GroupParser.importGroups(filebuffer, assignmentId))
         .to.eventually.be.rejectedWith("paulvanderlaan is already in a group");
     });
 

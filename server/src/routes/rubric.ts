@@ -12,6 +12,107 @@ const router = express();
 router.use(express.json());
 
 /**
+ * create checkboxquestion
+ * @body question - question
+ * @body rubric_id - rubric_id
+ * @body question_number - question_number
+ */
+router.post("/checkboxquestion", index.authorization.checkRubricAuthorizationPostQuestion, (req, res) => {
+    RubricPS.executeCreateCheckboxQuestion(req.body.question, req.body.rubric_id, req.body.question_number)
+    .then((data: any) => {
+        data.type_question = "checkbox";
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
+
+/**
+ * Update checkboxquestion
+ * @params  question_id - question_id
+ * @body question - question
+ * @body question_number - question_number
+ */
+router.put("/checkboxquestion/:question_id", index.authorization.checkCheckboxQuestionEdit, (req, res) => {
+    RubricPS.executeUpdateCheckboxQuestion(req.body.question, req.body.question_number, req.params.question_id)
+    .then((data: any) => {
+        data.type_question = "checkbox";
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
+
+/**
+ * Route to delete checkbox question
+ * @params id - id
+ */
+router.delete("/checkboxquestion/:question_id", index.authorization.checkCheckboxQuestionEdit, async (req, res) => {
+    const checkboxOptions: any = await RubricPS.executeGetAllCheckboxOptionsByQuestionId(req.params.question_id);
+    for (let i = 0; i < checkboxOptions.length; i++) {
+        await RubricPS.executeDeleteCheckboxOption(checkboxOptions[i].id);
+    }
+    RubricPS.executeDeleteCheckboxQuestion(req.params.question_id)
+    .then((data: any) => {
+        data.type_question = "checkbox";
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
+
+/**
+ * Route to create an option for a checkbox question
+ * @body option, checkboxquestion_id
+ */
+router.post("/checkboxoption", index.authorization.checkCheckboxOptionPost, (req, res) => {
+    if (req.body.option == "") {
+        // Option cannot be empty
+        res.sendStatus(400);
+    } else {
+        RubricPS.executeCreateCheckboxOption(req.body.option, req.body.checkboxquestion_id)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.sendStatus(400);
+        });
+    }
+});
+
+
+/**
+ * Route to update checkboxoption
+ *
+ */
+router.put("/checkboxoption/:option_id", index.authorization.checkCheckboxOptionEdit, (req, res) => {
+    if (req.body.option == "") {
+        // Option cannot be empty
+        res.sendStatus(400);
+    } else {
+        RubricPS.executeUpdateCheckboxOption(req.body.option, req.params.option_id)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.sendStatus(400);
+        });
+    }
+});
+
+
+/**
+ * Route to delete checkbox option
+ * @params id - id
+ */
+router.delete("/checkboxoption/:option_id", index.authorization.checkCheckboxOptionEdit, (req, res) => {
+    RubricPS.executeDeleteCheckboxOption(req.params.option_id)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
+
+/**
  * Route to delete an open question
  * @params id - id
  */
