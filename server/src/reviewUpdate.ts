@@ -209,7 +209,8 @@ export default class ReviewUpdate {
             throw new Error("Wrong Open Question: " + questionId);
         }
         // answer validation
-        if (!(typeof answerText === "string") || answerText == "") {
+        // !question.optional is a temporary fix, we would want to delete the entry
+        if (!(typeof answerText === "string") || (answerText == "" && !question.optional)) {
             throw new Error("The following Open Question has an invalid answer: " + questionId);
         } else {
             return {
