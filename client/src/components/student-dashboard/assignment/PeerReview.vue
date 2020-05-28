@@ -231,7 +231,7 @@ export default {
             let validated = true;
             this.peerReview.form.forEach(pair => {
                 if (pair.answer.answer === null || pair.answer.answer === undefined || pair.answer.answer === "") {
-                    if (pair.question.type_question === 'checkbox' || pair.question.type_question === 'upload') {
+                    if (pair.question.type_question === 'upload') {
                         return
                     }
                     validated = false
