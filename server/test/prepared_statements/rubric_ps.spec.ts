@@ -27,11 +27,12 @@ describe("RubricPreparedStatements Test", () => {
      * Test to create open question
      */
     it("create open question", async () => {
-        expect(await RubricPS.executeCreateOpenQuestion("hi", 1, 1)).to.deep.equal({
+        expect(await RubricPS.executeCreateOpenQuestion("hi", 1, 1, false)).to.deep.equal({
             id: 3,
             question: "hi",
             question_number: 1,
-            rubric_id: 1
+            rubric_id: 1,
+            optional: false
         });
     });
 
@@ -39,11 +40,12 @@ describe("RubricPreparedStatements Test", () => {
      * Test to create mc question
      */
     it("create mc question", async () => {
-        expect(await RubricPS.executeCreateMCQuestion("hi", 1, 1)).to.deep.equal({
+        expect(await RubricPS.executeCreateMCQuestion("hi", 1, 1, false)).to.deep.equal({
             id: 3,
             question: "hi",
             question_number: 1,
-            rubric_id: 1
+            rubric_id: 1,
+            optional: false
         });
     });
 
@@ -51,12 +53,13 @@ describe("RubricPreparedStatements Test", () => {
      * Test to create open question
      */
     it("create range question", async () => {
-        expect(await RubricPS.executeCreateRangeQuestion("hi", 6, 1, 1)).to.deep.equal({
+        expect(await RubricPS.executeCreateRangeQuestion("hi", 6, 1, 1, false)).to.deep.equal({
             id: 2,
             question: "hi",
             question_number: 1,
             rubric_id: 1,
-            range: 6
+            range: 6,
+            optional: false
         });
     });
 
@@ -82,7 +85,7 @@ describe("RubricPreparedStatements Test", () => {
         const extension = "pdf";
 
         // Create upload question
-        const created: any = await RubricPS.executeCreateUploadQuestion(question, assignmentId, questionNr, extension);
+        const created: any = await RubricPS.executeCreateUploadQuestion(question, assignmentId, questionNr, extension, false);
 
         // Get upload question
         const fetched = await RubricPS.executeGetUploadQuestionByIdAndRubricId(created.id, assignmentId);
@@ -110,10 +113,10 @@ describe("RubricPreparedStatements Test", () => {
         const extension = "zip";
 
         // Create upload question
-        const created: any = await RubricPS.executeCreateUploadQuestion("", 2, 4, "not");
+        const created: any = await RubricPS.executeCreateUploadQuestion("", 2, 4, "not", false);
 
         // Update question
-        const updated: any = await RubricPS.executeUpdateUploadQuestion(question, questionNr, created.id, extension);
+        const updated: any = await RubricPS.executeUpdateUploadQuestion(question, questionNr, created.id, extension, false);
 
         // Verify results
         expect({
@@ -133,11 +136,12 @@ describe("RubricPreparedStatements Test", () => {
      * Test to update an open question
      */
     it("update open question", async () => {
-        expect(await RubricPS.executeUpdateOpenQuestion("hi2", 1, 1)).to.deep.equal({
+        expect(await RubricPS.executeUpdateOpenQuestion("hi2", 1, 1, false)).to.deep.equal({
             id: 1,
             question: "hi2",
             question_number: 1,
-            rubric_id: 1
+            rubric_id: 1,
+            optional: false
         });
     });
 
@@ -145,12 +149,13 @@ describe("RubricPreparedStatements Test", () => {
      * Test to update an range question
      */
     it("update range question", async () => {
-        expect(await RubricPS.executeUpdateRangeQuestion("hi2", 6, 1, 1)).to.deep.equal({
+        expect(await RubricPS.executeUpdateRangeQuestion("hi2", 6, 1, 1, false)).to.deep.equal({
             id: 1,
             question: "hi2",
             question_number: 1,
             range: 6,
-            rubric_id: 1
+            rubric_id: 1,
+            optional: false
         });
     });
 
@@ -158,11 +163,12 @@ describe("RubricPreparedStatements Test", () => {
      * Test to update a mc question
      */
     it("update mc question", async () => {
-        expect(await RubricPS.executeUpdateMCQuestion("hi2", 1, 1)).to.deep.equal({
+        expect(await RubricPS.executeUpdateMCQuestion("hi2", 1, 1, false)).to.deep.equal({
             id: 1,
             question: "hi2",
             question_number: 1,
-            rubric_id: 1
+            rubric_id: 1,
+            optional: false
         });
     });
 
@@ -185,13 +191,15 @@ describe("RubricPreparedStatements Test", () => {
             id: 1,
             question: "What is the best way to insert queries?",
             question_number: 3,
-            rubric_id: 1
+            rubric_id: 1,
+            optional: false
         },
         {
             id: 2,
             question: "Is the right Answer A?",
             question_number: 4,
-            rubric_id: 1
+            rubric_id: 1,
+            optional: false
             }]);
     });
 
@@ -203,7 +211,8 @@ describe("RubricPreparedStatements Test", () => {
             id: 1,
             question: "How to insert queries?",
             question_number: 1,
-            rubric_id: 1
+            rubric_id: 1,
+            optional: false
         }]);
     });
 
@@ -216,7 +225,8 @@ describe("RubricPreparedStatements Test", () => {
             question: "How much fun is inserting queries?",
             range: 7,
             question_number: 2,
-            rubric_id: 1
+            rubric_id: 1,
+            optional: false
         }]);
     });
 
@@ -247,12 +257,13 @@ describe("RubricPreparedStatements Test", () => {
      * Test to delete a open question
      */
     it("delete open question", async () => {
-        const newq: any = await RubricPS.executeCreateOpenQuestion("New Question", 1, 5);
+        const newq: any = await RubricPS.executeCreateOpenQuestion("New Question", 1, 5, false);
         expect(await RubricPS.executeDeleteOpenQuestion(newq.id)).to.deep.equal({
             rubric_id: 1,
             id: newq.id,
             question: "New Question",
-            question_number: 5
+            question_number: 5,
+            optional: false
         });
     });
 
@@ -260,13 +271,14 @@ describe("RubricPreparedStatements Test", () => {
      * Test to delete a range question
      */
     it("delete range question", async () => {
-        const newq: any = await RubricPS.executeCreateRangeQuestion("New Question", 5, 1, 5);
+        const newq: any = await RubricPS.executeCreateRangeQuestion("New Question", 5, 1, 5, false);
         expect(await RubricPS.executeDeleteRangeQuestion(newq.id)).to.deep.equal({
             rubric_id: 1,
             id: newq.id,
             question: "New Question",
             question_number: 5,
-            range: 5
+            range: 5,
+            optional: false
         });
     });
 
@@ -280,7 +292,8 @@ describe("RubricPreparedStatements Test", () => {
             rubric_id: 1,
             id: 2,
             question: "Is the right Answer A?",
-            question_number: 4
+            question_number: 4,
+            optional: false
         });
     });
 
@@ -305,7 +318,7 @@ describe("RubricPreparedStatements Test", () => {
         const extension = "pdf";
 
         // Create upload question
-        const created: any = await RubricPS.executeCreateUploadQuestion(question, assignmentId, questionNr, extension);
+        const created: any = await RubricPS.executeCreateUploadQuestion(question, assignmentId, questionNr, extension, false);
 
         // Get upload question
         const fetched = await RubricPS.executeGetUploadQuestionByIdAndRubricId(created.id, created.rubric_id);
@@ -322,7 +335,7 @@ describe("RubricPreparedStatements Test", () => {
      */
     it("get whole rubric includes", async () => {
         const assignmentId = 1;
-        const created: any = await RubricPS.executeCreateUploadQuestion("question", assignmentId, 12, "pdf");
+        const created: any = await RubricPS.executeCreateUploadQuestion("question", assignmentId, 12, "pdf", false);
         const fetched: any = await RubricPS.getAllQuestionsByRubricId(assignmentId);
 
         expect(fetched).to.deep.include({
@@ -359,6 +372,7 @@ describe("RubricPreparedStatements Test", () => {
                     "question_number": 3,
                     "rubric_id": 1,
                     "type_question": "mc",
+                    optional: false
                 },
                 {
                     "id": 2,
@@ -372,14 +386,16 @@ describe("RubricPreparedStatements Test", () => {
                     "question": "Is the right Answer A?",
                     "question_number": 4,
                     "rubric_id": 1,
-                    "type_question": "mc"
+                    "type_question": "mc",
+                    optional: false
                 },
                 {
                     "id": 1,
                     "question": "How to insert queries?",
                     "question_number": 1,
                     "rubric_id": 1,
-                    "type_question": "open"
+                    "type_question": "open",
+                    optional: false
                 },
                 {
                     "id": 1,
@@ -387,7 +403,8 @@ describe("RubricPreparedStatements Test", () => {
                     "question_number": 2,
                     "range": 7,
                     "rubric_id": 1,
-                    "type_question": "range"
+                    "type_question": "range",
+                    optional: false
                 }
             ]
         );

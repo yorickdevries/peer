@@ -9,11 +9,20 @@
             <div class="d-flex justify-content-between">
                 <div>
                     <div class="text-muted">Make Rubric</div>
-                    <b-button @click="makeRubric()" class="mb-3" variant="primary" size="sm">Make Rubric</b-button>
+                    <b-button @click="makeRubric()"
+                              class="mb-3"
+                              variant="primary"
+                              v-b-tooltip.hover title="Initialize the rubric">
+                        Make rubric
+                    </b-button>
                 </div>
                 <div>
                     <div class="text-muted">Create a new question.</div>
-                    <b-button v-b-modal="'createModal'"  variant="primary">Add new Question</b-button>
+                    <b-button v-b-modal="'createModal'"
+                              variant="primary"
+                              v-b-tooltip.hover title="Add a new question">
+                        Create new Question
+                    </b-button>
                 </div>
                 <div>
                     <div class="text-muted">Copy questions from another rubric.</div>
@@ -46,8 +55,14 @@
 
                     <b-card-header class="d-flex align-items-center">
                         <span class="w-100">Question {{ question.question_number }}</span>
-                        <b-badge variant="success" class="ml-2 float-right p-1">{{
+                        <b-badge variant="primary" class="ml-2 float-right p-1">{{
                             question.type_question.toUpperCase() }} QUESTION
+                        </b-badge>
+                        <b-badge pill v-if="question.optional"  variant="secondary" class="ml-2 float-right p-1">
+                            OPTIONAL
+                        </b-badge>
+                        <b-badge v-else variant="danger" class="ml-2 float-right p-1">
+                            REQUIRED
                         </b-badge>
                     </b-card-header>
 

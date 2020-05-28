@@ -73,31 +73,36 @@ export default {
             openQuestion: {
                 question: '',
                 rubric_id: this.rubricId,
-                question_number: null
+                question_number: null,
+                optional: false
             },
             rangeQuestion: {
                 question: '',
                 range: null,
                 rubric_id: this.rubricId,
-                question_number: null
+                question_number: null,
+                optional: false
             },
             mcQuestion: {
                 question: '',
                 rubric_id: this.rubricId,
                 question_number: null,
-                option: []
+                option: [],
+                optional: false
             },
             checkboxQuestion: {
                 question: '',
                 rubric_id: this.rubricId,
                 question_number: null,
-                option: []
+                option: [],
+                optional: false
             },
             uploadQuestion: {
                 question: '',
                 rubric_id: this.rubricId,
                 question_number: null,
-                extension: null
+                extension: null,
+                optional: false
             },
         }
     },
@@ -142,7 +147,8 @@ export default {
             let res = await api.client.post(`${apiPrefixes['mc']}`, {
                 question: question.question,
                 rubric_id: question.rubric_id,
-                question_number: question.question_number
+                question_number: question.question_number,
+                optional: question.optional
             })
 
             // Get the newly created ID of the MC question.
@@ -167,7 +173,8 @@ export default {
             let res = await api.client.post(`${apiPrefixes['checkbox']}`, {
                 question: question.question,
                 rubric_id: question.rubric_id,
-                question_number: question.question_number
+                question_number: question.question_number,
+                optional: question.optional
             })
 
             // Get the newly created ID of the Checkbox question.
@@ -191,31 +198,36 @@ export default {
             this.openQuestion = {
                 question: '',
                 rubric_id: this.rubricId,
-                question_number: this.nextNewQuestionNumber
+                question_number: this.nextNewQuestionNumber,
+                optional: false
             }
             this.rangeQuestion = {
                 question: '',
                 range: null,
                 rubric_id: this.rubricId,
-                question_number: this.nextNewQuestionNumber
+                question_number: this.nextNewQuestionNumber,
+                optional: false
             }
             this.mcQuestion = {
                 question: '',
                 rubric_id: this.rubricId,
                 question_number: this.nextNewQuestionNumber,
-                option: []
+                option: [],
+                optional: false
             },
             this.checkboxQuestion = {
                 question: '',
                 rubric_id: this.rubricId,
                 question_number: this.nextNewQuestionNumber,
-                option: []
+                option: [],
+                optional: false
             }
             this.uploadQuestion = {
                 question: '',
                 rubric_id: this.rubricId,
                 question_number: this.nextNewQuestionNumber,
-                extension: null
+                extension: null,
+                optional: false
             }
         }
     },

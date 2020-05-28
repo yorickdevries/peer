@@ -29,8 +29,15 @@
 
                     <!--Question Information-->
                     <div class="mb-2">
-                        <h5 class="text-primary">Question {{ pair.question.question_number }} of {{
-                            totalAmountOfQuestions }}</h5>
+                        <h5 class="text-primary">
+                            Question {{ pair.question.question_number }} of {{ totalAmountOfQuestions }}
+                        </h5>
+                        <b-badge pill v-if="pair.question.optional"  variant="secondary" class="ml-2 float-right p-1">
+                            OPTIONAL
+                        </b-badge>
+                        <b-badge v-else variant="danger" class="ml-2 float-right p-1">
+                            REQUIRED
+                        </b-badge>
                         <p>{{ pair.question.question }}</p>
                     </div>
 
@@ -85,22 +92,23 @@
                     <div v-if="pair.question.type_question === 'upload'">
 
                         <!--File upload-->
-                        <b-form-group :description="readOnly ? '' : 'Select a file and press save down below the page. Note: it overwrites files.'" class="mb-0">
-
-                            <!--Show currently uploaded file-->
-                            <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
-                                <!--Buttons for toggling new assignment upload-->
-                                <div>
-                                    <div v-if="pair.answer.answer">File uploaded: <a
-                                            :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">{{ pair.answer.answer }}</a></div>
-                                    <div v-else>You currently have no file uploaded.</div>
-                                </div>
+                        <b-form-group :description="readOnly || peerReview.review.done ? '' : 'Select a  file and press save down below the page'" class="mb-0">
+                            <!--Show whether file has been uploaded-->
+                            <b-alert v-if="pair.answer.answer" show variant="success" class="p-2">File uploaded:
+                                <a :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">
+                                    {{ pair.answer.answer }}
+                                </a>
+                            </b-alert>
+                            <b-alert v-else show variant="warning" class="p-2">
+                                Currently, no file has been uploaded. <br>
+                                Allowed file types: {{pair.question.extension}}
                             </b-alert>
 
                             <div v-if="!readOnly && !peerReview.review.done">
-                                <b-alert show variant="danger">{{ pair.question.extension.toUpperCase() }} files allowed only.</b-alert>
-
-                                <b-alert v-if="pair.answer.answer" show variant="warning">Note: uploading an new files will overwrite your current file.</b-alert>
+                                <!--Show note if a file has been uploaded and review not submitted-->
+                                <b-alert v-if="pair.answer.answer" show variant="secondary" class="p-2">Note: uploading a new file will overwrite your current file. <br>
+                                    Allowed file types: {{pair.question.extension}}
+                                </b-alert>
 
                                 <b-form-file  placeholder="Choose a new file..."
                                               v-model="files[pair.question.id]"
@@ -230,11 +238,13 @@ export default {
             // Validate all fields (required).
             let validated = true;
             this.peerReview.form.forEach(pair => {
-                if (pair.answer.answer === null || pair.answer.answer === undefined || pair.answer.answer === "") {
-                    if (pair.question.type_question === 'upload') {
-                        return
+                if(!pair.question.optional){
+                    if (pair.answer.answer === null || pair.answer.answer === undefined || pair.answer.answer === "") {
+                        if (pair.question.type_question === 'upload') {
+                            return
+                        }
+                        validated = false
                     }
-                    validated = false
                 }
             })
 
@@ -254,14 +264,14 @@ export default {
                         return
                     }
                 } catch (e) {
-                    this.showErrorMessage({message: "Submitting the review has failed. Make sure to fill in all fields."})
+                    this.showErrorMessage({message: "Submitting the review has failed. Make sure to fill in all required fields."})
                     return
                 }
 
                 this.$emit("submitEvent")
                 this.showSubmitMessage()
             } else {
-                this.showErrorMessage({message: "All fields are required."})
+                this.showErrorMessage({message: "Please make sure to fill in all required fields."})
             }
         },
         async savePeerReview() {

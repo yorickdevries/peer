@@ -86,7 +86,7 @@ describe("API review routes", () => {
         const submission: any = await SubmissionPS.executeCreateSubmission("henkjan", group.id, assignment.id, "none.pdf");
         const rubric: any = await RubricPS.executeCreateRubric(assignment.id, "submission");
         const review: any = await ReviewPS.executeCreateReview("paulvanderlaan", submission.id, rubric.id);
-        const uploadQuestion: any = await RubricPS.executeCreateUploadQuestion("Hi there?", rubric.id, 1, ".pdf");
+        const uploadQuestion: any = await RubricPS.executeCreateUploadQuestion("Hi there?", rubric.id, 1, ".pdf", false);
 
         // Submit a review with a uploaded file
         const res = await chai.request(router)
@@ -126,7 +126,7 @@ describe("API review routes", () => {
         const submission: any = await SubmissionPS.executeCreateSubmission("paulvanderlaan", 10, 1, "none.pdf");
         const rubric: any = await RubricPS.executeCreateRubric(1, "submission");
         const review: any = await ReviewPS.executeCreateReview("paulvanderlaan", submission.id, 1);
-        const uploadQuestion: any = await RubricPS.executeCreateUploadQuestion("Hi there?", rubric.id, 1, "pdf");
+        const uploadQuestion: any = await RubricPS.executeCreateUploadQuestion("Hi there?", rubric.id, 1, "pdf", false);
 
         // Submit a review with a uploaded file
         await chai.request(router)
@@ -233,7 +233,8 @@ describe("API review routes", () => {
                     "question": "How to insert queries?",
                     "question_number": 1,
                     "rubric_id": 1,
-                    "type_question": "open"
+                    "type_question": "open",
+                    optional: false
                   }
                 },
                 {
@@ -248,7 +249,8 @@ describe("API review routes", () => {
                     "question_number": 2,
                     "range": 7,
                     "rubric_id": 1,
-                    "type_question": "range"
+                    "type_question": "range",
+                    optional: false
                   }
                 },
                 {
@@ -267,7 +269,8 @@ describe("API review routes", () => {
                       "question": "What is the best way to insert queries?",
                       "question_number": 3,
                       "rubric_id": 1,
-                      "type_question": "mc"
+                      "type_question": "mc",
+                      optional: false
                     }
                   },
                   {
@@ -284,7 +287,8 @@ describe("API review routes", () => {
                       "question": "Is the right Answer A?",
                       "question_number": 4,
                       "rubric_id": 1,
-                      "type_question": "mc"
+                      "type_question": "mc",
+                      optional: false
                     }
                   }
               ],
