@@ -427,7 +427,8 @@ export default class RubricPS {
                 rubric_id: question.rubric_id,
                 question: question.question,
                 question_number: question.question_number,
-                option: await RubricPS.executeGetAllCheckboxOptionsByQuestionId(question.id)
+                option: await RubricPS.executeGetAllCheckboxOptionsByQuestionId(question.id),
+                optional: question.optional
             });
         }
 
