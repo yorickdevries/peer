@@ -70,6 +70,17 @@
                         </b-form-radio-group>
                     </b-form-group>
 
+                    <!-- CHECKBOX QUESTION -->
+                    <b-form-group v-else-if="pair.question.type_question === 'checkbox'">
+                        <b-form-checkbox-group
+                                :options="transformOptionsToHTMLOptions(pair.question.option)"
+                                v-model="pair.answer.answer"
+                                stacked
+                                required
+                                :disabled="peerReview.review.done || readOnly">
+                        </b-form-checkbox-group>
+                    </b-form-group>
+
                     <!-- UPLOAD QUESTION -->
                     <div v-if="pair.question.type_question === 'upload'">
 
@@ -178,12 +189,18 @@ export default {
     },
     computed: {
         peerReviewSorted() {
+            const tempForm = this.peerReview.form.slice().sort((a, b) => {
+                return a.question.question_number - b.question.question_number
+            })
+            tempForm.forEach(element => {
+                if (element.question.type_question === "checkbox" && !element.answer.answer) {
+                    element.answer.answer = []
+                }
+            })
             // Returns the review object, but sorted on question number.
             return {
                 review: this.peerReview.review,
-                form: this.peerReview.form.slice().sort((a, b) => {
-                    return a.question.question_number - b.question.question_number
-                })
+                form: tempForm
             }
         },
         totalAmountOfQuestions() {

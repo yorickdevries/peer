@@ -23,7 +23,25 @@ export default class ReviewUpdate {
                 let answer: any;
                 // Get the answers (from database) to the correct question type.
                 switch (question.type_question) {
-                    case "mc": answer = await ReviewsPS.executeGetMCAnswer(reviewId, question.id); break;
+                    case "mc": answer = await ReviewsPS.executeGetMCAnswer(review.id, question.id); break;
+                    case "checkbox": {
+                        // create answer object
+                        answer = {
+                            answer: [],
+                            checkboxquestion_id: question.id,
+                            review_id: review.id
+                        };
+                        // fill the answer field
+                        const options = await RubricPS.executeGetAllCheckboxOptionsByQuestionId(question.id);
+                        for (const option of options) {
+                            const optionAnswer: any = await ReviewsPS.executeGetCheckboxAnswer(review.id, option.id);
+                            const chosen = optionAnswer.answer;
+                            if (chosen) {
+                                answer.answer.push(option.id);
+                            }
+                        }
+                        break;
+                    }
                     case "open": answer = await ReviewsPS.executeGetOpenAnswer(reviewId, question.id); break;
                     case "range": answer = await ReviewsPS.executeGetRangeAnswer(reviewId, question.id); break;
                     case "upload": answer = await ReviewsPS.executeGetUploadAnswer(reviewId, question.id); break;
@@ -129,6 +147,9 @@ export default class ReviewUpdate {
                 break;
                 case "mc":
                     questionList.push(await this.checkMCQuestion(questionId, rubricId, answerText));
+                break;
+                case "checkbox":
+                    questionList.push(await this.checkCheckboxQuestion(questionId, rubricId, answerText));
                 break;
                 case "upload":
                     // If the question id is not contained, the user did not upload a file. Skip this one.
@@ -245,6 +266,36 @@ export default class ReviewUpdate {
     }
 
     /**
+     * Checks whether an answer for a Checkbox question is valid to add to the database
+     * @param {number} questionId
+     * @param {number} rubricId
+     * @param {*} answerText
+     * @returns checkbox question json.
+     */
+    public static async checkCheckboxQuestion(questionId: number, rubricId: number, answerText: number[]) {
+        // Initialize the question variable
+        let question;
+        try {
+            question = await RubricPS.executeGetCheckboxQuestionByIdAndRubricId(questionId, rubricId);
+        } catch (error) {
+            throw new Error("Wrong Checkbox Question: " + questionId);
+        }
+        const options = await RubricPS.executeGetAllCheckboxOptionsByQuestionId(question.id);
+
+        for (const chosenOption of answerText) {
+            const option = options.find((option: any) => option.id == chosenOption);
+            if (option == undefined) {
+                throw new Error("The following Checkbox Question has an invalid answer: " + questionId);
+            }
+        }
+        return {
+            questionType: "checkbox",
+            questionId: questionId,
+            answer: answerText
+        };
+    }
+
+    /**
      * Apply all questions to the database
      * @param {number} reviewId
      * @param {any[]} checkedQuestions
@@ -268,6 +319,13 @@ export default class ReviewUpdate {
                     break;
                     case "mc":
                         await ReviewsPS.executeUpdateMpcAnswer(answer, questionId, reviewId);
+                    break;
+                    case "checkbox":
+                        const options = await RubricPS.executeGetAllCheckboxOptionsByQuestionId(questionId);
+                        for (const option of options) {
+                            const chosen: boolean = answer.includes(option.id);
+                            await ReviewsPS.executeUpdateCheckboxAnswer(chosen, option.id, reviewId);
+                        }
                     break;
                     case "upload":
                         await ReviewsPS.executeUpdateUploadAnswer(answer, questionId, reviewId);

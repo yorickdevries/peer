@@ -19,6 +19,11 @@
             <b-button @click="createQuestion(mcQuestion, selectedType)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
         </template>
 
+        <template v-if="selectedType === 'checkbox'">
+            <CheckboxQuestion v-model="checkboxQuestion"></CheckboxQuestion>
+            <b-button @click="createQuestion(checkboxQuestion, selectedType)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
+        </template>
+
         <template v-if="selectedType === 'upload'">
             <UploadQuestion v-model="uploadQuestion"></UploadQuestion>
             <b-button @click="createQuestion(uploadQuestion, selectedType)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
@@ -31,14 +36,17 @@ import OpenQuestion from './OpenQuestion'
 import RangeQuestion from './RangeQuestion'
 import UploadQuestion from './UploadQuestion'
 import MCQuestion from './MCQuestion'
+import CheckboxQuestion from './CheckboxQuestion'
 import api from "../../../api"
 import notifications from '../../../mixins/notifications'
 
 let apiPrefixes = {
     open: '/rubric/openquestion',
-    mc: '/rubric/mcquestion',
     range: '/rubric/rangequestion',
+    mc: '/rubric/mcquestion',
     mcoption: '/rubric/mcoption',
+    checkbox: '/rubric/checkboxquestion',
+    checkboxoption: '/rubric/checkboxoption',
     upload: '/rubric/uploadquestion',
 }
 
@@ -48,6 +56,7 @@ export default {
         OpenQuestion,
         RangeQuestion,
         MCQuestion,
+        CheckboxQuestion,
         UploadQuestion
     },
     props: ['id', 'rubricId', 'nextNewQuestionNumber'],
@@ -56,6 +65,7 @@ export default {
             selectedType: '',
             questionTypes: [
                 { value: 'mc', text: 'Multiple Choice' },
+                { value: 'checkbox', text: 'Checkbox' },
                 { value: 'range', text: 'Range' },
                 { value: 'open', text: 'Open' },
                 { value: 'upload', text: 'Upload Question' },
@@ -77,6 +87,12 @@ export default {
                 question_number: null,
                 option: []
             },
+            checkboxQuestion: {
+                question: '',
+                rubric_id: this.rubricId,
+                question_number: null,
+                option: []
+            },
             uploadQuestion: {
                 question: '',
                 rubric_id: this.rubricId,
@@ -90,12 +106,14 @@ export default {
             this.openQuestion.rubric_id = val
             this.rangeQuestion.rubric_id = val
             this.mcQuestion.rubric_id = val
+            this.checkboxQuestion.rubric_id = val
             this.uploadQuestion.rubric_id = val
         },
         nextNewQuestionNumber(val) {
             this.openQuestion.question_number = val
             this.rangeQuestion.question_number = val
             this.mcQuestion.question_number = val
+            this.checkboxQuestion.question_number = val
             this.uploadQuestion.question_number = val
         }
     },
@@ -106,6 +124,8 @@ export default {
         async createQuestion(question, type) {
             // Special function to create MC question.
             if (type === 'mc') return this.createMCQuestion(question)
+            // Special function to create Checkbox question.
+            if (type === 'checkbox') return this.createCheckboxQuestion(question)
 
             try {
                 await api.client.post(`${apiPrefixes[type]}`, question)
@@ -141,6 +161,31 @@ export default {
             this.$emit('saved')
             this.onReset()
         },
+        async createCheckboxQuestion(question) {
+
+            // Create the Checkbox question itself.
+            let res = await api.client.post(`${apiPrefixes['checkbox']}`, {
+                question: question.question,
+                rubric_id: question.rubric_id,
+                question_number: question.question_number
+            })
+
+            // Get the newly created ID of the Checkbox question.
+            let checkboxquestion_id = res.data.id
+
+            // Create all the options.
+            let options = question.option
+            options.forEach(async option => {
+                await api.client.post(`${apiPrefixes['checkboxoption']}`, {
+                    option: option.option,
+                    checkboxquestion_id: checkboxquestion_id
+                })
+            })
+
+            this.showSuccessMessage({message: "Successfully created question."})
+            this.$emit('saved')
+            this.onReset()
+        },
         onReset() {
             this.selectedType = ''
             this.openQuestion = {
@@ -155,6 +200,12 @@ export default {
                 question_number: this.nextNewQuestionNumber
             }
             this.mcQuestion = {
+                question: '',
+                rubric_id: this.rubricId,
+                question_number: this.nextNewQuestionNumber,
+                option: []
+            },
+            this.checkboxQuestion = {
                 question: '',
                 rubric_id: this.rubricId,
                 question_number: this.nextNewQuestionNumber,
