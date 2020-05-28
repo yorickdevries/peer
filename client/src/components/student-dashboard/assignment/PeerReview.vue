@@ -92,22 +92,23 @@
                     <div v-if="pair.question.type_question === 'upload'">
 
                         <!--File upload-->
-                        <b-form-group :description="readOnly ? '' : 'Select a file and press save down below the page. Note: it overwrites files.'" class="mb-0">
-
-                            <!--Show currently uploaded file-->
-                            <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
-                                <!--Buttons for toggling new assignment upload-->
-                                <div>
-                                    <div v-if="pair.answer.answer">File uploaded: <a
-                                            :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">{{ pair.answer.answer }}</a></div>
-                                    <div v-else>You currently have no file uploaded.</div>
-                                </div>
+                        <b-form-group :description="readOnly || peerReview.review.done ? '' : 'Select a  file and press save down below the page'" class="mb-0">
+                            <!--Show whether file has been uploaded-->
+                            <b-alert v-if="pair.answer.answer" show variant="success" class="p-2">File uploaded:
+                                <a :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">
+                                    {{ pair.answer.answer }}
+                                </a>
+                            </b-alert>
+                            <b-alert v-else show variant="warning" class="p-2">
+                                Currently, no file has been uploaded. <br>
+                                Allowed file types: {{pair.question.extension}}
                             </b-alert>
 
                             <div v-if="!readOnly && !peerReview.review.done">
-                                <b-alert show variant="danger">{{ pair.question.extension.toUpperCase() }} files allowed only.</b-alert>
-
-                                <b-alert v-if="pair.answer.answer" show variant="warning">Note: uploading an new files will overwrite your current file.</b-alert>
+                                <!--Show note if a file has been uploaded and review not submitted-->
+                                <b-alert v-if="pair.answer.answer" show variant="secondary" class="p-2">Note: uploading a new file will overwrite your current file. <br>
+                                    Allowed file types: {{pair.question.extension}}
+                                </b-alert>
 
                                 <b-form-file  placeholder="Choose a new file..."
                                               v-model="files[pair.question.id]"
