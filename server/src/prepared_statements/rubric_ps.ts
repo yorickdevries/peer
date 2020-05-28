@@ -502,7 +502,7 @@ export default class RubricPS {
 
         // Copy checkbox questions
         for (let i = 0; i < checkboxQuestions.length; i++) {
-            const res: any = await this.executeCreateCheckboxQuestion(checkboxQuestions[i].question, currentRubricId, checkboxQuestions[i].question_number);
+            const res: any = await this.executeCreateCheckboxQuestion(checkboxQuestions[i].question, currentRubricId, checkboxQuestions[i].question_number, checkboxQuestions[i].optional);
 
             // Copy checkbox options
             checkboxOptions = await RubricPS.executeGetAllCheckboxOptionsByQuestionId(checkboxQuestions[i].id);
@@ -566,12 +566,12 @@ export default class RubricPS {
      * @param {number} questionNumber - question_number.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateCheckboxQuestion(question: string, rubricId: number, questionNumber: number)
+    public static executeCreateCheckboxQuestion(question: string, rubricId: number, questionNumber: number, optional: boolean)
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("make-Checkbox-question",
-            "INSERT INTO checkboxquestion (question, rubric_id, question_number) VALUES ($1, $2, $3) " +
+            "INSERT INTO checkboxquestion (question, rubric_id, question_number, optional) VALUES ($1, $2, $3, $4) " +
             "RETURNING *");
-        statement.values = [question, rubricId, questionNumber];
+        statement.values = [question, rubricId, questionNumber, optional];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -582,11 +582,12 @@ export default class RubricPS {
      * @param {number} id - id.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeUpdateCheckboxQuestion(question: string, questionNumber: number, id: number)
+    public static executeUpdateCheckboxQuestion(question: string, questionNumber: number, id: number, optional: boolean)
+
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-checkbox-question",
-            "UPDATE checkboxquestion SET (question, question_number) = ($1, $2) WHERE id = $3 RETURNING *");
-        statement.values = [question, questionNumber, id];
+            "UPDATE checkboxquestion SET (question, question_number, optional) = ($1, $2, $3) WHERE id = $4 RETURNING *");
+        statement.values = [question, questionNumber, optional, id];
         return Database.executeQuerySingleResult(statement);
     }
 

@@ -18,7 +18,7 @@ router.use(express.json());
  * @body question_number - question_number
  */
 router.post("/checkboxquestion", index.authorization.checkRubricAuthorizationPostQuestion, (req, res) => {
-    RubricPS.executeCreateCheckboxQuestion(req.body.question, req.body.rubric_id, req.body.question_number)
+    RubricPS.executeCreateCheckboxQuestion(req.body.question, req.body.rubric_id, req.body.question_number, req.body.optional)
     .then((data: any) => {
         data.type_question = "checkbox";
         res.json(data);
@@ -34,7 +34,7 @@ router.post("/checkboxquestion", index.authorization.checkRubricAuthorizationPos
  * @body question_number - question_number
  */
 router.put("/checkboxquestion/:question_id", index.authorization.checkCheckboxQuestionEdit, (req, res) => {
-    RubricPS.executeUpdateCheckboxQuestion(req.body.question, req.body.question_number, req.params.question_id)
+    RubricPS.executeUpdateCheckboxQuestion(req.body.question, req.body.question_number, req.params.question_id, req.body.optional)
     .then((data: any) => {
         data.type_question = "checkbox";
         res.json(data);
