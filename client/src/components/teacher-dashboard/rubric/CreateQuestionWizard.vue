@@ -94,7 +94,8 @@ export default {
                 question: '',
                 rubric_id: this.rubricId,
                 question_number: null,
-                option: []
+                option: [],
+                optional: false
             },
             uploadQuestion: {
                 question: '',
