@@ -173,7 +173,8 @@ export default {
             let res = await api.client.post(`${apiPrefixes['checkbox']}`, {
                 question: question.question,
                 rubric_id: question.rubric_id,
-                question_number: question.question_number
+                question_number: question.question_number,
+                optional: question.optional
             })
 
             // Get the newly created ID of the Checkbox question.
