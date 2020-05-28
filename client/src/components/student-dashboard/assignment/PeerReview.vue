@@ -29,8 +29,15 @@
 
                     <!--Question Information-->
                     <div class="mb-2">
-                        <h5 class="text-primary">Question {{ pair.question.question_number }} of {{
-                            totalAmountOfQuestions }}</h5>
+                        <h5 class="text-primary">
+                            Question {{ pair.question.question_number }} of {{ totalAmountOfQuestions }}
+                        </h5>
+                        <b-badge pill v-if="pair.question.optional"  variant="secondary" class="ml-2 float-right p-1">
+                            OPTIONAL
+                        </b-badge>
+                        <b-badge v-else variant="danger" class="ml-2 float-right p-1">
+                            REQUIRED
+                        </b-badge>
                         <p>{{ pair.question.question }}</p>
                     </div>
 
@@ -239,14 +246,14 @@ export default {
                         return
                     }
                 } catch (e) {
-                    this.showErrorMessage({message: "Submitting the review has failed. Make sure to fill in all fields."})
+                    this.showErrorMessage({message: "Submitting the review has failed. Make sure to fill in all required fields."})
                     return
                 }
 
                 this.$emit("submitEvent")
                 this.showSubmitMessage()
             } else {
-                this.showErrorMessage({message: "All fields are required."})
+                this.showErrorMessage({message: "Please make sure to fill in all required fields."})
             }
         },
         async savePeerReview() {
