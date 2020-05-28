@@ -76,7 +76,7 @@
                                          :rows="10"
                                          :max-rows="15"
                                          v-model="pair.answer.answer"
-                                         :readonly="peerReview.review.done"
+                                         :readonly="true"
                                          required/>
 
                         <!-- RANGE QUESTION -->
@@ -90,7 +90,7 @@
                                     inline
                                     :max-rating="Number(pair.question.range)"
                                     :show-rating="false"
-                                    :read-only="peerReview.review.done"
+                                    :read-only="true"
                                     v-model="pair.answer.answer"/>
 
                         <!-- MPC QUESTION -->
@@ -100,7 +100,7 @@
                                     v-model="pair.answer.answer"
                                     stacked
                                     required
-                                    :disabled="peerReview.review.done">
+                                    :disabled="true">
                             </b-form-radio-group>
                         </b-form-group>
 
@@ -117,7 +117,17 @@
 
                         <!-- UPLOAD QUESTION -->
                         <template v-if="pair.question.type_question === 'upload'">
-                            <a :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">{{ pair.answer.answer }}</a>
+                            <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
+                                <!--Buttons for toggling new assignment upload-->
+                                <div>
+                                    <div v-if="pair.answer.answer"> File uploaded:
+                                        <a :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">
+                                            {{ pair.answer.answer }}
+                                        </a>
+                                    </div>
+                                    <div v-else>No file has been uploaded.</div>
+                                </div>
+                            </b-alert>
                         </template>
 
 
