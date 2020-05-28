@@ -39,8 +39,10 @@
                                             <div class="">
                                                 <h5 class="text-primary">Question {{ activeQuestion.question_number
                                                     }}</h5>
+                                                <h6 v-if="activeQuestion.optional" class="text-muted">This was an optional question, the responses may be empty.</h6>
                                                 {{ activeQuestion.question }}
                                             </div>
+
                                         </b-list-group-item>
 
                             <b-list-group-item v-for="(pair, index) in aggregateQuestionAnswer(activeQuestion.id)" :key="index">

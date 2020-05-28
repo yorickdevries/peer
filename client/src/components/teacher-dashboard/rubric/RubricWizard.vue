@@ -58,6 +58,12 @@
                         <b-badge variant="primary" class="ml-2 float-right p-1">{{
                             question.type_question.toUpperCase() }} QUESTION
                         </b-badge>
+                        <b-badge pill v-if="question.optional"  variant="secondary" class="ml-2 float-right p-1">
+                            OPTIONAL
+                        </b-badge>
+                        <b-badge v-else variant="danger" class="ml-2 float-right p-1">
+                            REQUIRED
+                        </b-badge>
                     </b-card-header>
 
                     <b-card-body>
