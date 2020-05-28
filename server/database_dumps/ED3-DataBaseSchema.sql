@@ -124,6 +124,7 @@ CREATE TABLE CheckboxQuestion (
     question varchar(5000) NOT NULL,
     Rubric_id int NOT NULL,
     question_number int NOT NULL,
+    optional boolean NOT NULL,
     CONSTRAINT CheckboxQuestion_pk PRIMARY KEY (id)
 );
 
