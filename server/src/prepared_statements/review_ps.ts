@@ -490,4 +490,36 @@ export default class ReviewPS {
         return Database.executeQuery(statement);
     }
 
+
+    /**
+     * Execute a 'get checkbox answer by review id and optionId' query.
+     * @param {number} reviewId - a review id.
+     * @param {number} checkboxOptionId - a checkbox option id.
+     * @return {Promise<pgPromise.queryResult>} - a promise query result.
+     */
+    public static executeGetCheckboxAnswer(reviewId: number, checkboxOptionId: number)
+        : Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("get-checkbox-answer-by-review-id-and-option-id",
+            "SELECT * FROM checkboxanswer WHERE review_id = $1 AND checkboxoption_id = $2");
+        statement.values = [reviewId, checkboxOptionId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+
+    /**
+     * Execute an 'insert checkbox answer' query.
+     * @param {number} answer - the answer (chosen or not)
+     * @param {number} OptionId - the respective option
+     * @param {number} reviewId - a review id.
+     * @return {Promise<pgPromise.queryResult>} - a database query result, empty if succeeded.
+     */
+    public static executeUpdateCheckboxAnswer(answer: boolean, checkboxOptionId: number, reviewId: number)
+        : Promise<pgPromise.queryResult> {
+        const statement =  new PreparedStatement("add-checkbox-answer",
+            "INSERT INTO checkboxanswer(answer, checkboxoption_id, review_id) VALUES ($1, $2, $3) " +
+            "ON CONFLICT (checkboxoption_id, review_id) " +
+            "DO UPDATE SET answer=$1 RETURNING answer");
+        statement.values = [answer, checkboxOptionId, reviewId];
+        return Database.executeQuerySingleResult(statement);
+    }
 }

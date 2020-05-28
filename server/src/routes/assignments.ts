@@ -339,13 +339,9 @@ router.post("/:assignment_id/importgroups", upload("groupFile", [".csv"], maxSiz
     if (req.file == undefined) {
         res.status(400);
         res.json({error: "No file uploaded"});
-    } else if (req.body.groupColumn == undefined) {
-        res.status(400);
-        res.json({error: "No groupcolumn defined"});
     } else {
-        const groupColumn = req.body.groupColumn;
         const assignmentId = req.params.assignment_id;
-        GroupParser.importGroups(req.file.buffer, groupColumn, assignmentId)
+        GroupParser.importGroups(req.file.buffer, assignmentId)
         .then((data) => {
             res.json(data);
         }).catch((error) => {
@@ -530,7 +526,21 @@ router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enro
                     }
                 }
                 reviewJson[questionText] = chosenOption;
-            } else {
+            } else if (item.question.type_question == "checkbox") {
+                const chosenOptionIds = item.answer.answer;
+                if (chosenOptionIds) {
+                    const chosenOptions = [];
+                    const options = item.question.option;
+                    for (const chosenOptionId of chosenOptionIds) {
+                        const chosenOption = options.find((option: any) => option.id == chosenOptionId);
+                        chosenOptions.push(chosenOption.option);
+                    }
+                    reviewJson[questionText] = chosenOptions;
+                } else {
+                    reviewJson[questionText] = undefined;
+                }
+            }
+            else {
                 reviewJson[questionText] = item.answer.answer;
             }
         }
