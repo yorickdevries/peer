@@ -20,7 +20,7 @@
         <!--Notification is not owner-->
         <div v-if="evaluationExists">
             <b-alert variant="secondary" :show="!isEvaluationOwner">
-                Another group member ({{ evaluation_meta_data.user_netid }}) is the owner if this evaluation. Only they can edit/save/submit this evaluation.
+                Another group member ({{ evaluation_meta_data.user_netid }}) is the owner of this evaluation. Only they can edit, save or submit this evaluation.
             </b-alert>
         </div>
 
@@ -167,7 +167,7 @@
                                 </b-alert>
 
                                 <b-alert v-if="pair.answer.answer" show variant="warning">
-                                    Note: uploading an new files will overwrite your current file.
+                                    Note: uploading a new file will overwrite your current file.
                                 </b-alert>
 
                                 <b-form-file
@@ -388,7 +388,7 @@ export default {
 
             try {
                 await api.savePeerReview(this.evaluation.review.id, formData)
-                this.showSaveMessage({ message: "Your review evaluation has been saved successfully. NOTE: Saving does not count as a submission!"})
+                this.showSaveMessage({ message: "Your review evaluation has been saved successfully."})
             } catch (error) {
                 this.showErrorMessage({ message: "Error saving evaluation." })
             }

@@ -432,7 +432,7 @@ describe("API Assignment routes", () => {
         expect(JSON.parse(res.text).length).to.equal(3);
         const res2 = await chai.request(router).get("/2/distributeReviews/0");
         expect(res2.status).to.equal(400);
-        expect(JSON.parse(res2.text).error).to.equal("There are already reviews assigned for this assignment");
+        expect(JSON.parse(res2.text).error).to.equal("Reviews have already been assigned for this assignment");
     });
 
     /**

@@ -1,7 +1,7 @@
 
 <template>
     <div>
-    <b-alert :show="blockRubricEditing" variant="info">Rubric editing is not allowed anymore since the peer review publish date has already elapsed.</b-alert>
+    <b-alert :show="blockRubricEditing" variant="info">Rubric editing is not allowed anymore since the peer review publish date has already passed.</b-alert>
 
     <b-container v-bind:class="{ 'disabled-view': blockRubricEditing }">
 
@@ -11,21 +11,19 @@
                     <div class="text-muted">Make Rubric</div>
                     <b-button @click="makeRubric()"
                               class="mb-3"
-                              variant="primary"
-                              v-b-tooltip.hover title="Initialize the rubric">
+                              variant="primary">
                         Make rubric
                     </b-button>
                 </div>
                 <div>
-                    <div class="text-muted">Create a new question.</div>
+                    <div class="text-muted">Create a new question</div>
                     <b-button v-b-modal="'createModal'"
-                              variant="primary"
-                              v-b-tooltip.hover title="Add a new question">
+                              variant="primary">
                         Create new Question
                     </b-button>
                 </div>
                 <div>
-                    <div class="text-muted">Copy questions from another rubric.</div>
+                    <div class="text-muted">Copy questions from another rubric</div>
                     <div class="input-group mb-2">
                         <div class="input-group-prepend">
                             <b-button variant="primary" @click="copyRubric">Copy</b-button>
@@ -35,11 +33,11 @@
                 </div>
 
                 <div>
-                    <div class="text-muted">Deletes all questions</div>
+                    <div class="text-muted">Delete all questions</div>
                     <b-button variant="danger" v-b-modal.deleteAll>Delete all questions</b-button>
                     <b-modal id="deleteAll" centered title="Warning" @ok="deleteAll">
-                        Are you sure you want to delete ALL questions? Deleting a question after students have submitted
-                        answers to this question will DELETE all the answers the students have given.
+                        Are you sure you want to delete ALL questions? <br><br> Deleting all questions after students have submitted
+                        answers to questions will DELETE all the answers the students have given.
                     </b-modal>
                 </div>
             </div>
@@ -96,7 +94,7 @@
                         <span>
                             <b-btn v-b-modal="`delete${question.id}`" variant="outline-danger" size="sm">Delete</b-btn>
                             <b-modal :id="`delete${question.id}`" centered title="Warning" @ok="deleteQuestion(question)">
-                                Are you sure you want to delete? Deleting a question after students have submitted
+                                Are you sure you want to delete? <br><br> Deleting a question after students have submitted
                                 answers to this question will DELETE all the answers the students have given.
                             </b-modal>
                         </span>

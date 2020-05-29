@@ -139,6 +139,7 @@
                                         <b-form-checkbox
                                                 v-model="assignment.review_evaluation">
                                             Enable review evaluation
+                                            <b-badge v-b-tooltip.hover title="This will enable students to fill in a non-customisable evaluation form about their received reviews" variant="primary">?</b-badge>
                                         </b-form-checkbox>
                                     </b-form-group>
                                     <b-form-group v-if="assignment.review_evaluation">

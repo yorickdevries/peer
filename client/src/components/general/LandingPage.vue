@@ -24,9 +24,9 @@
                         </b-col>
 
                         <b-col cols="12" md="4" class="mb-4 mb-md-0">
-                            <b-card title="Peer review your students" header="Step 2." class="h-100">
+                            <b-card title="Peer review others" header="Step 2." class="h-100">
                                 <p class="card-text">
-                                    Assess your fellow students submissions and help them improve their skills.
+                                    Assess your fellow students' submissions and help them improve their skills.
                                 </p>
                             </b-card>
                         </b-col>

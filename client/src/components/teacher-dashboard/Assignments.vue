@@ -5,8 +5,7 @@
 
             <!--Header with create button-->
             <BreadcrumbTitle :items="['Assignments']" class="mt-3">
-                <b-button variant="success" :to="{ name: 'teacher-dashboard.assignments.create' }">Create Assignment
-                </b-button>
+                <b-button variant="success" :to="{ name: 'teacher-dashboard.assignments.create' }">Create assignment</b-button>
             </BreadcrumbTitle>
 
             <!--Course Cards-->
@@ -16,7 +15,7 @@
                         <p class="card-text">
                             {{ assignment.description}}
                         </p>
-                        <b-button variant="primary" :to="{ name: 'teacher-dashboard.assignments.assignment', params: { courseId: assignment.course_id, assignmentId: assignment.id } }">View Assignment</b-button>
+                        <b-button variant="primary" :to="{ name: 'teacher-dashboard.assignments.assignment', params: { courseId: assignment.course_id, assignmentId: assignment.id } }">View assignment</b-button>
                     </b-card>
                 </b-col>
 
