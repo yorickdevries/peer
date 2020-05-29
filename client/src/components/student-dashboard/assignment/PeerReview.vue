@@ -290,7 +290,7 @@ export default {
 
             try {
                 await api.savePeerReview(this.peerReview.review.id, formData)
-                this.showSaveMessage({ message: "Your review has been saved successfully. NOTE: Saving does not count as a submission!"})
+                this.showSaveMessage({ message: "Your review has been saved successfully."})
                 await this.fetchPeerReview()
                 this.clearFiles()
             } catch (error) {
