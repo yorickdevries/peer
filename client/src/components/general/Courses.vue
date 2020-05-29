@@ -92,8 +92,8 @@
                         </b-row>
                     </b-tab>
 
-                    <!--Unenrolled Courses Tab-->
-                    <b-tab title="Unenrolled Courses">
+                    <!--Available Courses Tab-->
+                    <b-tab title="Available Courses">
 
                         <!--Filter Input-->
                         <b-row>

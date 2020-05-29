@@ -18,9 +18,14 @@
 
                                 <!--Enrollable Assignments (Single User)-->
                                 <b-tab active :title-link-class="{ }">
-                                    <template slot="title">Enrollable <b-badge v-if="enrollableAssignments" variant="info">{{ enrollableAssignments.length }}</b-badge></template>
-                                    <p class="text-muted">On this tab, enrollable assignments are shown. In order to participate in an assignment you have to enroll.</p>
-                                    <span v-if="enrollableAssignments.length === 0">There are no enrollable assignments.</span>
+                                    <template slot="title">
+                                        Open for enrollment
+                                        <b-badge v-if="enrollableAssignments" variant="info">{{ enrollableAssignments.length }}</b-badge>
+                                    </template>
+                                    <p class="text-muted">
+                                        Open for enrollment means you can enroll yourself for the assignment. In some cases, the teacher enrolls you for the assignment(s).
+                                    </p>
+                                    <span v-if="enrollableAssignments.length === 0">There are currently no assignments open for enrollment.</span>
                                     <b-card v-for="(assignment, index) in enrollableAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== enrollableAssignments.length - 1}">
                                         <b-card-body>
                                             <h4>{{ assignment.title | truncate(100)}}</h4>
@@ -33,9 +38,9 @@
 
                                 <!--Active Assignments-->
                                 <b-tab :title-link-class="{ }">
-                                    <template slot="title">Ready for Submission <b-badge v-if="activeAssignments" variant="info">{{ activeAssignments.length }}</b-badge></template>
+                                    <template slot="title">Ready for submission <b-badge v-if="activeAssignments" variant="info">{{ activeAssignments.length }}</b-badge></template>
                                     <p class="text-muted">Ready for submission means that the assignment is open for submitting a solution to the assignment.</p>
-                                    <span v-if="activeAssignments.length === 0">There are no active assignments.</span>
+                                    <span v-if="activeAssignments.length === 0">There are currently no assignments ready for submission.</span>
                                     <b-card v-for="(assignment, index) in activeAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== activeAssignments.length - 1 }">
                                         <b-card-body>
                                             <h4>{{ assignment.title }}</h4>
@@ -47,9 +52,9 @@
 
                                 <!--Review Assignments-->
                                 <b-tab :title-link-class="{ }">
-                                    <template slot="title">Ready for Review <b-badge v-if="readyForSubmissionAssignments" variant="info">{{ readyForSubmissionAssignments.length }}</b-badge></template>
+                                    <template slot="title">Ready for review <b-badge v-if="readyForSubmissionAssignments" variant="info">{{ readyForSubmissionAssignments.length }}</b-badge></template>
                                     <p class="text-muted">Ready for review means that the assignment is open for reviewing a solution from other students.</p>
-                                    <span v-if="readyForSubmissionAssignments.length === 0">There are no assignments for review.</span>
+                                    <span v-if="readyForSubmissionAssignments.length === 0">There are currently no assignments ready for review.</span>
                                     <b-card v-for="(assignment, index) in readyForSubmissionAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== readyForSubmissionAssignments.length - 1 }">
                                         <b-card-body>
                                             <b-badge v-if="assignmentIsBetweenHandInDueAndReviewStart(assignment)" class="mb-2" variant="danger">Review opens at: {{ assignment.review_publish_date | formatDate }}</b-badge>
@@ -62,9 +67,9 @@
 
                                 <!--Closed Assignments-->
                                 <b-tab :title-link-class="{ }">
-                                    <template slot="title">Feedback Available <b-badge v-if="closedAssignments" variant="info">{{ closedAssignments.length }}</b-badge></template>
+                                    <template slot="title">Feedback available <b-badge v-if="closedAssignments" variant="info">{{ closedAssignments.length }}</b-badge></template>
                                     <p class="text-muted">Ready for feedback means that the feedback is available for the submission you handed in.</p>
-                                    <span v-if="closedAssignments.length === 0">There are no assignments that are closed. </span>
+                                    <span v-if="closedAssignments.length === 0">There are currently no assignments for which the feedback is available.</span>
                                     <b-card v-for="(assignment, index) in closedAssignments" :key="assignment.id" no-body :class="{'mb-3': index !== closedAssignments.length - 1}">
                                         <b-card-body>
                                             <h4>{{ assignment.title | truncate(100)}}</h4>
