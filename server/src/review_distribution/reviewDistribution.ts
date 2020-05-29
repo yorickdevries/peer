@@ -33,7 +33,7 @@ export default class ReviewDistribution {
         }
         const existingReviews: any = await ReviewPS.executeGetSubmissionReviewsByAssignmentId(assignmentId);
         if (existingReviews.length !== 0) {
-            throw new Error("Reviews have already been assigned in this assignment");
+            throw new Error("Reviews have already been assigned for this assignment");
         }
         // Add the review assignments to the database
         for (const review of reviews) {
