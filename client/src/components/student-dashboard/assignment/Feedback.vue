@@ -37,50 +37,80 @@
 
                                         <b-list-group-item>
                                             <div class="">
-                                                <h5 class="text-primary">Question {{ activeQuestion.question_number
-                                                    }}</h5>
+                                                <h5 class="text-primary">Question {{ activeQuestion.question_number }}</h5>
+                                                <h6 v-if="activeQuestion.optional" class="text-muted">This was an optional question, some responses may be empty.</h6>
                                                 {{ activeQuestion.question }}
                                             </div>
+
                                         </b-list-group-item>
 
-                            <b-list-group-item v-for="(pair, index) in aggregateQuestionAnswer(activeQuestion.id)" :key="index">
+                            <b-list-group-item v-for="(pair, index) in aggregateQuestionAnswer(activeQuestion.id, activeQuestion.type_question)" :key="index">
 
                                 <!--&lt;!&ndash; OPEN QUESTION &ndash;&gt;-->
                                 <template v-if="activeQuestion.type_question === 'open'">
 
                                     <b-form-textarea
+                                            v-if="pair.answer.answer"
                                             id="textarea1"
                                             :value="pair.answer.answer"
                                             :rows="10"
                                             readonly
                                             :max-rows="15"/>
+                                    <div v-else>
+                                        <p class="text-muted text mb-0"><i>The reviewer has not filled in this question</i></p>
+                                    </div>
                                 </template>
 
                                 <!--&lt;!&ndash; RANGE QUESTION &ndash;&gt;-->
-                                <StarRating v-else-if="activeQuestion.type_question === 'range'"
-                                            class="align-middle"
-                                            :border-color="'#007bff'"
-                                            :active-color="'#007bff'"
-                                            :border-width="2"
-                                            :item-size="20"
-                                            :spacing="5"
-                                            read-only
-                                            :rating="pair.answer.answer"
-                                            :max-rating="pair.question.range"/>
-
+                                <template v-else-if="activeQuestion.type_question === 'range'" >
+                                    <StarRating v-if="pair.answer.answer"
+                                                class="align-middle"
+                                                :border-color="'#007bff'"
+                                                :active-color="'#007bff'"
+                                                :border-width="2"
+                                                :item-size="20"
+                                                :spacing="5"
+                                                read-only
+                                                :rating="pair.answer.answer"
+                                                :max-rating="pair.question.range"/>
+                                    <div v-else>
+                                        <p class="text-muted text mb-0"><i>The reviewer has not filled in this question</i></p>
+                                    </div>
+                                </template>
                                 <!--&lt;!&ndash; MPC QUESTION &ndash;&gt;-->
-                                <b-form-group v-else-if="activeQuestion.type_question === 'mc'" class="mb-0">
-                                    <b-form-radio-group
+                                <template v-else-if="activeQuestion.type_question === 'mc'">
+                                    <b-form-group v-if="pair.answer.answer" class="mb-0">
+                                        <b-form-radio-group
+                                                v-if="pair.answer.answer"
+                                                :checked="pair.answer.answer"
+                                                :options="transformOptionsToHTMLOptions(activeQuestion.option)"
+                                                disabled
+                                                stacked>
+                                        </b-form-radio-group>
+                                    </b-form-group>
+                                    <div v-else>
+                                        <p class="text-muted text mb-0"><i>The reviewer has not filled in this question</i></p>
+                                    </div>
+                                </template>
+
+                                <!--&lt;!&ndash; CHECKBOX QUESTION &ndash;&gt;-->
+                                <b-form-group v-else-if="activeQuestion.type_question === 'checkbox'" class="mb-0">
+                                    <b-form-checkbox-group
                                             :checked="pair.answer.answer"
                                             :options="transformOptionsToHTMLOptions(activeQuestion.option)"
                                             disabled
                                             stacked>
-                                    </b-form-radio-group>
+                                    </b-form-checkbox-group>
                                 </b-form-group>
 
                                 <!--&lt;!&ndash; UPLOAD QUESTION &ndash;&gt;-->
                                 <template v-if="activeQuestion.type_question === 'upload'">
-                                    <a target="_blank" :href="uploadQuestionFilePath(pair.peerReviewId, pair.question.id)">{{ pair.answer.answer }}</a>
+                                    <div v-if="pair.answer.answer">
+                                        <a target="_blank" :href="uploadQuestionFilePath(pair.peerReviewId, pair.question.id)">{{ pair.answer.answer }}</a>
+                                    </div>
+                                    <div v-else>
+                                        <p class="text-muted text mb-0"><i>The reviewer has not uploaded a file for this question</i></p>
+                                    </div>
                                 </template>
 
 
@@ -210,12 +240,14 @@ export default {
 
         },
 
-        aggregateQuestionAnswer(targetQuestionId) {
+        aggregateQuestionAnswer(targetQuestionId, targetQuestionType) {
             // Aggregates the answers for a particular question into an array of answers.
             let res = []
 
             this.peerReviews.forEach(peerReview => {
-                let pair = peerReview.form.find(questionAnswerPair => questionAnswerPair.question.id === targetQuestionId)
+                let pair = peerReview.form.find(questionAnswerPair =>
+                    questionAnswerPair.question.id === targetQuestionId &&
+                    questionAnswerPair.question.type_question === targetQuestionType)
                 res.push({
                     ...pair,
                     // Add for later use when you need to gather the link for the upload question.

@@ -49,8 +49,7 @@ describe("API Assignment routes", () => {
         // log in as teacheraccount
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
-            .attach("groupFile", fs.readFileSync(file), "export.csv")
-            .field("groupColumn", "Education Groups");
+            .attach("groupFile", fs.readFileSync(file), "export.csv");
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             [{groupId: 25, groupname: "ED 4"}, {groupId: 26, groupname: "ED 3"}]
@@ -62,8 +61,8 @@ describe("API Assignment routes", () => {
         // log in as teacheraccount
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
-            .attach("groupFile", fs.readFileSync(file), "export.csv")
-            .field("groupColumn", "Education Groups");
+            .attach("groupFile", fs.readFileSync(file), "export.csv");
+        console.log(res.text);
         expect(res.status).to.equal(200);
         expect(res.text).to.equal(JSON.stringify(
             [{groupId: 25, groupname: "ED 4"}, {groupId: 26, groupname: "ED 3"}]
@@ -77,7 +76,6 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "text_file.txt");
         expect(res.status).to.equal(400);
-        expect(res.text).to.equal(JSON.stringify({error: "File should be a .csv file"}));
     });
 
     it("Import groups - file larger than 1MB", async () => {
@@ -87,7 +85,6 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv");
         expect(res.status).to.equal(400);
-        expect(res.text).to.equal(JSON.stringify({error: "File is too large" }));
     });
 
     it("Import groups - no file", async () => {
@@ -99,13 +96,22 @@ describe("API Assignment routes", () => {
     });
 
     it("Import groups - good file + no groupcolumn", async () => {
-        const file = path.join(__dirname, "../../example_data/csv_test/example_export.csv");
+        const file = path.join(__dirname, "../../example_data/csv_test/example_export_no_groupcolumn.csv");
         // log in as teacheraccount
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv");
         expect(res.status).to.equal(400);
-        expect(res.text).to.equal(JSON.stringify({error: "No groupcolumn defined"}));
+    });
+
+    it("Import groups - no usercolumn", async () => {
+        const file = path.join(__dirname, "../../example_data/csv_test/example_export_no_usercolumn.csv");
+        // log in as teacheraccount
+        MockLogin.initialize("bplanje");
+        const res = await chai.request(router).post("/3/importgroups")
+            .attach("groupFile", fs.readFileSync(file), "export.csv");
+        expect(res.status).to.equal(400);
+        expect(res.text).to.equal(JSON.stringify({error: "NetId is undefined"}));
     });
 
     /**
@@ -426,7 +432,7 @@ describe("API Assignment routes", () => {
         expect(JSON.parse(res.text).length).to.equal(3);
         const res2 = await chai.request(router).get("/2/distributeReviews/0");
         expect(res2.status).to.equal(400);
-        expect(JSON.parse(res2.text).error).to.equal("There are already reviews assigned for this assignment");
+        expect(JSON.parse(res2.text).error).to.equal("Reviews have already been assigned for this assignment");
     });
 
     /**

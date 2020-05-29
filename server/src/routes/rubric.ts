@@ -1,7 +1,6 @@
 import RubricPS, { default as rubricPS } from "../prepared_statements/rubric_ps";
 import ReviewPS from "../prepared_statements/review_ps";
 import ReviewUpdate from "../reviewUpdate";
-import bodyParser from "body-parser";
 import index from "../security/index";
 
 
@@ -9,7 +8,109 @@ import index from "../security/index";
 import express from "express";
 
 const router = express();
-router.use(bodyParser.json());
+// Needed for the tests (tests need to change)
+router.use(express.json());
+
+/**
+ * create checkboxquestion
+ * @body question - question
+ * @body rubric_id - rubric_id
+ * @body question_number - question_number
+ */
+router.post("/checkboxquestion", index.authorization.checkRubricAuthorizationPostQuestion, (req, res) => {
+    RubricPS.executeCreateCheckboxQuestion(req.body.question, req.body.rubric_id, req.body.question_number, req.body.optional)
+    .then((data: any) => {
+        data.type_question = "checkbox";
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
+
+/**
+ * Update checkboxquestion
+ * @params  question_id - question_id
+ * @body question - question
+ * @body question_number - question_number
+ */
+router.put("/checkboxquestion/:question_id", index.authorization.checkCheckboxQuestionEdit, (req, res) => {
+    RubricPS.executeUpdateCheckboxQuestion(req.body.question, req.body.question_number, req.params.question_id, req.body.optional)
+    .then((data: any) => {
+        data.type_question = "checkbox";
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
+
+/**
+ * Route to delete checkbox question
+ * @params id - id
+ */
+router.delete("/checkboxquestion/:question_id", index.authorization.checkCheckboxQuestionEdit, async (req, res) => {
+    const checkboxOptions: any = await RubricPS.executeGetAllCheckboxOptionsByQuestionId(req.params.question_id);
+    for (let i = 0; i < checkboxOptions.length; i++) {
+        await RubricPS.executeDeleteCheckboxOption(checkboxOptions[i].id);
+    }
+    RubricPS.executeDeleteCheckboxQuestion(req.params.question_id)
+    .then((data: any) => {
+        data.type_question = "checkbox";
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
+
+/**
+ * Route to create an option for a checkbox question
+ * @body option, checkboxquestion_id
+ */
+router.post("/checkboxoption", index.authorization.checkCheckboxOptionPost, (req, res) => {
+    if (req.body.option == "") {
+        // Option cannot be empty
+        res.sendStatus(400);
+    } else {
+        RubricPS.executeCreateCheckboxOption(req.body.option, req.body.checkboxquestion_id)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.sendStatus(400);
+        });
+    }
+});
+
+
+/**
+ * Route to update checkboxoption
+ *
+ */
+router.put("/checkboxoption/:option_id", index.authorization.checkCheckboxOptionEdit, (req, res) => {
+    if (req.body.option == "") {
+        // Option cannot be empty
+        res.sendStatus(400);
+    } else {
+        RubricPS.executeUpdateCheckboxOption(req.body.option, req.params.option_id)
+        .then((data) => {
+            res.json(data);
+        }).catch((error) => {
+            res.sendStatus(400);
+        });
+    }
+});
+
+
+/**
+ * Route to delete checkbox option
+ * @params id - id
+ */
+router.delete("/checkboxoption/:option_id", index.authorization.checkCheckboxOptionEdit, (req, res) => {
+    RubricPS.executeDeleteCheckboxOption(req.params.option_id)
+    .then((data) => {
+        res.json(data);
+    }).catch((error) => {
+        res.sendStatus(400);
+    });
+});
 
 /**
  * Route to delete an open question
@@ -126,7 +227,7 @@ router.put("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (req, 
  * @body question_number - question_number
  */
 router.post("/mcquestion", index.authorization.checkRubricAuthorizationPostQuestion, (req, res) => {
-    RubricPS.executeCreateMCQuestion(req.body.question, req.body.rubric_id, req.body.question_number)
+    RubricPS.executeCreateMCQuestion(req.body.question, req.body.rubric_id, req.body.question_number, req.body.optional)
     .then((data: any) => {
         data.type_question = "mc";
         res.json(data);
@@ -141,7 +242,7 @@ router.post("/mcquestion", index.authorization.checkRubricAuthorizationPostQuest
  * @body question_number - question_number
  */
 router.post("/uploadquestion", index.authorization.checkRubricAuthorizationPostQuestion, (req, res) => {
-    RubricPS.executeCreateUploadQuestion(req.body.question, req.body.rubric_id, req.body.question_number, req.body.extension)
+    RubricPS.executeCreateUploadQuestion(req.body.question, req.body.rubric_id, req.body.question_number, req.body.extension, req.body.optional)
         .then((data: any) => {
             data.type_question = "upload";
             res.json(data);
@@ -159,7 +260,7 @@ router.post("/uploadquestion", index.authorization.checkRubricAuthorizationPostQ
  * @body extension - the file extension
  */
 router.put("/uploadquestion/:question_id", index.authorization.checkUploadQuestionEdit, (req, res) => {
-    RubricPS.executeUpdateUploadQuestion(req.body.question, req.body.question_number, req.params.question_id, req.body.extension)
+    RubricPS.executeUpdateUploadQuestion(req.body.question, req.body.question_number, req.params.question_id, req.body.extension, req.body.optional)
         .then((data: any) => {
             data.type_question = "upload";
             res.json(data);
@@ -175,7 +276,7 @@ router.put("/uploadquestion/:question_id", index.authorization.checkUploadQuesti
  * @body question_number - question_number
  */
 router.put("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, (req, res) => {
-    rubricPS.executeUpdateMCQuestion(req.body.question, req.body.question_number, req.params.question_id)
+    rubricPS.executeUpdateMCQuestion(req.body.question, req.body.question_number, req.params.question_id, req.body.optional)
     .then((data: any) => {
         data.type_question = "mc";
         res.json(data);
@@ -192,7 +293,7 @@ router.put("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, 
  * @body question_number - question_number
  */
 router.post("/rangequestion", index.authorization.checkRubricAuthorizationPostQuestion, (req, res) => {
-    RubricPS.executeCreateRangeQuestion(req.body.question, req.body.range, req.body.rubric_id, req.body.question_number)
+    RubricPS.executeCreateRangeQuestion(req.body.question, req.body.range, req.body.rubric_id, req.body.question_number, req.body.optional)
     .then((data: any) => {
         data.type_question = "range";
         res.json(data);
@@ -211,7 +312,7 @@ router.post("/rangequestion", index.authorization.checkRubricAuthorizationPostQu
  * @body question_number - question_number
  */
 router.put("/rangequestion/:question_id", index.authorization.checkRangeQuestionEdit, (req, res) => {
-    rubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.question_number, req.params.question_id)
+    rubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.question_number, req.params.question_id, req.body.optional)
     .then((data: any) => {
         data.type_question = "range";
         res.json(data);
@@ -227,7 +328,7 @@ router.put("/rangequestion/:question_id", index.authorization.checkRangeQuestion
  * @body question_number - question_number
  */
 router.post("/openquestion", index.authorization.checkRubricAuthorizationPostQuestion, (req, res) => {
-    RubricPS.executeCreateOpenQuestion(req.body.question, req.body.rubric_id, req.body.question_number)
+    RubricPS.executeCreateOpenQuestion(req.body.question, req.body.rubric_id, req.body.question_number, req.body.optional)
     .then((data: any) => {
         data.type_question = "open";
         res.json(data);
@@ -241,7 +342,7 @@ router.post("/openquestion", index.authorization.checkRubricAuthorizationPostQue
  * @param question_id - question_id
  */
 router.put("/openquestion/:question_id", index.authorization.checkOpenQuestionEdit, (req, res) => {
-    rubricPS.executeUpdateOpenQuestion(req.body.question, req.body.question_number, req.params.question_id)
+    rubricPS.executeUpdateOpenQuestion(req.body.question, req.body.question_number, req.params.question_id, req.body.optional)
     .then((data: any) => {
         data.type_question = "open";
         res.json(data);

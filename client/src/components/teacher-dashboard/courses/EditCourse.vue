@@ -46,9 +46,8 @@
                             <b-form-group label="">
                                 <b-form-checkbox
                                         id="enrollable"
-                                        v-model="course.enrollable"
-                                >
-                                    This course is enrollable by students
+                                        v-model="course.enrollable">
+                                    Students can enroll themselves for this course
                                 </b-form-checkbox>
                             </b-form-group>
                             <b-button type="submit" variant="primary">Save changes</b-button>

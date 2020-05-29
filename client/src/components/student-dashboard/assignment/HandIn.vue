@@ -7,7 +7,7 @@
 
                 <!--Submission Information-->
                 <b-card header="Submission" class="h-100">
-                    <b-alert show variant="secondary">PDF/ZIP files only.</b-alert>
+                    <b-alert show variant="secondary">Allowed file types: .pdf/.zip/.doc/.docx</b-alert>
                     <b-alert v-if="hasUploadedSubmission" show variant="success">
                         <dl class="mb-0">
                             <dt>This is the latest submission you have made:</dt>
@@ -34,14 +34,13 @@
                                 hide-footer
                                 title="Upload Submission">
 
-                        <b-alert show variant="warning">If you already have a file uploaded, this will overwrite the
-                            file!
+                        <b-alert show variant="warning">If you have already uploaded a file, it will be overwritten!
                         </b-alert>
                         <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
 
                         <b-form-file
                             placeholder="Choose a file..."
-                            accept= ".pdf,.zip"
+                            accept= ".pdf,.zip,.doc,.docx"
                             v-model="file"
                             :state="Boolean(file)"
                             ref="fileInput"/>
@@ -68,7 +67,7 @@
           return {
               file: null,
               fileProgress: 0,
-              acceptFiles: ".pdf,.zip",
+              acceptFiles: ".pdf,.zip,.doc,.docx",
               submission: {
                   user_netid: null,
                   assignment_id: null,

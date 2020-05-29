@@ -107,7 +107,7 @@ describe("ReviewPreparedStatement Test", () => {
         const answer = "serious_answer.pdf";
 
         const rubric: any = await createTestRubric();
-        const question: any = await RubricPS.executeCreateUploadQuestion("something", rubric.id, 0, "pdf");
+        const question: any = await RubricPS.executeCreateUploadQuestion("something", rubric.id, 0, "pdf", true);
         await ReviewPS.executeUpdateUploadAnswer("kappa.pdf", question.id, 2);
         const updated: any = await ReviewPS.executeUpdateUploadAnswer(answer, question.id, 2);
 
@@ -157,7 +157,7 @@ describe("ReviewPreparedStatement Test", () => {
         const reviewId = 1;
 
         const rubric: any = await createTestRubric();
-        const question: any = await RubricPS.executeCreateUploadQuestion("something", rubric.id, 0, "pdf");
+        const question: any = await RubricPS.executeCreateUploadQuestion("something", rubric.id, 0, "pdf", true);
 
         const created: any = await ReviewPS.executeUpdateUploadAnswer(answer, question.id, reviewId);
         const fetched: any = await ReviewPS.executeGetUploadAnswer(reviewId, question.id);

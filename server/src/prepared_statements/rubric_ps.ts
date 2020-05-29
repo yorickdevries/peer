@@ -128,11 +128,11 @@ export default class RubricPS {
      * @param {number} id - id.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeUpdateMCQuestion(question: string, questionNumber: number, id: number)
+    public static executeUpdateMCQuestion(question: string, questionNumber: number, id: number, optional: boolean)
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-mc-question",
-            "UPDATE mcquestion SET (question, question_number) = ($1, $2) WHERE id = $3 RETURNING *");
-        statement.values = [question, questionNumber, id];
+            "UPDATE mcquestion SET (question, question_number, optional) = ($1, $2, $3) WHERE id = $4 RETURNING *");
+        statement.values = [question, questionNumber, optional, id];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -144,12 +144,12 @@ export default class RubricPS {
      * @param {number} id - id.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeUpdateRangeQuestion(question: string, range: number, questionNumber: number, id: number)
+    public static executeUpdateRangeQuestion(question: string, range: number, questionNumber: number, id: number, optional: boolean)
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-range-question",
-            "UPDATE rangequestion SET (question, range, question_number) = ($1, $2, $3) " +
-            "WHERE id = $4 RETURNING *");
-        statement.values = [question, range, questionNumber, id];
+            "UPDATE rangequestion SET (question, range, question_number, optional) = ($1, $2, $3, $4) " +
+            "WHERE id = $5 RETURNING *");
+        statement.values = [question, range, questionNumber, optional, id];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -160,11 +160,11 @@ export default class RubricPS {
      * @param {number} id - id.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeUpdateOpenQuestion(question: string, questionNumber: number, id: number)
+    public static executeUpdateOpenQuestion(question: string, questionNumber: number, id: number, optional: boolean)
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-open-question",
-            "UPDATE openquestion SET (question, question_number) = ($1, $2) WHERE id = $3 RETURNING *");
-        statement.values = [question, questionNumber, id];
+            "UPDATE openquestion SET (question, question_number, optional) = ($1, $2, $3) WHERE id = $4 RETURNING *");
+        statement.values = [question, questionNumber, optional, id];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -176,11 +176,11 @@ export default class RubricPS {
      * @param {string} extension - the file extension.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeUpdateUploadQuestion(question: string, questionNumber: number, id: number, extension: string)
+    public static executeUpdateUploadQuestion(question: string, questionNumber: number, id: number, extension: string, optional: boolean)
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("update-upload-question",
-            "UPDATE uploadquestion SET (question, question_number, extension) = ($1, $2, $4) WHERE id = $3 RETURNING *");
-        statement.values = [question, questionNumber, id, extension];
+            "UPDATE uploadquestion SET (question, question_number, extension, optional) = ($1, $2, $3, $4) WHERE id = $5 RETURNING *");
+        statement.values = [question, questionNumber, extension, optional, id];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -206,11 +206,11 @@ export default class RubricPS {
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeCreateRangeQuestion(question: string, range: number, rubricId: number,
-                                             questionNumber: number): Promise<pgPromise.queryResult> {
+                                             questionNumber: number, optional: boolean): Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("make-range-question",
-            "INSERT INTO rangequestion (question, range, rubric_id, question_number) " +
-            "VALUES ($1, $2, $3, $4) RETURNING *");
-        statement.values = [question, range, rubricId, questionNumber];
+            "INSERT INTO rangequestion (question, range, rubric_id, question_number, optional) " +
+            "VALUES ($1, $2, $3, $4, $5) RETURNING *");
+        statement.values = [question, range, rubricId, questionNumber, optional];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -221,12 +221,12 @@ export default class RubricPS {
      * @param {number} questionNumber - question_number.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateMCQuestion(question: string, rubricId: number, questionNumber: number)
+    public static executeCreateMCQuestion(question: string, rubricId: number, questionNumber: number, optional: boolean)
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("make-MC-question",
-            "INSERT INTO mcquestion (question, rubric_id, question_number) VALUES ($1, $2, $3) " +
+            "INSERT INTO mcquestion (question, rubric_id, question_number, optional) VALUES ($1, $2, $3, $4) " +
             "RETURNING *");
-        statement.values = [question, rubricId, questionNumber];
+        statement.values = [question, rubricId, questionNumber, optional];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -237,12 +237,12 @@ export default class RubricPS {
      * @param {number} questionNr - questino_number.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateOpenQuestion(question: string, rubricId: number, questionNr: number)
+    public static executeCreateOpenQuestion(question: string, rubricId: number, questionNr: number, optional: boolean)
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("make-open-question",
-            "INSERT INTO openquestion (question, rubric_id, question_number) VALUES ($1, $2, $3) " +
+            "INSERT INTO openquestion (question, rubric_id, question_number, optional) VALUES ($1, $2, $3, $4) " +
             "RETURNING *");
-        statement.values = [question, rubricId, questionNr];
+        statement.values = [question, rubricId, questionNr, optional];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -254,12 +254,12 @@ export default class RubricPS {
      * @param {string} extension - extension of the file.
      * @returns {Promise<pgPromise.queryResult>}
      */
-    public static executeCreateUploadQuestion(question: string, rubricId: number, questionNr: number, extension: string)
+    public static executeCreateUploadQuestion(question: string, rubricId: number, questionNr: number, extension: string, optional: boolean)
         : Promise<pgPromise.queryResult> {
         const statement = new PreparedStatement("make-upload-question",
-            "INSERT INTO uploadquestion (question, extension, rubric_id, question_number) VALUES ($1, $2, $3, $4) " +
+            "INSERT INTO uploadquestion (question, extension, rubric_id, question_number, optional) VALUES ($1, $2, $3, $4, $5) " +
             "RETURNING *");
-        statement.values = [question, extension, rubricId, questionNr];
+        statement.values = [question, extension, rubricId, questionNr, optional];
         return Database.executeQuerySingleResult(statement);
     }
 
@@ -396,6 +396,7 @@ export default class RubricPS {
     public static async getAllQuestionsByRubricId(rubricId: number) {
         // Fetch the questions of each type.
         const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubricId);
+        const checkboxQuestions = await RubricPS.executeGetAllCheckboxQuestionById(rubricId);
         const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubricId);
         const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubricId);
         const uploadQuestions = await RubricPS.executeGetAllUploadQuestionById(rubricId);
@@ -412,7 +413,22 @@ export default class RubricPS {
                 rubric_id: question.rubric_id,
                 question: question.question,
                 question_number: question.question_number,
-                option: await RubricPS.executeGetAllMCOptionById(question.id)
+                option: await RubricPS.executeGetAllMCOptionById(question.id),
+                optional: question.optional
+            });
+        }
+
+        // Fill with checkbox questions.
+        for (let i = 0; i < checkboxQuestions.length; i++) {
+            const question = checkboxQuestions[i];
+            questionJson.push({
+                id: question.id,
+                type_question: "checkbox",
+                rubric_id: question.rubric_id,
+                question: question.question,
+                question_number: question.question_number,
+                option: await RubricPS.executeGetAllCheckboxOptionsByQuestionId(question.id),
+                optional: question.optional
             });
         }
 
@@ -457,29 +473,42 @@ export default class RubricPS {
         const openQuestions = await RubricPS.executeGetAllOpenQuestionById(copyRubricId);
         const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(copyRubricId);
         const mcQuestions = await RubricPS.executeGetAllMCQuestionById(copyRubricId);
+        const checkboxQuestions = await RubricPS.executeGetAllCheckboxQuestionById(copyRubricId);
         const uploadQuestions = await RubricPS.executeGetAllUploadQuestionById(copyRubricId);
         let mcOptions;
+        let checkboxOptions;
 
         // Copy open questions
         for (let i = 0; i < openQuestions.length; i++) {
-            await this.executeCreateOpenQuestion(openQuestions[i].question, currentRubricId, openQuestions[i].question_number);
+            await this.executeCreateOpenQuestion(openQuestions[i].question, currentRubricId, openQuestions[i].question_number, openQuestions[i].optional);
         }
         // Copy range questions
         for (let i = 0; i < rangeQuestions.length; i++) {
-            await this.executeCreateRangeQuestion(rangeQuestions[i].question, rangeQuestions[i].range, currentRubricId, rangeQuestions[i].question_number);
+            await this.executeCreateRangeQuestion(rangeQuestions[i].question, rangeQuestions[i].range, currentRubricId, rangeQuestions[i].question_number, rangeQuestions[i].optional);
         }
         // Copy upload questions
         for (let i = 0; i < uploadQuestions.length; i++) {
-            await this.executeCreateUploadQuestion(uploadQuestions[i].question, currentRubricId, uploadQuestions[i].question_number, uploadQuestions[i].extension);
+            await this.executeCreateUploadQuestion(uploadQuestions[i].question, currentRubricId, uploadQuestions[i].question_number, uploadQuestions[i].extension, uploadQuestions[i].optional);
         }
         // Copy mc questions
         for (let i = 0; i < mcQuestions.length; i++) {
-            const res: any = await this.executeCreateMCQuestion(mcQuestions[i].question, currentRubricId, mcQuestions[i].question_number);
+            const res: any = await this.executeCreateMCQuestion(mcQuestions[i].question, currentRubricId, mcQuestions[i].question_number, mcQuestions[i].optional);
 
             // Copy mc options
             mcOptions = await RubricPS.executeGetAllMCOptionById(mcQuestions[i].id);
             for (let i = 0; i < mcOptions.length; i++) {
                 await this.executeCreateMCOption(mcOptions[i].option, res.id);
+            }
+        }
+
+        // Copy checkbox questions
+        for (let i = 0; i < checkboxQuestions.length; i++) {
+            const res: any = await this.executeCreateCheckboxQuestion(checkboxQuestions[i].question, currentRubricId, checkboxQuestions[i].question_number, checkboxQuestions[i].optional);
+
+            // Copy checkbox options
+            checkboxOptions = await RubricPS.executeGetAllCheckboxOptionsByQuestionId(checkboxQuestions[i].id);
+            for (let i = 0; i < checkboxOptions.length; i++) {
+                await this.executeCreateCheckboxOption(checkboxOptions[i].option, res.id);
             }
         }
     }
@@ -494,8 +523,10 @@ export default class RubricPS {
         const openQuestions = await RubricPS.executeGetAllOpenQuestionById(rubricId);
         const rangeQuestions = await RubricPS.executeGetAllRangeQuestionById(rubricId);
         const mcQuestions = await RubricPS.executeGetAllMCQuestionById(rubricId);
+        const checkboxQuestions = await RubricPS.executeGetAllCheckboxQuestionById(rubricId);
         const uploadQuestions = await RubricPS.executeGetAllUploadQuestionById(rubricId);
         let mcOptions;
+        let checkboxOptions;
 
         // Delete open questions
         for (let i = 0; i < openQuestions.length; i++) {
@@ -518,5 +549,135 @@ export default class RubricPS {
             }
             await this.executeDeleteMCQuestion(mcQuestions[i].id);
         }
+        // Delete checkbox questions
+        for (let i = 0; i < checkboxQuestions.length; i++) {
+            // Delete checkbox options
+            checkboxOptions = await RubricPS.executeGetAllCheckboxOptionsByQuestionId(checkboxQuestions[i].id);
+            for (let i = 0; i < checkboxOptions.length; i++) {
+                await this.executeDeleteCheckboxOption(checkboxOptions[i].id);
+            }
+            await this.executeDeleteCheckboxQuestion(checkboxQuestions[i].id);
+        }
     }
+
+    /**
+     * Executes 'create checkbox question' query.
+     * @param {string} question - question.
+     * @param {number} rubricId - rubric_id.
+     * @param {number} questionNumber - question_number.
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeCreateCheckboxQuestion(question: string, rubricId: number, questionNumber: number, optional: boolean)
+        : Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("make-Checkbox-question",
+            "INSERT INTO checkboxquestion (question, rubric_id, question_number, optional) VALUES ($1, $2, $3, $4) " +
+            "RETURNING *");
+        statement.values = [question, rubricId, questionNumber, optional];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'update checkbox question' query.
+     * @param {string} question - question.
+     * @param {number} questionNumber - question_number.
+     * @param {number} id - id.
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeUpdateCheckboxQuestion(question: string, questionNumber: number, id: number, optional: boolean)
+
+        : Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("update-checkbox-question",
+            "UPDATE checkboxquestion SET (question, question_number, optional) = ($1, $2, $3) WHERE id = $4 RETURNING *");
+        statement.values = [question, questionNumber, optional, id];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Query 'delete Checkbox question'
+     * @param {number} id - id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteCheckboxQuestion(id: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("delete-checkbox-question",
+            "DELETE FROM checkboxquestion WHERE id=$1 RETURNING *");
+        statement.values = [id];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'create Checkbox option' query.
+     * @param {string} option - option.
+     * @param {number} checkboxQuestionId - checkboxquestion_id.
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeCreateCheckboxOption(option: string, checkboxQuestionId: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("make-Checkbox-option",
+            "INSERT INTO checkboxoption (option, checkboxquestion_id) VALUES ($1, $2) RETURNING *");
+        statement.values = [option, checkboxQuestionId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'update checkbox option' query.
+     * @param {string} option
+     * @param {number} id
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeUpdateCheckboxOption(option: string, id: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("updat-checkbox-option",
+            "UPDATE checkboxoption SET option=$1 WHERE id = $2 RETURNING *");
+        statement.values = [option, id];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Query 'delete checkbox option'.
+     * @param {number} id - id.
+     * @returns {Promise<pgPromise.queryResult>}
+     */
+    public static executeDeleteCheckboxOption(id: number): Promise<pgPromise.queryResult> {
+        const statement = new PreparedStatement("delte-checkbox-option",
+            "DELETE FROM checkboxoption WHERE id=$1 RETURNING *");
+        statement.values = [id];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'get all options by id' query.
+     * @param {number} id - checkboxquestion_id.
+     * @returns {any}
+     */
+    public static executeGetAllCheckboxOptionsByQuestionId(checkBoxQuestionId: number): any {
+        // order the options alphabetically
+        const statement = new PreparedStatement("get-all-checkbox-options",
+            "SELECT * FROM checkboxoption WHERE checkboxquestion_id = $1 ORDER BY option");
+        statement.values = [checkBoxQuestionId];
+        return Database.executeQuery(statement);
+    }
+
+    /**
+     * Gets One Checkbox question by Id and RubricId.
+     * @param {number} questionId - question id.
+     * @param {number} rubricId - rubric id.
+     * @return {any}
+     */
+    public static executeGetCheckboxQuestionByIdAndRubricId(questionId: number, rubricId: number): any {
+        const statement = new PreparedStatement("get-one-checkboxquestion",
+            "SELECT * FROM checkboxquestion WHERE id = $1 AND rubric_id = $2");
+        statement.values = [questionId, rubricId];
+        return Database.executeQuerySingleResult(statement);
+    }
+
+    /**
+     * Executes 'get all Checkbox questions' query.
+     * @param {number} id - assignment_id
+     * @returns {any}
+     */
+    public static executeGetAllCheckboxQuestionById(id: number): any {
+        const statement = new PreparedStatement("get-all-checkbox-questions",
+            "SELECT * FROM checkboxquestion WHERE rubric_id = $1");
+        statement.values = [id];
+        return Database.executeQuery(statement);
+    }
+
 }

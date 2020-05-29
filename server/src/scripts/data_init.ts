@@ -76,9 +76,13 @@ const copyExampleReviewData = async function () {
 };
 
 // running the initialisation functions
-console.log("Importing database");
-importDatabase();
-console.log("Copying example data");
-copyExampleAssignmentData();
-copyExampleSubmissionData();
-copyExampleReviewData();
+if (process.env.NODE_ENV === "production") {
+    throw Error("You cannot run tests in production!");
+} else {
+    console.log("Importing database");
+    importDatabase();
+    console.log("Copying example data");
+    copyExampleAssignmentData();
+    copyExampleSubmissionData();
+    copyExampleReviewData();
+}

@@ -14,26 +14,27 @@ import passport from "passport";
 import config from "../config";
 import passportConfiguration from "../passport";
 import mockPassportConfiguration from "../passport_mock";
-
-const fileStore = sessionFileStore(session);
+import { eventLogger } from "../logger";
 
 const router = express();
+router.use(eventLogger);
 
 // session support is required to use Passport
+const fileStore = sessionFileStore(session);
 // needs a random secret
 const sessionConfig: any = {
+    cookie: {maxAge: config.session.maxAge},
     resave: true,
     saveUninitialized: true,
     secret: config.session.secret
   };
-
 // Depending of current mode, setup the session store
 if (process.env.NODE_ENV === "production") {
     sessionConfig.store = new fileStore();
 }
-
 router.use(session(sessionConfig));
 
+// initialize passport middleware
 router.use(passport.initialize());
 router.use(passport.session());
 
@@ -81,12 +82,13 @@ router.get("/logout", function(req, res) {
 
 // Retrieve SP metadata
 router.get("/metadata.xml", async function(req, res) {
+  const file = await fs.readFile("./SP_Metadata.xml");
   res.type("application/xml");
-  res.send(await fs.readFile("./SP_Metadata.xml"));
+  res.send(file);
 });
 
 // This route checks the user and updates it in the database
-router.use("*", async function(req: any, res, next) {
+router.use(async function(req: any, res, next) {
     const userinfo = req.user;
     // check whether userinfo exists
     if (userinfo == undefined || userinfo.netid == undefined) {
@@ -128,7 +130,7 @@ router.get("/authenticated", function(req: any, res) {
 });
 
 // Check always whether someone is logged in
-router.use("*", security.authorization.authorizeCheck);
+router.use(security.authorization.authorizeCheck);
 
 // Routing
 router.use("/assignments", assignments);
@@ -146,22 +148,8 @@ router.get("/user", function(req: any, res, next) {
 });
 
 // If no other routes apply, send a 404
-router.use("*", function(req, res) {
+router.use(function(req, res) {
     res.sendStatus(404);
 });
-
-// Error handler
-router.use(function(err: any, req: any, res: any, next: any) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get("env") === "development" ? err : {};
-    // Print error to console
-    console.log("Error: " + err.message);
-
-    // render the error page
-    res.status(err.status || 500);
-    res.json({ error: "There is an error in your API request" });
-});
-
 
 export default router;

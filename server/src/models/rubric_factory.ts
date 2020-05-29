@@ -1,17 +1,22 @@
 import RubricPS from "../prepared_statements/rubric_ps";
 
+// This file needs to be revised with new questiontypes
+
 interface OpenQuestion {
     question: string;
+    optional: boolean;
 }
 
 interface MultipleChoiceQuestion {
     question: string;
     options: string[];
+    optional: boolean;
 }
 
 interface RangeQuestion {
     question: string;
     range: number;
+    optional: boolean;
 }
 
 export interface RubricConfiguration {
@@ -56,14 +61,14 @@ export async function generateRubric(config: RubricConfiguration, assignmentId: 
         switch (getQuestionType(rubricQuestion)) {
             // After this point, we know for sure which QuestionType 'rubricQuestion' is, so it will be type casted appropriately.
             case "open":
-                await RubricPS.executeCreateOpenQuestion(rubricQuestion.question, rubric.id, questionNumber);
+                await RubricPS.executeCreateOpenQuestion(rubricQuestion.question, rubric.id, questionNumber, rubricQuestion.optional);
                 break;
             case "range":
-                await RubricPS.executeCreateRangeQuestion(rubricQuestion.question, (<RangeQuestion> rubricQuestion).range, rubric.id, questionNumber);
+                await RubricPS.executeCreateRangeQuestion(rubricQuestion.question, (<RangeQuestion> rubricQuestion).range, rubric.id, questionNumber, rubricQuestion.optional);
                 break;
             case "mc":
                 const mcQuestion = <MultipleChoiceQuestion> rubricQuestion;
-                const mcQuestionDb: any = await RubricPS.executeCreateMCQuestion(mcQuestion.question, rubric.id, questionNumber);
+                const mcQuestionDb: any = await RubricPS.executeCreateMCQuestion(mcQuestion.question, rubric.id, questionNumber, rubricQuestion.optional);
 
                 // Add the options to the multiple choice question.
                 for (const option of mcQuestion.options) {

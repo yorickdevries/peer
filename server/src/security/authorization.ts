@@ -663,6 +663,42 @@ const courseEnrollable = async (req: any, res: any, next: any) => {
 };
 
 /**
+ * Check authorization to edit a checkbox question
+ */
+const checkCheckboxQuestionEdit = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeAuthorizationCheckboxQuestion(req.params.question_id, req.user.netid);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check authorization to post checkbox option
+ */
+const checkCheckboxOptionPost = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeAuthorizationCheckboxQuestion(req.body.checkboxquestion_id, req.user.netid);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
+ * Check authorization to edit a checkbox option
+ */
+const checkCheckboxOptionEdit = async (req: any, res: any, next: any) => {
+    try {
+        const authCheck = await AuthorizationPS.executeAuthorizationCheckboxOption(req.params.option_id, req.user.netid);
+        await response(res, authCheck.exists, next);
+    } catch (error) {
+        res.sendStatus(401);
+    }
+};
+
+/**
  * Response method that handles the response
  */
 const response = (res: any, bool: boolean, next: any) => {
@@ -715,5 +751,8 @@ export default {
     enrolledAsTeacherTwoAssignmentsCheck,
     enrolledAsTeacherThreeAssignmentsCheck,
     courseEnrollable,
-    enrolledAsTAOrTeacherCourse
+    enrolledAsTAOrTeacherCourse,
+    checkCheckboxQuestionEdit,
+    checkCheckboxOptionPost,
+    checkCheckboxOptionEdit
 };

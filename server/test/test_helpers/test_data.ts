@@ -1,5 +1,6 @@
 import { QueryFile } from "pg-promise";
 import Database from "../../src/database";
+import config from "../../src/config";
 
 // file system imports
 import fs from "fs-extra";
@@ -8,7 +9,7 @@ import path from "path";
 /**
  * Class responsible for the initialisation of data used for testing
  */
-export default class TestData {
+class TestData {
     /**
      * Database schema
      */
@@ -26,22 +27,22 @@ export default class TestData {
      */
     static exampleReviewFolder = path.join(__dirname, "../../example_data/reviews");
     /**
-     * Submission file folder
-     */
-    static submissionFolder = path.join(__dirname, "../../src/files/submissions");
-    /**
      * Example Assignment files
      */
     static exampleAssignmentFolder = path.join(__dirname, "../../example_data/assignments");
     /**
+     * Submission file folder
+     */
+    static submissionFolder = config.submissions.fileFolder;
+    /**
      * Assignment file folder
      */
-    static assignmentFolder = path.join(__dirname, "../../src/files/assignments");
+    static assignmentFolder = config.assignments.fileFolder;
 
     /**
      * Review file folder
      */
-    static reviewFolder = path.join(__dirname, "../../src/files/reviews");
+    static reviewFolder = config.reviews.fileFolder;
 
     /**
      * initializes the database with testdata
@@ -114,3 +115,9 @@ export default class TestData {
         await fs.remove(this.assignmentFolder);
     }
 }
+
+if (process.env.NODE_ENV === "production") {
+    throw Error("You cannot run tests in production!");
+}
+
+export default TestData;

@@ -23,20 +23,24 @@ describe("RubricPreparedStatements Test", () => {
         const range = 5;
         const mcQuestion = "This is a mc question";
         const options = ["1", "2"];
+        const optional = false;
 
         const config: RubricConfiguration = {
             rubric_type: "submission",
             questions: [
                 {
-                    question: openQuestion
+                    question: openQuestion,
+                    optional
                 },
                 {
                     question: rangeQuestion,
-                    range
+                    range,
+                    optional
                 },
                 {
                     question: mcQuestion,
-                    options
+                    options,
+                    optional
                 }
             ]
         };

@@ -1,7 +1,7 @@
 
 <template>
     <div>
-    <b-alert :show="blockRubricEditing" variant="info">Rubric editing is not allowed anymore since the peer review publish date has already elapsed.</b-alert>
+    <b-alert :show="blockRubricEditing" variant="info">Rubric editing is not allowed anymore since the peer review publish date has already passed.</b-alert>
 
     <b-container v-bind:class="{ 'disabled-view': blockRubricEditing }">
 
@@ -9,14 +9,21 @@
             <div class="d-flex justify-content-between">
                 <div>
                     <div class="text-muted">Make Rubric</div>
-                    <b-button @click="makeRubric()" class="mb-3" variant="primary" size="sm">Make Rubric</b-button>
+                    <b-button @click="makeRubric()"
+                              class="mb-3"
+                              variant="primary">
+                        Make rubric
+                    </b-button>
                 </div>
                 <div>
-                    <div class="text-muted">Create a new question.</div>
-                    <b-button v-b-modal="'createModal'"  variant="primary">Add new Question</b-button>
+                    <div class="text-muted">Create a new question</div>
+                    <b-button v-b-modal="'createModal'"
+                              variant="primary">
+                        Create new Question
+                    </b-button>
                 </div>
                 <div>
-                    <div class="text-muted">Copy questions from another rubric.</div>
+                    <div class="text-muted">Copy questions from another rubric</div>
                     <div class="input-group mb-2">
                         <div class="input-group-prepend">
                             <b-button variant="primary" @click="copyRubric">Copy</b-button>
@@ -26,11 +33,11 @@
                 </div>
 
                 <div>
-                    <div class="text-muted">Deletes all questions</div>
+                    <div class="text-muted">Delete all questions</div>
                     <b-button variant="danger" v-b-modal.deleteAll>Delete all questions</b-button>
                     <b-modal id="deleteAll" centered title="Warning" @ok="deleteAll">
-                        Are you sure you want to delete ALL questions? Deleting a question after students have submitted
-                        answers to this question will DELETE all the answers the students have given.
+                        Are you sure you want to delete ALL questions? <br><br> Deleting all questions after students have submitted
+                        answers to questions will DELETE all the answers the students have given.
                     </b-modal>
                 </div>
             </div>
@@ -46,8 +53,14 @@
 
                     <b-card-header class="d-flex align-items-center">
                         <span class="w-100">Question {{ question.question_number }}</span>
-                        <b-badge variant="success" class="ml-2 float-right p-1">{{
+                        <b-badge variant="primary" class="ml-2 float-right p-1">{{
                             question.type_question.toUpperCase() }} QUESTION
+                        </b-badge>
+                        <b-badge pill v-if="question.optional"  variant="secondary" class="ml-2 float-right p-1">
+                            OPTIONAL
+                        </b-badge>
+                        <b-badge v-else variant="danger" class="ml-2 float-right p-1">
+                            REQUIRED
                         </b-badge>
                     </b-card-header>
 
@@ -64,6 +77,10 @@
                             <MCQuestion v-model="rubric.questions[index]"></MCQuestion>
                         </template>
 
+                        <template v-if="question.type_question === 'checkbox'">
+                            <CheckboxQuestion v-model="rubric.questions[index]"></CheckboxQuestion>
+                        </template>
+
                         <template v-if="question.type_question === 'upload'">
                             <UploadQuestion v-model="rubric.questions[index]"></UploadQuestion>
                         </template>
@@ -77,7 +94,7 @@
                         <span>
                             <b-btn v-b-modal="`delete${question.id}`" variant="outline-danger" size="sm">Delete</b-btn>
                             <b-modal :id="`delete${question.id}`" centered title="Warning" @ok="deleteQuestion(question)">
-                                Are you sure you want to delete? Deleting a question after students have submitted
+                                Are you sure you want to delete? <br><br> Deleting a question after students have submitted
                                 answers to this question will DELETE all the answers the students have given.
                             </b-modal>
                         </span>
@@ -107,14 +124,17 @@ import notifications from '../../../mixins/notifications'
 import OpenQuestion from './OpenQuestion'
 import RangeQuestion from './RangeQuestion'
 import MCQuestion from './MCQuestion'
+import CheckboxQuestion from './CheckboxQuestion'
 import UploadQuestion from './UploadQuestion'
 import CreateQuestionWizard from './CreateQuestionWizard'
 
 let apiPrefixes = {
     open: '/rubric/openquestion',
-    mc: '/rubric/mcquestion',
     range: '/rubric/rangequestion',
+    mc: '/rubric/mcquestion',
     mcoption: '/rubric/mcoption',
+    checkbox: '/rubric/checkboxquestion',
+    checkboxoption: '/rubric/checkboxoption',
     upload: '/rubric/uploadquestion'
 }
 
@@ -124,6 +144,7 @@ export default {
         OpenQuestion,
         RangeQuestion,
         MCQuestion,
+        CheckboxQuestion,
         CreateQuestionWizard,
         UploadQuestion
     },
@@ -188,6 +209,8 @@ export default {
         async saveQuestion(question) {
             // Special save function to save MC questions.
             if (question.type_question === 'mc') return this.saveMCQuestion(question)
+            // Special save function to save Checkbox questions.
+            if (question.type_question === 'checkbox') return this.saveCheckboxQuestion(question)
 
             await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
             this.showSuccessMessage({message: 'Successfully saved question.'})
@@ -205,6 +228,26 @@ export default {
                     await api.client.post(`${apiPrefixes['mcoption']}`, option)
                 else if (option.id)
                     await api.client.put(`${apiPrefixes['mcoption']}/${option.id}`, option)
+
+            })
+
+            // Save question text.
+            await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
+            this.showSuccessMessage({message: 'Successfully saved question.'})
+            await this.fetchRubric()
+        },
+        async saveCheckboxQuestion(question) {
+            let options = question.option
+
+            // Save options first to the API (delete/post/put).
+            options.forEach(async option => {
+
+                if (option.delete === true)
+                    await api.client.delete(`${apiPrefixes['checkboxoption']}/${option.id}`)
+                else if (option.id === undefined)
+                    await api.client.post(`${apiPrefixes['checkboxoption']}`, option)
+                else if (option.id)
+                    await api.client.put(`${apiPrefixes['checkboxoption']}/${option.id}`, option)
 
             })
 

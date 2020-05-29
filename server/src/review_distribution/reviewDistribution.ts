@@ -22,7 +22,7 @@ export default class ReviewDistribution {
         const assignment = await AssignmentPS.executeGetAssignmentById(assignmentId);
         // check whether the assignment is due
         if (new Date(assignment.due_date) > new Date()) {
-            throw new Error("The assignment isn't due yet");
+            throw new Error("The assignment deadline has not passed yet");
         }
         // Distribution of reviews for assignment
         let reviews = undefined;
@@ -33,7 +33,7 @@ export default class ReviewDistribution {
         }
         const existingReviews: any = await ReviewPS.executeGetSubmissionReviewsByAssignmentId(assignmentId);
         if (existingReviews.length !== 0) {
-            throw new Error("There are already reviews assigned for this assignment");
+            throw new Error("Reviews have already been assigned for this assignment");
         }
         // Add the review assignments to the database
         for (const review of reviews) {

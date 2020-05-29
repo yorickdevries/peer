@@ -114,7 +114,34 @@ CREATE TABLE MCQuestion (
     question varchar(5000) NOT NULL,
     Rubric_id int NOT NULL,
     question_number int NOT NULL,
+    optional boolean NOT NULL,
     CONSTRAINT MCQuestion_pk PRIMARY KEY (id)
+);
+
+-- Table: CheckboxQuestion
+CREATE TABLE CheckboxQuestion (
+    id SERIAL,
+    question varchar(5000) NOT NULL,
+    Rubric_id int NOT NULL,
+    question_number int NOT NULL,
+    optional boolean NOT NULL,
+    CONSTRAINT CheckboxQuestion_pk PRIMARY KEY (id)
+);
+
+-- Table: CheckboxAnswer
+CREATE TABLE CheckboxAnswer (
+    answer boolean NOT NULL,
+    CheckboxOption_id int NOT NULL,
+    Review_id int NOT NULL,
+    CONSTRAINT CheckboxAnswer_pk PRIMARY KEY (CheckboxOption_id,Review_id)
+);
+
+-- Table: CheckboxOption
+CREATE TABLE CheckboxOption (
+    id SERIAL,
+    option varchar(5000) NOT NULL,
+    CheckboxQuestion_id int NOT NULL,
+    CONSTRAINT CheckboxOption_pk PRIMARY KEY (id)
 );
 
 -- Table: OpenAnswer
@@ -131,6 +158,7 @@ CREATE TABLE OpenQuestion (
     question varchar(5000) NOT NULL,
     Rubric_id int NOT NULL,
     question_number int NOT NULL,
+    optional boolean NOT NULL,
     CONSTRAINT OpenQuestion_pk PRIMARY KEY (id)
 );
 
@@ -149,6 +177,7 @@ CREATE TABLE RangeQuestion (
     range int NOT NULL,
     Rubric_id int NOT NULL,
     question_number int NOT NULL,
+    optional boolean NOT NULL,
     CONSTRAINT RangeQuestion_pk PRIMARY KEY (id),
     CONSTRAINT positive_range CHECK (range > 0)
 );
@@ -165,9 +194,10 @@ CREATE TABLE UploadAnswer (
 CREATE TABLE UploadQuestion (
     id SERIAL,
     question varchar(5000) NOT NULL,
-    extension varchar(10) NOT NULL,
+    extension varchar(100) NOT NULL,
     Rubric_id int NOT NULL,
     question_number int NOT NULL,
+    optional boolean NOT NULL,
     CONSTRAINT UploadQuestion_pk PRIMARY KEY (id)
 );
 
@@ -367,6 +397,38 @@ ALTER TABLE MCAnswer ADD CONSTRAINT MCAnswer_MCOption
 
 -- Reference: MCQuestion_Rubric (table: MCQuestion)
 ALTER TABLE MCQuestion ADD CONSTRAINT MCQuestion_Rubric
+    FOREIGN KEY (Rubric_id)
+    REFERENCES Rubric (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: CheckboxAnswer_CheckboxOption (table: CheckboxAnswer)
+ALTER TABLE CheckboxAnswer ADD CONSTRAINT CheckboxAnswer_CheckboxOption
+    FOREIGN KEY (CheckboxOption_id)
+    REFERENCES CheckboxOption (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: CheckboxAnswer_Review (table: CheckboxAnswer)
+ALTER TABLE CheckboxAnswer ADD CONSTRAINT CheckboxAnswer_Review
+    FOREIGN KEY (Review_id)
+    REFERENCES Review (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: CheckboxOption_CheckboxQuestion (table: CheckboxOption)
+ALTER TABLE CheckboxOption ADD CONSTRAINT CheckboxOption_CheckboxQuestion
+    FOREIGN KEY (CheckboxQuestion_id)
+    REFERENCES CheckboxQuestion (id)
+    NOT DEFERRABLE
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: CheckboxQuestion_Rubric (table: CheckboxQuestion)
+ALTER TABLE CheckboxQuestion ADD CONSTRAINT CheckboxQuestion_Rubric
     FOREIGN KEY (Rubric_id)
     REFERENCES Rubric (id)
     NOT DEFERRABLE
