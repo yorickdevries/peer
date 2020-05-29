@@ -111,7 +111,7 @@
                                     v-model="pair.answer.answer"
                                     stacked
                                     required
-                                    :disabled="peerReview.review.done">
+                                    :disabled="true">
                             </b-form-checkbox-group>
                         </b-form-group>
 
