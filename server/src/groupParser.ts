@@ -27,11 +27,11 @@ export default class GroupParser {
     }
 
     /**
-     * Checks if a group is empty.
+     * Checks if a row is empty.
      * @param csvEntry - an entry of the brightspace csv export.
-     * @return {boolean} - true if the group is empty.
+     * @return {boolean} - true if the row is empty.
      */
-    public static isEmptyGroup(csvEntry: any): boolean {
+    public static isEmptyRow(csvEntry: any): boolean {
         const studentNumber = csvEntry["OrgDefinedId"];
         const netId = csvEntry["Username"];
         const lastName = csvEntry["LastName"];
@@ -53,8 +53,8 @@ export default class GroupParser {
         const allStudents: string[] = [];
         const validStudents: any[] = [];
         for (const student of studentlist) {
-            // Skip empty groups
-            if (this.isEmptyGroup(student)) {
+            // Skip empty rows
+            if (this.isEmptyRow(student)) {
                 continue;
             }
             const currentStudent = student.Username;
