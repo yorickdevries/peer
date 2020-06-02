@@ -71,13 +71,14 @@
     "json2csv": "^4.5.2",
     "morgan": "~1.9.0",
     "multer": "^1.4.2",
-    "neat-csv": "^2.1.0",
+    "neat-csv": "^5.2.0",
     "passport": "^0.4.0",
     "passport-mock-strategy": "^1.1.1",
     "passport-saml": "^0.35.0",
     "passport-saml-metadata": "^1.5.1",
     "pg-promise": "8.4.4",
     "session-file-store": "^1.2.0",
+    "strip-bom-buf": "^2.0.0",
     "typescript": "^3.8.3"
   },
   "devDependencies": {
