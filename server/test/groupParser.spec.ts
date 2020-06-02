@@ -84,6 +84,30 @@ describe("GroupParser tests", () => {
         .to.eventually.be.rejectedWith("NetId is an empty string");
     });
 
+    it("student is not defined, but group is 1", async () => {
+        // set up input data
+        const file = path.join(__dirname, "../example_data/csv_test/example_export_empty_groups.csv");
+        const filebuffer = new Buffer(fs.readFileSync(file));
+        const assignmentId = 3;
+        const result = await GroupParser.importGroups(filebuffer, assignmentId);
+        expect(result).to.deep.equal([
+            {groupId: 25, groupname: "ED 4"},
+            {groupId: 26, groupname: "ED 3"}
+        ]);
+    });
+
+    it("student is not defined, but group is 2", async () => {
+        // set up input data
+        const file = path.join(__dirname, "../example_data/csv_test/tud-sndbx-stefanhugtenbu+o.csv");
+        const filebuffer = new Buffer(fs.readFileSync(file));
+        const assignmentId = 3;
+        const result = await GroupParser.importGroups(filebuffer, assignmentId);
+        expect(result).to.deep.equal([
+            {groupId: 25, groupname: "CG_ 2"},
+            {groupId: 26, groupname: "CG_ 3"}
+        ]);
+    });
+
     it("some netids are without @ symbol", async () => {
         // set up input data
         const file = path.join(__dirname, "../example_data/csv_test/example_export_usernames_without_at.csv");
