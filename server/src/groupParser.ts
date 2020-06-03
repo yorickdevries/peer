@@ -1,4 +1,5 @@
 import neatCsv from "neat-csv";
+import stripBomBuffer from "strip-bom-buf";
 import GroupPS from "./prepared_statements/group_ps";
 import UserPS from "./prepared_statements/user_ps";
 import AssignmentPS from "./prepared_statements/assignment_ps";
@@ -19,24 +20,24 @@ export default class GroupParser {
      */
     public static async importGroups(filebuffer: Buffer, assignmentId: number) {
         // parse the file
-        let studentlist = await neatCsv(filebuffer);
+        let studentlist = await neatCsv(stripBomBuffer(filebuffer));
         studentlist = await this.checkStudentList(studentlist, assignmentId);
         const studentmap = this.mapGroups(studentlist);
         return await this.addGroupsToDatabase(studentmap, assignmentId);
     }
 
     /**
-     * Checks if a group is empty.
+     * Checks if a row is empty.
      * @param csvEntry - an entry of the brightspace csv export.
-     * @return {boolean} - true if the group is empty.
+     * @return {boolean} - true if the row is empty.
      */
-    public static isEmptyGroup(csvEntry: any): boolean {
+    public static isEmptyRow(csvEntry: any): boolean {
         const studentNumber = csvEntry["OrgDefinedId"];
-        const netId = csvEntry.Username;
+        const netId = csvEntry["Username"];
         const lastName = csvEntry["LastName"];
         const firstName = csvEntry["FirstName"];
         const email = csvEntry["Email"];
-        return studentNumber === "" && netId === "" && netId === "" && lastName === "" && firstName === "" && email === "";
+        return studentNumber === "" && netId === "" && lastName === "" && firstName === "" && email === "";
     }
 
     /**
@@ -50,10 +51,10 @@ export default class GroupParser {
      */
     public static async checkStudentList(studentlist: any[], assignmentId: number) {
         const allStudents: string[] = [];
-        const validStudents: string[] = [];
+        const validStudents: any[] = [];
         for (const student of studentlist) {
-            // Skip empty groups
-            if (this.isEmptyGroup(student)) {
+            // Skip empty rows
+            if (this.isEmptyRow(student)) {
                 continue;
             }
             const currentStudent = student.Username;

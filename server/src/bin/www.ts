@@ -10,6 +10,11 @@ import http from "http";
 
 debug("peer_review:server");
 
+// Print time info on start of the script
+const dateString = new Date().toString();
+console.log(`Started server at ${dateString}`);
+console.error(`Started server at ${dateString}`);
+
 console.log("Currently running in: " + app.get("env"));
 
 /**
