@@ -1,4 +1,5 @@
 import logger from "morgan";
+import forwarded from "forwarded-for";
 
 // Include the netid as token for logs
 logger.token("netid", function(req, res) {
@@ -9,7 +10,13 @@ logger.token("netid", function(req, res) {
     }
 });
 
-const loggerFormat = "(:netid) - :remote-addr - :remote-user [:date[clf]] \":method :url HTTP/:http-version\" :status :res[content-length]";
+// Include the original ip as token for logs
+logger.token("ipadress", function(req, res) {
+    const address = forwarded(req, req.headers);
+    return address.ip;
+});
+
+const loggerFormat = ":netid :ipadress [:date[clf]] \":method :url HTTP/:http-version\" :status :res[content-length]";
 
 // logger for all events
 const eventLogger = logger(loggerFormat);
