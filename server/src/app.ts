@@ -29,7 +29,7 @@ app.get("/*", (req, res) => {
 // Error handler
 app.use(function(err: any, req: any, res: any, next: any) {
     // Print error to the stderr
-    console.error("Error: " + err);
+    console.error(`Error occured at ${new Date()}: ${err}`);
 
     // send generic 500 error response
     res.status(500);
