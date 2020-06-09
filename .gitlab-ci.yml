@@ -28,7 +28,7 @@ build_server:
   variables:
     NODE_ENV: production
   services:
-  - postgres:10.3
+  - postgres:10
   script:
   - cd server && npm install
   - npm run build
@@ -41,7 +41,7 @@ build_client:
   variables:
     NODE_ENV: production
   services:
-  - postgres:10.3
+  - postgres:10
   script:
   - cd client && npm install
   - npm run build
@@ -52,7 +52,7 @@ build_client:
 test:
   stage: test
   services:
-  - postgres:10.3
+  - postgres:10
   script:
   - cd server && npm install
   - npm run test
@@ -65,7 +65,7 @@ test:
 coverage:
   stage: coverage
   services:
-  - postgres:10.3
+  - postgres:10
   script:
   - cd server && npm install
   - npm run coverage
@@ -80,7 +80,7 @@ start_server:
   variables:
     NODE_ENV: production
   services:
-  - postgres:10.3
+  - postgres:10
   script:
   - cd server && npm install
   - npm run build
