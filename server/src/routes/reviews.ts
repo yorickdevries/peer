@@ -22,7 +22,7 @@ const fileFolder = config.reviews.fileFolder;
  */
 router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
     try {
-        const reviewId = req.params.reviewId;
+        const reviewId = parseInt(req.params.reviewId);
         const result = await ReviewUpdate.getReview(reviewId);
 
         // Update the started_at date of the review
@@ -43,7 +43,7 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
  */
 router.route("/:reviewId/reviewevaluation").get(index.authorization.checkAuthorizationForGettingReviewEvaluation, async (req, res) => {
     try {
-        const reviewId = req.params.reviewId;
+        const reviewId = parseInt(req.params.reviewId);
         const reviewEvaluation: any = await ReviewsPS.executeGetFullReviewEvaluation(reviewId);
         res.json({
             id: reviewEvaluation.id,
@@ -60,7 +60,7 @@ router.route("/:reviewId/reviewevaluation").get(index.authorization.checkAuthori
  */
 router.route("/:reviewId/reviewevaluation").post(index.authorization.checkAuthorizationForCreatingReviewEvaluation, async (req, res) => {
     try {
-        const reviewId = req.params.reviewId;
+        const reviewId = parseInt(req.params.reviewId);
         const reviewEvaluationExists: any = await ReviewsPS.executeCheckExistsReviewEvaluation(reviewId);
         if (reviewEvaluationExists.exists) {
             throw new Error("Review evaluation already exists");
@@ -94,7 +94,7 @@ router.route("/:reviewId/reviewevaluation").post(index.authorization.checkAuthor
 router.route("/:reviewId").put(upload(undefined, config.allowed_extensions, config.reviews.maxSizeReviewFile), index.authorization.checkReviewOwner, index.authorization.checkReviewEditAllowed, async (req, res) => {
     try {
         // input
-        const reviewId = req.params.reviewId;
+        const reviewId = parseInt(req.params.reviewId);
         const inputForm = JSON.parse(req.body.form);
         const flagged = JSON.parse(req.body.review).flagged;
         // get review
@@ -185,7 +185,7 @@ router.route("/:reviewId").put(upload(undefined, config.allowed_extensions, conf
  */
 router.get("/:reviewId/questions/:question_id/file", index.authorization.checkAuthorizationForReview, async (req, res) => {
     try {
-        const review: any = await ReviewsPS.executeGetUploadAnswer(req.params.reviewId, req.params.question_id);
+        const review: any = await ReviewsPS.executeGetUploadAnswer(parseInt(req.params.reviewId), parseInt(req.params.question_id));
         const fileName = path.join(fileFolder, `${review.answer}`);
         res.download(fileName);
     } catch (err) {
@@ -199,7 +199,7 @@ router.get("/:reviewId/questions/:question_id/file", index.authorization.checkAu
  * @return database return value.
  */
 router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewEditAllowed, async (req, res) => {
-    const reviewId = req.params.reviewId;
+    const reviewId = parseInt(req.params.reviewId);
     const flagged = (await ReviewsPS.executeGetReview(reviewId)).flagged;
     const reviewFilled = await ReviewUpdate.isCompletelyFilledIn(reviewId);
     if (reviewFilled || flagged === true) {
@@ -224,7 +224,7 @@ router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, 
  * @return database return value.
  */
 router.route("/:reviewId/unsubmit").get(index.authorization.checkReviewOwnerDone, index.authorization.checkReviewEditAllowed, async (req, res) => {
-    const reviewId = req.params.reviewId;
+    const reviewId = parseInt(req.params.reviewId);
     const result = await ReviewsPS.executeUnSubmitReview(reviewId);
     res.json(result);
 });
@@ -235,7 +235,7 @@ router.route("/:reviewId/unsubmit").get(index.authorization.checkReviewOwnerDone
  * @return database return value.
  */
 router.route("/:reviewId/allComments").get(index.authorization.checkAuthorizationForReview, (req, res) => {
-    ReviewsPS.executeGetAllReviewComments(req.params.reviewId)
+    ReviewsPS.executeGetAllReviewComments(parseInt(req.params.reviewId))
         .then((data) => {
             res.json(data);
         }).catch((error) => {
@@ -250,7 +250,7 @@ router.route("/:reviewId/allComments").get(index.authorization.checkAuthorizatio
  * @return database return value.
  */
 router.route("/:reviewCommentId/comment").put(index.authorization.checkOwnerReviewComment, (req, res) => {
-    ReviewsPS.executeUpdateReviewComment(req.params.reviewCommentId, req.body.comment)
+    ReviewsPS.executeUpdateReviewComment(parseInt(req.params.reviewCommentId), req.body.comment)
         .then((data) => {
             res.json(data);
         }).catch((error) => {
@@ -279,7 +279,7 @@ router.route("/:reviewId/comment").post(index.authorization.checkReviewTAOrTeach
  * @return database return value.
  */
 router.route("/:reviewCommentId/comment").delete(index.authorization.checkOwnerReviewComment, (req, res) => {
-    ReviewsPS.executeDeleteReviewComment(req.params.reviewCommentId)
+    ReviewsPS.executeDeleteReviewComment(parseInt(req.params.reviewCommentId))
         .then((data) => {
             res.json(data);
         }).catch((error) => {
@@ -292,7 +292,7 @@ router.route("/:reviewCommentId/comment").delete(index.authorization.checkOwnerR
  */
 router.route("/:reviewId/file").get(index.authorization.checkAuthorizationForReview, async (req, res) => {
     try {
-        const reviewId = req.params.reviewId;
+        const reviewId = parseInt(req.params.reviewId);
 
         // errors in case of submission is null
         const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(reviewId);

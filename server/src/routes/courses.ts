@@ -92,7 +92,7 @@ router.get("/:courseId/assignments", index.authorization.enrolledAsTAOrTeacherCo
  * @body name - a new course name.
  */
 router.put("/:courseId", index.authorization.enrolledCourseTeacherCheck, (req, res) => {
-    CoursesPS.executeUpdateCourse(req.params.courseId, req.body.faculty, req.body.academic_year, req.body.course_code, req.body.description, req.body.name, req.body.enrollable)
+    CoursesPS.executeUpdateCourse(parseInt(req.params.courseId), req.body.faculty, req.body.academic_year, req.body.course_code, req.body.description, req.body.name, req.body.enrollable)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -105,7 +105,7 @@ router.put("/:courseId", index.authorization.enrolledCourseTeacherCheck, (req, r
  * @param courseId - course id.
  */
 router.get("/:courseId", index.authorization.enrolledCourseCheck, (req, res) => {
-    CoursesPS.executeGetCourseById(req.params.courseId)
+    CoursesPS.executeGetCourseById(parseInt(req.params.courseId))
     .then((data) => {
         res.json(data);
     }).catch((error) => {

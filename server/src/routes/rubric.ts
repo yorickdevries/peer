@@ -34,7 +34,7 @@ router.post("/checkboxquestion", index.authorization.checkRubricAuthorizationPos
  * @body question_number - question_number
  */
 router.put("/checkboxquestion/:question_id", index.authorization.checkCheckboxQuestionEdit, (req, res) => {
-    RubricPS.executeUpdateCheckboxQuestion(req.body.question, req.body.question_number, req.params.question_id, req.body.optional)
+    RubricPS.executeUpdateCheckboxQuestion(req.body.question, req.body.question_number, parseInt(req.params.question_id), req.body.optional)
     .then((data: any) => {
         data.type_question = "checkbox";
         res.json(data);
@@ -48,11 +48,11 @@ router.put("/checkboxquestion/:question_id", index.authorization.checkCheckboxQu
  * @params id - id
  */
 router.delete("/checkboxquestion/:question_id", index.authorization.checkCheckboxQuestionEdit, async (req, res) => {
-    const checkboxOptions: any = await RubricPS.executeGetAllCheckboxOptionsByQuestionId(req.params.question_id);
+    const checkboxOptions: any = await RubricPS.executeGetAllCheckboxOptionsByQuestionId(parseInt(req.params.question_id));
     for (let i = 0; i < checkboxOptions.length; i++) {
         await RubricPS.executeDeleteCheckboxOption(checkboxOptions[i].id);
     }
-    RubricPS.executeDeleteCheckboxQuestion(req.params.question_id)
+    RubricPS.executeDeleteCheckboxQuestion(parseInt(req.params.question_id))
     .then((data: any) => {
         data.type_question = "checkbox";
         res.json(data);
@@ -89,7 +89,7 @@ router.put("/checkboxoption/:option_id", index.authorization.checkCheckboxOption
         // Option cannot be empty
         res.sendStatus(400);
     } else {
-        RubricPS.executeUpdateCheckboxOption(req.body.option, req.params.option_id)
+        RubricPS.executeUpdateCheckboxOption(req.body.option, parseInt(req.params.option_id))
         .then((data) => {
             res.json(data);
         }).catch((error) => {
@@ -104,7 +104,7 @@ router.put("/checkboxoption/:option_id", index.authorization.checkCheckboxOption
  * @params id - id
  */
 router.delete("/checkboxoption/:option_id", index.authorization.checkCheckboxOptionEdit, (req, res) => {
-    RubricPS.executeDeleteCheckboxOption(req.params.option_id)
+    RubricPS.executeDeleteCheckboxOption(parseInt(req.params.option_id))
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -117,7 +117,7 @@ router.delete("/checkboxoption/:option_id", index.authorization.checkCheckboxOpt
  * @params id - id
  */
 router.delete("/openquestion/:question_id", index.authorization.checkOpenQuestionEdit, (req, res) => {
-    RubricPS.executeDeleteOpenQuestion(req.params.question_id)
+    RubricPS.executeDeleteOpenQuestion(parseInt(req.params.question_id))
     .then((data: any) => {
         data.type_question = "open";
         res.json(data);
@@ -131,7 +131,7 @@ router.delete("/openquestion/:question_id", index.authorization.checkOpenQuestio
  * @params id - id
  */
 router.delete("/uploadquestion/:question_id", index.authorization.checkUploadQuestionEdit, (req, res) => {
-    RubricPS.executeDeleteUploadQuestion(req.params.question_id)
+    RubricPS.executeDeleteUploadQuestion(parseInt(req.params.question_id))
         .then((data: any) => {
             data.type_question = "upload";
             res.json(data);
@@ -145,7 +145,7 @@ router.delete("/uploadquestion/:question_id", index.authorization.checkUploadQue
  * @params id - id
  */
 router.delete("/rangequestion/:question_id", index.authorization.checkRangeQuestionEdit, (req, res) => {
-    RubricPS.executeDeleteRangeQuestion(req.params.question_id)
+    RubricPS.executeDeleteRangeQuestion(parseInt(req.params.question_id))
     .then((data: any) => {
         data.type_question = "range";
         res.json(data);
@@ -159,11 +159,11 @@ router.delete("/rangequestion/:question_id", index.authorization.checkRangeQuest
  * @params id - id
  */
 router.delete("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, async (req, res) => {
-    const mcOptions: any = await RubricPS.executeGetAllMCOptionById(req.params.question_id);
+    const mcOptions: any = await RubricPS.executeGetAllMCOptionById(parseInt(req.params.question_id));
     for (let i = 0; i < mcOptions.length; i++) {
         await RubricPS.executeDeleteMCOption(mcOptions[i].id);
     }
-    RubricPS.executeDeleteMCQuestion(req.params.question_id)
+    RubricPS.executeDeleteMCQuestion(parseInt(req.params.question_id))
     .then((data: any) => {
         data.type_question = "mc";
         res.json(data);
@@ -177,7 +177,7 @@ router.delete("/mcquestion/:question_id", index.authorization.checkMCQuestionEdi
  * @params id - id
  */
 router.delete("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (req, res) => {
-    RubricPS.executeDeleteMCOption(req.params.option_id)
+    RubricPS.executeDeleteMCOption(parseInt(req.params.option_id))
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -212,7 +212,7 @@ router.put("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (req, 
         // Option cannot be empty
         res.sendStatus(400);
     } else {
-        RubricPS.executeUpdateMCOption(req.body.option, req.params.option_id)
+        RubricPS.executeUpdateMCOption(req.body.option, parseInt(req.params.option_id))
         .then((data) => {
             res.json(data);
         }).catch((error) => {
@@ -260,7 +260,7 @@ router.post("/uploadquestion", index.authorization.checkRubricAuthorizationPostQ
  * @body extension - the file extension
  */
 router.put("/uploadquestion/:question_id", index.authorization.checkUploadQuestionEdit, (req, res) => {
-    RubricPS.executeUpdateUploadQuestion(req.body.question, req.body.question_number, req.params.question_id, req.body.extension, req.body.optional)
+    RubricPS.executeUpdateUploadQuestion(req.body.question, req.body.question_number, parseInt(req.params.question_id), req.body.extension, req.body.optional)
         .then((data: any) => {
             data.type_question = "upload";
             res.json(data);
@@ -276,7 +276,7 @@ router.put("/uploadquestion/:question_id", index.authorization.checkUploadQuesti
  * @body question_number - question_number
  */
 router.put("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, (req, res) => {
-    rubricPS.executeUpdateMCQuestion(req.body.question, req.body.question_number, req.params.question_id, req.body.optional)
+    rubricPS.executeUpdateMCQuestion(req.body.question, req.body.question_number, parseInt(req.params.question_id), req.body.optional)
     .then((data: any) => {
         data.type_question = "mc";
         res.json(data);
@@ -312,7 +312,7 @@ router.post("/rangequestion", index.authorization.checkRubricAuthorizationPostQu
  * @body question_number - question_number
  */
 router.put("/rangequestion/:question_id", index.authorization.checkRangeQuestionEdit, (req, res) => {
-    rubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.question_number, req.params.question_id, req.body.optional)
+    rubricPS.executeUpdateRangeQuestion(req.body.question, req.body.range, req.body.question_number, parseInt(req.params.question_id), req.body.optional)
     .then((data: any) => {
         data.type_question = "range";
         res.json(data);
@@ -342,7 +342,7 @@ router.post("/openquestion", index.authorization.checkRubricAuthorizationPostQue
  * @param question_id - question_id
  */
 router.put("/openquestion/:question_id", index.authorization.checkOpenQuestionEdit, (req, res) => {
-    rubricPS.executeUpdateOpenQuestion(req.body.question, req.body.question_number, req.params.question_id, req.body.optional)
+    rubricPS.executeUpdateOpenQuestion(req.body.question, req.body.question_number, parseInt(req.params.question_id), req.body.optional)
     .then((data: any) => {
         data.type_question = "open";
         res.json(data);
@@ -375,7 +375,7 @@ router.post("/", index.authorization.checkRubricAuthorizationPost, async (req, r
  */
 router.get("/submissionrubric/:assignment_id", index.authorization.enrolledAssignmentCheck, async (req, res) => {
     try {
-        const rubric = await RubricPS.executeGetSubmissionRubricByAssignmentId(req.params.assignment_id);
+        const rubric = await RubricPS.executeGetSubmissionRubricByAssignmentId(parseInt(req.params.assignment_id));
         const questionJson = await RubricPS.getAllQuestionsByRubricId(rubric.id);
         rubric.questions = questionJson;
 
@@ -390,7 +390,7 @@ router.get("/submissionrubric/:assignment_id", index.authorization.enrolledAssig
  */
 router.get("/:rubric_id", index.authorization.getRubricCheck, async (req, res) => {
     try {
-        const rubric = await RubricPS.executeGetRubricById(req.params.rubric_id);
+        const rubric = await RubricPS.executeGetRubricById(parseInt(req.params.rubric_id));
         const questionJson = await RubricPS.getAllQuestionsByRubricId(rubric.id);
         questionJson.sort(function(a, b) {return a.question_number - b.question_number; });
 
@@ -408,7 +408,7 @@ router.get("/:rubric_id", index.authorization.getRubricCheck, async (req, res) =
  */
 router.get("/:rubric_id/copy/:rubric_copy_id", index.authorization.checkRubricAuthorization, async (req, res) => {
     try {
-        await RubricPS.copyRubricQuestions(req.params.rubric_id, req.params.rubric_copy_id);
+        await RubricPS.copyRubricQuestions(parseInt(req.params.rubric_id), parseInt(req.params.rubric_copy_id));
         res.sendStatus(200);
     } catch {
         res.sendStatus(400);
@@ -421,7 +421,7 @@ router.get("/:rubric_id/copy/:rubric_copy_id", index.authorization.checkRubricAu
  */
 router.get("/:rubric_id/deleteAll", index.authorization.checkRubricAuthorization, async (req, res) => {
     try {
-        await RubricPS.deleteRubricQuestions(req.params.rubric_id);
+        await RubricPS.deleteRubricQuestions(parseInt(req.params.rubric_id));
         res.sendStatus(200);
     } catch {
         res.sendStatus(400);
@@ -434,7 +434,7 @@ router.get("/:rubric_id/deleteAll", index.authorization.checkRubricAuthorization
  */
 router.get("/:rubric_id/submitallfilledreviews", index.authorization.checkRubricAuthorization, async (req, res) => {
     try {
-        const rubricId = req.params.rubric_id;
+        const rubricId = parseInt(req.params.rubric_id);
         const allReviews: any = await ReviewPS.executeGetReviewsByRubricId(rubricId);
         let counter = 0;
         for (let i = 0; i < allReviews.length; i++) {

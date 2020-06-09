@@ -16,7 +16,7 @@ const passportConfiguration = function(passport: any) {
   fetch({ url, backupStore })
   .then((reader: any) => {
     // Setup config object
-    const ppConfig = toPassportConfig(reader);
+    const ppConfig: any = toPassportConfig(reader);
     ppConfig.realm = config.passport.realm;
     ppConfig.protocol = config.passport.protocol;
     ppConfig.issuer = config.passport.issuer;
