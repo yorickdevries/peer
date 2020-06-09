@@ -12,7 +12,7 @@ export default class ExportResultsPS {
      * and total amount of reviews by the student.
      */
     public static executeGetStudentSubmissionReviewExportAssignment(assignmentId: number): any {
-        const statement = new PreparedStatement("get-result-aggregation-assignment",
+        const statement = new PreparedStatement({name: "get-result-aggregation-assignment", text: 
             'SELECT netID AS "netID", studentNumber AS "studentnumber", approved, disapproved, total - approved - disapproved AS "waiting for TA", total AS "student total reviews", flagged' +
             " FROM (" +
             "    SELECT userlist.netid AS netID," +
@@ -27,7 +27,7 @@ export default class ExportResultsPS {
             "    WHERE rubric.assignment_id = $1 AND review.done = TRUE" +
             "    AND rubric.type = 'submission'" +
             "    GROUP BY userlist.netid" +
-            ") AS aggregations");
+            ") AS aggregations"});
         statement.values = [assignmentId];
         return Database.executeQuery(statement);
     }
@@ -38,7 +38,7 @@ export default class ExportResultsPS {
      * and total amount of reviews by the student.
      */
     public static executeGetStudentSubmissionReviewExportCourse(courseId: number): any {
-        const statement = new PreparedStatement("get-result-aggregation-course",
+        const statement = new PreparedStatement({name: "get-result-aggregation-course", text: 
             'SELECT netID AS "netID", studentNumber AS "studentnumber", approved, disapproved, total - approved - disapproved AS "waiting for TA", total AS "student total reviews", flagged' +
             " FROM (" +
             "    SELECT userlist.netid AS netID," +
@@ -54,7 +54,7 @@ export default class ExportResultsPS {
             "    WHERE review.done = TRUE AND assignmentlist.course_id = $1" +
             "    AND rubric.type = 'submission'" +
             "    GROUP BY userlist.netid" +
-            ") AS aggregations");
+            ") AS aggregations"});
         statement.values = [courseId];
         return Database.executeQuery(statement);
     }

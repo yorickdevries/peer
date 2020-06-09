@@ -12,8 +12,8 @@ export default class AssignmentPS {
      * @returns tuple with true or false depending on exists as pg promise.
      */
     public static executeExistsAssignmentById(assignmentId: number) {
-        const statement = new PreparedStatement("exists-assignment-by-id",
-        'SELECT EXISTS(SELECT * FROM "assignmentlist" WHERE "id" = $1)');
+        const statement = new PreparedStatement({name: "exists-assignment-by-id", text: 
+        'SELECT EXISTS(SELECT * FROM "assignmentlist" WHERE "id" = $1)'});
         statement.values = [assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -24,8 +24,8 @@ export default class AssignmentPS {
      * @return {any} all assignments of the course as pg promise..
      */
     public static executeGetAssignments(courseId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-assignments-by-course-id",
-            'SELECT * FROM "assignmentlist" WHERE "course_id" = $1');
+        const statement = new PreparedStatement({name: "get-assignments-by-course-id", text: 
+            'SELECT * FROM "assignmentlist" WHERE "course_id" = $1'});
         statement.values = [courseId];
         return Database.executeQuery(statement);
     }
@@ -36,8 +36,8 @@ export default class AssignmentPS {
      * @return {any} an assignment as pg promise.
      */
     public static executeGetAssignmentById(assignmentId: number) {
-        const statement = new PreparedStatement("get-assignment-by-id",
-            'SELECT * FROM "assignmentlist" WHERE "id" = $1');
+        const statement = new PreparedStatement({name: "get-assignment-by-id", text: 
+            'SELECT * FROM "assignmentlist" WHERE "id" = $1'});
         statement.values = [assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -63,9 +63,9 @@ export default class AssignmentPS {
                                        filename: string | null, publishDate: Date, dueDate: Date, reviewPublishDate: Date,
                                        reviewDueDate: Date, onePersonGroups: boolean, reviewEvaluation: boolean, externalLink: string | undefined,
                                        reviewEvaluationDueDate?: Date): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("addAssignment",
+        const statement = new PreparedStatement({name: "addAssignment", text: 
         'INSERT INTO "assignmentlist" (title, description, course_id, reviews_per_user, filename, publish_date, ' +
-            "due_date, review_publish_date, review_due_date, one_person_groups, review_evaluation, review_evaluation_due_date, external_link) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *");
+            "due_date, review_publish_date, review_due_date, one_person_groups, review_evaluation, review_evaluation_due_date, external_link) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *"});
         statement.values = [title, description, courseId, reviewsPerUser, filename, publishDate, dueDate,
             reviewPublishDate, reviewDueDate, onePersonGroups, reviewEvaluation, reviewEvaluationDueDate, externalLink];
         return Database.executeQuerySingleResult(statement);
@@ -90,11 +90,11 @@ export default class AssignmentPS {
                                               reviewPublishDate: Date, reviewDueDate: Date, assignmentId: number, externalLink: string,
                                               reviewEvaluationDueDate?: Date)
         : Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("update-assignment-by-id",
+        const statement = new PreparedStatement({name: "update-assignment-by-id", text: 
             "UPDATE assignmentlist " +
             "SET title=$1, description=$2, reviews_per_user=$3, filename=$4, publish_date=$5, due_date=$6, " +
             "review_publish_date=$7, review_due_date=$8, review_evaluation_due_date=$10, external_link=$11 " +
-            "WHERE id = $9 RETURNING *");
+            "WHERE id = $9 RETURNING *"});
 
         statement.values = [title, description, reviewsPerUser, filename, publishDate, dueDate, reviewPublishDate,
             reviewDueDate, assignmentId, reviewEvaluationDueDate, externalLink];
@@ -109,10 +109,10 @@ export default class AssignmentPS {
      */
     public static executeGetSubmissionsByAssignmentId(netId: string, assignmentId: number)
         : Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-submissions-by-assignment",
+        const statement = new PreparedStatement({name: "get-submissions-by-assignment", text: 
             "SELECT s.id, s.user_netid, s.group_id, s.assignment_id, s.file_path, s.date " +
             "FROM submission AS s JOIN groupusers gu ON s.group_id = gu.group_groupid " +
-            "WHERE gu.user_netid = $1 AND assignment_id = $2");
+            "WHERE gu.user_netid = $1 AND assignment_id = $2"});
         statement.values = [netId, assignmentId];
         return Database.executeQuery(statement);
     }
@@ -123,9 +123,9 @@ export default class AssignmentPS {
      * @returns {Promise<pgPromise.queryResult>}
      */
     public static executeGetGroupsByAssignmentId (id: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-all-groups-per-assignment",
+        const statement = new PreparedStatement({name: "get-all-groups-per-assignment", text: 
         "SELECT g.id, g.group_name FROM assignmentgroup a JOIN grouplist g ON a.group_id = g.id " +
-            "WHERE assignment_id = $1");
+            "WHERE assignment_id = $1"});
         statement.values = [id];
         return Database.executeQuery(statement);
     }
@@ -136,8 +136,8 @@ export default class AssignmentPS {
      * @return {Promise<pgPromise.queryResult>}
      */
     public static executeGetUsersOfGroup(groupId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-all-groups-users-for-assignment",
-            "SELECT * from groupusers WHERE group_groupid = $1");
+        const statement = new PreparedStatement({name: "get-all-groups-users-for-assignment", text: 
+            "SELECT * from groupusers WHERE group_groupid = $1"});
         statement.values = [groupId];
         return Database.executeQuery(statement);
     }
@@ -150,10 +150,10 @@ export default class AssignmentPS {
      */
     public static executeGetGroupOfNetIdByAssignmentId(netId: string, assignmentId: number)
         : Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("get-group-of-netid-by-assignmentid",
+        const statement = new PreparedStatement({name: "get-group-of-netid-by-assignmentid", text: 
         "SELECT a.assignment_id, a.group_id " +
             "FROM assignmentgroup a JOIN groupusers g ON a.group_id = g.group_groupid " +
-            "WHERE g.user_netid = $1 AND a.assignment_id = $2");
+            "WHERE g.user_netid = $1 AND a.assignment_id = $2"});
         statement.values = [netId, assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -166,10 +166,10 @@ export default class AssignmentPS {
      */
     public static executeExistsGroupOfNetIdByAssignmentId(netId: string, assignmentId: number)
         : Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement("exists-group-netid-assignment-id",
+        const statement = new PreparedStatement({name: "exists-group-netid-assignment-id", text: 
         "SELECT EXISTS(SELECT a.assignment_id, a.group_id " +
             "FROM assignmentgroup a JOIN groupusers g ON a.group_id = g.group_groupid " +
-            "WHERE g.user_netid = $1 AND a.assignment_id = $2)");
+            "WHERE g.user_netid = $1 AND a.assignment_id = $2)"});
         statement.values = [netId, assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -180,8 +180,8 @@ export default class AssignmentPS {
      * @return {Promise<any>} true or false as pg promise.
      */
     public static executeIsOnePersonGroupAssignment(assignmentId: number) {
-        const statement = new PreparedStatement("exists-group-netid-assignment-id",
-            "SELECT one_person_groups FROM assignmentlist WHERE id = $1");
+        const statement = new PreparedStatement({name: "exists-group-netid-assignment-id", text: 
+            "SELECT one_person_groups FROM assignmentlist WHERE id = $1"});
         statement.values = [assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -193,12 +193,12 @@ export default class AssignmentPS {
      * @return {Promise<any>} - all enrolled assignments.
      */
     public static executeGetEnrolledAssignmentsForUser(netId: string, courseId: number) {
-        const statement = new PreparedStatement("get-enrolled-assignments-for-netid",
+        const statement = new PreparedStatement({name: "get-enrolled-assignments-for-netid", text: 
             "SELECT al.* " +
             "FROM assignmentlist al " +
             "JOIN assignmentgroup a ON a.assignment_id = al.id " +
             "JOIN groupusers g ON a.group_id = g.group_groupid " +
-            "WHERE g.user_netid = $1 AND al.course_id = $2");
+            "WHERE g.user_netid = $1 AND al.course_id = $2"});
         statement.values = [netId, courseId];
         return Database.executeQuery(statement);
     }
@@ -210,7 +210,7 @@ export default class AssignmentPS {
      * @return {Promise<any>} - all not enrolled assignments.
      */
     public static executeGetUnenrolledAssignmentsForUser(netId: string, courseId: number) {
-        const statement = new PreparedStatement("get-not-enrolled-assignments-for-netid",
+        const statement = new PreparedStatement({name: "get-not-enrolled-assignments-for-netid", text: 
             "SELECT * FROM assignmentlist " +
             "WHERE course_id = $1 AND id NOT IN (SELECT al.id FROM assignmentlist al " +
             "JOIN assignmentgroup a ON a.assignment_id = al.id " +
@@ -218,7 +218,7 @@ export default class AssignmentPS {
             "WHERE g.user_netid = $2 AND al.course_id = $1) " +
             "AND assignmentlist.one_person_groups = true " +
             "AND assignmentlist.publish_date < CURRENT_TIMESTAMP " +
-            "AND assignmentlist.due_date > CURRENT_TIMESTAMP");
+            "AND assignmentlist.due_date > CURRENT_TIMESTAMP"});
         statement.values = [courseId, netId];
         return Database.executeQuery(statement);
     }

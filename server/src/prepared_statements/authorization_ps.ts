@@ -13,8 +13,8 @@ export default class AuthorizationPS {
      * @returns {Promise<pgPromise.queryResult>} true or false as pg promise.
      */
     public static executeCheckCourseEnrollment(courseId: number, netId: String): any {
-        const statement = new PreparedStatement("check-course-enrollment",
-            "SELECT EXISTS(SELECT 1 FROM ENROLL WHERE course_id = $1 AND user_netid = $2)");
+        const statement = new PreparedStatement({name: "check-course-enrollment", text: 
+            "SELECT EXISTS(SELECT 1 FROM ENROLL WHERE course_id = $1 AND user_netid = $2)"});
         statement.values = [courseId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -23,14 +23,14 @@ export default class AuthorizationPS {
      * Check whether a user is enrolled in an assignment.
      */
     public static executeCheckAssignmentEnrollment(assignmentId: number, netId: String): any {
-        const statement = new PreparedStatement("check-assignment-enrollment",
+        const statement = new PreparedStatement({name: "check-assignment-enrollment", text: 
             "SELECT EXISTS(" +
             "SELECT * FROM assignmentlist " +
             "JOIN assignmentgroup ON assignmentlist.id = assignmentgroup.assignment_id " +
             "JOIN groupusers ON assignmentgroup.group_id = groupusers.group_groupid " +
             "WHERE assignmentlist.id = $1 " +
             "AND groupusers.user_netid = $2" +
-            ")");
+            ")"});
         statement.values = [assignmentId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -42,8 +42,8 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckEnrollmentAsTeacher(courseId: number, netId: String): any {
-        const statement = new PreparedStatement("check-enrollment-as-teacher",
-            "SELECT EXISTS(SELECT 1 FROM ENROLL WHERE course_id = $1 AND user_netid = $2 AND role = 'teacher')");
+        const statement = new PreparedStatement({name: "check-enrollment-as-teacher", text: 
+            "SELECT EXISTS(SELECT 1 FROM ENROLL WHERE course_id = $1 AND user_netid = $2 AND role = 'teacher')"});
         statement.values = [courseId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -55,9 +55,9 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckEnrollAsTAOrTeacher(courseId: number, netId: String): any {
-        const statement = new PreparedStatement("check-enrollment-ta-teacher",
+        const statement = new PreparedStatement({name: "check-enrollment-ta-teacher", text: 
             "SELECT EXISTS(SELECT 1 FROM ENROLL " +
-            "WHERE course_id = $1 AND user_netid = $2 AND (role = 'teacher' OR role = 'TA'))");
+            "WHERE course_id = $1 AND user_netid = $2 AND (role = 'teacher' OR role = 'TA'))"});
         statement.values = [courseId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -69,9 +69,9 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckEnrollAsStudent(courseId: number, netId: String): any {
-        const statement = new PreparedStatement("check-enrollment-student",
+        const statement = new PreparedStatement({name: "check-enrollment-student", text: 
             "SELECT EXISTS(SELECT 1 FROM ENROLL " +
-            "WHERE course_id = $1 AND user_netid = $2 AND role = 'student')");
+            "WHERE course_id = $1 AND user_netid = $2 AND role = 'student')"});
         statement.values = [courseId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -83,14 +83,14 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckTAOrTeacherForReview(reviewId: number, netId: String): any {
-        const statement = new PreparedStatement("check-enrollment-ta-teacher-via-review",
+        const statement = new PreparedStatement({name: "check-enrollment-ta-teacher-via-review", text: 
             "SELECT EXISTS(SELECT * FROM review, submission, assignmentlist, courselist, enroll " +
             "WHERE review.submission_id = submission.id " +
             "AND submission.assignment_id = assignmentlist.id " +
             "AND assignmentlist.course_id = courselist.id " +
             "AND courselist.id = enroll.course_id " +
             "AND (enroll.role = 'TA' OR enroll.role = 'teacher') " +
-            "AND review.id = $1 AND enroll.user_netid = $2)");
+            "AND review.id = $1 AND enroll.user_netid = $2)"});
         statement.values = [reviewId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -102,8 +102,8 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckReviewMaker(reviewId: number, netId: String): any {
-        const statement = new PreparedStatement("check-review-owner",
-            "SELECT EXISTS(SELECT * FROM review WHERE review.id = $1 AND review.user_netid = $2)");
+        const statement = new PreparedStatement({name: "check-review-owner", text: 
+            "SELECT EXISTS(SELECT * FROM review WHERE review.id = $1 AND review.user_netid = $2)"});
         statement.values = [reviewId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -116,12 +116,12 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeAuthorizationMCQuestion(questionId: number, netId: String): any {
-        const statement = new PreparedStatement("check-authorization-mcquestion",
+        const statement = new PreparedStatement({name: "check-authorization-mcquestion", text: 
             "SELECT EXISTS(SELECT * FROM mcquestion, rubric, assignmentlist, enroll " +
             "WHERE mcquestion.rubric_id = rubric.id " +
             "AND rubric.assignment_id = assignmentlist.id " +
             "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher') " +
-            "AND mcquestion.id = $1 AND enroll.user_netid = $2)");
+            "AND mcquestion.id = $1 AND enroll.user_netid = $2)"});
         statement.values = [questionId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -133,13 +133,13 @@ export default class AuthorizationPS {
      * @return {any}
      */
     public static executeAuthorizationMCOption(optionId: number, netId: String): any {
-        const statement = new PreparedStatement("check-authorization-mcoption",
+        const statement = new PreparedStatement({name: "check-authorization-mcoption", text: 
             "SELECT EXISTS(SELECT * FROM mcoption, mcquestion, rubric, assignmentlist, enroll " +
             "WHERE mcoption.mcquestion_id = mcquestion.id " +
             "AND mcquestion.rubric_id = rubric.id " +
             "AND rubric.assignment_id = assignmentlist.id " +
             "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher') " +
-            "AND mcoption.id = $1 AND enroll.user_netid = $2)");
+            "AND mcoption.id = $1 AND enroll.user_netid = $2)"});
         statement.values = [optionId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -151,12 +151,12 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeAuthorizationRangeQuestion(questionId: number, netId: String): any {
-        const statement = new PreparedStatement("check-authorization-rangequestion",
+        const statement = new PreparedStatement({name: "check-authorization-rangequestion", text: 
             "SELECT EXISTS(SELECT * FROM rangequestion, rubric, assignmentlist, enroll " +
             "WHERE rangequestion.rubric_id = rubric.id " +
             "AND rubric.assignment_id = assignmentlist.id " +
             "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher') " +
-            "AND rangequestion.id = $1 AND enroll.user_netid = $2)");
+            "AND rangequestion.id = $1 AND enroll.user_netid = $2)"});
         statement.values = [questionId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -168,12 +168,12 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeAuthorizationOpenQuestion(questionId: number, netId: String): any {
-        const statement = new PreparedStatement("check-authorization-openquestion",
+        const statement = new PreparedStatement({name: "check-authorization-openquestion", text: 
             "SELECT EXISTS(SELECT * FROM openquestion, rubric, assignmentlist, enroll " +
             "WHERE openquestion.rubric_id = rubric.id " +
             "AND rubric.assignment_id = assignmentlist.id " +
             "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher') " +
-            "AND openquestion.id = $1 AND enroll.user_netid = $2)");
+            "AND openquestion.id = $1 AND enroll.user_netid = $2)"});
         statement.values = [questionId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -185,12 +185,12 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeAuthorizationUploadQuestion(questionId: number, netId: String): any {
-        const statement = new PreparedStatement("check-authorization-uploadquestion",
+        const statement = new PreparedStatement({name: "check-authorization-uploadquestion", text: 
             "SELECT EXISTS(SELECT * FROM uploadquestion, rubric, assignmentlist, enroll " +
             "WHERE uploadquestion.rubric_id = rubric.id " +
             "AND rubric.assignment_id = assignmentlist.id " +
             "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher') " +
-            "AND uploadquestion.id = $1 AND enroll.user_netid = $2)");
+            "AND uploadquestion.id = $1 AND enroll.user_netid = $2)"});
         statement.values = [questionId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -202,8 +202,8 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckReviewMakerNotDone(reviewId: number, netId: String): any {
-        const statement = new PreparedStatement("check-review-owner",
-            "SELECT EXISTS(SELECT * FROM review WHERE review.done = false AND review.id = $1 AND review.user_netid = $2)");
+        const statement = new PreparedStatement({name: "check-review-owner-not-done", text: 
+            "SELECT EXISTS(SELECT * FROM review WHERE review.done = false AND review.id = $1 AND review.user_netid = $2)"});
         statement.values = [reviewId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -215,8 +215,8 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckOwnerReviewComment(reviewCommentId: number, netId: String): any {
-        const statement = new PreparedStatement("check-reviewComment-owner",
-            "SELECT EXISTS(SELECT * FROM reviewcomment WHERE id = $1 AND netid = $2)");
+        const statement = new PreparedStatement({name: "check-reviewComment-owner", text: 
+            "SELECT EXISTS(SELECT * FROM reviewcomment WHERE id = $1 AND netid = $2)"});
         statement.values = [reviewCommentId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -229,9 +229,9 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckGroupBelongingToReview(reviewId: number, netId: String): any {
-        const statement = new PreparedStatement("check-review-belonging-to-submission-of-user",
+        const statement = new PreparedStatement({name: "check-review-belonging-to-submission-of-user", text: 
             "SELECT EXISTS(SELECT * FROM review, submission, groupusers WHERE review.submission_id = submission.id AND " +
-            "submission.group_id = groupusers.group_groupId AND review.id = $1 AND groupusers.user_netid = $2)");
+            "submission.group_id = groupusers.group_groupId AND review.id = $1 AND groupusers.user_netid = $2)"});
         statement.values = [reviewId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -243,11 +243,11 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static isTAOrTeacherForGroup(netId: String, groupId: number): any {
-        const statement = new PreparedStatement("Check-if-netid-is-TA-or-Teacher-for-group",
+        const statement = new PreparedStatement({name: "Check-if-netid-is-TA-or-Teacher-for-group", text: 
             "SELECT EXISTS(SELECT * FROM grouplist, assignmentgroup, assignmentlist, enroll " +
             "WHERE grouplist.id = assignmentgroup.group_id AND assignmentgroup.assignment_id = assignmentlist.id " +
             "AND (enroll.role = 'TA' OR enroll.role = 'teacher') AND assignmentlist.course_id = enroll.course_id " +
-            "AND enroll.user_netid = $1 AND grouplist.id = $2)");
+            "AND enroll.user_netid = $1 AND grouplist.id = $2)"});
         statement.values = [netId, groupId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -259,11 +259,11 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static isTeacherForGroup(netId: String, groupId: number): any {
-        const statement = new PreparedStatement("Check-if-netid-is-Teacher-for-group",
+        const statement = new PreparedStatement({name: "Check-if-netid-is-Teacher-for-group", text: 
             "SELECT EXISTS(SELECT * FROM grouplist, assignmentgroup, assignmentlist, enroll " +
             "WHERE grouplist.id = assignmentgroup.group_id AND assignmentgroup.assignment_id = assignmentlist.id " +
             "AND enroll.role = 'teacher' AND assignmentlist.course_id = enroll.course_id " +
-            "AND enroll.user_netid = $1 AND grouplist.id = $2)");
+            "AND enroll.user_netid = $1 AND grouplist.id = $2)"});
         statement.values = [netId, groupId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -275,8 +275,8 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static isInGroup(netId: String, groupId: number): any {
-        const statement = new PreparedStatement("Check-if-student-is-in-group",
-            "SELECT EXISTS(SELECT * FROM groupusers WHERE user_netid = $1 AND group_groupid = $2)");
+        const statement = new PreparedStatement({name: "Check-if-student-is-in-group", text: 
+            "SELECT EXISTS(SELECT * FROM groupusers WHERE user_netid = $1 AND group_groupid = $2)"});
         statement.values = [netId, groupId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -288,10 +288,10 @@ export default class AuthorizationPS {
      * @return {any} true if authorized.
      */
     public static isGetSubmissionAuth(submissionId: number, netId: number): any {
-        const statement = new PreparedStatement("check-submission-auth-submission-id",
+        const statement = new PreparedStatement({name: "check-submission-auth-submission-id", text: 
             "SELECT EXISTS(SELECT * FROM submission JOIN grouplist ON submission.group_id = grouplist.id " +
             "JOIN groupusers ON grouplist.id = groupusers.group_groupid WHERE submission.id = $1 " +
-            "AND groupusers.user_netid = $2)");
+            "AND groupusers.user_netid = $2)"});
         statement.values = [submissionId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -303,9 +303,9 @@ export default class AuthorizationPS {
      * @return {any} true if authorized.
      */
     public static isPostSubmissionAuth(assignmentId: number, netId: number): any {
-        const statement = new PreparedStatement("check-post-submission-submitter-assignment-id",
+        const statement = new PreparedStatement({name: "check-post-submission-submitter-assignment-id", text: 
             "SELECT EXISTS(SELECT a.assignment_id, a.group_id FROM assignmentgroup a " +
-            "JOIN groupusers g ON a.group_id = g.group_groupid WHERE g.user_netid = $1 AND a.assignment_id = $2)");
+            "JOIN groupusers g ON a.group_id = g.group_groupid WHERE g.user_netid = $1 AND a.assignment_id = $2)"});
         statement.values = [netId, assignmentId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -317,8 +317,8 @@ export default class AuthorizationPS {
      * @return {any} true if authorized.
      */
     public static isPutSubmissionCommentAuth(submissionCommentId: number, netId: number): any {
-        const statement = new PreparedStatement("put-submission-comment-for-submission",
-            "SELECT EXISTS(SELECT * FROM submissioncomment WHERE id = $1 AND netid = $2)");
+        const statement = new PreparedStatement({name: "put-submission-comment-for-submission", text: 
+            "SELECT EXISTS(SELECT * FROM submissioncomment WHERE id = $1 AND netid = $2)"});
         statement.values = [submissionCommentId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -330,8 +330,8 @@ export default class AuthorizationPS {
      * @return {any} true if authorized.
      */
     public static isSubmissionReviewerAuth(submissionId: number, netId: number): any {
-        const statement = new PreparedStatement("check-submission-submitter-assignment-id-reviewer",
-            "SELECT EXISTS(SELECT id FROM review WHERE submission_id = $1 AND user_netid = $2)");
+        const statement = new PreparedStatement({name: "check-submission-submitter-assignment-id-reviewer", text: 
+            "SELECT EXISTS(SELECT id FROM review WHERE submission_id = $1 AND user_netid = $2)"});
         statement.values = [submissionId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -343,12 +343,12 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeAuthorizationCheckboxQuestion(questionId: number, netId: String): any {
-        const statement = new PreparedStatement("check-authorization-checkboxquestion",
+        const statement = new PreparedStatement({name: "check-authorization-checkboxquestion", text: 
             "SELECT EXISTS(SELECT * FROM checkboxquestion, rubric, assignmentlist, enroll " +
             "WHERE checkboxquestion.rubric_id = rubric.id " +
             "AND rubric.assignment_id = assignmentlist.id " +
             "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher') " +
-            "AND checkboxquestion.id = $1 AND enroll.user_netid = $2)");
+            "AND checkboxquestion.id = $1 AND enroll.user_netid = $2)"});
         statement.values = [questionId, netId];
         return Database.executeQuerySingleResult(statement);
     }
@@ -361,13 +361,13 @@ export default class AuthorizationPS {
      * @return {any}
      */
     public static executeAuthorizationCheckboxOption(optionId: number, netId: String): any {
-        const statement = new PreparedStatement("check-authorization-checkboxoption",
+        const statement = new PreparedStatement({name: "check-authorization-checkboxoption", text: 
             "SELECT EXISTS(SELECT * FROM checkboxoption, checkboxquestion, rubric, assignmentlist, enroll " +
             "WHERE checkboxoption.checkboxquestion_id = checkboxquestion.id " +
             "AND checkboxquestion.rubric_id = rubric.id " +
             "AND rubric.assignment_id = assignmentlist.id " +
             "AND assignmentlist.course_id = enroll.course_id AND (enroll.role = 'teacher') " +
-            "AND checkboxoption.id = $1 AND enroll.user_netid = $2)");
+            "AND checkboxoption.id = $1 AND enroll.user_netid = $2)"});
         statement.values = [optionId, netId];
         return Database.executeQuerySingleResult(statement);
     }
