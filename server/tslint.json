@@ -2,7 +2,7 @@
 {
     "rules": {
         "completed-docs": [
-            true
+            false
           ],
         "class-name": true,
         "comment-format": [
