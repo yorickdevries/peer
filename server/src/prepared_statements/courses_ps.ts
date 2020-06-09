@@ -18,7 +18,7 @@ export default class CoursesPS {
      * @returns {Promise<pgPromise.queryResult>} the updated course as pg promise.
      */
     public static executeUpdateCourse(id: number, faculty: string, academicYear: string, courseCode: string, description: string, name: string, enrollable: boolean): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "update-course", text: 
+        const statement = new PreparedStatement({name: "update-course", text:
             'UPDATE "courselist" SET ("faculty", "academic_year", "course_code", "description", "name", "enrollable") = ($1, $2, $3, $4, $5, $6) WHERE "id" = $7 ' +
             "RETURNING id, faculty, academic_year, course_code, description, name, enrollable"});
         statement.values = [faculty, academicYear, courseCode, description, name, enrollable, id];
@@ -36,7 +36,7 @@ export default class CoursesPS {
      * @returns {Promise<pgPromise.queryResult>} course that is inserted as pg promise.
      */
     public static executeCreateCourse(faculty: string, academicYear: string, courseCode: string, description: string, name: string, enrollable: boolean): any {
-        const statement = new PreparedStatement({name: "create-course", text: 
+        const statement = new PreparedStatement({name: "create-course", text:
             'INSERT INTO "courselist" ("faculty", "academic_year", "course_code", "description", "name", "enrollable")' +
             " VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, faculty, academic_year, course_code, description, name, enrollable"});
         statement.values = [faculty, academicYear, courseCode, description, name, enrollable];
@@ -82,7 +82,7 @@ export default class CoursesPS {
      * @return {any} a query result.
      */
     public static executeGetAllEnrolledCourses(userNetId: string) {
-        const statement = new PreparedStatement({name: "get-all-courses-you-are-enrolled,", text: 
+        const statement = new PreparedStatement({name: "get-all-courses-you-are-enrolled,", text:
             'SELECT * FROM "courselist" WHERE "id" IN (SELECT "course_id" FROM "enroll" ' +
             "WHERE user_netid LIKE $1)"});
         statement.values = [userNetId];
@@ -95,7 +95,7 @@ export default class CoursesPS {
      * @returns {Promise<pgPromise.queryResult>} course as pg promise.
      */
     public static executeGetCourseById(id: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "get-course-by-id", text: 
+        const statement = new PreparedStatement({name: "get-course-by-id", text:
             'SELECT * FROM "courselist" WHERE "id" = $1'});
         statement.values = [id];
         return Database.executeQuerySingleResult(statement);
@@ -108,7 +108,7 @@ export default class CoursesPS {
      * @return {Promise<pgPromise.queryResult>} a json object containing the role, if any (as promise).
      */
     public static executeGetRoleById(netId: string, id: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "get-course-role", text: 
+        const statement = new PreparedStatement({name: "get-course-role", text:
             "SELECT enroll.role FROM enroll JOIN courselist ON courselist.id = enroll.course_id " +
             "WHERE user_netid = $1 AND course_id = $2"});
         statement.values = [netId, id];
@@ -123,7 +123,7 @@ export default class CoursesPS {
      */
     public static executeExistsEnrolledByCourseIdUserById(courseId: number, netId: string)
         : Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "exists-enrolled-user-by-id", text: 
+        const statement = new PreparedStatement({name: "exists-enrolled-user-by-id", text:
         'SELECT EXISTS(SELECT * FROM enroll WHERE "course_id" = $1 AND "user_netid" = $2)'});
         statement.values = [courseId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -138,7 +138,7 @@ export default class CoursesPS {
      */
     public static executeEnrollInCourseId(courseId: number, netId: string, role: string)
         : Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "enroll-in-course-id", text: 
+        const statement = new PreparedStatement({name: "enroll-in-course-id", text:
             "INSERT INTO enroll (course_id, user_netid, role) VALUES ($1, $2, $3) RETURNING *"});
         statement.values = [courseId, netId, role];
         return Database.executeQuerySingleResult(statement);
@@ -152,7 +152,7 @@ export default class CoursesPS {
      * @return {any} - a database query result.
      */
     public static executeSetRole(courseId: number, netId: string, role: string): any {
-        const statement = new PreparedStatement({name: "set-user-role", text: 
+        const statement = new PreparedStatement({name: "set-user-role", text:
             "UPDATE enroll SET role=$1 WHERE course_id =$2 AND user_netid=$3 RETURNING *"});
         statement.values = [role, courseId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -165,7 +165,7 @@ export default class CoursesPS {
      * @return {any} - a database query result.
      */
     public static executeGetUsersByRole(courseId: number, role: string): any {
-        const statement = new PreparedStatement({name: "get-user-by-role", text: 
+        const statement = new PreparedStatement({name: "get-user-by-role", text:
             "SELECT user_netid FROM enroll WHERE course_id=$1 AND enroll.role=$2"});
         statement.values = [courseId, role];
         return Database.executeQuery(statement);
@@ -178,7 +178,7 @@ export default class CoursesPS {
      * @return {any} - a database query result.
      */
     public static executeGetUsersByRoleExcludeTeacher(courseId: number, teacherNetId: string): any {
-        const statement = new PreparedStatement({name: "get-user-by-role-without-teacher", text: 
+        const statement = new PreparedStatement({name: "get-user-by-role-without-teacher", text:
             "SELECT user_netid " +
             "FROM enroll " +
             "WHERE course_id=$1 AND enroll.role='teacher' AND enroll.user_netid NOT IN ($2)"});
@@ -192,7 +192,7 @@ export default class CoursesPS {
      * @return {any} - all not enrolled courses for that user.
      */
     public static executeGetUnenrolledForUser(netId: string): any {
-        const statement = new PreparedStatement({name: "get-unenrolled-courses-for-netid", text: 
+        const statement = new PreparedStatement({name: "get-unenrolled-courses-for-netid", text:
             `
                 SELECT * FROM "courselist"
                 JOIN academicyearlist on courselist.academic_year = academicyearlist.year

@@ -12,7 +12,7 @@ export default class SubmissionsPS {
      * @return database single result of the course id.
      */
     public static executeGetCourseId(submissionId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "get-course-id", text: 
+        const statement = new PreparedStatement({name: "get-course-id", text:
             "SELECT course_id " +
             "FROM submission JOIN assignmentlist ON submission.assignment_id = assignmentlist.id " +
             "WHERE submission.id = $1"});
@@ -26,7 +26,7 @@ export default class SubmissionsPS {
      * @return {Promise<pgPromise.queryResult>} submission as pg promise.
      */
     public static executeGetSubmissionById(id: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "get-submission-by-id", text: 
+        const statement = new PreparedStatement({name: "get-submission-by-id", text:
             'SELECT * FROM "submission" WHERE "id" = $1'});
         statement.values = [id];
         return Database.executeQuerySingleResult(statement);
@@ -38,7 +38,7 @@ export default class SubmissionsPS {
      * @return {Promise<pgPromise.queryResult>} all submissions as pg promise.
      */
     public static executeGetAllSubmissionsByAssignmentId(id: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "get-all-submissions-by-assignment-id", text: 
+        const statement = new PreparedStatement({name: "get-all-submissions-by-assignment-id", text:
         "SELECT s1.*, s2.comment_count " +
             "FROM submission s1 JOIN (SELECT s.id, COUNT(sc.submission_id) AS comment_count FROM submission s " +
             "LEFT JOIN submissioncomment sc ON s.id = sc.submission_id GROUP BY s.id) s2 ON s2.id = s1.id " +
@@ -53,7 +53,7 @@ export default class SubmissionsPS {
      * @return {Promise<pgPromise.queryResult>} all latest submission as pg promise.
      */
     public static executeGetLatestSubmissionsByAssignmentId(id: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "get-latest-submissions-by-assignment-id", text: 
+        const statement = new PreparedStatement({name: "get-latest-submissions-by-assignment-id", text:
         "SELECT s1.*, s2.comment_count FROM submission s1 JOIN "
         + "(SELECT s.id, COUNT(sc.submission_id) AS comment_count FROM submission s " +
             "LEFT JOIN submissioncomment sc ON s.id = sc.submission_id GROUP BY s.id) s2 ON s2.id = s1.id "
@@ -71,7 +71,7 @@ export default class SubmissionsPS {
      */
     public static executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId: number, groupId: number)
         : Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "get-latest-submission-by-assignmentid-by-groupid", text: 
+        const statement = new PreparedStatement({name: "get-latest-submission-by-assignmentid-by-groupid", text:
         "SELECT * FROM submission s1 WHERE assignment_id = $1 AND group_id = $2 AND date = (SELECT max(date) " +
             "FROM submission s2 WHERE s2.group_id = $2)"});
         statement.values = [assignmentId, groupId];
@@ -86,7 +86,7 @@ export default class SubmissionsPS {
      */
     public static executeGetAllSubmissionByAssignmentIdByGroupId(assignmentId: number, groupId: number)
         : any {
-        const statement = new PreparedStatement({name: "get-all-submission-by-assignmentid-by-groupid", text: 
+        const statement = new PreparedStatement({name: "get-all-submission-by-assignmentid-by-groupid", text:
         "SELECT * FROM submission s1 WHERE assignment_id = $1 AND group_id = $2"});
         statement.values = [assignmentId, groupId];
         return Database.executeQuery(statement);
@@ -102,7 +102,7 @@ export default class SubmissionsPS {
      */
     public static executeCreateSubmission(netid: string, groupId: number, assignmentId: number, filePath: string)
         : Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "create-submission", text: 
+        const statement = new PreparedStatement({name: "create-submission", text:
         'INSERT INTO "submission" ("user_netid", "group_id", "assignment_id",  "file_path") ' +
             "VALUES ($1, $2, $3, $4) RETURNING *"});
         statement.values = [netid, groupId, assignmentId, filePath];
@@ -115,7 +115,7 @@ export default class SubmissionsPS {
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
     public static executeGetAllSubmissionComments(submissionId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "get-submission-comments", text: 
+        const statement = new PreparedStatement({name: "get-submission-comments", text:
             "SELECT * FROM submissioncomment WHERE submission_id = $1"});
         statement.values = [submissionId];
         return Database.executeQuery(statement);
@@ -130,7 +130,7 @@ export default class SubmissionsPS {
      */
     public static executeAddSubmissionComment(submissionId: number, netId: string, comment: string)
         : Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "add-submission-comments", text: 
+        const statement = new PreparedStatement({name: "add-submission-comments", text:
             "INSERT INTO submissioncomment(comment, submission_id, netid) VALUES ($1, $2, $3) RETURNING *"});
         statement.values = [comment, submissionId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -144,7 +144,7 @@ export default class SubmissionsPS {
      */
     public static executeUpdateSubmissionComment(submissionCommentId: number, comment: string)
         : Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "put-submission-comments", text: 
+        const statement = new PreparedStatement({name: "put-submission-comments", text:
             "UPDATE submissioncomment SET comment = $1 WHERE id = $2 RETURNING *"});
         statement.values = [comment, submissionCommentId];
         return Database.executeQuerySingleResult(statement);
@@ -156,7 +156,7 @@ export default class SubmissionsPS {
      * @return {Promise<pgPromise.queryResult>} - a database promise.
      */
     public static executeDeleteSubmissionComment(submissionCommentId: number): Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "delete-submission-comments", text: 
+        const statement = new PreparedStatement({name: "delete-submission-comments", text:
             "DELETE FROM submissioncomment WHERE id = $1 RETURNING *"});
         statement.values = [submissionCommentId];
         return Database.executeQuerySingleResult(statement);
@@ -169,7 +169,7 @@ export default class SubmissionsPS {
      */
     public static executeGetSubmissionBySubmissionCommentId(submissionCommentId: number)
         : Promise<pgPromise.queryResult> {
-        const statement = new PreparedStatement({name: "delete-submission-comments", text: 
+        const statement = new PreparedStatement({name: "delete-submission-comments", text:
             "SELECT * FROM submissioncomment WHERE id = $1"});
         statement.values = [submissionCommentId];
         return Database.executeQuerySingleResult(statement);

@@ -13,7 +13,7 @@ export default class AuthorizationPS {
      * @returns {Promise<pgPromise.queryResult>} true or false as pg promise.
      */
     public static executeCheckCourseEnrollment(courseId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-course-enrollment", text: 
+        const statement = new PreparedStatement({name: "check-course-enrollment", text:
             "SELECT EXISTS(SELECT 1 FROM ENROLL WHERE course_id = $1 AND user_netid = $2)"});
         statement.values = [courseId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -23,7 +23,7 @@ export default class AuthorizationPS {
      * Check whether a user is enrolled in an assignment.
      */
     public static executeCheckAssignmentEnrollment(assignmentId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-assignment-enrollment", text: 
+        const statement = new PreparedStatement({name: "check-assignment-enrollment", text:
             "SELECT EXISTS(" +
             "SELECT * FROM assignmentlist " +
             "JOIN assignmentgroup ON assignmentlist.id = assignmentgroup.assignment_id " +
@@ -42,7 +42,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckEnrollmentAsTeacher(courseId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-enrollment-as-teacher", text: 
+        const statement = new PreparedStatement({name: "check-enrollment-as-teacher", text:
             "SELECT EXISTS(SELECT 1 FROM ENROLL WHERE course_id = $1 AND user_netid = $2 AND role = 'teacher')"});
         statement.values = [courseId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -55,7 +55,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckEnrollAsTAOrTeacher(courseId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-enrollment-ta-teacher", text: 
+        const statement = new PreparedStatement({name: "check-enrollment-ta-teacher", text:
             "SELECT EXISTS(SELECT 1 FROM ENROLL " +
             "WHERE course_id = $1 AND user_netid = $2 AND (role = 'teacher' OR role = 'TA'))"});
         statement.values = [courseId, netId];
@@ -69,7 +69,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckEnrollAsStudent(courseId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-enrollment-student", text: 
+        const statement = new PreparedStatement({name: "check-enrollment-student", text:
             "SELECT EXISTS(SELECT 1 FROM ENROLL " +
             "WHERE course_id = $1 AND user_netid = $2 AND role = 'student')"});
         statement.values = [courseId, netId];
@@ -83,7 +83,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckTAOrTeacherForReview(reviewId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-enrollment-ta-teacher-via-review", text: 
+        const statement = new PreparedStatement({name: "check-enrollment-ta-teacher-via-review", text:
             "SELECT EXISTS(SELECT * FROM review, submission, assignmentlist, courselist, enroll " +
             "WHERE review.submission_id = submission.id " +
             "AND submission.assignment_id = assignmentlist.id " +
@@ -102,7 +102,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckReviewMaker(reviewId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-review-owner", text: 
+        const statement = new PreparedStatement({name: "check-review-owner", text:
             "SELECT EXISTS(SELECT * FROM review WHERE review.id = $1 AND review.user_netid = $2)"});
         statement.values = [reviewId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -116,7 +116,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeAuthorizationMCQuestion(questionId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-authorization-mcquestion", text: 
+        const statement = new PreparedStatement({name: "check-authorization-mcquestion", text:
             "SELECT EXISTS(SELECT * FROM mcquestion, rubric, assignmentlist, enroll " +
             "WHERE mcquestion.rubric_id = rubric.id " +
             "AND rubric.assignment_id = assignmentlist.id " +
@@ -133,7 +133,7 @@ export default class AuthorizationPS {
      * @return {any}
      */
     public static executeAuthorizationMCOption(optionId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-authorization-mcoption", text: 
+        const statement = new PreparedStatement({name: "check-authorization-mcoption", text:
             "SELECT EXISTS(SELECT * FROM mcoption, mcquestion, rubric, assignmentlist, enroll " +
             "WHERE mcoption.mcquestion_id = mcquestion.id " +
             "AND mcquestion.rubric_id = rubric.id " +
@@ -151,7 +151,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeAuthorizationRangeQuestion(questionId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-authorization-rangequestion", text: 
+        const statement = new PreparedStatement({name: "check-authorization-rangequestion", text:
             "SELECT EXISTS(SELECT * FROM rangequestion, rubric, assignmentlist, enroll " +
             "WHERE rangequestion.rubric_id = rubric.id " +
             "AND rubric.assignment_id = assignmentlist.id " +
@@ -168,7 +168,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeAuthorizationOpenQuestion(questionId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-authorization-openquestion", text: 
+        const statement = new PreparedStatement({name: "check-authorization-openquestion", text:
             "SELECT EXISTS(SELECT * FROM openquestion, rubric, assignmentlist, enroll " +
             "WHERE openquestion.rubric_id = rubric.id " +
             "AND rubric.assignment_id = assignmentlist.id " +
@@ -185,7 +185,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeAuthorizationUploadQuestion(questionId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-authorization-uploadquestion", text: 
+        const statement = new PreparedStatement({name: "check-authorization-uploadquestion", text:
             "SELECT EXISTS(SELECT * FROM uploadquestion, rubric, assignmentlist, enroll " +
             "WHERE uploadquestion.rubric_id = rubric.id " +
             "AND rubric.assignment_id = assignmentlist.id " +
@@ -202,7 +202,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckReviewMakerNotDone(reviewId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-review-owner-not-done", text: 
+        const statement = new PreparedStatement({name: "check-review-owner-not-done", text:
             "SELECT EXISTS(SELECT * FROM review WHERE review.done = false AND review.id = $1 AND review.user_netid = $2)"});
         statement.values = [reviewId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -215,7 +215,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckOwnerReviewComment(reviewCommentId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-reviewComment-owner", text: 
+        const statement = new PreparedStatement({name: "check-reviewComment-owner", text:
             "SELECT EXISTS(SELECT * FROM reviewcomment WHERE id = $1 AND netid = $2)"});
         statement.values = [reviewCommentId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -229,7 +229,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckGroupBelongingToReview(reviewId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-review-belonging-to-submission-of-user", text: 
+        const statement = new PreparedStatement({name: "check-review-belonging-to-submission-of-user", text:
             "SELECT EXISTS(SELECT * FROM review, submission, groupusers WHERE review.submission_id = submission.id AND " +
             "submission.group_id = groupusers.group_groupId AND review.id = $1 AND groupusers.user_netid = $2)"});
         statement.values = [reviewId, netId];
@@ -243,7 +243,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static isTAOrTeacherForGroup(netId: String, groupId: number): any {
-        const statement = new PreparedStatement({name: "Check-if-netid-is-TA-or-Teacher-for-group", text: 
+        const statement = new PreparedStatement({name: "Check-if-netid-is-TA-or-Teacher-for-group", text:
             "SELECT EXISTS(SELECT * FROM grouplist, assignmentgroup, assignmentlist, enroll " +
             "WHERE grouplist.id = assignmentgroup.group_id AND assignmentgroup.assignment_id = assignmentlist.id " +
             "AND (enroll.role = 'TA' OR enroll.role = 'teacher') AND assignmentlist.course_id = enroll.course_id " +
@@ -259,7 +259,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static isTeacherForGroup(netId: String, groupId: number): any {
-        const statement = new PreparedStatement({name: "Check-if-netid-is-Teacher-for-group", text: 
+        const statement = new PreparedStatement({name: "Check-if-netid-is-Teacher-for-group", text:
             "SELECT EXISTS(SELECT * FROM grouplist, assignmentgroup, assignmentlist, enroll " +
             "WHERE grouplist.id = assignmentgroup.group_id AND assignmentgroup.assignment_id = assignmentlist.id " +
             "AND enroll.role = 'teacher' AND assignmentlist.course_id = enroll.course_id " +
@@ -275,7 +275,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static isInGroup(netId: String, groupId: number): any {
-        const statement = new PreparedStatement({name: "Check-if-student-is-in-group", text: 
+        const statement = new PreparedStatement({name: "Check-if-student-is-in-group", text:
             "SELECT EXISTS(SELECT * FROM groupusers WHERE user_netid = $1 AND group_groupid = $2)"});
         statement.values = [netId, groupId];
         return Database.executeQuerySingleResult(statement);
@@ -288,7 +288,7 @@ export default class AuthorizationPS {
      * @return {any} true if authorized.
      */
     public static isGetSubmissionAuth(submissionId: number, netId: number): any {
-        const statement = new PreparedStatement({name: "check-submission-auth-submission-id", text: 
+        const statement = new PreparedStatement({name: "check-submission-auth-submission-id", text:
             "SELECT EXISTS(SELECT * FROM submission JOIN grouplist ON submission.group_id = grouplist.id " +
             "JOIN groupusers ON grouplist.id = groupusers.group_groupid WHERE submission.id = $1 " +
             "AND groupusers.user_netid = $2)"});
@@ -303,7 +303,7 @@ export default class AuthorizationPS {
      * @return {any} true if authorized.
      */
     public static isPostSubmissionAuth(assignmentId: number, netId: number): any {
-        const statement = new PreparedStatement({name: "check-post-submission-submitter-assignment-id", text: 
+        const statement = new PreparedStatement({name: "check-post-submission-submitter-assignment-id", text:
             "SELECT EXISTS(SELECT a.assignment_id, a.group_id FROM assignmentgroup a " +
             "JOIN groupusers g ON a.group_id = g.group_groupid WHERE g.user_netid = $1 AND a.assignment_id = $2)"});
         statement.values = [netId, assignmentId];
@@ -317,7 +317,7 @@ export default class AuthorizationPS {
      * @return {any} true if authorized.
      */
     public static isPutSubmissionCommentAuth(submissionCommentId: number, netId: number): any {
-        const statement = new PreparedStatement({name: "put-submission-comment-for-submission", text: 
+        const statement = new PreparedStatement({name: "put-submission-comment-for-submission", text:
             "SELECT EXISTS(SELECT * FROM submissioncomment WHERE id = $1 AND netid = $2)"});
         statement.values = [submissionCommentId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -330,7 +330,7 @@ export default class AuthorizationPS {
      * @return {any} true if authorized.
      */
     public static isSubmissionReviewerAuth(submissionId: number, netId: number): any {
-        const statement = new PreparedStatement({name: "check-submission-submitter-assignment-id-reviewer", text: 
+        const statement = new PreparedStatement({name: "check-submission-submitter-assignment-id-reviewer", text:
             "SELECT EXISTS(SELECT id FROM review WHERE submission_id = $1 AND user_netid = $2)"});
         statement.values = [submissionId, netId];
         return Database.executeQuerySingleResult(statement);
@@ -343,7 +343,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeAuthorizationCheckboxQuestion(questionId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-authorization-checkboxquestion", text: 
+        const statement = new PreparedStatement({name: "check-authorization-checkboxquestion", text:
             "SELECT EXISTS(SELECT * FROM checkboxquestion, rubric, assignmentlist, enroll " +
             "WHERE checkboxquestion.rubric_id = rubric.id " +
             "AND rubric.assignment_id = assignmentlist.id " +
@@ -361,7 +361,7 @@ export default class AuthorizationPS {
      * @return {any}
      */
     public static executeAuthorizationCheckboxOption(optionId: number, netId: String): any {
-        const statement = new PreparedStatement({name: "check-authorization-checkboxoption", text: 
+        const statement = new PreparedStatement({name: "check-authorization-checkboxoption", text:
             "SELECT EXISTS(SELECT * FROM checkboxoption, checkboxquestion, rubric, assignmentlist, enroll " +
             "WHERE checkboxoption.checkboxquestion_id = checkboxquestion.id " +
             "AND checkboxquestion.rubric_id = rubric.id " +

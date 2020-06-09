@@ -12,7 +12,7 @@ export default class ExportResultsPS {
      * and total amount of reviews by the student.
      */
     public static executeGetStudentSubmissionReviewExportAssignment(assignmentId: number): any {
-        const statement = new PreparedStatement({name: "get-result-aggregation-assignment", text: 
+        const statement = new PreparedStatement({name: "get-result-aggregation-assignment", text:
             'SELECT netID AS "netID", studentNumber AS "studentnumber", approved, disapproved, total - approved - disapproved AS "waiting for TA", total AS "student total reviews", flagged' +
             " FROM (" +
             "    SELECT userlist.netid AS netID," +
@@ -38,7 +38,7 @@ export default class ExportResultsPS {
      * and total amount of reviews by the student.
      */
     public static executeGetStudentSubmissionReviewExportCourse(courseId: number): any {
-        const statement = new PreparedStatement({name: "get-result-aggregation-course", text: 
+        const statement = new PreparedStatement({name: "get-result-aggregation-course", text:
             'SELECT netID AS "netID", studentNumber AS "studentnumber", approved, disapproved, total - approved - disapproved AS "waiting for TA", total AS "student total reviews", flagged' +
             " FROM (" +
             "    SELECT userlist.netid AS netID," +
