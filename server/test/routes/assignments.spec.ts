@@ -394,7 +394,6 @@ describe("API Assignment routes", () => {
         const res = await chai.request(router).get("/1/allreviews/true");
         expect(res.status).to.equal(200);
         expect(res.body[0]).to.deep.include(
-            // tslint:disable-next-line
             {"approved": null, "ta_netid": null, "reviewer": "paulvanderlaan", "submitter": "paulvanderlaan", done: true}
         );
     });

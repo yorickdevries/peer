@@ -294,7 +294,6 @@ describe("API review routes", () => {
               ],
               "review": {
                 "done": false,
-                  // tslint:disable-next-line
                   "approved": null,
                   "id": 1,
                 "rubric_id": 1,
@@ -387,7 +386,6 @@ describe("API review routes", () => {
 
         // Check if the approval and ta net id was previously null
         const resultBefore = await ReviewPS.executeGetReview(reviewId);
-        // tslint:disable-next-line
         expect(resultBefore.approved).to.equal(null);
         expect(resultBefore.ta_netid).to.equal(undefined);
 
