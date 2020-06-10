@@ -34,7 +34,7 @@ const fileFolder = config.assignments.fileFolder;
  */
 router.route("/:assignment_id")
     .get(index.authorization.enrolledAssignmentCheck, (req, res) => {
-        AssignmentPS.executeGetAssignmentById(req.params.assignment_id)
+        AssignmentPS.executeGetAssignmentById(parseInt(req.params.assignment_id))
         .then((data) => {
             res.json(data);
         }).catch((error) => {
@@ -176,7 +176,7 @@ router.put("/:assignment_id", upload("assignmentFile", config.allowed_extensions
  */
 router.get("/:assignment_id/file", index.authorization.enrolledAssignmentCheck, async (req, res) => {
     try {
-        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
+        const assignment: any = await AssignmentPS.executeGetAssignmentById(parseInt(req.params.assignment_id));
         const fileName = path.join(fileFolder, assignment.filename);
         res.download(fileName);
     } catch (err) {
@@ -227,7 +227,7 @@ router.route("/:id/latestsubmission")
  */
 router.route("/:assignment_id/allsubmissions")
     .get(index.authorization.enrolledAsTAOrTeacherAssignment, (req, res) => {
-        SubmissionsPS.executeGetAllSubmissionsByAssignmentId(req.params.assignment_id)
+        SubmissionsPS.executeGetAllSubmissionsByAssignmentId(parseInt(req.params.assignment_id))
         .then((data) => {
             res.json(data);
         }).catch((error) => {
@@ -241,7 +241,7 @@ router.route("/:assignment_id/allsubmissions")
  */
 router.route("/:assignment_id/alllatestsubmissions")
     .get(index.authorization.enrolledAsTAOrTeacherAssignment, (req, res) => {
-        SubmissionsPS.executeGetLatestSubmissionsByAssignmentId(req.params.assignment_id)
+        SubmissionsPS.executeGetLatestSubmissionsByAssignmentId(parseInt(req.params.assignment_id))
         .then((data) => {
             res.json(data);
         }).catch((error) => {

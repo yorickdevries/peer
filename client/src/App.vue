@@ -12,7 +12,7 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .site {
     display: flex;
     min-height: 100vh;

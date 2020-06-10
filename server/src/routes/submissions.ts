@@ -20,7 +20,7 @@ router.use(express.json());
  * @authorization user should be TA, teacher or part of the group which has submitted.
  */
 router.get("/:id", index.authorization.getSubmissionAuth, (req, res) => {
-    SubmissionsPS.executeGetSubmissionById(req.params.id)
+    SubmissionsPS.executeGetSubmissionById(parseInt(req.params.id))
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -67,7 +67,7 @@ router.post("/", upload("submissionFile", config.allowed_extensions, config.subm
  */
 router.get("/:id/file", index.authorization.getSubmissionFileAuth, async (req, res) => {
     try {
-        const submission: any = await SubmissionsPS.executeGetSubmissionById(req.params.id);
+        const submission: any = await SubmissionsPS.executeGetSubmissionById(parseInt(req.params.id));
         const filePath = path.join(config.submissions.fileFolder, submission.file_path);
         res.download(filePath);
     } catch (err) {
@@ -82,7 +82,7 @@ router.get("/:id/file", index.authorization.getSubmissionFileAuth, async (req, r
  * @return database return value.
  */
 router.get("/:id/allComments", index.authorization.getSubmissionAuth, (req, res) => {
-    SubmissionsPS.executeGetAllSubmissionComments(req.params.id)
+    SubmissionsPS.executeGetAllSubmissionComments(parseInt(req.params.id))
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -98,7 +98,7 @@ router.get("/:id/allComments", index.authorization.getSubmissionAuth, (req, res)
  * @return database return value.
  */
 router.put("/:submissionCommentId/comment", index.authorization.putSubmissionCommentAuth, (req, res) => {
-    SubmissionsPS.executeUpdateSubmissionComment(req.params.submissionCommentId, req.body.comment)
+    SubmissionsPS.executeUpdateSubmissionComment(parseInt(req.params.submissionCommentId), req.body.comment)
     .then((data) => {
         res.json(data);
     }).catch((error) => {
@@ -130,7 +130,7 @@ router.post("/:id/comment", index.authorization.getSubmissionAuth, (req: any, re
  * @return database return value.
  */
 router.delete("/:submissionCommentId/comment", (req, res) => {
-    SubmissionsPS.executeDeleteSubmissionComment(req.params.submissionCommentId)
+    SubmissionsPS.executeDeleteSubmissionComment(parseInt(req.params.submissionCommentId))
     .then((data) => {
         res.json(data);
     }).catch((error) => {

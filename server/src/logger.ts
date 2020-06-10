@@ -29,4 +29,4 @@ const errorLogger = logger(loggerFormat,
     }
 );
 
-export {eventLogger, errorLogger};
+export { eventLogger, errorLogger };
