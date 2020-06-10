@@ -40,7 +40,7 @@ router.get("/enrolled", (req: any, res) => {
    CoursesPS.executeGetAllEnrolledCourses(req.user.netid)
    .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -66,7 +66,7 @@ router.get("/:courseId/assignments/enrolled", index.authorization.enrolledCourse
     AssignmentsPS.executeGetEnrolledAssignmentsForUser(req.user.netid, req.params.courseId)
     .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -79,7 +79,7 @@ router.get("/:courseId/assignments", index.authorization.enrolledAsTAOrTeacherCo
     AssignmentsPS.executeGetAssignments(req.params.courseId)
         .then((data) => {
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -95,7 +95,7 @@ router.put("/:courseId", index.authorization.enrolledCourseTeacherCheck, (req, r
     CoursesPS.executeUpdateCourse(parseInt(req.params.courseId), req.body.faculty, req.body.academic_year, req.body.course_code, req.body.description, req.body.name, req.body.enrollable)
     .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -108,7 +108,7 @@ router.get("/:courseId", index.authorization.enrolledCourseCheck, (req, res) => 
     CoursesPS.executeGetCourseById(parseInt(req.params.courseId))
     .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -121,7 +121,7 @@ router.get("/:courseId/role", index.authorization.enrolledCourseCheck, async (re
     CoursesPS.executeGetRoleById(req.user.netid, req.params.courseId)
     .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -222,7 +222,7 @@ router.get("/:courseId/assignments/unenrolled", async (req: any, res) => {
 /**
  * Get all faculties.
  */
-router.get("/data/faculties", async (req: any, res) => {
+router.get("/data/faculties", async (_: any, res) => {
     try {
         res.json(await CoursesPS.executeGetFaculties());
     } catch {
@@ -233,7 +233,7 @@ router.get("/data/faculties", async (req: any, res) => {
 /**
  * Get all faculties.
  */
-router.get("/data/academicYears", async (req: any, res) => {
+router.get("/data/academicYears", async (_: any, res) => {
     try {
         res.json(await CoursesPS.executeGetAcademicYears());
     } catch {
@@ -241,7 +241,7 @@ router.get("/data/academicYears", async (req: any, res) => {
     }
 });
 
-router.get("/data/activeAcademicYears", async (req: any, res) => {
+router.get("/data/activeAcademicYears", async (_: any, res) => {
     try {
         res.json(await CoursesPS.executeGetactiveAcademicYears());
     } catch {

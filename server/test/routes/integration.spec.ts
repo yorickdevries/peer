@@ -291,7 +291,7 @@ describe("API integration test", () => {
 
         MockLogin.initialize("paulvanderlaan");
         const submitReviewPaul = await chai.request(router).get("/reviews/" + paulFeedbackId + "/submit");
-        expect(submitReviewYorick.status).to.equal(200);
+        expect(submitReviewPaul.status).to.equal(200);
         console.log("Student created reviews");
 
         // [10]

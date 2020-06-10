@@ -23,7 +23,7 @@ router.get("/:id", index.authorization.getSubmissionAuth, (req, res) => {
     SubmissionsPS.executeGetSubmissionById(parseInt(req.params.id))
     .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -32,7 +32,7 @@ router.get("/:id", index.authorization.getSubmissionAuth, (req, res) => {
  * Route to make a new submission.
  * @authorization the user should be part of a group in the course.
  */
-router.post("/", upload("submissionFile", config.allowed_extensions, config.submissions.maxSizeSubmissionFile), index.authorization.postSubmissionAuth, index.authorization.checkSubmissionBetweenPublishDue, async function(req: any, res: any, next: any) {
+router.post("/", upload("submissionFile", config.allowed_extensions, config.submissions.maxSizeSubmissionFile), index.authorization.postSubmissionAuth, index.authorization.checkSubmissionBetweenPublishDue, async function(req: any, res: any) {
     // error if no file was uploaded or no group column defined
     if (req.file == undefined) {
         res.status(400);
@@ -85,7 +85,7 @@ router.get("/:id/allComments", index.authorization.getSubmissionAuth, (req, res)
     SubmissionsPS.executeGetAllSubmissionComments(parseInt(req.params.id))
     .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -101,7 +101,7 @@ router.put("/:submissionCommentId/comment", index.authorization.putSubmissionCom
     SubmissionsPS.executeUpdateSubmissionComment(parseInt(req.params.submissionCommentId), req.body.comment)
     .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -118,7 +118,7 @@ router.post("/:id/comment", index.authorization.getSubmissionAuth, (req: any, re
     SubmissionsPS.executeAddSubmissionComment(req.params.id,  req.user.netid, req.body.comment)
     .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -133,7 +133,7 @@ router.delete("/:submissionCommentId/comment", (req, res) => {
     SubmissionsPS.executeDeleteSubmissionComment(parseInt(req.params.submissionCommentId))
     .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });

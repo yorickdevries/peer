@@ -154,10 +154,6 @@ describe("API rubric routes", () => {
      * Test if an uploadquestion can be deleted
      */
     it("rubric/uploadquestion deleted", async () => {
-        const updatedQuestion = "new question";
-        const updatedExtension = "zip";
-        const updatedQuestionNumber = 2;
-
         const created = await chai.request(router)
             .post("/uploadquestion")
             .send({ question: "opt", extension: "pdf", rubric_id: 1, question_number: 1, optional: false });

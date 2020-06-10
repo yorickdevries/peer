@@ -158,7 +158,7 @@ describe("ReviewPreparedStatement Test", () => {
         const rubric: any = await createTestRubric();
         const question: any = await RubricPS.executeCreateUploadQuestion("something", rubric.id, 0, "pdf", true);
 
-        const created: any = await ReviewPS.executeUpdateUploadAnswer(answer, question.id, reviewId);
+        await ReviewPS.executeUpdateUploadAnswer(answer, question.id, reviewId);
         const fetched: any = await ReviewPS.executeGetUploadAnswer(reviewId, question.id);
 
         expect({
