@@ -220,8 +220,6 @@ describe("API Assignment routes", () => {
             .field("one_person_groups", false)
             .field("review_evaluation", false);
         // assertions
-        const result = JSON.parse(res.text);
-
         expect(res.status).to.equal(400);
     });
 

@@ -65,7 +65,7 @@ describe("API root routes", () => {
      */
     it("User is added upon login", async () => {
         MockLogin.initialize("newuser", "newemail@mail");
-        const res = await chai.request(router).get("/anything");
+        await chai.request(router).get("/anything");
         const user: any = await UserPS.executeGetUserById("newuser");
         expect(user.netid).to.equal("newuser");
         expect(user.email).to.equal("newemail@mail");

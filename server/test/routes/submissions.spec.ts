@@ -66,7 +66,6 @@ describe("Submission routes", () => {
     it("post submissions/ without file", async () => {
         // log in as henkjan
         MockLogin.initialize("henkjan");
-        const exampleSubmissionFile = path.join(__dirname, "../../example_data/submissions/submission1.pdf");
         const res = await chai.request(router).post("/")
         .field("assignmentId", 4);
         // assertions
