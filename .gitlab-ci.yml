@@ -23,6 +23,15 @@ tslint:
   - merge_requests
   - pushes
 
+vue-lint:
+  stage: static-analysis
+  script:
+  - cd client && npm install
+  - npm run lint
+  only:
+  - merge_requests
+  - pushes
+
 build_server:
   stage: build
   variables:
