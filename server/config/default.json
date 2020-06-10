@@ -7,30 +7,30 @@
             "password": "password",
             "port": 5432
           },
-        "schemaQueryFile": "../database_dumps/ED3-DataBaseSchema.sql",
-        "fullQueryFile": "../database_dumps/ED3-FullData.sql",
-        "testQueryFile": "../database_dumps/ED3-TestData.sql"
+        "schemaQueryFile": "./database_dumps/ED3-DataBaseSchema.sql",
+        "fullQueryFile": "./database_dumps/ED3-FullData.sql",
+        "testQueryFile": "./database_dumps/ED3-TestData.sql"
         },
     "session": {
         "secret": "add something random here",
         "maxAge": 43200000 // 12 hours in ms
     },
     "reviews": {
-        "fileFolder": "../files/reviews",
+        "fileFolder": "./files/reviews",
         "maxSizeReviewFile": 52428800 // 50 MB
     },
     "assignments": {
-        "fileFolder": "../files/assignments",
+        "fileFolder": "./files/assignments",
         "maxSizeAssignmentFile": 52428800 // 50 MB
     },
     "submissions": {
-        "fileFolder": "../files/submissions",
+        "fileFolder": "./files/submissions",
         "maxSizeSubmissionFile": 52428800 // 50 MB
     },
     "exampleData": {
-        "exampleAssignmentFolder": "../example_data/assignments",
-        "exampleSubmissionFolder": "../example_data/submissions",
-        "exampleReviewFolder": "../example_data/reviews"
+        "exampleAssignmentFolder": "./example_data/assignments",
+        "exampleSubmissionFolder": "./example_data/submissions",
+        "exampleReviewFolder": "./example_data/reviews"
     },
     "passport": {
         "idpUrl": "https://login.tudelft.nl/sso/saml2/idp/metadata.php",
