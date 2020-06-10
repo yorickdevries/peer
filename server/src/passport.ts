@@ -3,28 +3,28 @@ import fs from "fs";
 import fileCache from "file-system-cache";
 import { fetch, toPassportConfig } from "passport-saml-metadata";
 import passport_saml from "passport-saml";
-import config from "./config";
+import config from "config";
 import ParseNetId from "./parseNetId";
 
-const samlStrategy = passport_saml.Strategy;
-const backupStore = fileCache({ basePath: os.tmpdir() });
-
-// URL of the TU Delft Metadata
-const url = config.passport.idpUrl;
-
 const passportConfiguration = function(passport: any) {
+  const samlStrategy = passport_saml.Strategy;
+  const backupStore = fileCache({ basePath: os.tmpdir() });
+  const passportConfig: any = config.get("passport");
+  // URL of the TU Delft Metadata
+  const url = passportConfig.idpUrl;
+  
   fetch({ url, backupStore })
   .then((reader: any) => {
     // Setup config object
     const ppConfig: any = toPassportConfig(reader);
-    ppConfig.realm = config.passport.realm;
-    ppConfig.protocol = config.passport.protocol;
-    ppConfig.issuer = config.passport.issuer;
-    ppConfig.callbackUrl = config.passport.callbackUrl;
+    ppConfig.realm = passportConfig.realm;
+    ppConfig.protocol = passportConfig.protocol;
+    ppConfig.issuer = passportConfig.issuer;
+    ppConfig.callbackUrl = passportConfig.callbackUrl;
 
     // Certificate
-    const cert = fs.readFileSync(config.passport.certificate, "utf-8");
-    const key = fs.readFileSync(config.passport.key, "utf-8");
+    const cert = fs.readFileSync(passportConfig.certificate, "utf-8");
+    const key = fs.readFileSync(passportConfig.key, "utf-8");
 
     ppConfig.privateCert = key;
 

@@ -1,0 +1,35 @@
+{
+    "database": {
+        "connection": {
+            "user": "postgres",
+            "host": "localhost",
+            "database": "peer_development",
+            "password": "password",
+            "port": 5432
+          },
+        "schemaQueryFile": "./database_dumps/ED3-DataBaseSchema.sql",
+        "fullQueryFile": "./database_dumps/ED3-FullData.sql"
+        },
+    "session": {
+        "secret": "add something random here",
+        "maxAge": 43200000 // 12 hours in ms
+    },
+    "reviews": {
+        "fileFolder": "./files/development/reviews",
+        "maxSizeReviewFile": 52428800 // 50 MB
+    },
+    "assignments": {
+        "fileFolder": "./files/development/assignments",
+        "maxSizeAssignmentFile": 52428800 // 50 MB
+    },
+    "submissions": {
+        "fileFolder": "./files/development/submissions",
+        "maxSizeSubmissionFile": 52428800 // 50 MB
+    },
+    "exampleData": {
+        "exampleAssignmentFolder": "./example_data/assignments",
+        "exampleSubmissionFolder": "./example_data/submissions",
+        "exampleReviewFolder": "./example_data/reviews"
+    },
+    "allowed_extensions": [".pdf", ".zip", ".doc", ".docx"]
+}

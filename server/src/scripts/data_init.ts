@@ -3,18 +3,21 @@ import { QueryFile } from "pg-promise";
 import Database from "../database";
 
 import fs from "fs-extra";
-import config from "../config";
+import config from "config";
+import path from "path";
 
 // import database
 const importDatabase = async function () {
+    const databaseConfig: any = config.get("database");
+    
     // Database import files
-    const qfSchema = new QueryFile(config.database.schemaQueryFile);
-    const qfData = new QueryFile(config.database.fullQueryFile);
+    const qfSchema = new QueryFile(path.resolve(databaseConfig.schemaQueryFile));
+    const qfData = new QueryFile(path.resolve(databaseConfig.fullQueryFile));
     try {
         await Database.DatabaseDrop();
         await Database.DatabaseImport(qfSchema);
         await Database.DatabaseImport(qfData);
-        console.log("Imported database to: " + Database.connection.database + "@" + Database.connection.host);
+        console.log("Imported database");
     } catch (error) {
         console.log(error);
         process.exit(1);
@@ -24,8 +27,8 @@ const importDatabase = async function () {
 // copy assignment files
 const copyExampleAssignmentData = async function () {
     // Assignment file folders
-    const exampleAssignmentFolder = config.exampleData.exampleAssignmentFolder;
-    const assignmentFolder = config.assignments.fileFolder;
+    const exampleAssignmentFolder = (config.get("exampleData") as any).exampleAssignmentFolder;
+    const assignmentFolder = (config.get("assignments") as any).fileFolder;
     try {
         // Make folder
         await fs.mkdirs(assignmentFolder);
@@ -42,8 +45,8 @@ const copyExampleAssignmentData = async function () {
 // copy submission files
 const copyExampleSubmissionData = async function () {
     // Submission file folders
-    const exampleSubmissionFolder = config.exampleData.exampleSubmissionFolder;
-    const submissionFolder = config.submissions.fileFolder;
+    const exampleSubmissionFolder = (config.get("exampleData") as any).exampleSubmissionFolder;
+    const submissionFolder = (config.get("submissions") as any).fileFolder;
     try {
         // Make folder
         await fs.mkdirs(submissionFolder);
@@ -60,8 +63,8 @@ const copyExampleSubmissionData = async function () {
 // copy review files
 const copyExampleReviewData = async function () {
     // Submission file folders
-    const exampleReviewFolder = config.exampleData.exampleReviewFolder;
-    const reviewFolder = config.reviews.fileFolder;
+    const exampleReviewFolder = (config.get("exampleData") as any).exampleReviewFolder;
+    const reviewFolder = (config.get("reviews") as any).fileFolder;
     try {
         // Make folder
         await fs.mkdirs(reviewFolder);

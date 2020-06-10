@@ -11,7 +11,7 @@ import UserPS from "../prepared_statements/user_ps";
 import session from "express-session";
 import sessionFileStore from "session-file-store";
 import passport from "passport";
-import config from "../config";
+import config from "config";
 import passportConfiguration from "../passport";
 import mockPassportConfiguration from "../passport_mock";
 import { eventLogger } from "../logger";
@@ -23,10 +23,10 @@ router.use(eventLogger);
 const fileStore = sessionFileStore(session);
 // needs a random secret
 const sessionConfig: any = {
-    cookie: {maxAge: config.session.maxAge},
+    cookie: {maxAge: (config.get("session") as any).maxAge},
     resave: true,
     saveUninitialized: true,
-    secret: config.session.secret
+    secret: (config.get("session") as any).secret
   };
 // Depending of current mode, setup the session store
 if (process.env.NODE_ENV === "production") {

@@ -1,10 +1,12 @@
 import { QueryFile } from "pg-promise";
 import Database from "../../src/database";
-import config from "../../src/config";
+import config from "config";
 
 // file system imports
 import fs from "fs-extra";
 import path from "path";
+
+const databaseConfig: any = config.get("database");
 
 /**
  * Class responsible for the initialisation of data used for testing
@@ -13,36 +15,36 @@ class TestData {
     /**
      * Database schema
      */
-    static qfSchema = new QueryFile("../../../database_dumps/ED3-DataBaseSchema.sql");
+    static qfSchema = new QueryFile(path.resolve(databaseConfig.schemaQueryFile));
     /**
      * Example data for in the database
      */
-    static qfData = new QueryFile("../../../database_dumps/ED3-TestData.sql");
+    static qfData = new QueryFile(path.resolve(databaseConfig.testQueryFile));
     /**
      * Example Submission files
      */
-    static exampleSubmissionFolder = path.join(__dirname, "../../example_data/submissions");
+    static exampleSubmissionFolder = (config.get("exampleData") as any).exampleSubmissionFolder;
     /**
      * Excample Review files
      */
-    static exampleReviewFolder = path.join(__dirname, "../../example_data/reviews");
+    static exampleReviewFolder = (config.get("exampleData") as any).exampleReviewFolder;
     /**
      * Example Assignment files
      */
-    static exampleAssignmentFolder = path.join(__dirname, "../../example_data/assignments");
+    static exampleAssignmentFolder = (config.get("exampleData") as any).exampleAssignmentFolder;
     /**
      * Submission file folder
      */
-    static submissionFolder = config.submissions.fileFolder;
+    static submissionFolder = (config.get("submissions") as any).fileFolder;
     /**
      * Assignment file folder
      */
-    static assignmentFolder = config.assignments.fileFolder;
+    static assignmentFolder = (config.get("assignments") as any).fileFolder;
 
     /**
      * Review file folder
      */
-    static reviewFolder = config.reviews.fileFolder;
+    static reviewFolder = (config.get("reviews") as any).fileFolder;
 
     /**
      * initializes the database with testdata

@@ -1,6 +1,6 @@
 import promise from "bluebird";
 import pgp from "pg-promise";
-import config from "./config";
+import config from "config";
 
 /**
  * Database class responsible for the connection to the postgreSQL database.
@@ -20,13 +20,6 @@ export default class Database {
    *   }}
    * @memberof Database
    */
-  static connection: {
-    user: string,
-    host: string,
-    database: string,
-    password: string,
-    port: number
-  };
 
   /**
    * Database object which will contain the connection
@@ -50,8 +43,14 @@ export default class Database {
     const pgpObject = pgp(options);
 
     // Get connection from config file
-    this.connection = config.database.connection;
-    this.db = pgpObject(this.connection);
+    const databaseConfig: any = config.get("database");
+    if (databaseConfig.connectionUrl) {
+      this.db = pgpObject(databaseConfig.connectionUrl);
+    } else if (databaseConfig.connection) {
+      this.db = pgpObject(databaseConfig.connection);
+    } else {
+      throw Error("No connection parameters available");
+    }
   }
 
     /**
