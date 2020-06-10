@@ -28,7 +28,7 @@ export default class Database {
    * @type {*}
    * @memberof Database
    */
-  static db: any;
+  static db;
   /**
    * Initialisation method which connects the database settings to this.db .
    *
@@ -43,7 +43,7 @@ export default class Database {
     const pgpObject = pgp(options);
 
     // Get connection from config file
-    const databaseConfig: any = config.get("database") as any;
+    const databaseConfig: any = config.get("database");
     if (databaseConfig.connection) {
       this.db = pgpObject(databaseConfig.connection);
     } else if (databaseConfig.connectionUrl) {

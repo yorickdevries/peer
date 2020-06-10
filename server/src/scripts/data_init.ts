@@ -17,7 +17,7 @@ const importDatabase = async function () {
         await Database.DatabaseDrop();
         await Database.DatabaseImport(qfSchema);
         await Database.DatabaseImport(qfData);
-        console.log("Imported database to: " + Database.connection.database + "@" + Database.connection.host);
+        console.log("Imported database");
     } catch (error) {
         console.log(error);
         process.exit(1);
