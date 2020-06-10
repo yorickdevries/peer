@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Navbar :title="course.name" :links="navbarItems" role="ta" variant="danger"/>
+        <Navbar :title="course.name" :links="navbarItems" role="ta" variant="danger" />
 
         <transition name="slide-right" mode="out-in">
             <router-view></router-view>
@@ -9,7 +9,7 @@
 </template>
 
 <script>
-    import api from "../../api"
+import api from "../../api"
 import Navbar from "../Navbar"
 
 export default {
@@ -18,9 +18,7 @@ export default {
     },
     data() {
         return {
-            navbarItems: [
-                { to: { name: 'teaching-assistant-dashboard.course' } , text: 'Assignments'}
-            ],
+            navbarItems: [{ to: { name: "teaching-assistant-dashboard.course" }, text: "Assignments" }],
             course: {
                 name: null
             },
@@ -31,8 +29,6 @@ export default {
         // Fetch course information (for navbar).
         let res = await api.getCourse(this.$route.params.courseId)
         this.course = res.data
-    },
+    }
 }
 </script>
-
-

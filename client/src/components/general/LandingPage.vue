@@ -1,15 +1,14 @@
 <template>
     <div class="mh-100 flex-grow-1 d-flex justify-content-center flex-column my-5">
         <div class="mx-auto">
-
             <b-container>
                 <b-card class="shadow py-2">
                     <b-row class="mb-3">
                         <b-col>
                             <h1 class="display-5 font-weight-bold">Peer Review done right.</h1>
                             <p class="lead">
-                                Peer reviewing can now be done without any hassle with paper. Submit, review and get feedback
-                                for your course, all within one app!
+                                Peer reviewing can now be done without any hassle with paper. Submit, review and get
+                                feedback for your course, all within one app!
                             </p>
                         </b-col>
                     </b-row>
@@ -41,7 +40,6 @@
                     </b-row>
                 </b-card>
             </b-container>
-
         </div>
     </div>
 </template>

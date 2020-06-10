@@ -11,12 +11,13 @@
                             <b-col class="pl-0">
                                 <b-list-group>
                                     <b-list-group-item
-                                            v-for="question in sortedQuestionsList"
-                                            :key="question.question_number"
-                                            @click="activeQuestion = question"
-                                            :active="activeQuestion === question"
-                                            style="cursor: pointer;">
-                                        Question #{{ question.question_number}}
+                                        v-for="question in sortedQuestionsList"
+                                        :key="question.question_number"
+                                        @click="activeQuestion = question"
+                                        :active="activeQuestion === question"
+                                        style="cursor: pointer;"
+                                    >
+                                        Question #{{ question.question_number }}
                                     </b-list-group-item>
                                 </b-list-group>
                             </b-col>
@@ -24,130 +25,152 @@
                             <!--Feedback view with 1 question at a time-->
                             <b-col cols="9" class="pr-0">
                                 <b-card no-body>
-
                                     <!--Title-->
                                     <b-card-body>
                                         <h4>Feedback</h4>
-                                        <h6 class="card-subtitle text-muted">Feedback given to you aggregated per
-                                            question.</h6>
+                                        <h6 class="card-subtitle text-muted">
+                                            Feedback given to you aggregated per question.
+                                        </h6>
                                     </b-card-body>
 
                                     <!--Single Active Question-->
                                     <b-list-group flush>
-
                                         <b-list-group-item>
                                             <div class="">
-                                                <h5 class="text-primary">Question {{ activeQuestion.question_number }}</h5>
-                                                <h6 v-if="activeQuestion.optional" class="text-muted">This was an optional question, some responses may be empty.</h6>
+                                                <h5 class="text-primary">
+                                                    Question {{ activeQuestion.question_number }}
+                                                </h5>
+                                                <h6 v-if="activeQuestion.optional" class="text-muted">
+                                                    This was an optional question, some responses may be empty.
+                                                </h6>
                                                 {{ activeQuestion.question }}
                                             </div>
-
                                         </b-list-group-item>
 
-                            <b-list-group-item v-for="(pair, index) in aggregateQuestionAnswer(activeQuestion.id, activeQuestion.type_question)" :key="index">
+                                        <b-list-group-item
+                                            v-for="(pair, index) in aggregateQuestionAnswer(
+                                                activeQuestion.id,
+                                                activeQuestion.type_question
+                                            )"
+                                            :key="index"
+                                        >
+                                            <!--&lt;!&ndash; OPEN QUESTION &ndash;&gt;-->
+                                            <template v-if="activeQuestion.type_question === 'open'">
+                                                <b-form-textarea
+                                                    v-if="pair.answer.answer"
+                                                    id="textarea1"
+                                                    :value="pair.answer.answer"
+                                                    :rows="10"
+                                                    readonly
+                                                    :max-rows="15"
+                                                />
+                                                <div v-else>
+                                                    <p class="text-muted text mb-0">
+                                                        <i>The reviewer has not filled in this question</i>
+                                                    </p>
+                                                </div>
+                                            </template>
 
-                                <!--&lt;!&ndash; OPEN QUESTION &ndash;&gt;-->
-                                <template v-if="activeQuestion.type_question === 'open'">
+                                            <!--&lt;!&ndash; RANGE QUESTION &ndash;&gt;-->
+                                            <template v-else-if="activeQuestion.type_question === 'range'">
+                                                <StarRating
+                                                    v-if="pair.answer.answer"
+                                                    class="align-middle"
+                                                    :border-color="'#007bff'"
+                                                    :active-color="'#007bff'"
+                                                    :border-width="2"
+                                                    :item-size="20"
+                                                    :spacing="5"
+                                                    read-only
+                                                    :rating="pair.answer.answer"
+                                                    :max-rating="pair.question.range"
+                                                />
+                                                <div v-else>
+                                                    <p class="text-muted text mb-0">
+                                                        <i>The reviewer has not filled in this question</i>
+                                                    </p>
+                                                </div>
+                                            </template>
+                                            <!--&lt;!&ndash; MPC QUESTION &ndash;&gt;-->
+                                            <template v-else-if="activeQuestion.type_question === 'mc'">
+                                                <b-form-group v-if="pair.answer.answer" class="mb-0">
+                                                    <b-form-radio-group
+                                                        v-if="pair.answer.answer"
+                                                        :checked="pair.answer.answer"
+                                                        :options="transformOptionsToHTMLOptions(activeQuestion.option)"
+                                                        disabled
+                                                        stacked
+                                                    >
+                                                    </b-form-radio-group>
+                                                </b-form-group>
+                                                <div v-else>
+                                                    <p class="text-muted text mb-0">
+                                                        <i>The reviewer has not filled in this question</i>
+                                                    </p>
+                                                </div>
+                                            </template>
 
-                                    <b-form-textarea
-                                            v-if="pair.answer.answer"
-                                            id="textarea1"
-                                            :value="pair.answer.answer"
-                                            :rows="10"
-                                            readonly
-                                            :max-rows="15"/>
-                                    <div v-else>
-                                        <p class="text-muted text mb-0"><i>The reviewer has not filled in this question</i></p>
-                                    </div>
-                                </template>
+                                            <!--&lt;!&ndash; CHECKBOX QUESTION &ndash;&gt;-->
+                                            <b-form-group
+                                                v-else-if="activeQuestion.type_question === 'checkbox'"
+                                                class="mb-0"
+                                            >
+                                                <b-form-checkbox-group
+                                                    :checked="pair.answer.answer"
+                                                    :options="transformOptionsToHTMLOptions(activeQuestion.option)"
+                                                    disabled
+                                                    stacked
+                                                >
+                                                </b-form-checkbox-group>
+                                            </b-form-group>
 
-                                <!--&lt;!&ndash; RANGE QUESTION &ndash;&gt;-->
-                                <template v-else-if="activeQuestion.type_question === 'range'" >
-                                    <StarRating v-if="pair.answer.answer"
-                                                class="align-middle"
-                                                :border-color="'#007bff'"
-                                                :active-color="'#007bff'"
-                                                :border-width="2"
-                                                :item-size="20"
-                                                :spacing="5"
-                                                read-only
-                                                :rating="pair.answer.answer"
-                                                :max-rating="pair.question.range"/>
-                                    <div v-else>
-                                        <p class="text-muted text mb-0"><i>The reviewer has not filled in this question</i></p>
-                                    </div>
-                                </template>
-                                <!--&lt;!&ndash; MPC QUESTION &ndash;&gt;-->
-                                <template v-else-if="activeQuestion.type_question === 'mc'">
-                                    <b-form-group v-if="pair.answer.answer" class="mb-0">
-                                        <b-form-radio-group
-                                                v-if="pair.answer.answer"
-                                                :checked="pair.answer.answer"
-                                                :options="transformOptionsToHTMLOptions(activeQuestion.option)"
-                                                disabled
-                                                stacked>
-                                        </b-form-radio-group>
-                                    </b-form-group>
-                                    <div v-else>
-                                        <p class="text-muted text mb-0"><i>The reviewer has not filled in this question</i></p>
-                                    </div>
-                                </template>
-
-                                <!--&lt;!&ndash; CHECKBOX QUESTION &ndash;&gt;-->
-                                <b-form-group v-else-if="activeQuestion.type_question === 'checkbox'" class="mb-0">
-                                    <b-form-checkbox-group
-                                            :checked="pair.answer.answer"
-                                            :options="transformOptionsToHTMLOptions(activeQuestion.option)"
-                                            disabled
-                                            stacked>
-                                    </b-form-checkbox-group>
-                                </b-form-group>
-
-                                <!--&lt;!&ndash; UPLOAD QUESTION &ndash;&gt;-->
-                                <template v-if="activeQuestion.type_question === 'upload'">
-                                    <div v-if="pair.answer.answer">
-                                        <a target="_blank" :href="uploadQuestionFilePath(pair.peerReviewId, pair.question.id)">{{ pair.answer.answer }}</a>
-                                    </div>
-                                    <div v-else>
-                                        <p class="text-muted text mb-0"><i>The reviewer has not uploaded a file for this question</i></p>
-                                    </div>
-                                </template>
-
-
-                            </b-list-group-item>
-
-                        </b-list-group>
-
-                    </b-card>
-                </b-col>
-
+                                            <!--&lt;!&ndash; UPLOAD QUESTION &ndash;&gt;-->
+                                            <template v-if="activeQuestion.type_question === 'upload'">
+                                                <div v-if="pair.answer.answer">
+                                                    <a
+                                                        target="_blank"
+                                                        :href="
+                                                            uploadQuestionFilePath(pair.peerReviewId, pair.question.id)
+                                                        "
+                                                        >{{ pair.answer.answer }}</a
+                                                    >
+                                                </div>
+                                                <div v-else>
+                                                    <p class="text-muted text mb-0">
+                                                        <i>The reviewer has not uploaded a file for this question</i>
+                                                    </p>
+                                                </div>
+                                            </template>
+                                        </b-list-group-item>
+                                    </b-list-group>
+                                </b-card>
+                            </b-col>
                         </b-row>
                     </b-container>
                 </b-tab>
 
                 <!--TA Feedback Comments-->
                 <b-tab title="TA Feedback">
-
                     <b-alert show variant="info">
                         Consult with your teacher whether TA feedback will be given in this course.
                     </b-alert>
 
                     <!--Submission Feedback-->
                     <b-card header="Submission Feedback" class="mb-3">
-
                         <p class="text-muted">The feedback TAs will give on your submission will be shown here.</p>
 
                         <b-list-group v-if="comments.length > 0">
-
                             <!--Single Comment-->
                             <b-list-group-item v-for="(comment, index) in comments" :key="comment.id">
                                 <dl class="mb-0">
                                     <dt>Comment {{ index + 1 }}</dt>
                                     <dd>
-                                        <b-form-textarea v-model="comment.comment"
-                                                         placeholder="Input your submission comment here."
-                                                         max-rows="10"
-                                                         readonly></b-form-textarea>
+                                        <b-form-textarea
+                                            v-model="comment.comment"
+                                            placeholder="Input your submission comment here."
+                                            max-rows="10"
+                                            readonly
+                                        ></b-form-textarea>
                                     </dd>
 
                                     <dt>Created by TA</dt>
@@ -160,22 +183,23 @@
 
                     <!--Review Feedback-->
                     <b-card header="Review Feedback">
-
-                        <p class="text-muted">The feedback TAs will give on the peer reviews that you have given to other students will be shown here. It will be either approved, disapproved or there might not have been any action taken yet.</p>
+                        <p class="text-muted">
+                            The feedback TAs will give on the peer reviews that you have given to other students will be
+                            shown here. It will be either approved, disapproved or there might not have been any action
+                            taken yet.
+                        </p>
 
                         <div v-for="(peerReview, index) in peerReviewsToOthers" :key="peerReview.review.id">
-
-                            <dl :class="{ 'mb-0': index === peerReviews.length - 1}">
+                            <dl :class="{ 'mb-0': index === peerReviews.length - 1 }">
                                 <dt>Review {{ index + 1 }} Status</dt>
                                 <dd v-if="peerReview.review.approved">Approved 👍</dd>
                                 <dd v-if="peerReview.review.approved === false">Disapproved 👎</dd>
-                                <dd v-if="peerReview.review.approved === null || peerReview.undefined">No action taken yet by any TA.</dd>
+                                <dd v-if="peerReview.review.approved === null || peerReview.undefined">
+                                    No action taken yet by any TA.
+                                </dd>
                             </dl>
                         </div>
-
-
                     </b-card>
-
                 </b-tab>
             </b-tabs>
         </b-card>
@@ -183,7 +207,7 @@
 </template>
 
 <script>
-import { StarRating } from 'vue-rate-it';
+import { StarRating } from "vue-rate-it"
 import api from "../../../api"
 
 export default {
@@ -207,37 +231,31 @@ export default {
         }
     },
     async created() {
-
         // Retrieve peer review RECEIVED.
-        const {data: receivedIds} = await api.getFeedbackOfAssignment(this.$route.params.assignmentId)
+        const { data: receivedIds } = await api.getFeedbackOfAssignment(this.$route.params.assignmentId)
         const receivedFlatIds = receivedIds.map(value => value.id)
 
         this.peerReviews = await this.foreignKeyJoinOfPeerReviews(receivedFlatIds)
 
         // Retrieve peer reviews GIVEN.
-        const {data: givenIds} = await api.getGivenFeedbackOfAssignment(this.$route.params.assignmentId)
+        const { data: givenIds } = await api.getGivenFeedbackOfAssignment(this.$route.params.assignmentId)
         const givenFlatIds = givenIds.map(value => value.id)
 
         this.peerReviewsToOthers = await this.foreignKeyJoinOfPeerReviews(givenFlatIds)
 
         // Set the default active question.
-        if (this.sortedQuestionsList !== undefined)
-            this.activeQuestion = this.sortedQuestionsList[0]
+        if (this.sortedQuestionsList !== undefined) this.activeQuestion = this.sortedQuestionsList[0]
 
         await this.getSubmissionComments()
-
     },
     methods: {
-
         async foreignKeyJoinOfPeerReviews(ids) {
-
             let peerReviews = []
             for (let i = 0; i < ids.length; i++) {
-                let {data} = await api.getPeerReview(ids[i])
+                let { data } = await api.getPeerReview(ids[i])
                 peerReviews.push(data)
             }
             return peerReviews
-
         },
 
         aggregateQuestionAnswer(targetQuestionId, targetQuestionType) {
@@ -245,9 +263,11 @@ export default {
             let res = []
 
             this.peerReviews.forEach(peerReview => {
-                let pair = peerReview.form.find(questionAnswerPair =>
-                    questionAnswerPair.question.id === targetQuestionId &&
-                    questionAnswerPair.question.type_question === targetQuestionType)
+                let pair = peerReview.form.find(
+                    questionAnswerPair =>
+                        questionAnswerPair.question.id === targetQuestionId &&
+                        questionAnswerPair.question.type_question === targetQuestionType
+                )
                 res.push({
                     ...pair,
                     // Add for later use when you need to gather the link for the upload question.
@@ -276,6 +296,6 @@ export default {
         uploadQuestionFilePath(reviewId, questionId) {
             return `/api/reviews/${reviewId}/questions/${questionId}/file`
         }
-    },
+    }
 }
 </script>

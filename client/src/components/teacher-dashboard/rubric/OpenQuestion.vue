@@ -1,10 +1,10 @@
 <template>
     <div>
         <b-form-group label="Question Number" description="The questions will be sorted on this number.">
-            <b-form-input v-model="question.question_number" type="number"/>
+            <b-form-input v-model="question.question_number" type="number" />
         </b-form-group>
         <b-form-group label="Question Text" description="The actual question that the student has to answer.">
-            <b-form-textarea v-model="question.question"/>
+            <b-form-textarea v-model="question.question" />
         </b-form-group>
         <b-form-group label="Optional Question" description="Make this question optional for the student.">
             <b-form-checkbox v-model="question.optional">
@@ -16,7 +16,7 @@
 
 <script>
 export default {
-    props: ['value'],
+    props: ["value"],
     data() {
         return {
             question: this.value
@@ -24,7 +24,7 @@ export default {
     },
     watch: {
         question(val) {
-            this.$emit('input', val)
+            this.$emit("input", val)
         },
         value(val) {
             this.question = val

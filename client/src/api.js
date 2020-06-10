@@ -1,13 +1,13 @@
-import axios from 'axios'
+import axios from "axios"
 
 const client = axios.create({
-    baseURL: '/api/',
+    baseURL: "/api/",
     json: true
 })
 
 export default {
     client,
-    getCourse: async (id) => {
+    getCourse: async id => {
         return client.get(`courses/${id}`)
     },
     getEnrolledCourses() {
@@ -22,8 +22,8 @@ export default {
     enrollInAssignment(assignmentId) {
         return client.get(`assignments/${assignmentId}/enroll`)
     },
-    createCourse: async(course) => {
-        return client.post('courses', course)
+    createCourse: async course => {
+        return client.post("courses", course)
     },
     saveCourse(courseId, course) {
         return client.put(`courses/${courseId}`, course)
@@ -43,8 +43,8 @@ export default {
     getRubric(rubricId) {
         return client.get(`rubric/${rubricId}`)
     },
-    createAssignment: async(assignment) => {
-        return client.post('/assignments', assignment)
+    createAssignment: async assignment => {
+        return client.post("/assignments", assignment)
     },
     getAssignmentReviews(assignmentId, done) {
         return client.get(`/assignments/${assignmentId}/allreviews/${done}`)
@@ -67,11 +67,11 @@ export default {
     unSubmitPeerReview(peerReview) {
         return client.get(`/reviews/${peerReview.review.id}/unsubmit`)
     },
-    getAuthenticated: async() => {
-        return client.get('authenticated')
+    getAuthenticated: async () => {
+        return client.get("authenticated")
     },
     getUser: () => {
-        return client.get('user')
+        return client.get("user")
     },
     savePeerReview(peerReviewId, peerReview) {
         return client.put(`reviews/${peerReviewId}`, peerReview)
@@ -124,13 +124,12 @@ export default {
         }
     },
     getAcademicYears() {
-        return client.get('/courses/data/academicYears')
+        return client.get("/courses/data/academicYears")
     },
     getFaculties() {
-        return client.get('/courses/data/faculties')
+        return client.get("/courses/data/faculties")
     },
     getactiveAcademicYears() {
-        return client.get('/courses/data/activeAcademicYears')
+        return client.get("/courses/data/activeAcademicYears")
     }
 }
-

@@ -2,37 +2,36 @@
     <b-container>
         <b-row>
             <b-col>
-                <BreadcrumbTitle :items="['Assignments', assignment.title]" class="mt-3"/>
+                <BreadcrumbTitle :items="['Assignments', assignment.title]" class="mt-3" />
             </b-col>
         </b-row>
         <b-row>
-
             <b-col cols="12">
-
                 <b-card no-body>
-
                     <b-row class="px-3 pt-0">
-
                         <b-col class="p-0 d-flex flex-wrap">
-
-                            <b-button   variant="white"
-                                        active-class="bg-light"
-                                        class="flex-fill p-0"
-                                        :to="{ name: 'student-dashboard.course.assignment.information' }">
+                            <b-button
+                                variant="white"
+                                active-class="bg-light"
+                                class="flex-fill p-0"
+                                :to="{ name: 'student-dashboard.course.assignment.information' }"
+                            >
                                 <div class="text-center border-right border-bottom active py-3 h-100 align-middle">
                                     <div class="lead font-weight-bold align-middle">Assignment</div>
                                     <div class="text-muted">Information</div>
                                 </div>
-
                             </b-button>
 
-                            <b-button variant="white"
-                                    active-class="bg-light"
-                                    class="flex-fill p-0"
-                                    :to="{ name: 'student-dashboard.course.assignment.hand-in' }"
-                                    :disabled="!isHandInActive">
+                            <b-button
+                                variant="white"
+                                active-class="bg-light"
+                                class="flex-fill p-0"
+                                :to="{ name: 'student-dashboard.course.assignment.hand-in' }"
+                                :disabled="!isHandInActive"
+                            >
                                 <div class="text-center border-right border-bottom active py-3">
-                                    <div class="lead font-weight-bold">Submission
+                                    <div class="lead font-weight-bold">
+                                        Submission
                                         <b-badge variant="success" v-if="isHandInActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
@@ -40,13 +39,16 @@
                                 </div>
                             </b-button>
 
-                            <b-button   variant="white"
-                                        active-class="bg-light"
-                                        class="flex-fill p-0"
-                                    :to="{ name: 'student-dashboard.course.assignment.peer-review' }"
-                                    :disabled="!isPeerReviewVisible">
+                            <b-button
+                                variant="white"
+                                active-class="bg-light"
+                                class="flex-fill p-0"
+                                :to="{ name: 'student-dashboard.course.assignment.peer-review' }"
+                                :disabled="!isPeerReviewVisible"
+                            >
                                 <div class="text-center border-right border-bottom py-3">
-                                    <div class="lead font-weight-bold">Peer Review
+                                    <div class="lead font-weight-bold">
+                                        Peer Review
                                         <b-badge variant="success" v-if="isPeerReviewActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
@@ -54,36 +56,45 @@
                                 </div>
                             </b-button>
 
-                            <b-button   variant="white"
-                                        active-class="bg-light"
-                                        class="flex-fill p-0"
-                                    :to="{ name: 'student-dashboard.course.assignment.feedback' }"
-                                    :disabled="!isFeedbackActive">
+                            <b-button
+                                variant="white"
+                                active-class="bg-light"
+                                class="flex-fill p-0"
+                                :to="{ name: 'student-dashboard.course.assignment.feedback' }"
+                                :disabled="!isFeedbackActive"
+                            >
                                 <div class="text-center border-bottom py-3">
-                                    <div class="lead font-weight-bold ">Received Feedback
+                                    <div class="lead font-weight-bold ">
+                                        Received Feedback
                                         <b-badge variant="success" v-if="isFeedbackActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
-                                    <span class="text-muted">Opens after {{ assignment.review_due_date | formatDate }}</span>
+                                    <span class="text-muted"
+                                        >Opens after {{ assignment.review_due_date | formatDate }}</span
+                                    >
                                 </div>
                             </b-button>
 
-                            <b-button   v-if="assignment.review_evaluation"
-                                        variant="white"
-                                        active-class="bg-light"
-                                        class="flex-fill p-0"
-                                        :to="{ name: 'student-dashboard.course.assignment.review-evaluation' }"
-                                        :disabled="!isEvaluationActive">
+                            <b-button
+                                v-if="assignment.review_evaluation"
+                                variant="white"
+                                active-class="bg-light"
+                                class="flex-fill p-0"
+                                :to="{ name: 'student-dashboard.course.assignment.review-evaluation' }"
+                                :disabled="!isEvaluationActive"
+                            >
                                 <div class="text-center border-bottom py-3">
-                                    <div class="lead font-weight-bold ">Review Evaluation
+                                    <div class="lead font-weight-bold ">
+                                        Review Evaluation
                                         <b-badge variant="success" v-if="isEvaluationActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
-                                    <span class="text-muted">Due: {{ assignment.review_evaluation_due_date | formatDate }}</span>
+                                    <span class="text-muted"
+                                        >Due: {{ assignment.review_evaluation_due_date | formatDate }}</span
+                                    >
                                 </div>
                             </b-button>
                         </b-col>
-
                     </b-row>
 
                     <b-card-body>
@@ -93,21 +104,19 @@
                             </b-col>
                         </b-row>
                     </b-card-body>
-
                 </b-card>
             </b-col>
         </b-row>
-
     </b-container>
 </template>
 
 <script>
 import api from "../../api"
-import BreadcrumbTitle from '../BreadcrumbTitle'
+import BreadcrumbTitle from "../BreadcrumbTitle"
 
 export default {
-    name: 'Assignment',
-    components: {BreadcrumbTitle},
+    name: "Assignment",
+    components: { BreadcrumbTitle },
     data() {
         return {
             assignment: {
@@ -115,7 +124,7 @@ export default {
                 due_date: null,
                 review_due_date: null,
                 review_evaluation: null
-            },
+            }
         }
     },
     computed: {
@@ -126,13 +135,19 @@ export default {
             return new Date() > new Date(this.assignment.review_publish_date)
         },
         isPeerReviewActive() {
-            return new Date() < new Date(this.assignment.review_due_date) && new Date() > new Date(this.assignment.review_publish_date)
+            return (
+                new Date() < new Date(this.assignment.review_due_date) &&
+                new Date() > new Date(this.assignment.review_publish_date)
+            )
         },
         isFeedbackActive() {
             return new Date() > new Date(this.assignment.review_due_date)
         },
         isEvaluationActive() {
-            return new Date() > new Date(this.assignment.review_due_date) && new Date() < new Date(this.assignment.review_evaluation_due_date)
+            return (
+                new Date() > new Date(this.assignment.review_due_date) &&
+                new Date() < new Date(this.assignment.review_evaluation_due_date)
+            )
         }
     },
     async created() {
@@ -148,5 +163,3 @@ export default {
     }
 }
 </script>
-
-

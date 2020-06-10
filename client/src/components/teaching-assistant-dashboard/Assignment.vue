@@ -1,14 +1,12 @@
 <template>
     <div>
         <b-container>
-
             <!--Header-->
             <BreadcrumbTitle :items="['Assignment', assignment.title]" class="mt-3"></BreadcrumbTitle>
 
             <!--Tab Layout-->
             <b-card no-body>
                 <b-tabs card>
-
                     <!--Details-->
                     <b-tab title="Home" active>
                         <AssignmentDetails :assignment="assignment"></AssignmentDetails>
@@ -21,7 +19,10 @@
 
                     <!--Reviews-->
                     <b-tab title="Reviews">
-                        <Reviews :assignmentId="$route.params.assignmentId" :pathName="'teaching-assistant-dashboard.course.assignment.reviews'"></Reviews>
+                        <Reviews
+                            :assignmentId="$route.params.assignmentId"
+                            :pathName="'teaching-assistant-dashboard.course.assignment.reviews'"
+                        ></Reviews>
                     </b-tab>
 
                     <!--Groups-->
@@ -30,19 +31,17 @@
                     </b-tab>
                 </b-tabs>
             </b-card>
-
-
         </b-container>
     </div>
 </template>
 
 <script>
 import api from "../../api"
-import BreadcrumbTitle from '../BreadcrumbTitle'
+import BreadcrumbTitle from "../BreadcrumbTitle"
 import Submissions from "../ta_teacher_shared/Submissions"
-import Reviews from '../ta_teacher_shared/Reviews'
-import Groups from './Groups'
-import AssignmentDetails from '../ta_teacher_shared/AssignmentDetails'
+import Reviews from "../ta_teacher_shared/Reviews"
+import Groups from "./Groups"
+import AssignmentDetails from "../ta_teacher_shared/AssignmentDetails"
 
 export default {
     components: {
@@ -56,7 +55,7 @@ export default {
         return {
             items: [
                 {
-                    text: 'Course Home',
+                    text: "Course Home",
                     active: true
                 }
             ],
@@ -69,7 +68,7 @@ export default {
     },
     async created() {
         // Fetch course information.
-        let {data} = await api.getAssignment(this.$route.params.assignmentId);
+        let { data } = await api.getAssignment(this.$route.params.assignmentId)
         this.assignment = data
     }
 }
