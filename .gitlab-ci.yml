@@ -26,6 +26,7 @@ server-lint:
 
 client-lint:
   stage: static-analysis
+  allow_failure: true
   script:
   - cd client && npm install
   - npm run lint
