@@ -2,6 +2,7 @@
     "database": {
         "connection": {
             "database": "peer_test"
-        }
+        },
+        "testQueryFile": "./database_dumps/ED3-TestData.sql"
     }
 }

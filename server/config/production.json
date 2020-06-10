@@ -3,5 +3,14 @@
         "connection": {
             "database": "peer_database"
         }
+    },
+    "passport": {
+        "idpUrl": "https://login.tudelft.nl/sso/saml2/idp/metadata.php",
+        "realm": "urn:nodejs:passport-saml-metadata-example-app",
+        "protocol": "saml2",
+        "issuer": "peer.ewi.tudelft.nl",
+        "callbackUrl": "https://peer.ewi.tudelft.nl/api/login/callback",
+        "certificate": "/var/www/peer/cert/peer_ewi_tudelft_nl.crt",
+        "key": "/var/www/peer/cert/peer.ewi.tudelft.nl.key"
     }
 }

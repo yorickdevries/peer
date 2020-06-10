@@ -8,8 +8,7 @@
             "port": 5432
           },
         "schemaQueryFile": "./database_dumps/ED3-DataBaseSchema.sql",
-        "fullQueryFile": "./database_dumps/ED3-FullData.sql",
-        "testQueryFile": "./database_dumps/ED3-TestData.sql"
+        "fullQueryFile": "./database_dumps/ED3-FullData.sql"
         },
     "session": {
         "secret": "add something random here",
@@ -31,15 +30,6 @@
         "exampleAssignmentFolder": "./example_data/assignments",
         "exampleSubmissionFolder": "./example_data/submissions",
         "exampleReviewFolder": "./example_data/reviews"
-    },
-    "passport": {
-        "idpUrl": "https://login.tudelft.nl/sso/saml2/idp/metadata.php",
-        "realm": "urn:nodejs:passport-saml-metadata-example-app",
-        "protocol": "saml2",
-        "issuer": "peer.ewi.tudelft.nl",
-        "callbackUrl": "https://peer.ewi.tudelft.nl/api/login/callback",
-        "certificate": "/var/www/peer/cert/peer_ewi_tudelft_nl.crt",
-        "key": "/var/www/peer/cert/peer.ewi.tudelft.nl.key"
     },
     "allowed_extensions": [".pdf", ".zip", ".doc", ".docx"]
 }

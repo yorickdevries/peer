@@ -6,15 +6,13 @@ import passport_saml from "passport-saml";
 import config from "config";
 import ParseNetId from "./parseNetId";
 
-const samlStrategy = passport_saml.Strategy;
-const backupStore = fileCache({ basePath: os.tmpdir() });
-
-const passportConfig: any = config.get("passport");
-
-// URL of the TU Delft Metadata
-const url = passportConfig.idpUrl;
-
 const passportConfiguration = function(passport: any) {
+  const samlStrategy = passport_saml.Strategy;
+  const backupStore = fileCache({ basePath: os.tmpdir() });
+  const passportConfig: any = config.get("passport");
+  // URL of the TU Delft Metadata
+  const url = passportConfig.idpUrl;
+  
   fetch({ url, backupStore })
   .then((reader: any) => {
     // Setup config object
