@@ -19,22 +19,6 @@ describe("Database Test", () => {
     });
 
     /**
-     * Test the connection port.
-     */
-    it("connection port", () => {
-        const result = Database.connection.port;
-        expect(result).to.equal(5432);
-    });
-
-    /**
-     * Test the user connection.
-     */
-    it("connection user", () => {
-        const result = Database.connection.user;
-        expect(result).to.equal("postgres");
-    });
-
-    /**
      * Test the database connection.
      */
     it("database connection correct", async () => {
