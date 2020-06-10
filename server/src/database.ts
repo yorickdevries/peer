@@ -44,10 +44,10 @@ export default class Database {
 
     // Get connection from config file
     const databaseConfig: any = config.get("database");
-    if (databaseConfig.connection) {
-      this.db = pgpObject(databaseConfig.connection);
-    } else if (databaseConfig.connectionUrl) {
+    if (databaseConfig.connectionUrl) {
       this.db = pgpObject(databaseConfig.connectionUrl);
+    } else if (databaseConfig.connection) {
+      this.db = pgpObject(databaseConfig.connection);
     } else {
       throw Error("No connection parameters available");
     }
