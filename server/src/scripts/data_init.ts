@@ -4,13 +4,15 @@ import Database from "../database";
 
 import fs from "fs-extra";
 import config from "config";
+import path from "path";
 
 // import database
 const importDatabase = async function () {
     const databaseConfig: any = config.get("database");
+    
     // Database import files
-    const qfSchema = new QueryFile(databaseConfig.schemaQueryFile);
-    const qfData = new QueryFile(databaseConfig.fullQueryFile);
+    const qfSchema = new QueryFile(path.resolve(databaseConfig.schemaQueryFile));
+    const qfData = new QueryFile(path.resolve(databaseConfig.fullQueryFile));
     try {
         await Database.DatabaseDrop();
         await Database.DatabaseImport(qfSchema);
