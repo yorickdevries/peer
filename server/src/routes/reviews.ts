@@ -238,7 +238,7 @@ router.route("/:reviewId/allComments").get(index.authorization.checkAuthorizatio
     ReviewsPS.executeGetAllReviewComments(parseInt(req.params.reviewId))
         .then((data) => {
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -253,7 +253,7 @@ router.route("/:reviewCommentId/comment").put(index.authorization.checkOwnerRevi
     ReviewsPS.executeUpdateReviewComment(parseInt(req.params.reviewCommentId), req.body.comment)
         .then((data) => {
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -268,7 +268,7 @@ router.route("/:reviewId/comment").post(index.authorization.checkReviewTAOrTeach
     ReviewsPS.executeAddReviewComment(req.params.reviewId, req.user.netid, req.body.comment)
         .then((data) => {
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -282,7 +282,7 @@ router.route("/:reviewCommentId/comment").delete(index.authorization.checkOwnerR
     ReviewsPS.executeDeleteReviewComment(parseInt(req.params.reviewCommentId))
         .then((data) => {
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
         res.sendStatus(400);
     });
 });

@@ -71,10 +71,10 @@ describe("DistributeReviews two assignments", () => {
         await RubricPS.executeCreateRubric(assignment2.id, "submission");
 
         // make students
-        const student1 = await UserPS.executeAddUser("studentone");
-        const student2 = await UserPS.executeAddUser("studenttwo");
-        const student3 = await UserPS.executeAddUser("studentthree");
-        const student4 = await UserPS.executeAddUser("studentfour");
+        await UserPS.executeAddUser("studentone");
+        await UserPS.executeAddUser("studenttwo");
+        await UserPS.executeAddUser("studentthree");
+        await UserPS.executeAddUser("studentfour");
 
         const group1: any = await GroupsPS.executeAddGroup("Group1");
         const group2: any = await GroupsPS.executeAddGroup("Group2");
@@ -152,12 +152,12 @@ describe("DistributeReviews two assignments", () => {
         await RubricPS.executeCreateRubric(assignment2.id, "submission");
 
         // make students
-        const student1 = await UserPS.executeAddUser("studentone");
-        const student2 = await UserPS.executeAddUser("studenttwo");
-        const student3 = await UserPS.executeAddUser("studentthree");
-        const student4 = await UserPS.executeAddUser("studentfour");
-        const student5 = await UserPS.executeAddUser("studentfive");
-        const student6 = await UserPS.executeAddUser("studentsix");
+        await UserPS.executeAddUser("studentone");
+        await UserPS.executeAddUser("studenttwo");
+        await UserPS.executeAddUser("studentthree");
+        await UserPS.executeAddUser("studentfour");
+        await UserPS.executeAddUser("studentfive");
+        await UserPS.executeAddUser("studentsix");
 
         const group1: any = await GroupsPS.executeAddGroup("Group1");
         const group2: any = await GroupsPS.executeAddGroup("Group2");

@@ -43,14 +43,14 @@ if (process.env.NODE_ENV === "production" ) {
     passportConfiguration(passport);
   } else {
     router.get("/mocklogin/:netid/:affiliation",
-    function(req, res, next) {
+    function(req, _, next) {
         console.log("Mocked login: " + req.params.netid + ", " + req.params.affiliation);
         // make Mocked passport configuration
         mockPassportConfiguration(passport, req.params.netid, req.params.affiliation);
         next();
     },
     passport.authenticate("mock"),
-    function(req, res, next) {
+    function(_, res) {
         res.redirect("/");
     });
 }
@@ -68,7 +68,7 @@ router.post("/login/callback", passport.authenticate("saml",
   {
     failureRedirect: "/",
     failureFlash: true
-  }), function(req, res) {
+  }), function(_, res) {
     res.redirect("/");
     }
 );
@@ -81,14 +81,14 @@ router.get("/logout", function(req, res) {
 });
 
 // Retrieve SP metadata
-router.get("/metadata.xml", async function(req, res) {
+router.get("/metadata.xml", async function(_, res) {
   const file = await fs.readFile("./SP_Metadata.xml");
   res.type("application/xml");
   res.send(file);
 });
 
 // This route checks the user and updates it in the database
-router.use(async function(req: any, res, next) {
+router.use(async function(req: any, _, next) {
     const userinfo = req.user;
     // check whether userinfo exists
     if (userinfo == undefined || userinfo.netid == undefined) {
@@ -141,14 +141,14 @@ router.use("/rubric", rubrics);
 router.use("/submissions", submissions);
 
 // Route to get the userinfo
-router.get("/user", function(req: any, res, next) {
+router.get("/user", function(req: any, res) {
     res.json({
         user: req.user
     });
 });
 
 // If no other routes apply, send a 404
-router.use(function(req, res) {
+router.use(function(_, res) {
     res.sendStatus(404);
 });
 

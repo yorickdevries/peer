@@ -2,7 +2,7 @@ import logger from "morgan";
 import forwarded from "forwarded-for";
 
 // Include the netid as token for logs
-logger.token("netid", function(req, res) {
+logger.token("netid", function(req) {
     if (req.user != undefined) {
         return req.user.netid;
     } else {
@@ -11,7 +11,7 @@ logger.token("netid", function(req, res) {
 });
 
 // Include the original ip as token for logs
-logger.token("ipadress", function(req, res) {
+logger.token("ipadress", function(req) {
     const address = forwarded(req, req.headers);
     return address.ip;
 });
@@ -24,7 +24,7 @@ const eventLogger = logger(loggerFormat);
 // logger for only server errors
 const errorLogger = logger(loggerFormat,
     {
-    skip: function (req, res) { return res.statusCode < 500; },
+    skip: function (_, res) { return res.statusCode < 500; },
     stream: process.stderr
     }
 );

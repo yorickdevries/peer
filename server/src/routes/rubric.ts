@@ -22,7 +22,7 @@ router.post("/checkboxquestion", index.authorization.checkRubricAuthorizationPos
     .then((data: any) => {
         data.type_question = "checkbox";
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -38,7 +38,7 @@ router.put("/checkboxquestion/:question_id", index.authorization.checkCheckboxQu
     .then((data: any) => {
         data.type_question = "checkbox";
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -56,7 +56,7 @@ router.delete("/checkboxquestion/:question_id", index.authorization.checkCheckbo
     .then((data: any) => {
         data.type_question = "checkbox";
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -73,7 +73,7 @@ router.post("/checkboxoption", index.authorization.checkCheckboxOptionPost, (req
         RubricPS.executeCreateCheckboxOption(req.body.option, req.body.checkboxquestion_id)
         .then((data) => {
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
             res.sendStatus(400);
         });
     }
@@ -92,7 +92,7 @@ router.put("/checkboxoption/:option_id", index.authorization.checkCheckboxOption
         RubricPS.executeUpdateCheckboxOption(req.body.option, parseInt(req.params.option_id))
         .then((data) => {
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
             res.sendStatus(400);
         });
     }
@@ -107,7 +107,7 @@ router.delete("/checkboxoption/:option_id", index.authorization.checkCheckboxOpt
     RubricPS.executeDeleteCheckboxOption(parseInt(req.params.option_id))
     .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -121,7 +121,7 @@ router.delete("/openquestion/:question_id", index.authorization.checkOpenQuestio
     .then((data: any) => {
         data.type_question = "open";
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -135,7 +135,7 @@ router.delete("/uploadquestion/:question_id", index.authorization.checkUploadQue
         .then((data: any) => {
             data.type_question = "upload";
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -149,7 +149,7 @@ router.delete("/rangequestion/:question_id", index.authorization.checkRangeQuest
     .then((data: any) => {
         data.type_question = "range";
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -167,7 +167,7 @@ router.delete("/mcquestion/:question_id", index.authorization.checkMCQuestionEdi
     .then((data: any) => {
         data.type_question = "mc";
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -180,7 +180,7 @@ router.delete("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (re
     RubricPS.executeDeleteMCOption(parseInt(req.params.option_id))
     .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -197,7 +197,7 @@ router.post("/mcoption", index.authorization.checkMCOptionPost, (req, res) => {
         RubricPS.executeCreateMCOption(req.body.option, req.body.mcquestion_id)
         .then((data) => {
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
             res.sendStatus(400);
         });
     }
@@ -215,7 +215,7 @@ router.put("/mcoption/:option_id", index.authorization.checkMCOptionEdit, (req, 
         RubricPS.executeUpdateMCOption(req.body.option, parseInt(req.params.option_id))
         .then((data) => {
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
             res.sendStatus(400);
         });
     }
@@ -231,7 +231,7 @@ router.post("/mcquestion", index.authorization.checkRubricAuthorizationPostQuest
     .then((data: any) => {
         data.type_question = "mc";
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -246,7 +246,7 @@ router.post("/uploadquestion", index.authorization.checkRubricAuthorizationPostQ
         .then((data: any) => {
             data.type_question = "upload";
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -264,7 +264,7 @@ router.put("/uploadquestion/:question_id", index.authorization.checkUploadQuesti
         .then((data: any) => {
             data.type_question = "upload";
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -280,7 +280,7 @@ router.put("/mcquestion/:question_id", index.authorization.checkMCQuestionEdit, 
     .then((data: any) => {
         data.type_question = "mc";
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -297,7 +297,7 @@ router.post("/rangequestion", index.authorization.checkRubricAuthorizationPostQu
     .then((data: any) => {
         data.type_question = "range";
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -316,7 +316,7 @@ router.put("/rangequestion/:question_id", index.authorization.checkRangeQuestion
     .then((data: any) => {
         data.type_question = "range";
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -332,7 +332,7 @@ router.post("/openquestion", index.authorization.checkRubricAuthorizationPostQue
     .then((data: any) => {
         data.type_question = "open";
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });
@@ -346,7 +346,7 @@ router.put("/openquestion/:question_id", index.authorization.checkOpenQuestionEd
     .then((data: any) => {
         data.type_question = "open";
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });

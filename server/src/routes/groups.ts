@@ -21,7 +21,7 @@ router.get("/:id", index.authorization.isAuthorizedToViewGroup, (req: any, res) 
     GroupsPS.executeGetGroupById(req.params.id)
     .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
  });
@@ -33,7 +33,7 @@ router.get("/:id/users", index.authorization.isAuthorizedToViewGroup, (req: any,
     GroupsPS.executeGetUsersOfGroupById(req.params.id)
     .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
  });

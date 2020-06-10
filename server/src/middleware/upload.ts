@@ -8,7 +8,7 @@ export default function upload(fieldName: string | undefined, allowedExtensions:
     /**
      * Filefilter for the upload
      */
-    function fileFilter (req: any, file: any, callback: any) {
+    function fileFilter (_: any, file: any, callback: any) {
         const extension = path.extname(file.originalname);
         if (!(allowedExtensions.includes(extension))) {
             return callback(new Error(`Extension not allowed: ${extension}`), false);

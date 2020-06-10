@@ -22,12 +22,12 @@ app.use(cookieParser());
 app.use("/api", api);
 
 // Send homepage
-app.get("/*", (req, res) => {
+app.get("/*", (_, res) => {
     res.sendFile(path.join(clientWebsite, "index.html"));
 });
 
 // Error handler
-app.use(function(err: any, req: any, res: any, next: any) {
+app.use(function(err: any, _req: any, res: any, _next: any) {
     // Print error to the stderr
     console.error(`Error occured at ${new Date()}: ${err}`);
 
