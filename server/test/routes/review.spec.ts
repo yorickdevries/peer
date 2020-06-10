@@ -12,11 +12,11 @@ import TestData from "../test_helpers/test_data";
 import ReviewPS from "../../src/prepared_statements/review_ps";
 import SubmissionPS from "../../src/prepared_statements/submissions_ps";
 import RubricPS from "../../src/prepared_statements/rubric_ps";
-import config from "../../src/config";
+import config from "config";
 import AssignmentPS from "../../src/prepared_statements/assignment_ps";
 import GroupsPS from "../../src/prepared_statements/group_ps";
 
-const fileFolder = config.reviews.fileFolder;
+const fileFolder = (config.get("reviews") as any).fileFolder;
 
 describe("API review routes", () => {
     /**

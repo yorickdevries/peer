@@ -1,6 +1,6 @@
 import { QueryFile } from "pg-promise";
 import Database from "../../src/database";
-import config from "../../src/config";
+import config from "config";
 
 // file system imports
 import fs from "fs-extra";
@@ -33,16 +33,16 @@ class TestData {
     /**
      * Submission file folder
      */
-    static submissionFolder = config.submissions.fileFolder;
+    static submissionFolder = (config.get("submissions") as any).fileFolder;
     /**
      * Assignment file folder
      */
-    static assignmentFolder = config.assignments.fileFolder;
+    static assignmentFolder = (config.get("assignments") as any).fileFolder;
 
     /**
      * Review file folder
      */
-    static reviewFolder = config.reviews.fileFolder;
+    static reviewFolder = (config.get("reviews") as any).fileFolder;
 
     /**
      * initializes the database with testdata
