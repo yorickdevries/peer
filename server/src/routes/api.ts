@@ -40,7 +40,26 @@ router.use(passport.session());
 
 // Depending of current mode, setup the login method
 if (process.env.NODE_ENV === "production" ) {
+    // Initialize TU Delft passport
     passportConfiguration(passport);
+
+    // Login route
+    router.get("/login", passport.authenticate("saml",
+    {
+        successRedirect: "https://peer.ewi.tudelft.nl/",
+        failureRedirect: "/login"
+    })
+    );
+
+    // Callback of the login route
+    router.post("/login/callback", passport.authenticate("saml",
+    {
+        failureRedirect: "/",
+        failureFlash: true
+    }), function(_, res) {
+        res.redirect("/");
+    }
+    );
   } else {
     router.get("/mocklogin/:netid/:affiliation",
     function(req, _, next) {
@@ -55,24 +74,6 @@ if (process.env.NODE_ENV === "production" ) {
     });
 }
 
-// Login route
-router.get("/login", passport.authenticate("saml",
-  {
-    successRedirect: "https://peer.ewi.tudelft.nl/",
-    failureRedirect: "/login"
-  })
-);
-
-// Callback of the login route
-router.post("/login/callback", passport.authenticate("saml",
-  {
-    failureRedirect: "/",
-    failureFlash: true
-  }), function(_, res) {
-    res.redirect("/");
-    }
-);
-
 // Route to logout.
 router.get("/logout", function(req, res) {
     req.logout();
@@ -80,7 +81,7 @@ router.get("/logout", function(req, res) {
     res.redirect("/");
 });
 
-// Retrieve SP metadata
+// Retrieve SP metadata (Only works in production)
 router.get("/metadata.xml", async function(_, res) {
   const file = await fs.readFile("./SP_Metadata.xml");
   res.type("application/xml");
