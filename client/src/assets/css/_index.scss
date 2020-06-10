@@ -32,8 +32,8 @@ $navbar-dark-active-color:          rgba(#FFFFFF, 1);
 }
 
 // Import Bootstrap
-@import "../node_modules/bootstrap/scss/bootstrap.scss";            // Bootstrap
-@import "../node_modules/bootstrap-vue/dist/bootstrap-vue.css";     // Bootstrap-Vue
+@import '~bootstrap';            // Bootstrap
+@import '~bootstrap-vue.css';     // Bootstrap-Vue
 
 /**
   ======================
