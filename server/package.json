@@ -78,6 +78,8 @@
     "typescript": "^3.9.5"
   },
   "devDependencies": {
+    "@types/chai-as-promised": "^7.1.2",
+    "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-http": "^4.3.0",
