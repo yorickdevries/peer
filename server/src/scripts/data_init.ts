@@ -78,13 +78,13 @@ const copyExampleReviewData = async function () {
     }
 };
 
-const arguments = process.argv.slice(2);
+const args = process.argv.slice(2);
 
 // running the initialisation functions
 if (process.env.NODE_ENV === "production") {
     throw Error("You cannot run tests in production!");
 } else {
-    if (!arguments.includes("--filesonly")) {
+    if (!args.includes("--filesonly")) {
         console.log("Importing database");
         importDatabase();
     }
