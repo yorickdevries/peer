@@ -1,0 +1,10 @@
+{
+    "database": {
+        "connection": {
+            "user": "POSTGRES_USER",
+            "host": "POSTGRES_HOST",
+            "database": "POSTGRES_DB",
+            "password": "POSTGRES_PASSWORD"
+        }
+    }
+}
