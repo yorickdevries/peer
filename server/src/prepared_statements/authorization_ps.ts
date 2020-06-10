@@ -1,5 +1,5 @@
 import Database from "../database";
-import pgp, { default as pgPromise, PreparedStatement } from "pg-promise";
+import { PreparedStatement } from "pg-promise";
 
 /**
  * Prepared statement class for authorization

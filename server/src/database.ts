@@ -1,5 +1,5 @@
 import promise from "bluebird";
-import pgp, { errors, default as pgPromise, PreparedStatement } from "pg-promise";
+import pgp from "pg-promise";
 import config from "./config";
 
 /**
@@ -89,7 +89,7 @@ export default class Database {
      * @param {pgPromise.PreparedStatement} statement - a prepared statement to query.
      * @return a database query result or an json error with awaiting, a promise otherwise.
      */
-  public static async executeQuery(statement: PreparedStatement) {
+  public static async executeQuery(statement: pgp.PreparedStatement) {
       return Database.db.any(statement);
   }
 
@@ -100,7 +100,7 @@ export default class Database {
      * @param {pgPromise.PreparedStatement} statement - a prepared statement to query.
      * @return a database query result or an json error with awaiting, a promise otherwise.
      */
-    public static async executeQuerySingleResult(statement: PreparedStatement) {
+    public static async executeQuerySingleResult(statement: pgp.PreparedStatement) {
         return Database.db.one(statement);
     }
 }

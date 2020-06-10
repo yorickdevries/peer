@@ -37,7 +37,7 @@ router.route("/:assignment_id")
         AssignmentPS.executeGetAssignmentById(parseInt(req.params.assignment_id))
         .then((data) => {
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
             res.sendStatus(400);
         });
     });
@@ -195,7 +195,7 @@ router.route("/:assignment_id/submissions", )
             req.params.assignment_id
         ).then((data) => {
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
             res.sendStatus(400);
         });
     });
@@ -229,7 +229,7 @@ router.route("/:assignment_id/allsubmissions")
         SubmissionsPS.executeGetAllSubmissionsByAssignmentId(parseInt(req.params.assignment_id))
         .then((data) => {
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
             res.sendStatus(400);
         });
     });
@@ -243,7 +243,7 @@ router.route("/:assignment_id/alllatestsubmissions")
         SubmissionsPS.executeGetLatestSubmissionsByAssignmentId(parseInt(req.params.assignment_id))
         .then((data) => {
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
             res.sendStatus(400);
         });
     });
@@ -259,7 +259,7 @@ router.route("/:assignment_id/reviews")
         ReviewPS.executeGetSubmissionReviewsByUserIdAndAssignmentId(req.user.netid, req.params.assignment_id)
         .then((data) => {
             res.json(data);
-        }).catch((error) => {
+        }).catch(() => {
             res.sendStatus(400);
         });
     });
@@ -442,7 +442,7 @@ router.get("/:assignment_id/groups", index.authorization.enrolledAsTAOrTeacherAs
     AssignmentPS.executeGetGroupsByAssignmentId(req.params.assignment_id)
     .then((data) => {
         res.json(data);
-    }).catch((error) => {
+    }).catch(() => {
         res.sendStatus(400);
     });
 });

@@ -23,7 +23,7 @@ export default class FileExport {
         if (exportType == "xls") {
             this.exportJSONToXLSFile(data, fileName, "xls", res);
         } else if (exportType == "csv") {
-            this.exportJSONToCSVFile(data, fileName, "csv", res);
+            this.exportJSONToCSVFile(data, fileName, res);
         } else {
             throw new Error("Invalid exportType");
         }
@@ -54,7 +54,7 @@ export default class FileExport {
     /**
      * Exports to CSV.
      */
-    static exportJSONToCSVFile(data: any, fileName: any, exportType: any, res: any) {
+    static exportJSONToCSVFile(data: any, fileName: any, res: any) {
         // Get the fields for the csv file. Export data contains at least 1 item at this point.
         const csvFields = this.getAllKeys(data);
         res.setHeader("Content-disposition", `attachment; filename=${fileName}.csv`);
