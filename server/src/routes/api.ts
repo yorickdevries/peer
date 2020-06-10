@@ -1,4 +1,5 @@
 import fs from "fs-extra";
+import path from "path";
 import express from "express";
 import assignments from "./assignments";
 import courses from "./courses";
@@ -61,11 +62,18 @@ if (process.env.NODE_ENV === "production" ) {
     }
     );
   } else {
-    router.get("/mocklogin/:netid/:affiliation",
+    // Mock Login form
+    router.get("/login", (_, res) => {
+        res.sendFile(path.resolve("./mocklogin.html"));
+    });
+
+    router.post("/mocklogin",
     function(req, _, next) {
-        console.log("Mocked login: " + req.params.netid + ", " + req.params.affiliation);
+        const netid = String(req.body.netid);
+        const affiliation = String(req.body.affiliation);
+        console.log("Mocklogin: " + netid + ", " + affiliation);
         // make Mocked passport configuration
-        mockPassportConfiguration(passport, req.params.netid, req.params.affiliation);
+        mockPassportConfiguration(passport, netid, affiliation);
         next();
     },
     passport.authenticate("mock"),
