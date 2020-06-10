@@ -20,7 +20,8 @@
         <!--Notification is not owner-->
         <div v-if="evaluationExists">
             <b-alert variant="secondary" :show="!isEvaluationOwner">
-                Another group member ({{ evaluation_meta_data.user_netid }}) is the owner of this evaluation. Only they can edit, save or submit this evaluation.
+                Another group member ({{ evaluation_meta_data.user_netid }}) is the owner of this evaluation. Only they
+                can edit, save or submit this evaluation.
             </b-alert>
         </div>
 
@@ -50,7 +51,8 @@
         <!--Button/info if no evaluation exists yet.-->
         <div v-if="!evaluationExists" class="mt-3">
             <b-alert show variant="info">
-                You can give an evaluation of a review that you have received by clicking the button down below. Note: if you are in a group, only 1 group member can evaluate this review.
+                You can give an evaluation of a review that you have received by clicking the button down below. Note:
+                if you are in a group, only 1 group member can evaluate this review.
                 <div>
                     <b-button @click="createEvaluationButton()" variant="primary" class="mt-2">
                         I want to evaluate this review
@@ -213,7 +215,7 @@ import api from "../../../api"
 import { StarRating } from "vue-rate-it"
 import notifications from "../../../mixins/notifications"
 import PeerReview from "./PeerReview"
-import SessionCheck from '../../general/SessionCheck'
+import SessionCheck from "../../general/SessionCheck"
 
 export default {
     mixins: [notifications],
@@ -230,7 +232,7 @@ export default {
                 form: {}
             },
             evaluation_meta_data: {
-                user_netid:""
+                user_netid: ""
             },
             isEvaluationOwner: false,
             files: {}
@@ -373,7 +375,6 @@ export default {
             }
         },
         async saveEvaluation() {
-
             // Session check.
             const inSession = await this.$refs.sessionCheck.sessionGuardCheck()
             if (!inSession) {
@@ -388,7 +389,7 @@ export default {
 
             try {
                 await api.savePeerReview(this.evaluation.review.id, formData)
-                this.showSaveMessage({ message: "Your review evaluation has been saved successfully."})
+                this.showSaveMessage({ message: "Your review evaluation has been saved successfully." })
             } catch (error) {
                 this.showErrorMessage({ message: "Error saving evaluation." })
             }

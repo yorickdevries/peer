@@ -52,7 +52,6 @@ router.post("/", upload("assignmentFile", config.allowed_extensions, config.assi
         let filePath: string | undefined = undefined;
 
         if (req.file == undefined) {
-            // tslint:disable-next-line
             fileName = null;
         } else {
             fileName = Date.now() + "-" + req.file.originalname;

@@ -1,7 +1,6 @@
 <template>
     <div>
         <b-container>
-
             <!--Header-->
             <BreadcrumbTitle :items="['Courses']" class="mt-3"></BreadcrumbTitle>
 
@@ -24,55 +23,55 @@
                     </b-col>
                 </b-row>
 
-                <b-table striped
-                         outlined
-                         show-empty
-                         stacked="md"
-                         :items=assignments
-                         :fields="fields"
-                         :current-page="currentPage"
-                         :per-page="perPage"
-                         :filter="filter">
+                <b-table
+                    striped
+                    outlined
+                    show-empty
+                    stacked="md"
+                    :items="assignments"
+                    :fields="fields"
+                    :current-page="currentPage"
+                    :per-page="perPage"
+                    :filter="filter"
+                >
                     <template slot="filename" slot-scope="data">
-                        <a :href="`/api/assignments/${data.item.id}/file`" target="_blank"> {{data.value}} </a>
+                        <a :href="`/api/assignments/${data.item.id}/file`" target="_blank"> {{ data.value }} </a>
                     </template>
                     <template slot="due_date" slot-scope="data"> {{ data.value | formatDate }} </template>
                     <template slot="publish_date" slot-scope="data"> {{ data.value | formatDate }} </template>
 
                     <template slot="actions" slot-scope="data">
-                        <b-button size="sm"
-                                  :to="{ name: 'teaching-assistant-dashboard.course.assignment', params: { assignmentId: data.item.id } }"
-                                  class="mr-1">
+                        <b-button
+                            size="sm"
+                            :to="{
+                                name: 'teaching-assistant-dashboard.course.assignment',
+                                params: { assignmentId: data.item.id }
+                            }"
+                            class="mr-1"
+                        >
                             Details
                         </b-button>
                     </template>
 
-                    <template slot="table-caption">
-                        Assignments for: {{course.name}}
-                    </template>
+                    <template slot="table-caption"> Assignments for: {{ course.name }} </template>
                 </b-table>
 
-                <b-pagination :total-rows=assignmentsCount() :per-page="perPage" v-model="currentPage" class="my-0" />
-
+                <b-pagination :total-rows="assignmentsCount()" :per-page="perPage" v-model="currentPage" class="my-0" />
             </b-card>
-
-
-
-
         </b-container>
     </div>
 </template>
 
 <script>
 import api from "../../api"
-import BreadcrumbTitle from '../BreadcrumbTitle'
+import BreadcrumbTitle from "../BreadcrumbTitle"
 export default {
-    components: {BreadcrumbTitle},
+    components: { BreadcrumbTitle },
     data() {
         return {
             items: [
                 {
-                    text: 'Course Home',
+                    text: "Course Home",
                     active: true
                 }
             ],
@@ -91,40 +90,42 @@ export default {
                 description: null
             },
             fields: [
-                { key:'title', label:'Title' },
-                { key:'description', label:'Description' },
-                { key:'publish_date', label:'Publish date' },
-                { key:'due_date', label:'Due date' },
-                { key:'filename', label:'Download' },
-                { key:'actions', label:'Action' }
+                { key: "title", label: "Title" },
+                { key: "description", label: "Description" },
+                { key: "publish_date", label: "Publish date" },
+                { key: "due_date", label: "Due date" },
+                { key: "filename", label: "Download" },
+                { key: "actions", label: "Action" }
             ],
             currentPage: 1,
             perPage: 5,
-            pageOptions: [ 5, 10, 15, 25, 50 ],
-            filter: null,
+            pageOptions: [5, 10, 15, 25, 50],
+            filter: null
         }
     },
     computed: {
-        sortOptions () {
+        sortOptions() {
             // Create an options list from our fields
             return this.fields
                 .filter(f => f.sortable)
-                .map(f => { return { text: f.label, value: f.key } })
+                .map(f => {
+                    return { text: f.label, value: f.key }
+                })
         }
     },
     methods: {
         assignmentsCount() {
-            return this.assignments.length;
+            return this.assignments.length
         }
     },
     async created() {
         // Fetch course information.
-        let course = await api.getCourse(this.$route.params.courseId);
-        let assignments = await api.getCourseAssignments(this.$route.params.courseId);
+        let course = await api.getCourse(this.$route.params.courseId)
+        let assignments = await api.getCourseAssignments(this.$route.params.courseId)
 
         // Assign fetched data.
-        this.assignments = assignments.data;
-        this.course = course.data;
+        this.assignments = assignments.data
+        this.course = course.data
     }
 }
 </script>

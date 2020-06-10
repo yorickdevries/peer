@@ -1,12 +1,11 @@
 <template>
     <div>
-
         <!--Download-->
         <b-row>
             <b-col>
                 <a target="_blank" :href="peerReviewFilePath">
-                    <button type="button" class="btn btn-success success w-100"
-                            style="height: 3rem">Click here to download the file that you have to review
+                    <button type="button" class="btn btn-success success w-100" style="height: 3rem">
+                        Click here to download the file that you have to review
                     </button>
                 </a>
             </b-col>
@@ -22,17 +21,18 @@
 
             <!--Form-->
             <b-list-group flush>
-
                 <!--Questions-->
-                <b-list-group-item class="py-4" v-for="pair in peerReviewSorted.form"
-                                   :key="pair.question.id + pair.question.type_question">
-
+                <b-list-group-item
+                    class="py-4"
+                    v-for="pair in peerReviewSorted.form"
+                    :key="pair.question.id + pair.question.type_question"
+                >
                     <!--Question Information-->
                     <div class="mb-2">
                         <h5 class="text-primary">
                             Question {{ pair.question.question_number }} of {{ totalAmountOfQuestions }}
                         </h5>
-                        <b-badge pill v-if="pair.question.optional"  variant="secondary" class="ml-2 float-right p-1">
+                        <b-badge pill v-if="pair.question.optional" variant="secondary" class="ml-2 float-right p-1">
                             OPTIONAL
                         </b-badge>
                         <b-badge v-else variant="danger" class="ml-2 float-right p-1">
@@ -42,97 +42,111 @@
                     </div>
 
                     <!-- OPEN QUESTION -->
-                    <b-form-textarea v-if="pair.question.type_question === 'open'"
-                                     id="textarea1"
-                                     placeholder="Enter something"
-                                     :rows="10"
-                                     :max-rows="15"
-                                     v-model="pair.answer.answer"
-                                     :readonly="peerReview.review.done || readOnly"
-                                     required
-                                     maxlength="90000"/>
+                    <b-form-textarea
+                        v-if="pair.question.type_question === 'open'"
+                        id="textarea1"
+                        placeholder="Enter something"
+                        :rows="10"
+                        :max-rows="15"
+                        v-model="pair.answer.answer"
+                        :readonly="peerReview.review.done || readOnly"
+                        required
+                        maxlength="90000"
+                    />
 
                     <!-- RANGE QUESTION -->
-                    <StarRating v-else-if="pair.question.type_question === 'range'"
-                                class="align-middle"
-                                :border-color="'#007bff'"
-                                :active-color="'#007bff'"
-                                :border-width="2"
-                                :item-size="20"
-                                :spacing="5"
-                                inline
-                                :max-rating="Number(pair.question.range)"
-                                :show-rating="false"
-                                :read-only="peerReview.review.done || readOnly"
-                                v-model="pair.answer.answer"/>
+                    <StarRating
+                        v-else-if="pair.question.type_question === 'range'"
+                        class="align-middle"
+                        :border-color="'#007bff'"
+                        :active-color="'#007bff'"
+                        :border-width="2"
+                        :item-size="20"
+                        :spacing="5"
+                        inline
+                        :max-rating="Number(pair.question.range)"
+                        :show-rating="false"
+                        :read-only="peerReview.review.done || readOnly"
+                        v-model="pair.answer.answer"
+                    />
 
                     <!-- MPC QUESTION -->
                     <b-form-group v-else-if="pair.question.type_question === 'mc'">
                         <b-form-radio-group
-                                :options="transformOptionsToHTMLOptions(pair.question.option)"
-                                v-model="pair.answer.answer"
-                                stacked
-                                required
-                                :disabled="peerReview.review.done || readOnly">
+                            :options="transformOptionsToHTMLOptions(pair.question.option)"
+                            v-model="pair.answer.answer"
+                            stacked
+                            required
+                            :disabled="peerReview.review.done || readOnly"
+                        >
                         </b-form-radio-group>
                     </b-form-group>
 
                     <!-- CHECKBOX QUESTION -->
                     <b-form-group v-else-if="pair.question.type_question === 'checkbox'">
                         <b-form-checkbox-group
-                                :options="transformOptionsToHTMLOptions(pair.question.option)"
-                                v-model="pair.answer.answer"
-                                stacked
-                                required
-                                :disabled="peerReview.review.done || readOnly">
+                            :options="transformOptionsToHTMLOptions(pair.question.option)"
+                            v-model="pair.answer.answer"
+                            stacked
+                            required
+                            :disabled="peerReview.review.done || readOnly"
+                        >
                         </b-form-checkbox-group>
                     </b-form-group>
 
                     <!-- UPLOAD QUESTION -->
                     <div v-if="pair.question.type_question === 'upload'">
-
                         <!--File upload-->
-                        <b-form-group :description="readOnly || peerReview.review.done ? '' : 'Select a  file and press save down below the page'" class="mb-0">
+                        <b-form-group
+                            :description="
+                                readOnly || peerReview.review.done
+                                    ? ''
+                                    : 'Select a  file and press save down below the page'
+                            "
+                            class="mb-0"
+                        >
                             <!--Show whether file has been uploaded-->
-                            <b-alert v-if="pair.answer.answer" show variant="success" class="p-2">File uploaded:
+                            <b-alert v-if="pair.answer.answer" show variant="success" class="p-2"
+                                >File uploaded:
                                 <a :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">
                                     {{ pair.answer.answer }}
                                 </a>
                             </b-alert>
                             <b-alert v-else show variant="warning" class="p-2">
-                                Currently, no file has been uploaded. <br>
-                                Allowed file types: {{pair.question.extension}}
+                                Currently, no file has been uploaded. <br />
+                                Allowed file types: {{ pair.question.extension }}
                             </b-alert>
 
                             <div v-if="!readOnly && !peerReview.review.done">
                                 <!--Show note if a file has been uploaded and review not submitted-->
-                                <b-alert v-if="pair.answer.answer" show variant="secondary" class="p-2">Note: uploading a new file will overwrite your current file. <br>
-                                    Allowed file types: {{pair.question.extension}}
+                                <b-alert v-if="pair.answer.answer" show variant="secondary" class="p-2"
+                                    >Note: uploading a new file will overwrite your current file. <br />
+                                    Allowed file types: {{ pair.question.extension }}
                                 </b-alert>
 
-                                <b-form-file  placeholder="Choose a new file..."
-                                              v-model="files[pair.question.id]"
-                                              :state="Boolean(files[pair.question.id])"
-                                              :accept="`${pair.question.extension}`"
-                                              :disabled="peerReview.review.done || readOnly"
-                                              :ref="'fileForm' + pair.question.id + peerReview.review.id">
+                                <b-form-file
+                                    placeholder="Choose a new file..."
+                                    v-model="files[pair.question.id]"
+                                    :state="Boolean(files[pair.question.id])"
+                                    :accept="`${pair.question.extension}`"
+                                    :disabled="peerReview.review.done || readOnly"
+                                    :ref="'fileForm' + pair.question.id + peerReview.review.id"
+                                >
                                 </b-form-file>
                             </div>
-
                         </b-form-group>
-
                     </div>
-
                 </b-list-group-item>
             </b-list-group>
-
 
             <SessionCheck ref="sessionCheck"></SessionCheck>
 
             <template v-if="peerReview.review.id !== null && readOnly === false">
                 <!--Save/Submit Buttons-->
                 <b-card-body v-if="!peerReview.review.done">
-                    <b-btn type="submit" variant="success float-right" v-b-modal="`submit${peerReview.review.id}`">Submit Review</b-btn>
+                    <b-btn type="submit" variant="success float-right" v-b-modal="`submit${peerReview.review.id}`"
+                        >Submit Review</b-btn
+                    >
                     <b-button variant="secondary float-right mr-2" @click="savePeerReview">Save Review</b-button>
                     <div>
                         <b-form-checkbox v-model="peerReview.review.flagged" name="reportButton" class="float-left">
@@ -142,33 +156,31 @@
                         <small>Only report if the submission is empty or not serious.</small>
                     </div>
                     <!--Submit Modal-->
-                    <b-modal    :id="`submit${peerReview.review.id}`"
-                                title="Submit Confirmation"
-                                @ok="submitPeerReview">
+                    <b-modal :id="`submit${peerReview.review.id}`" title="Submit Confirmation" @ok="submitPeerReview">
                         Do you really want to submit? This marks the review as finished.
                     </b-modal>
                 </b-card-body>
                 <b-card-body v-else>
-                    <b-button variant="outline-success float-right" @click="unSubmitPeerReview">Unsubmit Review</b-button>
+                    <b-button variant="outline-success float-right" @click="unSubmitPeerReview"
+                        >Unsubmit Review</b-button
+                    >
                 </b-card-body>
             </template>
-
         </b-card>
-
     </div>
 </template>
 
 <script>
 import api from "../../../api"
-import { StarRating } from 'vue-rate-it';
-import notifications from '../../../mixins/notifications'
-import SessionCheck from '../../general/SessionCheck'
+import { StarRating } from "vue-rate-it"
+import notifications from "../../../mixins/notifications"
+import SessionCheck from "../../general/SessionCheck"
 
 export default {
     mixins: [notifications],
     components: {
         StarRating,
-        SessionCheck,
+        SessionCheck
     },
     props: {
         reviewId: {
@@ -188,11 +200,11 @@ export default {
                     file_path: "",
                     comment: null,
                     done: null,
-                    flagged: null,
+                    flagged: null
                 },
                 form: []
             },
-            files: {},
+            files: {}
         }
     },
     computed: {
@@ -226,21 +238,19 @@ export default {
     methods: {
         async fetchPeerReview() {
             try {
-                let {data} = await api.getPeerReview(this.reviewId)
+                let { data } = await api.getPeerReview(this.reviewId)
                 this.peerReview = data
             } catch (e) {
-                this.showErrorMessage({message: "Could not fetch the review."})
+                this.showErrorMessage({ message: "Could not fetch the review." })
             }
-
         },
         async submitPeerReview() {
-
             // Validate all fields (required).
-            let validated = true;
+            let validated = true
             this.peerReview.form.forEach(pair => {
-                if(!pair.question.optional){
+                if (!pair.question.optional) {
                     if (pair.answer.answer === null || pair.answer.answer === undefined || pair.answer.answer === "") {
-                        if (pair.question.type_question === 'upload') {
+                        if (pair.question.type_question === "upload") {
                             return
                         }
                         validated = false
@@ -257,25 +267,26 @@ export default {
                 try {
                     await api.submitPeerReview(this.peerReview)
                     try {
-                        let {data} = await api.getPeerReview(this.reviewId)
+                        let { data } = await api.getPeerReview(this.reviewId)
                         this.peerReview = data
                     } catch (e) {
-                        this.showErrorMessage({message: "Could not fetch the review."})
+                        this.showErrorMessage({ message: "Could not fetch the review." })
                         return
                     }
                 } catch (e) {
-                    this.showErrorMessage({message: "Submitting the review has failed. Make sure to fill in all required fields."})
+                    this.showErrorMessage({
+                        message: "Submitting the review has failed. Make sure to fill in all required fields."
+                    })
                     return
                 }
 
                 this.$emit("submitEvent")
                 this.showSubmitMessage()
             } else {
-                this.showErrorMessage({message: "Please make sure to fill in all required fields."})
+                this.showErrorMessage({ message: "Please make sure to fill in all required fields." })
             }
         },
         async savePeerReview() {
-
             // Session check.
             const inSession = await this.$refs.sessionCheck.sessionGuardCheck()
             if (!inSession) {
@@ -290,11 +301,11 @@ export default {
 
             try {
                 await api.savePeerReview(this.peerReview.review.id, formData)
-                this.showSaveMessage({ message: "Your review has been saved successfully."})
+                this.showSaveMessage({ message: "Your review has been saved successfully." })
                 await this.fetchPeerReview()
                 this.clearFiles()
             } catch (error) {
-                this.showErrorMessage({message: "Error saving peer review."})
+                this.showErrorMessage({ message: "Error saving peer review." })
             }
         },
         async unSubmitPeerReview() {
@@ -305,13 +316,13 @@ export default {
                 this.$emit("submitEvent")
                 this.showUnSubmitMessage()
             } catch (error) {
-                this.showErrorMessage({message: "Error unsubmitting peer review."})
+                this.showErrorMessage({ message: "Error unsubmitting peer review." })
             }
         },
         transformOptionsToHTMLOptions(options) {
             // Transforms the option array from the API to a HTML option array.
             return options.map(option => {
-                return {text: option.option, value: option.id}
+                return { text: option.option, value: option.id }
             })
         },
         uploadQuestionFilePath(reviewId, questionId) {
@@ -320,12 +331,12 @@ export default {
         clearFiles() {
             // eslint-disable-next-line
             Object.entries(this.files).forEach(([key, _]) => {
-                const name = 'fileForm' + String(key) + this.peerReview.review.id
+                const name = "fileForm" + String(key) + this.peerReview.review.id
                 this.$refs[name][0].reset()
                 this.files[key] = null
             })
             this.files = {}
         }
-    },
+    }
 }
 </script>

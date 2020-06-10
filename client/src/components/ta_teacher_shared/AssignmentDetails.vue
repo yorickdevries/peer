@@ -17,30 +17,36 @@
             <dd>{{ assignment.review_due_date | formatDate }}</dd>
 
             <dt v-if="assignment.review_evaluation_due_date != null">Review evaluation due date and time</dt>
-            <dd v-if="assignment.review_evaluation_due_date != null">{{ assignment.review_evaluation_due_date | formatDate }}</dd>
+            <dd v-if="assignment.review_evaluation_due_date != null">
+                {{ assignment.review_evaluation_due_date | formatDate }}
+            </dd>
 
             <dt>Amount of peer reviews assigned per student</dt>
             <dd>{{ assignment.reviews_per_user }}</dd>
 
             <dt>Assignment File</dt>
-            <dd v-if="assignment.filename == null" class="text-danger"> No assignment file uploaded </dd>
-            <dd v-else><a :href="assignmentFilePath" target="_blank">{{ assignment.filename }}</a></dd>
+            <dd v-if="assignment.filename == null" class="text-danger">No assignment file uploaded</dd>
+            <dd v-else>
+                <a :href="assignmentFilePath" target="_blank">{{ assignment.filename }}</a>
+            </dd>
 
             <dt>Assignment Link</dt>
-            <dd v-if="assignment.external_link == null"> No assignment link given</dd>
-            <dd v-else><a :href="assignment.external_link" target="_blank">{{ assignment.external_link }}</a></dd>
+            <dd v-if="assignment.external_link == null">No assignment link given</dd>
+            <dd v-else>
+                <a :href="assignment.external_link" target="_blank">{{ assignment.external_link }}</a>
+            </dd>
         </dl>
     </b-card>
 </template>
 
 <script>
-    export default {
-        props: ["assignment"],
-        computed: {
-            assignmentFilePath() {
-                // Get the assignment file path.
-                return `/api/assignments/${this.assignment.id}/file`
-            },
-        },
+export default {
+    props: ["assignment"],
+    computed: {
+        assignmentFilePath() {
+            // Get the assignment file path.
+            return `/api/assignments/${this.assignment.id}/file`
+        }
     }
+}
 </script>

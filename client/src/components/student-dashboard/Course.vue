@@ -1,10 +1,9 @@
 <template>
     <b-container>
-
         <!--Header-->
         <b-row>
             <b-col>
-                <BreadcrumbTitle :items="['Course Home']" class="mt-3"/>
+                <BreadcrumbTitle :items="['Course Home']" class="mt-3" />
             </b-col>
         </b-row>
 
@@ -12,7 +11,6 @@
         <b-row>
             <b-col>
                 <b-card no-body>
-
                     <b-card-body>
                         <h4 class="card-title mb-0">Course Announcements</h4>
                     </b-card-body>
@@ -25,8 +23,8 @@
                                 <small>3 days ago</small>
                             </div>
                             <p class="mb-1">
-                                Donec id elit non mi porta gravida at eget metus. Maecenas
-                                sed diam eget risus varius blandit.
+                                Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius
+                                blandit.
                             </p>
                             <small>Donec id elit non mi porta.</small>
                         </b-list-group-item>
@@ -36,14 +34,12 @@
                                 <small>3 days ago</small>
                             </div>
                             <p class="mb-1">
-                                Donec id elit non mi porta gravida at eget metus. Maecenas
-                                sed diam eget risus varius blandit.
+                                Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius
+                                blandit.
                             </p>
                             <small>Donec id elit non mi porta.</small>
                         </b-list-group-item>
-
                     </b-list-group>
-
                 </b-card>
             </b-col>
 
@@ -53,24 +49,21 @@
                     <b-card-body>
                         <h4 class="card-title">Course Information</h4>
                         <span class="font-weight-bold">Description</span>
-                        <p v-if="course.description != null">{{ course.description | truncate(200)}}</p>
+                        <p v-if="course.description != null">{{ course.description | truncate(200) }}</p>
                         <p v-else><i>No course description</i></p>
-
                     </b-card-body>
                 </b-card>
-
             </b-col>
         </b-row>
-
     </b-container>
 </template>
 
 <script>
 import api from "../../api"
-import BreadcrumbTitle from '../BreadcrumbTitle'
+import BreadcrumbTitle from "../BreadcrumbTitle"
 
 export default {
-    components: {BreadcrumbTitle},
+    components: { BreadcrumbTitle },
     data() {
         return {
             course: {
@@ -83,6 +76,6 @@ export default {
         // Fetch course information.
         let res = await api.getCourse(this.$route.params.courseId)
         this.course = res.data
-    },
+    }
 }
 </script>

@@ -65,7 +65,6 @@ describe("ReviewPreparedStatement Test", () => {
      */
     it("Approve reviews of an assignment", async () => {
         const resultBefore = await ReviewPS.executeGetReview(1);
-        // tslint:disable-next-line
         expect(resultBefore.approved).to.equal(null);
 
         await ReviewPS.executeSetApprovedForReview(false, 1, "bplanje");
@@ -247,12 +246,10 @@ describe("ReviewPreparedStatement Test", () => {
      */
     it("Reviews of an assignment", async () => {
         expect(await ReviewPS.executeGetAllSubmissionReviewsByAssignmentId(1, true)).to.deep.equal([{
-            // tslint:disable-next-line
             "approved": null,
             "id": 2,
             "reviewer": "paulvanderlaan",
             "submitter": "paulvanderlaan",
-            // tslint:disable-next-line
             "ta_netid": null,
             "flagged": false,
             done: true

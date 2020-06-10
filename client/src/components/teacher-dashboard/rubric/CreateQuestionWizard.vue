@@ -6,48 +6,74 @@
 
         <template v-if="selectedType === 'open'">
             <OpenQuestion v-model="openQuestion"></OpenQuestion>
-            <b-button @click="createQuestion(openQuestion, selectedType)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
+            <b-button
+                @click="createQuestion(openQuestion, selectedType)"
+                variant="outline-primary"
+                size="sm"
+                class="mr-1"
+                >Save</b-button
+            >
         </template>
 
         <template v-if="selectedType === 'range'">
             <RangeQuestion v-model="rangeQuestion"></RangeQuestion>
-            <b-button @click="createQuestion(rangeQuestion, selectedType)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
+            <b-button
+                @click="createQuestion(rangeQuestion, selectedType)"
+                variant="outline-primary"
+                size="sm"
+                class="mr-1"
+                >Save</b-button
+            >
         </template>
 
         <template v-if="selectedType === 'mc'">
             <MCQuestion v-model="mcQuestion"></MCQuestion>
-            <b-button @click="createQuestion(mcQuestion, selectedType)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
+            <b-button @click="createQuestion(mcQuestion, selectedType)" variant="outline-primary" size="sm" class="mr-1"
+                >Save</b-button
+            >
         </template>
 
         <template v-if="selectedType === 'checkbox'">
             <CheckboxQuestion v-model="checkboxQuestion"></CheckboxQuestion>
-            <b-button @click="createQuestion(checkboxQuestion, selectedType)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
+            <b-button
+                @click="createQuestion(checkboxQuestion, selectedType)"
+                variant="outline-primary"
+                size="sm"
+                class="mr-1"
+                >Save</b-button
+            >
         </template>
 
         <template v-if="selectedType === 'upload'">
             <UploadQuestion v-model="uploadQuestion"></UploadQuestion>
-            <b-button @click="createQuestion(uploadQuestion, selectedType)" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
+            <b-button
+                @click="createQuestion(uploadQuestion, selectedType)"
+                variant="outline-primary"
+                size="sm"
+                class="mr-1"
+                >Save</b-button
+            >
         </template>
     </b-card>
 </template>
 
 <script>
-import OpenQuestion from './OpenQuestion'
-import RangeQuestion from './RangeQuestion'
-import UploadQuestion from './UploadQuestion'
-import MCQuestion from './MCQuestion'
-import CheckboxQuestion from './CheckboxQuestion'
+import OpenQuestion from "./OpenQuestion"
+import RangeQuestion from "./RangeQuestion"
+import UploadQuestion from "./UploadQuestion"
+import MCQuestion from "./MCQuestion"
+import CheckboxQuestion from "./CheckboxQuestion"
 import api from "../../../api"
-import notifications from '../../../mixins/notifications'
+import notifications from "../../../mixins/notifications"
 
 let apiPrefixes = {
-    open: '/rubric/openquestion',
-    range: '/rubric/rangequestion',
-    mc: '/rubric/mcquestion',
-    mcoption: '/rubric/mcoption',
-    checkbox: '/rubric/checkboxquestion',
-    checkboxoption: '/rubric/checkboxoption',
-    upload: '/rubric/uploadquestion',
+    open: "/rubric/openquestion",
+    range: "/rubric/rangequestion",
+    mc: "/rubric/mcquestion",
+    mcoption: "/rubric/mcoption",
+    checkbox: "/rubric/checkboxquestion",
+    checkboxoption: "/rubric/checkboxoption",
+    upload: "/rubric/uploadquestion"
 }
 
 export default {
@@ -59,51 +85,51 @@ export default {
         CheckboxQuestion,
         UploadQuestion
     },
-    props: ['id', 'rubricId', 'nextNewQuestionNumber'],
+    props: ["id", "rubricId", "nextNewQuestionNumber"],
     data() {
         return {
-            selectedType: '',
+            selectedType: "",
             questionTypes: [
-                { value: 'mc', text: 'Multiple Choice' },
-                { value: 'checkbox', text: 'Checkbox' },
-                { value: 'range', text: 'Range' },
-                { value: 'open', text: 'Open' },
-                { value: 'upload', text: 'Upload Question' },
+                { value: "mc", text: "Multiple Choice" },
+                { value: "checkbox", text: "Checkbox" },
+                { value: "range", text: "Range" },
+                { value: "open", text: "Open" },
+                { value: "upload", text: "Upload Question" }
             ],
             openQuestion: {
-                question: '',
+                question: "",
                 rubric_id: this.rubricId,
                 question_number: null,
                 optional: false
             },
             rangeQuestion: {
-                question: '',
+                question: "",
                 range: null,
                 rubric_id: this.rubricId,
                 question_number: null,
                 optional: false
             },
             mcQuestion: {
-                question: '',
+                question: "",
                 rubric_id: this.rubricId,
                 question_number: null,
                 option: [],
                 optional: false
             },
             checkboxQuestion: {
-                question: '',
+                question: "",
                 rubric_id: this.rubricId,
                 question_number: null,
                 option: [],
                 optional: false
             },
             uploadQuestion: {
-                question: '',
+                question: "",
                 rubric_id: this.rubricId,
                 question_number: null,
                 extension: null,
                 optional: false
-            },
+            }
         }
     },
     watch: {
@@ -128,23 +154,24 @@ export default {
     methods: {
         async createQuestion(question, type) {
             // Special function to create MC question.
-            if (type === 'mc') return this.createMCQuestion(question)
+            if (type === "mc") return this.createMCQuestion(question)
             // Special function to create Checkbox question.
-            if (type === 'checkbox') return this.createCheckboxQuestion(question)
+            if (type === "checkbox") return this.createCheckboxQuestion(question)
 
             try {
                 await api.client.post(`${apiPrefixes[type]}`, question)
-                this.showSuccessMessage({message: "Successfully created question."})
-                this.$emit('saved')
+                this.showSuccessMessage({ message: "Successfully created question." })
+                this.$emit("saved")
                 this.onReset()
             } catch (e) {
-                this.showErrorMessage({ message: "Error making question. Please make sure you have filled in all the fields."})
+                this.showErrorMessage({
+                    message: "Error making question. Please make sure you have filled in all the fields."
+                })
             }
         },
         async createMCQuestion(question) {
-
             // Create the MC question itself.
-            let res = await api.client.post(`${apiPrefixes['mc']}`, {
+            let res = await api.client.post(`${apiPrefixes["mc"]}`, {
                 question: question.question,
                 rubric_id: question.rubric_id,
                 question_number: question.question_number,
@@ -157,20 +184,19 @@ export default {
             // Create all the options.
             let options = question.option
             options.forEach(async option => {
-                await api.client.post(`${apiPrefixes['mcoption']}`, {
+                await api.client.post(`${apiPrefixes["mcoption"]}`, {
                     option: option.option,
                     mcquestion_id: mcquestion_id
                 })
             })
 
-            this.showSuccessMessage({message: "Successfully created question."})
-            this.$emit('saved')
+            this.showSuccessMessage({ message: "Successfully created question." })
+            this.$emit("saved")
             this.onReset()
         },
         async createCheckboxQuestion(question) {
-
             // Create the Checkbox question itself.
-            let res = await api.client.post(`${apiPrefixes['checkbox']}`, {
+            let res = await api.client.post(`${apiPrefixes["checkbox"]}`, {
                 question: question.question,
                 rubric_id: question.rubric_id,
                 question_number: question.question_number,
@@ -183,54 +209,53 @@ export default {
             // Create all the options.
             let options = question.option
             options.forEach(async option => {
-                await api.client.post(`${apiPrefixes['checkboxoption']}`, {
+                await api.client.post(`${apiPrefixes["checkboxoption"]}`, {
                     option: option.option,
                     checkboxquestion_id: checkboxquestion_id
                 })
             })
 
-            this.showSuccessMessage({message: "Successfully created question."})
-            this.$emit('saved')
+            this.showSuccessMessage({ message: "Successfully created question." })
+            this.$emit("saved")
             this.onReset()
         },
         onReset() {
-            this.selectedType = ''
+            this.selectedType = ""
             this.openQuestion = {
-                question: '',
+                question: "",
                 rubric_id: this.rubricId,
                 question_number: this.nextNewQuestionNumber,
                 optional: false
             }
             this.rangeQuestion = {
-                question: '',
+                question: "",
                 range: null,
                 rubric_id: this.rubricId,
                 question_number: this.nextNewQuestionNumber,
                 optional: false
             }
-            this.mcQuestion = {
-                question: '',
+            ;(this.mcQuestion = {
+                question: "",
                 rubric_id: this.rubricId,
                 question_number: this.nextNewQuestionNumber,
                 option: [],
                 optional: false
-            },
-            this.checkboxQuestion = {
-                question: '',
-                rubric_id: this.rubricId,
-                question_number: this.nextNewQuestionNumber,
-                option: [],
-                optional: false
-            }
+            }),
+                (this.checkboxQuestion = {
+                    question: "",
+                    rubric_id: this.rubricId,
+                    question_number: this.nextNewQuestionNumber,
+                    option: [],
+                    optional: false
+                })
             this.uploadQuestion = {
-                question: '',
+                question: "",
                 rubric_id: this.rubricId,
                 question_number: this.nextNewQuestionNumber,
                 extension: null,
                 optional: false
             }
         }
-    },
-
+    }
 }
 </script>

@@ -14,16 +14,17 @@ stages:
     - start
     - sast
 
-tslint:
+server-lint:
   stage: static-analysis
+  allow_failure: true
   script:
   - cd server && npm install
-  - npm run tslint
+  - npm run lint
   only:
   - merge_requests
   - pushes
 
-vue-lint:
+client-lint:
   stage: static-analysis
   script:
   - cd client && npm install

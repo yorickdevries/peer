@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import Footer from './components/Footer'
+import Footer from "./components/Footer"
 export default {
     components: { Footer }
 }
@@ -22,5 +22,4 @@ export default {
 .site-content {
     flex: 1;
 }
-
 </style>

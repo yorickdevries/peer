@@ -13,7 +13,6 @@ export default function upload(fieldName: string | undefined, allowedExtensions:
         if (!(allowedExtensions.includes(extension))) {
             return callback(new Error(`Extension not allowed: ${extension}`), false);
         } else {
-            // tslint:disable-next-line
             return callback(null, true);
         }
     }

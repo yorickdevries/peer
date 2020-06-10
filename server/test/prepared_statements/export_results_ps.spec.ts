@@ -24,7 +24,6 @@ describe("CoursePreparedStatement Test", () => {
                 disapproved: "0",
                 "waiting for TA": "1",
                 "student total reviews": "1",
-                // tslint:disable-next-line
                 "studentnumber": null
             }]
         );
@@ -41,7 +40,6 @@ describe("CoursePreparedStatement Test", () => {
                 disapproved: "0",
                 "waiting for TA": "1",
                 "student total reviews": "1",
-                // tslint:disable-next-line
                 "studentnumber": null,
                 "flagged": "0"
             }]
