@@ -1,6 +1,6 @@
 import promise from "bluebird";
 import pgp, { errors, default as pgPromise, PreparedStatement } from "pg-promise";
-import config from "./config";
+import config from "config";
 
 /**
  * Database class responsible for the connection to the postgreSQL database.
@@ -50,7 +50,7 @@ export default class Database {
     const pgpObject = pgp(options);
 
     // Get connection from config file
-    this.connection = config.database.connection;
+    this.connection = (config.get("database") as any).connection;
     this.db = pgpObject(this.connection);
   }
 

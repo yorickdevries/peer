@@ -4,7 +4,7 @@ import fs from "fs-extra";
 import SubmissionsPS from "../prepared_statements/submissions_ps";
 import AssignmentPS from "../prepared_statements/assignment_ps";
 import index from "../security/index";
-import config from "../config";
+import config from "config";
 import upload from "../middleware/upload";
 
 // Router
@@ -32,14 +32,14 @@ router.get("/:id", index.authorization.getSubmissionAuth, (req, res) => {
  * Route to make a new submission.
  * @authorization the user should be part of a group in the course.
  */
-router.post("/", upload("submissionFile", config.allowed_extensions, config.submissions.maxSizeSubmissionFile), index.authorization.postSubmissionAuth, index.authorization.checkSubmissionBetweenPublishDue, async function(req: any, res: any, next: any) {
+router.post("/", upload("submissionFile", (config.get("allowed_extensions") as string[]), (config.get("submissions") as any).maxSizeSubmissionFile), index.authorization.postSubmissionAuth, index.authorization.checkSubmissionBetweenPublishDue, async function(req: any, res: any, next: any) {
     // error if no file was uploaded or no group column defined
     if (req.file == undefined) {
         res.status(400);
         res.json({error: "No file uploaded"});
     } else {
         try {
-            const fileFolder = config.submissions.fileFolder;
+            const fileFolder = (config.get("submissions") as any).fileFolder;
             const fileName = Date.now() + "-" + req.file.originalname;
             const filePath = path.join(fileFolder, fileName);
             const netId = req.user.netid;
@@ -68,7 +68,7 @@ router.post("/", upload("submissionFile", config.allowed_extensions, config.subm
 router.get("/:id/file", index.authorization.getSubmissionFileAuth, async (req, res) => {
     try {
         const submission: any = await SubmissionsPS.executeGetSubmissionById(parseInt(req.params.id));
-        const filePath = path.join(config.submissions.fileFolder, submission.file_path);
+        const filePath = path.join((config.get("submissions") as any).fileFolder, submission.file_path);
         res.download(filePath);
     } catch (err) {
         res.sendStatus(400);

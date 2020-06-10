@@ -11,7 +11,7 @@ import GroupParser from "../groupParser";
 import reviewDistribution from "../review_distribution/reviewDistribution";
 import ReviewDistributionTwoAssignments from "../review_distribution/reviewDistributionTwoAssignments";
 import ReviewDistributionThreeAssignments from "../review_distribution/reviewDistributionThreeAssignments";
-import config from "../config";
+import config from "config";
 import FileExport from "../fileExport";
 import upload from "../middleware/upload";
 
@@ -26,7 +26,7 @@ const router = express();
 // Needed for the tests (tests need to change)
 router.use(express.json());
 
-const fileFolder = config.assignments.fileFolder;
+const fileFolder = (config.get("assignments") as any).fileFolder;
 
 /**
  * Route to get all information about an assignment
@@ -46,7 +46,7 @@ router.route("/:assignment_id")
 /**
  * Route to post and update an assignment.
  */
-router.post("/", upload("assignmentFile", config.allowed_extensions, config.assignments.maxSizeAssignmentFile), index.authorization.enrolledAsTeacherAssignmentCheckForPost, async function(req: any, res: any) {
+router.post("/", upload("assignmentFile", (config.get("allowed_extensions") as string[]), (config.get("assignments") as any).maxSizeAssignmentFile), index.authorization.enrolledAsTeacherAssignmentCheckForPost, async function(req: any, res: any) {
     try {
         let fileName: string | null;
         let filePath: string | undefined = undefined;
@@ -110,7 +110,7 @@ router.post("/", upload("assignmentFile", config.allowed_extensions, config.assi
  * Removes the old assignment (also from the files folder - if a file is uploaded)
  * and adds the new assignment.
  */
-router.put("/:assignment_id", upload("assignmentFile", config.allowed_extensions, config.assignments.maxSizeAssignmentFile), index.authorization.enrolledAsTeacherAssignmentCheck, async function(req: any, res: any) {
+router.put("/:assignment_id", upload("assignmentFile", (config.get("allowed_extensions") as string[]), (config.get("assignments") as any).maxSizeAssignmentFile), index.authorization.enrolledAsTeacherAssignmentCheck, async function(req: any, res: any) {
     try {
         const oldFilename: string = (await AssignmentPS.executeGetAssignmentById(req.params.assignment_id)).filename;
         // Determine whether a file is uploaded and set the filename accordingly.

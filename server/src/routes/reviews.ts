@@ -5,7 +5,7 @@ import index from "../security/index";
 import path from "path";
 import upload from "../middleware/upload";
 import fs from "fs-extra";
-import config from "../config";
+import config from "config";
 
 // Router
 import express from "express";
@@ -13,7 +13,7 @@ const router = express();
 // Needed for the tests (tests need to change)
 router.use(express.json());
 
-const fileFolder = config.reviews.fileFolder;
+const fileFolder = (config.get("reviews") as any).fileFolder;
 
 /**
  * Route to get a review by review id.
@@ -91,7 +91,7 @@ router.route("/:reviewId/reviewevaluation").post(index.authorization.checkAuthor
  * @body a json object of the whole form, as specified in the doc.
  * @return JSON representation of a review.
  */
-router.route("/:reviewId").put(upload(undefined, config.allowed_extensions, config.reviews.maxSizeReviewFile), index.authorization.checkReviewOwner, index.authorization.checkReviewEditAllowed, async (req, res) => {
+router.route("/:reviewId").put(upload(undefined, (config.get("allowed_extensions") as string[]), (config.get("reviews") as any).maxSizeReviewFile), index.authorization.checkReviewOwner, index.authorization.checkReviewEditAllowed, async (req, res) => {
     try {
         // input
         const reviewId = parseInt(req.params.reviewId);
@@ -296,7 +296,7 @@ router.route("/:reviewId/file").get(index.authorization.checkAuthorizationForRev
 
         // errors in case of submission is null
         const submission: any = await ReviewsPS.executeGetSubmissionByReviewId(reviewId);
-        const filePath = path.join(config.submissions.fileFolder, submission.file_path);
+        const filePath = path.join((config.get("submissions") as any).fileFolder, submission.file_path);
 
         // Update the downloaded_at date of the review
         const fullReview: any = await ReviewsPS.executeGetFullReview(reviewId);
