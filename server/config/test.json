@@ -1,0 +1,7 @@
+{
+    "database": {
+        "connection": {
+            "database": "peer_test"
+        }
+    }
+}
