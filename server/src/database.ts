@@ -28,7 +28,7 @@ export default class Database {
    * @type {*}
    * @memberof Database
    */
-  static db;
+  static db: any;
   /**
    * Initialisation method which connects the database settings to this.db .
    *
