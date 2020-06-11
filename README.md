@@ -1,4 +1,5 @@
 # Peer Review #
+Peer reviewing can now be done without any hassle with paper. Submit, review and get feedback for your course, all within one app! 
 
 ## Build Instructions
 1. Run a Postgres database on `localhost:5432` with password `password`
