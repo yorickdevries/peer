@@ -2,7 +2,7 @@
 
 ## Build Instructions
 1. Run a Postgres database on localhost:5432 with password 'password'
-2. Create a 2 databases called 'peer_development' and 'peer_test'
+2. Create 2 databases called ```peer_development``` and `peer_test`
 3. Run 'npm install' in root
 4. Run 'npm run start_newdata' in the root to start with initializing sample data OR Run 'npm start' in the root to start without initializing sample data
 5. Access the site through [http://localhost:3000](http://localhost:3000)
