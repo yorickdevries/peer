@@ -43,7 +43,7 @@ export default class Database {
     const pgpObject = pgp(options);
 
     // Get connection from config file
-    const databaseConfig: any = database_dumps_old;
+    const databaseConfig: any = config.get("database_dumps_old");
     if (databaseConfig.connectionUrl) {
       this.db = pgpObject(databaseConfig.connectionUrl);
     } else if (databaseConfig.connection) {
