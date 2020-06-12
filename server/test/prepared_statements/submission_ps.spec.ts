@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import TestData from "../test_helpers/test_data";
 
-import SubmissionPS from "../../../src/old_api/prepared_statements/submissions_ps";
+import SubmissionPS from "../../src/old_api/prepared_statements/submissions_ps";
 
 describe("SubmissionPreparedStatements Test", () => {
     /**

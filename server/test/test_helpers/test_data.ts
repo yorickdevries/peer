@@ -1,5 +1,5 @@
 import { QueryFile } from "pg-promise";
-import Database from "../../../src/old_api/database";
+import Database from "../../src/old_api/database";
 import config from "config";
 
 // file system imports

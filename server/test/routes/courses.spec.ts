@@ -3,11 +3,11 @@ import chai from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 chai.use(chaiHttp);
-const router: any = require("../../../src/old_api/routes/courses").default;
+const router: any = require("../../src/old_api/routes/courses").default;
 import MockLogin from "../test_helpers/mock_login";
 import TestData from "../test_helpers/test_data";
 
-import { Roles } from "../../../src/old_api/roles";
+import { Roles } from "../../src/old_api/roles";
 
 describe("API Course routes", () => {
     /**

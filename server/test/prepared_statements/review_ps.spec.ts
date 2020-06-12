@@ -2,9 +2,9 @@ import "mocha";
 import { expect } from "chai";
 import TestData from "../test_helpers/test_data";
 
-import ReviewPS from "../../../src/old_api/prepared_statements/review_ps";
-import RubricPS from "../../../src/old_api/prepared_statements/rubric_ps";
-import AssignmentPS from "../../../src/old_api/prepared_statements/assignment_ps";
+import ReviewPS from "../../src/old_api/prepared_statements/review_ps";
+import RubricPS from "../../src/old_api/prepared_statements/rubric_ps";
+import AssignmentPS from "../../src/old_api/prepared_statements/assignment_ps";
 
 describe("ReviewPreparedStatement Test", () => {
     /**

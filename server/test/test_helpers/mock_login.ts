@@ -1,10 +1,10 @@
-import api from "../../../src/old_api/routes/api";
-import assignments from "../../../src/old_api/routes/assignments";
-import courses from "../../../src/old_api/routes/courses";
-import groups from "../../../src/old_api/routes/groups";
-import reviews from "../../../src/old_api/routes/reviews";
-import rubric from "../../../src/old_api/routes/rubric";
-import submissions from "../../../src/old_api/routes/submissions";
+import api from "../../src/old_api/routes/api";
+import assignments from "../../src/old_api/routes/assignments";
+import courses from "../../src/old_api/routes/courses";
+import groups from "../../src/old_api/routes/groups";
+import reviews from "../../src/old_api/routes/reviews";
+import rubric from "../../src/old_api/routes/rubric";
+import submissions from "../../src/old_api/routes/submissions";
 
 /**
  * Class responsible for making a fake mocked logged in user for testing purposes.
