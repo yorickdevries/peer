@@ -71,7 +71,7 @@ test_old:
   only:
   - merge_requests
 
-start_server:
+start_server_old:
   stage: start
   variables:
     NODE_ENV: production
@@ -81,7 +81,7 @@ start_server:
   - cd server && npm install
   - npm run build
   - export NODE_ENV="development"
-  - npm run data_init
+  - npm run data_init_old
   - timeout 30s npm run start_server || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
   only:
   - merge_requests
