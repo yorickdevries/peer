@@ -3,15 +3,13 @@
   "version": "2.0.0",
   "scripts": {
     "postinstall": "cd server && npm install && cd ../client && npm install & cd ..",
-    "start": "npm run build && npm run start_server",
-    "start_newdata_old": "npm run build_newdata_old && npm run start_server",
     "build": "npm run build_server && npm run build_client",
-    "build_newdata_old": "npm run build_server && npm run build_data_old && npm run build_client",
     "build_server": "npm run build --prefix ./server",
-    "build_data": "npm run data_init_old --prefix ./server",
     "build_client": "npm run build --prefix ./client",
-    "start_server": "npm run start_server --prefix ./server",
-    "test_all": "npm run lint --prefix ./server && npm run lint --prefix ./client && npm run build_newdata && npm run test_old --prefix ./server"
+    "start": "npm run start --prefix ./server",
+    "build_newdata_old": "npm run build_server && npm run data_init_old --prefix ./server && npm run build_client",
+    "build_start_newdata_old": "npm run build_newdata_old && npm run start_server",
+    "test_all_old": "npm run lint --prefix ./server && npm run lint --prefix ./client && npm run build_newdata_old && npm run test_old --prefix ./server"
   },
   "engines": {
     "node": "14.x"
