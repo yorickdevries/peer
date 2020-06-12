@@ -5,7 +5,6 @@ variables:
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: password
   POSTGRES_HOST: postgres
-  NODE_ENV: development
 
 stages:
     - static-analysis
@@ -17,6 +16,8 @@ stages:
 
 server-lint:
   stage: static-analysis
+  variables:
+    NODE_ENV: development
   script:
   - cd server && npm install
   - npm run lint
@@ -26,6 +27,8 @@ server-lint:
 
 client-lint:
   stage: static-analysis
+  variables:
+    NODE_ENV: development
   script:
   - cd client && npm install
   - npm run lint
@@ -61,6 +64,8 @@ build_client:
 
 test:
   stage: test
+  variables:
+    NODE_ENV: test
   script:
   - cd server && npm install
   - npm run test
@@ -70,6 +75,8 @@ test:
 
 test_old:
   stage: test
+  variables:
+    NODE_ENV: test
   services:
   - postgres:12
   script:
