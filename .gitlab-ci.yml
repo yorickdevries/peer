@@ -60,7 +60,7 @@ build_client:
   - merge_requests
   - pushes
 
-test:
+test_old:
   stage: test
   services:
   - postgres:12
@@ -71,20 +71,6 @@ test:
   - longJob
   only:
   - merge_requests
-  - pushes
-
-coverage:
-  stage: coverage
-  services:
-  - postgres:12
-  script:
-  - cd server && npm install
-  - npm run coverage_old
-  tags:
-  - longJob
-  only:
-  - merge_requests
-  - pushes
 
 start_server:
   stage: start
