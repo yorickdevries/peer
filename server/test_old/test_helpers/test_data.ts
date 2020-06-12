@@ -6,7 +6,7 @@ import config from "config";
 import fs from "fs-extra";
 import path from "path";
 
-const databaseConfig: any = config.get("database_dumps_old");
+const databaseConfig: any = config.get("old_database");
 
 /**
  * Class responsible for the initialisation of data used for testing
