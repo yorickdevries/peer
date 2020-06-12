@@ -59,6 +59,15 @@ build_client:
   - merge_requests
   - pushes
 
+test:
+  stage: test
+  script:
+  - cd server && npm install
+  - npm run test
+  only:
+  - merge_requests
+  - pushes
+
 test_old:
   stage: test
   services:
