@@ -3,7 +3,7 @@ import chai from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 chai.use(chaiHttp);
-const router: any = require("../../src/old_api/routes/submissions").default;
+const router: any = require("../../../src/old_api/routes/submissions").default;
 import MockLogin from "../test_helpers/mock_login";
 import TestData from "../test_helpers/test_data";
 

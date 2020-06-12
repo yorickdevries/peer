@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import TestData from "../test_helpers/test_data";
 
-import AuthorizationPS from "../../src/old_api/prepared_statements/authorization_ps";
+import AuthorizationPS from "../../../src/old_api/prepared_statements/authorization_ps";
 
 describe("AuthorizationPreparedstatements Test", () => {
     /**

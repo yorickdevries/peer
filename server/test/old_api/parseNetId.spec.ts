@@ -3,7 +3,7 @@ import { expect } from "chai";
 
 import TestData from "./test_helpers/test_data";
 
-import ParseNetId from "../../src/old_api/parseNetId";
+import ParseNetId from "../../../src/old_api/parseNetId";
 
 describe("ParseNetID tests", () => {
     /**

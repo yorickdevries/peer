@@ -3,10 +3,10 @@ import chai from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 chai.use(chaiHttp);
-const router: any = require("../../src/old_api/routes/groups").default;
+const router: any = require("../../../src/old_api/routes/groups").default;
 import MockLogin from "../test_helpers/mock_login";
 import TestData from "../test_helpers/test_data";
-import GroupParser from "../../src/old_api/groupParser";
+import GroupParser from "../../../src/old_api/groupParser";
 
 describe("API Group routes", () => {
     /**
