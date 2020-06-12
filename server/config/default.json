@@ -1,5 +1,5 @@
 {
-    "database": {
+    "old_database": {
         "connection": {
             "user": "postgres",
             "host": "localhost",

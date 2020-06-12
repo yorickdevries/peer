@@ -1,5 +1,5 @@
 {
-    "database": {
+    "old_database": {
         "connection": {
             "database": "peer_database"
         }

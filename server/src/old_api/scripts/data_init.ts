@@ -8,7 +8,7 @@ import path from "path";
 
 // import database
 const importDatabase = async function () {
-    const databaseConfig: any = config.get("database");
+    const databaseConfig: any = database_dumps_old;
     
     // Database import files
     const qfSchema = new QueryFile(path.resolve(databaseConfig.schemaQueryFile));
