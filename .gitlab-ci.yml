@@ -17,7 +17,6 @@ stages:
 
 server-lint:
   stage: static-analysis
-  allow_failure: true
   script:
   - cd server && npm install
   - npm run lint
