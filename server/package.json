@@ -11,7 +11,7 @@
     "build": "tsc",
     "test": "mocha",
     "coverage": "nyc npm run test",
-    "data_init": "node ./dist/scripts/data_init.js"
+    "data_init": "node ./dist/old_api/scripts/data_init.js"
   },
   "nyc": {
     "check-coverage": true,
