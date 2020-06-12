@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import TestData from "../test_helpers/test_data";
 
-import RubricPS from "../../src/prepared_statements/rubric_ps";
+import RubricPS from "../../src/old_api/prepared_statements/rubric_ps";
 
 describe("RubricPreparedStatements Test", () => {
     /**

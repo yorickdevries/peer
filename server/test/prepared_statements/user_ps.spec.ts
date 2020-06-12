@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import TestData from "../test_helpers/test_data";
 
-import UserPS from "../../src/prepared_statements/user_ps";
+import UserPS from "../../src/old_api/prepared_statements/user_ps";
 
 describe("UserPreparedStatements Test", () => {
     /**

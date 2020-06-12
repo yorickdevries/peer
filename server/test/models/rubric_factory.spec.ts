@@ -2,9 +2,9 @@ import "mocha";
 import { expect } from "chai";
 import TestData from "../test_helpers/test_data";
 
-import RubricPS from "../../src/prepared_statements/rubric_ps";
-import { generateRubric, RubricConfiguration } from "../../src/models/rubric_factory";
-import AssignmentPS from "../../src/prepared_statements/assignment_ps";
+import RubricPS from "../../src/old_api/prepared_statements/rubric_ps";
+import { generateRubric, RubricConfiguration } from "../../src/old_api/models/rubric_factory";
+import AssignmentPS from "../../src/old_api/prepared_statements/assignment_ps";
 
 describe("RubricPreparedStatements Test", () => {
     /**

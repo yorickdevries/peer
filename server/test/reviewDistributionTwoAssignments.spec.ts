@@ -6,14 +6,14 @@ import mockDate from "mockdate";
 
 chai.use(chaiAsPromised);
 
-import CoursesPS from "../src/prepared_statements/courses_ps";
-import UserPS from "../src/prepared_statements/user_ps";
-import RubricPS from "../src/prepared_statements/rubric_ps";
-import GroupsPS from "../src/prepared_statements/group_ps";
-import SubmissionsPS from "../src/prepared_statements/submissions_ps";
-import AssignmentPS from "../src/prepared_statements/assignment_ps";
+import CoursesPS from "../src/old_api/prepared_statements/courses_ps";
+import UserPS from "../src/old_api/prepared_statements/user_ps";
+import RubricPS from "../src/old_api/prepared_statements/rubric_ps";
+import GroupsPS from "../src/old_api/prepared_statements/group_ps";
+import SubmissionsPS from "../src/old_api/prepared_statements/submissions_ps";
+import AssignmentPS from "../src/old_api/prepared_statements/assignment_ps";
 import TestData from "./test_helpers/test_data";
-import ReviewDistributionTwoAssignments from "../src/review_distribution/reviewDistributionTwoAssignments";
+import ReviewDistributionTwoAssignments from "../src/old_api/review_distribution/reviewDistributionTwoAssignments";
 
 describe("DistributeReviews two assignments", () => {
     /**

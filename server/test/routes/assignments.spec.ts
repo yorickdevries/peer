@@ -3,14 +3,14 @@ import chai from "chai";
 import { expect } from "chai";
 import chaiHttp from "chai-http";
 chai.use(chaiHttp);
-const router: any = require("../../src/routes/assignments").default;
+const router: any = require("../../src/old_api/routes/assignments").default;
 import MockLogin from "../test_helpers/mock_login";
 import TestData from "../test_helpers/test_data";
 
 // file system imports
 import fs from "fs-extra";
 import path from "path";
-import AssignmentPS from "../../src/prepared_statements/assignment_ps";
+import AssignmentPS from "../../src/old_api/prepared_statements/assignment_ps";
 
 describe("API Assignment routes", () => {
     /**

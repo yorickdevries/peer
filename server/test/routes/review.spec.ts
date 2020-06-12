@@ -6,15 +6,15 @@ import mockDate from "mockdate";
 import fs from "fs-extra";
 import path from "path";
 chai.use(chaiHttp);
-const router: any = require("../../src/routes/reviews").default;
+const router: any = require("../../src/old_api/routes/reviews").default;
 import MockLogin from "../test_helpers/mock_login";
 import TestData from "../test_helpers/test_data";
-import ReviewPS from "../../src/prepared_statements/review_ps";
-import SubmissionPS from "../../src/prepared_statements/submissions_ps";
-import RubricPS from "../../src/prepared_statements/rubric_ps";
+import ReviewPS from "../../src/old_api/prepared_statements/review_ps";
+import SubmissionPS from "../../src/old_api/prepared_statements/submissions_ps";
+import RubricPS from "../../src/old_api/prepared_statements/rubric_ps";
 import config from "config";
-import AssignmentPS from "../../src/prepared_statements/assignment_ps";
-import GroupsPS from "../../src/prepared_statements/group_ps";
+import AssignmentPS from "../../src/old_api/prepared_statements/assignment_ps";
+import GroupsPS from "../../src/old_api/prepared_statements/group_ps";
 
 const fileFolder = (config.get("reviews") as any).fileFolder;
 

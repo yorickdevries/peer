@@ -6,7 +6,7 @@ import chaiAsPromised from "chai-as-promised";
 chai.use(chaiAsPromised);
 
 import TestData from "./test_helpers/test_data";
-import ReviewUpdate from "../src/reviewUpdate";
+import ReviewUpdate from "../src/old_api/reviewUpdate";
 
 describe("ReviewUpdate Class tests", () => {
     /**

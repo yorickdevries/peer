@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import TestData from "../test_helpers/test_data";
 
-import ExportResultsPS from "../../src/prepared_statements/export_results_ps";
+import ExportResultsPS from "../../src/old_api/prepared_statements/export_results_ps";
 
 describe("CoursePreparedStatement Test", () => {
     /**
