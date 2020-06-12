@@ -17,7 +17,6 @@ stages:
 
 server-lint:
   stage: static-analysis
-  allow_failure: true
   script:
   - cd server && npm install
   - npm run lint
@@ -60,33 +59,31 @@ build_client:
   - merge_requests
   - pushes
 
-test:
+test_old:
   stage: test
   services:
   - postgres:12
   script:
   - cd server && npm install
-  - npm run test
+  - npm run test_old
   tags:
   - longJob
   only:
   - merge_requests
-  - pushes
-
-coverage:
-  stage: coverage
-  services:
-  - postgres:12
-  script:
-  - cd server && npm install
-  - npm run coverage
-  tags:
-  - longJob
-  only:
-  - merge_requests
-  - pushes
 
 start_server:
+  stage: start
+  variables:
+    NODE_ENV: production
+  script:
+  - cd server && npm install
+  - npm run build
+  - timeout 10s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
+  only:
+  - merge_requests
+  - pushes
+
+start_server_old:
   stage: start
   variables:
     NODE_ENV: production
@@ -96,8 +93,8 @@ start_server:
   - cd server && npm install
   - npm run build
   - export NODE_ENV="development"
-  - npm run data_init
-  - timeout 30s npm run start_server || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
+  - npm run data_init_old
+  - timeout 10s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
   only:
   - merge_requests
   - pushes

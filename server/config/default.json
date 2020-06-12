@@ -1,5 +1,5 @@
 {
-    "database": {
+    "old_database": {
         "connection": {
             "user": "postgres",
             "host": "localhost",
@@ -7,8 +7,8 @@
             "password": "password",
             "port": 5432
           },
-        "schemaQueryFile": "./database_dumps/ED3-DataBaseSchema.sql",
-        "fullQueryFile": "./database_dumps/ED3-FullData.sql"
+        "schemaQueryFile": "./database_dumps_old/ED3-DataBaseSchema.sql",
+        "fullQueryFile": "./database_dumps_old/ED3-FullData.sql"
         },
     "session": {
         "secret": "add something random here",

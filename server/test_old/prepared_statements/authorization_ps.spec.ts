@@ -1,0 +1,51 @@
+import "mocha";
+import { expect } from "chai";
+import TestData from "../test_helpers/test_data";
+
+import AuthorizationPS from "../../src/old_api/prepared_statements/authorization_ps";
+
+describe("AuthorizationPreparedstatements Test", () => {
+    /**
+     * Make a clean database before each test.
+     */
+    beforeEach(async () => {
+        await TestData.initializeDatabase();
+    });
+
+    /**
+     * Test get submission by id prepared statement.
+     */
+    it("checkenrollment by id", async () => {
+        expect(await AuthorizationPS.executeCheckCourseEnrollment(1, "paulvanderlaan")).to.deep.equal({
+            "exists": true
+        });
+    });
+
+    /**
+     * Test get submission by id prepared statement, failing.
+     */
+    it("checkenrollment by id fail", async () => {
+        expect(await AuthorizationPS.executeCheckCourseEnrollment(1, "henkjan")).to.deep.equal({
+            "exists": false
+        });
+    });
+
+    /**
+     * Test to check enrollment as teacher
+     */
+    it("check enrollment teacher", async () => {
+        expect(await AuthorizationPS.executeCheckEnrollmentAsTeacher(1, "paulvanderlaan")).to.deep.equal({
+            "exists": false
+        });
+    });
+
+    /**
+     * Test to check enrollment as teacher or ta
+     */
+    it("check enrollment teacher or ta", async () => {
+        expect(await AuthorizationPS.executeCheckEnrollAsTAOrTeacher(1, "paulvanderlaan")).to.deep.equal({
+            "exists": false
+        });
+    });
+
+});
