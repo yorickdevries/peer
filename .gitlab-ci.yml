@@ -106,7 +106,6 @@ start_server_old:
   - timeout 10s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
   only:
   - merge_requests
-  - pushes
 
 sast:
   stage: sast
