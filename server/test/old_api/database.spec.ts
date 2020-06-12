@@ -7,7 +7,7 @@ chai.use(chaiAsPromised);
 
 import TestData from "./test_helpers/test_data";
 
-import Database from "../src/old_api/database";
+import Database from "../../src/old_api/database";
 import { PreparedStatement } from "pg-promise";
 
 describe("Database Test", () => {

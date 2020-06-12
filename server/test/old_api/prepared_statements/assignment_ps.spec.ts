@@ -1,8 +1,8 @@
 import "mocha";
 import { expect } from "chai";
-import TestData from "../test_helpers/test_data";
+import TestData from "../../test_helpers/test_data";
 
-import AssignmentPS from "../../src/old_api/prepared_statements/assignment_ps";
+import AssignmentPS from "../../../src/old_api/prepared_statements/assignment_ps";
 
 describe("AssignmentPreparedStatements Test", () => {
     /**

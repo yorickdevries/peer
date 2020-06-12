@@ -7,7 +7,7 @@ chai.use(chaiAsPromised);
 
 import TestData from "./test_helpers/test_data";
 
-import GroupParser from "../src/old_api/groupParser";
+import GroupParser from "../../src/old_api/groupParser";
 import neatCsv from "neat-csv";
 
 // file system imports
