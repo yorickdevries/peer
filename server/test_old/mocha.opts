@@ -1,7 +1,7 @@
 --compilers ts-node/register
 --require source-map-support/register
---require test/mocha.env.ts
+--require test_old/mocha.env.ts
 --full-trace
 --bail
 --timeout 10000
-test/**/*.spec.ts test/**/*.spec.tsx
+test_old/**/*.spec.ts test_old/**/*.spec.tsx
