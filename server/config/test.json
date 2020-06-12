@@ -3,7 +3,7 @@
         "connection": {
             "database": "peer_test"
         },
-        "testQueryFile": "./database_dumps/ED3-TestData.sql"
+        "testQueryFile": "./database_dumps_old/ED3-TestData.sql"
     },
     "reviews": {
         "fileFolder": "./files/test/reviews"
