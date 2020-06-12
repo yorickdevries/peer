@@ -9,8 +9,8 @@
     "start_server": "node ./dist/bin/www.js",
     "lint": "eslint . --ext .ts",
     "build": "tsc",
-    "test": "mocha",
-    "coverage": "nyc npm run test",
+    "test_old": "mocha",
+    "coverage_old": "nyc npm run test_old",
     "data_init": "node ./dist/old_api/scripts/data_init.js"
   },
   "nyc": {

@@ -4,4 +4,4 @@
 --full-trace
 --bail
 --timeout 10000
-test/**/*.spec.ts test/**/*.spec.tsx
+test/old_api/*.spec.ts test/old_api/*.spec.tsx
