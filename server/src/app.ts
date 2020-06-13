@@ -7,10 +7,7 @@ import helmet from "helmet";
 import compression from "compression";
 import { errorLogger } from "./middleware/logger";
 
-// old api (can later be deleted)
-import api from "./old_api/routes/api";
-// this is the new version of the API
-import api2 from "./routes/api";
+import api from "./routes/api";
 
 // instantiate the app
 const app = express();
@@ -27,10 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Routing
-// old api (can later be deleted)
 app.use("/api", api);
-// this is the new version of the API
-app.use("/api2", api2);
 
 // Send homepage index.html
 app.get("/*", (_, res) => {
