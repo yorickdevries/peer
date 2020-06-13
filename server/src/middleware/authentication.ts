@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import HttpStatusCode from "../enum/HttpStatusCode";
 
 const authenticationCheck = function (
   req: Request,
@@ -8,7 +9,7 @@ const authenticationCheck = function (
   if (req.isAuthenticated()) {
     next();
   } else {
-    res.sendStatus(401);
+    res.sendStatus(HttpStatusCode.UNAUTHORIZED);
   }
 };
 

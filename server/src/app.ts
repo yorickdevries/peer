@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import compression from "compression";
 import { errorLogger } from "./middleware/logger";
+import HttpStatusCode from "./enum/HttpStatusCode";
 
 import api from "./routes/api";
 
@@ -36,7 +37,7 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   // Print error to the stderr
   console.error(`Error occured at ${new Date()}: ${err}`);
   // Send generic 500 error response
-  res.sendStatus(500);
+  res.sendStatus(HttpStatusCode.INTERNAL_SERVER_ERROR);
 });
 
 export default app;
