@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 
 // This route checks the user and updates it in the database
-const saveUserinfo = async (req: Request, _: Response, next: NextFunction) => {
+const saveUserinfo = async function (
+  req: Request,
+  _: Response,
+  next: NextFunction
+): void {
   const userinfo = req.user;
   // check whether userinfo exists
   if (userinfo == undefined || userinfo.netid == undefined) {

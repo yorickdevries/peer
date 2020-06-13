@@ -6,7 +6,7 @@ const mockPassportConfiguration = function (
   passport: any,
   netid: string,
   affiliation: string
-) {
+): void {
   const userobject: any = {
     netid: parseNetId(netid),
     studentNumber: 1234567,

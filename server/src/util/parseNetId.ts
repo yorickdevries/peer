@@ -1,7 +1,7 @@
 /**
  * Class which takes care of NetId parsing
  */
-const parseNetId = (netId: string) => {
+const parseNetId = function (netId: string): string {
   if (netId == undefined) {
     throw new Error("NetId is undefined");
   }

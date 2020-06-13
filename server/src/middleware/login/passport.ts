@@ -7,7 +7,7 @@ import config from "config";
 import parseNetId from "../../util/parseNetId";
 import { PassportStatic } from "passport";
 
-const passportConfiguration = (passport: PassportStatic) => {
+const passportConfiguration = function (passport: PassportStatic): void {
   const samlStrategy = passport_saml.Strategy;
   const backupStore = fileCache({ basePath: os.tmpdir() });
   const passportConfig: {
