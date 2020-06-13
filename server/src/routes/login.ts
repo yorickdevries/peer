@@ -60,6 +60,7 @@ const loginRoutes = function (router: Router): void {
       },
       passport.authenticate("mock"),
       (_req, res) => {
+        // TODO: ADD HERE SAVING OF USERINFO
         res.redirect("/");
       }
     );
