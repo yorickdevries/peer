@@ -7,10 +7,8 @@ import rubrics from "./rubric";
 import submissions from "./submissions";
 import security from "../security";
 import UserPS from "../prepared_statements/user_ps";
-import { eventLogger } from "../logger";
 
 const router = express();
-router.use(eventLogger);
 
 // This route checks the user and updates it in the database
 router.use(async function(req: any, _, next) {
