@@ -1,3 +1,4 @@
+// needs to be converted to a class
 export interface UserModel {
   netid: string;
   studentNumber?: number;

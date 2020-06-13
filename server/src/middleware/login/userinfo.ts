@@ -3,17 +3,17 @@ import { Request, Response, NextFunction } from "express";
 // This route checks the user and updates it in the database
 const saveUserinfo = async function (
   req: Request,
-  _: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> {
   const userinfo = req.user;
   // check whether userinfo exists
-  if (userinfo == undefined || userinfo.netid == undefined) {
+  if (!userinfo || !userinfo.netid) {
     // no user logged in
     next();
   } else {
-    // TODO: save to database
-    console.log(`Saving ${userinfo}`);
+    // TODO: save to new database
+    console.log(`Saving ${userinfo.netid}`);
     next();
   }
 };
