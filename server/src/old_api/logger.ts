@@ -16,7 +16,7 @@ logger.token("ipadress", function(req) {
     return address.ip;
 });
 
-const loggerFormat = ":netid :ipadress [:date[clf]] \":method :url HTTP/:http-version\" :status :res[content-length]";
+const loggerFormat = "OLD API :netid :ipadress [:date[clf]] \":method :url HTTP/:http-version\" :status :res[content-length]";
 
 // logger for all events
 const eventLogger = logger(loggerFormat);

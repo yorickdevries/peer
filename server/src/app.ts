@@ -5,6 +5,7 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import compression from "compression";
+import { errorLogger } from "./middleware/logger";
 
 // old api (can later be deleted)
 import api from "./old_api/routes/api";
@@ -16,7 +17,7 @@ const app = express();
 
 app.use(helmet());
 app.use(compression());
-//app.use(errorLogger);
+app.use(errorLogger);
 
 const clientWebsite = path.join(__dirname, "../dist/public");
 app.use(express.static(clientWebsite));
