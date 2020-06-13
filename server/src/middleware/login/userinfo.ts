@@ -5,7 +5,7 @@ const saveUserinfo = async function (
   req: Request,
   _: Response,
   next: NextFunction
-): void {
+): Promise<void> {
   const userinfo = req.user;
   // check whether userinfo exists
   if (userinfo == undefined || userinfo.netid == undefined) {
