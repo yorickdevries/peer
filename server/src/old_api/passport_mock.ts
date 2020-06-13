@@ -17,7 +17,7 @@ const mockPassportConfiguration = function(passport: any, netid: string, affilia
   };
 
   const strategy = new MockStrategy({
-    name: "mock",
+    name: "mock_old",
     user: userobject
     }, (profile: any, done: any) => {
       return done(undefined, profile);

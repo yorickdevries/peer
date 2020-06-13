@@ -45,7 +45,7 @@ if (process.env.NODE_ENV === "production" ) {
     passportConfiguration(passport);
 
     // Login route
-    router.get("/login", passport.authenticate("saml",
+    router.get("/login", passport.authenticate("saml_old",
     {
         successRedirect: "https://peer.ewi.tudelft.nl/",
         failureRedirect: "/login"
@@ -53,7 +53,7 @@ if (process.env.NODE_ENV === "production" ) {
     );
 
     // Callback of the login route
-    router.post("/login/callback", passport.authenticate("saml",
+    router.post("/login/callback", passport.authenticate("saml_old",
     {
         failureRedirect: "/",
         failureFlash: true
@@ -76,7 +76,7 @@ if (process.env.NODE_ENV === "production" ) {
         mockPassportConfiguration(passport, netid, affiliation);
         next();
     },
-    passport.authenticate("mock"),
+    passport.authenticate("mock_old"),
     function(_, res) {
         res.redirect("/");
     });

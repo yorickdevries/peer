@@ -54,7 +54,7 @@ const passportConfiguration = function(passport: any) {
     const metadataXML = strategy.generateServiceProviderMetadata(decryptionCert);
     fs.writeFileSync("./SP_Metadata.xml", metadataXML);
     console.log("metadataXML written to: ./SP_Metadata.xml");
-    passport.use("saml", strategy);
+    passport.use("saml_old", strategy);
 
     passport.serializeUser((user: any, done: any) => {
       done(undefined, user);
