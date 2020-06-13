@@ -2,9 +2,9 @@ import { Router } from "express";
 import passport from "passport";
 import fs from "fs-extra";
 import path from "path";
-import session from "../middleware/session";
-import passportConfiguration from "../middleware/passport";
-import mockPassportConfiguration from "../middleware/passport_mock";
+import session from "../middleware/login/session";
+import passportConfiguration from "../middleware/login/passport";
+import mockPassportConfiguration from "../middleware/login/passport_mock";
 
 // Adds login routes
 const loginRoutes = (router: Router) => {

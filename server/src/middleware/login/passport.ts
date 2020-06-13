@@ -4,7 +4,7 @@ import fileCache from "file-system-cache";
 import { fetch, toPassportConfig } from "passport-saml-metadata";
 import passport_saml from "passport-saml";
 import config from "config";
-import parseNetId from "../util/parseNetId";
+import parseNetId from "../../util/parseNetId";
 import { PassportStatic } from "passport";
 
 const passportConfiguration = (passport: PassportStatic) => {
