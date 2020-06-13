@@ -5,15 +5,12 @@
  */
 
 import app from "../app";
-import debug from "debug";
 import http from "http";
 
-debug("peer_review:server");
-
 // Print time info on start of the script
-const dateString = new Date().toString();
-console.log(`Started server at ${dateString}`);
-console.error(`Started server at ${dateString}`);
+const startMessage = `Started server at ${new Date()}`;
+console.log(startMessage);
+console.error(startMessage);
 
 console.log("Currently running in: " + app.get("env"));
 
@@ -41,7 +38,7 @@ server.on("listening", onListening);
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val: number | string): number | string | boolean {
+function normalizePort(val: number | string) {
   const port: number = typeof val === "string" ? parseInt(val, 10) : val;
   if (isNaN(port)) return val;
   else if (port >= 0) return port;
@@ -52,7 +49,7 @@ function normalizePort(val: number | string): number | string | boolean {
  * Event listener for HTTP server "error" event.
  */
 
-function onError(error: NodeJS.ErrnoException): void {
+function onError(error: NodeJS.ErrnoException) {
   if (error.syscall !== "listen") throw error;
   const bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
   switch (error.code) {
@@ -73,7 +70,7 @@ function onError(error: NodeJS.ErrnoException): void {
  * Event listener for HTTP server "listening" event.
  */
 
-function onListening(): void {
+function onListening() {
   const addr = server.address();
   const bind = typeof addr === "string" ? `pipe ${addr}` : `port ${addr?.port}`;
   console.log(`Listening on ${bind}`);
