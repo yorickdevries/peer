@@ -1,7 +1,5 @@
 // Mock the login of an user for development purposes
-import MockStrategy, {
-  setupSerializeAndDeserialize,
-} from "passport-mock-strategy";
+import MockStrategy from "passport-mock-strategy";
 import parseNetId from "../../util/parseNetId";
 import { PassportStatic } from "passport";
 import { UserModel } from "../../models/user";
@@ -32,7 +30,13 @@ const mockPassportConfiguration = function (
   });
   passport.use(strategy);
 
-  setupSerializeAndDeserialize(passport, undefined, undefined);
+  passport.serializeUser((user: any, done: any) => {
+    done(undefined, user);
+  });
+
+  passport.deserializeUser((user: any, done: any) => {
+    done(undefined, user);
+  });
 };
 
 export default mockPassportConfiguration;
