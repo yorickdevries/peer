@@ -17,33 +17,23 @@ loginRoutes(router);
 router.use(saveUserinfo);
 
 // Authentication route
-/*
 router.get("/authenticated", (req, res) => {
   res.json({ authenticated: req.isAuthenticated() });
 });
-*/
 
 // TODO: Check always whether someone is logged in before accessing the routes below
 //router.use(security.authorization.authorizeCheck);
 
-// TODO: Routing
-//router.use("/assignments", assignments);
-//router.use("/courses", courses);
-//router.use("/groups", groups);
-//router.use("/reviews", reviews);
-//router.use("/rubric", rubrics);
-//router.use("/submissions", submissions);
-
 // Route to get the userinfo
-/*
-router.get("/user", (req, res) => {
+router.get("/me", (req, res) => {
   res.json({
     user: req.user,
   });
 });
-*/
 
-// old routes
+// TODO: Complete routing of the new API
+
+// old routes, can be deleted when not needed anymore
 router.use("/oldroutes", oldRoutes);
 
 // If no other routes apply, send a 404
