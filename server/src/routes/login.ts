@@ -1,6 +1,7 @@
 import { Router } from "express";
 import passport from "passport";
 import path from "path";
+import config from "config";
 import session from "../middleware/login/session";
 import passportConfiguration from "../middleware/login/passport";
 import mockPassportConfiguration from "../middleware/login/passport_mock";
@@ -18,11 +19,12 @@ const loginRoutes = function (router: Router): void {
     // Initialize TU Delft passport
     passportConfiguration(passport);
 
+    const url: string = config.get("url");
     // Login route
     router.get(
       "/login",
       passport.authenticate("saml", {
-        successRedirect: "https://peer.ewi.tudelft.nl/",
+        successRedirect: url,
         failureRedirect: "/login",
       })
     );

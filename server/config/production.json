@@ -12,5 +12,6 @@
         "callbackUrl": "https://peer.ewi.tudelft.nl/api/login/callback",
         "certificate": "/var/www/peer/cert/peer_ewi_tudelft_nl.crt",
         "key": "/var/www/peer/cert/peer.ewi.tudelft.nl.key"
-    }
+    },
+    "url": "https://peer.ewi.tudelft.nl/"
 }
