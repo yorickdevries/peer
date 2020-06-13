@@ -4,7 +4,7 @@ import path from "path";
 import config from "config";
 import session from "../middleware/login/session";
 import passportConfiguration from "../middleware/login/passport";
-import mockPassportConfiguration from "../middleware/login/passport_mock";
+import mockPassportConfiguration from "../middleware/login/passportMock";
 import saveUserinfo from "../middleware/login/userinfo";
 
 // Adds login routes

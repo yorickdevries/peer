@@ -2,6 +2,7 @@ import express from "express";
 import { eventLogger } from "../middleware/logger";
 import loginRoutes from "./login";
 import authenticationCheck from "../middleware/authentication";
+import HttpStatusCode from "../enum/HttpStatusCode";
 
 // old routes, can be deleted when not needed anymore
 import oldRoutes from "../old_api/routes/api";
@@ -34,7 +35,7 @@ router.use("/oldroutes", oldRoutes);
 
 // If no other routes apply, send a 404
 router.use((_req, res) => {
-  res.sendStatus(404);
+  res.sendStatus(HttpStatusCode.NOT_FOUND);
 });
 
 export default router;
