@@ -10,5 +10,7 @@
         "plugin:@typescript-eslint/recommended",
         "plugin:prettier/recommended"
     ],
-    "rules": { }
+    "rules": {
+        "prefer-arrow-callback": "error"
+    }
 }

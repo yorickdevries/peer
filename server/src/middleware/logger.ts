@@ -2,12 +2,12 @@ import logger from "morgan";
 import forwarded from "forwarded-for";
 
 // Include the netid as token for logs
-logger.token("netid", function (req) {
+logger.token("netid", (req) => {
   return req.user?.netid;
 });
 
 // Include the original ip as token for logs
-logger.token("ipadress", function (req) {
+logger.token("ipadress", (req) => {
   const address = forwarded(req, req.headers);
   return address.ip;
 });

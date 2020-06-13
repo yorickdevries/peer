@@ -38,12 +38,7 @@ app.get("/*", (_, res) => {
 });
 
 // Error handler
-app.use(function (
-  err: Error,
-  _req: Request,
-  res: Response,
-  _next: NextFunction
-) {
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   // Print error to the stderr
   console.error(`Error occured at ${new Date()}: ${err}`);
   // Send generic 500 error response
