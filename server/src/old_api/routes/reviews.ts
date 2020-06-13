@@ -27,7 +27,7 @@ router.route("/:reviewId").get(index.authorization.checkAuthorizationForReview, 
 
         // Update the started_at date of the review
         const fullReview: any = await ReviewsPS.executeGetFullReview(reviewId);
-        if (req.user.netid == fullReview.user_netid) {
+        if (req.user?.netid == fullReview.user_netid) {
             await ReviewsPS.executeUpdateStartedAtIfNull(reviewId);
         }
 
@@ -73,7 +73,7 @@ router.route("/:reviewId/reviewevaluation").post(index.authorization.checkAuthor
             const reviewEvaluationRubric = await RubricPS.executeGetReviewEvaluationRubricByAssignmentId(assignmentId);
 
             // create the review
-            const reviewEvaluation: any = await ReviewsPS.executeCreateReviewEvaluation(req.user.netid, reviewId, reviewEvaluationRubric.id);
+            const reviewEvaluation: any = await ReviewsPS.executeCreateReviewEvaluation(String(req.user?.netid), reviewId, reviewEvaluationRubric.id);
             res.json({
                 id: reviewEvaluation.id,
                 user_netid: reviewEvaluation.net_id
@@ -167,7 +167,7 @@ router.route("/:reviewId").put(upload(undefined, (config.get("allowed_extensions
 
         // Update the saved_at date of the review.
         const fullReview: any = await ReviewsPS.executeGetFullReview(reviewId);
-        if (req.user.netid == fullReview.user_netid) {
+        if (req.user?.netid == fullReview.user_netid) {
             await ReviewsPS.executeUpdateSavedAt(reviewId);
         }
 
@@ -207,7 +207,7 @@ router.route("/:reviewId/submit").get(index.authorization.checkReviewOwnerDone, 
 
         // Update the submitted_at date of the review
         const fullReview: any = await ReviewsPS.executeGetFullReview(reviewId);
-        if (req.user.netid == fullReview.user_netid) {
+        if (req.user?.netid == fullReview.user_netid) {
             await ReviewsPS.executeUpdateSubmittedAt(reviewId);
         }
 
@@ -300,7 +300,7 @@ router.route("/:reviewId/file").get(index.authorization.checkAuthorizationForRev
 
         // Update the downloaded_at date of the review
         const fullReview: any = await ReviewsPS.executeGetFullReview(reviewId);
-        if (req.user.netid == fullReview.user_netid) {
+        if (req.user?.netid == fullReview.user_netid) {
             await ReviewsPS.executeUpdateDownloadedAtIfNull(reviewId);
         }
 
