@@ -1,6 +1,8 @@
 import express from "express";
+import { eventLogger } from "../middleware/logger";
 
 const router = express.Router();
+router.use(eventLogger);
 
 // Authentication route
 router.get("/authenticated", function (req, res) {

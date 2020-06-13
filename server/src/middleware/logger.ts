@@ -3,8 +3,7 @@ import forwarded from "forwarded-for";
 
 // Include the netid as token for logs
 logger.token("netid", function (req) {
-  //needs double check
-  return req.user.netid;
+  return req.user?.netid;
 });
 
 // Include the original ip as token for logs
