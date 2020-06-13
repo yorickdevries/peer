@@ -1,13 +1,12 @@
 import { Router } from "express";
 import passport from "passport";
-import fs from "fs-extra";
 import path from "path";
 import session from "../middleware/login/session";
 import passportConfiguration from "../middleware/login/passport";
 import mockPassportConfiguration from "../middleware/login/passport_mock";
 
 // Adds login routes
-const loginRoutes = (router: Router) => {
+const loginRoutes = function (router: Router): void {
   // setup sessions for login
   router.use(session);
   // initialize passport middleware
@@ -71,11 +70,8 @@ const loginRoutes = (router: Router) => {
   });
 
   // Retrieve SP metadata (Only works in production)
-  // TODO: catch error if await fails
   router.get("/metadata.xml", async (_, res) => {
-    const file = await fs.readFile("./SP_Metadata.xml");
-    res.type("application/xml");
-    res.send(file);
+    res.sendFile("./SP_Metadata.xml");
   });
 };
 

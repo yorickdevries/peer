@@ -1,7 +1,7 @@
 import express from "express";
 import { eventLogger } from "../middleware/logger";
-import saveUserinfo from "../middleware/login/userinfo";
 import loginRoutes from "./login";
+import saveUserinfo from "../middleware/login/userinfo";
 
 const router = express.Router();
 router.use(eventLogger);
