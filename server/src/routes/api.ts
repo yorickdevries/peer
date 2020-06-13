@@ -1,7 +1,6 @@
 import express from "express";
 import { eventLogger } from "../middleware/logger";
 import loginRoutes from "./login";
-import saveUserinfo from "../middleware/login/userinfo";
 
 // old routes, can be deleted when not needed anymore
 import oldRoutes from "../old_api/routes/api";
@@ -11,10 +10,6 @@ router.use(eventLogger);
 
 // initialize login/logout routes
 loginRoutes(router);
-
-// Save userinfo to the database
-// TODO: Needs to be moved to the login callback so it is only saved once per session
-router.use(saveUserinfo);
 
 // Authentication route
 router.get("/authenticated", (req, res) => {

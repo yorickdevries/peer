@@ -10,10 +10,11 @@ const saveUserinfo = async function (
   // check whether userinfo exists
   if (!userinfo || !userinfo.netid) {
     // no user logged in
+    console.log("No user saved");
     next();
   } else {
     // TODO: save to new database
-    console.log(`Saving ${userinfo.netid}`);
+    console.log(`Saved ${userinfo.netid}`);
     next();
   }
 };

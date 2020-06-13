@@ -5,6 +5,7 @@ import config from "config";
 import session from "../middleware/login/session";
 import passportConfiguration from "../middleware/login/passport";
 import mockPassportConfiguration from "../middleware/login/passport_mock";
+import saveUserinfo from "../middleware/login/userinfo";
 
 // Adds login routes
 const loginRoutes = function (router: Router): void {
@@ -36,8 +37,8 @@ const loginRoutes = function (router: Router): void {
         failureRedirect: "/",
         failureFlash: true,
       }),
+      saveUserinfo, // Save userinfo to the database
       (_req, res) => {
-        // TODO: ADD HERE SAVING OF USERINFO
         res.redirect("/");
       }
     );
@@ -59,8 +60,8 @@ const loginRoutes = function (router: Router): void {
         next();
       },
       passport.authenticate("mock"),
+      saveUserinfo, // Save userinfo to the database
       (_req, res) => {
-        // TODO: ADD HERE SAVING OF USERINFO
         res.redirect("/");
       }
     );
