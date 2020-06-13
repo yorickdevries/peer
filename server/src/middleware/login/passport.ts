@@ -1,7 +1,9 @@
 import os from "os";
 import fs from "fs";
 import fileCache from "file-system-cache";
+// Needs to be updated and tested with newest version of the package
 import { fetch, toPassportConfig } from "passport-saml-metadata";
+// Needs to be updated and tested with newest version of the package
 import passport_saml from "passport-saml";
 import config from "config";
 import parseNetId from "../../util/parseNetId";
@@ -25,7 +27,7 @@ const passportConfiguration = function (passport: PassportStatic): void {
 
   fetch({ url, backupStore }).then((reader: any) => {
     // Setup config object
-    const ppConfig: any = toPassportConfig(reader);
+    const ppConfig = toPassportConfig(reader);
     ppConfig.realm = passportConfig.realm;
     ppConfig.protocol = passportConfig.protocol;
     ppConfig.issuer = passportConfig.issuer;
@@ -65,11 +67,11 @@ const passportConfiguration = function (passport: PassportStatic): void {
     console.log("metadataXML written to: ./SP_Metadata.xml");
     passport.use("saml", strategy);
 
-    passport.serializeUser((user: any, done: any) => {
+    passport.serializeUser((user, done) => {
       done(undefined, user);
     });
 
-    passport.deserializeUser((user: any, done: any) => {
+    passport.deserializeUser((user, done) => {
       done(undefined, user);
     });
   });
