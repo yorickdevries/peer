@@ -1,6 +1,7 @@
 import express from "express";
 import { eventLogger } from "../middleware/logger";
 import loginRoutes from "./login";
+import authenticationCheck from "../middleware/authentication";
 
 // old routes, can be deleted when not needed anymore
 import oldRoutes from "../old_api/routes/api";
@@ -16,8 +17,8 @@ router.get("/authenticated", (req, res) => {
   res.json({ authenticated: req.isAuthenticated() });
 });
 
-// TODO: Check always whether someone is logged in before accessing the routes below
-//router.use(security.authorization.authorizeCheck);
+// Check always whether someone is logged in before accessing the other routes below
+router.use(authenticationCheck);
 
 // Route to get the userinfo
 router.get("/me", (req, res) => {
