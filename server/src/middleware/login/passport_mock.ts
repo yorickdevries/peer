@@ -30,11 +30,11 @@ const mockPassportConfiguration = function (
   });
   passport.use(strategy);
 
-  passport.serializeUser((user: any, done: any) => {
+  passport.serializeUser((user, done) => {
     done(undefined, user);
   });
 
-  passport.deserializeUser((user: any, done: any) => {
+  passport.deserializeUser((user, done) => {
     done(undefined, user);
   });
 };
