@@ -5,7 +5,6 @@ variables:
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: password
   POSTGRES_HOST: postgres
-  NODE_ENV: development
 
 stages:
     - static-analysis
@@ -17,6 +16,8 @@ stages:
 
 server-lint:
   stage: static-analysis
+  variables:
+    NODE_ENV: development
   script:
   - cd server && npm install
   - npm run lint
@@ -26,6 +27,8 @@ server-lint:
 
 client-lint:
   stage: static-analysis
+  variables:
+    NODE_ENV: development
   script:
   - cd client && npm install
   - npm run lint
@@ -59,8 +62,21 @@ build_client:
   - merge_requests
   - pushes
 
+test:
+  stage: test
+  variables:
+    NODE_ENV: test
+  script:
+  - cd server && npm install
+  - npm run test
+  only:
+  - merge_requests
+  - pushes
+
 test_old:
   stage: test
+  variables:
+    NODE_ENV: test
   services:
   - postgres:12
   script:
@@ -97,7 +113,6 @@ start_server_old:
   - timeout 10s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
   only:
   - merge_requests
-  - pushes
 
 sast:
   stage: sast

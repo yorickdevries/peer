@@ -7,6 +7,9 @@
     "start": "node ./dist/bin/www.js",
     "dev": "nodemon",
     "lint": "eslint . --ext .ts",
+    "lint-fix": "eslint . --ext .ts --fix",
+    "test": "jest ./tests",
+    "coverage": "jest --collectCoverage ./tests",
     "test_old": "mocha --opts ./test_old/mocha.opts",
     "coverage_old": "nyc npm run test_old",
     "data_init_old": "node ./dist/old_api/scripts/data_init.js"
@@ -77,6 +80,7 @@
   },
   "devDependencies": {
     "@types/chai-as-promised": "^7.1.2",
+    "@types/jest": "^26.0.0",
     "@types/mocha": "^5.2.7",
     "@typescript-eslint/eslint-plugin": "^3.2.0",
     "@typescript-eslint/parser": "^3.2.0",
@@ -86,12 +90,14 @@
     "eslint": "^7.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.3",
+    "jest": "^26.0.1",
     "mocha": "^5.2.0",
     "mockdate": "^3.0.2",
     "nodemon": "^2.0.4",
     "nyc": "^15.1.0",
     "prettier": "^2.0.5",
     "source-map-support": "^0.5.19",
+    "ts-jest": "^26.1.0",
     "ts-node": "^6.2.0"
   }
 }
