@@ -1,19 +1,24 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
+// library to make sure async errors are handled
 require("express-async-errors");
 import path from "path";
 import cookieParser from "cookie-parser";
-import api from "./old_api/routes/api";
-import { errorLogger } from "./old_api/logger";
 import helmet from "helmet";
 import compression from "compression";
+import { errorLogger } from "./middleware/logger";
 
-const app: express.Express = express();
+import api from "./routes/api";
+
+// instantiate the app
+const app = express();
+
 app.use(helmet());
 app.use(compression());
 app.use(errorLogger);
 
 const clientWebsite = path.join(__dirname, "../dist/public");
 app.use(express.static(clientWebsite));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -21,19 +26,17 @@ app.use(cookieParser());
 // Routing
 app.use("/api", api);
 
-// Send homepage
+// Send homepage index.html
 app.get("/*", (_, res) => {
   res.sendFile(path.join(clientWebsite, "index.html"));
 });
 
 // Error handler
-app.use(function (err: any, _req: any, res: any, _next: any) {
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   // Print error to the stderr
   console.error(`Error occured at ${new Date()}: ${err}`);
-
-  // send generic 500 error response
-  res.status(500);
-  res.json({ error: "There is an error in your request" });
+  // Send generic 500 error response
+  res.sendStatus(500);
 });
 
 export default app;

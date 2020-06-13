@@ -1,5 +1,3 @@
-import fs from "fs-extra";
-import path from "path";
 import express from "express";
 import assignments from "./assignments";
 import courses from "./courses";
@@ -9,92 +7,8 @@ import rubrics from "./rubric";
 import submissions from "./submissions";
 import security from "../security";
 import UserPS from "../prepared_statements/user_ps";
-import session from "express-session";
-import sessionFileStore from "session-file-store";
-import passport from "passport";
-import config from "config";
-import passportConfiguration from "../passport";
-import mockPassportConfiguration from "../passport_mock";
-import { eventLogger } from "../logger";
 
 const router = express();
-router.use(eventLogger);
-
-// session support is required to use Passport
-const fileStore = sessionFileStore(session);
-// needs a random secret
-const sessionConfig: any = {
-    cookie: {maxAge: (config.get("session") as any).maxAge},
-    resave: true,
-    saveUninitialized: true,
-    secret: (config.get("session") as any).secret
-  };
-// Depending of current mode, setup the session store
-if (process.env.NODE_ENV === "production") {
-    sessionConfig.store = new fileStore();
-}
-router.use(session(sessionConfig));
-
-// initialize passport middleware
-router.use(passport.initialize());
-router.use(passport.session());
-
-// Depending of current mode, setup the login method
-if (process.env.NODE_ENV === "production" ) {
-    // Initialize TU Delft passport
-    passportConfiguration(passport);
-
-    // Login route
-    router.get("/login", passport.authenticate("saml",
-    {
-        successRedirect: "https://peer.ewi.tudelft.nl/",
-        failureRedirect: "/login"
-    })
-    );
-
-    // Callback of the login route
-    router.post("/login/callback", passport.authenticate("saml",
-    {
-        failureRedirect: "/",
-        failureFlash: true
-    }), function(_, res) {
-        res.redirect("/");
-    }
-    );
-  } else {
-    // Mock Login form
-    router.get("/login", (_, res) => {
-        res.sendFile(path.resolve("./mocklogin.html"));
-    });
-
-    router.post("/mocklogin",
-    function(req, _, next) {
-        const netid = String(req.body.netid);
-        const affiliation = String(req.body.affiliation);
-        console.log("Mocklogin: " + netid + ", " + affiliation);
-        // make Mocked passport configuration
-        mockPassportConfiguration(passport, netid, affiliation);
-        next();
-    },
-    passport.authenticate("mock"),
-    function(_, res) {
-        res.redirect("/");
-    });
-}
-
-// Route to logout.
-router.get("/logout", function(req, res) {
-    req.logout();
-    // TODO: invalidate session on IP
-    res.redirect("/");
-});
-
-// Retrieve SP metadata (Only works in production)
-router.get("/metadata.xml", async function(_, res) {
-  const file = await fs.readFile("./SP_Metadata.xml");
-  res.type("application/xml");
-  res.send(file);
-});
 
 // This route checks the user and updates it in the database
 router.use(async function(req: any, _, next) {

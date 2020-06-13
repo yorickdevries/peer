@@ -2,7 +2,8 @@
     "root": true,
     "parser": "@typescript-eslint/parser",
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "no-null"
     ],
     "extends": [
         "eslint:recommended",
@@ -10,5 +11,8 @@
         "plugin:@typescript-eslint/recommended",
         "plugin:prettier/recommended"
     ],
-    "rules": { }
+    "rules": {
+        "prefer-arrow-callback": "error",
+        "no-null/no-null": "error"
+    }
 }
