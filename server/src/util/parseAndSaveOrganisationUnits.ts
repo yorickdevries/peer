@@ -8,16 +8,12 @@ const parseAndSaveOrganisationUnits = async function (
     // skip if undefined
     if (typeof input === "string") {
       // one element array in case the input is just a string
-      // TODO: use constructor
-      const organisationUnit = new OrganisationUnit();
-      organisationUnit.name = input;
+      const organisationUnit = new OrganisationUnit(input);
       organisationUnits.push(organisationUnit);
     } else {
       // otherwise, parse all strings to OrganisationUnits
       for (const name of input) {
-        // TODO: use constructor
-        const organisationUnit = new OrganisationUnit();
-        organisationUnit.name = name;
+        const organisationUnit = new OrganisationUnit(name);
         organisationUnits.push(organisationUnit);
       }
     }
