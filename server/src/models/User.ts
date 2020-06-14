@@ -68,7 +68,7 @@ export class User extends BaseEntity {
   }
 
   // temporatily added as typescipt doesn't compile when private fields aren't used
-  toString() {
+  toString(): string {
     return `${this.netid},${this.studentNumber},${this.firstName},${this.prefix}, ${this.lastName},${this.email},${this.affiliation},${this.displayName},${this.study},${this.organisationUnit}`;
   }
 }
