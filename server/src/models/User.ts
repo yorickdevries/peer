@@ -3,35 +3,35 @@ import { Entity, Column, PrimaryColumn } from "typeorm";
 @Entity()
 export class User {
   @PrimaryColumn()
-  // Annotated with "!"" due to typescripts strictPropertyInitialization
+  // Annotated with "!" due to typescripts strictPropertyInitialization
   netid!: string;
 
-  @Column()
+  @Column({ nullable: true })
   studentNumber?: number;
 
-  @Column()
+  @Column({ nullable: true })
   firstName?: string;
 
-  @Column()
+  @Column({ nullable: true })
   prefix?: string;
 
-  @Column()
+  @Column({ nullable: true })
   lastName?: string;
 
-  @Column()
+  @Column({ nullable: true })
   email?: string;
 
-  @Column()
+  @Column({ nullable: true })
   // is either string or string[], but now saved as string in the database
   affiliation?: string;
 
-  @Column()
+  @Column({ nullable: true })
   displayName?: string;
 
-  @Column()
+  @Column({ nullable: true })
   study?: string;
 
-  @Column()
+  @Column({ nullable: true })
   // is either string or string[], but now saved as string in the database
   organisationUnit?: string;
 }
