@@ -6,6 +6,11 @@ variables:
   POSTGRES_PASSWORD: password
   POSTGRES_HOST: postgres
 
+variables:
+  MYSQL_DATABASE: peer_database
+  MYSQL_ROOT_PASSWORD: password123
+  MYSQL_HOST: mysql
+
 stages:
     - static-analysis
     - build
@@ -91,6 +96,8 @@ start_server:
   stage: start
   variables:
     NODE_ENV: development
+  services:
+  - mysql:8
   script:
   - cd server && npm install
   - npm run build
@@ -105,6 +112,7 @@ start_server_old:
     NODE_ENV: development
   services:
   - postgres:12
+  - mysql:8
   script:
   - cd server && npm install
   - npm run build

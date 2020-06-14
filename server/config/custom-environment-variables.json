@@ -1,4 +1,9 @@
 {
+    "database": {
+        "host": "MYSQL_HOST",
+        "database": "MYSQL_DATABASE",
+        "password": "MYSQL_ROOT_PASSWORD"
+    },
     "old_database": {
         "connection": {
             "user": "POSTGRES_USER",
