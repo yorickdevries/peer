@@ -52,10 +52,10 @@ const passportConfiguration = function (passport: PassportStatic): void {
         prefix: profile["tudPrefix"],
         lastName: profile["sn"],
         email: profile["mail"],
-        affiliation: profile["eduPersonAffiliation"],
+        affiliation: String(profile["eduPersonAffiliation"]),
         displayName: profile["displayName"],
         study: profile["nlEduPersonStudyBranch"],
-        organisationUnit: profile["nlEduPersonOrgUnit"],
+        organisationUnit: String(profile["nlEduPersonOrgUnit"]),
       });
     });
 
