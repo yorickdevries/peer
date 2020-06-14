@@ -3,6 +3,7 @@ import { createConnection, Connection } from "typeorm";
 import config from "config";
 // Database models
 import { User } from "./models/User";
+import { OrganisationUnit } from "./models/OrganisationUnit";
 
 const databaseConfig: {
   host: string;
@@ -20,7 +21,7 @@ const createDatabaseConnection = async function (): Promise<Connection> {
     username: databaseConfig.username,
     password: databaseConfig.password,
     database: databaseConfig.database,
-    entities: [User],
+    entities: [User, OrganisationUnit],
     synchronize: true,
     logging: false,
   });

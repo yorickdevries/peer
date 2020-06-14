@@ -1,4 +1,12 @@
-import { Entity, PrimaryColumn, Column, BaseEntity } from "typeorm";
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  BaseEntity,
+  ManyToMany,
+  JoinTable,
+} from "typeorm";
+import { OrganisationUnit } from "./OrganisationUnit";
 
 @Entity()
 export class User extends BaseEntity {
@@ -31,7 +39,7 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   study?: string;
 
-  @Column({ nullable: true })
-  // is either string or string[], but now saved as string in the database
-  organisationUnit?: string;
+  @ManyToMany((_type) => OrganisationUnit)
+  @JoinTable()
+  organisationUnit?: OrganisationUnit[];
 }

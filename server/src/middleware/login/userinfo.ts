@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import parseNetId from "../../util/parseNetId";
+import parseAndSaveOrganisationUnits from "../../util/parseAndSaveOrganisationUnits";
 import { User } from "../../models/User";
 
 // This route checks the user and updates it in the database
@@ -30,7 +31,9 @@ const saveUserinfo = async function (
     user.study = String(userinfo.study);
     // needs to be improved with organisationUnit table
     // in addition this will result in a undefined string in the database
-    user.organisationUnit = String(userinfo.organisationUnit);
+    user.organisationUnit = await parseAndSaveOrganisationUnits(
+      userinfo.organisationUnit
+    );
     // TODO: Add class validation before save
     await user.save();
     next();
