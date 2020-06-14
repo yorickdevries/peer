@@ -6,6 +6,8 @@ import {
   ManyToMany,
   JoinTable,
 } from "typeorm";
+import { Affiliation } from "./Affiliation";
+import { Study } from "./Study";
 import { OrganisationUnit } from "./OrganisationUnit";
 
 @Entity()
@@ -28,15 +30,16 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   private email?: string;
 
-  @Column({ nullable: true })
-  // is either string or string[], but now saved as string in the database
-  private affiliation?: string;
+  @ManyToMany((_type) => Affiliation)
+  @JoinTable()
+  private affiliation?: Affiliation[];
 
   @Column({ nullable: true })
   private displayName?: string;
 
-  @Column({ nullable: true })
-  private study?: string;
+  @ManyToMany((_type) => Study)
+  @JoinTable()
+  private study?: Study[];
 
   @ManyToMany((_type) => OrganisationUnit)
   @JoinTable()
@@ -49,9 +52,9 @@ export class User extends BaseEntity {
     prefix?: string,
     lastName?: string,
     email?: string,
-    affiliation?: string,
+    affiliation?: Affiliation[],
     displayName?: string,
-    study?: string,
+    study?: Study[],
     organisationUnit?: OrganisationUnit[]
   ) {
     super();

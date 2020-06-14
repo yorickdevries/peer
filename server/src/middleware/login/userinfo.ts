@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import parseNetId from "../../util/parseNetId";
 import parseAndSaveSSOFields from "../../util/parseAndSaveSSOFields";
 import { User } from "../../models/User";
+import { Affiliation } from "../../models/Affiliation";
+import { Study } from "../../models/Study";
 import { OrganisationUnit } from "../../models/OrganisationUnit";
 
 // This route checks the user and updates it in the database
@@ -25,12 +27,9 @@ const saveUserinfo = async function (
       userinfo.prefix,
       userinfo.lastName,
       userinfo.email,
-      // needs to be improved with affiliation table
-      String(userinfo.affiliation),
+      await parseAndSaveSSOFields(userinfo.affiliation, Affiliation),
       userinfo.displayName,
-      // needs to be improved with study table
-      // in addition this will result in a undefined string in the database
-      String(userinfo.study),
+      await parseAndSaveSSOFields(userinfo.study, Study),
       await parseAndSaveSSOFields(userinfo.organisationUnit, OrganisationUnit)
     );
     // TODO: Add class validation before save
