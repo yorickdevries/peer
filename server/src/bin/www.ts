@@ -23,7 +23,11 @@ app.set("port", port);
 const server = http.createServer(app);
 
 createDatabaseConnection()
-  .then((_connection) => {
+  .then((connection) => {
+    console.log(
+      `Connected to ${connection.options.type} database: ${connection.options.database}`
+    );
+
     // Listen on provided port, on all network interfaces.
     server.listen(port);
     server.on("error", onError);
