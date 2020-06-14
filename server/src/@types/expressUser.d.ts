@@ -1,5 +1,5 @@
 // Makes sure that the type of res.user is correct
-import { User as UserModel } from "../models/user";
+import { User as UserModel } from "../models/User2";
 
 declare global {
   namespace Express {

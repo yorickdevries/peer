@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { createConnection, Connection } from "typeorm";
 import config from "config";
 // Database models
-import { User } from "./models/user";
+import { User } from "./models/User2";
 
 const databaseConfig: {
   host: string;
