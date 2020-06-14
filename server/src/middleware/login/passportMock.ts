@@ -2,7 +2,7 @@
 import MockStrategy from "passport-mock-strategy";
 import parseNetId from "../../util/parseNetId";
 import { PassportStatic } from "passport";
-import { User } from "../../models/User2";
+import { User } from "../../models/User";
 
 const mockPassportConfiguration = function (
   passport: PassportStatic,
