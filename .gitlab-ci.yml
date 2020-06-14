@@ -5,8 +5,6 @@ variables:
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: password
   POSTGRES_HOST: postgres
-
-variables:
   MYSQL_DATABASE: peer_database
   MYSQL_ROOT_PASSWORD: password
   MYSQL_HOST: mysql
