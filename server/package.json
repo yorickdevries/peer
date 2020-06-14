@@ -54,6 +54,7 @@
     "@types/node": "^14.0.13",
     "@types/session-file-store": "^1.2.1",
     "bluebird": "^3.7.2",
+    "class-validator": "^0.12.2",
     "compression": "^1.7.4",
     "config": "^3.3.1",
     "cookie-parser": "^1.4.5",
