@@ -1,15 +1,25 @@
 import "reflect-metadata";
-import { createConnection } from "typeorm";
+import { createConnection, Connection } from "typeorm";
+import config from "config";
+// Database models
 import { User } from "./models/user";
 
-const createDatabaseConnection = async function () {
+const databaseConfig: {
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  database: string;
+} = config.get("database");
+
+const createDatabaseConnection = async function (): Promise<Connection> {
   return createConnection({
     type: "mysql",
-    host: "localhost",
-    port: 3306,
-    username: "root",
-    password: "password",
-    database: "peer_development",
+    host: databaseConfig.host,
+    port: databaseConfig.port,
+    username: databaseConfig.username,
+    password: databaseConfig.password,
+    database: databaseConfig.database,
     entities: [User],
     synchronize: true,
     logging: false,

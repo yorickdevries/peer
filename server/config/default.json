@@ -1,4 +1,12 @@
 {
+    
+    "database": {
+        "host": "localhost",
+        "port": 3306,
+        "username": "root",
+        "password": "password",
+        "database": "peer_development"
+    },
     "old_database": {
         "connection": {
             "user": "postgres",
