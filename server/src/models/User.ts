@@ -1,7 +1,7 @@
-import { Entity, Column, PrimaryColumn } from "typeorm";
+import { Entity, PrimaryColumn, Column, BaseEntity } from "typeorm";
 
 @Entity()
-export class User {
+export class User extends BaseEntity {
   @PrimaryColumn()
   // Annotated with "!" due to typescripts strictPropertyInitialization
   netid!: string;
