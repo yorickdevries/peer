@@ -1,17 +1,5 @@
-import { Entity, PrimaryColumn, BaseEntity } from "typeorm";
+import { Entity } from "typeorm";
+import { SSOField } from "./SSOField";
 
 @Entity()
-export class OrganisationUnit extends BaseEntity {
-  @PrimaryColumn()
-  private name: string;
-
-  constructor(name: string) {
-    super();
-    this.name = name;
-  }
-
-  // temporatily added as typescipt doesn't compile when private fields aren't used
-  toString(): string {
-    return this.name;
-  }
-}
+export class OrganisationUnit extends SSOField {}
