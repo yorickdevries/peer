@@ -2,14 +2,13 @@
 import MockStrategy from "passport-mock-strategy";
 import parseNetId from "../../util/parseNetId";
 import { PassportStatic } from "passport";
-import { User } from "../../models/User";
 
 const mockPassportConfiguration = function (
   passport: PassportStatic,
   netid: string,
   affiliation: string
 ): void {
-  const userObject: User = {
+  const userObject: Express.User = {
     netid: parseNetId(netid),
     studentNumber: 1234567,
     firstName: "First",
@@ -19,9 +18,11 @@ const mockPassportConfiguration = function (
     affiliation: affiliation,
     displayName: netid,
     study: "M Computer Science",
-    organisationUnit: String([
+    organisationUnit: [
+      "EWI-ST-CSETT",
       "Electrical Engineering, Mathematics and Computer Science",
-    ]),
+      "Software Technology",
+    ],
   };
 
   const strategy = new MockStrategy({

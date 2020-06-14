@@ -21,12 +21,11 @@ const saveUserinfo = async function (
     user.prefix = userinfo.prefix;
     user.lastName = userinfo.lastName;
     user.email = userinfo.email;
-    user.affiliation = userinfo.affiliation;
+    user.affiliation = String(userinfo.affiliation);
     user.displayName = userinfo.displayName;
     user.study = userinfo.study;
-    user.organisationUnit = userinfo.organisationUnit;
+    user.organisationUnit = String(userinfo.organisationUnit);
     await user.save();
-    console.log(`Saved ${user.netid}`);
     next();
   }
 };
