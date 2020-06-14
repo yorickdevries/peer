@@ -23,9 +23,7 @@ router.use(authenticationCheck);
 
 // Route to get the userinfo
 router.get("/me", (req, res) => {
-  res.json({
-    user: req.user,
-  });
+  res.json(req.user);
 });
 
 // TODO: Complete routing of the new API
