@@ -17,22 +17,21 @@ const saveUserinfo = async function (
   } else {
     // Save user to database
     // Overwrites existing entry with the same NetID if present
-    const user = new User();
-    user.netid = parseNetId(userinfo.netid);
-    user.studentNumber = userinfo.studentNumber;
-    user.firstName = userinfo.firstName;
-    user.prefix = userinfo.prefix;
-    user.lastName = userinfo.lastName;
-    user.email = userinfo.email;
-    // needs to be improved with affiliation table
-    user.affiliation = String(userinfo.affiliation);
-    user.displayName = userinfo.displayName;
-    // needs to be improved with study table
-    user.study = String(userinfo.study);
-    // needs to be improved with organisationUnit table
-    // in addition this will result in a undefined string in the database
-    user.organisationUnit = await parseAndSaveOrganisationUnits(
-      userinfo.organisationUnit
+    const user = new User(
+      parseNetId(userinfo.netid),
+      userinfo.studentNumber,
+      userinfo.firstName,
+      userinfo.prefix,
+      userinfo.lastName,
+      userinfo.email,
+      // needs to be improved with affiliation table
+      String(userinfo.affiliation),
+      userinfo.displayName,
+      // needs to be improved with study table
+      // in addition this will result in a undefined string in the database
+      String(userinfo.study),
+      // needs to be improved with organisationUnit table
+      await parseAndSaveOrganisationUnits(userinfo.organisationUnit)
     );
     // TODO: Add class validation before save
     await user.save();
