@@ -1,9 +1,10 @@
-import {Entity, Column, PrimaryColumn} from "typeorm";
+import { Entity, Column, PrimaryColumn } from "typeorm";
 
 @Entity()
-export class UserModel {
+export class User {
   @PrimaryColumn()
-  netid: string;
+  // Annotated with "!"" due to typescripts strictPropertyInitialization
+  netid!: string;
 
   @Column()
   studentNumber?: number;
@@ -21,7 +22,8 @@ export class UserModel {
   email?: string;
 
   @Column()
-  affiliation?: string | string[];
+  // is either string or string[], but now saved as string in the database
+  affiliation?: string;
 
   @Column()
   displayName?: string;
@@ -30,5 +32,6 @@ export class UserModel {
   study?: string;
 
   @Column()
-  organisationUnit?: string | string[];
+  // is either string or string[], but now saved as string in the database
+  organisationUnit?: string;
 }
