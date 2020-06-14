@@ -19,9 +19,9 @@ const mockPassportConfiguration = function (
     affiliation: affiliation,
     displayName: netid,
     study: "M Computer Science",
-    organisationUnit: [
+    organisationUnit: String([
       "Electrical Engineering, Mathematics and Computer Science",
-    ],
+    ]),
   };
 
   const strategy = new MockStrategy({
