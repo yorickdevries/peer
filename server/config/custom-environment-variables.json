@@ -1,8 +1,8 @@
 {
     "database": {
         "host": "MYSQL_HOST",
-        "database": "MYSQL_DATABASE",
-        "password": "MYSQL_ROOT_PASSWORD"
+        "password": "MYSQL_ROOT_PASSWORD",
+        "database": "MYSQL_DATABASE"
     },
     "old_database": {
         "connection": {
