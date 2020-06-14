@@ -26,7 +26,8 @@ const saveUserinfo = async function (
     // needs to be improved with affiliation table
     user.affiliation = String(userinfo.affiliation);
     user.displayName = userinfo.displayName;
-    user.study = userinfo.study;
+    // needs to be improved with study table
+    user.study = String(userinfo.study);
     // needs to be improved with organisationUnit table
     // in addition this will result in a undefined string in the database
     user.organisationUnit = String(userinfo.organisationUnit);

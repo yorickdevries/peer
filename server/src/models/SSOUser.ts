@@ -9,6 +9,6 @@ export interface SSOUser {
   email: string;
   affiliation: string | string[];
   displayName: string;
-  study?: string;
+  study?: string | string[];
   organisationUnit?: string | string[];
 }
