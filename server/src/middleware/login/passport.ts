@@ -51,8 +51,8 @@ const passportConfiguration = function (passport: PassportStatic): void {
         prefix: profile["tudPrefix"],
         lastName: profile["sn"],
         email: profile["mail"],
-        affiliation: profile["eduPersonAffiliation"],
         displayName: profile["displayName"],
+        affiliation: profile["eduPersonAffiliation"],
         study: profile["nlEduPersonStudyBranch"],
         organisationUnit: profile["nlEduPersonOrgUnit"],
       });

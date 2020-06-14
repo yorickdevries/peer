@@ -7,8 +7,8 @@ export interface SSOUser {
   prefix?: string;
   lastName: string;
   email: string;
-  affiliation: string | string[];
   displayName: string;
+  affiliation: string | string[];
   study?: string | string[];
   organisationUnit?: string | string[];
 }

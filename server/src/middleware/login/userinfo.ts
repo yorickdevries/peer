@@ -27,8 +27,8 @@ const saveUserinfo = async function (
       userinfo.prefix,
       userinfo.lastName,
       userinfo.email,
-      await parseAndSaveSSOFields(userinfo.affiliation, Affiliation),
       userinfo.displayName,
+      await parseAndSaveSSOFields(userinfo.affiliation, Affiliation),
       await parseAndSaveSSOFields(userinfo.study, Study),
       await parseAndSaveSSOFields(userinfo.organisationUnit, OrganisationUnit)
     );

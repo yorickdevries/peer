@@ -14,8 +14,8 @@ const mockPassportConfiguration = function (
     prefix: "and",
     lastName: "Last",
     email: "mail@mail.com",
-    affiliation: affiliation,
     displayName: netid,
+    affiliation: affiliation,
     study: "M Computer Science",
     organisationUnit: [
       "EWI-ST-CSETT",

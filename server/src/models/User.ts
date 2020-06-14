@@ -30,12 +30,12 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   private email?: string;
 
+  @Column({ nullable: true })
+  private displayName?: string;
+
   @ManyToMany((_type) => Affiliation)
   @JoinTable()
   private affiliation?: Affiliation[];
-
-  @Column({ nullable: true })
-  private displayName?: string;
 
   @ManyToMany((_type) => Study)
   @JoinTable()
@@ -52,8 +52,8 @@ export class User extends BaseEntity {
     prefix?: string,
     lastName?: string,
     email?: string,
-    affiliation?: Affiliation[],
     displayName?: string,
+    affiliation?: Affiliation[],
     study?: Study[],
     organisationUnit?: OrganisationUnit[]
   ) {
@@ -64,8 +64,8 @@ export class User extends BaseEntity {
     this.prefix = prefix;
     this.lastName = lastName;
     this.email = email;
-    this.affiliation = affiliation;
     this.displayName = displayName;
+    this.affiliation = affiliation;
     this.study = study;
     this.organisationUnit = organisationUnit;
   }
