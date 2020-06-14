@@ -90,7 +90,7 @@ test_old:
 start_server:
   stage: start
   variables:
-    NODE_ENV: production
+    NODE_ENV: development
   script:
   - cd server && npm install
   - npm run build
@@ -102,7 +102,7 @@ start_server:
 start_server_old:
   stage: start
   variables:
-    NODE_ENV: production
+    NODE_ENV: development
   services:
   - postgres:12
   script:
