@@ -1,6 +1,5 @@
 // Mock the login of an user for development purposes
 import MockStrategy from "passport-mock-strategy";
-import parseNetId from "../../util/parseNetId";
 import { PassportStatic } from "passport";
 
 const mockPassportConfiguration = function (
@@ -9,7 +8,7 @@ const mockPassportConfiguration = function (
   affiliation: string
 ): void {
   const userObject: Express.User = {
-    netid: parseNetId(netid),
+    netid: netid,
     studentNumber: 1234567,
     firstName: "First",
     prefix: "and",
