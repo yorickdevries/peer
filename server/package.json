@@ -51,6 +51,7 @@
     "@types/helmet": "0.0.47",
     "@types/morgan": "^1.9.0",
     "@types/multer": "^1.4.3",
+    "@types/node": "^14.0.13",
     "@types/session-file-store": "^1.2.1",
     "bluebird": "^3.7.2",
     "compression": "^1.7.4",
@@ -73,8 +74,10 @@
     "passport-saml": "^0.35.0",
     "passport-saml-metadata": "^1.6.0",
     "pg-promise": "^10.5.6",
+    "reflect-metadata": "^0.1.13",
     "session-file-store": "^1.4.0",
     "strip-bom-buf": "^2.0.0",
+    "typeorm": "^0.2.25",
     "typescript": "^3.9.5"
   },
   "devDependencies": {

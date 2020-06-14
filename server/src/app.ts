@@ -7,6 +7,8 @@ import helmet from "helmet";
 import compression from "compression";
 import { errorLogger } from "./middleware/logger";
 import HttpStatusCode from "./enum/HttpStatusCode";
+// Dependency needed for TypeORM
+import "reflect-metadata";
 
 import api from "./routes/api";
 
