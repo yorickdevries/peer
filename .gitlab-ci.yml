@@ -43,8 +43,6 @@ build_server:
   stage: build
   variables:
     NODE_ENV: production
-  services:
-  - postgres:12
   script:
   - cd server && npm install
   - npm run build
@@ -56,8 +54,6 @@ build_client:
   stage: build
   variables:
     NODE_ENV: production
-  services:
-  - postgres:12
   script:
   - cd client && npm install
   - npm run build
