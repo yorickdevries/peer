@@ -5,7 +5,7 @@ import { PassportStatic } from "passport";
 const mockPassportConfiguration = function (
   passport: PassportStatic,
   netid: string,
-  affiliation: string
+  affiliation: string | string[]
 ): void {
   const userObject: Express.User = {
     netid: netid,

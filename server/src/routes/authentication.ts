@@ -53,7 +53,10 @@ const authenticationRoutes = function (router: Router): void {
     // Joi inputvalidation
     const mockUserSchema = Joi.object({
       netid: Joi.string().required(),
-      affiliation: [Joi.string(), Joi.array().items(Joi.string())],
+      affiliation: [
+        Joi.string().required(),
+        Joi.array().items(Joi.string()).required(),
+      ],
     });
 
     // Mock login route
