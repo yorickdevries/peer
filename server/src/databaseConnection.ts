@@ -38,10 +38,11 @@ const createDatabaseConnection = async function (): Promise<Connection> {
       connectionConfig = { ...baseConfig, ...mysqlConfig };
       break;
     }
+    // in memory database
     case "sqlite": {
       const sqliteConfig = {
         type: databaseConfig.type,
-        database: databaseConfig.database,
+        database: ":memory:",
         dropSchema: true,
       };
       connectionConfig = { ...baseConfig, ...sqliteConfig };

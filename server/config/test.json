@@ -1,7 +1,6 @@
 {
     "database": {
-        "type": "sqlite",
-        "database": ":memory:"
+        "type": "sqlite"
     },
     "old_database": {
         "connection": {
