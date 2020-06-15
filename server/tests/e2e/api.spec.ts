@@ -3,7 +3,7 @@ import request from "supertest";
 import { Connection } from "typeorm";
 import app from "../../src/app";
 import createDatabaseConnection from "../../src/databaseConnection";
-import HttpStatusCode from "../../src/enum/HttpStatusCode"
+import HttpStatusCode from "../../src/enum/HttpStatusCode";
 
 describe("E2E API", () => {
   // will be initialized and closed in beforeAll / afterAll
