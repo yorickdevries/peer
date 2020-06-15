@@ -1,7 +1,7 @@
 import express from "express";
 import { eventLogger } from "../middleware/logger";
 import loginRoutes from "./login";
-import authenticationCheck from "../middleware/authentication";
+import checkAuthentication from "../middleware/authentication/checkAuthentication";
 import HttpStatusCode from "../enum/HttpStatusCode";
 
 // old routes, can be deleted when not needed anymore
@@ -19,7 +19,7 @@ router.get("/authenticated", (req, res) => {
 });
 
 // Check always whether someone is logged in before accessing the other routes below
-router.use(authenticationCheck);
+router.use(checkAuthentication);
 
 // Route to get the userinfo
 router.get("/me", (req, res) => {
