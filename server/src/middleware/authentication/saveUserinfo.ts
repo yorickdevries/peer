@@ -50,6 +50,7 @@ const saveUserinfo = async function (
       }
       const user = new User(parseNetId(userinfo.netid));
       await user.save();
+      console.error(`Saved with only NetID: ${userinfo}`);
     } catch (error2) {
       console.error(`Cannot save: ${userinfo}, Error: ${error2}`);
     }
