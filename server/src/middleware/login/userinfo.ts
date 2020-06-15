@@ -36,7 +36,7 @@ const saveUserinfo = async function (
     // Validation before save
     const errors = await validate(user, { skipMissingProperties: true });
     if (errors.length > 0) {
-      console.error("User validation failed. errors: ", errors);
+      console.error("User validation failed: ", errors);
     }
     // still save as we dont want to block users from using the app
     await user.save();
