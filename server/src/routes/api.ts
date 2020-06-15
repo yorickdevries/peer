@@ -33,7 +33,7 @@ router.use("/oldroutes", oldRoutes);
 
 // If no other routes apply, send a 404
 router.use((_req, res) => {
-  res.sendStatus(HttpStatusCode.NOT_FOUND);
+  res.status(HttpStatusCode.NOT_FOUND).send("Resource not found");
 });
 
 export default router;

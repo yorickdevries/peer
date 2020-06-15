@@ -37,7 +37,9 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   // Print error to the stderr
   console.error(`Error occured at ${new Date()}: ${err}`);
   // Send generic 500 error response
-  res.sendStatus(HttpStatusCode.INTERNAL_SERVER_ERROR);
+  res
+    .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+    .send("Internal server error, please contact the system administrator");
 });
 
 export default app;
