@@ -14,20 +14,23 @@ interface SSOUser {
   organisationUnit?: string | string[];
 }
 
-// Joi Schema
-const SSOUserSchema = Joi.object({
-  netid: Joi.string().required(),
-  studentNumber: Joi.number(),
-  firstName: Joi.string(),
-  prefix: Joi.string(),
-  lastName: Joi.string(),
-  email: Joi.string(),
-  displayName: Joi.string(),
-  affiliation: [Joi.string(), Joi.array().items(Joi.string())],
-  study: [Joi.string(), Joi.array().items(Joi.string())],
-  organisationUnit: [Joi.string(), Joi.array().items(Joi.string())],
-});
-
 // move validate here
+function validateSSOUser(user: any): Joi.ValidationError | undefined {
+  // Joi Schema for SSOUser
+  const schema = Joi.object({
+    netid: Joi.string().required(),
+    studentNumber: Joi.number(),
+    firstName: Joi.string(),
+    prefix: Joi.string(),
+    lastName: Joi.string(),
+    email: Joi.string(),
+    displayName: Joi.string(),
+    affiliation: [Joi.string(), Joi.array().items(Joi.string())],
+    study: [Joi.string(), Joi.array().items(Joi.string())],
+    organisationUnit: [Joi.string(), Joi.array().items(Joi.string())],
+  });
 
-export { SSOUser, SSOUserSchema };
+  return schema.validate(user).error;
+}
+
+export { SSOUser, validateSSOUser };

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { validate } from "class-validator";
-import { SSOUserSchema } from "../../models/SSOUser";
+import { validateSSOUser } from "../../models/SSOUser";
 import parseNetId from "../../util/parseNetId";
 import parseAndSaveSSOFields from "../../util/parseAndSaveSSOFields";
 import { User } from "../../models/User";
@@ -21,7 +21,7 @@ const saveUserinfo = async function (
       throw new Error("req.user is undefined");
     }
     // check whether the schema is compliant with what is expected
-    const joiError = SSOUserSchema.validate(userinfo).error;
+    const joiError = validateSSOUser(userinfo);
     if (joiError) {
       throw joiError;
     }
