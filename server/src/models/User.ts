@@ -1,11 +1,4 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  BaseEntity,
-  ManyToMany,
-  JoinTable,
-} from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToMany, JoinTable } from "typeorm";
 import {
   IsDefined,
   IsString,
@@ -16,12 +9,13 @@ import {
   IsEmail,
   IsNotEmpty,
 } from "class-validator";
+import { BaseModel } from "./BaseModel";
 import { Affiliation } from "./Affiliation";
 import { Study } from "./Study";
 import { OrganisationUnit } from "./OrganisationUnit";
 
 @Entity()
-export class User extends BaseEntity {
+export class User extends BaseModel {
   @PrimaryColumn()
   @IsDefined()
   @IsString()
