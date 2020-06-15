@@ -37,7 +37,7 @@ const saveUserinfo = async function (
       await parseAndSaveSSOFields(userinfo.study, Study),
       await parseAndSaveSSOFields(userinfo.organisationUnit, OrganisationUnit)
     );
-    // Class Validation before save
+    // Class Validation before saving to database
     const errors = await validate(user, { skipMissingProperties: true });
     if (errors.length > 0) {
       throw errors;
@@ -46,7 +46,7 @@ const saveUserinfo = async function (
     await user.save();
   } catch (error) {
     console.error("Problem while saving user: ", error);
-    // try to just save the NetID to the database
+    // Alternatively, try to just save the NetID to the database
     try {
       if (typeof userinfo?.netid !== "string") {
         throw new Error("NetID is not a string");
