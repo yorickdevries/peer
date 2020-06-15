@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { validate } from "class-validator";
+import { SSOUserSchema } from "../../models/SSOUser";
 import parseNetId from "../../util/parseNetId";
 import parseAndSaveSSOFields from "../../util/parseAndSaveSSOFields";
 import { User } from "../../models/User";
@@ -14,13 +15,16 @@ const saveUserinfo = async function (
   next: NextFunction
 ): Promise<void> {
   const userinfo = req.user;
-  // check whether userinfo exists
-  if (!userinfo) {
-    // no user logged in
-    next();
-  } else {
-    // Save user to database
-    // Overwrites existing entry with the same NetID if present
+  try {
+    if (userinfo === undefined) {
+      throw new Error("req.user is undefined");
+    }
+    // check whether the schema is compliant with what is expected
+    const joiError = SSOUserSchema.validate(userinfo).error;
+    if (joiError) {
+      throw joiError;
+    }
+    // Try to save the user to database
     const user = new User(
       parseNetId(userinfo.netid),
       userinfo.studentNumber,
@@ -33,13 +37,27 @@ const saveUserinfo = async function (
       await parseAndSaveSSOFields(userinfo.study, Study),
       await parseAndSaveSSOFields(userinfo.organisationUnit, OrganisationUnit)
     );
-    // Validation before save
+    // Class Validation before save
     const errors = await validate(user, { skipMissingProperties: true });
     if (errors.length > 0) {
-      console.error("User validation failed: ", errors);
+      throw errors;
     }
-    // still save as we dont want to block users from using the app
+    // Overwrites existing entry with the same NetID if present
     await user.save();
+  } catch (error) {
+    console.error("Problem while saving user: ", error);
+    // try to just save the NetID to the database
+    try {
+      if (typeof userinfo?.netid !== "string") {
+        throw new Error("NetID is not a string");
+      }
+      const user = new User(parseNetId(userinfo.netid));
+      await user.save();
+    } catch (error2) {
+      console.error(`Cannot save: ${userinfo}, Error: ${error2}`);
+    }
+  } finally {
+    // call next route anyhow
     next();
   }
 };
