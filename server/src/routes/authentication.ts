@@ -6,7 +6,7 @@ import Joi from "@hapi/joi";
 import session from "../middleware/authentication/session";
 import passportConfiguration from "../middleware/authentication/passport";
 import mockPassportConfiguration from "../middleware/authentication/passportMock";
-import saveUserinfo from "../middleware/authentication/userinfo";
+import saveUserinfo from "../middleware/authentication/saveUserinfo";
 import HttpStatusCode from "../enum/HttpStatusCode";
 
 // Adds authentication routes

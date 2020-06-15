@@ -1,4 +1,3 @@
-import { validate } from "class-validator";
 import { SSOField } from "../models/SSOField";
 
 const parseAndSaveSSOFields = async function <T extends SSOField>(
@@ -18,12 +17,13 @@ const parseAndSaveSSOFields = async function <T extends SSOField>(
     // Parse all strings to ssoFields
     for (const name of inputNames) {
       const ssoField = new constructor(name);
-      const errors = await validate(ssoField);
-      if (errors.length > 0) {
+      // validate before saving
+      const errors = await ssoField.validate();
+      if (errors) {
         // Log error and skip SSOField
         console.error("SSOField validation failed: ", errors);
       } else {
-        // save all the ssoFields to the database
+        // save the ssoField to the database
         ssoFields.push(ssoField);
         await ssoField.save();
       }

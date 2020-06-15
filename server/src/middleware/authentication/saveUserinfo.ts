@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { validate } from "class-validator";
 import { validateSSOUser } from "../../models/SSOUser";
 import parseNetId from "../../util/parseNetId";
 import parseAndSaveSSOFields from "../../util/parseAndSaveSSOFields";
@@ -38,13 +37,9 @@ const saveUserinfo = async function (
       await parseAndSaveSSOFields(userinfo.study, Study),
       await parseAndSaveSSOFields(userinfo.organisationUnit, OrganisationUnit)
     );
-    // Class Validation before saving to database
-    const errors = await validate(user, { skipMissingProperties: true });
-    if (errors.length > 0) {
-      throw errors;
-    }
     // Overwrites existing entry with the same NetID if present
     // Does however not delete values if undefined values are passed
+    // might throw an error if the object is not valid
     await user.save();
   } catch (error) {
     console.error("Problem while saving user: ", error);
