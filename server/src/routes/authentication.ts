@@ -4,7 +4,7 @@ import path from "path";
 import config from "config";
 import Joi from "@hapi/joi";
 import session from "../middleware/authentication/session";
-import passportConfiguration from "../middleware/authentication/passport";
+import passportConfiguration from "../middleware/authentication/passportTUDelft";
 import mockPassportConfiguration from "../middleware/authentication/passportMock";
 import saveUserinfo from "../middleware/authentication/saveUserinfo";
 import HttpStatusCode from "../enum/HttpStatusCode";
