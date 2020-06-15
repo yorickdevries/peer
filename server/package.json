@@ -43,6 +43,7 @@
     "instrument": true
   },
   "dependencies": {
+    "@hapi/joi": "^17.1.1",
     "@types/bluebird": "^3.5.32",
     "@types/compression": "^1.7.0",
     "@types/config": "0.0.36",
