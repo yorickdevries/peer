@@ -1,6 +1,4 @@
-/**
- * Class which takes care of NetId parsing
- */
+// Class which takes care of NetId parsing
 const parseNetId = function (netId: string): string {
   // extra check in case SSO sends something weird
   if (typeof netId !== "string") {

@@ -13,7 +13,7 @@ router.use(eventLogger);
 // initialize login/logout authentication routes
 authenticationRoutes(router);
 
-// Authentication route
+// Check authentication route
 router.get("/authenticated", (req, res) => {
   res.json({ authenticated: req.isAuthenticated() });
 });
@@ -21,7 +21,7 @@ router.get("/authenticated", (req, res) => {
 // Check always whether someone is logged in before accessing the other routes below
 router.use(checkAuthentication);
 
-// Route to get the userinfo
+// Route to get the current userinfo from SSO
 router.get("/me", (req, res) => {
   res.json(req.user);
 });

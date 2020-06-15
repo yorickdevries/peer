@@ -14,6 +14,7 @@ const saveUserinfo = async function (
   _res: Response,
   next: NextFunction
 ): Promise<void> {
+  // the userinfo comes from the TU Delft SSO provider, so it needs to be validated
   const userinfo = req.user;
   try {
     if (userinfo === undefined) {

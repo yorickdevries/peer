@@ -28,4 +28,6 @@ const SSOUserSchema = Joi.object({
   organisationUnit: [Joi.string(), Joi.array().items(Joi.string())],
 });
 
+// move validate here
+
 export { SSOUser, SSOUserSchema };
