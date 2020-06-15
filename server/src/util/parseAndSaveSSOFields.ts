@@ -6,32 +6,28 @@ const parseAndSaveSSOFields = async function <T extends SSOField>(
   constructor: new (_: string) => T
 ): Promise<T[]> {
   const ssoFields: T[] = [];
-  // skip if undefined
+  // skip if input is undefined
   if (input !== undefined) {
     // inputNames array
-    let inputNames: string[];
-    if (typeof input === "string") {
-      inputNames = [input];
-    } else {
+    let inputNames;
+    if (input instanceof Array) {
       inputNames = input;
+    } else {
+      inputNames = [input];
     }
     // Parse all strings to ssoFields
     for (const name of inputNames) {
       const ssoField = new constructor(name);
-      validate(ssoField).then((errors) => {
-        if (errors.length > 0) {
-          // Log error and skip SSOField
-          console.error("SSOField validation failed: ", errors);
-        } else {
-          ssoFields.push(ssoField);
-        }
-      });
+      const errors = await validate(ssoField);
+      if (errors.length > 0) {
+        // Log error and skip SSOField
+        console.error("SSOField validation failed: ", errors);
+      } else {
+        // save all the ssoFields to the database
+        ssoFields.push(ssoField);
+        await ssoField.save();
+      }
     }
-  }
-  // save all the ssoFields to the database
-  for (const ssoField of ssoFields) {
-    // TODO: add validation
-    await ssoField.save();
   }
   return ssoFields;
 };
