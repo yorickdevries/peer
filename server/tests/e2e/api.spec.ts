@@ -36,11 +36,13 @@ describe("E2E API", () => {
   });
 
   test("check /authenticated route with logging in", async () => {
-    // perform a mocklogin
-    const response1 = await request(server).post("/api/mocklogin").send({
-      netid: "user",
-      affiliation: "employee",
-    });
+    // perform a mocklogin with random user
+    const response1 = await request(server)
+      .post("/api/mocklogin")
+      .send({
+        netid: `user${Math.floor(Math.random() * 1000)}`,
+        affiliation: "employee",
+      });
     //save the session cookie
     const sessionCookie = response1.header["set-cookie"];
     const response2 = await request(server)
