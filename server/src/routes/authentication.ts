@@ -53,10 +53,7 @@ const authenticationRoutes = function (router: Router): void {
     // Joi inputvalidation
     const mockUserSchema = Joi.object({
       netid: Joi.string().required(),
-      affiliation: [
-        Joi.string().required(),
-        Joi.array().items(Joi.string()).required(),
-      ],
+      affiliation: Joi.string().required(),
     });
 
     // Mock login route
@@ -64,8 +61,9 @@ const authenticationRoutes = function (router: Router): void {
       "/mocklogin",
       (req, res, next) => {
         // check whether the schema is compliant with what is expected
-        if (mockUserSchema.validate(req.body).error) {
-          res.sendStatus(HttpStatusCode.BAD_REQUEST);
+        const error = mockUserSchema.validate(req.body).error;
+        if (error) {
+          res.status(HttpStatusCode.BAD_REQUEST).send(error);
         } else {
           const netid = req.body.netid;
           const affiliation = req.body.affiliation;

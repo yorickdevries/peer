@@ -9,7 +9,7 @@ const checkAuthentication = function (
   if (req.isAuthenticated()) {
     next();
   } else {
-    res.sendStatus(HttpStatusCode.UNAUTHORIZED);
+    res.status(HttpStatusCode.UNAUTHORIZED).send("Please log in and try again");
   }
 };
 
