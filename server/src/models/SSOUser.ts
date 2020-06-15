@@ -14,8 +14,8 @@ interface SSOUser {
   organisationUnit?: string | string[];
 }
 
-// move validate here
-function validateSSOUser(user: any): Joi.ValidationError | undefined {
+// Validation of SSO data with Joi
+function validateSSOUser(user: SSOUser): Joi.ValidationError | undefined {
   // Joi Schema for SSOUser
   const schema = Joi.object({
     netid: Joi.string().required(),
