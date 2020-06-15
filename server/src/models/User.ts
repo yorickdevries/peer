@@ -99,7 +99,7 @@ export class User extends BaseModel {
     this.organisationUnit = organisationUnit;
   }
 
-  // temporatily added as typescipt doesn't compile when private fields aren't used
+  // temporarily added as typescript doesn't compile when private fields aren't used
   toString(): string {
     return `${this.netid},${this.studentNumber},${this.firstName},${this.prefix}, ${this.lastName},${this.email},${this.affiliation},${this.displayName},${this.study},${this.organisationUnit}`;
   }

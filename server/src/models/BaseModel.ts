@@ -1,5 +1,5 @@
 import { BaseEntity, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { validate, ValidationError, IsDate } from "class-validator";
+import { validate, ValidationError, IsDate, IsOptional } from "class-validator";
 
 // Adds the basic fields of @CreateDateColumn and UpdateDateColumn
 export abstract class BaseModel extends BaseEntity {
@@ -8,18 +8,20 @@ export abstract class BaseModel extends BaseEntity {
     // maybe move to separate function when more Dates are used in the database
     process.env.NODE_ENV === "test" ? undefined : { type: "timestamp" }
   )
+  // these fields are created after saving, so @IsOptional() is added
+  @IsOptional()
   @IsDate()
-  // Added ! due to tsc complications
-  createdAt!: Date;
+  private createdAt?: Date;
 
   @UpdateDateColumn(
     // set datatype to timestamp if not running in test environment
     // maybe move to separate function when more Dates are used in the database
     process.env.NODE_ENV === "test" ? undefined : { type: "timestamp" }
   )
+  // these fields are created after saving, so @IsOptional() is added
+  @IsOptional()
   @IsDate()
-  // Added ! due to tsc complications
-  updatedAt!: Date;
+  private updatedAt?: Date;
 
   // overloading save route
   save(): Promise<this> {
@@ -42,5 +44,10 @@ export abstract class BaseModel extends BaseEntity {
         return undefined;
       }
     });
+  }
+
+  // temporarily added as typescript doesn't compile when private fields aren't used
+  toString(): string {
+    return `${this.createdAt},${this.updatedAt}`;
   }
 }

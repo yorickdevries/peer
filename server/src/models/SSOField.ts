@@ -14,7 +14,7 @@ export abstract class SSOField extends BaseModel {
     this.name = name;
   }
 
-  // temporatily added as typescipt doesn't compile when private fields aren't used
+  // temporarily added as typescript doesn't compile when private fields aren't used
   toString(): string {
     return this.name;
   }
