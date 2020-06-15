@@ -10,6 +10,7 @@ describe("E2E API", () => {
   let server: http.Server;
 
   beforeAll(async () => {
+    // For the in memory test database, the schema is automatically dropped upon connect
     connection = await createDatabaseConnection();
     console.log(
       `Connected to ${connection.options.type} database: ${connection.options.database}`
@@ -18,9 +19,8 @@ describe("E2E API", () => {
   });
 
   afterAll(async () => {
-    //close server and remove data
+    //close server and connection
     server.close();
-    await connection.dropDatabase();
     await connection.close();
   });
 
