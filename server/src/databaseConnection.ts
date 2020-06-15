@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { createConnection, Connection } from "typeorm";
+import { createConnection, Connection, ConnectionOptions } from "typeorm";
 import config from "config";
 // Database models
 import { User } from "./models/User";
@@ -8,6 +8,7 @@ import { Study } from "./models/Study";
 import { OrganisationUnit } from "./models/OrganisationUnit";
 
 const databaseConfig: {
+  type: string;
   host: string;
   port: number;
   username: string;
@@ -16,17 +17,40 @@ const databaseConfig: {
 } = config.get("database");
 
 const createDatabaseConnection = async function (): Promise<Connection> {
-  return createConnection({
-    type: "mysql",
-    host: databaseConfig.host,
-    port: databaseConfig.port,
-    username: databaseConfig.username,
-    password: databaseConfig.password,
-    database: databaseConfig.database,
+  const baseConfig = {
     entities: [User, Affiliation, Study, OrganisationUnit],
     synchronize: true,
     logging: false,
-  });
+  };
+  // will be assigned in the switch statement
+  let connectionConfig: ConnectionOptions;
+
+  switch (databaseConfig.type) {
+    case "mysql": {
+      const mysqlConfig = {
+        type: databaseConfig.type,
+        host: databaseConfig.host,
+        port: databaseConfig.port,
+        username: databaseConfig.username,
+        password: databaseConfig.password,
+        database: databaseConfig.database,
+      };
+      connectionConfig = { ...baseConfig, ...mysqlConfig };
+      break;
+    }
+    case "sqlite": {
+      const sqliteConfig = {
+        type: databaseConfig.type,
+        database: databaseConfig.database,
+        dropSchema: true,
+      };
+      connectionConfig = { ...baseConfig, ...sqliteConfig };
+      break;
+    }
+    default:
+      throw new Error(`Invalid Database type: ${databaseConfig.type}`);
+  }
+  return createConnection(connectionConfig);
 };
 
 export default createDatabaseConnection;

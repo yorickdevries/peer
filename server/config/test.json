@@ -1,4 +1,8 @@
 {
+    "database": {
+        "type": "sqlite",
+        "database": ":memory:"
+    },
     "old_database": {
         "connection": {
             "database": "peer_test"
