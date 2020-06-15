@@ -1,6 +1,6 @@
 import express from "express";
 import { eventLogger } from "../middleware/logger";
-import loginRoutes from "./login";
+import authenticationRoutes from "./authentication";
 import checkAuthentication from "../middleware/authentication/checkAuthentication";
 import HttpStatusCode from "../enum/HttpStatusCode";
 
@@ -10,8 +10,8 @@ import oldRoutes from "../old_api/routes/api";
 const router = express.Router();
 router.use(eventLogger);
 
-// initialize login/logout routes
-loginRoutes(router);
+// initialize login/logout authentication routes
+authenticationRoutes(router);
 
 // Authentication route
 router.get("/authenticated", (req, res) => {

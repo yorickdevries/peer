@@ -9,8 +9,8 @@ import mockPassportConfiguration from "../middleware/authentication/passportMock
 import saveUserinfo from "../middleware/authentication/userinfo";
 import HttpStatusCode from "../enum/HttpStatusCode";
 
-// Adds login routes
-const loginRoutes = function (router: Router): void {
+// Adds authentication routes
+const authenticationRoutes = function (router: Router): void {
   // setup sessions for login
   router.use(session);
   // initialize passport middleware
@@ -92,4 +92,4 @@ const loginRoutes = function (router: Router): void {
   });
 };
 
-export default loginRoutes;
+export default authenticationRoutes;
