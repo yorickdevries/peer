@@ -3,6 +3,7 @@ import request from "supertest";
 import { Connection } from "typeorm";
 import app from "../../src/app";
 import createDatabaseConnection from "../../src/databaseConnection";
+import HttpStatusCode from "../../src/enum/HttpStatusCode"
 
 describe("E2E API", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -26,12 +27,12 @@ describe("E2E API", () => {
 
   test("check /me route without logging in", async () => {
     const response = await request(server).get("/api/me");
-    expect(response.status).toBe(401);
+    expect(response.status).toBe(HttpStatusCode.UNAUTHORIZED);
   });
 
   test("check /authenticated route without logging in", async () => {
     const response = await request(server).get("/api/authenticated");
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(response.text)).toEqual({ authenticated: false });
   });
 
@@ -49,7 +50,7 @@ describe("E2E API", () => {
       .get("/api/authenticated")
       .set("cookie", sessionCookie);
     // assertions
-    expect(response2.status).toBe(200);
+    expect(response2.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(response2.text)).toEqual({ authenticated: true });
   });
 });
