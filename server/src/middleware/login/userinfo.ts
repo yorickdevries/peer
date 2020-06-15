@@ -43,6 +43,7 @@ const saveUserinfo = async function (
       throw errors;
     }
     // Overwrites existing entry with the same NetID if present
+    // Does however not delete values if undefined values are passed
     await user.save();
   } catch (error) {
     console.error("Problem while saving user: ", error);
