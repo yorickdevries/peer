@@ -3,10 +3,10 @@ import passport from "passport";
 import path from "path";
 import config from "config";
 import Joi from "@hapi/joi";
-import session from "../middleware/login/session";
-import passportConfiguration from "../middleware/login/passport";
-import mockPassportConfiguration from "../middleware/login/passportMock";
-import saveUserinfo from "../middleware/login/userinfo";
+import session from "../middleware/authentication/session";
+import passportConfiguration from "../middleware/authentication/passport";
+import mockPassportConfiguration from "../middleware/authentication/passportMock";
+import saveUserinfo from "../middleware/authentication/userinfo";
 import HttpStatusCode from "../enum/HttpStatusCode";
 
 // Adds login routes
