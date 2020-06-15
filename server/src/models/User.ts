@@ -1,6 +1,7 @@
 import { Entity, PrimaryColumn, Column, ManyToMany, JoinTable } from "typeorm";
 import {
   IsDefined,
+  IsOptional,
   IsString,
   IsInt,
   IsAlphanumeric,
@@ -25,32 +26,38 @@ export class User extends BaseModel {
   private netid: string;
 
   @Column({ nullable: true })
+  @IsOptional()
   @IsInt()
   @IsPositive()
   private studentNumber?: number;
 
   @Column({ nullable: true })
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   private firstName?: string;
 
   @Column({ nullable: true })
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   private prefix?: string;
 
   @Column({ nullable: true })
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   private lastName?: string;
 
   @Column({ nullable: true })
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   @IsEmail()
   private email?: string;
 
   @Column({ nullable: true })
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   private displayName?: string;
