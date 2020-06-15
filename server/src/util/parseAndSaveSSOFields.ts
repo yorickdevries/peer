@@ -1,3 +1,4 @@
+import { validate } from "class-validator";
 import { SSOField } from "../models/SSOField";
 
 const parseAndSaveSSOFields = async function <T extends SSOField>(
@@ -5,18 +6,26 @@ const parseAndSaveSSOFields = async function <T extends SSOField>(
   constructor: new (_: string) => T
 ): Promise<T[]> {
   const ssoFields: T[] = [];
+  // skip if undefined
   if (input !== undefined) {
-    // skip if undefined
+    // inputNames array
+    let inputNames: string[];
     if (typeof input === "string") {
-      // one element array in case the input is just a string
-      const ssoField = new constructor(input);
-      ssoFields.push(ssoField);
+      inputNames = [input];
     } else {
-      // otherwise, parse all strings to ssoFields
-      for (const name of input) {
-        const ssoField = new constructor(name);
-        ssoFields.push(ssoField);
-      }
+      inputNames = input;
+    }
+    // Parse all strings to ssoFields
+    for (const name of inputNames) {
+      const ssoField = new constructor(name);
+      validate(ssoField).then((errors) => {
+        if (errors.length > 0) {
+          // Log error and skip SSOField
+          console.error("SSOField validation failed: ", errors);
+        } else {
+          ssoFields.push(ssoField);
+        }
+      });
     }
   }
   // save all the ssoFields to the database
