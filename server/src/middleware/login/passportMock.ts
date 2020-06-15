@@ -11,7 +11,6 @@ const mockPassportConfiguration = function (
     netid: netid,
     studentNumber: 1234567,
     firstName: "First",
-    prefix: "and",
     lastName: "Last",
     email: "mail@mail.com",
     displayName: netid,

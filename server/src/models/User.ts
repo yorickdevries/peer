@@ -6,6 +6,16 @@ import {
   ManyToMany,
   JoinTable,
 } from "typeorm";
+import {
+  IsDefined,
+  IsString,
+  IsInt,
+  IsAlphanumeric,
+  IsLowercase,
+  IsPositive,
+  IsEmail,
+  IsNotEmpty,
+} from "class-validator";
 import { Affiliation } from "./Affiliation";
 import { Study } from "./Study";
 import { OrganisationUnit } from "./OrganisationUnit";
@@ -13,24 +23,42 @@ import { OrganisationUnit } from "./OrganisationUnit";
 @Entity()
 export class User extends BaseEntity {
   @PrimaryColumn()
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
+  @IsAlphanumeric()
+  @IsLowercase()
   private netid: string;
 
   @Column({ nullable: true })
+  @IsInt()
+  @IsPositive()
   private studentNumber?: number;
 
   @Column({ nullable: true })
+  @IsString()
+  @IsNotEmpty()
   private firstName?: string;
 
   @Column({ nullable: true })
+  @IsString()
+  @IsNotEmpty()
   private prefix?: string;
 
   @Column({ nullable: true })
+  @IsString()
+  @IsNotEmpty()
   private lastName?: string;
 
   @Column({ nullable: true })
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
   private email?: string;
 
   @Column({ nullable: true })
+  @IsString()
+  @IsNotEmpty()
   private displayName?: string;
 
   @ManyToMany((_type) => Affiliation)

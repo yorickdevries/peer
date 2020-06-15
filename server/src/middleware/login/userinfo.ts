@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { validate } from "class-validator";
 import parseNetId from "../../util/parseNetId";
 import parseAndSaveSSOFields from "../../util/parseAndSaveSSOFields";
 import { User } from "../../models/User";
@@ -32,7 +33,12 @@ const saveUserinfo = async function (
       await parseAndSaveSSOFields(userinfo.study, Study),
       await parseAndSaveSSOFields(userinfo.organisationUnit, OrganisationUnit)
     );
-    // TODO: Add class validation before save
+    // Validation before save
+    const errors = await validate(user, { skipMissingProperties: true });
+    if (errors.length > 0) {
+      console.error("User validation failed. errors: ", errors);
+    }
+    // still save as we dont want to block users from using the app
     await user.save();
     next();
   }
