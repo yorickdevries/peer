@@ -2,13 +2,15 @@ import { Router } from "express";
 import passport from "passport";
 import path from "path";
 import config from "config";
-import session from "../middleware/login/session";
-import passportConfiguration from "../middleware/login/passport";
-import mockPassportConfiguration from "../middleware/login/passportMock";
-import saveUserinfo from "../middleware/login/userinfo";
+import Joi from "@hapi/joi";
+import session from "../middleware/authentication/session";
+import passportConfiguration from "../middleware/authentication/passportTUDelft";
+import mockPassportConfiguration from "../middleware/authentication/passportMock";
+import saveUserinfo from "../middleware/authentication/saveUserinfo";
+import HttpStatusCode from "../enum/HttpStatusCode";
 
-// Adds login routes
-const loginRoutes = function (router: Router): void {
+// Adds authentication routes
+const authenticationRoutes = function (router: Router): void {
   // setup sessions for login
   router.use(session);
   // initialize passport middleware
@@ -48,16 +50,30 @@ const loginRoutes = function (router: Router): void {
       res.sendFile(path.resolve("./mocklogin.html"));
     });
 
+    // Joi inputvalidation
+    const mockUserSchema = Joi.object({
+      netid: Joi.string().required(),
+      affiliation: [
+        Joi.string().required(),
+        Joi.array().items(Joi.string()).required(),
+      ],
+    });
+
     // Mock login route
     router.post(
       "/mocklogin",
-      (req, _res, next) => {
-        const netid = req.body.netid;
-        const affiliation = req.body.affiliation;
-        console.log(`Mocklogin: ${netid}, ${affiliation}`);
-        // make Mocked passport configuration
-        mockPassportConfiguration(passport, netid, affiliation);
-        next();
+      (req, res, next) => {
+        // check whether the schema is compliant with what is expected
+        if (mockUserSchema.validate(req.body).error) {
+          res.sendStatus(HttpStatusCode.BAD_REQUEST);
+        } else {
+          const netid = req.body.netid;
+          const affiliation = req.body.affiliation;
+          console.log(`Mocklogin: ${netid}, ${affiliation}`);
+          // make Mocked passport configuration
+          mockPassportConfiguration(passport, netid, affiliation);
+          next();
+        }
       },
       passport.authenticate("mock"),
       saveUserinfo, // Save userinfo to the database
@@ -79,4 +95,4 @@ const loginRoutes = function (router: Router): void {
   });
 };
 
-export default loginRoutes;
+export default authenticationRoutes;

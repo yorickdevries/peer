@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import HttpStatusCode from "../enum/HttpStatusCode";
+import HttpStatusCode from "../../enum/HttpStatusCode";
 
-const authenticationCheck = function (
+const checkAuthentication = function (
   req: Request,
   res: Response,
   next: NextFunction
@@ -13,4 +13,4 @@ const authenticationCheck = function (
   }
 };
 
-export default authenticationCheck;
+export default checkAuthentication;

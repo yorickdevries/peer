@@ -1,9 +1,8 @@
-/**
- * Class which takes care of NetId parsing
- */
+// Class which takes care of NetId parsing
 const parseNetId = function (netId: string): string {
-  if (netId == undefined) {
-    throw new Error("NetId is undefined");
+  // extra check in case SSO sends something weird
+  if (typeof netId !== "string") {
+    throw new Error("NetId isn't a string");
   }
   // in case the student doesnt have a Username field
   if (netId == "") {
