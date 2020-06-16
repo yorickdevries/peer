@@ -14,6 +14,7 @@ const databaseConfig: {
   username: string;
   password: string;
   database: string;
+  connectionUrl?: string;
 } = config.get("database");
 
 const createDatabaseConnection = async function (): Promise<Connection> {
@@ -27,14 +28,24 @@ const createDatabaseConnection = async function (): Promise<Connection> {
 
   switch (databaseConfig.type) {
     case "mysql": {
-      const mysqlConfig = {
-        type: databaseConfig.type,
-        host: databaseConfig.host,
-        port: databaseConfig.port,
-        username: databaseConfig.username,
-        password: databaseConfig.password,
-        database: databaseConfig.database,
-      };
+      let mysqlConfig;
+      if (databaseConfig.connectionUrl) {
+        // Use the URL to set up the connection (like for Heroku)
+        mysqlConfig = {
+          type: databaseConfig.type,
+          url: databaseConfig.connectionUrl,
+        };
+      } else {
+        // use the other parameters
+        mysqlConfig = {
+          type: databaseConfig.type,
+          host: databaseConfig.host,
+          port: databaseConfig.port,
+          username: databaseConfig.username,
+          password: databaseConfig.password,
+          database: databaseConfig.database,
+        };
+      }
       connectionConfig = { ...baseConfig, ...mysqlConfig };
       break;
     }
