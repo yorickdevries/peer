@@ -20,7 +20,7 @@ const databaseConfig: {
 const createDatabaseConnection = async function (): Promise<Connection> {
   const baseConfig = {
     entities: [User, Affiliation, Study, OrganisationUnit],
-    synchronize: true,
+    synchronize: true, // must be set to false once deployed to production (we should siwtch to migrations instead)
     logging: false,
   };
   // will be assigned in the switch statement
