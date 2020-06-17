@@ -1,5 +1,17 @@
-import { BaseEntity, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { validate, ValidationError, IsDate, IsOptional } from "class-validator";
+import {
+  BaseEntity,
+  CreateDateColumn,
+  UpdateDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
+} from "typeorm";
+import {
+  validate,
+  validateOrReject,
+  ValidationError,
+  IsDate,
+  IsOptional,
+} from "class-validator";
 
 // Adds the basic fields of @CreateDateColumn and UpdateDateColumn
 export abstract class BaseModel extends BaseEntity {
@@ -23,19 +35,7 @@ export abstract class BaseModel extends BaseEntity {
   @IsDate()
   private updatedAt?: Date;
 
-  // overloading save route
-  save(): Promise<this> {
-    // Class Validation before saving to database
-    return this.validate().then((errors) => {
-      if (errors) {
-        throw errors;
-      } else {
-        return super.save();
-      }
-    });
-  }
-
-  // add validation route
+  // validation route which can be externally called and can return error objects
   validate(): Promise<ValidationError[] | undefined> {
     return validate(this).then((errors) => {
       if (errors.length > 0) {
@@ -46,8 +46,15 @@ export abstract class BaseModel extends BaseEntity {
     });
   }
 
+  // validateOrReject to be run before saving/updating by TypeORM
+  @BeforeInsert()
+  @BeforeUpdate()
+  private validateOrReject(): Promise<void> {
+    return validateOrReject(this);
+  }
+
   // temporarily added as typescript doesn't compile when private fields aren't used
   toString(): string {
-    return `${this.createdAt},${this.updatedAt}`;
+    return `${this.createdAt},${this.updatedAt},${this.validateOrReject}`;
   }
 }
