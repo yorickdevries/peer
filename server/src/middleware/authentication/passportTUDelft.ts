@@ -7,7 +7,7 @@ import { fetch, toPassportConfig } from "passport-saml-metadata";
 import passport_saml from "passport-saml";
 import config from "config";
 import { PassportStatic } from "passport";
-import parseNetId from "../../util/parseNetId";
+import parseNetId from "../../util/parse_NetId";
 
 const passportConfiguration = function (passport: PassportStatic): void {
   const samlStrategy = passport_saml.Strategy;

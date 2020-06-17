@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { validateSSOUser } from "../../models/SSOUser";
-import parseNetId from "../../util/parseNetId";
+import parseNetId from "../../util/parse_NetId";
 import parseAndSaveSSOFields from "../../util/parseAndSaveSSOFields";
 import { User } from "../../models/User";
 import { Affiliation } from "../../models/Affiliation";
