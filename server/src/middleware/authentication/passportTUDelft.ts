@@ -7,6 +7,7 @@ import { fetch, toPassportConfig } from "passport-saml-metadata";
 import passport_saml from "passport-saml";
 import config from "config";
 import { PassportStatic } from "passport";
+import parseNetID from "../../util/parseNetID";
 
 const passportConfiguration = function (passport: PassportStatic): void {
   const samlStrategy = passport_saml.Strategy;
@@ -45,7 +46,7 @@ const passportConfiguration = function (passport: PassportStatic): void {
     // Setup Strategy
     const strategy = new samlStrategy(ppConfig, (profile: any, done: any) => {
       return done(undefined, {
-        netid: profile["uid"],
+        netid: parseNetID(profile["uid"]), // parsed as this is the primary key
         studentNumber: profile["tudStudentNumber"],
         firstName: profile["givenName"],
         prefix: profile["tudPrefix"],
