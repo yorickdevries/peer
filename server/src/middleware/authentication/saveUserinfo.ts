@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { validateSSOUser } from "../../models/SSOUser";
-import parseNetId from "../../util/parse_NetId";
+import parseNetID from "../../util/parseNetID";
 import parseAndSaveSSOFields from "../../util/parseAndSaveSSOFields";
 import { User } from "../../models/User";
 import { Affiliation } from "../../models/Affiliation";
@@ -26,7 +26,7 @@ const saveUserinfo = async function (
     }
     // Try to save the user to database
     const user = new User(
-      parseNetId(userinfo.netid),
+      parseNetID(userinfo.netid),
       userinfo.studentNumber,
       userinfo.firstName,
       userinfo.prefix,
@@ -48,7 +48,7 @@ const saveUserinfo = async function (
       if (typeof userinfo?.netid !== "string") {
         throw new Error("NetID is not a string");
       }
-      const user = new User(parseNetId(userinfo.netid));
+      const user = new User(parseNetID(userinfo.netid));
       await user.save();
       console.error(`Saved with only NetID: ${userinfo}`);
     } catch (error2) {
