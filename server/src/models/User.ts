@@ -82,24 +82,25 @@ export class User extends BaseModel {
 
   constructor(
     netid: string,
-    studentNumber?: number,
-    firstName?: string,
-    prefix?: string,
-    lastName?: string,
-    email?: string,
-    displayName?: string,
+    studentNumber?: number | null,
+    firstName?: string | null,
+    prefix?: string | null,
+    lastName?: string | null,
+    email?: string | null,
+    displayName?: string | null,
     affiliation?: Affiliation[],
     study?: Study[],
     organisationUnit?: OrganisationUnit[]
   ) {
     super();
     this.netid = netid;
-    this.studentNumber = studentNumber;
-    this.firstName = firstName;
-    this.prefix = prefix;
-    this.lastName = lastName;
-    this.email = email;
-    this.displayName = displayName;
+    // the cast is done so the fields can be set to null in the database
+    this.studentNumber = studentNumber as number | undefined;
+    this.firstName = firstName as string | undefined;
+    this.prefix = prefix as string | undefined;
+    this.lastName = lastName as string | undefined;
+    this.email = email as string | undefined;
+    this.displayName = displayName as string | undefined;
     this.affiliation = affiliation;
     this.study = study;
     this.organisationUnit = organisationUnit;

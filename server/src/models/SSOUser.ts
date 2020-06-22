@@ -4,12 +4,12 @@ import Joi from "@hapi/joi";
 interface SSOUser {
   netid: string;
   studentNumber?: number;
-  firstName: string;
+  firstName?: string;
   prefix?: string;
-  lastName: string;
-  email: string;
-  displayName: string;
-  affiliation: string | string[];
+  lastName?: string;
+  email?: string;
+  displayName?: string;
+  affiliation?: string | string[];
   study?: string | string[];
   organisationUnit?: string | string[];
 }

@@ -44,6 +44,12 @@ const authenticationRoutes = function (router: Router): void {
         res.redirect("/");
       }
     );
+
+    // Retrieve SP metadata (Only works in production)
+    const metadata_path = path.resolve(config.get("SP_metadata_file"));
+    router.get("/metadata.xml", async (_, res) => {
+      res.sendFile(metadata_path);
+    });
   } else {
     // Mock Login form
     router.get("/login", (_req, res) => {
@@ -85,11 +91,6 @@ const authenticationRoutes = function (router: Router): void {
     req.logout();
     // TODO: invalidate session on IP
     res.redirect("/");
-  });
-
-  // Retrieve SP metadata (Only works in production)
-  router.get("/metadata.xml", async (_, res) => {
-    res.sendFile("./SP_Metadata.xml");
   });
 };
 

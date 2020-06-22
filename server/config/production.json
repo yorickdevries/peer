@@ -13,5 +13,6 @@
         "certificate": "/var/www/peer/cert/peer_ewi_tudelft_nl.crt",
         "key": "/var/www/peer/cert/peer.ewi.tudelft.nl.key"
     },
+    "SP_metadata_file": "./SP_Metadata.xml",
     "url": "https://peer.ewi.tudelft.nl/"
 }

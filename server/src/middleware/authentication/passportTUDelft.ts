@@ -1,5 +1,6 @@
 import os from "os";
 import fs from "fs";
+import path from "path";
 import fileCache from "file-system-cache";
 // Needs to be updated and tested with newest version of the package
 import { fetch, toPassportConfig } from "passport-saml-metadata";
@@ -34,8 +35,11 @@ const passportConfiguration = function (passport: PassportStatic): void {
     ppConfig.callbackUrl = passportConfig.callbackUrl;
 
     // Certificate
-    const cert = fs.readFileSync(passportConfig.certificate, "utf-8");
-    const key = fs.readFileSync(passportConfig.key, "utf-8");
+    const cert = fs.readFileSync(
+      path.resolve(passportConfig.certificate),
+      "utf-8"
+    );
+    const key = fs.readFileSync(path.resolve(passportConfig.key), "utf-8");
 
     ppConfig.privateCert = key;
 
@@ -63,8 +67,9 @@ const passportConfiguration = function (passport: PassportStatic): void {
     const metadataXML = strategy.generateServiceProviderMetadata(
       decryptionCert
     );
-    fs.writeFileSync("./SP_Metadata.xml", metadataXML);
-    console.log("metadataXML written to: ./SP_Metadata.xml");
+    const metadata_path = path.resolve(config.get("SP_metadata_file"));
+    fs.writeFileSync(metadata_path, metadataXML);
+    console.log(`metadataXML written to: ${metadata_path}`);
     passport.use("saml", strategy);
 
     passport.serializeUser((user, done) => {
