@@ -35,8 +35,11 @@ const passportConfiguration = function (passport: PassportStatic): void {
     ppConfig.callbackUrl = passportConfig.callbackUrl;
 
     // Certificate
-    const cert = fs.readFileSync(passportConfig.certificate, "utf-8");
-    const key = fs.readFileSync(passportConfig.key, "utf-8");
+    const cert = fs.readFileSync(
+      path.resolve(passportConfig.certificate),
+      "utf-8"
+    );
+    const key = fs.readFileSync(path.resolve(passportConfig.key), "utf-8");
 
     ppConfig.privateCert = key;
 
