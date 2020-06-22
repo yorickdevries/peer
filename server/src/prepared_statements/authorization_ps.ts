@@ -202,7 +202,7 @@ export default class AuthorizationPS {
      * @return {any} true or false as pg promise.
      */
     public static executeCheckReviewMakerNotDone(reviewId: number, netId: String): any {
-        const statement = new PreparedStatement("check-review-owner",
+        const statement = new PreparedStatement("check-review-owner-not-done",
             "SELECT EXISTS(SELECT * FROM review WHERE review.done = false AND review.id = $1 AND review.user_netid = $2)");
         statement.values = [reviewId, netId];
         return Database.executeQuerySingleResult(statement);

@@ -86,7 +86,7 @@ export default class SubmissionsPS {
      */
     public static executeGetAllSubmissionByAssignmentIdByGroupId(assignmentId: number, groupId: number)
         : any {
-        const statement = new PreparedStatement("get-latest-submission-by-assignmentid-by-groupid",
+        const statement = new PreparedStatement("get-all-submission-by-assignmentid-by-groupid",
         "SELECT * FROM submission s1 WHERE assignment_id = $1 AND group_id = $2");
         statement.values = [assignmentId, groupId];
         return Database.executeQuery(statement);
