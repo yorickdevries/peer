@@ -13,6 +13,6 @@
     ],
     "rules": {
         "prefer-arrow-callback": "error",
-        "no-null/no-null": "error"
+        "no-null/no-null": "warn"
     }
 }

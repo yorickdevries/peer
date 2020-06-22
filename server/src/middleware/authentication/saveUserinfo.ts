@@ -27,18 +27,19 @@ const saveUserinfo = async function (
     // Try to save the user to database
     const user = new User(
       parseNetID(userinfo.netid),
-      userinfo.studentNumber,
-      userinfo.firstName,
-      userinfo.prefix,
-      userinfo.lastName,
-      userinfo.email,
-      userinfo.displayName,
+      userinfo.studentNumber ? userinfo.studentNumber : null,
+      userinfo.firstName ? userinfo.firstName : null,
+      userinfo.prefix ? userinfo.prefix : null,
+      userinfo.lastName ? userinfo.lastName : null,
+      userinfo.email ? userinfo.email : null,
+      userinfo.displayName ? userinfo.displayName : null,
       await parseAndSaveSSOFields(userinfo.affiliation, Affiliation),
       await parseAndSaveSSOFields(userinfo.study, Study),
       await parseAndSaveSSOFields(userinfo.organisationUnit, OrganisationUnit)
     );
     // Overwrites existing entry with the same NetID if present
     // Does however not delete values if undefined values are passed
+    // so null values are passed instead to delete the values
     // might throw an error if the object is not valid
     await user.save();
   } catch (error) {
