@@ -1,8 +1,8 @@
 import express from "express";
 import Joi from "@hapi/joi";
-const router = express.Router();
 import AcademicYear from "../models/AcademicYear";
 import HttpStatusCode from "../enum/HttpStatusCode";
+const router = express.Router();
 
 // Joi inputvalidation for query
 const querySchema = Joi.object({
