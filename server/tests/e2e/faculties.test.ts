@@ -7,7 +7,7 @@ import Faculty from "../../src/models/Faculty";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
 
-describe("E2E API", () => {
+describe("Faculties API", () => {
   let connection: Connection;
   let server: http.Server;
 
