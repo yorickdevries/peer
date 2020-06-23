@@ -4,6 +4,7 @@ import authenticationRoutes from "./authentication";
 import checkAuthentication from "../middleware/authentication/checkAuthentication";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import { User } from "../models/User";
+import faculties from "./faculties";
 
 // old routes, can be deleted when not needed anymore
 import oldRoutes from "../old_api/routes/api";
@@ -40,6 +41,7 @@ router.get("/me", async (req, res) => {
 });
 
 // TODO: Complete routing of the new API
+router.use("/faculties", faculties);
 
 // old routes, can be deleted when not needed anymore
 router.use("/oldroutes", oldRoutes);
