@@ -1,5 +1,5 @@
 import { Entity } from "typeorm";
-import { NamedModel } from "./NamedModel";
+import NamedModel from "./NamedModel";
 
 @Entity()
-export class Affiliation extends NamedModel {}
+export default class Affiliation extends NamedModel {}

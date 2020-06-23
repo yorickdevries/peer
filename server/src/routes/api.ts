@@ -3,7 +3,7 @@ import { eventLogger } from "../middleware/logger";
 import authenticationRoutes from "./authentication";
 import checkAuthentication from "../middleware/authentication/checkAuthentication";
 import HttpStatusCode from "../enum/HttpStatusCode";
-import { User } from "../models/User";
+import User from "../models/User";
 import faculties from "./faculties";
 
 // old routes, can be deleted when not needed anymore

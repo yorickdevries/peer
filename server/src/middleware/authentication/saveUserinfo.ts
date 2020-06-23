@@ -2,10 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import { validateSSOUser } from "../../models/SSOUser";
 import parseNetID from "../../util/parseNetID";
 import parseAndSaveSSOFields from "../../util/parseAndSaveSSOFields";
-import { User } from "../../models/User";
-import { Affiliation } from "../../models/Affiliation";
-import { Study } from "../../models/Study";
-import { OrganisationUnit } from "../../models/OrganisationUnit";
+import User from "../../models/User";
+import Affiliation from "../../models/Affiliation";
+import Study from "../../models/Study";
+import OrganisationUnit from "../../models/OrganisationUnit";
 
 // This route checks the user and updates it in the database
 const saveUserinfo = async function (

@@ -2,10 +2,10 @@ import "reflect-metadata";
 import { createConnection, Connection, ConnectionOptions } from "typeorm";
 import config from "config";
 // Database models
-import { User } from "./models/User";
-import { Affiliation } from "./models/Affiliation";
-import { Study } from "./models/Study";
-import { OrganisationUnit } from "./models/OrganisationUnit";
+import User from "./models/User";
+import Affiliation from "./models/Affiliation";
+import Study from "./models/Study";
+import OrganisationUnit from "./models/OrganisationUnit";
 import Faculty from "./models/Faculty";
 
 const databaseConfig: {

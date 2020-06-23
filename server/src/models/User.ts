@@ -10,13 +10,13 @@ import {
   IsEmail,
   IsNotEmpty,
 } from "class-validator";
-import { BaseModel } from "./BaseModel";
-import { Affiliation } from "./Affiliation";
-import { Study } from "./Study";
-import { OrganisationUnit } from "./OrganisationUnit";
+import BaseModel from "./BaseModel";
+import Affiliation from "./Affiliation";
+import Study from "./Study";
+import OrganisationUnit from "./OrganisationUnit";
 
 @Entity()
-export class User extends BaseModel {
+export default class User extends BaseModel {
   @PrimaryColumn()
   @IsDefined()
   @IsString()

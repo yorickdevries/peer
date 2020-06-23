@@ -1,4 +1,4 @@
-import { NamedModel } from "../models/NamedModel";
+import NamedModel from "../models/NamedModel";
 
 const parseAndSaveSSOFields = async function <T extends NamedModel>(
   input: string | string[] | undefined,

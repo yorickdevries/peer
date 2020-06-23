@@ -14,7 +14,7 @@ import {
 } from "class-validator";
 
 // Adds the basic fields of @CreateDateColumn and UpdateDateColumn
-export abstract class BaseModel extends BaseEntity {
+export default abstract class BaseModel extends BaseEntity {
   @CreateDateColumn(
     // set datatype to timestamp if not running in test environment
     // maybe move to separate function when more Dates are used in the database
