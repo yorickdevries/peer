@@ -7,7 +7,7 @@ export default async function mockLoginCookie(
   netid: string,
   affiliation: "student" | "employee" = "employee"
 ): Promise<string> {
-  // perform a mocklogin with random user
+  // perform a mocklogin
   const res = await request(server).post("/api/mocklogin").send({
     netid: netid,
     affiliation: affiliation,
