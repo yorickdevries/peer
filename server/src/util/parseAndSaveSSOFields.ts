@@ -1,4 +1,4 @@
-import { SSOField } from "../models/SSOField";
+import { SSOField } from "../models/NamedModel";
 
 const parseAndSaveSSOFields = async function <T extends SSOField>(
   input: string | string[] | undefined,
