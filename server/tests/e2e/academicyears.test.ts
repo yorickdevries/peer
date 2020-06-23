@@ -1,0 +1,40 @@
+import http from "http";
+import request from "supertest";
+import { Connection } from "typeorm";
+import app from "../../src/app";
+import createDatabaseConnection from "../../src/databaseConnection";
+import AcademicYear from "../../src/models/AcademicYear";
+import HttpStatusCode from "../../src/enum/HttpStatusCode";
+import mockLoginCookie from "../helpers/mockLoginCookie";
+
+describe("Academic Years", () => {
+  let connection: Connection;
+  let server: http.Server;
+
+  beforeAll(async () => {
+    connection = await createDatabaseConnection();
+    server = http.createServer(app);
+  });
+
+  afterAll(async () => {
+    server.close();
+    await connection.close();
+  });
+
+  test("Get all academic years", async () => {
+    //insert some academic years
+    new AcademicYear("2018/2019").save();
+    new AcademicYear("2019/2020").save();
+    new AcademicYear("2020/2021").save();
+
+    const sessionCookie = await mockLoginCookie(server, "user123");
+    const res = await request(server)
+      .get("/api/academicyears")
+      .set("cookie", sessionCookie);
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    // are always alphabetically sorted
+    // here new academic years need to be added
+    expect(JSON.parse(res.text)).toMatchObject([]);
+  });
+});
