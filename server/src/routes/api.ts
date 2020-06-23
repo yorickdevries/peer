@@ -6,6 +6,7 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import User from "../models/User";
 import faculties from "./faculties";
 import academicyears from "./academicyears";
+import courses from "./courses";
 
 // old routes, can be deleted when not needed anymore
 import oldRoutes from "../old_api/routes/api";
@@ -44,6 +45,7 @@ router.get("/me", async (req, res) => {
 // TODO: Complete routing of the new API
 router.use("/faculties", faculties);
 router.use("/academicyears", academicyears);
+router.use("/courses", courses);
 
 // old routes, can be deleted when not needed anymore
 router.use("/oldroutes", oldRoutes);

@@ -17,7 +17,7 @@ import Faculty from "./Faculty";
 import AcademicYear from "./AcademicYear";
 
 @Entity()
-export default class User extends BaseModel {
+export default class Course extends BaseModel {
   @PrimaryGeneratedColumn()
   @IsOptional()
   id?: number;
