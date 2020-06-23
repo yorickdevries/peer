@@ -27,7 +27,7 @@ router.use(checkAuthentication);
 router.get("/me", async (req, res) => {
   const netid = req.user?.netid;
   if (netid !== undefined) {
-    const me = await User.findOne(netid);
+    const me = await User.findOne(netid, { relations: ["affiliation"] });
     if (me) {
       res.json(me);
     } else {
