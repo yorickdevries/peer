@@ -1,5 +1,5 @@
 import { Entity } from "typeorm";
-import { SSOField } from "./NamedModel";
+import { NamedModel } from "./NamedModel";
 
 @Entity()
-export class Affiliation extends SSOField {}
+export class Affiliation extends NamedModel {}

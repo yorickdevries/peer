@@ -4,7 +4,7 @@ import { BaseModel } from "./BaseModel";
 
 // This class is extended by other named models like Affiliation, Study and OrganisationUnit as they are all classes with just a name
 // maybe later a better name can be found
-export abstract class SSOField extends BaseModel {
+export abstract class NamedModel extends BaseModel {
   @PrimaryColumn()
   @IsString()
   @IsNotEmpty()

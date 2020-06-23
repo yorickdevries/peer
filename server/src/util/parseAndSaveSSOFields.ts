@@ -1,6 +1,6 @@
-import { SSOField } from "../models/NamedModel";
+import { NamedModel } from "../models/NamedModel";
 
-const parseAndSaveSSOFields = async function <T extends SSOField>(
+const parseAndSaveSSOFields = async function <T extends NamedModel>(
   input: string | string[] | undefined,
   constructor: new (_: string) => T
 ): Promise<T[]> {
