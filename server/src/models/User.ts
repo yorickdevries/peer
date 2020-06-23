@@ -23,44 +23,44 @@ export default class User extends BaseModel {
   @IsNotEmpty()
   @IsAlphanumeric()
   @IsLowercase()
-  private netid: string;
+  netid: string;
 
   @Column({ nullable: true })
   @IsOptional()
   @IsInt()
   @IsPositive()
-  private studentNumber?: number;
+  studentNumber?: number;
 
   @Column({ nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  private firstName?: string;
+  firstName?: string;
 
   @Column({ nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  private prefix?: string;
+  prefix?: string;
 
   @Column({ nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  private lastName?: string;
+  lastName?: string;
 
   @Column({ nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
   @IsEmail()
-  private email?: string;
+  email?: string;
 
   @Column({ nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  private displayName?: string;
+  displayName?: string;
 
   @ManyToMany((_type) => Affiliation)
   @JoinTable()
@@ -68,11 +68,11 @@ export default class User extends BaseModel {
 
   @ManyToMany((_type) => Study)
   @JoinTable()
-  private study?: Study[];
+  study?: Study[];
 
   @ManyToMany((_type) => OrganisationUnit)
   @JoinTable()
-  private organisationUnit?: OrganisationUnit[];
+  organisationUnit?: OrganisationUnit[];
 
   constructor(
     netid: string,
@@ -98,10 +98,5 @@ export default class User extends BaseModel {
     this.affiliation = affiliation;
     this.study = study;
     this.organisationUnit = organisationUnit;
-  }
-
-  // temporarily added as typescript doesn't compile when private fields aren't used
-  toString(): string {
-    return `${this.netid},${this.studentNumber},${this.firstName},${this.prefix}, ${this.lastName},${this.email},${this.affiliation},${this.displayName},${this.study},${this.organisationUnit}`;
   }
 }
