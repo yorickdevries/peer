@@ -4,6 +4,7 @@ import { Connection } from "typeorm";
 import app from "../../src/app";
 import createDatabaseConnection from "../../src/databaseConnection";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
+import mockLoginCookie from "../helpers/mockLoginCookie";
 
 describe("E2E API", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -37,20 +38,13 @@ describe("E2E API", () => {
   });
 
   test("check /authenticated route with logging in", async () => {
-    // perform a mocklogin with random user
-    const response1 = await request(server)
-      .post("/api/mocklogin")
-      .send({
-        netid: `user${Math.floor(Math.random() * 1000)}`,
-        affiliation: "employee",
-      });
-    //save the session cookie
-    const sessionCookie = response1.header["set-cookie"];
-    const response2 = await request(server)
+    const randomUser = `user${Math.floor(Math.random() * 1000)}`;
+    const sessionCookie = await mockLoginCookie(server, randomUser);
+    const response = await request(server)
       .get("/api/authenticated")
       .set("cookie", sessionCookie);
     // assertions
-    expect(response2.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(response2.text)).toEqual({ authenticated: true });
+    expect(response.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(response.text)).toEqual({ authenticated: true });
   });
 });
