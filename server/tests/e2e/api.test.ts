@@ -6,7 +6,7 @@ import createDatabaseConnection from "../../src/databaseConnection";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
 
-describe("E2E API", () => {
+describe("API", () => {
   // will be initialized and closed in beforeAll / afterAll
   let connection: Connection;
   let server: http.Server;

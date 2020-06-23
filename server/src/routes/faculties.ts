@@ -5,8 +5,8 @@ import _ from "lodash";
 
 router.get("/", async (_req, res) => {
   const faculties = await Faculty.find();
-  const faculties_sorted = _.sortBy(faculties, "name");
-  res.send(faculties_sorted);
+  const facultiesSorted = _.sortBy(faculties, "name");
+  res.send(facultiesSorted);
 });
 
 export default router;

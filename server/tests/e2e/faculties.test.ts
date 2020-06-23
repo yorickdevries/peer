@@ -7,7 +7,7 @@ import Faculty from "../../src/models/Faculty";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
 
-describe("Faculties API", () => {
+describe("Faculties", () => {
   let connection: Connection;
   let server: http.Server;
 
