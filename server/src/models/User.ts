@@ -25,42 +25,42 @@ export default class User extends BaseModel {
   @IsLowercase()
   netid: string;
 
-  @Column({ nullable: true })
+  @Column("int", { nullable: true })
   @IsOptional()
   @IsInt()
   @IsPositive()
-  studentNumber?: number;
+  studentNumber?: number | null;
 
-  @Column({ nullable: true })
+  @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  firstName?: string;
+  firstName?: string | null;
 
-  @Column({ nullable: true })
+  @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  prefix?: string;
+  prefix?: string | null;
 
-  @Column({ nullable: true })
+  @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  lastName?: string;
+  lastName?: string | null;
 
-  @Column({ nullable: true })
+  @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
   @IsEmail()
-  email?: string;
+  email?: string | null;
 
-  @Column({ nullable: true })
+  @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  displayName?: string;
+  displayName?: string | null;
 
   @ManyToMany((_type) => Affiliation)
   @JoinTable()
@@ -89,12 +89,12 @@ export default class User extends BaseModel {
     super();
     this.netid = netid;
     // the cast is done so the fields can be set to null in the database
-    this.studentNumber = studentNumber as number | undefined;
-    this.firstName = firstName as string | undefined;
-    this.prefix = prefix as string | undefined;
-    this.lastName = lastName as string | undefined;
-    this.email = email as string | undefined;
-    this.displayName = displayName as string | undefined;
+    this.studentNumber = studentNumber;
+    this.firstName = firstName;
+    this.prefix = prefix;
+    this.lastName = lastName;
+    this.email = email;
+    this.displayName = displayName;
     this.affiliation = affiliation;
     this.study = study;
     this.organisationUnit = organisationUnit;
