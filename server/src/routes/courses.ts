@@ -1,5 +1,6 @@
 import express from "express";
 import Joi from "@hapi/joi";
+import checkEmployee from "../middleware/authentication/checkEmployee";
 import Course from "../models/Course";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Faculty from "../models/Faculty";
@@ -24,7 +25,8 @@ const courseSchema = Joi.object({
   description: Joi.string().allow(null).required(),
 });
 // post a course
-router.post("/", async (req, res) => {
+// needs to be checked whether the user is employee
+router.post("/", checkEmployee, async (req, res) => {
   try {
     // check whether the schema is compliant with what is expected
     const error = courseSchema.validate(req.body).error;
