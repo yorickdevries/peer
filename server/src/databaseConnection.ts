@@ -7,6 +7,7 @@ import Affiliation from "./models/Affiliation";
 import Study from "./models/Study";
 import OrganisationUnit from "./models/OrganisationUnit";
 import Faculty from "./models/Faculty";
+import AcademicYear from "./models/AcademicYear";
 
 const databaseConfig: {
   type: string;
@@ -20,7 +21,14 @@ const databaseConfig: {
 
 const createDatabaseConnection = async function (): Promise<Connection> {
   const baseConfig = {
-    entities: [User, Affiliation, Study, OrganisationUnit, Faculty],
+    entities: [
+      User,
+      Affiliation,
+      Study,
+      OrganisationUnit,
+      Faculty,
+      AcademicYear,
+    ],
     synchronize: true, // must be set to false once deployed to production (we should siwtch to migrations instead)
     logging: false,
   };

@@ -23,18 +23,22 @@ describe("Academic Years", () => {
 
   test("Get all academic years", async () => {
     //insert some academic years
-    new AcademicYear("2018/2019").save();
-    new AcademicYear("2019/2020").save();
-    new AcademicYear("2020/2021").save();
+    new AcademicYear("2018/2019", false).save();
+    new AcademicYear("2019/2020", true).save();
+    new AcademicYear("2020/2021", true).save();
+    new AcademicYear("2021/2022", false).save();
 
     const sessionCookie = await mockLoginCookie(server, "user123");
     const res = await request(server)
-      .get("/api/academicyears")
+      .get("/api/academicyears?active=true")
       .set("cookie", sessionCookie);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     // are always alphabetically sorted
     // here new academic years need to be added
-    expect(JSON.parse(res.text)).toMatchObject([]);
+    expect(JSON.parse(res.text)).toMatchObject([
+      { name: "2019/2020", active: true },
+      { name: "2020/2021", active: true },
+    ]);
   });
 });
