@@ -1,8 +1,9 @@
 import { Entity, PrimaryColumn, Column, ManyToOne } from "typeorm";
-import { IsDefined, IsString, IsNotEmpty } from "class-validator";
+import { IsDefined } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import Course from "./Course";
+import UserRole from "../enum/UserRole";
 
 @Entity()
 export default class Enroll extends BaseModel {
@@ -20,11 +21,9 @@ export default class Enroll extends BaseModel {
 
   @Column()
   @IsDefined()
-  @IsString()
-  @IsNotEmpty()
-  role: string;
+  role: UserRole;
 
-  constructor(user: User, course: Course, role: string) {
+  constructor(user: User, course: Course, role: UserRole) {
     super();
     this.user = user;
     this.course = course;
