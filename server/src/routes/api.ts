@@ -29,7 +29,7 @@ router.use(checkAuthentication);
 // Route to get the current userinfo from SSO
 // might need to be moved to /users route
 router.get("/me", async (req, res) => {
-  // the user is defined as it is checked above
+  // the user is defined as it is checked with checkAuthentication
   const user = await User.findOne(req.user!.netid, {
     relations: ["affiliation", "study", "organisationUnit"],
   });

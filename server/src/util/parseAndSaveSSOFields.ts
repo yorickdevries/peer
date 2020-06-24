@@ -25,7 +25,6 @@ const parseAndSaveSSOFields = async function <T extends NamedModel>(
       } else {
         // save the ssoField to the database
         await ssoField.save();
-        // reload to get all fields from the database
         ssoFields.push(ssoField);
       }
     }
