@@ -1,9 +1,4 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  ManyToOne,
-} from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToOne } from "typeorm";
 import { IsDefined, IsString, IsNotEmpty } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
