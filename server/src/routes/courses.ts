@@ -12,35 +12,15 @@ import _ from "lodash";
 
 const router = express.Router();
 
-// get all the courses where the user is enrolled in
-router.get("/enrolled", async (req, res) => {
-  const enrolls = await Enrollment.find({
-    where: { userNetid: req.user!.netid },
-    relations: ["course"],
-  });
-  // map the courses to a courselist
-  const enrolledCourses = _.map(enrolls, "course");
-  res.send(enrolledCourses);
-});
-
 // get all enrollable courses where the student isnt in enrolled yet
 router.get("/enrollable", async (req, res) => {
-  const enrolls = await Enrollment.find({
-    where: { userNetid: req.user!.netid },
-    relations: ["course"],
-  });
-  // map the courses to a list of course ids
-  const enrolledCourseIds = _.map(enrolls, "course.id");
-  // all enrollable courses
-  // maybe check whether year is active?
-  const enrollableCourses = await Course.find({
-    where: { enrollable: true },
-  });
-  // filter all courses present in enrolledCourseIds
-  const filteredEnrollableCourses = _.filter(enrollableCourses, (e) => {
-    return enrolledCourseIds.indexOf(e.id) < 0;
-  });
-  res.send(filteredEnrollableCourses);
+  const user = await User.findOne(req.user?.netid);
+  if (user) {
+    const enrollableCourses = await Course.getEnrollableCourses(user);
+    res.send(enrollableCourses);
+  } else {
+    res.status(HttpStatusCode.UNAUTHORIZED).send("Not logged in");
+  }
 });
 
 // Joi inputvalidation

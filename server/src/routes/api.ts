@@ -7,6 +7,7 @@ import User from "../models/User";
 import faculties from "./faculties";
 import academicyears from "./academicyears";
 import courses from "./courses";
+import enrollments from "./enrollments";
 
 // old routes, can be deleted when not needed anymore
 import oldRoutes from "../old_api/routes/api";
@@ -46,6 +47,7 @@ router.get("/me", async (req, res) => {
 router.use("/faculties", faculties);
 router.use("/academicyears", academicyears);
 router.use("/courses", courses);
+router.use("/enrollments", enrollments);
 
 // old routes, can be deleted when not needed anymore
 router.use("/oldroutes", oldRoutes);

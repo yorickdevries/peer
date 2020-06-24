@@ -117,36 +117,54 @@ describe("Integration", () => {
       .send({
         name: "AntoherName",
         courseCode: "XYZ123",
-        enrollable: true,
+        enrollable: false,
         faculty: "3ME",
         academicYear: "2019/2020",
         description: null,
       })
       .set("cookie", teacherCookie2);
+    const course2 = JSON.parse(res.text);
 
     // fetch all the enrolled courses from the server
     // create a course
     res = await request(server)
-      .get("/api/courses/enrolled")
+      .get("/api/enrollments")
       .set("cookie", teacherCookie);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([
-      { id: course.id, name: course.name },
+      { courseId: course.id, role: "teacher" },
     ]);
 
     // check available courses as teacher
     res = await request(server)
       .get("/api/courses/enrollable")
-      .set("cookie", teacherCookie2);
+      .set("cookie", teacherCookie);
     // assertions
-    expect(JSON.parse(res.text).length).toEqual(1);
+    expect(JSON.parse(res.text).length).toEqual(0);
 
     // check available courses as student
     res = await request(server)
       .get("/api/courses/enrollable")
       .set("cookie", studentCookie1);
     // assertions
-    expect(JSON.parse(res.text).length).toEqual(2);
+    expect(JSON.parse(res.text).length).toEqual(1);
+
+    // enroll for course as student
+    res = await request(server)
+      .post("/api/enrollments")
+      .set("cookie", studentCookie1)
+      .send({ courseId: course.id });
+    // assertions
+    const enrollment = JSON.parse(res.text);
+    expect(enrollment).toMatchObject({ courseId: course.id, role: "student" });
+
+    // enroll for an unenrollable course
+    res = await request(server)
+      .post("/api/enrollments")
+      .set("cookie", studentCookie1)
+      .send({ courseId: course2.id });
+    // assertions
+    expect(res.status).toBe(400);
   });
 });

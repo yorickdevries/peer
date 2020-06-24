@@ -4,6 +4,8 @@ import {
   Column,
   ManyToOne,
   JoinTable,
+  Not,
+  In,
 } from "typeorm";
 import {
   IsDefined,
@@ -13,8 +15,11 @@ import {
   IsBoolean,
 } from "class-validator";
 import BaseModel from "./BaseModel";
+import User from "./User";
 import Faculty from "./Faculty";
 import AcademicYear from "./AcademicYear";
+import Enrollment from "../models/Enrollment";
+import _ from "lodash";
 
 @Entity()
 export default class Course extends BaseModel {
@@ -68,5 +73,29 @@ export default class Course extends BaseModel {
     this.faculty = faculty;
     this.academicYear = academicYear;
     this.description = description;
+  }
+
+  // get all enrollable courses for a certain user
+  static async getEnrollableCourses(user: User): Promise<Course[]> {
+    // current enrollments for the user
+    const enrollments = await Enrollment.find({
+      where: { userNetid: user.netid },
+    });
+    // map the courses to a list of course ids
+    const enrollmentCourseIds = _.map(enrollments, "courseId");
+
+    // all enrollable courses without already enrolled courses
+    const enrollableCourses = await this.find({
+      relations: ["faculty", "academicYear"],
+      where: {
+        enrollable: true,
+        id: Not(In(enrollmentCourseIds)),
+      },
+    });
+    // remove courses based on active academic years
+    _.remove(enrollableCourses, (val) => {
+      return !val.academicYear?.active;
+    });
+    return enrollableCourses;
   }
 }
