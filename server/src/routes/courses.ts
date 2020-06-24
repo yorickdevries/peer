@@ -5,6 +5,8 @@ import Course from "../models/Course";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Faculty from "../models/Faculty";
 import AcademicYear from "../models/AcademicYear";
+import Enroll from "../models/Enroll";
+import User from "../models/User";
 
 const router = express.Router();
 
@@ -48,6 +50,9 @@ router.post("/", checkEmployee, async (req, res) => {
         req.body.description
       );
       await course.save();
+      // here the current user needs to be enrolled as teacher fot he just created course
+      const currentUser = await User.findOneOrFail(req.user!.netid);
+      await new Enroll(currentUser, course, "teacher").save();
       // if all goes well, the course can be returned
       res.send(course);
     }
