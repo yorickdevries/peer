@@ -62,15 +62,21 @@ export default class User extends BaseModel {
   @IsNotEmpty()
   displayName?: string | null;
 
-  @ManyToMany((_type) => Affiliation)
+  @ManyToMany((_type) => Affiliation, {
+    eager: true,
+  })
   @JoinTable()
   affiliation?: Affiliation[];
 
-  @ManyToMany((_type) => Study)
+  @ManyToMany((_type) => Study, {
+    eager: true,
+  })
   @JoinTable()
   study?: Study[];
 
-  @ManyToMany((_type) => OrganisationUnit)
+  @ManyToMany((_type) => OrganisationUnit, {
+    eager: true,
+  })
   @JoinTable()
   organisationUnit?: OrganisationUnit[];
 
