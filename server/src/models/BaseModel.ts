@@ -4,6 +4,7 @@ import {
   UpdateDateColumn,
   BeforeInsert,
   BeforeUpdate,
+  SaveOptions,
 } from "typeorm";
 import {
   validate,
@@ -51,5 +52,12 @@ export default abstract class BaseModel extends BaseEntity {
   @BeforeUpdate()
   validateOrReject(): Promise<void> {
     return validateOrReject(this);
+  }
+
+  // reloads the entry after saving to the database
+  async save(options?: SaveOptions): Promise<this> {
+    await super.save(options);
+    await this.reload();
+    return this;
   }
 }
