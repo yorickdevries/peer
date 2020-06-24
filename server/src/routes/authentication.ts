@@ -6,7 +6,7 @@ import Joi from "@hapi/joi";
 import session from "../middleware/authentication/session";
 import passportConfiguration from "../middleware/authentication/passportTUDelft";
 import mockPassportConfiguration from "../middleware/authentication/passportMock";
-import HttpStatusCode from "../enum/HttpStatusCode";
+import { validateBody } from "../middleware/validation";
 
 // Adds authentication routes
 const authenticationRoutes = function (router: Router): void {
@@ -59,23 +59,17 @@ const authenticationRoutes = function (router: Router): void {
       netid: Joi.string().required(),
       affiliation: Joi.string().required(),
     });
-
     // Mock login route
     router.post(
       "/mocklogin",
-      async (req, res, next) => {
-        // check whether the schema is compliant with what is expected
-        const error = mockUserSchema.validate(req.body).error;
-        if (error) {
-          res.status(HttpStatusCode.BAD_REQUEST).send(error);
-        } else {
-          const netid = req.body.netid;
-          const affiliation = req.body.affiliation;
-          console.log(`Mocklogin: ${netid}, ${affiliation}`);
-          // make Mocked passport configuration
-          await mockPassportConfiguration(passport, netid, affiliation);
-          next();
-        }
+      validateBody(mockUserSchema),
+      async (req, _res, next) => {
+        const netid = req.body.netid;
+        const affiliation = req.body.affiliation;
+        console.log(`Mocklogin: ${netid}, ${affiliation}`);
+        // make Mocked passport configuration
+        await mockPassportConfiguration(passport, netid, affiliation);
+        next();
       },
       passport.authenticate("mock"),
       (_req, res) => {

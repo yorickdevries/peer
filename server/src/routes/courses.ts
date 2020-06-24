@@ -7,6 +7,7 @@ import Faculty from "../models/Faculty";
 import AcademicYear from "../models/AcademicYear";
 import Enrollment from "../models/Enrollment";
 import UserRole from "../enum/UserRole";
+import { validateBody } from "../middleware/validation";
 
 const router = express.Router();
 
@@ -27,13 +28,12 @@ const courseSchema = Joi.object({
 });
 // post a course
 // needs to be checked whether the user is employee
-router.post("/", checkEmployee, async (req, res) => {
-  try {
-    // check whether the schema is compliant with what is expected
-    const error = courseSchema.validate(req.body).error;
-    if (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(error);
-    } else {
+router.post(
+  "/",
+  checkEmployee,
+  validateBody(courseSchema),
+  async (req, res) => {
+    try {
       // find the faculty and academic year in the database
       const faculty = await Faculty.findOneOrFail(req.body.faculty);
       const academicYear = await AcademicYear.findOneOrFail(
@@ -53,10 +53,10 @@ router.post("/", checkEmployee, async (req, res) => {
       await new Enrollment(req.user!, course, UserRole.TEACHER).save();
       // if all goes well, the course can be returned
       res.send(course);
+    } catch (error) {
+      res.status(HttpStatusCode.BAD_REQUEST).send(error);
     }
-  } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(error);
   }
-});
+);
 
 export default router;

@@ -4,6 +4,7 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import Course from "../models/Course";
 import UserRole from "../enum/UserRole";
 import Joi from "@hapi/joi";
+import { validateBody } from "../middleware/validation";
 import _ from "lodash";
 
 const router = express.Router();
@@ -23,24 +24,19 @@ const enrollmentSchema = Joi.object({
   courseId: Joi.number().required(),
 });
 // post an enrollment
-router.post("/", async (req, res) => {
+router.post("/", validateBody(enrollmentSchema), async (req, res) => {
   const user = req.user!;
-  const error = enrollmentSchema.validate(req.body).error;
-  if (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+  const courseId: number = req.body.courseId;
+  const enrollableCourses = await Course.getEnrollableCourses(user);
+  const course = _.find(enrollableCourses, { id: courseId });
+  if (course) {
+    const enrollment = new Enrollment(user, course, UserRole.STUDENT);
+    await enrollment.save();
+    res.send(enrollment);
   } else {
-    const courseId: number = req.body.courseId;
-    const enrollableCourses = await Course.getEnrollableCourses(user);
-    const course = _.find(enrollableCourses, { id: courseId });
-    if (course) {
-      const enrollment = new Enrollment(user, course, UserRole.STUDENT);
-      await enrollment.save();
-      res.send(enrollment);
-    } else {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send(`course with id ${courseId} is not enrollable`);
-    }
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(`course with id ${courseId} is not enrollable`);
   }
 });
 
