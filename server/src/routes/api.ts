@@ -7,6 +7,7 @@ import faculties from "./faculties";
 import academicyears from "./academicyears";
 import courses from "./courses";
 import enrollments from "./enrollments";
+import User from "../models/User";
 
 // old routes, can be deleted when not needed anymore
 import oldRoutes from "../old_api/routes/api";
@@ -27,8 +28,12 @@ router.use(checkAuthentication);
 
 // Route to get the current userinfo from SSO
 // might need to be moved to /users route
-router.get("/me", (req, res) => {
-  res.json(req.user);
+router.get("/me", async (req, res) => {
+  // the user is defined as it is checked above
+  const user = await User.findOne(req.user!.netid, {
+    relations: ["affiliation", "study", "organisationUnit"],
+  });
+  res.json(user);
 });
 
 // TODO: Complete routing of the new API
