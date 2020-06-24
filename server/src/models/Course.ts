@@ -91,8 +91,9 @@ export default class Course extends BaseModel {
         enrollable: true,
         id: Not(In(enrollmentCourseIds)),
       },
+      order: { id: "ASC" },
     });
-    // remove courses based on active academic years
+    // remove courses based on inactive academic years
     _.remove(enrollableCourses, (val) => {
       return !val.academicYear?.active;
     });

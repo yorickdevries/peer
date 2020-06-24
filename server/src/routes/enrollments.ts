@@ -1,7 +1,6 @@
 import express from "express";
 import Enrollment from "../models/Enrollment";
 import HttpStatusCode from "../enum/HttpStatusCode";
-import User from "../models/User";
 import Course from "../models/Course";
 import UserRole from "../enum/UserRole";
 import Joi from "@hapi/joi";
@@ -14,6 +13,7 @@ router.get("/", async (req, res) => {
   const enrollments = await Enrollment.find({
     where: { userNetid: req.user!.netid },
     relations: ["course"],
+    order: { courseId: "ASC" },
   });
   res.send(enrollments);
 });
@@ -24,9 +24,9 @@ const enrollmentSchema = Joi.object({
 });
 // post an enrollment
 router.post("/", async (req, res) => {
-  const user = await User.findOne(req.user?.netid);
+  const user = req.user!;
   const error = enrollmentSchema.validate(req.body).error;
-  if (error || !user) {
+  if (error) {
     res.status(HttpStatusCode.BAD_REQUEST).send(error);
   } else {
     const courseId: number = req.body.courseId;

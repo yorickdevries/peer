@@ -26,6 +26,7 @@ router.get("/authenticated", (req, res) => {
 router.use(checkAuthentication);
 
 // Route to get the current userinfo from SSO
+// might need to be moved to /users route
 router.get("/me", (req, res) => {
   res.json(req.user);
 });

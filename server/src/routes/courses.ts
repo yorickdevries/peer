@@ -6,21 +6,14 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import Faculty from "../models/Faculty";
 import AcademicYear from "../models/AcademicYear";
 import Enrollment from "../models/Enrollment";
-import User from "../models/User";
 import UserRole from "../enum/UserRole";
-import _ from "lodash";
 
 const router = express.Router();
 
 // get all enrollable courses where the student isnt in enrolled yet
 router.get("/enrollable", async (req, res) => {
-  const user = await User.findOne(req.user?.netid);
-  if (user) {
-    const enrollableCourses = await Course.getEnrollableCourses(user);
-    res.send(enrollableCourses);
-  } else {
-    res.status(HttpStatusCode.UNAUTHORIZED).send("Not logged in");
-  }
+  const enrollableCourses = await Course.getEnrollableCourses(req.user!);
+  res.send(enrollableCourses);
 });
 
 // Joi inputvalidation
@@ -39,7 +32,7 @@ router.post("/", checkEmployee, async (req, res) => {
     // check whether the schema is compliant with what is expected
     const error = courseSchema.validate(req.body).error;
     if (error) {
-      throw error;
+      res.status(HttpStatusCode.BAD_REQUEST).send(error);
     } else {
       // find the faculty and academic year in the database
       const faculty = await Faculty.findOneOrFail(req.body.faculty);
@@ -57,8 +50,7 @@ router.post("/", checkEmployee, async (req, res) => {
       );
       await course.save();
       // here the current user needs to be enrolled as teacher fot he just created course
-      const currentUser = await User.findOneOrFail(req.user!.netid);
-      await new Enrollment(currentUser, course, UserRole.TEACHER).save();
+      await new Enrollment(req.user!, course, UserRole.TEACHER).save();
       // if all goes well, the course can be returned
       res.send(course);
     }

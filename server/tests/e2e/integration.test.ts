@@ -42,7 +42,7 @@ describe("Integration", () => {
     // log in as teacher
     const teacherCookie = await mockLoginCookie(server, "teacher");
     const teacherCookie2 = await mockLoginCookie(server, "anotherteacher");
-    const studentCookie1 = await mockLoginCookie(server, "student1");
+    const studentCookie1 = await mockLoginCookie(server, "student1", "student");
 
     // check whether the teacher is logged in
     res = await request(server)
@@ -111,6 +111,21 @@ describe("Integration", () => {
       description: null,
     });
 
+    // create a course as student
+    res = await request(server)
+      .post("/api/courses")
+      .send({
+        name: "CourseName",
+        courseCode: "ABC123",
+        enrollable: true,
+        faculty: "EEMCS",
+        academicYear: "2019/2020",
+        description: null,
+      })
+      .set("cookie", studentCookie1);
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+
     // create another course as another teacher
     res = await request(server)
       .post("/api/courses")
@@ -158,6 +173,14 @@ describe("Integration", () => {
     // assertions
     const enrollment = JSON.parse(res.text);
     expect(enrollment).toMatchObject({ courseId: course.id, role: "student" });
+
+    // enroll for course as student for the second time
+    res = await request(server)
+      .post("/api/enrollments")
+      .set("cookie", studentCookie1)
+      .send({ courseId: course.id });
+    // assertions
+    expect(res.status).toBe(400);
 
     // enroll for an unenrollable course
     res = await request(server)

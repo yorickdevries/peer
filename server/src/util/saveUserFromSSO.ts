@@ -33,8 +33,6 @@ const saveUserFromSSO = async function (
       await parseAndSaveSSOFields(organisationUnit, OrganisationUnit)
     );
     // Overwrites existing entry with the same NetID if present
-    // Does however not delete values if undefined values are passed
-    // so null values are passed instead to delete the values
     // might throw an error if the object is not valid
     await user.save();
     return user;
