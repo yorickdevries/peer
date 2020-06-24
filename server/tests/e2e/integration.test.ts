@@ -41,6 +41,8 @@ describe("Integration", () => {
     let res; // will store all responses
     // log in as teacher
     const teacherCookie = await mockLoginCookie(server, "teacher");
+    const teacherCookie2 = await mockLoginCookie(server, "anotherteacher");
+    const studentCookie1 = await mockLoginCookie(server, "student1");
 
     // check whether the teacher is logged in
     res = await request(server)
@@ -85,5 +87,66 @@ describe("Integration", () => {
       { name: "2019/2020", active: true },
       { name: "2020/2021", active: true },
     ]);
+
+    // create a course
+    res = await request(server)
+      .post("/api/courses")
+      .send({
+        name: "CourseName",
+        courseCode: "ABC123",
+        enrollable: true,
+        faculty: "EEMCS",
+        academicYear: "2019/2020",
+        description: null,
+      })
+      .set("cookie", teacherCookie);
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    // are always alphabetically sorted
+    const course = JSON.parse(res.text);
+    expect(course).toMatchObject({
+      name: "CourseName",
+      courseCode: "ABC123",
+      enrollable: true,
+      description: null,
+    });
+
+    // create another course as another teacher
+    res = await request(server)
+      .post("/api/courses")
+      .send({
+        name: "AntoherName",
+        courseCode: "XYZ123",
+        enrollable: true,
+        faculty: "3ME",
+        academicYear: "2019/2020",
+        description: null,
+      })
+      .set("cookie", teacherCookie2);
+
+    // fetch all the enrolled courses from the server
+    // create a course
+    res = await request(server)
+      .get("/api/courses/enrolled")
+      .set("cookie", teacherCookie);
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject([
+      { id: course.id, name: course.name },
+    ]);
+
+    // check available courses as teacher
+    res = await request(server)
+      .get("/api/courses/enrollable")
+      .set("cookie", teacherCookie2);
+    // assertions
+    expect(JSON.parse(res.text).length).toEqual(1);
+
+    // check available courses as student
+    res = await request(server)
+      .get("/api/courses/enrollable")
+      .set("cookie", studentCookie1);
+    // assertions
+    expect(JSON.parse(res.text).length).toEqual(2);
   });
 });

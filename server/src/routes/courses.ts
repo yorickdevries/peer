@@ -8,15 +8,39 @@ import AcademicYear from "../models/AcademicYear";
 import Enroll from "../models/Enroll";
 import User from "../models/User";
 import UserRole from "../enum/UserRole";
+import _ from "lodash";
 
 const router = express.Router();
 
-// get all courses
-// needs to be adapted so not all courses are visible
-//router.get("/enrolled", async (_req, res) => {
-//  const courses = await Course.find({ order: { name: "ASC" } });
-//  res.send(courses);
-//});
+// get all the courses where the user is enrolled in
+router.get("/enrolled", async (req, res) => {
+  const enrolls = await Enroll.find({
+    where: { userNetid: req.user!.netid },
+    relations: ["course"],
+  });
+  // map the courses to a courselist
+  const enrolledCourses = _.map(enrolls, "course");
+  res.send(enrolledCourses);
+});
+
+// get all enrollable courses where the student isnt in enrolled yet
+router.get("/enrollable", async (req, res) => {
+  const enrolls = await Enroll.find({
+    where: { userNetid: req.user!.netid },
+    relations: ["course"],
+  });
+  // map the courses to a list of course ids
+  const enrolledCourseIds = _.map(enrolls, (e) => e.course?.id);
+  // all enrollable courses
+  const enrollableCourses = await Course.find({
+    where: { enrollable: true },
+  });
+  // filter all courses present in enrolledCourseIds
+  const filteredEnrollableCourses = _.filter(enrollableCourses, (e) => {
+    return enrolledCourseIds.indexOf(e.id) < 0;
+  });
+  res.send(filteredEnrollableCourses);
+});
 
 // Joi inputvalidation
 const courseSchema = Joi.object({
