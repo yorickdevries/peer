@@ -5,7 +5,7 @@ import Course from "../models/Course";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Faculty from "../models/Faculty";
 import AcademicYear from "../models/AcademicYear";
-import Enroll from "../models/Enroll";
+import Enrollment from "../models/Enrollment";
 import User from "../models/User";
 import UserRole from "../enum/UserRole";
 import _ from "lodash";
@@ -14,7 +14,7 @@ const router = express.Router();
 
 // get all the courses where the user is enrolled in
 router.get("/enrolled", async (req, res) => {
-  const enrolls = await Enroll.find({
+  const enrolls = await Enrollment.find({
     where: { userNetid: req.user!.netid },
     relations: ["course"],
   });
@@ -25,7 +25,7 @@ router.get("/enrolled", async (req, res) => {
 
 // get all enrollable courses where the student isnt in enrolled yet
 router.get("/enrollable", async (req, res) => {
-  const enrolls = await Enroll.find({
+  const enrolls = await Enrollment.find({
     where: { userNetid: req.user!.netid },
     relations: ["course"],
   });
@@ -78,7 +78,7 @@ router.post("/", checkEmployee, async (req, res) => {
       await course.save();
       // here the current user needs to be enrolled as teacher fot he just created course
       const currentUser = await User.findOneOrFail(req.user!.netid);
-      await new Enroll(currentUser, course, UserRole.TEACHER).save();
+      await new Enrollment(currentUser, course, UserRole.TEACHER).save();
       // if all goes well, the course can be returned
       res.send(course);
     }

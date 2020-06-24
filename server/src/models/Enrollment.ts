@@ -6,7 +6,7 @@ import Course from "./Course";
 import UserRole from "../enum/UserRole";
 
 @Entity()
-export default class Enroll extends BaseModel {
+export default class Enrollment extends BaseModel {
   @PrimaryColumn()
   userNetid?: string;
 
