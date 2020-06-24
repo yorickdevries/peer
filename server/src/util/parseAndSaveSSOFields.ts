@@ -24,8 +24,13 @@ const parseAndSaveSSOFields = async function <T extends NamedModel>(
         console.error("SSOField validation failed: ", errors);
       } else {
         // save the ssoField to the database
-        await ssoField.save();
-        ssoFields.push(ssoField);
+        try {
+          await ssoField.save();
+          ssoFields.push(ssoField);
+        } catch (error) {
+          // Log error and skip SSOField
+          console.error("SSOField save failed: ", error);
+        }
       }
     }
   }

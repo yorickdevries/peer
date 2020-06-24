@@ -30,9 +30,13 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
   const enrollableCourses = await Course.getEnrollableCourses(user);
   const course = _.find(enrollableCourses, { id: courseId });
   if (course) {
-    const enrollment = new Enrollment(user, course, UserRole.STUDENT);
-    await enrollment.save();
-    res.send(enrollment);
+    try {
+      const enrollment = new Enrollment(user, course, UserRole.STUDENT);
+      await enrollment.save();
+      res.send(enrollment);
+    } catch (error) {
+      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    }
   } else {
     res
       .status(HttpStatusCode.BAD_REQUEST)
