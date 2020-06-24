@@ -8,7 +8,7 @@ import { fetch, toPassportConfig } from "passport-saml-metadata";
 import passport_saml from "passport-saml";
 import config from "config";
 import { PassportStatic } from "passport";
-import parseNetID from "../../util/parseNetID";
+import saveUserFromSSO from "../../util/saveUserFromSSO";
 
 const passportConfiguration = function (passport: PassportStatic): void {
   const samlStrategy = passport_saml.Strategy;
@@ -48,20 +48,30 @@ const passportConfiguration = function (passport: PassportStatic): void {
     ppConfig.decryptionPvk = key;
 
     // Setup Strategy
-    const strategy = new samlStrategy(ppConfig, (profile: any, done: any) => {
-      return done(undefined, {
-        netid: parseNetID(profile["uid"]), // parsed as this is the primary key
-        studentNumber: profile["tudStudentNumber"],
-        firstName: profile["givenName"],
-        prefix: profile["tudPrefix"],
-        lastName: profile["sn"],
-        email: profile["mail"],
-        displayName: profile["displayName"],
-        affiliation: profile["eduPersonAffiliation"],
-        study: profile["nlEduPersonStudyBranch"],
-        organisationUnit: profile["nlEduPersonOrgUnit"],
-      });
-    });
+    const strategy = new samlStrategy(
+      ppConfig,
+      async (profile: any, done: any) => {
+        // save the user to the database
+        const user = await saveUserFromSSO(
+          profile["uid"],
+          profile["tudStudentNumber"],
+          profile["givenName"],
+          profile["tudPrefix"],
+          profile["sn"],
+          profile["mail"],
+          profile["displayName"],
+          profile["eduPersonAffiliation"],
+          profile["nlEduPersonStudyBranch"],
+          profile["nlEduPersonOrgUnit"]
+        );
+        if (user) {
+          return done(undefined, user);
+        } else {
+          // no user will be logged in (needs to be tested in production)
+          return done(undefined, false);
+        }
+      }
+    );
 
     // Generate metadata
     const metadataXML = strategy.generateServiceProviderMetadata(

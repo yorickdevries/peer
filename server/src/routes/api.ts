@@ -3,7 +3,6 @@ import { eventLogger } from "../middleware/logger";
 import authenticationRoutes from "./authentication";
 import checkAuthentication from "../middleware/authentication/checkAuthentication";
 import HttpStatusCode from "../enum/HttpStatusCode";
-import User from "../models/User";
 import faculties from "./faculties";
 import academicyears from "./academicyears";
 import courses from "./courses";
@@ -27,20 +26,8 @@ router.get("/authenticated", (req, res) => {
 router.use(checkAuthentication);
 
 // Route to get the current userinfo from SSO
-router.get("/me", async (req, res) => {
-  const netid = req.user?.netid;
-  if (netid !== undefined) {
-    const me = await User.findOne(netid, { relations: ["affiliation"] });
-    if (me) {
-      res.json(me);
-    } else {
-      res
-        .status(HttpStatusCode.NOT_FOUND)
-        .send(`User with NetID "${netid}" not found in the database`);
-    }
-  } else {
-    res.status(HttpStatusCode.BAD_REQUEST).send("No NetID available");
-  }
+router.get("/me", (req, res) => {
+  res.json(req.user);
 });
 
 // TODO: Complete routing of the new API

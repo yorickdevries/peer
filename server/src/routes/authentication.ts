@@ -6,7 +6,6 @@ import Joi from "@hapi/joi";
 import session from "../middleware/authentication/session";
 import passportConfiguration from "../middleware/authentication/passportTUDelft";
 import mockPassportConfiguration from "../middleware/authentication/passportMock";
-import saveUserinfo from "../middleware/authentication/saveUserinfo";
 import HttpStatusCode from "../enum/HttpStatusCode";
 
 // Adds authentication routes
@@ -39,7 +38,6 @@ const authenticationRoutes = function (router: Router): void {
         failureRedirect: "/",
         failureFlash: true,
       }),
-      saveUserinfo, // Save userinfo to the database
       (_req, res) => {
         res.redirect("/");
       }
@@ -65,7 +63,7 @@ const authenticationRoutes = function (router: Router): void {
     // Mock login route
     router.post(
       "/mocklogin",
-      (req, res, next) => {
+      async (req, res, next) => {
         // check whether the schema is compliant with what is expected
         const error = mockUserSchema.validate(req.body).error;
         if (error) {
@@ -75,12 +73,11 @@ const authenticationRoutes = function (router: Router): void {
           const affiliation = req.body.affiliation;
           console.log(`Mocklogin: ${netid}, ${affiliation}`);
           // make Mocked passport configuration
-          mockPassportConfiguration(passport, netid, affiliation);
+          await mockPassportConfiguration(passport, netid, affiliation);
           next();
         }
       },
       passport.authenticate("mock"),
-      saveUserinfo, // Save userinfo to the database
       (_req, res) => {
         res.redirect("/");
       }
