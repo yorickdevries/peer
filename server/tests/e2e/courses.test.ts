@@ -41,7 +41,6 @@ describe("Courses", () => {
       .set("cookie", sessionCookie);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    // are always alphabetically sorted
     expect(JSON.parse(res.text)).toMatchObject({
       name: "CourseName",
       courseCode: "ABC123",
