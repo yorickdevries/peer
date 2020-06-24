@@ -30,8 +30,9 @@ router.get("/enrollable", async (req, res) => {
     relations: ["course"],
   });
   // map the courses to a list of course ids
-  const enrolledCourseIds = _.map(enrolls, (e) => e.course?.id);
+  const enrolledCourseIds = _.map(enrolls, "course.id");
   // all enrollable courses
+  // maybe check whether year is active?
   const enrollableCourses = await Course.find({
     where: { enrollable: true },
   });
