@@ -42,11 +42,7 @@ const saveUserFromSSO = async function (
     try {
       const parsedNetid = parseNetID(netid);
       // save the user to the database with only the netid
-      await new User(parsedNetid).save();
-      // get the user from the database
-      const user = await User.findOneOrFail(parsedNetid, {
-        relations: ["affiliation", "study", "organisationUnit"],
-      });
+      const user = await new User(parsedNetid).save();
       console.error(`Saved with only NetID: ${user}`);
       return user;
     } catch (error2) {
