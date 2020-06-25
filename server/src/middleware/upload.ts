@@ -1,6 +1,7 @@
 import path from "path";
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import multer from "multer";
+import HttpStatusCode from "../enum/HttpStatusCode";
 
 // Middleware creator to parse the multipart data into a file and body
 export default function upload(
@@ -45,16 +46,14 @@ export default function upload(
       // Send error in case of too large file size
       if (error) {
         if (error.code === "LIMIT_FILE_SIZE") {
-          res.status(400);
-          res.json({
-            error: `File too large, max size: ${
-              maxFileSize / (1024 * 1024)
-            } MB`,
-          });
+          res.status(HttpStatusCode.BAD_REQUEST);
+          res.send(
+            `File too large, max size: ${maxFileSize / (1024 * 1024)} MB`
+          );
         }
         // Error in case of wrong file extension
         else {
-          res.status(400);
+          res.status(HttpStatusCode.BAD_REQUEST);
           res.send(error.message);
         }
       } else {
