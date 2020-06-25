@@ -38,9 +38,7 @@ export default function upload(
     uploader = multer(options).any();
   }
 
-  /**
-   * Middleware which parses and validates the uploaded file
-   */
+  // Middleware which parses and validates the uploaded file
   function upload(req: Request, res: Response, next: NextFunction) {
     uploader(req, res, (error: any) => {
       // Send error in case of too large file size
