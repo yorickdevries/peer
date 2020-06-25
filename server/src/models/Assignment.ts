@@ -82,10 +82,13 @@ export default class Assignment extends BaseModel {
   reviewDueDate: Date;
 
   // review_evaluation_due_date timestamptz,
-  @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
+  @Column({
+    type: process.env.NODE_ENV === "test" ? undefined : "timestamp",
+    nullable: true,
+  })
   @IsOptional()
   @IsDate()
-  reviewEvaluationDueDate?: Date;
+  reviewEvaluationDueDate?: Date | null;
 
   // description varchar(5000),
   @Column("text", { nullable: true })
@@ -120,7 +123,7 @@ export default class Assignment extends BaseModel {
     dueDate: Date,
     reviewPublishDate: Date,
     reviewDueDate: Date,
-    reviewEvaluationDueDate?: Date,
+    reviewEvaluationDueDate?: Date | null,
     description?: string | null,
     filename?: string | null,
     externalLink?: string | null
