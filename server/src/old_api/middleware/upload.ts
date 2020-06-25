@@ -1,6 +1,7 @@
 import path from "path";
 import multer from "multer";
 
+// COPIED OVER TO NEW API
 /**
  * Middleware creator to parse the multipart data into a file and body
  */
