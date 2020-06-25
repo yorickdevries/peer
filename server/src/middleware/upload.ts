@@ -41,10 +41,10 @@ export default function upload(
    * Middleware which parses and validates the uploaded file
    */
   function upload(req: Request, res: Response, next: NextFunction) {
-    uploader(req, res, (err: any) => {
+    uploader(req, res, (error: any) => {
       // Send error in case of too large file size
-      if (err) {
-        if (err.code === "LIMIT_FILE_SIZE") {
+      if (error) {
+        if (error.code === "LIMIT_FILE_SIZE") {
           res.status(400);
           res.json({
             error: `File too large, max size: ${
@@ -55,7 +55,7 @@ export default function upload(
         // Error in case of wrong file extension
         else {
           res.status(400);
-          res.json({ error: err.message });
+          res.send(error.message);
         }
       } else {
         next();
