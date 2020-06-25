@@ -2,8 +2,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  OneToOne,
   ManyToOne,
-  JoinTable,
+  JoinColumn,
 } from "typeorm";
 import {
   IsDefined,
@@ -18,6 +19,7 @@ import {
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import Course from "./Course";
+import File from "./File";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -34,8 +36,7 @@ export default class Assignment extends BaseModel {
   name: string;
 
   // course_id int NOT NULL, FK
-  @ManyToOne((_type) => Course)
-  @JoinTable()
+  @ManyToOne((_type) => Course, { nullable: false })
   course?: Course;
 
   // reviews_per_user int NOT NULL,
@@ -98,12 +99,9 @@ export default class Assignment extends BaseModel {
   description?: string | null;
 
   // filename varchar(500),
-  // can be replaced by a file class?
-  @Column("varchar", { nullable: true })
-  @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  filename?: string | null;
+  @OneToOne((_type) => File, { eager: true })
+  @JoinColumn()
+  file?: File | null;
 
   // external_link varchar(1000),
   @Column("varchar", { nullable: true })
@@ -125,7 +123,7 @@ export default class Assignment extends BaseModel {
     reviewDueDate: Date,
     reviewEvaluationDueDate?: Date | null,
     description?: string | null,
-    filename?: string | null,
+    file?: File | null,
     externalLink?: string | null
   ) {
     super();
@@ -140,7 +138,7 @@ export default class Assignment extends BaseModel {
     this.reviewDueDate = reviewDueDate;
     this.reviewEvaluationDueDate = reviewEvaluationDueDate;
     this.description = description;
-    this.filename = filename;
+    this.file = file;
     this.externalLink = externalLink;
   }
 

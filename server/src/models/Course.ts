@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinTable,
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import {
   IsDefined,
   IsOptional,
@@ -50,14 +44,14 @@ export default class Course extends BaseModel {
 
   @ManyToOne((_type) => Faculty, {
     eager: true,
+    nullable: false,
   })
-  @JoinTable()
   faculty: Faculty;
 
   @ManyToOne((_type) => AcademicYear, {
     eager: true,
+    nullable: false,
   })
-  @JoinTable()
   academicYear: AcademicYear;
 
   constructor(
