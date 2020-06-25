@@ -23,8 +23,8 @@ describe("Faculties", () => {
 
   test("Get all faculties", async () => {
     //insert some faculties
-    new Faculty("EEMCS").save();
-    new Faculty("3ME").save();
+    new Faculty("EEMCS", "EEMCS").save();
+    new Faculty("3ME", "3ME").save();
 
     const sessionCookie = await mockLoginCookie(server, "user123");
     const res = await request(server)

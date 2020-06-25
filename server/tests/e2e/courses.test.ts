@@ -24,7 +24,7 @@ describe("Courses", () => {
 
   test("Create a course", async () => {
     //insert a faculty and academic year
-    new Faculty("EEMCS").save();
+    new Faculty("EEMCS", "EEMCS").save();
     new AcademicYear("2019/2020", true).save();
 
     const sessionCookie = await mockLoginCookie(server, "teacher");
@@ -51,7 +51,7 @@ describe("Courses", () => {
 
   test("Check enrollable courses", async () => {
     //insert a faculty and academic year
-    new Faculty("EEMCS").save();
+    new Faculty("EEMCS", "EEMCS").save();
     new AcademicYear("2018/2019", false).save();
     new AcademicYear("2019/2020", true).save();
 

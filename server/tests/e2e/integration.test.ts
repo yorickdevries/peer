@@ -22,8 +22,9 @@ describe("Integration", () => {
     server = http.createServer(app);
     // add some faculties and academic years
     //insert some faculties
-    new Faculty("EEMCS").save();
-    new Faculty("3ME").save();
+    // replace by init data
+    new Faculty("EEMCS", "EEMCS").save();
+    new Faculty("3ME", "3ME").save();
     //insert some academic years
     new AcademicYear("2018/2019", false).save();
     new AcademicYear("2019/2020", true).save();
