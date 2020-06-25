@@ -48,11 +48,15 @@ export default class Course extends BaseModel {
   @IsNotEmpty()
   description?: string | null;
 
-  @ManyToOne((_type) => Faculty)
+  @ManyToOne((_type) => Faculty, {
+    eager: true,
+  })
   @JoinTable()
   faculty?: Faculty;
 
-  @ManyToOne((_type) => AcademicYear)
+  @ManyToOne((_type) => AcademicYear, {
+    eager: true,
+  })
   @JoinTable()
   academicYear?: AcademicYear;
 
@@ -84,7 +88,6 @@ export default class Course extends BaseModel {
 
     // all enrollable courses
     const enrollableCourses = await this.find({
-      relations: ["faculty", "academicYear"],
       where: {
         enrollable: true,
       },
