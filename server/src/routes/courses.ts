@@ -1,4 +1,5 @@
 import express from "express";
+import { getManager } from "typeorm";
 import Joi from "@hapi/joi";
 import checkEmployee from "../middleware/authentication/checkEmployee";
 import Course from "../models/Course";
@@ -48,9 +49,16 @@ router.post(
         academicYear,
         req.body.description
       );
-      await course.save();
-      // here the current user needs to be enrolled as teacher fot he just created course
-      await new Enrollment(req.user!, course, UserRole.TEACHER).save();
+      // start transaction to both save the course and teacher enrollment
+      await getManager().transaction(async (transactionalEntityManager) => {
+        // save the course so it gets an id
+        await transactionalEntityManager.save(course);
+        // here the current user needs to be enrolled as teacher fot he just created course
+        const enrollment = new Enrollment(req.user!, course, UserRole.TEACHER);
+        await transactionalEntityManager.save(enrollment);
+      });
+      // reload course to get all data
+      await course.reload();
       // if all goes well, the course can be returned
       res.send(course);
     } catch (error) {
