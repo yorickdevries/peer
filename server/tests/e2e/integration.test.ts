@@ -5,8 +5,7 @@ import app from "../../src/app";
 import createDatabaseConnection from "../../src/databaseConnection";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
-import Faculty from "../../src/models/Faculty";
-import AcademicYear from "../../src/models/AcademicYear";
+import initializeData from "../../src/util/initializeData";
 
 describe("Integration", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -20,16 +19,8 @@ describe("Integration", () => {
       `Connected to ${connection.options.type} database: ${connection.options.database}`
     );
     server = http.createServer(app);
-    // add some faculties and academic years
-    //insert some faculties
-    // replace by init data
-    new Faculty("EEMCS", "EEMCS").save();
-    new Faculty("3ME", "3ME").save();
-    //insert some academic years
-    new AcademicYear("2018/2019", false).save();
-    new AcademicYear("2019/2020", true).save();
-    new AcademicYear("2020/2021", true).save();
-    new AcademicYear("2021/2022", false).save();
+    // initialize faculties and academic years
+    await initializeData();
   });
 
   afterAll(async () => {
@@ -71,10 +62,12 @@ describe("Integration", () => {
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     // are always alphabetically sorted
-    expect(JSON.parse(res.text)).toMatchObject([
-      { name: "3ME" },
-      { name: "EEMCS" },
-    ]);
+    expect(JSON.parse(res.text)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: "3mE" }),
+        expect.objectContaining({ name: "EEMCS" }),
+      ])
+    );
 
     // get the current academic years
     res = await request(server)
@@ -84,10 +77,9 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     // are always alphabetically sorted
     // here new academic years need to be added
-    expect(JSON.parse(res.text)).toMatchObject([
-      { name: "2019/2020", active: true },
-      { name: "2020/2021", active: true },
-    ]);
+    expect(JSON.parse(res.text)).toEqual(
+      expect.arrayContaining([expect.objectContaining({ name: "2019/2020" })])
+    );
 
     // create a course
     res = await request(server)

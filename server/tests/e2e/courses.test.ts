@@ -3,10 +3,9 @@ import request from "supertest";
 import { Connection } from "typeorm";
 import app from "../../src/app";
 import createDatabaseConnection from "../../src/databaseConnection";
-import Faculty from "../../src/models/Faculty";
-import AcademicYear from "../../src/models/AcademicYear";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
+import initializeData from "../../src/util/initializeData";
 
 describe("Courses", () => {
   let connection: Connection;
@@ -15,6 +14,8 @@ describe("Courses", () => {
   beforeAll(async () => {
     connection = await createDatabaseConnection();
     server = http.createServer(app);
+    // initialize faculties and academic years
+    await initializeData();
   });
 
   afterAll(async () => {
@@ -23,10 +24,6 @@ describe("Courses", () => {
   });
 
   test("Create a course", async () => {
-    //insert a faculty and academic year
-    new Faculty("EEMCS", "EEMCS").save();
-    new AcademicYear("2019/2020", true).save();
-
     const sessionCookie = await mockLoginCookie(server, "teacher");
     const res = await request(server)
       .post("/api/courses")
@@ -50,11 +47,6 @@ describe("Courses", () => {
   });
 
   test("Check enrollable courses", async () => {
-    //insert a faculty and academic year
-    new Faculty("EEMCS", "EEMCS").save();
-    new AcademicYear("2018/2019", false).save();
-    new AcademicYear("2019/2020", true).save();
-
     const teacherCookie = await mockLoginCookie(server, "teacher");
 
     // create a normal course
