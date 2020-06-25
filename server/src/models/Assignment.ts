@@ -144,9 +144,26 @@ export default class Assignment extends BaseModel {
     this.externalLink = externalLink;
   }
 
-  //  // CONSTRAINT publish_before_due CHECK (publish_date < due_date),
-  // CONSTRAINT due_before_review_publish CHECK (due_date < review_publish_date),
-  // CONSTRAINT review_publish_before_review_due CHECK (review_publish_date < review_due_date),
-  // CONSTRAINT review_due_before_review_evaluation_due CHECK (review_
-  // custom validation needs to be performed
+  // custom validation which is run before saving
+  validateOrReject(): Promise<void> {
+    // check whether the boolean is correctly set
+    if (this.reviewEvaluation && !this.reviewEvaluationDueDate) {
+      throw "reviewEvaluationDueDate must be defined";
+    }
+    if (!this.reviewEvaluation && this.reviewEvaluationDueDate) {
+      throw "reviewEvaluationDueDate is defined while reviewEvaluation is turned off";
+    }
+    // check chronological order of the dates
+    if (
+      this.publishDate > this.dueDate ||
+      this.dueDate > this.reviewPublishDate ||
+      this.reviewPublishDate > this.reviewDueDate ||
+      (this.reviewEvaluationDueDate &&
+        this.reviewDueDate > this.reviewEvaluationDueDate)
+    ) {
+      throw "The dates must chronologically correct";
+    }
+    // if all succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
 }
