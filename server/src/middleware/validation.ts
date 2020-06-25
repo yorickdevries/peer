@@ -1,5 +1,5 @@
 import Joi from "@hapi/joi";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import HttpStatusCode from "../enum/HttpStatusCode";
 
 const validate = (schema: Joi.ObjectSchema, field: "body" | "query") => {
@@ -13,15 +13,11 @@ const validate = (schema: Joi.ObjectSchema, field: "body" | "query") => {
   };
 };
 
-const validateBody = (
-  schema: Joi.ObjectSchema
-): ((req: Request, res: Response, next: NextFunction) => void) => {
+const validateBody = (schema: Joi.ObjectSchema): RequestHandler => {
   return validate(schema, "body");
 };
 
-const validateQuery = (
-  schema: Joi.ObjectSchema
-): ((req: Request, res: Response, next: NextFunction) => void) => {
+const validateQuery = (schema: Joi.ObjectSchema): RequestHandler => {
   return validate(schema, "query");
 };
 
