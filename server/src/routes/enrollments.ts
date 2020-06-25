@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
 
 // Joi inputvalidation
 const enrollmentSchema = Joi.object({
-  courseId: Joi.number().required(),
+  courseId: Joi.number().integer().required(),
 });
 // post an enrollment
 router.post("/", validateBody(enrollmentSchema), async (req, res) => {
