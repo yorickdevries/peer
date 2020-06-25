@@ -5,6 +5,7 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import compression from "compression";
+import queryParser from "express-query-parser";
 import { errorLogger } from "./middleware/logger";
 import HttpStatusCode from "./enum/HttpStatusCode";
 
@@ -23,6 +24,12 @@ app.use(express.static(clientWebsite));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(
+  queryParser({
+    parseNull: true,
+    parseBoolean: true,
+  })
+);
 
 // Routing
 app.use("/api", api);

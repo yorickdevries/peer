@@ -3,7 +3,6 @@
     "parser": "@typescript-eslint/parser",
     "plugins": [
         "@typescript-eslint",
-        "no-null"
     ],
     "extends": [
         "eslint:recommended",
@@ -13,6 +12,5 @@
     ],
     "rules": {
         "prefer-arrow-callback": "error",
-        "no-null/no-null": "warn"
     }
 }

@@ -2,10 +2,14 @@ import "reflect-metadata";
 import { createConnection, Connection, ConnectionOptions } from "typeorm";
 import config from "config";
 // Database models
-import { User } from "./models/User";
-import { Affiliation } from "./models/Affiliation";
-import { Study } from "./models/Study";
-import { OrganisationUnit } from "./models/OrganisationUnit";
+import User from "./models/User";
+import Affiliation from "./models/Affiliation";
+import Study from "./models/Study";
+import OrganisationUnit from "./models/OrganisationUnit";
+import Faculty from "./models/Faculty";
+import AcademicYear from "./models/AcademicYear";
+import Course from "./models/Course";
+import Enrollment from "./models/Enrollment";
 
 const databaseConfig: {
   type: string;
@@ -19,7 +23,16 @@ const databaseConfig: {
 
 const createDatabaseConnection = async function (): Promise<Connection> {
   const baseConfig = {
-    entities: [User, Affiliation, Study, OrganisationUnit],
+    entities: [
+      User,
+      Affiliation,
+      Study,
+      OrganisationUnit,
+      Faculty,
+      AcademicYear,
+      Course,
+      Enrollment,
+    ],
     synchronize: true, // must be set to false once deployed to production (we should siwtch to migrations instead)
     logging: false,
   };

@@ -1,5 +1,5 @@
 import { Entity } from "typeorm";
-import { SSOField } from "./SSOField";
+import NamedModel from "./NamedModel";
 
 @Entity()
-export class OrganisationUnit extends SSOField {}
+export default class OrganisationUnit extends NamedModel {}

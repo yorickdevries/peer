@@ -10,69 +10,75 @@ import {
   IsEmail,
   IsNotEmpty,
 } from "class-validator";
-import { BaseModel } from "./BaseModel";
-import { Affiliation } from "./Affiliation";
-import { Study } from "./Study";
-import { OrganisationUnit } from "./OrganisationUnit";
+import BaseModel from "./BaseModel";
+import Affiliation from "./Affiliation";
+import Study from "./Study";
+import OrganisationUnit from "./OrganisationUnit";
 
 @Entity()
-export class User extends BaseModel {
+export default class User extends BaseModel {
   @PrimaryColumn()
   @IsDefined()
   @IsString()
   @IsNotEmpty()
   @IsAlphanumeric()
   @IsLowercase()
-  private netid: string;
+  netid: string;
 
-  @Column({ nullable: true })
+  @Column("int", { nullable: true })
   @IsOptional()
   @IsInt()
   @IsPositive()
-  private studentNumber?: number;
+  studentNumber?: number | null;
 
-  @Column({ nullable: true })
+  @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  private firstName?: string;
+  firstName?: string | null;
 
-  @Column({ nullable: true })
+  @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  private prefix?: string;
+  prefix?: string | null;
 
-  @Column({ nullable: true })
+  @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  private lastName?: string;
+  lastName?: string | null;
 
-  @Column({ nullable: true })
+  @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
   @IsEmail()
-  private email?: string;
+  email?: string | null;
 
-  @Column({ nullable: true })
+  @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  private displayName?: string;
+  displayName?: string | null;
 
-  @ManyToMany((_type) => Affiliation)
+  @ManyToMany((_type) => Affiliation, {
+    eager: true,
+  })
   @JoinTable()
   affiliation?: Affiliation[];
 
-  @ManyToMany((_type) => Study)
+  @ManyToMany((_type) => Study, {
+    eager: true,
+  })
   @JoinTable()
-  private study?: Study[];
+  study?: Study[];
 
-  @ManyToMany((_type) => OrganisationUnit)
+  @ManyToMany((_type) => OrganisationUnit, {
+    eager: true,
+  })
   @JoinTable()
-  private organisationUnit?: OrganisationUnit[];
+  organisationUnit?: OrganisationUnit[];
 
   constructor(
     netid: string,
@@ -89,19 +95,14 @@ export class User extends BaseModel {
     super();
     this.netid = netid;
     // the cast is done so the fields can be set to null in the database
-    this.studentNumber = studentNumber as number | undefined;
-    this.firstName = firstName as string | undefined;
-    this.prefix = prefix as string | undefined;
-    this.lastName = lastName as string | undefined;
-    this.email = email as string | undefined;
-    this.displayName = displayName as string | undefined;
+    this.studentNumber = studentNumber;
+    this.firstName = firstName;
+    this.prefix = prefix;
+    this.lastName = lastName;
+    this.email = email;
+    this.displayName = displayName;
     this.affiliation = affiliation;
     this.study = study;
     this.organisationUnit = organisationUnit;
-  }
-
-  // temporarily added as typescript doesn't compile when private fields aren't used
-  toString(): string {
-    return `${this.netid},${this.studentNumber},${this.firstName},${this.prefix}, ${this.lastName},${this.email},${this.affiliation},${this.displayName},${this.study},${this.organisationUnit}`;
   }
 }

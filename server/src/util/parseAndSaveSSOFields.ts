@@ -1,6 +1,6 @@
-import { SSOField } from "../models/SSOField";
+import NamedModel from "../models/NamedModel";
 
-const parseAndSaveSSOFields = async function <T extends SSOField>(
+const parseAndSaveSSOFields = async function <T extends NamedModel>(
   input: string | string[] | undefined,
   constructor: new (_: string) => T
 ): Promise<T[]> {
@@ -24,8 +24,13 @@ const parseAndSaveSSOFields = async function <T extends SSOField>(
         console.error("SSOField validation failed: ", errors);
       } else {
         // save the ssoField to the database
-        ssoFields.push(ssoField);
-        await ssoField.save();
+        try {
+          await ssoField.save();
+          ssoFields.push(ssoField);
+        } catch (error) {
+          // Log error and skip SSOField
+          console.error("SSOField save failed: ", error);
+        }
       }
     }
   }

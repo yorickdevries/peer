@@ -3,3 +3,4 @@ declare module "forwarded-for";
 declare module "fs-extra";
 declare module "passport-saml";
 declare module "passport-saml-metadata";
+declare module "express-query-parser";
