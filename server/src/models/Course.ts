@@ -4,8 +4,6 @@ import {
   Column,
   ManyToOne,
   JoinTable,
-  Not,
-  In,
 } from "typeorm";
 import {
   IsDefined,
@@ -84,18 +82,19 @@ export default class Course extends BaseModel {
     // map the courses to a list of course ids
     const enrollmentCourseIds = _.map(enrollments, "courseId");
 
-    // all enrollable courses without already enrolled courses
+    // all enrollable courses
     const enrollableCourses = await this.find({
       relations: ["faculty", "academicYear"],
       where: {
         enrollable: true,
-        id: Not(In(enrollmentCourseIds)),
       },
       order: { id: "ASC" },
     });
-    // remove courses based on inactive academic years
+    // remove courses based on inactive academic years and already enrolled courses
     _.remove(enrollableCourses, (val) => {
-      return !val.academicYear?.active;
+      return (
+        !val.academicYear?.active || _.includes(enrollmentCourseIds, val.id)
+      );
     });
     return enrollableCourses;
   }
