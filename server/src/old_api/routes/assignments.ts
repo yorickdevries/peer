@@ -46,7 +46,7 @@ router.route("/:assignment_id")
 /**
  * Route to post and update an assignment.
  */
-router.post("/", upload("assignmentFile", (config.get("allowed_extensions") as string[]), (config.get("assignments") as any).maxSizeAssignmentFile), index.authorization.enrolledAsTeacherAssignmentCheckForPost, async function(req: any, res: any) {
+router.post("/", upload("assignmentFile", (config.get("allowedExtensions") as string[]), (config.get("assignments") as any).maxSizeAssignmentFile), index.authorization.enrolledAsTeacherAssignmentCheckForPost, async function(req: any, res: any) {
     try {
         let fileName: string | null;
         let filePath: string | undefined = undefined;
@@ -110,7 +110,7 @@ router.post("/", upload("assignmentFile", (config.get("allowed_extensions") as s
  * Removes the old assignment (also from the files folder - if a file is uploaded)
  * and adds the new assignment.
  */
-router.put("/:assignment_id", upload("assignmentFile", (config.get("allowed_extensions") as string[]), (config.get("assignments") as any).maxSizeAssignmentFile), index.authorization.enrolledAsTeacherAssignmentCheck, async function(req: any, res: any) {
+router.put("/:assignment_id", upload("assignmentFile", (config.get("allowedExtensions") as string[]), (config.get("assignments") as any).maxSizeAssignmentFile), index.authorization.enrolledAsTeacherAssignmentCheck, async function(req: any, res: any) {
     try {
         const oldFilename: string = (await AssignmentPS.executeGetAssignmentById(req.params.assignment_id)).filename;
         // Determine whether a file is uploaded and set the filename accordingly.

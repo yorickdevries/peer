@@ -91,7 +91,7 @@ router.route("/:reviewId/reviewevaluation").post(index.authorization.checkAuthor
  * @body a json object of the whole form, as specified in the doc.
  * @return JSON representation of a review.
  */
-router.route("/:reviewId").put(upload(undefined, (config.get("allowed_extensions") as string[]), (config.get("reviews") as any).maxSizeReviewFile), index.authorization.checkReviewOwner, index.authorization.checkReviewEditAllowed, async (req, res) => {
+router.route("/:reviewId").put(upload(undefined, (config.get("allowedExtensions") as string[]), (config.get("reviews") as any).maxSizeReviewFile), index.authorization.checkReviewOwner, index.authorization.checkReviewEditAllowed, async (req, res) => {
     try {
         // input
         const reviewId = parseInt(req.params.reviewId);
