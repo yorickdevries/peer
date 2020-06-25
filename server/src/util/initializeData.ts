@@ -3,14 +3,20 @@ import AcademicYear from "../models/AcademicYear";
 
 const initializeData = async function (): Promise<void> {
   // Faculties
-  await new Faculty("ABE").save();
-  await new Faculty("CEG").save();
-  await new Faculty("EEMCS").save();
-  await new Faculty("IDE").save();
-  await new Faculty("AE").save();
-  await new Faculty("TPM").save();
-  await new Faculty("AS").save();
-  await new Faculty("3mE").save();
+  await new Faculty("ABE", "Architecture and the Built Environment").save();
+  await new Faculty("CEG", "Civil Engineering and Geosciences").save();
+  await new Faculty(
+    "EEMCS",
+    "Electrical Engineering, Mathematics & Computer Science"
+  ).save();
+  await new Faculty("IDE", "Industrial Design Engineering").save();
+  await new Faculty("AE", "Aerospace Engineering").save();
+  await new Faculty("TPM", "Technology, Policy and Management").save();
+  await new Faculty("AS", "Applied Sciences").save();
+  await new Faculty(
+    "3mE",
+    "Mechanical, Maritime and Materials Engineering"
+  ).save();
 
   // Academic Years
   await new AcademicYear("2017/2018", false).save();
