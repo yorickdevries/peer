@@ -83,7 +83,7 @@ export default class Assignment extends BaseModel {
 
   // review_evaluation_due_date timestamptz,
   @Column({
-    type: process.env.NODE_ENV === "test" ? undefined : "timestamp",
+    type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
     nullable: true,
   })
   @IsOptional()
