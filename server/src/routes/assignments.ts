@@ -23,7 +23,6 @@ const assignmentSchema = Joi.object({
   reviewDueDate: Joi.date().required(),
   reviewEvaluationDueDate: Joi.date().allow(null).required(),
   description: Joi.string().allow(null).required(),
-  filename: Joi.string().allow(null).required(),
   externalLink: Joi.string().allow(null).required(),
 });
 // post an assignment in a course
@@ -42,6 +41,7 @@ router.post("/", validateBody(assignmentSchema), async (req, res) => {
         return o.userNetid === req.user!.netid;
       })
     ) {
+      // here the file needs to be saved as well
       const course = await Course.findOneOrFail(req.body.courseId);
       const assignment = new Assignment(
         req.body.name,
@@ -57,7 +57,7 @@ router.post("/", validateBody(assignmentSchema), async (req, res) => {
           ? new Date(req.body.reviewEvaluationDueDate)
           : null, // when the value is null, it should not be converted to a date
         req.body.description,
-        req.body.filename,
+        null,
         req.body.externalLink
       );
       await assignment.save();
