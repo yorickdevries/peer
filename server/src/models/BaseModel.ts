@@ -6,13 +6,7 @@ import {
   BeforeUpdate,
   SaveOptions,
 } from "typeorm";
-import {
-  validate,
-  validateOrReject,
-  ValidationError,
-  IsDate,
-  IsOptional,
-} from "class-validator";
+import { validateOrReject, IsDate, IsOptional } from "class-validator";
 
 // Adds the basic fields of @CreateDateColumn and UpdateDateColumn
 export default abstract class BaseModel extends BaseEntity {
@@ -35,17 +29,6 @@ export default abstract class BaseModel extends BaseEntity {
   @IsOptional()
   @IsDate()
   updatedAt?: Date;
-
-  // validation route which can be externally called and can return error objects
-  validate(): Promise<ValidationError[] | undefined> {
-    return validate(this).then((errors) => {
-      if (errors.length > 0) {
-        return errors;
-      } else {
-        return undefined;
-      }
-    });
-  }
 
   // validateOrReject to be run before saving/updating by TypeORM
   @BeforeInsert()
