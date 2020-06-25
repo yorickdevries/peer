@@ -190,5 +190,23 @@ describe("Integration", () => {
       .send({ courseId: course2.id });
     // assertions
     expect(res.status).toBe(400);
+
+    // enroll for an unenrollable course
+    res = await request(server)
+      .get("/api/enrollments")
+      .set("cookie", studentCookie1);
+    // assertions
+    expect(res.status).toBe(200);
+    expect(JSON.parse(res.text)).toMatchObject([
+      {
+        role: "student",
+        courseId: course.id,
+      },
+    ]);
+    expect(JSON.parse(res.text)).not.toMatchObject([
+      {
+        courseId: course2.id,
+      },
+    ]);
   });
 });
