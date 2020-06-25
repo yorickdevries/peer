@@ -52,13 +52,13 @@ export default class Course extends BaseModel {
     eager: true,
   })
   @JoinTable()
-  faculty?: Faculty;
+  faculty: Faculty;
 
   @ManyToOne((_type) => AcademicYear, {
     eager: true,
   })
   @JoinTable()
-  academicYear?: AcademicYear;
+  academicYear: AcademicYear;
 
   constructor(
     name: string,

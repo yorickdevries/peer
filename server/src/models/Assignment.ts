@@ -36,7 +36,7 @@ export default class Assignment extends BaseModel {
   // course_id int NOT NULL, FK
   @ManyToOne((_type) => Course)
   @JoinTable()
-  course: Course;
+  course?: Course;
 
   // reviews_per_user int NOT NULL,
   @Column()

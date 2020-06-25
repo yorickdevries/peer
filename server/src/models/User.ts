@@ -66,19 +66,19 @@ export default class User extends BaseModel {
     eager: true,
   })
   @JoinTable()
-  affiliation?: Affiliation[];
+  affiliation: Affiliation[];
 
   @ManyToMany((_type) => Study, {
     eager: true,
   })
   @JoinTable()
-  study?: Study[];
+  study: Study[];
 
   @ManyToMany((_type) => OrganisationUnit, {
     eager: true,
   })
   @JoinTable()
-  organisationUnit?: OrganisationUnit[];
+  organisationUnit: OrganisationUnit[];
 
   constructor(
     netid: string,
