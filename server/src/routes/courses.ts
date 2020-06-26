@@ -14,8 +14,7 @@ const router = express.Router();
 
 // get all enrollable courses where the student isnt in enrolled yet
 router.get("/enrollable", async (req, res) => {
-  const enrollableCourses = await Course.getEnrollableCourses(req.user!);
-  res.send(enrollableCourses);
+  res.send(await Course.getEnrollable(req.user!));
 });
 
 // Joi inputvalidation
@@ -34,6 +33,7 @@ router.post(
   checkEmployee,
   validateBody(courseSchema),
   async (req, res) => {
+    const user = req.user!;
     try {
       // find the faculty and academic year in the database
       const faculty = await Faculty.findOneOrFail(req.body.faculty);
@@ -54,7 +54,7 @@ router.post(
         // save the course so it gets an id
         await transactionalEntityManager.save(course);
         // here the current user needs to be enrolled as teacher fot he just created course
-        const enrollment = new Enrollment(req.user!, course, UserRole.TEACHER);
+        const enrollment = new Enrollment(user, course, UserRole.TEACHER);
         await transactionalEntityManager.save(enrollment);
       });
       // reload course to get all data
