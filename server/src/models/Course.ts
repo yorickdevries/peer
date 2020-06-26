@@ -71,14 +71,21 @@ export default class Course extends BaseModel {
     this.description = description;
   }
 
-  // get all enrollable courses for a certain user
-  static async getEnrollableCourses(user: User): Promise<Course[]> {
+  // get all enrolled courses for a certain user
+  static async getEnrolledCourses(user: User): Promise<Course[]> {
     // current enrollments for the user
     const enrollments = await Enrollment.find({
+      relations: ["course"],
       where: { userNetid: user.netid },
     });
     // map the courses to a list of course ids
-    const enrollmentCourseIds = _.map(enrollments, "courseId");
+    return _.map(enrollments, "course") as Course[];
+  }
+
+  // get all enrollable courses for a certain user
+  static async getEnrollableCourses(user: User): Promise<Course[]> {
+    // current enrolled courses for the user
+    const enrolledCourses = await this.getEnrolledCourses(user);
 
     // all enrollable courses
     const enrollableCourses = await this.find({
@@ -89,7 +96,7 @@ export default class Course extends BaseModel {
     });
     // remove courses based on inactive academic years and already enrolled courses
     _.remove(enrollableCourses, (o) => {
-      return !o.academicYear?.active || _.includes(enrollmentCourseIds, o.id);
+      return !o.academicYear?.active || _.includes(enrolledCourses, o);
     });
     return enrollableCourses;
   }
