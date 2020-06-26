@@ -37,7 +37,7 @@ export default class Group extends BaseModel {
     this.assignments = assignments;
   }
 
-  async getUsers(): Promise<Users[]> {
+  async getUsers(): Promise<User[]> {
     return (
       await Group.findOneOrFail(this.id, {
         relations: ["users"],
