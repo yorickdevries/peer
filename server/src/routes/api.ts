@@ -24,6 +24,7 @@ router.get("/authenticated", (req, res) => {
 });
 
 // Check always whether someone is logged in before accessing the other routes below
+// additionally fixes the user object so all fields are copied over from the database
 router.use(checkAuthentication);
 
 // Route to get the current userinfo from SSO
