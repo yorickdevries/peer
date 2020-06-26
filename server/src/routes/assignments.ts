@@ -16,6 +16,8 @@ import path from "path";
 import fs from "fs";
 const fsPromises = fs.promises;
 
+const uploadFolder = config.get("uploadFolder") as string;
+
 const router = express.Router();
 
 // Joi inputvalidation
@@ -58,8 +60,6 @@ router.post(
         let assignment: Assignment;
         // find the course
         const course = await Course.findOneOrFail(req.body.courseId);
-        const uploadFolder = config.get("uploadFolder") as string;
-
         // start transaction make sure the file and assignment are both saved
         await getManager().transaction(async (transactionalEntityManager) => {
           // create the file object or leave it as null if no file is uploaded
@@ -73,14 +73,11 @@ router.post(
               fileExtension
             );
             const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
-            file = await transactionalEntityManager.save(
-              new File(fileName, fileExtension, fileHash)
-            );
-            // save the file to disk
-            if (!file?.id) {
-              throw "File could not be saved in the database";
-            }
+            file = new File(fileName, fileExtension, fileHash);
+            await transactionalEntityManager.save(file);
           }
+
+          // create assignment
           assignment = new Assignment(
             req.body.name,
             course,
@@ -98,7 +95,7 @@ router.post(
           );
           await transactionalEntityManager.save(assignment);
 
-          // save the file to disk lastly (if this goed wrong all previous steps are rolled back)
+          // save the file to disk lastly (if this goes wrong all previous steps are rolled back)
           if (file?.id && req.file) {
             const filePath = path.resolve(uploadFolder, file.id.toString());
             await fsPromises.writeFile(filePath, req.file.buffer);
