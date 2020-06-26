@@ -80,10 +80,7 @@ export default class Course extends BaseModel {
   }
 
   // get all enrolled courses for a certain user
-  static async getEnrolled(
-    user: User,
-    role?: UserRole
-  ): Promise<Course[]> {
+  static async getEnrolled(user: User, role?: UserRole): Promise<Course[]> {
     // current enrollments for the user
     const enrollments = await Enrollment.find({
       relations: ["course"],
