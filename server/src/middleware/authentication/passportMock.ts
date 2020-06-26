@@ -25,7 +25,7 @@ const mockPassportConfiguration = async function (
       "Software Technology",
     ]
   );
-  const user = {netid: userNetid};
+  const user = { netid: userNetid };
   const strategy = new MockStrategy({
     name: "mock",
     user: user as any, // Added any as MockStrategy asks for a specific User type

@@ -65,7 +65,7 @@ const passportConfiguration = function (passport: PassportStatic): void {
           profile["nlEduPersonOrgUnit"]
         );
         if (userNetid) {
-          const user = {netid: userNetid};
+          const user = { netid: userNetid };
           return done(undefined, user);
         } else {
           // no user will be logged in (needs to be tested in production)
