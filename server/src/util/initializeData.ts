@@ -1,5 +1,8 @@
 import Faculty from "../models/Faculty";
 import AcademicYear from "../models/AcademicYear";
+import config from "config";
+import fs from "fs";
+import path from "path";
 
 const initializeData = async function (): Promise<void> {
   // Faculties
@@ -24,6 +27,12 @@ const initializeData = async function (): Promise<void> {
   await new AcademicYear("2019/2020", true).save();
   await new AcademicYear("2020/2021", true).save();
   console.log("Initialized Faculties and Academic Years");
+
+  // file folder
+  const uploadFolder = path.resolve(config.get("uploadFolder") as string);
+  await fs.promises.mkdir(uploadFolder, { recursive: true });
+  console.log("Created upload folder");
+
   return;
 };
 

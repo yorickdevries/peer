@@ -9,8 +9,8 @@ const checkEmployee = async function (
 ): Promise<void> {
   const user = req.user!;
   if (
-    _.some(user.affiliation, (elem) => {
-      return elem.name === "employee";
+    _.some(user.affiliation, (o) => {
+      return o.name === "employee";
     })
   ) {
     next();

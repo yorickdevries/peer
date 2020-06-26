@@ -39,5 +39,7 @@
         "exampleSubmissionFolder": "./example_data/submissions",
         "exampleReviewFolder": "./example_data/reviews"
     },
-    "allowed_extensions": [".pdf", ".zip", ".doc", ".docx"]
+    "allowedExtensions": [".pdf", ".zip", ".doc", ".docx"],
+    "maxFileSize": 52428800, // 50 MB
+    "uploadFolder": "./files/development/"
 }

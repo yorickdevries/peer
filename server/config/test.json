@@ -16,5 +16,6 @@
     },
     "submissions": {
         "fileFolder": "./files/test/submissions"
-    }
+    },
+    "uploadFolder": "./files/test/"
 }

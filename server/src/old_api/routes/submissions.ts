@@ -32,7 +32,7 @@ router.get("/:id", index.authorization.getSubmissionAuth, (req, res) => {
  * Route to make a new submission.
  * @authorization the user should be part of a group in the course.
  */
-router.post("/", upload("submissionFile", (config.get("allowed_extensions") as string[]), (config.get("submissions") as any).maxSizeSubmissionFile), index.authorization.postSubmissionAuth, index.authorization.checkSubmissionBetweenPublishDue, async function(req: any, res: any) {
+router.post("/", upload("submissionFile", (config.get("allowedExtensions") as string[]), (config.get("submissions") as any).maxSizeSubmissionFile), index.authorization.postSubmissionAuth, index.authorization.checkSubmissionBetweenPublishDue, async function(req: any, res: any) {
     // error if no file was uploaded or no group column defined
     if (req.file == undefined) {
         res.status(400);

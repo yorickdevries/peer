@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinTable,
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import {
   IsDefined,
   IsOptional,
@@ -50,15 +44,15 @@ export default class Course extends BaseModel {
 
   @ManyToOne((_type) => Faculty, {
     eager: true,
+    nullable: false,
   })
-  @JoinTable()
-  faculty?: Faculty;
+  faculty: Faculty;
 
   @ManyToOne((_type) => AcademicYear, {
     eager: true,
+    nullable: false,
   })
-  @JoinTable()
-  academicYear?: AcademicYear;
+  academicYear: AcademicYear;
 
   constructor(
     name: string,
@@ -94,10 +88,8 @@ export default class Course extends BaseModel {
       order: { id: "ASC" },
     });
     // remove courses based on inactive academic years and already enrolled courses
-    _.remove(enrollableCourses, (val) => {
-      return (
-        !val.academicYear?.active || _.includes(enrollmentCourseIds, val.id)
-      );
+    _.remove(enrollableCourses, (o) => {
+      return !o.academicYear?.active || _.includes(enrollmentCourseIds, o.id);
     });
     return enrollableCourses;
   }

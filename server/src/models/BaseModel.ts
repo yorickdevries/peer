@@ -6,20 +6,14 @@ import {
   BeforeUpdate,
   SaveOptions,
 } from "typeorm";
-import {
-  validate,
-  validateOrReject,
-  ValidationError,
-  IsDate,
-  IsOptional,
-} from "class-validator";
+import { validateOrReject, IsDate, IsOptional } from "class-validator";
 
 // Adds the basic fields of @CreateDateColumn and UpdateDateColumn
 export default abstract class BaseModel extends BaseEntity {
   @CreateDateColumn(
     // set datatype to timestamp if not running in test environment
     // maybe move to separate function when more Dates are used in the database
-    process.env.NODE_ENV === "test" ? undefined : { type: "timestamp" }
+    { type: process.env.NODE_ENV === "test" ? undefined : "timestamp" }
   )
   // these fields are created after saving, so @IsOptional() is added
   @IsOptional()
@@ -29,23 +23,12 @@ export default abstract class BaseModel extends BaseEntity {
   @UpdateDateColumn(
     // set datatype to timestamp if not running in test environment
     // maybe move to separate function when more Dates are used in the database
-    process.env.NODE_ENV === "test" ? undefined : { type: "timestamp" }
+    { type: process.env.NODE_ENV === "test" ? undefined : "timestamp" }
   )
   // these fields are created after saving, so @IsOptional() is added
   @IsOptional()
   @IsDate()
   updatedAt?: Date;
-
-  // validation route which can be externally called and can return error objects
-  validate(): Promise<ValidationError[] | undefined> {
-    return validate(this).then((errors) => {
-      if (errors.length > 0) {
-        return errors;
-      } else {
-        return undefined;
-      }
-    });
-  }
 
   // validateOrReject to be run before saving/updating by TypeORM
   @BeforeInsert()

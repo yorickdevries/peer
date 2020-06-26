@@ -10,6 +10,8 @@ import Faculty from "./models/Faculty";
 import AcademicYear from "./models/AcademicYear";
 import Course from "./models/Course";
 import Enrollment from "./models/Enrollment";
+import Assignment from "./models/Assignment";
+import File from "./models/File";
 
 const databaseConfig: {
   type: string;
@@ -32,6 +34,8 @@ const createDatabaseConnection = async function (): Promise<Connection> {
       AcademicYear,
       Course,
       Enrollment,
+      Assignment,
+      File,
     ],
     synchronize: true, // must be set to false once deployed to production (we should siwtch to migrations instead)
     logging: false,

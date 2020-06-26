@@ -66,43 +66,42 @@ export default class User extends BaseModel {
     eager: true,
   })
   @JoinTable()
-  affiliation?: Affiliation[];
+  affiliation: Affiliation[];
 
   @ManyToMany((_type) => Study, {
     eager: true,
   })
   @JoinTable()
-  study?: Study[];
+  study: Study[];
 
   @ManyToMany((_type) => OrganisationUnit, {
     eager: true,
   })
   @JoinTable()
-  organisationUnit?: OrganisationUnit[];
+  organisationUnit: OrganisationUnit[];
 
   constructor(
     netid: string,
+    affiliation: Affiliation[],
+    study: Study[],
+    organisationUnit: OrganisationUnit[],
     studentNumber?: number | null,
     firstName?: string | null,
     prefix?: string | null,
     lastName?: string | null,
     email?: string | null,
-    displayName?: string | null,
-    affiliation?: Affiliation[],
-    study?: Study[],
-    organisationUnit?: OrganisationUnit[]
+    displayName?: string | null
   ) {
     super();
     this.netid = netid;
-    // the cast is done so the fields can be set to null in the database
+    this.affiliation = affiliation;
+    this.study = study;
+    this.organisationUnit = organisationUnit;
     this.studentNumber = studentNumber;
     this.firstName = firstName;
     this.prefix = prefix;
     this.lastName = lastName;
     this.email = email;
     this.displayName = displayName;
-    this.affiliation = affiliation;
-    this.study = study;
-    this.organisationUnit = organisationUnit;
   }
 }

@@ -1,0 +1,167 @@
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  ManyToOne,
+  JoinColumn,
+} from "typeorm";
+import {
+  IsDefined,
+  IsOptional,
+  IsString,
+  IsNotEmpty,
+  IsBoolean,
+  IsInt,
+  IsPositive,
+  IsDate,
+  IsUrl,
+} from "class-validator";
+import BaseModel from "./BaseModel";
+import Course from "./Course";
+import File from "./File";
+
+@Entity()
+export default class Assignment extends BaseModel {
+  // id SERIAL,
+  @PrimaryGeneratedColumn()
+  @IsOptional()
+  id?: number;
+
+  // title varchar(500) NOT NULL,
+  @Column()
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  // course_id int NOT NULL, FK
+  @ManyToOne((_type) => Course, { nullable: false })
+  course?: Course;
+
+  // reviews_per_user int NOT NULL,
+  @Column()
+  @IsDefined()
+  @IsInt()
+  @IsPositive()
+  reviewsPerUser: number;
+
+  // one_person_groups boolean NOT NULL,
+  @Column()
+  @IsDefined()
+  @IsBoolean()
+  enrollable: boolean;
+
+  // review_evaluation boolean NOT NULL,
+  @Column()
+  @IsDefined()
+  @IsBoolean()
+  reviewEvaluation: boolean;
+
+  // publish_date timestamptz NOT NULL,
+  @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
+  @IsDefined()
+  @IsDate()
+  publishDate: Date;
+
+  // due_date timestamptz NOT NULL,
+  @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
+  @IsDefined()
+  @IsDate()
+  dueDate: Date;
+
+  // review_publish_date timestamptz NOT NULL,
+  @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
+  @IsDefined()
+  @IsDate()
+  reviewPublishDate: Date;
+
+  // review_due_date timestamptz NOT NULL,
+  @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
+  @IsDefined()
+  @IsDate()
+  reviewDueDate: Date;
+
+  // review_evaluation_due_date timestamptz,
+  @Column({
+    type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
+    nullable: true,
+  })
+  @IsOptional()
+  @IsDate()
+  reviewEvaluationDueDate?: Date | null;
+
+  // description varchar(5000),
+  @Column("text", { nullable: true })
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  description?: string | null;
+
+  // filename varchar(500),
+  @OneToOne((_type) => File, { eager: true })
+  @JoinColumn()
+  file?: File | null;
+
+  // external_link varchar(1000),
+  @Column("varchar", { nullable: true })
+  @IsOptional()
+  @IsUrl()
+  @IsString()
+  @IsNotEmpty()
+  externalLink?: string | null;
+
+  constructor(
+    name: string,
+    course: Course,
+    reviewsPerUser: number,
+    enrollable: boolean,
+    reviewEvaluation: boolean,
+    publishDate: Date,
+    dueDate: Date,
+    reviewPublishDate: Date,
+    reviewDueDate: Date,
+    reviewEvaluationDueDate?: Date | null,
+    description?: string | null,
+    file?: File | null,
+    externalLink?: string | null
+  ) {
+    super();
+    this.name = name;
+    this.course = course;
+    this.reviewsPerUser = reviewsPerUser;
+    this.enrollable = enrollable;
+    this.reviewEvaluation = reviewEvaluation;
+    this.publishDate = publishDate;
+    this.dueDate = dueDate;
+    this.reviewPublishDate = reviewPublishDate;
+    this.reviewDueDate = reviewDueDate;
+    this.reviewEvaluationDueDate = reviewEvaluationDueDate;
+    this.description = description;
+    this.file = file;
+    this.externalLink = externalLink;
+  }
+
+  // custom validation which is run before saving
+  validateOrReject(): Promise<void> {
+    // check whether the boolean is correctly set
+    if (this.reviewEvaluation && !this.reviewEvaluationDueDate) {
+      throw "reviewEvaluationDueDate must be defined";
+    }
+    if (!this.reviewEvaluation && this.reviewEvaluationDueDate) {
+      throw "reviewEvaluationDueDate is defined while reviewEvaluation is turned off";
+    }
+    // check chronological order of the dates
+    if (
+      this.publishDate > this.dueDate ||
+      this.dueDate > this.reviewPublishDate ||
+      this.reviewPublishDate > this.reviewDueDate ||
+      (this.reviewEvaluationDueDate &&
+        this.reviewDueDate > this.reviewEvaluationDueDate)
+    ) {
+      throw "The dates must chronologically correct";
+    }
+    // if all succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
+}

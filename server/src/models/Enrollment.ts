@@ -10,13 +10,13 @@ export default class Enrollment extends BaseModel {
   @PrimaryColumn()
   userNetid?: string;
 
-  @ManyToOne((_type) => User)
+  @ManyToOne((_type) => User, { nullable: false })
   user?: User;
 
   @PrimaryColumn()
   courseId?: number;
 
-  @ManyToOne((_type) => Course)
+  @ManyToOne((_type) => Course, { nullable: false })
   course?: Course;
 
   @Column()
