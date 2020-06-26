@@ -94,10 +94,18 @@ export default class Course extends BaseModel {
 
   // get all enrolled courses for a certain user
   static async getEnrolled(user: User, role?: UserRole): Promise<Course[]> {
+    const where: {
+      userNetid: string;
+      role?: UserRole;
+    } = { userNetid: user.netid };
+    // add role to query if specified
+    if (role) {
+      where.role = role;
+    }
     // current enrollments for the user
     const enrollments = await Enrollment.find({
       relations: ["course"],
-      where: { userNetid: user.netid, role: role },
+      where: where,
     });
     // map the courses to a list of course ids
     const courses = _.map(enrollments, "course") as Course[];
