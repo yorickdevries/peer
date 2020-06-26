@@ -6,6 +6,7 @@ import createDatabaseConnection from "../../src/databaseConnection";
 import AcademicYear from "../../src/models/AcademicYear";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
+import initializeData from "../../src/util/initializeData";
 
 describe("Academic Years", () => {
   let connection: Connection;
@@ -14,6 +15,8 @@ describe("Academic Years", () => {
   beforeAll(async () => {
     connection = await createDatabaseConnection();
     server = http.createServer(app);
+    // initialize faculties and academic years
+    await initializeData();
   });
 
   afterAll(async () => {

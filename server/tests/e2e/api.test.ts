@@ -5,6 +5,7 @@ import app from "../../src/app";
 import createDatabaseConnection from "../../src/databaseConnection";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
+import initializeData from "../../src/util/initializeData";
 
 describe("API", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -18,6 +19,8 @@ describe("API", () => {
       `Connected to ${connection.options.type} database: ${connection.options.database}`
     );
     server = http.createServer(app);
+    // initialize faculties and academic years
+    await initializeData();
   });
 
   afterAll(async () => {
