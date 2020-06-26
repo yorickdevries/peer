@@ -192,27 +192,13 @@ export default class Assignment extends BaseModel {
     ).groups!;
   }
 
-  // get all enrolled assignments for a user
-  static async getEnrolled(user: User): Promise<Assignment[]> {
-    const userGroups = await user.getGroups();
-    // map the groups to a list of assignments
-    const enrolledAssignments = _.union(..._.map(userGroups, "assignments"));
-    return enrolledAssignments;
-  }
-
-  // check whether the user is enrolled in this assignment
-  async isEnrolled(user: User): Promise<boolean> {
-    const enrolledAssignments = await Assignment.getEnrolled(user);
-    return _.includes(enrolledAssignments, this);
-  }
-
   // get all enrollable assignments for a certain user
   static async getEnrollableAssignments(user: User): Promise<Assignment[]> {
     // all enrollable published assignments
     const allEnrollableAssignments = await this.find({
       where: {
         enrollable: true,
-        publishDate: LessThan(moment()),
+        publishDate: LessThan(new Date()),
       },
     });
     // pick the assignments of courses the student is enrolled in
@@ -227,5 +213,27 @@ export default class Assignment extends BaseModel {
       }
     }
     return enrollableAssignments;
+  }
+
+  // check whether the user is enrolled in this assignment
+  async isEnrollable(user: User): Promise<boolean> {
+    const enrollableAssignments = await Assignment.getEnrollableAssignments(
+      user
+    );
+    return _.includes(enrollableAssignments, this);
+  }
+
+  // get all enrolled assignments for a user
+  static async getEnrolled(user: User): Promise<Assignment[]> {
+    const userGroups = await user.getGroups();
+    // map the groups to a list of assignments
+    const enrolledAssignments = _.union(..._.map(userGroups, "assignments"));
+    return enrolledAssignments;
+  }
+
+  // check whether the user is enrolled in this assignment
+  async isEnrolled(user: User): Promise<boolean> {
+    const enrolledAssignments = await Assignment.getEnrolled(user);
+    return _.includes(enrolledAssignments, this);
   }
 }
