@@ -93,15 +93,24 @@ export default class Course extends BaseModel {
   // get all enrollable courses for a certain user
   static async getEnrollable(user: User): Promise<Course[]> {
     // all enrollable courses
-    const enrollableCourses = await this.find({
+    const allEnrollableCourses = await this.find({
       where: {
         enrollable: true,
       },
+      order: { id: "DESC" },
     });
-    // remove courses based on inactive academic years and already enrolled courses
-    _.remove(enrollableCourses, async (course) => {
-      return !course.academicYear?.active || (await course.isEnrolled(user));
+    // pick the courses which are active and not enrolled
+    const enrollableCourses = [];
+    for (const course of allEnrollableCourses) {
+      // add courses based on active academic years and not already enrolled courses
+      if (course.academicYear?.active && !(await course.isEnrolled(user))) {
+        enrollableCourses.push(course);
+      }
+    }
+    // sort by course id
+    const sortedEnrollableCourses = _.sortBy(enrollableCourses, (course) => {
+      return course.id;
     });
-    return enrollableCourses;
+    return sortedEnrollableCourses;
   }
 }
