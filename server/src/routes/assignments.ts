@@ -12,6 +12,7 @@ import config from "config";
 import hasha from "hasha";
 import path from "path";
 import fsPromises from "fs/promises";
+import Group from "../models/Group";
 
 const router = express.Router();
 
@@ -102,5 +103,25 @@ router.post(
     }
   }
 );
+
+// TODO: input validation for id!
+// plus transaction for group creation as a user should only make one group
+router.post("/:id/enroll", async (req, res) => {
+  const user = req.user!;
+  try {
+    const assignment = await Assignment.findOneOrFail(req.params.id);
+    if (await assignment.isEnrollable(user)) {
+      const group = new Group(user.netid, [user], [assignment]);
+      await group.save();
+      res.send(group);
+    } else {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("Assignment is not enrollable");
+    }
+  } catch (error) {
+    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+  }
+});
 
 export default router;
