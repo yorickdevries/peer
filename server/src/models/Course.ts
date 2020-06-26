@@ -41,7 +41,7 @@ export default class Course extends BaseModel {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  description?: string | null;
+  description: string | null;
 
   @ManyToOne((_type) => Faculty, {
     eager: true,
@@ -61,7 +61,7 @@ export default class Course extends BaseModel {
     enrollable: boolean,
     faculty: Faculty,
     academicYear: AcademicYear,
-    description?: string | null
+    description: string | null
   ) {
     super();
     this.name = name;
@@ -103,8 +103,8 @@ export default class Course extends BaseModel {
       order: { id: "ASC" },
     });
     // remove courses based on inactive academic years and already enrolled courses
-    _.remove(enrollableCourses, (o) => {
-      return !o.academicYear?.active || o.isEnrolledInCourse(user);
+    _.remove(enrollableCourses, async (o) => {
+      return !o.academicYear?.active || (await o.isEnrolledInCourse(user));
     });
     return enrollableCourses;
   }

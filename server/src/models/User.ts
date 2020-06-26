@@ -109,4 +109,13 @@ export default class User extends BaseModel {
     this.email = email;
     this.displayName = displayName;
   }
+
+  async getGroups(): Promise<Group[]> {
+    // get the user with all current groups
+    return (
+      await User.findOneOrFail(this.netid, {
+        relations: ["groups"],
+      })
+    ).groups!;
+  }
 }

@@ -22,6 +22,7 @@ import BaseModel from "./BaseModel";
 import Group from "./Group";
 import Course from "./Course";
 import File from "./File";
+import _ from "lodash";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -36,10 +37,6 @@ export default class Assignment extends BaseModel {
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  // course_id int NOT NULL, FK
-  @ManyToOne((_type) => Course, { nullable: false })
-  course?: Course;
 
   // reviews_per_user int NOT NULL,
   @Column()
@@ -91,19 +88,19 @@ export default class Assignment extends BaseModel {
   })
   @IsOptional()
   @IsDate()
-  reviewEvaluationDueDate?: Date | null;
+  reviewEvaluationDueDate: Date | null;
 
   // description varchar(5000),
   @Column("text", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  description?: string | null;
+  description: string | null;
 
   // filename varchar(500),
   @OneToOne((_type) => File, { eager: true })
   @JoinColumn()
-  file?: File | null;
+  file: File | null;
 
   // external_link varchar(1000),
   @Column("varchar", { nullable: true })
@@ -111,7 +108,11 @@ export default class Assignment extends BaseModel {
   @IsUrl()
   @IsString()
   @IsNotEmpty()
-  externalLink?: string | null;
+  externalLink: string | null;
+
+  // course_id int NOT NULL, FK
+  @ManyToOne((_type) => Course, { nullable: false })
+  course?: Course;
 
   // Assignment groups
   @ManyToMany((_type) => Group, (group) => group.assignments)
@@ -127,10 +128,10 @@ export default class Assignment extends BaseModel {
     dueDate: Date,
     reviewPublishDate: Date,
     reviewDueDate: Date,
-    reviewEvaluationDueDate?: Date | null,
-    description?: string | null,
-    file?: File | null,
-    externalLink?: string | null
+    reviewEvaluationDueDate: Date | null,
+    description: string | null,
+    file: File | null,
+    externalLink: string | null
   ) {
     super();
     this.name = name;
@@ -158,6 +159,7 @@ export default class Assignment extends BaseModel {
       throw "reviewEvaluationDueDate is defined while reviewEvaluation is turned off";
     }
     // check chronological order of the dates
+    // replace with moment syntax
     if (
       this.publishDate > this.dueDate ||
       this.dueDate > this.reviewPublishDate ||
@@ -169,5 +171,21 @@ export default class Assignment extends BaseModel {
     }
     // if all succeeds the super validateOrReject can be called
     return super.validateOrReject();
+  }
+
+  async getCourse(): Promise<Course> {
+    return (
+      await Assignment.findOneOrFail(this.id, {
+        relations: ["course"],
+      })
+    ).course!;
+  }
+
+  async getGroups(): Promise<Group[]> {
+    return (
+      await Assignment.findOneOrFail(this.id, {
+        relations: ["groups"],
+      })
+    ).groups!;
   }
 }

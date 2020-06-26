@@ -22,15 +22,11 @@ export default class Group extends BaseModel {
   @IsNotEmpty()
   name: string;
 
-  @ManyToMany((_type) => User, (user) => user.groups, {
-    eager: true,
-  })
+  @ManyToMany((_type) => User, (user) => user.groups)
   @JoinTable()
   users: User[];
 
-  @ManyToMany((_type) => Assignment, (assignment) => assignment.groups, {
-    eager: true,
-  })
+  @ManyToMany((_type) => Assignment, (assignment) => assignment.groups)
   @JoinTable()
   assignments: Assignment[];
 
@@ -39,5 +35,21 @@ export default class Group extends BaseModel {
     this.name = name;
     this.users = users;
     this.assignments = assignments;
+  }
+
+  async getUsers(): Promise<Users[]> {
+    return (
+      await Group.findOneOrFail(this.id, {
+        relations: ["users"],
+      })
+    ).users!;
+  }
+
+  async getAssignments(): Promise<Assignment[]> {
+    return (
+      await Group.findOneOrFail(this.id, {
+        relations: ["assignments"],
+      })
+    ).assignments!;
   }
 }
