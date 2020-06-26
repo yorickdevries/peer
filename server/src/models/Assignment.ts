@@ -163,13 +163,12 @@ export default class Assignment extends BaseModel {
       throw "reviewEvaluationDueDate is defined while reviewEvaluation is turned off";
     }
     // check chronological order of the dates
-    // replace with moment syntax
     if (
-      this.publishDate > this.dueDate ||
-      this.dueDate > this.reviewPublishDate ||
-      this.reviewPublishDate > this.reviewDueDate ||
+      moment(this.publishDate).isAfter(this.dueDate) ||
+      moment(this.dueDate).isAfter(this.reviewPublishDate) ||
+      moment(this.reviewPublishDate).isAfter(this.reviewDueDate) ||
       (this.reviewEvaluationDueDate &&
-        this.reviewDueDate > this.reviewEvaluationDueDate)
+        moment(this.reviewDueDate).isAfter(this.reviewEvaluationDueDate))
     ) {
       throw "The dates must chronologically correct";
     }
@@ -214,7 +213,7 @@ export default class Assignment extends BaseModel {
       where: {
         enrollable: true,
         publishDate: LessThan(moment()),
-      }
+      },
     });
     // remove assignments based on already enrolled groups
     _.remove(enrollableAssignments, async (assignment) => {
