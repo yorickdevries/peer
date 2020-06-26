@@ -73,8 +73,21 @@ export default class Course extends BaseModel {
   }
 
   async isEnrolled(user: User, role?: UserRole): Promise<boolean> {
+    // if this.id isnt instantiated no user can be enrolled
+    if (!this.id) {
+      return false;
+    }
+    const where: {
+      userNetid: string;
+      courseId: number;
+      role?: UserRole;
+    } = { userNetid: user.netid, courseId: this.id };
+    // add role to query if specified
+    if (role) {
+      where.role = role;
+    }
     const enrollment = await Enrollment.findOne({
-      where: { userNetid: user.netid, courseId: this.id, role: role },
+      where: where,
     });
     return enrollment ? true : false;
   }
