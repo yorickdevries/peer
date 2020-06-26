@@ -97,7 +97,6 @@ export default class Course extends BaseModel {
       where: {
         enrollable: true,
       },
-      order: { id: "DESC" },
     });
     // pick the courses which are active and not enrolled
     const enrollableCourses = [];
