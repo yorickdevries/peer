@@ -102,6 +102,7 @@ router.post(
           }
         });
         // reload assignment to get all data
+        // assignment should be defined now
         await assignment!.reload();
         res.send(assignment!);
       } else {
