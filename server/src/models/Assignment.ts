@@ -6,6 +6,7 @@ import {
   ManyToOne,
   ManyToMany,
   JoinColumn,
+  LessThan,
 } from "typeorm";
 import {
   IsDefined,
@@ -21,8 +22,11 @@ import {
 import BaseModel from "./BaseModel";
 import Group from "./Group";
 import Course from "./Course";
+import User from "./User";
 import File from "./File";
+import moment from "moment";
 import _ from "lodash";
+import UserRole from "../enum/UserRole";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -187,5 +191,38 @@ export default class Assignment extends BaseModel {
         relations: ["groups"],
       })
     ).groups!;
+  }
+
+  // get all enrolled assignments for a user
+  static async getEnrolled(user: User): Promise<Assignment[]> {
+    const userGroups = await user.getGroups();
+    // map the groups to a list of assignments
+    const enrolledAssignments = _.union(..._.map(userGroups, "assignments"));
+    return enrolledAssignments;
+  }
+
+  // check whether the user is enrolled in this assignment
+  async isEnrolled(user: User): Promise<boolean> {
+    const enrolledAssignments = await Assignment.getEnrolled(user);
+    return _.includes(enrolledAssignments, this);
+  }
+
+  // get all enrollable assignments for a certain user
+  static async getEnrollableAssignments(user: User): Promise<Assignment[]> {
+    // all enrollable published assignments
+    const enrollableAssignments = await this.find({
+      where: {
+        enrollable: true,
+        publishDate: LessThan(moment()),
+      }
+    });
+    // remove assignments based on already enrolled groups
+    _.remove(enrollableAssignments, async (assignment) => {
+      const course = await assignment.getCourse();
+      const studentInCourse = course.isEnrolled(user, UserRole.STUDENT);
+      const enrolledInAssignment = assignment.isEnrolled(user);
+      return !studentInCourse || enrolledInAssignment;
+    });
+    return enrollableAssignments;
   }
 }
