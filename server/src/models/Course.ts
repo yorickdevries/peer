@@ -72,7 +72,7 @@ export default class Course extends BaseModel {
     this.description = description;
   }
 
-  async isEnrolledInCourse(user: User, role?: UserRole): Promise<boolean> {
+  async isEnrolled(user: User, role?: UserRole): Promise<boolean> {
     const enrollment = await Enrollment.findOne({
       where: { userNetid: user.netid, courseId: this.id, role: role },
     });
@@ -80,7 +80,7 @@ export default class Course extends BaseModel {
   }
 
   // get all enrolled courses for a certain user
-  static async getEnrolledCourses(
+  static async getEnrolled(
     user: User,
     role?: UserRole
   ): Promise<Course[]> {
@@ -94,17 +94,16 @@ export default class Course extends BaseModel {
   }
 
   // get all enrollable courses for a certain user
-  static async getEnrollableCourses(user: User): Promise<Course[]> {
+  static async getEnrollable(user: User): Promise<Course[]> {
     // all enrollable courses
     const enrollableCourses = await this.find({
       where: {
         enrollable: true,
       },
-      order: { id: "ASC" },
     });
     // remove courses based on inactive academic years and already enrolled courses
-    _.remove(enrollableCourses, async (o) => {
-      return !o.academicYear?.active || (await o.isEnrolledInCourse(user));
+    _.remove(enrollableCourses, async (course) => {
+      return !course.academicYear?.active || (await course.isEnrolled(user));
     });
     return enrollableCourses;
   }
