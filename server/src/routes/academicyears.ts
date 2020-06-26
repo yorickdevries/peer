@@ -12,11 +12,11 @@ const querySchema = Joi.object({
 // get academic years, possibly with filter based on query
 router.get("/", validateQuery(querySchema), async (req, res) => {
   // check whether the schema is compliant with what is expected
-  const faculties = await AcademicYear.find({
+  const academicYears = await AcademicYear.find({
     where: req.query,
     order: { name: "ASC" },
   });
-  res.send(faculties);
+  res.send(academicYears);
 });
 
 export default router;
