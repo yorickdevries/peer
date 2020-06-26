@@ -87,7 +87,8 @@ export default class Course extends BaseModel {
       where: { userNetid: user.netid, role: role },
     });
     // map the courses to a list of course ids
-    return _.map(enrollments, "course") as Course[];
+    const courses = _.map(enrollments, "course") as Course[];
+    return courses;
   }
 
   // get all enrollable courses for a certain user
@@ -106,10 +107,6 @@ export default class Course extends BaseModel {
         enrollableCourses.push(course);
       }
     }
-    // sort by course id
-    const sortedEnrollableCourses = _.sortBy(enrollableCourses, (course) => {
-      return course.id;
-    });
-    return sortedEnrollableCourses;
+    return enrollableCourses;
   }
 }
