@@ -9,12 +9,15 @@ import AcademicYear from "../models/AcademicYear";
 import Enrollment from "../models/Enrollment";
 import UserRole from "../enum/UserRole";
 import { validateBody } from "../middleware/validation";
+import _ from "lodash";
 
 const router = express.Router();
 
 // get all enrollable courses where the student isnt in enrolled yet
 router.get("/enrollable", async (req, res) => {
-  res.send(await Course.getEnrollable(req.user!));
+  const courses = await Course.getEnrollable(req.user!);
+  const sortedCourses = _.sortBy(courses, "id");
+  res.send(sortedCourses);
 });
 
 // Joi inputvalidation
