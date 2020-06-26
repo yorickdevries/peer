@@ -32,7 +32,7 @@ export default class Group extends BaseModel {
     eager: true,
   })
   @JoinTable()
-  assignments?: Assignment[];
+  assignments: Assignment[];
 
   constructor(name: string, users: User[], assignments: Assignment[]) {
     super();
