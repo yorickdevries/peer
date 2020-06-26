@@ -27,7 +27,7 @@ const enrollmentSchema = Joi.object({
 router.post("/", validateBody(enrollmentSchema), async (req, res) => {
   const user = req.user!;
   const courseId: number = req.body.courseId;
-  const enrollableCourses = await Course.getEnrollableCourses(user);
+  const enrollableCourses = await Course.getEnrollable(user);
   const course = _.find(enrollableCourses, { id: courseId });
   if (course) {
     try {
