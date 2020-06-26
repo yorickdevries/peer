@@ -4,6 +4,7 @@ import {
   Column,
   OneToOne,
   ManyToOne,
+  ManyToMany,
   JoinColumn,
 } from "typeorm";
 import {
@@ -18,6 +19,7 @@ import {
   IsUrl,
 } from "class-validator";
 import BaseModel from "./BaseModel";
+import Group from "./Group";
 import Course from "./Course";
 import File from "./File";
 
@@ -110,6 +112,10 @@ export default class Assignment extends BaseModel {
   @IsString()
   @IsNotEmpty()
   externalLink?: string | null;
+
+  // Assignment groups
+  @ManyToMany((_type) => Group, (group) => group.assignments)
+  groups?: Group[];
 
   constructor(
     name: string,

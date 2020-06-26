@@ -22,11 +22,15 @@ export default class Group extends BaseModel {
   @IsNotEmpty()
   name: string;
 
-  @ManyToMany((_type) => User)
+  @ManyToMany((_type) => User, (user) => user.groups, {
+    eager: true,
+  })
   @JoinTable()
-  users?: User[];
+  users: User[];
 
-  @ManyToMany((_type) => Assignment)
+  @ManyToMany((_type) => Assignment, (assignment) => assignment.groups, {
+    eager: true,
+  })
   @JoinTable()
   assignments?: Assignment[];
 

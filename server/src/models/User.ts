@@ -13,6 +13,7 @@ import {
 import BaseModel from "./BaseModel";
 import Affiliation from "./Affiliation";
 import Study from "./Study";
+import Group from "./Group";
 import OrganisationUnit from "./OrganisationUnit";
 
 @Entity()
@@ -79,6 +80,10 @@ export default class User extends BaseModel {
   })
   @JoinTable()
   organisationUnit: OrganisationUnit[];
+
+  // Assignment groups
+  @ManyToMany((_type) => Group, (group) => group.users)
+  groups?: Group[];
 
   constructor(
     netid: string,
