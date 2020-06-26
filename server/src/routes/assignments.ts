@@ -1,5 +1,6 @@
 import express from "express";
 import Joi from "@hapi/joi";
+import { getManager } from "typeorm";
 import { validateBody } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import Course from "../models/Course";
@@ -54,42 +55,55 @@ router.post(
           return o.userNetid === req.user!.netid;
         })
       ) {
-        // create the file
-        let file: File | null = null;
-        if (req.file) {
-          const fileBuffer = req.file.buffer;
-          const fileExtension = path.extname(req.file.originalname);
-          const fileName = path.basename(req.file.originalname, fileExtension);
-          const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
-          file = await new File(fileName, fileExtension, fileHash).save();
-          // save the file to disk
-          if (!file?.id) {
-            throw "File could not be saved in the database";
-          } else {
-            const uploadFolder = config.get("uploadFolder") as string;
+        let assignment: Assignment;
+        // find the course
+        const course = await Course.findOneOrFail(req.body.courseId);
+        // file info
+        const fileBuffer = req.file.buffer;
+        const fileExtension = path.extname(req.file.originalname);
+        const fileName = path.basename(req.file.originalname, fileExtension);
+        const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+        const uploadFolder = config.get("uploadFolder") as string;
+
+        // start transaction make sure the file and assignment are both saved
+        await getManager().transaction(async (transactionalEntityManager) => {
+          // create the file object or leave it as null if no file is uploaded
+          let file: File | null = null;
+          if (req.file) {
+            file = await transactionalEntityManager.save(
+              new File(fileName, fileExtension, fileHash)
+            );
+            // save the file to disk
+            if (!file?.id) {
+              throw "File could not be saved in the database";
+            }
+          }
+          assignment = new Assignment(
+            req.body.name,
+            course,
+            req.body.reviewsPerUser,
+            req.body.enrollable,
+            req.body.reviewEvaluation,
+            req.body.publishDate,
+            req.body.dueDate,
+            req.body.reviewPublishDate,
+            req.body.reviewDueDate,
+            req.body.reviewEvaluationDueDate,
+            req.body.description,
+            file,
+            req.body.externalLink
+          );
+          await transactionalEntityManager.save(assignment);
+
+          // save the file to disk lastly (if this goed wrong all previous steps are rolled back)
+          if (file?.id) {
             const filePath = path.resolve(uploadFolder, file.id.toString());
             await fsPromises.writeFile(filePath, fileBuffer);
           }
-        }
-        // find the course
-        const course = await Course.findOneOrFail(req.body.courseId);
-        const assignment = new Assignment(
-          req.body.name,
-          course,
-          req.body.reviewsPerUser,
-          req.body.enrollable,
-          req.body.reviewEvaluation,
-          req.body.publishDate,
-          req.body.dueDate,
-          req.body.reviewPublishDate,
-          req.body.reviewDueDate,
-          req.body.reviewEvaluationDueDate,
-          req.body.description,
-          file,
-          req.body.externalLink
-        );
-        await assignment.save();
-        res.send(assignment);
+        });
+        // reload assignment to get all data
+        await assignment!.reload();
+        res.send(assignment!);
       } else {
         res
           .status(HttpStatusCode.FORBIDDEN)
