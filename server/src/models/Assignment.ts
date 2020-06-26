@@ -209,19 +209,23 @@ export default class Assignment extends BaseModel {
   // get all enrollable assignments for a certain user
   static async getEnrollableAssignments(user: User): Promise<Assignment[]> {
     // all enrollable published assignments
-    const enrollableAssignments = await this.find({
+    const allEnrollableAssignments = await this.find({
       where: {
         enrollable: true,
         publishDate: LessThan(moment()),
       },
     });
-    // remove assignments based on already enrolled groups
-    _.remove(enrollableAssignments, async (assignment) => {
+    // pick the assignments of courses the student is enrolled in
+    // and where the student is not part of a group yet
+    const enrollableAssignments = [];
+    for (const assignment of allEnrollableAssignments) {
       const course = await assignment.getCourse();
       const studentInCourse = course.isEnrolled(user, UserRole.STUDENT);
       const enrolledInAssignment = assignment.isEnrolled(user);
-      return !studentInCourse || enrolledInAssignment;
-    });
+      if (studentInCourse && !enrolledInAssignment) {
+        enrollableAssignments.push(assignment);
+      }
+    }
     return enrollableAssignments;
   }
 }
