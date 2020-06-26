@@ -13,12 +13,15 @@ import upload from "../middleware/upload";
 import config from "config";
 import hasha from "hasha";
 import path from "path";
-import fs from "fs";
-const fsPromises = fs.promises;
-
-const uploadFolder = config.get("uploadFolder") as string;
+import fsPromises from "fs/promises";
+import Group from "../models/Group";
 
 const router = express.Router();
+
+// config values
+const uploadFolder = config.get("uploadFolder") as string;
+const allowedExtensions = config.get("allowedExtensions") as string[];
+const maxFileSize = config.get("maxFileSize") as number;
 
 // Joi inputvalidation
 const assignmentSchema = Joi.object({
@@ -36,30 +39,16 @@ const assignmentSchema = Joi.object({
   externalLink: Joi.string().allow(null).required(),
 });
 // post an assignment in a course
-// allowed extensions
-const allowedExtensions = config.get("allowedExtensions") as string[];
-const maxFileSize = config.get("maxFileSize") as number;
 router.post(
   "/",
   upload(allowedExtensions, maxFileSize, "file"),
   validateBody(assignmentSchema),
   async (req, res) => {
+    const user = req.user!;
     try {
-      const courseTeachers = await Enrollment.find({
-        where: {
-          courseId: req.body.courseId,
-          role: UserRole.TEACHER,
-        },
-      });
-      // check whether the user is teacher of the course
-      if (
-        _.some(courseTeachers, (o) => {
-          return o.userNetid === req.user!.netid;
-        })
-      ) {
+      const course = await Course.findOneOrFail(req.body.courseId);
+      if (await course.isEnrolled(user, UserRole.TEACHER)) {
         let assignment: Assignment;
-        // find the course
-        const course = await Course.findOneOrFail(req.body.courseId);
         // start transaction make sure the file and assignment are both saved
         await getManager().transaction(async (transactionalEntityManager) => {
           // create the file object or leave it as null if no file is uploaded
@@ -91,18 +80,19 @@ router.post(
             req.body.reviewEvaluationDueDate,
             req.body.description,
             file,
-            null
+            req.body.externalLink
           );
           await transactionalEntityManager.save(assignment);
 
-          // save the file to disk lastly (if this goes wrong all previous steps are rolled back)
+          // save the file to disk lastly
+          // (if this goes wrong all previous steps are rolled back)
           if (file?.id && req.file) {
             const filePath = path.resolve(uploadFolder, file.id.toString());
             await fsPromises.writeFile(filePath, req.file.buffer);
           }
         });
         // reload assignment to get all data
-        // assignment should be defined now
+        // assignment should be defined now (else we would be in the catch)
         await assignment!.reload();
         res.send(assignment!);
       } else {
