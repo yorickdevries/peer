@@ -11,6 +11,7 @@ import User from "./User";
 import Faculty from "./Faculty";
 import AcademicYear from "./AcademicYear";
 import Enrollment from "../models/Enrollment";
+import UserRole from "../enum/UserRole";
 import _ from "lodash";
 
 @Entity()
@@ -71,12 +72,22 @@ export default class Course extends BaseModel {
     this.description = description;
   }
 
+  async isEnrolledInCourse(user: User, role?: UserRole): Promise<boolean> {
+    const enrollment = await Enrollment.findOne({
+      where: { userNetid: user.netid, courseId: this.id, role: role },
+    });
+    return enrollment ? true : false;
+  }
+
   // get all enrolled courses for a certain user
-  static async getEnrolledCourses(user: User): Promise<Course[]> {
+  static async getEnrolledCourses(
+    user: User,
+    role?: UserRole
+  ): Promise<Course[]> {
     // current enrollments for the user
     const enrollments = await Enrollment.find({
       relations: ["course"],
-      where: { userNetid: user.netid },
+      where: { userNetid: user.netid, role: role },
     });
     // map the courses to a list of course ids
     return _.map(enrollments, "course") as Course[];
@@ -84,9 +95,6 @@ export default class Course extends BaseModel {
 
   // get all enrollable courses for a certain user
   static async getEnrollableCourses(user: User): Promise<Course[]> {
-    // current enrolled courses for the user
-    const enrolledCourses = await this.getEnrolledCourses(user);
-
     // all enrollable courses
     const enrollableCourses = await this.find({
       where: {
@@ -96,7 +104,7 @@ export default class Course extends BaseModel {
     });
     // remove courses based on inactive academic years and already enrolled courses
     _.remove(enrollableCourses, (o) => {
-      return !o.academicYear?.active || _.includes(enrolledCourses, o);
+      return !o.academicYear?.active || o.isEnrolledInCourse(user);
     });
     return enrollableCourses;
   }
