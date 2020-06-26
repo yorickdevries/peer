@@ -40,5 +40,6 @@
         "exampleReviewFolder": "./example_data/reviews"
     },
     "allowedExtensions": [".pdf", ".zip", ".doc", ".docx"],
-    "maxFileSize": 52428800 // 50 MB
+    "maxFileSize": 52428800, // 50 MB
+    "uploadFolder": "./files/development/"
 }

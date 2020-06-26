@@ -5,10 +5,15 @@ import Assignment from "../models/Assignment";
 import Course from "../models/Course";
 import UserRole from "../enum/UserRole";
 import Enrollment from "../models/Enrollment";
+import File from "../models/File";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import _ from "lodash";
 import upload from "../middleware/upload";
 import config from "config";
+import hasha from "hasha";
+import path from "path";
+import fs from "fs";
+const fsPromises = fs.promises;
 
 const router = express.Router();
 
@@ -49,7 +54,24 @@ router.post(
           return o.userNetid === req.user!.netid;
         })
       ) {
-        // here the file needs to be saved as well
+        // create the file
+        let file: File | null = null;
+        if (req.file) {
+          const fileBuffer = req.file.buffer;
+          const fileExtension = path.extname(req.file.originalname);
+          const fileName = path.basename(req.file.originalname, fileExtension);
+          const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+          file = await new File(fileName, fileExtension, fileHash).save();
+          // save the file to disk
+          if (!file?.id) {
+            throw "File could not be saved in the database";
+          } else {
+            const uploadFolder = config.get("uploadFolder") as string;
+            const filePath = path.resolve(uploadFolder, file.id.toString());
+            await fsPromises.writeFile(filePath, fileBuffer);
+          }
+        }
+        // find the course
         const course = await Course.findOneOrFail(req.body.courseId);
         const assignment = new Assignment(
           req.body.name,
@@ -63,7 +85,7 @@ router.post(
           req.body.reviewDueDate,
           req.body.reviewEvaluationDueDate,
           req.body.description,
-          null, //needs to be fixed with file object
+          file,
           req.body.externalLink
         );
         await assignment.save();
