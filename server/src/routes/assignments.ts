@@ -5,16 +5,13 @@ import { validateBody } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import Course from "../models/Course";
 import UserRole from "../enum/UserRole";
-import Enrollment from "../models/Enrollment";
 import File from "../models/File";
 import HttpStatusCode from "../enum/HttpStatusCode";
-import _ from "lodash";
 import upload from "../middleware/upload";
 import config from "config";
 import hasha from "hasha";
 import path from "path";
 import fsPromises from "fs/promises";
-import Group from "../models/Group";
 
 const router = express.Router();
 
