@@ -52,7 +52,7 @@ const passportConfiguration = function (passport: PassportStatic): void {
       ppConfig,
       async (profile: any, done: any) => {
         // save the user to the database
-        const user = await saveUserFromSSO(
+        const userNetid = await saveUserFromSSO(
           profile["uid"],
           profile["tudStudentNumber"],
           profile["givenName"],
@@ -64,8 +64,8 @@ const passportConfiguration = function (passport: PassportStatic): void {
           profile["nlEduPersonStudyBranch"],
           profile["nlEduPersonOrgUnit"]
         );
-        if (user) {
-          return done(undefined, user);
+        if (userNetid) {
+          return done(undefined, userNetid);
         } else {
           // no user will be logged in (needs to be tested in production)
           return done(undefined, false);

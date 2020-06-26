@@ -9,7 +9,7 @@ const mockPassportConfiguration = async function (
   affiliation: string | string[]
 ): Promise<void> {
   // save the user to the database
-  const user = await saveUserFromSSO(
+  const userNetid = await saveUserFromSSO(
     netid,
     1234567,
     "First",
@@ -28,7 +28,7 @@ const mockPassportConfiguration = async function (
 
   const strategy = new MockStrategy({
     name: "mock",
-    user: user as any, // Added any as MockStrategy asks for a specific User type
+    user: userNetid as any, // Added any as MockStrategy asks for a specific User type
   });
   passport.use(strategy);
 
