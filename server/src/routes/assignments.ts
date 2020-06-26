@@ -58,11 +58,6 @@ router.post(
         let assignment: Assignment;
         // find the course
         const course = await Course.findOneOrFail(req.body.courseId);
-        // file info
-        const fileBuffer = req.file.buffer;
-        const fileExtension = path.extname(req.file.originalname);
-        const fileName = path.basename(req.file.originalname, fileExtension);
-        const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
         const uploadFolder = config.get("uploadFolder") as string;
 
         // start transaction make sure the file and assignment are both saved
@@ -70,6 +65,14 @@ router.post(
           // create the file object or leave it as null if no file is uploaded
           let file: File | null = null;
           if (req.file) {
+            // file info
+            const fileBuffer = req.file.buffer;
+            const fileExtension = path.extname(req.file.originalname);
+            const fileName = path.basename(
+              req.file.originalname,
+              fileExtension
+            );
+            const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
             file = await transactionalEntityManager.save(
               new File(fileName, fileExtension, fileHash)
             );
@@ -91,14 +94,14 @@ router.post(
             req.body.reviewEvaluationDueDate,
             req.body.description,
             file,
-            req.body.externalLink
+            null
           );
           await transactionalEntityManager.save(assignment);
 
           // save the file to disk lastly (if this goed wrong all previous steps are rolled back)
-          if (file?.id) {
+          if (file?.id && req.file) {
             const filePath = path.resolve(uploadFolder, file.id.toString());
-            await fsPromises.writeFile(filePath, fileBuffer);
+            await fsPromises.writeFile(filePath, req.file.buffer);
           }
         });
         // reload assignment to get all data
