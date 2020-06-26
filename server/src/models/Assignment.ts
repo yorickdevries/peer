@@ -206,8 +206,8 @@ export default class Assignment extends BaseModel {
     const enrollableAssignments = [];
     for (const assignment of allEnrollableAssignments) {
       const course = await assignment.getCourse();
-      const studentInCourse = course.isEnrolled(user, UserRole.STUDENT);
-      const enrolledInAssignment = assignment.isEnrolled(user);
+      const studentInCourse = await course.isEnrolled(user, UserRole.STUDENT);
+      const enrolledInAssignment = await assignment.isEnrolled(user);
       if (studentInCourse && !enrolledInAssignment) {
         enrollableAssignments.push(assignment);
       }
@@ -220,20 +220,31 @@ export default class Assignment extends BaseModel {
     const enrollableAssignments = await Assignment.getEnrollableAssignments(
       user
     );
-    return _.includes(enrollableAssignments, this);
+    return _.some(enrollableAssignments, (assignment) => {
+      return assignment.id === this.id;
+    });
   }
 
   // get all enrolled assignments for a user
   static async getEnrolled(user: User): Promise<Assignment[]> {
     const userGroups = await user.getGroups();
+
+    const assignments = [];
+    for (const group of userGroups) {
+      for (const assignment of await group.getAssignments()) {
+        assignments.push(assignment);
+      }
+    }
     // map the groups to a list of assignments
-    const enrolledAssignments = _.union(..._.map(userGroups, "assignments"));
+    const enrolledAssignments = _.unionBy(assignments, "id");
     return enrolledAssignments;
   }
 
   // check whether the user is enrolled in this assignment
   async isEnrolled(user: User): Promise<boolean> {
     const enrolledAssignments = await Assignment.getEnrolled(user);
-    return _.includes(enrolledAssignments, this);
+    return _.some(enrolledAssignments, (assignment) => {
+      return assignment.id === this.id;
+    });
   }
 }
