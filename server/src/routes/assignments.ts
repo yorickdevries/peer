@@ -1,7 +1,7 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import { getManager } from "typeorm";
-import { validateBody } from "../middleware/validation";
+import { validateBody, validateParams } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import Course from "../models/Course";
 import UserRole from "../enum/UserRole";
@@ -104,24 +104,31 @@ router.post(
   }
 );
 
-// TODO: input validation for id!
-// plus transaction for group creation as a user should only make one group
-router.post("/:id/enroll", async (req, res) => {
-  const user = req.user!;
-  try {
-    const assignment = await Assignment.findOneOrFail(req.params.id);
-    if (await assignment.isEnrollable(user)) {
-      const group = new Group(user.netid, [user], [assignment]);
-      await group.save();
-      res.send(group);
-    } else {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send("Assignment is not enrollable");
-    }
-  } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(error);
-  }
+// Joi inputvalidation
+const assignmentIdSchema = Joi.object({
+  id: Joi.number().integer().required(),
 });
+// plus transaction for group creation as a user should only make one group
+router.post(
+  "/:id/enroll",
+  validateParams(assignmentIdSchema),
+  async (req, res) => {
+    const user = req.user!;
+    try {
+      const assignment = await Assignment.findOneOrFail(req.params.id);
+      if (await assignment.isEnrollable(user)) {
+        const group = new Group(user.netid, [user], [assignment]);
+        await group.save();
+        res.send(group);
+      } else {
+        res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .send("Assignment is not enrollable");
+      }
+    } catch (error) {
+      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    }
+  }
+);
 
 export default router;
