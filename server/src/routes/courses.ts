@@ -53,13 +53,16 @@ router.post(
         req.body.description
       );
       // start transaction to both save the course and teacher enrollment
-      await getManager().transaction(async (transactionalEntityManager) => {
-        // save the course so it gets an id
-        await transactionalEntityManager.save(course);
-        // here the current user needs to be enrolled as teacher fot he just created course
-        const enrollment = new Enrollment(user, course, UserRole.TEACHER);
-        await transactionalEntityManager.save(enrollment);
-      });
+      await getManager().transaction(
+        "SERIALIZABLE",
+        async (transactionalEntityManager) => {
+          // save the course so it gets an id
+          await transactionalEntityManager.save(course);
+          // here the current user needs to be enrolled as teacher fot he just created course
+          const enrollment = new Enrollment(user, course, UserRole.TEACHER);
+          await transactionalEntityManager.save(enrollment);
+        }
+      );
       // reload course to get all data
       await course.reload();
       // if all goes well, the course can be returned

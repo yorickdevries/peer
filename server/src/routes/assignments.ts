@@ -49,47 +49,50 @@ router.post(
       if (await course.isEnrolled(user, UserRole.TEACHER)) {
         let assignment: Assignment;
         // start transaction make sure the file and assignment are both saved
-        await getManager().transaction(async (transactionalEntityManager) => {
-          // create the file object or leave it as null if no file is uploaded
-          let file: File | null = null;
-          if (req.file) {
-            // file info
-            const fileBuffer = req.file.buffer;
-            const fileExtension = path.extname(req.file.originalname);
-            const fileName = path.basename(
-              req.file.originalname,
-              fileExtension
+        await getManager().transaction(
+          "SERIALIZABLE",
+          async (transactionalEntityManager) => {
+            // create the file object or leave it as null if no file is uploaded
+            let file: File | null = null;
+            if (req.file) {
+              // file info
+              const fileBuffer = req.file.buffer;
+              const fileExtension = path.extname(req.file.originalname);
+              const fileName = path.basename(
+                req.file.originalname,
+                fileExtension
+              );
+              const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+              file = new File(fileName, fileExtension, fileHash);
+              await transactionalEntityManager.save(file);
+            }
+
+            // create assignment
+            assignment = new Assignment(
+              req.body.name,
+              course,
+              req.body.reviewsPerUser,
+              req.body.enrollable,
+              req.body.reviewEvaluation,
+              req.body.publishDate,
+              req.body.dueDate,
+              req.body.reviewPublishDate,
+              req.body.reviewDueDate,
+              req.body.reviewEvaluationDueDate,
+              req.body.description,
+              file,
+              req.body.externalLink
             );
-            const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
-            file = new File(fileName, fileExtension, fileHash);
-            await transactionalEntityManager.save(file);
-          }
+            await transactionalEntityManager.save(assignment);
 
-          // create assignment
-          assignment = new Assignment(
-            req.body.name,
-            course,
-            req.body.reviewsPerUser,
-            req.body.enrollable,
-            req.body.reviewEvaluation,
-            req.body.publishDate,
-            req.body.dueDate,
-            req.body.reviewPublishDate,
-            req.body.reviewDueDate,
-            req.body.reviewEvaluationDueDate,
-            req.body.description,
-            file,
-            req.body.externalLink
-          );
-          await transactionalEntityManager.save(assignment);
-
-          // save the file to disk lastly
-          // (if this goes wrong all previous steps are rolled back)
-          if (file?.id && req.file) {
-            const filePath = path.resolve(uploadFolder, file.id.toString());
-            await fsPromises.writeFile(filePath, req.file.buffer);
+            // save the file to disk lastly
+            // (if this goes wrong all previous steps are rolled back)
+            if (file?.id && req.file) {
+              const filePath = path.resolve(uploadFolder, file.id.toString());
+              await fsPromises.writeFile(filePath, req.file.buffer);
+            }
           }
-        });
+        );
         // reload assignment to get all data
         // assignment should be defined now (else we would be in the catch)
         await assignment!.reload();
