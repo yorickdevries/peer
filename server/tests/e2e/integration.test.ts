@@ -258,8 +258,9 @@ describe("Integration", () => {
 
     // enroll in assignment
     res = await request(server)
-      .post(`/api/assignments/${course.id}/enroll`)
-      .set("cookie", studentCookie1);
+      .post(`/api/groups/`)
+      .set("cookie", studentCookie1)
+      .send({ assignmentId: assignment.id });
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     const group = JSON.parse(res.text);
@@ -293,7 +294,7 @@ describe("Integration", () => {
 
     // get group
     res = await request(server)
-      .get(`/api/assignments/${assignment.id}/group`)
+      .get(`/api/groups/enrolled?assignmentId=${assignment.id}`)
       .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
