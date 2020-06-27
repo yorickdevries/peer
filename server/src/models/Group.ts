@@ -9,6 +9,7 @@ import { IsDefined, IsOptional, IsString, IsNotEmpty } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import Assignment from "./Assignment";
+import _ from "lodash";
 
 @Entity()
 export default class Group extends BaseModel {
@@ -37,7 +38,21 @@ export default class Group extends BaseModel {
     this.assignments = assignments;
   }
 
-  // TODO: add validation to check whether all assignments are from he same course
+  // validation to check whether all assignments are from he same course
+  async validateOrReject(): Promise<void> {
+    if (this.assignments) {
+      const courseIds = [];
+      for (const assignment of this.assignments) {
+        const course = await assignment.getCourse();
+        courseIds.push(course.id);
+      }
+      if (_.uniq(courseIds).length > 1) {
+        throw "Assignments of a group should be from the same course";
+      }
+    }
+    // if it succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
 
   async getUsers(): Promise<User[]> {
     return (
