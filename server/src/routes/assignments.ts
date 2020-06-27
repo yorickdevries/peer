@@ -26,14 +26,14 @@ const uploadFolder = config.get("uploadFolder") as string;
 const allowedExtensions = config.get("allowedExtensions") as string[];
 const maxFileSize = config.get("maxFileSize") as number;
 
-// get all enrollable assignments for
+// get all enrollable assignments for a certain course
 // Joi inputvalidation
-const enrollableAssignmentsSchema = Joi.object({
+const fetchAssignmentsSchema = Joi.object({
   courseId: Joi.number().integer().required(),
 });
 router.get(
   "/enrollable",
-  validateQuery(enrollableAssignmentsSchema),
+  validateQuery(fetchAssignmentsSchema),
   async (req, res) => {
     const user = req.user!;
     const course = await Course.findOneOrFail(req.params.courseId);
@@ -41,7 +41,6 @@ router.get(
     const allAssignments = await course.getAssignments();
     const enrollableAssignments = [];
     for (const assignment of allAssignments) {
-      console.log(assignment);
       if (await assignment.isEnrollable(user)) {
         enrollableAssignments.push(assignment);
       }
@@ -50,6 +49,22 @@ router.get(
     res.send(sortedEnrollableAssignments);
   }
 );
+
+// get all enrolled assignments for
+router.get("/", validateQuery(fetchAssignmentsSchema), async (req, res) => {
+  const user = req.user!;
+  const course = await Course.findOneOrFail(req.params.courseId);
+
+  const allAssignments = await course.getAssignments();
+  const enrolledAssignments = [];
+  for (const assignment of allAssignments) {
+    if (await assignment.isEnrolled(user)) {
+      enrolledAssignments.push(assignment);
+    }
+  }
+  const sortedEnrolledAssignments = _.sortBy(enrolledAssignments, "id");
+  res.send(sortedEnrolledAssignments);
+});
 
 // Joi inputvalidation
 const assignmentSchema = Joi.object({

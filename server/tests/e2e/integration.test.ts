@@ -236,18 +236,59 @@ describe("Integration", () => {
       },
     ]);
 
+    // get enrolled assignments
+    res = await request(server)
+      .get(`/api/assignments?courseId=${course.id}`)
+      .set("cookie", studentCookie1);
+    // assertions
+    expect(res.status).toBe(200);
+    expect(JSON.parse(res.text)).toMatchObject([]);
+
     // get available assignments
     res = await request(server)
       .get(`/api/assignments/enrollable?courseId=${course.id}`)
       .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(200);
-    console.log(res.text);
-    expect(JSON.parse(res.text)).toMatchObject([{
-      id: assignment.id
-    }]);
+    expect(JSON.parse(res.text)).toMatchObject([
+      {
+        id: assignment.id,
+      },
+    ]);
 
-    // enroll in assignment as user
-    // todo
+    // enroll in assignment
+    res = await request(server)
+      .post(`/api/assignments/${course.id}/enroll`)
+      .set("cookie", studentCookie1);
+    // assertions
+    expect(res.status).toBe(200);
+    const group = JSON.parse(res.text);
+    expect(group).toMatchObject({
+      name: "student1",
+    });
+
+    // get enrolled assignments
+    res = await request(server)
+      .get(`/api/assignments?courseId=${course.id}`)
+      .set("cookie", studentCookie1);
+    // assertions
+    expect(res.status).toBe(200);
+    expect(JSON.parse(res.text)).toMatchObject([
+      {
+        id: assignment.id,
+      },
+    ]);
+
+    // get available assignments
+    res = await request(server)
+      .get(`/api/assignments/enrollable?courseId=${course.id}`)
+      .set("cookie", studentCookie1);
+    // assertions
+    expect(res.status).toBe(200);
+    expect(JSON.parse(res.text)).not.toMatchObject([
+      {
+        id: assignment.id,
+      },
+    ]);
   });
 });
