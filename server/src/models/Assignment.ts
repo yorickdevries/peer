@@ -270,19 +270,6 @@ export default class Assignment extends BaseModel {
 
   // check whether the user is enrolled in this assignment
   async isEnrolled(user: User): Promise<boolean> {
-    // iterate over all groups to check whether the user is present
-    const groups = await this.getGroups();
-    for (const group of groups) {
-      const groupUsers = await group.getUsers();
-      if (
-        _.some(groupUsers, (groupUser) => {
-          return groupUser.netid === user.netid;
-        })
-      ) {
-        // if the user is found, true is returned
-        return true;
-      }
-    }
-    return false;
+    return (await this.getGroup(user)) ? true : false;
   }
 }
