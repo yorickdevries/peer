@@ -192,6 +192,21 @@ export default class Assignment extends BaseModel {
     ).groups!;
   }
 
+  async getGroup(user: User): Promise<Group | undefined> {
+    const groups = await this.getGroups();
+    for (const group of groups) {
+      const groupUsers = await group.getUsers();
+      if (
+        _.some(groupUsers, (groupUser) => {
+          return groupUser.netid === user.netid;
+        })
+      ) {
+        return group;
+      }
+    }
+    return undefined;
+  }
+
   // // get all enrollable assignments for a certain user
   // static async getEnrollableAssignments(user: User): Promise<Assignment[]> {
   //   // all enrollable published assignments
