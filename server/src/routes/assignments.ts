@@ -56,25 +56,29 @@ router.get(
 );
 
 // get all enrolled assignments for
-router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
-  const user = req.user!;
-  // this value has been parsed by the validate function
-  const courseId = req.query.courseId as any;
-  try {
-    const course = await Course.findOneOrFail(courseId);
-    const allAssignments = await course.getAssignments();
-    const enrolledAssignments = [];
-    for (const assignment of allAssignments) {
-      if (await assignment.isEnrolled(user)) {
-        enrolledAssignments.push(assignment);
+router.get(
+  "/enrolled",
+  validateQuery(queryCourseIdSchema),
+  async (req, res) => {
+    const user = req.user!;
+    // this value has been parsed by the validate function
+    const courseId = req.query.courseId as any;
+    try {
+      const course = await Course.findOneOrFail(courseId);
+      const allAssignments = await course.getAssignments();
+      const enrolledAssignments = [];
+      for (const assignment of allAssignments) {
+        if (await assignment.isEnrolled(user)) {
+          enrolledAssignments.push(assignment);
+        }
       }
+      const sortedEnrolledAssignments = _.sortBy(enrolledAssignments, "id");
+      res.send(sortedEnrolledAssignments);
+    } catch (error) {
+      res.status(HttpStatusCode.BAD_REQUEST).send(error);
     }
-    const sortedEnrolledAssignments = _.sortBy(enrolledAssignments, "id");
-    res.send(sortedEnrolledAssignments);
-  } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(error);
   }
-});
+);
 
 // Joi inputvalidation
 const assignmentSchema = Joi.object({
