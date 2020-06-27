@@ -12,7 +12,6 @@ import Faculty from "./Faculty";
 import AcademicYear from "./AcademicYear";
 import Enrollment from "../models/Enrollment";
 import UserRole from "../enum/UserRole";
-import _ from "lodash";
 
 @Entity()
 export default class Course extends BaseModel {
@@ -72,6 +71,14 @@ export default class Course extends BaseModel {
     this.description = description;
   }
 
+  async isEnrollable(user: User): Promise<boolean> {
+    return (
+      this.academicYear?.active &&
+      this.enrollable &&
+      !(await this.isEnrolled(user))
+    );
+  }
+
   async isEnrolled(user: User, role?: UserRole): Promise<boolean> {
     // if this.id isnt instantiated no user can be enrolled
     if (!this.id) {
@@ -92,26 +99,6 @@ export default class Course extends BaseModel {
     return enrollment ? true : false;
   }
 
-  // get all enrolled courses for a certain user
-  static async getEnrolled(user: User, role?: UserRole): Promise<Course[]> {
-    const where: {
-      userNetid: string;
-      role?: UserRole;
-    } = { userNetid: user.netid };
-    // add role to query if specified
-    if (role) {
-      where.role = role;
-    }
-    // current enrollments for the user
-    const enrollments = await Enrollment.find({
-      relations: ["course"],
-      where: where,
-    });
-    // map the courses to a list of course ids
-    const courses = _.map(enrollments, "course") as Course[];
-    return courses;
-  }
-
   // get all enrollable courses for a certain user
   static async getEnrollable(user: User): Promise<Course[]> {
     // all enrollable courses
@@ -124,7 +111,7 @@ export default class Course extends BaseModel {
     const enrollableCourses = [];
     for (const course of allEnrollableCourses) {
       // add courses based on active academic years and not already enrolled courses
-      if (course.academicYear?.active && !(await course.isEnrolled(user))) {
+      if (await course.isEnrollable(user)) {
         enrollableCourses.push(course);
       }
     }

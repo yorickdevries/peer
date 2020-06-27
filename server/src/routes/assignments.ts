@@ -141,6 +141,7 @@ router.post(
             });
             if (alreadyExists) {
               // throw error if a group already exists
+              // Can happen if 2 concurrent calls are made
               throw "Group already exists";
             } else {
               await transactionalEntityManager.save(group);

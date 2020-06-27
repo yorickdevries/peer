@@ -6,7 +6,6 @@ import {
   ManyToOne,
   ManyToMany,
   JoinColumn,
-  LessThan,
 } from "typeorm";
 import {
   IsDefined,
@@ -26,7 +25,6 @@ import User from "./User";
 import File from "./File";
 import moment from "moment";
 import _ from "lodash";
-import UserRole from "../enum/UserRole";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -192,61 +190,79 @@ export default class Assignment extends BaseModel {
     ).groups!;
   }
 
-  // get all enrollable assignments for a certain user
-  static async getEnrollableAssignments(user: User): Promise<Assignment[]> {
-    // all enrollable published assignments
-    const allEnrollableAssignments = await this.find({
-      where: {
-        enrollable: true,
-        publishDate: LessThan(new Date()),
-      },
-    });
-    // pick the assignments of courses the student is enrolled in
-    // and where the student is not part of a group yet
-    const enrollableAssignments = [];
-    for (const assignment of allEnrollableAssignments) {
-      const course = await assignment.getCourse();
-      const studentInCourse = await course.isEnrolled(user, UserRole.STUDENT);
-      const enrolledInAssignment = await assignment.isEnrolled(user);
-      if (studentInCourse && !enrolledInAssignment) {
-        enrollableAssignments.push(assignment);
-      }
-    }
-    return enrollableAssignments;
-  }
+  // // get all enrollable assignments for a certain user
+  // static async getEnrollableAssignments(user: User): Promise<Assignment[]> {
+  //   // all enrollable published assignments
+  //   const allEnrollableAssignments = await this.find({
+  //     where: {
+  //       enrollable: true,
+  //       publishDate: LessThan(new Date()),
+  //     },
+  //   });
+  //   // pick the assignments of courses the student is enrolled in
+  //   // and where the student is not part of a group yet
+  //   const enrollableAssignments = [];
+  //   for (const assignment of allEnrollableAssignments) {
+  //     const course = await assignment.getCourse();
+  //     const studentInCourse = await course.isEnrolled(user, UserRole.STUDENT);
+  //     const enrolledInAssignment = await assignment.isEnrolled(user);
+  //     if (studentInCourse && !enrolledInAssignment) {
+  //       enrollableAssignments.push(assignment);
+  //     }
+  //   }
+  //   return enrollableAssignments;
+  // }
 
   // check whether the user is enrolled in this assignment
   async isEnrollable(user: User): Promise<boolean> {
-    // TODO: rewrite code so it finds the enrollable assignments more efficient
-    // so: check whether the user is in the course and then assignment is public/enrollable and not already enrolled
-    const enrollableAssignments = await Assignment.getEnrollableAssignments(
-      user
-    );
-    return _.some(enrollableAssignments, (assignment) => {
-      return assignment.id === this.id;
-    });
-  }
-
-  // get all enrolled assignments for a user
-  static async getEnrolled(user: User): Promise<Assignment[]> {
-    const userGroups = await user.getGroups();
-
-    const assignments = [];
-    for (const group of userGroups) {
-      for (const assignment of await group.getAssignments()) {
-        assignments.push(assignment);
+    // Check whether the user is in the course and not already enrolled
+    // plus check whether the assignment is public/enrollable
+    if (this.enrollable) {
+      // published
+      if (moment().isAfter(this.publishDate)) {
+        const course = await this.getCourse();
+        if (await course.isEnrolled(user)) {
+          //enrolledInCourse
+          // not already enrolled in assignment
+          if (!(await this.isEnrolled(user))) {
+            return true;
+          }
+        }
       }
     }
-    // map the groups to a list of assignments
-    const enrolledAssignments = _.unionBy(assignments, "id");
-    return enrolledAssignments;
+    return false;
   }
+
+  // // get all enrolled assignments for a user
+  // static async getEnrolled(user: User): Promise<Assignment[]> {
+  //   const userGroups = await user.getGroups();
+
+  //   const assignments = [];
+  //   for (const group of userGroups) {
+  //     for (const assignment of await group.getAssignments()) {
+  //       assignments.push(assignment);
+  //     }
+  //   }
+  //   // map the groups to a list of assignments
+  //   const enrolledAssignments = _.unionBy(assignments, "id");
+  //   return enrolledAssignments;
+  // }
 
   // check whether the user is enrolled in this assignment
   async isEnrolled(user: User): Promise<boolean> {
-    const enrolledAssignments = await Assignment.getEnrolled(user);
-    return _.some(enrolledAssignments, (assignment) => {
-      return assignment.id === this.id;
-    });
+    // iterate over all groups to check whether the user is present
+    const groups = await this.getGroups();
+    for (const group of groups) {
+      const groupUsers = await group.getUsers();
+      if (
+        _.some(groupUsers, (groupUser) => {
+          return groupUser.netid === user.netid;
+        })
+      ) {
+        // if the user is found, true is returned
+        return true;
+      }
+    }
+    return false;
   }
 }

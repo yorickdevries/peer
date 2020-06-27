@@ -23,13 +23,12 @@ router.get("/", async (req, res) => {
 const enrollmentSchema = Joi.object({
   courseId: Joi.number().integer().required(),
 });
-// post an enrollment
+// post an enrollment (enroll in a course)
 router.post("/", validateBody(enrollmentSchema), async (req, res) => {
   const user = req.user!;
-  const courseId: number = req.body.courseId;
-  const enrollableCourses = await Course.getEnrollable(user);
-  const course = _.find(enrollableCourses, { id: courseId });
-  if (course) {
+  const courseId = req.body.courseId;
+  const course = await Course.findOneOrFail(courseId);
+  if (course.isEnrollable(user)) {
     try {
       const enrollment = new Enrollment(user, course, UserRole.STUDENT);
       await enrollment.save();
