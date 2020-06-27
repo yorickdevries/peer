@@ -290,5 +290,16 @@ describe("Integration", () => {
         id: assignment.id,
       },
     ]);
+
+    // get group
+    res = await request(server)
+      .get(`/api/assignments/${assignment.id}/group`)
+      .set("cookie", studentCookie1);
+    // assertions
+    expect(res.status).toBe(200);
+    expect(JSON.parse(res.text)).toMatchObject({
+      id: group.id,
+      name: group.name,
+    });
   });
 });

@@ -216,4 +216,23 @@ router.post(
   }
 );
 
+// get the group of a student for this assignment
+router.get(
+  "/:id/group",
+  validateParams(assignmentIdSchema),
+  async (req, res) => {
+    try {
+      const assignment = await Assignment.findOneOrFail(req.params.id);
+      const group = await assignment.getGroup(req.user!);
+      if (group) {
+        res.send(group);
+      } else {
+        res.status(HttpStatusCode.NOT_FOUND).send("No group found");
+      }
+    } catch (error) {
+      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    }
+  }
+);
+
 export default router;
