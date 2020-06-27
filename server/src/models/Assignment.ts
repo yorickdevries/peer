@@ -217,6 +217,8 @@ export default class Assignment extends BaseModel {
 
   // check whether the user is enrolled in this assignment
   async isEnrollable(user: User): Promise<boolean> {
+    // TODO: rewrite code so it finds the enrollable assignments more efficient
+    // so: check whether the user is in the course and then assignment is public/enrollable and not already enrolled
     const enrollableAssignments = await Assignment.getEnrollableAssignments(
       user
     );

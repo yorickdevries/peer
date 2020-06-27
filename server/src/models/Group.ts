@@ -37,6 +37,8 @@ export default class Group extends BaseModel {
     this.assignments = assignments;
   }
 
+  // TODO: add validation to check whether all assignments are from he same course
+
   async getUsers(): Promise<User[]> {
     return (
       await Group.findOneOrFail(this.id, {
