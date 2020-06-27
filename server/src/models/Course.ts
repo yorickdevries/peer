@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
 import {
   IsDefined,
   IsOptional,
@@ -11,6 +11,7 @@ import User from "./User";
 import Faculty from "./Faculty";
 import AcademicYear from "./AcademicYear";
 import Enrollment from "../models/Enrollment";
+import Assignment from "../models/Assignment";
 import UserRole from "../enum/UserRole";
 
 @Entity()
@@ -54,6 +55,9 @@ export default class Course extends BaseModel {
   })
   academicYear: AcademicYear;
 
+  @OneToMany((_type) => Assignment, (assignment) => assignment.course)
+  assignments?: Assignment[];
+
   constructor(
     name: string,
     courseCode: string,
@@ -69,6 +73,14 @@ export default class Course extends BaseModel {
     this.faculty = faculty;
     this.academicYear = academicYear;
     this.description = description;
+  }
+
+  async getAssignments(): Promise<Assignment[]> {
+    return (
+      await Course.findOneOrFail(this.id, {
+        relations: ["assignments"],
+      })
+    ).assignments!;
   }
 
   async isEnrollable(user: User): Promise<boolean> {

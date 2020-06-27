@@ -1,7 +1,11 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import { getManager } from "typeorm";
-import { validateBody, validateParams } from "../middleware/validation";
+import {
+  validateBody,
+  validateParams,
+  validateQuery,
+} from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import Course from "../models/Course";
 import UserRole from "../enum/UserRole";
@@ -21,6 +25,31 @@ const router = express.Router();
 const uploadFolder = config.get("uploadFolder") as string;
 const allowedExtensions = config.get("allowedExtensions") as string[];
 const maxFileSize = config.get("maxFileSize") as number;
+
+// get all enrollable assignments for
+// Joi inputvalidation
+const enrollableAssignmentsSchema = Joi.object({
+  courseId: Joi.number().integer().required(),
+});
+router.get(
+  "/enrollable",
+  validateQuery(enrollableAssignmentsSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const course = await Course.findOneOrFail(req.params.courseId);
+
+    const allAssignments = await course.getAssignments();
+    const enrollableAssignments = [];
+    for (const assignment of allAssignments) {
+      console.log(assignment);
+      if (await assignment.isEnrollable(user)) {
+        enrollableAssignments.push(assignment);
+      }
+    }
+    const sortedEnrollableAssignments = _.sortBy(enrollableAssignments, "id");
+    res.send(sortedEnrollableAssignments);
+  }
+);
 
 // Joi inputvalidation
 const assignmentSchema = Joi.object({

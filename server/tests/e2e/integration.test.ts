@@ -6,6 +6,9 @@ import createDatabaseConnection from "../../src/databaseConnection";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
 import initializeData from "../../src/util/initializeData";
+import fs from "fs";
+import path from "path";
+import mockDate from "mockdate";
 
 describe("Integration", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -24,6 +27,7 @@ describe("Integration", () => {
   });
 
   afterAll(async () => {
+    mockDate.reset();
     //close server and connection
     server.close();
     await connection.close();
@@ -50,7 +54,7 @@ describe("Integration", () => {
     expect(JSON.parse(res.text)).toMatchObject({
       netid: "teacher",
     });
-    // check whether the affilition contains the employee entry
+    // check whether the affiliation contains the employee entry
     expect(JSON.parse(res.text).affiliation).toMatchObject([
       { name: "employee" },
     ]);
@@ -151,6 +155,37 @@ describe("Integration", () => {
     // assertions
     expect(JSON.parse(res.text).length).toEqual(0);
 
+    // make an assingment for the course
+    // create am assignment course
+    const exampleAssignmentFile = path.resolve(
+      __dirname,
+      "../../example_data/assignments/assignment1.pdf"
+    );
+    res = await request(server)
+      .post("/api/assignments")
+      .set("cookie", teacherCookie)
+      .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
+      .field("name", "Example title")
+      .field("courseId", course.id)
+      .field("reviewsPerUser", 2)
+      .field("enrollable", true)
+      .field("reviewEvaluation", false)
+      .field("publishDate", new Date("2020-01-01T10:00Z").toISOString())
+      .field("dueDate", new Date("2020-02-01T10:00Z").toISOString())
+      .field("reviewPublishDate", new Date("2020-03-01T10:00Z").toISOString())
+      .field("reviewDueDate", new Date("2020-04-01T10:00Z").toISOString())
+      .field("reviewEvaluationDueDate", "null")
+      .field("description", "Example description")
+      .field("externalLink", "null");
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const assignment = JSON.parse(res.text);
+    expect(assignment).toMatchObject({
+      name: "Example title",
+    });
+
+    // set date to the moment that the assignment is published
+    mockDate.set(new Date("2020-01-15T10:00Z"));
+
     // check available courses as student
     res = await request(server)
       .get("/api/courses/enrollable")
@@ -200,5 +235,19 @@ describe("Integration", () => {
         courseId: course2.id,
       },
     ]);
+
+    // get available assignments
+    res = await request(server)
+      .get(`/api/assignments/enrollable?courseId=${course.id}`)
+      .set("cookie", studentCookie1);
+    // assertions
+    expect(res.status).toBe(200);
+    console.log(res.text);
+    expect(JSON.parse(res.text)).toMatchObject([{
+      id: assignment.id
+    }]);
+
+    // enroll in assignment as user
+    // todo
   });
 });

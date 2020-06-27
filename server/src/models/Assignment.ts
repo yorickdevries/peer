@@ -113,7 +113,9 @@ export default class Assignment extends BaseModel {
   externalLink: string | null;
 
   // course_id int NOT NULL, FK
-  @ManyToOne((_type) => Course, { nullable: false })
+  @ManyToOne((_type) => Course, (course) => course.assignments, {
+    nullable: false,
+  })
   course?: Course;
 
   // Assignment groups
@@ -219,7 +221,10 @@ export default class Assignment extends BaseModel {
     // plus check whether the assignment is public/enrollable
     if (this.enrollable) {
       // published
-      if (moment().isAfter(this.publishDate)) {
+      if (
+        moment().isAfter(this.publishDate) &&
+        moment().isBefore(this.dueDate)
+      ) {
         const course = await this.getCourse();
         if (await course.isEnrolled(user)) {
           //enrolledInCourse
