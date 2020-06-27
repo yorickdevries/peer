@@ -208,7 +208,7 @@ describe("Integration", () => {
       .set("cookie", studentCookie1)
       .send({ courseId: course.id });
     // assertions
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
 
     // enroll for an unenrollable course
     res = await request(server)
@@ -216,14 +216,14 @@ describe("Integration", () => {
       .set("cookie", studentCookie1)
       .send({ courseId: course2.id });
     // assertions
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
 
     // enroll for an unenrollable course
     res = await request(server)
       .get("/api/enrollments")
       .set("cookie", studentCookie1);
     // assertions
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([
       {
         role: "student",
@@ -241,7 +241,7 @@ describe("Integration", () => {
       .get(`/api/assignments?courseId=${course.id}`)
       .set("cookie", studentCookie1);
     // assertions
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([]);
 
     // get available assignments
@@ -249,7 +249,7 @@ describe("Integration", () => {
       .get(`/api/assignments/enrollable?courseId=${course.id}`)
       .set("cookie", studentCookie1);
     // assertions
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([
       {
         id: assignment.id,
@@ -261,7 +261,7 @@ describe("Integration", () => {
       .post(`/api/assignments/${course.id}/enroll`)
       .set("cookie", studentCookie1);
     // assertions
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(HttpStatusCode.OK);
     const group = JSON.parse(res.text);
     expect(group).toMatchObject({
       name: "student1",
@@ -272,7 +272,7 @@ describe("Integration", () => {
       .get(`/api/assignments?courseId=${course.id}`)
       .set("cookie", studentCookie1);
     // assertions
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([
       {
         id: assignment.id,
@@ -284,7 +284,7 @@ describe("Integration", () => {
       .get(`/api/assignments/enrollable?courseId=${course.id}`)
       .set("cookie", studentCookie1);
     // assertions
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).not.toMatchObject([
       {
         id: assignment.id,
@@ -296,10 +296,23 @@ describe("Integration", () => {
       .get(`/api/assignments/${assignment.id}/group`)
       .set("cookie", studentCookie1);
     // assertions
-    expect(res.status).toBe(200);
-    expect(JSON.parse(res.text)).toMatchObject({
-      id: group.id,
-      name: group.name,
-    });
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject(group);
+
+    // get all groups by the teacher
+    res = await request(server)
+      .get(`/api/groups/?assignmentId=${assignment.id}`)
+      .set("cookie", teacherCookie);
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject([group]);
+
+    // get all groups by the student
+    res = await request(server)
+      .get(`/api/groups/?assignmentId=${assignment.id}`)
+      .set("cookie", studentCookie1);
+    // assertions
+    console.log(res.text);
+    expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
   });
 });
