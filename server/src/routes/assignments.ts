@@ -13,6 +13,7 @@ import hasha from "hasha";
 import path from "path";
 import fsPromises from "fs/promises";
 import Group from "../models/Group";
+import _ from "lodash";
 
 const router = express.Router();
 
@@ -108,7 +109,6 @@ router.post(
 const assignmentIdSchema = Joi.object({
   id: Joi.number().integer().required(),
 });
-// plus transaction for group creation as a user should only make one group
 router.post(
   "/:id/enroll",
   validateParams(assignmentIdSchema),
@@ -118,7 +118,34 @@ router.post(
       const assignment = await Assignment.findOneOrFail(req.params.id);
       if (await assignment.isEnrollable(user)) {
         const group = new Group(user.netid, [user], [assignment]);
-        await group.save();
+        // save the group in an transaction to make sure no 2 groups are saved at the same time
+        await getManager().transaction(
+          "SERIALIZABLE",
+          async (transactionalEntityManager) => {
+            // find all groups to check for group existence
+            const allGroups = await transactionalEntityManager.find(Group, {
+              relations: ["users", "assignments"],
+            });
+            const alreadyExists = _.some(allGroups, (group) => {
+              return (
+                _.some(group.users, (groupUser) => {
+                  return groupUser.netid === user.netid;
+                }) &&
+                _.some(group.assignments, (groupAssignment) => {
+                  return groupAssignment.id === assignment.id;
+                })
+              );
+            });
+            if (alreadyExists) {
+              // throw error if a group already exists
+              throw "Group already exists";
+            } else {
+              await transactionalEntityManager.save(group);
+            }
+          }
+        );
+        // reload the group
+        await group.reload();
         res.send(group);
       } else {
         res
