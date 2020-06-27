@@ -28,42 +28,52 @@ const maxFileSize = config.get("maxFileSize") as number;
 
 // get all enrollable assignments for a certain course
 // Joi inputvalidation
-const fetchAssignmentsSchema = Joi.object({
+const queryCourseIdSchema = Joi.object({
   courseId: Joi.number().integer().required(),
 });
 router.get(
   "/enrollable",
-  validateQuery(fetchAssignmentsSchema),
+  validateQuery(queryCourseIdSchema),
   async (req, res) => {
     const user = req.user!;
-    const course = await Course.findOneOrFail(req.params.courseId);
-
-    const allAssignments = await course.getAssignments();
-    const enrollableAssignments = [];
-    for (const assignment of allAssignments) {
-      if (await assignment.isEnrollable(user)) {
-        enrollableAssignments.push(assignment);
+    // this value has been parsed by the validate function
+    const courseId = req.query.courseId as any;
+    try {
+      const course = await Course.findOneOrFail(courseId);
+      const allAssignments = await course.getAssignments();
+      const enrollableAssignments = [];
+      for (const assignment of allAssignments) {
+        if (await assignment.isEnrollable(user)) {
+          enrollableAssignments.push(assignment);
+        }
       }
+      const sortedEnrollableAssignments = _.sortBy(enrollableAssignments, "id");
+      res.send(sortedEnrollableAssignments);
+    } catch (error) {
+      res.status(HttpStatusCode.BAD_REQUEST).send(error);
     }
-    const sortedEnrollableAssignments = _.sortBy(enrollableAssignments, "id");
-    res.send(sortedEnrollableAssignments);
   }
 );
 
 // get all enrolled assignments for
-router.get("/", validateQuery(fetchAssignmentsSchema), async (req, res) => {
+router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
   const user = req.user!;
-  const course = await Course.findOneOrFail(req.params.courseId);
-
-  const allAssignments = await course.getAssignments();
-  const enrolledAssignments = [];
-  for (const assignment of allAssignments) {
-    if (await assignment.isEnrolled(user)) {
-      enrolledAssignments.push(assignment);
+  // this value has been parsed by the validate function
+  const courseId = req.query.courseId as any;
+  try {
+    const course = await Course.findOneOrFail(courseId);
+    const allAssignments = await course.getAssignments();
+    const enrolledAssignments = [];
+    for (const assignment of allAssignments) {
+      if (await assignment.isEnrolled(user)) {
+        enrolledAssignments.push(assignment);
+      }
     }
+    const sortedEnrolledAssignments = _.sortBy(enrolledAssignments, "id");
+    res.send(sortedEnrolledAssignments);
+  } catch (error) {
+    res.status(HttpStatusCode.BAD_REQUEST).send(error);
   }
-  const sortedEnrolledAssignments = _.sortBy(enrolledAssignments, "id");
-  res.send(sortedEnrolledAssignments);
 });
 
 // Joi inputvalidation

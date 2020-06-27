@@ -27,19 +27,19 @@ const enrollmentSchema = Joi.object({
 router.post("/", validateBody(enrollmentSchema), async (req, res) => {
   const user = req.user!;
   const courseId = req.body.courseId;
-  const course = await Course.findOneOrFail(courseId);
-  if (course.isEnrollable(user)) {
-    try {
+  try {
+    const course = await Course.findOneOrFail(courseId);
+    if (course.isEnrollable(user)) {
       const enrollment = new Enrollment(user, course, UserRole.STUDENT);
       await enrollment.save();
       res.send(enrollment);
-    } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    } else {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(`course with id ${courseId} is not enrollable`);
     }
-  } else {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(`course with id ${courseId} is not enrollable`);
+  } catch (error) {
+    res.status(HttpStatusCode.BAD_REQUEST).send(error);
   }
 });
 
