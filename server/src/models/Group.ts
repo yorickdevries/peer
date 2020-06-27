@@ -24,11 +24,11 @@ export default class Group extends BaseModel {
 
   @ManyToMany((_type) => User, (user) => user.groups)
   @JoinTable()
-  users: User[];
+  users?: User[];
 
   @ManyToMany((_type) => Assignment, (assignment) => assignment.groups)
   @JoinTable()
-  assignments: Assignment[];
+  assignments?: Assignment[];
 
   constructor(name: string, users: User[], assignments: Assignment[]) {
     super();
