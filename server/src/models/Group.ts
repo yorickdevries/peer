@@ -24,7 +24,7 @@ export default class Group extends BaseModel {
   @IsNotEmpty()
   name: string;
 
-  @ManyToMany((_type) => User, (user) => user.groups)
+  @ManyToMany((_type) => User)
   @JoinTable()
   users?: User[];
 

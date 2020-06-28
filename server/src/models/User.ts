@@ -13,7 +13,6 @@ import {
 import BaseModel from "./BaseModel";
 import Affiliation from "./Affiliation";
 import Study from "./Study";
-import Group from "./Group";
 import OrganisationUnit from "./OrganisationUnit";
 
 @Entity()
@@ -81,10 +80,6 @@ export default class User extends BaseModel {
   @JoinTable()
   organisationUnit: OrganisationUnit[];
 
-  // Assignment groups
-  @ManyToMany((_type) => Group, (group) => group.users)
-  groups?: Group[];
-
   constructor(
     netid: string,
     affiliation: Affiliation[],
@@ -108,14 +103,5 @@ export default class User extends BaseModel {
     this.lastName = lastName;
     this.email = email;
     this.displayName = displayName;
-  }
-
-  async getGroups(): Promise<Group[]> {
-    // get the user with all current groups
-    return (
-      await User.findOneOrFail(this.netid, {
-        relations: ["groups"],
-      })
-    ).groups!;
   }
 }
