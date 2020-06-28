@@ -14,6 +14,7 @@ import fsPromises from "fs/promises";
 import upload from "../middleware/upload";
 import assignmentState from "../enum/assignmentState";
 import { getManager } from "typeorm";
+import _ from "lodash";
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
@@ -34,7 +35,9 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
     const assignment = await Assignment.findOneOrFail(assignmentId);
     const course = await assignment.getCourse();
     if (await course.isEnrolled(user, UserRole.TEACHER)) {
-      res.send(await assignment.getSubmissions());
+      const submissions = await assignment.getSubmissions();
+      const sortedSubmissions = _.sortBy(submissions, "id");
+      res.send(sortedSubmissions);
     } else {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -62,7 +65,9 @@ router.get(
       const assignment = await Assignment.findOneOrFail(assignmentId);
       const group = await Group.findOneOrFail(groupId);
       if (await group.hasUser(user)) {
-        res.send(await assignment.getSubmissions(group));
+        const submissions = await assignment.getSubmissions(group);
+        const sortedSubmissions = _.sortBy(submissions, "id");
+        res.send(sortedSubmissions);
       } else {
         res
           .status(HttpStatusCode.BAD_REQUEST)
