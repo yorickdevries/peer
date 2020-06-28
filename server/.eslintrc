@@ -1,6 +1,9 @@
 {
     "root": true,
     "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "project": ["./tsconfig.json", "./tests/tsconfig.json"],
+      },
     "plugins": [
         "@typescript-eslint",
     ],
@@ -12,5 +15,6 @@
     ],
     "rules": {
         "prefer-arrow-callback": "error",
+        "@typescript-eslint/no-misused-promises": "error",
     }
 }
