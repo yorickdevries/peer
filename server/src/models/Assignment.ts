@@ -6,6 +6,7 @@ import {
   ManyToOne,
   ManyToMany,
   JoinColumn,
+  OneToMany,
 } from "typeorm";
 import {
   IsDefined,
@@ -24,8 +25,9 @@ import Course from "./Course";
 import User from "./User";
 import File from "./File";
 import moment from "moment";
-import _ from "lodash";
 import UserRole from "../enum/UserRole";
+import Submission from "./Submission";
+import assignmentState from "../enum/assignmentState";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -123,6 +125,9 @@ export default class Assignment extends BaseModel {
   @ManyToMany((_type) => Group, (group) => group.assignments)
   groups?: Group[];
 
+  @OneToMany((_type) => Submission, (submission) => submission.assignment)
+  submissions?: Submission[];
+
   constructor(
     name: string,
     course: Course,
@@ -177,6 +182,21 @@ export default class Assignment extends BaseModel {
     return super.validateOrReject();
   }
 
+  // check whether the user is enrolled in this assignment
+  getState(): assignmentState {
+    if (moment().isBefore(this.publishDate)) {
+      return assignmentState.UNPUBLISHED;
+    } else if (moment().isBefore(this.dueDate)) {
+      return assignmentState.SUBMISSION;
+    } else if (moment().isBefore(this.reviewPublishDate)) {
+      return assignmentState.WAITINGFORREVIEW;
+    } else if (moment().isBefore(this.reviewDueDate)) {
+      return assignmentState.REVIEW;
+    } else {
+      return assignmentState.FEEDBACK;
+    }
+  }
+
   async getCourse(): Promise<Course> {
     return (
       await Assignment.findOneOrFail(this.id, {
@@ -193,15 +213,34 @@ export default class Assignment extends BaseModel {
     ).groups!;
   }
 
+  async getSubmissions(group?: Group): Promise<Submission[]> {
+    if (group) {
+      return this.getSubmissionsOfGroup(group);
+    } else {
+      return (
+        await Assignment.findOneOrFail(this.id, {
+          relations: ["submissions"],
+        })
+      ).submissions!;
+    }
+  }
+
+  private async getSubmissionsOfGroup(group: Group): Promise<Submission[]> {
+    const allSubmissions = await this.getSubmissions();
+    const submissionsOfGroup = [];
+    for (const submission of allSubmissions) {
+      const submissionGroup = await submission.getGroup();
+      if (submissionGroup.id === group.id) {
+        submissionsOfGroup.push(submission);
+      }
+    }
+    return submissionsOfGroup;
+  }
+
   async getGroup(user: User): Promise<Group | undefined> {
     const groups = await this.getGroups();
     for (const group of groups) {
-      const groupUsers = await group.getUsers();
-      if (
-        _.some(groupUsers, (groupUser) => {
-          return groupUser.netid === user.netid;
-        })
-      ) {
+      if (await group.hasUser(user)) {
         return group;
       }
     }
@@ -214,10 +253,7 @@ export default class Assignment extends BaseModel {
     // plus check whether the assignment is public/enrollable
     if (this.enrollable) {
       // published
-      if (
-        moment().isAfter(this.publishDate) &&
-        moment().isBefore(this.dueDate)
-      ) {
+      if (this.getState() === assignmentState.SUBMISSION) {
         const course = await this.getCourse();
         if (await course.isEnrolled(user, UserRole.STUDENT)) {
           //enrolledInCourse

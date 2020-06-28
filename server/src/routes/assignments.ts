@@ -80,7 +80,9 @@ router.get(
     const courseId = req.query.courseId as any;
     try {
       const course = await Course.findOneOrFail(courseId);
-      const enrolledAssignments = await course.getEnrolledAssignments(user);
+      const enrolledAssignments = await course.getPublishedEnrolledAssignments(
+        user
+      );
       const sortedEnrolledAssignments = _.sortBy(enrolledAssignments, "id");
       res.send(sortedEnrolledAssignments);
     } catch (error) {

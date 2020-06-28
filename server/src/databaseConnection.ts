@@ -13,6 +13,7 @@ import Enrollment from "./models/Enrollment";
 import Assignment from "./models/Assignment";
 import File from "./models/File";
 import Group from "./models/Group";
+import Submission from "./models/Submission";
 // Database models
 
 const databaseConfig: {
@@ -39,6 +40,7 @@ const createDatabaseConnection = async function (): Promise<Connection> {
       Assignment,
       File,
       Group,
+      Submission,
     ],
     synchronize: true, // must be set to false once deployed to production (we should switch to migrations instead)
     logging: false,

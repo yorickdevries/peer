@@ -83,7 +83,7 @@ router.post("/:id/enroll", validateParams(courseIdSchema), async (req, res) => {
   const courseId = req.params.id;
   try {
     const course = await Course.findOneOrFail(courseId);
-    if (course.isEnrollable(user)) {
+    if (await course.isEnrollable(user)) {
       const enrollment = new Enrollment(user, course, UserRole.STUDENT);
       await enrollment.save();
       res.send(enrollment);
