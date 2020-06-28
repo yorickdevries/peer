@@ -20,7 +20,7 @@ const initializeData = async function (): Promise<void> {
     ["3mE", "Mechanical, Maritime and Materials Engineering"],
   ];
   for (const faculty of faculties) {
-    new Faculty(faculty[0], faculty[1]).save();
+    await new Faculty(faculty[0], faculty[1]).save();
   }
 
   // Academic Years
@@ -31,7 +31,7 @@ const initializeData = async function (): Promise<void> {
     ["2020/2021", true],
   ];
   for (const academicYear of academicYears) {
-    new AcademicYear(academicYear[0], academicYear[1]).save();
+    await new AcademicYear(academicYear[0], academicYear[1]).save();
   }
   console.log("Initialized Faculties and Academic Years");
 
