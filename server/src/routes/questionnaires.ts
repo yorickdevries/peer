@@ -5,6 +5,8 @@ import Assignment from "../models/Assignment";
 import UserRole from "../enum/UserRole";
 import { validateBody } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
+import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
+import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import Questionnaire from "../models/Questionnaire";
 import { getManager } from "typeorm";
 
@@ -46,7 +48,7 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
               throw "Questionnaire already exists";
             }
             // create questionnaire
-            questionnaire = new Questionnaire();
+            questionnaire = new SubmissionQuestionnaire();
             await transactionalEntityManager.save(questionnaire);
 
             // save the assignment with the questionnaire
@@ -78,7 +80,7 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
               throw "Questionnaire already exists";
             }
             // create questionnaire
-            questionnaire = new Questionnaire();
+            questionnaire = new ReviewQuestionnaire();
             await transactionalEntityManager.save(questionnaire);
 
             // save the assignment with the questionnaire

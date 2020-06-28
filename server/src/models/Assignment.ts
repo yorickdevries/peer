@@ -27,7 +27,8 @@ import File from "./File";
 import moment from "moment";
 import UserRole from "../enum/UserRole";
 import Submission from "./Submission";
-import Questionnaire from "./Questionnaire";
+import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
+import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import assignmentState from "../enum/assignmentState";
 
 @Entity()
@@ -109,14 +110,14 @@ export default class Assignment extends BaseModel {
   file: File | null;
 
   // submission questionaire
-  @OneToOne((_type) => Questionnaire, { eager: true })
+  @OneToOne((_type) => SubmissionQuestionnaire, { eager: true })
   @JoinColumn()
-  submissionQuestionnaire: Questionnaire | null;
+  submissionQuestionnaire: SubmissionQuestionnaire | null;
 
   // review questionaire (for review evaluation)
-  @OneToOne((_type) => Questionnaire, { eager: true })
+  @OneToOne((_type) => ReviewQuestionnaire, { eager: true })
   @JoinColumn()
-  reviewQuestionnaire: Questionnaire | null;
+  reviewQuestionnaire: ReviewQuestionnaire | null;
 
   // external_link varchar(1000),
   @Column("varchar", { nullable: true })
@@ -153,8 +154,8 @@ export default class Assignment extends BaseModel {
     description: string | null,
     file: File | null,
     externalLink: string | null,
-    submissionQuestionnaire: Questionnaire | null,
-    reviewQuestionnaire: Questionnaire | null
+    submissionQuestionnaire: SubmissionQuestionnaire | null,
+    reviewQuestionnaire: ReviewQuestionnaire | null
   ) {
     super();
     this.name = name;
@@ -231,7 +232,7 @@ export default class Assignment extends BaseModel {
     ).groups!;
   }
 
-  async getSubmissionQuestionnaire(): Promise<Questionnaire | null> {
+  async getSubmissionQuestionnaire(): Promise<SubmissionQuestionnaire | null> {
     return (
       await Assignment.findOneOrFail(this.id, {
         relations: ["submissionQuestionnaire"],
@@ -239,7 +240,7 @@ export default class Assignment extends BaseModel {
     ).submissionQuestionnaire!;
   }
 
-  async getReviewQuestionnaire(): Promise<Questionnaire | null> {
+  async getReviewQuestionnaire(): Promise<ReviewQuestionnaire | null> {
     return (
       await Assignment.findOneOrFail(this.id, {
         relations: ["reviewQuestionnaire"],
