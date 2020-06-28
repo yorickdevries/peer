@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 
 const initializeData = async function (): Promise<void> {
-  if (!["development", undefined].includes(process.env.NODE_ENV)) {
+  if (!["development", "test", undefined].includes(process.env.NODE_ENV)) {
     throw new Error(`NODE_ENV is set to ${process.env.NODE_ENV}`);
   }
 
