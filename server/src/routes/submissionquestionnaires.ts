@@ -1,7 +1,6 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import Assignment from "../models/Assignment";
-import UserRole from "../enum/UserRole";
 import { validateBody, validateParams } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
@@ -21,8 +20,7 @@ router.get("/:id", validateParams(questionnaireSchema), async (req, res) => {
       req.params.id
     );
     const assignment = await submissionQuestionaire.getAssignment();
-    const course = await assignment.getCourse();
-    if (await course.isEnrolled(user, UserRole.TEACHER)) {
+    if (await assignment.isTeacherOfCourse(user)) {
       res.send(submissionQuestionaire);
     } else {
       //later we need to extend this so the students can access it when the assignment is in reivew state
@@ -45,8 +43,7 @@ router.post("/", validateBody(questionnairePostSchema), async (req, res) => {
   try {
     // find the assignment and course
     const assignment = await Assignment.findOneOrFail(req.body.assignmentId);
-    const course = await assignment.getCourse();
-    if (await course.isEnrolled(user, UserRole.TEACHER)) {
+    if (await assignment.isTeacherOfCourse(user)) {
       // check if the questionnaire isnt already defined
       if (!(await assignment.getSubmissionQuestionnaire())) {
         const submissionQuestionnaire = new SubmissionQuestionnaire();

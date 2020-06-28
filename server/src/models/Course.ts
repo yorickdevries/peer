@@ -106,7 +106,7 @@ export default class Course extends BaseModel {
     const enrolledAssignments = [];
     for (const assignment of allAssignments) {
       if (
-        (await assignment.isEnrolled(user)) &&
+        (await assignment.isEnrolledInGroup(user)) &&
         !(assignment.getState() === assignmentState.UNPUBLISHED)
       ) {
         enrolledAssignments.push(assignment);

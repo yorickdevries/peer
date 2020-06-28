@@ -1,7 +1,6 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import Assignment from "../models/Assignment";
-import UserRole from "../enum/UserRole";
 import { validateBody } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
@@ -19,8 +18,7 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   try {
     // find the assignment and course
     const assignment = await Assignment.findOneOrFail(req.body.assignmentId);
-    const course = await assignment.getCourse();
-    if (await course.isEnrolled(user, UserRole.TEACHER)) {
+    if (await assignment.isTeacherOfCourse(user)) {
       // check if the questionnaire isnt already defined
       if (
         assignment.reviewEvaluation &&

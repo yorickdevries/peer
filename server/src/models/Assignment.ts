@@ -293,7 +293,7 @@ export default class Assignment extends BaseModel {
         if (await course.isEnrolled(user, UserRole.STUDENT)) {
           //enrolledInCourse
           // not already enrolled in assignment
-          if (!(await this.isEnrolled(user))) {
+          if (!(await this.isEnrolledInGroup(user))) {
             return true;
           }
         }
@@ -303,7 +303,12 @@ export default class Assignment extends BaseModel {
   }
 
   // check whether the user is enrolled in this assignment
-  async isEnrolled(user: User): Promise<boolean> {
+  async isEnrolledInGroup(user: User): Promise<boolean> {
     return (await this.getGroup(user)) ? true : false;
+  }
+
+  async isTeacherOfCourse(user: User): Promise<boolean> {
+    const course = await this.getCourse();
+    return await course.isEnrolled(user, UserRole.TEACHER);
   }
 }

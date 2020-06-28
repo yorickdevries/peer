@@ -3,7 +3,6 @@ import Joi from "@hapi/joi";
 import { validateQuery, validateBody } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
-import UserRole from "../enum/UserRole";
 import Group from "../models/Group";
 import config from "config";
 import Submission from "../models/Submission";
@@ -33,8 +32,7 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   const assignmentId = req.query.assignmentId as any;
   try {
     const assignment = await Assignment.findOneOrFail(assignmentId);
-    const course = await assignment.getCourse();
-    if (await course.isEnrolled(user, UserRole.TEACHER)) {
+    if (await assignment.isTeacherOfCourse(user)) {
       const submissions = await assignment.getSubmissions();
       const sortedSubmissions = _.sortBy(submissions, "id");
       res.send(sortedSubmissions);
