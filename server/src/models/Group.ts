@@ -76,4 +76,11 @@ export default class Group extends BaseModel {
       })
     ).assignments!;
   }
+
+  async hasUser(user: User): Promise<boolean> {
+    const groupUsers = await this.getUsers();
+    return _.some(groupUsers, (groupUser) => {
+      return groupUser.netid === user.netid;
+    });
+  }
 }

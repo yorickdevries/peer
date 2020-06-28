@@ -28,7 +28,9 @@ export default class Submission extends BaseModel {
   group?: Group;
 
   // Assignment_id int NOT NULL,
-  @ManyToOne((_type) => Assignment, { nullable: false })
+  @ManyToOne((_type) => Assignment, (assignment) => assignment.submissions, {
+    nullable: false,
+  })
   assignment?: Assignment;
 
   // file_path varchar(500) NOT NULL,
