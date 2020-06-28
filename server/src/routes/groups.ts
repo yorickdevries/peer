@@ -23,7 +23,7 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
     } else {
       res
         .status(HttpStatusCode.BAD_REQUEST)
-        .send("user is not a teacher for the course");
+        .send("User is not a teacher for the course");
     }
   } catch (error) {
     res.status(HttpStatusCode.BAD_REQUEST).send(error);
