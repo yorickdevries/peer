@@ -19,6 +19,7 @@ import AcademicYear from "./AcademicYear";
 import Enrollment from "../models/Enrollment";
 import Assignment from "../models/Assignment";
 import UserRole from "../enum/UserRole";
+import assignmentState from "../enum/assignmentState";
 
 @Entity()
 export default class Course extends BaseModel {
@@ -100,11 +101,14 @@ export default class Course extends BaseModel {
     return enrollableAssignments;
   }
 
-  async getEnrolledAssignments(user: User): Promise<Assignment[]> {
+  async getPublishedEnrolledAssignments(user: User): Promise<Assignment[]> {
     const allAssignments = await this.getAssignments();
     const enrolledAssignments = [];
     for (const assignment of allAssignments) {
-      if (await assignment.isEnrolled(user)) {
+      if (
+        (await assignment.isEnrolled(user)) &&
+        !(assignment.getState() === assignmentState.UNPUBLISHED)
+      ) {
         enrolledAssignments.push(assignment);
       }
     }
