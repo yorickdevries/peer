@@ -61,13 +61,7 @@ router.get(
     const courseId = req.query.courseId as any;
     try {
       const course = await Course.findOneOrFail(courseId);
-      const allAssignments = await course.getAssignments();
-      const enrollableAssignments = [];
-      for (const assignment of allAssignments) {
-        if (await assignment.isEnrollable(user)) {
-          enrollableAssignments.push(assignment);
-        }
-      }
+      const enrollableAssignments = await course.getEnrollableAssignments(user);
       const sortedEnrollableAssignments = _.sortBy(enrollableAssignments, "id");
       res.send(sortedEnrollableAssignments);
     } catch (error) {
@@ -86,13 +80,7 @@ router.get(
     const courseId = req.query.courseId as any;
     try {
       const course = await Course.findOneOrFail(courseId);
-      const allAssignments = await course.getAssignments();
-      const enrolledAssignments = [];
-      for (const assignment of allAssignments) {
-        if (await assignment.isEnrolled(user)) {
-          enrolledAssignments.push(assignment);
-        }
-      }
+      const enrolledAssignments = await course.getEnrolledAssignments(user);
       const sortedEnrolledAssignments = _.sortBy(enrolledAssignments, "id");
       res.send(sortedEnrolledAssignments);
     } catch (error) {

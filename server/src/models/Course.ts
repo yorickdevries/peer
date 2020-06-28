@@ -89,6 +89,28 @@ export default class Course extends BaseModel {
     ).assignments!;
   }
 
+  async getEnrollableAssignments(user: User): Promise<Assignment[]> {
+    const allAssignments = await this.getAssignments();
+    const enrollableAssignments = [];
+    for (const assignment of allAssignments) {
+      if (await assignment.isEnrollable(user)) {
+        enrollableAssignments.push(assignment);
+      }
+    }
+    return enrollableAssignments;
+  }
+
+  async getEnrolledAssignments(user: User): Promise<Assignment[]> {
+    const allAssignments = await this.getAssignments();
+    const enrolledAssignments = [];
+    for (const assignment of allAssignments) {
+      if (await assignment.isEnrolled(user)) {
+        enrolledAssignments.push(assignment);
+      }
+    }
+    return enrolledAssignments;
+  }
+
   async isEnrollable(user: User): Promise<boolean> {
     return (
       this.academicYear?.active &&
