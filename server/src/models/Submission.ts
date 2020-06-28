@@ -10,6 +10,7 @@ import BaseModel from "./BaseModel";
 import User from "./User";
 import Assignment from "../models/Assignment";
 import Group from "./Group";
+import File from "./File";
 
 @Entity()
 export default class Submission extends BaseModel {
