@@ -2,7 +2,7 @@ import express from "express";
 import Joi from "@hapi/joi";
 import Assignment from "../models/Assignment";
 import UserRole from "../enum/UserRole";
-import { validateBody } from "../middleware/validation";
+import { validateBody, validateParams } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { getManager } from "typeorm";
@@ -11,10 +11,36 @@ const router = express.Router();
 
 // Joi inputvalidation
 const questionnaireSchema = Joi.object({
+  id: Joi.number().integer().required(),
+});
+// get the submissionquestionaire for an assignment
+router.get("/:id", validateParams(questionnaireSchema), async (req, res) => {
+  const user = req.user!;
+  try {
+    const submissionQuestionaire = await SubmissionQuestionnaire.findOneOrFail(
+      req.params.id
+    );
+    const assignment = await submissionQuestionaire.getAssignment();
+    const course = await assignment.getCourse();
+    if (await course.isEnrolled(user, UserRole.TEACHER)) {
+      res.send(submissionQuestionaire);
+    } else {
+      //later we need to extend this so the students can access it when the assignment is in reivew state
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You are not a teacher of this course");
+    }
+  } catch (error) {
+    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+  }
+});
+
+// Joi inputvalidation
+const questionnairePostSchema = Joi.object({
   assignmentId: Joi.number().integer().required(),
 });
 // post a submissionQuestionnaire in an assignment
-router.post("/", validateBody(questionnaireSchema), async (req, res) => {
+router.post("/", validateBody(questionnairePostSchema), async (req, res) => {
   const user = req.user!;
   try {
     // find the assignment and course
