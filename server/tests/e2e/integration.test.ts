@@ -195,32 +195,29 @@ describe("Integration", () => {
 
     // enroll for course as student
     res = await request(server)
-      .post("/api/enrollments/enrolled")
-      .set("cookie", studentCookie1)
-      .send({ courseId: course.id });
+      .post(`/api/courses/${course.id}/enroll`)
+      .set("cookie", studentCookie1);
     // assertions
     const enrollment = JSON.parse(res.text);
     expect(enrollment).toMatchObject({ courseId: course.id, role: "student" });
 
     // enroll for course as student for the second time
     res = await request(server)
-      .post("/api/enrollments")
-      .set("cookie", studentCookie1)
-      .send({ courseId: course.id });
+      .post(`/api/courses/${course.id}/enroll`)
+      .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
 
     // enroll for an unenrollable course
     res = await request(server)
-      .post("/api/enrollments")
-      .set("cookie", studentCookie1)
-      .send({ courseId: course2.id });
+      .post(`/api/courses/${course2.id}/enroll`)
+      .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
 
-    // enroll for an unenrollable course
+    // get enrollments
     res = await request(server)
-      .get("/api/enrollments")
+      .get("/api/enrollments/enrolled")
       .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -258,9 +255,8 @@ describe("Integration", () => {
 
     // enroll in assignment
     res = await request(server)
-      .post(`/api/groups/`)
-      .set("cookie", studentCookie1)
-      .send({ assignmentId: assignment.id });
+      .post(`/api/assignments/${assignment.id}/enroll`)
+      .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     const group = JSON.parse(res.text);
