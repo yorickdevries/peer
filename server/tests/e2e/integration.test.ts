@@ -298,7 +298,7 @@ describe("Integration", () => {
 
     // get all groups by the teacher
     res = await request(server)
-      .get(`/api/groups/?assignmentId=${assignment.id}`)
+      .get(`/api/groups?assignmentId=${assignment.id}`)
       .set("cookie", teacherCookie);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -306,7 +306,7 @@ describe("Integration", () => {
 
     // get all groups by the student
     res = await request(server)
-      .get(`/api/groups/?assignmentId=${assignment.id}`)
+      .get(`/api/groups?assignmentId=${assignment.id}`)
       .set("cookie", studentCookie1);
     // assertions
     console.log(res.text);
