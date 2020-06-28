@@ -47,6 +47,19 @@ export default class Submission extends BaseModel {
     this.file = file;
   }
 
+  // validation: check whether the group is in the assingment and the user in the group
+  async validateOrReject(): Promise<void> {
+    // might need to be changed if a teacher submits on behalf of a group
+    if (!(await this.group!.hasUser(this.user!))) {
+      throw "User is not part of this group";
+    }
+    if (!(await this.group!.hasAssignment(this.assignment!))) {
+      throw "Group is not part of this assignment";
+    }
+    // if it succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
+
   // user
   async getUser(): Promise<User> {
     return (
