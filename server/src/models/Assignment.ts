@@ -27,6 +27,7 @@ import File from "./File";
 import moment from "moment";
 import UserRole from "../enum/UserRole";
 import Submission from "./Submission";
+import Questionnaire from "./Questionnaire";
 import assignmentState from "../enum/assignmentState";
 
 @Entity()
@@ -107,6 +108,16 @@ export default class Assignment extends BaseModel {
   @JoinColumn()
   file: File | null;
 
+  // submission questionaire
+  @OneToOne((_type) => Questionnaire)
+  @JoinColumn()
+  submissionQuestionnaire?: Questionnaire | null;
+
+  // review questionaire (for review evaluation)
+  @OneToOne((_type) => Questionnaire)
+  @JoinColumn()
+  reviewQuestionnaire?: Questionnaire | null;
+
   // external_link varchar(1000),
   @Column("varchar", { nullable: true })
   @IsOptional()
@@ -141,7 +152,9 @@ export default class Assignment extends BaseModel {
     reviewEvaluationDueDate: Date | null,
     description: string | null,
     file: File | null,
-    externalLink: string | null
+    externalLink: string | null,
+    submissionQuestionnaire: Questionnaire | null,
+    reviewQuestionnaire: Questionnaire | null
   ) {
     super();
     this.name = name;
@@ -157,6 +170,8 @@ export default class Assignment extends BaseModel {
     this.description = description;
     this.file = file;
     this.externalLink = externalLink;
+    this.submissionQuestionnaire = submissionQuestionnaire;
+    this.reviewQuestionnaire = reviewQuestionnaire;
   }
 
   // custom validation which is run before saving
@@ -211,6 +226,22 @@ export default class Assignment extends BaseModel {
         relations: ["groups"],
       })
     ).groups!;
+  }
+
+  async getSubmissionQuestionnaire(): Promise<Questionnaire | null> {
+    return (
+      await Assignment.findOneOrFail(this.id, {
+        relations: ["submissionQuestionnaire"],
+      })
+    ).submissionQuestionnaire!;
+  }
+
+  async getReviewQuestionnaire(): Promise<Questionnaire | null> {
+    return (
+      await Assignment.findOneOrFail(this.id, {
+        relations: ["reviewQuestionnaire"],
+      })
+    ).reviewQuestionnaire!;
   }
 
   async getSubmissions(group?: Group): Promise<Submission[]> {

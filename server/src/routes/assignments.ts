@@ -150,7 +150,9 @@ router.post(
               req.body.reviewEvaluationDueDate,
               req.body.description,
               file,
-              req.body.externalLink
+              req.body.externalLink,
+              null, // submissionQuestionnaire (initially empty)
+              null // reviewQuestionnaire (initially empty)
             );
             await transactionalEntityManager.save(assignment);
 
