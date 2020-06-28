@@ -10,6 +10,7 @@ import BaseModel from "./BaseModel";
 import User from "./User";
 import Assignment from "./Assignment";
 import _ from "lodash";
+import UserRole from "../enum/UserRole";
 
 @Entity()
 export default class Group extends BaseModel {
@@ -38,15 +39,20 @@ export default class Group extends BaseModel {
     this.assignments = assignments;
   }
 
-  // validation to check whether all assignments are from he same course
-  // TODO: validate that all users are also enrolled in the course
   async validateOrReject(): Promise<void> {
-    if (this.assignments) {
+    if (this.assignments && this.users) {
       const courseIds = [];
       for (const assignment of this.assignments) {
         const course = await assignment.getCourse();
-        courseIds.push(course.id);
+        // validate that all users are also enrolled in the course
+        for (const user of this.users) {
+          if (!(await course.isEnrolled(user, UserRole.STUDENT))) {
+            throw `${user} is not enrolled in ${course}`;
+          }
+          courseIds.push(course.id);
+        }
       }
+      // validation to check whether all assignments are from the same course
       if (_.uniq(courseIds).length > 1) {
         throw "Assignments of a group should be from the same course";
       }
