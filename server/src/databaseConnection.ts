@@ -1,4 +1,4 @@
-import "reflect-metadata";
+import "reflect-metadata"; // needed for typeORM to work
 import { createConnection, Connection, ConnectionOptions } from "typeorm";
 import config from "config";
 // Database models
@@ -13,6 +13,7 @@ import Enrollment from "./models/Enrollment";
 import Assignment from "./models/Assignment";
 import File from "./models/File";
 import Group from "./models/Group";
+// Database models
 
 const databaseConfig: {
   type: string;

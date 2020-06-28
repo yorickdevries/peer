@@ -2,9 +2,9 @@ import os from "os";
 import fs from "fs";
 import path from "path";
 import fileCache from "file-system-cache";
-// Needs to be updated and tested with newest version of the package
+// TODO: Needs to be updated and tested with newest version of the package
 import { fetch, toPassportConfig } from "passport-saml-metadata";
-// Needs to be updated and tested with newest version of the package
+// TODO: to be updated and tested with newest version of the package
 import passport_saml from "passport-saml";
 import config from "config";
 import { PassportStatic } from "passport";
