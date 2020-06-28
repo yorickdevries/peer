@@ -39,6 +39,7 @@ export default class Group extends BaseModel {
   }
 
   // validation to check whether all assignments are from he same course
+  // TODO: validate that all users are also enrolled in the course
   async validateOrReject(): Promise<void> {
     if (this.assignments) {
       const courseIds = [];
