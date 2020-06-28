@@ -25,6 +25,7 @@ import User from "./User";
 import File from "./File";
 import moment from "moment";
 import _ from "lodash";
+import UserRole from "../enum/UserRole";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -241,7 +242,7 @@ export default class Assignment extends BaseModel {
         moment().isBefore(this.dueDate)
       ) {
         const course = await this.getCourse();
-        if (await course.isEnrolled(user)) {
+        if (await course.isEnrolled(user, UserRole.STUDENT)) {
           //enrolledInCourse
           // not already enrolled in assignment
           if (!(await this.isEnrolled(user))) {
