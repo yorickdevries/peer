@@ -335,7 +335,6 @@ describe("Integration", () => {
       .get(`/api/groups?assignmentId=${assignment.id}`)
       .set("cookie", studentCookie1);
     // assertions
-    console.log(res.text);
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
 
     // make a submission
