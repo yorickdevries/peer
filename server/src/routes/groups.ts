@@ -4,6 +4,7 @@ import { validateQuery } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import UserRole from "../enum/UserRole";
+import _ from "lodash";
 
 const router = express.Router();
 
@@ -19,7 +20,10 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
     const assignment = await Assignment.findOneOrFail(assignmentId);
     const course = await assignment.getCourse();
     if (await course.isEnrolled(user, UserRole.TEACHER)) {
-      res.send(await assignment.getGroups());
+      // sorting needs to be done
+      const groups = await assignment.getGroups();
+      const sortedGroups = _.sortBy(groups, "id");
+      res.send(sortedGroups);
     } else {
       res
         .status(HttpStatusCode.BAD_REQUEST)
