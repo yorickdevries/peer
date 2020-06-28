@@ -81,8 +81,6 @@ test_old:
   script:
   - cd server && npm install
   - npm run test_old
-  tags:
-  - longJob
   only:
   - merge_requests
 
