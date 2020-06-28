@@ -183,6 +183,9 @@ export default class Assignment extends BaseModel {
     if (!this.reviewEvaluation && this.reviewEvaluationDueDate) {
       throw "reviewEvaluationDueDate is defined while reviewEvaluation is turned off";
     }
+    if (!this.reviewEvaluation && this.reviewQuestionnaire) {
+      throw "reviewQuestionnaire is defined while reviewEvaluation is turned off";
+    }
     // check chronological order of the dates
     if (
       moment(this.publishDate).isAfter(this.dueDate) ||
