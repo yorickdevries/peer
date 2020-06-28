@@ -311,5 +311,38 @@ describe("Integration", () => {
     // assertions
     console.log(res.text);
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
+
+    // make a submission
+    const exampleSubmissionFile = path.resolve(
+      __dirname,
+      "../../example_data/submissions/submission1.pdf"
+    );
+    res = await request(server)
+      .post("/api/submissions")
+      .set("cookie", studentCookie1)
+      .attach("file", fs.readFileSync(exampleSubmissionFile), "submission1.pdf")
+      .field("groupId", group.id)
+      .field("assignmentId", assignment.id);
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const submission = JSON.parse(res.text);
+
+    // get all submissions for this assignment by this group
+    res = await request(server)
+      .get(
+        `/api/submissions/enrolled?assignmentId=${assignment.id}&groupId=${group.id}`
+      )
+      .set("cookie", studentCookie1);
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject([submission]);
+
+    // get all submissions for this assignment as teacher
+    res = await request(server)
+      .get(`/api/submissions?assignmentId=${assignment.id}`)
+      .set("cookie", teacherCookie);
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject([submission]);
   });
 });
