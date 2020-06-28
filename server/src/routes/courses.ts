@@ -8,7 +8,7 @@ import Faculty from "../models/Faculty";
 import AcademicYear from "../models/AcademicYear";
 import Enrollment from "../models/Enrollment";
 import UserRole from "../enum/UserRole";
-import { validateBody } from "../middleware/validation";
+import { validateBody, validateParams } from "../middleware/validation";
 import _ from "lodash";
 
 const router = express.Router();
@@ -72,5 +72,29 @@ router.post(
     }
   }
 );
+
+// Joi inputvalidation
+const courseIdSchema = Joi.object({
+  id: Joi.number().integer().required(),
+});
+// post an enrollment (enroll in a course)
+router.post("/:id/enroll", validateParams(courseIdSchema), async (req, res) => {
+  const user = req.user!;
+  const courseId = req.params.id;
+  try {
+    const course = await Course.findOneOrFail(courseId);
+    if (course.isEnrollable(user)) {
+      const enrollment = new Enrollment(user, course, UserRole.STUDENT);
+      await enrollment.save();
+      res.send(enrollment);
+    } else {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(`course with id ${courseId} is not enrollable`);
+    }
+  } catch (error) {
+    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+  }
+});
 
 export default router;

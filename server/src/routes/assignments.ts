@@ -1,7 +1,11 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import { getManager } from "typeorm";
-import { validateBody, validateQuery } from "../middleware/validation";
+import {
+  validateBody,
+  validateQuery,
+  validateParams,
+} from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import Course from "../models/Course";
 import UserRole from "../enum/UserRole";
@@ -13,6 +17,7 @@ import hasha from "hasha";
 import path from "path";
 import fsPromises from "fs/promises";
 import _ from "lodash";
+import Group from "../models/Group";
 
 const router = express.Router();
 
@@ -21,11 +26,32 @@ const uploadFolder = config.get("uploadFolder") as string;
 const allowedExtensions = config.get("allowedExtensions") as string[];
 const maxFileSize = config.get("maxFileSize") as number;
 
-// get all enrollable assignments for a certain course
 // Joi inputvalidation
 const queryCourseIdSchema = Joi.object({
   courseId: Joi.number().integer().required(),
 });
+// get all all assignments (for teacher) for specific course
+router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
+  const user = req.user!;
+  // this value has been parsed by the validate function
+  const courseId = req.query.courseId as any;
+  try {
+    const course = await Course.findOneOrFail(courseId);
+    if (await course.isEnrolled(user, UserRole.TEACHER)) {
+      const allAssignments = await course.getAssignments();
+      const sortedAllAssignments = _.sortBy(allAssignments, "id");
+      res.send(sortedAllAssignments);
+    } else {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You are not a teacher of this course");
+    }
+  } catch (error) {
+    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+  }
+});
+
+// get all enrollable assignments for a certain course
 router.get(
   "/enrollable",
   validateQuery(queryCourseIdSchema),
@@ -50,7 +76,7 @@ router.get(
   }
 );
 
-// get all enrolled assignments for
+// get all enrolled assignments for students
 router.get(
   "/enrolled",
   validateQuery(queryCourseIdSchema),
@@ -154,6 +180,60 @@ router.post(
         res
           .status(HttpStatusCode.FORBIDDEN)
           .send("User is not a teacher for the course");
+      }
+    } catch (error) {
+      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    }
+  }
+);
+
+// Joi inputvalidation for query
+const assignmentIdSchema = Joi.object({
+  id: Joi.number().integer().required(),
+});
+router.post(
+  "/:id/enroll",
+  validateParams(assignmentIdSchema),
+  async (req, res) => {
+    const user = req.user!;
+    try {
+      const assignment = await Assignment.findOneOrFail(req.params.id);
+      if (await assignment.isEnrollable(user)) {
+        const group = new Group(user.netid, [user], [assignment]);
+        // save the group in an transaction to make sure no 2 groups are saved at the same time
+        await getManager().transaction(
+          "SERIALIZABLE",
+          async (transactionalEntityManager) => {
+            // find all groups to check for group existence
+            const allGroups = await transactionalEntityManager.find(Group, {
+              relations: ["users", "assignments"],
+            });
+            const alreadyExists = _.some(allGroups, (group) => {
+              return (
+                _.some(group.users, (groupUser) => {
+                  return groupUser.netid === user.netid;
+                }) &&
+                _.some(group.assignments, (groupAssignment) => {
+                  return groupAssignment.id === assignment.id;
+                })
+              );
+            });
+            if (alreadyExists) {
+              // throw error if a group already exists
+              // Can happen if 2 concurrent calls are made
+              throw "Group already exists";
+            } else {
+              await transactionalEntityManager.save(group);
+            }
+          }
+        );
+        // reload the group
+        await group.reload();
+        res.send(group);
+      } else {
+        res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .send("Assignment is not enrollable");
       }
     } catch (error) {
       res.status(HttpStatusCode.BAD_REQUEST).send(error);

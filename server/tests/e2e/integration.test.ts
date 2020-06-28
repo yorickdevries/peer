@@ -140,7 +140,7 @@ describe("Integration", () => {
     // fetch all the enrolled courses from the server
     // create a course
     res = await request(server)
-      .get("/api/enrollments")
+      .get("/api/enrollments/enrolled")
       .set("cookie", teacherCookie);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -195,7 +195,7 @@ describe("Integration", () => {
 
     // enroll for course as student
     res = await request(server)
-      .post("/api/enrollments")
+      .post("/api/enrollments/enrolled")
       .set("cookie", studentCookie1)
       .send({ courseId: course.id });
     // assertions
