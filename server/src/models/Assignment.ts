@@ -109,14 +109,14 @@ export default class Assignment extends BaseModel {
   file: File | null;
 
   // submission questionaire
-  @OneToOne((_type) => Questionnaire)
+  @OneToOne((_type) => Questionnaire, { eager: true })
   @JoinColumn()
-  submissionQuestionnaire?: Questionnaire | null;
+  submissionQuestionnaire: Questionnaire | null;
 
   // review questionaire (for review evaluation)
-  @OneToOne((_type) => Questionnaire)
+  @OneToOne((_type) => Questionnaire, { eager: true })
   @JoinColumn()
-  reviewQuestionnaire?: Questionnaire | null;
+  reviewQuestionnaire: Questionnaire | null;
 
   // external_link varchar(1000),
   @Column("varchar", { nullable: true })

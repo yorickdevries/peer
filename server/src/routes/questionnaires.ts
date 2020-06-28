@@ -39,10 +39,7 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
             // get the assignment with questionnaire
             const assignment = await transactionalEntityManager.findOneOrFail(
               Assignment,
-              req.body.assignmentId,
-              {
-                relations: ["submissionQuestionnaire"],
-              }
+              req.body.assignmentId
             );
             // make sure the questionnaire not alraeady exists
             if (assignment.submissionQuestionnaire) {
@@ -74,10 +71,7 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
             // get the assignment with questionnaire
             const assignment = await transactionalEntityManager.findOneOrFail(
               Assignment,
-              req.body.assignmentId,
-              {
-                relations: ["reviewQuestionnaire"],
-              }
+              req.body.assignmentId
             );
             // make sure the questionnaire not alraeady exists
             if (assignment.reviewQuestionnaire) {
