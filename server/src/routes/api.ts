@@ -10,6 +10,8 @@ import enrollments from "./enrollments";
 import assignments from "./assignments";
 import groups from "./groups";
 import submissions from "./submissions";
+import submissionquestionnaires from "./submissionquestionnaires";
+import reviewquestionnaires from "./reviewquestionnaires";
 
 // old routes, can be deleted when not needed anymore
 import oldRoutes from "../old_api/routes/api";
@@ -44,6 +46,8 @@ router.use("/enrollments", enrollments);
 router.use("/assignments", assignments);
 router.use("/groups", groups);
 router.use("/submissions", submissions);
+router.use("/submissionquestionnaires", submissionquestionnaires);
+router.use("/reviewquestionnaires", reviewquestionnaires);
 
 // old routes, can be deleted when not needed anymore
 router.use("/oldroutes", oldRoutes);

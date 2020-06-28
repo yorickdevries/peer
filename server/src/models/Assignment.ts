@@ -27,6 +27,8 @@ import File from "./File";
 import moment from "moment";
 import UserRole from "../enum/UserRole";
 import Submission from "./Submission";
+import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
+import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import assignmentState from "../enum/assignmentState";
 
 @Entity()
@@ -107,6 +109,16 @@ export default class Assignment extends BaseModel {
   @JoinColumn()
   file: File | null;
 
+  // submission questionaire
+  @OneToOne((_type) => SubmissionQuestionnaire, { eager: true })
+  @JoinColumn()
+  submissionQuestionnaire: SubmissionQuestionnaire | null;
+
+  // review questionaire (for review evaluation)
+  @OneToOne((_type) => ReviewQuestionnaire, { eager: true })
+  @JoinColumn()
+  reviewQuestionnaire: ReviewQuestionnaire | null;
+
   // external_link varchar(1000),
   @Column("varchar", { nullable: true })
   @IsOptional()
@@ -141,7 +153,9 @@ export default class Assignment extends BaseModel {
     reviewEvaluationDueDate: Date | null,
     description: string | null,
     file: File | null,
-    externalLink: string | null
+    externalLink: string | null,
+    submissionQuestionnaire: SubmissionQuestionnaire | null,
+    reviewQuestionnaire: ReviewQuestionnaire | null
   ) {
     super();
     this.name = name;
@@ -157,6 +171,8 @@ export default class Assignment extends BaseModel {
     this.description = description;
     this.file = file;
     this.externalLink = externalLink;
+    this.submissionQuestionnaire = submissionQuestionnaire;
+    this.reviewQuestionnaire = reviewQuestionnaire;
   }
 
   // custom validation which is run before saving
@@ -167,6 +183,9 @@ export default class Assignment extends BaseModel {
     }
     if (!this.reviewEvaluation && this.reviewEvaluationDueDate) {
       throw "reviewEvaluationDueDate is defined while reviewEvaluation is turned off";
+    }
+    if (!this.reviewEvaluation && this.reviewQuestionnaire) {
+      throw "reviewQuestionnaire is defined while reviewEvaluation is turned off";
     }
     // check chronological order of the dates
     if (
@@ -211,6 +230,22 @@ export default class Assignment extends BaseModel {
         relations: ["groups"],
       })
     ).groups!;
+  }
+
+  async getSubmissionQuestionnaire(): Promise<SubmissionQuestionnaire | null> {
+    return (
+      await Assignment.findOneOrFail(this.id, {
+        relations: ["submissionQuestionnaire"],
+      })
+    ).submissionQuestionnaire!;
+  }
+
+  async getReviewQuestionnaire(): Promise<ReviewQuestionnaire | null> {
+    return (
+      await Assignment.findOneOrFail(this.id, {
+        relations: ["reviewQuestionnaire"],
+      })
+    ).reviewQuestionnaire!;
   }
 
   async getSubmissions(group?: Group): Promise<Submission[]> {
@@ -258,7 +293,7 @@ export default class Assignment extends BaseModel {
         if (await course.isEnrolled(user, UserRole.STUDENT)) {
           //enrolledInCourse
           // not already enrolled in assignment
-          if (!(await this.isEnrolled(user))) {
+          if (!(await this.isEnrolledInGroup(user))) {
             return true;
           }
         }
@@ -268,7 +303,12 @@ export default class Assignment extends BaseModel {
   }
 
   // check whether the user is enrolled in this assignment
-  async isEnrolled(user: User): Promise<boolean> {
+  async isEnrolledInGroup(user: User): Promise<boolean> {
     return (await this.getGroup(user)) ? true : false;
+  }
+
+  async isTeacherOfCourse(user: User): Promise<boolean> {
+    const course = await this.getCourse();
+    return await course.isEnrolled(user, UserRole.TEACHER);
   }
 }
