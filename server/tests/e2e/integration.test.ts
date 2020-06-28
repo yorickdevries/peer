@@ -39,6 +39,7 @@ describe("Integration", () => {
     const teacherCookie = await mockLoginCookie(server, "teacher");
     const teacherCookie2 = await mockLoginCookie(server, "anotherteacher");
     const studentCookie1 = await mockLoginCookie(server, "student1", "student");
+    const studentCookie2 = await mockLoginCookie(server, "student2", "student");
 
     // check whether the teacher is logged in
     res = await request(server)
@@ -198,8 +199,22 @@ describe("Integration", () => {
       .post(`/api/courses/${course.id}/enroll`)
       .set("cookie", studentCookie1);
     // assertions
-    const enrollment = JSON.parse(res.text);
-    expect(enrollment).toMatchObject({ courseId: course.id, role: "student" });
+    const enrollment1 = JSON.parse(res.text);
+    expect(enrollment1).toMatchObject({
+      courseId: course.id,
+      role: "student",
+    });
+
+    // enroll for course as student
+    res = await request(server)
+      .post(`/api/courses/${course.id}/enroll`)
+      .set("cookie", studentCookie2);
+    // assertions
+    const enrollment2 = JSON.parse(res.text);
+    expect(enrollment2).toMatchObject({
+      courseId: course.id,
+      role: "student",
+    });
 
     // enroll for course as student for the second time
     res = await request(server)
@@ -259,9 +274,20 @@ describe("Integration", () => {
       .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    const group = JSON.parse(res.text);
-    expect(group).toMatchObject({
+    const group1 = JSON.parse(res.text);
+    expect(group1).toMatchObject({
       name: "student1",
+    });
+
+    // enroll in assignment
+    res = await request(server)
+      .post(`/api/assignments/${assignment.id}/enroll`)
+      .set("cookie", studentCookie2);
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const group2 = JSON.parse(res.text);
+    expect(group2).toMatchObject({
+      name: "student2",
     });
 
     // get enrolled assignments
@@ -294,7 +320,7 @@ describe("Integration", () => {
       .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject(group);
+    expect(JSON.parse(res.text)).toMatchObject(group1);
 
     // get all groups by the teacher
     res = await request(server)
@@ -302,7 +328,7 @@ describe("Integration", () => {
       .set("cookie", teacherCookie);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject([group]);
+    expect(JSON.parse(res.text)).toMatchObject([group1, group2]);
 
     // get all groups by the student
     res = await request(server)
@@ -313,29 +339,52 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
 
     // make a submission
-    const exampleSubmissionFile = path.resolve(
+    const exampleSubmissionFile1 = path.resolve(
       __dirname,
       "../../example_data/submissions/submission1.pdf"
     );
     res = await request(server)
       .post("/api/submissions")
       .set("cookie", studentCookie1)
-      .attach("file", fs.readFileSync(exampleSubmissionFile), "submission1.pdf")
-      .field("groupId", group.id)
+      .attach(
+        "file",
+        fs.readFileSync(exampleSubmissionFile1),
+        "submission1.pdf"
+      )
+      .field("groupId", group1.id)
       .field("assignmentId", assignment.id);
 
     expect(res.status).toBe(HttpStatusCode.OK);
-    const submission = JSON.parse(res.text);
+    const submission1 = JSON.parse(res.text);
+
+    // make a submission
+    const exampleSubmissionFile2 = path.resolve(
+      __dirname,
+      "../../example_data/submissions/submission2.pdf"
+    );
+    res = await request(server)
+      .post("/api/submissions")
+      .set("cookie", studentCookie2)
+      .attach(
+        "file",
+        fs.readFileSync(exampleSubmissionFile2),
+        "submission2.pdf"
+      )
+      .field("groupId", group2.id)
+      .field("assignmentId", assignment.id);
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const submission2 = JSON.parse(res.text);
 
     // get all submissions for this assignment by this group
     res = await request(server)
       .get(
-        `/api/submissions/enrolled?assignmentId=${assignment.id}&groupId=${group.id}`
+        `/api/submissions/enrolled?assignmentId=${assignment.id}&groupId=${group1.id}`
       )
       .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject([submission]);
+    expect(JSON.parse(res.text)).toMatchObject([submission1]);
 
     // get all submissions for this assignment as teacher
     res = await request(server)
@@ -343,6 +392,6 @@ describe("Integration", () => {
       .set("cookie", teacherCookie);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject([submission]);
+    expect(JSON.parse(res.text)).toMatchObject([submission1, submission2]);
   });
 });
