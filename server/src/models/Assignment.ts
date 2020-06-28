@@ -240,7 +240,7 @@ export default class Assignment extends BaseModel {
   async getGroup(user: User): Promise<Group | undefined> {
     const groups = await this.getGroups();
     for (const group of groups) {
-      if (group.hasUser(user)) {
+      if (await group.hasUser(user)) {
         return group;
       }
     }
