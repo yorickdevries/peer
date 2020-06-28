@@ -9,6 +9,7 @@ import courses from "./courses";
 import enrollments from "./enrollments";
 import assignments from "./assignments";
 import groups from "./groups";
+import submissions from "./submissions";
 
 // old routes, can be deleted when not needed anymore
 import oldRoutes from "../old_api/routes/api";
@@ -42,6 +43,7 @@ router.use("/courses", courses);
 router.use("/enrollments", enrollments);
 router.use("/assignments", assignments);
 router.use("/groups", groups);
+router.use("/submissions", submissions);
 
 // old routes, can be deleted when not needed anymore
 router.use("/oldroutes", oldRoutes);
