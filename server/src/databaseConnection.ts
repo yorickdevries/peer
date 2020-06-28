@@ -1,4 +1,4 @@
-import "reflect-metadata";
+import "reflect-metadata"; // needed for typeORM to work
 import { createConnection, Connection, ConnectionOptions } from "typeorm";
 import config from "config";
 // Database models
@@ -12,6 +12,8 @@ import Course from "./models/Course";
 import Enrollment from "./models/Enrollment";
 import Assignment from "./models/Assignment";
 import File from "./models/File";
+import Group from "./models/Group";
+// Database models
 
 const databaseConfig: {
   type: string;
@@ -36,8 +38,9 @@ const createDatabaseConnection = async function (): Promise<Connection> {
       Enrollment,
       Assignment,
       File,
+      Group,
     ],
-    synchronize: true, // must be set to false once deployed to production (we should siwtch to migrations instead)
+    synchronize: true, // must be set to false once deployed to production (we should switch to migrations instead)
     logging: false,
   };
   // will be assigned in the switch statement

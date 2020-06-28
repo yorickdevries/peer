@@ -3,7 +3,10 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import _ from "lodash";
 
-const validate = (schema: Joi.ObjectSchema, field: "body" | "query") => {
+const validate = (
+  schema: Joi.ObjectSchema,
+  field: "body" | "query" | "params"
+) => {
   return function (req: Request, res: Response, next: NextFunction): void {
     const nullConverted = convertNullStrings(req[field]);
     const { error, value } = schema.validate(nullConverted);
@@ -40,4 +43,8 @@ const validateQuery = (schema: Joi.ObjectSchema): RequestHandler => {
   return validate(schema, "query");
 };
 
-export { validateBody, validateQuery };
+const validateParams = (schema: Joi.ObjectSchema): RequestHandler => {
+  return validate(schema, "params");
+};
+
+export { validateBody, validateQuery, validateParams };

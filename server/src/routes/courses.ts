@@ -8,14 +8,16 @@ import Faculty from "../models/Faculty";
 import AcademicYear from "../models/AcademicYear";
 import Enrollment from "../models/Enrollment";
 import UserRole from "../enum/UserRole";
-import { validateBody } from "../middleware/validation";
+import { validateBody, validateParams } from "../middleware/validation";
+import _ from "lodash";
 
 const router = express.Router();
 
 // get all enrollable courses where the student isnt in enrolled yet
 router.get("/enrollable", async (req, res) => {
-  const enrollableCourses = await Course.getEnrollableCourses(req.user!);
-  res.send(enrollableCourses);
+  const courses = await Course.getEnrollable(req.user!);
+  const sortedCourses = _.sortBy(courses, "id");
+  res.send(sortedCourses);
 });
 
 // Joi inputvalidation
@@ -34,6 +36,7 @@ router.post(
   checkEmployee,
   validateBody(courseSchema),
   async (req, res) => {
+    const user = req.user!;
     try {
       // find the faculty and academic year in the database
       const faculty = await Faculty.findOneOrFail(req.body.faculty);
@@ -50,13 +53,16 @@ router.post(
         req.body.description
       );
       // start transaction to both save the course and teacher enrollment
-      await getManager().transaction(async (transactionalEntityManager) => {
-        // save the course so it gets an id
-        await transactionalEntityManager.save(course);
-        // here the current user needs to be enrolled as teacher fot he just created course
-        const enrollment = new Enrollment(req.user!, course, UserRole.TEACHER);
-        await transactionalEntityManager.save(enrollment);
-      });
+      await getManager().transaction(
+        "SERIALIZABLE",
+        async (transactionalEntityManager) => {
+          // save the course so it gets an id
+          await transactionalEntityManager.save(course);
+          // here the current user needs to be enrolled as teacher fot he just created course
+          const enrollment = new Enrollment(user, course, UserRole.TEACHER);
+          await transactionalEntityManager.save(enrollment);
+        }
+      );
       // reload course to get all data
       await course.reload();
       // if all goes well, the course can be returned
@@ -66,5 +72,29 @@ router.post(
     }
   }
 );
+
+// Joi inputvalidation
+const courseIdSchema = Joi.object({
+  id: Joi.number().integer().required(),
+});
+// post an enrollment (enroll in a course)
+router.post("/:id/enroll", validateParams(courseIdSchema), async (req, res) => {
+  const user = req.user!;
+  const courseId = req.params.id;
+  try {
+    const course = await Course.findOneOrFail(courseId);
+    if (course.isEnrollable(user)) {
+      const enrollment = new Enrollment(user, course, UserRole.STUDENT);
+      await enrollment.save();
+      res.send(enrollment);
+    } else {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(`course with id ${courseId} is not enrollable`);
+    }
+  } catch (error) {
+    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+  }
+});
 
 export default router;

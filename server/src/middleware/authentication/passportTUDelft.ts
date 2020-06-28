@@ -2,9 +2,9 @@ import os from "os";
 import fs from "fs";
 import path from "path";
 import fileCache from "file-system-cache";
-// Needs to be updated and tested with newest version of the package
+// TODO: Needs to be updated and tested with newest version of the package
 import { fetch, toPassportConfig } from "passport-saml-metadata";
-// Needs to be updated and tested with newest version of the package
+// TODO: to be updated and tested with newest version of the package
 import passport_saml from "passport-saml";
 import config from "config";
 import { PassportStatic } from "passport";
@@ -52,7 +52,7 @@ const passportConfiguration = function (passport: PassportStatic): void {
       ppConfig,
       async (profile: any, done: any) => {
         // save the user to the database
-        const user = await saveUserFromSSO(
+        const userNetid = await saveUserFromSSO(
           profile["uid"],
           profile["tudStudentNumber"],
           profile["givenName"],
@@ -64,7 +64,8 @@ const passportConfiguration = function (passport: PassportStatic): void {
           profile["nlEduPersonStudyBranch"],
           profile["nlEduPersonOrgUnit"]
         );
-        if (user) {
+        if (userNetid) {
+          const user = { netid: userNetid };
           return done(undefined, user);
         } else {
           // no user will be logged in (needs to be tested in production)

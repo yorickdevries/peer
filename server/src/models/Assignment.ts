@@ -4,6 +4,7 @@ import {
   Column,
   OneToOne,
   ManyToOne,
+  ManyToMany,
   JoinColumn,
 } from "typeorm";
 import {
@@ -18,8 +19,13 @@ import {
   IsUrl,
 } from "class-validator";
 import BaseModel from "./BaseModel";
+import Group from "./Group";
 import Course from "./Course";
+import User from "./User";
 import File from "./File";
+import moment from "moment";
+import _ from "lodash";
+import UserRole from "../enum/UserRole";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -34,10 +40,6 @@ export default class Assignment extends BaseModel {
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  // course_id int NOT NULL, FK
-  @ManyToOne((_type) => Course, { nullable: false })
-  course?: Course;
 
   // reviews_per_user int NOT NULL,
   @Column()
@@ -89,19 +91,19 @@ export default class Assignment extends BaseModel {
   })
   @IsOptional()
   @IsDate()
-  reviewEvaluationDueDate?: Date | null;
+  reviewEvaluationDueDate: Date | null;
 
   // description varchar(5000),
   @Column("text", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  description?: string | null;
+  description: string | null;
 
   // filename varchar(500),
   @OneToOne((_type) => File, { eager: true })
   @JoinColumn()
-  file?: File | null;
+  file: File | null;
 
   // external_link varchar(1000),
   @Column("varchar", { nullable: true })
@@ -109,7 +111,17 @@ export default class Assignment extends BaseModel {
   @IsUrl()
   @IsString()
   @IsNotEmpty()
-  externalLink?: string | null;
+  externalLink: string | null;
+
+  // course_id int NOT NULL, FK
+  @ManyToOne((_type) => Course, (course) => course.assignments, {
+    nullable: false,
+  })
+  course?: Course;
+
+  // Assignment groups
+  @ManyToMany((_type) => Group, (group) => group.assignments)
+  groups?: Group[];
 
   constructor(
     name: string,
@@ -121,10 +133,10 @@ export default class Assignment extends BaseModel {
     dueDate: Date,
     reviewPublishDate: Date,
     reviewDueDate: Date,
-    reviewEvaluationDueDate?: Date | null,
-    description?: string | null,
-    file?: File | null,
-    externalLink?: string | null
+    reviewEvaluationDueDate: Date | null,
+    description: string | null,
+    file: File | null,
+    externalLink: string | null
   ) {
     super();
     this.name = name;
@@ -153,15 +165,74 @@ export default class Assignment extends BaseModel {
     }
     // check chronological order of the dates
     if (
-      this.publishDate > this.dueDate ||
-      this.dueDate > this.reviewPublishDate ||
-      this.reviewPublishDate > this.reviewDueDate ||
+      moment(this.publishDate).isAfter(this.dueDate) ||
+      moment(this.dueDate).isAfter(this.reviewPublishDate) ||
+      moment(this.reviewPublishDate).isAfter(this.reviewDueDate) ||
       (this.reviewEvaluationDueDate &&
-        this.reviewDueDate > this.reviewEvaluationDueDate)
+        moment(this.reviewDueDate).isAfter(this.reviewEvaluationDueDate))
     ) {
       throw "The dates must chronologically correct";
     }
     // if all succeeds the super validateOrReject can be called
     return super.validateOrReject();
+  }
+
+  async getCourse(): Promise<Course> {
+    return (
+      await Assignment.findOneOrFail(this.id, {
+        relations: ["course"],
+      })
+    ).course!;
+  }
+
+  async getGroups(): Promise<Group[]> {
+    return (
+      await Assignment.findOneOrFail(this.id, {
+        relations: ["groups"],
+      })
+    ).groups!;
+  }
+
+  async getGroup(user: User): Promise<Group | undefined> {
+    const groups = await this.getGroups();
+    for (const group of groups) {
+      const groupUsers = await group.getUsers();
+      if (
+        _.some(groupUsers, (groupUser) => {
+          return groupUser.netid === user.netid;
+        })
+      ) {
+        return group;
+      }
+    }
+    return undefined;
+  }
+
+  // check whether the user is enrolled in this assignment
+  async isEnrollable(user: User): Promise<boolean> {
+    // Check whether the user is in the course and not already enrolled
+    // plus check whether the assignment is public/enrollable
+    if (this.enrollable) {
+      // published
+      if (
+        moment().isAfter(this.publishDate) &&
+        moment().isBefore(this.dueDate)
+      ) {
+        const course = await this.getCourse();
+        if (await course.isEnrolled(user, UserRole.STUDENT)) {
+          //enrolledInCourse
+          // not already enrolled in assignment
+          if (!(await this.isEnrolled(user))) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  // check whether the user is enrolled in this assignment
+  async isEnrolled(user: User): Promise<boolean> {
+    return (await this.getGroup(user)) ? true : false;
   }
 }

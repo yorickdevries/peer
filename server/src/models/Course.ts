@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+} from "typeorm";
 import {
   IsDefined,
   IsOptional,
@@ -11,7 +17,8 @@ import User from "./User";
 import Faculty from "./Faculty";
 import AcademicYear from "./AcademicYear";
 import Enrollment from "../models/Enrollment";
-import _ from "lodash";
+import Assignment from "../models/Assignment";
+import UserRole from "../enum/UserRole";
 
 @Entity()
 export default class Course extends BaseModel {
@@ -40,7 +47,7 @@ export default class Course extends BaseModel {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  description?: string | null;
+  description: string | null;
 
   @ManyToOne((_type) => Faculty, {
     eager: true,
@@ -54,13 +61,16 @@ export default class Course extends BaseModel {
   })
   academicYear: AcademicYear;
 
+  @OneToMany((_type) => Assignment, (assignment) => assignment.course)
+  assignments?: Assignment[];
+
   constructor(
     name: string,
     courseCode: string,
     enrollable: boolean,
     faculty: Faculty,
     academicYear: AcademicYear,
-    description?: string | null
+    description: string | null
   ) {
     super();
     this.name = name;
@@ -71,26 +81,80 @@ export default class Course extends BaseModel {
     this.description = description;
   }
 
-  // get all enrollable courses for a certain user
-  static async getEnrollableCourses(user: User): Promise<Course[]> {
-    // current enrollments for the user
-    const enrollments = await Enrollment.find({
-      where: { userNetid: user.netid },
-    });
-    // map the courses to a list of course ids
-    const enrollmentCourseIds = _.map(enrollments, "courseId");
+  async getAssignments(): Promise<Assignment[]> {
+    return (
+      await Course.findOneOrFail(this.id, {
+        relations: ["assignments"],
+      })
+    ).assignments!;
+  }
 
+  async getEnrollableAssignments(user: User): Promise<Assignment[]> {
+    const allAssignments = await this.getAssignments();
+    const enrollableAssignments = [];
+    for (const assignment of allAssignments) {
+      if (await assignment.isEnrollable(user)) {
+        enrollableAssignments.push(assignment);
+      }
+    }
+    return enrollableAssignments;
+  }
+
+  async getEnrolledAssignments(user: User): Promise<Assignment[]> {
+    const allAssignments = await this.getAssignments();
+    const enrolledAssignments = [];
+    for (const assignment of allAssignments) {
+      if (await assignment.isEnrolled(user)) {
+        enrolledAssignments.push(assignment);
+      }
+    }
+    return enrolledAssignments;
+  }
+
+  async isEnrollable(user: User): Promise<boolean> {
+    return (
+      this.academicYear?.active &&
+      this.enrollable &&
+      !(await this.isEnrolled(user))
+    );
+  }
+
+  async isEnrolled(user: User, role?: UserRole): Promise<boolean> {
+    // if this.id isnt instantiated no user can be enrolled
+    if (!this.id) {
+      return false;
+    }
+    const where: {
+      userNetid: string;
+      courseId: number;
+      role?: UserRole;
+    } = { userNetid: user.netid, courseId: this.id };
+    // add role to query if specified
+    if (role) {
+      where.role = role;
+    }
+    const enrollment = await Enrollment.findOne({
+      where: where,
+    });
+    return enrollment ? true : false;
+  }
+
+  // get all enrollable courses for a certain user
+  static async getEnrollable(user: User): Promise<Course[]> {
     // all enrollable courses
-    const enrollableCourses = await this.find({
+    const allEnrollableCourses = await this.find({
       where: {
         enrollable: true,
       },
-      order: { id: "ASC" },
     });
-    // remove courses based on inactive academic years and already enrolled courses
-    _.remove(enrollableCourses, (o) => {
-      return !o.academicYear?.active || _.includes(enrollmentCourseIds, o.id);
-    });
+    // pick the courses which are active and not enrolled
+    const enrollableCourses = [];
+    for (const course of allEnrollableCourses) {
+      // add courses based on active academic years and not already enrolled courses
+      if (await course.isEnrollable(user)) {
+        enrollableCourses.push(course);
+      }
+    }
     return enrollableCourses;
   }
 }

@@ -19,6 +19,7 @@ const loggerFormat =
 const eventLogger = logger(loggerFormat);
 
 // logger for only internal server errors
+// Might want to change it to < 400 when the frontend is adapted properly
 const errorLogger = logger(loggerFormat, {
   skip: function (_req, res) {
     return res.statusCode < 500;

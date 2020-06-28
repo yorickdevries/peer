@@ -80,7 +80,6 @@ const authenticationRoutes = function (router: Router): void {
   // Route to logout.
   router.get("/logout", (req, res) => {
     req.logout();
-    // TODO: invalidate session on IP
     res.redirect("/");
   });
 };
