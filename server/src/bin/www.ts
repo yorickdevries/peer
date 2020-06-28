@@ -31,6 +31,7 @@ createDatabaseConnection()
     );
     // initialize data in case of running in development
     if (["development", undefined].includes(process.env.NODE_ENV)) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       initializeData().then(() => {
         console.log("Initialized data");
       });
