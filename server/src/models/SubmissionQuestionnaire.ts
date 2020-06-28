@@ -13,4 +13,12 @@ export default class SubmissionQuestionnaire extends Questionnaire {
   constructor() {
     super();
   }
+
+  async getAssignment(): Promise<Assignment> {
+    return (
+      await SubmissionQuestionnaire.findOneOrFail(this.id, {
+        relations: ["assignment"],
+      })
+    ).assignment!;
+  }
 }
