@@ -16,6 +16,7 @@ import {
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import Questionnaire from "./Questionnaire";
+import QuestionType from "../enum/QuestionType";
 
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "type" } })
@@ -24,6 +25,10 @@ export default abstract class Question extends BaseModel {
   @IsOptional()
   // id SERIAL,
   id?: number;
+
+  @Column()
+  // will be filled in by typeorm with the questiontype
+  type?: QuestionType;
 
   // question varchar(5000) NOT NULL,
   @Column("text")

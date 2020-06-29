@@ -1,8 +1,9 @@
 import Questionnaire from "./Questionnaire";
 import Question from "./Question";
 import { ChildEntity } from "typeorm";
+import QuestionType from "../enum/QuestionType";
 
-@ChildEntity()
+@ChildEntity(QuestionType.OPEN)
 export default class OpenQuestion extends Question {
   constructor(
     text: string,
