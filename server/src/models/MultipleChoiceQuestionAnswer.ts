@@ -5,7 +5,7 @@ import MultipleChoiceQuestion from "./MultipleChoiceQuestion";
 import Review from "./Review";
 import MultipleChoiceQuestionOption from "./MultipleChoiceQuestionOption";
 
-@ChildEntity(QuestionAnswerType.MULTIPLECHOICE)
+@ChildEntity(QuestionAnswerType.MULTIPLE_CHOICE)
 export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
   // answer int NOT NULL,
   @ManyToOne((_type) => MultipleChoiceQuestionOption, {

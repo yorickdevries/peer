@@ -5,7 +5,7 @@ import User from "./User";
 import Questionnaire from "./Questionnaire";
 import Review from "./Review";
 
-@ChildEntity(ReviewType.REVIEWOFSUBMISSION)
+@ChildEntity(ReviewType.REVIEW_OF_SUBMISSION)
 export default class ReviewOfSubmission extends Review {
   @ManyToOne((_type) => Submission, {
     nullable: false,

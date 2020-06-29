@@ -4,7 +4,7 @@ import { ChildEntity, OneToMany } from "typeorm";
 import QuestionType from "../enum/QuestionType";
 import MultipleChoiceQuestionOption from "./MultipleChoiceQuestionOption";
 
-@ChildEntity(QuestionType.MULTIPLECHOICE)
+@ChildEntity(QuestionType.MULTIPLE_CHOICE)
 export default class MultipleChoiceQuestion extends Question {
   @OneToMany(
     (_type) => MultipleChoiceQuestionOption,
