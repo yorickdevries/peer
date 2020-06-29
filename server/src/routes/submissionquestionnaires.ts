@@ -21,8 +21,7 @@ router.get("/:id", validateParams(questionnaireSchema), async (req, res) => {
   try {
     // also load the questions
     const submissionQuestionaire = await SubmissionQuestionnaire.findOneOrFail(
-      req.params.id,
-      { relations: ["questions"] }
+      req.params.id
     );
     const assignment = await submissionQuestionaire.getAssignment();
     if (await assignment.isTeacherOfCourse(user)) {
