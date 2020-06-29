@@ -3,6 +3,7 @@ import QuestionAnswerType from "../enum/QuestionAnswerType";
 import QuestionAnswer from "./QuestionAnswer";
 import Review from "./Review";
 import { IsDefined, IsString, IsNotEmpty } from "class-validator";
+import OpenQuestion from "./OpenQuestion";
 
 @ChildEntity(QuestionAnswerType.OPEN)
 export default class OpenQuestionAnswer extends QuestionAnswer {
