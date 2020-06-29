@@ -3,12 +3,14 @@ import {
   Entity,
   TableInheritance,
   OneToMany,
+  Column,
 } from "typeorm";
 import { IsOptional } from "class-validator";
 import BaseModel from "./BaseModel";
 import Assignment from "./Assignment";
 import Question from "./Question";
 import User from "./User";
+import QuestionnaireType from "../enum/QuestionnaireType";
 
 // formely called rubric
 @Entity()
@@ -18,6 +20,10 @@ export default abstract class Questionnaire extends BaseModel {
   @IsOptional()
   // id SERIAL,
   id?: number;
+
+  @Column()
+  // will be filled in by typeorm with the QuestionnaireType
+  type?: QuestionnaireType;
 
   @OneToMany((_type) => Question, (question) => question.questionnaire)
   // all questions (might want to split this later)
