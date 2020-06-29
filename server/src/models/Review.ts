@@ -16,25 +16,24 @@ import Questionnaire from "./Questionnaire";
 @TableInheritance({ column: { type: "varchar", name: "type" } })
 export default abstract class Review extends BaseModel {
   @PrimaryGeneratedColumn()
-  @IsOptional()
   // id SERIAL,
-  id?: number;
+  id!: number;
 
   @Column()
   // will be filled in by typeorm with the QuestionnaireType
-  type?: ReviewType;
+  type!: ReviewType;
 
   // Rubric_id int NOT NULL,
   @ManyToOne((_type) => Questionnaire, {
     nullable: false,
   })
-  questionnaire: Questionnaire;
+  questionnaire?: Questionnaire;
 
   // User_netid varchar(500) NOT NULL,
   @ManyToOne((_type) => User, {
     nullable: false,
   })
-  user: User;
+  user?: User;
 
   // flagged BOOLEAN NOT NULL DEFAULT FALSE,
   @Column()
@@ -92,7 +91,7 @@ export default abstract class Review extends BaseModel {
 
   // ta_netid varchar(500),
   @ManyToOne((_type) => User)
-  approvingTA: User | null;
+  approvingTA?: User | null;
 
   constructor(
     questionnaire: Questionnaire,

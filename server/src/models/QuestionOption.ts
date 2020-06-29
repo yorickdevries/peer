@@ -4,7 +4,7 @@ import {
   Entity,
   TableInheritance,
 } from "typeorm";
-import { IsOptional, IsDefined, IsString, IsNotEmpty } from "class-validator";
+import { IsDefined, IsString, IsNotEmpty } from "class-validator";
 import BaseModel from "./BaseModel";
 import QuestionOptionType from "../enum/QuestionType";
 import Question from "./Question";
@@ -13,13 +13,12 @@ import Question from "./Question";
 @TableInheritance({ column: { type: "varchar", name: "type" } })
 export default abstract class QuestionOption extends BaseModel {
   @PrimaryGeneratedColumn()
-  @IsOptional()
   // id SERIAL,
-  id?: number;
+  id!: number;
 
   @Column()
   // will be filled in by typeorm with the questionoptiontype
-  type?: QuestionOptionType;
+  type!: QuestionOptionType;
 
   // question varchar(5000) NOT NULL,
   @Column("text")

@@ -6,7 +6,6 @@ import {
   TableInheritance,
 } from "typeorm";
 import {
-  IsOptional,
   IsDefined,
   IsString,
   IsNotEmpty,
@@ -23,13 +22,12 @@ import User from "./User";
 @TableInheritance({ column: { type: "varchar", name: "type" } })
 export default abstract class Question extends BaseModel {
   @PrimaryGeneratedColumn()
-  @IsOptional()
   // id SERIAL,
-  id?: number;
+  id!: number;
 
   @Column()
   // will be filled in by typeorm with the questiontype
-  type?: QuestionType;
+  type!: QuestionType;
 
   // question varchar(5000) NOT NULL,
   @Column("text")

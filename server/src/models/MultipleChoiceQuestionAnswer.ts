@@ -10,6 +10,7 @@ export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
   // answer int NOT NULL,
   @ManyToOne((_type) => MultipleChoiceQuestionOption, {
     nullable: false,
+    eager: true,
   })
   answer: MultipleChoiceQuestionOption;
 

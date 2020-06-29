@@ -1,5 +1,5 @@
 import { PrimaryColumn } from "typeorm";
-import { IsString, IsNotEmpty } from "class-validator";
+import { IsString, IsNotEmpty, IsDefined } from "class-validator";
 import BaseModel from "./BaseModel";
 
 // This class is extended by other named models like Affiliation, Study and OrganisationUnit
@@ -7,6 +7,7 @@ import BaseModel from "./BaseModel";
 // maybe later a better name can be found
 export default abstract class NamedModel extends BaseModel {
   @PrimaryColumn()
+  @IsDefined()
   @IsString()
   @IsNotEmpty()
   name: string;

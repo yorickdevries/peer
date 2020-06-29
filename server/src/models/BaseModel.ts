@@ -18,7 +18,7 @@ export default abstract class BaseModel extends BaseEntity {
   // these fields are created after saving, so @IsOptional() is added
   @IsOptional()
   @IsDate()
-  createdAt?: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn(
     // set datatype to timestamp if not running in test environment
@@ -28,7 +28,12 @@ export default abstract class BaseModel extends BaseEntity {
   // these fields are created after saving, so @IsOptional() is added
   @IsOptional()
   @IsDate()
-  updatedAt?: Date;
+  updatedAt!: Date;
+
+  // basic super constructor
+  constructor() {
+    super();
+  }
 
   // validateOrReject to be run before saving/updating by TypeORM
   @BeforeInsert()

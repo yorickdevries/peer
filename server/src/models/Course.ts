@@ -24,8 +24,7 @@ import AssignmentState from "../enum/AssignmentState";
 @Entity()
 export default class Course extends BaseModel {
   @PrimaryGeneratedColumn()
-  @IsOptional()
-  id?: number;
+  id!: number;
 
   @Column()
   @IsDefined()
@@ -54,12 +53,14 @@ export default class Course extends BaseModel {
     eager: true,
     nullable: false,
   })
+  @IsDefined()
   faculty: Faculty;
 
   @ManyToOne((_type) => AcademicYear, {
     eager: true,
     nullable: false,
   })
+  @IsDefined()
   academicYear: AcademicYear;
 
   @OneToMany((_type) => Assignment, (assignment) => assignment.course)

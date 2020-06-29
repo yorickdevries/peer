@@ -5,7 +5,7 @@ import {
   ManyToMany,
   JoinTable,
 } from "typeorm";
-import { IsDefined, IsOptional, IsString, IsNotEmpty } from "class-validator";
+import { IsDefined, IsString, IsNotEmpty } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import Assignment from "./Assignment";
@@ -15,8 +15,7 @@ import UserRole from "../enum/UserRole";
 @Entity()
 export default class Group extends BaseModel {
   @PrimaryGeneratedColumn()
-  @IsOptional()
-  id?: number;
+  id!: number;
 
   @Column()
   @IsDefined()

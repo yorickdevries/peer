@@ -1,13 +1,12 @@
 import { PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import { IsOptional, IsString, IsNotEmpty, IsDefined } from "class-validator";
+import { IsString, IsNotEmpty, IsDefined } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 
 export default abstract class Comment extends BaseModel {
   @PrimaryGeneratedColumn()
-  @IsOptional()
   // id SERIAL,
-  id?: number;
+  id!: number;
 
   // comment varchar(100000) NOT NULL,
   @Column("text")
@@ -20,7 +19,7 @@ export default abstract class Comment extends BaseModel {
   @ManyToOne((_type) => User, {
     nullable: false,
   })
-  user: User;
+  user?: User;
 
   constructor(text: string, user: User) {
     super();

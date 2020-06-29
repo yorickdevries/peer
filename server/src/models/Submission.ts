@@ -5,7 +5,7 @@ import {
   ManyToOne,
   OneToOne,
 } from "typeorm";
-import { IsOptional, IsDefined } from "class-validator";
+import { IsDefined } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import Assignment from "../models/Assignment";
@@ -15,9 +15,8 @@ import File from "./File";
 @Entity()
 export default class Submission extends BaseModel {
   @PrimaryGeneratedColumn()
-  @IsOptional()
   // id SERIAL,
-  id?: number;
+  id!: number;
 
   // User_netid varchar(500) NOT NULL,
   @ManyToOne((_type) => User, { nullable: false })

@@ -5,7 +5,6 @@ import {
   OneToMany,
   Column,
 } from "typeorm";
-import { IsOptional } from "class-validator";
 import BaseModel from "./BaseModel";
 import Assignment from "./Assignment";
 import Question from "./Question";
@@ -17,13 +16,12 @@ import QuestionnaireType from "../enum/QuestionnaireType";
 @TableInheritance({ column: { type: "varchar", name: "type" } })
 export default abstract class Questionnaire extends BaseModel {
   @PrimaryGeneratedColumn()
-  @IsOptional()
   // id SERIAL,
-  id?: number;
+  id!: number;
 
   @Column()
   // will be filled in by typeorm with the QuestionnaireType
-  type?: QuestionnaireType;
+  type!: QuestionnaireType;
 
   @OneToMany((_type) => Question, (question) => question.questionnaire, {
     eager: true,
