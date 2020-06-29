@@ -7,7 +7,7 @@ import RangeQuestion from "./RangeQuestion";
 import config from "config";
 
 const rangeconfig: {
-  mint: number;
+  min: number;
   max: number;
 } = config.get("rangeQuestion");
 
@@ -17,7 +17,7 @@ export default class RangeQuestionAnswer extends QuestionAnswer {
   @IsDefined()
   @IsInt()
   @IsPositive()
-  @Min(rangeconfig.mint) //1 star is the minimum, max is set by the questionmaker (needs validation)
+  @Min(rangeconfig.min) //1 star is the minimum, max is set by the questionmaker (needs validation)
   answer: number;
 
   constructor(question: RangeQuestion, review: Review, answer: number) {
