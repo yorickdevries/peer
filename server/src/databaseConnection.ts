@@ -26,6 +26,9 @@ import UploadQuestion from "./models/UploadQuestion";
 import QuestionOption from "./models/QuestionOption";
 import CheckboxQuestionOption from "./models/CheckboxQuestionOption";
 import MultipleChoiceQuestionOption from "./models/MultipleChoiceQuestionOption";
+import Review from "./models/Review";
+import ReviewOfSubmission from "./models/ReviewOfSubmission";
+import ReviewOfReview from "./models/ReviewOfReview";
 // Database models
 
 const databaseConfig: {
@@ -65,6 +68,9 @@ const createDatabaseConnection = async function (): Promise<Connection> {
       QuestionOption,
       CheckboxQuestionOption,
       MultipleChoiceQuestionOption,
+      Review,
+      ReviewOfSubmission,
+      ReviewOfReview,
     ],
     synchronize: true, // must be set to false once deployed to production (we should switch to migrations instead)
     logging: false,
