@@ -1,7 +1,7 @@
 import express from "express";
 import { eventLogger } from "../middleware/logger";
 import authenticationRoutes from "./authentication";
-import checkAuthentication from "../middleware/authentication/checkAuthentication";
+import checkAndSetAuthentication from "../middleware/authentication/checkAuthentication";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import faculties from "./faculties";
 import academicyears from "./academicyears";
@@ -36,12 +36,12 @@ router.get("/authenticated", (req, res) => {
 
 // Check always whether someone is logged in before accessing the other routes below
 // additionally fixes the user object so all fields are copied over from the database
-router.use(checkAuthentication);
+router.use(checkAndSetAuthentication);
 
 // Route to get the current userinfo from SSO
 // might need to be moved to /users route
 router.get("/me", async (req, res) => {
-  // the user is defined as it is checked with checkAuthentication
+  // the user is defined as it is checked and set with checkAndSetAuthentication
   res.json(req.user);
 });
 

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import HttpStatusCode from "../../enum/HttpStatusCode";
 import User from "../../models/User";
 
-const checkAuthentication = async function (
+const checkAndSetAuthentication = async function (
   req: Request,
   res: Response,
   next: NextFunction
@@ -18,4 +18,4 @@ const checkAuthentication = async function (
   }
 };
 
-export default checkAuthentication;
+export default checkAndSetAuthentication;
