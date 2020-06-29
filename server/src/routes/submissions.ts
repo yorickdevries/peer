@@ -11,7 +11,7 @@ import path from "path";
 import hasha from "hasha";
 import fsPromises from "fs/promises";
 import upload from "../middleware/upload";
-import assignmentState from "../enum/assignmentState";
+import assignmentState from "../enum/tempassignmentState";
 import { getManager } from "typeorm";
 import _ from "lodash";
 

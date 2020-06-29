@@ -29,7 +29,7 @@ import UserRole from "../enum/UserRole";
 import Submission from "./Submission";
 import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import ReviewQuestionnaire from "./ReviewQuestionnaire";
-import assignmentState from "../enum/assignmentState";
+import assignmentState from "../enum/tempassignmentState";
 
 @Entity()
 export default class Assignment extends BaseModel {

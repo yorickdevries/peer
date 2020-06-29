@@ -19,7 +19,7 @@ import AcademicYear from "./AcademicYear";
 import Enrollment from "../models/Enrollment";
 import Assignment from "../models/Assignment";
 import UserRole from "../enum/UserRole";
-import assignmentState from "../enum/assignmentState";
+import assignmentState from "../enum/tempassignmentState";
 
 @Entity()
 export default class Course extends BaseModel {
