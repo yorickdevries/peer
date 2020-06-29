@@ -72,4 +72,12 @@ export default abstract class Question extends BaseModel {
     this.optional = optional;
     this.questionnaire = questionnaire;
   }
+
+  async getQuestionnaire(): Promise<Questionnaire> {
+    return (
+      await Question.findOneOrFail(this.id, {
+        relations: ["questionnaire"],
+      })
+    ).questionnaire!;
+  }
 }
