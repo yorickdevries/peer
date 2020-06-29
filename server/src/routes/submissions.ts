@@ -11,7 +11,7 @@ import path from "path";
 import hasha from "hasha";
 import fsPromises from "fs/promises";
 import upload from "../middleware/upload";
-import assignmentState from "../enum/tempassignmentState";
+import AssignmentState from "../enum/AssignmentState";
 import { getManager } from "typeorm";
 import _ from "lodash";
 
@@ -96,7 +96,7 @@ router.post(
         (await group.hasUser(user)) &&
         (await group.hasAssignment(assignment))
       ) {
-        if (assignment.getState() === assignmentState.SUBMISSION) {
+        if (assignment.getState() === AssignmentState.SUBMISSION) {
           // make the submission here in a transation
           let submission: Submission;
 

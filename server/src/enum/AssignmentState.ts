@@ -1,4 +1,4 @@
-enum assignmentState {
+enum AssignmentState {
   UNPUBLISHED = "unpublished",
   SUBMISSION = "submission",
   WAITINGFORREVIEW = "waitingforreview",
@@ -6,4 +6,4 @@ enum assignmentState {
   FEEDBACK = "feedback",
 }
 
-export default assignmentState;
+export default AssignmentState;

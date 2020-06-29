@@ -19,7 +19,7 @@ import AcademicYear from "./AcademicYear";
 import Enrollment from "../models/Enrollment";
 import Assignment from "../models/Assignment";
 import UserRole from "../enum/UserRole";
-import assignmentState from "../enum/tempassignmentState";
+import AssignmentState from "../enum/AssignmentState";
 
 @Entity()
 export default class Course extends BaseModel {
@@ -107,7 +107,7 @@ export default class Course extends BaseModel {
     for (const assignment of allAssignments) {
       if (
         (await assignment.isEnrolledInGroup(user)) &&
-        !(assignment.getState() === assignmentState.UNPUBLISHED)
+        !(assignment.getState() === AssignmentState.UNPUBLISHED)
       ) {
         enrolledAssignments.push(assignment);
       }
