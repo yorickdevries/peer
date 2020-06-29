@@ -6,6 +6,8 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { getManager } from "typeorm";
 import _ from "lodash";
+import CheckboxQuestion from "../models/CheckboxQuestion";
+import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 
 const router = express.Router();
 
@@ -29,6 +31,16 @@ router.get("/:id", validateParams(questionnaireSchema), async (req, res) => {
         submissionQuestionaire.questions,
         "number"
       );
+      // sort the options alphabetically in case it is a question with options
+      for (const question of sortedQuestions) {
+        if (question instanceof CheckboxQuestion) {
+          const sortedOptions = _.sortBy(question.options, "text");
+          question.options = sortedOptions;
+        } else if (question instanceof MultipleChoiceQuestion) {
+          const sortedOptions = _.sortBy(question.options, "text");
+          question.options = sortedOptions;
+        }
+      }
       submissionQuestionaire.questions = sortedQuestions;
       res.send(submissionQuestionaire);
     } else {
