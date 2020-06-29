@@ -14,6 +14,7 @@ import Assignment from "./models/Assignment";
 import File from "./models/File";
 import Group from "./models/Group";
 import Submission from "./models/Submission";
+import Questionnaire from "./models/Questionnaire";
 import SubmissionQuestionnaire from "./models/SubmissionQuestionnaire";
 import ReviewQuestionnaire from "./models/ReviewQuestionnaire";
 // Database models
@@ -43,6 +44,7 @@ const createDatabaseConnection = async function (): Promise<Connection> {
       File,
       Group,
       Submission,
+      Questionnaire,
       SubmissionQuestionnaire,
       ReviewQuestionnaire,
     ],
