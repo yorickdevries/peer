@@ -3,7 +3,7 @@ import { ChildEntity, ManyToOne } from "typeorm";
 import QuestionOptionType from "../enum/QuestionOptionType";
 import MultipleChoiceQuestion from "./MultipleChoiceQuestion";
 
-@ChildEntity(QuestionOptionType.MULTIPLECHOICE)
+@ChildEntity(QuestionOptionType.MULTIPLE_CHOICE)
 export default class MultipleChoiceQuestionOption extends QuestionOption {
   @ManyToOne(
     (_type) => MultipleChoiceQuestion,

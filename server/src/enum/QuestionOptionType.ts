@@ -1,5 +1,5 @@
 enum QuestionOptionType {
-  MULTIPLECHOICE = "multiplechoice",
+  MULTIPLE_CHOICE = "multiplechoice",
   CHECKBOX = "checkbox",
 }
 

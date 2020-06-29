@@ -1,6 +1,6 @@
 enum UserRole {
   TEACHER = "teacher",
-  TA = "teaching assistant",
+  TEACHING_ASSISTANT = "teaching assistant",
   STUDENT = "student",
 }
 

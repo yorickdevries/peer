@@ -212,7 +212,7 @@ export default class Assignment extends BaseModel {
     } else if (moment().isBefore(this.dueDate)) {
       return AssignmentState.SUBMISSION;
     } else if (moment().isBefore(this.reviewPublishDate)) {
-      return AssignmentState.WAITINGFORREVIEW;
+      return AssignmentState.WAITING_FOR_REVIEW;
     } else if (moment().isBefore(this.reviewDueDate)) {
       return AssignmentState.REVIEW;
     } else {

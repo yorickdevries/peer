@@ -1,6 +1,6 @@
 enum QuestionType {
   OPEN = "open",
-  MULTIPLECHOICE = "multiplechoice",
+  MULTIPLE_CHOICE = "multiplechoice",
   CHECKBOX = "checkbox",
   RANGE = "range",
   UPLOAD = "upload",

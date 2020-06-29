@@ -1,7 +1,7 @@
 enum AssignmentState {
   UNPUBLISHED = "unpublished",
   SUBMISSION = "submission",
-  WAITINGFORREVIEW = "waitingforreview",
+  WAITING_FOR_REVIEW = "waitingforreview",
   REVIEW = "review",
   FEEDBACK = "feedback",
 }

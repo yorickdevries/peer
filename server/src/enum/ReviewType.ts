@@ -1,6 +1,6 @@
 enum ReviewType {
-  REVIEWOFSUBMISSION = "reviewofsubmission",
-  REVIEWOFREVIEW = "reviewofreview",
+  REVIEW_OF_SUBMISSION = "reviewofsubmission",
+  REVIEW_OF_REVIEW = "reviewofreview",
 }
 
 export default ReviewType;
