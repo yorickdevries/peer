@@ -1,43 +1,7 @@
 import "reflect-metadata"; // needed for typeORM to work
 import { createConnection, Connection, ConnectionOptions } from "typeorm";
 import config from "config";
-// Database models
-import User from "./models/User";
-import Affiliation from "./models/Affiliation";
-import Study from "./models/Study";
-import OrganisationUnit from "./models/OrganisationUnit";
-import Faculty from "./models/Faculty";
-import AcademicYear from "./models/AcademicYear";
-import Course from "./models/Course";
-import Enrollment from "./models/Enrollment";
-import Assignment from "./models/Assignment";
-import File from "./models/File";
-import Group from "./models/Group";
-import Submission from "./models/Submission";
-import Questionnaire from "./models/Questionnaire";
-import SubmissionQuestionnaire from "./models/SubmissionQuestionnaire";
-import ReviewQuestionnaire from "./models/ReviewQuestionnaire";
-import Question from "./models/Question";
-import CheckboxQuestion from "./models/CheckboxQuestion";
-import MultipleChoiceQuestion from "./models/MultipleChoiceQuestion";
-import OpenQuestion from "./models/OpenQuestion";
-import RangeQuestion from "./models/RangeQuestion";
-import UploadQuestion from "./models/UploadQuestion";
-import QuestionOption from "./models/QuestionOption";
-import CheckboxQuestionOption from "./models/CheckboxQuestionOption";
-import MultipleChoiceQuestionOption from "./models/MultipleChoiceQuestionOption";
-import Review from "./models/Review";
-import ReviewOfSubmission from "./models/ReviewOfSubmission";
-import ReviewOfReview from "./models/ReviewOfReview";
-import QuestionAnswer from "./models/QuestionAnswer";
-import CheckboxQuestionAnswer from "./models/CheckboxQuestionAnswer";
-import MultipleChoiceQuestionAnswer from "./models/MultipleChoiceQuestionAnswer";
-import OpenQuestionAnswer from "./models/OpenQuestionAnswer";
-import RangeQuestionAnswer from "./models/RangeQuestionAnswer";
-import UploadQuestionAnswer from "./models/UploadQuestionAnswer";
-import SubmissionComment from "./models/SubmissionComment";
-import ReviewComment from "./models/ReviewComment";
-// Database models
+import entityList from "./models/entityList";
 
 const databaseConfig: {
   type: string;
@@ -51,43 +15,7 @@ const databaseConfig: {
 
 const createDatabaseConnection = async function (): Promise<Connection> {
   const baseConfig = {
-    entities: [
-      User,
-      Affiliation,
-      Study,
-      OrganisationUnit,
-      Faculty,
-      AcademicYear,
-      Course,
-      Enrollment,
-      Assignment,
-      File,
-      Group,
-      Submission,
-      Questionnaire,
-      SubmissionQuestionnaire,
-      ReviewQuestionnaire,
-      Question,
-      CheckboxQuestion,
-      MultipleChoiceQuestion,
-      OpenQuestion,
-      RangeQuestion,
-      UploadQuestion,
-      QuestionOption,
-      CheckboxQuestionOption,
-      MultipleChoiceQuestionOption,
-      Review,
-      ReviewOfSubmission,
-      ReviewOfReview,
-      QuestionAnswer,
-      CheckboxQuestionAnswer,
-      MultipleChoiceQuestionAnswer,
-      OpenQuestionAnswer,
-      RangeQuestionAnswer,
-      UploadQuestionAnswer,
-      SubmissionComment,
-      ReviewComment,
-    ],
+    entities: entityList,
     synchronize: true, // must be set to false once deployed to production (we should switch to migrations instead)
     logging: false,
   };
