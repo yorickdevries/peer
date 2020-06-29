@@ -73,7 +73,7 @@ export default abstract class Review extends BaseModel {
   submittedAt: Date | null;
 
   // approved boolean,
-  @Column()
+  @Column("boolean", { nullable: true })
   @IsOptional()
   @IsBoolean()
   approvalByTA: boolean | null;
