@@ -4,6 +4,7 @@ import QuestionAnswer from "./QuestionAnswer";
 import Review from "./Review";
 import { IsDefined } from "class-validator";
 import UploadQuestion from "./UploadQuestion";
+import File from "./File";
 
 @ChildEntity(QuestionAnswerType.UPLOAD)
 export default class UploadQuestionAnswer extends QuestionAnswer {
