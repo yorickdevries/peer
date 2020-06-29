@@ -18,6 +18,7 @@ import path from "path";
 import fsPromises from "fs/promises";
 import _ from "lodash";
 import Group from "../models/Group";
+import AssignmentState from "../enum/AssignmentState";
 
 const router = express.Router();
 
@@ -90,6 +91,31 @@ router.get(
     }
   }
 );
+
+// get an assignment by id
+// Joi inputvalidation
+const idSchema = Joi.object({
+  id: Joi.number().integer().required(),
+});
+router.get("/:id", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  try {
+    const assignment = await Assignment.findOneOrFail(req.params.id);
+    if (
+      (await assignment.isTeacherOfCourse(user)) ||
+      ((await assignment.isEnrolledInGroup(user)) &&
+        !((await assignment.getState()) === AssignmentState.UNPUBLISHED))
+    ) {
+      res.send(assignment);
+    } else {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You are not allowed to view this assignment");
+    }
+  } catch (error) {
+    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+  }
+});
 
 // Joi inputvalidation
 const assignmentSchema = Joi.object({

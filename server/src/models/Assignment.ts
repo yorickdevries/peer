@@ -7,6 +7,7 @@ import {
   ManyToMany,
   JoinColumn,
   OneToMany,
+  RelationId,
 } from "typeorm";
 import {
   IsDefined,
@@ -110,14 +111,18 @@ export default class Assignment extends BaseModel {
   file: File | null;
 
   // submission questionaire
-  @OneToOne((_type) => SubmissionQuestionnaire, { eager: true })
+  @OneToOne((_type) => SubmissionQuestionnaire)
   @JoinColumn()
   submissionQuestionnaire: SubmissionQuestionnaire | null;
+  @RelationId((assignment: Assignment) => assignment.submissionQuestionnaire)
+  submissionQuestionnaireId?: number; // this is undefined when questionnaire is null
 
   // review questionaire (for review evaluation)
-  @OneToOne((_type) => ReviewQuestionnaire, { eager: true })
+  @OneToOne((_type) => ReviewQuestionnaire)
   @JoinColumn()
   reviewQuestionnaire: ReviewQuestionnaire | null;
+  @RelationId((assignment: Assignment) => assignment.reviewQuestionnaire)
+  reviewQuestionnaireId?: number; // this is undefined when questionnaire is null
 
   // external_link varchar(1000),
   @Column("varchar", { nullable: true })

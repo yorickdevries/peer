@@ -25,9 +25,11 @@ export default abstract class Questionnaire extends BaseModel {
   // will be filled in by typeorm with the QuestionnaireType
   type?: QuestionnaireType;
 
-  @OneToMany((_type) => Question, (question) => question.questionnaire)
+  @OneToMany((_type) => Question, (question) => question.questionnaire, {
+    eager: true,
+  })
   // all questions (might want to split this later)
-  questions?: Question[];
+  questions!: Question[];
 
   abstract assignment?: Assignment;
 
@@ -42,13 +44,5 @@ export default abstract class Questionnaire extends BaseModel {
   async isTeacherOfCourse(user: User): Promise<boolean> {
     const assignment = await this.getAssignment();
     return await assignment.isTeacherOfCourse(user);
-  }
-
-  async getQuestions(): Promise<Question[]> {
-    return (
-      await Questionnaire.findOneOrFail(this.id, {
-        relations: ["questions"],
-      })
-    ).questions!;
   }
 }

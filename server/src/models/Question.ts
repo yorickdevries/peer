@@ -17,6 +17,7 @@ import {
 import BaseModel from "./BaseModel";
 import Questionnaire from "./Questionnaire";
 import QuestionType from "../enum/QuestionType";
+import User from "./User";
 
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "type" } })
@@ -79,5 +80,12 @@ export default abstract class Question extends BaseModel {
         relations: ["questionnaire"],
       })
     ).questionnaire!;
+  }
+
+  // checks whether the user is teacher
+  // of the corresponding questionnaire/assignment/course
+  async isTeacherOfCourse(user: User): Promise<boolean> {
+    const questionnaire = await this.getQuestionnaire();
+    return await questionnaire.isTeacherOfCourse(user);
   }
 }

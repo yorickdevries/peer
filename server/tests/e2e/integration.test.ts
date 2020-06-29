@@ -179,9 +179,78 @@ describe("Integration", () => {
       .field("description", "Example description")
       .field("externalLink", "null");
     expect(res.status).toBe(HttpStatusCode.OK);
-    const assignment = JSON.parse(res.text);
+    let assignment = JSON.parse(res.text);
     expect(assignment).toMatchObject({
       name: "Example title",
+    });
+
+    // make a questionnaire
+    res = await request(server)
+      .post("/api/submissionquestionnaires/")
+      .send({
+        assignmentId: assignment.id,
+      })
+      .set("cookie", teacherCookie);
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // get the assignment including questionnaire
+    res = await request(server)
+      .get(`/api/assignments/${assignment.id}`)
+      .set("cookie", teacherCookie);
+    expect(res.status).toBe(HttpStatusCode.OK);
+    assignment = JSON.parse(res.text);
+
+    // get the questionnaire
+    res = await request(server)
+      .get(
+        `/api/submissionquestionnaires/${assignment.submissionQuestionnaireId}`
+      )
+      .set("cookie", teacherCookie);
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const submissionQuestionnaire = JSON.parse(res.text);
+
+    // post a MC question in the questionnaire
+    res = await request(server)
+      .post(`/api/multiplechoicequestions/`)
+      .send({
+        text: "This is a MC question",
+        number: 1,
+        optional: true,
+        questionnaireId: submissionQuestionnaire.id,
+      })
+      .set("cookie", teacherCookie);
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const mcQuestion = JSON.parse(res.text);
+    expect(mcQuestion).toMatchObject({
+      text: "This is a MC question",
+      number: 1,
+      optional: true,
+    });
+
+    // post a MC question option in the questionnaire
+    res = await request(server)
+      .post(`/api/multiplechoicequestionoptions/`)
+      .send({
+        text: "option A",
+        multipleChoiceQuestionId: mcQuestion.id,
+      })
+      .set("cookie", teacherCookie);
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject({
+      text: "option A",
+    });
+
+    // post another MC question option in the questionnaire
+    res = await request(server)
+      .post(`/api/multiplechoicequestionoptions/`)
+      .send({
+        text: "option B",
+        multipleChoiceQuestionId: mcQuestion.id,
+      })
+      .set("cookie", teacherCookie);
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject({
+      text: "option B",
     });
 
     // set date to the moment that the assignment is published
