@@ -8,6 +8,7 @@ import { IsOptional } from "class-validator";
 import BaseModel from "./BaseModel";
 import Assignment from "./Assignment";
 import Question from "./Question";
+import User from "./User";
 
 // formely called rubric
 @Entity()
@@ -29,4 +30,11 @@ export default abstract class Questionnaire extends BaseModel {
   }
 
   abstract getAssignment(): Promise<Assignment>;
+
+  // checks whether the user is teacher
+  // of the corresponding assignment and course
+  async isTeacherOfCourse(user: User): Promise<boolean> {
+    const assignment = await this.getAssignment();
+    return await assignment.isTeacherOfCourse(user);
+  }
 }
