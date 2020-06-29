@@ -3,7 +3,7 @@ import Joi from "@hapi/joi";
 import { validateBody } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Questionnaire from "../models/Questionnaire";
-import OpenQuestion from "../models/OpenQuestion";
+import UploadQuestion from "../models/UploadQuestion";
 
 const router = express.Router();
 
@@ -13,6 +13,7 @@ const questionSchema = Joi.object({
   number: Joi.number().integer().required(),
   optional: Joi.boolean().required(),
   questionnaireId: Joi.number().integer().required(),
+  extensions: Joi.string().required(),
 });
 // post a question
 router.post("/", validateBody(questionSchema), async (req, res) => {
@@ -22,11 +23,12 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
       req.body.questionnaireId
     );
     if (await questionnaire.isTeacherOfCourse(user)) {
-      const question = new OpenQuestion(
+      const question = new UploadQuestion(
         req.body.text,
         req.body.number,
         req.body.optional,
-        questionnaire
+        questionnaire,
+        req.body.extensions
       );
       await question.save();
       res.send(question);

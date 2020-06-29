@@ -3,7 +3,7 @@ import Joi from "@hapi/joi";
 import { validateBody } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Questionnaire from "../models/Questionnaire";
-import OpenQuestion from "../models/OpenQuestion";
+import CheckboxQuestion from "../models/CheckboxQuestion";
 
 const router = express.Router();
 
@@ -22,7 +22,7 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
       req.body.questionnaireId
     );
     if (await questionnaire.isTeacherOfCourse(user)) {
-      const question = new OpenQuestion(
+      const question = new CheckboxQuestion(
         req.body.text,
         req.body.number,
         req.body.optional,
