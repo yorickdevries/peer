@@ -43,4 +43,12 @@ export default abstract class Questionnaire extends BaseModel {
     const assignment = await this.getAssignment();
     return await assignment.isTeacherOfCourse(user);
   }
+
+  async getQuestions(): Promise<Question[]> {
+    return (
+      await Questionnaire.findOneOrFail(this.id, {
+        relations: ["questions"],
+      })
+    ).questions!;
+  }
 }
