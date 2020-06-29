@@ -3,6 +3,12 @@ import Question from "./Question";
 import { ChildEntity, Column } from "typeorm";
 import QuestionType from "../enum/QuestionType";
 import { IsDefined, IsInt, IsPositive, Min, Max } from "class-validator";
+import config from "config";
+
+const rangeconfig: {
+  min: number;
+  max: number;
+} = config.get("rangeQuestion");
 
 @ChildEntity(QuestionType.RANGE)
 export default class RangeQuestion extends Question {
@@ -10,8 +16,8 @@ export default class RangeQuestion extends Question {
   @IsDefined()
   @IsInt()
   @IsPositive()
-  @Min(1) //1 star is the minimum
-  @Max(100) //needs to be checked whats most useful
+  @Min(rangeconfig.min) //1 star is the minimum
+  @Max(rangeconfig.max) //needs to be checked whats most useful
   range: number;
 
   constructor(

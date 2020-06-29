@@ -16,19 +16,19 @@ import Review from "./Review";
 export default abstract class QuestionAnswer extends BaseModel {
   @Column()
   // will be filled in by typeorm with the QuestionAnswerType
-  type?: QuestionAnswerType;
+  type!: QuestionAnswerType;
 
   // Question_id int NOT NULL,
   @PrimaryColumn()
   @RelationId((questionAnswer: QuestionAnswer) => questionAnswer.question)
-  questionId?: string;
+  questionId!: number;
   @ManyToOne((_type) => Question, { nullable: false })
   question?: Question;
 
   // Review_id int NOT NULL,
   @PrimaryColumn()
   @RelationId((questionAnswer: QuestionAnswer) => questionAnswer.review)
-  reviewId?: string;
+  reviewId!: number;
   @ManyToOne((_type) => Review, { nullable: false })
   review?: Review;
 

@@ -9,15 +9,13 @@ import UserRole from "../enum/UserRole";
 export default class Enrollment extends BaseModel {
   @PrimaryColumn()
   @RelationId((enrollment: Enrollment) => enrollment.user)
-  userNetid?: string;
-
+  userNetid!: string;
   @ManyToOne((_type) => User, { nullable: false })
   user?: User;
 
   @PrimaryColumn()
   @RelationId((enrollment: Enrollment) => enrollment.course)
-  courseId?: number;
-
+  courseId!: number;
   @ManyToOne((_type) => Course, { nullable: false })
   course?: Course;
 

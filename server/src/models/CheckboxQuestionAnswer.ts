@@ -8,7 +8,7 @@ import CheckboxQuestion from "./CheckboxQuestion";
 @ChildEntity(QuestionAnswerType.CHECKBOX)
 export default class CheckboxQuestionAnswer extends QuestionAnswer {
   // answer int NOT NULL,
-  @ManyToMany((_type) => CheckboxQuestionOption)
+  @ManyToMany((_type) => CheckboxQuestionOption, { eager: true })
   @JoinTable()
   answer: CheckboxQuestionOption[];
 

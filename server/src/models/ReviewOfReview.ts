@@ -10,7 +10,7 @@ export default class ReviewOfReview extends Review {
   @ManyToOne((_type) => ReviewOfSubmission, {
     nullable: false,
   })
-  reviewOfSubmission: ReviewOfSubmission;
+  reviewOfSubmission?: ReviewOfSubmission;
 
   constructor(
     questionnaire: Questionnaire,

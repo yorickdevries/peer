@@ -36,8 +36,7 @@ import AssignmentState from "../enum/AssignmentState";
 export default class Assignment extends BaseModel {
   // id SERIAL,
   @PrimaryGeneratedColumn()
-  @IsOptional()
-  id?: number;
+  id!: number;
 
   // title varchar(500) NOT NULL,
   @Column()
@@ -111,18 +110,18 @@ export default class Assignment extends BaseModel {
   file: File | null;
 
   // submission questionaire
-  @OneToOne((_type) => SubmissionQuestionnaire)
-  @JoinColumn()
-  submissionQuestionnaire: SubmissionQuestionnaire | null;
   @RelationId((assignment: Assignment) => assignment.submissionQuestionnaire)
   submissionQuestionnaireId?: number; // this is undefined when questionnaire is null
+  @OneToOne((_type) => SubmissionQuestionnaire)
+  @JoinColumn()
+  submissionQuestionnaire?: SubmissionQuestionnaire | null;
 
   // review questionaire (for review evaluation)
-  @OneToOne((_type) => ReviewQuestionnaire)
-  @JoinColumn()
-  reviewQuestionnaire: ReviewQuestionnaire | null;
   @RelationId((assignment: Assignment) => assignment.reviewQuestionnaire)
   reviewQuestionnaireId?: number; // this is undefined when questionnaire is null
+  @OneToOne((_type) => ReviewQuestionnaire)
+  @JoinColumn()
+  reviewQuestionnaire?: ReviewQuestionnaire | null;
 
   // external_link varchar(1000),
   @Column("varchar", { nullable: true })

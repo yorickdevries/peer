@@ -1,18 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import {
-  IsDefined,
-  IsOptional,
-  IsString,
-  IsNotEmpty,
-  IsHash,
-} from "class-validator";
+import { IsDefined, IsString, IsNotEmpty, IsHash } from "class-validator";
 import BaseModel from "./BaseModel";
 
 @Entity()
 export default class File extends BaseModel {
   @PrimaryGeneratedColumn()
-  @IsOptional()
-  id?: number;
+  id!: number;
 
   @Column()
   @IsDefined()

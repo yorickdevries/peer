@@ -8,7 +8,7 @@ export default class SubmissionComment extends Comment {
   @ManyToOne((_type) => Submission, {
     nullable: false,
   })
-  submission: Submission;
+  submission?: Submission;
 
   constructor(text: string, user: User, submission: Submission) {
     super(text, user);
