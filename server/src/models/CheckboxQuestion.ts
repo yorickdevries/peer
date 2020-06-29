@@ -1,11 +1,16 @@
 import Questionnaire from "./Questionnaire";
 import Question from "./Question";
-import { ChildEntity } from "typeorm";
+import { ChildEntity, OneToMany } from "typeorm";
 import QuestionType from "../enum/QuestionType";
+import CheckboxQuestionOption from "./CheckboxQuestionOption";
 
 @ChildEntity(QuestionType.CHECKBOX)
 export default class CheckboxQuestion extends Question {
-  // to be added: options
+  @OneToMany(
+    (_type) => CheckboxQuestionOption,
+    (checkboxQuestionOption) => checkboxQuestionOption.question
+  )
+  options?: CheckboxQuestionOption[];
 
   constructor(
     text: string,

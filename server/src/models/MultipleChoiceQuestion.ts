@@ -1,11 +1,16 @@
 import Questionnaire from "./Questionnaire";
 import Question from "./Question";
-import { ChildEntity } from "typeorm";
+import { ChildEntity, OneToMany } from "typeorm";
 import QuestionType from "../enum/QuestionType";
+import MultipleChoiceQuestionOption from "./MultipleChoiceQuestionOption";
 
 @ChildEntity(QuestionType.MULTIPLECHOICE)
 export default class MultipleChoiceQuestion extends Question {
-  // to be added: options
+  @OneToMany(
+    (_type) => MultipleChoiceQuestionOption,
+    (multipleChoiceQuestionOption) => multipleChoiceQuestionOption.question
+  )
+  options?: MultipleChoiceQuestionOption[];
 
   constructor(
     text: string,
