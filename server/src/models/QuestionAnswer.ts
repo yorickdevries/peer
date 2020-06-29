@@ -32,6 +32,8 @@ export default abstract class QuestionAnswer extends BaseModel {
   @ManyToOne((_type) => Review, { nullable: false })
   review?: Review;
 
+  abstract answer: any;
+
   constructor(question: Question, review: Review) {
     super();
     this.question = question;
