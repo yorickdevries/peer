@@ -12,6 +12,11 @@ import groups from "./groups";
 import submissions from "./submissions";
 import submissionquestionnaires from "./submissionquestionnaires";
 import reviewquestionnaires from "./reviewquestionnaires";
+import checkboxquestions from "./checkboxquestions";
+import multiplechoicequestions from "./multiplechoicequestions";
+import openquestions from "./openquestions";
+import rangequestions from "./rangequestions";
+import uploadquestions from "./uploadquestions";
 
 // old routes, can be deleted when not needed anymore
 import oldRoutes from "../old_api/routes/api";
@@ -48,6 +53,11 @@ router.use("/groups", groups);
 router.use("/submissions", submissions);
 router.use("/submissionquestionnaires", submissionquestionnaires);
 router.use("/reviewquestionnaires", reviewquestionnaires);
+router.use("/checkboxquestions", checkboxquestions);
+router.use("/multiplechoicequestions", multiplechoicequestions);
+router.use("/openquestions", openquestions);
+router.use("/rangequestions", rangequestions);
+router.use("/uploadquestions", uploadquestions);
 
 // old routes, can be deleted when not needed anymore
 router.use("/oldroutes", oldRoutes);

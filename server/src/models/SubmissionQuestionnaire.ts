@@ -1,8 +1,9 @@
 import Questionnaire from "./Questionnaire";
 import { ChildEntity, OneToOne } from "typeorm";
 import Assignment from "./Assignment";
+import QuestionnaireType from "../enum/QuestionnaireType";
 
-@ChildEntity()
+@ChildEntity(QuestionnaireType.SUBMISSION)
 export default class SubmissionQuestionnaire extends Questionnaire {
   @OneToOne(
     (_type) => Assignment,

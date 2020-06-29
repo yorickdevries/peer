@@ -1,8 +1,9 @@
 import Questionnaire from "./Questionnaire";
 import { ChildEntity, OneToOne } from "typeorm";
 import Assignment from "./Assignment";
+import QuestionnaireType from "../enum/QuestionnaireType";
 
-@ChildEntity()
+@ChildEntity(QuestionnaireType.REVIEW)
 export default class ReviewQuestionnaire extends Questionnaire {
   @OneToOne(
     (_type) => Assignment,

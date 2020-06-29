@@ -5,6 +5,7 @@ import { validateBody, validateParams } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { getManager } from "typeorm";
+import _ from "lodash";
 
 const router = express.Router();
 
@@ -16,11 +17,19 @@ const questionnaireSchema = Joi.object({
 router.get("/:id", validateParams(questionnaireSchema), async (req, res) => {
   const user = req.user!;
   try {
+    // also load the questions
     const submissionQuestionaire = await SubmissionQuestionnaire.findOneOrFail(
-      req.params.id
+      req.params.id,
+      { relations: ["questions"] }
     );
     const assignment = await submissionQuestionaire.getAssignment();
     if (await assignment.isTeacherOfCourse(user)) {
+      // sort the questions and return questionnaire
+      const sortedQuestions = _.sortBy(
+        submissionQuestionaire.questions,
+        "number"
+      );
+      submissionQuestionaire.questions = sortedQuestions;
       res.send(submissionQuestionaire);
     } else {
       //later we need to extend this so the students can access it when the assignment is in reivew state
@@ -81,7 +90,7 @@ router.post("/", validateBody(questionnairePostSchema), async (req, res) => {
     } else {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("User is not a teacher for the course");
+        .send("User is not a teacher of the course");
     }
   } catch (error) {
     res.status(HttpStatusCode.BAD_REQUEST).send(error);

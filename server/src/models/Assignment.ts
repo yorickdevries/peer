@@ -29,7 +29,7 @@ import UserRole from "../enum/UserRole";
 import Submission from "./Submission";
 import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import ReviewQuestionnaire from "./ReviewQuestionnaire";
-import assignmentState from "../enum/assignmentState";
+import AssignmentState from "../enum/AssignmentState";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -202,17 +202,17 @@ export default class Assignment extends BaseModel {
   }
 
   // check whether the user is enrolled in this assignment
-  getState(): assignmentState {
+  getState(): AssignmentState {
     if (moment().isBefore(this.publishDate)) {
-      return assignmentState.UNPUBLISHED;
+      return AssignmentState.UNPUBLISHED;
     } else if (moment().isBefore(this.dueDate)) {
-      return assignmentState.SUBMISSION;
+      return AssignmentState.SUBMISSION;
     } else if (moment().isBefore(this.reviewPublishDate)) {
-      return assignmentState.WAITINGFORREVIEW;
+      return AssignmentState.WAITINGFORREVIEW;
     } else if (moment().isBefore(this.reviewDueDate)) {
-      return assignmentState.REVIEW;
+      return AssignmentState.REVIEW;
     } else {
-      return assignmentState.FEEDBACK;
+      return AssignmentState.FEEDBACK;
     }
   }
 
@@ -288,7 +288,7 @@ export default class Assignment extends BaseModel {
     // plus check whether the assignment is public/enrollable
     if (this.enrollable) {
       // published
-      if (this.getState() === assignmentState.SUBMISSION) {
+      if (this.getState() === AssignmentState.SUBMISSION) {
         const course = await this.getCourse();
         if (await course.isEnrolled(user, UserRole.STUDENT)) {
           //enrolledInCourse
