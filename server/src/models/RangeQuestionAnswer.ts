@@ -4,6 +4,12 @@ import QuestionAnswer from "./QuestionAnswer";
 import Review from "./Review";
 import { IsDefined, IsInt, IsPositive, Min } from "class-validator";
 import RangeQuestion from "./RangeQuestion";
+import config from "config";
+
+const rangeconfig: {
+  mint: number;
+  max: number;
+} = config.get("rangeQuestion");
 
 @ChildEntity(QuestionAnswerType.RANGE)
 export default class RangeQuestionAnswer extends QuestionAnswer {
@@ -11,7 +17,7 @@ export default class RangeQuestionAnswer extends QuestionAnswer {
   @IsDefined()
   @IsInt()
   @IsPositive()
-  @Min(1) //1 star is the minimum
+  @Min(rangeconfig.mint) //1 star is the minimum, max is set by the questionmaker (needs validation)
   answer: number;
 
   constructor(question: RangeQuestion, review: Review, answer: number) {
