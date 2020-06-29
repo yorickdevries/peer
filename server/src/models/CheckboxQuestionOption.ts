@@ -10,8 +10,9 @@ export default class CheckboxQuestionOption extends QuestionOption {
   })
   question?: CheckboxQuestion;
 
-  constructor(text: string) {
+  constructor(text: string, question: CheckboxQuestion) {
     super(text);
+    this.question = question;
   }
 
   async getQuestion(): Promise<CheckboxQuestion> {

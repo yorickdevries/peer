@@ -14,8 +14,9 @@ export default class MultipleChoiceQuestionOption extends QuestionOption {
   )
   question?: MultipleChoiceQuestion;
 
-  constructor(text: string) {
+  constructor(text: string, question: MultipleChoiceQuestion) {
     super(text);
+    this.question = question;
   }
 
   async getQuestion(): Promise<MultipleChoiceQuestion> {
