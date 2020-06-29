@@ -5,6 +5,7 @@ import { validateBody, validateParams } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { getManager } from "typeorm";
+import _ from "lodash";
 
 const router = express.Router();
 
@@ -23,6 +24,12 @@ router.get("/:id", validateParams(questionnaireSchema), async (req, res) => {
     );
     const assignment = await submissionQuestionaire.getAssignment();
     if (await assignment.isTeacherOfCourse(user)) {
+      // sort the questions and return questionnaire
+      const sortedQuestions = _.sortBy(
+        submissionQuestionaire.questions,
+        "number"
+      );
+      submissionQuestionaire.questions = sortedQuestions;
       res.send(submissionQuestionaire);
     } else {
       //later we need to extend this so the students can access it when the assignment is in reivew state
