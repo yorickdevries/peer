@@ -29,7 +29,7 @@ import MultipleChoiceQuestionOption from "./models/MultipleChoiceQuestionOption"
 import Review from "./models/Review";
 import ReviewOfSubmission from "./models/ReviewOfSubmission";
 import ReviewOfReview from "./models/ReviewOfReview";
-import QuestionAnswer from "./models/Question";
+import QuestionAnswer from "./models/QuestionAnswer";
 import CheckboxQuestionAnswer from "./models/CheckboxQuestionAnswer";
 import MultipleChoiceQuestionAnswer from "./models/MultipleChoiceQuestionAnswer";
 import OpenQuestionAnswer from "./models/OpenQuestionAnswer";
