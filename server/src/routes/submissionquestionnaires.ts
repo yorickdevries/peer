@@ -90,7 +90,7 @@ router.post("/", validateBody(questionnairePostSchema), async (req, res) => {
     } else {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("User is not a teacher for the course");
+        .send("User is not a teacher of the course");
     }
   } catch (error) {
     res.status(HttpStatusCode.BAD_REQUEST).send(error);
