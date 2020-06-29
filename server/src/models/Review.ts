@@ -49,25 +49,37 @@ export default abstract class Review extends BaseModel {
   submitted: boolean;
 
   // started_at timestamptz,
-  @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
+  @Column({
+    type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
+    nullable: true,
+  })
   @IsOptional()
   @IsDate()
   startedAt: Date | null;
 
   // downloaded_at timestamptz,
-  @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
+  @Column({
+    type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
+    nullable: true,
+  })
   @IsOptional()
   @IsDate()
   downloadedAt: Date | null;
 
   // saved_at timestamptz,
-  @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
+  @Column({
+    type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
+    nullable: true,
+  })
   @IsOptional()
   @IsDate()
   savedAt: Date | null;
 
   // submitted_at timestamptz,
-  @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
+  @Column({
+    type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
+    nullable: true,
+  })
   @IsOptional()
   @IsDate()
   submittedAt: Date | null;
