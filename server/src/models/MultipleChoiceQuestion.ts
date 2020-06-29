@@ -8,9 +8,12 @@ import MultipleChoiceQuestionOption from "./MultipleChoiceQuestionOption";
 export default class MultipleChoiceQuestion extends Question {
   @OneToMany(
     (_type) => MultipleChoiceQuestionOption,
-    (multipleChoiceQuestionOption) => multipleChoiceQuestionOption.question
+    (multipleChoiceQuestionOption) => multipleChoiceQuestionOption.question,
+    {
+      eager: true,
+    }
   )
-  options?: MultipleChoiceQuestionOption[];
+  options!: MultipleChoiceQuestionOption[];
 
   constructor(
     text: string,

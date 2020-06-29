@@ -8,9 +8,12 @@ import CheckboxQuestionOption from "./CheckboxQuestionOption";
 export default class CheckboxQuestion extends Question {
   @OneToMany(
     (_type) => CheckboxQuestionOption,
-    (checkboxQuestionOption) => checkboxQuestionOption.question
+    (checkboxQuestionOption) => checkboxQuestionOption.question,
+    {
+      eager: true,
+    }
   )
-  options?: CheckboxQuestionOption[];
+  options!: CheckboxQuestionOption[];
 
   constructor(
     text: string,
