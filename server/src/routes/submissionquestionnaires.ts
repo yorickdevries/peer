@@ -16,8 +16,10 @@ const questionnaireSchema = Joi.object({
 router.get("/:id", validateParams(questionnaireSchema), async (req, res) => {
   const user = req.user!;
   try {
+    // also load the questions
     const submissionQuestionaire = await SubmissionQuestionnaire.findOneOrFail(
-      req.params.id
+      req.params.id,
+      { relations: ["questions"] }
     );
     const assignment = await submissionQuestionaire.getAssignment();
     if (await assignment.isTeacherOfCourse(user)) {
