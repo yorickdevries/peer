@@ -1,4 +1,4 @@
-import { ChildEntity, ManyToOne } from "typeorm";
+import { ChildEntity, ManyToMany, JoinTable } from "typeorm";
 import QuestionAnswerType from "../enum/QuestionAnswerType";
 import QuestionAnswer from "./QuestionAnswer";
 import Review from "./Review";
@@ -8,9 +8,8 @@ import CheckboxQuestion from "./CheckboxQuestion";
 @ChildEntity(QuestionAnswerType.CHECKBOX)
 export default class CheckboxQuestionAnswer extends QuestionAnswer {
   // answer int NOT NULL,
-  @ManyToOne((_type) => CheckboxQuestionOption, {
-    nullable: false,
-  })
+  @ManyToMany((_type) => CheckboxQuestionOption)
+  @JoinTable()
   answer: CheckboxQuestionOption[];
 
   constructor(
