@@ -17,6 +17,7 @@ import Submission from "./models/Submission";
 import Questionnaire from "./models/Questionnaire";
 import SubmissionQuestionnaire from "./models/SubmissionQuestionnaire";
 import ReviewQuestionnaire from "./models/ReviewQuestionnaire";
+import Question from "./models/Question";
 import OpenQuestion from "./models/OpenQuestion";
 // Database models
 
@@ -48,6 +49,7 @@ const createDatabaseConnection = async function (): Promise<Connection> {
       Questionnaire,
       SubmissionQuestionnaire,
       ReviewQuestionnaire,
+      Question,
       OpenQuestion,
     ],
     synchronize: true, // must be set to false once deployed to production (we should switch to migrations instead)

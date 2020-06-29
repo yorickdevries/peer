@@ -1,8 +1,13 @@
-import { PrimaryGeneratedColumn, Entity, TableInheritance } from "typeorm";
+import {
+  PrimaryGeneratedColumn,
+  Entity,
+  TableInheritance,
+  OneToMany,
+} from "typeorm";
 import { IsOptional } from "class-validator";
 import BaseModel from "./BaseModel";
 import Assignment from "./Assignment";
-//import OpenQuestion from "./OpenQuestion";
+import Question from "./Question";
 
 // formely called rubric
 @Entity()
@@ -13,13 +18,9 @@ export default abstract class Questionnaire extends BaseModel {
   // id SERIAL,
   id?: number;
 
-  /*
-  @OneToMany(
-    (_type) => OpenQuestion
-    (openQuestion) => openQuestion.questionnaire
-  )
-  */
-  //openQuestions?: OpenQuestion[];
+  @OneToMany((_type) => Question, (question) => question.questionnaire)
+  // all questions (might want to split this later)
+  questions?: Question[];
 
   abstract assignment?: Assignment;
 

@@ -1,4 +1,10 @@
-import { PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import {
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  Entity,
+  TableInheritance,
+} from "typeorm";
 import {
   IsOptional,
   IsDefined,
@@ -9,8 +15,10 @@ import {
   IsBoolean,
 } from "class-validator";
 import BaseModel from "./BaseModel";
-import ReviewQuestionnaire from "./ReviewQuestionnaire";
+import Questionnaire from "./Questionnaire";
 
+@Entity()
+@TableInheritance({ column: { type: "varchar", name: "type" } })
 export default abstract class Question extends BaseModel {
   @PrimaryGeneratedColumn()
   @IsOptional()
@@ -38,17 +46,21 @@ export default abstract class Question extends BaseModel {
   optional: boolean;
 
   // Rubric_id int NOT NULL,
-  //abstract questionnaire?: Questionnaire;
   @ManyToOne(
-    (_type) => ReviewQuestionnaire,
-    //(questionnaire) => questionnaire.openQuestions,
+    (_type) => Questionnaire,
+    (questionnaire) => questionnaire.questions,
     {
       nullable: false,
     }
   )
-  questionnaire?: ReviewQuestionnaire;
+  questionnaire?: Questionnaire;
 
-  constructor(text: string, number: number, optional: boolean, questionnaire: ReviewQuestionnaire) {
+  constructor(
+    text: string,
+    number: number,
+    optional: boolean,
+    questionnaire: Questionnaire
+  ) {
     super();
     this.text = text;
     this.number = number;
