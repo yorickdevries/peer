@@ -131,6 +131,8 @@ export default class Assignment extends BaseModel {
   @IsNotEmpty()
   externalLink: string | null;
 
+  @RelationId((assignment: Assignment) => assignment.course)
+  courseId!: number;
   // course_id int NOT NULL, FK
   @ManyToOne((_type) => Course, (course) => course.assignments, {
     nullable: false,

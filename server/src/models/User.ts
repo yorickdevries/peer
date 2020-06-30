@@ -14,6 +14,7 @@ import BaseModel from "./BaseModel";
 import Affiliation from "./Affiliation";
 import Study from "./Study";
 import OrganisationUnit from "./OrganisationUnit";
+import parseNetID from "../util/parseNetID";
 
 @Entity()
 export default class User extends BaseModel {
@@ -29,65 +30,62 @@ export default class User extends BaseModel {
   @IsOptional()
   @IsInt()
   @IsPositive()
-  studentNumber?: number | null;
+  studentNumber: number | null;
 
   @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  firstName?: string | null;
+  firstName: string | null;
 
   @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  prefix?: string | null;
+  prefix: string | null;
 
   @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  lastName?: string | null;
+  lastName: string | null;
 
   @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
   @IsEmail()
-  email?: string | null;
+  email: string | null;
 
   @Column("varchar", { nullable: true })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  displayName?: string | null;
+  displayName: string | null;
 
   @ManyToMany((_type) => Affiliation, {
     eager: true,
   })
   @JoinTable()
-  @IsDefined()
   affiliation: Affiliation[];
 
   @ManyToMany((_type) => Study, {
     eager: true,
   })
   @JoinTable()
-  @IsDefined()
   study: Study[];
 
   @ManyToMany((_type) => OrganisationUnit, {
     eager: true,
   })
   @JoinTable()
-  @IsDefined()
   organisationUnit: OrganisationUnit[];
 
   constructor(
     netid: string,
-    affiliation: Affiliation[],
-    study: Study[],
-    organisationUnit: OrganisationUnit[],
+    affiliation?: Affiliation[],
+    study?: Study[],
+    organisationUnit?: OrganisationUnit[],
     studentNumber?: number | null,
     firstName?: string | null,
     prefix?: string | null,
@@ -97,14 +95,22 @@ export default class User extends BaseModel {
   ) {
     super();
     this.netid = netid;
-    this.affiliation = affiliation;
-    this.study = study;
-    this.organisationUnit = organisationUnit;
-    this.studentNumber = studentNumber;
-    this.firstName = firstName;
-    this.prefix = prefix;
-    this.lastName = lastName;
-    this.email = email;
-    this.displayName = displayName;
+    this.studentNumber = studentNumber!;
+    this.firstName = firstName!;
+    this.prefix = prefix!;
+    this.lastName = lastName!;
+    this.email = email!;
+    this.displayName = displayName!;
+    this.affiliation = affiliation!;
+    this.study = study!;
+    this.organisationUnit = organisationUnit!;
+  }
+
+  async validateOrReject(): Promise<void> {
+    // validate the netid
+    if (this.netid !== parseNetID(this.netid)) {
+      throw `invalid netid: ${this.netid}`;
+    }
+    return super.validateOrReject();
   }
 }

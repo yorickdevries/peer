@@ -62,7 +62,7 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
         .send("User is not a teacher of the course");
     }
   } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
   }
 });
 

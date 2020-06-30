@@ -48,7 +48,7 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
         .send("You are not a teacher of this course");
     }
   } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
   }
 });
 
@@ -66,7 +66,7 @@ router.get(
       const sortedEnrollableAssignments = _.sortBy(enrollableAssignments, "id");
       res.send(sortedEnrollableAssignments);
     } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
     }
   }
 );
@@ -87,7 +87,7 @@ router.get(
       const sortedEnrolledAssignments = _.sortBy(enrolledAssignments, "id");
       res.send(sortedEnrolledAssignments);
     } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
     }
   }
 );
@@ -113,7 +113,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
         .send("You are not allowed to view this assignment");
     }
   } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
   }
 });
 
@@ -200,7 +200,7 @@ router.post(
           .send("User is not a teacher of the course");
       }
     } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
     }
   }
 );
@@ -254,7 +254,7 @@ router.post(
           .send("Assignment is not enrollable");
       }
     } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
     }
   }
 );
