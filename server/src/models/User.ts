@@ -14,6 +14,7 @@ import BaseModel from "./BaseModel";
 import Affiliation from "./Affiliation";
 import Study from "./Study";
 import OrganisationUnit from "./OrganisationUnit";
+import parseNetID from "../util/parseNetID";
 
 @Entity()
 export default class User extends BaseModel {
@@ -103,5 +104,13 @@ export default class User extends BaseModel {
     this.lastName = lastName!;
     this.email = email!;
     this.displayName = displayName!;
+  }
+
+  async validateOrReject(): Promise<void> {
+    // validate the netid
+    if (this.netid !== parseNetID(this.netid)) {
+      throw `invalid netid: ${this.netid}`;
+    }
+    return super.validateOrReject();
   }
 }
