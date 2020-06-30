@@ -1,11 +1,16 @@
 import express from "express";
 import Joi from "@hapi/joi";
-import { validateQuery } from "../middleware/validation";
+import { validateQuery, validateBody } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import _ from "lodash";
+import upload from "../middleware/upload";
+import config from "config";
+import parseGroupCSV from "../parseGroupCSV";
 
 const router = express.Router();
+
+const maxFileSize = config.get("maxFileSize") as number;
 
 // Joi inputvalidation for query
 const assignmentIdSchema = Joi.object({
@@ -47,5 +52,25 @@ router.get("/enrolled", validateQuery(assignmentIdSchema), async (req, res) => {
     res.status(HttpStatusCode.BAD_REQUEST).send(error);
   }
 });
+
+// import groups from a brightspace export
+router.post(
+  "/import",
+  upload([".csv"], maxFileSize, "file"),
+  validateBody(assignmentIdSchema),
+  async (req, res) => {
+    try {
+      const assignment = await Assignment.findOneOrFail(req.body.assignmentId);
+      console.log(assignment);
+      const csvFile = req.file.buffer;
+      // still need to be saved
+      const groupNameWithNetidLists = await parseGroupCSV(csvFile);
+      console.log(groupNameWithNetidLists);
+      res.send(groupNameWithNetidLists);
+    } catch (error) {
+      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    }
+  }
+);
 
 export default router;
