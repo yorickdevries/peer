@@ -10,7 +10,6 @@ import BaseModel from "./BaseModel";
 import User from "./User";
 import Assignment from "./Assignment";
 import _ from "lodash";
-import UserRole from "../enum/UserRole";
 
 @Entity()
 export default class Group extends BaseModel {
@@ -39,17 +38,13 @@ export default class Group extends BaseModel {
   }
 
   async validateOrReject(): Promise<void> {
-    if (this.assignments && this.users) {
+    // checking whether the students are enrolled in the course is skipped
+    // as this enrollment is done in an transaction and ca therefore not be checked here
+    // so every time a course is saved, this needs to be checked separately
+    if (this.assignments) {
       const courseIds = [];
       for (const assignment of this.assignments) {
-        const course = await assignment.getCourse();
-        // validate that all users are also enrolled in the course
-        for (const user of this.users) {
-          if (!(await course.isEnrolled(user, UserRole.STUDENT))) {
-            throw `${user} is not enrolled in ${course}`;
-          }
-          courseIds.push(course.id);
-        }
+        courseIds.push(assignment.courseId);
       }
       // validation to check whether all assignments are from the same course
       if (_.uniq(courseIds).length > 1) {
