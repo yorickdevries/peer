@@ -1,6 +1,6 @@
 import neatCsv from "neat-csv";
 import stripBomBuffer from "strip-bom-buf";
-import parseNetID from "./util/parseNetID";
+import parseNetID from "./parseNetID";
 
 interface netidWithGroupName {
   netid: string;

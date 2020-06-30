@@ -6,7 +6,7 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import _ from "lodash";
 import upload from "../middleware/upload";
 import config from "config";
-import parseGroupCSV from "../parseGroupCSV";
+import parseGroupCSV from "../util/parseGroupCSV";
 import AssignmentState from "../enum/AssignmentState";
 import Course from "../models/Course";
 import { getManager } from "typeorm";
