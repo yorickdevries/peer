@@ -29,7 +29,7 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
       res.send(sortedGroups);
     } else {
       res
-        .status(HttpStatusCode.BAD_REQUEST)
+        .status(HttpStatusCode.FORBIDDEN)
         .send("User is not a teacher of the course");
     }
   } catch (error) {
