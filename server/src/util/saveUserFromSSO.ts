@@ -22,15 +22,15 @@ const saveUserFromSSO = async function (
     // Try to save the user to database
     const user = new User(
       parseNetID(netid),
+      await parseAndSaveSSOFields(affiliation, Affiliation),
+      await parseAndSaveSSOFields(study, Study),
+      await parseAndSaveSSOFields(organisationUnit, OrganisationUnit),
       studentNumber ? studentNumber : null,
       firstName ? firstName : null,
       prefix ? prefix : null,
       lastName ? lastName : null,
       email ? email : null,
-      displayName ? displayName : null,
-      await parseAndSaveSSOFields(affiliation, Affiliation),
-      await parseAndSaveSSOFields(study, Study),
-      await parseAndSaveSSOFields(organisationUnit, OrganisationUnit)
+      displayName ? displayName : null
     );
     // Overwrites existing entry with the same NetID if present
     // might throw an error if the object is not valid
