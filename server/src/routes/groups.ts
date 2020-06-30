@@ -7,6 +7,13 @@ import _ from "lodash";
 import upload from "../middleware/upload";
 import config from "config";
 import parseGroupCSV from "../parseGroupCSV";
+import AssignmentState from "../enum/AssignmentState";
+import Course from "../models/Course";
+import { getManager } from "typeorm";
+import User from "../models/User";
+import Enrollment from "../models/Enrollment";
+import UserRole from "../enum/UserRole";
+import Group from "../models/Group";
 
 const router = express.Router();
 
@@ -59,14 +66,100 @@ router.post(
   upload([".csv"], maxFileSize, "file"),
   validateBody(assignmentIdSchema),
   async (req, res) => {
+    const user = req.user!;
     try {
       const assignment = await Assignment.findOneOrFail(req.body.assignmentId);
-      console.log(assignment);
-      const csvFile = req.file.buffer;
-      // still need to be saved
-      const groupNameWithNetidLists = await parseGroupCSV(csvFile);
-      console.log(groupNameWithNetidLists);
-      res.send(groupNameWithNetidLists);
+      if (await assignment.isTeacherOfCourse(user)) {
+        const assignmentState = await assignment.getState();
+        if (
+          assignmentState === AssignmentState.UNPUBLISHED ||
+          assignmentState === AssignmentState.SUBMISSION
+        ) {
+          if ((await assignment.getGroups()).length !== 0) {
+            throw "There already exist groups for this assignment";
+          }
+          // still need to be saved
+          const groupNameWithNetidLists = await parseGroupCSV(req.file.buffer);
+
+          // save the groups in the assignment
+          const groups: Group[] = [];
+          await getManager().transaction(
+            "SERIALIZABLE",
+            async (transactionalEntityManager) => {
+              const existingGroups = (
+                await transactionalEntityManager.findOneOrFail(
+                  Assignment,
+                  assignment.id,
+                  {
+                    relations: ["groups"],
+                  }
+                )
+              ).groups!;
+              if (existingGroups.length !== 0) {
+                throw "there already exists groups for this assignment";
+              }
+
+              const course = await transactionalEntityManager.findOneOrFail(
+                Course,
+                assignment.courseId
+              );
+
+              // iterate over all groups
+              for (const groupNameWithNetidList of groupNameWithNetidLists) {
+                const netids = groupNameWithNetidList.netids;
+                // get or make users
+                const users = [];
+                for (const netid of netids) {
+                  let user = await transactionalEntityManager.findOne(
+                    User,
+                    netid
+                  );
+                  // in case the user doesnt exists in the database yet, create it
+                  if (!user) {
+                    user = new User(netid);
+                    await transactionalEntityManager.save(user);
+                  }
+                  // enroll user in the course if not already
+                  let enrollment = await transactionalEntityManager.findOne(
+                    Enrollment,
+                    { where: { userNetid: user.netid, courseId: course.id } }
+                  );
+
+                  if (enrollment) {
+                    if (enrollment.role !== UserRole.STUDENT) {
+                      throw `${netid} is ${UserRole.STUDENT} in this course`;
+                    }
+                  } else {
+                    // enroll the user as student in the course
+                    enrollment = new Enrollment(user, course, UserRole.STUDENT);
+                    await transactionalEntityManager.save(enrollment);
+                  }
+                  users.push(user);
+                }
+
+                const groupName = groupNameWithNetidList.groupName;
+                // make the group self
+                const group = new Group(groupName, users, [assignment]);
+                await transactionalEntityManager.save(group);
+                groups.push(group);
+              }
+            }
+          );
+          // reload the groups from the database
+          for (const group of groups) {
+            await group.reload();
+          }
+          res.send(groups);
+        } else {
+          res
+            .status(HttpStatusCode.FORBIDDEN)
+            .send("The submission state has passed");
+        }
+      } else {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("User is not a teacher of the course");
+      }
     } catch (error) {
       res.status(HttpStatusCode.BAD_REQUEST).send(error);
     }
