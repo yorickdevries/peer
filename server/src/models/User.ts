@@ -83,15 +83,15 @@ export default class User extends BaseModel {
 
   constructor(
     netid: string,
+    affiliation?: Affiliation[],
+    study?: Study[],
+    organisationUnit?: OrganisationUnit[],
     studentNumber?: number | null,
     firstName?: string | null,
     prefix?: string | null,
     lastName?: string | null,
     email?: string | null,
-    displayName?: string | null,
-    affiliation?: Affiliation[],
-    study?: Study[],
-    organisationUnit?: OrganisationUnit[]
+    displayName?: string | null
   ) {
     super();
     this.netid = netid;
