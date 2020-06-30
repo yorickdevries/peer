@@ -131,7 +131,7 @@ describe("Integration", () => {
         name: "AntoherName",
         courseCode: "XYZ123",
         enrollable: false,
-        faculty: "3ME",
+        faculty: "3mE",
         academicYear: "2019/2020",
         description: null,
       })
