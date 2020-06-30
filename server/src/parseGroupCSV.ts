@@ -38,7 +38,7 @@ const getNetidWithGroupNames = function (studentList: neatCsv.Row[]) {
     }
     const netid = parseNetID(studentRow["Username"]);
     if (allNetids.includes(netid)) {
-      throw "Duplicate netid: " + netid;
+      throw `Duplicate netid: ${netid}`;
     }
     const groupName = studentRow["GroupName"];
     // in case the student doesnt have a groupName field
