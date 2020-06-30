@@ -70,6 +70,7 @@
     "fs-extra": "^6.0.1",
     "hasha": "^5.2.0",
     "helmet": "^3.22.0",
+    "js-graph-algorithms": "^1.0.18",
     "json2csv": "^4.5.4",
     "lodash": "^4.17.15",
     "moment": "^2.27.0",
