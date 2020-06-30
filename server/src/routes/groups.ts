@@ -40,7 +40,7 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
         .send("User is not a teacher of the course");
     }
   } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
   }
 });
 
@@ -56,7 +56,7 @@ router.get("/enrolled", validateQuery(assignmentIdSchema), async (req, res) => {
       res.status(HttpStatusCode.NOT_FOUND).send("No group found");
     }
   } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
   }
 });
 
@@ -161,7 +161,7 @@ router.post(
           .send("User is not a teacher of the course");
       }
     } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
     }
   }
 );

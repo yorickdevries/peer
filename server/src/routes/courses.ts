@@ -68,7 +68,7 @@ router.post(
       // if all goes well, the course can be returned
       res.send(course);
     } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
     }
   }
 );
@@ -93,7 +93,7 @@ router.post("/:id/enroll", validateParams(courseIdSchema), async (req, res) => {
         .send(`course with id ${courseId} is not enrollable`);
     }
   } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
   }
 });
 

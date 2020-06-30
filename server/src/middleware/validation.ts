@@ -11,7 +11,7 @@ const validate = (
     const nullConverted = convertNullStrings(req[field]);
     const { error, value } = schema.validate(nullConverted);
     if (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
     } else {
       // replace the value with converted version
       req[field] = value;

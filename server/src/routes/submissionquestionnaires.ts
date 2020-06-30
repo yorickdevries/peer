@@ -49,7 +49,7 @@ router.get("/:id", validateParams(questionnaireSchema), async (req, res) => {
         .send("You are not a teacher of this course");
     }
   } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
   }
 });
 
@@ -104,7 +104,7 @@ router.post("/", validateBody(questionnairePostSchema), async (req, res) => {
         .send("User is not a teacher of the course");
     }
   } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
   }
 });
 

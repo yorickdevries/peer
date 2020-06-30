@@ -42,7 +42,7 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
         .send("User is not a teacher of the course");
     }
   } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(error);
+    res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
   }
 });
 
@@ -72,7 +72,7 @@ router.get(
           .send("User is part of the group");
       }
     } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
     }
   }
 );
@@ -145,7 +145,7 @@ router.post(
           .send("User is not allowed to submit.");
       }
     } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(error);
+      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
     }
   }
 );
