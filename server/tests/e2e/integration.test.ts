@@ -404,7 +404,7 @@ describe("Integration", () => {
       .get(`/api/groups?assignmentId=${assignment.id}`)
       .set("cookie", studentCookie1);
     // assertions
-    expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
 
     // make a submission
     const exampleSubmissionFile1 = path.resolve(
