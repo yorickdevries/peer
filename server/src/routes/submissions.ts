@@ -77,7 +77,7 @@ router.post(
         .send(ResponseMessage.GROUP_NOT_FOUND);
       return;
     }
-    const assignment = await Assignment.findOneOrFail(req.body.assignmentId);
+    const assignment = await Assignment.findOne(req.body.assignmentId);
     if (!assignment) {
       res
         .status(HttpStatusCode.BAD_REQUEST)

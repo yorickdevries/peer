@@ -276,7 +276,7 @@ router.post(
 
 router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   const user = req.user!;
-  const assignment = await Assignment.findOneOrFail(req.params.id);
+  const assignment = await Assignment.findOne(req.params.id);
   if (!assignment) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
