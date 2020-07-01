@@ -10,14 +10,38 @@ import Enrollment from "../models/Enrollment";
 import UserRole from "../enum/UserRole";
 import { validateBody, validateParams } from "../middleware/validation";
 import _ from "lodash";
+import ResponseMessage from "../enum/ResponseMessage";
 
 const router = express.Router();
 
 // get all enrollable courses where the student isnt in enrolled yet
 router.get("/enrollable", async (req, res) => {
-  const courses = await Course.getEnrollable(req.user!);
+  const user = req.user!;
+  const courses = await Course.getEnrollable(user);
   const sortedCourses = _.sortBy(courses, "id");
   res.send(sortedCourses);
+});
+
+// Joi inputvalidation
+const idSchema = Joi.object({
+  id: Joi.number().integer().required(),
+});
+// get a course
+router.get("/:id", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  const courseId = req.params.id;
+  const course = await Course.findOne(courseId);
+  if (!course) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
+    return;
+  }
+  if (!(await course.isEnrolled(user))) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_ENROLLED_IN_COURSE);
+    return;
+  }
+  res.send(course);
 });
 
 // Joi inputvalidation
@@ -25,8 +49,8 @@ const courseSchema = Joi.object({
   name: Joi.string().required(),
   courseCode: Joi.string().required(),
   enrollable: Joi.boolean().required(),
-  faculty: Joi.string().required(),
-  academicYear: Joi.string().required(),
+  facultyName: Joi.string().required(),
+  academicYearName: Joi.string().required(),
   description: Joi.string().allow(null).required(),
 });
 // post a course
@@ -37,64 +61,139 @@ router.post(
   validateBody(courseSchema),
   async (req, res) => {
     const user = req.user!;
-    try {
-      // find the faculty and academic year in the database
-      const faculty = await Faculty.findOneOrFail(req.body.faculty);
-      const academicYear = await AcademicYear.findOneOrFail(
-        req.body.academicYear
-      );
-      // instantiate the course
-      const course = new Course(
-        req.body.name,
-        req.body.courseCode,
-        req.body.enrollable,
-        faculty,
-        academicYear,
-        req.body.description
-      );
-      // start transaction to both save the course and teacher enrollment
-      await getManager().transaction(
-        "SERIALIZABLE",
-        async (transactionalEntityManager) => {
-          // save the course so it gets an id
-          await transactionalEntityManager.save(course);
-          // here the current user needs to be enrolled as teacher fot he just created course
-          const enrollment = new Enrollment(user, course, UserRole.TEACHER);
-          await transactionalEntityManager.save(enrollment);
-        }
-      );
-      // reload course to get all data
-      await course.reload();
-      // if all goes well, the course can be returned
-      res.send(course);
-    } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
+    // find the faculty and academic year in the database
+    const faculty = await Faculty.findOne(req.body.facultyName);
+    if (!faculty) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("The specified faculty is not found");
+      return;
     }
+    const academicYear = await AcademicYear.findOne(req.body.academicYearName);
+    if (!academicYear) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("The specified academic year is not found");
+      return;
+    }
+    // instantiate the course
+    const course = new Course(
+      req.body.name,
+      req.body.courseCode,
+      req.body.enrollable,
+      faculty,
+      academicYear,
+      req.body.description
+    );
+    // start transaction to both save the course and teacher enrollment
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        // save the course so it gets an id
+        await transactionalEntityManager.save(course);
+        // here the current user needs to be enrolled as teacher fot he just created course
+        const enrollment = new Enrollment(user, course, UserRole.TEACHER);
+        await transactionalEntityManager.save(enrollment);
+      }
+    );
+    // reload course to get all data
+    await course.reload();
+    // if all goes well, the course can be returned
+    res.send(course);
   }
 );
 
-// Joi inputvalidation
-const courseIdSchema = Joi.object({
-  id: Joi.number().integer().required(),
-});
 // post an enrollment (enroll in a course)
-router.post("/:id/enroll", validateParams(courseIdSchema), async (req, res) => {
+router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   const user = req.user!;
   const courseId = req.params.id;
-  try {
-    const course = await Course.findOneOrFail(courseId);
-    if (await course.isEnrollable(user)) {
-      const enrollment = new Enrollment(user, course, UserRole.STUDENT);
-      await enrollment.save();
-      res.send(enrollment);
-    } else {
+  const course = await Course.findOne(courseId);
+  if (!course) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.COURSE_NOT_FOUND);
+    return;
+  }
+  if (!(await course.isEnrollable(user))) {
+    res.status(HttpStatusCode.BAD_REQUEST).send("The course is not enrollable");
+    return;
+  }
+  const enrollment = new Enrollment(user, course, UserRole.STUDENT);
+  await enrollment.save();
+  res.send(enrollment);
+});
+
+// get your enrollment fr a course
+router.get("/:id/enrollment", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  const courseId = req.params.id;
+  const course = await Course.findOne(courseId);
+  if (!course) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.COURSE_NOT_FOUND);
+    return;
+  }
+  const enrollment = await Enrollment.findOne({
+    where: { courseId: courseId, userNetid: user.netid },
+  });
+  if (!enrollment) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
+    return;
+  }
+  res.send(enrollment);
+});
+
+// get all enrollable assignments for a certain course
+router.get(
+  "/:id/enrollableassignments",
+  validateParams(idSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const course = await Course.findOne(req.params.courseId);
+    if (!course) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
-        .send(`course with id ${courseId} is not enrollable`);
+        .send(ResponseMessage.COURSE_NOT_FOUND);
+      return;
     }
-  } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
+    if (!(await course.isEnrolled(user, UserRole.STUDENT))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_ENROLLED_IN_COURSE);
+      return;
+    }
+    const enrollableAssignments = await course.getEnrollableAssignments(user);
+    const sortedEnrollableAssignments = _.sortBy(enrollableAssignments, "id");
+    res.send(sortedEnrollableAssignments);
   }
-});
+);
+
+// get all enrolled assignments for students
+router.get(
+  "/:id/enrolledassignments",
+  validateParams(idSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const course = await Course.findOne(req.params.courseId);
+    if (!course) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.COURSE_NOT_FOUND);
+      return;
+    }
+    if (!(await course.isEnrolled(user, UserRole.STUDENT))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_ENROLLED_IN_COURSE);
+      return;
+    }
+    const enrolledAssignments = await course.getPublishedEnrolledAssignments(
+      user
+    );
+    const sortedEnrolledAssignments = _.sortBy(enrolledAssignments, "id");
+    res.send(sortedEnrolledAssignments);
+  }
+);
 
 export default router;

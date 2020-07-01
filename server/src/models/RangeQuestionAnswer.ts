@@ -24,4 +24,6 @@ export default class RangeQuestionAnswer extends QuestionAnswer {
     super(question, review);
     this.answer = answer;
   }
+
+  // validation: answer should be in range of the question
 }

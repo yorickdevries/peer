@@ -29,12 +29,4 @@ export default class Enrollment extends BaseModel {
     this.course = course;
     this.role = role;
   }
-
-  getUser(): Promise<User> {
-    return User.findOneOrFail(this.userNetid);
-  }
-
-  getCourse(): Promise<Course> {
-    return Course.findOneOrFail(this.courseId);
-  }
 }

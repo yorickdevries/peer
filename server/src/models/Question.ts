@@ -82,8 +82,8 @@ export default abstract class Question extends BaseModel {
 
   // checks whether the user is teacher
   // of the corresponding questionnaire/assignment/course
-  async isTeacherOfCourse(user: User): Promise<boolean> {
+  async isTeacherInCourse(user: User): Promise<boolean> {
     const questionnaire = await this.getQuestionnaire();
-    return await questionnaire.isTeacherOfCourse(user);
+    return await questionnaire.isTeacherInCourse(user);
   }
 }

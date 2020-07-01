@@ -1,6 +1,10 @@
 import express from "express";
 import Joi from "@hapi/joi";
-import { validateQuery, validateBody } from "../middleware/validation";
+import {
+  validateBody,
+  validateQuery,
+  validateParams,
+} from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import _ from "lodash";
@@ -14,6 +18,7 @@ import User from "../models/User";
 import Enrollment from "../models/Enrollment";
 import UserRole from "../enum/UserRole";
 import Group from "../models/Group";
+import ResponseMessage from "../enum/ResponseMessage";
 
 const router = express.Router();
 
@@ -27,37 +32,48 @@ const assignmentIdSchema = Joi.object({
 router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   const user = req.user!;
   const assignmentId = req.query.assignmentId as any;
-  try {
-    const assignment = await Assignment.findOneOrFail(assignmentId);
-    if (await assignment.isTeacherOfCourse(user)) {
-      // sorting needs to be done
-      const groups = await assignment.getGroups();
-      const sortedGroups = _.sortBy(groups, "id");
-      res.send(sortedGroups);
-    } else {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("User is not a teacher of the course");
-    }
-  } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
+  const assignment = await Assignment.findOne(assignmentId);
+  if (!assignment) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+    return;
   }
+  if (
+    // not a teacher
+    !(await assignment.isTeacherInCourse(user))
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+    return;
+  }
+  const groups = await assignment.getGroups();
+  const sortedGroups = _.sortBy(groups, "id");
+  res.send(sortedGroups);
 });
 
-// get the group of a student for this assignment
-router.get("/enrolled", validateQuery(assignmentIdSchema), async (req, res) => {
-  const assignmentId = req.query.assignmentId as any;
-  try {
-    const assignment = await Assignment.findOneOrFail(assignmentId);
-    const group = await assignment.getGroup(req.user!);
-    if (group) {
-      res.send(group);
-    } else {
-      res.status(HttpStatusCode.NOT_FOUND).send("No group found");
-    }
-  } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
+// get all the groups for an assignment
+// Joi inputvalidation
+const idSchema = Joi.object({
+  id: Joi.number().integer().required(),
+});
+router.get("/:id", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  const group = await Group.findOne(req.params.id);
+  if (!group) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
+    return;
   }
+  if (!(await group.isTeacherInCourse(user))) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+    return;
+  }
+  const users = await group.getUsers();
+  group.users = users;
+  res.send(group);
 });
 
 // import groups from a brightspace export
@@ -67,102 +83,143 @@ router.post(
   validateBody(assignmentIdSchema),
   async (req, res) => {
     const user = req.user!;
+    const assignment = await Assignment.findOne(req.body.assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignment.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    const assignmentState = await assignment.getState();
+    if (
+      !(
+        assignmentState === AssignmentState.UNPUBLISHED ||
+        assignmentState === AssignmentState.SUBMISSION
+      )
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The submission state has passed");
+      return;
+    }
+    if (await assignment.hasGroups()) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("There are already groups for this assignment");
+      return;
+    }
+    // still need to be saved
+    interface groupNameWithNetidList {
+      groupName: string;
+      netids: string[];
+    }
+    let groupNameWithNetidLists: groupNameWithNetidList[];
     try {
-      const assignment = await Assignment.findOneOrFail(req.body.assignmentId);
-      if (await assignment.isTeacherOfCourse(user)) {
-        const assignmentState = await assignment.getState();
-        if (
-          assignmentState === AssignmentState.UNPUBLISHED ||
-          assignmentState === AssignmentState.SUBMISSION
-        ) {
-          if ((await assignment.getGroups()).length !== 0) {
-            throw "There already exist groups for this assignment";
-          }
-          // still need to be saved
-          const groupNameWithNetidLists = await parseGroupCSV(req.file.buffer);
-
-          // save the groups in the assignment
-          const groups: Group[] = [];
-          await getManager().transaction(
-            "SERIALIZABLE",
-            async (transactionalEntityManager) => {
-              const existingGroups = (
-                await transactionalEntityManager.findOneOrFail(
-                  Assignment,
-                  assignment.id,
-                  {
-                    relations: ["groups"],
-                  }
-                )
-              ).groups!;
-              if (existingGroups.length !== 0) {
-                throw "there already exists groups for this assignment";
-              }
-
-              const course = await transactionalEntityManager.findOneOrFail(
-                Course,
-                assignment.courseId
-              );
-
-              // iterate over all groups
-              for (const groupNameWithNetidList of groupNameWithNetidLists) {
-                const netids = groupNameWithNetidList.netids;
-                // get or make users
-                const users = [];
-                for (const netid of netids) {
-                  let user = await transactionalEntityManager.findOne(
-                    User,
-                    netid
-                  );
-                  // in case the user doesnt exists in the database yet, create it
-                  if (!user) {
-                    user = new User(netid);
-                    await transactionalEntityManager.save(user);
-                  }
-                  // enroll user in the course if not already
-                  let enrollment = await transactionalEntityManager.findOne(
-                    Enrollment,
-                    { where: { userNetid: user.netid, courseId: course.id } }
-                  );
-
-                  if (enrollment) {
-                    if (enrollment.role !== UserRole.STUDENT) {
-                      throw `${netid} is ${UserRole.STUDENT} in this course`;
-                    }
-                  } else {
-                    // enroll the user as student in the course
-                    enrollment = new Enrollment(user, course, UserRole.STUDENT);
-                    await transactionalEntityManager.save(enrollment);
-                  }
-                  users.push(user);
-                }
-
-                const groupName = groupNameWithNetidList.groupName;
-                // make the group self
-                const group = new Group(groupName, users, [assignment]);
-                await transactionalEntityManager.save(group);
-                groups.push(group);
-              }
-            }
-          );
-          // reload the groups from the database
-          for (const group of groups) {
-            await group.reload();
-          }
-          res.send(groups);
-        } else {
-          res
-            .status(HttpStatusCode.FORBIDDEN)
-            .send("The submission state has passed");
-        }
-      } else {
-        res
-          .status(HttpStatusCode.FORBIDDEN)
-          .send("User is not a teacher of the course");
-      }
+      // can throw an error if malformed
+      groupNameWithNetidLists = await parseGroupCSV(req.file.buffer);
     } catch (error) {
       res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
+      return;
     }
+    // save the users and enroll them in the course
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        const course = await transactionalEntityManager.findOneOrFail(
+          Course,
+          assignment.courseId
+        );
+
+        // iterate over all groups
+        for (const groupNameWithNetidList of groupNameWithNetidLists) {
+          const netids = groupNameWithNetidList.netids;
+          // get or make users
+          for (const netid of netids) {
+            let user = await transactionalEntityManager.findOne(User, netid);
+            // in case the user doesnt exists in the database yet, create it
+            if (!user) {
+              user = new User(netid);
+              await transactionalEntityManager.save(user);
+            }
+            // enroll user in the course if not already
+            let enrollment = await transactionalEntityManager.findOne(
+              Enrollment,
+              { where: { userNetid: user.netid, courseId: course.id } }
+            );
+
+            if (enrollment) {
+              if (enrollment.role !== UserRole.STUDENT) {
+                throw new Error(
+                  `${netid} is ${enrollment.role} in this course`
+                );
+              }
+            } else {
+              // enroll the user as student in the course
+              enrollment = new Enrollment(user, course, UserRole.STUDENT);
+              await transactionalEntityManager.save(enrollment);
+            }
+          }
+        }
+      }
+    );
+    // save the users of the groups in the course
+    const groups: Group[] = [];
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        const existingGroups = (
+          await transactionalEntityManager.findOneOrFail(
+            Assignment,
+            assignment.id,
+            {
+              relations: ["groups"],
+            }
+          )
+        ).groups!;
+        if (existingGroups.length > 0) {
+          throw new Error("There are already groups for this assignment");
+        }
+
+        const course = await transactionalEntityManager.findOneOrFail(
+          Course,
+          assignment.courseId
+        );
+
+        // iterate over all groups
+        for (const groupNameWithNetidList of groupNameWithNetidLists) {
+          const netids = groupNameWithNetidList.netids;
+          // get or make users
+          const users = [];
+          for (const netid of netids) {
+            const user = await transactionalEntityManager.findOneOrFail(
+              User,
+              netid
+            );
+            users.push(user);
+          }
+
+          const groupName = groupNameWithNetidList.groupName;
+          // make the group
+          const group = new Group(groupName, course, users, [assignment]);
+          await transactionalEntityManager.save(group);
+          groups.push(group);
+        }
+      }
+    );
+    // reload the groups from the database
+    for (const group of groups) {
+      await group.reload();
+    }
+    res.send(groups);
   }
 );
 

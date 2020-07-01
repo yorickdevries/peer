@@ -39,4 +39,5 @@ export default class ReviewOfSubmission extends Review {
     );
     this.submission = submission;
   }
+  // validation: questionnaire and submission should correspond to same assignment
 }

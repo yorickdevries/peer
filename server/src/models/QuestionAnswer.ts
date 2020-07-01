@@ -40,4 +40,6 @@ export default abstract class QuestionAnswer extends BaseModel {
     this.question = question;
     this.review = review;
   }
+
+  // validation: questions should be part of the questionnaire of the review
 }

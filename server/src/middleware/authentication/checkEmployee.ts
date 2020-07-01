@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import HttpStatusCode from "../../enum/HttpStatusCode";
 import _ from "lodash";
+import ResponseMessage from "../../enum/ResponseMessage";
 
 const checkEmployee = async function (
   req: Request,
@@ -15,7 +16,7 @@ const checkEmployee = async function (
   ) {
     next();
   } else {
-    res.status(HttpStatusCode.FORBIDDEN).send("User is not an employee");
+    res.status(HttpStatusCode.FORBIDDEN).send(ResponseMessage.NO_EMPLOYEE);
   }
 };
 

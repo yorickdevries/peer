@@ -1,6 +1,5 @@
 import { Entity, Column } from "typeorm";
 import { IsDefined, IsBoolean } from "class-validator";
-
 import NamedModel from "./NamedModel";
 
 @Entity()
