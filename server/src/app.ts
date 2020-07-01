@@ -34,13 +34,19 @@ app.get("/*", (_req, res) => {
 });
 
 // Error handler
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+app.use((error: Error, _req: Request, res: Response, _next: NextFunction) => {
   // Print error to the stderr
-  console.error(`Error occured at ${new Date()}: ${err}`);
+  const errorString = String(error);
+  console.error(`Error occured at ${new Date()}: ${errorString}`);
+
   // Send generic 500 error response
-  res
-    .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
-    .send("Internal server error, please contact the system administrator");
+  res.status(HttpStatusCode.INTERNAL_SERVER_ERROR);
+  if (process.env.NODE_ENV === "production") {
+    res.send("Internal server error, please contact the system administrator");
+  } else {
+    // Send error to frontend if not in production
+    res.send(errorString);
+  }
 });
 
 export default app;
