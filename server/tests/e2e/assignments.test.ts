@@ -35,8 +35,8 @@ describe("Assignments", () => {
         name: "CourseName",
         courseCode: "ABC123",
         enrollable: false,
-        faculty: "EEMCS",
-        academicYear: "2019/2020",
+        facultyName: "EEMCS",
+        academicYearName: "2019/2020",
         description: null,
       })
       .set("cookie", sessionCookie);

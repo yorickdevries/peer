@@ -93,8 +93,8 @@ describe("Integration", () => {
         name: "CourseName",
         courseCode: "ABC123",
         enrollable: true,
-        faculty: "EEMCS",
-        academicYear: "2019/2020",
+        facultyName: "EEMCS",
+        academicYearName: "2019/2020",
         description: null,
       })
       .set("cookie", teacherCookie);
@@ -116,8 +116,8 @@ describe("Integration", () => {
         name: "CourseName",
         courseCode: "ABC123",
         enrollable: true,
-        faculty: "EEMCS",
-        academicYear: "2019/2020",
+        facultyName: "EEMCS",
+        academicYearName: "2019/2020",
         description: null,
       })
       .set("cookie", studentCookie1);
@@ -131,8 +131,8 @@ describe("Integration", () => {
         name: "AntoherName",
         courseCode: "XYZ123",
         enrollable: false,
-        faculty: "3mE",
-        academicYear: "2019/2020",
+        facultyName: "3mE",
+        academicYearName: "2019/2020",
         description: null,
       })
       .set("cookie", teacherCookie2);
@@ -319,7 +319,7 @@ describe("Integration", () => {
 
     // get enrolled assignments
     res = await request(server)
-      .get(`/api/assignments/enrolled?courseId=${course.id}`)
+      .get(`/api/courses/${course.id}/enrolledassignments`)
       .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -327,7 +327,7 @@ describe("Integration", () => {
 
     // get available assignments
     res = await request(server)
-      .get(`/api/assignments/enrollable?courseId=${course.id}`)
+      .get(`/api/courses/${course.id}/enrollableassignments`)
       .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -361,7 +361,7 @@ describe("Integration", () => {
 
     // get enrolled assignments
     res = await request(server)
-      .get(`/api/assignments/enrolled?courseId=${course.id}`)
+      .get(`/api/courses/${course.id}/enrolledassignments`)
       .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -373,7 +373,7 @@ describe("Integration", () => {
 
     // get available assignments
     res = await request(server)
-      .get(`/api/assignments/enrollable?courseId=${course.id}`)
+      .get(`/api/courses/${course.id}/enrollableassignments`)
       .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -385,7 +385,7 @@ describe("Integration", () => {
 
     // get group
     res = await request(server)
-      .get(`/api/groups/enrolled?assignmentId=${assignment.id}`)
+      .get(`/api/assignments/${assignment.id}/group`)
       .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -446,9 +446,7 @@ describe("Integration", () => {
 
     // get all submissions for this assignment by this group
     res = await request(server)
-      .get(
-        `/api/submissions/enrolled?assignmentId=${assignment.id}&groupId=${group1.id}`
-      )
+      .get(`/api/assignments/${assignment.id}/submissions?groupId=${group1.id}`)
       .set("cookie", studentCookie1);
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);

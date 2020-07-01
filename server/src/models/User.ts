@@ -109,7 +109,7 @@ export default class User extends BaseModel {
   async validateOrReject(): Promise<void> {
     // validate the netid
     if (this.netid !== parseNetID(this.netid)) {
-      throw `invalid netid: ${this.netid}`;
+      throw new Error(`invalid netid: ${this.netid}`);
     }
     return super.validateOrReject();
   }

@@ -13,6 +13,7 @@ import fsPromises from "fs/promises";
 import upload from "../middleware/upload";
 import AssignmentState from "../enum/AssignmentState";
 import { getManager } from "typeorm";
+import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
 
 // config values
@@ -30,52 +31,26 @@ const assignmentIdSchema = Joi.object({
 router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   const user = req.user!;
   const assignmentId = req.query.assignmentId as any;
-  try {
-    const assignment = await Assignment.findOneOrFail(assignmentId);
-    if (await assignment.isTeacherOfCourse(user)) {
-      const submissions = await assignment.getSubmissions();
-      const sortedSubmissions = _.sortBy(submissions, "id");
-      res.send(sortedSubmissions);
-    } else {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send("User is not a teacher of the course");
-    }
-  } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
+  const assignment = await Assignment.findOne(assignmentId);
+  if (!assignment) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+    return;
   }
-});
-
-// Joi inputvalidation for query
-const querySubmissionSchema = Joi.object({
-  assignmentId: Joi.number().integer().required(),
-  groupId: Joi.number().integer().required(),
-});
-// get the submissions of a group
-router.get(
-  "/enrolled",
-  validateQuery(querySubmissionSchema),
-  async (req, res) => {
-    const user = req.user!;
-    const assignmentId = req.query.assignmentId as any;
-    const groupId = req.query.groupId as any;
-    try {
-      const assignment = await Assignment.findOneOrFail(assignmentId);
-      const group = await Group.findOneOrFail(groupId);
-      if (await group.hasUser(user)) {
-        const submissions = await assignment.getSubmissions(group);
-        const sortedSubmissions = _.sortBy(submissions, "id");
-        res.send(sortedSubmissions);
-      } else {
-        res
-          .status(HttpStatusCode.BAD_REQUEST)
-          .send("User is part of the group");
-      }
-    } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
-    }
+  if (
+    // not a teacher
+    !(await assignment.isTeacherInCourse(user))
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+    return;
   }
-);
+  const submissions = await assignment.getSubmissions();
+  const sortedSubmissions = _.sortBy(submissions, "id");
+  res.send(sortedSubmissions);
+});
 
 // Joi inputvalidation
 const submissionSchema = Joi.object({
@@ -89,64 +64,70 @@ router.post(
   validateBody(submissionSchema),
   async (req, res) => {
     const user = req.user!;
-    try {
-      const group = await Group.findOneOrFail(req.body.groupId);
-      const assignment = await Assignment.findOneOrFail(req.body.assignmentId);
-      if (
-        (await group.hasUser(user)) &&
-        (await group.hasAssignment(assignment))
-      ) {
-        if (assignment.getState() === AssignmentState.SUBMISSION) {
-          // make the submission here in a transation
-          let submission: Submission;
-
-          // start transaction make sure the file and submission are both saved
-          await getManager().transaction(
-            "SERIALIZABLE",
-            async (transactionalEntityManager) => {
-              if (!req.file) {
-                throw "file is needed for the submission";
-              }
-
-              // create the file object
-              const fileBuffer = req.file.buffer;
-              const fileExtension = path.extname(req.file.originalname);
-              const fileName = path.basename(
-                req.file.originalname,
-                fileExtension
-              );
-              const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
-              const file = new File(fileName, fileExtension, fileHash);
-
-              await transactionalEntityManager.save(file);
-
-              // create submission
-              submission = new Submission(user, group, assignment, file);
-              await transactionalEntityManager.save(submission);
-
-              // save the file to disk lastly
-              // (if this goes wrong all previous steps are rolled back)
-              const filePath = path.resolve(uploadFolder, file.id!.toString());
-              await fsPromises.writeFile(filePath, req.file.buffer);
-            }
-          );
-          // reload submission to get all data
-          // submission should be defined now (else we would be in the catch)
-          await submission!.reload();
-          res.send(submission!);
-        } else {
-          res
-            .status(HttpStatusCode.FORBIDDEN)
-            .send("The assignment is not in submission state");
-        }
-      } else {
-        res
-          .status(HttpStatusCode.FORBIDDEN)
-          .send("User is not allowed to submit.");
-      }
-    } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
+    if (!req.file) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("file is needed for the submission");
+      return;
     }
+    const group = await Group.findOne(req.body.groupId);
+    if (!group) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.GROUP_NOT_FOUND);
+      return;
+    }
+    const assignment = await Assignment.findOne(req.body.assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (
+      !(await group.hasUser(user)) ||
+      !(await group.hasAssignment(assignment))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not allowed to submit.");
+      return;
+    }
+    if (!(assignment.getState() === AssignmentState.SUBMISSION)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is not in submission state");
+      return;
+    }
+    // make the submission here in a transaction
+    let submission: Submission;
+
+    // start transaction make sure the file and submission are both saved
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        // create the file object
+        const fileBuffer = req.file.buffer;
+        const fileExtension = path.extname(req.file.originalname);
+        const fileName = path.basename(req.file.originalname, fileExtension);
+        const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+        const file = new File(fileName, fileExtension, fileHash);
+
+        await transactionalEntityManager.save(file);
+
+        // create submission
+        submission = new Submission(user, group, assignment, file);
+        await transactionalEntityManager.save(submission);
+
+        // save the file to disk lastly
+        // (if this goes wrong all previous steps are rolled back)
+        const filePath = path.resolve(uploadFolder, file.id!.toString());
+        await fsPromises.writeFile(filePath, req.file.buffer);
+      }
+    );
+    // reload submission to get all data
+    await submission!.reload();
+    res.send(submission!);
   }
 );
 

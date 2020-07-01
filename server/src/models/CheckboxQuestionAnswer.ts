@@ -20,4 +20,6 @@ export default class CheckboxQuestionAnswer extends QuestionAnswer {
     super(question, review);
     this.answer = answer;
   }
+
+  // validation: options should be oart of question
 }

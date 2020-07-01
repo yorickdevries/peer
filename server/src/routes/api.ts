@@ -3,6 +3,8 @@ import { eventLogger } from "../middleware/logger";
 import authenticationRoutes from "./authentication";
 import checkAndSetAuthentication from "../middleware/authentication/checkAuthentication";
 import HttpStatusCode from "../enum/HttpStatusCode";
+import ResponseMessage from "../enum/ResponseMessage";
+// routes
 import faculties from "./faculties";
 import academicyears from "./academicyears";
 import courses from "./courses";
@@ -31,7 +33,7 @@ authenticationRoutes(router);
 
 // Check authentication route
 router.get("/authenticated", (req, res) => {
-  res.json({ authenticated: req.isAuthenticated() });
+  res.send({ authenticated: req.isAuthenticated() });
 });
 
 // Check always whether someone is logged in before accessing the other routes below
@@ -42,7 +44,7 @@ router.use(checkAndSetAuthentication);
 // might need to be moved to /users route
 router.get("/me", async (req, res) => {
   // the user is defined as it is checked and set with checkAndSetAuthentication
-  res.json(req.user);
+  res.send(req.user);
 });
 
 // TODO: Complete routing of the new API
@@ -68,7 +70,7 @@ router.use("/oldroutes", oldRoutes);
 
 // If no other routes apply, send a 404
 router.use((_req, res) => {
-  res.status(HttpStatusCode.NOT_FOUND).send("Resource not found");
+  res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
 });
 
 export default router;

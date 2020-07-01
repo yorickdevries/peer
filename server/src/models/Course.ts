@@ -126,9 +126,6 @@ export default class Course extends BaseModel {
 
   async isEnrolled(user: User, role?: UserRole): Promise<boolean> {
     // if this.id isnt instantiated no user can be enrolled
-    if (!this.id) {
-      return false;
-    }
     const where: {
       userNetid: string;
       courseId: number;

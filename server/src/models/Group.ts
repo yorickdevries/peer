@@ -4,12 +4,16 @@ import {
   Column,
   ManyToMany,
   JoinTable,
+  RelationId,
+  ManyToOne,
 } from "typeorm";
 import { IsDefined, IsString, IsNotEmpty } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import Assignment from "./Assignment";
 import _ from "lodash";
+import UserRole from "../enum/UserRole";
+import Course from "./Course";
 
 @Entity()
 export default class Group extends BaseModel {
@@ -22,6 +26,12 @@ export default class Group extends BaseModel {
   @IsNotEmpty()
   name: string;
 
+  @RelationId((group: Group) => group.course)
+  courseId!: number;
+  // course_id int NOT NULL, FK
+  @ManyToOne((_type) => Course, { nullable: false })
+  course?: Course;
+
   @ManyToMany((_type) => User)
   @JoinTable()
   users?: User[];
@@ -30,29 +40,46 @@ export default class Group extends BaseModel {
   @JoinTable()
   assignments?: Assignment[];
 
-  constructor(name: string, users: User[], assignments: Assignment[]) {
+  constructor(
+    name: string,
+    course: Course,
+    users: User[],
+    assignments: Assignment[]
+  ) {
     super();
     this.name = name;
+    this.course = course;
     this.users = users;
     this.assignments = assignments;
   }
 
   async validateOrReject(): Promise<void> {
-    // checking whether the students are enrolled in the course is skipped
-    // as this enrollment is done in an transaction and ca therefore not be checked here
-    // so every time a course is saved, this needs to be checked separately
-    if (this.assignments) {
-      const courseIds = [];
+    if (this.course && this.assignments && this.users) {
       for (const assignment of this.assignments) {
-        courseIds.push(assignment.courseId);
-      }
-      // validation to check whether all assignments are from the same course
-      if (_.uniq(courseIds).length > 1) {
-        throw "Assignments of a group should be from the same course";
+        const course = await assignment.getCourse();
+        if (this.course.id !== course.id) {
+          throw new Error(
+            `Assignment with id ${assignment.id} is not part of course ${this.course.id}`
+          );
+        }
+        // validate that all users are also enrolled in the course
+        for (const user of this.users) {
+          if (!(await course.isEnrolled(user, UserRole.STUDENT))) {
+            throw new Error(`${user.netid} is not enrolled in ${course.id}`);
+          }
+        }
       }
     }
     // if it succeeds the super validateOrReject can be called
     return super.validateOrReject();
+  }
+
+  async getCourse(): Promise<Course> {
+    return (
+      await Group.findOneOrFail(this.id, {
+        relations: ["course"],
+      })
+    ).course!;
   }
 
   async getUsers(): Promise<User[]> {
@@ -83,5 +110,10 @@ export default class Group extends BaseModel {
     return _.some(groupAssignments, (groupAssignment) => {
       return groupAssignment.id === assignment.id;
     });
+  }
+
+  async isTeacherInCourse(user: User): Promise<boolean> {
+    const course = await this.getCourse();
+    return await course.isEnrolled(user, UserRole.TEACHER);
   }
 }

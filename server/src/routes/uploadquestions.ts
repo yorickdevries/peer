@@ -4,6 +4,7 @@ import { validateBody } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Questionnaire from "../models/Questionnaire";
 import UploadQuestion from "../models/UploadQuestion";
+import ResponseMessage from "../enum/ResponseMessage";
 
 const router = express.Router();
 
@@ -18,28 +19,27 @@ const questionSchema = Joi.object({
 // post a question
 router.post("/", validateBody(questionSchema), async (req, res) => {
   const user = req.user!;
-  try {
-    const questionnaire = await Questionnaire.findOneOrFail(
-      req.body.questionnaireId
-    );
-    if (await questionnaire.isTeacherOfCourse(user)) {
-      const question = new UploadQuestion(
-        req.body.text,
-        req.body.number,
-        req.body.optional,
-        questionnaire,
-        req.body.extensions
-      );
-      await question.save();
-      res.send(question);
-    } else {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("User is not a teacher of the course");
-    }
-  } catch (error) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
+  const questionnaire = await Questionnaire.findOne(req.body.questionnaireId);
+  if (!questionnaire) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
+    return;
   }
+  if (!(await questionnaire.isTeacherInCourse(user))) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+  }
+  const question = new UploadQuestion(
+    req.body.text,
+    req.body.number,
+    req.body.optional,
+    questionnaire,
+    req.body.extensions
+  );
+  await question.save();
+  res.send(question);
 });
 
 export default router;

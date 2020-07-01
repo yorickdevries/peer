@@ -4,6 +4,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToOne,
+  RelationId,
 } from "typeorm";
 import { IsDefined } from "class-validator";
 import BaseModel from "./BaseModel";
@@ -19,14 +20,20 @@ export default class Submission extends BaseModel {
   id!: number;
 
   // User_netid varchar(500) NOT NULL,
+  @RelationId((submission: Submission) => submission.user)
+  userNetid!: number;
   @ManyToOne((_type) => User, { nullable: false })
   user?: User;
 
   // Group_id int NOT NULL,
+  @RelationId((submission: Submission) => submission.group)
+  groupId!: number;
   @ManyToOne((_type) => Group, { nullable: false })
   group?: Group;
 
   // Assignment_id int NOT NULL,
+  @RelationId((submission: Submission) => submission.assignment)
+  assignmentId!: number;
   @ManyToOne((_type) => Assignment, (assignment) => assignment.submissions, {
     nullable: false,
   })
@@ -50,39 +57,20 @@ export default class Submission extends BaseModel {
   async validateOrReject(): Promise<void> {
     // might need to be changed if a teacher submits on behalf of a group
     if (!(await this.group!.hasUser(this.user!))) {
-      throw "User is not part of this group";
+      throw new Error("User is not part of this group");
     }
     if (!(await this.group!.hasAssignment(this.assignment!))) {
-      throw "Group is not part of this assignment";
+      throw new Error("Group is not part of this assignment");
     }
     // if it succeeds the super validateOrReject can be called
     return super.validateOrReject();
   }
 
-  // user
-  async getUser(): Promise<User> {
-    return (
-      await Submission.findOneOrFail(this.id, {
-        relations: ["user"],
-      })
-    ).user!;
-  }
-
-  //group
   async getGroup(): Promise<Group> {
     return (
       await Submission.findOneOrFail(this.id, {
         relations: ["group"],
       })
     ).group!;
-  }
-
-  //assignment
-  async getAssignment(): Promise<Assignment> {
-    return (
-      await Submission.findOneOrFail(this.id, {
-        relations: ["assignment"],
-      })
-    ).assignment!;
   }
 }

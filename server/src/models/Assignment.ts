@@ -185,13 +185,17 @@ export default class Assignment extends BaseModel {
   validateOrReject(): Promise<void> {
     // check whether the boolean is correctly set
     if (this.reviewEvaluation && !this.reviewEvaluationDueDate) {
-      throw "reviewEvaluationDueDate must be defined";
+      throw new Error("reviewEvaluationDueDate must be defined");
     }
     if (!this.reviewEvaluation && this.reviewEvaluationDueDate) {
-      throw "reviewEvaluationDueDate is defined while reviewEvaluation is turned off";
+      throw new Error(
+        "reviewEvaluationDueDate is defined while reviewEvaluation is turned off"
+      );
     }
     if (!this.reviewEvaluation && this.reviewQuestionnaire) {
-      throw "reviewQuestionnaire is defined while reviewEvaluation is turned off";
+      throw new Error(
+        "reviewQuestionnaire is defined while reviewEvaluation is turned off"
+      );
     }
     // check chronological order of the dates
     if (
@@ -201,7 +205,7 @@ export default class Assignment extends BaseModel {
       (this.reviewEvaluationDueDate &&
         moment(this.reviewDueDate).isAfter(this.reviewEvaluationDueDate))
     ) {
-      throw "The dates must chronologically correct";
+      throw new Error("The dates must chronologically correct");
     }
     // if all succeeds the super validateOrReject can be called
     return super.validateOrReject();
@@ -288,7 +292,7 @@ export default class Assignment extends BaseModel {
     return undefined;
   }
 
-  // check whether the user is enrolled in this assignment
+  // check whether the assgnment is enrollable for a user
   async isEnrollable(user: User): Promise<boolean> {
     // Check whether the user is in the course and not already enrolled
     // plus check whether the assignment is public/enrollable
@@ -297,7 +301,6 @@ export default class Assignment extends BaseModel {
       if (this.getState() === AssignmentState.SUBMISSION) {
         const course = await this.getCourse();
         if (await course.isEnrolled(user, UserRole.STUDENT)) {
-          //enrolledInCourse
           // not already enrolled in assignment
           if (!(await this.isEnrolledInGroup(user))) {
             return true;
@@ -308,12 +311,16 @@ export default class Assignment extends BaseModel {
     return false;
   }
 
+  async hasGroups(): Promise<boolean> {
+    return (await this.getGroups()).length > 0;
+  }
+
   // check whether the user is enrolled in this assignment
   async isEnrolledInGroup(user: User): Promise<boolean> {
     return (await this.getGroup(user)) ? true : false;
   }
 
-  async isTeacherOfCourse(user: User): Promise<boolean> {
+  async isTeacherInCourse(user: User): Promise<boolean> {
     const course = await this.getCourse();
     return await course.isEnrolled(user, UserRole.TEACHER);
   }
