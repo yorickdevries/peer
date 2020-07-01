@@ -87,7 +87,9 @@ describe("Review distribution", () => {
       ) {
         studentsOfGroup.push(students[i]);
       }
-      const group = new Group(`group${j}`, studentsOfGroup, [assignment]);
+      const group = new Group(`group${j}`, course, studentsOfGroup, [
+        assignment,
+      ]);
       await group.save();
       // make submission
       const file = new File(
@@ -180,7 +182,9 @@ describe("Review distribution", () => {
         studentsOfGroup.push(students[studentIndex]);
         studentIndex++;
       }
-      const group = new Group(`group${j}`, studentsOfGroup, [assignment]);
+      const group = new Group(`group${j}`, course, studentsOfGroup, [
+        assignment,
+      ]);
       await group.save();
       // make submission
       const file = new File(
@@ -264,7 +268,7 @@ describe("Review distribution", () => {
     const submissions: Submission[] = [];
 
     // submission 1
-    const group1 = new Group(`group1`, [student1], [assignment]);
+    const group1 = new Group(`group1`, course, [student1], [assignment]);
     await group1.save();
     // make submission
     const file1 = new File(
@@ -279,7 +283,12 @@ describe("Review distribution", () => {
     submissions.push(submission1);
 
     // submission 1
-    const group2 = new Group(`group2`, [student2, student3], [assignment]);
+    const group2 = new Group(
+      `group2`,
+      course,
+      [student2, student3],
+      [assignment]
+    );
     await group2.save();
     // make submission
     const file2 = new File(
