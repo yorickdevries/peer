@@ -33,8 +33,8 @@ describe("Integration", () => {
         name: "CourseName",
         courseCode: "ABC123",
         enrollable: true,
-        faculty: "EEMCS",
-        academicYear: "2019/2020",
+        facultyName: "EEMCS",
+        academicYearName: "2019/2020",
         description: null,
       })
       .set("cookie", teacherCookie);
