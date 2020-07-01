@@ -31,7 +31,7 @@ authenticationRoutes(router);
 
 // Check authentication route
 router.get("/authenticated", (req, res) => {
-  res.json({ authenticated: req.isAuthenticated() });
+  res.send({ authenticated: req.isAuthenticated() });
 });
 
 // Check always whether someone is logged in before accessing the other routes below
@@ -42,7 +42,7 @@ router.use(checkAndSetAuthentication);
 // might need to be moved to /users route
 router.get("/me", async (req, res) => {
   // the user is defined as it is checked and set with checkAndSetAuthentication
-  res.json(req.user);
+  res.send(req.user);
 });
 
 // TODO: Complete routing of the new API
