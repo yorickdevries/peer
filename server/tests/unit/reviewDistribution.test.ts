@@ -74,7 +74,7 @@ describe("Review distribution", () => {
       const student = new User(`student${i}`);
       await student.save();
       const enrollment = new Enrollment(student, course, UserRole.STUDENT);
-      await enrollment.save()
+      await enrollment.save();
       students.push(student);
     }
 
@@ -171,7 +171,7 @@ describe("Review distribution", () => {
       const student = new User(`student${i}`);
       await student.save();
       const enrollment = new Enrollment(student, course, UserRole.STUDENT);
-      await enrollment.save()
+      await enrollment.save();
       students.push(student);
     }
 
@@ -267,16 +267,15 @@ describe("Review distribution", () => {
     const student1 = new User(`student1`);
     await student1.save();
     const enrollment1 = new Enrollment(student1, course, UserRole.STUDENT);
-    await enrollment1.save()
+    await enrollment1.save();
     const student2 = new User(`student2`);
     await student2.save();
     const enrollment2 = new Enrollment(student2, course, UserRole.STUDENT);
-    await enrollment2.save()
+    await enrollment2.save();
     const student3 = new User(`student3`);
     await student3.save();
     const enrollment3 = new Enrollment(student3, course, UserRole.STUDENT);
-    await enrollment3.save()
-
+    await enrollment3.save();
 
     const submissions: Submission[] = [];
 
