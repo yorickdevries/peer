@@ -295,13 +295,13 @@ describe("Review distribution", () => {
 
     const reviewsPerUser = 1;
     // need to be made into an object
-    const reviewAssignmentsFunction = async function () {
-      return await generateDistribution(
-        submissions,
-        [student2, student3],
-        reviewsPerUser
-      );
-    };
-    expect(reviewAssignmentsFunction).toThrowError();
+    const generateDistributionPromise = generateDistribution(
+      submissions,
+      [student2, student3],
+      reviewsPerUser
+    );
+    expect.assertions(1);
+    //await expect(generateDistributionPromise).rejects;
+    await expect(generateDistributionPromise).rejects.toThrow();
   });
 });
