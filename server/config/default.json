@@ -35,9 +35,9 @@
         "maxSizeSubmissionFile": 52428800 // 50 MB
     },
     "exampleData": {
-        "exampleAssignmentFolder": "./example_data/assignments",
-        "exampleSubmissionFolder": "./example_data/submissions",
-        "exampleReviewFolder": "./example_data/reviews"
+        "exampleAssignmentFolder": "./exampleData/assignments",
+        "exampleSubmissionFolder": "./exampleData/submissions",
+        "exampleReviewFolder": "./exampleData/reviews"
     },
     "allowedExtensions": [".pdf", ".zip", ".doc", ".docx"],
     "maxFileSize": 52428800, // 50 MB

@@ -74,7 +74,7 @@ describe("Integration", () => {
     // group export
     const groupCSV = path.resolve(
       __dirname,
-      "../../example_data/csv_test/",
+      "../../exampleData/groupExports/",
       "example_export.csv"
     );
     const res = await request(server)
@@ -96,7 +96,7 @@ describe("Integration", () => {
     // group export
     const groupCSV = path.resolve(
       __dirname,
-      "../../example_data/csv_test/",
+      "../../exampleData/groupExports/",
       "example_export_groupnumbers.csv"
     );
     const res = await request(server)
@@ -119,7 +119,7 @@ describe("Integration", () => {
     // group export
     const groupCSV = path.resolve(
       __dirname,
-      "../../example_data/csv_test/",
+      "../../exampleData/groupExports/",
       "example_export_non_csv.csv"
     );
     const res = await request(server)
@@ -134,7 +134,7 @@ describe("Integration", () => {
     // group export
     const groupCSV = path.resolve(
       __dirname,
-      "../../example_data/csv_test/",
+      "../../exampleData/groupExports/",
       "example_export_missing_group.csv"
     );
     const res = await request(server)
@@ -150,7 +150,7 @@ describe("Integration", () => {
     // group export
     const groupCSV = path.resolve(
       __dirname,
-      "../../example_data/csv_test/",
+      "../../exampleData/groupExports/",
       "example_export_missing_username.csv"
     );
     const res = await request(server)
@@ -165,7 +165,7 @@ describe("Integration", () => {
     // group export
     const groupCSV = path.resolve(
       __dirname,
-      "../../example_data/csv_test/",
+      "../../exampleData/groupExports/",
       "example_export_empty_username.csv"
     );
     const res = await request(server)
@@ -180,7 +180,7 @@ describe("Integration", () => {
     // group export
     const groupCSV = path.resolve(
       __dirname,
-      "../../example_data/csv_test/",
+      "../../exampleData/groupExports/",
       "example_export_empty_groups.csv"
     );
     const res = await request(server)
@@ -202,7 +202,7 @@ describe("Integration", () => {
     // group export
     const groupCSV = path.resolve(
       __dirname,
-      "../../example_data/csv_test/",
+      "../../exampleData/groupExports/",
       "tud-sndbx-stefanhugtenbu+o.csv"
     );
     const res = await request(server)
@@ -217,7 +217,7 @@ describe("Integration", () => {
     // group export
     const groupCSV = path.resolve(
       __dirname,
-      "../../example_data/csv_test/",
+      "../../exampleData/groupExports/",
       "example_export_usernames_without_at.csv"
     );
     const res = await request(server)
@@ -239,7 +239,7 @@ describe("Integration", () => {
     // group export
     const groupCSV = path.resolve(
       __dirname,
-      "../../example_data/csv_test/",
+      "../../exampleData/groupExports/",
       "example_export.csv"
     );
     const res = await request(server)
@@ -254,7 +254,7 @@ describe("Integration", () => {
     // group export
     const groupCSV = path.resolve(
       __dirname,
-      "../../example_data/csv_test/",
+      "../../exampleData/groupExports/",
       "duplicate_student.csv"
     );
     const res = await request(server)

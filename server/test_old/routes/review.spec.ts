@@ -78,7 +78,7 @@ describe("API review routes", () => {
     it("Put review with valid file upload", async () => {
         mockDate.set("2019-10-02T21:00:00Z");
         MockLogin.initialize("paulvanderlaan");
-        const exampleReviewFile = path.join(__dirname, "../../example_data/reviews/review1.pdf");
+        const exampleReviewFile = path.join(__dirname, "../../exampleData/reviews/review1.pdf");
 
         const assignment: any = await AssignmentPS.executeAddAssignment("New", "Description", 1, 2, "test_file.pdf",
         new Date("2017-07-01T20:30:00Z"), new Date("2018-07-01T20:30:00Z"), new Date("2019-07-01T20:30:00Z"), new Date("2020-07-01T20:30:00Z"), false, false, undefined);
@@ -121,7 +121,7 @@ describe("API review routes", () => {
     it("Put review with invalid file upload", async () => {
         mockDate.set("2018-05-02T21:00:00Z");
         MockLogin.initialize("paulvanderlaan");
-        const exampleReviewFile = path.join(__dirname, "../../example_data/reviews/review2.zip");
+        const exampleReviewFile = path.join(__dirname, "../../exampleData/reviews/review2.zip");
 
         const submission: any = await SubmissionPS.executeCreateSubmission("paulvanderlaan", 10, 1, "none.pdf");
         const rubric: any = await RubricPS.executeCreateRubric(1, "submission");

@@ -160,7 +160,7 @@ describe("Integration", () => {
     // create am assignment course
     const exampleAssignmentFile = path.resolve(
       __dirname,
-      "../../example_data/assignments/assignment1.pdf"
+      "../../exampleData/assignments/assignment1.pdf"
     );
     res = await request(server)
       .post("/api/assignments")
@@ -409,7 +409,7 @@ describe("Integration", () => {
     // make a submission
     const exampleSubmissionFile1 = path.resolve(
       __dirname,
-      "../../example_data/submissions/submission1.pdf"
+      "../../exampleData/submissions/submission1.pdf"
     );
     res = await request(server)
       .post("/api/submissions")
@@ -428,7 +428,7 @@ describe("Integration", () => {
     // make a submission
     const exampleSubmissionFile2 = path.resolve(
       __dirname,
-      "../../example_data/submissions/submission2.pdf"
+      "../../exampleData/submissions/submission2.pdf"
     );
     res = await request(server)
       .post("/api/submissions")
