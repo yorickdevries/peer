@@ -28,8 +28,9 @@ app.use(cookieParser());
 app.use("/api", api);
 
 // Send homepage index.html
-app.get("/*", (_, res) => {
-  res.sendFile(path.resolve(clientWebsite, "index.html"));
+const clientIndex = path.resolve(clientWebsite, "index.html");
+app.get("/*", (_req, res) => {
+  res.sendFile(clientIndex);
 });
 
 // Error handler
