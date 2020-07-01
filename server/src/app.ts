@@ -17,7 +17,7 @@ app.use(helmet());
 app.use(compression());
 app.use(errorLogger);
 
-const clientWebsite = path.join(__dirname, "../dist/public");
+const clientWebsite = path.resolve(__dirname, "../dist/public");
 app.use(express.static(clientWebsite));
 
 app.use(express.json());
@@ -29,7 +29,7 @@ app.use("/api", api);
 
 // Send homepage index.html
 app.get("/*", (_, res) => {
-  res.sendFile(path.join(clientWebsite, "index.html"));
+  res.sendFile(path.resolve(clientWebsite, "index.html"));
 });
 
 // Error handler
