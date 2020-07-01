@@ -301,7 +301,6 @@ describe("Review distribution", () => {
       reviewsPerUser
     );
     expect.assertions(1);
-    //await expect(generateDistributionPromise).rejects;
     await expect(generateDistributionPromise).rejects.toThrow();
   });
 });
