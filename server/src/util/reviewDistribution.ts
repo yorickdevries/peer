@@ -3,12 +3,17 @@ import _ from "lodash";
 import Submission from "../models/Submission";
 import User from "../models/User";
 
-// Takes care of the distribution of all reviews over the students
-const generateDistribution = async function (
+interface reviewAssignment {
+  user: User;
+  submission: Submission;
+}
+
+// Takes care of the distribution of reviews of submissions over the students
+const generateReviewDistribution = async function (
   submissions: Submission[],
   users: User[],
   reviewsPerUser: number
-) {
+): Promise<reviewAssignment[]> {
   // basic validation
   if (reviewsPerUser < 1 || !Number.isInteger(reviewsPerUser)) {
     throw new Error("reviewsPerUser should be a positive integer");
@@ -16,37 +21,96 @@ const generateDistribution = async function (
   // If there are less submissions than required to review per person, then no division can be made
   if (submissions.length - 1 < reviewsPerUser) {
     throw new Error(
-      "There are not enough submissions to assign the required number of reviewsPerUser: " +
-        reviewsPerUser
+      `There are not enough submissions to assign the required number of reviewsPerUser: ${reviewsPerUser}`
     );
   }
   // If there are less users * reviews per user than submissions
-  // then no division can be made
+  // then no division can be made as there will be submissions without reviews
   if (submissions.length > users.length * reviewsPerUser) {
     throw new Error("There are not enough users for the number of submissions");
   }
-  // assigning can start here
-  // try 10 times
-  await performMaxFlow(submissions, users, reviewsPerUser);
-  return;
+
+  // findDistribution will try max 10 times to find a distribution (to avoid infinite loops)
+  // it will thor an error if no solution is found
+  const reviewDistribution = await findDistribution(
+    submissions,
+    users,
+    reviewsPerUser
+  );
+  return reviewDistribution;
 };
 
-const performMaxFlow = async function (
+const findDistribution = async function (
   submissions: Submission[],
   users: User[],
   reviewsPerUser: number
 ) {
-  // n number of users
+  // calculate ideal upper and lower bounds
+  const totalNumberOfReviews = reviewsPerUser * users.length;
+  const averageNumberOfReviewsPerSubmission =
+    totalNumberOfReviews / submissions.length;
+  // lowerbound of at least 1
+  let minNumberOfReviewsPerSubmission = Math.max(
+    1,
+    Math.floor(averageNumberOfReviewsPerSubmission)
+  );
+  // upperbound of at least 1
+  let maxNumberOfReviewsPerSubmission = Math.max(
+    1,
+    Math.ceil(averageNumberOfReviewsPerSubmission)
+  );
+
+  // make shuffled arrays to remove determinism
+  const shuffledUsers = _.shuffle(users);
+  const shuffledSubmissions = _.shuffle(submissions);
+
+  // initialize result and attemptcounter
+  const maxAttempts = 10;
+  let reviewDistribution = undefined;
+  let counter = 0;
+  // attempt 10 times to make a distribution
+  while (!reviewDistribution && counter < maxAttempts) {
+    reviewDistribution = await performMaxFlow(
+      shuffledSubmissions,
+      shuffledUsers,
+      reviewsPerUser,
+      minNumberOfReviewsPerSubmission,
+      maxNumberOfReviewsPerSubmission
+    );
+    if (counter % 2 === 0 && minNumberOfReviewsPerSubmission > 1) {
+      // decrease lowerbound
+      minNumberOfReviewsPerSubmission--;
+    } else {
+      // increase upperbound
+      maxNumberOfReviewsPerSubmission++;
+    }
+    counter++;
+  }
+  // if still no Distribution is found, an error is thrown
+  if (!reviewDistribution) {
+    throw new Error("No review distribution could be made");
+  }
+  return reviewDistribution;
+};
+
+// Based on the TI2306 Algorithm Design lectures
+const performMaxFlow = async function (
+  submissions: Submission[],
+  users: User[],
+  reviewsPerUser: number,
+  minNumberOfReviewsPerSubmission: number,
+  maxNumberOfReviewsPerSubmission: number
+) {
+  // k number of users
   const k = users.length;
-  // m number of submissions
+  // n number of submissions
   const n = submissions.length;
   // total reviews
   const totalNumberOfReviews = reviewsPerUser * k;
-  const averageNumberOfReviewsPerSubmission = totalNumberOfReviews / n;
-  // lowerbound
-  const c = Math.floor(averageNumberOfReviewsPerSubmission);
-  // upperbound
-  const C = Math.ceil(averageNumberOfReviewsPerSubmission);
+  // lowerbound c
+  const c = minNumberOfReviewsPerSubmission;
+  // upperbound C
+  const C = maxNumberOfReviewsPerSubmission;
 
   // 2 sources s and s'
   const SOURCE = 0;
@@ -56,26 +120,35 @@ const performMaxFlow = async function (
   const TARGET_PRIME = 3;
   const numberOfNodes = 4 + k + n;
 
+  // functions to convert node numbers
   const nodeNumberOfUserIndex = function (userIndex: number) {
     return 4 + userIndex;
+  };
+  const userIndexOfNodeNumber = function (nodeNumber: number) {
+    return nodeNumber - 4;
   };
   const nodeNumberOfSubmissionIndex = function (submissionIndex: number) {
     return 4 + k + submissionIndex;
   };
+  const submissionIndexOfNodeNumber = function (nodeNumber: number) {
+    return nodeNumber - (4 + k);
+  };
 
+  // flow graph
   const graph = new jsgraphs.FlowNetwork(numberOfNodes);
-  // total flow
+  // add 1 edge with the capacity of the total number of reviews between SOURCE_PRIME and SOURCE
   graph.addEdge(
     new jsgraphs.FlowEdge(SOURCE_PRIME, SOURCE, totalNumberOfReviews)
   );
 
-  // 1 SOURCE_PRIME edge for every user
+  // 1 SOURCE edge for every user with capacity reviewsPerUser
   for (let i = 0; i < k; i++) {
     graph.addEdge(
       new jsgraphs.FlowEdge(SOURCE, nodeNumberOfUserIndex(i), reviewsPerUser)
     );
   }
 
+  // fetch all submissionGroupUsers so these can be checked in subsequent loop
   const groupUsersOfSubmissions: User[][] = [];
   for (let j = 0; j < n; j++) {
     const submission = submissions[j];
@@ -86,7 +159,7 @@ const performMaxFlow = async function (
   // 1 connection per user to submission if the user isn't in the submissiongroup
   for (let i = 0; i < k; i++) {
     const user = users[i];
-    // iterate over the groups
+    // iterate over the groups of the submissions
     for (let j = 0; j < n; j++) {
       const groupUsersOfSubmission = groupUsersOfSubmissions[j];
       if (
@@ -94,6 +167,7 @@ const performMaxFlow = async function (
           return groupUser.netid === user.netid;
         })
       ) {
+        // add edge with capacity 1 if the user can review the submission
         graph.addEdge(
           new jsgraphs.FlowEdge(
             nodeNumberOfUserIndex(i),
@@ -105,8 +179,8 @@ const performMaxFlow = async function (
     }
   }
 
-  // 1 connection of c to TARGET_PRIME per submission
-  // 1 connection of C-c to TARGET per submission
+  // 1 connection of capacity c to TARGET_PRIME per submission
+  // 1 connection of capacity C-c to TARGET per submission
   for (let j = 0; j < n; j++) {
     graph.addEdge(
       new jsgraphs.FlowEdge(nodeNumberOfSubmissionIndex(j), TARGET_PRIME, c)
@@ -121,22 +195,36 @@ const performMaxFlow = async function (
     new jsgraphs.FlowEdge(TARGET, TARGET_PRIME, totalNumberOfReviews - n * c)
   );
 
-  console.log("performing max flow");
+  // perform ford fulkerson
   const fordFulkerson = new jsgraphs.FordFulkerson(
     graph,
     SOURCE_PRIME,
     TARGET_PRIME
   );
-  console.log(`MaxFlow: ${fordFulkerson.value}`);
 
+  // get the minCut to determine the reviewdistribution
   const minCut = fordFulkerson.minCut(graph);
-
-  // needs to be checked and used
+  const reviewDistribution: reviewAssignment[] = [];
   for (let i = 0; i < minCut.length; i++) {
-    const e = minCut[i];
-    console.log(`min-cut: (${e.from()}, ${e.to()})`);
+    const edge = minCut[i];
+    const from = edge.from();
+    const to = edge.to();
+    // check whether this is an assignment of a user to submission
+    // and not an edge from source/sink
+    if (from > 3 && to > 3) {
+      const user = users[userIndexOfNodeNumber(from)];
+      const submission = submissions[submissionIndexOfNodeNumber(to)];
+      reviewDistribution.push({ user: user, submission: submission });
+    }
   }
-  return;
+  // check if the max flow is achieved
+  if (totalNumberOfReviews !== reviewDistribution.length) {
+    console.log(`MaxFlow not achieved: ${reviewDistribution.length}`);
+    return undefined;
+  } else {
+    console.log(`MaxFlow achieved: ${reviewDistribution.length}`);
+    return reviewDistribution;
+  }
 };
 
-export default generateDistribution;
+export default generateReviewDistribution;
