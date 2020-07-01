@@ -46,7 +46,7 @@ describe("Assignments", () => {
     // create am assignment course
     const exampleAssignmentFile = path.resolve(
       __dirname,
-      "../../example_data/assignments/assignment1.pdf"
+      "../../exampleData/assignments/assignment1.pdf"
     );
     const res2 = await request(server)
       .post("/api/assignments")

@@ -45,7 +45,7 @@ describe("API Assignment routes", () => {
      * Import group tests
      */
     it("Import groups - good weather", async () => {
-        const file = path.join(__dirname, "../../example_data/csv_test/example_export.csv");
+        const file = path.join(__dirname, "../../exampleData/groupExports/example_export.csv");
         // log in as teacheraccount
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
@@ -57,7 +57,7 @@ describe("API Assignment routes", () => {
     });
 
     it("Import groups - containing empty groups", async () => {
-        const file = path.join(__dirname, "../../example_data/csv_test/example_export_empty_groups.csv");
+        const file = path.join(__dirname, "../../exampleData/groupExports/example_export_empty_groups.csv");
         // log in as teacheraccount
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
@@ -70,7 +70,7 @@ describe("API Assignment routes", () => {
     });
 
     it("Import groups - wrong extension", async () => {
-        const file = path.join(__dirname, "../../example_data/csv_test/text_file.txt");
+        const file = path.join(__dirname, "../../exampleData/groupExports/text_file.txt");
         // log in as teacheraccount
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
@@ -79,7 +79,7 @@ describe("API Assignment routes", () => {
     });
 
     it("Import groups - file larger than 1MB", async () => {
-        const file = path.join(__dirname, "../../example_data/csv_test/example_export_big.csv");
+        const file = path.join(__dirname, "../../exampleData/groupExports/example_export_big.csv");
         // log in as teacheraccount
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
@@ -96,7 +96,7 @@ describe("API Assignment routes", () => {
     });
 
     it("Import groups - good file + no groupcolumn", async () => {
-        const file = path.join(__dirname, "../../example_data/csv_test/example_export_no_groupcolumn.csv");
+        const file = path.join(__dirname, "../../exampleData/groupExports/example_export_no_groupcolumn.csv");
         // log in as teacheraccount
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
@@ -105,7 +105,7 @@ describe("API Assignment routes", () => {
     });
 
     it("Import groups - no usercolumn", async () => {
-        const file = path.join(__dirname, "../../example_data/csv_test/example_export_no_usercolumn.csv");
+        const file = path.join(__dirname, "../../exampleData/groupExports/example_export_no_usercolumn.csv");
         // log in as teacheraccount
         MockLogin.initialize("bplanje");
         const res = await chai.request(router).post("/3/importgroups")
@@ -179,7 +179,7 @@ describe("API Assignment routes", () => {
     it("post assignment/ with file", async () => {
         // log in as bplanje (teacher)
         MockLogin.initialize("bplanje");
-        const exampleSubmissionFile = path.join(__dirname, "../../example_data/assignments/assignment1.pdf");
+        const exampleSubmissionFile = path.join(__dirname, "../../exampleData/assignments/assignment1.pdf");
         const res = await chai.request(router).post("/")
             .attach("assignmentFile", fs.readFileSync(exampleSubmissionFile), "assignment1.pdf")
             .field("title", "Example title")
@@ -206,7 +206,7 @@ describe("API Assignment routes", () => {
     it("post assignment/ with 0 reviews", async () => {
         // log in as bplanje (teacher)
         MockLogin.initialize("bplanje");
-        const exampleSubmissionFile = path.join(__dirname, "../../example_data/assignments/assignment1.pdf");
+        const exampleSubmissionFile = path.join(__dirname, "../../exampleData/assignments/assignment1.pdf");
         const res = await chai.request(router).post("/")
             .attach("assignmentFile", fs.readFileSync(exampleSubmissionFile), "assignment1.pdf")
             .field("title", "Example title")
@@ -227,7 +227,7 @@ describe("API Assignment routes", () => {
      * Test whether an assignment is properly updated.
      */
     it("PUT /:assignment_id", async () => {
-        const file = path.join(__dirname, "../../example_data/assignments/assignment1.pdf");
+        const file = path.join(__dirname, "../../exampleData/assignments/assignment1.pdf");
 
         // login as bplanje (teacher)
         MockLogin.initialize("bplanje");
@@ -273,7 +273,7 @@ describe("API Assignment routes", () => {
      * Test whether an assignment is properly updated.
      */
     it("PUT /:assignment_id without file", async () => {
-        const file = path.join(__dirname, "../../example_data/assignments/assignment1.pdf");
+        const file = path.join(__dirname, "../../exampleData/assignments/assignment1.pdf");
 
         // login as bplanje (teacher)
         MockLogin.initialize("bplanje");

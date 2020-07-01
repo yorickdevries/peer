@@ -82,7 +82,7 @@ describe("API integration test", () => {
 
         // [2]
         // Create an assignment.
-        const exampleSubmissionFile1 = path.join(__dirname, "../../example_data/assignments/assignment1.pdf");
+        const exampleSubmissionFile1 = path.join(__dirname, "../../exampleData/assignments/assignment1.pdf");
         const assignment: any = await chai.request(router).post("/assignments/")
             .attach("assignmentFile", fs.readFileSync(exampleSubmissionFile1), "assignment1.pdf")
             .field("title", "Example title")
@@ -131,7 +131,7 @@ describe("API integration test", () => {
 
         // [4]
         // Import the groups for the created assignment.
-        const file = path.join(__dirname, "../../example_data/csv_test/integration_export.csv");
+        const file = path.join(__dirname, "../../exampleData/groupExports/integration_export.csv");
 
         const groups = await chai.request(router).post("/assignments/" + assignmentId + "/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv")
@@ -146,7 +146,7 @@ describe("API integration test", () => {
         // [5]
         // Login as paulvanderlaan and submit a submission.
         MockLogin.initialize("paulvanderlaan");
-        const exampleSubmissionFile2 = path.join(__dirname, "../../example_data/submissions/submission1.pdf");
+        const exampleSubmissionFile2 = path.join(__dirname, "../../exampleData/submissions/submission1.pdf");
         const submissionPaul = await chai.request(router).post("/submissions/")
             .attach("submissionFile", fs.readFileSync(exampleSubmissionFile2), "submission2.pdf")
             .field("assignmentId", assignmentId);

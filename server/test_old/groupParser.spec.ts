@@ -27,7 +27,7 @@ describe("GroupParser tests", () => {
      */
     it("normal import", async () => {
         // set up input data
-        const file = path.join(__dirname, "../example_data/csv_test/example_export.csv");
+        const file = path.join(__dirname, "../exampleData/groupExports/example_export.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const assignmentId = 3;
         const result = await GroupParser.importGroups(filebuffer, assignmentId);
@@ -37,7 +37,7 @@ describe("GroupParser tests", () => {
 
     it("normal import with groupnumbers", async () => {
         // set up input data
-        const file = path.join(__dirname, "../example_data/csv_test/example_export_groupnumbers.csv");
+        const file = path.join(__dirname, "../exampleData/groupExports/example_export_groupnumbers.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const assignmentId = 3;
         const result = await GroupParser.importGroups(filebuffer, assignmentId);
@@ -50,7 +50,7 @@ describe("GroupParser tests", () => {
      */
     it("No comma separated file is used", async () => {
         // set up input data
-        const file = path.join(__dirname, "../example_data/csv_test/example_export_non_csv.csv");
+        const file = path.join(__dirname, "../exampleData/groupExports/example_export_non_csv.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const assignmentId = 3;
         await expect(GroupParser.importGroups(filebuffer, assignmentId))
@@ -59,7 +59,7 @@ describe("GroupParser tests", () => {
 
     it("students misses a group field", async () => {
         // set up input data
-        const file = path.join(__dirname, "../example_data/csv_test/example_export_missing_group.csv");
+        const file = path.join(__dirname, "../exampleData/groupExports/example_export_missing_group.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const assignmentId = 3;
         await expect(GroupParser.importGroups(filebuffer, assignmentId))
@@ -68,7 +68,7 @@ describe("GroupParser tests", () => {
 
     it("students misses a username", async () => {
         // set up input data
-        const file = path.join(__dirname, "../example_data/csv_test/example_export_missing_username.csv");
+        const file = path.join(__dirname, "../exampleData/groupExports/example_export_missing_username.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const assignmentId = 3;
         await expect(GroupParser.importGroups(filebuffer, assignmentId))
@@ -77,7 +77,7 @@ describe("GroupParser tests", () => {
 
     it("student has no username field", async () => {
         // set up input data
-        const file = path.join(__dirname, "../example_data/csv_test/example_export_empty_username.csv");
+        const file = path.join(__dirname, "../exampleData/groupExports/example_export_empty_username.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const assignmentId = 3;
         await expect(GroupParser.importGroups(filebuffer, assignmentId))
@@ -86,7 +86,7 @@ describe("GroupParser tests", () => {
 
     it("student is not defined, but group is 1", async () => {
         // set up input data
-        const file = path.join(__dirname, "../example_data/csv_test/example_export_empty_groups.csv");
+        const file = path.join(__dirname, "../exampleData/groupExports/example_export_empty_groups.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const assignmentId = 3;
         const result = await GroupParser.importGroups(filebuffer, assignmentId);
@@ -98,7 +98,7 @@ describe("GroupParser tests", () => {
 
     it("student is not defined, but group is 2", async () => {
         // set up input data
-        const file = path.join(__dirname, "../example_data/csv_test/tud-sndbx-stefanhugtenbu+o.csv");
+        const file = path.join(__dirname, "../exampleData/groupExports/tud-sndbx-stefanhugtenbu+o.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const assignmentId = 3;
         const result = await GroupParser.importGroups(filebuffer, assignmentId);
@@ -110,7 +110,7 @@ describe("GroupParser tests", () => {
 
     it("some netids are without @ symbol", async () => {
         // set up input data
-        const file = path.join(__dirname, "../example_data/csv_test/example_export_usernames_without_at.csv");
+        const file = path.join(__dirname, "../exampleData/groupExports/example_export_usernames_without_at.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const studentlist = await neatCsv(filebuffer);
         const result = await GroupParser.mapGroups(studentlist);
@@ -120,7 +120,7 @@ describe("GroupParser tests", () => {
 
     it("invalid assignment id", async () => {
         // set up input data
-        const file = path.join(__dirname, "../example_data/csv_test/example_export.csv");
+        const file = path.join(__dirname, "../exampleData/groupExports/example_export.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const assignmentId = -1;
         await expect(GroupParser.importGroups(filebuffer, assignmentId))
@@ -129,7 +129,7 @@ describe("GroupParser tests", () => {
 
     it("duplicate student", async () => {
         // set up input data
-        const file = path.join(__dirname, "../example_data/csv_test/duplicate_student.csv");
+        const file = path.join(__dirname, "../exampleData/groupExports/duplicate_student.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const assignmentId = 3;
         await expect(GroupParser.importGroups(filebuffer, assignmentId))
@@ -138,7 +138,7 @@ describe("GroupParser tests", () => {
 
     it("Student has already a group", async () => {
         // set up input data
-        const file = path.join(__dirname, "../example_data/csv_test/example_export.csv");
+        const file = path.join(__dirname, "../exampleData/groupExports/example_export.csv");
         const filebuffer = new Buffer(fs.readFileSync(file));
         const assignmentId = 1;
         await expect(GroupParser.importGroups(filebuffer, assignmentId))
