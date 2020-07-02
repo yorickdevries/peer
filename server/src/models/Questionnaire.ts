@@ -66,4 +66,9 @@ export default abstract class Questionnaire extends BaseModel {
     }
     return userReviews;
   }
+
+  async hasReviewsWhereUserIsReviewer(user: User): Promise<boolean> {
+    const reviews = await this.getReviewsWhereUserIsReviewer(user);
+    return reviews.length > 0;
+  }
 }

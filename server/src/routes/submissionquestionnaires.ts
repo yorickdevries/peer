@@ -28,11 +28,20 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
     return;
   }
-  //later we need to extend this so the students can access it when the assignment is in review state
-  if (!(await submissionQuestionnaire.isTeacherInCourse(user))) {
+  // students can only access it when the assignment is in review state
+  const assignment = await submissionQuestionnaire.getAssignment();
+  const assignmentState = assignment.getState();
+  if (
+    !(await submissionQuestionnaire.isTeacherInCourse(user)) &&
+    !(
+      (await submissionQuestionnaire.hasReviewsWhereUserIsReviewer(user)) &&
+      (assignmentState === AssignmentState.REVIEW ||
+        assignmentState === AssignmentState.FEEDBACK)
+    )
+  ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
-      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      .send("You are not allowed to view this questionnaire");
     return;
   }
   // sort the questions and return questionnaire
