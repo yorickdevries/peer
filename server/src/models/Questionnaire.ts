@@ -10,6 +10,7 @@ import Assignment from "./Assignment";
 import Question from "./Question";
 import User from "./User";
 import QuestionnaireType from "../enum/QuestionnaireType";
+import Review from "./Review";
 
 // formely called rubric
 @Entity()
@@ -29,6 +30,9 @@ export default abstract class Questionnaire extends BaseModel {
   // all questions (might want to split this later)
   questions!: Question[];
 
+  @OneToMany((_type) => Review, (review) => review.questionnaire)
+  reviews?: Review[];
+
   abstract assignment?: Assignment;
 
   constructor() {
@@ -36,6 +40,14 @@ export default abstract class Questionnaire extends BaseModel {
   }
 
   abstract getAssignment(): Promise<Assignment>;
+
+  async getReviews(): Promise<Review[]> {
+    return (
+      await Questionnaire.findOneOrFail(this.id, {
+        relations: ["reviews"],
+      })
+    ).reviews!;
+  }
 
   // checks whether the user is teacher
   // of the corresponding assignment and course

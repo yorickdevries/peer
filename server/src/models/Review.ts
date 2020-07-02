@@ -25,9 +25,11 @@ export default abstract class Review extends BaseModel {
   type!: ReviewType;
 
   // Rubric_id int NOT NULL,
-  @ManyToOne((_type) => Questionnaire, {
-    nullable: false,
-  })
+  @ManyToOne(
+    (_type) => Questionnaire,
+    (questionnaire) => questionnaire.reviews,
+    { nullable: false }
+  )
   questionnaire?: Questionnaire;
 
   // User_netid varchar(500) NOT NULL,
