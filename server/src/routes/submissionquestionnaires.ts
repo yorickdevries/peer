@@ -33,7 +33,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
-      return;
+    return;
   }
   // sort the questions and return questionnaire
   const sortedQuestions = _.sortBy(submissionQuestionnaire.questions, "number");
