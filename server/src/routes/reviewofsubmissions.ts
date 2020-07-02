@@ -118,7 +118,7 @@ router.post(
       }
     }
     interface reviewAssignment {
-      user: User;
+      reviewer: User;
       submission: Submission;
     }
     let reviewDistribution: reviewAssignment[];
@@ -155,7 +155,7 @@ router.post(
           // make the review
           const review = new ReviewOfSubmission(
             questionnaire,
-            reviewAssignment.user,
+            reviewAssignment.reviewer,
             false,
             false,
             null,
