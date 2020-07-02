@@ -184,6 +184,45 @@ router.get(
   }
 );
 
+// get the submissions of a group
+// we should swicth to specific annotation of submissions which indicate whether they are the latest
+router.get(
+  "/:id/latestsubmission",
+  validateParams(idSchema),
+  validateQuery(querySubmissionSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const assignmentId = req.params.id;
+    const groupId = req.query.groupId as any;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    const group = await Group.findOne(groupId);
+    if (!group) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.GROUP_NOT_FOUND);
+      return;
+    }
+    if (!(await group.hasUser(user))) {
+      res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
+      return;
+    }
+    const latestSubmission = await assignment.getLatestSubmission(group);
+    if (!latestSubmission) {
+      res
+        .status(HttpStatusCode.NOT_FOUND)
+        .send("No submissions have been made yet");
+      return;
+    }
+    res.send(latestSubmission);
+  }
+);
+
 // Joi inputvalidation
 const assignmentSchema = Joi.object({
   name: Joi.string().required(),
