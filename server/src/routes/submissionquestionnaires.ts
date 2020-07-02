@@ -13,6 +13,7 @@ import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
+import AssignmentState from "../enum/AssignmentState";
 
 const router = express.Router();
 
@@ -27,11 +28,21 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
     return;
   }
-  //later we need to extend this so the students can access it when the assignment is in review state
-  if (!(await submissionQuestionnaire.isTeacherInCourse(user))) {
+  // students can only access it when the assignment is in review state
+  const assignment = await submissionQuestionnaire.getAssignment();
+  const assignmentState = assignment.getState();
+  if (
+    !(await submissionQuestionnaire.isTeacherInCourse(user)) &&
+    !(
+      (await submissionQuestionnaire.hasReviewsWhereUserIsReviewer(user)) &&
+      (assignmentState === AssignmentState.REVIEW ||
+        assignmentState === AssignmentState.FEEDBACK)
+    )
+  ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
-      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      .send("You are not allowed to view this questionnaire");
+    return;
   }
   // sort the questions and return questionnaire
   const sortedQuestions = _.sortBy(submissionQuestionnaire.questions, "number");
@@ -47,6 +58,40 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   }
   submissionQuestionnaire.questions = sortedQuestions;
   res.send(submissionQuestionnaire);
+});
+
+// get the reviews a user needs to make by questionnaire id
+router.get("/:id/reviews", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  // also loads the questions
+  const submissionQuestionnaire = await SubmissionQuestionnaire.findOne(
+    req.params.id
+  );
+  if (!submissionQuestionnaire) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
+    return;
+  }
+  const assignment = await submissionQuestionnaire.getAssignment();
+  const assignmentState = assignment.getState();
+  if (
+    !(
+      assignmentState === AssignmentState.REVIEW ||
+      assignmentState === AssignmentState.FEEDBACK
+    )
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not allowed to view reviews");
+    return;
+  }
+  const reviews = await submissionQuestionnaire.getReviewsWhereUserIsReviewer(
+    user
+  );
+  const anonymousReviews = _.map(reviews, (review) => {
+    return review.getAnonymousVersion();
+  });
+  const sortedReviews = _.sortBy(anonymousReviews, "id");
+  res.send(sortedReviews);
 });
 
 // Joi inputvalidation

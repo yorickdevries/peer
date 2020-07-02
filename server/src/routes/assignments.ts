@@ -140,9 +140,9 @@ router.get("/:id/group", validateParams(idSchema), async (req, res) => {
   }
   const groupUsers = await group.getUsers();
   // remove the sensitive info
-  const users = _.map(groupUsers, (user) =>
-    _.pick(user, ["netid", "displayName", "email"])
-  );
+  const users = _.map(groupUsers, (user) => {
+    return _.pick(user, ["netid", "displayName", "email"]);
+  });
   group.users = users as any;
   res.send(group);
 });

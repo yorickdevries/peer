@@ -21,6 +21,7 @@ import rangequestions from "./rangequestions";
 import uploadquestions from "./uploadquestions";
 import checkboxquestionoptions from "./checkboxquestionoptions";
 import multiplechoicequestionoptions from "./multiplechoicequestionoptions";
+import reviewofsubmissions from "./reviewofsubmissions";
 
 // old routes, can be deleted when not needed anymore
 import oldRoutes from "../old_api/routes/api";
@@ -64,6 +65,7 @@ router.use("/rangequestions", rangequestions);
 router.use("/uploadquestions", uploadquestions);
 router.use("/checkboxquestionoptions", checkboxquestionoptions);
 router.use("/multiplechoicequestionoptions", multiplechoicequestionoptions);
+router.use("/reviewofsubmissions", reviewofsubmissions);
 
 // old routes, can be deleted when not needed anymore
 router.use("/oldroutes", oldRoutes);

@@ -4,12 +4,23 @@ import {
   TableInheritance,
   Column,
   ManyToOne,
+  RelationId,
 } from "typeorm";
 import { IsOptional, IsDefined, IsBoolean, IsDate } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import ReviewType from "../enum/ReviewType";
 import Questionnaire from "./Questionnaire";
+import UserRole from "../enum/UserRole";
+import _ from "lodash";
+
+interface AnonymousReview {
+  id: number;
+  flaggedByReviewer: boolean;
+  submitted: boolean;
+  approvalByTA: boolean | null;
+  questionnaireId: number;
+}
 
 // formely called rubric
 @Entity()
@@ -24,16 +35,21 @@ export default abstract class Review extends BaseModel {
   type!: ReviewType;
 
   // Rubric_id int NOT NULL,
-  @ManyToOne((_type) => Questionnaire, {
-    nullable: false,
-  })
+  @RelationId((review: Review) => review.questionnaire)
+  questionnaireId!: number;
+  @ManyToOne(
+    (_type) => Questionnaire,
+    (questionnaire) => questionnaire.reviews,
+    { nullable: false }
+  )
   questionnaire?: Questionnaire;
 
   // User_netid varchar(500) NOT NULL,
   @ManyToOne((_type) => User, {
     nullable: false,
+    eager: true,
   })
-  user?: User;
+  reviewer?: User;
 
   // flagged BOOLEAN NOT NULL DEFAULT FALSE,
   @Column()
@@ -90,12 +106,14 @@ export default abstract class Review extends BaseModel {
   approvalByTA: boolean | null;
 
   // ta_netid varchar(500),
-  @ManyToOne((_type) => User)
+  @ManyToOne((_type) => User, { eager: true })
   approvingTA?: User | null;
+
+  abstract isReviewed(user: User): Promise<boolean>;
 
   constructor(
     questionnaire: Questionnaire,
-    user: User,
+    reviewer: User,
     flaggedByReviewer: boolean,
     submitted: boolean,
     startedAt: Date | null,
@@ -107,7 +125,7 @@ export default abstract class Review extends BaseModel {
   ) {
     super();
     this.questionnaire = questionnaire;
-    this.user = user;
+    this.reviewer = reviewer;
     this.flaggedByReviewer = flaggedByReviewer;
     this.submitted = submitted;
     this.startedAt = startedAt;
@@ -116,5 +134,75 @@ export default abstract class Review extends BaseModel {
     this.submittedAt = submittedAt;
     this.approvalByTA = approvalByTA;
     this.approvingTA = approvingTA;
+  }
+
+  // custom validation which is run before saving
+  async validateOrReject(): Promise<void> {
+    const assignment = await this.questionnaire!.getAssignment();
+    const course = await assignment.getCourse();
+    if (!(await course.isEnrolled(this.reviewer!, UserRole.STUDENT))) {
+      throw new Error(
+        `${this.reviewer!.netid} should be enrolled in the course`
+      );
+    }
+    if (this.approvingTA && this.approvalByTA === null) {
+      throw new Error("Approval should be set");
+    }
+    if (!this.approvingTA && typeof this.approvalByTA === "boolean") {
+      throw new Error("Approving TA should be set");
+    }
+    if (this.approvingTA) {
+      if (
+        !(await course.isEnrolled(
+          this.approvingTA,
+          UserRole.TEACHING_ASSISTANT
+        )) &&
+        !(await course.isEnrolled(this.approvingTA, UserRole.TEACHER))
+      ) {
+        throw new Error(
+          `${this.approvingTA.netid} should be enrolled in the course`
+        );
+      }
+    }
+    // if all succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
+
+  async getQuestionnaire(): Promise<Questionnaire> {
+    return (
+      await Review.findOneOrFail(this.id, {
+        relations: ["questionnaire"],
+      })
+    ).questionnaire!;
+  }
+
+  async getReviewer(): Promise<User> {
+    return (
+      await Review.findOneOrFail(this.id, {
+        relations: ["reviewer"],
+      })
+    ).reviewer!;
+  }
+
+  // checks whether the user is teacher
+  async isTeacherInCourse(user: User): Promise<boolean> {
+    const questionnaire = await this.getQuestionnaire();
+    return await questionnaire.isTeacherInCourse(user);
+  }
+
+  // checks whether the user is the reviewer
+  async isReviewer(user: User): Promise<boolean> {
+    const reviewer = await this.getReviewer();
+    return reviewer.netid === user.netid;
+  }
+
+  getAnonymousVersion(): AnonymousReview {
+    return {
+      id: this.id,
+      flaggedByReviewer: this.flaggedByReviewer,
+      submitted: this.submitted,
+      approvalByTA: this.approvalByTA,
+      questionnaireId: this.questionnaireId,
+    };
   }
 }

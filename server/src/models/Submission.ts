@@ -73,4 +73,12 @@ export default class Submission extends BaseModel {
       })
     ).group!;
   }
+
+  async getAssignment(): Promise<Assignment> {
+    return (
+      await Submission.findOneOrFail(this.id, {
+        relations: ["assignment"],
+      })
+    ).assignment!;
+  }
 }

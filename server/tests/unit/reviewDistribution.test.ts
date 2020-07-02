@@ -117,7 +117,7 @@ describe("Review distribution", () => {
     ))!;
     expect(reviewAssignments.length).toBe(reviewsPerUser * numStudents);
     for (const reviewAssignment of reviewAssignments) {
-      const user = reviewAssignment.user;
+      const user = reviewAssignment.reviewer;
       const submission = reviewAssignment.submission;
       const submissionGroup = await submission.getGroup();
       expect(await submissionGroup.hasUser(user)).toBe(false);
@@ -220,7 +220,7 @@ describe("Review distribution", () => {
     expect(reviewAssignments.length).toBe(reviewsPerUser * numStudents);
     // check whether the solution is valid
     for (const reviewAssignment of reviewAssignments) {
-      const user = reviewAssignment.user;
+      const user = reviewAssignment.reviewer;
       const submission = reviewAssignment.submission;
       const submissionGroup = await submission.getGroup();
       expect(await submissionGroup.hasUser(user)).toBe(false);

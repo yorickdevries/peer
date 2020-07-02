@@ -4,7 +4,7 @@ import Submission from "../models/Submission";
 import User from "../models/User";
 
 interface reviewAssignment {
-  user: User;
+  reviewer: User;
   submission: Submission;
 }
 
@@ -214,7 +214,7 @@ const performMaxFlow = async function (
     if (from > 3 && to > 3) {
       const user = users[userIndexOfNodeNumber(from)];
       const submission = submissions[submissionIndexOfNodeNumber(to)];
-      reviewDistribution.push({ user: user, submission: submission });
+      reviewDistribution.push({ reviewer: user, submission: submission });
     }
   }
   // check if the max flow is achieved
