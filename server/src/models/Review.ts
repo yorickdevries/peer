@@ -4,6 +4,7 @@ import {
   TableInheritance,
   Column,
   ManyToOne,
+  RelationId,
 } from "typeorm";
 import { IsOptional, IsDefined, IsBoolean, IsDate } from "class-validator";
 import BaseModel from "./BaseModel";
@@ -25,6 +26,8 @@ export default abstract class Review extends BaseModel {
   type!: ReviewType;
 
   // Rubric_id int NOT NULL,
+  @RelationId((review: Review) => review.questionnaire)
+  questionnaireId!: number;
   @ManyToOne(
     (_type) => Questionnaire,
     (questionnaire) => questionnaire.reviews,
@@ -35,6 +38,7 @@ export default abstract class Review extends BaseModel {
   // User_netid varchar(500) NOT NULL,
   @ManyToOne((_type) => User, {
     nullable: false,
+    eager: true,
   })
   user?: User;
 
@@ -93,7 +97,7 @@ export default abstract class Review extends BaseModel {
   approvalByTA: boolean | null;
 
   // ta_netid varchar(500),
-  @ManyToOne((_type) => User)
+  @ManyToOne((_type) => User, { eager: true })
   approvingTA?: User | null;
 
   constructor(
