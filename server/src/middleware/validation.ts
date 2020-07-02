@@ -3,6 +3,10 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import _ from "lodash";
 
+// Joi inputvalidation
+const idSchema = Joi.object({
+  id: Joi.number().integer().required(),
+});
 const validate = (
   schema: Joi.ObjectSchema,
   field: "body" | "query" | "params"
@@ -48,4 +52,4 @@ const validateParams = (schema: Joi.ObjectSchema): RequestHandler => {
   return validate(schema, "params");
 };
 
-export { validateBody, validateQuery, validateParams };
+export { idSchema, validateBody, validateQuery, validateParams };

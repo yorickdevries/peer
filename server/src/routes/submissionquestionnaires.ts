@@ -1,7 +1,11 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import Assignment from "../models/Assignment";
-import { validateBody, validateParams } from "../middleware/validation";
+import {
+  validateBody,
+  validateParams,
+  idSchema,
+} from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { getManager } from "typeorm";
@@ -12,10 +16,6 @@ import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 
 const router = express.Router();
 
-// Joi inputvalidation
-const idSchema = Joi.object({
-  id: Joi.number().integer().required(),
-});
 // get the submissionquestionaire for an assignment
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   const user = req.user!;

@@ -4,6 +4,7 @@ import {
   validateBody,
   validateQuery,
   validateParams,
+  idSchema,
 } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
@@ -53,11 +54,6 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   res.send(sortedGroups);
 });
 
-// get all the groups for an assignment
-// Joi inputvalidation
-const idSchema = Joi.object({
-  id: Joi.number().integer().required(),
-});
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   const user = req.user!;
   const group = await Group.findOne(req.params.id);
