@@ -12,6 +12,15 @@ import User from "./User";
 import ReviewType from "../enum/ReviewType";
 import Questionnaire from "./Questionnaire";
 import UserRole from "../enum/UserRole";
+import _ from "lodash";
+
+interface AnonymousReview {
+  id: number;
+  flaggedByReviewer: boolean;
+  submitted: boolean;
+  approvalByTA: boolean | null;
+  questionnaireId: number;
+}
 
 // formely called rubric
 @Entity()
@@ -185,5 +194,15 @@ export default abstract class Review extends BaseModel {
   async isReviewer(user: User): Promise<boolean> {
     const reviewer = await this.getReviewer();
     return reviewer.netid === user.netid;
+  }
+
+  getAnonymousVersion(): AnonymousReview {
+    return {
+      id: this.id,
+      flaggedByReviewer: this.flaggedByReviewer,
+      submitted: this.submitted,
+      approvalByTA: this.approvalByTA,
+      questionnaireId: this.questionnaireId,
+    };
   }
 }

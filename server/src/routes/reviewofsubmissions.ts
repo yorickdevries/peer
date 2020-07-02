@@ -83,14 +83,8 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
       assignmentState === AssignmentState.FEEDBACK &&
       review.submitted)
   ) {
-    const limitedReview = _.pick(review, [
-      "id",
-      "flaggedByReviewer",
-      "submitted",
-      "approvalByTA",
-      "questionnaireId",
-    ]);
-    res.send(limitedReview);
+    const anonymousReview = review.getAnonymousVersion();
+    res.send(anonymousReview);
     return;
   }
   res
