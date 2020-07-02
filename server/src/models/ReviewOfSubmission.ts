@@ -52,4 +52,19 @@ export default class ReviewOfSubmission extends Review {
     // if all succeeds the super validateOrReject can be called
     return super.validateOrReject();
   }
+
+  async getSubmission(): Promise<Submission> {
+    return (
+      await ReviewOfSubmission.findOneOrFail(this.id, {
+        relations: ["submission"],
+      })
+    ).submission!;
+  }
+
+  // checks whether the user is the reviewer
+  async isReviewed(user: User): Promise<boolean> {
+    const submission = await this.getSubmission();
+    const group = await submission.getGroup();
+    return await group.hasUser(user);
+  }
 }

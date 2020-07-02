@@ -40,7 +40,7 @@ export default abstract class Review extends BaseModel {
     nullable: false,
     eager: true,
   })
-  user?: User;
+  reviewer?: User;
 
   // flagged BOOLEAN NOT NULL DEFAULT FALSE,
   @Column()
@@ -100,9 +100,11 @@ export default abstract class Review extends BaseModel {
   @ManyToOne((_type) => User, { eager: true })
   approvingTA?: User | null;
 
+  abstract isReviewed(user: User): Promise<boolean>;
+
   constructor(
     questionnaire: Questionnaire,
-    user: User,
+    reviewer: User,
     flaggedByReviewer: boolean,
     submitted: boolean,
     startedAt: Date | null,
@@ -114,7 +116,7 @@ export default abstract class Review extends BaseModel {
   ) {
     super();
     this.questionnaire = questionnaire;
-    this.user = user;
+    this.reviewer = reviewer;
     this.flaggedByReviewer = flaggedByReviewer;
     this.submitted = submitted;
     this.startedAt = startedAt;
@@ -129,8 +131,8 @@ export default abstract class Review extends BaseModel {
   async validateOrReject(): Promise<void> {
     const assignment = await this.questionnaire!.getAssignment();
     const course = await assignment.getCourse();
-    if (!(await course.isEnrolled(this.user!, UserRole.STUDENT))) {
-      throw new Error(`${this.user!.netid} should be enrolled in the course`);
+    if (!(await course.isEnrolled(this.reviewer!, UserRole.STUDENT))) {
+      throw new Error(`${this.reviewer!.netid} should be enrolled in the course`);
     }
     if (this.approvingTA && this.approvalByTA === null) {
       throw new Error("Approval should be set");
@@ -161,5 +163,25 @@ export default abstract class Review extends BaseModel {
         relations: ["questionnaire"],
       })
     ).questionnaire!;
+  }
+
+  async getReviewer(): Promise<User> {
+    return (
+      await Review.findOneOrFail(this.id, {
+        relations: ["reviewer"],
+      })
+    ).reviewer!;
+  }
+
+  // checks whether the user is teacher
+  async isTeacherInCourse(user: User): Promise<boolean> {
+    const questionnaire = await this.getQuestionnaire();
+    return await questionnaire.isTeacherInCourse(user);
+  }
+
+  // checks whether the user is the reviewer
+  async isReviewer(user: User): Promise<boolean> {
+    const reviewer = await this.getReviewer();
+    return reviewer.netid === user.netid;
   }
 }
