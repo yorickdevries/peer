@@ -1,6 +1,10 @@
 import express from "express";
 import Joi from "@hapi/joi";
-import { validateQuery } from "../middleware/validation";
+import {
+  validateQuery,
+  validateParams,
+  idSchema,
+} from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ResponseMessage from "../enum/ResponseMessage";
@@ -12,6 +16,7 @@ import Submission from "../models/Submission";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { getManager } from "typeorm";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
+import Review from "../models/Review";
 
 const router = express.Router();
 
@@ -49,6 +54,48 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   const reviews = await questionnaire.getReviews();
   const sortedReviews = _.sortBy(reviews, "id");
   res.send(sortedReviews);
+});
+
+// get a review eitehr as teacher or student
+router.get("/:id", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  // needs to include answers as well (maybe add separately?)
+  const review = await Review.findOne(req.params.id);
+  if (!review) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
+    return;
+  }
+  if (await review.isTeacherInCourse(user)) {
+    res.send(review);
+    return;
+  }
+  // get assignmentstate
+  const questionnaire = await review.getQuestionnaire();
+  const assignment = await questionnaire.getAssignment();
+  const assignmentState = assignment.getState();
+  if (
+    // reviewer should access the review when reviewing
+    ((await review.isReviewer(user)) &&
+      (assignmentState === AssignmentState.REVIEW ||
+        assignmentState === AssignmentState.FEEDBACK)) ||
+    // reviewed user should access the review when getting feedback and the review is finished
+    ((await review.isReviewed(user)) &&
+      assignmentState === AssignmentState.FEEDBACK &&
+      review.submitted)
+  ) {
+    const limitedReview = _.pick(review, [
+      "id",
+      "flaggedByReviewer",
+      "submitted",
+      "approvalByTA",
+      "questionnaireId",
+    ]);
+    res.send(limitedReview);
+    return;
+  }
+  res
+    .status(HttpStatusCode.FORBIDDEN)
+    .send("You are not allowed to view this review");
 });
 
 // distribute the reviews for an assignment
