@@ -132,7 +132,9 @@ export default abstract class Review extends BaseModel {
     const assignment = await this.questionnaire!.getAssignment();
     const course = await assignment.getCourse();
     if (!(await course.isEnrolled(this.reviewer!, UserRole.STUDENT))) {
-      throw new Error(`${this.reviewer!.netid} should be enrolled in the course`);
+      throw new Error(
+        `${this.reviewer!.netid} should be enrolled in the course`
+      );
     }
     if (this.approvingTA && this.approvalByTA === null) {
       throw new Error("Approval should be set");
