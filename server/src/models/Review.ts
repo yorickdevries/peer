@@ -10,6 +10,7 @@ import BaseModel from "./BaseModel";
 import User from "./User";
 import ReviewType from "../enum/ReviewType";
 import Questionnaire from "./Questionnaire";
+import UserRole from "../enum/UserRole";
 
 // formely called rubric
 @Entity()
@@ -116,5 +117,43 @@ export default abstract class Review extends BaseModel {
     this.submittedAt = submittedAt;
     this.approvalByTA = approvalByTA;
     this.approvingTA = approvingTA;
+  }
+
+  // custom validation which is run before saving
+  async validateOrReject(): Promise<void> {
+    const assignment = await this.questionnaire!.getAssignment();
+    const course = await assignment.getCourse();
+    if (!(await course.isEnrolled(this.user!, UserRole.STUDENT))) {
+      throw new Error(`${this.user!.netid} should be enrolled in the course`);
+    }
+    if (this.approvingTA && this.approvalByTA === null) {
+      throw new Error("Approval should be set");
+    }
+    if (!this.approvingTA && typeof this.approvalByTA === "boolean") {
+      throw new Error("Approving TA should be set");
+    }
+    if (this.approvingTA) {
+      if (
+        !(await course.isEnrolled(
+          this.approvingTA,
+          UserRole.TEACHING_ASSISTANT
+        )) &&
+        !(await course.isEnrolled(this.approvingTA, UserRole.TEACHER))
+      ) {
+        throw new Error(
+          `${this.approvingTA.netid} should be enrolled in the course`
+        );
+      }
+    }
+    // if all succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
+
+  async getQuestionnaire(): Promise<Questionnaire> {
+    return (
+      await Review.findOneOrFail(this.id, {
+        relations: ["questionnaire"],
+      })
+    ).questionnaire!;
   }
 }

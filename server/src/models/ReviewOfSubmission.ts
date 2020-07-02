@@ -39,5 +39,18 @@ export default class ReviewOfSubmission extends Review {
     );
     this.submission = submission;
   }
-  // validation: questionnaire and submission should correspond to same assignment
+
+  // custom validation which is run before saving
+  async validateOrReject(): Promise<void> {
+    // validation: questionnaire and submission should correspond to same assignment
+    const questionnaireAssignment = await this.questionnaire!.getAssignment();
+    const submissionAssignment = await this.submission!.getAssignment();
+    if (questionnaireAssignment.id !== submissionAssignment.id) {
+      throw new Error(
+        "The questionnaire should correspond to the assignment of the submission"
+      );
+    }
+    // if all succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
 }

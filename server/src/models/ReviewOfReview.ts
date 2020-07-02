@@ -40,5 +40,21 @@ export default class ReviewOfReview extends Review {
     this.reviewOfSubmission = reviewOfSubmission;
   }
 
-  // validation: questionnaire and reviewofsubmission should correspond to same assignment
+  // custom validation which is run before saving
+  async validateOrReject(): Promise<void> {
+    // validation: questionnaire and reviewofsubmission should correspond to same assignment
+    const questionnaireAssignment = await this.questionnaire!.getAssignment();
+    const reviewOfSubmissionQuestionnaire = await this.reviewOfSubmission!.getQuestionnaire();
+    const reviewOfSubmissionQuestionnaireAssignment = await reviewOfSubmissionQuestionnaire.getAssignment();
+    if (
+      questionnaireAssignment.id !==
+      reviewOfSubmissionQuestionnaireAssignment.id
+    ) {
+      throw new Error(
+        "The questionnaire should correspond to the assignment of the review"
+      );
+    }
+    // if all succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
 }
