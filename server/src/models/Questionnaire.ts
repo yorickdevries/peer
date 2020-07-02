@@ -55,4 +55,15 @@ export default abstract class Questionnaire extends BaseModel {
     const assignment = await this.getAssignment();
     return await assignment.isTeacherInCourse(user);
   }
+
+  async getReviewsWhereUserIsReviewer(user: User) {
+    const reviews = await this.getReviews();
+    const userReviews: Review[] = [];
+    for (const review of reviews) {
+      if (await review.isReviewer(user)) {
+        userReviews.push(review);
+      }
+    }
+    return userReviews;
+  }
 }
