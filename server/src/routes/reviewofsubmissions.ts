@@ -59,7 +59,7 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
 // get a review eitehr as teacher or student
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   const user = req.user!;
-  // needs to include answers as well (maybe add separately?)
+  // TODO: needs to include answers as well (maybe add separately?)
   const review = await Review.findOne(req.params.id);
   if (!review) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
