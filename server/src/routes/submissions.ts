@@ -73,15 +73,7 @@ router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
       .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
     return;
   }
-  const latestSubmissionsOfEachGroup: Submission[] = [];
-  const groups = await assignment.getGroups();
-  for (const group of groups) {
-    const submissions = await assignment.getSubmissions(group);
-    const latestSubmission = _.maxBy(submissions, "id");
-    if (latestSubmission) {
-      latestSubmissionsOfEachGroup.push(latestSubmission);
-    }
-  }
+  const latestSubmissionsOfEachGroup = await assignment.getLatestSubmissionsOfEachGroup();
   const sortedSubmissions = _.sortBy(latestSubmissionsOfEachGroup, "id");
   res.send(sortedSubmissions);
 });

@@ -212,9 +212,7 @@ router.get(
       res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
       return;
     }
-    // all submissions of group
-    const submissions = await assignment.getSubmissions(group);
-    const latestSubmission = _.maxBy(submissions, "id");
+    const latestSubmission = await assignment.getLatestSubmission(group);
     if (!latestSubmission) {
       res
         .status(HttpStatusCode.NOT_FOUND)

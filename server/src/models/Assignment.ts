@@ -31,6 +31,7 @@ import Submission from "./Submission";
 import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import AssignmentState from "../enum/AssignmentState";
+import _ from "lodash";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -268,6 +269,25 @@ export default class Assignment extends BaseModel {
         })
       ).submissions!;
     }
+  }
+
+  async getLatestSubmissionsOfEachGroup(): Promise<Submission[]> {
+    const latestSubmissionsOfEachGroup: Submission[] = [];
+    const groups = await this.getGroups();
+    for (const group of groups) {
+      const submissions = await this.getSubmissions(group);
+      const latestSubmission = _.maxBy(submissions, "id");
+      if (latestSubmission) {
+        latestSubmissionsOfEachGroup.push(latestSubmission);
+      }
+    }
+    return latestSubmissionsOfEachGroup;
+  }
+
+  async getLatestSubmission(group: Group): Promise<Submission | undefined> {
+    const submissions = await this.getSubmissions(group);
+    const latestSubmission = _.maxBy(submissions, "id");
+    return latestSubmission;
   }
 
   private async getSubmissionsOfGroup(group: Group): Promise<Submission[]> {
