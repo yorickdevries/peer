@@ -52,6 +52,40 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   res.send(sortedSubmissions);
 });
 
+// get all the submissions for an assignment
+// we should swicth to specific annotation of submissions which indicate whether they are the latest
+router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
+  const user = req.user!;
+  const assignmentId = req.query.assignmentId as any;
+  const assignment = await Assignment.findOne(assignmentId);
+  if (!assignment) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+    return;
+  }
+  if (
+    // not a teacher
+    !(await assignment.isTeacherInCourse(user))
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+    return;
+  }
+  const latestSubmissionsOfEachGroup: Submission[] = [];
+  const groups = await assignment.getGroups();
+  for (const group of groups) {
+    const submissions = await assignment.getSubmissions(group);
+    const latestSubmission = _.maxBy(submissions, "id");
+    if (latestSubmission) {
+      latestSubmissionsOfEachGroup.push(latestSubmission);
+    }
+  }
+  const sortedSubmissions = _.sortBy(latestSubmissionsOfEachGroup, "id");
+  res.send(sortedSubmissions);
+});
+
 // Joi inputvalidation
 const submissionSchema = Joi.object({
   groupId: Joi.number().integer().required(),

@@ -189,6 +189,7 @@ router.get(
 );
 
 // get the submissions of a group
+// we should swicth to specific annotation of submissions which indicate whether they are the latest
 router.get(
   "/:id/latestsubmission",
   validateParams(idSchema),
