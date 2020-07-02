@@ -8,7 +8,11 @@ import Faculty from "../models/Faculty";
 import AcademicYear from "../models/AcademicYear";
 import Enrollment from "../models/Enrollment";
 import UserRole from "../enum/UserRole";
-import { validateBody, validateParams } from "../middleware/validation";
+import {
+  validateBody,
+  validateParams,
+  idSchema,
+} from "../middleware/validation";
 import _ from "lodash";
 import ResponseMessage from "../enum/ResponseMessage";
 
@@ -22,10 +26,6 @@ router.get("/enrollable", async (req, res) => {
   res.send(sortedCourses);
 });
 
-// Joi inputvalidation
-const idSchema = Joi.object({
-  id: Joi.number().integer().required(),
-});
 // get a course
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   const user = req.user!;

@@ -5,6 +5,7 @@ import {
   validateBody,
   validateQuery,
   validateParams,
+  idSchema,
 } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import Course from "../models/Course";
@@ -55,11 +56,6 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
   res.send(sortedAllAssignments);
 });
 
-// get an assignment by id
-// Joi inputvalidation
-const idSchema = Joi.object({
-  id: Joi.number().integer().required(),
-});
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   const user = req.user!;
   const assignment = await Assignment.findOne(req.params.id);
