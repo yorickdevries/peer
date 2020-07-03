@@ -21,5 +21,19 @@ export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
     super(question, review);
     this.multipleChoiceAnswer = answer;
   }
-  // validation: options should be oart of question
+
+  async validateOrReject(): Promise<void> {
+    // validation: options should be part of question
+    const question = await this.getQuestion();
+    if (!question.containsOption(this.multipleChoiceAnswer)) {
+      throw new Error("The questionOption is not part of this question");
+    }
+    // if all succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
+
+  async getQuestion(): Promise<MultipleChoiceQuestion> {
+    const questionId = this.question ? this.question.id : this.questionId;
+    return MultipleChoiceQuestion.findOneOrFail(questionId);
+  }
 }
