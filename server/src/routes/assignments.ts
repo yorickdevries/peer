@@ -118,8 +118,8 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
       .send("This assignment does not have a file attached.");
     return;
   }
-  const fileName = file.name + file.extension;
-  const filePath = path.resolve(uploadFolder, file.id.toString());
+  const fileName = file.getFileNamewithExtension();
+  const filePath = file.getPath();
   res.download(filePath, fileName);
 });
 
