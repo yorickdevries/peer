@@ -9,7 +9,8 @@ export default class SubmissionQuestionnaire extends Questionnaire {
     (_type) => Assignment,
     (assignment) => assignment.submissionQuestionnaire
   )
-  assignment?: Assignment;
+  // cannot be named assignment as this clashed with reviewquestionnaire
+  assignmentOfSubmissionQuestionnaire?: Assignment;
 
   constructor() {
     super();
@@ -18,8 +19,8 @@ export default class SubmissionQuestionnaire extends Questionnaire {
   async getAssignment(): Promise<Assignment> {
     return (
       await SubmissionQuestionnaire.findOneOrFail(this.id, {
-        relations: ["assignment"],
+        relations: ["assignmentOfSubmissionQuestionnaire"],
       })
-    ).assignment!;
+    ).assignmentOfSubmissionQuestionnaire!;
   }
 }

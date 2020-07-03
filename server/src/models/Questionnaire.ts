@@ -33,7 +33,8 @@ export default abstract class Questionnaire extends BaseModel {
   @OneToMany((_type) => Review, (review) => review.questionnaire)
   reviews?: Review[];
 
-  abstract assignment?: Assignment;
+  // commented out as 2 different implementations will break typeORM
+  // abstract assignment?: Assignment;
 
   constructor() {
     super();
@@ -52,7 +53,9 @@ export default abstract class Questionnaire extends BaseModel {
   // checks whether the user is teacher
   // of the corresponding assignment and course
   async isTeacherInCourse(user: User): Promise<boolean> {
+    console.log("hier");
     const assignment = await this.getAssignment();
+    console.log(assignment);
     return await assignment.isTeacherInCourse(user);
   }
 
