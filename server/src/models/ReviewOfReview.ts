@@ -57,17 +57,9 @@ export default class ReviewOfReview extends Review {
     return super.validateOrReject();
   }
 
-  async getReviewOfSubmission(): Promise<ReviewOfSubmission> {
-    return (
-      await ReviewOfReview.findOneOrFail(this.id, {
-        relations: ["reviewOfSubmission"],
-      })
-    ).reviewOfSubmission!;
-  }
-
   // checks whether the user is reviewed
   async isReviewed(user: User): Promise<boolean> {
-    const reviewOfSubmission = await this.getReviewOfSubmission();
+    const reviewOfSubmission = this.reviewOfSubmission!;
     const reviewer = await reviewOfSubmission.getReviewer();
     return reviewer.netid === user.netid;
   }

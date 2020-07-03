@@ -15,6 +15,7 @@ import Questionnaire from "./Questionnaire";
 import UserRole from "../enum/UserRole";
 import _ from "lodash";
 import QuestionAnswer from "./QuestionAnswer";
+import Question from "./Question";
 
 interface AnonymousReview {
   id: number;
@@ -148,7 +149,8 @@ export default abstract class Review extends BaseModel {
 
   // custom validation which is run before saving
   async validateOrReject(): Promise<void> {
-    const assignment = await this.questionnaire!.getAssignment();
+    const questionnaire = await this.getQuestionnaire();
+    const assignment = await questionnaire.getAssignment();
     const course = await assignment.getCourse();
     if (!(await course.isEnrolled(this.reviewer!, UserRole.STUDENT))) {
       throw new Error(
@@ -174,16 +176,30 @@ export default abstract class Review extends BaseModel {
         );
       }
     }
+    // check whether the review is allows to be submitted
+    if (this.submitted) {
+      for (const question of questionnaire.questions) {
+        if (!question.optional) {
+          if (!this.getAnswer(question)) {
+            throw new Error("A non-optional question isn't answered yet.");
+          }
+        }
+      }
+    }
     // if all succeeds the super validateOrReject can be called
     return super.validateOrReject();
   }
 
   async getQuestionnaire(): Promise<Questionnaire> {
-    return (
-      await Review.findOneOrFail(this.id, {
-        relations: ["questionnaire"],
-      })
-    ).questionnaire!;
+    if (this.questionnaire) {
+      return this.questionnaire;
+    } else {
+      return (
+        await Review.findOneOrFail(this.id, {
+          relations: ["questionnaire"],
+        })
+      ).questionnaire!;
+    }
   }
 
   async getReviewer(): Promise<User> {
@@ -215,5 +231,11 @@ export default abstract class Review extends BaseModel {
       questionnaireId: this.questionnaireId,
       questionAnswers: this.questionAnswers,
     };
+  }
+
+  getAnswer(question: Question): QuestionAnswer | undefined {
+    return _.find(this.questionAnswers, (questionAnswer) => {
+      return questionAnswer.questionId === question.id;
+    });
   }
 }
