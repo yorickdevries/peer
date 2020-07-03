@@ -30,6 +30,7 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
       .status(HttpStatusCode.FORBIDDEN)
       .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
   }
+  // TODO: check for the right state of the assignment
   const question = new OpenQuestion(
     req.body.text,
     req.body.number,
