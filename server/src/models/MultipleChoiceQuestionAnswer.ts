@@ -12,7 +12,7 @@ export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
     nullable: false,
     eager: true,
   })
-  answer: MultipleChoiceQuestionOption;
+  multipleChoiceAnswer: MultipleChoiceQuestionOption;
 
   constructor(
     question: MultipleChoiceQuestion,
@@ -20,7 +20,7 @@ export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
     answer: MultipleChoiceQuestionOption
   ) {
     super(question, review);
-    this.answer = answer;
+    this.multipleChoiceAnswer = answer;
   }
   // validation: options should be oart of question
 }

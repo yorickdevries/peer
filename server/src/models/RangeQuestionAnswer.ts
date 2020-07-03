@@ -18,18 +18,18 @@ export default class RangeQuestionAnswer extends QuestionAnswer {
   @IsInt()
   @IsPositive()
   @Min(rangeconfig.min) //1 star is the minimum, max is set by the questionmaker (needs validation)
-  answer: number;
+  rangeAnswer: number;
 
   constructor(question: RangeQuestion, review: Review, answer: number) {
     super(question, review);
-    this.answer = answer;
+    this.rangeAnswer = answer;
   }
 
   // validation: answer should be in range of the question
   async validateOrReject(): Promise<void> {
     // validation: questions should be part of the questionnaire of the review
     const question = await this.getQuestion();
-    if (question.range < this.answer) {
+    if (question.range < this.rangeAnswer) {
       throw new Error("The answer is outside the range");
     }
     // all succeeds the super validateOrReject can be called

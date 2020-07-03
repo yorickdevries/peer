@@ -10,7 +10,7 @@ export default class CheckboxQuestionAnswer extends QuestionAnswer {
   // answer int NOT NULL,
   @ManyToMany((_type) => CheckboxQuestionOption, { eager: true })
   @JoinTable()
-  answer: CheckboxQuestionOption[];
+  checkboxAnswer: CheckboxQuestionOption[];
 
   constructor(
     question: CheckboxQuestion,
@@ -18,7 +18,7 @@ export default class CheckboxQuestionAnswer extends QuestionAnswer {
     answer: CheckboxQuestionOption[]
   ) {
     super(question, review);
-    this.answer = answer;
+    this.checkboxAnswer = answer;
   }
 
   // validation: options should be oart of question

@@ -33,7 +33,7 @@ export default abstract class QuestionAnswer extends BaseModel {
   review?: Review;
 
   // Note: needs to be checked whether the tables properly distiguish different answers
-  abstract answer: any;
+  // abstract answer: any;
 
   constructor(question: Question, review: Review) {
     super();

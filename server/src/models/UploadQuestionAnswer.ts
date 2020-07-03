@@ -12,10 +12,10 @@ export default class UploadQuestionAnswer extends QuestionAnswer {
   @OneToOne((_type) => File, { eager: true })
   @JoinColumn()
   @IsDefined()
-  answer: File;
+  uploadAnswer: File;
 
   constructor(question: UploadQuestion, review: Review, answer: File) {
     super(question, review);
-    this.answer = answer;
+    this.uploadAnswer = answer;
   }
 }
