@@ -5,6 +5,7 @@ import {
   Column,
   ManyToOne,
   RelationId,
+  OneToMany,
 } from "typeorm";
 import { IsOptional, IsDefined, IsBoolean, IsDate } from "class-validator";
 import BaseModel from "./BaseModel";
@@ -13,6 +14,7 @@ import ReviewType from "../enum/ReviewType";
 import Questionnaire from "./Questionnaire";
 import UserRole from "../enum/UserRole";
 import _ from "lodash";
+import QuestionAnswer from "./QuestionAnswer";
 
 interface AnonymousReview {
   id: number;
@@ -20,6 +22,7 @@ interface AnonymousReview {
   submitted: boolean;
   approvalByTA: boolean | null;
   questionnaireId: number;
+  questionAnswers: QuestionAnswer[];
 }
 
 // formely called rubric
@@ -108,6 +111,13 @@ export default abstract class Review extends BaseModel {
   // ta_netid varchar(500),
   @ManyToOne((_type) => User, { eager: true })
   approvingTA?: User | null;
+
+  @OneToMany(
+    (_type) => QuestionAnswer,
+    (questionAnswer) => questionAnswer.review,
+    { eager: true }
+  )
+  questionAnswers!: QuestionAnswer[];
 
   abstract isReviewed(user: User): Promise<boolean>;
 
@@ -203,6 +213,7 @@ export default abstract class Review extends BaseModel {
       submitted: this.submitted,
       approvalByTA: this.approvalByTA,
       questionnaireId: this.questionnaireId,
+      questionAnswers: this.questionAnswers,
     };
   }
 }

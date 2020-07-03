@@ -29,7 +29,9 @@ export default abstract class QuestionAnswer extends BaseModel {
   @PrimaryColumn()
   @RelationId((questionAnswer: QuestionAnswer) => questionAnswer.review)
   reviewId!: number;
-  @ManyToOne((_type) => Review, { nullable: false })
+  @ManyToOne((_type) => Review, (review) => review.questionAnswers, {
+    nullable: false,
+  })
   review?: Review;
 
   // Note: needs to be checked whether the tables properly distiguish different answers
