@@ -26,4 +26,18 @@ export default class RangeQuestionAnswer extends QuestionAnswer {
   }
 
   // validation: answer should be in range of the question
+  async validateOrReject(): Promise<void> {
+    // validation: questions should be part of the questionnaire of the review
+    const question = await this.getQuestion();
+    if (question.range < this.answer) {
+      throw new Error("The answer is outside the range");
+    }
+    // all succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
+
+  async getQuestion(): Promise<RangeQuestion> {
+    const questionId = this.question ? this.question.id : this.questionId;
+    return RangeQuestion.findOneOrFail(questionId);
+  }
 }
