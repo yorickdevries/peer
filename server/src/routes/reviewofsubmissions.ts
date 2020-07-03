@@ -113,7 +113,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
     (assignmentState === AssignmentState.REVIEW ||
       assignmentState === AssignmentState.FEEDBACK)
   ) {
-    const submission = await review.getSubmission();
+    const submission = await review.submission!;
     const file = await submission.getFile();
     const fileName = file.getFileNamewithExtension();
     const filePath = file.getPath();
@@ -123,6 +123,44 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   res
     .status(HttpStatusCode.FORBIDDEN)
     .send("You are not allowed to view this review");
+});
+
+// submit a review
+router.post("/:id/submit", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  const review = await ReviewOfSubmission.findOne(req.params.id);
+  if (!review) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
+    return;
+  }
+  if (!(await review.isReviewer(user))) {
+    res.status(HttpStatusCode.FORBIDDEN).send("You are not the reviewer");
+    return;
+  }
+  // get assignmentstate
+  const questionnaire = await review.getQuestionnaire();
+  const assignment = await questionnaire.getAssignment();
+  const assignmentState = assignment.getState();
+  if (assignmentState !== AssignmentState.REVIEW) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("The assignment is not in review state");
+    return;
+  }
+  // check whether the review is fully filled in
+  for (const question of questionnaire.questions) {
+    if (!question.optional) {
+      if (!review.getAnswer(question)) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("The review is not fully filled in");
+        return;
+      }
+    }
+  }
+  review.submitted = true;
+  await review.save();
+  res.send(review);
 });
 
 // distribute the reviews for an assignment
