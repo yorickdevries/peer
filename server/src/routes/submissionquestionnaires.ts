@@ -133,7 +133,7 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
         req.body.assignmentId
       );
       // make sure the questionnaire not already exists
-      if (assignment.reviewQuestionnaireId) {
+      if (assignment.submissionQuestionnaireId) {
         throw new Error("Questionnaire already exists");
       }
       // save questionnaire
