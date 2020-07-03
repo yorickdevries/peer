@@ -81,4 +81,12 @@ export default class Submission extends BaseModel {
       })
     ).assignment!;
   }
+
+  async getFile(): Promise<File> {
+    return (
+      await Submission.findOneOrFail(this.id, {
+        relations: ["file"],
+      })
+    ).file!;
+  }
 }
