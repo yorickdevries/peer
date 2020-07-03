@@ -22,6 +22,7 @@ import uploadquestions from "./uploadquestions";
 import checkboxquestionoptions from "./checkboxquestionoptions";
 import multiplechoicequestionoptions from "./multiplechoicequestionoptions";
 import reviewofsubmissions from "./reviewofsubmissions";
+import openquestionanswers from "./openquestionanswers";
 
 // old routes, can be deleted when not needed anymore
 import oldRoutes from "../old_api/routes/api";
@@ -66,6 +67,7 @@ router.use("/uploadquestions", uploadquestions);
 router.use("/checkboxquestionoptions", checkboxquestionoptions);
 router.use("/multiplechoicequestionoptions", multiplechoicequestionoptions);
 router.use("/reviewofsubmissions", reviewofsubmissions);
+router.use("/openquestionanswers", openquestionanswers);
 
 // old routes, can be deleted when not needed anymore
 router.use("/oldroutes", oldRoutes);
