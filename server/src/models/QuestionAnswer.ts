@@ -41,5 +41,23 @@ export default abstract class QuestionAnswer extends BaseModel {
     this.review = review;
   }
 
-  // validation: questions should be part of the questionnaire of the review
+  async validateOrReject(): Promise<void> {
+    // validation: questions should be part of the questionnaire of the review
+    const question = this.question ? this.question : await this.getQuestion();
+    const review = this.review ? this.review : await this.getReview();
+    const questionnaire = await review.getQuestionnaire();
+    if (!questionnaire.containsQuestion(question)) {
+      throw new Error("The question is not part of this review");
+    }
+    // if all succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
+
+  async getReview(): Promise<Review> {
+    return Review.findOneOrFail(this.reviewId);
+  }
+
+  async getQuestion(): Promise<Question> {
+    return Question.findOneOrFail(this.questionId);
+  }
 }
