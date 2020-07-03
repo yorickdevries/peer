@@ -17,8 +17,10 @@ export default class ReviewQuestionnaire extends Questionnaire {
   }
 
   async getAssignment(): Promise<Assignment> {
-    return (await ReviewQuestionnaire.findOneOrFail(this.id, {
-      relations: ["assignmentOfReviewQuestionnaire"],
-    })).assignmentOfReviewQuestionnaire!;
+    return (
+      await ReviewQuestionnaire.findOneOrFail(this.id, {
+        relations: ["assignmentOfReviewQuestionnaire"],
+      })
+    ).assignmentOfReviewQuestionnaire!;
   }
 }
