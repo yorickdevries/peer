@@ -93,7 +93,7 @@ router.post(
     if (!req.file) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
-        .send("file is needed for the submission");
+        .send("File is needed for the submission");
       return;
     }
     const group = await Group.findOne(req.body.groupId);
