@@ -11,14 +11,14 @@ import RangeQuestionAnswer from "../models/RangeQuestionAnswer";
 const router = express.Router();
 
 // Joi inputvalidation
-const answerSchema = Joi.object({
+const rangeAnswerSchema = Joi.object({
   rangeQuestionId: Joi.number().integer().required(),
   reviewId: Joi.number().integer().required(),
-  answer: Joi.number().integer().required(),
+  rangeAnswer: Joi.number().integer().required(),
 });
-// post an answer
+// post an rangeAnswer
 // overwrites existing if already exists
-router.post("/", validateBody(answerSchema), async (req, res) => {
+router.post("/", validateBody(rangeAnswerSchema), async (req, res) => {
   const user = req.user!;
   const question = await RangeQuestion.findOne(req.body.rangeQuestionId);
   if (!question) {
@@ -54,20 +54,20 @@ router.post("/", validateBody(answerSchema), async (req, res) => {
       .send("The assignment is not in reviewstate");
     return;
   }
-  // make or overwrite answer;
-  let answer = await RangeQuestionAnswer.findOne({
+  // make or overwrite rangeAnswer;
+  let rangeAnswer = await RangeQuestionAnswer.findOne({
     where: {
       reviewId: review.id,
       questionId: question.id,
     },
   });
-  if (answer) {
-    answer.answer = req.body.answer;
+  if (rangeAnswer) {
+    rangeAnswer.rangeAnswer = req.body.rangeAnswer;
   } else {
-    answer = new RangeQuestionAnswer(question, review, req.body.answer);
+    rangeAnswer = new RangeQuestionAnswer(question, review, req.body.rangeAnswer);
   }
-  await answer.save();
-  res.send(answer);
+  await rangeAnswer.save();
+  res.send(rangeAnswer);
 });
 
 export default router;

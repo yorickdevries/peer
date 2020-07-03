@@ -11,14 +11,14 @@ import OpenQuestionAnswer from "../models/OpenQuestionAnswer";
 const router = express.Router();
 
 // Joi inputvalidation
-const answerSchema = Joi.object({
+const openAnswerSchema = Joi.object({
   openQuestionId: Joi.number().integer().required(),
   reviewId: Joi.number().integer().required(),
-  answer: Joi.string().required(),
+  openAnswer: Joi.string().required(),
 });
-// post an answer
+// post an openAnswer
 // overwrites existing if already exists
-router.post("/", validateBody(answerSchema), async (req, res) => {
+router.post("/", validateBody(openAnswerSchema), async (req, res) => {
   const user = req.user!;
   const question = await OpenQuestion.findOne(req.body.openQuestionId);
   if (!question) {
@@ -54,20 +54,20 @@ router.post("/", validateBody(answerSchema), async (req, res) => {
       .send("The assignment is not in reviewstate");
     return;
   }
-  // make or overwrite answer;
-  let answer = await OpenQuestionAnswer.findOne({
+  // make or overwrite openAnswer;
+  let openAnswer = await OpenQuestionAnswer.findOne({
     where: {
       reviewId: review.id,
       questionId: question.id,
     },
   });
-  if (answer) {
-    answer.answer = req.body.answer;
+  if (openAnswer) {
+    openAnswer.openAnswer = req.body.openAnswer;
   } else {
-    answer = new OpenQuestionAnswer(question, review, req.body.answer);
+    openAnswer = new OpenQuestionAnswer(question, review, req.body.openAnswer);
   }
-  await answer.save();
-  res.send(answer);
+  await openAnswer.save();
+  res.send(openAnswer);
 });
 
 export default router;
