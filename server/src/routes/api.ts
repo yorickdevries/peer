@@ -26,6 +26,7 @@ import openquestionanswers from "./openquestionanswers";
 import rangequestionanswers from "./rangequestionanswers";
 import uploadquestionanswers from "./uploadquestionanswers";
 import multiplechoicequestionanswers from "./multiplechoicequestionanswers";
+import checkboxquestionanswers from "./checkboxquestionanswers";
 
 // old routes, can be deleted when not needed anymore
 import oldRoutes from "../old_api/routes/api";
@@ -74,6 +75,7 @@ router.use("/openquestionanswers", openquestionanswers);
 router.use("/rangequestionanswers", rangequestionanswers);
 router.use("/uploadquestionanswers", uploadquestionanswers);
 router.use("/multiplechoicequestionanswers", multiplechoicequestionanswers);
+router.use("/checkboxquestionanswers", checkboxquestionanswers);
 
 // old routes, can be deleted when not needed anymore
 router.use("/oldroutes", oldRoutes);
