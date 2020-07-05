@@ -7,7 +7,11 @@ import Review from "./Review";
 
 @ChildEntity(ReviewType.REVIEW_OF_SUBMISSION)
 export default class ReviewOfSubmission extends Review {
-  @ManyToOne((_type) => Submission, { eager: true })
+  @ManyToOne(
+    (_type) => Submission,
+    (submission) => submission.reviewOfSubmissions,
+    { eager: true }
+  )
   // can be null as it is in the same table as reviewOfReview
   submission?: Submission;
 

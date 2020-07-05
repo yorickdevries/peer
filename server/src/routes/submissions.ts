@@ -1,6 +1,11 @@
 import express from "express";
 import Joi from "@hapi/joi";
-import { validateQuery, validateBody } from "../middleware/validation";
+import {
+  validateQuery,
+  validateBody,
+  idSchema,
+  validateParams,
+} from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Group from "../models/Group";
@@ -76,6 +81,34 @@ router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
   const latestSubmissionsOfEachGroup = await assignment.getLatestSubmissionsOfEachGroup();
   const sortedSubmissions = _.sortBy(latestSubmissionsOfEachGroup, "id");
   res.send(sortedSubmissions);
+});
+
+// get the feedback of a submission
+router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  const submission = await Submission.findOne(req.params.id);
+  if (!submission) {
+    res
+      .status(HttpStatusCode.NOT_FOUND)
+      .send(ResponseMessage.SUBMISSION_NOT_FOUND);
+    return;
+  }
+  const assignment = await submission.getAssignment();
+  const assignmentState = assignment.getState();
+  if (assignmentState !== AssignmentState.FEEDBACK) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not allowed to view reviews");
+    return;
+  }
+  const group = await submission.getGroup();
+  if (!(await group.hasUser(user))) {
+    res.status(HttpStatusCode.FORBIDDEN).send("You are not part of this group");
+    return;
+  }
+  const reviewOfSubmissions = await submission.getReviewOfSubmissions();
+  const sortedReviews = _.sortBy(reviewOfSubmissions, "id");
+  res.send(sortedReviews);
 });
 
 // Joi inputvalidation

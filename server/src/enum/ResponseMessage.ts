@@ -11,6 +11,7 @@ enum ResponseMessage {
   QUESTION_NOT_FOUND = "The specified question is not found",
   QUESTIONOPTION_NOT_FOUND = "The specified questionoption is not found",
   REVIEW_NOT_FOUND = "The specified review is not found",
+  SUBMISSION_NOT_FOUND = "The specified submission is not found",
 }
 
 export default ResponseMessage;
