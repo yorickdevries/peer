@@ -83,6 +83,56 @@ router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
   res.send(sortedSubmissions);
 });
 
+// get the submission
+router.get("/:id", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  const submission = await Submission.findOne(req.params.id);
+  if (!submission) {
+    res
+      .status(HttpStatusCode.NOT_FOUND)
+      .send(ResponseMessage.SUBMISSION_NOT_FOUND);
+    return;
+  }
+  const group = await submission.getGroup();
+  const assignment = await submission.getAssignment();
+  if (
+    !((await group.hasUser(user)) || (await assignment.isTeacherInCourse(user)))
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not part of this group or teacher of the course");
+    return;
+  }
+  res.send(submission);
+});
+
+// get the submission
+router.get("/:id/file", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  const submission = await Submission.findOne(req.params.id);
+  if (!submission) {
+    res
+      .status(HttpStatusCode.NOT_FOUND)
+      .send(ResponseMessage.SUBMISSION_NOT_FOUND);
+    return;
+  }
+  const group = await submission.getGroup();
+  const assignment = await submission.getAssignment();
+  if (
+    !((await group.hasUser(user)) || (await assignment.isTeacherInCourse(user)))
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not part of this group or teacher of the course");
+    return;
+  }
+  // get the file
+  const file = submission.file;
+  const fileName = file.getFileNamewithExtension();
+  const filePath = file.getPath();
+  res.download(filePath, fileName);
+});
+
 // get the feedback of a submission
 router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
   const user = req.user!;
