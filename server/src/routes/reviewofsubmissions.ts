@@ -99,8 +99,9 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
     return;
   }
   const reviewAnswers = await review.getQuestionAnswers();
+  const sortedReviewAnswers = _.sortBy(reviewAnswers, "questionId");
   if (await review.isTeacherInCourse(user)) {
-    res.send(reviewAnswers);
+    res.send(sortedReviewAnswers);
     return;
   }
   // get assignmentstate
@@ -117,7 +118,7 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
       assignmentState === AssignmentState.FEEDBACK &&
       review.submitted)
   ) {
-    res.send(reviewAnswers);
+    res.send(sortedReviewAnswers);
     return;
   }
   res
