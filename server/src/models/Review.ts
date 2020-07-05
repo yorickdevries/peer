@@ -23,7 +23,6 @@ interface AnonymousReview {
   submitted: boolean;
   approvalByTA: boolean | null;
   questionnaireId: number;
-  questionAnswers: QuestionAnswer[];
 }
 
 // formely called rubric
@@ -113,12 +112,12 @@ export default abstract class Review extends BaseModel {
   @ManyToOne((_type) => User, { eager: true })
   approvingTA?: User | null;
 
+  // cannot be eager as this casues 'ER_BAD_NULL_ERROR's
   @OneToMany(
     (_type) => QuestionAnswer,
-    (questionAnswer) => questionAnswer.review,
-    { eager: true }
+    (questionAnswer) => questionAnswer.review
   )
-  questionAnswers!: QuestionAnswer[];
+  questionAnswers?: QuestionAnswer[];
 
   abstract isReviewed(user: User): Promise<boolean>;
 
@@ -210,6 +209,14 @@ export default abstract class Review extends BaseModel {
     ).reviewer!;
   }
 
+  async getQuestionAnswers(): Promise<QuestionAnswer[]> {
+    return (
+      await Review.findOneOrFail(this.id, {
+        relations: ["questionAnswers"],
+      })
+    ).questionAnswers!;
+  }
+
   // checks whether the user is teacher
   async isTeacherInCourse(user: User): Promise<boolean> {
     const questionnaire = await this.getQuestionnaire();
@@ -229,12 +236,12 @@ export default abstract class Review extends BaseModel {
       submitted: this.submitted,
       approvalByTA: this.approvalByTA,
       questionnaireId: this.questionnaireId,
-      questionAnswers: this.questionAnswers,
     };
   }
 
-  getAnswer(question: Question): QuestionAnswer | undefined {
-    return _.find(this.questionAnswers, (questionAnswer) => {
+  async getAnswer(question: Question): Promise<QuestionAnswer | undefined> {
+    const questionAnswers = await this.getQuestionAnswers();
+    return _.find(questionAnswers, (questionAnswer) => {
       return questionAnswer.questionId === question.id;
     });
   }

@@ -58,7 +58,6 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
 // get a review eitehr as teacher or student
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   const user = req.user!;
-  // TODO: needs to include answers as well (maybe add separately?)
   const review = await ReviewOfSubmission.findOne(req.params.id);
   if (!review) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
@@ -137,6 +136,12 @@ router.post("/:id/submit", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.FORBIDDEN).send("You are not the reviewer");
     return;
   }
+  if (review.submitted) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("The review is already submitted");
+    return;
+  }
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
@@ -150,7 +155,7 @@ router.post("/:id/submit", validateParams(idSchema), async (req, res) => {
   // check whether the review is fully filled in
   for (const question of questionnaire.questions) {
     if (!question.optional) {
-      if (!review.getAnswer(question)) {
+      if (!(await review.getAnswer(question))) {
         res
           .status(HttpStatusCode.FORBIDDEN)
           .send("The review is not fully filled in");
