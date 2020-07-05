@@ -156,6 +156,9 @@ describe("Integration", () => {
     // assertions
     expect(JSON.parse(res.text).length).toEqual(0);
 
+    // set date to the moment that the assignment is unpublished
+    mockDate.set(new Date("2020-01-01T10:00Z"));
+
     // make an assingment for the course
     // create am assignment course
     const exampleAssignmentFile = path.resolve(
@@ -171,7 +174,7 @@ describe("Integration", () => {
       .field("reviewsPerUser", 2)
       .field("enrollable", true)
       .field("reviewEvaluation", false)
-      .field("publishDate", new Date("2020-01-01T10:00Z").toISOString())
+      .field("publishDate", new Date("2020-01-05T10:00Z").toISOString())
       .field("dueDate", new Date("2020-02-01T10:00Z").toISOString())
       .field("reviewPublishDate", new Date("2020-03-01T10:00Z").toISOString())
       .field("reviewDueDate", new Date("2020-04-01T10:00Z").toISOString())
