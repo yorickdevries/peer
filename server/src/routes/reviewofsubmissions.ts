@@ -91,6 +91,41 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
 });
 
 // get a review eitehr as teacher or student
+router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  const review = await ReviewOfSubmission.findOne(req.params.id);
+  if (!review) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
+    return;
+  }
+  const reviewAnswers = await review.getQuestionAnswers();
+  if (await review.isTeacherInCourse(user)) {
+    res.send(reviewAnswers);
+    return;
+  }
+  // get assignmentstate
+  const questionnaire = await review.getQuestionnaire();
+  const assignment = await questionnaire.getAssignment();
+  const assignmentState = assignment.getState();
+  if (
+    // reviewer should access the review when reviewing
+    ((await review.isReviewer(user)) &&
+      (assignmentState === AssignmentState.REVIEW ||
+        assignmentState === AssignmentState.FEEDBACK)) ||
+    // reviewed user should access the review when getting feedback and the review is finished
+    ((await review.isReviewed(user)) &&
+      assignmentState === AssignmentState.FEEDBACK &&
+      review.submitted)
+  ) {
+    res.send(reviewAnswers);
+    return;
+  }
+  res
+    .status(HttpStatusCode.FORBIDDEN)
+    .send("You are not allowed to view this review");
+});
+
+// get a review eitehr as teacher or student
 router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   const user = req.user!;
   const review = await ReviewOfSubmission.findOne(req.params.id);
