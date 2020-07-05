@@ -201,7 +201,9 @@ router.post("/:id/submit", validateParams(idSchema), async (req, res) => {
   }
   review.submitted = true;
   await review.save();
-  res.send(review);
+  const anonymousReview = review.getAnonymousVersion();
+  res.send(anonymousReview);
+  return;
 });
 
 // distribute the reviews for an assignment
