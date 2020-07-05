@@ -179,7 +179,7 @@ export default abstract class Review extends BaseModel {
     if (this.submitted) {
       for (const question of questionnaire.questions) {
         if (!question.optional) {
-          if (!this.getAnswer(question)) {
+          if (!(await this.getAnswer(question))) {
             throw new Error("A non-optional question isn't answered yet.");
           }
         }
