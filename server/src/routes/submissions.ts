@@ -107,7 +107,13 @@ router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
     return;
   }
   const reviewOfSubmissions = await submission.getReviewOfSubmissions();
-  const sortedReviews = _.sortBy(reviewOfSubmissions, "id");
+  const submittedReviews = _.filter(reviewOfSubmissions, (review) => {
+    return review.submitted;
+  });
+  const anonymousReviews = _.map(submittedReviews, (review) => {
+    return review.getAnonymousVersion();
+  });
+  const sortedReviews = _.sortBy(anonymousReviews, "id");
   res.send(sortedReviews);
 });
 
