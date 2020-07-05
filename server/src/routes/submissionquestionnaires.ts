@@ -13,7 +13,7 @@ import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
-import AssignmentState from "../enum/AssignmentState";
+import { AssignmentState } from "../enum/AssignmentState";
 
 const router = express.Router();
 

@@ -20,7 +20,7 @@ import fsPromises from "fs/promises";
 import _ from "lodash";
 import ResponseMessage from "../enum/ResponseMessage";
 import Group from "../models/Group";
-import AssignmentState from "../enum/AssignmentState";
+import { AssignmentState } from "../enum/AssignmentState";
 
 const router = express.Router();
 

@@ -30,7 +30,7 @@ import UserRole from "../enum/UserRole";
 import Submission from "./Submission";
 import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import ReviewQuestionnaire from "./ReviewQuestionnaire";
-import AssignmentState from "../enum/AssignmentState";
+import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
 import _ from "lodash";
 
 @Entity()
@@ -225,6 +225,25 @@ export default class Assignment extends BaseModel {
     } else {
       return AssignmentState.FEEDBACK;
     }
+  }
+
+  isAtState(otherState: AssignmentState): boolean {
+    const currentState = this.getState();
+    return currentState === otherState;
+  }
+
+  isAtOrAfterState(otherState: AssignmentState): boolean {
+    const currentState = this.getState();
+    const currentStateIndex = assignmentStateOrder.indexOf(currentState);
+    const otherStateIndex = assignmentStateOrder.indexOf(otherState);
+    return currentStateIndex >= otherStateIndex;
+  }
+
+  isAtOrBeforeState(otherState: AssignmentState): boolean {
+    const currentState = this.getState();
+    const currentStateIndex = assignmentStateOrder.indexOf(currentState);
+    const otherStateIndex = assignmentStateOrder.indexOf(otherState);
+    return currentStateIndex <= otherStateIndex;
   }
 
   async getCourse(): Promise<Course> {

@@ -16,7 +16,7 @@ import path from "path";
 import hasha from "hasha";
 import fsPromises from "fs/promises";
 import upload from "../middleware/upload";
-import AssignmentState from "../enum/AssignmentState";
+import { AssignmentState } from "../enum/AssignmentState";
 import { getManager } from "typeorm";
 import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";

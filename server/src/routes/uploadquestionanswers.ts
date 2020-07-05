@@ -5,7 +5,7 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import UploadQuestion from "../models/UploadQuestion";
 import ResponseMessage from "../enum/ResponseMessage";
 import Review from "../models/Review";
-import AssignmentState from "../enum/AssignmentState";
+import { AssignmentState } from "../enum/AssignmentState";
 import UploadQuestionAnswer from "../models/UploadQuestionAnswer";
 import File from "../models/File";
 import upload from "../middleware/upload";

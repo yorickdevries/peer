@@ -5,7 +5,7 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import RangeQuestion from "../models/RangeQuestion";
 import ResponseMessage from "../enum/ResponseMessage";
 import Review from "../models/Review";
-import AssignmentState from "../enum/AssignmentState";
+import { AssignmentState } from "../enum/AssignmentState";
 import RangeQuestionAnswer from "../models/RangeQuestionAnswer";
 
 const router = express.Router();

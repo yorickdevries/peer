@@ -9,7 +9,7 @@ import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
-import AssignmentState from "../enum/AssignmentState";
+import { AssignmentState } from "../enum/AssignmentState";
 import generateReviewDistribution from "../util/reviewDistribution";
 import User from "../models/User";
 import Submission from "../models/Submission";

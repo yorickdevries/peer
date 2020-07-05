@@ -5,6 +5,9 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import Questionnaire from "../models/Questionnaire";
 import OpenQuestion from "../models/OpenQuestion";
 import ResponseMessage from "../enum/ResponseMessage";
+import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
+import { AssignmentState } from "../enum/AssignmentState";
+import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 
 const router = express.Router();
 
@@ -30,7 +33,25 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
       .status(HttpStatusCode.FORBIDDEN)
       .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
   }
-  // TODO: check for the right state of the assignment
+  const assignment = await questionnaire.getAssignment();
+  if (
+    questionnaire instanceof SubmissionQuestionnaire &&
+    assignment.isAtOrAfterState(AssignmentState.REVIEW)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("The assignment is already in review state");
+    return;
+  }
+  if (
+    questionnaire instanceof ReviewQuestionnaire &&
+    assignment.isAtOrAfterState(AssignmentState.FEEDBACK)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("The assignment is already in feedback state");
+    return;
+  }
   const question = new OpenQuestion(
     req.body.text,
     req.body.number,
