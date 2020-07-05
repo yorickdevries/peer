@@ -8,7 +8,7 @@ import mockLoginCookie from "../helpers/mockLoginCookie";
 import initializeData from "../../src/util/initializeData";
 import fs from "fs";
 import path from "path";
-import mockDate from "mockdate";
+import { advanceTo, clear } from "jest-date-mock";
 
 describe("Integration", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -59,11 +59,11 @@ describe("Integration", () => {
     assignmentId = JSON.parse(res2.text).id;
 
     // set date to the moment that the assignment is published
-    mockDate.set(new Date("2020-01-15T10:00Z"));
+    advanceTo(new Date("2020-01-15T10:00Z"));
   });
 
   afterEach(async () => {
-    mockDate.reset();
+    clear();
     //close server and connection
     server.close();
     await connection.close();
