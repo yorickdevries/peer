@@ -66,14 +66,18 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     return;
   }
   if (
-    // not a teacher
-    !(await assignment.isTeacherInCourse(user)) &&
+    (await assignment.isEnrolledInGroup(user)) &&
+    (await assignment.getState()) === AssignmentState.UNPUBLISHED
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("This assignment is not published yet");
+    return;
+  }
+  if (
     !(
-      // not published yet
-      (
-        (await assignment.isEnrolledInGroup(user)) &&
-        !((await assignment.getState()) === AssignmentState.UNPUBLISHED)
-      )
+      (await assignment.isTeacherInCourse(user)) ||
+      (await assignment.isEnrolledInGroup(user))
     )
   ) {
     res
@@ -95,14 +99,18 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
     return;
   }
   if (
-    // not a teacher
-    !(await assignment.isTeacherInCourse(user)) &&
+    (await assignment.isEnrolledInGroup(user)) &&
+    (await assignment.getState()) === AssignmentState.UNPUBLISHED
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("This assignment is not published yet");
+    return;
+  }
+  if (
     !(
-      // not published yet
-      (
-        (await assignment.isEnrolledInGroup(user)) &&
-        !((await assignment.getState()) === AssignmentState.UNPUBLISHED)
-      )
+      (await assignment.isTeacherInCourse(user)) ||
+      (await assignment.isEnrolledInGroup(user))
     )
   ) {
     res
