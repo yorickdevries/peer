@@ -3,6 +3,7 @@ import Question from "./Question";
 import { ChildEntity, OneToMany } from "typeorm";
 import QuestionType from "../enum/QuestionType";
 import CheckboxQuestionOption from "./CheckboxQuestionOption";
+import _ from "lodash";
 
 @ChildEntity(QuestionType.CHECKBOX)
 export default class CheckboxQuestion extends Question {
@@ -22,5 +23,11 @@ export default class CheckboxQuestion extends Question {
     questionnaire: Questionnaire
   ) {
     super(text, number, optional, questionnaire);
+  }
+
+  containsOption(option: CheckboxQuestionOption): boolean {
+    return _.some(this.options, (o) => {
+      return o.id === option.id;
+    });
   }
 }

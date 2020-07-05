@@ -10,7 +10,7 @@ export default class CheckboxQuestionAnswer extends QuestionAnswer {
   // answer int NOT NULL,
   @ManyToMany((_type) => CheckboxQuestionOption, { eager: true })
   @JoinTable()
-  answer: CheckboxQuestionOption[];
+  checkboxAnswer: CheckboxQuestionOption[];
 
   constructor(
     question: CheckboxQuestion,
@@ -18,8 +18,23 @@ export default class CheckboxQuestionAnswer extends QuestionAnswer {
     answer: CheckboxQuestionOption[]
   ) {
     super(question, review);
-    this.answer = answer;
+    this.checkboxAnswer = answer;
   }
 
-  // validation: options should be oart of question
+  async validateOrReject(): Promise<void> {
+    // validation: options should be part of question
+    const question = await this.getQuestion();
+    for (const questionOption of this.checkboxAnswer) {
+      if (!question.containsOption(questionOption)) {
+        throw new Error("The questionOption is not part of this question");
+      }
+    }
+    // if all succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
+
+  async getQuestion(): Promise<CheckboxQuestion> {
+    const questionId = this.question ? this.question.id : this.questionId;
+    return CheckboxQuestion.findOneOrFail(questionId);
+  }
 }

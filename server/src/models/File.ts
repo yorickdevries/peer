@@ -1,6 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { IsDefined, IsString, IsNotEmpty, IsHash } from "class-validator";
 import BaseModel from "./BaseModel";
+import path from "path";
+import config from "config";
+
+const uploadFolder = config.get("uploadFolder") as string;
 
 @Entity()
 export default class File extends BaseModel {
@@ -31,5 +35,14 @@ export default class File extends BaseModel {
     this.name = name;
     this.extension = extension;
     this.hash = hash;
+  }
+
+  getFileNamewithExtension(): string {
+    return this.name + this.extension;
+  }
+
+  getPath(): string {
+    const filePath = path.resolve(uploadFolder, this.id.toString());
+    return filePath;
   }
 }

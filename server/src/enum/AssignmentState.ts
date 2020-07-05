@@ -6,4 +6,12 @@ enum AssignmentState {
   FEEDBACK = "feedback",
 }
 
-export default AssignmentState;
+const assignmentStateOrder = [
+  AssignmentState.UNPUBLISHED,
+  AssignmentState.SUBMISSION,
+  AssignmentState.WAITING_FOR_REVIEW,
+  AssignmentState.REVIEW,
+  AssignmentState.FEEDBACK,
+];
+
+export { AssignmentState, assignmentStateOrder };

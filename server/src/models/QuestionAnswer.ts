@@ -29,11 +29,13 @@ export default abstract class QuestionAnswer extends BaseModel {
   @PrimaryColumn()
   @RelationId((questionAnswer: QuestionAnswer) => questionAnswer.review)
   reviewId!: number;
-  @ManyToOne((_type) => Review, { nullable: false })
+  @ManyToOne((_type) => Review, (review) => review.questionAnswers, {
+    nullable: false,
+  })
   review?: Review;
 
   // Note: needs to be checked whether the tables properly distiguish different answers
-  abstract answer: any;
+  // abstract answer: any;
 
   constructor(question: Question, review: Review) {
     super();
@@ -41,5 +43,29 @@ export default abstract class QuestionAnswer extends BaseModel {
     this.review = review;
   }
 
-  // validation: questions should be part of the questionnaire of the review
+  async validateOrReject(): Promise<void> {
+    // validation: questions should be part of the questionnaire of the review
+    const question = await this.getQuestion();
+    const review = await this.getReview();
+    const questionnaire = await review.getQuestionnaire();
+    if (!questionnaire.containsQuestion(question)) {
+      throw new Error("The question is not part of this review");
+    }
+    // if all succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
+
+  async getReview(): Promise<Review> {
+    const review = this.review
+      ? this.review
+      : await Review.findOneOrFail(this.reviewId);
+    return review;
+  }
+
+  async getQuestion(): Promise<Question> {
+    const question = this.question
+      ? this.question
+      : await Question.findOneOrFail(this.questionId);
+    return question;
+  }
 }

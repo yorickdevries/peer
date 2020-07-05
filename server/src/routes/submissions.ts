@@ -1,6 +1,11 @@
 import express from "express";
 import Joi from "@hapi/joi";
-import { validateQuery, validateBody } from "../middleware/validation";
+import {
+  validateQuery,
+  validateBody,
+  idSchema,
+  validateParams,
+} from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Group from "../models/Group";
@@ -11,7 +16,7 @@ import path from "path";
 import hasha from "hasha";
 import fsPromises from "fs/promises";
 import upload from "../middleware/upload";
-import AssignmentState from "../enum/AssignmentState";
+import { AssignmentState } from "../enum/AssignmentState";
 import { getManager } from "typeorm";
 import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
@@ -78,6 +83,40 @@ router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
   res.send(sortedSubmissions);
 });
 
+// get the feedback of a submission
+router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  const submission = await Submission.findOne(req.params.id);
+  if (!submission) {
+    res
+      .status(HttpStatusCode.NOT_FOUND)
+      .send(ResponseMessage.SUBMISSION_NOT_FOUND);
+    return;
+  }
+  const assignment = await submission.getAssignment();
+  const assignmentState = assignment.getState();
+  if (assignmentState !== AssignmentState.FEEDBACK) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not allowed to view reviews");
+    return;
+  }
+  const group = await submission.getGroup();
+  if (!(await group.hasUser(user))) {
+    res.status(HttpStatusCode.FORBIDDEN).send("You are not part of this group");
+    return;
+  }
+  const reviewOfSubmissions = await submission.getReviewOfSubmissions();
+  const submittedReviews = _.filter(reviewOfSubmissions, (review) => {
+    return review.submitted;
+  });
+  const anonymousReviews = _.map(submittedReviews, (review) => {
+    return review.getAnonymousVersion();
+  });
+  const sortedReviews = _.sortBy(anonymousReviews, "id");
+  res.send(sortedReviews);
+});
+
 // Joi inputvalidation
 const submissionSchema = Joi.object({
   groupId: Joi.number().integer().required(),
@@ -93,7 +132,7 @@ router.post(
     if (!req.file) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
-        .send("file is needed for the submission");
+        .send("File is needed for the submission");
       return;
     }
     const group = await Group.findOne(req.body.groupId);

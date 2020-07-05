@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToOne,
   RelationId,
+  OneToMany,
 } from "typeorm";
 import { IsDefined } from "class-validator";
 import BaseModel from "./BaseModel";
@@ -12,6 +13,7 @@ import User from "./User";
 import Assignment from "../models/Assignment";
 import Group from "./Group";
 import File from "./File";
+import ReviewOfSubmission from "./ReviewOfSubmission";
 
 @Entity()
 export default class Submission extends BaseModel {
@@ -44,6 +46,12 @@ export default class Submission extends BaseModel {
   @JoinColumn()
   @IsDefined()
   file: File;
+
+  @OneToMany(
+    (_type) => ReviewOfSubmission,
+    (reviewOfSubmission) => reviewOfSubmission.submission
+  )
+  reviewOfSubmissions?: ReviewOfSubmission[];
 
   constructor(user: User, group: Group, assignment: Assignment, file: File) {
     super();
@@ -80,5 +88,21 @@ export default class Submission extends BaseModel {
         relations: ["assignment"],
       })
     ).assignment!;
+  }
+
+  async getFile(): Promise<File> {
+    return (
+      await Submission.findOneOrFail(this.id, {
+        relations: ["file"],
+      })
+    ).file!;
+  }
+
+  async getReviewOfSubmissions(): Promise<ReviewOfSubmission[]> {
+    return (
+      await Submission.findOneOrFail(this.id, {
+        relations: ["reviewOfSubmissions"],
+      })
+    ).reviewOfSubmissions!;
   }
 }

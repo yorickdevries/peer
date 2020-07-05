@@ -13,7 +13,7 @@ import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
-import AssignmentState from "../enum/AssignmentState";
+import { AssignmentState } from "../enum/AssignmentState";
 
 const router = express.Router();
 
@@ -133,7 +133,7 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
         req.body.assignmentId
       );
       // make sure the questionnaire not already exists
-      if (assignment.reviewQuestionnaireId) {
+      if (assignment.submissionQuestionnaireId) {
         throw new Error("Questionnaire already exists");
       }
       // save questionnaire

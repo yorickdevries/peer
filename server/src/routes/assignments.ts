@@ -20,7 +20,7 @@ import fsPromises from "fs/promises";
 import _ from "lodash";
 import ResponseMessage from "../enum/ResponseMessage";
 import Group from "../models/Group";
-import AssignmentState from "../enum/AssignmentState";
+import { AssignmentState } from "../enum/AssignmentState";
 
 const router = express.Router();
 
@@ -118,8 +118,8 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
       .send("This assignment does not have a file attached.");
     return;
   }
-  const fileName = file.name + file.extension;
-  const filePath = path.resolve(uploadFolder, file.id.toString());
+  const fileName = file.getFileNamewithExtension();
+  const filePath = file.getPath();
   res.download(filePath, fileName);
 });
 

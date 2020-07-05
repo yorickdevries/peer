@@ -7,7 +7,11 @@ import Review from "./Review";
 
 @ChildEntity(ReviewType.REVIEW_OF_SUBMISSION)
 export default class ReviewOfSubmission extends Review {
-  @ManyToOne((_type) => Submission, { eager: true })
+  @ManyToOne(
+    (_type) => Submission,
+    (submission) => submission.reviewOfSubmissions,
+    { eager: true }
+  )
   // can be null as it is in the same table as reviewOfReview
   submission?: Submission;
 
@@ -42,7 +46,8 @@ export default class ReviewOfSubmission extends Review {
   // custom validation which is run before saving
   async validateOrReject(): Promise<void> {
     // validation: questionnaire and submission should correspond to same assignment
-    const questionnaireAssignment = await this.questionnaire!.getAssignment();
+    const questionnaire = await this.getQuestionnaire();
+    const questionnaireAssignment = await questionnaire.getAssignment();
     const submissionAssignment = await this.submission!.getAssignment();
     if (questionnaireAssignment.id !== submissionAssignment.id) {
       throw new Error(
@@ -53,17 +58,9 @@ export default class ReviewOfSubmission extends Review {
     return super.validateOrReject();
   }
 
-  async getSubmission(): Promise<Submission> {
-    return (
-      await ReviewOfSubmission.findOneOrFail(this.id, {
-        relations: ["submission"],
-      })
-    ).submission!;
-  }
-
   // checks whether the user is the reviewer
   async isReviewed(user: User): Promise<boolean> {
-    const submission = await this.getSubmission();
+    const submission = this.submission!;
     const group = await submission.getGroup();
     return await group.hasUser(user);
   }

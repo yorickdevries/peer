@@ -12,10 +12,26 @@ export default class UploadQuestionAnswer extends QuestionAnswer {
   @OneToOne((_type) => File, { eager: true })
   @JoinColumn()
   @IsDefined()
-  answer: File;
+  uploadAnswer: File;
 
   constructor(question: UploadQuestion, review: Review, answer: File) {
     super(question, review);
-    this.answer = answer;
+    this.uploadAnswer = answer;
+  }
+
+  // validation: file should have the right extension
+  async validateOrReject(): Promise<void> {
+    const question = await this.getQuestion();
+    // check if the file has the right extension
+    if (!question.extensions.split(",").includes(this.uploadAnswer.extension)) {
+      throw new Error("The file is of the wrong extension");
+    }
+    // all succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
+
+  async getQuestion(): Promise<UploadQuestion> {
+    const questionId = this.question ? this.question.id : this.questionId;
+    return UploadQuestion.findOneOrFail(questionId);
   }
 }

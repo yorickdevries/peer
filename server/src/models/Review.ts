@@ -5,6 +5,7 @@ import {
   Column,
   ManyToOne,
   RelationId,
+  OneToMany,
 } from "typeorm";
 import { IsOptional, IsDefined, IsBoolean, IsDate } from "class-validator";
 import BaseModel from "./BaseModel";
@@ -13,6 +14,8 @@ import ReviewType from "../enum/ReviewType";
 import Questionnaire from "./Questionnaire";
 import UserRole from "../enum/UserRole";
 import _ from "lodash";
+import QuestionAnswer from "./QuestionAnswer";
+import Question from "./Question";
 
 interface AnonymousReview {
   id: number;
@@ -109,6 +112,13 @@ export default abstract class Review extends BaseModel {
   @ManyToOne((_type) => User, { eager: true })
   approvingTA?: User | null;
 
+  // cannot be eager as this casues 'ER_BAD_NULL_ERROR's
+  @OneToMany(
+    (_type) => QuestionAnswer,
+    (questionAnswer) => questionAnswer.review
+  )
+  questionAnswers?: QuestionAnswer[];
+
   abstract isReviewed(user: User): Promise<boolean>;
 
   constructor(
@@ -138,7 +148,8 @@ export default abstract class Review extends BaseModel {
 
   // custom validation which is run before saving
   async validateOrReject(): Promise<void> {
-    const assignment = await this.questionnaire!.getAssignment();
+    const questionnaire = await this.getQuestionnaire();
+    const assignment = await questionnaire.getAssignment();
     const course = await assignment.getCourse();
     if (!(await course.isEnrolled(this.reviewer!, UserRole.STUDENT))) {
       throw new Error(
@@ -164,16 +175,30 @@ export default abstract class Review extends BaseModel {
         );
       }
     }
+    // check whether the review is allows to be submitted
+    if (this.submitted) {
+      for (const question of questionnaire.questions) {
+        if (!question.optional) {
+          if (!(await this.getAnswer(question))) {
+            throw new Error("A non-optional question isn't answered yet.");
+          }
+        }
+      }
+    }
     // if all succeeds the super validateOrReject can be called
     return super.validateOrReject();
   }
 
   async getQuestionnaire(): Promise<Questionnaire> {
-    return (
-      await Review.findOneOrFail(this.id, {
-        relations: ["questionnaire"],
-      })
-    ).questionnaire!;
+    if (this.questionnaire) {
+      return this.questionnaire;
+    } else {
+      return (
+        await Review.findOneOrFail(this.id, {
+          relations: ["questionnaire"],
+        })
+      ).questionnaire!;
+    }
   }
 
   async getReviewer(): Promise<User> {
@@ -182,6 +207,14 @@ export default abstract class Review extends BaseModel {
         relations: ["reviewer"],
       })
     ).reviewer!;
+  }
+
+  async getQuestionAnswers(): Promise<QuestionAnswer[]> {
+    return (
+      await Review.findOneOrFail(this.id, {
+        relations: ["questionAnswers"],
+      })
+    ).questionAnswers!;
   }
 
   // checks whether the user is teacher
@@ -204,5 +237,12 @@ export default abstract class Review extends BaseModel {
       approvalByTA: this.approvalByTA,
       questionnaireId: this.questionnaireId,
     };
+  }
+
+  async getAnswer(question: Question): Promise<QuestionAnswer | undefined> {
+    const questionAnswers = await this.getQuestionAnswers();
+    return _.find(questionAnswers, (questionAnswer) => {
+      return questionAnswer.questionId === question.id;
+    });
   }
 }

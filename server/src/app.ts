@@ -47,6 +47,7 @@ app.use((error: Error, _req: Request, res: Response, _next: NextFunction) => {
   } else {
     // Send error to frontend if not in production
     res.send(errorString);
+    throw error;
   }
 });
 

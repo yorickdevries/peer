@@ -12,10 +12,10 @@ export default class OpenQuestionAnswer extends QuestionAnswer {
   @IsDefined()
   @IsString()
   @IsNotEmpty()
-  answer: string;
+  openAnswer: string;
 
   constructor(question: OpenQuestion, review: Review, answer: string) {
     super(question, review);
-    this.answer = answer;
+    this.openAnswer = answer;
   }
 }

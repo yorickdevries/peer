@@ -11,6 +11,7 @@ import Question from "./Question";
 import User from "./User";
 import QuestionnaireType from "../enum/QuestionnaireType";
 import Review from "./Review";
+import _ from "lodash";
 
 // formely called rubric
 @Entity()
@@ -33,7 +34,8 @@ export default abstract class Questionnaire extends BaseModel {
   @OneToMany((_type) => Review, (review) => review.questionnaire)
   reviews?: Review[];
 
-  abstract assignment?: Assignment;
+  // commented out as 2 different implementations will break typeORM
+  // abstract assignment?: Assignment;
 
   constructor() {
     super();
@@ -70,5 +72,11 @@ export default abstract class Questionnaire extends BaseModel {
   async hasReviewsWhereUserIsReviewer(user: User): Promise<boolean> {
     const reviews = await this.getReviewsWhereUserIsReviewer(user);
     return reviews.length > 0;
+  }
+
+  containsQuestion(question: Question): boolean {
+    return _.some(this.questions, (q) => {
+      return q.id === question.id;
+    });
   }
 }
