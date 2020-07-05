@@ -8,7 +8,7 @@ import mockLoginCookie from "../helpers/mockLoginCookie";
 import initializeData from "../../src/util/initializeData";
 import fs from "fs";
 import path from "path";
-import mockDate from "mockdate";
+import { advanceTo, clear } from "jest-date-mock";
 
 describe("Integration", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -16,6 +16,7 @@ describe("Integration", () => {
   let server: http.Server;
 
   beforeAll(async () => {
+    clear();
     // For the in memory test database, the schema is automatically dropped upon connect
     connection = await createDatabaseConnection();
     console.log(
@@ -27,7 +28,7 @@ describe("Integration", () => {
   });
 
   afterAll(async () => {
-    mockDate.reset();
+    clear();
     //close server and connection
     server.close();
     await connection.close();
@@ -35,21 +36,34 @@ describe("Integration", () => {
 
   test("Integration test", async () => {
     let res; // will store all responses
+    // set the mocktime
+    advanceTo(new Date("2020-01-01T10:00Z"));
+
     // log in as teacher
-    const teacherCookie = await mockLoginCookie(server, "teacher");
-    const teacherCookie2 = await mockLoginCookie(server, "anotherteacher");
-    const studentCookie1 = await mockLoginCookie(server, "student1", "student");
-    const studentCookie2 = await mockLoginCookie(server, "student2", "student");
+    const teacherCookie = async () => {
+      return await mockLoginCookie(server, "teacher");
+    };
+    const teacherCookie2 = async () => {
+      return await mockLoginCookie(server, "anotherteacher");
+    };
+    const studentCookie1 = async () => {
+      return await mockLoginCookie(server, "student1", "student");
+    };
+    const studentCookie2 = async () => {
+      return await mockLoginCookie(server, "student2", "student");
+    };
 
     // check whether the teacher is logged in
     res = await request(server)
       .get("/api/authenticated")
-      .set("cookie", teacherCookie);
+      .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toEqual({ authenticated: true });
 
     // get teacher userinfo
-    res = await request(server).get("/api/me").set("cookie", teacherCookie);
+    res = await request(server)
+      .get("/api/me")
+      .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     // check netid correct
     expect(JSON.parse(res.text)).toMatchObject({
@@ -63,7 +77,7 @@ describe("Integration", () => {
     // get the current faculties
     res = await request(server)
       .get("/api/faculties")
-      .set("cookie", teacherCookie);
+      .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     // are always alphabetically sorted
@@ -77,7 +91,7 @@ describe("Integration", () => {
     // get the current academic years
     res = await request(server)
       .get("/api/academicyears?active=true")
-      .set("cookie", teacherCookie);
+      .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     // are always alphabetically sorted
@@ -97,7 +111,7 @@ describe("Integration", () => {
         academicYearName: "2019/2020",
         description: null,
       })
-      .set("cookie", teacherCookie);
+      .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     // are always alphabetically sorted
@@ -120,7 +134,7 @@ describe("Integration", () => {
         academicYearName: "2019/2020",
         description: null,
       })
-      .set("cookie", studentCookie1);
+      .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
 
@@ -135,14 +149,14 @@ describe("Integration", () => {
         academicYearName: "2019/2020",
         description: null,
       })
-      .set("cookie", teacherCookie2);
+      .set("cookie", await teacherCookie2());
     const course2 = JSON.parse(res.text);
 
     // fetch all the enrolled courses from the server
     // create a course
     res = await request(server)
       .get("/api/enrollments/enrolled")
-      .set("cookie", teacherCookie);
+      .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([
@@ -152,12 +166,9 @@ describe("Integration", () => {
     // check available courses as teacher
     res = await request(server)
       .get("/api/courses/enrollable")
-      .set("cookie", teacherCookie);
+      .set("cookie", await teacherCookie());
     // assertions
     expect(JSON.parse(res.text).length).toEqual(0);
-
-    // set date to the moment that the assignment is unpublished
-    mockDate.set(new Date("2020-01-01T10:00Z"));
 
     // make an assingment for the course
     // create am assignment course
@@ -167,7 +178,7 @@ describe("Integration", () => {
     );
     res = await request(server)
       .post("/api/assignments")
-      .set("cookie", teacherCookie)
+      .set("cookie", await teacherCookie())
       .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
       .field("name", "Example title")
       .field("courseId", course.id)
@@ -193,13 +204,13 @@ describe("Integration", () => {
       .send({
         assignmentId: assignment.id,
       })
-      .set("cookie", teacherCookie);
+      .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
 
     // get the assignment including questionnaire
     res = await request(server)
       .get(`/api/assignments/${assignment.id}`)
-      .set("cookie", teacherCookie);
+      .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     assignment = JSON.parse(res.text);
 
@@ -208,7 +219,7 @@ describe("Integration", () => {
       .get(
         `/api/submissionquestionnaires/${assignment.submissionQuestionnaireId}`
       )
-      .set("cookie", teacherCookie);
+      .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     const submissionQuestionnaire = JSON.parse(res.text);
 
@@ -221,7 +232,7 @@ describe("Integration", () => {
         optional: true,
         questionnaireId: submissionQuestionnaire.id,
       })
-      .set("cookie", teacherCookie);
+      .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     const mcQuestion = JSON.parse(res.text);
     expect(mcQuestion).toMatchObject({
@@ -237,7 +248,7 @@ describe("Integration", () => {
         text: "option A",
         multipleChoiceQuestionId: mcQuestion.id,
       })
-      .set("cookie", teacherCookie);
+      .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject({
       text: "option A",
@@ -250,26 +261,26 @@ describe("Integration", () => {
         text: "option B",
         multipleChoiceQuestionId: mcQuestion.id,
       })
-      .set("cookie", teacherCookie);
+      .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject({
       text: "option B",
     });
 
     // set date to the moment that the assignment is published
-    mockDate.set(new Date("2020-01-15T10:00Z"));
+    advanceTo(new Date("2020-01-15T10:00Z"));
 
     // check available courses as student
     res = await request(server)
       .get("/api/courses/enrollable")
-      .set("cookie", studentCookie1);
+      .set("cookie", await studentCookie1());
     // assertions
     expect(JSON.parse(res.text).length).toEqual(1);
 
     // enroll for course as student
     res = await request(server)
       .post(`/api/courses/${course.id}/enroll`)
-      .set("cookie", studentCookie1);
+      .set("cookie", await studentCookie1());
     // assertions
     const enrollment1 = JSON.parse(res.text);
     expect(enrollment1).toMatchObject({
@@ -280,7 +291,7 @@ describe("Integration", () => {
     // enroll for course as student
     res = await request(server)
       .post(`/api/courses/${course.id}/enroll`)
-      .set("cookie", studentCookie2);
+      .set("cookie", await studentCookie2());
     // assertions
     const enrollment2 = JSON.parse(res.text);
     expect(enrollment2).toMatchObject({
@@ -291,21 +302,21 @@ describe("Integration", () => {
     // enroll for course as student for the second time
     res = await request(server)
       .post(`/api/courses/${course.id}/enroll`)
-      .set("cookie", studentCookie1);
+      .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
 
     // enroll for an unenrollable course
     res = await request(server)
       .post(`/api/courses/${course2.id}/enroll`)
-      .set("cookie", studentCookie1);
+      .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
 
     // get enrollments
     res = await request(server)
       .get("/api/enrollments/enrolled")
-      .set("cookie", studentCookie1);
+      .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([
@@ -323,7 +334,7 @@ describe("Integration", () => {
     // get enrolled assignments
     res = await request(server)
       .get(`/api/courses/${course.id}/enrolledassignments`)
-      .set("cookie", studentCookie1);
+      .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([]);
@@ -331,7 +342,7 @@ describe("Integration", () => {
     // get available assignments
     res = await request(server)
       .get(`/api/courses/${course.id}/enrollableassignments`)
-      .set("cookie", studentCookie1);
+      .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([
@@ -343,7 +354,7 @@ describe("Integration", () => {
     // enroll in assignment
     res = await request(server)
       .post(`/api/assignments/${assignment.id}/enroll`)
-      .set("cookie", studentCookie1);
+      .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     const group1 = JSON.parse(res.text);
@@ -354,7 +365,7 @@ describe("Integration", () => {
     // enroll in assignment
     res = await request(server)
       .post(`/api/assignments/${assignment.id}/enroll`)
-      .set("cookie", studentCookie2);
+      .set("cookie", await studentCookie2());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     const group2 = JSON.parse(res.text);
@@ -365,7 +376,7 @@ describe("Integration", () => {
     // get enrolled assignments
     res = await request(server)
       .get(`/api/courses/${course.id}/enrolledassignments`)
-      .set("cookie", studentCookie1);
+      .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([
@@ -377,7 +388,7 @@ describe("Integration", () => {
     // get available assignments
     res = await request(server)
       .get(`/api/courses/${course.id}/enrollableassignments`)
-      .set("cookie", studentCookie1);
+      .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).not.toMatchObject([
@@ -389,7 +400,7 @@ describe("Integration", () => {
     // get group
     res = await request(server)
       .get(`/api/assignments/${assignment.id}/group`)
-      .set("cookie", studentCookie1);
+      .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject(group1);
@@ -397,7 +408,7 @@ describe("Integration", () => {
     // get all groups by the teacher
     res = await request(server)
       .get(`/api/groups?assignmentId=${assignment.id}`)
-      .set("cookie", teacherCookie);
+      .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([group1, group2]);
@@ -405,7 +416,7 @@ describe("Integration", () => {
     // get all groups by the student
     res = await request(server)
       .get(`/api/groups?assignmentId=${assignment.id}`)
-      .set("cookie", studentCookie1);
+      .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
 
@@ -416,7 +427,7 @@ describe("Integration", () => {
     );
     res = await request(server)
       .post("/api/submissions")
-      .set("cookie", studentCookie1)
+      .set("cookie", await studentCookie1())
       .attach(
         "file",
         fs.readFileSync(exampleSubmissionFile1),
@@ -435,7 +446,7 @@ describe("Integration", () => {
     );
     res = await request(server)
       .post("/api/submissions")
-      .set("cookie", studentCookie2)
+      .set("cookie", await studentCookie2())
       .attach(
         "file",
         fs.readFileSync(exampleSubmissionFile2),
@@ -450,7 +461,7 @@ describe("Integration", () => {
     // get all submissions for this assignment by this group
     res = await request(server)
       .get(`/api/assignments/${assignment.id}/submissions?groupId=${group1.id}`)
-      .set("cookie", studentCookie1);
+      .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([submission1]);
@@ -458,7 +469,7 @@ describe("Integration", () => {
     // get all submissions for this assignment as teacher
     res = await request(server)
       .get(`/api/submissions?assignmentId=${assignment.id}`)
-      .set("cookie", teacherCookie);
+      .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([submission1, submission2]);

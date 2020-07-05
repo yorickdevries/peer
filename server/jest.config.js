@@ -1,5 +1,5 @@
 module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
-  setupFiles: ["./tests/setTestEnv.ts"],
+  setupFiles: ["jest-date-mock", "./tests/setTestEnv.ts"],
 };
