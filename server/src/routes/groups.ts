@@ -72,6 +72,42 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   res.send(group);
 });
 
+router.delete("/:id", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  const group = await Group.findOne(req.params.id);
+  if (!group) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
+    return;
+  }
+  if (!(await group.isTeacherInCourse(user))) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+    return;
+  }
+
+  // TODO: these checks should be done in an transaction
+  const assignments = await group.getAssignments();
+  for (const assignment of assignments) {
+    const submission = await assignment.getLatestSubmission(group);
+    if (submission) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The group has already made submissions");
+      return;
+    }
+  }
+  const users = await group.getUsers();
+  if (users.length > 0) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("There are still users in the group");
+    return;
+  }
+  await group.remove();
+  res.send(group);
+});
+
 // Joi inputvalidation
 const userSchema = Joi.object({
   userNetid: Joi.string().required(),
