@@ -261,7 +261,6 @@ router.post("/", validateBody(groupSchema), async (req, res) => {
   res.send(group);
 });
 
-
 const copyFromAssignmentIdSchema = Joi.object({
   assignmentId: Joi.number().integer().required(),
   copyFromAssignmentId: Joi.number().integer().required(),
