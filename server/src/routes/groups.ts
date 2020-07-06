@@ -72,6 +72,88 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   res.send(group);
 });
 
+// Joi inputvalidation
+const userSchema = Joi.object({
+  userNetid: Joi.string().required(),
+});
+router.patch(
+  "/:id/adduser",
+  validateParams(idSchema),
+  validateBody(userSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const group = await Group.findOne(req.params.id);
+    if (!group) {
+      res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
+      return;
+    }
+    if (!(await group.isTeacherInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    // NOTE: This should be done in an transaction in the future
+    const groupUsers = await group.getUsers();
+    const newUserNetid = req.body.userNetid;
+    let newUser = await User.findOne(newUserNetid);
+    // in case the user doesnt exists in the database yet, create it
+    if (!newUser) {
+      newUser = new User(newUserNetid);
+      await newUser.save();
+    }
+    if (await group.hasUser(newUser)) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("User is already part of the group");
+      return;
+    }
+    // check whether the user already has a group for one of the assignments
+    const groupAssignments = await group.getAssignments();
+    for (const assignment of groupAssignments) {
+      if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
+        res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .send("Assignment is already beyond submissionstate");
+        return;
+      }
+      if (await assignment.getGroup(newUser)) {
+        res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .send("User is already part of another group in a assignment");
+        return;
+      }
+    }
+    // make enrollment if not exists yet
+    const course = await group.getCourse();
+    // enroll user in the course if not already
+    let enrollment = await Enrollment.findOne({
+      where: { userNetid: newUser.netid, courseId: course.id },
+    });
+    if (enrollment) {
+      if (enrollment.role !== UserRole.STUDENT) {
+        res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .send("The user TA or Teacher in the course");
+        return;
+      }
+    } else {
+      // enroll the user as student in the course
+      enrollment = new Enrollment(newUser, course, UserRole.STUDENT);
+      await enrollment.save();
+    }
+    groupUsers.push(newUser);
+    group.users = groupUsers;
+    await group.save();
+
+    // reload the complete group
+    const newGroup = await Group.findOne(req.params.id);
+    const newUsers = await group.getUsers();
+    newGroup!.users = newUsers;
+    res.send(newGroup);
+  }
+);
+
 // import groups from a brightspace export
 router.post(
   "/import",
