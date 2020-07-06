@@ -43,7 +43,24 @@ export default abstract class Questionnaire extends BaseModel {
 
   abstract getAssignment(): Promise<Assignment>;
 
-  async getReviews(): Promise<Review[]> {
+  async getReviews(submitted?: boolean): Promise<Review[]> {
+    const allReviews = (
+      await Questionnaire.findOneOrFail(this.id, {
+        relations: ["reviews"],
+      })
+    ).reviews!;
+
+    if (submitted !== undefined) {
+      const filteredReviews = _.filter(allReviews, (review) => {
+        return review.submitted === submitted;
+      });
+      return filteredReviews;
+    } else {
+      return allReviews;
+    }
+  }
+
+  async getsubmiiReviews(): Promise<Review[]> {
     return (
       await Questionnaire.findOneOrFail(this.id, {
         relations: ["reviews"],
