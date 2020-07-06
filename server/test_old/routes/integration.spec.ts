@@ -61,7 +61,7 @@ describe("API integration test", () => {
     it("Full integration test for assignments", async () => {
         // [1]
         // Log in as bplanje (teacher) and create a course.
-        MockLogin.initialize("bplanje", undefined, ["employee", "faculty"]);
+        MockLogin.initialize("bplanje", undefined, "employee");
         const courseUpdateData = {
             faculty: "EWI",
             academic_year: "2019/2020",
