@@ -110,6 +110,12 @@ router.patch(
     // check whether the user already has a group for one of the assignments
     const groupAssignments = await group.getAssignments();
     for (const assignment of groupAssignments) {
+      if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
+        res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .send("Assignment is already beyond submissionstate");
+        return;
+      }
       if (await assignment.getGroup(newUser)) {
         res
           .status(HttpStatusCode.BAD_REQUEST)
