@@ -22,6 +22,7 @@ const router = express.Router();
 // Joi inputvalidation for query
 const assignmentIdSchema = Joi.object({
   assignmentId: Joi.number().integer().required(),
+  submitted: Joi.boolean(),
 });
 // get all the groups for an assignment
 router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
@@ -50,7 +51,8 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
       .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
     return;
   }
-  const reviews = await questionnaire.getReviews();
+  const submitted = req.query.submitted as any;
+  const reviews = await questionnaire.getReviews(submitted);
   const sortedReviews = _.sortBy(reviews, "id");
   res.send(sortedReviews);
 });
@@ -161,7 +163,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
 });
 
 // submit a review
-router.post("/:id/submit", validateParams(idSchema), async (req, res) => {
+router.patch("/:id/submit", validateParams(idSchema), async (req, res) => {
   const user = req.user!;
   const review = await ReviewOfSubmission.findOne(req.params.id);
   if (!review) {

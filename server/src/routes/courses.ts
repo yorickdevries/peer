@@ -29,7 +29,7 @@ router.get("/enrollable", async (req, res) => {
 // get a course
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   const user = req.user!;
-  const courseId = req.params.id;
+  const courseId = req.params.id as any;
   const course = await Course.findOne(courseId);
   if (!course) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
@@ -99,6 +99,51 @@ router.post(
     // reload course to get all data
     await course.reload();
     // if all goes well, the course can be returned
+    res.send(course);
+  }
+);
+
+// change a course
+router.patch(
+  "/:id",
+  validateParams(idSchema),
+  validateBody(courseSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const courseId = req.params.id as any;
+    const course = await Course.findOne(courseId);
+    if (!course) {
+      res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
+      return;
+    }
+    if (!(await course.isEnrolled(user, UserRole.TEACHER))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    // find the faculty and academic year in the database
+    const faculty = await Faculty.findOne(req.body.facultyName);
+    if (!faculty) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("The specified faculty is not found");
+      return;
+    }
+    const academicYear = await AcademicYear.findOne(req.body.academicYearName);
+    if (!academicYear) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("The specified academic year is not found");
+      return;
+    }
+    course.name = req.body.name;
+    course.courseCode = req.body.courseCode;
+    course.enrollable = req.body.enrollable;
+    course.faculty = faculty;
+    course.academicYear = academicYear;
+    course.description = req.body.description;
+    await course.save();
     res.send(course);
   }
 );

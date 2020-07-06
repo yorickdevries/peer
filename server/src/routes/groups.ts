@@ -261,4 +261,114 @@ router.post("/", validateBody(groupSchema), async (req, res) => {
   res.send(group);
 });
 
+
+const copyFromAssignmentIdSchema = Joi.object({
+  assignmentId: Joi.number().integer().required(),
+  copyFromAssignmentId: Joi.number().integer().required(),
+});
+// import groups from a brightspace export
+router.post(
+  "/copy",
+  validateBody(copyFromAssignmentIdSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const assignment = await Assignment.findOne(req.body.assignmentId);
+    const copyFromAssignment = await Assignment.findOne(
+      req.body.copyFromAssignmentId
+    );
+    if (!assignment || !copyFromAssignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (assignment.id === copyFromAssignment.id) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("Two distinct assignments are required");
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignment.isTeacherInCourse(user)) ||
+      !(await copyFromAssignment.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    const course = await assignment.getCourse();
+    const copyFromAssignmentCourse = await copyFromAssignment.getCourse();
+    if (course.id !== copyFromAssignmentCourse.id) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("Both assignments should be from the same course");
+      return;
+    }
+    const assignmentState = await assignment.getState();
+    if (
+      !(
+        assignmentState === AssignmentState.UNPUBLISHED ||
+        assignmentState === AssignmentState.SUBMISSION
+      )
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The submission state has passed");
+      return;
+    }
+    if (await assignment.hasGroups()) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("There are already groups for this assignment");
+      return;
+    }
+    const copyFromAssignmentGroups = await copyFromAssignment.getGroups();
+    // save the users of the groups in the course
+    const groups: Group[] = [];
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        const existingGroups = (
+          await transactionalEntityManager.findOneOrFail(
+            Assignment,
+            assignment.id,
+            {
+              relations: ["groups"],
+            }
+          )
+        ).groups!;
+        if (existingGroups.length > 0) {
+          throw new Error("There are already groups for this assignment");
+        }
+        const course = await transactionalEntityManager.findOneOrFail(
+          Course,
+          assignment.courseId
+        );
+        // iterate over all groups
+        for (const copyFromAssignmentGroup of copyFromAssignmentGroups) {
+          const groupWithUsers = await transactionalEntityManager.findOneOrFail(
+            Group,
+            copyFromAssignmentGroup.id,
+            { relations: ["users"] }
+          );
+          // get users
+          const users = groupWithUsers.users!;
+          const groupName = groupWithUsers.name;
+          // make the new group
+          const group = new Group(groupName, course, users, [assignment]);
+          await transactionalEntityManager.save(group);
+          groups.push(group);
+        }
+      }
+    );
+    // reload the groups from the database
+    for (const group of groups) {
+      await group.reload();
+    }
+    res.send(groups);
+  }
+);
+
 export default router;
