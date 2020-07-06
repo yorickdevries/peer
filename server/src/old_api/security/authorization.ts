@@ -26,8 +26,18 @@ const authorizeCheck = (req: any, res: any, next: any) => {
  * @param next - next.
  */
 const employeeCheck = (req: any, res: any, next: any) => {
-    if (req.user.affiliation === "employee" || req.user.affiliation.includes("employee")) {
-        next();
+    if (req.user) {
+        let employee = false;
+        for(const affiliation of req.user.affiliation){
+            if(affiliation.name === "employee"){
+                employee = true;
+            }
+        }
+        if(employee){
+            next();
+        } else {
+            res.sendStatus(401);
+        }
     } else {
         res.sendStatus(401);
     }
