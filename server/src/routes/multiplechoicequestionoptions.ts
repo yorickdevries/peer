@@ -1,6 +1,10 @@
 import express from "express";
 import Joi from "@hapi/joi";
-import { validateBody } from "../middleware/validation";
+import {
+  validateBody,
+  validateParams,
+  idSchema,
+} from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 import MultipleChoiceQuestionOption from "../models/MultipleChoiceQuestionOption";
@@ -59,6 +63,103 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
     question
   );
   await questionOption.save();
+  res.send(questionOption);
+});
+
+// Joi inputvalidation
+const questionPatchSchema = Joi.object({
+  text: Joi.string().required(),
+});
+// post a question
+router.patch(
+  "/:id",
+  validateParams(idSchema),
+  validateBody(questionPatchSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const questionOptionId = req.params.id as any;
+    const questionOption = await MultipleChoiceQuestionOption.findOne(
+      questionOptionId
+    );
+    if (!questionOption) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.QUESTIONOPTION_NOT_FOUND);
+      return;
+    }
+    const question = await questionOption.getQuestion();
+    if (!(await question.isTeacherInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    const questionnaire = await question.getQuestionnaire();
+    const assignment = await questionnaire.getAssignment();
+    if (
+      questionnaire instanceof SubmissionQuestionnaire &&
+      assignment.isAtOrAfterState(AssignmentState.REVIEW)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is already in review state");
+      return;
+    }
+    if (
+      questionnaire instanceof ReviewQuestionnaire &&
+      assignment.isAtOrAfterState(AssignmentState.FEEDBACK)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is already in feedback state");
+      return;
+    }
+    questionOption.text = req.body.text;
+    await questionOption.save();
+    res.send(questionOption);
+  }
+);
+
+router.delete("/:id", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  const questionOptionId = req.params.id as any;
+  const questionOption = await MultipleChoiceQuestionOption.findOne(
+    questionOptionId
+  );
+  if (!questionOption) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.QUESTIONOPTION_NOT_FOUND);
+    return;
+  }
+  const question = await questionOption.getQuestion();
+  if (!(await question.isTeacherInCourse(user))) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+    return;
+  }
+  const questionnaire = await question.getQuestionnaire();
+  const assignment = await questionnaire.getAssignment();
+  if (
+    questionnaire instanceof SubmissionQuestionnaire &&
+    assignment.isAtOrAfterState(AssignmentState.REVIEW)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("The assignment is already in review state");
+    return;
+  }
+  if (
+    questionnaire instanceof ReviewQuestionnaire &&
+    assignment.isAtOrAfterState(AssignmentState.FEEDBACK)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("The assignment is already in feedback state");
+    return;
+  }
+  await questionOption.remove();
   res.send(questionOption);
 });
 
