@@ -317,6 +317,111 @@ router.post(
   }
 );
 
+// Joi inputvalidation
+const assignmentPatchSchema = Joi.object({
+  name: Joi.string().required(),
+  reviewsPerUser: Joi.number().integer().required(),
+  enrollable: Joi.boolean().required(),
+  reviewEvaluation: Joi.boolean().required(),
+  publishDate: Joi.date().required(),
+  dueDate: Joi.date().required(),
+  reviewPublishDate: Joi.date().required(),
+  reviewDueDate: Joi.date().required(),
+  reviewEvaluationDueDate: Joi.date().allow(null).required(),
+  description: Joi.string().allow(null).required(),
+  file: Joi.allow(null),
+  externalLink: Joi.string().allow(null).required(),
+});
+// patch an assignment in a course
+router.patch(
+  "/:id",
+  upload(allowedExtensions, maxFileSize, "file"),
+  validateParams(idSchema),
+  validateBody(assignmentPatchSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const assignmentId = req.params.id;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (!(await assignment.isTeacherInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not a teacher of the course");
+      return;
+    }
+    // either a new file can be sent or a file can be removed, not both
+    if (req.file && req.body.file === null) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("Both a file is uploaded and the body is set to null");
+      return;
+    }
+    // start transaction make sure the file and assignment are both saved
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        let oldFile: File | null | undefined = undefined;
+        // in case a new file is sent or file is set to null, the old one needs to be deleted
+        if (req.file || req.body.file === null) {
+          oldFile = assignment.file;
+        }
+        let newFile: File | null | undefined = undefined;
+        if (req.body.file === null) {
+          newFile = null;
+        }
+        // create the file object
+        if (req.file) {
+          // file info
+          const fileBuffer = req.file.buffer;
+          const fileExtension = path.extname(req.file.originalname);
+          const fileName = path.basename(req.file.originalname, fileExtension);
+          const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+          newFile = new File(fileName, fileExtension, fileHash);
+          await transactionalEntityManager.save(newFile);
+        }
+        // update assignment fields
+        // undefined values will not be changed
+        assignment.name = req.body.name;
+        assignment.reviewsPerUser = req.body.reviewsPerUser;
+        assignment.enrollable = req.body.enrollable;
+        assignment.reviewEvaluation = req.body.reviewEvaluation;
+        assignment.publishDate = req.body.publishDate;
+        assignment.dueDate = req.body.dueDate;
+        assignment.reviewPublishDate = req.body.reviewPublishDate;
+        assignment.reviewDueDate = req.body.reviewDueDate;
+        assignment.reviewEvaluationDueDate = req.body.reviewEvaluationDueDate;
+        assignment.description = req.body.description;
+        if (newFile !== undefined) {
+          assignment.file = newFile;
+        }
+        assignment.externalLink = req.body.externalLink;
+        await transactionalEntityManager.save(assignment);
+
+        // save the file to disk
+        if (newFile?.id && req.file) {
+          const filePath = path.resolve(uploadFolder, newFile.id.toString());
+          await fsPromises.writeFile(filePath, req.file.buffer);
+        }
+        // remove the old file from the disk
+        if (oldFile?.id) {
+          const filePath = path.resolve(uploadFolder, oldFile.id.toString());
+          await fsPromises.unlink(filePath);
+          await transactionalEntityManager.remove(oldFile);
+        }
+      }
+    );
+    // reload assignment to get all data
+    // assignment should be defined now (else we would be in the catch)
+    await assignment!.reload();
+    res.send(assignment!);
+  }
+);
+
 router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   const user = req.user!;
   const assignment = await Assignment.findOne(req.params.id);
