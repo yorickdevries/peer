@@ -4,6 +4,7 @@ import {
   validateQuery,
   validateParams,
   idSchema,
+  validateBody,
 } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
@@ -162,51 +163,48 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
     .send("You are not allowed to view this review");
 });
 
-// submit a review
-router.patch("/:id/submit", validateParams(idSchema), async (req, res) => {
-  const user = req.user!;
-  const review = await ReviewOfSubmission.findOne(req.params.id);
-  if (!review) {
-    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
-    return;
-  }
-  if (!(await review.isReviewer(user))) {
-    res.status(HttpStatusCode.FORBIDDEN).send("You are not the reviewer");
-    return;
-  }
-  if (review.submitted) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("The review is already submitted");
-    return;
-  }
-  // get assignmentstate
-  const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
-  const assignmentState = assignment.getState();
-  if (assignmentState !== AssignmentState.REVIEW) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("The assignment is not in review state");
-    return;
-  }
-  // check whether the review is fully filled in
-  for (const question of questionnaire.questions) {
-    if (!question.optional) {
-      if (!(await review.getAnswer(question))) {
-        res
-          .status(HttpStatusCode.FORBIDDEN)
-          .send("The review is not fully filled in");
-        return;
-      }
-    }
-  }
-  review.submitted = true;
-  await review.save();
-  const anonymousReview = review.getAnonymousVersion();
-  res.send(anonymousReview);
-  return;
+// Joi inputvalidation for query
+const reviewSchema = Joi.object({
+  submitted: Joi.boolean().required(),
+  flaggedByReviewer: Joi.boolean().required(),
 });
+// change a review
+router.patch(
+  "/:id",
+  validateParams(idSchema),
+  validateBody(reviewSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const review = await ReviewOfSubmission.findOne(req.params.id);
+    if (!review) {
+      res
+        .status(HttpStatusCode.NOT_FOUND)
+        .send(ResponseMessage.REVIEW_NOT_FOUND);
+      return;
+    }
+    if (!(await review.isReviewer(user))) {
+      res.status(HttpStatusCode.FORBIDDEN).send("You are not the reviewer");
+      return;
+    }
+    // get assignmentstate
+    const questionnaire = await review.getQuestionnaire();
+    const assignment = await questionnaire.getAssignment();
+    const assignmentState = assignment.getState();
+    if (assignmentState !== AssignmentState.REVIEW) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is not in review state");
+      return;
+    }
+    // set new values
+    review.submitted = req.body.submitted;
+    review.flaggedByReviewer = req.body.flaggedByReviewer;
+    await review.save();
+    const anonymousReview = review.getAnonymousVersion();
+    res.send(anonymousReview);
+    return;
+  }
+);
 
 // distribute the reviews for an assignment
 router.post(
