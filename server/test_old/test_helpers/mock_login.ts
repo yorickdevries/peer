@@ -66,7 +66,7 @@ class MockLogin {
                 prefix: "and",
                 lastName: "Last",
                 email: email,
-                affiliation: affiliation,
+                affiliation: [{name: affiliation}],
                 displayName: "First and Last"};
         }
     }
