@@ -1,6 +1,6 @@
 import express from "express";
 import Joi from "@hapi/joi";
-import { validateBody } from "../middleware/validation";
+import { validateBody, validateQuery } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import UploadQuestion from "../models/UploadQuestion";
 import ResponseMessage from "../enum/ResponseMessage";
@@ -21,6 +21,45 @@ const router = express.Router();
 const uploadFolder = config.get("uploadFolder") as string;
 const allowedExtensions = config.get("allowedExtensions") as string[];
 const maxFileSize = config.get("maxFileSize") as number;
+
+const querySchema = Joi.object({
+  reviewId: Joi.number().integer().required(),
+  questionId: Joi.number().integer().required(),
+});
+// get the feedback of a submission
+router.get("/file", validateQuery(querySchema), async (req, res) => {
+  const user = req.user!;
+  const uploadQuestionAnswer = await UploadQuestionAnswer.findOne({
+    where: req.query,
+  });
+  if (!uploadQuestionAnswer) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.ANSWER_NOT_FOUND);
+    return;
+  }
+  const review = await uploadQuestionAnswer.getReview();
+  const questionnaire = await review.getQuestionnaire();
+  const assignment = await questionnaire.getAssignment();
+  if (
+    // is teacher
+    (await assignment.isTeacherInCourse(user)) ||
+    // or reviwer
+    (await review.isReviewer(user)) ||
+    // or reviewed
+    (assignment.isAtOrBeforeState(AssignmentState.FEEDBACK) &&
+      (await review.isReviewed(user)) &&
+      review.submitted)
+  ) {
+    // get the file
+    const file = uploadQuestionAnswer.uploadAnswer;
+    const fileName = file.getFileNamewithExtension();
+    const filePath = file.getPath();
+    res.download(filePath, fileName);
+    return;
+  }
+  res
+    .status(HttpStatusCode.FORBIDDEN)
+    .send("You are allowed to access this review");
+});
 
 // Joi inputvalidation
 const uploadAnswerSchema = Joi.object({
