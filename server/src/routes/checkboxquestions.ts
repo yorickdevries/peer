@@ -160,6 +160,10 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
       .send("The assignment is already in feedback state");
     return;
   }
+  if (question.options.length > 0) {
+    res.status(HttpStatusCode.FORBIDDEN).send("The question still has options");
+    return;
+  }
   // otherwise update the question
   await question.remove();
   res.send(question);
