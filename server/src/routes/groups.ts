@@ -219,4 +219,46 @@ router.post(
   }
 );
 
+// Joi inputvalidation for query
+const groupSchema = Joi.object({
+  assignmentId: Joi.number().integer().required(),
+  name: Joi.string().required(),
+});
+// create a group for this assignment
+router.post("/", validateBody(groupSchema), async (req, res) => {
+  const user = req.user!;
+  const assignment = await Assignment.findOne(req.body.assignmentId);
+  if (!assignment) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+    return;
+  }
+  if (
+    // not a teacher
+    !(await assignment.isTeacherInCourse(user))
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+    return;
+  }
+  const assignmentState = await assignment.getState();
+  if (
+    !(
+      assignmentState === AssignmentState.UNPUBLISHED ||
+      assignmentState === AssignmentState.SUBMISSION
+    )
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("The submission state has passed");
+    return;
+  }
+  const course = await assignment.getCourse();
+  const group = new Group(req.body.name, course, [], [assignment]);
+  await group.save();
+  res.send(group);
+});
+
 export default router;
