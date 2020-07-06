@@ -154,6 +154,65 @@ router.patch(
   }
 );
 
+// Joi inputvalidation
+router.patch(
+  "/:id/removeuser",
+  validateParams(idSchema),
+  validateBody(userSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const group = await Group.findOne(req.params.id);
+    if (!group) {
+      res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
+      return;
+    }
+    if (!(await group.isTeacherInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    // NOTE: This should be done in an transaction in the future
+    const groupUsers = await group.getUsers();
+    const removedUserNetid = req.body.userNetid;
+    const removedUser = await User.findOne(removedUserNetid);
+    if (!removedUser) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.USER_NOT_FOUND);
+      return;
+    }
+    if (!(await group.hasUser(removedUser))) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("User is not part of the group");
+      return;
+    }
+    // check whether the assignments are still in submissionstate
+    const groupAssignments = await group.getAssignments();
+    for (const assignment of groupAssignments) {
+      if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
+        res
+          .status(HttpStatusCode.BAD_REQUEST)
+          .send("Assignment is already beyond submissionstate");
+        return;
+      }
+    }
+    // if all is ok, the user can be removed
+    _.remove(groupUsers, (groupUser) => {
+      return groupUser.netid === removedUser.netid;
+    });
+    group.users = groupUsers;
+    await group.save();
+
+    // reload the complete group
+    const newGroup = await Group.findOne(req.params.id);
+    const newUsers = await group.getUsers();
+    newGroup!.users = newUsers;
+    res.send(newGroup);
+  }
+);
+
 // import groups from a brightspace export
 router.post(
   "/import",
