@@ -117,7 +117,6 @@ router.patch(
         return;
       }
     }
-
     // make enrollment if not exists yet
     const course = await group.getCourse();
     // enroll user in the course if not already
