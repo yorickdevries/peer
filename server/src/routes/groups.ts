@@ -93,6 +93,7 @@ router.patch(
         .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
       return;
     }
+    // NOTE: This should be done in an transaction in the future
     const groupUsers = await group.getUsers();
     const newUserNetid = req.body.userNetid;
     let newUser = await User.findOne(newUserNetid);
