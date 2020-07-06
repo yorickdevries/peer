@@ -161,7 +161,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
 });
 
 // submit a review
-router.post("/:id/submit", validateParams(idSchema), async (req, res) => {
+router.patch("/:id/submit", validateParams(idSchema), async (req, res) => {
   const user = req.user!;
   const review = await ReviewOfSubmission.findOne(req.params.id);
   if (!review) {
