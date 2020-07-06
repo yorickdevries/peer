@@ -47,34 +47,6 @@ describe("API Course routes", () => {
     });
 
     /**
-     * Tests whether course can be made when the affiliation is ["employee","faculty"]
-     */
-    it("create course as [employee,faculty]", async () => {
-        MockLogin.initialize("bplanje", undefined, ["employee", "faculty"]);
-        const res = await chai.request(router)
-            .post("/")
-            .send({
-                faculty: "3ME",
-                academic_year: "2018/2019",
-                course_code: "2",
-                description: "example",
-                name: "test name",
-                enrollable: true
-            });
-
-        expect(res.status).to.equal(200);
-        expect(res.body).to.deep.include({
-                faculty: "3ME",
-                academic_year: "2018/2019",
-                course_code: "2",
-                description: "example",
-                name: "test name",
-                enrollable: true
-            }
-        );
-    });
-
-    /**
      * Tests whether course cannot be made when the affiliation is student
      */
     it("Create course as student", async () => {
