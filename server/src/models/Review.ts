@@ -176,7 +176,7 @@ export default abstract class Review extends BaseModel {
       }
     }
     // check whether the review is allows to be submitted
-    if (this.submitted) {
+    if (this.submitted && !this.flaggedByReviewer) {
       for (const question of questionnaire.questions) {
         if (!question.optional) {
           if (!(await this.getAnswer(question))) {
