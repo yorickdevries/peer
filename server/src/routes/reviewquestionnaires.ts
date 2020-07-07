@@ -1,13 +1,62 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import Assignment from "../models/Assignment";
-import { validateBody } from "../middleware/validation";
+import {
+  validateBody,
+  idSchema,
+  validateParams,
+} from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import { getManager } from "typeorm";
 import ResponseMessage from "../enum/ResponseMessage";
+import addDefaultReviewEvaluationQuestions from "../util/DefaultReviewEvaluationQuestions";
+import { AssignmentState } from "../enum/AssignmentState";
+import _ from "lodash";
+import CheckboxQuestion from "../models/CheckboxQuestion";
+import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 
 const router = express.Router();
+
+// get the reviewquestionaire for an assignment
+router.get("/:id", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  // also loads the questions
+  const reviewQuestionnaire = await ReviewQuestionnaire.findOne(req.params.id);
+  if (!reviewQuestionnaire) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
+    return;
+  }
+  // students can only access it when the assignment is in review state
+  const assignment = await reviewQuestionnaire.getAssignment();
+  const assignmentState = assignment.getState();
+  if (
+    !(await reviewQuestionnaire.isTeacherInCourse(user)) &&
+    !(
+      (await reviewQuestionnaire.hasReviewsWhereUserIsReviewer(user)) &&
+      assignmentState === AssignmentState.FEEDBACK
+    )
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not allowed to view this questionnaire");
+    return;
+  }
+  // sort the questions and return questionnaire
+  const sortedQuestions = _.sortBy(reviewQuestionnaire.questions, "number");
+  // sort the options alphabetically in case it is a question with options
+  for (const question of sortedQuestions) {
+    if (question instanceof CheckboxQuestion) {
+      const sortedOptions = _.sortBy(question.options, "text");
+      question.options = sortedOptions;
+    } else if (question instanceof MultipleChoiceQuestion) {
+      const sortedOptions = _.sortBy(question.options, "text");
+      question.options = sortedOptions;
+    }
+  }
+  reviewQuestionnaire.questions = sortedQuestions;
+  res.send(reviewQuestionnaire);
+});
 
 // Joi inputvalidation
 const questionnaireSchema = Joi.object({
@@ -71,5 +120,38 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   await reviewQuestionnaire!.reload();
   res.send(reviewQuestionnaire!);
 });
+
+// add default questions to the reviewquestionnaire
+router.patch(
+  "/:id/defaultquestions",
+  validateParams(idSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const questionnaireId = req.params.id;
+    const questionnaire = await ReviewQuestionnaire.findOne(questionnaireId);
+    if (!questionnaire) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
+      return;
+    }
+    if (!(await questionnaire.isTeacherInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    const assignment = await questionnaire.getAssignment();
+    if (assignment.isAtOrAfterState(AssignmentState.FEEDBACK)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is already in feedback state");
+      return;
+    }
+    await addDefaultReviewEvaluationQuestions(questionnaire);
+    await questionnaire.reload();
+    res.send(questionnaire);
+  }
+);
 
 export default router;
