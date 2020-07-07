@@ -176,17 +176,26 @@ export default abstract class Review extends BaseModel {
       }
     }
     // check whether the review is allows to be submitted
-    if (this.submitted && !this.flaggedByReviewer) {
+    if (this.submitted && !(await this.canBeSubmitted())) {
+      throw new Error("A non-optional question isn't answered yet.");
+    }
+    // if all succeeds the super validateOrReject can be called
+    return super.validateOrReject();
+  }
+
+  async canBeSubmitted(): Promise<boolean> {
+    const questionnaire = await this.getQuestionnaire();
+    // check whether the review is allowed to be submitted
+    if (!this.flaggedByReviewer) {
       for (const question of questionnaire.questions) {
         if (!question.optional) {
           if (!(await this.getAnswer(question))) {
-            throw new Error("A non-optional question isn't answered yet.");
+            return false;
           }
         }
       }
     }
-    // if all succeeds the super validateOrReject can be called
-    return super.validateOrReject();
+    return true;
   }
 
   async getQuestionnaire(): Promise<Questionnaire> {

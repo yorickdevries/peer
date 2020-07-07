@@ -21,12 +21,12 @@ import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 const router = express.Router();
 
 // Joi inputvalidation for query
-const assignmentIdSchema = Joi.object({
+const assignmentSubmitIdSchema = Joi.object({
   assignmentId: Joi.number().integer().required(),
   submitted: Joi.boolean(),
 });
 // get all the groups for an assignment
-router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
+router.get("/", validateQuery(assignmentSubmitIdSchema), async (req, res) => {
   const user = req.user!;
   const assignmentId = req.query.assignmentId as any;
   const assignment = await Assignment.findOne(assignmentId);
@@ -57,6 +57,61 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   const sortedReviews = _.sortBy(reviews, "id");
   res.send(sortedReviews);
 });
+
+// Joi inputvalidation for query
+const assignmentIdSchema = Joi.object({
+  assignmentId: Joi.number().integer().required(),
+});
+// get all the groups for an assignment
+router.patch(
+  "/submitall",
+  validateBody(assignmentIdSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const assignmentId = req.query.assignmentId as any;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignment.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    // get assignmentstate
+    const assignmentState = assignment.getState();
+    if (assignmentState !== AssignmentState.FEEDBACK) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is not in feedback state");
+      return;
+    }
+    const questionnaire = await assignment.getSubmissionQuestionnaire();
+    if (!questionnaire) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
+      return;
+    }
+    const submitted = false;
+    const reviews = await questionnaire.getReviews(submitted);
+    for (const review of reviews) {
+      if (!review.submitted && (await review.canBeSubmitted())) {
+        review.submitted = true;
+        await review.save();
+      }
+    }
+    const sortedReviews = _.sortBy(reviews, "id");
+    res.send(sortedReviews);
+  }
+);
 
 // get a review eitehr as teacher or student
 router.get("/:id", validateParams(idSchema), async (req, res) => {
