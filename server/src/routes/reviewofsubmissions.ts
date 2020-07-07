@@ -206,6 +206,51 @@ router.patch(
   }
 );
 
+// Joi inputvalidation for query
+const reviewApprovalSchema = Joi.object({
+  approvalByTA: Joi.boolean().required(),
+});
+// change a review approval
+router.patch(
+  "/:id/approval",
+  validateParams(idSchema),
+  validateBody(reviewApprovalSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const review = await ReviewOfSubmission.findOne(req.params.id);
+    if (!review) {
+      res
+        .status(HttpStatusCode.NOT_FOUND)
+        .send(ResponseMessage.REVIEW_NOT_FOUND);
+      return;
+    }
+    if (!(await review.isTeacherInCourse(user))) {
+      res.status(HttpStatusCode.FORBIDDEN).send("You are not a teacher");
+      return;
+    }
+    if (!review.submitted) {
+      res.status(HttpStatusCode.FORBIDDEN).send("The review isn't submitted");
+      return;
+    }
+    // get assignmentstate
+    const questionnaire = await review.getQuestionnaire();
+    const assignment = await questionnaire.getAssignment();
+    const assignmentState = assignment.getState();
+    if (assignmentState !== AssignmentState.FEEDBACK) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is not in feedback state");
+      return;
+    }
+    // set new values
+    review.approvalByTA = req.body.approvalByTA;
+    review.approvingTA = user;
+    await review.save();
+    res.send(review);
+    return;
+  }
+);
+
 // distribute the reviews for an assignment
 router.post(
   "/distribute",
