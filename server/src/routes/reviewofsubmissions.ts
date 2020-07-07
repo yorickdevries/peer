@@ -103,7 +103,7 @@ router.patch(
     const submitted = false;
     const reviews = await questionnaire.getReviews(submitted);
     for (const review of reviews) {
-      if (!review.submitted && (await review.canBeSubmitted())) {
+      if (await review.canBeSubmitted()) {
         review.submitted = true;
         await review.save();
       }
