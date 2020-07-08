@@ -8,6 +8,8 @@ import OpenQuestion from "../models/OpenQuestion";
 import RangeQuestion from "../models/RangeQuestion";
 import UploadQuestion from "../models/UploadQuestion";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
+import Questionnaire from "../models/Questionnaire";
+import Question from "../models/Question";
 
 interface QuestionTemplate {
   text: string;
@@ -150,9 +152,9 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionnaire
             );
             await transactionalEntityManager.save(question);
-            for (const optionTemplate of questionToCopy.options!) {
+            for (const optionToCopy of questionToCopy.options!) {
               const option = new CheckboxQuestionOption(
-                optionTemplate.text,
+                optionToCopy.text,
                 question
               );
               await transactionalEntityManager.save(option);
@@ -167,9 +169,9 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionnaire
             );
             await transactionalEntityManager.save(question);
-            for (const optionTemplate of questionToCopy.options!) {
+            for (const optionToCopy of questionToCopy.options!) {
               const option = new MultipleChoiceQuestionOption(
-                optionTemplate.text,
+                optionToCopy.text,
                 question
               );
               await transactionalEntityManager.save(option);
@@ -219,4 +221,88 @@ const addDefaultReviewEvaluationQuestions = async function (
   return;
 };
 
-export default addDefaultReviewEvaluationQuestions;
+const addCopyOfQuestions = async function (
+  questionnaireToCopyTo: Questionnaire,
+  questions: Question[]
+): Promise<void> {
+  await getManager().transaction(
+    "SERIALIZABLE",
+    async (transactionalEntityManager) => {
+      // find all groups to check for group existence
+      const questionnaire = await transactionalEntityManager.findOne(
+        Questionnaire,
+        questionnaireToCopyTo.id
+      );
+      if (!questionnaire) {
+        throw Error("Questionnaire not found");
+      }
+      if (questionnaire.questions.length > 0) {
+        throw Error("Questionnaire already has questions");
+      }
+      for (const questionToCopy of questions) {
+        if (questionToCopy instanceof CheckboxQuestion) {
+          const question = new CheckboxQuestion(
+            questionToCopy.text,
+            questionToCopy.number,
+            questionToCopy.optional,
+            questionnaire
+          );
+          await transactionalEntityManager.save(question);
+          for (const optionToCopy of questionToCopy.options!) {
+            const option = new CheckboxQuestionOption(
+              optionToCopy.text,
+              question
+            );
+            await transactionalEntityManager.save(option);
+          }
+        } else if (questionToCopy instanceof MultipleChoiceQuestion) {
+          const question = new MultipleChoiceQuestion(
+            questionToCopy.text,
+            questionToCopy.number,
+            questionToCopy.optional,
+            questionnaire
+          );
+          await transactionalEntityManager.save(question);
+          for (const optionToCopy of questionToCopy.options!) {
+            const option = new MultipleChoiceQuestionOption(
+              optionToCopy.text,
+              question
+            );
+            await transactionalEntityManager.save(option);
+          }
+        } else if (questionToCopy instanceof OpenQuestion) {
+          const question = new OpenQuestion(
+            questionToCopy.text,
+            questionToCopy.number,
+            questionToCopy.optional,
+            questionnaire
+          );
+          await transactionalEntityManager.save(question);
+        } else if (questionToCopy instanceof RangeQuestion) {
+          const question = new RangeQuestion(
+            questionToCopy.text,
+            questionToCopy.number,
+            questionToCopy.optional,
+            questionnaire,
+            questionToCopy.range
+          );
+          await transactionalEntityManager.save(question);
+        } else if (questionToCopy instanceof UploadQuestion) {
+          const question = new UploadQuestion(
+            questionToCopy.text,
+            questionToCopy.number,
+            questionToCopy.optional,
+            questionnaire,
+            questionToCopy.extensions
+          );
+          await transactionalEntityManager.save(question);
+        } else {
+          throw new Error("Invalid QuestionType");
+        }
+      }
+    }
+  );
+  return;
+};
+
+export { addDefaultReviewEvaluationQuestions, addCopyOfQuestions };

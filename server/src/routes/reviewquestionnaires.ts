@@ -10,7 +10,7 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import { getManager } from "typeorm";
 import ResponseMessage from "../enum/ResponseMessage";
-import addDefaultReviewEvaluationQuestions from "../util/DefaultReviewEvaluationQuestions";
+import { addDefaultReviewEvaluationQuestions } from "../util/CopyReviewQuestions";
 import { AssignmentState } from "../enum/AssignmentState";
 import _ from "lodash";
 import CheckboxQuestion from "../models/CheckboxQuestion";
