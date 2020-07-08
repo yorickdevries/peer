@@ -127,7 +127,9 @@ router.post(
         moment().isBefore(assignment.reviewEvaluationDueDate)
       )
     ) {
-      res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The reviewevaluation is passed");
       return;
     }
 

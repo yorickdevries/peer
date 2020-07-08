@@ -329,16 +329,17 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not allowed to evaluate this review");
+      return;
   }
   const reviewEvaluation = await ReviewOfReview.findOne({
     where: { reviewOfSubmission: review.id },
   });
   if (!reviewEvaluation) {
-    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
+    res.status(HttpStatusCode.NOT_FOUND).send("Evaluation is not found");
     return;
   }
   // otherwise the review can be sent
-  const anonymousReview = reviewEvaluation.getAnonymousVersion();
+  const anonymousReview = reviewEvaluation.getAnonymousVersionWithReviewer();
   res.send(anonymousReview);
 });
 
@@ -365,6 +366,7 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not allowed to evaluate this review");
+      return;
   }
   const reviewQuestionnaire = await assignment.getReviewQuestionnaire();
   if (!reviewQuestionnaire) {
@@ -404,7 +406,8 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
     }
   );
   await reviewEvaluation!.reload();
-  res.send(reviewEvaluation!);
+  const anonymousReview = reviewEvaluation!.getAnonymousVersionWithReviewer();
+  res.send(anonymousReview);
 });
 
 // distribute the reviews for an assignment

@@ -25,6 +25,10 @@ interface AnonymousReview {
   questionnaireId: number;
 }
 
+interface AnonymousReviewWithReviewer extends AnonymousReview {
+  reviewerNetid: string;
+}
+
 // formely called rubric
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "type" } })
@@ -52,7 +56,7 @@ export default abstract class Review extends BaseModel {
     nullable: false,
     eager: true,
   })
-  reviewer?: User;
+  reviewer: User;
 
   // flagged BOOLEAN NOT NULL DEFAULT FALSE,
   @Column()
@@ -245,6 +249,17 @@ export default abstract class Review extends BaseModel {
       submitted: this.submitted,
       approvalByTA: this.approvalByTA,
       questionnaireId: this.questionnaireId,
+    };
+  }
+
+  getAnonymousVersionWithReviewer(): AnonymousReviewWithReviewer {
+    return {
+      id: this.id,
+      flaggedByReviewer: this.flaggedByReviewer,
+      submitted: this.submitted,
+      approvalByTA: this.approvalByTA,
+      questionnaireId: this.questionnaireId,
+      reviewerNetid: this.reviewer.netid,
     };
   }
 
