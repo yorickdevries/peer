@@ -34,7 +34,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   if (
     !(await questionnaire.isTeacherInCourse(user)) &&
     !(
-      (await questionnaire.hasReviewsWhereUserIsReviewer(user)) &&
+      (await assignment.isEnrolledInGroup(user)) &&
       (assignmentState === AssignmentState.REVIEW ||
         assignmentState === AssignmentState.FEEDBACK)
     )
