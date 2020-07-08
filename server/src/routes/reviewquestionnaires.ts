@@ -22,18 +22,18 @@ const router = express.Router();
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   const user = req.user!;
   // also loads the questions
-  const reviewQuestionnaire = await ReviewQuestionnaire.findOne(req.params.id);
-  if (!reviewQuestionnaire) {
+  const questionnaire = await ReviewQuestionnaire.findOne(req.params.id);
+  if (!questionnaire) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
     return;
   }
   // students can only access it when the assignment is in review state
-  const assignment = await reviewQuestionnaire.getAssignment();
+  const assignment = await questionnaire.getAssignment();
   const assignmentState = assignment.getState();
   if (
-    !(await reviewQuestionnaire.isTeacherInCourse(user)) &&
+    !(await questionnaire.isTeacherInCourse(user)) &&
     !(
-      (await reviewQuestionnaire.hasReviewsWhereUserIsReviewer(user)) &&
+      (await questionnaire.hasReviewsWhereUserIsReviewer(user)) &&
       assignmentState === AssignmentState.FEEDBACK
     )
   ) {
@@ -43,7 +43,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     return;
   }
   // sort the questions and return questionnaire
-  const sortedQuestions = _.sortBy(reviewQuestionnaire.questions, "number");
+  const sortedQuestions = _.sortBy(questionnaire.questions, "number");
   // sort the options alphabetically in case it is a question with options
   for (const question of sortedQuestions) {
     if (question instanceof CheckboxQuestion) {
@@ -54,15 +54,15 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
       question.options = sortedOptions;
     }
   }
-  reviewQuestionnaire.questions = sortedQuestions;
-  res.send(reviewQuestionnaire);
+  questionnaire.questions = sortedQuestions;
+  res.send(questionnaire);
 });
 
 // Joi inputvalidation
 const questionnaireSchema = Joi.object({
   assignmentId: Joi.number().integer().required(),
 });
-// post a reviewQuestionnaire in an assignment
+// post a questionnaire in an assignment
 router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   const user = req.user!;
 
@@ -92,7 +92,7 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
     res.status(HttpStatusCode.FORBIDDEN).send("Questionnaire already exists");
     return;
   }
-  const reviewQuestionnaire = new ReviewQuestionnaire();
+  const questionnaire = new ReviewQuestionnaire();
   // start transaction make sure the questionnaire and assignment are both saved
   // and no questionnaire is made in the mean time
   await getManager().transaction(
@@ -108,17 +108,17 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
         throw new Error("Questionnaire already exists");
       }
       // save questionnaire
-      await transactionalEntityManager.save(reviewQuestionnaire);
+      await transactionalEntityManager.save(questionnaire);
 
       // save the assignment with the questionnaire
-      assignment.reviewQuestionnaire = reviewQuestionnaire;
+      assignment.reviewQuestionnaire = questionnaire;
       await transactionalEntityManager.save(assignment);
     }
   );
   // reload questionnaire to get all data
-  // reviewQuestionnaire should be defined now (else we would be in the catch)
-  await reviewQuestionnaire!.reload();
-  res.send(reviewQuestionnaire!);
+  // questionnaire should be defined now (else we would be in the catch)
+  await questionnaire!.reload();
+  res.send(questionnaire!);
 });
 
 // add default questions to the reviewquestionnaire

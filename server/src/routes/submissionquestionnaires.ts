@@ -23,20 +23,18 @@ const router = express.Router();
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   const user = req.user!;
   // also loads the questions
-  const submissionQuestionnaire = await SubmissionQuestionnaire.findOne(
-    req.params.id
-  );
-  if (!submissionQuestionnaire) {
+  const questionnaire = await SubmissionQuestionnaire.findOne(req.params.id);
+  if (!questionnaire) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
     return;
   }
   // students can only access it when the assignment is in review state
-  const assignment = await submissionQuestionnaire.getAssignment();
+  const assignment = await questionnaire.getAssignment();
   const assignmentState = assignment.getState();
   if (
-    !(await submissionQuestionnaire.isTeacherInCourse(user)) &&
+    !(await questionnaire.isTeacherInCourse(user)) &&
     !(
-      (await submissionQuestionnaire.hasReviewsWhereUserIsReviewer(user)) &&
+      (await questionnaire.hasReviewsWhereUserIsReviewer(user)) &&
       (assignmentState === AssignmentState.REVIEW ||
         assignmentState === AssignmentState.FEEDBACK)
     )
@@ -47,7 +45,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     return;
   }
   // sort the questions and return questionnaire
-  const sortedQuestions = _.sortBy(submissionQuestionnaire.questions, "number");
+  const sortedQuestions = _.sortBy(questionnaire.questions, "number");
   // sort the options alphabetically in case it is a question with options
   for (const question of sortedQuestions) {
     if (question instanceof CheckboxQuestion) {
@@ -58,49 +56,15 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
       question.options = sortedOptions;
     }
   }
-  submissionQuestionnaire.questions = sortedQuestions;
-  res.send(submissionQuestionnaire);
-});
-
-// get the reviews a user needs to make by questionnaire id
-router.get("/:id/reviews", validateParams(idSchema), async (req, res) => {
-  const user = req.user!;
-  // also loads the questions
-  const submissionQuestionnaire = await SubmissionQuestionnaire.findOne(
-    req.params.id
-  );
-  if (!submissionQuestionnaire) {
-    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
-    return;
-  }
-  const assignment = await submissionQuestionnaire.getAssignment();
-  const assignmentState = assignment.getState();
-  if (
-    !(
-      assignmentState === AssignmentState.REVIEW ||
-      assignmentState === AssignmentState.FEEDBACK
-    )
-  ) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("You are not allowed to view reviews");
-    return;
-  }
-  const reviews = await submissionQuestionnaire.getReviewsWhereUserIsReviewer(
-    user
-  );
-  const anonymousReviews = _.map(reviews, (review) => {
-    return review.getAnonymousVersion();
-  });
-  const sortedReviews = _.sortBy(anonymousReviews, "id");
-  res.send(sortedReviews);
+  questionnaire.questions = sortedQuestions;
+  res.send(questionnaire);
 });
 
 // Joi inputvalidation
 const questionnaireSchema = Joi.object({
   assignmentId: Joi.number().integer().required(),
 });
-// post a submissionQuestionnaire in an assignment
+// post a questionnaire in an assignment
 router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   const user = req.user!;
   const assignment = await Assignment.findOne(req.body.assignmentId);
@@ -123,7 +87,7 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
     res.status(HttpStatusCode.FORBIDDEN).send("Questionnaire already exists");
     return;
   }
-  const submissionQuestionnaire = new SubmissionQuestionnaire();
+  const questionnaire = new SubmissionQuestionnaire();
   // start transaction make sure the questionnaire and assignment are both saved
   // and no questionnaire is made in the mean time
   await getManager().transaction(
@@ -139,17 +103,17 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
         throw new Error("Questionnaire already exists");
       }
       // save questionnaire
-      await transactionalEntityManager.save(submissionQuestionnaire);
+      await transactionalEntityManager.save(questionnaire);
 
       // save the assignment with the questionnaire
-      assignment.submissionQuestionnaire = submissionQuestionnaire;
+      assignment.submissionQuestionnaire = questionnaire;
       await transactionalEntityManager.save(assignment);
     }
   );
   // reload questionnaire to get all data
-  // submissionQuestionnaire should be defined now (else we would be in the catch)
-  await submissionQuestionnaire!.reload();
-  res.send(submissionQuestionnaire!);
+  // questionnaire should be defined now (else we would be in the catch)
+  await questionnaire!.reload();
+  res.send(questionnaire!);
 });
 
 // add default questions to the reviewquestionnaire
@@ -204,5 +168,35 @@ router.patch(
     res.send(questionnaire);
   }
 );
+
+// get the reviews a user needs to make by questionnaire id
+router.get("/:id/reviews", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  // also loads the questions
+  const questionnaire = await SubmissionQuestionnaire.findOne(req.params.id);
+  if (!questionnaire) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
+    return;
+  }
+  const assignment = await questionnaire.getAssignment();
+  const assignmentState = assignment.getState();
+  if (
+    !(
+      assignmentState === AssignmentState.REVIEW ||
+      assignmentState === AssignmentState.FEEDBACK
+    )
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not allowed to view reviews");
+    return;
+  }
+  const reviews = await questionnaire.getReviewsWhereUserIsReviewer(user);
+  const anonymousReviews = _.map(reviews, (review) => {
+    return review.getAnonymousVersion();
+  });
+  const sortedReviews = _.sortBy(anonymousReviews, "id");
+  res.send(sortedReviews);
+});
 
 export default router;
