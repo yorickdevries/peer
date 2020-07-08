@@ -98,6 +98,14 @@ export default class Submission extends BaseModel {
     ).file!;
   }
 
+  async getUser(): Promise<User> {
+    return (
+      await Submission.findOneOrFail(this.id, {
+        relations: ["user"],
+      })
+    ).user!;
+  }
+
   async getReviewOfSubmissions(): Promise<ReviewOfSubmission[]> {
     return (
       await Submission.findOneOrFail(this.id, {
