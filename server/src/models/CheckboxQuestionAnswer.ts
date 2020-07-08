@@ -37,4 +37,12 @@ export default class CheckboxQuestionAnswer extends QuestionAnswer {
     const questionId = this.question ? this.question.id : this.questionId;
     return CheckboxQuestion.findOneOrFail(questionId);
   }
+
+  getAnswerText(): string {
+    const answer = [];
+    for(const option of this.checkboxAnswer){
+      answer.push(option.text);
+    }
+    return String(answer);
+  }
 }

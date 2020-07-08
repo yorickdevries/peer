@@ -36,4 +36,8 @@ export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
     const questionId = this.question ? this.question.id : this.questionId;
     return MultipleChoiceQuestion.findOneOrFail(questionId);
   }
+
+  getAnswerText(): string {
+    return this.multipleChoiceAnswer.text;
+  }
 }
