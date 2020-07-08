@@ -116,7 +116,6 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   res.send(questionnaire!);
 });
 
-// add default questions to the reviewquestionnaire
 // Joi inputvalidation
 const copyFromQuestionnaireIdSchema = Joi.object({
   copyFromQuestionnaireId: Joi.number().integer().required(),
@@ -157,7 +156,7 @@ router.patch(
       return;
     }
     const assignment = await questionnaire.getAssignment();
-    if (assignment.isAtOrAfterState(AssignmentState.WAITING_FOR_REVIEW)) {
+    if (assignment.isAtOrAfterState(AssignmentState.REVIEW)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The assignment is already in review state");
