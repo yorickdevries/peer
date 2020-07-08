@@ -13,7 +13,7 @@ import ResponseMessage from "../enum/ResponseMessage";
 import {
   addDefaultReviewEvaluationQuestions,
   addCopyOfQuestions,
-} from "../util/CopyReviewQuestions";
+} from "../util/copyReviewQuestions";
 import { AssignmentState } from "../enum/AssignmentState";
 import _ from "lodash";
 import CheckboxQuestion from "../models/CheckboxQuestion";
