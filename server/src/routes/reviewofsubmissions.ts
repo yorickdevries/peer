@@ -17,6 +17,8 @@ import Submission from "../models/Submission";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { getManager } from "typeorm";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
+import moment from "moment";
+import ReviewOfReview from "../models/ReviewOfReview";
 
 const router = express.Router();
 
@@ -305,6 +307,105 @@ router.patch(
     return;
   }
 );
+
+// make an evaluation as student
+router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  const review = await ReviewOfSubmission.findOne(req.params.id);
+  if (!review) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
+    return;
+  }
+  // get assignmentstate
+  const submissionQuestionnaire = await review.getQuestionnaire();
+  const assignment = await submissionQuestionnaire.getAssignment();
+  if (
+    !(
+      (await review.isReviewed(user)) &&
+      assignment.isAtState(AssignmentState.FEEDBACK) &&
+      review.submitted
+    )
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not allowed to evaluate this review");
+  }
+  const reviewEvaluation = await ReviewOfReview.findOne({
+    where: { reviewOfSubmission: review.id },
+  });
+  if (!reviewEvaluation) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
+    return;
+  }
+  // otherwise the review can be sent
+  const anonymousReview = reviewEvaluation.getAnonymousVersion();
+  res.send(anonymousReview);
+});
+
+// make an evaluation as student
+router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
+  const user = req.user!;
+  const review = await ReviewOfSubmission.findOne(req.params.id);
+  if (!review) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
+    return;
+  }
+  // get assignmentstate
+  const submissionQuestionnaire = await review.getQuestionnaire();
+  const assignment = await submissionQuestionnaire.getAssignment();
+  if (
+    !(
+      (await review.isReviewed(user)) &&
+      assignment.isAtState(AssignmentState.FEEDBACK) &&
+      review.submitted &&
+      assignment.reviewEvaluation &&
+      moment().isBefore(assignment.reviewEvaluationDueDate)
+    )
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not allowed to evaluate this review");
+  }
+  const reviewQuestionnaire = await assignment.getReviewQuestionnaire();
+  if (!reviewQuestionnaire) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
+    return;
+  }
+  // create the reviewEvaluation
+  let reviewEvaluation: ReviewOfReview;
+  await getManager().transaction(
+    "SERIALIZABLE",
+    async (transactionalEntityManager) => {
+      // check whether the review is already evaluated
+      const existingReview = await transactionalEntityManager.findOne(
+        ReviewOfReview,
+        { where: { reviewOfSubmission: review.id } }
+      );
+      if (existingReview) {
+        throw new Error("There already exists a reviewEvaluation");
+      }
+      // create review
+      reviewEvaluation = new ReviewOfReview(
+        reviewQuestionnaire,
+        user,
+        false,
+        false,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        review
+      );
+      await transactionalEntityManager.save(reviewEvaluation);
+    }
+  );
+  await reviewEvaluation!.reload();
+  res.send(reviewEvaluation!);
+});
 
 // distribute the reviews for an assignment
 router.post(
