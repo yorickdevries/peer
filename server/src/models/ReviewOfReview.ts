@@ -69,7 +69,6 @@ export default class ReviewOfReview extends Review {
   // checks whether the user is reviewed
   async isReviewed(user: User): Promise<boolean> {
     const reviewOfSubmission = this.reviewOfSubmission!;
-    const reviewer = await reviewOfSubmission.getReviewer();
-    return reviewer.netid === user.netid;
+    return reviewOfSubmission.reviewer.netid === user.netid;
   }
 }

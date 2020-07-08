@@ -214,14 +214,6 @@ export default abstract class Review extends BaseModel {
     }
   }
 
-  async getReviewer(): Promise<User> {
-    return (
-      await Review.findOneOrFail(this.id, {
-        relations: ["reviewer"],
-      })
-    ).reviewer!;
-  }
-
   async getQuestionAnswers(): Promise<QuestionAnswer[]> {
     return (
       await Review.findOneOrFail(this.id, {
@@ -238,8 +230,7 @@ export default abstract class Review extends BaseModel {
 
   // checks whether the user is the reviewer
   async isReviewer(user: User): Promise<boolean> {
-    const reviewer = await this.getReviewer();
-    return reviewer.netid === user.netid;
+    return this.reviewer.netid === user.netid;
   }
 
   getAnonymousVersion(): AnonymousReview {
