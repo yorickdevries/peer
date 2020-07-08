@@ -11,7 +11,7 @@ const exportJSONToFile = function (
   fileName: string,
   exportType: "xls" | "csv",
   res: Response
-) {
+): void {
   // Check if the export data contains data.
   if (data.length == 0) {
     res.status(HttpStatusCode.BAD_REQUEST);
