@@ -4,6 +4,7 @@ import Submission from "./Submission";
 import User from "./User";
 import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import Review from "./Review";
+import ReviewOfReview from "./ReviewOfReview";
 
 @ChildEntity(ReviewType.REVIEW_OF_SUBMISSION)
 export default class ReviewOfSubmission extends Review {
@@ -63,5 +64,15 @@ export default class ReviewOfSubmission extends Review {
     const submission = this.submission!;
     const group = await submission.getGroup();
     return await group.hasUser(user);
+  }
+
+  // checks whether the user is the reviewer
+  async getReviewOfThisReview(): Promise<ReviewOfReview | undefined> {
+    const reviewOfReview = await ReviewOfReview.findOne({
+      where: {
+        reviewOfSubmission: this,
+      },
+    });
+    return reviewOfReview;
   }
 }

@@ -18,4 +18,8 @@ export default class OpenQuestionAnswer extends QuestionAnswer {
     super(question, review);
     this.openAnswer = answer;
   }
+
+  getAnswerText(): string {
+    return this.openAnswer;
+  }
 }

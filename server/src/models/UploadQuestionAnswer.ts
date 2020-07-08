@@ -34,4 +34,8 @@ export default class UploadQuestionAnswer extends QuestionAnswer {
     const questionId = this.question ? this.question.id : this.questionId;
     return UploadQuestion.findOneOrFail(questionId);
   }
+
+  getAnswerText(): string {
+    return this.uploadAnswer.getFileNamewithExtension();
+  }
 }

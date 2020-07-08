@@ -40,4 +40,8 @@ export default class RangeQuestionAnswer extends QuestionAnswer {
     const questionId = this.question ? this.question.id : this.questionId;
     return RangeQuestion.findOneOrFail(questionId);
   }
+
+  getAnswerText(): string {
+    return String(this.rangeAnswer);
+  }
 }

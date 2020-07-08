@@ -60,14 +60,6 @@ export default abstract class Questionnaire extends BaseModel {
     }
   }
 
-  async getsubmiiReviews(): Promise<Review[]> {
-    return (
-      await Questionnaire.findOneOrFail(this.id, {
-        relations: ["reviews"],
-      })
-    ).reviews!;
-  }
-
   // checks whether the user is teacher
   // of the corresponding assignment and course
   async isTeacherInCourse(user: User): Promise<boolean> {
