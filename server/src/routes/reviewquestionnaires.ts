@@ -65,7 +65,6 @@ const questionnaireSchema = Joi.object({
 // post a questionnaire in an assignment
 router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   const user = req.user!;
-
   const assignment = await Assignment.findOne(req.body.assignmentId);
   if (!assignment) {
     res
