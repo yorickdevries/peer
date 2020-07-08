@@ -15,7 +15,7 @@ import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 import { AssignmentState } from "../enum/AssignmentState";
 import Questionnaire from "../models/Questionnaire";
-import { addCopyOfQuestions } from "../util/copy2ReviewQuestions";
+import { addCopyOfQuestions } from "../util/copyReviewQuestions";
 
 const router = express.Router();
 
