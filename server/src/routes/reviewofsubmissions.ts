@@ -19,6 +19,8 @@ import { getManager } from "typeorm";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
 import ReviewOfReview from "../models/ReviewOfReview";
+import makeGradeSummaries from "../util/makeGradeSummary";
+import exportJSONToFile from "../util/exportJSONToFile";
 
 const router = express.Router();
 
@@ -59,6 +61,50 @@ router.get("/", validateQuery(assignmentSubmitIdSchema), async (req, res) => {
   const sortedReviews = _.sortBy(reviews, "id");
   res.send(sortedReviews);
 });
+
+// Joi inputvalidation for query
+const assignmentExportIdSchema = Joi.object({
+  assignmentId: Joi.number().integer().required(),
+  exportType: Joi.string().valid("csv", "xls"),
+});
+// get all the groups for an assignment
+router.get(
+  "/grades",
+  validateQuery(assignmentExportIdSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const assignmentId = req.query.assignmentId as any;
+    const exportType = req.query.exportType as any;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignment.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    const questionnaire = await assignment.getSubmissionQuestionnaire();
+    if (!questionnaire) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
+      return;
+    }
+    const submitted = true;
+    const reviews = await questionnaire.getReviews(submitted);
+    const gradeSummaries = makeGradeSummaries(reviews);
+    const filename = `assignment${assignment.id}_grades`;
+    exportJSONToFile(gradeSummaries, filename, exportType, res);
+  }
+);
 
 // Joi inputvalidation for query
 const assignmentIdSchema = Joi.object({
