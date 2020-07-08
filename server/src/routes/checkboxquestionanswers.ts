@@ -8,6 +8,9 @@ import Review from "../models/Review";
 import { AssignmentState } from "../enum/AssignmentState";
 import CheckboxQuestionAnswer from "../models/CheckboxQuestionAnswer";
 import CheckboxQuestionOption from "../models/CheckboxQuestionOption";
+import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
+import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
+import moment from "moment";
 
 const router = express.Router();
 
@@ -70,10 +73,23 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
     checkboxQuestionOptions.push(questionOption);
   }
   const assignment = await questionnaire.getAssignment();
-  if (assignment.getState() !== AssignmentState.REVIEW) {
+  if (
+    questionnaire instanceof SubmissionQuestionnaire &&
+    !assignment.isAtState(AssignmentState.REVIEW)
+  ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("The assignment is not in reviewstate");
+    return;
+  }
+  if (
+    questionnaire instanceof ReviewQuestionnaire &&
+    !(
+      assignment.isAtState(AssignmentState.FEEDBACK) &&
+      moment().isBefore(assignment.reviewEvaluationDueDate)
+    )
+  ) {
+    res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
     return;
   }
   // make or overwrite checkboxAnswer;

@@ -1,7 +1,7 @@
 import { ChildEntity, ManyToOne } from "typeorm";
 import ReviewType from "../enum/ReviewType";
 import User from "./User";
-import Questionnaire from "./Questionnaire";
+import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import Review from "./Review";
 import ReviewOfSubmission from "./ReviewOfSubmission";
 
@@ -12,7 +12,7 @@ export default class ReviewOfReview extends Review {
   reviewOfSubmission?: ReviewOfSubmission;
 
   constructor(
-    questionnaire: Questionnaire,
+    questionnaire: ReviewQuestionnaire,
     user: User,
     flaggedByReviewer: boolean,
     submitted: boolean,
@@ -42,7 +42,8 @@ export default class ReviewOfReview extends Review {
   // custom validation which is run before saving
   async validateOrReject(): Promise<void> {
     // validation: questionnaire and reviewofsubmission should correspond to same assignment
-    const questionnaireAssignment = await this.questionnaire!.getAssignment();
+    const questionnaire = await this.getQuestionnaire();
+    const questionnaireAssignment = await questionnaire.getAssignment();
     const reviewOfSubmissionQuestionnaire = await this.reviewOfSubmission!.getQuestionnaire();
     const reviewOfSubmissionQuestionnaireAssignment = await reviewOfSubmissionQuestionnaire.getAssignment();
     if (
@@ -55,6 +56,14 @@ export default class ReviewOfReview extends Review {
     }
     // if all succeeds the super validateOrReject can be called
     return super.validateOrReject();
+  }
+
+  async getReviewOfSubmission(): Promise<ReviewOfSubmission> {
+    return (
+      await ReviewOfReview.findOneOrFail(this.id, {
+        relations: ["reviewOfSubmission"],
+      })
+    ).reviewOfSubmission!;
   }
 
   // checks whether the user is reviewed

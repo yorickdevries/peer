@@ -2,7 +2,7 @@ import { ChildEntity, ManyToOne } from "typeorm";
 import ReviewType from "../enum/ReviewType";
 import Submission from "./Submission";
 import User from "./User";
-import Questionnaire from "./Questionnaire";
+import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import Review from "./Review";
 
 @ChildEntity(ReviewType.REVIEW_OF_SUBMISSION)
@@ -16,7 +16,7 @@ export default class ReviewOfSubmission extends Review {
   submission?: Submission;
 
   constructor(
-    questionnaire: Questionnaire,
+    questionnaire: SubmissionQuestionnaire,
     user: User,
     flaggedByReviewer: boolean,
     submitted: boolean,
