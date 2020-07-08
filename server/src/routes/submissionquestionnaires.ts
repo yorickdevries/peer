@@ -14,6 +14,8 @@ import _ from "lodash";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 import { AssignmentState } from "../enum/AssignmentState";
+import Questionnaire from "../models/Questionnaire";
+import { addCopyOfQuestions } from "../util/CopyReviewQuestions";
 
 const router = express.Router();
 
@@ -149,5 +151,58 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   await submissionQuestionnaire!.reload();
   res.send(submissionQuestionnaire!);
 });
+
+// add default questions to the reviewquestionnaire
+// Joi inputvalidation
+const copyFromQuestionnaireIdSchema = Joi.object({
+  copyFromQuestionnaireId: Joi.number().integer().required(),
+});
+router.patch(
+  "/:id/copyquestions",
+  validateParams(idSchema),
+  validateBody(copyFromQuestionnaireIdSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const questionnaireId = req.params.id;
+    const questionnaire = await SubmissionQuestionnaire.findOne(
+      questionnaireId
+    );
+    const copyFromQuestionnaireId = req.body.copyFromQuestionnaireId;
+    const copyFromQuestionnaire = await Questionnaire.findOne(
+      copyFromQuestionnaireId
+    );
+    if (!questionnaire || !copyFromQuestionnaire) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
+      return;
+    }
+    if (questionnaire.id === copyFromQuestionnaire.id) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("Two distinct questionnaires are required");
+      return;
+    }
+    if (
+      !(await questionnaire.isTeacherInCourse(user)) ||
+      !(await copyFromQuestionnaire.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    const assignment = await questionnaire.getAssignment();
+    if (assignment.isAtOrAfterState(AssignmentState.WAITING_FOR_REVIEW)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is already in review state");
+      return;
+    }
+    await addCopyOfQuestions(questionnaire, copyFromQuestionnaire.questions);
+    await questionnaire.reload();
+    res.send(questionnaire);
+  }
+);
 
 export default router;
