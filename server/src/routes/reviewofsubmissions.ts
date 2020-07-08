@@ -329,7 +329,7 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not allowed to evaluate this review");
-      return;
+    return;
   }
   const reviewEvaluation = await ReviewOfReview.findOne({
     where: { reviewOfSubmission: review.id },
@@ -366,7 +366,7 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not allowed to evaluate this review");
-      return;
+    return;
   }
   const reviewQuestionnaire = await assignment.getReviewQuestionnaire();
   if (!reviewQuestionnaire) {
