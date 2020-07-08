@@ -10,11 +10,15 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import { getManager } from "typeorm";
 import ResponseMessage from "../enum/ResponseMessage";
-import { addDefaultReviewEvaluationQuestions } from "../util/CopyReviewQuestions";
+import {
+  addDefaultReviewEvaluationQuestions,
+  addCopyOfQuestions,
+} from "../util/CopyReviewQuestions";
 import { AssignmentState } from "../enum/AssignmentState";
 import _ from "lodash";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
+import Questionnaire from "../models/Questionnaire";
 
 const router = express.Router();
 
@@ -119,6 +123,56 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   await questionnaire!.reload();
   res.send(questionnaire!);
 });
+
+// Joi inputvalidation
+const copyFromQuestionnaireIdSchema = Joi.object({
+  copyFromQuestionnaireId: Joi.number().integer().required(),
+});
+router.patch(
+  "/:id/copyquestions",
+  validateParams(idSchema),
+  validateBody(copyFromQuestionnaireIdSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const questionnaireId = req.params.id;
+    const questionnaire = await ReviewQuestionnaire.findOne(questionnaireId);
+    const copyFromQuestionnaireId = req.body.copyFromQuestionnaireId;
+    const copyFromQuestionnaire = await Questionnaire.findOne(
+      copyFromQuestionnaireId
+    );
+    if (!questionnaire || !copyFromQuestionnaire) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
+      return;
+    }
+    if (questionnaire.id === copyFromQuestionnaire.id) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("Two distinct questionnaires are required");
+      return;
+    }
+    if (
+      !(await questionnaire.isTeacherInCourse(user)) ||
+      !(await copyFromQuestionnaire.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    const assignment = await questionnaire.getAssignment();
+    if (assignment.isAtOrAfterState(AssignmentState.FEEDBACK)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is already in feedback state");
+      return;
+    }
+    await addCopyOfQuestions(questionnaire, copyFromQuestionnaire.questions);
+    await questionnaire.reload();
+    res.send(questionnaire);
+  }
+);
 
 // add default questions to the reviewquestionnaire
 router.patch(
