@@ -40,7 +40,7 @@ export default class CheckboxQuestionAnswer extends QuestionAnswer {
 
   getAnswerText(): string {
     const answer = [];
-    for(const option of this.checkboxAnswer){
+    for (const option of this.checkboxAnswer) {
       answer.push(option.text);
     }
     return String(answer);
