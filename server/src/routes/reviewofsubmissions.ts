@@ -69,7 +69,7 @@ const assignmentExportIdSchema = Joi.object({
 });
 // get all the groups for an assignment
 router.get(
-  "/grades",
+  "/exportgrades",
   validateQuery(assignmentExportIdSchema),
   async (req, res) => {
     const user = req.user!;
