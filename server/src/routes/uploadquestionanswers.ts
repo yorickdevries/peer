@@ -14,6 +14,9 @@ import { getManager } from "typeorm";
 import path from "path";
 import hasha from "hasha";
 import fsPromises from "fs/promises";
+import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
+import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
+import moment from "moment";
 
 const router = express.Router();
 
@@ -108,10 +111,23 @@ router.post(
       return;
     }
     const assignment = await questionnaire.getAssignment();
-    if (assignment.getState() !== AssignmentState.REVIEW) {
+    if (
+      questionnaire instanceof SubmissionQuestionnaire &&
+      !assignment.isAtState(AssignmentState.REVIEW)
+    ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The assignment is not in reviewstate");
+      return;
+    }
+    if (
+      questionnaire instanceof ReviewQuestionnaire &&
+      !(
+        assignment.isAtState(AssignmentState.FEEDBACK) &&
+        moment().isBefore(assignment.reviewEvaluationDueDate)
+      )
+    ) {
+      res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
       return;
     }
 
