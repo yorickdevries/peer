@@ -16,17 +16,17 @@ interface QuestionTemplate {
   type: QuestionType;
   range?: number;
   extensions?: string;
-  options?: string[];
+  options?: { text: string }[];
 }
 // configuration file
-const questionTemplates: QuestionTemplate[] = [
+const templateQuestions: QuestionTemplate[] = [
   {
     text:
       "Was the review comprehensive and complete, covering all relevant aspects of the work?",
     number: 1,
     optional: false,
     type: QuestionType.MULTIPLE_CHOICE,
-    options: ["A: Yes", "B: No"],
+    options: [{ text: "A: Yes" }, { text: "B: No" }],
   },
   {
     text: "Was the input factually correct?",
@@ -34,10 +34,10 @@ const questionTemplates: QuestionTemplate[] = [
     optional: false,
     type: QuestionType.MULTIPLE_CHOICE,
     options: [
-      "A: Yes, fully",
-      "B: Yes, mostly",
-      "C: No, mostly not",
-      "D: No, not at all",
+      { text: "A: Yes, fully" },
+      { text: "B: Yes, mostly" },
+      { text: "C: No, mostly not" },
+      { text: "D: No, not at all" },
     ],
   },
   {
@@ -46,14 +46,18 @@ const questionTemplates: QuestionTemplate[] = [
     number: 3,
     optional: false,
     type: QuestionType.MULTIPLE_CHOICE,
-    options: ["A: Yes, major mistakes", "B: Yes, minor mistakes", "C: No"],
+    options: [
+      { text: "A: Yes, major mistakes" },
+      { text: "B: Yes, minor mistakes" },
+      { text: "C: No" },
+    ],
   },
   {
     text: "Did the reviewer submit any open feedback (text or pdf)?",
     number: 4,
     optional: false,
     type: QuestionType.MULTIPLE_CHOICE,
-    options: ["A: Yes", "B: No"],
+    options: [{ text: "A: Yes" }, { text: "B: No" }],
   },
   {
     text: "If there was any open feedback, how much?",
@@ -61,10 +65,10 @@ const questionTemplates: QuestionTemplate[] = [
     optional: false,
     type: QuestionType.MULTIPLE_CHOICE,
     options: [
-      "A: Too little",
-      "B: An acceptable amount",
-      "C: Much",
-      "D: Not applicable",
+      { text: "A: Too little" },
+      { text: "B: An acceptable amount" },
+      { text: "C: Much" },
+      { text: "D: Not applicable" },
     ],
   },
   {
@@ -73,7 +77,11 @@ const questionTemplates: QuestionTemplate[] = [
     number: 6,
     optional: false,
     type: QuestionType.MULTIPLE_CHOICE,
-    options: ["A: Yes", "B: No", "C: Not applicable"],
+    options: [
+      { text: "A: Yes" },
+      { text: "B: No" },
+      { text: "C: Not applicable" },
+    ],
   },
   {
     text:
@@ -81,7 +89,11 @@ const questionTemplates: QuestionTemplate[] = [
     number: 7,
     optional: false,
     type: QuestionType.MULTIPLE_CHOICE,
-    options: ["A: Yes", "B: No", "C: Not applicable"],
+    options: [
+      { text: "A: Yes" },
+      { text: "B: No" },
+      { text: "C: Not applicable" },
+    ],
   },
   {
     text: "Overall, do you agree with the reviewer's assessment of the work?",
@@ -89,10 +101,10 @@ const questionTemplates: QuestionTemplate[] = [
     optional: false,
     type: QuestionType.MULTIPLE_CHOICE,
     options: [
-      "A: Yes, fully",
-      "B: Yes, mostly",
-      "C: No, mostly not",
-      "D: No, not at all",
+      { text: "A: Yes, fully" },
+      { text: "B: Yes, mostly" },
+      { text: "C: No, mostly not" },
+      { text: "D: No, not at all" },
     ],
   },
   {
@@ -128,19 +140,19 @@ const addDefaultReviewEvaluationQuestions = async function (
       if (questionnaire.questions.length > 0) {
         throw Error("Questionnaire already has questions");
       }
-      for (const questionTemplate of questionTemplates) {
-        switch (questionTemplate.type) {
+      for (const questionToCopy of templateQuestions) {
+        switch (questionToCopy.type) {
           case QuestionType.CHECKBOX: {
             const question = new CheckboxQuestion(
-              questionTemplate.text,
-              questionTemplate.number,
-              questionTemplate.optional,
+              questionToCopy.text,
+              questionToCopy.number,
+              questionToCopy.optional,
               questionnaire
             );
             await transactionalEntityManager.save(question);
-            for (const optionTemplate of questionTemplate.options!) {
+            for (const optionTemplate of questionToCopy.options!) {
               const option = new CheckboxQuestionOption(
-                optionTemplate,
+                optionTemplate.text,
                 question
               );
               await transactionalEntityManager.save(option);
@@ -149,15 +161,15 @@ const addDefaultReviewEvaluationQuestions = async function (
           }
           case QuestionType.MULTIPLE_CHOICE: {
             const question = new MultipleChoiceQuestion(
-              questionTemplate.text,
-              questionTemplate.number,
-              questionTemplate.optional,
+              questionToCopy.text,
+              questionToCopy.number,
+              questionToCopy.optional,
               questionnaire
             );
             await transactionalEntityManager.save(question);
-            for (const optionTemplate of questionTemplate.options!) {
+            for (const optionTemplate of questionToCopy.options!) {
               const option = new MultipleChoiceQuestionOption(
-                optionTemplate,
+                optionTemplate.text,
                 question
               );
               await transactionalEntityManager.save(option);
@@ -166,9 +178,9 @@ const addDefaultReviewEvaluationQuestions = async function (
           }
           case QuestionType.OPEN: {
             const question = new OpenQuestion(
-              questionTemplate.text,
-              questionTemplate.number,
-              questionTemplate.optional,
+              questionToCopy.text,
+              questionToCopy.number,
+              questionToCopy.optional,
               questionnaire
             );
             await transactionalEntityManager.save(question);
@@ -176,22 +188,22 @@ const addDefaultReviewEvaluationQuestions = async function (
           }
           case QuestionType.RANGE: {
             const question = new RangeQuestion(
-              questionTemplate.text,
-              questionTemplate.number,
-              questionTemplate.optional,
+              questionToCopy.text,
+              questionToCopy.number,
+              questionToCopy.optional,
               questionnaire,
-              questionTemplate.range!
+              questionToCopy.range!
             );
             await transactionalEntityManager.save(question);
             break;
           }
           case QuestionType.UPLOAD: {
             const question = new UploadQuestion(
-              questionTemplate.text,
-              questionTemplate.number,
-              questionTemplate.optional,
+              questionToCopy.text,
+              questionToCopy.number,
+              questionToCopy.optional,
               questionnaire,
-              questionTemplate.extensions!
+              questionToCopy.extensions!
             );
             await transactionalEntityManager.save(question);
             break;
