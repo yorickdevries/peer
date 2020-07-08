@@ -57,7 +57,7 @@ const exportJSONToCSVFile = function (
   res: Response
 ) {
   // Get the fields for the csv file. Export data contains at least 1 item at this point.
-  const csvFields = _.union(
+  const csvFields = _.uniq(
     _.flatMap(data, (element) => {
       return _.keys(element);
     })
