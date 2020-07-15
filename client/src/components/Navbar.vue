@@ -9,7 +9,7 @@
                 <router-link :to="{ name: 'landing-page' }"
                     ><b-navbar-brand class="font-weight-bold d-flex align-items-center"
                         ><img src="../assets/images/logo.svg" alt="logo" height="20px" class="mr-1 mb-1" />
-                        <div>Peer Review</div></b-navbar-brand
+                        <div>{{ siteName }}</div></b-navbar-brand
                     ></router-link
                 >
 
@@ -67,7 +67,8 @@ export default {
         return {
             authenticated: null,
             user: { name: null },
-            currentCourse: ""
+            currentCourse: "",
+            siteName: process.env.NODE_ENV === "production" ? "Peer Review" : "Peer Review Development"
         }
     },
     computed: {

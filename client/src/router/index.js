@@ -1,9 +1,9 @@
 import Vue from "vue"
-import Router from "vue-router"
+import VueRouter from "vue-router"
 import StudentRoutes from "./student-routes"
 import TeacherRoutes from "./teacher-routes"
 import TeachingAssistantRoutes from "./teaching-assistant-routes"
-Vue.use(Router)
+Vue.use(VueRouter)
 
 /**
  * Naming convention for routes:
@@ -11,7 +11,7 @@ Vue.use(Router)
  * Path of a route: use '-' for any multi-word URL parts
  */
 
-export default new Router({
+export default new VueRouter({
     mode: "history",
     routes: [
         {
