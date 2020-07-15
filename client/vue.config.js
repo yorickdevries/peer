@@ -8,12 +8,5 @@ module.exports = {
                 changeOrigin: true
             }
         }
-    },
-    css: {
-        loaderOptions: {
-            sass: {
-                prependData: `@import "@/assets/css/_index.scss";`
-            }
-        }
     }
 }
