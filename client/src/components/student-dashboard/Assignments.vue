@@ -178,7 +178,7 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 import notifications from "../../mixins/notifications"
 
@@ -228,14 +228,12 @@ export default {
         },
         async fetch() {
             // Fetch assignments.
-            let resAssignment = await api.getCourseEnrolledAssignments(this.$route.params.courseId)
+            let resAssignment = await api.getEnrolledAssignmentsAsStudent(this.$route.params.courseId)
             this.assignments = resAssignment.data
 
             // Fetch not yet enrolled assignments.
             try {
-                let { data: enrollableAssignments } = await api.getCourseAssignmentsUnenrolled(
-                    this.$route.params.courseId
-                )
+                let { data: enrollableAssignments } = await api.getEnrollableAssignments(this.$route.params.courseId)
                 this.enrollableAssignments = enrollableAssignments
             } catch (e) {
                 this.showErrorMessage({ message: "Could not load assignments that you are not yet enrolled in." })
