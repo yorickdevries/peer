@@ -49,7 +49,7 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
   if (review.submitted) {
     res
       .status(HttpStatusCode.FORBIDDEN)
-      .send("The reivew is already submitted");
+      .send("The review is already submitted");
     return;
   }
   const questionnaire = await review.getQuestionnaire();
