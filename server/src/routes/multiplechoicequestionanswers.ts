@@ -46,6 +46,12 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
       .send("You are not the reviewer of this review");
     return;
   }
+  if (review.submitted) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("The reivew is already submitted");
+    return;
+  }
   const questionnaire = await review.getQuestionnaire();
   if (!questionnaire.containsQuestion(question)) {
     res
