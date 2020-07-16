@@ -103,7 +103,7 @@
                                                 size="sm"
                                                 :to="{
                                                     name: 'teaching-assistant-dashboard.course.home',
-                                                    params: { courseId: course.id }
+                                                    params: { courseId: course.course.id }
                                                 }"
                                             >
                                                 Enter Course
@@ -174,7 +174,8 @@
                                             <h4 class="card-title m-0">{{ course.name }}</h4>
                                         </div>
                                         <p class="card-title mt-0 text-muted">
-                                            {{ course.course_code }} - {{ course.faculty }} - {{ course.academic_year }}
+                                            {{ course.courseCode }} - {{ course.faculty.name }} -
+                                            {{ course.academicYear.name }}
                                         </p>
 
                                         <div class="mb-auto">
@@ -250,8 +251,7 @@ export default {
             })
         },
         filteredUnenrolledCourses() {
-            return this.unEnrolledCourses.filter(courseItem => {
-                let course = courseItem.course
+            return this.unEnrolledCourses.filter(course => {
                 return (
                     (course.name.toLowerCase().includes(this.filterUnenrolled.toLowerCase()) ||
                         this.filterUnenrolled === "") &&
@@ -333,8 +333,8 @@ export default {
         },
         async fetchUnenrolledCourses() {
             try {
-                const { data: unenrolledCourses } = await api.getEnrollableCourses()
-                this.unEnrolledCourses = unenrolledCourses
+                const res = await api.getEnrollableCourses()
+                this.unEnrolledCourses = res.data
                 this.showNoUnenrolledCoursesText = this.unEnrolledCourses.length === 0
             } catch (e) {
                 this.showNoUnenrolledCoursesText = this.unEnrolledCourses.length === 0

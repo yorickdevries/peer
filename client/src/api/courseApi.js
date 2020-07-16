@@ -9,6 +9,9 @@ export default {
     getEnrollableCourses() {
         return client.get("enrollable")
     },
+    getCourse(courseId) {
+        return client.get(`${courseId}`)
+    },
     getCourseRole(courseId) {
         return client.get(`${courseId}/enrollment`)
     },
@@ -20,5 +23,8 @@ export default {
     },
     enrollInCourse(courseId) {
         return client.post(`${courseId}/enroll`)
+    },
+    createCourse(course) {
+        return client.post("", course)
     }
 }

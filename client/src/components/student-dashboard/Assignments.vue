@@ -233,8 +233,8 @@ export default {
 
             // Fetch not yet enrolled assignments.
             try {
-                let { data: enrollableAssignments } = await api.getEnrollableAssignments(this.$route.params.courseId)
-                this.enrollableAssignments = enrollableAssignments
+                let enrollableAssignments = await api.getEnrollableAssignmentsAsStudent(this.$route.params.courseId)
+                this.enrollableAssignments = enrollableAssignments.data
             } catch (e) {
                 this.showErrorMessage({ message: "Could not load assignments that you are not yet enrolled in." })
             }

@@ -16,7 +16,7 @@
                         </b-form-group>
                         <b-form-group label="Course code">
                             <b-form-input
-                                v-model="course.course_code"
+                                v-model="course.courseCode"
                                 type="text"
                                 placeholder="Please enter the course code"
                             >
@@ -32,11 +32,11 @@
                         </b-form-group>
 
                         <b-form-group label="Faculty" description="">
-                            <b-form-select :options="faculties" v-model="course.faculty"></b-form-select>
+                            <b-form-select :options="faculties" v-model="course.facultyName"></b-form-select>
                         </b-form-group>
 
                         <b-form-group label="Academic Year" description="">
-                            <b-form-select :options="academic_years" v-model="course.academic_year"></b-form-select>
+                            <b-form-select :options="academic_years" v-model="course.academicYearName"></b-form-select>
                         </b-form-group>
 
                         <b-form-group label="">
@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 import notifications from "../../mixins/notifications"
 
 export default {
@@ -64,9 +64,9 @@ export default {
                 name: null,
                 description: null,
                 enrollable: false,
-                faculty: null,
-                academic_year: null,
-                course_code: null
+                facultyName: null,
+                academicYearName: null,
+                courseCode: null
             },
             faculties: [],
             academic_years: []
@@ -80,8 +80,8 @@ export default {
     methods: {
         async fetchactiveAcademicYears() {
             try {
-                let res = await api.getactiveAcademicYears()
-                this.course.academic_year = res.data[0].year
+                let res = await api.getAcademicYears(true)
+                this.course.academicYearName = res.data[0].name
             } catch (e) {
                 console.log(e)
             }
@@ -101,9 +101,9 @@ export default {
 
         async fetchAcademicYears() {
             try {
-                let res = await api.getAcademicYears()
+                let res = await api.getAllAcademicYears()
                 this.academic_years = res.data.map(entry => {
-                    return { value: entry.year, text: entry.year }
+                    return { value: entry.name, text: entry.name }
                 })
             } catch (e) {
                 console.log(e)
