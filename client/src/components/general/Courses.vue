@@ -272,8 +272,7 @@ export default {
         await this.fetchAllCourseRoles()
 
         // Fetch user to see if create course button should be showed.
-        // TODO: Uncomment line below
-        // await this.fetchUser()
+        await this.fetchUser()
         await this.fetchAcademicYears()
         await this.fetchactiveAcademicYears()
         await this.fetchFaculties()
@@ -314,9 +313,8 @@ export default {
 
         async fetchUser() {
             let res = await api.getUserInfo()
-
             this.showCreateCourseButton = false
-            for (const affiliation of res.affiliation) {
+            for (const affiliation of res.data.affiliation) {
                 if (affiliation.name === "employee") {
                     this.showCreateCourseButton = true
                 }
