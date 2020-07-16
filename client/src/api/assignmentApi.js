@@ -6,7 +6,6 @@ const client = axios.create({
 })
 
 export default {
-    client,
     getAssignment(assignmentId) {
         return client.get(`${assignmentId}`)
     },
@@ -15,5 +14,8 @@ export default {
     },
     getLatestSubmissionAsStudent(assignmentId) {
         return client.get(`${assignmentId}/latestsubmission`)
+    },
+    enrollInAssignment(assignmentId) {
+        return client.post(`${assignmentId}/enroll`)
     }
 }
