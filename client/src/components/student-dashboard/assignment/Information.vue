@@ -46,10 +46,10 @@
                         <p>This assignment is made individually.</p>
                         <dl>
                             <dt>Individual ID</dt>
-                            <dd>{{ groupInfo.group.group_groupid }}</dd>
+                            <dd>{{ groupInfo.groupId }}</dd>
 
                             <dt>Name</dt>
-                            <dd>{{ groupName }}</dd>
+                            <dd>{{ groupInfo.name }}</dd>
 
                             <dt>Latest Submission</dt>
                             <dd>
@@ -76,16 +76,16 @@
                         </p>
                         <dl>
                             <dt>Group ID</dt>
-                            <dd>{{ groupInfo.group.group_groupid }}</dd>
+                            <dd>{{ groupInfo.groupId }}</dd>
 
                             <dt>Group Name</dt>
-                            <dd>{{ groupName }}</dd>
+                            <dd>{{ groupInfo.name }}</dd>
 
                             <dt>Group Members</dt>
                             <dt>
                                 <ul>
                                     <li
-                                        v-for="member in groupInfo.groupmembers"
+                                        v-for="member in groupInfo.groupMembers"
                                         :key="member.user_netid"
                                         class="font-weight-light"
                                     >
@@ -113,7 +113,7 @@
 </template>
 
 <script>
-import api from "../../../api/api_old"
+import api from "../../../api/api"
 
 export default {
     data() {
@@ -131,17 +131,14 @@ export default {
                 external_link: null
             },
             groupInfo: {
-                group: {
-                    group_groupid: null
-                },
-                groupmembers: []
+                name: "",
+                groupId: null,
+                groupMembers: []
             },
-            groupName: "",
             submission: {
                 user_netid: null,
                 assignment_id: null,
-                file_path: null,
-                date: null
+                file_path: null
             }
         }
     },
@@ -168,18 +165,22 @@ export default {
         },
         async fetchGroupInformation() {
             // Fetch the group information.
-            let res = await api.getGroupMembersOfAssignment(this.$route.params.assignmentId)
-            this.groupInfo = res.data
-
-            // Fetch group name.
-            let nameRes = await api.getGroupInfo(this.groupInfo.group.group_groupid)
-            this.groupName = nameRes.data.group_name
+            let res = await api.getGroupAsStudent(this.$route.params.assignmentId)
+            this.groupInfo = {
+                name: res.name,
+                groupId: res.id,
+                groupMembers: res.users
+            }
         },
         async fetchSubmission() {
             // Fetch the submission.
             try {
-                let res = await api.getAssignmentLatestSubmission(this.assignment.id)
-                this.submission = res.data
+                let res = await api.getLatestSubmissionAsStudent(this.assignment.id)
+                this.submission = {
+                    user_netid: res.userNetid,
+                    assignment_id: res.assignmentId,
+                    file_path: res.file
+                }
             } catch (e) {
                 this.onSubmissionReset()
             }

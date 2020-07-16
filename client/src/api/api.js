@@ -1,4 +1,5 @@
 import axios from "axios"
+import assignmentApi from "./assignmentApi"
 
 const client = axios.create({
     baseURL: "/api/",
@@ -6,5 +7,6 @@ const client = axios.create({
 })
 
 export default {
-    client
+    client,
+    ...assignmentApi
 }
