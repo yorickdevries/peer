@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import api from "../../api"
+import api from "../../api_old"
 import notifications from "../../mixins/notifications"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 

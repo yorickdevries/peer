@@ -130,7 +130,7 @@
 </template>
 
 <script>
-import api from "../../../api"
+import api from "../../../api_old"
 import notifications from "../../../mixins/notifications"
 import OpenQuestion from "./OpenQuestion"
 import RangeQuestion from "./RangeQuestion"

@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import api from "../../api"
+import api from "../../api_old"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 
 export default {

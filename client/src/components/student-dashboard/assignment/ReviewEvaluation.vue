@@ -211,7 +211,7 @@
 </template>
 
 <script>
-import api from "../../../api"
+import api from "../../../api_old"
 import { StarRating } from "vue-rate-it"
 import notifications from "../../../mixins/notifications"
 import PeerReview from "./PeerReview"

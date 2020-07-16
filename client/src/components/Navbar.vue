@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import api from "../api"
+import api from "../api_old"
 
 export default {
     props: ["links", "title", "role", "variant"],

@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import api from "../../api"
+import api from "../../api_old"
 import Navbar from "../Navbar"
 
 export default {
