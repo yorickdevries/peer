@@ -8,10 +8,10 @@ const client = axios.create({
 export default {
     client,
     getCourse: async id => {
-        return client.get(`${id}`)
+        return client.get(`courses/${id}`)
     },
     getEnrolledCourses() {
-        return client.get(`enrolled`)
+        return client.get(`courses/enrolled`)
     },
     getUnenrolledCourses() {
         return client.get(`courses/unenrolled`)
