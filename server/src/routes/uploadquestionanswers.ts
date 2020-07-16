@@ -48,7 +48,7 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
     // or reviwer
     (await review.isReviewer(user)) ||
     // or reviewed
-    (assignment.isAtOrBeforeState(AssignmentState.FEEDBACK) &&
+    (assignment.isAtState(AssignmentState.FEEDBACK) &&
       (await review.isReviewed(user)) &&
       review.submitted)
   ) {
