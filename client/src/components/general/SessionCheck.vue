@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 import notifications from "../../mixins/notifications"
 
 export default {
@@ -27,7 +27,7 @@ export default {
         async sessionGuardCheck() {
             // Submit the peer review.
             try {
-                const res = await api.getUser()
+                const res = await api.getUserInfo()
                 const user = res.data
 
                 if (!user) {
