@@ -23,7 +23,7 @@ export default class Submission extends BaseModel {
 
   // User_netid varchar(500) NOT NULL,
   @RelationId((submission: Submission) => submission.user)
-  userNetid!: number;
+  userNetid!: string;
   @ManyToOne((_type) => User, { nullable: false })
   user?: User;
 
