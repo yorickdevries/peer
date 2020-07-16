@@ -118,7 +118,7 @@
 
 <script>
 import notifications from "../../mixins/notifications"
-import api from "../../api_old"
+import api from "../../api/api_old"
 
 export default {
     mixins: [notifications],

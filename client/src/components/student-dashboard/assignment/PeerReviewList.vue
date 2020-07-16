@@ -35,7 +35,7 @@
 // https://github.com/bootstrap-vue/bootstrap-vue/issues/2148
 
 import PeerReview from "./PeerReview"
-import api from "../../../api_old"
+import api from "../../../api/api_old"
 
 export default {
     components: {

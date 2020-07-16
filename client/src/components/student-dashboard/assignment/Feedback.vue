@@ -208,7 +208,7 @@
 
 <script>
 import { StarRating } from "vue-rate-it"
-import api from "../../../api_old"
+import api from "../../../api/api_old"
 
 export default {
     components: {
