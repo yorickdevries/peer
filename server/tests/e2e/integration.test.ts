@@ -804,5 +804,20 @@ describe("Integration", () => {
       .field("uploadQuestionId", uploadQuestion.id)
       .set("cookie", await studentCookie1());
     expect(res.status).toBe(HttpStatusCode.OK);
+
+    //submit review
+    res = await request(server)
+      .patch(`/api/reviewofsubmissions/${review.id}`)
+      .send({
+        submitted: true,
+        flaggedByReviewer: false,
+      })
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject({
+      id: review.id,
+      submitted: true,
+      flaggedByReviewer: false,
+    });
   }, 30000); // timeout is set to 30 seconds
 });
