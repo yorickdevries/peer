@@ -215,6 +215,13 @@ describe("Integration", () => {
       name: "Example title",
     });
 
+    // get all assignments of a course by the teacher
+    res = await request(server)
+      .get(`/api/assignments?courseId=${course.id}`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).length).toBe(1);
+
     // make a questionnaire
     res = await request(server)
       .post("/api/submissionquestionnaires/")
