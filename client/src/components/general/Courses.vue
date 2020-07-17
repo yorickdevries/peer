@@ -255,7 +255,7 @@ export default {
                 return (
                     (course.name.toLowerCase().includes(this.filterUnenrolled.toLowerCase()) ||
                         this.filterUnenrolled === "") &&
-                    (this.filterOptions.faculty == null || course.faculty === this.filterOptions.faculty) &&
+                    (this.filterOptions.faculty == null || course.faculty.name === this.filterOptions.faculty) &&
                     course.academicYear.name === this.academic_year_active
                 )
             })
