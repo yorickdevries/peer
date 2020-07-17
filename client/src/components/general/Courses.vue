@@ -244,7 +244,7 @@ export default {
                 let course = courseItem.course
                 return (
                     (course.name.toLowerCase().includes(this.filter.toLowerCase()) || this.filter === "") &&
-                    (this.filterOptions.faculty == null || course.faculty === this.filterOptions.faculty) &&
+                    (this.filterOptions.faculty == null || course.faculty.name === this.filterOptions.faculty) &&
                     (this.filterOptions.academic_year == null ||
                         course.academicYear.name === this.filterOptions.academic_year)
                 )
