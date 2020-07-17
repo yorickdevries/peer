@@ -92,6 +92,66 @@ describe("Integration", () => {
     );
   });
 
+  test("import with big file", async () => {
+    // group export
+    const groupCSV = path.resolve(
+      __dirname,
+      "../../exampleData/groupExports/",
+      "example_export_big.csv"
+    );
+    const res = await request(server)
+      .post("/api/groups/import")
+      .set("cookie", teacherCookie)
+      .attach("file", fs.readFileSync(groupCSV), "file.csv")
+      .field("assignmentId", assignmentId);
+    expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
+  });
+
+  test("import with file without groupcolumn", async () => {
+    // group export
+    const groupCSV = path.resolve(
+      __dirname,
+      "../../exampleData/groupExports/",
+      "example_export_no_groupcolumn.csv"
+    );
+    const res = await request(server)
+      .post("/api/groups/import")
+      .set("cookie", teacherCookie)
+      .attach("file", fs.readFileSync(groupCSV), "file.csv")
+      .field("assignmentId", assignmentId);
+    expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
+  });
+
+  test("import with file without usercolumn", async () => {
+    // group export
+    const groupCSV = path.resolve(
+      __dirname,
+      "../../exampleData/groupExports/",
+      "example_export_no_usercolumn.csv"
+    );
+    const res = await request(server)
+      .post("/api/groups/import")
+      .set("cookie", teacherCookie)
+      .attach("file", fs.readFileSync(groupCSV), "file.csv")
+      .field("assignmentId", assignmentId);
+    expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
+  });
+
+  test("import with textfile", async () => {
+    // group export
+    const groupCSV = path.resolve(
+      __dirname,
+      "../../exampleData/groupExports/",
+      "text_file.txt"
+    );
+    const res = await request(server)
+      .post("/api/groups/import")
+      .set("cookie", teacherCookie)
+      .attach("file", fs.readFileSync(groupCSV), "file.txt")
+      .field("assignmentId", assignmentId);
+    expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
+  });
+
   test("normal import with groupnumbers", async () => {
     // group export
     const groupCSV = path.resolve(
