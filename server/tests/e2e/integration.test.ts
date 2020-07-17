@@ -598,7 +598,7 @@ describe("Integration", () => {
     // assertions
     expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
 
-    // make a submission
+    // make a submission for student 1
     const exampleSubmissionFile1 = path.resolve(
       __dirname,
       "../../exampleData/submissions/submission1.pdf"
@@ -617,7 +617,7 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     const submission1 = JSON.parse(res.text);
 
-    // make a submission
+    // make a submission for student 2
     const exampleSubmissionFile2 = path.resolve(
       __dirname,
       "../../exampleData/submissions/submission2.pdf"
@@ -644,9 +644,27 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([submission1]);
 
+    // get latest submissions for this assignment by this group
+    res = await request(server)
+      .get(
+        `/api/assignments/${assignment.id}/latestsubmission?groupId=${group1.id}`
+      )
+      .set("cookie", await studentCookie1());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject(submission1);
+
     // get all submissions for this assignment as teacher
     res = await request(server)
       .get(`/api/submissions?assignmentId=${assignment.id}`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject([submission1, submission2]);
+
+    // get latest submissions for this assignment as teacher
+    res = await request(server)
+      .get(`/api/submissions/latest?assignmentId=${assignment.id}`)
       .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
