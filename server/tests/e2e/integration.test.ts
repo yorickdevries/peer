@@ -9,6 +9,7 @@ import initializeData from "../../src/util/initializeData";
 import fs from "fs";
 import path from "path";
 import { advanceTo, clear } from "jest-date-mock";
+import UserRole from "../../src/enum/UserRole";
 
 describe("Integration", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -175,6 +176,16 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     // assertions
     expect(JSON.parse(res.text).name).toBe("CourseName");
+
+    // get enrollment for a course
+    res = await request(server)
+      .get(`/api/courses/${course.id}/enrollment`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(JSON.parse(res.text)).toMatchObject({
+      courseId: course.id,
+      role: UserRole.TEACHER,
+    });
 
     // make an assingment for the course
     // create am assignment course
