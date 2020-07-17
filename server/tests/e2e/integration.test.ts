@@ -819,5 +819,40 @@ describe("Integration", () => {
       submitted: true,
       flaggedByReviewer: false,
     });
+
+    // get the current answers for the review
+    res = await request(server)
+      .get(`/api/reviewofsubmissions/${review.id}/answers`)
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).length).toBe(5);
+
+    // set date to the moment that the feedback is available
+    advanceTo(new Date("2020-04-15T10:00Z"));
+
+    // get the feedback of the other submission
+    res = await request(server)
+      .get(`/api/submissions/${submission2.id}/feedback`)
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const feedback = JSON.parse(res.text);
+    expect(feedback.length).toBe(1);
+    const feedback1 = feedback[0];
+    expect(feedback1.id).toBe(review.id);
+
+    // get the answers for the feedback
+    res = await request(server)
+      .get(`/api/reviewofsubmissions/${feedback1.id}/answers`)
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).length).toBe(5);
+
+    // get the file of the uploadanswer
+    res = await request(server)
+      .get(
+        `/api/uploadquestionanswers/file?reviewId=${feedback1.id}&questionId=${uploadQuestion.id}`
+      )
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
   }, 30000); // timeout is set to 30 seconds
 });
