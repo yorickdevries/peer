@@ -384,7 +384,7 @@ describe("Integration", () => {
     // assertions
     expect(JSON.parse(res.text).length).toEqual(1);
 
-    // enroll for course as student
+    // enroll for course as student1
     res = await request(server)
       .post(`/api/courses/${course.id}/enroll`)
       .set("cookie", await studentCookie1());
@@ -395,7 +395,7 @@ describe("Integration", () => {
       role: "student",
     });
 
-    // enroll for course as student
+    // enroll for course as student2
     res = await request(server)
       .post(`/api/courses/${course.id}/enroll`)
       .set("cookie", await studentCookie2());
