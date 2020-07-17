@@ -830,6 +830,19 @@ describe("Integration", () => {
     // set date to the moment that the feedback is available
     advanceTo(new Date("2020-04-15T10:00Z"));
 
+    // approve a review as teacher
+    res = await request(server)
+      .patch(`/api/reviewofsubmissions/${review.id}/approval`)
+      .send({
+        approvalByTA: true,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject({
+      id: review.id,
+      approvalByTA: true,
+    });
+
     // get the feedback of the other submission
     res = await request(server)
       .get(`/api/submissions/${submission2.id}/feedback`)
