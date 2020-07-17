@@ -706,6 +706,15 @@ describe("Integration", () => {
     // set date to the moment that the reviews are opened
     advanceTo(new Date("2020-03-15T10:00Z"));
 
+    // get the questionnaire as student
+    res = await request(server)
+      .get(
+        `/api/submissionquestionnaires/${assignment.submissionQuestionnaireId}`
+      )
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).questions.length).toBe(5);
+
     // get the reviews a student needs to do
     res = await request(server)
       .get(
@@ -726,15 +735,6 @@ describe("Integration", () => {
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject(review);
-
-    // get the questionnaire as student
-    res = await request(server)
-      .get(
-        `/api/submissionquestionnaires/${assignment.submissionQuestionnaireId}`
-      )
-      .set("cookie", await studentCookie1());
-    expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text).questions.length).toBe(5);
 
     // get the current answers for the review
     res = await request(server)
