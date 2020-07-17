@@ -256,6 +256,12 @@ router.post(
   validateBody(assignmentIdSchema),
   async (req, res) => {
     const user = req.user!;
+    if (!req.file) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("File is needed for the import");
+      return;
+    }
     const assignment = await Assignment.findOne(req.body.assignmentId);
     if (!assignment) {
       res

@@ -48,7 +48,7 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
     // or reviwer
     (await review.isReviewer(user)) ||
     // or reviewed
-    (assignment.isAtOrBeforeState(AssignmentState.FEEDBACK) &&
+    (assignment.isAtState(AssignmentState.FEEDBACK) &&
       (await review.isReviewed(user)) &&
       review.submitted)
   ) {
@@ -101,6 +101,12 @@ router.post(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("You are not the reviewer of this review");
+      return;
+    }
+    if (review.submitted) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The review is already submitted");
       return;
     }
     const questionnaire = await review.getQuestionnaire();
