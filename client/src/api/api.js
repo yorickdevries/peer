@@ -4,6 +4,7 @@ import courseApi from "./courseApi"
 import facultiesApi from "./facultyApi"
 import academicYearsApi from "./academicYearsApi"
 import enrollmentApi from "./enrollmentApi"
+import submissionApi from "./submissionApi"
 
 const client = axios.create({
     baseURL: "/api/",
@@ -19,5 +20,6 @@ export default {
     ...courseApi,
     ...facultiesApi,
     ...academicYearsApi,
-    ...enrollmentApi
+    ...enrollmentApi,
+    ...submissionApi
 }
