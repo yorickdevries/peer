@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import api from "../../../api"
+import api from "../../../api/api_old"
 import notifications from "../../../mixins/notifications"
 
 export default {

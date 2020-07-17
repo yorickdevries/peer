@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import api from "../../api"
+import api from "../../api/api_old"
 import SubmissionCommentWizard from "./SubmissionCommentsWizard"
 
 export default {

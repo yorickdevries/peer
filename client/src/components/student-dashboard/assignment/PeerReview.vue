@@ -171,7 +171,7 @@
 </template>
 
 <script>
-import api from "../../../api"
+import api from "../../../api/api_old"
 import { StarRating } from "vue-rate-it"
 import notifications from "../../../mixins/notifications"
 import SessionCheck from "../../general/SessionCheck"
