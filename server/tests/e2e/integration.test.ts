@@ -854,5 +854,40 @@ describe("Integration", () => {
       )
       .set("cookie", await studentCookie2());
     expect(res.status).toBe(HttpStatusCode.OK);
+
+    // create a reviewEvaluation as student
+    res = await request(server)
+      .post(`/api/reviewofsubmissions/${feedback1.id}/evaluation`)
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const reviewOfReview = JSON.parse(res.text);
+
+    // get the reviewOfReview without id
+    res = await request(server)
+      .get(`/api/reviewofsubmissions/${feedback1.id}/evaluation`)
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject(reviewOfReview);
+
+    // get the reviewOfReview
+    res = await request(server)
+      .get(`/api/reviewofreviews/${reviewOfReview.id}`)
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).id).toBe(reviewOfReview.id);
+
+    // get the reviewquestionnaire as student
+    res = await request(server)
+      .get(`/api/reviewquestionnaires/${assignment.reviewQuestionnaireId}`)
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).questions.length).toBe(10);
+
+    // get the current answers
+    res = await request(server)
+      .get(`/api/reviewofreviews/${reviewOfReview.id}/answers`)
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).length).toBe(0);
   }, 30000); // timeout is set to 30 seconds
 });
