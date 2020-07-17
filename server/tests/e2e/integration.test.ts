@@ -669,5 +669,37 @@ describe("Integration", () => {
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([submission1, submission2]);
-  });
+
+    // get a single submission as teacher
+    res = await request(server)
+      .get(`/api/submissions/${submission1.id}`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject(submission1);
+
+    // set date to the moment that the submission is closed
+    advanceTo(new Date("2020-02-15T10:00Z"));
+
+    // distribute the reviews as teacher
+    res = await request(server)
+      .post(`/api/reviewofsubmissions/distribute?assignmentId=${assignment.id}`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    // 2 reviews are generated
+    expect(JSON.parse(res.text).length).toBe(2);
+
+    // get the reviews as teacher
+    res = await request(server)
+      .get(`/api/reviewofsubmissions?assignmentId=${assignment.id}`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    // 2 reviews are present
+    expect(JSON.parse(res.text).length).toBe(2);
+
+    // set date to the moment that the reviews are opened
+    advanceTo(new Date("2020-03-15T10:00Z"));
+  }, 30000); // timeout is set to 30 seconds
 });
