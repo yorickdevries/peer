@@ -753,5 +753,56 @@ describe("Integration", () => {
       })
       .set("cookie", await studentCookie1());
     expect(res.status).toBe(HttpStatusCode.OK);
+
+    // answer mc Question
+    res = await request(server)
+      .post(`/api/multiplechoicequestionanswers/`)
+      .send({
+        reviewId: review.id,
+        multipleChoiceQuestionId: mcQuestion.id,
+        multipleChoiceQuestionOptionId: mcoption1.id,
+      })
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // answer open Question
+    res = await request(server)
+      .post(`/api/openquestionanswers/`)
+      .send({
+        reviewId: review.id,
+        openQuestionId: openQuestion.id,
+        openAnswer: "This is my answer",
+      })
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // answer range Question
+    res = await request(server)
+      .post(`/api/rangequestionanswers/`)
+      .send({
+        reviewId: review.id,
+        rangeQuestionId: rangeQuestion.id,
+        rangeAnswer: 3,
+      })
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // answer checkbox Question
+    const exampleUploadAnswerFile = path.resolve(
+      __dirname,
+      "../../exampleData/reviews/review1.pdf"
+    );
+    // answer upload Question
+    res = await request(server)
+      .post(`/api/uploadquestionanswers/`)
+      .attach(
+        "file",
+        fs.readFileSync(exampleUploadAnswerFile),
+        "assignment1.pdf"
+      )
+      .field("reviewId", review.id)
+      .field("uploadQuestionId", uploadQuestion.id)
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
   }, 30000); // timeout is set to 30 seconds
 });
