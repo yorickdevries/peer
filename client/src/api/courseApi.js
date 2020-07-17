@@ -15,10 +15,10 @@ export default {
     getCourseRole(courseId) {
         return client.get(`${courseId}/enrollment`)
     },
-    getEnrollableAssignmentsAsStudent(courseId) {
+    getCourseUnenrolledAssignmentsAsStudent(courseId) {
         return client.get(`${courseId}/enrollableassignments`)
     },
-    getEnrolledAssignmentsAsStudent(courseId) {
+    getCourseEnrolledAssignmentsAsStudent(courseId) {
         return client.get(`${courseId}/enrolledassignments`)
     },
     enrollInCourse(courseId) {

@@ -94,7 +94,6 @@ export default {
         }
     },
     async created() {
-        // Fetch assignment & submission.
         await this.fetchAssignment()
         await this.fetchGroupId()
         await this.fetchSubmission()

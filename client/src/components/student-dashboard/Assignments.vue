@@ -228,12 +228,14 @@ export default {
         },
         async fetch() {
             // Fetch assignments.
-            let resAssignment = await api.getEnrolledAssignmentsAsStudent(this.$route.params.courseId)
+            let resAssignment = await api.getCourseEnrolledAssignmentsAsStudent(this.$route.params.courseId)
             this.assignments = resAssignment.data
 
             // Fetch not yet enrolled assignments.
             try {
-                let enrollableAssignments = await api.getEnrollableAssignmentsAsStudent(this.$route.params.courseId)
+                let enrollableAssignments = await api.getCourseUnenrolledAssignmentsAsStudent(
+                    this.$route.params.courseId
+                )
                 this.enrollableAssignments = enrollableAssignments.data
             } catch (e) {
                 this.showErrorMessage({ message: "Could not load assignments that you are not yet enrolled in." })
