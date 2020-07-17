@@ -278,7 +278,8 @@ describe("Integration", () => {
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject({
+    const checkboxoption1 = JSON.parse(res.text);
+    expect(checkboxoption1).toMatchObject({
       text: "option 1",
     });
 
@@ -291,7 +292,8 @@ describe("Integration", () => {
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject({
+    const checkboxoption2 = JSON.parse(res.text);
+    expect(checkboxoption2).toMatchObject({
       text: "option 2",
     });
 
@@ -322,7 +324,8 @@ describe("Integration", () => {
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject({
+    const mcoption1 = JSON.parse(res.text);
+    expect(mcoption1).toMatchObject({
       text: "option A",
     });
 
@@ -335,7 +338,8 @@ describe("Integration", () => {
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject({
+    const mcoption2 = JSON.parse(res.text);
+    expect(mcoption2).toMatchObject({
       text: "option B",
     });
 
