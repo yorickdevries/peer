@@ -705,5 +705,53 @@ describe("Integration", () => {
 
     // set date to the moment that the reviews are opened
     advanceTo(new Date("2020-03-15T10:00Z"));
+
+    // get the reviews a student needs to do
+    res = await request(server)
+      .get(
+        `/api/submissionquestionnaires/${submissionQuestionnaire.id}/reviews`
+      )
+      .set("cookie", await studentCookie1());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    // 1 review is present
+    const reviews = JSON.parse(res.text);
+    expect(reviews.length).toBe(1);
+    const review = reviews[0];
+
+    // get the reviews a student needs to do
+    res = await request(server)
+      .get(`/api/reviewofsubmissions/${review.id}`)
+      .set("cookie", await studentCookie1());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject(review);
+
+    // get the questionnaire as student
+    res = await request(server)
+      .get(
+        `/api/submissionquestionnaires/${assignment.submissionQuestionnaireId}`
+      )
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).questions.length).toBe(5);
+
+    // get the current answers for the review
+    res = await request(server)
+      .get(`/api/reviewofsubmissions/${review.id}/answers`)
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).length).toBe(0);
+
+    // answer checkbox Question
+    res = await request(server)
+      .post(`/api/checkboxquestionanswers/`)
+      .send({
+        reviewId: review.id,
+        checkboxQuestionId: checkboxQuestion.id,
+        checkboxQuestionOptionIds: [checkboxoption2.id],
+      })
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
   }, 30000); // timeout is set to 30 seconds
 });
