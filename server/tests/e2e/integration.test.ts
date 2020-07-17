@@ -201,12 +201,15 @@ describe("Integration", () => {
       .field("courseId", course.id)
       .field("reviewsPerUser", 1)
       .field("enrollable", true)
-      .field("reviewEvaluation", false)
+      .field("reviewEvaluation", true)
       .field("publishDate", new Date("2020-01-05T10:00Z").toISOString())
       .field("dueDate", new Date("2020-02-01T10:00Z").toISOString())
       .field("reviewPublishDate", new Date("2020-03-01T10:00Z").toISOString())
       .field("reviewDueDate", new Date("2020-04-01T10:00Z").toISOString())
-      .field("reviewEvaluationDueDate", "null")
+      .field(
+        "reviewEvaluationDueDate",
+        new Date("2020-05-01T10:00Z").toISOString()
+      )
       .field("description", "Example description")
       .field("externalLink", "null");
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -391,6 +394,37 @@ describe("Integration", () => {
       number: 5,
       optional: true,
     });
+
+    // make a reviewquestionnaire
+    res = await request(server)
+      .post("/api/reviewquestionnaires/")
+      .send({
+        assignmentId: assignment.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // get the assignment including questionnaire
+    res = await request(server)
+      .get(`/api/assignments/${assignment.id}`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    assignment = JSON.parse(res.text);
+
+    // get the questionnaire
+    res = await request(server)
+      .get(`/api/reviewquestionnaires/${assignment.reviewQuestionnaireId}`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const reviewQuestionnaire = JSON.parse(res.text);
+
+    // add default questions to reviewquestionnaire
+    res = await request(server)
+      .patch(
+        `/api/reviewquestionnaires/${reviewQuestionnaire.id}/defaultquestions`
+      )
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
 
     // set date to the moment that the assignment is published
     advanceTo(new Date("2020-01-15T10:00Z"));
