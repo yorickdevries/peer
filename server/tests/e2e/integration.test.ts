@@ -152,8 +152,7 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie2());
     const course2 = JSON.parse(res.text);
 
-    // fetch all the enrolled courses from the server
-    // create a course
+    // fetch all the enrolled courses from the server as teacher
     res = await request(server)
       .get("/api/enrollments/enrolled")
       .set("cookie", await teacherCookie());
@@ -169,6 +168,13 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     // assertions
     expect(JSON.parse(res.text).length).toEqual(0);
+
+    // get a course by id
+    res = await request(server)
+      .get(`/api/courses/${course.id}`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(JSON.parse(res.text).name).toBe("CourseName");
 
     // make an assingment for the course
     // create am assignment course
