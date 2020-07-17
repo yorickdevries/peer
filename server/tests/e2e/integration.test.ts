@@ -229,12 +229,57 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     const submissionQuestionnaire = JSON.parse(res.text);
 
+    // CREATE QUESTIONS
+    // post a checkbox question in the questionnaire
+    res = await request(server)
+      .post(`/api/checkboxquestions/`)
+      .send({
+        text: "This is a Checkbox question",
+        number: 1,
+        optional: true,
+        questionnaireId: submissionQuestionnaire.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const checkboxQuestion = JSON.parse(res.text);
+    expect(checkboxQuestion).toMatchObject({
+      text: "This is a Checkbox question",
+      number: 1,
+      optional: true,
+    });
+
+    // post Checkbox question option in the questionnaire
+    res = await request(server)
+      .post(`/api/checkboxquestionoptions/`)
+      .send({
+        text: "option 1",
+        checkboxQuestionId: checkboxQuestion.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject({
+      text: "option 1",
+    });
+
+    // post Checkbox question option in the questionnaire
+    res = await request(server)
+      .post(`/api/checkboxquestionoptions/`)
+      .send({
+        text: "option 2",
+        checkboxQuestionId: checkboxQuestion.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject({
+      text: "option 2",
+    });
+
     // post a MC question in the questionnaire
     res = await request(server)
       .post(`/api/multiplechoicequestions/`)
       .send({
         text: "This is a MC question",
-        number: 1,
+        number: 2,
         optional: true,
         questionnaireId: submissionQuestionnaire.id,
       })
@@ -243,7 +288,7 @@ describe("Integration", () => {
     const mcQuestion = JSON.parse(res.text);
     expect(mcQuestion).toMatchObject({
       text: "This is a MC question",
-      number: 1,
+      number: 2,
       optional: true,
     });
 
@@ -271,6 +316,62 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject({
       text: "option B",
+    });
+
+    // post an open question in the questionnaire
+    res = await request(server)
+      .post(`/api/openquestions/`)
+      .send({
+        text: "This is an Open question",
+        number: 3,
+        optional: false,
+        questionnaireId: submissionQuestionnaire.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const openQuestion = JSON.parse(res.text);
+    expect(openQuestion).toMatchObject({
+      text: "This is an Open question",
+      number: 3,
+      optional: false,
+    });
+
+    // post a range question in the questionnaire
+    res = await request(server)
+      .post(`/api/rangequestions/`)
+      .send({
+        text: "This is a Range question",
+        number: 4,
+        optional: true,
+        range: 5,
+        questionnaireId: submissionQuestionnaire.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const rangeQuestion = JSON.parse(res.text);
+    expect(rangeQuestion).toMatchObject({
+      text: "This is a Range question",
+      number: 4,
+      optional: true,
+    });
+
+    // post an upload question in the questionnaire
+    res = await request(server)
+      .post(`/api/uploadquestions/`)
+      .send({
+        text: "This is an Upload question",
+        number: 5,
+        optional: true,
+        extensions: ".pdf",
+        questionnaireId: submissionQuestionnaire.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const uploadQuestion = JSON.parse(res.text);
+    expect(uploadQuestion).toMatchObject({
+      text: "This is an Upload question",
+      number: 5,
+      optional: true,
     });
 
     // set date to the moment that the assignment is published
