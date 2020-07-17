@@ -188,7 +188,7 @@ describe("Integration", () => {
       .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
       .field("name", "Example title")
       .field("courseId", course.id)
-      .field("reviewsPerUser", 2)
+      .field("reviewsPerUser", 1)
       .field("enrollable", true)
       .field("reviewEvaluation", false)
       .field("publishDate", new Date("2020-01-05T10:00Z").toISOString())
