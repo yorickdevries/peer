@@ -520,6 +520,17 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([group1, group2]);
 
+    // get course students by the teacher
+    res = await request(server)
+      .get(`/api/enrollments/?courseId=${course.id}&role=student`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject([
+      { userNetid: "student1" },
+      { userNetid: "student2" },
+    ]);
+
     // get all groups by the student
     res = await request(server)
       .get(`/api/groups?assignmentId=${assignment.id}`)
