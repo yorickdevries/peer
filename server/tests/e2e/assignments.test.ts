@@ -70,4 +70,47 @@ describe("Assignments", () => {
       name: "Example title",
     });
   });
+
+  test("post assignment/ with 0 reviews", async () => {
+    const sessionCookie = await mockLoginCookie(server, "teacher");
+
+    // create a course
+    const res1 = await request(server)
+      .post("/api/courses")
+      .send({
+        name: "CourseName",
+        courseCode: "ABC123",
+        enrollable: false,
+        facultyName: "EEMCS",
+        academicYearName: "2019/2020",
+        description: null,
+      })
+      .set("cookie", sessionCookie);
+    // assertions
+    const course = JSON.parse(res1.text);
+
+    // Tests whether an assignment with 0 reviews per users is rejected
+    const exampleAssignmentFile = path.resolve(
+      __dirname,
+      "../../exampleData/assignments/assignment1.pdf"
+    );
+    const res2 = await request(server)
+      .post("/api/assignments")
+      .set("cookie", sessionCookie)
+      .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
+      .field("name", "Example title")
+      .field("courseId", course.id)
+      .field("reviewsPerUser", 0)
+      .field("enrollable", false)
+      .field("reviewEvaluation", false)
+      .field("publishDate", new Date("2020-06-23T10:00Z").toISOString())
+      .field("dueDate", new Date("2020-06-24T10:00Z").toISOString())
+      .field("reviewPublishDate", new Date("2020-06-25T10:00Z").toISOString())
+      .field("reviewDueDate", new Date("2020-06-26T10:00Z").toISOString())
+      .field("reviewEvaluationDueDate", "null")
+      .field("description", "Example description")
+      .field("externalLink", "null");
+
+    expect(res2.status).not.toBe(HttpStatusCode.OK);
+  });
 });

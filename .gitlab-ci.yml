@@ -72,6 +72,18 @@ test:
   - merge_requests
   - pushes
 
+coverage:
+  stage: test
+  variables:
+    NODE_ENV: test
+  allow_failure: true
+  script:
+  - cd server && npm install
+  - npm run coverage
+  only:
+  - merge_requests
+  - pushes
+
 test_old:
   stage: test
   variables:
