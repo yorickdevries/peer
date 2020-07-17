@@ -34,7 +34,7 @@
                                         :class="{ 'mb-3': index !== enrollableAssignments.length - 1 }"
                                     >
                                         <b-card-body>
-                                            <h4>{{ assignment.title | truncate(100) }}</h4>
+                                            <h4>{{ assignment.name | truncate(100) }}</h4>
                                             <p>{{ assignment.description | truncate(100) }}</p>
                                             <b-button
                                                 variant="outline-primary"
@@ -67,14 +67,14 @@
                                         :class="{ 'mb-3': index !== activeAssignments.length - 1 }"
                                     >
                                         <b-card-body>
-                                            <h4>{{ assignment.title }}</h4>
+                                            <h4>{{ assignment.name }}</h4>
                                             <p>{{ assignment.description | truncate(100) }}</p>
                                             <b-button
                                                 variant="primary"
                                                 :to="{
                                                     name: 'student-dashboard.course.assignment',
                                                     params: {
-                                                        courseId: assignment.course_id,
+                                                        courseId: assignment.courseId,
                                                         assignmentId: assignment.id
                                                     }
                                                 }"
@@ -111,16 +111,16 @@
                                                 class="mb-2"
                                                 variant="danger"
                                                 >Review opens at:
-                                                {{ assignment.review_publish_date | formatDate }}</b-badge
+                                                {{ assignment.reviewPublishDate | formatDate }}</b-badge
                                             >
-                                            <h4>{{ assignment.title }}</h4>
+                                            <h4>{{ assignment.name }}</h4>
                                             <p>{{ assignment.description | truncate(100) }}</p>
                                             <b-button
                                                 variant="primary"
                                                 :to="{
                                                     name: 'student-dashboard.course.assignment',
                                                     params: {
-                                                        courseId: assignment.course_id,
+                                                        courseId: assignment.courseId,
                                                         assignmentId: assignment.id
                                                     }
                                                 }"
@@ -152,14 +152,14 @@
                                         :class="{ 'mb-3': index !== closedAssignments.length - 1 }"
                                     >
                                         <b-card-body>
-                                            <h4>{{ assignment.title | truncate(100) }}</h4>
+                                            <h4>{{ assignment.name | truncate(100) }}</h4>
                                             <p>{{ assignment.description | truncate(100) }}</p>
                                             <b-button
                                                 variant="primary"
                                                 :to="{
                                                     name: 'student-dashboard.course.assignment',
                                                     params: {
-                                                        courseId: assignment.course_id,
+                                                        courseId: assignment.courseId,
                                                         assignmentId: assignment.id
                                                     }
                                                 }"
@@ -198,18 +198,18 @@ export default {
         activeAssignments() {
             let now = new Date()
             return this.assignments.filter(
-                assignment => now > new Date(assignment.publish_date) && now < new Date(assignment.due_date)
+                assignment => now > new Date(assignment.publishDate) && now < new Date(assignment.dueDate)
             )
         },
         readyForSubmissionAssignments() {
             let now = new Date()
             return this.assignments.filter(
-                assignment => now > new Date(assignment.due_date) && now < new Date(assignment.review_due_date)
+                assignment => now > new Date(assignment.dueDate) && now < new Date(assignment.reviewDueDate)
             )
         },
         closedAssignments() {
             let now = new Date()
-            return this.assignments.filter(assignment => now > new Date(assignment.review_due_date))
+            return this.assignments.filter(assignment => now > new Date(assignment.reviewDueDate))
         }
     },
     async created() {
@@ -241,7 +241,7 @@ export default {
         },
         assignmentIsBetweenHandInDueAndReviewStart(assignment) {
             let now = new Date()
-            return now > new Date(assignment.due_date) && now < new Date(assignment.review_publish_date)
+            return now > new Date(assignment.dueDate) && now < new Date(assignment.reviewPublishDate)
         }
     }
 }
