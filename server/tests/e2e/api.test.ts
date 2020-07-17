@@ -50,4 +50,14 @@ describe("API", () => {
     expect(response.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(response.text)).toEqual({ authenticated: true });
   });
+
+  // Test whether userinfo is returned
+  test("Get /user info - netid", async () => {
+    const sessionCookie = await mockLoginCookie(server, "henkjan");
+    const res = await request(server)
+      .get("/api/me")
+      .set("cookie", sessionCookie);
+    expect(res.status).toBe(200);
+    expect(JSON.parse(res.text).netid).toBe("henkjan");
+  });
 });
