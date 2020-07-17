@@ -12,8 +12,8 @@ export default {
     getGroupAsStudent(assignmentId) {
         return client.get(`${assignmentId}/group`)
     },
-    getLatestSubmissionAsStudent(assignmentId) {
-        return client.get(`${assignmentId}/latestsubmission`)
+    getLatestSubmissionAsStudent(assignmentId, groupId) {
+        return client.get(`${assignmentId}/latestsubmission`, { params: { groupId: groupId } })
     },
     enrollInAssignment(assignmentId) {
         return client.post(`${assignmentId}/enroll`)

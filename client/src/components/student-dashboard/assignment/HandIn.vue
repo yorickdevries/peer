@@ -12,12 +12,14 @@
                             <dd></dd>
                             <dt>File</dt>
                             <dd>
-                                <a :href="submissionFilePath" target="_blank">{{ submission.file_path }}</a>
+                                <a :href="submissionFilePath" target="_blank">
+                                    {{ submission.file.name }}{{ submission.file.extension }}
+                                </a>
                             </dd>
                             <dt>Submitted by</dt>
-                            <dd>{{ submission.user_netid }}</dd>
+                            <dd>{{ submission.userNetid }}</dd>
                             <dt>Date</dt>
-                            <dd>{{ submission.date | formatDate }}</dd>
+                            <dd>{{ submission.updatedAt | formatDate }}</dd>
                         </dl>
                     </b-alert>
                     <b-alert v-else show variant="danger">You have not yet made a submission</b-alert>
@@ -39,7 +41,7 @@
                             accept=".pdf,.zip,.doc,.docx"
                             v-model="file"
                             :state="Boolean(file)"
-                            ref="fileInput"
+                            ref="file"
                         />
                         <b-button variant="primary" class="mt-3" @click="submitSubmission()">Upload</b-button>
                     </b-modal>
@@ -50,7 +52,7 @@
 </template>
 
 <script>
-import api from "../../../api/api_old"
+import api from "../../../api/api"
 import notifications from "../../../mixins/notifications"
 
 export default {
@@ -61,10 +63,13 @@ export default {
             fileProgress: 0,
             acceptFiles: ".pdf,.zip,.doc,.docx",
             submission: {
-                user_netid: null,
-                assignment_id: null,
-                file_path: null,
-                date: null
+                userNetid: null,
+                assignmentId: null,
+                file: {
+                    name: null,
+                    extension: null
+                },
+                updatedAt: null
             },
             assignment: {
                 title: null,
@@ -74,7 +79,8 @@ export default {
                 id: null,
                 course_id: null,
                 filename: ""
-            }
+            },
+            groupId: null
         }
     },
     computed: {
@@ -90,6 +96,7 @@ export default {
     async created() {
         // Fetch assignment & submission.
         await this.fetchAssignment()
+        await this.fetchGroupId()
         await this.fetchSubmission()
     },
     methods: {
@@ -97,7 +104,8 @@ export default {
             // Create the form data with the file.
             let formData = new FormData()
             formData.append("assignmentId", this.assignment.id)
-            formData.append("submissionFile", this.file)
+            formData.append("groupId", this.groupId)
+            formData.append("file", this.file)
 
             // Config set for the HTTP request & updating the progress field.
             let config = {
@@ -109,7 +117,7 @@ export default {
 
             // Perform upload.
             try {
-                await api.client.post("/submissions", formData, config)
+                await api.postSubmission(formData, config)
                 this.showSuccessMessage({ message: "Successfully submitted new submission." })
                 this.$refs.uploadModal.hide()
             } catch (e) {
@@ -128,14 +136,17 @@ export default {
             let res = await api.getAssignment(this.$route.params.assignmentId)
             this.assignment = res.data
         },
+        async fetchGroupId() {
+            let res = await api.getGroupAsStudent(this.assignment.id)
+            this.groupId = res.data.id
+        },
         async fetchSubmission() {
             // Fetch the submission.
-            let res = await api.getAssignmentLatestSubmission(this.assignment.id)
-
-            // If submission is not available, clear it.
-            if (!res.data.error) {
+            var res
+            try {
+                res = await api.getLatestSubmissionAsStudent(this.assignment.id, this.groupId)
                 this.submission = res.data
-            } else {
+            } catch (e) {
                 this.onSubmissionReset()
             }
         },
@@ -143,13 +154,16 @@ export default {
             // Reset the upload modal state.
             this.fileProgress = 0
             this.file = null
-            this.$refs.fileInput.reset()
+            this.$refs.file.reset()
         },
         onSubmissionReset() {
             this.submission = {
-                user_netid: null,
-                assignment_id: null,
-                file_path: null
+                userNetid: null,
+                assignmentId: null,
+                file: {
+                    name: null,
+                    extension: null
+                }
             }
         }
     }

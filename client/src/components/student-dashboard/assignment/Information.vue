@@ -50,8 +50,10 @@
                             <dt>Latest Submission</dt>
                             <dd>
                                 <div>Download the latest submission you have submitted here.</div>
-                                <template v-if="submission.file">
-                                    <a :href="submissionFilePath" target="_blank">{{ submission.file }}</a>
+                                <template v-if="submission.file.name">
+                                    <a :href="submissionFilePath" target="_blank">
+                                        {{ submission.file.name }}{{ submission.file.extension }}
+                                    </a>
                                 </template>
                                 <template v-else>
                                     <i>No submission done yet.</i>
@@ -81,7 +83,7 @@
                             <dt>
                                 <ul>
                                     <li v-for="member in groupInfo.users" :key="member.netid" class="font-weight-light">
-                                        {{ member.displayName }}
+                                        {{ member.netid }}
                                     </li>
                                 </ul>
                             </dt>
@@ -89,8 +91,10 @@
                             <dt>Latest Submission</dt>
                             <dd>
                                 <div>Download the latest submission you have submitted with the group here.</div>
-                                <template v-if="submission.file">
-                                    <a :href="submissionFilePath" target="_blank">{{ submission.file }}</a>
+                                <template v-if="submission.file.name">
+                                    <a :href="submissionFilePath" target="_blank">
+                                        {{ submission.file.name }}{{ submission.file.extension }}
+                                    </a>
                                 </template>
                                 <template v-else>
                                     <i>No submission done yet.</i>
@@ -128,9 +132,12 @@ export default {
                 users: []
             },
             submission: {
-                netid: null,
+                id: null,
                 assignmentId: null,
-                file: null
+                file: {
+                    name: null,
+                    extension: null
+                }
             }
         }
     },
@@ -146,8 +153,8 @@ export default {
     },
     async created() {
         await this.fetchAssignment()
-        await this.fetchSubmission()
         await this.fetchGroupInformation()
+        await this.fetchSubmission()
     },
     methods: {
         async fetchAssignment() {
@@ -163,7 +170,7 @@ export default {
         async fetchSubmission() {
             // Fetch the submission.
             try {
-                let res = await api.getLatestSubmissionAsStudent(this.assignment.id)
+                let res = await api.getLatestSubmissionAsStudent(this.assignment.id, this.groupInfo.id)
                 this.submission = res.data
             } catch (e) {
                 this.onSubmissionReset()
@@ -171,7 +178,6 @@ export default {
         },
         onSubmissionReset() {
             this.submission = {
-                userNetid: null,
                 assignmentId: null,
                 file: null
             }
