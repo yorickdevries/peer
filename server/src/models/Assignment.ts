@@ -247,6 +247,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getCourse(): Promise<Course> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Assignment.findOneOrFail(this.id, {
         relations: ["course"],
@@ -255,6 +256,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getGroups(): Promise<Group[]> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Assignment.findOneOrFail(this.id, {
         relations: ["groups"],
@@ -263,6 +265,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getSubmissionQuestionnaire(): Promise<SubmissionQuestionnaire | null> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Assignment.findOneOrFail(this.id, {
         relations: ["submissionQuestionnaire"],
@@ -271,6 +274,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getReviewQuestionnaire(): Promise<ReviewQuestionnaire | null> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Assignment.findOneOrFail(this.id, {
         relations: ["reviewQuestionnaire"],
@@ -282,6 +286,7 @@ export default class Assignment extends BaseModel {
     if (group) {
       return this.getSubmissionsOfGroup(group);
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return (
         await Assignment.findOneOrFail(this.id, {
           relations: ["submissions"],
