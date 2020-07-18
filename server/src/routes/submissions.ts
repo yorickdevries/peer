@@ -60,7 +60,7 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   res.send(sortedSubmissions);
 });
 
-// get all the submissions for an assignment
+// get all the latest submissions for an assignment
 // we should swicth to specific annotation of submissions which indicate whether they are the latest
 router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -113,7 +113,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   res.send(submission);
 });
 
-// get the submission
+// get the submission file
 router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;

@@ -19,7 +19,7 @@ import { addCopyOfQuestions } from "../util/copyReviewQuestions";
 
 const router = express.Router();
 
-// get the submissionquestionaire for an assignment
+// get the submissionquestionaire
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;

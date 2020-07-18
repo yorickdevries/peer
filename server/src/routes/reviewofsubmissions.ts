@@ -30,7 +30,7 @@ const assignmentSubmitIdSchema = Joi.object({
   assignmentId: Joi.number().integer().required(),
   submitted: Joi.boolean(),
 });
-// get all the groups for an assignment
+// get all the reviews for an assignment
 router.get("/", validateQuery(assignmentSubmitIdSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
@@ -73,7 +73,6 @@ const assignmentExportIdSchema = Joi.object({
   assignmentId: Joi.number().integer().required(),
   exportType: Joi.string().valid("csv", "xls"),
 });
-// get all the groups for an assignment
 router.get(
   "/exportgrades",
   validateQuery(assignmentExportIdSchema),
@@ -116,7 +115,6 @@ router.get(
   }
 );
 
-// get all the groups for an assignment
 router.get(
   "/exportreviews",
   validateQuery(assignmentExportIdSchema),
@@ -161,7 +159,6 @@ router.get(
 const assignmentIdSchema = Joi.object({
   assignmentId: Joi.number().integer().required(),
 });
-// get all the groups for an assignment
 router.patch(
   "/submitall",
   validateBody(assignmentIdSchema),
@@ -251,7 +248,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     .send("You are not allowed to view this review");
 });
 
-// get a review eitehr as teacher or student
+// get a review answers eitehr as teacher or student
 router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
@@ -288,7 +285,7 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
     .send("You are not allowed to view this review");
 });
 
-// get a review eitehr as teacher or student
+// get a review file either as teacher or student
 router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
@@ -414,7 +411,7 @@ router.patch(
   }
 );
 
-// make an evaluation as student
+// get an evaluation as student
 router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;

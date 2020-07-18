@@ -177,7 +177,7 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   res.send(enrollment);
 });
 
-// get your enrollment fr a course
+// get your enrollment for a course
 router.get("/:id/enrollment", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;

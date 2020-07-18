@@ -77,7 +77,7 @@ const questionPatchSchema = Joi.object({
   optional: Joi.boolean().required(),
   extensions: Joi.string().required(),
 });
-// post a question
+// patch a question
 router.patch(
   "/:id",
   validateParams(idSchema),
@@ -131,7 +131,7 @@ router.patch(
   }
 );
 
-// post a question
+// delete a question
 router.delete("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;

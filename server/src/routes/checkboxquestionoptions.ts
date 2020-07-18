@@ -20,7 +20,7 @@ const questionOptionSchema = Joi.object({
   text: Joi.string().required(),
   checkboxQuestionId: Joi.number().integer().required(),
 });
-// post a question
+// post a questionoption
 router.post("/", validateBody(questionOptionSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
@@ -66,7 +66,7 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
 const questionPatchSchema = Joi.object({
   text: Joi.string().required(),
 });
-// post a question
+// patch a questionoption
 router.patch(
   "/:id",
   validateParams(idSchema),

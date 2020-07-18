@@ -29,7 +29,7 @@ const querySchema = Joi.object({
   reviewId: Joi.number().integer().required(),
   questionId: Joi.number().integer().required(),
 });
-// get the feedback of a submission
+// get the file of an uplloadquestion
 router.get("/file", validateQuery(querySchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
@@ -190,7 +190,7 @@ router.post(
         await fsPromises.writeFile(filePath, req.file.buffer);
       }
     );
-    // relaod the answer
+    // reload the answer
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await uploadAnswer!.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

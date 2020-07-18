@@ -16,7 +16,7 @@ const queryCourseIdSchema = Joi.object({
   courseId: Joi.number().integer().required(),
   role: Joi.string().valid(...Object.values(UserRole)),
 });
-// get all all enrollments (for teacher) for specific course
+// get all enrollments (for teacher) for specific course
 router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;

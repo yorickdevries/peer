@@ -22,7 +22,7 @@ import Questionnaire from "../models/Questionnaire";
 
 const router = express.Router();
 
-// get the reviewquestionaire for an assignment
+// get the reviewquestionaire
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;

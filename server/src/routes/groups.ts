@@ -464,7 +464,7 @@ const copyFromAssignmentIdSchema = Joi.object({
   assignmentId: Joi.number().integer().required(),
   copyFromAssignmentId: Joi.number().integer().required(),
 });
-// import groups from a brightspace export
+// copy groups from another assignment
 router.post(
   "/copy",
   validateBody(copyFromAssignmentIdSchema),

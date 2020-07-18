@@ -71,7 +71,7 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
 const questionPatchSchema = Joi.object({
   text: Joi.string().required(),
 });
-// post a question
+// patch an option
 router.patch(
   "/:id",
   validateParams(idSchema),
