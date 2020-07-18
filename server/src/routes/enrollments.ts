@@ -18,6 +18,7 @@ const queryCourseIdSchema = Joi.object({
 });
 // get all all enrollments (for teacher) for specific course
 router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // this value has been parsed by the validate function
   const courseId = req.query.courseId as any;
@@ -50,6 +51,7 @@ const enrollmentSchema = Joi.object({
 });
 // create an enrollment for a course
 router.post("/", validateBody(enrollmentSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // this value has been parsed by the validate function
   const userNetid = req.body.userNetid as any;

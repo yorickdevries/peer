@@ -23,6 +23,7 @@ const multipleChoiceAnswerSchema = Joi.object({
 // post an multipleChoiceAnswer
 // overwrites existing if already exists
 router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const question = await MultipleChoiceQuestion.findOne(
     req.body.multipleChoiceQuestionId

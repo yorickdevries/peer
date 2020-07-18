@@ -35,6 +35,7 @@ const queryCourseIdSchema = Joi.object({
 });
 // get all all assignments (for teacher) for specific course
 router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // this value has been parsed by the validate function
   const courseId = req.query.courseId as any;
@@ -57,6 +58,7 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
 });
 
 router.get("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const assignment = await Assignment.findOne(req.params.id);
   if (!assignment) {
@@ -90,6 +92,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
 
 // get an assignment file by assignment id
 router.get("/:id/file", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const assignment = await Assignment.findOne(req.params.id);
   if (!assignment) {
@@ -133,6 +136,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
 
 // get the group by assignment id
 router.get("/:id/group", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const assignment = await Assignment.findOne(req.params.id);
   if (!assignment) {
@@ -165,6 +169,7 @@ router.get(
   validateParams(idSchema),
   validateQuery(querySubmissionSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const assignmentId = req.params.id;
     const groupId = req.query.groupId as any;
@@ -199,6 +204,7 @@ router.get(
   validateParams(idSchema),
   validateQuery(querySubmissionSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const assignmentId = req.params.id;
     const groupId = req.query.groupId as any;
@@ -252,6 +258,7 @@ router.post(
   upload(allowedExtensions, maxFileSize, "file"),
   validateBody(assignmentSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const course = await Course.findOne(req.body.courseId);
     if (!course) {
@@ -339,6 +346,7 @@ router.patch(
   validateParams(idSchema),
   validateBody(assignmentPatchSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const assignmentId = req.params.id;
     const assignment = await Assignment.findOne(assignmentId);
@@ -423,6 +431,7 @@ router.patch(
 );
 
 router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const assignment = await Assignment.findOne(req.params.id);
   if (!assignment) {

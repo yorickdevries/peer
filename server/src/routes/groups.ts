@@ -31,6 +31,7 @@ const assignmentIdSchema = Joi.object({
 });
 // get all the groups for an assignment
 router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const assignmentId = req.query.assignmentId as any;
   const assignment = await Assignment.findOne(assignmentId);
@@ -55,6 +56,7 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
 });
 
 router.get("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const group = await Group.findOne(req.params.id);
   if (!group) {
@@ -73,6 +75,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
 });
 
 router.delete("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const group = await Group.findOne(req.params.id);
   if (!group) {
@@ -117,6 +120,7 @@ router.patch(
   validateParams(idSchema),
   validateBody(userSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const group = await Group.findOne(req.params.id);
     if (!group) {
@@ -196,6 +200,7 @@ router.patch(
   validateParams(idSchema),
   validateBody(userSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const group = await Group.findOne(req.params.id);
     if (!group) {
@@ -255,6 +260,7 @@ router.post(
   upload([".csv"], maxFileSize, "file"),
   validateBody(assignmentIdSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     if (!req.file) {
       res
@@ -409,6 +415,7 @@ const groupSchema = Joi.object({
 });
 // create a group for this assignment
 router.post("/", validateBody(groupSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const assignment = await Assignment.findOne(req.body.assignmentId);
   if (!assignment) {
@@ -453,6 +460,7 @@ router.post(
   "/copy",
   validateBody(copyFromAssignmentIdSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const assignment = await Assignment.findOne(req.body.assignmentId);
     const copyFromAssignment = await Assignment.findOne(

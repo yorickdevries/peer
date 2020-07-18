@@ -15,6 +15,7 @@ const router = express.Router();
 
 // get a review eitehr as teacher or student
 router.get("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const reviewOfReview = await ReviewOfReview.findOne(req.params.id);
   if (!reviewOfReview) {
@@ -39,6 +40,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
 
 // get a review eitehr as teacher or student
 router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const reviewOfReview = await ReviewOfReview.findOne(req.params.id);
   if (!reviewOfReview) {
@@ -73,6 +75,7 @@ router.patch(
   validateParams(idSchema),
   validateBody(reviewSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const review = await ReviewOfReview.findOne(req.params.id);
     if (!review) {

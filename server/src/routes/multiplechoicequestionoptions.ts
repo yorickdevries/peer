@@ -22,6 +22,7 @@ const questionOptionSchema = Joi.object({
 });
 // post a question
 router.post("/", validateBody(questionOptionSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const question = await MultipleChoiceQuestion.findOne(
     req.body.multipleChoiceQuestionId
@@ -76,6 +77,7 @@ router.patch(
   validateParams(idSchema),
   validateBody(questionPatchSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const questionOptionId = req.params.id as any;
     const questionOption = await MultipleChoiceQuestionOption.findOne(
@@ -121,6 +123,7 @@ router.patch(
 );
 
 router.delete("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const questionOptionId = req.params.id as any;
   const questionOption = await MultipleChoiceQuestionOption.findOne(

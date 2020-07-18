@@ -32,6 +32,7 @@ const assignmentSubmitIdSchema = Joi.object({
 });
 // get all the groups for an assignment
 router.get("/", validateQuery(assignmentSubmitIdSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const assignmentId = req.query.assignmentId as any;
   const assignment = await Assignment.findOne(assignmentId);
@@ -73,6 +74,7 @@ router.get(
   "/exportgrades",
   validateQuery(assignmentExportIdSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const assignmentId = req.query.assignmentId as any;
     const exportType = req.query.exportType as any;
@@ -112,6 +114,7 @@ router.get(
   "/exportreviews",
   validateQuery(assignmentExportIdSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const assignmentId = req.query.assignmentId as any;
     const exportType = req.query.exportType as any;
@@ -153,6 +156,7 @@ router.patch(
   "/submitall",
   validateBody(assignmentIdSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const assignmentId = req.query.assignmentId as any;
     const assignment = await Assignment.findOne(assignmentId);
@@ -201,6 +205,7 @@ router.patch(
 
 // get a review eitehr as teacher or student
 router.get("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const review = await ReviewOfSubmission.findOne(req.params.id);
   if (!review) {
@@ -236,6 +241,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
 
 // get a review eitehr as teacher or student
 router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const review = await ReviewOfSubmission.findOne(req.params.id);
   if (!review) {
@@ -272,6 +278,7 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
 
 // get a review eitehr as teacher or student
 router.get("/:id/file", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const review = await ReviewOfSubmission.findOne(req.params.id);
   if (!review) {
@@ -315,6 +322,7 @@ router.patch(
   validateParams(idSchema),
   validateBody(reviewSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const review = await ReviewOfSubmission.findOne(req.params.id);
     if (!review) {
@@ -357,6 +365,7 @@ router.patch(
   validateParams(idSchema),
   validateBody(reviewApprovalSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const review = await ReviewOfSubmission.findOne(req.params.id);
     if (!review) {
@@ -394,6 +403,7 @@ router.patch(
 
 // make an evaluation as student
 router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const review = await ReviewOfSubmission.findOne(req.params.id);
   if (!review) {
@@ -429,6 +439,7 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
 
 // make an evaluation as student
 router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const review = await ReviewOfSubmission.findOne(req.params.id);
   if (!review) {
@@ -499,6 +510,7 @@ router.post(
   "/distribute",
   validateQuery(assignmentIdSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const assignmentId = req.query.assignmentId as any;
     const assignment = await Assignment.findOne(assignmentId);

@@ -31,6 +31,7 @@ const querySchema = Joi.object({
 });
 // get the feedback of a submission
 router.get("/file", validateQuery(querySchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const uploadQuestionAnswer = await UploadQuestionAnswer.findOne({
     where: req.query,
@@ -76,6 +77,7 @@ router.post(
   upload(allowedExtensions, maxFileSize, "file"),
   validateBody(uploadAnswerSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     if (!req.file) {
       res

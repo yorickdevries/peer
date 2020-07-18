@@ -25,6 +25,7 @@ const questionSchema = Joi.object({
 });
 // post a question
 router.post("/", validateBody(questionSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const questionnaire = await Questionnaire.findOne(req.body.questionnaireId);
   if (!questionnaire) {
@@ -82,6 +83,7 @@ router.patch(
   validateParams(idSchema),
   validateBody(questionPatchSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const questionId = req.params.id as any;
     const question = await UploadQuestion.findOne(questionId);
@@ -129,6 +131,7 @@ router.patch(
 
 // post a question
 router.delete("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const questionId = req.params.id as any;
   const question = await UploadQuestion.findOne(questionId);

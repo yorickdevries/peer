@@ -22,6 +22,7 @@ const questionOptionSchema = Joi.object({
 });
 // post a question
 router.post("/", validateBody(questionOptionSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const question = await CheckboxQuestion.findOne(req.body.checkboxQuestionId);
   if (!question) {
@@ -71,6 +72,7 @@ router.patch(
   validateParams(idSchema),
   validateBody(questionPatchSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const questionOptionId = req.params.id as any;
     const questionOption = await CheckboxQuestionOption.findOne(
@@ -116,6 +118,7 @@ router.patch(
 );
 
 router.delete("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const questionOptionId = req.params.id as any;
   const questionOption = await CheckboxQuestionOption.findOne(questionOptionId);

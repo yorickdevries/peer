@@ -20,6 +20,7 @@ const router = express.Router();
 
 // get all enrollable courses where the student isnt in enrolled yet
 router.get("/enrollable", async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const courses = await Course.getEnrollable(user);
   const sortedCourses = _.sortBy(courses, "id");
@@ -28,6 +29,7 @@ router.get("/enrollable", async (req, res) => {
 
 // get a course
 router.get("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const courseId = req.params.id as any;
   const course = await Course.findOne(courseId);
@@ -60,6 +62,7 @@ router.post(
   checkEmployee,
   validateBody(courseSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     // find the faculty and academic year in the database
     const faculty = await Faculty.findOne(req.body.facultyName);
@@ -109,6 +112,7 @@ router.patch(
   validateParams(idSchema),
   validateBody(courseSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const courseId = req.params.id as any;
     const course = await Course.findOne(courseId);
@@ -150,6 +154,7 @@ router.patch(
 
 // post an enrollment (enroll in a course)
 router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const courseId = req.params.id;
   const course = await Course.findOne(courseId);
@@ -170,6 +175,7 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
 
 // get your enrollment fr a course
 router.get("/:id/enrollment", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const courseId = req.params.id;
   const course = await Course.findOne(courseId);
@@ -194,6 +200,7 @@ router.get(
   "/:id/enrollableassignments",
   validateParams(idSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const course = await Course.findOne(req.params.courseId);
     if (!course) {
@@ -219,6 +226,7 @@ router.get(
   "/:id/enrolledassignments",
   validateParams(idSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const course = await Course.findOne(req.params.courseId);
     if (!course) {

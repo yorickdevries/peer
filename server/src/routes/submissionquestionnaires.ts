@@ -21,6 +21,7 @@ const router = express.Router();
 
 // get the submissionquestionaire for an assignment
 router.get("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // also loads the questions
   const questionnaire = await SubmissionQuestionnaire.findOne(req.params.id);
@@ -66,6 +67,7 @@ const questionnaireSchema = Joi.object({
 });
 // post a questionnaire in an assignment
 router.post("/", validateBody(questionnaireSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const assignment = await Assignment.findOne(req.body.assignmentId);
   if (!assignment) {
@@ -125,6 +127,7 @@ router.patch(
   validateParams(idSchema),
   validateBody(copyFromQuestionnaireIdSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const questionnaireId = req.params.id;
     const questionnaire = await SubmissionQuestionnaire.findOne(
@@ -170,6 +173,7 @@ router.patch(
 
 // get the reviews a user needs to make by questionnaire id
 router.get("/:id/reviews", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // also loads the questions
   const questionnaire = await SubmissionQuestionnaire.findOne(req.params.id);
