@@ -34,9 +34,6 @@ export default abstract class Questionnaire extends BaseModel {
   @OneToMany((_type) => Review, (review) => review.questionnaire)
   reviews?: Review[];
 
-  // commented out as 2 different implementations will break typeORM
-  // abstract assignment?: Assignment;
-
   constructor() {
     super();
   }
@@ -44,6 +41,7 @@ export default abstract class Questionnaire extends BaseModel {
   abstract getAssignment(): Promise<Assignment>;
 
   async getReviews(submitted?: boolean): Promise<Review[]> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const allReviews = (
       await Questionnaire.findOneOrFail(this.id, {
         relations: ["reviews"],
