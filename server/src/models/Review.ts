@@ -190,7 +190,9 @@ export default abstract class Review extends BaseModel {
   }
 
   async canBeSubmitted(): Promise<boolean> {
-    const questionnaire = await this.getQuestionnaire();
+    const questionnaire = this.questionnaire
+      ? this.questionnaire
+      : await this.getQuestionnaire();
     // check whether the review is allowed to be submitted
     if (!this.flaggedByReviewer) {
       for (const question of questionnaire.questions) {
