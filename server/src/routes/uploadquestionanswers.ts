@@ -29,8 +29,9 @@ const querySchema = Joi.object({
   reviewId: Joi.number().integer().required(),
   questionId: Joi.number().integer().required(),
 });
-// get the feedback of a submission
+// get the file of an uplloadquestion
 router.get("/file", validateQuery(querySchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const uploadQuestionAnswer = await UploadQuestionAnswer.findOne({
     where: req.query,
@@ -76,6 +77,7 @@ router.post(
   upload(allowedExtensions, maxFileSize, "file"),
   validateBody(uploadAnswerSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     if (!req.file) {
       res
@@ -184,13 +186,15 @@ router.post(
 
         // save the file to disk lastly (overwites exisitng if present)
         // (if this goes wrong all previous steps are rolled back)
-        const filePath = path.resolve(uploadFolder, file.id!.toString());
+        const filePath = path.resolve(uploadFolder, file.id.toString());
         await fsPromises.writeFile(filePath, req.file.buffer);
       }
     );
-    // relaod the answer
+    // reload the answer
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await uploadAnswer!.reload();
-    res.send(uploadAnswer);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    res.send(uploadAnswer!);
   }
 );
 

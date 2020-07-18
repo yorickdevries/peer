@@ -16,7 +16,6 @@ const exportJSONToFile = function (
     res.send("Nothing to export.");
     return;
   }
-  // based on the exporttype, choose the right function
   const result = exportFromJSON({
     data,
     fileName,

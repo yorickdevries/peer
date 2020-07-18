@@ -1,9 +1,8 @@
 import Review from "../models/Review";
-import _ from "lodash";
 
 interface gradeSummary {
   netid: string;
-  studentnumber: number;
+  studentnumber: number | null;
   approved: number;
   disapproved: number;
   waitingForApproval: number;
@@ -19,7 +18,7 @@ const makeGradeSummaries = function (reviews: Review[]): gradeSummary[] {
     if (!userGradeSummary) {
       userGradeSummary = {
         netid: reviewer.netid,
-        studentnumber: reviewer.studentNumber!,
+        studentnumber: reviewer.studentNumber,
         approved: 0,
         disapproved: 0,
         waitingForApproval: 0,

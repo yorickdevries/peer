@@ -22,6 +22,7 @@ const rangeAnswerSchema = Joi.object({
 // post an rangeAnswer
 // overwrites existing if already exists
 router.post("/", validateBody(rangeAnswerSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const question = await RangeQuestion.findOne(req.body.rangeQuestionId);
   if (!question) {

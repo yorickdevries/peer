@@ -35,6 +35,7 @@ app.get("/*", (_req, res) => {
 });
 
 // Error handler
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: Error, _req: Request, res: Response, _next: NextFunction) => {
   // Print error to the stderr
   const errorString = String(error);

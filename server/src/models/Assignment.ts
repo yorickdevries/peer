@@ -106,6 +106,7 @@ export default class Assignment extends BaseModel {
   description: string | null;
 
   // filename varchar(500),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToOne((_type) => File, { eager: true })
   @JoinColumn()
   file: File | null;
@@ -113,6 +114,7 @@ export default class Assignment extends BaseModel {
   // submission questionaire
   @RelationId((assignment: Assignment) => assignment.submissionQuestionnaire)
   submissionQuestionnaireId?: number; // this is undefined when questionnaire is null
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToOne((_type) => SubmissionQuestionnaire)
   @JoinColumn()
   submissionQuestionnaire?: SubmissionQuestionnaire | null;
@@ -120,6 +122,7 @@ export default class Assignment extends BaseModel {
   // review questionaire (for review evaluation)
   @RelationId((assignment: Assignment) => assignment.reviewQuestionnaire)
   reviewQuestionnaireId?: number; // this is undefined when questionnaire is null
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToOne((_type) => ReviewQuestionnaire)
   @JoinColumn()
   reviewQuestionnaire?: ReviewQuestionnaire | null;
@@ -135,15 +138,18 @@ export default class Assignment extends BaseModel {
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
   // course_id int NOT NULL, FK
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => Course, (course) => course.assignments, {
     nullable: false,
   })
   course?: Course;
 
   // Assignment groups
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToMany((_type) => Group, (group) => group.assignments)
   groups?: Group[];
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => Submission, (submission) => submission.assignment)
   submissions?: Submission[];
 
@@ -247,6 +253,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getCourse(): Promise<Course> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Assignment.findOneOrFail(this.id, {
         relations: ["course"],
@@ -255,6 +262,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getGroups(): Promise<Group[]> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Assignment.findOneOrFail(this.id, {
         relations: ["groups"],
@@ -263,6 +271,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getSubmissionQuestionnaire(): Promise<SubmissionQuestionnaire | null> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Assignment.findOneOrFail(this.id, {
         relations: ["submissionQuestionnaire"],
@@ -271,6 +280,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getReviewQuestionnaire(): Promise<ReviewQuestionnaire | null> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Assignment.findOneOrFail(this.id, {
         relations: ["reviewQuestionnaire"],
@@ -282,6 +292,7 @@ export default class Assignment extends BaseModel {
     if (group) {
       return this.getSubmissionsOfGroup(group);
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return (
         await Assignment.findOneOrFail(this.id, {
           relations: ["submissions"],
@@ -294,8 +305,7 @@ export default class Assignment extends BaseModel {
     const latestSubmissionsOfEachGroup: Submission[] = [];
     const groups = await this.getGroups();
     for (const group of groups) {
-      const submissions = await this.getSubmissions(group);
-      const latestSubmission = _.maxBy(submissions, "id");
+      const latestSubmission = await this.getLatestSubmission(group);
       if (latestSubmission) {
         latestSubmissionsOfEachGroup.push(latestSubmission);
       }
@@ -310,15 +320,12 @@ export default class Assignment extends BaseModel {
   }
 
   private async getSubmissionsOfGroup(group: Group): Promise<Submission[]> {
-    const allSubmissions = await this.getSubmissions();
-    const submissionsOfGroup = [];
-    for (const submission of allSubmissions) {
-      const submissionGroup = await submission.getGroup();
-      if (submissionGroup.id === group.id) {
-        submissionsOfGroup.push(submission);
-      }
-    }
-    return submissionsOfGroup;
+    return Submission.find({
+      where: {
+        assignment: this,
+        group: group,
+      },
+    });
   }
 
   async getGroup(user: User): Promise<Group | undefined> {
@@ -331,13 +338,13 @@ export default class Assignment extends BaseModel {
     return undefined;
   }
 
-  // check whether the assgnment is enrollable for a user
+  // check whether the assignment is enrollable for a user
   async isEnrollable(user: User): Promise<boolean> {
     // Check whether the user is in the course and not already enrolled
     // plus check whether the assignment is public/enrollable
     if (this.enrollable) {
       // published
-      if (this.getState() === AssignmentState.SUBMISSION) {
+      if (this.isAtState(AssignmentState.SUBMISSION)) {
         const course = await this.getCourse();
         if (await course.isEnrolled(user, UserRole.STUDENT)) {
           // not already enrolled in assignment
@@ -350,6 +357,7 @@ export default class Assignment extends BaseModel {
     return false;
   }
 
+  // check whether the assignment contains groups
   async hasGroups(): Promise<boolean> {
     return (await this.getGroups()).length > 0;
   }
@@ -361,6 +369,6 @@ export default class Assignment extends BaseModel {
 
   async isTeacherInCourse(user: User): Promise<boolean> {
     const course = await this.getCourse();
-    return await course.isEnrolled(user, UserRole.TEACHER);
+    return await course.isTeacher(user);
   }
 }

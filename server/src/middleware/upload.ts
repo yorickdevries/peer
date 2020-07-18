@@ -40,6 +40,7 @@ export default function upload(
 
   // Middleware which parses and validates the uploaded file
   function upload(req: Request, res: Response, next: NextFunction) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     uploader(req, res, (error: any) => {
       // Send error in case of too large file size
       if (error) {

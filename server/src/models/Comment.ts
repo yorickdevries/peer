@@ -16,6 +16,7 @@ export default abstract class Comment extends BaseModel {
   text: string;
 
   // netid varchar(500) NOT NULL,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, {
     nullable: false,
   })

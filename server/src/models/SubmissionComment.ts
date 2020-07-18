@@ -5,6 +5,7 @@ import Comment from "./Comment";
 
 @Entity()
 export default class SubmissionComment extends Comment {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => Submission, {
     nullable: false,
   })

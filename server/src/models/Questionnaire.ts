@@ -25,17 +25,16 @@ export default abstract class Questionnaire extends BaseModel {
   // will be filled in by typeorm with the QuestionnaireType
   type!: QuestionnaireType;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => Question, (question) => question.questionnaire, {
     eager: true,
   })
   // all questions (might want to split this later)
   questions!: Question[];
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => Review, (review) => review.questionnaire)
   reviews?: Review[];
-
-  // commented out as 2 different implementations will break typeORM
-  // abstract assignment?: Assignment;
 
   constructor() {
     super();
@@ -44,6 +43,7 @@ export default abstract class Questionnaire extends BaseModel {
   abstract getAssignment(): Promise<Assignment>;
 
   async getReviews(submitted?: boolean): Promise<Review[]> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const allReviews = (
       await Questionnaire.findOneOrFail(this.id, {
         relations: ["reviews"],

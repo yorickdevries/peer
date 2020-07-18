@@ -11,7 +11,7 @@ export default class UploadQuestion extends Question {
   @IsString()
   @IsNotEmpty()
   // can be in the form: ".pdf,.zip,.doc,.docx"
-  // needs later to be revides to a list of strings
+  // needs later to be revised to a list of strings
   extensions: string;
 
   constructor(

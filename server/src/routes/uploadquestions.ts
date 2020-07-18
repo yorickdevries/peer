@@ -25,6 +25,7 @@ const questionSchema = Joi.object({
 });
 // post a question
 router.post("/", validateBody(questionSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const questionnaire = await Questionnaire.findOne(req.body.questionnaireId);
   if (!questionnaire) {
@@ -76,14 +77,17 @@ const questionPatchSchema = Joi.object({
   optional: Joi.boolean().required(),
   extensions: Joi.string().required(),
 });
-// post a question
+// patch a question
 router.patch(
   "/:id",
   validateParams(idSchema),
   validateBody(questionPatchSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const questionId = req.params.id as any;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const questionId: number = req.params.id as any;
     const question = await UploadQuestion.findOne(questionId);
     if (!question) {
       res
@@ -127,10 +131,13 @@ router.patch(
   }
 );
 
-// post a question
+// delete a question
 router.delete("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const questionId = req.params.id as any;
+  // this value has been parsed by the validate function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const questionId: number = req.params.id as any;
   const question = await UploadQuestion.findOne(questionId);
   if (!question) {
     res

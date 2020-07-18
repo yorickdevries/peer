@@ -10,12 +10,14 @@ export default class Enrollment extends BaseModel {
   @PrimaryColumn()
   @RelationId((enrollment: Enrollment) => enrollment.user)
   userNetid!: string;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, { nullable: false })
   user?: User;
 
   @PrimaryColumn()
   @RelationId((enrollment: Enrollment) => enrollment.course)
   courseId!: number;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => Course, { nullable: false })
   course?: Course;
 
