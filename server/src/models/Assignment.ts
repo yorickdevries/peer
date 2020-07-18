@@ -332,13 +332,13 @@ export default class Assignment extends BaseModel {
     return undefined;
   }
 
-  // check whether the assgnment is enrollable for a user
+  // check whether the assignment is enrollable for a user
   async isEnrollable(user: User): Promise<boolean> {
     // Check whether the user is in the course and not already enrolled
     // plus check whether the assignment is public/enrollable
     if (this.enrollable) {
       // published
-      if (this.getState() === AssignmentState.SUBMISSION) {
+      if (this.isAtState(AssignmentState.SUBMISSION)) {
         const course = await this.getCourse();
         if (await course.isEnrolled(user, UserRole.STUDENT)) {
           // not already enrolled in assignment
@@ -351,6 +351,7 @@ export default class Assignment extends BaseModel {
     return false;
   }
 
+  // check whether the assignment contains groups
   async hasGroups(): Promise<boolean> {
     return (await this.getGroups()).length > 0;
   }
@@ -362,6 +363,6 @@ export default class Assignment extends BaseModel {
 
   async isTeacherInCourse(user: User): Promise<boolean> {
     const course = await this.getCourse();
-    return await course.isEnrolled(user, UserRole.TEACHER);
+    return await course.isTeacher(user);
   }
 }
