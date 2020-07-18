@@ -299,8 +299,7 @@ export default class Assignment extends BaseModel {
     const latestSubmissionsOfEachGroup: Submission[] = [];
     const groups = await this.getGroups();
     for (const group of groups) {
-      const submissions = await this.getSubmissions(group);
-      const latestSubmission = _.maxBy(submissions, "id");
+      const latestSubmission = await this.getLatestSubmission(group);
       if (latestSubmission) {
         latestSubmissionsOfEachGroup.push(latestSubmission);
       }
