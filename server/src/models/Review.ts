@@ -114,7 +114,7 @@ export default abstract class Review extends BaseModel {
 
   // ta_netid varchar(500),
   @ManyToOne((_type) => User, { eager: true })
-  approvingTA?: User | null;
+  approvingTA: User | null;
 
   // cannot be eager as this casues 'ER_BAD_NULL_ERROR's
   @OneToMany(
@@ -152,12 +152,14 @@ export default abstract class Review extends BaseModel {
 
   // custom validation which is run before saving
   async validateOrReject(): Promise<void> {
-    const questionnaire = await this.getQuestionnaire();
+    const questionnaire = this.questionnaire
+      ? this.questionnaire
+      : await this.getQuestionnaire();
     const assignment = await questionnaire.getAssignment();
     const course = await assignment.getCourse();
-    if (!(await course.isEnrolled(this.reviewer!, UserRole.STUDENT))) {
+    if (!(await course.isEnrolled(this.reviewer, UserRole.STUDENT))) {
       throw new Error(
-        `${this.reviewer!.netid} should be enrolled in the course`
+        `${this.reviewer.netid} should be enrolled in the course`
       );
     }
     if (this.approvingTA && this.approvalByTA === null) {
@@ -179,7 +181,7 @@ export default abstract class Review extends BaseModel {
         );
       }
     }
-    // check whether the review is allows to be submitted
+    // check whether the review is allowed to be submitted
     if (this.submitted && !(await this.canBeSubmitted())) {
       throw new Error("A non-optional question isn't answered yet.");
     }
@@ -203,18 +205,16 @@ export default abstract class Review extends BaseModel {
   }
 
   async getQuestionnaire(): Promise<Questionnaire> {
-    if (this.questionnaire) {
-      return this.questionnaire;
-    } else {
-      return (
-        await Review.findOneOrFail(this.id, {
-          relations: ["questionnaire"],
-        })
-      ).questionnaire!;
-    }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return (
+      await Review.findOneOrFail(this.id, {
+        relations: ["questionnaire"],
+      })
+    ).questionnaire!;
   }
 
   async getQuestionAnswers(): Promise<QuestionAnswer[]> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Review.findOneOrFail(this.id, {
         relations: ["questionAnswers"],
@@ -243,7 +243,7 @@ export default abstract class Review extends BaseModel {
     };
   }
 
-  getAnonymousVersionWithReviewer(): AnonymousReviewWithReviewer {
+  getAnonymousVersionWithReviewerNetid(): AnonymousReviewWithReviewer {
     return {
       id: this.id,
       flaggedByReviewer: this.flaggedByReviewer,

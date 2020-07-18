@@ -423,7 +423,7 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
     return;
   }
   // otherwise the review can be sent
-  const anonymousReview = reviewEvaluation.getAnonymousVersionWithReviewer();
+  const anonymousReview = reviewEvaluation.getAnonymousVersionWithReviewerNetid();
   res.send(anonymousReview);
 });
 
@@ -490,7 +490,7 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
     }
   );
   await reviewEvaluation!.reload();
-  const anonymousReview = reviewEvaluation!.getAnonymousVersionWithReviewer();
+  const anonymousReview = reviewEvaluation!.getAnonymousVersionWithReviewerNetid();
   res.send(anonymousReview);
 });
 
