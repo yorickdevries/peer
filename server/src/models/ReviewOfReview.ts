@@ -59,6 +59,7 @@ export default class ReviewOfReview extends Review {
   }
 
   async getReviewOfSubmission(): Promise<ReviewOfSubmission> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await ReviewOfReview.findOneOrFail(this.id, {
         relations: ["reviewOfSubmission"],
@@ -68,7 +69,6 @@ export default class ReviewOfReview extends Review {
 
   // checks whether the user is reviewed
   async isReviewed(user: User): Promise<boolean> {
-    const reviewOfSubmission = this.reviewOfSubmission!;
-    return reviewOfSubmission.reviewer.netid === user.netid;
+    return this.reviewOfSubmission!.reviewer.netid === user.netid;
   }
 }

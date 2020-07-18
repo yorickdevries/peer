@@ -59,14 +59,12 @@ export default class ReviewOfSubmission extends Review {
     return super.validateOrReject();
   }
 
-  // checks whether the user is the reviewer
+  // checks whether the user is reviewed
   async isReviewed(user: User): Promise<boolean> {
-    const submission = this.submission!;
-    const group = await submission.getGroup();
+    const group = await this.submission!.getGroup();
     return await group.hasUser(user);
   }
 
-  // checks whether the user is the reviewer
   async getReviewOfThisReview(): Promise<ReviewOfReview | undefined> {
     const reviewOfReview = await ReviewOfReview.findOne({
       where: {
