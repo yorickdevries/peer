@@ -20,6 +20,7 @@ export default class MultipleChoiceQuestionOption extends QuestionOption {
   }
 
   async getQuestion(): Promise<MultipleChoiceQuestion> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await MultipleChoiceQuestionOption.findOneOrFail(this.id, {
         relations: ["question"],

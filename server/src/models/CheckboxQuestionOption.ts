@@ -16,6 +16,7 @@ export default class CheckboxQuestionOption extends QuestionOption {
   }
 
   async getQuestion(): Promise<CheckboxQuestion> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await CheckboxQuestionOption.findOneOrFail(this.id, {
         relations: ["question"],
