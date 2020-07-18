@@ -38,7 +38,8 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // this value has been parsed by the validate function
-  const courseId = req.query.courseId as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const courseId: number = req.query.courseId as any;
   const course = await Course.findOne(courseId);
   if (!course) {
     res
@@ -155,6 +156,7 @@ router.get("/:id/group", validateParams(idSchema), async (req, res) => {
   const users = _.map(groupUsers, (user) => {
     return _.pick(user, ["netid", "displayName", "email"]);
   });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   group.users = users as any;
   res.send(group);
 });
@@ -172,7 +174,9 @@ router.get(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const assignmentId = req.params.id;
-    const groupId = req.query.groupId as any;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const groupId: number = req.query.groupId as any;
     const assignment = await Assignment.findOne(assignmentId);
     if (!assignment) {
       res
@@ -197,7 +201,7 @@ router.get(
   }
 );
 
-// get the submissions of a group
+// get the latest submission of a group
 // we should swicth to specific annotation of submissions which indicate whether they are the latest
 router.get(
   "/:id/latestsubmission",
@@ -207,7 +211,9 @@ router.get(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const assignmentId = req.params.id;
-    const groupId = req.query.groupId as any;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const groupId: number = req.query.groupId as any;
     const assignment = await Assignment.findOne(assignmentId);
     if (!assignment) {
       res
@@ -319,7 +325,9 @@ router.post(
     );
     // reload assignment to get all data
     // assignment should be defined now (else we would be in the catch)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await assignment!.reload();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(assignment!);
   }
 );
@@ -425,7 +433,9 @@ router.patch(
     );
     // reload assignment to get all data
     // assignment should be defined now (else we would be in the catch)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await assignment!.reload();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(assignment!);
   }
 );
