@@ -314,15 +314,12 @@ export default class Assignment extends BaseModel {
   }
 
   private async getSubmissionsOfGroup(group: Group): Promise<Submission[]> {
-    const allSubmissions = await this.getSubmissions();
-    const submissionsOfGroup = [];
-    for (const submission of allSubmissions) {
-      const submissionGroup = await submission.getGroup();
-      if (submissionGroup.id === group.id) {
-        submissionsOfGroup.push(submission);
-      }
-    }
-    return submissionsOfGroup;
+    return Submission.find({
+      where: {
+        assignment: this,
+        group: group,
+      },
+    });
   }
 
   async getGroup(user: User): Promise<Group | undefined> {
