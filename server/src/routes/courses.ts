@@ -31,7 +31,9 @@ router.get("/enrollable", async (req, res) => {
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const courseId = req.params.id as any;
+  // this value has been parsed by the validate function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const courseId: number = req.params.id as any;
   const course = await Course.findOne(courseId);
   if (!course) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
@@ -114,7 +116,9 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const courseId = req.params.id as any;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const courseId: number = req.params.id as any;
     const course = await Course.findOne(courseId);
     if (!course) {
       res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);

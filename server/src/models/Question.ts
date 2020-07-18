@@ -51,6 +51,7 @@ export default abstract class Question extends BaseModel {
 
   // Rubric_id int NOT NULL,
   @ManyToOne(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => Questionnaire,
     (questionnaire) => questionnaire.questions,
     {

@@ -21,7 +21,8 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // this value has been parsed by the validate function
-  const courseId = req.query.courseId as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const courseId: number = req.query.courseId as any;
   const course = await Course.findOne(courseId);
   if (!course) {
     res
@@ -54,9 +55,12 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // this value has been parsed by the validate function
-  const userNetid = req.body.userNetid as any;
-  const role = req.body.role as any;
-  const courseId = req.body.courseId as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userNetid: string = req.body.userNetid as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const role: UserRole = req.body.role as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const courseId: number = req.body.courseId as any;
   const course = await Course.findOne(courseId);
   if (!course) {
     res
@@ -95,14 +99,18 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
       await transactionalEntityManager.save(enrollment);
     }
   );
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   await enrollment!.reload();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   res.send(enrollment!);
 });
 
 // get all the enrollments of the current user
 router.get("/enrolled", async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
   const enrollments = await Enrollment.find({
-    where: { userNetid: req.user!.netid },
+    where: { userNetid: user.netid },
     relations: ["course"],
     order: { courseId: "ASC" },
   });

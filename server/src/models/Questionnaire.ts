@@ -25,12 +25,14 @@ export default abstract class Questionnaire extends BaseModel {
   // will be filled in by typeorm with the QuestionnaireType
   type!: QuestionnaireType;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => Question, (question) => question.questionnaire, {
     eager: true,
   })
   // all questions (might want to split this later)
   questions!: Question[];
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => Review, (review) => review.questionnaire)
   reviews?: Review[];
 

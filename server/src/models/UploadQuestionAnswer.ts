@@ -9,6 +9,7 @@ import File from "./File";
 @ChildEntity(QuestionAnswerType.UPLOAD)
 export default class UploadQuestionAnswer extends QuestionAnswer {
   // file_path varchar(500) NOT NULL,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToOne((_type) => File, { eager: true })
   @JoinColumn()
   @IsDefined()

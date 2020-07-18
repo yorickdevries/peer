@@ -186,13 +186,15 @@ router.post(
 
         // save the file to disk lastly (overwites exisitng if present)
         // (if this goes wrong all previous steps are rolled back)
-        const filePath = path.resolve(uploadFolder, file.id!.toString());
+        const filePath = path.resolve(uploadFolder, file.id.toString());
         await fsPromises.writeFile(filePath, req.file.buffer);
       }
     );
     // relaod the answer
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await uploadAnswer!.reload();
-    res.send(uploadAnswer);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    res.send(uploadAnswer!);
   }
 );
 

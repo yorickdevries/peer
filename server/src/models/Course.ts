@@ -49,6 +49,7 @@ export default class Course extends BaseModel {
   @IsNotEmpty()
   description: string | null;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => Faculty, {
     eager: true,
     nullable: false,
@@ -56,6 +57,7 @@ export default class Course extends BaseModel {
   @IsDefined()
   faculty: Faculty;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => AcademicYear, {
     eager: true,
     nullable: false,
@@ -63,6 +65,7 @@ export default class Course extends BaseModel {
   @IsDefined()
   academicYear: AcademicYear;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => Assignment, (assignment) => assignment.course)
   assignments?: Assignment[];
 

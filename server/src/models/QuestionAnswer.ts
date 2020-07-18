@@ -22,6 +22,7 @@ export default abstract class QuestionAnswer extends BaseModel {
   @PrimaryColumn()
   @RelationId((questionAnswer: QuestionAnswer) => questionAnswer.question)
   questionId!: number;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => Question, { nullable: false })
   question?: Question;
 
@@ -29,6 +30,7 @@ export default abstract class QuestionAnswer extends BaseModel {
   @PrimaryColumn()
   @RelationId((questionAnswer: QuestionAnswer) => questionAnswer.review)
   reviewId!: number;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => Review, (review) => review.questionAnswers, {
     nullable: false,
   })

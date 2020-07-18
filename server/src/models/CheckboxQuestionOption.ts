@@ -5,6 +5,7 @@ import CheckboxQuestion from "./CheckboxQuestion";
 
 @ChildEntity(QuestionOptionType.CHECKBOX)
 export default class CheckboxQuestionOption extends QuestionOption {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => CheckboxQuestion, (question) => question.options, {
     nullable: false,
   })

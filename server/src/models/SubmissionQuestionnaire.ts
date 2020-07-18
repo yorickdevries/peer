@@ -6,6 +6,7 @@ import QuestionnaireType from "../enum/QuestionnaireType";
 @ChildEntity(QuestionnaireType.SUBMISSION)
 export default class SubmissionQuestionnaire extends Questionnaire {
   @OneToOne(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => Assignment,
     (assignment) => assignment.submissionQuestionnaire
   )

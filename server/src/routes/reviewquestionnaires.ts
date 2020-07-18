@@ -122,7 +122,9 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   );
   // reload questionnaire to get all data
   // questionnaire should be defined now (else we would be in the catch)
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   await questionnaire!.reload();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   res.send(questionnaire!);
 });
 

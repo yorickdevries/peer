@@ -8,6 +8,7 @@ import _ from "lodash";
 @ChildEntity(QuestionType.MULTIPLE_CHOICE)
 export default class MultipleChoiceQuestion extends Question {
   @OneToMany(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => MultipleChoiceQuestionOption,
     (multipleChoiceQuestionOption) => multipleChoiceQuestionOption.question,
     {

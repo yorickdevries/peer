@@ -24,30 +24,35 @@ export default class Submission extends BaseModel {
   // User_netid varchar(500) NOT NULL,
   @RelationId((submission: Submission) => submission.user)
   userNetid!: string;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, { nullable: false })
   user?: User;
 
   // Group_id int NOT NULL,
   @RelationId((submission: Submission) => submission.group)
   groupId!: number;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => Group, { nullable: false })
   group?: Group;
 
   // Assignment_id int NOT NULL,
   @RelationId((submission: Submission) => submission.assignment)
   assignmentId!: number;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => Assignment, (assignment) => assignment.submissions, {
     nullable: false,
   })
   assignment?: Assignment;
 
   // file_path varchar(500) NOT NULL,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToOne((_type) => File, { eager: true })
   @JoinColumn()
   @IsDefined()
   file: File;
 
   @OneToMany(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => ReviewOfSubmission,
     (reviewOfSubmission) => reviewOfSubmission.submission
   )

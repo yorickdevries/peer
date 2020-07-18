@@ -26,6 +26,8 @@ const passportConfiguration = function (passport: PassportStatic): void {
   // URL of the TU Delft Metadata
   const url = passportConfig.idpUrl;
 
+  // the library needs to be updated
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fetch({ url, backupStore }).then((reader: any) => {
     // Setup config object
     const ppConfig = toPassportConfig(reader);
@@ -50,6 +52,8 @@ const passportConfiguration = function (passport: PassportStatic): void {
     // Setup Strategy
     const strategy = new samlStrategy(
       ppConfig,
+      // the library needs to be updated
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       async (profile: any, done: any) => {
         // save the user to the database
         const userNetid = await saveUserFromSSO(

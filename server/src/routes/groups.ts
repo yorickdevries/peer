@@ -33,7 +33,9 @@ const assignmentIdSchema = Joi.object({
 router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const assignmentId = req.query.assignmentId as any;
+  // this value has been parsed by the validate function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const assignmentId: number = req.query.assignmentId as any;
   const assignment = await Assignment.findOne(assignmentId);
   if (!assignment) {
     res
@@ -122,7 +124,10 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const group = await Group.findOne(req.params.id);
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const groupId: number = req.params.id as any;
+    const group = await Group.findOne(groupId);
     if (!group) {
       res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
       return;
@@ -187,8 +192,9 @@ router.patch(
     await group.save();
 
     // reload the complete group
-    const newGroup = await Group.findOne(req.params.id);
+    const newGroup = await Group.findOne(groupId);
     const newUsers = await group.getUsers();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     newGroup!.users = newUsers;
     res.send(newGroup);
   }
@@ -202,7 +208,10 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const group = await Group.findOne(req.params.id);
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const groupId: number = req.params.id as any;
+    const group = await Group.findOne(groupId);
     if (!group) {
       res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
       return;
@@ -247,8 +256,9 @@ router.patch(
     await group.save();
 
     // reload the complete group
-    const newGroup = await Group.findOne(req.params.id);
+    const newGroup = await Group.findOne(groupId);
     const newUsers = await group.getUsers();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     newGroup!.users = newUsers;
     res.send(newGroup);
   }
@@ -361,13 +371,12 @@ router.post(
     await getManager().transaction(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const existingGroups = (
           await transactionalEntityManager.findOneOrFail(
             Assignment,
             assignment.id,
-            {
-              relations: ["groups"],
-            }
+            { relations: ["groups"] }
           )
         ).groups!;
         if (existingGroups.length > 0) {
@@ -520,6 +529,7 @@ router.post(
     await getManager().transaction(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const existingGroups = (
           await transactionalEntityManager.findOneOrFail(
             Assignment,
@@ -544,6 +554,7 @@ router.post(
             { relations: ["users"] }
           );
           // get users
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const users = groupWithUsers.users!;
           const groupName = groupWithUsers.name;
           // make the new group

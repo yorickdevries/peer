@@ -63,18 +63,21 @@ export default class User extends BaseModel {
   @IsNotEmpty()
   displayName: string | null;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToMany((_type) => Affiliation, {
     eager: true,
   })
   @JoinTable()
   affiliation: Affiliation[];
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToMany((_type) => Study, {
     eager: true,
   })
   @JoinTable()
   study: Study[];
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToMany((_type) => OrganisationUnit, {
     eager: true,
   })

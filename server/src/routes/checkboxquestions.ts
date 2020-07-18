@@ -82,7 +82,9 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const questionId = req.params.id as any;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const questionId: number = req.params.id as any;
     const question = await CheckboxQuestion.findOne(questionId);
     if (!question) {
       res
@@ -129,7 +131,9 @@ router.patch(
 router.delete("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const questionId = req.params.id as any;
+  // this value has been parsed by the validate function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const questionId: number = req.params.id as any;
   const question = await CheckboxQuestion.findOne(questionId);
   if (!question) {
     res

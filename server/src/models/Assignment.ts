@@ -106,6 +106,7 @@ export default class Assignment extends BaseModel {
   description: string | null;
 
   // filename varchar(500),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToOne((_type) => File, { eager: true })
   @JoinColumn()
   file: File | null;
@@ -113,6 +114,7 @@ export default class Assignment extends BaseModel {
   // submission questionaire
   @RelationId((assignment: Assignment) => assignment.submissionQuestionnaire)
   submissionQuestionnaireId?: number; // this is undefined when questionnaire is null
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToOne((_type) => SubmissionQuestionnaire)
   @JoinColumn()
   submissionQuestionnaire?: SubmissionQuestionnaire | null;
@@ -120,6 +122,7 @@ export default class Assignment extends BaseModel {
   // review questionaire (for review evaluation)
   @RelationId((assignment: Assignment) => assignment.reviewQuestionnaire)
   reviewQuestionnaireId?: number; // this is undefined when questionnaire is null
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToOne((_type) => ReviewQuestionnaire)
   @JoinColumn()
   reviewQuestionnaire?: ReviewQuestionnaire | null;
@@ -135,15 +138,18 @@ export default class Assignment extends BaseModel {
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
   // course_id int NOT NULL, FK
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => Course, (course) => course.assignments, {
     nullable: false,
   })
   course?: Course;
 
   // Assignment groups
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToMany((_type) => Group, (group) => group.assignments)
   groups?: Group[];
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => Submission, (submission) => submission.assignment)
   submissions?: Submission[];
 

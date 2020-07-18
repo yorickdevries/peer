@@ -8,6 +8,7 @@ import CheckboxQuestion from "./CheckboxQuestion";
 @ChildEntity(QuestionAnswerType.CHECKBOX)
 export default class CheckboxQuestionAnswer extends QuestionAnswer {
   // answer int NOT NULL,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToMany((_type) => CheckboxQuestionOption, { eager: true })
   @JoinTable()
   checkboxAnswer: CheckboxQuestionOption[];

@@ -152,6 +152,7 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionnaire
             );
             await transactionalEntityManager.save(question);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
               const option = new CheckboxQuestionOption(
                 optionToCopy.text,
@@ -169,6 +170,7 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionnaire
             );
             await transactionalEntityManager.save(question);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
               const option = new MultipleChoiceQuestionOption(
                 optionToCopy.text,
@@ -194,6 +196,7 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionToCopy.number,
               questionToCopy.optional,
               questionnaire,
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               questionToCopy.range!
             );
             await transactionalEntityManager.save(question);
@@ -205,6 +208,7 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionToCopy.number,
               questionToCopy.optional,
               questionnaire,
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               questionToCopy.extensions!
             );
             await transactionalEntityManager.save(question);
@@ -248,6 +252,7 @@ const addCopyOfQuestions = async function (
             questionnaire
           );
           await transactionalEntityManager.save(question);
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           for (const optionToCopy of questionToCopy.options!) {
             const option = new CheckboxQuestionOption(
               optionToCopy.text,
@@ -263,6 +268,7 @@ const addCopyOfQuestions = async function (
             questionnaire
           );
           await transactionalEntityManager.save(question);
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           for (const optionToCopy of questionToCopy.options!) {
             const option = new MultipleChoiceQuestionOption(
               optionToCopy.text,

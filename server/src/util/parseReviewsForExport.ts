@@ -8,6 +8,7 @@ import Question from "../models/Question";
 
 const parseSubmissionReviewsForExport = async function (
   submissionQuestionnaire: SubmissionQuestionnaire
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
   // iterate over all reviews and save the data
   const questions = _.sortBy(submissionQuestionnaire.questions, (question) => {
@@ -16,9 +17,13 @@ const parseSubmissionReviewsForExport = async function (
   const reviews = (await submissionQuestionnaire.getReviews()) as ReviewOfSubmission[];
   const assignment = await submissionQuestionnaire.getAssignment();
 
+  // the parsed review is too extensive to make an interface
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const parsedReviews: any[] = [];
   for (const review of reviews) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const parsedReview: any = {};
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const submission = review.submission!;
 
     const submitter = await submission.getUser();

@@ -8,6 +8,7 @@ import MultipleChoiceQuestionOption from "./MultipleChoiceQuestionOption";
 @ChildEntity(QuestionAnswerType.MULTIPLE_CHOICE)
 export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
   // answer int NOT NULL,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => MultipleChoiceQuestionOption, {
     eager: true,
   })

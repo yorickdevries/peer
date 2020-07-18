@@ -94,6 +94,7 @@ const getGroupNameWithNetidLists = function (
   for (const groupName of groupMapping.keys()) {
     const groupNameWithNetidList = {
       groupName: groupName,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       netids: groupMapping.get(groupName)!, // defined as we map over the keys
     };
     groupNameWithNetidLists.push(groupNameWithNetidList);

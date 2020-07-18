@@ -45,6 +45,7 @@ export default abstract class Review extends BaseModel {
   @RelationId((review: Review) => review.questionnaire)
   questionnaireId!: number;
   @ManyToOne(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => Questionnaire,
     (questionnaire) => questionnaire.reviews,
     { nullable: false }
@@ -52,6 +53,7 @@ export default abstract class Review extends BaseModel {
   questionnaire?: Questionnaire;
 
   // User_netid varchar(500) NOT NULL,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, {
     nullable: false,
     eager: true,
@@ -113,11 +115,13 @@ export default abstract class Review extends BaseModel {
   approvalByTA: boolean | null;
 
   // ta_netid varchar(500),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, { eager: true })
   approvingTA: User | null;
 
   // cannot be eager as this casues 'ER_BAD_NULL_ERROR's
   @OneToMany(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => QuestionAnswer,
     (questionAnswer) => questionAnswer.review
   )

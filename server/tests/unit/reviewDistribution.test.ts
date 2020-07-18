@@ -110,11 +110,11 @@ describe("Review distribution", () => {
 
     const reviewsPerUser = 3;
     // need to be made into an object
-    const reviewAssignments = (await generateDistribution(
+    const reviewAssignments = await generateDistribution(
       submissions,
       students,
       reviewsPerUser
-    ))!;
+    );
     expect(reviewAssignments.length).toBe(reviewsPerUser * numStudents);
     for (const reviewAssignment of reviewAssignments) {
       const user = reviewAssignment.reviewer;
@@ -212,11 +212,11 @@ describe("Review distribution", () => {
     // so the algorithm should find a less fair solution
     const reviewsPerUser = 3;
     // need to be made into an object
-    const reviewAssignments = (await generateDistribution(
+    const reviewAssignments = await generateDistribution(
       submissions,
       students,
       reviewsPerUser
-    ))!;
+    );
     expect(reviewAssignments.length).toBe(reviewsPerUser * numStudents);
     // check whether the solution is valid
     for (const reviewAssignment of reviewAssignments) {

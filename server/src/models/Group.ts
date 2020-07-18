@@ -29,13 +29,16 @@ export default class Group extends BaseModel {
   @RelationId((group: Group) => group.course)
   courseId!: number;
   // course_id int NOT NULL, FK
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => Course, { nullable: false })
   course?: Course;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToMany((_type) => User)
   @JoinTable()
   users?: User[];
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToMany((_type) => Assignment, (assignment) => assignment.groups)
   @JoinTable()
   assignments?: Assignment[];

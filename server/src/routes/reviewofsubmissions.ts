@@ -34,7 +34,9 @@ const assignmentSubmitIdSchema = Joi.object({
 router.get("/", validateQuery(assignmentSubmitIdSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const assignmentId = req.query.assignmentId as any;
+  // this value has been parsed by the validate function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const assignmentId: number = req.query.assignmentId as any;
   const assignment = await Assignment.findOne(assignmentId);
   if (!assignment) {
     res
@@ -58,7 +60,9 @@ router.get("/", validateQuery(assignmentSubmitIdSchema), async (req, res) => {
       .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
     return;
   }
-  const submitted = req.query.submitted as any;
+  // this value has been parsed by the validate function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const submitted: boolean | undefined = req.query.submitted as any;
   const reviews = await questionnaire.getReviews(submitted);
   const sortedReviews = _.sortBy(reviews, "id");
   res.send(sortedReviews);
@@ -76,8 +80,11 @@ router.get(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const assignmentId = req.query.assignmentId as any;
-    const exportType = req.query.exportType as any;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const assignmentId: number = req.query.assignmentId as any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const exportType: "csv" | "xls" = req.query.exportType as any;
     const assignment = await Assignment.findOne(assignmentId);
     if (!assignment) {
       res
@@ -116,8 +123,11 @@ router.get(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const assignmentId = req.query.assignmentId as any;
-    const exportType = req.query.exportType as any;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const assignmentId: number = req.query.assignmentId as any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const exportType: "csv" | "xls" = req.query.exportType as any;
     const assignment = await Assignment.findOne(assignmentId);
     if (!assignment) {
       res
@@ -158,7 +168,9 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const assignmentId = req.query.assignmentId as any;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const assignmentId: number = req.query.assignmentId as any;
     const assignment = await Assignment.findOne(assignmentId);
     if (!assignment) {
       res
@@ -299,7 +311,8 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
     (assignmentState === AssignmentState.REVIEW ||
       assignmentState === AssignmentState.FEEDBACK)
   ) {
-    const submission = await review.submission!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const submission = review.submission!;
     const file = submission.file;
     const fileName = file.getFileNamewithExtension();
     const filePath = file.getPath();
@@ -500,7 +513,9 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
       await transactionalEntityManager.save(reviewEvaluation);
     }
   );
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   await reviewEvaluation!.reload();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const anonymousReview = reviewEvaluation!.getAnonymousVersionWithReviewerNetid();
   res.send(anonymousReview);
 });
@@ -512,7 +527,9 @@ router.post(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const assignmentId = req.query.assignmentId as any;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const assignmentId: number = req.query.assignmentId as any;
     const assignment = await Assignment.findOne(assignmentId);
     if (!assignment) {
       res
@@ -593,6 +610,7 @@ router.post(
     await getManager().transaction(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const existingReviews = (
           await transactionalEntityManager.findOneOrFail(
             SubmissionQuestionnaire,

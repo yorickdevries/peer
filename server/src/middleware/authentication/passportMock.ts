@@ -28,6 +28,7 @@ const mockPassportConfiguration = async function (
   const user = { netid: userNetid };
   const strategy = new MockStrategy({
     name: "mock",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     user: user as any, // Added any as MockStrategy asks for a specific User type
   });
   passport.use(strategy);
