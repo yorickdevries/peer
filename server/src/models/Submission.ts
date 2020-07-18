@@ -63,11 +63,16 @@ export default class Submission extends BaseModel {
 
   // validation: check whether the group is in the assingment and the user in the group
   async validateOrReject(): Promise<void> {
+    const group = this.group ? this.group : await this.getGroup();
+    const user = this.user ? this.user : await this.getUser();
+    const assignment = this.assignment
+      ? this.assignment
+      : await this.getAssignment();
     // might need to be changed if a teacher submits on behalf of a group
-    if (!(await this.group!.hasUser(this.user!))) {
+    if (!(await group.hasUser(user))) {
       throw new Error("User is not part of this group");
     }
-    if (!(await this.group!.hasAssignment(this.assignment!))) {
+    if (!(await group.hasAssignment(assignment))) {
       throw new Error("Group is not part of this assignment");
     }
     // if it succeeds the super validateOrReject can be called
@@ -75,6 +80,7 @@ export default class Submission extends BaseModel {
   }
 
   async getGroup(): Promise<Group> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Submission.findOneOrFail(this.id, {
         relations: ["group"],
@@ -83,6 +89,7 @@ export default class Submission extends BaseModel {
   }
 
   async getAssignment(): Promise<Assignment> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Submission.findOneOrFail(this.id, {
         relations: ["assignment"],
@@ -90,15 +97,8 @@ export default class Submission extends BaseModel {
     ).assignment!;
   }
 
-  async getFile(): Promise<File> {
-    return (
-      await Submission.findOneOrFail(this.id, {
-        relations: ["file"],
-      })
-    ).file!;
-  }
-
   async getUser(): Promise<User> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Submission.findOneOrFail(this.id, {
         relations: ["user"],
@@ -107,6 +107,7 @@ export default class Submission extends BaseModel {
   }
 
   async getReviewOfSubmissions(): Promise<ReviewOfSubmission[]> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Submission.findOneOrFail(this.id, {
         relations: ["reviewOfSubmissions"],

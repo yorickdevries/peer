@@ -293,7 +293,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
       assignmentState === AssignmentState.FEEDBACK)
   ) {
     const submission = await review.submission!;
-    const file = await submission.getFile();
+    const file = submission.file;
     const fileName = file.getFileNamewithExtension();
     const filePath = file.getPath();
     res.download(filePath, fileName);

@@ -95,14 +95,23 @@ export default class User extends BaseModel {
   ) {
     super();
     this.netid = netid;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.studentNumber = studentNumber!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.firstName = firstName!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.prefix = prefix!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.lastName = lastName!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.email = email!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.displayName = displayName!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.affiliation = affiliation!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.study = study!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.organisationUnit = organisationUnit!;
   }
 
