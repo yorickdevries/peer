@@ -20,7 +20,7 @@ interface QuestionTemplate {
   extensions?: string;
   options?: { text: string }[];
 }
-// configuration file
+
 const templateQuestions: QuestionTemplate[] = [
   {
     text:
@@ -131,7 +131,6 @@ const addDefaultReviewEvaluationQuestions = async function (
   await getManager().transaction(
     "SERIALIZABLE",
     async (transactionalEntityManager) => {
-      // find all groups to check for group existence
       const questionnaire = await transactionalEntityManager.findOne(
         ReviewQuestionnaire,
         reviewQuestionnaire.id
@@ -232,7 +231,6 @@ const addCopyOfQuestions = async function (
   await getManager().transaction(
     "SERIALIZABLE",
     async (transactionalEntityManager) => {
-      // find all groups to check for group existence
       const questionnaire = await transactionalEntityManager.findOne(
         Questionnaire,
         questionnaireToCopyTo.id
