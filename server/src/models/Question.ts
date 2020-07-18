@@ -73,6 +73,7 @@ export default abstract class Question extends BaseModel {
   }
 
   async getQuestionnaire(): Promise<Questionnaire> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Question.findOneOrFail(this.id, {
         relations: ["questionnaire"],
