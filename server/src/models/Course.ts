@@ -141,6 +141,10 @@ export default class Course extends BaseModel {
     return enrollment ? true : false;
   }
 
+  async isTeacher(user: User) {
+    return this.isEnrolled(user, UserRole.TEACHER);
+  }
+
   // get all enrollable courses for a certain user
   static async getEnrollable(user: User): Promise<Course[]> {
     // all enrollable courses
