@@ -1,3 +1,4 @@
 dist
+src/migration
 src/old_api
 test_old
