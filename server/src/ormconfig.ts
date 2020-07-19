@@ -1,6 +1,7 @@
 import { ConnectionOptions } from "typeorm";
 import config from "config";
 import entityList from "./models/entityList";
+import path from "path";
 
 // Database config for TypeORM
 
@@ -27,7 +28,7 @@ const baseConfig = {
   // Allow both start:prod and start:dev to use migrations
   // __dirname is either dist or src folder, meaning either
   // the compiled js in prod or the ts in dev.
-  migrations: [__dirname + "/migration/**/*{.ts,.js}"],
+  migrations: [path.resolve(__dirname, "migration/**/*{.ts,.js}")],
   cli: {
     // Location of migration should be inside src folder
     // to be compiled into dist/ folder.
