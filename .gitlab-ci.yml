@@ -14,6 +14,7 @@ stages:
     - build
     - test
     - coverage
+    - migration
     - start
     - sast
 
@@ -96,10 +97,24 @@ test_old:
   only:
   - merge_requests
 
+migration:
+  stage: migration
+  variables:
+    NODE_ENV: production
+  services:
+  - mysql:8
+  script:
+  - cd server && npm install
+  - npm run build
+  - npm run typeorm:migration:run
+  only:
+  - merge_requests
+  - pushes
+
 start_server:
   stage: start
   variables:
-    NODE_ENV: development
+    NODE_ENV: production
   services:
   - mysql:8
   script:
