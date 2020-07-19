@@ -2,7 +2,9 @@
 
 // Module dependencies.
 import http from "http";
-import createDatabaseConnection from "../databaseConnection";
+import "reflect-metadata"; // needed for typeORM to work
+import { createConnection } from "typeorm";
+import * as ormconfig from "../ormconfig";
 import app from "../app";
 
 import initializeData from "../util/initializeData";
@@ -24,7 +26,7 @@ app.set("port", port);
 // Create HTTP server.
 const server = http.createServer(app);
 
-createDatabaseConnection()
+createConnection(ormconfig)
   .then((connection) => {
     console.log(
       `Connected to ${connection.options.type} database: ${connection.options.database}`
