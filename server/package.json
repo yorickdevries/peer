@@ -12,7 +12,10 @@
     "coverage": "jest --collectCoverage ./tests",
     "test_old": "mocha --opts ./test_old/mocha.opts",
     "coverage_old": "nyc npm run test_old",
-    "data_init_old": "node ./dist/old_api/scripts/data_init.js"
+    "data_init_old": "node ./dist/old_api/scripts/data_init.js",
+    "typeorm": "ts-node ./node_modules/typeorm/cli.js --config src/ormconfig.ts",
+    "typeorm:migration:generate": "npm run typeorm migration:generate -- -n",
+    "typeorm:migration:run": "npm run typeorm migration:run"
   },
   "nyc": {
     "check-coverage": true,
