@@ -99,7 +99,7 @@ test_old:
 start_server:
   stage: start
   variables:
-    NODE_ENV: development
+    NODE_ENV: production
   services:
   - mysql:8
   script:
