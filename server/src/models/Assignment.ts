@@ -371,4 +371,10 @@ export default class Assignment extends BaseModel {
     const course = await this.getCourse();
     return await course.isTeacher(user);
   }
+
+  // needs to be replaced with actual setting state as a field
+  getAssignmentWithstate(): Assignment & { state: AssignmentState } {
+    const assignmentWithState = { ...this, state: this.getState() };
+    return assignmentWithState;
+  }
 }
