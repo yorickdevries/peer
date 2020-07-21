@@ -54,7 +54,10 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
     return;
   }
   const allAssignments = await course.getAssignments();
-  const sortedAllAssignments = _.sortBy(allAssignments, "id");
+  const allAssignmentsWithState = _.map(allAssignments, (assignment) => {
+    return assignment.getAssignmentWithstate();
+  });
+  const sortedAllAssignments = _.sortBy(allAssignmentsWithState, "id");
   res.send(sortedAllAssignments);
 });
 
@@ -88,7 +91,9 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
       .send("You are not allowed to view this assignment");
     return;
   }
-  res.send(assignment);
+  // set assignmentstate to return to front-end
+  const assignmentWithState = assignment.getAssignmentWithstate();
+  res.send(assignmentWithState);
 });
 
 // get an assignment file by assignment id
@@ -327,8 +332,10 @@ router.post(
     // assignment should be defined now (else we would be in the catch)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await assignment!.reload();
+    // set assignmentstate to return to front-end
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    res.send(assignment!);
+    const assignmentWithState = assignment!.getAssignmentWithstate();
+    res.send(assignmentWithState);
   }
 );
 
@@ -435,8 +442,10 @@ router.patch(
     // assignment should be defined now (else we would be in the catch)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await assignment!.reload();
+    // set assignmentstate to return to front-end
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    res.send(assignment!);
+    const assignmentWithState = assignment!.getAssignmentWithstate();
+    res.send(assignmentWithState);
   }
 );
 
