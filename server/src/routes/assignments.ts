@@ -88,7 +88,6 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
       .send("You are not allowed to view this assignment");
     return;
   }
-  // set assignmentstate to return to front-end
   res.send(assignment);
 });
 
@@ -332,7 +331,6 @@ router.post(
     // assignment should be defined now (else we would be in the catch)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await assignment!.reload();
-    // set assignmentstate to return to front-end
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(assignment!);
   }
