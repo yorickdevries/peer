@@ -160,7 +160,7 @@ const assignmentIdSchema = Joi.object({
   assignmentId: Joi.number().integer().required(),
 });
 router.patch(
-  "/submitall",
+  "/openfeedback",
   validateBody(assignmentIdSchema),
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -185,10 +185,17 @@ router.patch(
       return;
     }
     // get assignmentstate
-    if (!assignment.isAtState(AssignmentState.FEEDBACK)) {
+    if (!assignment.isAtState(AssignmentState.REVIEW)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is not in feedback state");
+        .send("The assignment is not in review state");
+      return;
+    }
+    // check whether review evaluation is enabled and questionnaire is present
+    if (assignment.reviewEvaluation && !assignment.reviewQuestionnaireId) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("No reviewQuestionnaire is present to evaluate the reviews");
       return;
     }
     const questionnaire = await assignment.getSubmissionQuestionnaire();
@@ -206,6 +213,8 @@ router.patch(
         await review.save();
       }
     }
+    assignment.state = AssignmentState.FEEDBACK;
+    await assignment.save();
     const sortedReviews = _.sortBy(reviews, "id");
     res.send(sortedReviews);
   }
