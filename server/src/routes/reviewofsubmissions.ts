@@ -215,8 +215,7 @@ router.patch(
     }
     assignment.state = AssignmentState.FEEDBACK;
     await assignment.save();
-    const sortedReviews = _.sortBy(reviews, "id");
-    res.send(sortedReviews);
+    res.send(assignment);
   }
 );
 
