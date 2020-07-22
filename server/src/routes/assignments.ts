@@ -54,10 +54,7 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
     return;
   }
   const allAssignments = await course.getAssignments();
-  const allAssignmentsWithState = _.map(allAssignments, (assignment) => {
-    return assignment.getAssignmentWithstate();
-  });
-  const sortedAllAssignments = _.sortBy(allAssignmentsWithState, "id");
+  const sortedAllAssignments = _.sortBy(allAssignments, "id");
   res.send(sortedAllAssignments);
 });
 
@@ -73,7 +70,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   }
   if (
     (await assignment.isEnrolledInGroup(user)) &&
-    (await assignment.getState()) === AssignmentState.UNPUBLISHED
+    (await assignment.isAtState(AssignmentState.UNPUBLISHED))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
@@ -92,8 +89,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     return;
   }
   // set assignmentstate to return to front-end
-  const assignmentWithState = assignment.getAssignmentWithstate();
-  res.send(assignmentWithState);
+  res.send(assignment);
 });
 
 // get an assignment file by assignment id
@@ -109,7 +105,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   }
   if (
     (await assignment.isEnrolledInGroup(user)) &&
-    (await assignment.getState()) === AssignmentState.UNPUBLISHED
+    (await assignment.isAtState(AssignmentState.UNPUBLISHED))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
@@ -338,8 +334,7 @@ router.post(
     await assignment!.reload();
     // set assignmentstate to return to front-end
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const assignmentWithState = assignment!.getAssignmentWithstate();
-    res.send(assignmentWithState);
+    res.send(assignment!);
   }
 );
 
@@ -448,8 +443,7 @@ router.patch(
     await assignment!.reload();
     // set assignmentstate to return to front-end
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const assignmentWithState = assignment!.getAssignmentWithstate();
-    res.send(assignmentWithState);
+    res.send(assignment!);
   }
 );
 

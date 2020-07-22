@@ -226,35 +226,19 @@ export default class Assignment extends BaseModel {
     return super.validateOrReject();
   }
 
-  // check whether the user is enrolled in this assignment
-  getState(): AssignmentState {
-    if (moment().isBefore(this.publishDate)) {
-      return AssignmentState.UNPUBLISHED;
-    } else if (moment().isBefore(this.dueDate)) {
-      return AssignmentState.SUBMISSION;
-    } else if (moment().isBefore(this.reviewPublishDate)) {
-      return AssignmentState.WAITING_FOR_REVIEW;
-    } else if (moment().isBefore(this.reviewDueDate)) {
-      return AssignmentState.REVIEW;
-    } else {
-      return AssignmentState.FEEDBACK;
-    }
-  }
-
   isAtState(otherState: AssignmentState): boolean {
-    const currentState = this.getState();
-    return currentState === otherState;
+    return this.state === otherState;
   }
 
   isAtOrAfterState(otherState: AssignmentState): boolean {
-    const currentState = this.getState();
+    const currentState = this.state;
     const currentStateIndex = assignmentStateOrder.indexOf(currentState);
     const otherStateIndex = assignmentStateOrder.indexOf(otherState);
     return currentStateIndex >= otherStateIndex;
   }
 
   isAtOrBeforeState(otherState: AssignmentState): boolean {
-    const currentState = this.getState();
+    const currentState = this.state;
     const currentStateIndex = assignmentStateOrder.indexOf(currentState);
     const otherStateIndex = assignmentStateOrder.indexOf(otherState);
     return currentStateIndex <= otherStateIndex;
@@ -378,11 +362,5 @@ export default class Assignment extends BaseModel {
   async isTeacherInCourse(user: User): Promise<boolean> {
     const course = await this.getCourse();
     return await course.isTeacher(user);
-  }
-
-  // needs to be replaced with actual setting state as a field
-  getAssignmentWithstate(): Assignment & { state: AssignmentState } {
-    const assignmentWithState = { ...this, state: this.getState() };
-    return assignmentWithState;
   }
 }

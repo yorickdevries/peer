@@ -220,16 +220,7 @@ router.get(
       return;
     }
     const enrollableAssignments = await course.getEnrollableAssignments(user);
-    const enrollableAssignmentsWithState = _.map(
-      enrollableAssignments,
-      (assignment) => {
-        return assignment.getAssignmentWithstate();
-      }
-    );
-    const sortedEnrollableAssignments = _.sortBy(
-      enrollableAssignmentsWithState,
-      "id"
-    );
+    const sortedEnrollableAssignments = _.sortBy(enrollableAssignments, "id");
     res.send(sortedEnrollableAssignments);
   }
 );
@@ -257,16 +248,7 @@ router.get(
     const enrolledAssignments = await course.getPublishedEnrolledAssignments(
       user
     );
-    const enrolledAssignmentsWithState = _.map(
-      enrolledAssignments,
-      (assignment) => {
-        return assignment.getAssignmentWithstate();
-      }
-    );
-    const sortedEnrolledAssignments = _.sortBy(
-      enrolledAssignmentsWithState,
-      "id"
-    );
+    const sortedEnrolledAssignments = _.sortBy(enrolledAssignments, "id");
     res.send(sortedEnrolledAssignments);
   }
 );
