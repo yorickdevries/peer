@@ -19,6 +19,7 @@ import {
   IsPositive,
   IsDate,
   IsUrl,
+  IsEnum,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import Group from "./Group";
@@ -64,6 +65,11 @@ export default class Assignment extends BaseModel {
   @IsDefined()
   @IsBoolean()
   reviewEvaluation: boolean;
+
+  @Column()
+  @IsDefined()
+  @IsEnum(AssignmentState)
+  state: AssignmentState;
 
   // publish_date timestamptz NOT NULL,
   @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
@@ -159,6 +165,7 @@ export default class Assignment extends BaseModel {
     reviewsPerUser: number,
     enrollable: boolean,
     reviewEvaluation: boolean,
+    state: AssignmentState,
     publishDate: Date,
     dueDate: Date,
     reviewPublishDate: Date,
@@ -176,6 +183,7 @@ export default class Assignment extends BaseModel {
     this.reviewsPerUser = reviewsPerUser;
     this.enrollable = enrollable;
     this.reviewEvaluation = reviewEvaluation;
+    this.state = state;
     this.publishDate = publishDate;
     this.dueDate = dueDate;
     this.reviewPublishDate = reviewPublishDate;
