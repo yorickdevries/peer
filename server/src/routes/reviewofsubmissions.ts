@@ -535,10 +535,12 @@ router.post(
       return;
     }
     // assignmentstate
-    if (assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
+    if (!assignment.isAtState(AssignmentState.WAITING_FOR_REVIEW)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("The submission state has not been passed");
+        .send(
+          "The submission state has not been passed or reviews are already assigned"
+        );
       return;
     }
     const questionnaire = await assignment.getSubmissionQuestionnaire();
@@ -626,6 +628,9 @@ router.post(
           await transactionalEntityManager.save(review);
           reviews.push(review);
         }
+        // set the proper assignmentstate
+        assignment.state = AssignmentState.REVIEW;
+        await transactionalEntityManager.save(assignment);
       }
     );
     // reload the groups from the database
