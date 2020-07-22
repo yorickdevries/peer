@@ -10,6 +10,7 @@ import fs from "fs";
 import path from "path";
 import { advanceTo, clear } from "jest-date-mock";
 import UserRole from "../../src/enum/UserRole";
+import { AssignmentState } from "../../src/enum/AssignmentState";
 
 describe("Integration", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -202,6 +203,7 @@ describe("Integration", () => {
       .field("reviewsPerUser", 1)
       .field("enrollable", true)
       .field("reviewEvaluation", true)
+      .field("state", AssignmentState.UNPUBLISHED)
       .field("publishDate", new Date("2020-01-05T10:00Z").toISOString())
       .field("dueDate", new Date("2020-02-01T10:00Z").toISOString())
       .field("reviewPublishDate", new Date("2020-03-01T10:00Z").toISOString())
@@ -216,6 +218,18 @@ describe("Integration", () => {
     let assignment = JSON.parse(res.text);
     expect(assignment).toMatchObject({
       name: "Example title",
+      state: AssignmentState.UNPUBLISHED,
+    });
+
+    // publish an assingment for the course
+    res = await request(server)
+      .patch(`/api/assignments/${assignment.id}/publish`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    assignment = JSON.parse(res.text);
+    expect(assignment).toMatchObject({
+      name: "Example title",
+      state: AssignmentState.SUBMISSION,
     });
 
     // get all assignments of a course by the teacher
