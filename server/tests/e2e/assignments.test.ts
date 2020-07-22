@@ -8,6 +8,7 @@ import mockLoginCookie from "../helpers/mockLoginCookie";
 import path from "path";
 import initializeData from "../../src/util/initializeData";
 import fs from "fs";
+import { AssignmentState } from "../../src/enum/AssignmentState";
 
 describe("Assignments", () => {
   let connection: Connection;
@@ -57,6 +58,7 @@ describe("Assignments", () => {
       .field("reviewsPerUser", 2)
       .field("enrollable", false)
       .field("reviewEvaluation", false)
+      .field("state", AssignmentState.SUBMISSION)
       .field("publishDate", new Date("2020-06-23T10:00Z").toISOString())
       .field("dueDate", new Date("2020-06-24T10:00Z").toISOString())
       .field("reviewPublishDate", new Date("2020-06-25T10:00Z").toISOString())
@@ -103,6 +105,7 @@ describe("Assignments", () => {
       .field("reviewsPerUser", 0)
       .field("enrollable", false)
       .field("reviewEvaluation", false)
+      .field("state", AssignmentState.SUBMISSION)
       .field("publishDate", new Date("2020-06-23T10:00Z").toISOString())
       .field("dueDate", new Date("2020-06-24T10:00Z").toISOString())
       .field("reviewPublishDate", new Date("2020-06-25T10:00Z").toISOString())
