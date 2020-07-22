@@ -12,6 +12,7 @@ import File from "../../src/models/File";
 import generateDistribution from "../../src/util/reviewDistribution";
 import Enrollment from "../../src/models/Enrollment";
 import UserRole from "../../src/enum/UserRole";
+import { AssignmentState } from "../../src/enum/AssignmentState";
 
 describe("Review distribution", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -51,6 +52,7 @@ describe("Review distribution", () => {
       2,
       true,
       false,
+      AssignmentState.SUBMISSION,
       new Date("2020-06-23T10:00Z"),
       new Date("2020-06-24T10:00Z"),
       new Date("2020-06-25T10:00Z"),
@@ -148,6 +150,7 @@ describe("Review distribution", () => {
       2,
       true,
       false,
+      AssignmentState.SUBMISSION,
       new Date("2020-06-23T10:00Z"),
       new Date("2020-06-24T10:00Z"),
       new Date("2020-06-25T10:00Z"),
@@ -251,6 +254,7 @@ describe("Review distribution", () => {
       2,
       true,
       false,
+      AssignmentState.SUBMISSION,
       new Date("2020-06-23T10:00Z"),
       new Date("2020-06-24T10:00Z"),
       new Date("2020-06-25T10:00Z"),
