@@ -341,7 +341,8 @@ router.patch(
     // get assignmentstate
     const questionnaire = await review.getQuestionnaire();
     const assignment = await questionnaire.getAssignment();
-    if (!assignment.isAtState(AssignmentState.REVIEW)) {
+    // Review cannot be changed (unsubmitted/flagged) in feedback phase when not submitted
+    if (assignment.isAtState(AssignmentState.FEEDBACK) && review.submitted) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The assignment is not in review state");
