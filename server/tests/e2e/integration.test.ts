@@ -221,17 +221,6 @@ describe("Integration", () => {
       state: AssignmentState.UNPUBLISHED,
     });
 
-    // publish an assingment for the course
-    res = await request(server)
-      .patch(`/api/assignments/${assignment.id}/publish`)
-      .set("cookie", await teacherCookie());
-    expect(res.status).toBe(HttpStatusCode.OK);
-    assignment = JSON.parse(res.text);
-    expect(assignment).toMatchObject({
-      name: "Example title",
-      state: AssignmentState.SUBMISSION,
-    });
-
     // get all assignments of a course by the teacher
     res = await request(server)
       .get(`/api/assignments?courseId=${course.id}`)
@@ -444,8 +433,16 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
 
-    // set date to the moment that the assignment is published
-    advanceTo(new Date("2020-01-15T10:00Z"));
+    // publish an assingment for the course
+    res = await request(server)
+      .patch(`/api/assignments/${assignment.id}/publish`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    assignment = JSON.parse(res.text);
+    expect(assignment).toMatchObject({
+      name: "Example title",
+      state: AssignmentState.SUBMISSION,
+    });
 
     // check available courses as student
     res = await request(server)
@@ -696,8 +693,16 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject(submission1);
 
-    // set date to the moment that the submission is closed
-    advanceTo(new Date("2020-02-15T10:00Z"));
+    // close the submission phase of an assingment for the course
+    res = await request(server)
+      .patch(`/api/assignments/${assignment.id}/closesubmission`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    assignment = JSON.parse(res.text);
+    expect(assignment).toMatchObject({
+      name: "Example title",
+      state: AssignmentState.WAITING_FOR_REVIEW,
+    });
 
     // distribute the reviews as teacher
     res = await request(server)
@@ -716,9 +721,6 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     // 2 reviews are present
     expect(JSON.parse(res.text).length).toBe(2);
-
-    // set date to the moment that the reviews are opened
-    advanceTo(new Date("2020-03-15T10:00Z"));
 
     // get the questionnaire as student
     res = await request(server)
