@@ -8,7 +8,6 @@ import Review from "../models/Review";
 import { AssignmentState } from "../enum/AssignmentState";
 import CheckboxQuestionAnswer from "../models/CheckboxQuestionAnswer";
 import CheckboxQuestionOption from "../models/CheckboxQuestionOption";
-import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import moment from "moment";
 
@@ -80,15 +79,6 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
     checkboxQuestionOptions.push(questionOption);
   }
   const assignment = await questionnaire.getAssignment();
-  if (
-    questionnaire instanceof SubmissionQuestionnaire &&
-    !assignment.isAtState(AssignmentState.REVIEW)
-  ) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("The assignment is not in reviewstate");
-    return;
-  }
   if (
     questionnaire instanceof ReviewQuestionnaire &&
     !(
