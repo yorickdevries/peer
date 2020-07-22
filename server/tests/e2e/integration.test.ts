@@ -8,7 +8,7 @@ import mockLoginCookie from "../helpers/mockLoginCookie";
 import initializeData from "../../src/util/initializeData";
 import fs from "fs";
 import path from "path";
-import { advanceTo, clear } from "jest-date-mock";
+import { clear } from "jest-date-mock";
 import UserRole from "../../src/enum/UserRole";
 import { AssignmentState } from "../../src/enum/AssignmentState";
 
@@ -38,8 +38,6 @@ describe("Integration", () => {
 
   test("Integration test", async () => {
     let res; // will store all responses
-    // set the mocktime
-    advanceTo(new Date("2020-01-01T10:00Z"));
 
     // log in as teacher
     const teacherCookie = async () => {
@@ -843,8 +841,17 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text).length).toBe(5);
 
-    // set date to the moment that the feedback is available
-    advanceTo(new Date("2020-04-15T10:00Z"));
+    // open the feedback for the students
+    res = await request(server)
+      .patch(`/api/reviewofsubmissions/openfeedback`)
+      .send({ assignmentId: assignment.id })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    assignment = JSON.parse(res.text);
+    expect(assignment).toMatchObject({
+      name: "Example title",
+      state: AssignmentState.FEEDBACK,
+    });
 
     // approve a review as teacher
     res = await request(server)
