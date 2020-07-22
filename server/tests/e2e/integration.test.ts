@@ -8,7 +8,7 @@ import mockLoginCookie from "../helpers/mockLoginCookie";
 import initializeData from "../../src/util/initializeData";
 import fs from "fs";
 import path from "path";
-import { clear } from "jest-date-mock";
+import { clear, advanceTo } from "jest-date-mock";
 import UserRole from "../../src/enum/UserRole";
 import { AssignmentState } from "../../src/enum/AssignmentState";
 
@@ -852,6 +852,9 @@ describe("Integration", () => {
       name: "Example title",
       state: AssignmentState.FEEDBACK,
     });
+
+    // set the moment to a time between review due and evualuation due
+    advanceTo(new Date("2020-04-15T10:00Z"));
 
     // approve a review as teacher
     res = await request(server)
