@@ -294,13 +294,7 @@ router.post(
         .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
       return;
     }
-    const assignmentState = await assignment.getState();
-    if (
-      !(
-        assignmentState === AssignmentState.UNPUBLISHED ||
-        assignmentState === AssignmentState.SUBMISSION
-      )
-    ) {
+    if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The submission state has passed");
@@ -442,13 +436,7 @@ router.post("/", validateBody(groupSchema), async (req, res) => {
       .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
     return;
   }
-  const assignmentState = await assignment.getState();
-  if (
-    !(
-      assignmentState === AssignmentState.UNPUBLISHED ||
-      assignmentState === AssignmentState.SUBMISSION
-    )
-  ) {
+  if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("The submission state has passed");
@@ -505,13 +493,7 @@ router.post(
         .send("Both assignments should be from the same course");
       return;
     }
-    const assignmentState = await assignment.getState();
-    if (
-      !(
-        assignmentState === AssignmentState.UNPUBLISHED ||
-        assignmentState === AssignmentState.SUBMISSION
-      )
-    ) {
+    if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The submission state has passed");

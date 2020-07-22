@@ -153,8 +153,7 @@ router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
     return;
   }
   const assignment = await submission.getAssignment();
-  const assignmentState = assignment.getState();
-  if (assignmentState !== AssignmentState.FEEDBACK) {
+  if (!assignment.isAtState(AssignmentState.FEEDBACK)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not allowed to view reviews");
@@ -218,7 +217,7 @@ router.post(
         .send("User is not allowed to submit.");
       return;
     }
-    if (!(assignment.getState() === AssignmentState.SUBMISSION)) {
+    if (!assignment.isAtState(AssignmentState.SUBMISSION)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The assignment is not in submission state");

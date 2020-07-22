@@ -185,8 +185,7 @@ router.patch(
       return;
     }
     // get assignmentstate
-    const assignmentState = assignment.getState();
-    if (assignmentState !== AssignmentState.FEEDBACK) {
+    if (!assignment.isAtState(AssignmentState.FEEDBACK)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The assignment is not in feedback state");
@@ -228,15 +227,13 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
-  const assignmentState = assignment.getState();
   if (
     // reviewer should access the review when reviewing
     ((await review.isReviewer(user)) &&
-      (assignmentState === AssignmentState.REVIEW ||
-        assignmentState === AssignmentState.FEEDBACK)) ||
+      assignment.isAtOrAfterState(AssignmentState.REVIEW)) ||
     // reviewed user should access the review when getting feedback and the review is finished
     ((await review.isReviewed(user)) &&
-      assignmentState === AssignmentState.FEEDBACK &&
+      assignment.isAtState(AssignmentState.FEEDBACK) &&
       review.submitted)
   ) {
     const anonymousReview = review.getAnonymousVersion();
@@ -266,15 +263,13 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
-  const assignmentState = assignment.getState();
   if (
     // reviewer should access the review when reviewing
     ((await review.isReviewer(user)) &&
-      (assignmentState === AssignmentState.REVIEW ||
-        assignmentState === AssignmentState.FEEDBACK)) ||
+      assignment.isAtOrAfterState(AssignmentState.REVIEW)) ||
     // reviewed user should access the review when getting feedback and the review is finished
     ((await review.isReviewed(user)) &&
-      assignmentState === AssignmentState.FEEDBACK &&
+      assignment.isAtState(AssignmentState.FEEDBACK) &&
       review.submitted)
   ) {
     res.send(sortedReviewAnswers);
@@ -301,12 +296,10 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
-  const assignmentState = assignment.getState();
   if (
     // reviewer should access the review when reviewing
     (await review.isReviewer(user)) &&
-    (assignmentState === AssignmentState.REVIEW ||
-      assignmentState === AssignmentState.FEEDBACK)
+    assignment.isAtOrAfterState(AssignmentState.REVIEW)
   ) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const submission = review.submission!;
@@ -348,8 +341,7 @@ router.patch(
     // get assignmentstate
     const questionnaire = await review.getQuestionnaire();
     const assignment = await questionnaire.getAssignment();
-    const assignmentState = assignment.getState();
-    if (assignmentState !== AssignmentState.REVIEW) {
+    if (!assignment.isAtState(AssignmentState.REVIEW)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The assignment is not in review state");
@@ -395,8 +387,7 @@ router.patch(
     // get assignmentstate
     const questionnaire = await review.getQuestionnaire();
     const assignment = await questionnaire.getAssignment();
-    const assignmentState = assignment.getState();
-    if (assignmentState !== AssignmentState.FEEDBACK) {
+    if (!assignment.isAtState(AssignmentState.FEEDBACK)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The assignment is not in feedback state");
@@ -544,11 +535,7 @@ router.post(
       return;
     }
     // assignmentstate
-    const assignmentState = assignment.getState();
-    if (
-      assignmentState === AssignmentState.UNPUBLISHED ||
-      assignmentState === AssignmentState.SUBMISSION
-    ) {
+    if (assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The submission state has not been passed");
