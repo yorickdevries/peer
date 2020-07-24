@@ -23,15 +23,15 @@
         "maxAge": 43200000 // 12 hours in ms
     },
     "reviews": {
-        "fileFolder": "./files/development/reviews",
+        "fileFolder": "./productionData/reviews",
         "maxSizeReviewFile": 52428800 // 50 MB
     },
     "assignments": {
-        "fileFolder": "./files/development/assignments",
+        "fileFolder": "./productionData/assignments",
         "maxSizeAssignmentFile": 52428800 // 50 MB
     },
     "submissions": {
-        "fileFolder": "./files/development/submissions",
+        "fileFolder": "./productionData/submissions",
         "maxSizeSubmissionFile": 52428800 // 50 MB
     },
     "exampleData": {
