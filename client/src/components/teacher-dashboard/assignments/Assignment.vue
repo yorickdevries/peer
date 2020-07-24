@@ -131,7 +131,9 @@
                                                 <b-button
                                                     size="sm"
                                                     variant="primary"
-                                                    :href="`/api/oldroutes/assignments/${assignment.id}/reviewsExport/csv`"
+                                                    :href="
+                                                        `/api/oldroutes/assignments/${assignment.id}/reviewsExport/csv`
+                                                    "
                                                     class="mb-3 mr-2"
                                                 >
                                                     Download reviews .csv
@@ -139,7 +141,9 @@
                                                 <b-button
                                                     size="sm"
                                                     variant="primary"
-                                                    :href="`/api/oldroutes/assignments/${assignment.id}/reviewsExport/xls`"
+                                                    :href="
+                                                        `/api/oldroutes/assignments/${assignment.id}/reviewsExport/xls`
+                                                    "
                                                     class="mb-3"
                                                 >
                                                     Download reviews .xls
@@ -155,14 +159,18 @@
                                                     class="mr-2"
                                                     size="sm"
                                                     variant="primary"
-                                                    :href="`/api/oldroutes/assignments/${assignment.id}/gradeExport/csv`"
+                                                    :href="
+                                                        `/api/oldroutes/assignments/${assignment.id}/gradeExport/csv`
+                                                    "
                                                 >
                                                     Download grades .csv
                                                 </b-button>
                                                 <b-button
                                                     size="sm"
                                                     variant="primary"
-                                                    :href="`/api/oldroutes/assignments/${assignment.id}/gradeExport/xls`"
+                                                    :href="
+                                                        `/api/oldroutes/assignments/${assignment.id}/gradeExport/xls`
+                                                    "
                                                 >
                                                     Download grades .xls
                                                 </b-button>

@@ -37,7 +37,10 @@
                                 :href="`/api/oldroutes/courses/${course.id}/gradeExport/csv`"
                                 >Download .csv</b-button
                             >
-                            <b-button variant="primary" size="sm" :href="`/api/oldroutes/courses/${course.id}/gradeExport/xls`"
+                            <b-button
+                                variant="primary"
+                                size="sm"
+                                :href="`/api/oldroutes/courses/${course.id}/gradeExport/xls`"
                                 >Download .xls</b-button
                             >
                         </dl>
