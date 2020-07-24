@@ -2,8 +2,8 @@ import "reflect-metadata"; // needed for typeORM to work
 import { createConnection } from "typeorm";
 import * as ormconfig from "./ormconfig";
 import _ from "lodash";
-// import parseNetID from "./util/parseNetID";
-// import saveUserFromSSO from "./util/saveUserFromSSO";
+import parseNetID from "./util/parseNetID";
+import saveUserFromSSO from "./util/saveUserFromSSO";
 import { PreparedStatement } from "pg-promise";
 import Database from "./old_api/database";
 import config from "config";
@@ -15,8 +15,8 @@ import Faculty from "./models/Faculty";
 import AcademicYear from "./models/AcademicYear";
 import Course from "./models/Course";
 import Assignment from "./models/Assignment";
-// import User from "./models/User";
-// import Enrollment from "./models/Enrollment";
+import User from "./models/User";
+import Enrollment from "./models/Enrollment";
 
 const migrateDB = async function (): Promise<void> {
   console.log("Start migration");
@@ -25,94 +25,99 @@ const migrateDB = async function (): Promise<void> {
   const connection = await createConnection(ormconfig);
   console.log(connection.name);
 
-  // /*
-  //  * User,
-  //  * Affiliation,
-  //  * Study,
-  //  * OrganisationUnit,
-  //  */
-  // // get all users
-  // /*
-  // console.log("importing users");
-  // const userStatement = new PreparedStatement({
-  //   name: "users",
-  //   text: 'SELECT * FROM "userlist"',
-  // });
-  // const oldUsers = await Database.executeQuery(userStatement);
-  // console.log("num users:", oldUsers.length);
+  /*
+   * User,
+   * Affiliation,
+   * Study,
+   * OrganisationUnit,
+   */
+  // get all users
+  console.log("importing users");
+  const userStatement = new PreparedStatement({
+    name: "users",
+    text: 'SELECT * FROM "userlist"',
+  });
+  const oldUsers = await Database.executeQuery(userStatement);
+  console.log("num users:", oldUsers.length);
 
-  // // parse the postgres syntax for lists
-  // const replacePostgresSyntax = function (name?: string | string[]) {
-  //   if (typeof name === "string") {
-  //     // replace postgres syntax
-  //     if (name.startsWith("{") && name.endsWith("}")) {
-  //       name = name.replace("{", "[");
-  //       name = name.replace("}", "]");
-  //       name = JSON.parse(name);
-  //     }
-  //     return name;
-  //   } else if (name === undefined) {
-  //     return undefined;
-  //   } else {
-  //     throw new Error("incorrect name: " + name);
-  //   }
-  // };
+  const userMap: Map<string, User> = new Map<string, User>();
 
-  // const newUsers: (string | undefined)[] = [];
-  // for (const oldUser of oldUsers) {
-  //   const netid: string = parseNetID(oldUser.netid);
-  //   const studentNumber: number | undefined = oldUser.studentnumber
-  //     ? oldUser.studentnumber
-  //     : undefined;
-  //   const firstName: string | undefined = oldUser.firstname
-  //     ? oldUser.firstname
-  //     : undefined;
-  //   const prefix: string | undefined = oldUser.prefix
-  //     ? oldUser.prefix
-  //     : undefined;
-  //   const lastName: string | undefined = oldUser.lastname
-  //     ? oldUser.lastname
-  //     : undefined;
-  //   const email: string | undefined = oldUser.email ? oldUser.email : undefined;
-  //   const displayName: string | undefined = oldUser.displayname
-  //     ? oldUser.displayname
-  //     : undefined;
-  //   let affiliation: string | string[] | undefined = oldUser.affiliation
-  //     ? oldUser.affiliation
-  //     : undefined;
-  //   affiliation = replacePostgresSyntax(affiliation);
-  //   let study: string | string[] | undefined = oldUser.study
-  //     ? oldUser.study
-  //     : undefined;
-  //   study = replacePostgresSyntax(study);
-  //   let organisationUnit:
-  //     | string
-  //     | string[]
-  //     | undefined = oldUser.organisationunit
-  //     ? oldUser.organisationunit
-  //     : undefined;
-  //   organisationUnit = replacePostgresSyntax(organisationUnit);
+  // parse the postgres syntax for lists
+  const replacePostgresSyntax = function (name?: string | string[]) {
+    if (typeof name === "string") {
+      // replace postgres syntax
+      if (name.startsWith("{") && name.endsWith("}")) {
+        name = name.replace("{", "[");
+        name = name.replace("}", "]");
+        name = JSON.parse(name);
+      }
+      return name;
+    } else if (name === undefined) {
+      return undefined;
+    } else {
+      throw new Error("incorrect name: " + name);
+    }
+  };
 
-  //   // save user and fields to the database
-  //   const savedNetid = await saveUserFromSSO(
-  //     netid,
-  //     studentNumber,
-  //     firstName,
-  //     prefix,
-  //     lastName,
-  //     email,
-  //     displayName,
-  //     affiliation,
-  //     study,
-  //     organisationUnit
-  //   );
-  //   if (newUsers.includes(savedNetid)) {
-  //     throw new Error(`${savedNetid} is a duplicate`);
-  //   }
-  //   newUsers.push(savedNetid);
-  // }
-  // console.log(`saved ${newUsers.length} users`);
-  // */
+  const newUsers: (string | undefined)[] = [];
+  for (const oldUser of oldUsers) {
+    const netid: string = parseNetID(oldUser.netid);
+    const studentNumber: number | undefined = oldUser.studentnumber
+      ? oldUser.studentnumber
+      : undefined;
+    const firstName: string | undefined = oldUser.firstname
+      ? oldUser.firstname
+      : undefined;
+    const prefix: string | undefined = oldUser.prefix
+      ? oldUser.prefix
+      : undefined;
+    const lastName: string | undefined = oldUser.lastname
+      ? oldUser.lastname
+      : undefined;
+    const email: string | undefined = oldUser.email ? oldUser.email : undefined;
+    const displayName: string | undefined = oldUser.displayname
+      ? oldUser.displayname
+      : undefined;
+    let affiliation: string | string[] | undefined = oldUser.affiliation
+      ? oldUser.affiliation
+      : undefined;
+    affiliation = replacePostgresSyntax(affiliation);
+    let study: string | string[] | undefined = oldUser.study
+      ? oldUser.study
+      : undefined;
+    study = replacePostgresSyntax(study);
+    let organisationUnit:
+      | string
+      | string[]
+      | undefined = oldUser.organisationunit
+      ? oldUser.organisationunit
+      : undefined;
+    organisationUnit = replacePostgresSyntax(organisationUnit);
+
+    // save user and fields to the database
+    const savedNetid = await saveUserFromSSO(
+      netid,
+      studentNumber,
+      firstName,
+      prefix,
+      lastName,
+      email,
+      displayName,
+      affiliation,
+      study,
+      organisationUnit
+    );
+    if (newUsers.includes(savedNetid)) {
+      throw new Error(`${savedNetid} is a duplicate`);
+    }
+    if (savedNetid !== oldUser.netid || !savedNetid) {
+      throw new Error(`incorrect netid: ${netid}`);
+    }
+    newUsers.push(savedNetid);
+    const user = await User.findOneOrFail(savedNetid);
+    userMap.set(savedNetid, user);
+  }
+  console.log(`saved ${newUsers.length} users`);
 
   /*
    * Faculty,
@@ -238,31 +243,31 @@ const migrateDB = async function (): Promise<void> {
   /*
    * Enrollment,
    */
-  // console.log();
-  // console.log("importing enrollments");
-  // const enrollmentStatement = new PreparedStatement({
-  //   name: "enrollment",
-  //   text: 'SELECT * FROM "enroll"',
-  // });
-  // const oldEnrollments = await Database.executeQuery(enrollmentStatement);
-  // console.log("num oldEnrollments: ", oldEnrollments.length);
+  console.log();
+  console.log("importing enrollments");
+  const enrollmentStatement = new PreparedStatement({
+    name: "enrollment",
+    text: 'SELECT * FROM "enroll"',
+  });
+  const oldEnrollments = await Database.executeQuery(enrollmentStatement);
+  console.log("num oldEnrollments: ", oldEnrollments.length);
 
-  // // create the enrollments
-  // for (const oldEnrollment of oldEnrollments) {
-  //   const course = courseMap.get(oldEnrollment.course_id)!;
-  //   const user = await User.findOneOrFail(oldEnrollment.user_netid);
-  //   if (user.netid !== oldEnrollment.user_netid) {
-  //     throw new Error("Wrong user");
-  //   }
-  //   let role = oldEnrollment.role;
-  //   // change role in case of TA
-  //   if (role === "TA") {
-  //     role = "teachingassistant";
-  //   }
+  // create the enrollments
+  for (const oldEnrollment of oldEnrollments) {
+    const course = courseMap.get(oldEnrollment.course_id)!;
+    const user = userMap.get(oldEnrollment.user_netid)!;
+    if (user.netid !== oldEnrollment.user_netid) {
+      throw new Error("Wrong user");
+    }
+    let role = oldEnrollment.role;
+    // change role in case of TA
+    if (role === "TA") {
+      role = "teachingassistant";
+    }
 
-  //   const newEnrollment = new Enrollment(user, course, role);
-  //   await newEnrollment.save();
-  // }
+    const newEnrollment = new Enrollment(user, course, role);
+    await newEnrollment.save();
+  }
 
   /*
    * Assignment,
@@ -360,6 +365,87 @@ const migrateDB = async function (): Promise<void> {
   /*
    * Group,
    */
+  console.log();
+  console.log("importing groups");
+  const groupStatement = new PreparedStatement({
+    name: "groupList",
+    text: 'SELECT * FROM "grouplist"',
+  });
+  const oldGroups = await Database.executeQuery(groupStatement);
+  // console.log(oldGroups);
+  const sortedOldGroups = _.sortBy(oldGroups, "id");
+  console.log("num groups: ", sortedOldGroups.length);
+
+  interface GroupforImport {
+    groupName: string;
+    assignments: Assignment[];
+    users: User[];
+    course?: Course;
+  }
+  const groupforImportMap: Map<number, GroupforImport> = new Map<
+    number,
+    GroupforImport
+  >();
+  for (const oldGroup of oldGroups) {
+    const groupforImport: GroupforImport = {
+      groupName: oldGroup.group_name,
+      assignments: [],
+      users: [],
+    };
+
+    groupforImportMap.set(oldGroup.id, groupforImport);
+  }
+
+  //AssignmentGroup
+  const assignmentGroupStatement = new PreparedStatement({
+    name: "assignmentgroup",
+    text: 'SELECT * FROM "assignmentgroup"',
+  });
+  const oldAssignmentGroups = await Database.executeQuery(
+    assignmentGroupStatement
+  );
+  // console.log(oldAssignmentGroups);
+
+  console.log("go over assignmentgroups");
+  for (const oldAssignmentGroup of oldAssignmentGroups) {
+    const assignment = assignmentMap.get(oldAssignmentGroup.assignment_id)!;
+    const groupId = oldAssignmentGroup.group_id;
+    const group = groupforImportMap.get(groupId)!;
+    group.assignments.push(assignment);
+  }
+
+  //GroupUsers
+  const groupUsersStatement = new PreparedStatement({
+    name: "groupUsers",
+    text: 'SELECT * FROM "groupusers"',
+  });
+  const oldGroupUsers = await Database.executeQuery(groupUsersStatement);
+  // console.log(oldGroupUsers);
+
+  console.log("go over groupusers");
+  for (const oldGroupUser of oldGroupUsers) {
+    const user = userMap.get(oldGroupUser.user_netid)!;
+    if (user.netid !== oldGroupUser.user_netid) {
+      throw new Error("Wrong user");
+    }
+    const groupId = oldGroupUser.group_groupid;
+    const group = groupforImportMap.get(groupId)!;
+    group.users.push(user);
+  }
+
+  console.log("assign the right course");
+  for (const [_key, groupforImport] of groupforImportMap) {
+    if (groupforImport.users.length < 1) {
+      console.log(_key, groupforImport);
+    }
+    if (groupforImport.assignments.length !== 1) {
+      throw new Error(`${_key}, ${groupforImport}`);
+    } else {
+      groupforImport.course = await groupforImport.assignments[0].getCourse();
+    }
+  }
+
+  console.log(groupforImportMap);
 
   // Submission,
   // Questionnaire,
