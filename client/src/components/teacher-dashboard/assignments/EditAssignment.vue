@@ -324,7 +324,7 @@ export default {
         },
         assignmentFilePath() {
             // Get the assignment file path.
-            return `/api/assignments/${this.assignment.id}/file`
+            return `/api/oldroutes/assignments/${this.assignment.id}/file`
         }
     },
     async created() {
