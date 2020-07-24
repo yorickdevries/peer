@@ -25,7 +25,7 @@ const migrateDB = async function (): Promise<void> {
     text: 'SELECT * FROM "userlist"',
   });
   const oldUsers = await Database.executeQuery(userStatement);
-  // console.log(oldUsers[1000]);
+  console.log("num users:", oldUsers.length);
 
   // parse the postgres syntax for lists
   const replacePostgresSyntax = function (name?: string | string[]) {
