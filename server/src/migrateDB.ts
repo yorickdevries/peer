@@ -6,11 +6,17 @@ import _ from "lodash";
 // import saveUserFromSSO from "./util/saveUserFromSSO";
 import { PreparedStatement } from "pg-promise";
 import Database from "./old_api/database";
+import config from "config";
+const assignmentFolder = (config.get("assignments") as any).fileFolder;
+import path from "path";
+import fs from "fs";
+import constructFile from "./util/fileFactory";
 import Faculty from "./models/Faculty";
 import AcademicYear from "./models/AcademicYear";
 import Course from "./models/Course";
-import User from "./models/User";
-import Enrollment from "./models/Enrollment";
+import Assignment from "./models/Assignment";
+// import User from "./models/User";
+// import Enrollment from "./models/Enrollment";
 
 const migrateDB = async function (): Promise<void> {
   console.log("Start migration");
@@ -232,35 +238,129 @@ const migrateDB = async function (): Promise<void> {
   /*
    * Enrollment,
    */
+  // console.log();
+  // console.log("importing enrollments");
+  // const enrollmentStatement = new PreparedStatement({
+  //   name: "enrollment",
+  //   text: 'SELECT * FROM "enroll"',
+  // });
+  // const oldEnrollments = await Database.executeQuery(enrollmentStatement);
+  // console.log("num oldEnrollments: ", oldEnrollments.length);
+
+  // // create the enrollments
+  // for (const oldEnrollment of oldEnrollments) {
+  //   const course = courseMap.get(oldEnrollment.course_id)!;
+  //   const user = await User.findOneOrFail(oldEnrollment.user_netid);
+  //   if (user.netid !== oldEnrollment.user_netid) {
+  //     throw new Error("Wrong user");
+  //   }
+  //   let role = oldEnrollment.role;
+  //   // change role in case of TA
+  //   if (role === "TA") {
+  //     role = "teachingassistant";
+  //   }
+
+  //   const newEnrollment = new Enrollment(user, course, role);
+  //   await newEnrollment.save();
+  // }
+
+  /*
+   * Assignment,
+   */
   console.log();
-  console.log("importing enrollments");
-  const enrollmentStatement = new PreparedStatement({
-    name: "enrollment",
-    text: 'SELECT * FROM "enroll"',
+  console.log("importing assignments");
+  const assignmentStatement = new PreparedStatement({
+    name: "assignmentList",
+    text: 'SELECT * FROM "assignmentlist"',
   });
-  const oldEnrollments = await Database.executeQuery(enrollmentStatement);
-  console.log("num oldEnrollments: ", oldEnrollments.length);
+  const oldAssignments = await Database.executeQuery(assignmentStatement);
+  const sortedOldAssignments = _.sortBy(oldAssignments, "id");
+  console.log("num assignments: ", sortedOldAssignments.length);
+  // console.log(sortedOldAssignments);
 
-  // create the enrollments
-  for (const oldEnrollment of oldEnrollments) {
-    const course = courseMap.get(oldEnrollment.course_id)!;
-    const user = await User.findOneOrFail(oldEnrollment.user_netid);
-    if (user.netid !== oldEnrollment.user_netid) {
-      throw new Error("Wrong user");
-    }
-    let role = oldEnrollment.role;
-    // change role in case of TA
-    if (role === "TA") {
-      role = "teachingassistant";
-    }
+  const assignmentMap: Map<number, Assignment> = new Map<number, Assignment>();
 
-    const newEnrollment = new Enrollment(user, course, role);
-    await newEnrollment.save();
+  for (const oldAssignment of sortedOldAssignments) {
+    // id
+    const oldId = oldAssignment.id;
+    // title
+    const title = oldAssignment.title;
+    // description
+    let description = oldAssignment.description
+      ? oldAssignment.description
+      : null;
+    if (description === " ") {
+      description = null;
+    }
+    // course_id
+    const course = courseMap.get(oldAssignment.course_id)!;
+    // reviews_per_user
+    const reviewsPerUser = oldAssignment.reviews_per_user;
+    // filename
+    let file;
+    if (oldAssignment.filename) {
+      const filePath = path.resolve(assignmentFolder, oldAssignment.filename);
+      if (!fs.existsSync(filePath)) {
+        throw new Error(`${filePath} does not exist`);
+      }
+      const fileBuffer = fs.readFileSync(filePath);
+      file = constructFile(fileBuffer, filePath);
+    } else {
+      file = null;
+    }
+    // TODO: save file to appropriate location
+
+    // publish_date
+    const publishDate = new Date(oldAssignment.publish_date);
+    // due_date
+    const dueDate = new Date(oldAssignment.due_date);
+    // review_publish_date
+    const reviewPublishDate = new Date(oldAssignment.review_publish_date);
+    // review_due_date
+    const reviewDueDate = new Date(oldAssignment.review_due_date);
+    // one_person_groups
+    const enrollable = oldAssignment.one_person_groups;
+    // review_evaluation_due_date
+    const reviewEvaluationDueDate = oldAssignment.review_evaluation_due_date
+      ? new Date(oldAssignment.review_evaluation_due_date)
+      : null;
+    // review_evaluation
+    const reviewEvaluation = oldAssignment.review_evaluation;
+    // external_link
+    const externalLink = oldAssignment.external_link
+      ? oldAssignment.external_link
+      : null;
+    // will be filled in later
+    const submissionQuestionnaire = null;
+    const reviewQuestionnaire = null;
+
+    const newAssignment = new Assignment(
+      title,
+      course,
+      reviewsPerUser,
+      enrollable,
+      reviewEvaluation,
+      publishDate,
+      dueDate,
+      reviewPublishDate,
+      reviewDueDate,
+      reviewEvaluationDueDate,
+      description,
+      file,
+      externalLink,
+      submissionQuestionnaire,
+      reviewQuestionnaire
+    );
+    await newAssignment.save();
+    assignmentMap.set(oldId, newAssignment);
   }
+  // console.log(assignmentMap);
 
-  // Assignment,
-  // File,
-  // Group,
+  // File, will be saved in respective using classes
+  /*
+   * Group,
+   */
+
   // Submission,
   // Questionnaire,
   // SubmissionQuestionnaire,
