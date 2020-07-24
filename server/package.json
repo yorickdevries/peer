@@ -15,7 +15,8 @@
     "data_init_old": "node ./dist/old_api/scripts/data_init.js",
     "typeorm": "ts-node ./node_modules/typeorm/cli.js --config src/ormconfig.ts",
     "typeorm:migration:generate": "npm run typeorm migration:generate -- -n",
-    "typeorm:migration:run": "npm run typeorm migration:run"
+    "typeorm:migration:run": "npm run typeorm migration:run",
+    "migrateDB": "ts-node ./src/migrateDB.ts"
   },
   "nyc": {
     "check-coverage": true,
