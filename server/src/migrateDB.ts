@@ -6,8 +6,8 @@ import _ from "lodash";
 // import saveUserFromSSO from "./util/saveUserFromSSO";
 import { PreparedStatement } from "pg-promise";
 import Database from "./old_api/database";
-import AcademicYear from "./models/AcademicYear";
 import Faculty from "./models/Faculty";
+import AcademicYear from "./models/AcademicYear";
 import Course from "./models/Course";
 
 const migrateDB = async function (): Promise<void> {
@@ -25,6 +25,7 @@ const migrateDB = async function (): Promise<void> {
    */
   // get all users
   /*
+  console.log("importing users");
   const userStatement = new PreparedStatement({
     name: "users",
     text: 'SELECT * FROM "userlist"',
@@ -108,6 +109,8 @@ const migrateDB = async function (): Promise<void> {
   /*
    * Faculty,
    */
+  console.log();
+  console.log("importing faculties");
   // const facultyStatement = new PreparedStatement({
   //   name: "faculties",
   //   text: 'SELECT * FROM "facultylist"',
@@ -155,6 +158,8 @@ const migrateDB = async function (): Promise<void> {
   /*
    * AcademicYear,
    */
+  console.log();
+  console.log("importing academic years");
   // const academicYearStatement = new PreparedStatement({
   //   name: "AcademicYearList",
   //   text: 'SELECT * FROM "academicyearlist"',
@@ -220,8 +225,7 @@ const migrateDB = async function (): Promise<void> {
     await newCourse.save();
     courseMap.set(oldId, newCourse);
   }
-
-  console.log(courseMap);
+  // console.log(courseMap);
 
   // Enrollment,
   // Assignment,
