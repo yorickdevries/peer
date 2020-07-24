@@ -60,7 +60,7 @@
             :filter="filter"
         >
             <template slot="file_path" slot-scope="data">
-                <a :href="`/api/submissions/${data.item.id}/file`" target="_blank"> {{ data.value }} </a>
+                <a :href="`/api/oldroutes/submissions/${data.item.id}/file`" target="_blank"> {{ data.value }} </a>
             </template>
 
             <template slot="formattedDate" slot-scope="row">
