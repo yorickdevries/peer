@@ -17,6 +17,7 @@ import Course from "./models/Course";
 import Assignment from "./models/Assignment";
 import User from "./models/User";
 import Enrollment from "./models/Enrollment";
+import Group from "./models/Group";
 
 const migrateDB = async function (): Promise<void> {
   console.log("Start migration");
@@ -444,10 +445,24 @@ const migrateDB = async function (): Promise<void> {
       groupforImport.course = await groupforImport.assignments[0].getCourse();
     }
   }
+  // make the groups in the database
+  const groupMap: Map<number, Group> = new Map<number, Group>();
+  for (const [oldId, groupforImport] of groupforImportMap) {
+    const group = new Group(
+      groupforImport.groupName,
+      groupforImport.course!,
+      groupforImport.users,
+      groupforImport.assignments
+    );
+    await group.save();
+    groupMap.set(oldId, group);
+  }
+  console.log(groupMap);
 
-  console.log(groupforImportMap);
+  /*
+   * Submission,
+   */
 
-  // Submission,
   // Questionnaire,
   // SubmissionQuestionnaire,
   // ReviewQuestionnaire,
@@ -476,7 +491,52 @@ const migrateDB = async function (): Promise<void> {
   return;
 };
 
-migrateDB()
+const migrateDB2 = async function (): Promise<void> {
+  console.log("Start migration");
+
+  // database connection with mysql database
+  const connection = await createConnection(ormconfig);
+  console.log(connection.name);
+
+  const submissionStatement = new PreparedStatement({
+    name: "submissionStatement",
+    text: 'SELECT * FROM "submission"',
+  });
+  const oldSubmissions = await Database.executeQuery(submissionStatement);
+
+  const sortedOldSubmissions = _.sortBy(oldSubmissions, "id");
+  console.log("num submissions: ", sortedOldSubmissions.length);
+
+  for (const sortedOldSubmission of sortedOldSubmissions) {
+    const oldId = sortedOldSubmission.id;
+    // const user = userMap.get(sortedOldSubmission.user_netid);
+    const user = sortedOldSubmission.user_netid;
+    const group = sortedOldSubmission.group_id;
+    const assignment = sortedOldSubmission.assignment_id;
+
+    // veel van de files zijn niet hier nu
+    const filePath = sortedOldSubmission.file_path;
+    const date = sortedOldSubmission.date;
+
+    // make this intp a submission entry
+    console.log(oldId, user, group, assignment, filePath, date);
+  }
+
+  /* CHECK IN REVIEWS WHETHER THIS WENT OK!!!!
+  for(let i = 1; i < sortedOldSubmissions.length; i++){
+    const previous = sortedOldSubmissions[i - 1];
+    const current = sortedOldSubmissions[i];
+    if(previous.date >= current.date){
+      console.log(previous);
+      console.log(current);
+    }
+  }
+  */
+};
+
+console.log(migrateDB);
+
+migrateDB2()
   .then(() => {
     console.log("finished succesfully");
     process.exit(0);
