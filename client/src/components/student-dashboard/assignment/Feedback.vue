@@ -294,7 +294,7 @@ export default {
             }
         },
         uploadQuestionFilePath(reviewId, questionId) {
-            return `/api/reviews/${reviewId}/questions/${questionId}/file`
+            return `/api/oldroutes/reviews/${reviewId}/questions/${questionId}/file`
         }
     }
 }

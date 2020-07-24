@@ -322,7 +322,7 @@ export default {
             await this.fetchEvaluation()
         },
         uploadQuestionFilePath(reviewId, questionId) {
-            return `/api/reviews/${reviewId}/questions/${questionId}/file`
+            return `/api/oldroutes/reviews/${reviewId}/questions/${questionId}/file`
         },
         clearFiles() {
             // eslint-disable-next-line

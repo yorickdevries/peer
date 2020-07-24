@@ -224,7 +224,7 @@ export default {
         },
         peerReviewFilePath() {
             // Get the submission file path.
-            return `/api/reviews/${this.peerReview.review.id}/file`
+            return `/api/oldroutes/reviews/${this.peerReview.review.id}/file`
         }
     },
     async created() {
@@ -295,7 +295,7 @@ export default {
             }
         },
         uploadQuestionFilePath(reviewId, questionId) {
-            return `/api/reviews/${reviewId}/questions/${questionId}/file`
+            return `/api/oldroutes/reviews/${reviewId}/questions/${questionId}/file`
         }
     }
 }
