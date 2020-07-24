@@ -1,10 +1,12 @@
 import "reflect-metadata"; // needed for typeORM to work
 import { createConnection } from "typeorm";
 import * as ormconfig from "./ormconfig";
-import { PreparedStatement } from "pg-promise";
-import Database from "./old_api/database";
-import parseNetID from "./util/parseNetID";
-import saveUserFromSSO from "./util/saveUserFromSSO";
+// import parseNetID from "./util/parseNetID";
+// import saveUserFromSSO from "./util/saveUserFromSSO";
+// import { PreparedStatement } from "pg-promise";
+// import Database from "./old_api/database";
+import AcademicYear from "./models/AcademicYear";
+import Faculty from "./models/Faculty";
 
 const migrateDB = async function (): Promise<void> {
   console.log("Start migration");
@@ -20,6 +22,7 @@ const migrateDB = async function (): Promise<void> {
    * OrganisationUnit,
    */
   // get all users
+  /*
   const userStatement = new PreparedStatement({
     name: "users",
     text: 'SELECT * FROM "userlist"',
@@ -98,9 +101,58 @@ const migrateDB = async function (): Promise<void> {
     newUsers.push(savedNetid);
   }
   console.log(`saved ${newUsers.length} users`);
+  */
 
-  // Faculty,
-  // AcademicYear,
+  /*
+   * Faculty,
+   */
+  // const facultyStatement = new PreparedStatement({
+  //   name: "faculties",
+  //   text: 'SELECT * FROM "facultylist"',
+  // });
+  // const oldFaculties = await Database.executeQuery(facultyStatement);
+  // console.log(oldFaculties);
+
+  // map to convert the previous names to the new objects
+  const facultyMap = {
+    EWI: await new Faculty(
+      "EEMCS",
+      "Electrical Engineering, Mathematics & Computer Science"
+    ).save(),
+    "3ME": await new Faculty(
+      "3mE",
+      "Mechanical, Maritime and Materials Engineering"
+    ).save(),
+    TNW: await new Faculty("AS", "Applied Sciences").save(),
+    TBM: await new Faculty("TPM", "Technology, Policy and Management").save(),
+    BK: await new Faculty(
+      "ABE",
+      "Architecture and the Built Environment"
+    ).save(),
+    CITG: await new Faculty("CEG", "Civil Engineering and Geosciences").save(),
+    IO: await new Faculty("IDE", "Industrial Design Engineering").save(),
+    LR: await new Faculty("AE", "Aerospace Engineering").save(),
+  };
+  console.log(facultyMap);
+
+  /*
+   * AcademicYear,
+   */
+  // const academicYearStatement = new PreparedStatement({
+  //   name: "AcademicYearList",
+  //   text: 'SELECT * FROM "academicyearlist"',
+  // });
+  // const oldAcademicYears = await Database.executeQuery(academicYearStatement);
+  // console.log(oldAcademicYears);
+
+  // map to convert the previous names to the new objects
+  const academicYearMap = {
+    "2018/2019": await new AcademicYear("2018/2019", false).save(),
+    "2019/2020": await new AcademicYear("2019/2020", true).save(),
+    "2020/2021": await new AcademicYear("2020/2021", true).save(),
+  };
+  console.log(academicYearMap);
+
   // Course,
   // Enrollment,
   // Assignment,
