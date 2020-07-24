@@ -1,12 +1,14 @@
 import "reflect-metadata"; // needed for typeORM to work
 import { createConnection } from "typeorm";
 import * as ormconfig from "./ormconfig";
+import _ from "lodash";
 // import parseNetID from "./util/parseNetID";
 // import saveUserFromSSO from "./util/saveUserFromSSO";
-// import { PreparedStatement } from "pg-promise";
-// import Database from "./old_api/database";
+import { PreparedStatement } from "pg-promise";
+import Database from "./old_api/database";
 import AcademicYear from "./models/AcademicYear";
 import Faculty from "./models/Faculty";
+import Course from "./models/Course";
 
 const migrateDB = async function (): Promise<void> {
   console.log("Start migration");
@@ -114,26 +116,41 @@ const migrateDB = async function (): Promise<void> {
   // console.log(oldFaculties);
 
   // map to convert the previous names to the new objects
-  const facultyMap = {
-    EWI: await new Faculty(
+  const facultyMap: Map<string, Faculty> = new Map<string, Faculty>();
+  facultyMap.set(
+    "EWI",
+    await new Faculty(
       "EEMCS",
       "Electrical Engineering, Mathematics & Computer Science"
-    ).save(),
-    "3ME": await new Faculty(
+    ).save()
+  );
+  facultyMap.set(
+    "3ME",
+    await new Faculty(
       "3mE",
       "Mechanical, Maritime and Materials Engineering"
-    ).save(),
-    TNW: await new Faculty("AS", "Applied Sciences").save(),
-    TBM: await new Faculty("TPM", "Technology, Policy and Management").save(),
-    BK: await new Faculty(
-      "ABE",
-      "Architecture and the Built Environment"
-    ).save(),
-    CITG: await new Faculty("CEG", "Civil Engineering and Geosciences").save(),
-    IO: await new Faculty("IDE", "Industrial Design Engineering").save(),
-    LR: await new Faculty("AE", "Aerospace Engineering").save(),
-  };
-  console.log(facultyMap);
+    ).save()
+  );
+  facultyMap.set("TNW", await new Faculty("AS", "Applied Sciences").save());
+  facultyMap.set(
+    "TBM",
+    await new Faculty("TPM", "Technology, Policy and Management").save()
+  );
+  facultyMap.set(
+    "BK",
+    await new Faculty("ABE", "Architecture and the Built Environment").save()
+  );
+  facultyMap.set(
+    "CITG",
+    await new Faculty("CEG", "Civil Engineering and Geosciences").save()
+  );
+  facultyMap.set(
+    "IO",
+    await new Faculty("IDE", "Industrial Design Engineering").save()
+  );
+  facultyMap.set("LR", await new Faculty("AE", "Aerospace Engineering").save());
+
+  // console.log(facultyMap);
 
   /*
    * AcademicYear,
@@ -146,14 +163,66 @@ const migrateDB = async function (): Promise<void> {
   // console.log(oldAcademicYears);
 
   // map to convert the previous names to the new objects
-  const academicYearMap = {
-    "2018/2019": await new AcademicYear("2018/2019", false).save(),
-    "2019/2020": await new AcademicYear("2019/2020", true).save(),
-    "2020/2021": await new AcademicYear("2020/2021", true).save(),
-  };
-  console.log(academicYearMap);
+  const academicYearMap: Map<string, AcademicYear> = new Map<
+    string,
+    AcademicYear
+  >();
+  academicYearMap.set(
+    "2018/2019",
+    await new AcademicYear("2018/2019", false).save()
+  );
+  academicYearMap.set(
+    "2019/2020",
+    await new AcademicYear("2019/2020", true).save()
+  );
+  academicYearMap.set(
+    "2020/2021",
+    await new AcademicYear("2020/2021", true).save()
+  );
+  // console.log(academicYearMap);
 
-  // Course,
+  /*
+   * Course,
+   */
+  console.log();
+  console.log("importing courses");
+  const courseStatement = new PreparedStatement({
+    name: "courseList",
+    text: 'SELECT * FROM "courselist"',
+  });
+  const oldCourses = await Database.executeQuery(courseStatement);
+  const sortedOldCourses = _.sortBy(oldCourses, "id");
+  console.log("num courses: ", sortedOldCourses.length);
+
+  const courseMap: Map<number, Course> = new Map<number, Course>();
+
+  for (const oldCourse of sortedOldCourses) {
+    const oldId: number = oldCourse.id;
+    const description: string | null = oldCourse.description
+      ? oldCourse.description
+      : null;
+    const name: string = oldCourse.name;
+    const courseCode: string = oldCourse.course_code;
+    const enrollable: boolean = oldCourse.enrollable;
+    const faculty: Faculty = facultyMap.get(oldCourse.faculty)!;
+    const academicYear: AcademicYear = academicYearMap.get(
+      oldCourse.academic_year
+    )!;
+
+    const newCourse = new Course(
+      name,
+      courseCode,
+      enrollable,
+      faculty,
+      academicYear,
+      description
+    );
+    await newCourse.save();
+    courseMap.set(oldId, newCourse);
+  }
+
+  console.log(courseMap);
+
   // Enrollment,
   // Assignment,
   // File,
