@@ -11,9 +11,9 @@ import fs from "fs";
 import config from "config";
 const assignmentFolder = (config.get("assignments") as any).fileFolder;
 const submissionFolder = (config.get("submissions") as any).fileFolder;
-const examplefolder = (config.get("exampleData") as any)
-  .exampleAssignmentFolder;
-const dummyFilePath = path.resolve(examplefolder, "assignment1.pdf");
+// const examplefolder = (config.get("exampleData") as any)
+//   .exampleAssignmentFolder;
+// const dummyFilePath = path.resolve(examplefolder, "assignment1.pdf");
 import constructFile from "./util/fileFactory";
 import Faculty from "./models/Faculty";
 import AcademicYear from "./models/AcademicYear";
@@ -32,8 +32,11 @@ import CheckboxQuestion from "./models/CheckboxQuestion";
 import OpenQuestion from "./models/OpenQuestion";
 import RangeQuestion from "./models/RangeQuestion";
 import UploadQuestion from "./models/UploadQuestion";
+import CheckboxQuestionOption from "./models/CheckboxQuestionOption";
+import MultipleChoiceQuestionOption from "./models/MultipleChoiceQuestionOption";
+import File from "./models/File";
 
-const migrateDBFull = async function (): Promise<void> {
+const migrateDB = async function (): Promise<void> {
   console.log("Start migration");
 
   // database connection with mysql database
@@ -597,23 +600,36 @@ const migrateDBFull = async function (): Promise<void> {
       //throw new Error(`${filePath} does not exist`);
       // TODO: remove this code and throw error if the file is not found
       // console.log("niet gevonden");
-      filePath = dummyFilePath;
+      // filePath = dummyFilePath;
+      filePath = "";
     }
     //  else {
     //   console.log("wel gevonden");
     // }
-    const fileBuffer = fs.readFileSync(filePath);
-    // also saves the file to disk
-    const file = await constructFile(fileBuffer, filePath);
+    let file: File;
+    if (filepath !== "") {
+      const fileBuffer = fs.readFileSync(filePath);
+      // also saves the file to disk
+      file = await constructFile(fileBuffer, filePath);
+    } else {
+      // get just file 1
+      file = await File.findOneOrFail(1);
+    }
+
     const date = sortedOldSubmission.date;
 
     // make this into a submission entry
     //console.log(oldId, user, group, assignment, file, date);
-    const submission = new Submission(user, group, assignment, file);
-    await submission.save();
-    submission.createdAt = date;
-    await submission.save();
-    submissionMap.set(oldId, submission);
+    try {
+      const submission = new Submission(user, group, assignment, file);
+      await submission.save();
+      submission.createdAt = date;
+      await submission.save();
+      submissionMap.set(oldId, submission);
+    } catch (error) {
+      console.log(error);
+      console.log(sortedOldSubmission);
+    }
   }
 
   /* CHECK IN REVIEWS WHETHER THIS WENT OK!!!!
@@ -884,7 +900,74 @@ const migrateDBFull = async function (): Promise<void> {
 
   // QuestionOption,
   // CheckboxQuestionOption,
+  // QuestionOption,
+  console.log();
+  console.log("importing checkboxquestionoptions");
+  const checkboxoptionStatement = new PreparedStatement({
+    name: "checkboxoptionList",
+    text: 'SELECT * FROM "checkboxoption"',
+  });
+
+  const oldCheckboxOptions = await Database.executeQuery(
+    checkboxoptionStatement
+  );
+  const sortedOldCheckboxOptions = _.sortBy(oldCheckboxOptions, "id");
+  console.log("num checkboxopitons: ", sortedOldCheckboxOptions.length);
+
+  const checkboxOptionsMap: Map<number, CheckboxQuestionOption> = new Map<
+    number,
+    CheckboxQuestionOption
+  >();
+  for (const oldCheckboxOption of sortedOldCheckboxOptions) {
+    // id SERIAL,
+    const oldId = oldCheckboxOption.id;
+    // option varchar(5000) NOT NULL,
+    const optionText = oldCheckboxOption.option;
+    // CheckboxQuestion_id int NOT NULL,
+    const question = checkboxquestionMap.get(
+      oldCheckboxOption.checkboxquestion_id
+    )!;
+    // const question = oldCheckboxOption.checkboxquestion_id;
+
+    console.log(oldId, optionText, question);
+    const option = new CheckboxQuestionOption(optionText, question);
+    await option.save();
+
+    checkboxOptionsMap.set(oldId, option);
+  }
+
   // MultipleChoiceQuestionOption,
+  // MultipleChoiceQuestionOption,
+  console.log();
+  console.log("importing mcquestionoptions");
+  const mcoptionStatement = new PreparedStatement({
+    name: "mcoptionList",
+    text: 'SELECT * FROM "mcoption"',
+  });
+
+  const oldMCOptions = await Database.executeQuery(mcoptionStatement);
+  const sortedOldMCOptions = _.sortBy(oldMCOptions, "id");
+  console.log("num mcquestionsoptions: ", sortedOldMCOptions.length);
+
+  const mcOptionsMap: Map<number, MultipleChoiceQuestionOption> = new Map<
+    number,
+    MultipleChoiceQuestionOption
+  >();
+  for (const oldMCOption of sortedOldMCOptions) {
+    // id SERIAL,
+    const oldId = oldMCOption.id;
+    // option varchar(5000) NOT NULL,
+    const optionText = oldMCOption.option;
+    //     MCQuestion_id int NOT NULL,
+    const question = mcquestionMap.get(oldMCOption.mcquestion_id)!;
+    // const question = oldMCOption.mcquestion_id;
+
+    // console.log(oldId, optionText, question);
+    const option = new MultipleChoiceQuestionOption(optionText, question);
+    await option.save();
+
+    mcOptionsMap.set(oldId, option);
+  }
 
   // Review,
   // ReviewOfSubmission,
@@ -910,11 +993,78 @@ const migrateDBTest = async function (): Promise<void> {
   // database connection with mysql database
   const connection = await createConnection(ormconfig);
   console.log(connection.name);
+
+  // Review,
+  // ReviewOfSubmission,
+  // ReviewOfReview,
+
+  console.log();
+  console.log("importing reviews");
+  const reviewStatement = new PreparedStatement({
+    name: "reviewList",
+    text: 'SELECT * FROM "review"',
+  });
+
+  const oldReviews = await Database.executeQuery(reviewStatement);
+  const sortedOldReviews = _.sortBy(oldReviews, "id");
+  console.log("num reviews: ", sortedOldReviews.length);
+
+  // const reviewMap: Map<number, Review> = new Map<number,Review>();
+  for (const oldReview of sortedOldReviews) {
+    // id SERIAL,
+    const oldId = oldReview.id;
+    // User_netid varchar(500) NOT NULL,
+    const user = oldReview.user_netid;
+    // Submission_id int,
+    const submission = oldReview.submission_id;
+    // evaluated_review_id int,
+    const evaluatedReview = oldReview.evaluated_review_id;
+    // flagged BOOLEAN NOT NULL DEFAULT FALSE,
+    const flagged = oldReview.flagged;
+    // Rubric_id int NOT NULL,
+    const rubric = oldReview.rubric_id;
+    // done BOOLEAN NOT NULL DEFAULT FALSE,
+    const done = oldReview.done;
+    // creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    const creationDate = oldReview.creation_date;
+    // started_at timestamptz,
+    const startedAt = oldReview.started_at;
+    // downloaded_at timestamptz,
+    const downloadedAt = oldReview.downloaded_at;
+    // submitted_at timestamptz,
+    const submittedAt = oldReview.submitted_at;
+    // saved_at timestamptz,
+    const savedAt = oldReview.saved_at;
+    // approved boolean,
+    const approval = oldReview.approved;
+    // ta_netid varchar(500),
+    const taNetid = oldReview.ta_netid;
+
+    console.log(
+      oldId,
+      user,
+      submission,
+      evaluatedReview,
+      flagged,
+      rubric,
+      done,
+      creationDate,
+      startedAt,
+      downloadedAt,
+      submittedAt,
+      savedAt,
+      approval,
+      taNetid
+    );
+
+    // await option.save();
+    // mcOptionsMap.set(oldId, option);
+  }
 };
 
-console.log(migrateDBFull, migrateDBTest);
+console.log(migrateDB, migrateDBTest);
 
-migrateDBFull()
+migrateDB()
   .then(() => {
     console.log("finished succesfully");
     process.exit(0);
