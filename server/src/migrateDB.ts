@@ -6,10 +6,14 @@ import parseNetID from "./util/parseNetID";
 import saveUserFromSSO from "./util/saveUserFromSSO";
 import { PreparedStatement } from "pg-promise";
 import Database from "./old_api/database";
-import config from "config";
-const assignmentFolder = (config.get("assignments") as any).fileFolder;
 import path from "path";
 import fs from "fs";
+import config from "config";
+const assignmentFolder = (config.get("assignments") as any).fileFolder;
+const submissionFolder = (config.get("submissions") as any).fileFolder;
+const examplefolder = (config.get("exampleData") as any)
+  .exampleAssignmentFolder;
+const dummyFilePath = path.resolve(examplefolder, "assignment1.pdf");
 import constructFile from "./util/fileFactory";
 import Faculty from "./models/Faculty";
 import AcademicYear from "./models/AcademicYear";
@@ -18,8 +22,18 @@ import Assignment from "./models/Assignment";
 import User from "./models/User";
 import Enrollment from "./models/Enrollment";
 import Group from "./models/Group";
+import UserRole from "./enum/UserRole";
+import Submission from "./models/Submission";
+import Questionnaire from "./models/Questionnaire";
+import SubmissionQuestionnaire from "./models/SubmissionQuestionnaire";
+import ReviewQuestionnaire from "./models/ReviewQuestionnaire";
+import MultipleChoiceQuestion from "./models/MultipleChoiceQuestion";
+import CheckboxQuestion from "./models/CheckboxQuestion";
+import OpenQuestion from "./models/OpenQuestion";
+import RangeQuestion from "./models/RangeQuestion";
+import UploadQuestion from "./models/UploadQuestion";
 
-const migrateDB = async function (): Promise<void> {
+const migrateDBFull = async function (): Promise<void> {
   console.log("Start migration");
 
   // database connection with mysql database
@@ -257,18 +271,99 @@ const migrateDB = async function (): Promise<void> {
   for (const oldEnrollment of oldEnrollments) {
     const course = courseMap.get(oldEnrollment.course_id)!;
     const user = userMap.get(oldEnrollment.user_netid)!;
-    if (user.netid !== oldEnrollment.user_netid) {
-      throw new Error("Wrong user");
-    }
     let role = oldEnrollment.role;
     // change role in case of TA
     if (role === "TA") {
       role = "teachingassistant";
     }
 
+    // FIX inciorrect roles thorughout the database
+    // edge case where I did a review, so must be a student
+    if (user.netid === "yorickdevries" && course.id === 2) {
+      console.log(
+        `${user.netid} changed from ${role} to student in course ${course.id}`
+      );
+      role = "student";
+    }
+    // test course
+    if (user.netid === "mlopescunha" && course.id === 5) {
+      console.log(
+        `${user.netid} changed from ${role} to student in course ${course.id}`
+      );
+      role = "student";
+    }
+    // test course
+    if (user.netid === "yorickdevries" && course.id === 8) {
+      console.log(
+        `${user.netid} changed from ${role} to student in course ${course.id}`
+      );
+      role = "student";
+    }
+    // another mixed test course
+    if (user.netid === "lpnkoopman" && course.id === 12) {
+      console.log(
+        `${user.netid} changed from ${role} to student in course ${course.id}`
+      );
+      role = "student";
+    }
+    if (user.netid === "rhelwig" && course.id === 12) {
+      console.log(
+        `${user.netid} changed from ${role} to student in course ${course.id}`
+      );
+      role = "student";
+    }
+    if (user.netid === "sbezelev" && course.id === 12) {
+      console.log(
+        `${user.netid} changed from ${role} to student in course ${course.id}`
+      );
+      role = "student";
+    }
+    if (user.netid === "mauritswassena" && course.id === 12) {
+      console.log(
+        `${user.netid} changed from ${role} to student in course ${course.id}`
+      );
+      role = "student";
+    }
+
+    // course 16
+    if (user.netid === "mjjoosten" && course.id === 16) {
+      console.log(
+        `${user.netid} changed from ${role} to student in course ${course.id}`
+      );
+      role = "student";
+    }
+    // note: test ta approval need to be changed to null
+    if (user.netid === "evavanoosten" && course.id === 16) {
+      console.log(
+        `${user.netid} changed from ${role} to student in course ${course.id}`
+      );
+      role = "student";
+    }
+    if (user.netid === "beslamimossall" && course.id === 16) {
+      console.log(
+        `${user.netid} changed from ${role} to student in course ${course.id}`
+      );
+      role = "student";
+    }
+    if (user.netid === "jvandegrint" && course.id === 16) {
+      console.log(
+        `${user.netid} changed from ${role} to student in course ${course.id}`
+      );
+      role = "student";
+    }
+
     const newEnrollment = new Enrollment(user, course, role);
     await newEnrollment.save();
   }
+
+  // AD course (mathijs made teacher now)
+  // make mathijs a teacher for AD
+  const mathijsEnrollment = new Enrollment(
+    userMap.get("mdeweerdt")!,
+    courseMap.get(2)!,
+    UserRole.TEACHER
+  );
+  await mathijsEnrollment.save();
 
   /*
    * Assignment,
@@ -310,11 +405,11 @@ const migrateDB = async function (): Promise<void> {
         throw new Error(`${filePath} does not exist`);
       }
       const fileBuffer = fs.readFileSync(filePath);
-      file = constructFile(fileBuffer, filePath);
+      // also saves the file to disk
+      file = await constructFile(fileBuffer, filePath);
     } else {
       file = null;
     }
-    // TODO: save file to appropriate location
 
     // publish_date
     const publishDate = new Date(oldAssignment.publish_date);
@@ -387,7 +482,7 @@ const migrateDB = async function (): Promise<void> {
     number,
     GroupforImport
   >();
-  for (const oldGroup of oldGroups) {
+  for (const oldGroup of sortedOldGroups) {
     const groupforImport: GroupforImport = {
       groupName: oldGroup.group_name,
       assignments: [],
@@ -426,11 +521,17 @@ const migrateDB = async function (): Promise<void> {
   console.log("go over groupusers");
   for (const oldGroupUser of oldGroupUsers) {
     const user = userMap.get(oldGroupUser.user_netid)!;
-    if (user.netid !== oldGroupUser.user_netid) {
-      throw new Error("Wrong user");
-    }
     const groupId = oldGroupUser.group_groupid;
     const group = groupforImportMap.get(groupId)!;
+    if (
+      user.netid === "lcschroten" &&
+      (groupId === 14287 || groupId === 14088)
+    ) {
+      console.log(
+        `skipping group ${groupId} for ${user.netid} because teacher`
+      );
+      continue;
+    }
     group.users.push(user);
   }
 
@@ -448,6 +549,14 @@ const migrateDB = async function (): Promise<void> {
   // make the groups in the database
   const groupMap: Map<number, Group> = new Map<number, Group>();
   for (const [oldId, groupforImport] of groupforImportMap) {
+    if (oldId === 14086) {
+      console.log("skipped sanders group");
+      continue;
+    }
+    if (oldId === 14526) {
+      console.log("skipped mkrceks group");
+      continue;
+    }
     const group = new Group(
       groupforImport.groupName,
       groupforImport.course!,
@@ -457,47 +566,11 @@ const migrateDB = async function (): Promise<void> {
     await group.save();
     groupMap.set(oldId, group);
   }
-  console.log(groupMap);
+  //console.log(groupMap);
 
   /*
    * Submission,
    */
-
-  // Questionnaire,
-  // SubmissionQuestionnaire,
-  // ReviewQuestionnaire,
-  // Question,
-  // CheckboxQuestion,
-  // MultipleChoiceQuestion,
-  // OpenQuestion,
-  // RangeQuestion,
-  // UploadQuestion,
-  // QuestionOption,
-  // CheckboxQuestionOption,
-  // MultipleChoiceQuestionOption,
-  // Review,
-  // ReviewOfSubmission,
-  // ReviewOfReview,
-  // QuestionAnswer,
-  // CheckboxQuestionAnswer,
-  // MultipleChoiceQuestionAnswer,
-  // OpenQuestionAnswer,
-  // RangeQuestionAnswer,
-  // UploadQuestionAnswer,
-  // SubmissionComment,
-  // ReviewComment,
-
-  console.log("Done migration");
-  return;
-};
-
-const migrateDB2 = async function (): Promise<void> {
-  console.log("Start migration");
-
-  // database connection with mysql database
-  const connection = await createConnection(ormconfig);
-  console.log(connection.name);
-
   const submissionStatement = new PreparedStatement({
     name: "submissionStatement",
     text: 'SELECT * FROM "submission"',
@@ -507,19 +580,40 @@ const migrateDB2 = async function (): Promise<void> {
   const sortedOldSubmissions = _.sortBy(oldSubmissions, "id");
   console.log("num submissions: ", sortedOldSubmissions.length);
 
+  const submissionMap: Map<number, Submission> = new Map<number, Submission>();
+
   for (const sortedOldSubmission of sortedOldSubmissions) {
     const oldId = sortedOldSubmission.id;
-    // const user = userMap.get(sortedOldSubmission.user_netid);
-    const user = sortedOldSubmission.user_netid;
-    const group = sortedOldSubmission.group_id;
-    const assignment = sortedOldSubmission.assignment_id;
+    const user = userMap.get(sortedOldSubmission.user_netid)!;
+    const group = groupMap.get(sortedOldSubmission.group_id)!;
+    const assignment = assignmentMap.get(sortedOldSubmission.assignment_id)!;
 
     // veel van de files zijn niet hier nu
-    const filePath = sortedOldSubmission.file_path;
+    let filePath = path.resolve(
+      submissionFolder,
+      sortedOldSubmission.file_path
+    );
+    if (!fs.existsSync(filePath)) {
+      //throw new Error(`${filePath} does not exist`);
+      // TODO: remove this code and throw error if the file is not found
+      // console.log("niet gevonden");
+      filePath = dummyFilePath;
+    }
+    //  else {
+    //   console.log("wel gevonden");
+    // }
+    const fileBuffer = fs.readFileSync(filePath);
+    // also saves the file to disk
+    const file = await constructFile(fileBuffer, filePath);
     const date = sortedOldSubmission.date;
 
-    // make this intp a submission entry
-    console.log(oldId, user, group, assignment, filePath, date);
+    // make this into a submission entry
+    //console.log(oldId, user, group, assignment, file, date);
+    const submission = new Submission(user, group, assignment, file);
+    await submission.save();
+    submission.createdAt = date;
+    await submission.save();
+    submissionMap.set(oldId, submission);
   }
 
   /* CHECK IN REVIEWS WHETHER THIS WENT OK!!!!
@@ -532,11 +626,295 @@ const migrateDB2 = async function (): Promise<void> {
     }
   }
   */
+
+  /*
+   * Questionnaire,
+   * SubmissionQuestionnaire,
+   * ReviewQuestionnaire,
+   */
+  console.log();
+  console.log("importing questionnaires");
+  const rubricStatement = new PreparedStatement({
+    name: "rubricList",
+    text: 'SELECT * FROM "rubric"',
+  });
+  const oldRubrics = await Database.executeQuery(rubricStatement);
+  const sortedOldRubrics = _.sortBy(oldRubrics, "id");
+  console.log("num Rubrics: ", sortedOldRubrics.length);
+  // console.log(sortedOldRubrics);
+
+  const questionnaireMap: Map<number, Questionnaire> = new Map<
+    number,
+    Questionnaire
+  >();
+  for (const oldRubric of sortedOldRubrics) {
+    // id SERIAL,
+    const oldId = oldRubric.id;
+    // Assignment_id int NOT NULL,
+    const assignment: Assignment = assignmentMap.get(oldRubric.assignment_id)!;
+    // type varchar(100) NOT NULL,
+    const typeOfQ = oldRubric.type;
+
+    // console.log(oldId, assignment, typeOfQ);
+    if (typeOfQ === "submission") {
+      const questionnaire = new SubmissionQuestionnaire();
+      await questionnaire.save();
+      assignment.submissionQuestionnaire = questionnaire;
+      await assignment.save();
+      // set values in the map
+      assignmentMap.set(oldRubric.assignment_id, assignment);
+      questionnaireMap.set(oldId, questionnaire);
+    } else if (typeOfQ === "review") {
+      const questionnaire = new ReviewQuestionnaire();
+      await questionnaire.save();
+      assignment.reviewQuestionnaire = questionnaire;
+      await assignment.save();
+      // set values in the map
+      assignmentMap.set(oldRubric.assignment_id, assignment);
+      questionnaireMap.set(oldId, questionnaire);
+    } else {
+      throw new Error("wrong type");
+    }
+  }
+
+  // Question,
+  // CheckboxQuestion,
+  console.log();
+  console.log("importing checkboxquestions");
+  const checkboxquestionStatement = new PreparedStatement({
+    name: "checkboxquestionList",
+    text: 'SELECT * FROM "checkboxquestion"',
+  });
+  const oldcheckboxquestions = await Database.executeQuery(
+    checkboxquestionStatement
+  );
+  const sortedOldcheckboxquestions = _.sortBy(oldcheckboxquestions, "id");
+  console.log("num checkboxquestions: ", sortedOldcheckboxquestions.length);
+  // console.log(sortedOldRubrics);
+
+  const checkboxquestionMap: Map<number, CheckboxQuestion> = new Map<
+    number,
+    CheckboxQuestion
+  >();
+  for (const oldquestion of sortedOldcheckboxquestions) {
+    // console.log(oldMcquestion);
+    //     id SERIAL,
+    const oldId = oldquestion.id;
+    //     question varchar(5000) NOT NULL,
+    const questiontext = oldquestion.question;
+    //     Rubric_id int NOT NULL,
+    const questionnaire = questionnaireMap.get(oldquestion.rubric_id)!;
+    //     question_number int NOT NULL,
+    const questionNumber = oldquestion.question_number;
+    //     optional boolean NOT NULL,
+    const optional = oldquestion.optional;
+
+    // console.log(oldId, question, rubric, questionNumber, optional);
+    const question = new CheckboxQuestion(
+      questiontext,
+      questionNumber,
+      optional,
+      questionnaire
+    );
+    await question.save();
+    checkboxquestionMap.set(oldId, question);
+  }
+
+  // MultipleChoiceQuestion,
+  console.log();
+  console.log("importing MCquestions");
+  const mcquestionStatement = new PreparedStatement({
+    name: "MCquestionList",
+    text: 'SELECT * FROM "mcquestion"',
+  });
+  const oldMcquestions = await Database.executeQuery(mcquestionStatement);
+  const sortedOldMcquestions = _.sortBy(oldMcquestions, "id");
+  console.log("num mcquestions: ", sortedOldMcquestions.length);
+  // console.log(sortedOldRubrics);
+
+  const mcquestionMap: Map<number, MultipleChoiceQuestion> = new Map<
+    number,
+    MultipleChoiceQuestion
+  >();
+  for (const oldMcquestion of sortedOldMcquestions) {
+    // console.log(oldMcquestion);
+    //     id SERIAL,
+    const oldId = oldMcquestion.id;
+    //     question varchar(5000) NOT NULL,
+    const questiontext = oldMcquestion.question;
+    //     Rubric_id int NOT NULL,
+    const questionnaire = questionnaireMap.get(oldMcquestion.rubric_id)!;
+    //     question_number int NOT NULL,
+    const questionNumber = oldMcquestion.question_number;
+    //     optional boolean NOT NULL,
+    const optional = oldMcquestion.optional;
+
+    // console.log(oldId, question, rubric, questionNumber, optional);
+    const question = new MultipleChoiceQuestion(
+      questiontext,
+      questionNumber,
+      optional,
+      questionnaire
+    );
+    await question.save();
+    mcquestionMap.set(oldId, question);
+  }
+
+  // OpenQuestion,
+  console.log();
+  console.log("importing openquestions");
+  const openquestionStatement = new PreparedStatement({
+    name: "openquestionList",
+    text: 'SELECT * FROM "openquestion"',
+  });
+  const oldOpenquestions = await Database.executeQuery(openquestionStatement);
+  const sortedOldOpenQuestions = _.sortBy(oldOpenquestions, "id");
+  console.log("num openquestions: ", sortedOldOpenQuestions.length);
+  // console.log(sortedOldRubrics);
+
+  const openquestionMap: Map<number, OpenQuestion> = new Map<
+    number,
+    OpenQuestion
+  >();
+  for (const oldquestion of sortedOldOpenQuestions) {
+    // console.log(oldMcquestion);
+
+    // id SERIAL,
+    const oldId = oldquestion.id;
+    // question varchar(5000) NOT NULL,
+    const questiontext = oldquestion.question;
+    // Rubric_id int NOT NULL,
+    const questionnaire = questionnaireMap.get(oldquestion.rubric_id)!;
+    // question_number int NOT NULL,
+    const questionNumber = oldquestion.question_number;
+    // optional boolean NOT NULL,
+    const optional = oldquestion.optional;
+
+    const question = new OpenQuestion(
+      questiontext,
+      questionNumber,
+      optional,
+      questionnaire
+    );
+    await question.save();
+    openquestionMap.set(oldId, question);
+  }
+
+  // RangeQuestion,
+  console.log();
+  console.log("importing rangequestions");
+  const rangequestionStatement = new PreparedStatement({
+    name: "rangequestionList",
+    text: 'SELECT * FROM "rangequestion"',
+  });
+  const oldRangeQuestions = await Database.executeQuery(rangequestionStatement);
+  const sortedOldRangeQuestions = _.sortBy(oldRangeQuestions, "id");
+  console.log("num rangequestions: ", sortedOldRangeQuestions.length);
+
+  const rangeQuestionMap: Map<number, RangeQuestion> = new Map<
+    number,
+    RangeQuestion
+  >();
+  for (const oldquestion of sortedOldRangeQuestions) {
+    // id SERIAL,
+    const oldId = oldquestion.id;
+    // question varchar(5000) NOT NULL,
+    const questiontext = oldquestion.question;
+    // Rubric_id int NOT NULL,
+    const questionnaire = questionnaireMap.get(oldquestion.rubric_id)!;
+    // question_number int NOT NULL,
+    const questionNumber = oldquestion.question_number;
+    // optional boolean NOT NULL,
+    const optional = oldquestion.optional;
+    // range int NOT NULL,
+    const range = oldquestion.range;
+
+    const question = new RangeQuestion(
+      questiontext,
+      questionNumber,
+      optional,
+      questionnaire,
+      range
+    );
+    await question.save();
+    rangeQuestionMap.set(oldId, question);
+  }
+
+  // UploadQuestion,
+  console.log();
+  console.log("importing uploadquestions");
+  const uploadQuestionStatement = new PreparedStatement({
+    name: "uploadquestionList",
+    text: 'SELECT * FROM "uploadquestion"',
+  });
+  const oldUploadQuestions = await Database.executeQuery(
+    uploadQuestionStatement
+  );
+  const sortedOldUploadQuestions = _.sortBy(oldUploadQuestions, "id");
+  console.log("num uploadquestions: ", sortedOldUploadQuestions.length);
+
+  const uploadQuestionMap: Map<number, UploadQuestion> = new Map<
+    number,
+    UploadQuestion
+  >();
+  for (const oldquestion of sortedOldUploadQuestions) {
+    // id SERIAL,
+    const oldId = oldquestion.id;
+    // question varchar(5000) NOT NULL,
+    const questiontext = oldquestion.question;
+    // Rubric_id int NOT NULL,
+    const questionnaire = questionnaireMap.get(oldquestion.rubric_id)!;
+    // question_number int NOT NULL,
+    const questionNumber = oldquestion.question_number;
+    // optional boolean NOT NULL,
+    const optional = oldquestion.optional;
+    // extension varchar(100) NOT NULL,
+    const extension = oldquestion.extension;
+
+    const question = new UploadQuestion(
+      questiontext,
+      questionNumber,
+      optional,
+      questionnaire,
+      extension
+    );
+    await question.save();
+    uploadQuestionMap.set(oldId, question);
+  }
+
+  // QuestionOption,
+  // CheckboxQuestionOption,
+  // MultipleChoiceQuestionOption,
+
+  // Review,
+  // ReviewOfSubmission,
+  // ReviewOfReview,
+
+  // QuestionAnswer,
+  // CheckboxQuestionAnswer,
+  // MultipleChoiceQuestionAnswer,
+  // OpenQuestionAnswer,
+  // RangeQuestionAnswer,
+  // UploadQuestionAnswer,
+
+  // SubmissionComment,
+  // ReviewComment,
+
+  console.log("Done migration");
+  return;
 };
 
-console.log(migrateDB);
+const migrateDBTest = async function (): Promise<void> {
+  console.log("Start migration");
 
-migrateDB2()
+  // database connection with mysql database
+  const connection = await createConnection(ormconfig);
+  console.log(connection.name);
+};
+
+console.log(migrateDBFull, migrateDBTest);
+
+migrateDBFull()
   .then(() => {
     console.log("finished succesfully");
     process.exit(0);
