@@ -9,6 +9,9 @@ export default {
     getAssignment(assignmentId) {
         return client.get(`${assignmentId}`)
     },
+    getCourseAssignments(courseId) {
+        return client.get(`?courseId=${courseId}`)
+    },
     getGroupAsStudent(assignmentId) {
         return client.get(`${assignmentId}/group`)
     },
@@ -17,5 +20,8 @@ export default {
     },
     enrollInAssignment(assignmentId) {
         return client.post(`${assignmentId}/enroll`)
+    },
+    async createAssignment(assignment) {
+        return client.post("", assignment)
     }
 }

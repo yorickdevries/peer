@@ -11,7 +11,7 @@
             <!--Course Cards-->
             <b-row>
                 <b-col cols="6" v-for="assignment in assignments" :key="assignment.id">
-                    <b-card :title="assignment.title" :sub-title="assignment.title" class="mb-3">
+                    <b-card :title="assignment.name" :sub-title="assignment.name" class="mb-3">
                         <p class="card-text">
                             {{ assignment.description }}
                         </p>
@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 
 export default {
