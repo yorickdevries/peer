@@ -8,6 +8,7 @@ const checkEmployee = async function (
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   if (
     _.some(user.affiliation, (o) => {

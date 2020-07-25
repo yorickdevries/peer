@@ -49,6 +49,7 @@ export default class Course extends BaseModel {
   @IsNotEmpty()
   description: string | null;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => Faculty, {
     eager: true,
     nullable: false,
@@ -56,6 +57,7 @@ export default class Course extends BaseModel {
   @IsDefined()
   faculty: Faculty;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => AcademicYear, {
     eager: true,
     nullable: false,
@@ -63,6 +65,7 @@ export default class Course extends BaseModel {
   @IsDefined()
   academicYear: AcademicYear;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => Assignment, (assignment) => assignment.course)
   assignments?: Assignment[];
 
@@ -84,6 +87,7 @@ export default class Course extends BaseModel {
   }
 
   async getAssignments(): Promise<Assignment[]> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Course.findOneOrFail(this.id, {
         relations: ["assignments"],
@@ -108,7 +112,7 @@ export default class Course extends BaseModel {
     for (const assignment of allAssignments) {
       if (
         (await assignment.isEnrolledInGroup(user)) &&
-        !(assignment.getState() === AssignmentState.UNPUBLISHED)
+        !assignment.isAtState(AssignmentState.UNPUBLISHED)
       ) {
         enrolledAssignments.push(assignment);
       }
@@ -125,12 +129,11 @@ export default class Course extends BaseModel {
   }
 
   async isEnrolled(user: User, role?: UserRole): Promise<boolean> {
-    // if this.id isnt instantiated no user can be enrolled
     const where: {
-      userNetid: string;
-      courseId: number;
+      user: User;
+      course: Course;
       role?: UserRole;
-    } = { userNetid: user.netid, courseId: this.id };
+    } = { user: user, course: this };
     // add role to query if specified
     if (role) {
       where.role = role;
@@ -141,10 +144,14 @@ export default class Course extends BaseModel {
     return enrollment ? true : false;
   }
 
+  async isTeacher(user: User): Promise<boolean> {
+    return this.isEnrolled(user, UserRole.TEACHER);
+  }
+
   // get all enrollable courses for a certain user
   static async getEnrollable(user: User): Promise<Course[]> {
     // all enrollable courses
-    const allEnrollableCourses = await this.find({
+    const allEnrollableCourses = await Course.find({
       where: {
         enrollable: true,
       },
@@ -152,7 +159,6 @@ export default class Course extends BaseModel {
     // pick the courses which are active and not enrolled
     const enrollableCourses = [];
     for (const course of allEnrollableCourses) {
-      // add courses based on active academic years and not already enrolled courses
       if (await course.isEnrollable(user)) {
         enrollableCourses.push(course);
       }

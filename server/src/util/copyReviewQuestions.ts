@@ -20,7 +20,7 @@ interface QuestionTemplate {
   extensions?: string;
   options?: { text: string }[];
 }
-// configuration file
+
 const templateQuestions: QuestionTemplate[] = [
   {
     text:
@@ -131,7 +131,6 @@ const addDefaultReviewEvaluationQuestions = async function (
   await getManager().transaction(
     "SERIALIZABLE",
     async (transactionalEntityManager) => {
-      // find all groups to check for group existence
       const questionnaire = await transactionalEntityManager.findOne(
         ReviewQuestionnaire,
         reviewQuestionnaire.id
@@ -152,6 +151,7 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionnaire
             );
             await transactionalEntityManager.save(question);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
               const option = new CheckboxQuestionOption(
                 optionToCopy.text,
@@ -169,6 +169,7 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionnaire
             );
             await transactionalEntityManager.save(question);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
               const option = new MultipleChoiceQuestionOption(
                 optionToCopy.text,
@@ -194,6 +195,7 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionToCopy.number,
               questionToCopy.optional,
               questionnaire,
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               questionToCopy.range!
             );
             await transactionalEntityManager.save(question);
@@ -205,6 +207,7 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionToCopy.number,
               questionToCopy.optional,
               questionnaire,
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               questionToCopy.extensions!
             );
             await transactionalEntityManager.save(question);
@@ -228,7 +231,6 @@ const addCopyOfQuestions = async function (
   await getManager().transaction(
     "SERIALIZABLE",
     async (transactionalEntityManager) => {
-      // find all groups to check for group existence
       const questionnaire = await transactionalEntityManager.findOne(
         Questionnaire,
         questionnaireToCopyTo.id
@@ -248,6 +250,7 @@ const addCopyOfQuestions = async function (
             questionnaire
           );
           await transactionalEntityManager.save(question);
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           for (const optionToCopy of questionToCopy.options!) {
             const option = new CheckboxQuestionOption(
               optionToCopy.text,
@@ -263,6 +266,7 @@ const addCopyOfQuestions = async function (
             questionnaire
           );
           await transactionalEntityManager.save(question);
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           for (const optionToCopy of questionToCopy.options!) {
             const option = new MultipleChoiceQuestionOption(
               optionToCopy.text,

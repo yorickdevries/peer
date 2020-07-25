@@ -22,8 +22,9 @@ import Questionnaire from "../models/Questionnaire";
 
 const router = express.Router();
 
-// get the reviewquestionaire for an assignment
+// get the reviewquestionaire
 router.get("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // also loads the questions
   const questionnaire = await ReviewQuestionnaire.findOne(req.params.id);
@@ -68,6 +69,7 @@ const questionnaireSchema = Joi.object({
 });
 // post a questionnaire in an assignment
 router.post("/", validateBody(questionnaireSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const assignment = await Assignment.findOne(req.body.assignmentId);
   if (!assignment) {
@@ -120,7 +122,9 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   );
   // reload questionnaire to get all data
   // questionnaire should be defined now (else we would be in the catch)
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   await questionnaire!.reload();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   res.send(questionnaire!);
 });
 
@@ -133,6 +137,7 @@ router.patch(
   validateParams(idSchema),
   validateBody(copyFromQuestionnaireIdSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const questionnaireId = req.params.id;
     const questionnaire = await ReviewQuestionnaire.findOne(questionnaireId);
@@ -179,6 +184,7 @@ router.patch(
   "/:id/defaultquestions",
   validateParams(idSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const questionnaireId = req.params.id;
     const questionnaire = await ReviewQuestionnaire.findOne(questionnaireId);

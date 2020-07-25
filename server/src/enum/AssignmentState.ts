@@ -1,3 +1,4 @@
+// the different states an assignment can be in
 enum AssignmentState {
   UNPUBLISHED = "unpublished",
   SUBMISSION = "submission",
@@ -6,6 +7,7 @@ enum AssignmentState {
   FEEDBACK = "feedback",
 }
 
+// the chronological order of the states
 const assignmentStateOrder = [
   AssignmentState.UNPUBLISHED,
   AssignmentState.SUBMISSION,

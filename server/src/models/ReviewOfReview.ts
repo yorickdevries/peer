@@ -7,6 +7,7 @@ import ReviewOfSubmission from "./ReviewOfSubmission";
 
 @ChildEntity(ReviewType.REVIEW_OF_REVIEW)
 export default class ReviewOfReview extends Review {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => ReviewOfSubmission, { eager: true })
   // can be null as it is in the same table as reviewOfSubmission
   reviewOfSubmission?: ReviewOfSubmission;
@@ -44,6 +45,7 @@ export default class ReviewOfReview extends Review {
     // validation: questionnaire and reviewofsubmission should correspond to same assignment
     const questionnaire = await this.getQuestionnaire();
     const questionnaireAssignment = await questionnaire.getAssignment();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const reviewOfSubmissionQuestionnaire = await this.reviewOfSubmission!.getQuestionnaire();
     const reviewOfSubmissionQuestionnaireAssignment = await reviewOfSubmissionQuestionnaire.getAssignment();
     if (
@@ -59,6 +61,7 @@ export default class ReviewOfReview extends Review {
   }
 
   async getReviewOfSubmission(): Promise<ReviewOfSubmission> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await ReviewOfReview.findOneOrFail(this.id, {
         relations: ["reviewOfSubmission"],
@@ -68,7 +71,7 @@ export default class ReviewOfReview extends Review {
 
   // checks whether the user is reviewed
   async isReviewed(user: User): Promise<boolean> {
-    const reviewOfSubmission = this.reviewOfSubmission!;
-    return reviewOfSubmission.reviewer.netid === user.netid;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return this.reviewOfSubmission!.reviewer.netid === user.netid;
   }
 }

@@ -6,6 +6,7 @@ import MultipleChoiceQuestion from "./MultipleChoiceQuestion";
 @ChildEntity(QuestionOptionType.MULTIPLE_CHOICE)
 export default class MultipleChoiceQuestionOption extends QuestionOption {
   @ManyToOne(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => MultipleChoiceQuestion,
     (question) => question.options,
     {
@@ -20,6 +21,7 @@ export default class MultipleChoiceQuestionOption extends QuestionOption {
   }
 
   async getQuestion(): Promise<MultipleChoiceQuestion> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await MultipleChoiceQuestionOption.findOneOrFail(this.id, {
         relations: ["question"],

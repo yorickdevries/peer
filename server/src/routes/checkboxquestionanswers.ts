@@ -25,6 +25,7 @@ const checkboxAnswerSchema = Joi.object({
 // post an checkboxAnswer
 // overwrites existing if already exists
 router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const question = await CheckboxQuestion.findOne(req.body.checkboxQuestionId);
   if (!question) {

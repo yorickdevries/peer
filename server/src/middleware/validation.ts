@@ -3,10 +3,11 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import _ from "lodash";
 
-// Joi inputvalidation
+// default idSchema used throughout routes
 const idSchema = Joi.object({
   id: Joi.number().integer().required(),
 });
+
 const validate = (
   schema: Joi.ObjectSchema,
   field: "body" | "query" | "params"

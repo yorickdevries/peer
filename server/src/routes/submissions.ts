@@ -34,8 +34,11 @@ const assignmentIdSchema = Joi.object({
 });
 // get all the submissions for an assignment
 router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const assignmentId = req.query.assignmentId as any;
+  // this value has been parsed by the validate function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const assignmentId: number = req.query.assignmentId as any;
   const assignment = await Assignment.findOne(assignmentId);
   if (!assignment) {
     res
@@ -57,11 +60,14 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   res.send(sortedSubmissions);
 });
 
-// get all the submissions for an assignment
+// get all the latest submissions for an assignment
 // we should swicth to specific annotation of submissions which indicate whether they are the latest
 router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const assignmentId = req.query.assignmentId as any;
+  // this value has been parsed by the validate function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const assignmentId: number = req.query.assignmentId as any;
   const assignment = await Assignment.findOne(assignmentId);
   if (!assignment) {
     res
@@ -85,6 +91,7 @@ router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
 
 // get the submission
 router.get("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const submission = await Submission.findOne(req.params.id);
   if (!submission) {
@@ -106,8 +113,9 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   res.send(submission);
 });
 
-// get the submission
+// get the submission file
 router.get("/:id/file", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const submission = await Submission.findOne(req.params.id);
   if (!submission) {
@@ -135,6 +143,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
 
 // get the feedback of a submission
 router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const submission = await Submission.findOne(req.params.id);
   if (!submission) {
@@ -178,6 +187,7 @@ router.post(
   upload(allowedExtensions, maxFileSize, "file"),
   validateBody(submissionSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     if (!req.file) {
       res
@@ -236,12 +246,14 @@ router.post(
 
         // save the file to disk lastly
         // (if this goes wrong all previous steps are rolled back)
-        const filePath = path.resolve(uploadFolder, file.id!.toString());
+        const filePath = path.resolve(uploadFolder, file.id.toString());
         await fsPromises.writeFile(filePath, req.file.buffer);
       }
     );
     // reload submission to get all data
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await submission!.reload();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(submission!);
   }
 );

@@ -29,13 +29,16 @@ export default class Group extends BaseModel {
   @RelationId((group: Group) => group.course)
   courseId!: number;
   // course_id int NOT NULL, FK
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => Course, { nullable: false })
   course?: Course;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToMany((_type) => User)
   @JoinTable()
   users?: User[];
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToMany((_type) => Assignment, (assignment) => assignment.groups)
   @JoinTable()
   assignments?: Assignment[];
@@ -54,19 +57,22 @@ export default class Group extends BaseModel {
   }
 
   async validateOrReject(): Promise<void> {
-    if (this.course && this.assignments && this.users) {
-      for (const assignment of this.assignments) {
-        const course = await assignment.getCourse();
-        if (this.course.id !== course.id) {
-          throw new Error(
-            `Assignment with id ${assignment.id} is not part of course ${this.course.id}`
-          );
-        }
-        // validate that all users are also enrolled in the course
-        for (const user of this.users) {
-          if (!(await course.isEnrolled(user, UserRole.STUDENT))) {
-            throw new Error(`${user.netid} is not enrolled in ${course.id}`);
-          }
+    const course = this.course ? this.course : await this.getCourse();
+    const assignments = this.assignments
+      ? this.assignments
+      : await this.getAssignments();
+    const users = this.users ? this.users : await this.getUsers();
+    for (const assignment of assignments) {
+      const assignmentCourse = await assignment.getCourse();
+      if (course.id !== assignmentCourse.id) {
+        throw new Error(
+          `Assignment with id ${assignment.id} is not part of course ${course.id}`
+        );
+      }
+      // validate that all users are also enrolled in the course
+      for (const user of users) {
+        if (!(await course.isEnrolled(user, UserRole.STUDENT))) {
+          throw new Error(`${user.netid} is not enrolled in ${course.id}`);
         }
       }
     }
@@ -75,6 +81,7 @@ export default class Group extends BaseModel {
   }
 
   async getCourse(): Promise<Course> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Group.findOneOrFail(this.id, {
         relations: ["course"],
@@ -83,6 +90,7 @@ export default class Group extends BaseModel {
   }
 
   async getUsers(): Promise<User[]> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Group.findOneOrFail(this.id, {
         relations: ["users"],
@@ -91,6 +99,7 @@ export default class Group extends BaseModel {
   }
 
   async getAssignments(): Promise<Assignment[]> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return (
       await Group.findOneOrFail(this.id, {
         relations: ["assignments"],

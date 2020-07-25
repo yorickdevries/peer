@@ -22,6 +22,7 @@ export default abstract class QuestionAnswer extends BaseModel {
   @PrimaryColumn()
   @RelationId((questionAnswer: QuestionAnswer) => questionAnswer.question)
   questionId!: number;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => Question, { nullable: false })
   question?: Question;
 
@@ -29,14 +30,16 @@ export default abstract class QuestionAnswer extends BaseModel {
   @PrimaryColumn()
   @RelationId((questionAnswer: QuestionAnswer) => questionAnswer.review)
   reviewId!: number;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => Review, (review) => review.questionAnswers, {
     nullable: false,
   })
   review?: Review;
 
-  // Note: needs to be checked whether the tables properly distiguish different answers
-  // abstract answer: any;
+  // enforce adding getquestion route
+  abstract getQuestion(): Promise<Question>;
 
+  // method to get string representation of the answer
   abstract getAnswerText(): string;
 
   constructor(question: Question, review: Review) {
@@ -58,16 +61,10 @@ export default abstract class QuestionAnswer extends BaseModel {
   }
 
   async getReview(): Promise<Review> {
-    const review = this.review
-      ? this.review
-      : await Review.findOneOrFail(this.reviewId);
-    return review;
-  }
-
-  async getQuestion(): Promise<Question> {
-    const question = this.question
-      ? this.question
-      : await Question.findOneOrFail(this.questionId);
-    return question;
+    if (this.review) {
+      return this.review;
+    } else {
+      return await Review.findOneOrFail(this.reviewId);
+    }
   }
 }

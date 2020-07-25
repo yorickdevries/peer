@@ -131,7 +131,7 @@ describe("API integration test", () => {
 
         // [4]
         // Import the groups for the created assignment.
-        const file = path.join(__dirname, "../../exampleData/groupExports/integration_export.csv");
+        const file = path.join(__dirname, "../../exampleData/groupExports/integration_export_old.csv");
 
         const groups = await chai.request(router).post("/assignments/" + assignmentId + "/importgroups")
             .attach("groupFile", fs.readFileSync(file), "export.csv")

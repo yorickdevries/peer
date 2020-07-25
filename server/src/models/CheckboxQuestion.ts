@@ -8,6 +8,7 @@ import _ from "lodash";
 @ChildEntity(QuestionType.CHECKBOX)
 export default class CheckboxQuestion extends Question {
   @OneToMany(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => CheckboxQuestionOption,
     (checkboxQuestionOption) => checkboxQuestionOption.question,
     {

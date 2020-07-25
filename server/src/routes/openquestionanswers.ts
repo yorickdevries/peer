@@ -22,6 +22,7 @@ const openAnswerSchema = Joi.object({
 // post an openAnswer
 // overwrites existing if already exists
 router.post("/", validateBody(openAnswerSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const question = await OpenQuestion.findOne(req.body.openQuestionId);
   if (!question) {

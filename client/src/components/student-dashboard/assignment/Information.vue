@@ -144,11 +144,11 @@ export default {
     computed: {
         assignmentFilePath() {
             // Get the assignment file path.
-            return `/api/assignments/${this.assignment.id}/file`
+            return `/api/oldroutes/assignments/${this.assignment.id}/file`
         },
         submissionFilePath() {
             // Get the submission file path.
-            return `/api/submissions/${this.submission.id}/file`
+            return `/api/oldroutes/submissions/${this.submission.id}/file`
         }
     },
     async created() {

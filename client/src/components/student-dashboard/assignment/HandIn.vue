@@ -86,7 +86,7 @@ export default {
     computed: {
         submissionFilePath() {
             // Get the submission file path.
-            return `/api/submissions/${this.submission.id}/file`
+            return `/api/oldroutes/submissions/${this.submission.id}/file`
         },
         hasUploadedSubmission() {
             // Returns whether an submission has been uploaded or not.

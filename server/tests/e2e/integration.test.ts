@@ -9,6 +9,7 @@ import initializeData from "../../src/util/initializeData";
 import fs from "fs";
 import path from "path";
 import { advanceTo, clear } from "jest-date-mock";
+import UserRole from "../../src/enum/UserRole";
 
 describe("Integration", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -152,8 +153,7 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie2());
     const course2 = JSON.parse(res.text);
 
-    // fetch all the enrolled courses from the server
-    // create a course
+    // fetch all the enrolled courses from the server as teacher
     res = await request(server)
       .get("/api/enrollments/enrolled")
       .set("cookie", await teacherCookie());
@@ -170,6 +170,23 @@ describe("Integration", () => {
     // assertions
     expect(JSON.parse(res.text).length).toEqual(0);
 
+    // get a course by id
+    res = await request(server)
+      .get(`/api/courses/${course.id}`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(JSON.parse(res.text).name).toBe("CourseName");
+
+    // get enrollment for a course
+    res = await request(server)
+      .get(`/api/courses/${course.id}/enrollment`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(JSON.parse(res.text)).toMatchObject({
+      courseId: course.id,
+      role: UserRole.TEACHER,
+    });
+
     // make an assingment for the course
     // create am assignment course
     const exampleAssignmentFile = path.resolve(
@@ -182,14 +199,17 @@ describe("Integration", () => {
       .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
       .field("name", "Example title")
       .field("courseId", course.id)
-      .field("reviewsPerUser", 2)
+      .field("reviewsPerUser", 1)
       .field("enrollable", true)
-      .field("reviewEvaluation", false)
+      .field("reviewEvaluation", true)
       .field("publishDate", new Date("2020-01-05T10:00Z").toISOString())
       .field("dueDate", new Date("2020-02-01T10:00Z").toISOString())
       .field("reviewPublishDate", new Date("2020-03-01T10:00Z").toISOString())
       .field("reviewDueDate", new Date("2020-04-01T10:00Z").toISOString())
-      .field("reviewEvaluationDueDate", "null")
+      .field(
+        "reviewEvaluationDueDate",
+        new Date("2020-05-01T10:00Z").toISOString()
+      )
       .field("description", "Example description")
       .field("externalLink", "null");
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -197,6 +217,13 @@ describe("Integration", () => {
     expect(assignment).toMatchObject({
       name: "Example title",
     });
+
+    // get all assignments of a course by the teacher
+    res = await request(server)
+      .get(`/api/assignments?courseId=${course.id}`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).length).toBe(1);
 
     // make a questionnaire
     res = await request(server)
@@ -223,12 +250,59 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     const submissionQuestionnaire = JSON.parse(res.text);
 
+    // CREATE QUESTIONS
+    // post a checkbox question in the questionnaire
+    res = await request(server)
+      .post(`/api/checkboxquestions/`)
+      .send({
+        text: "This is a Checkbox question",
+        number: 1,
+        optional: true,
+        questionnaireId: submissionQuestionnaire.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const checkboxQuestion = JSON.parse(res.text);
+    expect(checkboxQuestion).toMatchObject({
+      text: "This is a Checkbox question",
+      number: 1,
+      optional: true,
+    });
+
+    // post Checkbox question option in the questionnaire
+    res = await request(server)
+      .post(`/api/checkboxquestionoptions/`)
+      .send({
+        text: "option 1",
+        checkboxQuestionId: checkboxQuestion.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const checkboxoption1 = JSON.parse(res.text);
+    expect(checkboxoption1).toMatchObject({
+      text: "option 1",
+    });
+
+    // post Checkbox question option in the questionnaire
+    res = await request(server)
+      .post(`/api/checkboxquestionoptions/`)
+      .send({
+        text: "option 2",
+        checkboxQuestionId: checkboxQuestion.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const checkboxoption2 = JSON.parse(res.text);
+    expect(checkboxoption2).toMatchObject({
+      text: "option 2",
+    });
+
     // post a MC question in the questionnaire
     res = await request(server)
       .post(`/api/multiplechoicequestions/`)
       .send({
         text: "This is a MC question",
-        number: 1,
+        number: 2,
         optional: true,
         questionnaireId: submissionQuestionnaire.id,
       })
@@ -237,7 +311,7 @@ describe("Integration", () => {
     const mcQuestion = JSON.parse(res.text);
     expect(mcQuestion).toMatchObject({
       text: "This is a MC question",
-      number: 1,
+      number: 2,
       optional: true,
     });
 
@@ -250,7 +324,8 @@ describe("Integration", () => {
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject({
+    const mcoption1 = JSON.parse(res.text);
+    expect(mcoption1).toMatchObject({
       text: "option A",
     });
 
@@ -263,9 +338,97 @@ describe("Integration", () => {
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject({
+    const mcoption2 = JSON.parse(res.text);
+    expect(mcoption2).toMatchObject({
       text: "option B",
     });
+
+    // post an open question in the questionnaire
+    res = await request(server)
+      .post(`/api/openquestions/`)
+      .send({
+        text: "This is an Open question",
+        number: 3,
+        optional: false,
+        questionnaireId: submissionQuestionnaire.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const openQuestion = JSON.parse(res.text);
+    expect(openQuestion).toMatchObject({
+      text: "This is an Open question",
+      number: 3,
+      optional: false,
+    });
+
+    // post a range question in the questionnaire
+    res = await request(server)
+      .post(`/api/rangequestions/`)
+      .send({
+        text: "This is a Range question",
+        number: 4,
+        optional: true,
+        range: 5,
+        questionnaireId: submissionQuestionnaire.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const rangeQuestion = JSON.parse(res.text);
+    expect(rangeQuestion).toMatchObject({
+      text: "This is a Range question",
+      number: 4,
+      optional: true,
+    });
+
+    // post an upload question in the questionnaire
+    res = await request(server)
+      .post(`/api/uploadquestions/`)
+      .send({
+        text: "This is an Upload question",
+        number: 5,
+        optional: true,
+        extensions: ".pdf",
+        questionnaireId: submissionQuestionnaire.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const uploadQuestion = JSON.parse(res.text);
+    expect(uploadQuestion).toMatchObject({
+      text: "This is an Upload question",
+      number: 5,
+      optional: true,
+    });
+
+    // make a reviewquestionnaire
+    res = await request(server)
+      .post("/api/reviewquestionnaires/")
+      .send({
+        assignmentId: assignment.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // get the assignment including questionnaire
+    res = await request(server)
+      .get(`/api/assignments/${assignment.id}`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    assignment = JSON.parse(res.text);
+
+    // get the questionnaire
+    res = await request(server)
+      .get(`/api/reviewquestionnaires/${assignment.reviewQuestionnaireId}`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const reviewQuestionnaire = JSON.parse(res.text);
+
+    // add default questions to reviewquestionnaire
+    res = await request(server)
+      .patch(
+        `/api/reviewquestionnaires/${reviewQuestionnaire.id}/defaultquestions`
+      )
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
 
     // set date to the moment that the assignment is published
     advanceTo(new Date("2020-01-15T10:00Z"));
@@ -277,7 +440,7 @@ describe("Integration", () => {
     // assertions
     expect(JSON.parse(res.text).length).toEqual(1);
 
-    // enroll for course as student
+    // enroll for course as student1
     res = await request(server)
       .post(`/api/courses/${course.id}/enroll`)
       .set("cookie", await studentCookie1());
@@ -288,7 +451,7 @@ describe("Integration", () => {
       role: "student",
     });
 
-    // enroll for course as student
+    // enroll for course as student2
     res = await request(server)
       .post(`/api/courses/${course.id}/enroll`)
       .set("cookie", await studentCookie2());
@@ -413,6 +576,25 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([group1, group2]);
 
+    // get 1 group by the teacher
+    res = await request(server)
+      .get(`/api/groups/${group1.id}`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject(group1);
+
+    // get course students by the teacher
+    res = await request(server)
+      .get(`/api/enrollments/?courseId=${course.id}&role=student`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject([
+      { userNetid: "student1" },
+      { userNetid: "student2" },
+    ]);
+
     // get all groups by the student
     res = await request(server)
       .get(`/api/groups?assignmentId=${assignment.id}`)
@@ -420,7 +602,7 @@ describe("Integration", () => {
     // assertions
     expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
 
-    // make a submission
+    // make a submission for student 1
     const exampleSubmissionFile1 = path.resolve(
       __dirname,
       "../../exampleData/submissions/submission1.pdf"
@@ -439,7 +621,7 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     const submission1 = JSON.parse(res.text);
 
-    // make a submission
+    // make a submission for student 2
     const exampleSubmissionFile2 = path.resolve(
       __dirname,
       "../../exampleData/submissions/submission2.pdf"
@@ -466,6 +648,16 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([submission1]);
 
+    // get latest submissions for this assignment by this group
+    res = await request(server)
+      .get(
+        `/api/assignments/${assignment.id}/latestsubmission?groupId=${group1.id}`
+      )
+      .set("cookie", await studentCookie1());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject(submission1);
+
     // get all submissions for this assignment as teacher
     res = await request(server)
       .get(`/api/submissions?assignmentId=${assignment.id}`)
@@ -473,5 +665,242 @@ describe("Integration", () => {
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([submission1, submission2]);
-  });
+
+    // get latest submissions for this assignment as teacher
+    res = await request(server)
+      .get(`/api/submissions/latest?assignmentId=${assignment.id}`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject([submission1, submission2]);
+
+    // get a single submission as teacher
+    res = await request(server)
+      .get(`/api/submissions/${submission1.id}`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject(submission1);
+
+    // set date to the moment that the submission is closed
+    advanceTo(new Date("2020-02-15T10:00Z"));
+
+    // distribute the reviews as teacher
+    res = await request(server)
+      .post(`/api/reviewofsubmissions/distribute?assignmentId=${assignment.id}`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    // 2 reviews are generated
+    expect(JSON.parse(res.text).length).toBe(2);
+
+    // get the reviews as teacher
+    res = await request(server)
+      .get(`/api/reviewofsubmissions?assignmentId=${assignment.id}`)
+      .set("cookie", await teacherCookie());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    // 2 reviews are present
+    expect(JSON.parse(res.text).length).toBe(2);
+
+    // set date to the moment that the reviews are opened
+    advanceTo(new Date("2020-03-15T10:00Z"));
+
+    // get the questionnaire as student
+    res = await request(server)
+      .get(
+        `/api/submissionquestionnaires/${assignment.submissionQuestionnaireId}`
+      )
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).questions.length).toBe(5);
+
+    // get the reviews a student needs to do
+    res = await request(server)
+      .get(
+        `/api/submissionquestionnaires/${submissionQuestionnaire.id}/reviews`
+      )
+      .set("cookie", await studentCookie1());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    // 1 review is present
+    const reviews = JSON.parse(res.text);
+    expect(reviews.length).toBe(1);
+    const review = reviews[0];
+
+    // get the reviews a student needs to do
+    res = await request(server)
+      .get(`/api/reviewofsubmissions/${review.id}`)
+      .set("cookie", await studentCookie1());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject(review);
+
+    // get the current answers for the review
+    res = await request(server)
+      .get(`/api/reviewofsubmissions/${review.id}/answers`)
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).length).toBe(0);
+
+    // answer checkbox Question
+    res = await request(server)
+      .post(`/api/checkboxquestionanswers/`)
+      .send({
+        reviewId: review.id,
+        checkboxQuestionId: checkboxQuestion.id,
+        checkboxQuestionOptionIds: [checkboxoption2.id],
+      })
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // answer mc Question
+    res = await request(server)
+      .post(`/api/multiplechoicequestionanswers/`)
+      .send({
+        reviewId: review.id,
+        multipleChoiceQuestionId: mcQuestion.id,
+        multipleChoiceQuestionOptionId: mcoption1.id,
+      })
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // answer open Question
+    res = await request(server)
+      .post(`/api/openquestionanswers/`)
+      .send({
+        reviewId: review.id,
+        openQuestionId: openQuestion.id,
+        openAnswer: "This is my answer",
+      })
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // answer range Question
+    res = await request(server)
+      .post(`/api/rangequestionanswers/`)
+      .send({
+        reviewId: review.id,
+        rangeQuestionId: rangeQuestion.id,
+        rangeAnswer: 3,
+      })
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // answer checkbox Question
+    const exampleUploadAnswerFile = path.resolve(
+      __dirname,
+      "../../exampleData/reviews/review1.pdf"
+    );
+    // answer upload Question
+    res = await request(server)
+      .post(`/api/uploadquestionanswers/`)
+      .attach(
+        "file",
+        fs.readFileSync(exampleUploadAnswerFile),
+        "assignment1.pdf"
+      )
+      .field("reviewId", review.id)
+      .field("uploadQuestionId", uploadQuestion.id)
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    //submit review
+    res = await request(server)
+      .patch(`/api/reviewofsubmissions/${review.id}`)
+      .send({
+        submitted: true,
+        flaggedByReviewer: false,
+      })
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject({
+      id: review.id,
+      submitted: true,
+      flaggedByReviewer: false,
+    });
+
+    // get the current answers for the review
+    res = await request(server)
+      .get(`/api/reviewofsubmissions/${review.id}/answers`)
+      .set("cookie", await studentCookie1());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).length).toBe(5);
+
+    // set date to the moment that the feedback is available
+    advanceTo(new Date("2020-04-15T10:00Z"));
+
+    // approve a review as teacher
+    res = await request(server)
+      .patch(`/api/reviewofsubmissions/${review.id}/approval`)
+      .send({
+        approvalByTA: true,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject({
+      id: review.id,
+      approvalByTA: true,
+    });
+
+    // get the feedback of the other submission
+    res = await request(server)
+      .get(`/api/submissions/${submission2.id}/feedback`)
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const feedback = JSON.parse(res.text);
+    expect(feedback.length).toBe(1);
+    const feedback1 = feedback[0];
+    expect(feedback1.id).toBe(review.id);
+
+    // get the answers for the feedback
+    res = await request(server)
+      .get(`/api/reviewofsubmissions/${feedback1.id}/answers`)
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).length).toBe(5);
+
+    // get the file of the uploadanswer
+    res = await request(server)
+      .get(
+        `/api/uploadquestionanswers/file?reviewId=${feedback1.id}&questionId=${uploadQuestion.id}`
+      )
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // create a reviewEvaluation as student
+    res = await request(server)
+      .post(`/api/reviewofsubmissions/${feedback1.id}/evaluation`)
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const reviewOfReview = JSON.parse(res.text);
+
+    // get the reviewOfReview without id
+    res = await request(server)
+      .get(`/api/reviewofsubmissions/${feedback1.id}/evaluation`)
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject(reviewOfReview);
+
+    // get the reviewOfReview
+    res = await request(server)
+      .get(`/api/reviewofreviews/${reviewOfReview.id}`)
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).id).toBe(reviewOfReview.id);
+
+    // get the reviewquestionnaire as student
+    res = await request(server)
+      .get(`/api/reviewquestionnaires/${assignment.reviewQuestionnaireId}`)
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).questions.length).toBe(10);
+
+    // get the current answers
+    res = await request(server)
+      .get(`/api/reviewofreviews/${reviewOfReview.id}/answers`)
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).length).toBe(0);
+  }, 60000); // timeout is set to 60 seconds
 });

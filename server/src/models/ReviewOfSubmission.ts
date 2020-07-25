@@ -9,6 +9,7 @@ import ReviewOfReview from "./ReviewOfReview";
 @ChildEntity(ReviewType.REVIEW_OF_SUBMISSION)
 export default class ReviewOfSubmission extends Review {
   @ManyToOne(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => Submission,
     (submission) => submission.reviewOfSubmissions,
     { eager: true }
@@ -49,6 +50,7 @@ export default class ReviewOfSubmission extends Review {
     // validation: questionnaire and submission should correspond to same assignment
     const questionnaire = await this.getQuestionnaire();
     const questionnaireAssignment = await questionnaire.getAssignment();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const submissionAssignment = await this.submission!.getAssignment();
     if (questionnaireAssignment.id !== submissionAssignment.id) {
       throw new Error(
@@ -59,14 +61,13 @@ export default class ReviewOfSubmission extends Review {
     return super.validateOrReject();
   }
 
-  // checks whether the user is the reviewer
+  // checks whether the user is reviewed
   async isReviewed(user: User): Promise<boolean> {
-    const submission = this.submission!;
-    const group = await submission.getGroup();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const group = await this.submission!.getGroup();
     return await group.hasUser(user);
   }
 
-  // checks whether the user is the reviewer
   async getReviewOfThisReview(): Promise<ReviewOfReview | undefined> {
     const reviewOfReview = await ReviewOfReview.findOne({
       where: {
