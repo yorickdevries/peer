@@ -1257,6 +1257,55 @@ const migrateDB = async function (): Promise<void> {
     throw new Error("there are reviewcomments!");
   }
 
+  // update all reviews (they can now be subbmitted as the questions are there)
+  for (const oldReview of sortedOldReviews) {
+    // id SERIAL,
+    const oldId = oldReview.id;
+    const review = reviewMap.get(oldId)!;
+
+    // User_netid varchar(500) NOT NULL,
+    // already set
+
+    // Submission_id int,
+    //aleady set
+    // evaluated_review_id int, (this review should be defiend as we go over all reviews in order of id)
+    // already set
+    // flagged BOOLEAN NOT NULL DEFAULT FALSE,
+    const flagged = oldReview.flagged;
+    review.flaggedByReviewer = flagged;
+    // Rubric_id int NOT NULL,
+    // already set
+    // done BOOLEAN NOT NULL DEFAULT FALSE,
+    const done = oldReview.done;
+    review.submitted = done;
+    // creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    const creationDate = oldReview.creation_date;
+    review.createdAt = creationDate;
+    // started_at timestamptz,
+    const startedAt = oldReview.started_at ? oldReview.started_at : null;
+    review.startedAt = startedAt;
+    // downloaded_at timestamptz,
+    const downloadedAt = oldReview.downloaded_at
+      ? oldReview.downloaded_at
+      : null;
+    review.downloadedAt = downloadedAt;
+    // submitted_at timestamptz,
+    const submittedAt = oldReview.submitted_at ? oldReview.submitted_at : null;
+    review.submittedAt = submittedAt;
+    // saved_at timestamptz,
+    const savedAt = oldReview.saved_at ? oldReview.saved_at : null;
+    review.savedAt = savedAt;
+    // approved boolean,
+    const approval = oldReview.approved ? oldReview.approved : null;
+    review.approvalByTA = approval;
+    // ta_netid varchar(500),
+    const tauser = oldReview.ta_netid ? userMap.get(oldReview.ta_netid)! : null;
+    review.approvingTA = tauser;
+
+    await review.save();
+    reviewMap.set(oldId, review);
+  }
+
   console.log("Done migration");
   return;
 };
