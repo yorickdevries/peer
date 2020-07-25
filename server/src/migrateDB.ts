@@ -11,9 +11,7 @@ import fs from "fs";
 import config from "config";
 const assignmentFolder = (config.get("assignments") as any).fileFolder;
 const submissionFolder = (config.get("submissions") as any).fileFolder;
-// const examplefolder = (config.get("exampleData") as any)
-//   .exampleAssignmentFolder;
-// const dummyFilePath = path.resolve(examplefolder, "assignment1.pdf");
+const reviewsFolder = (config.get("reviews") as any).fileFolder;
 import constructFile from "./util/fileFactory";
 import Faculty from "./models/Faculty";
 import AcademicYear from "./models/AcademicYear";
@@ -35,6 +33,15 @@ import UploadQuestion from "./models/UploadQuestion";
 import CheckboxQuestionOption from "./models/CheckboxQuestionOption";
 import MultipleChoiceQuestionOption from "./models/MultipleChoiceQuestionOption";
 import File from "./models/File";
+import Review from "./models/Review";
+import ReviewOfSubmission from "./models/ReviewOfSubmission";
+import ReviewOfReview from "./models/ReviewOfReview";
+import OpenQuestionAnswer from "./models/OpenQuestionAnswer";
+import RangeQuestionAnswer from "./models/RangeQuestionAnswer";
+import UploadQuestionAnswer from "./models/UploadQuestionAnswer";
+import CheckboxQuestionAnswer from "./models/CheckboxQuestionAnswer";
+import MultipleChoiceQuestionAnswer from "./models/MultipleChoiceQuestionAnswer";
+import SubmissionComment from "./models/SubmissionComment";
 
 const migrateDB = async function (): Promise<void> {
   console.log("Start migration");
@@ -540,9 +547,9 @@ const migrateDB = async function (): Promise<void> {
 
   console.log("assign the right course");
   for (const [_key, groupforImport] of groupforImportMap) {
-    if (groupforImport.users.length < 1) {
-      console.log(_key, groupforImport);
-    }
+    // if (groupforImport.users.length < 1) {
+    //   console.log(_key, groupforImport);
+    // }
     if (groupforImport.assignments.length !== 1) {
       throw new Error(`${_key}, ${groupforImport}`);
     } else {
@@ -613,7 +620,12 @@ const migrateDB = async function (): Promise<void> {
       file = await constructFile(fileBuffer, filePath);
     } else {
       // get just file 1
-      file = await File.findOneOrFail(1);
+      file = new File(
+        "filename",
+        ".pdf",
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      );
+      await file.save();
     }
 
     const date = sortedOldSubmission.date;
@@ -972,32 +984,6 @@ const migrateDB = async function (): Promise<void> {
   // Review,
   // ReviewOfSubmission,
   // ReviewOfReview,
-
-  // QuestionAnswer,
-  // CheckboxQuestionAnswer,
-  // MultipleChoiceQuestionAnswer,
-  // OpenQuestionAnswer,
-  // RangeQuestionAnswer,
-  // UploadQuestionAnswer,
-
-  // SubmissionComment,
-  // ReviewComment,
-
-  console.log("Done migration");
-  return;
-};
-
-const migrateDBTest = async function (): Promise<void> {
-  console.log("Start migration");
-
-  // database connection with mysql database
-  const connection = await createConnection(ormconfig);
-  console.log(connection.name);
-
-  // Review,
-  // ReviewOfSubmission,
-  // ReviewOfReview,
-
   console.log();
   console.log("importing reviews");
   const reviewStatement = new PreparedStatement({
@@ -1008,62 +994,284 @@ const migrateDBTest = async function (): Promise<void> {
   const oldReviews = await Database.executeQuery(reviewStatement);
   const sortedOldReviews = _.sortBy(oldReviews, "id");
   console.log("num reviews: ", sortedOldReviews.length);
-
-  // const reviewMap: Map<number, Review> = new Map<number,Review>();
+  const reviewMap: Map<number, Review> = new Map<number, Review>();
   for (const oldReview of sortedOldReviews) {
     // id SERIAL,
     const oldId = oldReview.id;
     // User_netid varchar(500) NOT NULL,
-    const user = oldReview.user_netid;
+    const user = userMap.get(oldReview.user_netid)!;
     // Submission_id int,
-    const submission = oldReview.submission_id;
-    // evaluated_review_id int,
-    const evaluatedReview = oldReview.evaluated_review_id;
-    // flagged BOOLEAN NOT NULL DEFAULT FALSE,
-    const flagged = oldReview.flagged;
+    const submission = oldReview.submission_id
+      ? submissionMap.get(oldReview.submission_id)
+      : null;
+    // evaluated_review_id int, (this review should be defiend as we go over all reviews in order of id)
+    const evaluatedReview = oldReview.evaluated_review_id
+      ? reviewMap.get(oldReview.evaluated_review_id)
+      : null;
+    // // flagged BOOLEAN NOT NULL DEFAULT FALSE,
+    // const flagged = oldReview.flagged;
     // Rubric_id int NOT NULL,
-    const rubric = oldReview.rubric_id;
-    // done BOOLEAN NOT NULL DEFAULT FALSE,
-    const done = oldReview.done;
-    // creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    const creationDate = oldReview.creation_date;
-    // started_at timestamptz,
-    const startedAt = oldReview.started_at;
-    // downloaded_at timestamptz,
-    const downloadedAt = oldReview.downloaded_at;
-    // submitted_at timestamptz,
-    const submittedAt = oldReview.submitted_at;
-    // saved_at timestamptz,
-    const savedAt = oldReview.saved_at;
-    // approved boolean,
-    const approval = oldReview.approved;
-    // ta_netid varchar(500),
-    const taNetid = oldReview.ta_netid;
+    const questionnaire = questionnaireMap.get(oldReview.rubric_id)!;
+    // // done BOOLEAN NOT NULL DEFAULT FALSE,
+    // const done = oldReview.done;
+    // // creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    // const creationDate = oldReview.creation_date;
+    // // started_at timestamptz,
+    // const startedAt = oldReview.started_at ? oldReview.started_at : null;
+    // // downloaded_at timestamptz,
+    // const downloadedAt = oldReview.downloaded_at ? oldReview.downloaded_at : null;
+    // // submitted_at timestamptz,
+    // const submittedAt = oldReview.submitted_at ? oldReview.submitted_at : null;
+    // // saved_at timestamptz,
+    // const savedAt = oldReview.saved_at ? oldReview.saved_at : null;
+    // // approved boolean,
+    // const approval = oldReview.approved ? oldReview.approved : null;
+    // // ta_netid varchar(500),
+    // const taNetid = oldReview.ta_netid ? oldReview.ta_netid : null;
 
-    console.log(
-      oldId,
-      user,
-      submission,
-      evaluatedReview,
-      flagged,
-      rubric,
-      done,
-      creationDate,
-      startedAt,
-      downloadedAt,
-      submittedAt,
-      savedAt,
-      approval,
-      taNetid
-    );
-
-    // await option.save();
-    // mcOptionsMap.set(oldId, option);
+    // some basic check
+    if (submission !== null && evaluatedReview !== null) {
+      throw new Error("both submission and review are defined!");
+    }
+    let review: Review;
+    if (submission) {
+      // TODO: other fields need to be set once the answers are imported
+      review = new ReviewOfSubmission(
+        questionnaire,
+        user,
+        false,
+        false,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        submission
+      );
+    } else if (
+      evaluatedReview &&
+      evaluatedReview instanceof ReviewOfSubmission
+    ) {
+      // TODO: other fields need to be set once the answers are imported
+      review = new ReviewOfReview(
+        questionnaire,
+        user,
+        false,
+        false,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        evaluatedReview
+      );
+    } else {
+      throw new Error("both submission and review are not defined!");
+    }
+    await review.save();
+    reviewMap.set(oldId, review);
   }
+  // QuestionAnswer,
+  // CheckboxQuestionAnswer,
+  console.log();
+  console.log("importing CheckboxAnswer");
+  const checkboxAnswersStatement = new PreparedStatement({
+    name: "CheckboxAnswerList",
+    text: 'SELECT * FROM "checkboxanswer"',
+  });
+  const oldCheckboxAnswers = await Database.executeQuery(
+    checkboxAnswersStatement
+  );
+
+  // review answer map to
+  const checkBoxAnswerMapToFill: Map<
+    [Review, CheckboxQuestion],
+    CheckboxQuestionOption[]
+  > = new Map<[Review, CheckboxQuestion], CheckboxQuestionOption[]>();
+  for (const oldAnswer of oldCheckboxAnswers) {
+    const chosen = oldAnswer.answer;
+    if (chosen) {
+      const option: CheckboxQuestionOption = checkboxOptionsMap.get(
+        oldAnswer.checkboxoption_id
+      )!;
+      const question = await option.getQuestion();
+      const review = reviewMap.get(oldAnswer.review_id)!;
+
+      if (checkBoxAnswerMapToFill.has([review, question])) {
+        const answer = checkBoxAnswerMapToFill.get([review, question])!;
+        answer.push(option);
+        checkBoxAnswerMapToFill.set([review, question], answer);
+      } else {
+        const answer = [option];
+        checkBoxAnswerMapToFill.set([review, question], answer);
+      }
+    }
+  }
+
+  // save the answers to the database
+  for (const [[review, question], options] of checkBoxAnswerMapToFill) {
+    const answer = new CheckboxQuestionAnswer(question, review, options);
+    await answer.save();
+  }
+  // MultipleChoiceQuestionAnswer,
+  console.log();
+  console.log("importing MCAnswer");
+  const MCAnswersStatement = new PreparedStatement({
+    name: "MCAnswerList",
+    text: 'SELECT * FROM "mcanswer"',
+  });
+  const oldMCAnswers = await Database.executeQuery(MCAnswersStatement);
+  console.log(
+    oldMCAnswers[0].answer,
+    oldMCAnswers[0].mcquestion_id,
+    oldMCAnswers[0].review_id
+  );
+
+  for (const oldAnswer of oldMCAnswers) {
+    const option = mcOptionsMap.get(oldAnswer.answer)!;
+    const question = mcquestionMap.get(oldAnswer.mcquestion_id)!;
+    const review = reviewMap.get(oldAnswer.review_id)!;
+    const answer = new MultipleChoiceQuestionAnswer(question, review, option);
+    await answer.save();
+  }
+  // OpenQuestionAnswer,
+  console.log();
+  console.log("importing openanswers");
+  const openQuestionAnswerStatement = new PreparedStatement({
+    name: "openquestionanswerList",
+    text: 'SELECT * FROM "openanswer"',
+  });
+  const oldOpenAnswers = await Database.executeQuery(
+    openQuestionAnswerStatement
+  );
+
+  for (const oldOpenAnswer of oldOpenAnswers) {
+    const answerText = oldOpenAnswer.answer;
+    if (!answerText) {
+      throw new Error("invalid answertext");
+    }
+    const question = openquestionMap.get(oldOpenAnswer.openquestion_id)!;
+    const review = reviewMap.get(oldOpenAnswer.review_id)!;
+
+    const answer = new OpenQuestionAnswer(question, review, answerText);
+    await answer.save();
+  }
+  // RangeQuestionAnswer,
+  console.log();
+  console.log("importing RangeQuestionAnswers");
+  const rangeQuestionAnswerStatement = new PreparedStatement({
+    name: "rangequestionanswerList",
+    text: 'SELECT * FROM "rangeanswer"',
+  });
+  const oldRangeAnswers = await Database.executeQuery(
+    rangeQuestionAnswerStatement
+  );
+
+  for (const oldAnswer of oldRangeAnswers) {
+    const answerNumber = oldAnswer.answer;
+    const question = rangeQuestionMap.get(oldAnswer.rangequestion_id)!;
+    const review = reviewMap.get(oldAnswer.review_id)!;
+
+    const answer = new RangeQuestionAnswer(question, review, answerNumber);
+    await answer.save();
+  }
+  // UploadQuestionAnswer,
+  console.log();
+  console.log("importing UploadQuestionAnswers");
+  const uploadQuestionAnswerStatement = new PreparedStatement({
+    name: "uploadquestionanswerList",
+    text: 'SELECT * FROM "uploadanswer"',
+  });
+  const oldUploadAnswers = await Database.executeQuery(
+    uploadQuestionAnswerStatement
+  );
+
+  for (const oldAnswer of oldUploadAnswers) {
+    const fileName = oldAnswer.answer;
+    const question = uploadQuestionMap.get(oldAnswer.uploadquestion_id)!;
+    const review = reviewMap.get(oldAnswer.review_id)!;
+
+    let filePath = path.resolve(reviewsFolder, fileName);
+    if (!fs.existsSync(filePath)) {
+      //throw new Error(`${filePath} does not exist`);
+      // TODO: remove this code and throw error if the file is not found
+      // console.log("niet gevonden");
+      // filePath = dummyFilePath;
+      filePath = "";
+    }
+    //  else {
+    //   console.log("wel gevonden");
+    // }
+    let file: File;
+    if (filePath !== "") {
+      const fileBuffer = fs.readFileSync(filePath);
+      // also saves the file to disk
+      file = await constructFile(fileBuffer, filePath);
+    } else {
+      // get just file 1
+      file = new File(
+        "filename",
+        ".pdf",
+        "0000000000000000000000000000000000000000000000000000000000000000"
+      );
+      await file.save();
+    }
+
+    const answer = new UploadQuestionAnswer(question, review, file);
+    await answer.save();
+  }
+
+  // SubmissionComment,
+  console.log();
+  console.log("importing submissioncomments");
+  const submissionCommentStatement = new PreparedStatement({
+    name: "submissionCommentStatement",
+    text: 'SELECT * FROM "submissioncomment"',
+  });
+  const submissionComments = await Database.executeQuery(
+    submissionCommentStatement
+  );
+  const orderedsubmissionComments = _.sortBy(submissionComments, "id");
+
+  for (const submissionComment of orderedsubmissionComments) {
+    // const oldId = submissionComment.id;
+    const commentText = submissionComment.comment;
+    const submission = submissionMap.get(submissionComment.submission_id)!;
+    const user = userMap.get(submissionComment.netid)!;
+
+    // console.log(oldId, commentText, submission, user);
+    const comment = new SubmissionComment(commentText, user, submission);
+    await comment.save();
+  }
+  // ReviewComment,
+  console.log();
+  console.log("importing reviewcomments");
+  const reviewCommentStatement = new PreparedStatement({
+    name: "reviewCommentStatement",
+    text: 'SELECT * FROM "reviewcomment"',
+  });
+  const reviewComments = await Database.executeQuery(reviewCommentStatement);
+  if (reviewComments.length > 0) {
+    throw new Error("there are reviewcomments!");
+  }
+
+  console.log("Done migration");
+  return;
+};
+
+const migrateDBTest = async function (): Promise<void> {
+  console.log("Start migrationtest ");
+
+  // database connection with mysql database
+  const connection = await createConnection(ormconfig);
+  console.log(connection.name);
 };
 
 console.log(migrateDB, migrateDBTest);
 
+// migrateDBTest()
 migrateDB()
   .then(() => {
     console.log("finished succesfully");
