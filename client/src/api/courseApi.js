@@ -24,7 +24,10 @@ export default {
     enrollInCourse(courseId) {
         return client.post(`${courseId}/enroll`)
     },
-    createCourse(course) {
+    async createCourse(course) {
         return client.post("", course)
+    },
+    saveCourse(courseId, course) {
+        return client.patch(`${courseId}`, course)
     }
 }
