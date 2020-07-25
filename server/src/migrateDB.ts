@@ -607,7 +607,7 @@ const migrateDB = async function (): Promise<void> {
     //   console.log("wel gevonden");
     // }
     let file: File;
-    if (filepath !== "") {
+    if (filePath !== "") {
       const fileBuffer = fs.readFileSync(filePath);
       // also saves the file to disk
       file = await constructFile(fileBuffer, filePath);
