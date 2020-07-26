@@ -156,17 +156,6 @@ router.patch(
     // check whether the user already has a group for one of the assignments
     const groupAssignments = await group.getAssignments();
     for (const assignment of groupAssignments) {
-      const submissions = await assignment.getSubmissions();
-      if (
-        _.some(submissions, (submission) => {
-          return submission.userNetid === user.netid;
-        })
-      ) {
-        res
-          .status(HttpStatusCode.FORBIDDEN)
-          .send("User has already made a submission for the assignment");
-        return;
-      }
       if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
         res
           .status(HttpStatusCode.BAD_REQUEST)
@@ -252,6 +241,17 @@ router.patch(
     // check whether the assignments are still in submissionstate
     const groupAssignments = await group.getAssignments();
     for (const assignment of groupAssignments) {
+      const submissions = await assignment.getSubmissions();
+      if (
+        _.some(submissions, (submission) => {
+          return submission.userNetid === user.netid;
+        })
+      ) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("User has already made a submission for the assignment");
+        return;
+      }
       if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
         res
           .status(HttpStatusCode.BAD_REQUEST)
