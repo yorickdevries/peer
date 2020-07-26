@@ -967,7 +967,7 @@ const migrateDB = async function (): Promise<void> {
     // id SERIAL,
     const oldId = oldMCOption.id;
     // option varchar(5000) NOT NULL,
-    const optionText = oldMCOption.option;
+    const optionText = oldMCOption.option !== "" ? oldMCOption.option : "Empty";
     //     MCQuestion_id int NOT NULL,
     const question = mcquestionMap.get(oldMCOption.mcquestion_id)!;
     // const question = oldMCOption.mcquestion_id;
@@ -994,6 +994,15 @@ const migrateDB = async function (): Promise<void> {
   console.log("num reviews: ", sortedOldReviews.length);
   const reviewMap: Map<number, Review> = new Map<number, Review>();
   for (const oldReview of sortedOldReviews) {
+    // correct incorrect change made in the past
+    if (
+      oldReview.user_netid === "gfincatodelour" &&
+      oldReview.rubric_id === 18 &&
+      oldReview.submission_id === 1233
+    ) {
+      oldReview.submission_id = 1223;
+      console.log("corrected gfincatodelour review");
+    }
     // id SERIAL,
     const oldId = oldReview.id;
     // User_netid varchar(500) NOT NULL,
