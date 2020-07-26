@@ -1031,7 +1031,7 @@ const migrateDB = async function (): Promise<void> {
     }
     let review: Review;
     if (submission) {
-      if (!questionnaire instanceof SubmissionQuestionnaire) {
+      if (!(questionnaire instanceof SubmissionQuestionnaire)) {
         throw new Error("Wrong questionnaire type");
       }
       // other fields need to be set once the answers are imported (at the very last)
@@ -1052,7 +1052,7 @@ const migrateDB = async function (): Promise<void> {
       evaluatedReview &&
       evaluatedReview instanceof ReviewOfSubmission
     ) {
-      if (!questionnaire instanceof ReviewQuestionnaire) {
+      if (!(questionnaire instanceof ReviewQuestionnaire)) {
         throw new Error("Wrong questionnaire type");
       }
       // other fields need to be set once the answers are imported (at the very last)
