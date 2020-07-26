@@ -1100,30 +1100,40 @@ const migrateDB = async function (): Promise<void> {
 
   // review answer map to
   const checkBoxAnswerMapToFill: Map<
-    [Review, CheckboxQuestion],
+    string,
     CheckboxQuestionOption[]
-  > = new Map<[Review, CheckboxQuestion], CheckboxQuestionOption[]>();
+  > = new Map<string, CheckboxQuestionOption[]>();
   for (const oldAnswer of oldCheckboxAnswers) {
     const chosen = oldAnswer.answer;
     if (chosen) {
-      const option: CheckboxQuestionOption = checkboxOptionsMap.get(
-        oldAnswer.checkboxoption_id
-      )!;
-      const question = await option.getQuestion();
-      const review = reviewMap.get(oldAnswer.review_id)!;
+      const option = checkboxOptionsMap.get(oldAnswer.checkboxoption_id)!;
+      // questionId
+      const questionId = (await option.getQuestion()).id;
+      // const review = reviewMap.get(oldAnswer.review_id)!;
+      const reviewOldId = oldAnswer.review_id;
 
-      if (checkBoxAnswerMapToFill.has([review, question])) {
-        const answer = checkBoxAnswerMapToFill.get([review, question])!;
+      const key = String(reviewOldId) + "-" + String(questionId);
+      if (checkBoxAnswerMapToFill.has(key)) {
+        const answer = checkBoxAnswerMapToFill.get(key)!;
         answer.push(option);
-        checkBoxAnswerMapToFill.set([review, question], answer);
+        checkBoxAnswerMapToFill.set(key, answer);
       } else {
         const answer = [option];
-        checkBoxAnswerMapToFill.set([review, question], answer);
+        checkBoxAnswerMapToFill.set(key, answer);
       }
     }
   }
   // save the answers to the database
-  for (const [[review, question], options] of checkBoxAnswerMapToFill) {
+  for (const [key, options] of checkBoxAnswerMapToFill) {
+    // ket the values out of the key
+    const values = key.split("-");
+    const reviewOldId = Number.parseInt(values[0]);
+    const questionId = Number.parseInt(values[1]);
+
+    // get the values from the ids
+    const question = await CheckboxQuestion.findOneOrFail(questionId);
+    const review = reviewMap.get(reviewOldId)!;
+    // save to database
     const answer = new CheckboxQuestionAnswer(question, review, options);
     await answer.save();
   }
