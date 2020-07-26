@@ -43,6 +43,23 @@ import CheckboxQuestionAnswer from "./models/CheckboxQuestionAnswer";
 import MultipleChoiceQuestionAnswer from "./models/MultipleChoiceQuestionAnswer";
 import SubmissionComment from "./models/SubmissionComment";
 
+// parse the postgres syntax for lists
+const replacePostgresSyntax = function (name?: string | string[]) {
+  if (typeof name === "string") {
+    // replace postgres syntax
+    if (name.startsWith("{") && name.endsWith("}")) {
+      name = name.replace("{", "[");
+      name = name.replace("}", "]");
+      name = JSON.parse(name);
+    }
+    return name;
+  } else if (name === undefined) {
+    return undefined;
+  } else {
+    throw new Error("incorrect name: " + name);
+  }
+};
+
 const migrateDB = async function (): Promise<void> {
   console.log("Start migration");
 
@@ -66,23 +83,6 @@ const migrateDB = async function (): Promise<void> {
   console.log("num users:", oldUsers.length);
 
   const userMap: Map<string, User> = new Map<string, User>();
-
-  // parse the postgres syntax for lists
-  const replacePostgresSyntax = function (name?: string | string[]) {
-    if (typeof name === "string") {
-      // replace postgres syntax
-      if (name.startsWith("{") && name.endsWith("}")) {
-        name = name.replace("{", "[");
-        name = name.replace("}", "]");
-        name = JSON.parse(name);
-      }
-      return name;
-    } else if (name === undefined) {
-      return undefined;
-    } else {
-      throw new Error("incorrect name: " + name);
-    }
-  };
 
   const newUsers: (string | undefined)[] = [];
   for (const oldUser of oldUsers) {
@@ -139,6 +139,7 @@ const migrateDB = async function (): Promise<void> {
       throw new Error(`incorrect netid: ${netid}`);
     }
     newUsers.push(savedNetid);
+    // fecth the user for the usermap
     const user = await User.findOneOrFail(savedNetid);
     userMap.set(savedNetid, user);
   }
@@ -191,8 +192,6 @@ const migrateDB = async function (): Promise<void> {
   );
   facultyMap.set("LR", await new Faculty("AE", "Aerospace Engineering").save());
 
-  // console.log(facultyMap);
-
   /*
    * AcademicYear,
    */
@@ -222,7 +221,6 @@ const migrateDB = async function (): Promise<void> {
     "2020/2021",
     await new AcademicYear("2020/2021", true).save()
   );
-  // console.log(academicYearMap);
 
   /*
    * Course,
@@ -263,7 +261,6 @@ const migrateDB = async function (): Promise<void> {
     await newCourse.save();
     courseMap.set(oldId, newCourse);
   }
-  // console.log(courseMap);
 
   /*
    * Enrollment,
@@ -287,7 +284,7 @@ const migrateDB = async function (): Promise<void> {
       role = "teachingassistant";
     }
 
-    // FIX inciorrect roles thorughout the database
+    // FIX incorrect roles thorughout the database
     // edge case where I did a review, so must be a student
     if (user.netid === "yorickdevries" && course.id === 2) {
       console.log(
@@ -342,7 +339,7 @@ const migrateDB = async function (): Promise<void> {
       );
       role = "student";
     }
-    // note: test ta approval need to be changed to null
+    // note: test ta approval need to be changed to null (should error automatically)
     if (user.netid === "evavanoosten" && course.id === 16) {
       console.log(
         `${user.netid} changed from ${role} to student in course ${course.id}`
@@ -366,7 +363,7 @@ const migrateDB = async function (): Promise<void> {
     await newEnrollment.save();
   }
 
-  // AD course (mathijs made teacher now)
+  // AD course (mathijs/stefan made teacher now)
   // make mathijs a teacher for AD
   const mathijsEnrollment = new Enrollment(
     userMap.get("mdeweerdt")!,
@@ -374,6 +371,12 @@ const migrateDB = async function (): Promise<void> {
     UserRole.TEACHER
   );
   await mathijsEnrollment.save();
+  const stefanEnrollment = new Enrollment(
+    userMap.get("stefanhugtenbu")!,
+    courseMap.get(2)!,
+    UserRole.TEACHER
+  );
+  await stefanEnrollment.save();
 
   /*
    * Assignment,
@@ -387,10 +390,8 @@ const migrateDB = async function (): Promise<void> {
   const oldAssignments = await Database.executeQuery(assignmentStatement);
   const sortedOldAssignments = _.sortBy(oldAssignments, "id");
   console.log("num assignments: ", sortedOldAssignments.length);
-  // console.log(sortedOldAssignments);
 
   const assignmentMap: Map<number, Assignment> = new Map<number, Assignment>();
-
   for (const oldAssignment of sortedOldAssignments) {
     // id
     const oldId = oldAssignment.id;
@@ -478,7 +479,6 @@ const migrateDB = async function (): Promise<void> {
     text: 'SELECT * FROM "grouplist"',
   });
   const oldGroups = await Database.executeQuery(groupStatement);
-  // console.log(oldGroups);
   const sortedOldGroups = _.sortBy(oldGroups, "id");
   console.log("num groups: ", sortedOldGroups.length);
 
@@ -498,7 +498,6 @@ const migrateDB = async function (): Promise<void> {
       assignments: [],
       users: [],
     };
-
     groupforImportMap.set(oldGroup.id, groupforImport);
   }
 
@@ -547,12 +546,14 @@ const migrateDB = async function (): Promise<void> {
 
   console.log("assign the right course");
   for (const [_key, groupforImport] of groupforImportMap) {
-    // if (groupforImport.users.length < 1) {
-    //   console.log(_key, groupforImport);
-    // }
+    if (groupforImport.users.length < 1) {
+      console.log("empty group:");
+      console.log(_key, groupforImport.groupName);
+    }
     if (groupforImport.assignments.length !== 1) {
       throw new Error(`${_key}, ${groupforImport}`);
     } else {
+      // there is only one assignment
       groupforImport.course = await groupforImport.assignments[0].getCourse();
     }
   }
@@ -566,6 +567,17 @@ const migrateDB = async function (): Promise<void> {
     if (oldId === 14526) {
       console.log("skipped mkrceks group");
       continue;
+    }
+    // add users to group as they made submissions
+    if (oldId === 13188) {
+      groupforImport.users.push(userMap.get("beslamimossall")!);
+    }
+    if (oldId === 13190) {
+      groupforImport.users.push(userMap.get("mjjoosten")!);
+    }
+    // i guess this was an accidental deletion?
+    if (oldId === 14668) {
+      groupforImport.users.push(userMap.get("mmager")!);
     }
     const group = new Group(
       groupforImport.groupName,
@@ -586,7 +598,6 @@ const migrateDB = async function (): Promise<void> {
     text: 'SELECT * FROM "submission"',
   });
   const oldSubmissions = await Database.executeQuery(submissionStatement);
-
   const sortedOldSubmissions = _.sortBy(oldSubmissions, "id");
   console.log("num submissions: ", sortedOldSubmissions.length);
 
@@ -610,9 +621,6 @@ const migrateDB = async function (): Promise<void> {
       // filePath = dummyFilePath;
       filePath = "";
     }
-    //  else {
-    //   console.log("wel gevonden");
-    // }
     let file: File;
     if (filePath !== "") {
       const fileBuffer = fs.readFileSync(filePath);
@@ -632,28 +640,12 @@ const migrateDB = async function (): Promise<void> {
 
     // make this into a submission entry
     //console.log(oldId, user, group, assignment, file, date);
-    try {
-      const submission = new Submission(user, group, assignment, file);
-      await submission.save();
-      submission.createdAt = date;
-      await submission.save();
-      submissionMap.set(oldId, submission);
-    } catch (error) {
-      console.log(error);
-      console.log(sortedOldSubmission);
-    }
+    const submission = new Submission(user, group, assignment, file);
+    await submission.save();
+    submission.createdAt = date;
+    await submission.save();
+    submissionMap.set(oldId, submission);
   }
-
-  /* CHECK IN REVIEWS WHETHER THIS WENT OK!!!!
-  for(let i = 1; i < sortedOldSubmissions.length; i++){
-    const previous = sortedOldSubmissions[i - 1];
-    const current = sortedOldSubmissions[i];
-    if(previous.date >= current.date){
-      console.log(previous);
-      console.log(current);
-    }
-  }
-  */
 
   /*
    * Questionnaire,
@@ -773,7 +765,8 @@ const migrateDB = async function (): Promise<void> {
     //     Rubric_id int NOT NULL,
     const questionnaire = questionnaireMap.get(oldMcquestion.rubric_id)!;
     //     question_number int NOT NULL,
-    const questionNumber = oldMcquestion.question_number;
+    const questionNumber =
+      oldMcquestion.question_number > 0 ? oldMcquestion.question_number : 1;
     //     optional boolean NOT NULL,
     const optional = oldMcquestion.optional;
 
@@ -814,7 +807,8 @@ const migrateDB = async function (): Promise<void> {
     // Rubric_id int NOT NULL,
     const questionnaire = questionnaireMap.get(oldquestion.rubric_id)!;
     // question_number int NOT NULL,
-    const questionNumber = oldquestion.question_number;
+    const questionNumber =
+      oldquestion.question_number > 0 ? oldquestion.question_number : 1;
     // optional boolean NOT NULL,
     const optional = oldquestion.optional;
 
@@ -851,7 +845,8 @@ const migrateDB = async function (): Promise<void> {
     // Rubric_id int NOT NULL,
     const questionnaire = questionnaireMap.get(oldquestion.rubric_id)!;
     // question_number int NOT NULL,
-    const questionNumber = oldquestion.question_number;
+    const questionNumber =
+      oldquestion.question_number > 0 ? oldquestion.question_number : 1;
     // optional boolean NOT NULL,
     const optional = oldquestion.optional;
     // range int NOT NULL,
@@ -893,7 +888,8 @@ const migrateDB = async function (): Promise<void> {
     // Rubric_id int NOT NULL,
     const questionnaire = questionnaireMap.get(oldquestion.rubric_id)!;
     // question_number int NOT NULL,
-    const questionNumber = oldquestion.question_number;
+    const questionNumber =
+      oldquestion.question_number > 0 ? oldquestion.question_number : 1;
     // optional boolean NOT NULL,
     const optional = oldquestion.optional;
     // extension varchar(100) NOT NULL,
@@ -941,7 +937,7 @@ const migrateDB = async function (): Promise<void> {
     )!;
     // const question = oldCheckboxOption.checkboxquestion_id;
 
-    console.log(oldId, optionText, question);
+    //console.log(oldId, optionText, question);
     const option = new CheckboxQuestionOption(optionText, question);
     await option.save();
 
@@ -1035,7 +1031,10 @@ const migrateDB = async function (): Promise<void> {
     }
     let review: Review;
     if (submission) {
-      // TODO: other fields need to be set once the answers are imported
+      if (!questionnaire instanceof SubmissionQuestionnaire) {
+        throw new Error("Wrong questionnaire type");
+      }
+      // other fields need to be set once the answers are imported (at the very last)
       review = new ReviewOfSubmission(
         questionnaire,
         user,
@@ -1053,7 +1052,10 @@ const migrateDB = async function (): Promise<void> {
       evaluatedReview &&
       evaluatedReview instanceof ReviewOfSubmission
     ) {
-      // TODO: other fields need to be set once the answers are imported
+      if (!questionnaire instanceof ReviewQuestionnaire) {
+        throw new Error("Wrong questionnaire type");
+      }
+      // other fields need to be set once the answers are imported (at the very last)
       review = new ReviewOfReview(
         questionnaire,
         user,
@@ -1109,25 +1111,20 @@ const migrateDB = async function (): Promise<void> {
       }
     }
   }
-
   // save the answers to the database
   for (const [[review, question], options] of checkBoxAnswerMapToFill) {
     const answer = new CheckboxQuestionAnswer(question, review, options);
     await answer.save();
   }
+
   // MultipleChoiceQuestionAnswer,
   console.log();
-  console.log("importing MCAnswer");
+  console.log("importing MCAnswers");
   const MCAnswersStatement = new PreparedStatement({
     name: "MCAnswerList",
     text: 'SELECT * FROM "mcanswer"',
   });
   const oldMCAnswers = await Database.executeQuery(MCAnswersStatement);
-  console.log(
-    oldMCAnswers[0].answer,
-    oldMCAnswers[0].mcquestion_id,
-    oldMCAnswers[0].review_id
-  );
 
   for (const oldAnswer of oldMCAnswers) {
     const option = mcOptionsMap.get(oldAnswer.answer)!;
@@ -1136,6 +1133,7 @@ const migrateDB = async function (): Promise<void> {
     const answer = new MultipleChoiceQuestionAnswer(question, review, option);
     await answer.save();
   }
+
   // OpenQuestionAnswer,
   console.log();
   console.log("importing openanswers");
@@ -1154,10 +1152,10 @@ const migrateDB = async function (): Promise<void> {
     }
     const question = openquestionMap.get(oldOpenAnswer.openquestion_id)!;
     const review = reviewMap.get(oldOpenAnswer.review_id)!;
-
     const answer = new OpenQuestionAnswer(question, review, answerText);
     await answer.save();
   }
+
   // RangeQuestionAnswer,
   console.log();
   console.log("importing RangeQuestionAnswers");
@@ -1173,10 +1171,10 @@ const migrateDB = async function (): Promise<void> {
     const answerNumber = oldAnswer.answer;
     const question = rangeQuestionMap.get(oldAnswer.rangequestion_id)!;
     const review = reviewMap.get(oldAnswer.review_id)!;
-
     const answer = new RangeQuestionAnswer(question, review, answerNumber);
     await answer.save();
   }
+
   // UploadQuestionAnswer,
   console.log();
   console.log("importing UploadQuestionAnswers");
@@ -1216,6 +1214,8 @@ const migrateDB = async function (): Promise<void> {
         ".pdf",
         "0000000000000000000000000000000000000000000000000000000000000000"
       );
+      // set name to feedback as it is now some numbers
+      file.name = "feedback";
       await file.save();
     }
 
