@@ -761,7 +761,8 @@ const migrateDB = async function (): Promise<void> {
     //     id SERIAL,
     const oldId = oldMcquestion.id;
     //     question varchar(5000) NOT NULL,
-    const questiontext = oldMcquestion.question;
+    const questiontext =
+      oldMcquestion.question !== "" ? oldMcquestion.question : "Empty question";
     //     Rubric_id int NOT NULL,
     const questionnaire = questionnaireMap.get(oldMcquestion.rubric_id)!;
     //     question_number int NOT NULL,
@@ -803,7 +804,8 @@ const migrateDB = async function (): Promise<void> {
     // id SERIAL,
     const oldId = oldquestion.id;
     // question varchar(5000) NOT NULL,
-    const questiontext = oldquestion.question;
+    const questiontext =
+      oldquestion.question !== "" ? oldquestion.question : "Empty question";
     // Rubric_id int NOT NULL,
     const questionnaire = questionnaireMap.get(oldquestion.rubric_id)!;
     // question_number int NOT NULL,
