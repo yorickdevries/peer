@@ -132,7 +132,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `/api/oldroutes/assignments/${assignment.id}/reviewsExport/csv`
+                                                        `api/reviewofsubmissions/exportreviews?assignmentId=${assignment.id}&exportType=csv`
                                                     "
                                                     class="mb-3 mr-2"
                                                 >
@@ -142,7 +142,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `/api/oldroutes/assignments/${assignment.id}/reviewsExport/xls`
+                                                        `api/reviewofsubmissions/exportreviews?assignmentId=${assignment.id}&exportType=xls`
                                                     "
                                                     class="mb-3"
                                                 >
@@ -160,7 +160,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `/api/oldroutes/assignments/${assignment.id}/gradeExport/csv`
+                                                        `api/reviewofsubmissions/exportgrades?assignmentId=${assignment.id}&exportType=csv`
                                                     "
                                                 >
                                                     Download grades .csv
@@ -169,7 +169,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `/api/oldroutes/assignments/${assignment.id}/gradeExport/xls`
+                                                        `api/reviewofsubmissions/exportgrades?assignmentId=${assignment.id}&exportType=xls`
                                                     "
                                                 >
                                                     Download grades .xls
@@ -299,6 +299,7 @@ export default {
         async shuffleGroups() {
             try {
                 // Check if the user wants to self-assign shuffle instead.
+                // TODO: add new API calls
                 if (this.selfAssign) {
                     await api.client.get(`/assignments/${this.$route.params.assignmentId}/distributeReviews/1`)
                 } else {
@@ -312,7 +313,9 @@ export default {
         },
         async submitAllFilledReviews() {
             try {
-                let res = await api.client.get(`rubric/submissionrubric/${this.$route.params.assignmentId}`)
+                let res = await api.client.get(`
+                                                reviewofsubmissions/submitall?assignmentId=${this.$route.params.assignmentId}
+                                                `)
                 const rubricId = res.data.id
                 const result = await api.submitAllFilledReviews(rubricId)
                 const submittedReviews = result.data.submittedReviews
