@@ -28,7 +28,7 @@
             <dd v-if="assignment.file == null" class="text-danger">No assignment file uploaded</dd>
             <dd v-else>
                 <a :href="assignmentFilePath" target="_blank">
-                    {{ assignment.file.name }}.{{ assignment.file.extension }}
+                    {{ assignment.file.name }}{{ assignment.file.extension }}
                 </a>
             </dd>
 
