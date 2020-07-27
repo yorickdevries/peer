@@ -28,6 +28,14 @@ export default {
         return client.post("", course)
     },
     saveCourse(courseId, course) {
-        return client.patch(`${courseId}`, course)
+        let coursePatch = {
+            name: course.name,
+            courseCode: course.courseCode,
+            enrollable: course.enrollable,
+            facultyName: course.faculty.name,
+            academicYearName: course.academicYear.name,
+            description: course.description
+        }
+        return client.patch(`${courseId}`, coursePatch)
     }
 }
