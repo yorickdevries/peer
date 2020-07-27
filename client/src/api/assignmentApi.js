@@ -23,5 +23,16 @@ export default {
     },
     async createAssignment(assignment) {
         return client.post("", assignment)
+    },
+    saveAssignment(assignmentId, formData) {
+        // let coursePatch = {
+        //     name: course.name,
+        //     courseCode: course.courseCode,
+        //     enrollable: course.enrollable,
+        //     facultyName: course.faculty.name,
+        //     academicYearName: course.academicYear.name,
+        //     description: course.description
+        // }
+        return client.patch(`${assignmentId}`, formData)
     }
 }
