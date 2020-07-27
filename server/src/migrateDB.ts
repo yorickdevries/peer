@@ -1170,10 +1170,8 @@ const migrateDB = async function (): Promise<void> {
   console.log("num oldOpenAnswers: ", oldOpenAnswers.length);
 
   for (const oldOpenAnswer of oldOpenAnswers) {
-    const answerText = oldOpenAnswer.answer;
-    if (!answerText) {
-      throw new Error("invalid answertext");
-    }
+    const answerText =
+      oldOpenAnswer.answer !== "" ? oldOpenAnswer.answer : "Empty answer";
     const question = openquestionMap.get(oldOpenAnswer.openquestion_id)!;
     const review = reviewMap.get(oldOpenAnswer.review_id)!;
     const answer = new OpenQuestionAnswer(question, review, answerText);
@@ -1329,8 +1327,14 @@ const migrateDB = async function (): Promise<void> {
     const tauser = oldReview.ta_netid ? userMap.get(oldReview.ta_netid)! : null;
     review.approvingTA = tauser;
 
-    await review.save();
-    reviewMap.set(oldId, review);
+    // log the errors to the console so they can be solved in one go
+    try {
+      await review.save();
+      reviewMap.set(oldId, review);
+    } catch (error) {
+      console.log(error);
+      console.log(oldReview);
+    }
   }
 
   console.log("Done migration");
