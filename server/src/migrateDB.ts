@@ -1097,6 +1097,7 @@ const migrateDB = async function (): Promise<void> {
   const oldCheckboxAnswers = await Database.executeQuery(
     checkboxAnswersStatement
   );
+  console.log("num oldCheckboxAnswers (T AND F): ", oldCheckboxAnswers.length);
 
   // review answer map to
   const checkBoxAnswerMapToFill: Map<
@@ -1146,6 +1147,7 @@ const migrateDB = async function (): Promise<void> {
     text: 'SELECT * FROM "mcanswer"',
   });
   const oldMCAnswers = await Database.executeQuery(MCAnswersStatement);
+  console.log("num oldMCAnswers: ", oldMCAnswers.length);
 
   for (const oldAnswer of oldMCAnswers) {
     const option = mcOptionsMap.get(oldAnswer.answer)!;
@@ -1165,6 +1167,7 @@ const migrateDB = async function (): Promise<void> {
   const oldOpenAnswers = await Database.executeQuery(
     openQuestionAnswerStatement
   );
+  console.log("num oldOpenAnswers: ", oldOpenAnswers.length);
 
   for (const oldOpenAnswer of oldOpenAnswers) {
     const answerText = oldOpenAnswer.answer;
@@ -1187,6 +1190,7 @@ const migrateDB = async function (): Promise<void> {
   const oldRangeAnswers = await Database.executeQuery(
     rangeQuestionAnswerStatement
   );
+  console.log("num oldRangeAnswers: ", oldRangeAnswers.length);
 
   for (const oldAnswer of oldRangeAnswers) {
     const answerNumber = oldAnswer.answer;
@@ -1206,6 +1210,7 @@ const migrateDB = async function (): Promise<void> {
   const oldUploadAnswers = await Database.executeQuery(
     uploadQuestionAnswerStatement
   );
+  console.log("num oldUploadAnswers: ", oldUploadAnswers.length);
 
   for (const oldAnswer of oldUploadAnswers) {
     const fileName = oldAnswer.answer;
@@ -1255,6 +1260,7 @@ const migrateDB = async function (): Promise<void> {
     submissionCommentStatement
   );
   const orderedsubmissionComments = _.sortBy(submissionComments, "id");
+  console.log("num submissioncomments: ", orderedsubmissionComments.length);
 
   for (const submissionComment of orderedsubmissionComments) {
     // const oldId = submissionComment.id;
