@@ -19,7 +19,7 @@
                             variant="primary"
                             :to="{
                                 name: 'teacher-dashboard.assignments.assignment',
-                                params: { courseId: assignment.course_id, assignmentId: assignment.id }
+                                params: { courseId: assignment.courseId, assignmentId: assignment.id }
                             }"
                             >View assignment</b-button
                         >
