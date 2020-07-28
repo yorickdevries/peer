@@ -614,6 +614,7 @@ const migrateDB = async function (): Promise<void> {
       submissionFolder,
       sortedOldSubmission.file_path
     );
+    const fileExtension = path.extname(filePath);
     if (!fs.existsSync(filePath)) {
       //throw new Error(`${filePath} does not exist`);
       // TODO: remove this code and throw error if the file is not found
@@ -630,7 +631,7 @@ const migrateDB = async function (): Promise<void> {
       // get just file 1
       file = new File(
         "filename",
-        ".pdf",
+        fileExtension,
         "0000000000000000000000000000000000000000000000000000000000000000"
       );
       await file.save();
@@ -1216,6 +1217,7 @@ const migrateDB = async function (): Promise<void> {
     const review = reviewMap.get(oldAnswer.review_id)!;
 
     let filePath = path.resolve(reviewsFolder, fileName);
+    const fileExtension = path.extname(filePath);
     if (!fs.existsSync(filePath)) {
       //throw new Error(`${filePath} does not exist`);
       // TODO: remove this code and throw error if the file is not found
@@ -1235,7 +1237,7 @@ const migrateDB = async function (): Promise<void> {
       // get just file 1
       file = new File(
         "filename",
-        ".pdf",
+        fileExtension,
         "0000000000000000000000000000000000000000000000000000000000000000"
       );
       // set name to feedback as it is now some numbers
