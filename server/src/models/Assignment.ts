@@ -135,6 +135,14 @@ export default class Assignment extends BaseModel {
   @IsNotEmpty()
   externalLink: string | null;
 
+  @Column()
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
+  // can be in the form: ".pdf,.zip,.doc,.docx"
+  // needs later to be revised to a list of strings
+  submissionExtensions: string;
+
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
   // course_id int NOT NULL, FK
@@ -168,7 +176,8 @@ export default class Assignment extends BaseModel {
     file: File | null,
     externalLink: string | null,
     submissionQuestionnaire: SubmissionQuestionnaire | null,
-    reviewQuestionnaire: ReviewQuestionnaire | null
+    reviewQuestionnaire: ReviewQuestionnaire | null,
+    submissionExtensions: string
   ) {
     super();
     this.name = name;
@@ -186,6 +195,7 @@ export default class Assignment extends BaseModel {
     this.externalLink = externalLink;
     this.submissionQuestionnaire = submissionQuestionnaire;
     this.reviewQuestionnaire = reviewQuestionnaire;
+    this.submissionExtensions = submissionExtensions;
   }
 
   // custom validation which is run before saving
