@@ -1,6 +1,10 @@
 import express from "express";
 import Joi from "@hapi/joi";
-import { validateBody } from "../middleware/validation";
+import {
+  validateBody,
+  validateParams,
+  idSchema,
+} from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import ResponseMessage from "../enum/ResponseMessage";
@@ -11,6 +15,7 @@ import CheckboxQuestionOption from "../models/CheckboxQuestionOption";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import moment from "moment";
+import { getManager } from "typeorm";
 
 const router = express.Router();
 
@@ -117,6 +122,51 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
   }
   await checkboxAnswer.save();
   res.send(checkboxAnswer);
+});
+
+// delete an checkboxAnswer
+router.delete("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  // this value has been parsed by the validate function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const questionAnswerId: number = req.params.id as any;
+  const questionAnswer = await CheckboxQuestionAnswer.findOne(questionAnswerId);
+  if (!questionAnswer) {
+    res
+      .status(HttpStatusCode.NOT_FOUND)
+      .send(ResponseMessage.QUESTIONANSWER_NOT_FOUND);
+    return;
+  }
+  const review = await questionAnswer.getReview();
+  if (!(await review.isReviewer(user))) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not the reviewer of this review");
+    return;
+  }
+  if (review.submitted) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("The review is already submitted");
+    return;
+  }
+  // start transaction to make sure an asnwer isnt deleted from a submitted review
+  await getManager().transaction(
+    "SERIALIZABLE",
+    async (transactionalEntityManager) => {
+      // const review
+      const reviewToCheck = await transactionalEntityManager.findOneOrFail(
+        Review,
+        review.id
+      );
+      if (reviewToCheck.submitted) {
+        throw new Error("The review is already submitted");
+      }
+      await transactionalEntityManager.remove(questionAnswer);
+    }
+  );
+  res.send(questionAnswer);
 });
 
 export default router;

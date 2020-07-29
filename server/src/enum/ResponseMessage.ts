@@ -11,6 +11,7 @@ enum ResponseMessage {
   QUESTIONNAIRE_NOT_FOUND = "The specified questionnaire is not found",
   QUESTION_NOT_FOUND = "The specified question is not found",
   QUESTIONOPTION_NOT_FOUND = "The specified questionoption is not found",
+  QUESTIONANSWER_NOT_FOUND = "The specified questionanswer is not found",
   REVIEW_NOT_FOUND = "The specified review is not found",
   SUBMISSION_NOT_FOUND = "The specified submission is not found",
   ANSWER_NOT_FOUND = "The specified answer is not found",
