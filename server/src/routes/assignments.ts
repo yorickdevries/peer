@@ -377,6 +377,34 @@ router.patch(
         .send("Both a file is uploaded and the body is set to null");
       return;
     }
+    // check what can be changed
+    if (
+      assignment.isAtOrAfterState(AssignmentState.REVIEW) &&
+      assignment.reviewsPerUser !== req.body.reviewsPerUser
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change reviewsPerUser at this state");
+      return;
+    }
+    if (
+      !assignment.isAtOrBeforeState(AssignmentState.SUBMISSION) &&
+      assignment.enrollable !== req.body.enrollable
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change enrollable at this state");
+      return;
+    }
+    if (
+      !assignment.isAtOrAfterState(AssignmentState.FEEDBACK) &&
+      assignment.reviewEvaluation !== req.body.reviewEvaluation
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change reviewEvaluation at this state");
+      return;
+    }
     // start transaction make sure the file and assignment are both saved
     await getManager().transaction(
       "SERIALIZABLE",
