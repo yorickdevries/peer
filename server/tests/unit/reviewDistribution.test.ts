@@ -52,7 +52,6 @@ describe("Review distribution", () => {
       2,
       true,
       false,
-      AssignmentState.SUBMISSION,
       new Date("2020-06-23T10:00Z"),
       new Date("2020-06-24T10:00Z"),
       new Date("2020-06-25T10:00Z"),
@@ -64,6 +63,8 @@ describe("Review distribution", () => {
       null,
       null
     );
+    await assignment.save();
+    assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
 
     // students
@@ -150,7 +151,6 @@ describe("Review distribution", () => {
       2,
       true,
       false,
-      AssignmentState.SUBMISSION,
       new Date("2020-06-23T10:00Z"),
       new Date("2020-06-24T10:00Z"),
       new Date("2020-06-25T10:00Z"),
@@ -162,6 +162,8 @@ describe("Review distribution", () => {
       null,
       null
     );
+    await assignment.save();
+    assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
 
     // students
@@ -254,7 +256,6 @@ describe("Review distribution", () => {
       2,
       true,
       false,
-      AssignmentState.SUBMISSION,
       new Date("2020-06-23T10:00Z"),
       new Date("2020-06-24T10:00Z"),
       new Date("2020-06-25T10:00Z"),
@@ -266,6 +267,8 @@ describe("Review distribution", () => {
       null,
       null
     );
+    await assignment.save();
+    assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
 
     const student1 = new User(`student1`);

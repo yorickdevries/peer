@@ -201,7 +201,6 @@ describe("Integration", () => {
       .field("reviewsPerUser", 1)
       .field("enrollable", true)
       .field("reviewEvaluation", true)
-      .field("state", AssignmentState.UNPUBLISHED)
       .field("publishDate", new Date("2020-01-05T10:00Z").toISOString())
       .field("dueDate", new Date("2020-02-01T10:00Z").toISOString())
       .field("reviewPublishDate", new Date("2020-03-01T10:00Z").toISOString())

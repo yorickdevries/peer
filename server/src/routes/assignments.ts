@@ -250,9 +250,6 @@ const assignmentSchema = Joi.object({
   reviewsPerUser: Joi.number().integer().required(),
   enrollable: Joi.boolean().required(),
   reviewEvaluation: Joi.boolean().required(),
-  state: Joi.string()
-    .valid(AssignmentState.UNPUBLISHED, AssignmentState.SUBMISSION)
-    .required(),
   publishDate: Joi.date().required(),
   dueDate: Joi.date().required(),
   reviewPublishDate: Joi.date().required(),
@@ -305,7 +302,6 @@ router.post(
           req.body.reviewsPerUser,
           req.body.enrollable,
           req.body.reviewEvaluation,
-          req.body.state,
           req.body.publishDate,
           req.body.dueDate,
           req.body.reviewPublishDate,

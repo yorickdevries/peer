@@ -165,7 +165,6 @@ export default class Assignment extends BaseModel {
     reviewsPerUser: number,
     enrollable: boolean,
     reviewEvaluation: boolean,
-    state: AssignmentState,
     publishDate: Date,
     dueDate: Date,
     reviewPublishDate: Date,
@@ -183,7 +182,7 @@ export default class Assignment extends BaseModel {
     this.reviewsPerUser = reviewsPerUser;
     this.enrollable = enrollable;
     this.reviewEvaluation = reviewEvaluation;
-    this.state = state;
+    this.state = AssignmentState.UNPUBLISHED; // initial state
     this.publishDate = publishDate;
     this.dueDate = dueDate;
     this.reviewPublishDate = reviewPublishDate;

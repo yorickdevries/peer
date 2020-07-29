@@ -9,7 +9,6 @@ import initializeData from "../../src/util/initializeData";
 import fs from "fs";
 import path from "path";
 import { advanceTo, clear } from "jest-date-mock";
-import { AssignmentState } from "../../src/enum/AssignmentState";
 
 describe("Group import", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -50,7 +49,6 @@ describe("Group import", () => {
       .field("reviewsPerUser", 2)
       .field("enrollable", true)
       .field("reviewEvaluation", false)
-      .field("state", AssignmentState.SUBMISSION)
       .field("publishDate", new Date("2020-01-01T10:00Z").toISOString())
       .field("dueDate", new Date("2020-02-01T10:00Z").toISOString())
       .field("reviewPublishDate", new Date("2020-03-01T10:00Z").toISOString())
