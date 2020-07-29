@@ -257,6 +257,7 @@ const assignmentSchema = Joi.object({
   reviewEvaluationDueDate: Joi.date().allow(null).required(),
   description: Joi.string().allow(null).required(),
   externalLink: Joi.string().allow(null).required(),
+  submissionExtensions: Joi.string().required(),
 });
 // post an assignment in a course
 router.post(
@@ -311,7 +312,8 @@ router.post(
           file, // possibly null
           req.body.externalLink,
           null, // submissionQuestionnaire (initially empty)
-          null // reviewQuestionnaire (initially empty)
+          null, // reviewQuestionnaire (initially empty)
+          req.body.submissionExtensions
         );
         await transactionalEntityManager.save(assignment);
 
@@ -346,6 +348,7 @@ const assignmentPatchSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
+  submissionExtensions: Joi.string().required(),
 });
 // patch an assignment in a course
 router.patch(
@@ -405,6 +408,15 @@ router.patch(
         .send("You cannot change reviewEvaluation at this state");
       return;
     }
+    if (
+      !assignment.isAtState(AssignmentState.UNPUBLISHED) &&
+      assignment.submissionExtensions !== req.body.submissionExtensions
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change submissionExtensions at this state");
+      return;
+    }
     // start transaction make sure the file and assignment are both saved
     await getManager().transaction(
       "SERIALIZABLE",
@@ -444,6 +456,7 @@ router.patch(
           assignment.file = newFile;
         }
         assignment.externalLink = req.body.externalLink;
+        assignment.submissionExtensions = req.body.submissionExtensions;
         await transactionalEntityManager.save(assignment);
 
         // save the file to disk
