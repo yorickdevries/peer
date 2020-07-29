@@ -55,7 +55,8 @@ describe("Integration", () => {
       .field("reviewDueDate", new Date("2020-04-01T10:00Z").toISOString())
       .field("reviewEvaluationDueDate", "null")
       .field("description", "Example description")
-      .field("externalLink", "null");
+      .field("externalLink", "null")
+      .field("submissionExtensions", ".pdf");
     assignmentId = JSON.parse(res2.text).id;
 
     // set date to the moment that the assignment is published

@@ -60,7 +60,8 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null
+      null,
+      ".pdf"
     );
     await assignment.save();
 
@@ -157,7 +158,8 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null
+      null,
+      ".pdf"
     );
     await assignment.save();
 
@@ -260,7 +262,8 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null
+      null,
+      ".pdf"
     );
     await assignment.save();
 

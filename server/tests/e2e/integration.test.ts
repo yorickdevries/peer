@@ -211,7 +211,8 @@ describe("Integration", () => {
         new Date("2020-05-01T10:00Z").toISOString()
       )
       .field("description", "Example description")
-      .field("externalLink", "null");
+      .field("externalLink", "null")
+      .field("submissionExtensions", ".pdf");
     expect(res.status).toBe(HttpStatusCode.OK);
     let assignment = JSON.parse(res.text);
     expect(assignment).toMatchObject({
