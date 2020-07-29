@@ -377,7 +377,7 @@ router.patch(
         .send("Both a file is uploaded and the body is set to null");
       return;
     }
-    // check what can be changed
+    // check whether certain fields can be changed
     if (
       assignment.isAtOrAfterState(AssignmentState.REVIEW) &&
       assignment.reviewsPerUser !== req.body.reviewsPerUser
@@ -397,7 +397,7 @@ router.patch(
       return;
     }
     if (
-      !assignment.isAtOrAfterState(AssignmentState.FEEDBACK) &&
+      assignment.isAtOrAfterState(AssignmentState.FEEDBACK) &&
       assignment.reviewEvaluation !== req.body.reviewEvaluation
     ) {
       res
