@@ -80,6 +80,12 @@ export default class Submission extends BaseModel {
     if (!(await group.hasAssignment(assignment))) {
       throw new Error("Group is not part of this assignment");
     }
+    // check if the file has the right extension
+    if (
+      !assignment.submissionExtensions.split(",").includes(this.file.extension)
+    ) {
+      throw new Error("The file is of the wrong extension");
+    }
     // if it succeeds the super validateOrReject can be called
     return super.validateOrReject();
   }
