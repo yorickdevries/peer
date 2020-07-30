@@ -1323,7 +1323,13 @@ const migrateDB = async function (): Promise<void> {
     const savedAt = oldReview.saved_at ? oldReview.saved_at : null;
     review.savedAt = savedAt;
     // approved boolean,
-    const approval = oldReview.approved ? oldReview.approved : null;
+    const oldApproval = oldReview.approved;
+    let approval;
+    if (typeof oldApproval === "boolean") {
+      approval = oldApproval;
+    } else {
+      approval = null;
+    }
     review.approvalByTA = approval;
     // ta_netid varchar(500),
     const tauser = oldReview.ta_netid ? userMap.get(oldReview.ta_netid)! : null;
