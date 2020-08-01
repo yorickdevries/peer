@@ -813,7 +813,11 @@ const migrateDB = async function (): Promise<void> {
     const questionNumber =
       oldquestion.question_number > 0 ? oldquestion.question_number : 1;
     // optional boolean NOT NULL,
-    const optional = oldquestion.optional;
+    let optional = oldquestion.optional;
+    if (oldId === 107) {
+      console.log("chanign question to optional: ", questiontext);
+      optional = true;
+    }
 
     const question = new OpenQuestion(
       questiontext,
@@ -1324,16 +1328,27 @@ const migrateDB = async function (): Promise<void> {
     review.savedAt = savedAt;
     // approved boolean,
     const oldApproval = oldReview.approved;
+    // ta_netid varchar(500),
+    let tauser = oldReview.ta_netid ? userMap.get(oldReview.ta_netid)! : null;
     let approval;
+    // setting approval by otto when it was not registered yet
     if (typeof oldApproval === "boolean") {
       approval = oldApproval;
+      if (tauser === null && oldId <= 22) {
+        tauser = userMap.get("owvisser")!;
+      }
     } else {
       approval = null;
     }
     review.approvalByTA = approval;
-    // ta_netid varchar(500),
-    const tauser = oldReview.ta_netid ? userMap.get(oldReview.ta_netid)! : null;
     review.approvingTA = tauser;
+
+    // unsubmitting these unfilled reviews which were submitted due to a bug?
+    if (oldId === 3577 || oldId === 4743 || oldId === 6247) {
+      review.submitted = false;
+      review.approvalByTA = null;
+      review.approvingTA = null;
+    }
 
     // log the errors to the console so they can be solved in one go
     try {
