@@ -1334,7 +1334,7 @@ const migrateDB = async function (): Promise<void> {
     // setting approval by otto when it was not registered yet
     if (typeof oldApproval === "boolean") {
       approval = oldApproval;
-      if (tauser === null && oldId <= 22) {
+      if (tauser === null && oldReview.rubric_id <= 22) {
         tauser = userMap.get("owvisser")!;
       }
     } else {
