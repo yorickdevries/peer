@@ -1288,6 +1288,7 @@ const migrateDB = async function (): Promise<void> {
     throw new Error("there are reviewcomments!");
   }
 
+  console.log("updateing reviews");
   // update all reviews (they can now be subbmitted as the questions are there)
   for (const oldReview of sortedOldReviews) {
     // id SERIAL,
@@ -1348,6 +1349,7 @@ const migrateDB = async function (): Promise<void> {
       review.submitted = false;
       review.approvalByTA = null;
       review.approvingTA = null;
+      console.log("unsubmitted review: " + oldId);
     }
 
     // log the errors to the console so they can be solved in one go
