@@ -1111,21 +1111,28 @@ const migrateDB = async function (): Promise<void> {
   > = new Map<string, CheckboxQuestionOption[]>();
   for (const oldAnswer of oldCheckboxAnswers) {
     const chosen = oldAnswer.answer;
-    if (chosen) {
-      const option = checkboxOptionsMap.get(oldAnswer.checkboxoption_id)!;
-      // questionId
-      const questionId = (await option.getQuestion()).id;
-      // const review = reviewMap.get(oldAnswer.review_id)!;
-      const reviewOldId = oldAnswer.review_id;
+    const option = checkboxOptionsMap.get(oldAnswer.checkboxoption_id)!;
+    // questionId
+    const questionId = (await option.getQuestion()).id;
+    // const review = reviewMap.get(oldAnswer.review_id)!;
+    const reviewOldId = oldAnswer.review_id;
 
-      const key = String(reviewOldId) + "-" + String(questionId);
-      if (checkBoxAnswerMapToFill.has(key)) {
+    const key = String(reviewOldId) + "-" + String(questionId);
+    if (checkBoxAnswerMapToFill.has(key)) {
+      // add to map if chosen, do nothing otherwise
+      if (chosen) {
         const answer = checkBoxAnswerMapToFill.get(key)!;
         answer.push(option);
         checkBoxAnswerMapToFill.set(key, answer);
-      } else {
+      }
+    } else {
+      // add to map as list of 1 if chosen
+      if (chosen) {
         const answer = [option];
         checkBoxAnswerMapToFill.set(key, answer);
+        // add to map as emptylist if not chosen
+      } else {
+        checkBoxAnswerMapToFill.set(key, []);
       }
     }
   }
@@ -1350,6 +1357,11 @@ const migrateDB = async function (): Promise<void> {
       review.approvalByTA = null;
       review.approvingTA = null;
       console.log("unsubmitted review: " + oldId);
+    }
+    if (oldId === 32252) {
+      review.approvalByTA = null;
+      review.approvingTA = null;
+      console.log("approval removed review: " + oldId);
     }
 
     // log the errors to the console so they can be solved in one go
