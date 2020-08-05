@@ -610,32 +610,18 @@ const migrateDB = async function (): Promise<void> {
     const assignment = assignmentMap.get(sortedOldSubmission.assignment_id)!;
 
     // veel van de files zijn niet hier nu
-    let filePath = path.resolve(
+    const filePath = path.resolve(
       submissionFolder,
       sortedOldSubmission.file_path
     );
-    const fileExtension = path.extname(filePath);
     if (!fs.existsSync(filePath)) {
-      //throw new Error(`${filePath} does not exist`);
-      // TODO: remove this code and throw error if the file is not found
-      // console.log("niet gevonden");
-      // filePath = dummyFilePath;
-      filePath = "";
+      throw new Error(`${filePath} does not exist`);
     }
-    let file: File;
-    if (filePath !== "") {
-      const fileBuffer = fs.readFileSync(filePath);
-      // also saves the file to disk
-      file = await constructFile(fileBuffer, filePath);
-    } else {
-      // get just file 1
-      file = new File(
-        "filename",
-        fileExtension,
-        "0000000000000000000000000000000000000000000000000000000000000000"
-      );
-      await file.save();
-    }
+    const fileBuffer = fs.readFileSync(filePath);
+    // also saves the file to disk
+    const file = await constructFile(fileBuffer, filePath);
+
+    await file.save();
 
     const date = sortedOldSubmission.date;
 
@@ -1227,34 +1213,16 @@ const migrateDB = async function (): Promise<void> {
     const question = uploadQuestionMap.get(oldAnswer.uploadquestion_id)!;
     const review = reviewMap.get(oldAnswer.review_id)!;
 
-    let filePath = path.resolve(reviewsFolder, fileName);
-    const fileExtension = path.extname(filePath);
+    const filePath = path.resolve(reviewsFolder, fileName);
+
     if (!fs.existsSync(filePath)) {
-      //throw new Error(`${filePath} does not exist`);
-      // TODO: remove this code and throw error if the file is not found
-      // console.log("niet gevonden");
-      // filePath = dummyFilePath;
-      filePath = "";
+      throw new Error(`${filePath} does not exist`);
     }
-    //  else {
-    //   console.log("wel gevonden");
-    // }
-    let file: File;
-    if (filePath !== "") {
-      const fileBuffer = fs.readFileSync(filePath);
-      // also saves the file to disk
-      file = await constructFile(fileBuffer, filePath);
-    } else {
-      // get just file 1
-      file = new File(
-        "filename",
-        fileExtension,
-        "0000000000000000000000000000000000000000000000000000000000000000"
-      );
-      // set name to feedback as it is now some numbers
-      file.name = "feedback";
-      await file.save();
-    }
+    const fileBuffer = fs.readFileSync(filePath);
+    // also saves the file to disk
+    const file = await constructFile(fileBuffer, filePath);
+
+    await file.save();
 
     const answer = new UploadQuestionAnswer(question, review, file);
     await answer.save();
