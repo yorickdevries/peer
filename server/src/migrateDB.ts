@@ -1358,5 +1358,5 @@ migrateDB()
   .catch((error) => {
     console.log(error);
     console.log("did not finish succesfully");
-    process.exit(0);
+    process.exit(1);
   });
