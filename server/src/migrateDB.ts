@@ -418,6 +418,7 @@ const migrateDB = async function (): Promise<void> {
       const fileBuffer = fs.readFileSync(filePath);
       // also saves the file to disk
       file = await constructFile(fileBuffer, filePath);
+      fs.unlinkSync(filePath);
     } else {
       file = null;
     }
@@ -620,8 +621,7 @@ const migrateDB = async function (): Promise<void> {
     const fileBuffer = fs.readFileSync(filePath);
     // also saves the file to disk
     const file = await constructFile(fileBuffer, filePath);
-
-    await file.save();
+    fs.unlinkSync(filePath);
 
     const date = sortedOldSubmission.date;
 
@@ -1221,8 +1221,7 @@ const migrateDB = async function (): Promise<void> {
     const fileBuffer = fs.readFileSync(filePath);
     // also saves the file to disk
     const file = await constructFile(fileBuffer, filePath);
-
-    await file.save();
+    fs.unlinkSync(filePath);
 
     const answer = new UploadQuestionAnswer(question, review, file);
     await answer.save();
