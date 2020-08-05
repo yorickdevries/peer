@@ -2,7 +2,7 @@
     <b-container>
         <b-row>
             <b-col>
-                <BreadcrumbTitle :items="['Assignments', assignment.title]" class="mt-3" />
+                <BreadcrumbTitle :items="['Assignments', assignment.name]" class="mt-3" />
             </b-col>
         </b-row>
         <b-row>
@@ -35,7 +35,7 @@
                                         <b-badge variant="success" v-if="isHandInActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
-                                    <div class="text-muted">Due: {{ assignment.due_date | formatDate }}</div>
+                                    <div class="text-muted">Due: {{ assignment.dueDate | formatDate }}</div>
                                 </div>
                             </b-button>
 
@@ -52,7 +52,7 @@
                                         <b-badge variant="success" v-if="isPeerReviewActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
-                                    <span class="text-muted">Due: {{ assignment.review_due_date | formatDate }}</span>
+                                    <span class="text-muted">Due: {{ assignment.reviewDueDate | formatDate }}</span>
                                 </div>
                             </b-button>
 
@@ -70,13 +70,13 @@
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
                                     <span class="text-muted"
-                                        >Opens after {{ assignment.review_due_date | formatDate }}</span
+                                        >Opens after {{ assignment.reviewDueDate | formatDate }}</span
                                     >
                                 </div>
                             </b-button>
 
                             <b-button
-                                v-if="assignment.review_evaluation"
+                                v-if="assignment.reviewEvaluation"
                                 variant="white"
                                 active-class="bg-light"
                                 class="flex-fill p-0"
@@ -90,7 +90,7 @@
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
                                     <span class="text-muted"
-                                        >Due: {{ assignment.review_evaluation_due_date | formatDate }}</span
+                                        >Due: {{ assignment.reviewEvaluationDueDate | formatDate }}</span
                                     >
                                 </div>
                             </b-button>
@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 
 export default {
@@ -120,33 +120,35 @@ export default {
     data() {
         return {
             assignment: {
-                title: null,
-                due_date: null,
-                review_due_date: null,
-                review_evaluation: null
+                name: null,
+                dueDate: null,
+                reviewDueDate: null,
+                reviewPublishDate: null,
+                reviewEvaluation: null,
+                reviewEvaluationDueDate: null
             }
         }
     },
     computed: {
         isHandInActive() {
-            return new Date() < new Date(this.assignment.due_date)
+            return new Date() < new Date(this.assignment.dueDate)
         },
         isPeerReviewVisible() {
-            return new Date() > new Date(this.assignment.review_publish_date)
+            return new Date() > new Date(this.assignment.reviewPublishDate)
         },
         isPeerReviewActive() {
             return (
-                new Date() < new Date(this.assignment.review_due_date) &&
-                new Date() > new Date(this.assignment.review_publish_date)
+                new Date() < new Date(this.assignment.reviewDueDate) &&
+                new Date() > new Date(this.assignment.reviewPublishDate)
             )
         },
         isFeedbackActive() {
-            return new Date() > new Date(this.assignment.review_due_date)
+            return new Date() > new Date(this.assignment.reviewDueDate)
         },
         isEvaluationActive() {
             return (
-                new Date() > new Date(this.assignment.review_due_date) &&
-                new Date() < new Date(this.assignment.review_evaluation_due_date)
+                new Date() > new Date(this.assignment.reviewDueDate) &&
+                new Date() < new Date(this.assignment.reviewEvaluationDueDate)
             )
         }
     },

@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 import Navbar from "../Navbar"
 
 export default {

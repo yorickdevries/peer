@@ -62,25 +62,26 @@
                             <b-col
                                 cols="6"
                                 v-for="course in filteredCourses"
-                                :key="course.id"
+                                :key="course.course.id"
                                 class="d-flex align-items-stretch mb-3"
                             >
                                 <!--Single Card-->
                                 <b-card no-body class="mb-3 w-100">
                                     <b-card-body class="d-flex flex-column">
                                         <div class="d-flex justify-content-between align-items-center mb-0">
-                                            <h4 class="card-title m-0">{{ course.name }}</h4>
+                                            <h4 class="card-title m-0">{{ course.course.name }}</h4>
                                             <b-badge v-if="course.role" show variant="primary font-weight-bold">{{
                                                 course.role.toUpperCase()
                                             }}</b-badge>
                                         </div>
                                         <p class="card-title mt-0 text-muted">
-                                            {{ course.course_code }} - {{ course.faculty }} - {{ course.academic_year }}
+                                            {{ course.course.courseCode }} - {{ course.course.faculty.name }} -
+                                            {{ course.course.academicYear.name }}
                                         </p>
 
                                         <div class="mb-auto">
-                                            <p v-if="course.description != null">
-                                                {{ course.description | truncate(200) }}
+                                            <p v-if="course.course.description != null">
+                                                {{ course.course.description | truncate(200) }}
                                             </p>
                                             <p v-else><i>No course description</i></p>
                                         </div>
@@ -91,7 +92,7 @@
                                                 size="sm"
                                                 :to="{
                                                     name: 'student-dashboard.course.home',
-                                                    params: { courseId: course.id }
+                                                    params: { courseId: course.course.id }
                                                 }"
                                             >
                                                 Enter Course
@@ -102,7 +103,7 @@
                                                 size="sm"
                                                 :to="{
                                                     name: 'teaching-assistant-dashboard.course.home',
-                                                    params: { courseId: course.id }
+                                                    params: { courseId: course.course.id }
                                                 }"
                                             >
                                                 Enter Course
@@ -113,7 +114,7 @@
                                                 size="sm"
                                                 :to="{
                                                     name: 'teacher-dashboard.course',
-                                                    params: { courseId: course.id }
+                                                    params: { courseId: course.course.id }
                                                 }"
                                             >
                                                 Enter Course
@@ -173,7 +174,8 @@
                                             <h4 class="card-title m-0">{{ course.name }}</h4>
                                         </div>
                                         <p class="card-title mt-0 text-muted">
-                                            {{ course.course_code }} - {{ course.faculty }} - {{ course.academic_year }}
+                                            {{ course.courseCode }} - {{ course.faculty.name }} -
+                                            {{ course.academicYear.name }}
                                         </p>
 
                                         <div class="mb-auto">
@@ -203,7 +205,7 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 import notifications from "../../mixins/notifications"
 import CreateCourse from "./CreateCourse"
 
@@ -238,12 +240,13 @@ export default {
     },
     computed: {
         filteredCourses() {
-            return this.courses.filter(course => {
+            return this.courses.filter(courseItem => {
+                let course = courseItem.course
                 return (
                     (course.name.toLowerCase().includes(this.filter.toLowerCase()) || this.filter === "") &&
-                    (this.filterOptions.faculty == null || course.faculty === this.filterOptions.faculty) &&
+                    (this.filterOptions.faculty == null || course.faculty.name === this.filterOptions.faculty) &&
                     (this.filterOptions.academic_year == null ||
-                        course.academic_year === this.filterOptions.academic_year)
+                        course.academicYear.name === this.filterOptions.academic_year)
                 )
             })
         },
@@ -252,8 +255,8 @@ export default {
                 return (
                     (course.name.toLowerCase().includes(this.filterUnenrolled.toLowerCase()) ||
                         this.filterUnenrolled === "") &&
-                    (this.filterOptions.faculty == null || course.faculty === this.filterOptions.faculty) &&
-                    course.academic_year === this.academic_year_active
+                    (this.filterOptions.faculty == null || course.faculty.name === this.filterOptions.faculty) &&
+                    course.academicYear.name === this.academic_year_active
                 )
             })
         }
@@ -270,7 +273,6 @@ export default {
 
         // Fetch user to see if create course button should be showed.
         await this.fetchUser()
-
         await this.fetchAcademicYears()
         await this.fetchactiveAcademicYears()
         await this.fetchFaculties()
@@ -278,8 +280,8 @@ export default {
     methods: {
         async fetchactiveAcademicYears() {
             try {
-                let res = await api.getactiveAcademicYears()
-                this.academic_year_active = res.data[0].year
+                let res = await api.getAcademicYears(true)
+                this.academic_year_active = res.data[0].name
                 this.filterOptions.academic_year = this.academic_year_active
             } catch (e) {
                 console.log(e)
@@ -300,9 +302,9 @@ export default {
 
         async fetchAcademicYears() {
             try {
-                let res = await api.getAcademicYears()
+                let res = await api.getAllAcademicYears()
                 this.academic_years = res.data.map(entry => {
-                    return { value: entry.year, text: entry.year }
+                    return { value: entry.name, text: entry.name }
                 })
             } catch (e) {
                 console.log(e)
@@ -310,9 +312,9 @@ export default {
         },
 
         async fetchUser() {
-            let res = await api.getUser()
+            let res = await api.getUserInfo()
             this.showCreateCourseButton = false
-            for (const affiliation of res.data.user.affiliation) {
+            for (const affiliation of res.data.affiliation) {
                 if (affiliation.name === "employee") {
                     this.showCreateCourseButton = true
                 }
@@ -325,14 +327,14 @@ export default {
         },
         async fetchAllCourseRoles() {
             for (let i = 0; i < this.courses.length; i++) {
-                let res = await api.getCurrentRoleForCourse(this.courses[i].id)
+                let res = await api.getCourseRole(this.courses[i].course.id)
                 this.$set(this.courses[i], "role", res.data.role)
             }
         },
         async fetchUnenrolledCourses() {
             try {
-                const { data: unenrolledCourses } = await api.getUnenrolledCourses()
-                this.unEnrolledCourses = unenrolledCourses
+                const res = await api.getEnrollableCourses()
+                this.unEnrolledCourses = res.data
                 this.showNoUnenrolledCoursesText = this.unEnrolledCourses.length === 0
             } catch (e) {
                 this.showNoUnenrolledCoursesText = this.unEnrolledCourses.length === 0
