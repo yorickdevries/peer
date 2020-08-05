@@ -1365,13 +1365,8 @@ const migrateDB = async function (): Promise<void> {
     }
 
     // log the errors to the console so they can be solved in one go
-    try {
-      await review.save();
-      reviewMap.set(oldId, review);
-    } catch (error) {
-      console.log(error);
-      console.log(oldReview);
-    }
+    await review.save();
+    reviewMap.set(oldId, review);
   }
 
   console.log("Done migration");
