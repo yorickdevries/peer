@@ -32,7 +32,6 @@ import RangeQuestion from "./models/RangeQuestion";
 import UploadQuestion from "./models/UploadQuestion";
 import CheckboxQuestionOption from "./models/CheckboxQuestionOption";
 import MultipleChoiceQuestionOption from "./models/MultipleChoiceQuestionOption";
-import File from "./models/File";
 import Review from "./models/Review";
 import ReviewOfSubmission from "./models/ReviewOfSubmission";
 import ReviewOfReview from "./models/ReviewOfReview";
