@@ -35,16 +35,6 @@
                             ></b-form-select>
                         </div>
                     </div>
-
-                    <div>
-                        <div class="text-muted">Delete all questions</div>
-                        <b-button variant="danger" v-b-modal.deleteAll>Delete all questions</b-button>
-                        <b-modal id="deleteAll" centered title="Warning" @ok="deleteAll">
-                            Are you sure you want to delete ALL questions? <br /><br />
-                            Deleting all questions after students have submitted answers to questions will DELETE all
-                            the answers the students have given.
-                        </b-modal>
-                    </div>
                 </div>
             </b-card>
 
@@ -305,17 +295,6 @@ export default {
                 this.showSuccessMessage({ message: "Rubric successfully copied and appended to this rubric." })
             } catch (e) {
                 this.showErrorMessage({ message: "Rubric could not be copied." })
-            }
-
-            await this.fetchRubric()
-        },
-        async deleteAll() {
-            try {
-                //TODO: New API below
-                await api.client.get(`rubric/${this.rubric.id}/deleteall`)
-                this.showSuccessMessage({ message: "Deleted all questions." })
-            } catch (e) {
-                this.showErrorMessage({ message: "Could not delete all questions." })
             }
 
             await this.fetchRubric()
