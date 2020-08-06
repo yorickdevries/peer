@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 
 export default {
@@ -62,7 +62,7 @@ export default {
         return {
             students: [],
             currentPage: 1,
-            fields: [{ key: "user_netid", label: "NetID" }],
+            fields: [{ key: "userNetid", label: "NetID" }],
             perPage: 5,
             filter: null,
             netid: ""
@@ -74,7 +74,7 @@ export default {
     methods: {
         async fetchStudents() {
             try {
-                let res = await api.getUsersWithRole(this.$route.params.courseId, "student")
+                let res = await api.getEnrolledUsersWithRole(this.$route.params.courseId, "student")
                 this.students = res.data
             } catch (e) {
                 console.log(e)

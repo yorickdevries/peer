@@ -8,5 +8,11 @@ const client = axios.create({
 export default {
     getEnrolledCourses(courseId) {
         return client.get("enrolled", { params: { courseId } })
+    },
+    getEnrolledUsersWithRole(courseId, role) {
+        return client.get(`?courseId=${courseId}&role=${role}`)
+    },
+    enrollUser(enrollment) {
+        return client.post("", enrollment)
     }
 }
