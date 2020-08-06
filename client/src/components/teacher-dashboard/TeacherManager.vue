@@ -54,7 +54,7 @@
                 </b-card>
             </b-col>
 
-            <!--Add form for TA-->
+            <!--Add form for teacher-->
             <b-col cols="4">
                 <b-card class="mb-3" header="Add a teacher">
                     <label>NetID</label>
@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 import notifications from "../../mixins/notifications"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 
@@ -83,7 +83,7 @@ export default {
         return {
             teachers: [],
             currentPage: 1,
-            fields: [{ key: "user_netid", label: "NetID" }, "actions"],
+            fields: [{ key: "userNetid", label: "NetID" }],
             perPage: 5,
             filter: null,
             netid: ""
@@ -99,13 +99,19 @@ export default {
 
             // Change the role through the API.
             try {
-                await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
-                    netid: this.netid,
+                let enrollment = {
+                    courseId: this.$route.params.courseId,
+                    userNetid: this.netid,
                     role: "teacher"
-                })
+                }
+                await api.enrollUser(enrollment)
+                // await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
+                //     netid: this.netid,
+                //     role: "teacher"
+                // })
             } catch (e) {
                 console.log(e.response)
-                return this.showErrorMessage({ message: e.response.data.error })
+                return this.showErrorMessage({ message: e.response.data })
             }
 
             // Show correct status message.
@@ -117,13 +123,19 @@ export default {
         async removeTeacher(netid) {
             // Change the role through the API.
             try {
-                await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
-                    netid: netid,
+                let enrollment = {
+                    courseId: this.$route.params.courseId,
+                    userNetid: netid,
                     role: "student"
-                })
+                }
+                await api.enrollUser(enrollment)
+                // await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
+                //     netid: netid,
+                //     role: "student"
+                // })
             } catch (e) {
-                console.log(e)
-                return this.showErrorMessage({ message: e.response.data.error })
+                console.log(e.response)
+                return this.showErrorMessage({ message: e.response.data })
             }
 
             // Show correct status message.
@@ -133,8 +145,12 @@ export default {
             await this.fetchTeachers()
         },
         async fetchTeachers() {
-            let { data } = await api.getUsersWithRole(this.$route.params.courseId, "teacher")
-            this.teachers = data
+            try {
+                let { data } = await api.getEnrolledUsersWithRole(this.$route.params.courseId, "teacher")
+                this.teachers = data
+            } catch (e) {
+                console.log(e.response.data)
+            }
         }
     }
 }
