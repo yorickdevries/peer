@@ -32,16 +32,6 @@
                             ></b-form-select>
                         </div>
                     </div>
-
-                    <div>
-                        <div class="text-muted">Delete all questions</div>
-                        <b-button variant="danger" v-b-modal.deleteAll>Delete all questions</b-button>
-                        <b-modal id="deleteAll" centered title="Warning" @ok="deleteAll">
-                            Are you sure you want to delete ALL questions? <br /><br />
-                            Deleting all questions after students have submitted answers to questions will DELETE all
-                            the answers the students have given.
-                        </b-modal>
-                    </div>
                 </div>
             </b-card>
 
@@ -49,14 +39,14 @@
                 <b-col>
                     <b-card
                         v-for="(question, index) in rubric.questions"
-                        :key="`${question.id}-${question.type_question}`"
+                        :key="`${question.id}-${question.type}`"
                         class="mb-3"
                         no-body
                     >
                         <b-card-header class="d-flex align-items-center">
-                            <span class="w-100">Question {{ question.question_number }}</span>
+                            <span class="w-100">Question {{ question.number }}</span>
                             <b-badge variant="primary" class="ml-2 float-right p-1"
-                                >{{ question.type_question.toUpperCase() }} QUESTION
+                                >{{ question.type.toUpperCase() }} QUESTION
                             </b-badge>
                             <b-badge pill v-if="question.optional" variant="secondary" class="ml-2 float-right p-1">
                                 OPTIONAL
@@ -67,23 +57,23 @@
                         </b-card-header>
 
                         <b-card-body>
-                            <template v-if="question.type_question === 'open'">
+                            <template v-if="question.type === 'open'">
                                 <OpenQuestion v-model="rubric.questions[index]"></OpenQuestion>
                             </template>
 
-                            <template v-if="question.type_question === 'range'">
+                            <template v-if="question.type === 'range'">
                                 <RangeQuestion v-model="rubric.questions[index]"></RangeQuestion>
                             </template>
 
-                            <template v-if="question.type_question === 'mc'">
+                            <template v-if="question.type === 'multiplechoice'">
                                 <MCQuestion v-model="rubric.questions[index]"></MCQuestion>
                             </template>
 
-                            <template v-if="question.type_question === 'checkbox'">
+                            <template v-if="question.type === 'checkbox'">
                                 <CheckboxQuestion v-model="rubric.questions[index]"></CheckboxQuestion>
                             </template>
 
-                            <template v-if="question.type_question === 'upload'">
+                            <template v-if="question.type === 'upload'">
                                 <UploadQuestion v-model="rubric.questions[index]"></UploadQuestion>
                             </template>
 
@@ -130,7 +120,7 @@
 </template>
 
 <script>
-import api from "../../../api/api_old"
+import api from "../../../api/api"
 import notifications from "../../../mixins/notifications"
 import OpenQuestion from "./OpenQuestion"
 import RangeQuestion from "./RangeQuestion"
@@ -140,13 +130,13 @@ import UploadQuestion from "./UploadQuestion"
 import CreateQuestionWizard from "./CreateQuestionWizard"
 
 let apiPrefixes = {
-    open: "/rubric/openquestion",
-    range: "/rubric/rangequestion",
-    mc: "/rubric/mcquestion",
-    mcoption: "/rubric/mcoption",
-    checkbox: "/rubric/checkboxquestion",
-    checkboxoption: "/rubric/checkboxoption",
-    upload: "/rubric/uploadquestion"
+    open: "/openquestions",
+    range: "/rangequestions",
+    multiplechoice: "/multiplechoicequestions",
+    multiplechoiceoption: "/multiplechoicequestionoptions",
+    checkbox: "/checkboxquestions",
+    checkboxoption: "/checkboxquestionoptions",
+    upload: "/uploadquestions"
 }
 
 export default {
@@ -164,9 +154,11 @@ export default {
         return {
             rubric: {
                 id: null,
-                assignment_id: null,
+                assignmentId: null,
                 type: null,
-                questions: []
+                questions: [],
+                createdAt: null,
+                updatedAt: null
             },
             assignmentsMetaData: [],
             assignmentIdSubmissionRubricToCopy: null
@@ -183,8 +175,8 @@ export default {
                 // Get max question number.
                 let max = 1
                 this.rubric.questions.forEach(question => {
-                    if (question.question_number > max) {
-                        max = question.question_number
+                    if (question.number > max) {
+                        max = question.number
                     }
                 })
                 return max + 1
@@ -197,75 +189,90 @@ export default {
     },
     methods: {
         async fetchRubric() {
-            let res = await api.client.get(`rubric/submissionrubric/${this.assignmentId}`)
+            let assignment = await api.getAssignment(this.assignmentId)
+            let submissionQuestionnaireId = assignment.data.submissionQuestionnaireId
+            let res = await api.getSubmissionQuestionnaire(submissionQuestionnaireId)
             this.rubric = res.data
-            this.rubric.questions.sort((a, b) => a.question_number - b.question_number)
+            this.rubric.questions.sort((a, b) => a.number - b.number)
         },
         async fetchCourseRubricMetaData() {
             const { data } = await api.getCourseAssignments(this.$route.params.courseId)
-            const assignmentsMetaData = data.map(assignment => {
-                return { value: assignment.id, text: assignment.title }
+            this.assignmentsMetaData = data.map(assignment => {
+                return { value: assignment.id, text: assignment.name }
             })
-            this.assignmentsMetaData = assignmentsMetaData
         },
         async deleteQuestion(question) {
             try {
-                await api.client.delete(`${apiPrefixes[question.type_question]}/${question.id}`)
+                await api.client.delete(`${apiPrefixes[question.type]}/${question.id}`)
                 this.showSuccessMessage({ message: "Successfully deleted question." })
             } catch (e) {
-                this.showErrorMessage()
+                this.showErrorMessage({ message: e.response.data })
             }
             await this.fetchRubric()
         },
         async saveQuestion(question) {
+            // Construct questionPatch object for saving information
+            let questionPatch = {
+                text: question.text,
+                number: question.number,
+                optional: question.optional
+            }
+
+            // Add range for range question
+            if (question.type === "range") questionPatch.range = question.range
+            // Add allowed extensions for upload question
+            if (question.type === "upload") questionPatch.extensions = question.extensions
             // Special save function to save MC questions.
-            if (question.type_question === "mc") return this.saveMCQuestion(question)
+            if (question.type === "multiplechoice") return this.saveQuestionWithOptions(question)
             // Special save function to save Checkbox questions.
-            if (question.type_question === "checkbox") return this.saveCheckboxQuestion(question)
+            if (question.type === "checkbox") return this.saveQuestionWithOptions(question)
 
-            await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
-            this.showSuccessMessage({ message: "Successfully saved question." })
+            try {
+                await api.client.patch(`${apiPrefixes[question.type]}/${question.id}`, questionPatch)
+                this.showSuccessMessage({ message: "Successfully saved question." })
+            } catch (e) {
+                this.showErrorMessage({ message: e.response.data })
+            }
             await this.fetchRubric()
         },
-        async saveMCQuestion(question) {
-            let options = question.option
+        async saveQuestionWithOptions(question) {
+            try {
+                let options = question.options
 
-            // Save options first to the API (delete/post/put).
-            options.forEach(async option => {
-                if (option.delete === true) await api.client.delete(`${apiPrefixes["mcoption"]}/${option.id}`)
-                else if (option.id === undefined) await api.client.post(`${apiPrefixes["mcoption"]}`, option)
-                else if (option.id) await api.client.put(`${apiPrefixes["mcoption"]}/${option.id}`, option)
-            })
+                // Save options first to the API (delete/post/patch).
+                for (const option of options) {
+                    if (option.delete === true) {
+                        await api.client.delete(`${apiPrefixes[question.type + "option"]}/${option.id}`)
+                    } else if (option.id === undefined) {
+                        await api.client.post(`${apiPrefixes[question.type + "option"]}`, option)
+                    } else if (option.id) {
+                        let optionPatch = { text: option.text }
+                        await api.client.patch(`${apiPrefixes[question.type + "option"]}/${option.id}`, optionPatch)
+                    }
+                }
 
-            // Save question text.
-            await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
-            this.showSuccessMessage({ message: "Successfully saved question." })
-            await this.fetchRubric()
-        },
-        async saveCheckboxQuestion(question) {
-            let options = question.option
-
-            // Save options first to the API (delete/post/put).
-            options.forEach(async option => {
-                if (option.delete === true) await api.client.delete(`${apiPrefixes["checkboxoption"]}/${option.id}`)
-                else if (option.id === undefined) await api.client.post(`${apiPrefixes["checkboxoption"]}`, option)
-                else if (option.id) await api.client.put(`${apiPrefixes["checkboxoption"]}/${option.id}`, option)
-            })
-
-            // Save question text.
-            await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
-            this.showSuccessMessage({ message: "Successfully saved question." })
-            await this.fetchRubric()
+                // Save question text, number and optionality.
+                let questionPatch = {
+                    text: question.text,
+                    number: question.number,
+                    optional: question.optional
+                }
+                await api.client.patch(`${apiPrefixes[question.type]}/${question.id}`, questionPatch)
+                this.showSuccessMessage({ message: "Successfully saved question." })
+                await this.fetchRubric()
+            } catch (e) {
+                console.log("SAVE", question.type, "ERROR:", e)
+                console.log("SAVE", question.type, "ERROR:", e.response)
+            }
         },
         async copyRubric() {
             if (this.assignmentIdSubmissionRubricToCopy === null)
                 return this.showErrorMessage({ message: "Choose an Assignment rubric to copy first." })
-            const rubricToCopy = await api.client.get(
-                `rubric/submissionrubric/${this.assignmentIdSubmissionRubricToCopy}`
-            )
+            const rubricToCopy = await api.getSubmissionQuestionnaire(this.assignmentIdSubmissionRubricToCopy)
             const rubricToCopyId = rubricToCopy.data.id
             try {
-                await api.client.get(`rubric/${this.rubric.id}/copy/${rubricToCopyId}`)
+                await api.copyQuestionsSubmissionQuestionnaire({ copyFromQuestionnaireId: rubricToCopyId })
+                // await api.client.get(`rubric/${this.rubric.id}/copy/${rubricToCopyId}`)
                 this.showSuccessMessage({ message: "Rubric successfully copied and appended to this rubric." })
             } catch (e) {
                 this.showErrorMessage({ message: "Rubric could not be copied." })
@@ -273,22 +280,12 @@ export default {
 
             await this.fetchRubric()
         },
-        async deleteAll() {
-            try {
-                await api.client.get(`rubric/${this.rubric.id}/deleteall`)
-                this.showSuccessMessage({ message: "Deleted all questions." })
-            } catch (e) {
-                this.showErrorMessage({ message: "Could not delete all questions." })
-            }
-
-            await this.fetchRubric()
-        },
         async makeRubric() {
             try {
-                await api.client.post(`rubric/`, { assignment_id: this.assignmentId, rubric_type: "submission" })
+                await api.createSubmissionQuestionnaire({ assignmentId: this.assignmentId })
                 this.showSuccessMessage({ message: "Rubric made, you can now add questions." })
             } catch (e) {
-                this.showErrorMessage({ message: "Couldn't make Rubric" })
+                this.showErrorMessage({ message: e.response.data })
             }
             await this.fetchRubric()
             await this.fetchCourseRubricMetaData()
