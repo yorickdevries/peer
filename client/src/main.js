@@ -24,7 +24,6 @@ function toast({ title, message, type, timeout, cb }) {
         title,
         message,
         timeout,
-        onOpened: cb,
         position: "bottomCenter"
     })
 }
