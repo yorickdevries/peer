@@ -71,8 +71,8 @@ let apiPrefixes = {
     range: "/rangequestions",
     mc: "/multiplechoicequestions",
     mcoption: "/multiplechoicequestionoptions",
-    checkbox: "/rubric/checkboxquestion",
-    checkboxoption: "/rubric/checkboxoption",
+    checkbox: "/checkboxquestions",
+    checkboxoption: "/checkboxquestionoptions",
     upload: "/uploadquestions"
 }
 
@@ -117,10 +117,10 @@ export default {
                 optional: false
             },
             checkboxQuestion: {
-                question: "",
-                rubric_id: this.rubricId,
-                question_number: null,
-                option: [],
+                text: "",
+                questionnaireId: this.rubricId,
+                number: null,
+                options: [],
                 optional: false
             },
             uploadQuestion: {
@@ -154,9 +154,9 @@ export default {
     methods: {
         async createQuestion(question, type) {
             // Special function to create MC question.
-            if (type === "mc") return this.createMCQuestion(question)
+            if (type === "mc") return this.createQuestionWithOptions(question, type)
             // Special function to create Checkbox question.
-            if (type === "checkbox") return this.createCheckboxQuestion(question)
+            if (type === "checkbox") return this.createQuestionWithOptions(question, type)
 
             try {
                 await api.client.post(`${apiPrefixes[type]}`, question)
@@ -173,36 +173,45 @@ export default {
                 })
             }
         },
-        async createMCQuestion(question) {
+        async createQuestionWithOptions(question, type) {
             try {
                 // Create the MC question itself.
-                let res = await api.client.post(`${apiPrefixes["mc"]}`, {
+                let res = await api.client.post(`${apiPrefixes[type]}`, {
                     text: question.text,
                     questionnaireId: question.questionnaireId,
                     number: question.number,
                     optional: question.optional
                 })
 
-                console.log("MC", res)
+                console.log(type, res)
 
                 // Get the newly created ID of the MC question.
-                let multipleChoiceQuestionId = res.data.id
+                let parentQuestionId = res.data.id
 
                 // Create all the options.
                 let options = question.options
-                options.forEach(async option => {
-                    await api.client.post(`${apiPrefixes["mcoption"]}`, {
-                        text: option.text,
-                        multipleChoiceQuestionId: multipleChoiceQuestionId
-                    })
-                })
+                if (type === "mc") {
+                    for (const option of options) {
+                        await api.client.post(`${apiPrefixes["mcption"]}`, {
+                            text: option.text,
+                            multipleChoiceQuestionId: parentQuestionId
+                        })
+                    }
+                } else if (type === "checkbox") {
+                    for (const option of options) {
+                        await api.client.post(`${apiPrefixes["checkboxoption"]}`, {
+                            text: option.text,
+                            checkboxQuestionId: parentQuestionId
+                        })
+                    }
+                }
 
                 this.showSuccessMessage({ message: "Successfully created question." })
                 this.$emit("saved")
                 this.onReset()
             } catch (e) {
-                console.log("ERROR create MPC:", e)
-                console.log("ERROR:", e.response)
+                console.log("ERROR create", type, e)
+                console.log("ERROR create", type, e.response)
             }
         },
         async createCheckboxQuestion(question) {
@@ -253,10 +262,10 @@ export default {
                 optional: false
             }),
                 (this.checkboxQuestion = {
-                    question: "",
-                    rubric_id: this.rubricId,
-                    question_number: this.nextNewQuestionNumber,
-                    option: [],
+                    text: "",
+                    questionnaireId: this.rubricId,
+                    number: this.nextNewQuestionNumber,
+                    options: [],
                     optional: false
                 })
             this.uploadQuestion = {

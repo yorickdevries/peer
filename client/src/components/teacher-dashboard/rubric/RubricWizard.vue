@@ -137,7 +137,7 @@ let apiPrefixes = {
     range: "/rangequestions",
     multiplechoice: "/multiplechoicequestions",
     multiplechoiceoption: "/multiplechoicequestionoptions",
-    checkbox: "/checkboxquestion",
+    checkbox: "/checkboxquestions",
     checkboxoption: "/checkboxquestionoptions",
     upload: "/uploadquestions"
 }
