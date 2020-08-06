@@ -7,7 +7,7 @@ const client = axios.create({
 
 export default {
     createOpenQuestion(question) {
-        return client.post("",question)
+        return client.post("", question)
     }
     // getSubmissionQuestionnaire(submissionQuestionnaireId) {
     //     return client.get( `${submissionQuestionnaireId}`)
