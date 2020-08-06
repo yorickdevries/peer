@@ -83,7 +83,7 @@ export default {
         return {
             teachingAssistants: [],
             currentPage: 1,
-            fields: [{ key: "userNetid", label: "NetID" }, "actions"],
+            fields: [{ key: "userNetid", label: "NetID" }],
             perPage: 5,
             filter: null,
             netid: ""
