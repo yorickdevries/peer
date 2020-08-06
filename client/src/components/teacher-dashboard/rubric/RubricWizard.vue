@@ -147,7 +147,7 @@ let apiPrefixes = {
     mcoption: "/rubric/mcoption",
     checkbox: "/rubric/checkboxquestion",
     checkboxoption: "/rubric/checkboxoption",
-    upload: "/rubric/uploadquestion"
+    upload: "/uploadquestions"
 }
 
 export default {
@@ -165,7 +165,7 @@ export default {
         return {
             rubric: {
                 id: null,
-                assignment_id: null,
+                assignmentId: null,
                 type: null,
                 questions: [],
                 createdAt: null,
@@ -232,8 +232,8 @@ export default {
 
             // Add range for range question
             if (question.type === "range") questionPatch.range = question.range
-            // TODO: Add file for upload question
-
+            // Add allowed extensions for upload question
+            if (question.type === "upload") questionPatch.extensions = question.extensions
             // Special save function to save MC questions.
             if (question.type === "mc") return this.saveMCQuestion(question)
             // Special save function to save Checkbox questions.

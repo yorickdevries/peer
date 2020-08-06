@@ -1,13 +1,13 @@
 <template>
     <div>
         <b-form-group label="Question Number" description="The questions will be sorted on this number.">
-            <b-form-input type="number" v-model="question.question_number" />
+            <b-form-input type="number" v-model="question.number" />
         </b-form-group>
         <b-form-group label="Question Text" description="The actual question that the student has to answer.">
-            <b-form-textarea v-model="question.question" />
+            <b-form-textarea v-model="question.text" />
         </b-form-group>
         <b-form-group label="Allowed file extension" description="The extension of the file type that is allowed.">
-            <b-form-select :options="extensionTypes" v-model="question.extension"></b-form-select>
+            <b-form-select :options="extensionTypes" v-model="question.extensions"></b-form-select>
         </b-form-group>
         <b-form-group label="Optional Question" description="Make this question optional for the student.">
             <b-form-checkbox v-model="question.optional">

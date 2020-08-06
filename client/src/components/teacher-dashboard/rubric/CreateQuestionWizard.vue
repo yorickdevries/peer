@@ -73,7 +73,7 @@ let apiPrefixes = {
     mcoption: "/rubric/mcoption",
     checkbox: "/rubric/checkboxquestion",
     checkboxoption: "/rubric/checkboxoption",
-    upload: "/rubric/uploadquestion"
+    upload: "/uploadquestions"
 }
 
 export default {
@@ -124,10 +124,10 @@ export default {
                 optional: false
             },
             uploadQuestion: {
-                question: "",
-                rubric_id: this.rubricId,
-                question_number: null,
-                extension: null,
+                text: "",
+                questionnaireId: this.rubricId,
+                number: null,
+                extensions: null,
                 optional: false
             }
         }
@@ -249,10 +249,10 @@ export default {
                     optional: false
                 })
             this.uploadQuestion = {
-                question: "",
-                rubric_id: this.rubricId,
-                question_number: this.nextNewQuestionNumber,
-                extension: null,
+                text: "",
+                questionnaireId: this.rubricId,
+                number: this.nextNewQuestionNumber,
+                extensions: null,
                 optional: false
             }
         }
