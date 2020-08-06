@@ -69,8 +69,8 @@ import notifications from "../../../mixins/notifications"
 let apiPrefixes = {
     open: "/openquestions/",
     range: "/rangequestions",
-    mc: "/rubric/mcquestion",
-    mcoption: "/rubric/mcoption",
+    mc: "/multiplechoicequestions",
+    mcoption: "/multiplechoicequestionoptions",
     checkbox: "/rubric/checkboxquestion",
     checkboxoption: "/rubric/checkboxoption",
     upload: "/uploadquestions"
@@ -110,10 +110,10 @@ export default {
                 optional: false
             },
             mcQuestion: {
-                question: "",
-                rubric_id: this.rubricId,
-                question_number: null,
-                option: [],
+                text: "",
+                questionnaireId: this.rubricId,
+                number: null,
+                options: [],
                 optional: false
             },
             checkboxQuestion: {
@@ -164,35 +164,46 @@ export default {
                 this.$emit("saved")
                 this.onReset()
             } catch (e) {
+                console.log("ERROR:", e)
+                console.log("ERROR:", e.response)
+                console.log("ERROR:", e.response.data)
+                console.log("ERROR:", e.response.data.error)
                 this.showErrorMessage({
                     message: "Error making question. Please make sure you have filled in all the fields."
                 })
             }
         },
         async createMCQuestion(question) {
-            // Create the MC question itself.
-            let res = await api.client.post(`${apiPrefixes["mc"]}`, {
-                question: question.question,
-                rubric_id: question.rubric_id,
-                question_number: question.question_number,
-                optional: question.optional
-            })
-
-            // Get the newly created ID of the MC question.
-            let mcquestion_id = res.data.id
-
-            // Create all the options.
-            let options = question.option
-            options.forEach(async option => {
-                await api.client.post(`${apiPrefixes["mcoption"]}`, {
-                    option: option.option,
-                    mcquestion_id: mcquestion_id
+            try {
+                // Create the MC question itself.
+                let res = await api.client.post(`${apiPrefixes["mc"]}`, {
+                    text: question.text,
+                    questionnaireId: question.questionnaireId,
+                    number: question.number,
+                    optional: question.optional
                 })
-            })
 
-            this.showSuccessMessage({ message: "Successfully created question." })
-            this.$emit("saved")
-            this.onReset()
+                console.log("MC", res)
+
+                // Get the newly created ID of the MC question.
+                let multipleChoiceQuestionId = res.data.id
+
+                // Create all the options.
+                let options = question.options
+                options.forEach(async option => {
+                    await api.client.post(`${apiPrefixes["mcoption"]}`, {
+                        text: option.text,
+                        multipleChoiceQuestionId: multipleChoiceQuestionId
+                    })
+                })
+
+                this.showSuccessMessage({ message: "Successfully created question." })
+                this.$emit("saved")
+                this.onReset()
+            } catch (e) {
+                console.log("ERROR create MPC:", e)
+                console.log("ERROR:", e.response)
+            }
         },
         async createCheckboxQuestion(question) {
             // Create the Checkbox question itself.
@@ -235,10 +246,10 @@ export default {
                 optional: false
             }
             ;(this.mcQuestion = {
-                question: "",
-                rubric_id: this.rubricId,
-                question_number: this.nextNewQuestionNumber,
-                option: [],
+                text: "",
+                questionnaireId: this.rubricId,
+                number: this.nextNewQuestionNumber,
+                options: [],
                 optional: false
             }),
                 (this.checkboxQuestion = {

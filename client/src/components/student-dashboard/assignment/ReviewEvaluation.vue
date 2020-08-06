@@ -117,7 +117,7 @@
                     />
 
                     <!-- MPC QUESTION -->
-                    <b-form-group v-else-if="pair.question.type_question === 'mc'">
+                    <b-form-group v-else-if="pair.question.type_question === 'multiplechoice'">
                         <b-form-radio-group
                             :options="transformOptionsToHTMLOptions(pair.question.option)"
                             v-model="pair.answer.answer"

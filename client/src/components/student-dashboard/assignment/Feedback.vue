@@ -92,7 +92,7 @@
                                                 </div>
                                             </template>
                                             <!--&lt;!&ndash; MPC QUESTION &ndash;&gt;-->
-                                            <template v-else-if="activeQuestion.type_question === 'mc'">
+                                            <template v-else-if="activeQuestion.type_question === 'multiplechoice'">
                                                 <b-form-group v-if="pair.answer.answer" class="mb-0">
                                                     <b-form-radio-group
                                                         v-if="pair.answer.answer"

@@ -1,6 +1,6 @@
 <template>
     <div>
-
+        {{ rubric }}
         <b-alert :show="blockRubricEditing" variant="info"
             >Rubric editing is not allowed anymore since the peer review publish date has already passed.</b-alert
         >
@@ -76,7 +76,7 @@
                                 <RangeQuestion v-model="rubric.questions[index]"></RangeQuestion>
                             </template>
 
-                            <template v-if="question.type === 'mc'">
+                            <template v-if="question.type === 'multiplechoice'">
                                 <MCQuestion v-model="rubric.questions[index]"></MCQuestion>
                             </template>
 
@@ -143,8 +143,8 @@ import CreateQuestionWizard from "./CreateQuestionWizard"
 let apiPrefixes = {
     open: "/openquestions",
     range: "/rangequestions",
-    mc: "/rubric/mcquestion",
-    mcoption: "/rubric/mcoption",
+    mc: "/multiplechoicequestions",
+    mcoption: "/multiplechoicequestionoptions",
     checkbox: "/rubric/checkboxquestion",
     checkboxoption: "/rubric/checkboxoption",
     upload: "/uploadquestions"
@@ -204,6 +204,11 @@ export default {
             let res = await api.getSubmissionQuestionnaire(this.assignmentId)
             // let res = await api.client.get(`rubric/submissionrubric/${this.assignmentId}`)
             this.rubric = res.data
+            this.rubric.forEach(question => {
+                if (question.type === "multiplechoice") {
+
+                }
+            })
             this.rubric.questions.sort((a, b) => a.number - b.number)
         },
         async fetchCourseRubricMetaData() {
@@ -235,7 +240,7 @@ export default {
             // Add allowed extensions for upload question
             if (question.type === "upload") questionPatch.extensions = question.extensions
             // Special save function to save MC questions.
-            if (question.type === "mc") return this.saveMCQuestion(question)
+            if (question.type === "multiplechoice") return this.saveMCQuestion(question)
             // Special save function to save Checkbox questions.
             if (question.type === "checkbox") return this.saveCheckboxQuestion(question)
 
@@ -249,19 +254,25 @@ export default {
             await this.fetchRubric()
         },
         async saveMCQuestion(question) {
-            let options = question.option
+            try {
+                let options = question.option
 
-            // Save options first to the API (delete/post/put).
-            options.forEach(async option => {
-                if (option.delete === true) await api.client.delete(`${apiPrefixes["mcoption"]}/${option.id}`)
-                else if (option.id === undefined) await api.client.post(`${apiPrefixes["mcoption"]}`, option)
-                else if (option.id) await api.client.put(`${apiPrefixes["mcoption"]}/${option.id}`, option)
-            })
 
-            // Save question text.
-            await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
-            this.showSuccessMessage({ message: "Successfully saved question." })
-            await this.fetchRubric()
+                // Save options first to the API (delete/post/put).
+                options.forEach(async option => {
+                    if (option.delete === true) await api.client.delete(`${apiPrefixes["mcoption"]}/${option.id}`)
+                    else if (option.id === undefined) await api.client.post(`${apiPrefixes["mcoption"]}`, option)
+                    else if (option.id) await api.client.put(`${apiPrefixes["mcoption"]}/${option.id}`, option)
+                })
+
+                // Save question text.
+                await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
+                this.showSuccessMessage({message: "Successfully saved question."})
+                await this.fetchRubric()
+            } catch (e) {
+                console.log("SAVE MPC ERROR:", e)
+                console.log("SAVE MPC ERROR:", e.response)
+            }
         },
         async saveCheckboxQuestion(question) {
             let options = question.option
@@ -287,7 +298,7 @@ export default {
             // )
             const rubricToCopyId = rubricToCopy.data.id
             try {
-                await api.copyQuestionsSubmissionQuestionnaire({copyFromQuestionnaireId: rubricToCopyId})
+                await api.copyQuestionsSubmissionQuestionnaire({ copyFromQuestionnaireId: rubricToCopyId })
                 // await api.client.get(`rubric/${this.rubric.id}/copy/${rubricToCopyId}`)
                 this.showSuccessMessage({ message: "Rubric successfully copied and appended to this rubric." })
             } catch (e) {
@@ -309,7 +320,7 @@ export default {
         },
         async makeRubric() {
             try {
-                await api.createSubmissionQuestionnaire({assignmentId: this.assignmentId})
+                await api.createSubmissionQuestionnaire({ assignmentId: this.assignmentId })
                 // await api.client.post(`rubric/`, { assignment_id: this.assignmentId, rubric_type: "submission" })
                 this.showSuccessMessage({ message: "Rubric made, you can now add questions." })
             } catch (e) {
