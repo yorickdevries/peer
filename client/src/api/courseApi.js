@@ -24,7 +24,18 @@ export default {
     enrollInCourse(courseId) {
         return client.post(`${courseId}/enroll`)
     },
-    createCourse(course) {
+    async createCourse(course) {
         return client.post("", course)
+    },
+    saveCourse(courseId, course) {
+        let coursePatch = {
+            name: course.name,
+            courseCode: course.courseCode,
+            enrollable: course.enrollable,
+            facultyName: course.faculty.name,
+            academicYearName: course.academicYear.name,
+            description: course.description
+        }
+        return client.patch(`${courseId}`, coursePatch)
     }
 }

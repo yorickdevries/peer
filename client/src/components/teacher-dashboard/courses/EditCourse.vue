@@ -24,7 +24,7 @@
                             </b-form-group>
                             <b-form-group label="Course code">
                                 <b-form-input
-                                    v-model="course.course_code"
+                                    v-model="course.courseCode"
                                     type="text"
                                     placeholder="Please enter the course code"
                                 >
@@ -41,11 +41,14 @@
                                 </b-form-textarea>
                             </b-form-group>
                             <b-form-group label="Faculty" description="">
-                                <b-form-select :options="faculties" v-model="course.faculty"></b-form-select>
+                                <b-form-select :options="faculties" v-model="course.faculty.name"></b-form-select>
                             </b-form-group>
 
                             <b-form-group label="Academic Year" description="">
-                                <b-form-select :options="academic_years" v-model="course.academic_year"></b-form-select>
+                                <b-form-select
+                                    :options="academicYears"
+                                    v-model="course.academicYear.name"
+                                ></b-form-select>
                             </b-form-group>
                             <b-form-group label="">
                                 <b-form-checkbox id="enrollable" v-model="course.enrollable">
@@ -62,7 +65,7 @@
 </template>
 
 <script>
-import api from "../../../api/api_old"
+import api from "../../../api/api"
 
 export default {
     data() {
@@ -72,12 +75,18 @@ export default {
                 name: null,
                 description: null,
                 enrollable: false,
-                faculty: null,
-                academic_year: null,
-                course_code: null
+                faculty: {
+                    name: null,
+                    longName: null
+                },
+                academicYear: {
+                    name: null,
+                    active: null
+                },
+                courseCode: null
             },
             faculties: [],
-            academic_years: []
+            academicYears: []
         }
     },
     async created() {
@@ -104,9 +113,9 @@ export default {
 
         async fetchAcademicYears() {
             try {
-                let res = await api.getAcademicYears()
-                this.academic_years = res.data.map(entry => {
-                    return { value: entry.year, text: entry.year }
+                let res = await api.getAcademicYears(true)
+                this.academicYears = res.data.map(entry => {
+                    return { value: entry.name, text: entry.name }
                 })
             } catch (e) {
                 console.log(e)

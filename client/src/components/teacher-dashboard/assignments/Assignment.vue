@@ -80,7 +80,7 @@
                                                 <hr />
 
                                                 <!--Importing-->
-                                                <template v-if="assignment.one_person_groups">
+                                                <template v-if="assignment.enrollable">
                                                     <dt>Import groups</dt>
                                                     <dd>
                                                         Not available. On creation of the assignment, this assignment
@@ -101,7 +101,7 @@
                                                 </template>
 
                                                 <!--Copying-->
-                                                <template v-if="assignment.one_person_groups">
+                                                <template v-if="assignment.enrollable">
                                                     <dt>Copy groups</dt>
                                                     <dd>
                                                         Not available. On creation of the assignment, this assignment
@@ -132,7 +132,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `/api/oldroutes/assignments/${assignment.id}/reviewsExport/csv`
+                                                        `api/reviewofsubmissions/exportreviews?assignmentId=${assignment.id}&exportType=csv`
                                                     "
                                                     class="mb-3 mr-2"
                                                 >
@@ -142,7 +142,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `/api/oldroutes/assignments/${assignment.id}/reviewsExport/xls`
+                                                        `api/reviewofsubmissions/exportreviews?assignmentId=${assignment.id}&exportType=xls`
                                                     "
                                                     class="mb-3"
                                                 >
@@ -160,7 +160,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `/api/oldroutes/assignments/${assignment.id}/gradeExport/csv`
+                                                        `api/reviewofsubmissions/exportgrades?assignmentId=${assignment.id}&exportType=csv`
                                                     "
                                                 >
                                                     Download grades .csv
@@ -169,7 +169,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `/api/oldroutes/assignments/${assignment.id}/gradeExport/xls`
+                                                        `api/reviewofsubmissions/exportgrades?assignmentId=${assignment.id}&exportType=xls`
                                                     "
                                                 >
                                                     Download grades .xls
@@ -210,7 +210,7 @@
                             <b-tab title="Rubric">
                                 <RubricWizard
                                     :assignmentId="assignment.id"
-                                    :review_publish_date="assignment.review_publish_date"
+                                    :review_publish_date="assignment.reviewPublishDate"
                                 ></RubricWizard>
                             </b-tab>
 
@@ -240,7 +240,7 @@
 </template>
 
 <script>
-import api from "../../../api/api_old"
+import api from "../../../api/api"
 import BreadcrumbTitle from "../../BreadcrumbTitle"
 import RubricWizard from "../rubric/RubricWizard"
 import ImportGroupsWizard from "../ImportGroupsWizard"
@@ -281,12 +281,12 @@ export default {
                 id: null,
                 title: null,
                 description: null,
-                publish_date: null,
-                due_date: null,
-                review_publish_date: null,
-                review_due_date: null,
-                filename: null,
-                one_person_groups: null
+                publishDate: null,
+                dueDate: null,
+                reviewPublishDate: null,
+                reviewDueDate: null,
+                file: null,
+                enrollable: null
             }
         }
     },
@@ -299,6 +299,7 @@ export default {
         async shuffleGroups() {
             try {
                 // Check if the user wants to self-assign shuffle instead.
+                // TODO: add new API calls
                 if (this.selfAssign) {
                     await api.client.get(`/assignments/${this.$route.params.assignmentId}/distributeReviews/1`)
                 } else {
@@ -312,7 +313,9 @@ export default {
         },
         async submitAllFilledReviews() {
             try {
-                let res = await api.client.get(`rubric/submissionrubric/${this.$route.params.assignmentId}`)
+                let res = await api.client.get(`
+                                                reviewofsubmissions/submitall?assignmentId=${this.$route.params.assignmentId}
+                                                `)
                 const rubricId = res.data.id
                 const result = await api.submitAllFilledReviews(rubricId)
                 const submittedReviews = result.data.submittedReviews
