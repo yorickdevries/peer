@@ -164,13 +164,7 @@ export default {
                 this.$emit("saved")
                 this.onReset()
             } catch (e) {
-                console.log("ERROR:", e)
-                console.log("ERROR:", e.response)
-                console.log("ERROR:", e.response.data)
-                console.log("ERROR:", e.response.data.error)
-                this.showErrorMessage({
-                    message: "Error making question. Please make sure you have filled in all the fields."
-                })
+                this.showErrorMessage({ message: e.response.data })
             }
         },
         async createQuestionWithOptions(question, type) {
@@ -182,8 +176,6 @@ export default {
                     number: question.number,
                     optional: question.optional
                 })
-
-                console.log(type, res)
 
                 // Get the newly created ID of the MC question.
                 let parentQuestionId = res.data.id
@@ -210,34 +202,8 @@ export default {
                 this.$emit("saved")
                 this.onReset()
             } catch (e) {
-                console.log("ERROR create", type, e)
-                console.log("ERROR create", type, e.response)
+                this.showErrorMessage({ message: e.response.data })
             }
-        },
-        async createCheckboxQuestion(question) {
-            // Create the Checkbox question itself.
-            let res = await api.client.post(`${apiPrefixes["checkbox"]}`, {
-                question: question.question,
-                rubric_id: question.rubric_id,
-                question_number: question.question_number,
-                optional: question.optional
-            })
-
-            // Get the newly created ID of the Checkbox question.
-            let checkboxquestion_id = res.data.id
-
-            // Create all the options.
-            let options = question.option
-            options.forEach(async option => {
-                await api.client.post(`${apiPrefixes["checkboxoption"]}`, {
-                    option: option.option,
-                    checkboxquestion_id: checkboxquestion_id
-                })
-            })
-
-            this.showSuccessMessage({ message: "Successfully created question." })
-            this.$emit("saved")
-            this.onReset()
         },
         onReset() {
             this.selectedType = ""

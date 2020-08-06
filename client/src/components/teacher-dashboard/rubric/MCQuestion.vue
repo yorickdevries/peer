@@ -1,6 +1,5 @@
 <template>
     <div>
-        {{ question }}
         <b-form-group label="Question Number" description="The questions will be sorted on this number.">
             <b-form-input type="number" v-model="question.number" />
         </b-form-group>

@@ -1,8 +1,5 @@
 <template>
     <div>
-        {{ rubric }}
-        {{ assignmentsMetaData }}
-        {{ assignmentId }}
         <b-alert :show="blockRubricEditing" variant="info"
             >Rubric editing is not allowed anymore since the peer review publish date has already passed.</b-alert
         >
@@ -195,21 +192,14 @@ export default {
             let assignment = await api.getAssignment(this.assignmentId)
             let submissionQuestionnaireId = assignment.data.submissionQuestionnaireId
             let res = await api.getSubmissionQuestionnaire(submissionQuestionnaireId)
-            // let res = await api.client.get(`rubric/submissionrubric/${this.assignmentId}`)
             this.rubric = res.data
-            // this.rubric.forEach(question => {
-            //     if (question.type === "multiplechoice") {
-            //         console.log("yay")
-            //     }
-            // })
             this.rubric.questions.sort((a, b) => a.number - b.number)
         },
         async fetchCourseRubricMetaData() {
             const { data } = await api.getCourseAssignments(this.$route.params.courseId)
-            const assignmentsMetaData = data.map(assignment => {
+            this.assignmentsMetaData = data.map(assignment => {
                 return { value: assignment.id, text: assignment.name }
             })
-            this.assignmentsMetaData = assignmentsMetaData
         },
         async deleteQuestion(question) {
             try {
@@ -221,7 +211,7 @@ export default {
             await this.fetchRubric()
         },
         async saveQuestion(question) {
-            // Construct basic questionPath object for saving information
+            // Construct questionPatch object for saving information
             let questionPatch = {
                 text: question.text,
                 number: question.number,
@@ -241,9 +231,8 @@ export default {
                 await api.client.patch(`${apiPrefixes[question.type]}/${question.id}`, questionPatch)
                 this.showSuccessMessage({ message: "Successfully saved question." })
             } catch (e) {
-                console.log("Saving error:", e.response)
+                this.showErrorMessage({ message: e.response.data })
             }
-
             await this.fetchRubric()
         },
         async saveQuestionWithOptions(question) {
@@ -262,7 +251,7 @@ export default {
                     }
                 }
 
-                // Save question text.
+                // Save question text, number and optionality.
                 let questionPatch = {
                     text: question.text,
                     number: question.number,
@@ -276,28 +265,10 @@ export default {
                 console.log("SAVE", question.type, "ERROR:", e.response)
             }
         },
-        async saveCheckboxQuestion(question) {
-            let options = question.option
-
-            // Save options first to the API (delete/post/put).
-            options.forEach(async option => {
-                if (option.delete === true) await api.client.delete(`${apiPrefixes["checkboxoption"]}/${option.id}`)
-                else if (option.id === undefined) await api.client.post(`${apiPrefixes["checkboxoption"]}`, option)
-                else if (option.id) await api.client.put(`${apiPrefixes["checkboxoption"]}/${option.id}`, option)
-            })
-
-            // Save question text.
-            await api.client.put(`${apiPrefixes[question.type]}/${question.id}`, question)
-            this.showSuccessMessage({ message: "Successfully saved question." })
-            await this.fetchRubric()
-        },
         async copyRubric() {
             if (this.assignmentIdSubmissionRubricToCopy === null)
                 return this.showErrorMessage({ message: "Choose an Assignment rubric to copy first." })
             const rubricToCopy = await api.getSubmissionQuestionnaire(this.assignmentIdSubmissionRubricToCopy)
-            // const rubricToCopy = await api.client.get(
-            //     `rubric/submissionrubric/${this.assignmentIdSubmissionRubricToCopy}`
-            // )
             const rubricToCopyId = rubricToCopy.data.id
             try {
                 await api.copyQuestionsSubmissionQuestionnaire({ copyFromQuestionnaireId: rubricToCopyId })
@@ -312,11 +283,9 @@ export default {
         async makeRubric() {
             try {
                 await api.createSubmissionQuestionnaire({ assignmentId: this.assignmentId })
-                // await api.client.post(`rubric/`, { assignment_id: this.assignmentId, rubric_type: "submission" })
                 this.showSuccessMessage({ message: "Rubric made, you can now add questions." })
             } catch (e) {
-                console.log("E:", e.response.data)
-                this.showErrorMessage({ message: "Couldn't make Rubric" })
+                this.showErrorMessage({ message: e.response.data })
             }
             await this.fetchRubric()
             await this.fetchCourseRubricMetaData()
