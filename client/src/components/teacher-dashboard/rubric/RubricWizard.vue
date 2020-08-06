@@ -141,7 +141,7 @@ import UploadQuestion from "./UploadQuestion"
 import CreateQuestionWizard from "./CreateQuestionWizard"
 
 let apiPrefixes = {
-    open: "/rubric/openquestion",
+    open: "/openquestions",
     range: "/rubric/rangequestion",
     mc: "/rubric/mcquestion",
     mcoption: "/rubric/mcoption",

@@ -63,11 +63,11 @@ import RangeQuestion from "./RangeQuestion"
 import UploadQuestion from "./UploadQuestion"
 import MCQuestion from "./MCQuestion"
 import CheckboxQuestion from "./CheckboxQuestion"
-import api from "../../../api/api_old"
+import api from "../../../api/api"
 import notifications from "../../../mixins/notifications"
 
 let apiPrefixes = {
-    open: "/rubric/openquestion",
+    open: "/openquestions/",
     range: "/rubric/rangequestion",
     mc: "/rubric/mcquestion",
     mcoption: "/rubric/mcoption",
@@ -97,9 +97,9 @@ export default {
                 { value: "upload", text: "Upload Question" }
             ],
             openQuestion: {
-                question: "",
-                rubric_id: this.rubricId,
-                question_number: null,
+                text: "",
+                questionnaireId: this.rubricId,
+                number: null,
                 optional: false
             },
             rangeQuestion: {
@@ -134,14 +134,14 @@ export default {
     },
     watch: {
         rubricId(val) {
-            this.openQuestion.rubric_id = val
+            this.openQuestion.questionnaireId = val
             this.rangeQuestion.rubric_id = val
             this.mcQuestion.rubric_id = val
             this.checkboxQuestion.rubric_id = val
             this.uploadQuestion.rubric_id = val
         },
         nextNewQuestionNumber(val) {
-            this.openQuestion.question_number = val
+            this.openQuestion.number = val
             this.rangeQuestion.question_number = val
             this.mcQuestion.question_number = val
             this.checkboxQuestion.question_number = val
@@ -222,9 +222,9 @@ export default {
         onReset() {
             this.selectedType = ""
             this.openQuestion = {
-                question: "",
-                rubric_id: this.rubricId,
-                question_number: this.nextNewQuestionNumber,
+                text: "",
+                questionnaireId: this.rubricId,
+                number: this.nextNewQuestionNumber,
                 optional: false
             }
             this.rangeQuestion = {
