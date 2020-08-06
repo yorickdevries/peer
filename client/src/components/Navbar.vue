@@ -106,13 +106,11 @@ export default {
         async refreshAuthenticated() {
             // Refresh whether user is authenticated.
             let res = await api.getAuthenticated()
-            console.log(res.data)
             this.authenticated = res.data.authenticated
         },
         async refreshUser() {
             // Refresh user information.
             let res = await api.getUserInfo()
-            console.log(res.data)
             this.user = res.data
         }
     }
