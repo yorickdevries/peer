@@ -1,6 +1,8 @@
 <template>
     <div>
         {{ rubric }}
+        {{ assignmentsMetaData }}
+        {{ assignmentId }}
         <b-alert :show="blockRubricEditing" variant="info"
             >Rubric editing is not allowed anymore since the peer review publish date has already passed.</b-alert
         >
@@ -200,15 +202,16 @@ export default {
     },
     methods: {
         async fetchRubric() {
-            //TODO: use submissionQuestionnaireID instead of assignmentID (need new API call)
-            let res = await api.getSubmissionQuestionnaire(this.assignmentId)
+            let assignment = await api.getAssignment(this.assignmentId)
+            let submissionQuestionnaireId = assignment.data.submissionQuestionnaireId
+            let res = await api.getSubmissionQuestionnaire(submissionQuestionnaireId)
             // let res = await api.client.get(`rubric/submissionrubric/${this.assignmentId}`)
             this.rubric = res.data
-            this.rubric.forEach(question => {
-                if (question.type === "multiplechoice") {
-
-                }
-            })
+            // this.rubric.forEach(question => {
+            //     if (question.type === "multiplechoice") {
+            //         console.log("yay")
+            //     }
+            // })
             this.rubric.questions.sort((a, b) => a.number - b.number)
         },
         async fetchCourseRubricMetaData() {
@@ -257,7 +260,6 @@ export default {
             try {
                 let options = question.option
 
-
                 // Save options first to the API (delete/post/put).
                 options.forEach(async option => {
                     if (option.delete === true) await api.client.delete(`${apiPrefixes["mcoption"]}/${option.id}`)
@@ -267,7 +269,7 @@ export default {
 
                 // Save question text.
                 await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
-                this.showSuccessMessage({message: "Successfully saved question."})
+                this.showSuccessMessage({ message: "Successfully saved question." })
                 await this.fetchRubric()
             } catch (e) {
                 console.log("SAVE MPC ERROR:", e)
