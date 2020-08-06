@@ -135,7 +135,7 @@ import CreateQuestionWizard from "./CreateQuestionWizard"
 let apiPrefixes = {
     open: "/openquestions",
     range: "/rangequestions",
-    mc: "/multiplechoicequestions",
+    multiplechoice: "/multiplechoicequestions",
     mcoption: "/multiplechoicequestionoptions",
     checkbox: "/rubric/checkboxquestion",
     checkboxoption: "/rubric/checkboxoption",
@@ -216,7 +216,7 @@ export default {
                 await api.client.delete(`${apiPrefixes[question.type]}/${question.id}`)
                 this.showSuccessMessage({ message: "Successfully deleted question." })
             } catch (e) {
-                this.showErrorMessage()
+                this.showErrorMessage({ message: e.response.data })
             }
             await this.fetchRubric()
         },
@@ -248,17 +248,25 @@ export default {
         },
         async saveMCQuestion(question) {
             try {
-                let options = question.option
+                let options = question.options
 
                 // Save options first to the API (delete/post/put).
                 options.forEach(async option => {
                     if (option.delete === true) await api.client.delete(`${apiPrefixes["mcoption"]}/${option.id}`)
                     else if (option.id === undefined) await api.client.post(`${apiPrefixes["mcoption"]}`, option)
-                    else if (option.id) await api.client.put(`${apiPrefixes["mcoption"]}/${option.id}`, option)
+                    else if (option.id) {
+                        let optionPatch = { text: option.text }
+                        await api.client.patch(`${apiPrefixes["mcoption"]}/${option.id}`, optionPatch)
+                    }
                 })
 
                 // Save question text.
-                await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
+                let questionPatch = {
+                    text: question.text,
+                    number: question.number,
+                    optional: question.optional
+                }
+                await api.client.patch(`${apiPrefixes[question.type]}/${question.id}`, questionPatch)
                 this.showSuccessMessage({ message: "Successfully saved question." })
                 await this.fetchRubric()
             } catch (e) {
