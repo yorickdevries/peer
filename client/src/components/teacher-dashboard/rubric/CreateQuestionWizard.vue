@@ -68,7 +68,7 @@ import notifications from "../../../mixins/notifications"
 
 let apiPrefixes = {
     open: "/openquestions/",
-    range: "/rubric/rangequestion",
+    range: "/rangequestions",
     mc: "/rubric/mcquestion",
     mcoption: "/rubric/mcoption",
     checkbox: "/rubric/checkboxquestion",
@@ -103,10 +103,10 @@ export default {
                 optional: false
             },
             rangeQuestion: {
-                question: "",
+                text: "",
                 range: null,
-                rubric_id: this.rubricId,
-                question_number: null,
+                questionnaireId: this.rubricId,
+                number: null,
                 optional: false
             },
             mcQuestion: {
@@ -135,17 +135,17 @@ export default {
     watch: {
         rubricId(val) {
             this.openQuestion.questionnaireId = val
-            this.rangeQuestion.rubric_id = val
-            this.mcQuestion.rubric_id = val
-            this.checkboxQuestion.rubric_id = val
-            this.uploadQuestion.rubric_id = val
+            this.rangeQuestion.questionnaireId = val
+            this.mcQuestion.questionnaireId = val
+            this.checkboxQuestion.questionnaireId = val
+            this.uploadQuestion.questionnaireId = val
         },
         nextNewQuestionNumber(val) {
             this.openQuestion.number = val
-            this.rangeQuestion.question_number = val
-            this.mcQuestion.question_number = val
-            this.checkboxQuestion.question_number = val
-            this.uploadQuestion.question_number = val
+            this.rangeQuestion.number = val
+            this.mcQuestion.number = val
+            this.checkboxQuestion.number = val
+            this.uploadQuestion.number = val
         }
     },
     created() {
@@ -228,10 +228,10 @@ export default {
                 optional: false
             }
             this.rangeQuestion = {
-                question: "",
+                text: "",
                 range: null,
-                rubric_id: this.rubricId,
-                question_number: this.nextNewQuestionNumber,
+                questionnaireId: this.rubricId,
+                number: this.nextNewQuestionNumber,
                 optional: false
             }
             ;(this.mcQuestion = {

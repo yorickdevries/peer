@@ -72,7 +72,7 @@
                                 <OpenQuestion v-model="rubric.questions[index]"></OpenQuestion>
                             </template>
 
-                            <template v-if="question.type_question === 'range'">
+                            <template v-if="question.type === 'range'">
                                 <RangeQuestion v-model="rubric.questions[index]"></RangeQuestion>
                             </template>
 
@@ -142,7 +142,7 @@ import CreateQuestionWizard from "./CreateQuestionWizard"
 
 let apiPrefixes = {
     open: "/openquestions",
-    range: "/rubric/rangequestion",
+    range: "/rangequestions",
     mc: "/rubric/mcquestion",
     mcoption: "/rubric/mcoption",
     checkbox: "/rubric/checkboxquestion",
@@ -223,11 +223,17 @@ export default {
             await this.fetchRubric()
         },
         async saveQuestion(question) {
+            // Construct basic questionPath object for saving information
             let questionPatch = {
                 text: question.text,
                 number: question.number,
                 optional: question.optional
             }
+
+            // Add range for range question
+            if (question.type === "range") questionPatch.range = question.range
+            // TODO: Add file for upload question
+
             // Special save function to save MC questions.
             if (question.type === "mc") return this.saveMCQuestion(question)
             // Special save function to save Checkbox questions.
