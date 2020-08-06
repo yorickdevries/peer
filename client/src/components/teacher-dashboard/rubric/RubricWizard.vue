@@ -136,9 +136,9 @@ let apiPrefixes = {
     open: "/openquestions",
     range: "/rangequestions",
     multiplechoice: "/multiplechoicequestions",
-    mcoption: "/multiplechoicequestionoptions",
-    checkbox: "/rubric/checkboxquestion",
-    checkboxoption: "/rubric/checkboxoption",
+    multiplechoiceoption: "/multiplechoicequestionoptions",
+    checkbox: "/checkboxquestion",
+    checkboxoption: "/checkboxquestionoptions",
     upload: "/uploadquestions"
 }
 
@@ -233,9 +233,9 @@ export default {
             // Add allowed extensions for upload question
             if (question.type === "upload") questionPatch.extensions = question.extensions
             // Special save function to save MC questions.
-            if (question.type === "multiplechoice") return this.saveMCQuestion(question)
+            if (question.type === "multiplechoice") return this.saveQuestionWithOptions(question)
             // Special save function to save Checkbox questions.
-            if (question.type === "checkbox") return this.saveCheckboxQuestion(question)
+            if (question.type === "checkbox") return this.saveQuestionWithOptions(question)
 
             try {
                 await api.client.patch(`${apiPrefixes[question.type]}/${question.id}`, questionPatch)
@@ -246,19 +246,21 @@ export default {
 
             await this.fetchRubric()
         },
-        async saveMCQuestion(question) {
+        async saveQuestionWithOptions(question) {
             try {
                 let options = question.options
 
-                // Save options first to the API (delete/post/put).
-                options.forEach(async option => {
-                    if (option.delete === true) await api.client.delete(`${apiPrefixes["mcoption"]}/${option.id}`)
-                    else if (option.id === undefined) await api.client.post(`${apiPrefixes["mcoption"]}`, option)
-                    else if (option.id) {
+                // Save options first to the API (delete/post/patch).
+                for (const option of options) {
+                    if (option.delete === true) {
+                        await api.client.delete(`${apiPrefixes[question.type + "option"]}/${option.id}`)
+                    } else if (option.id === undefined) {
+                        await api.client.post(`${apiPrefixes[question.type + "option"]}`, option)
+                    } else if (option.id) {
                         let optionPatch = { text: option.text }
-                        await api.client.patch(`${apiPrefixes["mcoption"]}/${option.id}`, optionPatch)
+                        await api.client.patch(`${apiPrefixes[question.type + "option"]}/${option.id}`, optionPatch)
                     }
-                })
+                }
 
                 // Save question text.
                 let questionPatch = {
@@ -270,8 +272,8 @@ export default {
                 this.showSuccessMessage({ message: "Successfully saved question." })
                 await this.fetchRubric()
             } catch (e) {
-                console.log("SAVE MPC ERROR:", e)
-                console.log("SAVE MPC ERROR:", e.response)
+                console.log("SAVE", question.type, "ERROR:", e)
+                console.log("SAVE", question.type, "ERROR:", e.response)
             }
         },
         async saveCheckboxQuestion(question) {
