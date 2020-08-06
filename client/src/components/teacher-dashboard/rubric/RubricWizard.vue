@@ -50,14 +50,14 @@
                 <b-col>
                     <b-card
                         v-for="(question, index) in rubric.questions"
-                        :key="`${question.id}-${question.type_question}`"
+                        :key="`${question.id}-${question.type}`"
                         class="mb-3"
                         no-body
                     >
                         <b-card-header class="d-flex align-items-center">
-                            <span class="w-100">Question {{ question.question_number }}</span>
+                            <span class="w-100">Question {{ question.number }}</span>
                             <b-badge variant="primary" class="ml-2 float-right p-1"
-                                >{{ question.type_question.toUpperCase() }} QUESTION
+                                >{{ question.type.toUpperCase() }} QUESTION
                             </b-badge>
                             <b-badge pill v-if="question.optional" variant="secondary" class="ml-2 float-right p-1">
                                 OPTIONAL
@@ -68,7 +68,7 @@
                         </b-card-header>
 
                         <b-card-body>
-                            <template v-if="question.type_question === 'open'">
+                            <template v-if="question.type === 'open'">
                                 <OpenQuestion v-model="rubric.questions[index]"></OpenQuestion>
                             </template>
 
@@ -76,15 +76,15 @@
                                 <RangeQuestion v-model="rubric.questions[index]"></RangeQuestion>
                             </template>
 
-                            <template v-if="question.type_question === 'mc'">
+                            <template v-if="question.type === 'mc'">
                                 <MCQuestion v-model="rubric.questions[index]"></MCQuestion>
                             </template>
 
-                            <template v-if="question.type_question === 'checkbox'">
+                            <template v-if="question.type === 'checkbox'">
                                 <CheckboxQuestion v-model="rubric.questions[index]"></CheckboxQuestion>
                             </template>
 
-                            <template v-if="question.type_question === 'upload'">
+                            <template v-if="question.type === 'upload'">
                                 <UploadQuestion v-model="rubric.questions[index]"></UploadQuestion>
                             </template>
 
@@ -167,7 +167,9 @@ export default {
                 id: null,
                 assignment_id: null,
                 type: null,
-                questions: []
+                questions: [],
+                createdAt: null,
+                updatedAt: null
             },
             assignmentsMetaData: [],
             assignmentIdSubmissionRubricToCopy: null
@@ -184,8 +186,8 @@ export default {
                 // Get max question number.
                 let max = 1
                 this.rubric.questions.forEach(question => {
-                    if (question.question_number > max) {
-                        max = question.question_number
+                    if (question.number > max) {
+                        max = question.number
                     }
                 })
                 return max + 1
@@ -198,10 +200,11 @@ export default {
     },
     methods: {
         async fetchRubric() {
+            //TODO: use submissionQuestionnaireID instead of assignmentID (need new API call)
             let res = await api.getSubmissionQuestionnaire(this.assignmentId)
             // let res = await api.client.get(`rubric/submissionrubric/${this.assignmentId}`)
             this.rubric = res.data
-            this.rubric.questions.sort((a, b) => a.question_number - b.question_number)
+            this.rubric.questions.sort((a, b) => a.number - b.number)
         },
         async fetchCourseRubricMetaData() {
             const { data } = await api.getCourseAssignments(this.$route.params.courseId)
@@ -212,7 +215,7 @@ export default {
         },
         async deleteQuestion(question) {
             try {
-                await api.client.delete(`${apiPrefixes[question.type_question]}/${question.id}`)
+                await api.client.delete(`${apiPrefixes[question.type]}/${question.id}`)
                 this.showSuccessMessage({ message: "Successfully deleted question." })
             } catch (e) {
                 this.showErrorMessage()
@@ -220,13 +223,23 @@ export default {
             await this.fetchRubric()
         },
         async saveQuestion(question) {
+            let questionPatch = {
+                text: question.text,
+                number: question.number,
+                optional: question.optional
+            }
             // Special save function to save MC questions.
-            if (question.type_question === "mc") return this.saveMCQuestion(question)
+            if (question.type === "mc") return this.saveMCQuestion(question)
             // Special save function to save Checkbox questions.
-            if (question.type_question === "checkbox") return this.saveCheckboxQuestion(question)
+            if (question.type === "checkbox") return this.saveCheckboxQuestion(question)
 
-            await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
-            this.showSuccessMessage({ message: "Successfully saved question." })
+            try {
+                await api.client.patch(`${apiPrefixes[question.type]}/${question.id}`, questionPatch)
+                this.showSuccessMessage({ message: "Successfully saved question." })
+            } catch (e) {
+                console.log("Saving error:", e.response)
+            }
+
             await this.fetchRubric()
         },
         async saveMCQuestion(question) {
@@ -255,7 +268,7 @@ export default {
             })
 
             // Save question text.
-            await api.client.put(`${apiPrefixes[question.type_question]}/${question.id}`, question)
+            await api.client.put(`${apiPrefixes[question.type]}/${question.id}`, question)
             this.showSuccessMessage({ message: "Successfully saved question." })
             await this.fetchRubric()
         },
