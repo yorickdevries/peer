@@ -1,5 +1,6 @@
 <template>
     <div>
+
         <b-alert :show="blockRubricEditing" variant="info"
             >Rubric editing is not allowed anymore since the peer review publish date has already passed.</b-alert
         >
@@ -130,7 +131,7 @@
 </template>
 
 <script>
-import api from "../../../api/api_old"
+import api from "../../../api/api"
 import notifications from "../../../mixins/notifications"
 import OpenQuestion from "./OpenQuestion"
 import RangeQuestion from "./RangeQuestion"
@@ -197,14 +198,15 @@ export default {
     },
     methods: {
         async fetchRubric() {
-            let res = await api.client.get(`rubric/submissionrubric/${this.assignmentId}`)
+            let res = await api.getSubmissionQuestionnaire(this.assignmentId)
+            // let res = await api.client.get(`rubric/submissionrubric/${this.assignmentId}`)
             this.rubric = res.data
             this.rubric.questions.sort((a, b) => a.question_number - b.question_number)
         },
         async fetchCourseRubricMetaData() {
             const { data } = await api.getCourseAssignments(this.$route.params.courseId)
             const assignmentsMetaData = data.map(assignment => {
-                return { value: assignment.id, text: assignment.title }
+                return { value: assignment.id, text: assignment.name }
             })
             this.assignmentsMetaData = assignmentsMetaData
         },
@@ -260,12 +262,14 @@ export default {
         async copyRubric() {
             if (this.assignmentIdSubmissionRubricToCopy === null)
                 return this.showErrorMessage({ message: "Choose an Assignment rubric to copy first." })
-            const rubricToCopy = await api.client.get(
-                `rubric/submissionrubric/${this.assignmentIdSubmissionRubricToCopy}`
-            )
+            const rubricToCopy = await api.getSubmissionQuestionnaire(this.assignmentIdSubmissionRubricToCopy)
+            // const rubricToCopy = await api.client.get(
+            //     `rubric/submissionrubric/${this.assignmentIdSubmissionRubricToCopy}`
+            // )
             const rubricToCopyId = rubricToCopy.data.id
             try {
-                await api.client.get(`rubric/${this.rubric.id}/copy/${rubricToCopyId}`)
+                await api.copyQuestionsSubmissionQuestionnaire({copyFromQuestionnaireId: rubricToCopyId})
+                // await api.client.get(`rubric/${this.rubric.id}/copy/${rubricToCopyId}`)
                 this.showSuccessMessage({ message: "Rubric successfully copied and appended to this rubric." })
             } catch (e) {
                 this.showErrorMessage({ message: "Rubric could not be copied." })
@@ -275,6 +279,7 @@ export default {
         },
         async deleteAll() {
             try {
+                //TODO: New API below
                 await api.client.get(`rubric/${this.rubric.id}/deleteall`)
                 this.showSuccessMessage({ message: "Deleted all questions." })
             } catch (e) {
@@ -285,9 +290,11 @@ export default {
         },
         async makeRubric() {
             try {
-                await api.client.post(`rubric/`, { assignment_id: this.assignmentId, rubric_type: "submission" })
+                await api.createSubmissionQuestionnaire({assignmentId: this.assignmentId})
+                // await api.client.post(`rubric/`, { assignment_id: this.assignmentId, rubric_type: "submission" })
                 this.showSuccessMessage({ message: "Rubric made, you can now add questions." })
             } catch (e) {
+                console.log("E:", e.response.data)
                 this.showErrorMessage({ message: "Couldn't make Rubric" })
             }
             await this.fetchRubric()
