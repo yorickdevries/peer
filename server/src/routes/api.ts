@@ -30,7 +30,7 @@ import multiplechoicequestionanswers from "./multiplechoicequestionanswers";
 import checkboxquestionanswers from "./checkboxquestionanswers";
 
 // old routes, can be deleted when not needed anymore
-import oldRoutes from "../old_api/routes/api";
+// import oldRoutes from "../old_api/routes/api";
 
 const router = express.Router();
 router.use(eventLogger);
@@ -80,7 +80,7 @@ router.use("/multiplechoicequestionanswers", multiplechoicequestionanswers);
 router.use("/checkboxquestionanswers", checkboxquestionanswers);
 
 // old routes, can be deleted when not needed anymore
-router.use("/oldroutes", oldRoutes);
+// router.use("/oldroutes", oldRoutes);
 
 // If no other routes apply, send a 404
 router.use((_req, res) => {
