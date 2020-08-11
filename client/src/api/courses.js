@@ -4,9 +4,9 @@ export default {
     getEnrollable() {
         return client.get("courses/enrollable")
     },
-    // getCourse(courseId) {
-    //     return client.get(`${courseId}`)
-    // },
+    get(id) {
+        return client.get(`courses/${id}`)
+    },
     // getCourseRole(courseId) {
     //     return client.get(`${courseId}/enrollment`)
     // },
@@ -16,8 +16,8 @@ export default {
     // getCourseEnrolledAssignmentsAsStudent(courseId) {
     //     return client.get(`${courseId}/enrolledassignments`)
     // },
-    enroll(courseId) {
-        return client.post(`courses/${courseId}/enroll`)
+    enroll(id) {
+        return client.post(`courses/${id}/enroll`)
     },
     post(name, courseCode, enrollable, facultyName, academicYearName, description) {
         if (!description) {
