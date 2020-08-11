@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const client = axios.create({
-    baseURL: "/api/submissionquestionnaires/",
+    baseURL: "/api/temp/submissionquestionnaires/",
     json: true
 })
 

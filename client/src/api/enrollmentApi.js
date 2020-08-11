@@ -2,7 +2,7 @@ import axios from "axios"
 import { succesInterceptor, errorInterceptor } from "./axiosInterceptors"
 
 const client = axios.create({
-    baseURL: "/api/enrollments/",
+    baseURL: "/api/temp/enrollments/",
     json: true
 })
 // Add a response interceptor

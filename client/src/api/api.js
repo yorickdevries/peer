@@ -9,7 +9,7 @@ import submissionApi from "./submissionApi"
 import submissionquestionnairesApi from "./submissionquestionnairesApi"
 
 const client = axios.create({
-    baseURL: "/api/",
+    baseURL: "/api/temp/",
     json: true
 })
 // Add a response interceptor
