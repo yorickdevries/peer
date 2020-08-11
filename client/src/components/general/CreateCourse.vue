@@ -98,8 +98,7 @@ export default {
             this.academicYears = res.data
         },
         async onSubmit() {
-            // change input
-            await api.courses.post(
+            const res = await api.courses.post(
                 this.course.name,
                 this.course.courseCode,
                 this.course.enrollable,
@@ -107,8 +106,7 @@ export default {
                 this.course.academicYear.name,
                 this.course.description
             )
-            this.$router.push({ name: "courses" })
-            location.reload()
+            this.$router.push({ name: "teacher-dashboard.course", params: { courseId: res.data.id } })
         }
     }
 }
