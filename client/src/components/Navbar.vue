@@ -33,7 +33,7 @@
                                 <span class="p-3 align-middle">{{ user.displayName }}</span>
                             </template>
                             <b-dropdown-item v-b-modal.userinfo-modal>Userinfo</b-dropdown-item>
-                            <b-modal id="userinfo-modal" title="Userinfo" ok-only>
+                            <b-modal id="userinfo-modal" title="Userinfo" hide-footer>
                                 <div>NetID: {{ user.netid }}</div>
                                 <div>Studentnumber: {{ user.studentNumber }}</div>
                                 <div>First name: {{ user.firstName }}</div>
