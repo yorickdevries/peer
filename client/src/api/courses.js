@@ -18,10 +18,14 @@ export default {
     // },
     enroll(courseId) {
         return client.post(`courses/${courseId}/enroll`)
+    },
+    post(name, courseCode, enrollable, facultyName, academicYearName, description) {
+        if (!description) {
+            description = "null"
+        }
+        const course = { name, courseCode, enrollable, facultyName, academicYearName, description }
+        return client.post("courses/", course)
     }
-    // async createCourse(course) {
-    //     return client.post("", course)
-    // },
     // saveCourse(courseId, course) {
     //     let coursePatch = {
     //         name: course.name,
