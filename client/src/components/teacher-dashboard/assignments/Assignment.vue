@@ -240,7 +240,7 @@
 </template>
 
 <script>
-import api from "../../../api/api"
+import api from "../../../api/api_temp"
 import BreadcrumbTitle from "../../BreadcrumbTitle"
 import RubricWizard from "../rubric/RubricWizard"
 import ImportGroupsWizard from "../ImportGroupsWizard"

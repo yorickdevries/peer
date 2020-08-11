@@ -63,7 +63,7 @@ import RangeQuestion from "./RangeQuestion"
 import UploadQuestion from "./UploadQuestion"
 import MCQuestion from "./MCQuestion"
 import CheckboxQuestion from "./CheckboxQuestion"
-import api from "../../../api/api"
+import api from "../../../api/api_temp"
 import notifications from "../../../mixins/notifications"
 
 let apiPrefixes = {
