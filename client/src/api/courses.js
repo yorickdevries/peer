@@ -25,16 +25,12 @@ export default {
         }
         const course = { name, courseCode, enrollable, facultyName, academicYearName, description }
         return client.post("courses/", course)
+    },
+    patch(courseId, name, courseCode, enrollable, facultyName, academicYearName, description) {
+        if (!description) {
+            description = "null"
+        }
+        const course = { name, courseCode, enrollable, facultyName, academicYearName, description }
+        return client.patch(`courses/${courseId}`, course)
     }
-    // saveCourse(courseId, course) {
-    //     let coursePatch = {
-    //         name: course.name,
-    //         courseCode: course.courseCode,
-    //         enrollable: course.enrollable,
-    //         facultyName: course.faculty.name,
-    //         academicYearName: course.academicYear.name,
-    //         description: course.description
-    //     }
-    //     return client.patch(`${courseId}`, coursePatch)
-    // }
 }
