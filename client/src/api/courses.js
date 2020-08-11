@@ -1,16 +1,8 @@
-import axios from "axios"
-import { succesInterceptor, errorInterceptor } from "./axiosInterceptors"
-
-const client = axios.create({
-    baseURL: "/api/courses/",
-    json: true
-})
-// Add a response interceptor
-client.interceptors.response.use(succesInterceptor, errorInterceptor)
+import client from "./axiosClient"
 
 export default {
     getEnrollable() {
-        return client.get("enrollable")
+        return client.get("courses/enrollable")
     },
     // getCourse(courseId) {
     //     return client.get(`${courseId}`)
@@ -25,7 +17,7 @@ export default {
     //     return client.get(`${courseId}/enrolledassignments`)
     // },
     enroll(courseId) {
-        return client.post(`${courseId}/enroll`)
+        return client.post(`courses/${courseId}/enroll`)
     }
     // async createCourse(course) {
     //     return client.post("", course)

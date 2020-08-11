@@ -1,15 +1,7 @@
-import axios from "axios"
-import { succesInterceptor, errorInterceptor } from "./axiosInterceptors"
-
-const client = axios.create({
-    baseURL: "/api/faculties/",
-    json: true
-})
-// Add a response interceptor
-client.interceptors.response.use(succesInterceptor, errorInterceptor)
+import client from "./axiosClient"
 
 export default {
     get() {
-        return client.get("")
+        return client.get("faculties/")
     }
 }

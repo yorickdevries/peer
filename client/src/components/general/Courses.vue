@@ -231,12 +231,7 @@
 </template>
 
 <script>
-// api
-import rootApi from "../../api/root"
-import academicYearsApi from "../../api/academicYears"
-import facultiesApi from "../../api/faculties"
-import coursesApi from "../../api/courses"
-import enrollmentsApi from "../../api/enrollments"
+import api from "../../api/api"
 import notifications from "../../mixins/notifications"
 import CreateCourse from "./CreateCourse"
 
@@ -314,16 +309,16 @@ export default {
     },
     methods: {
         async fetchUser() {
-            let res = await rootApi.getMe()
+            let res = await api.getMe()
             this.user = res.data
             console.log(res)
         },
         async fetchFaculties() {
-            let res = await facultiesApi.get()
+            let res = await api.faculties.get()
             this.faculties = res.data
         },
         async fetchAcademicYears() {
-            const res = await academicYearsApi.get()
+            const res = await api.academicYears.get()
             this.academicYears = res.data
             for (let academicYear of this.academicYears) {
                 if (academicYear.active) {
@@ -332,15 +327,15 @@ export default {
             }
         },
         async fetchEnrollableCourses() {
-            const res = await coursesApi.getEnrollable()
+            const res = await api.courses.getEnrollable()
             this.enrollableCourses = res.data
         },
         async fetchEnrollments() {
-            const res = await enrollmentsApi.getEnrolledCourses()
+            const res = await api.enrollments.getEnrolledCourses()
             this.enrollments = res.data
         },
         async enrollInCourse(courseId) {
-            await coursesApi.enroll(courseId)
+            await api.courses.enroll(courseId)
             this.showSuccessMessage({ message: "Successfully enrolled in course." })
             // reload the data from the server
             await this.fetchEnrollableCourses()

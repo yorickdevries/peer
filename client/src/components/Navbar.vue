@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import rootApi from "../api/root"
+import api from "../api/api"
 
 export default {
     props: ["links", "title", "role", "variant"],
@@ -141,12 +141,12 @@ export default {
     methods: {
         async refreshAuthenticated() {
             // Refresh whether user is authenticated.
-            const res = await rootApi.getAuthenticated()
+            const res = await api.getAuthenticated()
             this.authenticated = res.data.authenticated
         },
         async refreshMe() {
             // Refresh user information.
-            const res = await rootApi.getMe()
+            const res = await api.getMe()
             this.user = res.data
         }
     }

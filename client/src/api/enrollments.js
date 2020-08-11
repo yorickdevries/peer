@@ -1,16 +1,8 @@
-import axios from "axios"
-import { succesInterceptor, errorInterceptor } from "./axiosInterceptors"
-
-const client = axios.create({
-    baseURL: "/api/enrollments/",
-    json: true
-})
-// Add a response interceptor
-client.interceptors.response.use(succesInterceptor, errorInterceptor)
+import client from "./axiosClient"
 
 export default {
     getEnrolledCourses() {
-        return client.get("enrolled")
+        return client.get("enrollments/enrolled")
     }
     // getEnrolledUsersWithRole(courseId, role) {
     //     return client.get(`?courseId=${courseId}&role=${role}`)
