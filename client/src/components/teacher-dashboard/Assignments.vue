@@ -11,7 +11,7 @@
             <!--Course Cards-->
             <b-row>
                 <b-col cols="6" v-for="assignment in assignments" :key="assignment.id">
-                    <b-card :title="assignment.name" :sub-title="assignment.name" class="mb-3">
+                    <b-card :title="assignment.name" :sub-title="assignment.state" class="mb-3">
                         <p class="card-text">
                             {{ assignment.description }}
                         </p>
@@ -31,27 +31,19 @@
 </template>
 
 <script>
-import api from "../../api/api_temp"
+import api from "../../api/api"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 
 export default {
     components: { BreadcrumbTitle },
     data() {
         return {
-            id: null,
             assignments: []
         }
     },
     async created() {
-        this.init()
-    },
-    methods: {
-        async init() {
-            let cid = this.$route.params.courseId
-            this.cid = cid
-            let res = await api.getCourseAssignments(cid)
-            this.assignments = res.data
-        }
+        const res = await api.assignments.get(this.$route.params.courseId)
+        this.assignments = res.data
     }
 }
 </script>

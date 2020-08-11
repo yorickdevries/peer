@@ -4,6 +4,7 @@ import faculties from "./faculties"
 import academicYears from "./academicYears"
 import courses from "./courses"
 import enrollments from "./enrollments"
+import assignments from "./assignments"
 
 export default {
     getAuthenticated: () => {
@@ -15,5 +16,6 @@ export default {
     faculties: faculties,
     academicYears: academicYears,
     courses: courses,
-    enrollments: enrollments
+    enrollments: enrollments,
+    assignments: assignments
 }
