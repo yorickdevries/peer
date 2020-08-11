@@ -103,7 +103,6 @@ export default {
             const res = await api.academicYears.get(true)
             this.academicYears = res.data
         },
-
         async onSubmit() {
             await api.courses.patch(
                 this.course.id,
