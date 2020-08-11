@@ -14,6 +14,9 @@ const client = axios.create({
 
 export default {
     client,
+    getAuthenticated: async () => {
+        return client.get("authenticated")
+    },
     getUserInfo() {
         return client.get("me")
     },
