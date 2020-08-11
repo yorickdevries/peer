@@ -17,6 +17,7 @@
 </template>
 
 <script>
+// NOTE: This can be deleted once proper error handling has been achieved
 import api from "../../api/api_temp"
 import notifications from "../../mixins/notifications"
 
