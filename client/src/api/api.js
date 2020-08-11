@@ -1,4 +1,5 @@
 import axios from "axios"
+import { succesInterceptor, errorInterceptor } from "./axiosInterceptors"
 import assignmentApi from "./assignmentApi"
 import courseApi from "./courseApi"
 import facultiesApi from "./facultyApi"
@@ -10,6 +11,8 @@ const client = axios.create({
     baseURL: "/api/",
     json: true
 })
+// Add a response interceptor
+client.interceptors.response.use(succesInterceptor, errorInterceptor)
 
 export default {
     client,
