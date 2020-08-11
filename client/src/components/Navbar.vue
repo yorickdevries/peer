@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import api from "../api/api_old"
+import api from "../api/api"
 
 export default {
     props: ["links", "title", "role", "variant"],
@@ -110,8 +110,8 @@ export default {
         },
         async refreshUser() {
             // Refresh user information.
-            let res = await api.getUser()
-            this.user = res.data.user
+            let res = await api.getUserInfo()
+            this.user = res.data
         }
     }
 }
