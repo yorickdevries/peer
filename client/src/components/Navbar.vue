@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import api from "../api/api"
+import rootApi from "../api/root"
 
 export default {
     props: ["links", "title", "role", "variant"],
@@ -100,17 +100,19 @@ export default {
     async mounted() {
         // Fetch authentication & user information.
         await this.refreshAuthenticated()
-        await this.refreshUser()
+        if (this.authenticated) {
+            await this.refreshMe()
+        }
     },
     methods: {
         async refreshAuthenticated() {
             // Refresh whether user is authenticated.
-            let res = await api.getAuthenticated()
+            const res = await rootApi.getAuthenticated()
             this.authenticated = res.data.authenticated
         },
-        async refreshUser() {
+        async refreshMe() {
             // Refresh user information.
-            let res = await api.getUserInfo()
+            const res = await rootApi.getMe()
             this.user = res.data
         }
     }
