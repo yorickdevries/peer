@@ -111,7 +111,7 @@
                                                 Enter Course
                                             </b-button>
                                             <b-button
-                                                v-else-if="course.role === 'teachingassistant'"
+                                                v-else-if="enrollment.role === 'teachingassistant'"
                                                 variant="outline-primary"
                                                 size="sm"
                                                 :to="{
@@ -122,7 +122,7 @@
                                                 Enter Course
                                             </b-button>
                                             <b-button
-                                                v-else-if="course.role === 'teacher'"
+                                                v-else-if="enrollment.role === 'teacher'"
                                                 variant="outline-primary"
                                                 size="sm"
                                                 :to="{
