@@ -256,6 +256,7 @@ const assignmentSchema = Joi.object({
   reviewDueDate: Joi.date().required(),
   reviewEvaluationDueDate: Joi.date().allow(null).required(),
   description: Joi.string().allow(null).required(),
+  file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
 });
 // post an assignment in a course
