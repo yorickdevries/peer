@@ -1,9 +1,12 @@
 import client from "./axiosClient"
 
 export default {
-    get(courseId) {
+    getAllForCourse(courseId) {
         const params = { courseId: courseId }
         return client.get("assignments/", { params: params })
+    },
+    get(id) {
+        return client.get(`assignments/${id}`)
     },
     post(
         name,

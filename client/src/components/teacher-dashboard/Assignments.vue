@@ -42,7 +42,7 @@ export default {
         }
     },
     async created() {
-        const res = await api.assignments.get(this.$route.params.courseId)
+        const res = await api.assignments.getAllForCourse(this.$route.params.courseId)
         this.assignments = res.data
     }
 }
