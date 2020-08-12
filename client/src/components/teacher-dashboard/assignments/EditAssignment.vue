@@ -13,12 +13,12 @@
                 <b-col>
                     <b-card>
                         <b-form @submit.prevent="onSubmit">
-                            <!--Assignment title-->
-                            <b-form-group label="Assignment title">
+                            <!--Assignment name-->
+                            <b-form-group label="Assignment name">
                                 <b-form-input
                                     v-model="assignment.name"
                                     type="text"
-                                    placeholder="Please enter the course name here"
+                                    placeholder="Please enter the assignment name here"
                                     required
                                 >
                                 </b-form-input>
@@ -27,16 +27,12 @@
                             <b-form-group label="Description">
                                 <b-form-textarea
                                     v-model="assignment.description"
-                                    id="textareadescription"
-                                    placeholder="Please enter the course description here"
-                                    :rows="4"
-                                    required
+                                    type="text"
+                                    placeholder="Please enter the assignment description here"
                                 >
                                 </b-form-textarea>
                             </b-form-group>
-
                             <hr />
-
                             <!--Publish and due date of the assignment-->
                             <b-row class="mb-3">
                                 <b-col>
@@ -53,13 +49,9 @@
                                         <datepicker
                                             placeholder="Select date"
                                             v-model="assignment.publishDay"
-                                        ></datepicker>
-                                        <b-form-input
-                                            v-model="assignment.publishTime"
-                                            type="time"
-                                            placeholder="00:00"
                                             required
-                                        >
+                                        ></datepicker>
+                                        <b-form-input v-model="assignment.publishTime" type="time" required>
                                         </b-form-input>
                                     </b-form-group>
                                 </b-col>
@@ -74,18 +66,15 @@
                                                 >?</b-badge
                                             >
                                         </template>
-                                        <datepicker placeholder="Select date" v-model="assignment.dueDay"></datepicker>
-                                        <b-form-input
-                                            v-model="assignment.dueTime"
-                                            type="time"
-                                            placeholder="00:00"
+                                        <datepicker
+                                            placeholder="Select date"
+                                            v-model="assignment.dueDay"
                                             required
-                                        >
-                                        </b-form-input>
+                                        ></datepicker>
+                                        <b-form-input v-model="assignment.dueTime" type="time" required> </b-form-input>
                                     </b-form-group>
                                 </b-col>
                             </b-row>
-
                             <!--Publish and due date of the peer review-->
                             <b-row>
                                 <b-col>
@@ -102,13 +91,9 @@
                                         <datepicker
                                             placeholder="Select date"
                                             v-model="assignment.reviewPublishDay"
-                                        ></datepicker>
-                                        <b-form-input
-                                            v-model="assignment.reviewPublishTime"
-                                            type="time"
-                                            placeholder="00:00"
                                             required
-                                        >
+                                        ></datepicker>
+                                        <b-form-input v-model="assignment.reviewPublishTime" type="time" required>
                                         </b-form-input>
                                     </b-form-group>
                                 </b-col>
@@ -126,13 +111,9 @@
                                         <datepicker
                                             placeholder="Select date"
                                             v-model="assignment.reviewDueDay"
-                                        ></datepicker>
-                                        <b-form-input
-                                            v-model="assignment.reviewDueTime"
-                                            type="time"
-                                            placeholder="00:00"
                                             required
-                                        >
+                                        ></datepicker>
+                                        <b-form-input v-model="assignment.reviewDueTime" type="time" required>
                                         </b-form-input>
                                     </b-form-group>
                                 </b-col>
@@ -145,7 +126,7 @@
                                 <b-form-input
                                     v-model="assignment.reviewsPerUser"
                                     type="number"
-                                    :state="checkPeerNumber"
+                                    :state="checkReviewsPerUser"
                                     placeholder="Enter an integer larger than 0"
                                     required
                                 >
@@ -153,7 +134,10 @@
                             </b-form-group>
 
                             <!--File upload-->
-                            <b-form-group label="Assignment file" class="mb-3">
+                            <b-form-group
+                                label="Assignment file"
+                                description="Add a file for the assignment (optional)."
+                            >
                                 <!--Show currently uploaded file-->
                                 <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
                                     <div v-if="assignment.file">
@@ -181,11 +165,9 @@
                                     >
                                 </b-alert>
                                 <b-form-file
-                                    v-if="uploadNewFile"
-                                    placeholder="Choose a new file..."
+                                    placeholder="Choose a file..."
                                     accept=".pdf,.zip,.doc,.docx"
-                                    v-model="file"
-                                    :state="Boolean(file)"
+                                    v-model="assignment.file"
                                 >
                                 </b-form-file>
                                 <p class="mb-0" v-if="uploadNewFile && file">
@@ -201,33 +183,29 @@
                                 <b-form-input v-model="assignment.externalLink"></b-form-input>
                             </b-form-group>
 
-                            <b-form-group
-                                label="Assignment Type"
-                                description="This can not be changed after creating the assignment."
-                            >
-                                <b-form-radio-group
-                                    v-model="assignment.enrollable"
-                                    :options="[
-                                        { value: true, text: 'Individual' },
-                                        { value: false, text: 'Group' }
-                                    ]"
-                                    stacked
-                                    disabled
-                                    name="radiosStacked"
-                                >
-                                </b-form-radio-group>
+                            <b-form-group>
+                                <b-form-checkbox v-model="assignment.enrollable">
+                                    Self enrollable
+                                    <b-badge
+                                        v-b-tooltip.hover
+                                        title="Allow students to enroll themselves into groups of 1 person"
+                                        variant="primary"
+                                        >?</b-badge
+                                    >
+                                </b-form-checkbox>
                             </b-form-group>
+
                             <b-row>
                                 <b-col>
                                     <b-form-group
                                         label="Students can evaluate their received reviews"
                                         description="This can not be changed after creating the assignment."
                                     >
-                                        <b-form-checkbox v-model="assignment.reviewEvaluation" disabled>
+                                        <b-form-checkbox v-model="assignment.reviewEvaluation">
                                             Enable review evaluation
                                             <b-badge
                                                 v-b-tooltip.hover
-                                                title="This will enable students to fill in a non-customisable evaluation form about their received reviews"
+                                                title="This will enable students to fill in a evaluation form about their received reviews"
                                                 variant="primary"
                                                 >?</b-badge
                                             >
@@ -247,19 +225,13 @@
                                             placeholder="Select date"
                                             v-model="assignment.reviewEvaluationDueDay"
                                         ></datepicker>
-                                        <b-form-input
-                                            v-model="assignment.reviewEvaluationDueTime"
-                                            type="time"
-                                            placeholder="00:00"
-                                            required
-                                        >
+                                        <b-form-input v-model="assignment.reviewEvaluationDueTime" type="time">
                                         </b-form-input>
                                     </b-form-group>
                                 </b-col>
                                 <b-col></b-col>
                             </b-row>
-
-                            <b-button type="submit" variant="primary">Save changes</b-button>
+                            <b-button type="submit" variant="primary">Create the assignment</b-button>
                         </b-form>
                     </b-card>
                 </b-col>
@@ -269,7 +241,7 @@
 </template>
 
 <script>
-import api from "../../../api/api_temp"
+import api from "../../../api/api"
 import notifications from "../../../mixins/notifications"
 import Datepicker from "vuejs-datepicker"
 
@@ -280,47 +252,18 @@ export default {
     },
     data() {
         return {
-            file: null,
-            fileProgress: 0,
-            uploadNewFile: false,
-            acceptFiles: ".pdf,.zip,.doc,.docx",
-            assignment: {
-                id: null,
-                title: null,
-                description: null,
-                courseId: null,
-                publishDate: null,
-                publishDay: null,
-                publishTime: null,
-                dueDate: null,
-                dueDay: null,
-                dueTime: null,
-                reviewPublishDate: null,
-                reviewPublishDay: null,
-                reviewPublish_time: null,
-                reviewDueDate: null,
-                reviewDueDay: null,
-                reviewDueTime: null,
-                reviewEvaluationDueDay: null,
-                reviewEvaluationDueTime: null,
-                reviewEvaluationDueDate: null,
-                reviewsPerUser: null,
-                file: null,
-                enrollable: null,
-                reviewEvaluation: null,
-                externalLink: null
-            },
-            course: {
-                id: null,
-                name: null,
-                description: null
-            }
+            removeFile: false,
+            newFile: null,
+            assignment: {}
         }
     },
     computed: {
-        checkPeerNumber() {
-            if (this.assignment.reviewsPerUser == null) return null
-            else return this.assignment.reviewsPerUser > 0
+        checkReviewsPerUser() {
+            if (this.assignment.reviewsPerUser == null) {
+                return null
+            } else {
+                return this.assignment.reviewsPerUser > 0
+            }
         },
         assignmentFilePath() {
             // Get the assignment file path.
@@ -329,12 +272,10 @@ export default {
     },
     async created() {
         // Load necessary data
-        let cid = this.$route.params.courseId
-        let aid = this.$route.params.assignmentId
-        this.course.id = cid
-        this.assignment.id = aid
-        let res = await api.getAssignment(aid)
+        let res = await api.assignments.get(this.$route.params.assignmentId)
         this.assignment = res.data
+
+        // HIER VERDER
 
         // Define function for correct formatting time
         function timeToInputFormat(time) {
