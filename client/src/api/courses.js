@@ -21,14 +21,14 @@ export default {
     },
     post(name, courseCode, enrollable, facultyName, academicYearName, description) {
         if (!description) {
-            description = "null"
+            description = null
         }
         const course = { name, courseCode, enrollable, facultyName, academicYearName, description }
         return client.post("courses/", course)
     },
     patch(courseId, name, courseCode, enrollable, facultyName, academicYearName, description) {
         if (!description) {
-            description = "null"
+            description = null
         }
         const course = { name, courseCode, enrollable, facultyName, academicYearName, description }
         return client.patch(`courses/${courseId}`, course)
