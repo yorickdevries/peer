@@ -149,7 +149,7 @@ export default {
         CreateQuestionWizard,
         UploadQuestion
     },
-    props: ["assignmentId", "review_publish_date"],
+    props: ["assignmentId", "reviewPublishDate"],
     data() {
         return {
             rubric: {
@@ -166,7 +166,7 @@ export default {
     },
     computed: {
         blockRubricEditing() {
-            return new Date() > new Date(this.review_publish_date)
+            return new Date() > new Date(this.reviewPublishDate)
         },
         nextNewQuestionNumber() {
             if (this.rubric.questions === undefined || this.rubric.questions.length === 0) {

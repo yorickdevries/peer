@@ -206,11 +206,11 @@
                                 </b-row>
                             </b-tab>
 
-                            <!--Rubric Wizard-->
+                            <!--Rubric Wizard // TODO: change name to questionnaire-->
                             <b-tab title="Rubric">
                                 <RubricWizard
                                     :assignmentId="assignment.id"
-                                    :review_publish_date="assignment.reviewPublishDate"
+                                    :reviewPublishDate="assignment.reviewPublishDate"
                                 ></RubricWizard>
                             </b-tab>
 
