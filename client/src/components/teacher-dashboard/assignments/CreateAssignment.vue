@@ -25,12 +25,12 @@
                             </b-form-group>
                             <!--Assignment description-->
                             <b-form-group label="Description">
-                                <b-form-input
+                                <b-form-textarea
                                     v-model="assignment.description"
                                     type="text"
                                     placeholder="Please enter the assignment description here"
                                 >
-                                </b-form-input>
+                                </b-form-textarea>
                             </b-form-group>
                             <hr />
                             <!--Publish and due date of the assignment-->
