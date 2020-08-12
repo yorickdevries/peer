@@ -1,13 +1,14 @@
+<!--NOTE: WHEN MORE ENDPOINTS ARE CONFIGURED, THIS FILE NEEDS TO BE REVISED-->
 <template>
     <div>
         <b-container>
             <!--Header and action-->
-            <BreadcrumbTitle :items="['Assignments', assignment.title]" class="mt-3">
+            <BreadcrumbTitle :items="['Assignments', assignment.name]" class="mt-3">
                 <b-button
                     variant="success"
                     :to="{
                         name: 'teacher-dashboard.assignments.assignment.edit',
-                        params: { courseId: course.id, assignmentId: assignment.id }
+                        params: { courseId: this.$route.params.courseId, assignmentId: assignment.id }
                     }"
                 >
                     Edit assignment
@@ -24,7 +25,6 @@
                                     <b-col cols="4">
                                         <AssignmentDetails :assignment="assignment"></AssignmentDetails>
                                     </b-col>
-
                                     <b-col cols="8">
                                         <b-card header="Actions">
                                             <dl class="mb-0">
@@ -54,7 +54,7 @@
                                                 </b-button>
                                                 <b-modal
                                                     id="shufflingModal"
-                                                    @ok="shuffleGroups()"
+                                                    @ok="shuffleGroups"
                                                     title="Confirmation"
                                                     centered
                                                 >
@@ -132,7 +132,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `api/reviewofsubmissions/exportreviews?assignmentId=${assignment.id}&exportType=csv`
+                                                        `api_temp/reviewofsubmissions/exportreviews?assignmentId=${assignment.id}&exportType=csv`
                                                     "
                                                     class="mb-3 mr-2"
                                                 >
@@ -142,7 +142,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `api/reviewofsubmissions/exportreviews?assignmentId=${assignment.id}&exportType=xls`
+                                                        `api_temp/reviewofsubmissions/exportreviews?assignmentId=${assignment.id}&exportType=xls`
                                                     "
                                                     class="mb-3"
                                                 >
@@ -160,7 +160,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `api/reviewofsubmissions/exportgrades?assignmentId=${assignment.id}&exportType=csv`
+                                                        `api_temp/reviewofsubmissions/exportgrades?assignmentId=${assignment.id}&exportType=csv`
                                                     "
                                                 >
                                                     Download grades .csv
@@ -169,7 +169,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `api/reviewofsubmissions/exportgrades?assignmentId=${assignment.id}&exportType=xls`
+                                                        `api_temp/reviewofsubmissions/exportgrades?assignmentId=${assignment.id}&exportType=xls`
                                                     "
                                                 >
                                                     Download grades .xls
@@ -198,7 +198,7 @@
                                             >
                                                 <CopyGroupsWizard
                                                     :assignmentId="assignment.id"
-                                                    :courseId="course.id"
+                                                    :courseId="this.$route.params.courseId"
                                                 ></CopyGroupsWizard>
                                             </b-modal>
                                         </b-card>
@@ -240,7 +240,7 @@
 </template>
 
 <script>
-import api from "../../../api/api_temp"
+import api from "../../../api/api"
 import BreadcrumbTitle from "../../BreadcrumbTitle"
 import RubricWizard from "../rubric/RubricWizard"
 import ImportGroupsWizard from "../ImportGroupsWizard"
@@ -263,66 +263,46 @@ export default {
         Submissions,
         AssignmentDetails
     },
-    async created() {
-        let cid = this.$route.params.courseId
-        let aid = this.$route.params.assignmentId
-        this.course.id = cid
-        this.assignment.id = aid
-        let res = await api.getAssignment(aid)
-        this.assignment = res.data
-    },
     data() {
         return {
             selfAssign: false,
-            course: {
-                id: null
-            },
-            assignment: {
-                id: null,
-                title: null,
-                description: null,
-                publishDate: null,
-                dueDate: null,
-                reviewPublishDate: null,
-                reviewDueDate: null,
-                file: null,
-                enrollable: null
-            }
+            assignment: {}
         }
     },
+    async created() {
+        let res = await api.assignments.get(this.$route.params.assignmentId)
+        this.assignment = res.data
+    },
     methods: {
-        formatDate(date) {
-            // Formats the date to a readable format for the UI.
-            if (!(date instanceof Date)) date = new Date(date)
-            return `${date.toLocaleDateString()} ${date.getHours()}:${date.getMinutes()}`
-        },
         async shuffleGroups() {
-            try {
-                // Check if the user wants to self-assign shuffle instead.
-                // TODO: add new API calls
-                if (this.selfAssign) {
-                    await api.client.get(`/assignments/${this.$route.params.assignmentId}/distributeReviews/1`)
-                } else {
-                    await api.client.get(`/assignments/${this.$route.params.assignmentId}/distributeReviews/0`)
-                }
+            return
+            // try {
+            //     // Check if the user wants to self-assign shuffle instead.
+            //     // TODO: add new API calls
+            //     if (this.selfAssign) {
+            //         await api.client.get(`/assignments/${assignment.id}/distributeReviews/1`)
+            //     } else {
+            //         await api.client.get(`/assignments/${assignment.id}/distributeReviews/0`)
+            //     }
 
-                this.showSuccessMessage({ message: "Groups have successfully been shuffled and assigned submissions." })
-            } catch (e) {
-                this.showErrorMessage({ message: e.response.data.error })
-            }
+            //     this.showSuccessMessage({ message: "Groups have successfully been shuffled and assigned submissions." })
+            // } catch (e) {
+            //     this.showErrorMessage({ message: e.response.data.error })
+            // }
         },
         async submitAllFilledReviews() {
-            try {
-                let res = await api.client.get(`
-                                                reviewofsubmissions/submitall?assignmentId=${this.$route.params.assignmentId}
-                                                `)
-                const rubricId = res.data.id
-                const result = await api.submitAllFilledReviews(rubricId)
-                const submittedReviews = result.data.submittedReviews
-                this.showSuccessMessage({ message: "Submitted " + submittedReviews + " Reviews" })
-            } catch (e) {
-                this.showErrorMessage({ message: e.response.data.error })
-            }
+            return
+            // try {
+            //     let res = await api.client.get(`
+            //                                     reviewofsubmissions/submitall?assignmentId=${assignment.id}
+            //                                     `)
+            //     const rubricId = res.data.id
+            //     const result = await api.submitAllFilledReviews(rubricId)
+            //     const submittedReviews = result.data.submittedReviews
+            //     this.showSuccessMessage({ message: "Submitted " + submittedReviews + " Reviews" })
+            // } catch (e) {
+            //     this.showErrorMessage({ message: e.response.data.error })
+            // }
         }
     }
 }
