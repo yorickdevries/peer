@@ -1,5 +1,6 @@
 import client from "./axiosClient"
 // subroutes
+import users from "./users"
 import faculties from "./faculties"
 import academicYears from "./academicYears"
 import courses from "./courses"
@@ -13,6 +14,7 @@ export default {
     getMe() {
         return client.get("me")
     },
+    users: users,
     faculties: faculties,
     academicYears: academicYears,
     courses: courses,

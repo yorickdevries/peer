@@ -5,6 +5,7 @@ import checkAndSetAuthentication from "../middleware/authentication/checkAuthent
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ResponseMessage from "../enum/ResponseMessage";
 // routes
+import users from "./users";
 import faculties from "./faculties";
 import academicyears from "./academicyears";
 import courses from "./courses";
@@ -55,6 +56,7 @@ router.get("/me", async (req, res) => {
 });
 
 // TODO: Complete routing of the new API
+router.use("/users", users);
 router.use("/faculties", faculties);
 router.use("/academicyears", academicyears);
 router.use("/courses", courses);
