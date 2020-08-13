@@ -2,7 +2,6 @@
     <b-container>
         <!--Header-->
         <BreadcrumbTitle :items="['Teacher Management']" class="mt-3"></BreadcrumbTitle>
-
         <b-row>
             <b-col>
                 <b-card header="Teacher Manager">
@@ -31,14 +30,18 @@
                         outlined
                         show-empty
                         stacked="md"
-                        :items="teachers"
+                        :items="enrollments"
                         :fields="fields"
                         :current-page="currentPage"
                         :per-page="Number(perPage)"
                         :filter="filter"
                     >
-                        <template slot="actions" slot-scope="data">
-                            <b-button @click="removeTeacher(data.item.user_netid)" size="sm" variant="danger"
+                        <template v-slot:cell(action)="data">
+                            <b-button
+                                v-if="data.item.userNetid !== user.netid"
+                                @click="deleteTeacher(data.item.userNetid)"
+                                size="sm"
+                                variant="danger"
                                 >Remove
                             </b-button>
                         </template>
@@ -46,7 +49,7 @@
 
                     <!--Pagination-->
                     <b-pagination
-                        :total-rows="this.teachers.length"
+                        :total-rows="this.enrollments.length"
                         :per-page="Number(perPage)"
                         v-model="currentPage"
                         class="my-0"
@@ -57,14 +60,25 @@
             <!--Add form for teacher-->
             <b-col cols="4">
                 <b-card class="mb-3" header="Add a teacher">
-                    <label>NetID</label>
+                    <label>Search for NetID</label>
                     <div class="input-group">
-                        <b-form-input v-model="netid"></b-form-input>
+                        <b-form-input v-model="queryNetid"></b-form-input>
                         <div class="input-group-append">
-                            <b-button @click="submitTeacher" variant="primary" size="sm">Add</b-button>
+                            <b-button @click="findUser" variant="primary" size="sm">Find</b-button>
                         </div>
                     </div>
-                    <small class="form-text text-muted">Please input a valid netID.</small>
+                    <small class="form-text text-muted">Please put in a valid netID.</small>
+                    <UserInfo :user="selectedUser" v-if="selectedUser"></UserInfo>
+                    <br />
+                    <div v-if="selectedNetid">
+                        <div v-if="!selectedUser">
+                            No user with <b>{{ selectedNetid }}</b> has ever logged into Peer before, if you are sure
+                            you have the right netID, you can click the button below
+                        </div>
+                        <b-button @click="addTeacher" variant="primary" size="sm"
+                            >Add <b>{{ selectedNetid }}</b> as teacher</b-button
+                        >
+                    </div>
                 </b-card>
             </b-col>
         </b-row>
@@ -72,85 +86,77 @@
 </template>
 
 <script>
-import api from "../../api/api_temp"
+import api from "../../api/api"
 import notifications from "../../mixins/notifications"
 import BreadcrumbTitle from "../BreadcrumbTitle"
+import UserInfo from "../general/UserInfo"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle },
+    components: { BreadcrumbTitle, UserInfo },
     data() {
         return {
-            teachers: [],
+            enrollments: [],
+            // current logged in user
+            user: null,
+            // used to find a user from the database
+            queryNetid: "",
+            // user fetched from the database
+            selectedNetid: "",
+            selectedUser: null,
+            // for navigation
+            fields: [
+                { key: "user.displayName", label: "Name" },
+                { key: "user.netid", label: "NetID" },
+                { key: "user.email", label: "​​​Email" },
+                { key: "user.studentNumber", label: "Studentnumber" },
+                { key: "action", label: "Action" }
+            ],
             currentPage: 1,
-            fields: [{ key: "userNetid", label: "NetID" }],
-            perPage: 5,
-            filter: null,
-            netid: ""
+            perPage: 10,
+            filter: ""
         }
     },
     async created() {
+        const res = await api.getMe()
+        this.user = res.data
         await this.fetchTeachers()
     },
     methods: {
-        async submitTeacher() {
-            // Check if input has been filled in.
-            if (this.netid === "") return this.showErrorMessage({ message: "Please input a valid netID." })
-
-            // Change the role through the API.
-            try {
-                let enrollment = {
-                    courseId: this.$route.params.courseId,
-                    userNetid: this.netid,
-                    role: "teacher"
-                }
-                await api.enrollUser(enrollment)
-                // await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
-                //     netid: this.netid,
-                //     role: "teacher"
-                // })
-            } catch (e) {
-                console.log(e.response)
-                return this.showErrorMessage({ message: e.response.data })
-            }
-
-            // Show correct status message.
-            this.showSuccessMessage({ message: `Successfully added ${this.netid} as a teacher.` })
-
-            // Re-fetch teachers.
-            await this.fetchTeachers()
-        },
-        async removeTeacher(netid) {
-            // Change the role through the API.
-            try {
-                let enrollment = {
-                    courseId: this.$route.params.courseId,
-                    userNetid: netid,
-                    role: "student"
-                }
-                await api.enrollUser(enrollment)
-                // await api.client.put(`courses/${this.$route.params.courseId}/setRole`, {
-                //     netid: netid,
-                //     role: "student"
-                // })
-            } catch (e) {
-                console.log(e.response)
-                return this.showErrorMessage({ message: e.response.data })
-            }
-
-            // Show correct status message.
-            this.showSuccessMessage({ message: `Successfully removed ${this.netid} as a teacher.` })
-
-            // Re-fetch teachers.
-            await this.fetchTeachers()
-        },
         async fetchTeachers() {
-            try {
-                let { data } = await api.getEnrolledUsersWithRole(this.$route.params.courseId, "teacher")
-                this.teachers = data
-            } catch (e) {
-                console.log(e.response.data)
+            const res = await api.enrollments.get(this.$route.params.courseId, "teacher")
+            this.enrollments = res.data
+        },
+        async findUser() {
+            if (!this.queryNetid) {
+                return this.showErrorMessage({ message: "Please input a valid netID." })
             }
+            try {
+                const res = await api.users.get(this.queryNetid)
+                this.selectedUser = res.data
+                this.selectedNetid = this.selectedUser.netid
+            } catch (error) {
+                this.selectedUser = null
+                this.selectedNetid = this.queryNetid
+            }
+            return
+        },
+        async addTeacher() {
+            // Change the role through the API.
+            await api.enrollments.post(this.$route.params.courseId, this.selectedNetid, "teacher")
+            // Show correct status message.
+            this.showSuccessMessage({ message: `Successfully added ${this.selectedNetid} as a teacher.` })
+            // Re-fetch teachers.
+            await this.fetchTeachers()
+            // reset search fields
+            this.queryNetid = ""
+            this.selectedUser = null
+            this.selectedNetid = ""
+        },
+        async deleteTeacher(netid) {
+            return this.showErrorMessage({
+                message: `At this moment deletion of user ${netid} is not supported, please contact the administrator to do this`
+            })
         }
     }
 }
