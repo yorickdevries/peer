@@ -33,38 +33,8 @@
                                 <span class="p-3 align-middle">{{ user.displayName }}</span>
                             </template>
                             <b-dropdown-item v-b-modal.userinfo-modal>Userinfo</b-dropdown-item>
-                            <b-modal id="userinfo-modal" title="Userinfo" hide-footer>
-                                <div>NetID: {{ user.netid }}</div>
-                                <div>Studentnumber: {{ user.studentNumber }}</div>
-                                <div>First name: {{ user.firstName }}</div>
-                                <div>prefix: {{ user.prefix }}</div>
-                                <div>Last name: {{ user.lastName }}</div>
-                                <div>Email: {{ user.email }}</div>
-                                <div>Display name: {{ user.displayName }}</div>
-                                <div>
-                                    Affiliation:
-                                    <ul>
-                                        <li v-for="item in user.affiliation" :key="item.name">
-                                            {{ item.name }}
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div>
-                                    Study:
-                                    <ul>
-                                        <li v-for="item in user.study" :key="item.name">
-                                            {{ item.name }}
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div>
-                                    Organisation unit:
-                                    <ul>
-                                        <li v-for="item in user.organisationUnit" :key="item.name">
-                                            {{ item.name }}
-                                        </li>
-                                    </ul>
-                                </div>
+                            <b-modal id="userinfo-modal" hide-header hide-footer>
+                                <UserInfo :user="user"></UserInfo>
                             </b-modal>
                             <b-dropdown-item href="/api/logout">Sign-out</b-dropdown-item>
                         </b-nav-item-dropdown>
@@ -94,9 +64,11 @@
 
 <script>
 import api from "../api/api"
+import UserInfo from "./general/UserInfo"
 
 export default {
     props: ["links", "title", "role", "variant"],
+    components: { UserInfo },
     data() {
         return {
             authenticated: null,
