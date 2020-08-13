@@ -93,8 +93,6 @@ export default {
     data() {
         return {
             enrollments: [],
-            // current logged in user
-            user: null,
             // used to find a user from the database
             queryNetid: "",
             // user fetched from the database
@@ -114,8 +112,6 @@ export default {
         }
     },
     async created() {
-        const res = await api.getMe()
-        this.user = res.data
         await this.fetchTeachingAssistants()
     },
     methods: {
