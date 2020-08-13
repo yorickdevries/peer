@@ -40,14 +40,14 @@ export default [
                 component: () => import("../components/teacher-dashboard/assignments/EditAssignment")
             },
             {
-                path: "courses/:courseId/teaching-assistants",
-                name: "teacher-dashboard.course.teaching-assistants",
-                component: () => import("../components/teacher-dashboard/TAManager")
-            },
-            {
                 path: "courses/:courseId/teachers",
                 name: "teacher-dashboard.course.teachers",
                 component: () => import("../components/teacher-dashboard/TeacherManager")
+            },
+            {
+                path: "courses/:courseId/teaching-assistants",
+                name: "teacher-dashboard.course.teaching-assistants",
+                component: () => import("../components/teacher-dashboard/TAManager")
             },
             {
                 path: "courses/:courseId/students",
