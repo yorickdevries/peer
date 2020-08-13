@@ -311,7 +311,6 @@ export default {
         async fetchUser() {
             let res = await api.getMe()
             this.user = res.data
-            console.log(res)
         },
         async fetchFaculties() {
             let res = await api.faculties.get()
