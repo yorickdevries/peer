@@ -6,6 +6,14 @@ import academicYears from "./academicYears"
 import courses from "./courses"
 import enrollments from "./enrollments"
 import assignments from "./assignments"
+import submissionquestionnaires from "./submissionquestionnaires"
+import openquestions from "./openquestions"
+import multiplechoicequestions from "./multiplechoicequestions"
+import multiplechoicequestionoptions from "./multiplechoicequestionoptions"
+import checkboxquestions from "./checkboxquestions"
+import checkboxquestionoptions from "./checkboxquestionoptions"
+import rangequestions from "./rangequestions"
+import uploadquestions from "./uploadquestions"
 
 export default {
     getAuthenticated: () => {
@@ -19,5 +27,13 @@ export default {
     academicYears: academicYears,
     courses: courses,
     enrollments: enrollments,
-    assignments: assignments
+    assignments: assignments,
+    submissionquestionnaires: submissionquestionnaires,
+    openquestions: openquestions,
+    multiplechoicequestions: multiplechoicequestions,
+    multiplechoicequestionoptions: multiplechoicequestionoptions,
+    checkboxquestions: checkboxquestions,
+    checkboxquestionoptions: checkboxquestionoptions,
+    rangequestions: rangequestions,
+    uploadquestions: uploadquestions
 }
