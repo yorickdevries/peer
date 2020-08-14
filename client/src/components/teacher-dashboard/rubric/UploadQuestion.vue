@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-form-group label="Question Number" description="The questions will be sorted on this number.">
-            <b-form-input type="number" v-model="question.number" />
+            <b-form-input v-model="question.number" type="number" />
         </b-form-group>
         <b-form-group label="Question Text" description="The actual question that the student has to answer.">
             <b-form-textarea v-model="question.text" />
@@ -14,15 +14,35 @@
                 Make this question optional.
             </b-form-checkbox>
         </b-form-group>
+        <b-button @click="save" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
+        <span v-if="question.id">
+            <b-btn v-b-modal="`delete${question.id}`" variant="outline-danger" size="sm">Delete</b-btn>
+            <b-modal :id="`delete${question.id}`" centered title="Warning" @ok="deleteQuestion">
+                Are you sure you want to delete? <br /><br />
+                Deleting a question after students have submitted answers to this question will DELETE all the answers
+                the students have given.
+            </b-modal>
+        </span>
     </div>
 </template>
 
 <script>
+import api from "../../../api/api"
+import notifications from "../../../mixins/notifications"
+
 export default {
-    props: ["value"],
+    mixins: [notifications],
+    props: ["questionId", "questionnaireId", "questionNumber"],
     data() {
         return {
-            question: this.value,
+            // default question, can be replaced when a questionId is passed
+            question: {
+                text: "",
+                number: this.questionNumber,
+                optional: false,
+                questionnaireId: this.questionnaireId,
+                extensions: ""
+            },
             extensionTypes: [
                 { value: ".pdf", text: ".pdf" },
                 { value: ".zip", text: ".zip" },
@@ -31,12 +51,51 @@ export default {
             ]
         }
     },
-    watch: {
-        question(val) {
-            this.$emit("input", val)
+    async created() {
+        await this.fetchQuestion()
+    },
+    methods: {
+        async fetchQuestion() {
+            // load the question in case an id is passed
+            if (this.questionId) {
+                const res = await api.uploadquestions.get(this.questionId)
+                this.question = res.data
+            }
         },
-        value(val) {
-            this.question = val
+        async save() {
+            // patch in case the id is defined
+            if (this.question.id) {
+                await this.patchQuestion()
+            } else {
+                await this.postQuestion()
+            }
+            this.showSuccessMessage({ message: "Successfully saved upload question." })
+            this.$emit("questionSaved")
+            await this.fetchQuestion()
+        },
+        async postQuestion() {
+            await api.uploadquestions.post(
+                this.question.text,
+                this.question.number,
+                this.question.optional,
+                this.question.questionnaireId,
+                this.question.extensions
+            )
+        },
+        async patchQuestion() {
+            await api.uploadquestions.patch(
+                this.question.id,
+                this.question.text,
+                this.question.number,
+                this.question.optional,
+                this.question.extensions
+            )
+        },
+        async deleteQuestion() {
+            await api.uploadquestions.delete(this.question.id)
+            this.showSuccessMessage({ message: "Successfully deleted upload question." })
+            this.$emit("questionSaved")
+            this.questionId = null
         }
     }
 }

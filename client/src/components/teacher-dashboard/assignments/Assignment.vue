@@ -206,12 +206,9 @@
                                 </b-row>
                             </b-tab>
 
-                            <!--Rubric Wizard // TODO: change name to questionnaire-->
-                            <b-tab title="Rubric">
-                                <RubricWizard
-                                    :assignmentId="assignment.id"
-                                    :reviewPublishDate="assignment.reviewPublishDate"
-                                ></RubricWizard>
+                            <!--Questionnaire Wizard-->
+                            <b-tab title="Questionnaire">
+                                <QuestionnaireWizard></QuestionnaireWizard>
                             </b-tab>
 
                             <!--Submissions-->
@@ -242,7 +239,7 @@
 <script>
 import api from "../../../api/api"
 import BreadcrumbTitle from "../../BreadcrumbTitle"
-import RubricWizard from "../rubric/RubricWizard"
+import QuestionnaireWizard from "../rubric/QuestionnaireWizard"
 import ImportGroupsWizard from "../ImportGroupsWizard"
 import Groups from "../Groups"
 import Reviews from "../../ta_teacher_shared/Reviews"
@@ -256,7 +253,7 @@ export default {
     components: {
         CopyGroupsWizard,
         BreadcrumbTitle,
-        RubricWizard,
+        QuestionnaireWizard,
         Groups,
         ImportGroupsWizard,
         Reviews,

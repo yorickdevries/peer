@@ -8,7 +8,7 @@
         </b-form-group>
         <b-form-group
             label="Multiple Choice Options"
-            description="Delete, edit and add checkbox options here. Make sure to save."
+            description="Delete, edit and add multiple choice options here. Make sure to save."
         >
             <template v-for="(option, index) in question.options">
                 <b-form :key="index">
@@ -75,7 +75,7 @@ export default {
         async fetchQuestion() {
             // load the question in case an id is passed
             if (this.questionId) {
-                const res = await api.checkboxquestions.get(this.questionId)
+                const res = await api.multiplechoicequestions.get(this.questionId)
                 this.question = res.data
             } else {
                 // only add empty options when the question is not fetched from the database
@@ -103,12 +103,12 @@ export default {
             } else {
                 await this.postQuestion()
             }
-            this.showSuccessMessage({ message: "Successfully saved checkbox question." })
+            this.showSuccessMessage({ message: "Successfully saved multiplechoice question." })
             this.$emit("questionSaved")
             await this.fetchQuestion()
         },
         async postQuestion() {
-            const res = await api.checkboxquestions.post(
+            const res = await api.multiplechoicequestions.post(
                 this.question.text,
                 this.question.number,
                 this.question.optional,
@@ -118,15 +118,15 @@ export default {
             this.questionId = res.data.id
             for (const option of this.question.options) {
                 try {
-                    await api.checkboxquestionoptions.post(option.text, this.questionId)
-                    this.showSuccessMessage({ message: "Successfully created checkbox question option." })
+                    await api.multiplechoicequestionoptions.post(option.text, this.questionId)
+                    this.showSuccessMessage({ message: "Successfully created multiple choice question option." })
                 } catch {
-                    this.showErrorMessage({ message: "failed to create checkbox question option." })
+                    this.showErrorMessage({ message: "failed to create multiple choice question option." })
                 }
             }
         },
         async patchQuestion() {
-            await api.checkboxquestions.patch(
+            await api.multiplechoicequestions.patch(
                 this.question.id,
                 this.question.text,
                 this.question.number,
@@ -137,18 +137,18 @@ export default {
                     if (option.id) {
                         if (option.delete) {
                             // delete it the boolean is set
-                            await api.checkboxquestionoptions.delete(option.id)
+                            await api.multiplechoicequestionoptions.delete(option.id)
                         } else {
                             // just patch the option text
-                            await api.checkboxquestionoptions.patch(option.text, option.id)
+                            await api.multiplechoicequestionoptions.patch(option.text, option.id)
                         }
                     } else {
                         // create the option
-                        await api.checkboxquestionoptions.post(option.text, this.question.id)
+                        await api.multiplechoicequestionoptions.post(option.text, this.question.id)
                     }
-                    this.showSuccessMessage({ message: "Successfully saved checkbox question option." })
+                    this.showSuccessMessage({ message: "Successfully saved multiple choice question option." })
                 } catch {
-                    this.showErrorMessage({ message: "failed to save checkbox question option." })
+                    this.showErrorMessage({ message: "failed to save multiple choice question option." })
                 }
             }
         },
@@ -156,11 +156,11 @@ export default {
             // delete all options
             for (const option of this.question.options) {
                 if (option.id) {
-                    await api.checkboxquestionoptions.delete(option.id)
+                    await api.multiplechoicequestionoptions.delete(option.id)
                 }
             }
-            await api.checkboxquestions.delete(this.question.id)
-            this.showSuccessMessage({ message: "Successfully deleted checkbox question." })
+            await api.multiplechoicequestions.delete(this.question.id)
+            this.showSuccessMessage({ message: "Successfully deleted multiplechoice question." })
             this.$emit("questionSaved")
             this.questionId = null
         }
