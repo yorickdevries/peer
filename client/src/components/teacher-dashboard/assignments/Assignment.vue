@@ -84,7 +84,7 @@
                                                     <dt>Import groups</dt>
                                                     <dd>
                                                         Not available. On creation of the assignment, this assignment
-                                                        has been set as individual.
+                                                        has been set as self-enrollable.
                                                     </dd>
                                                 </template>
                                                 <template v-else>
@@ -98,6 +98,20 @@
                                                     >
                                                         Import groups
                                                     </b-button>
+
+                                                    <!--Import Group Modal-->
+                                                    <b-modal
+                                                        id="importGroups"
+                                                        centered
+                                                        hide-header
+                                                        hide-footer
+                                                        class="p-0 m-0"
+                                                        size="lg"
+                                                    >
+                                                        <ImportGroupsWizard
+                                                            :assignmentId="assignment.id"
+                                                        ></ImportGroupsWizard>
+                                                    </b-modal>
                                                 </template>
 
                                                 <!--Copying-->
@@ -105,7 +119,7 @@
                                                     <dt>Copy groups</dt>
                                                     <dd>
                                                         Not available. On creation of the assignment, this assignment
-                                                        has been set as individual.
+                                                        has been set as self-enrollable.
                                                     </dd>
                                                 </template>
                                                 <template v-else>
@@ -175,18 +189,6 @@
                                                     Download grades .xls
                                                 </b-button>
                                             </dl>
-
-                                            <!--Import Group Modal-->
-                                            <b-modal
-                                                id="importGroups"
-                                                centered
-                                                hide-header
-                                                hide-footer
-                                                class="p-0 m-0"
-                                                size="lg"
-                                            >
-                                                <ImportGroupsWizard :assignmentId="assignment.id"></ImportGroupsWizard>
-                                            </b-modal>
 
                                             <b-modal
                                                 id="copyGroups"
