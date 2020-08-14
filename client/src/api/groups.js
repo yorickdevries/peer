@@ -7,5 +7,9 @@ export default {
         formData.append("assignmentId", assignmentId)
         formData.append("file", file)
         return client.post("groups/import", formData)
+    },
+    copy(assignmentId, copyFromAssignmentId) {
+        const body = { assignmentId, copyFromAssignmentId }
+        return client.post("groups/copy", body)
     }
 }

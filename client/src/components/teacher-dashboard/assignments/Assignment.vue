@@ -95,8 +95,7 @@
                                                         variant="primary"
                                                         size="sm"
                                                         class="mb-3"
-                                                    >
-                                                        Import groups
+                                                        >Import groups
                                                     </b-button>
 
                                                     <!--Import Group Modal-->
@@ -108,9 +107,7 @@
                                                         class="p-0 m-0"
                                                         size="lg"
                                                     >
-                                                        <ImportGroupsWizard
-                                                            :assignmentId="assignment.id"
-                                                        ></ImportGroupsWizard>
+                                                        <ImportGroupsWizard></ImportGroupsWizard>
                                                     </b-modal>
                                                 </template>
 
@@ -129,8 +126,18 @@
                                                         assignment.
                                                     </dd>
                                                     <b-button v-b-modal="'copyGroups'" variant="primary" size="sm"
-                                                        >Copy groups</b-button
+                                                        >Copy groups
+                                                    </b-button>
+                                                    <b-modal
+                                                        id="copyGroups"
+                                                        centered
+                                                        hide-header
+                                                        hide-footer
+                                                        class="p-0 m-0"
+                                                        size="lg"
                                                     >
+                                                        <CopyGroupsWizard></CopyGroupsWizard>
+                                                    </b-modal>
                                                 </template>
 
                                                 <hr />
@@ -189,20 +196,6 @@
                                                     Download grades .xls
                                                 </b-button>
                                             </dl>
-
-                                            <b-modal
-                                                id="copyGroups"
-                                                centered
-                                                hide-header
-                                                hide-footer
-                                                class="p-0 m-0"
-                                                size="lg"
-                                            >
-                                                <CopyGroupsWizard
-                                                    :assignmentId="assignment.id"
-                                                    :courseId="this.$route.params.courseId"
-                                                ></CopyGroupsWizard>
-                                            </b-modal>
                                         </b-card>
                                     </b-col>
                                 </b-row>

@@ -24,7 +24,6 @@ import notifications from "../../mixins/notifications"
 
 export default {
     mixins: [notifications],
-    props: ["assignmentId"],
     data() {
         return {
             file: null
@@ -32,7 +31,7 @@ export default {
     },
     methods: {
         async importGroups() {
-            await api.groups.import(this.assignmentId, this.file)
+            await api.groups.import(this.$route.params.assignmentId, this.file)
             this.showSuccessMessage()
         }
     }
