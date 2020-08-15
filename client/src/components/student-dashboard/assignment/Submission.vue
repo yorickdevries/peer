@@ -4,33 +4,42 @@
             <b-col>
                 <!--Submission Information-->
                 <b-card header="Submission" class="h-100">
-                    <b-alert v-if="latestSubmission" show variant="success">
-                        <dl class="mb-0">
-                            <dt>This is the latest submission you have made:</dt>
-                            <dd></dd>
-                            <dt>File</dt>
-                            <dd>
-                                <a :href="submissionFilePath" target="_blank">
-                                    {{ latestSubmission.file.name }}{{ latestSubmission.file.extension }}
+                    <div v-if="submissions.length > 0">
+                        <dt>These are the submission you have made:</dt>
+                        <b-table
+                            striped
+                            outlined
+                            show-empty
+                            stacked="md"
+                            :items="submissions"
+                            :fields="submissionFields"
+                        >
+                            <template v-slot:cell(file)="data">
+                                <a :href="submissionFilePath(data.item.id)" target="_blank">
+                                    {{ data.item.file.name }}{{ data.item.file.extension }}
                                 </a>
-                            </dd>
-                            <dt>Submitted by</dt>
-                            <dd>{{ latestSubmission.userNetid }}</dd>
-                            <dt>Date</dt>
-                            <dd>{{ latestSubmission.updatedAt | formatDate }}</dd>
-                        </dl>
-                    </b-alert>
+                            </template>
+                            <template v-slot:cell(date)="data">
+                                {{ data.item.updatedAt | formatDate }}
+                            </template>
+                            <template v-slot:cell(latest)="data">
+                                {{ data.item.id === latestSubmission.id }}
+                            </template>
+                        </b-table>
+                        Only the latest submission will be used for reviewing
+                        <br /><br />
+                    </div>
                     <b-alert v-else show variant="danger">You have not yet made a submission</b-alert>
 
                     <!-- Modal Button -->
                     <b-button v-b-modal="'uploadModal'" variant="primary" @click="resetFile"
-                        >Upload / Overwrite Submission</b-button
+                        >Upload new Submission</b-button
                     >
 
                     <!-- Upload Modal-->
                     <b-modal id="uploadModal" ref="uploadModal" centered hide-footer title="Upload Submission">
                         <b-alert show variant="warning"
-                            >If you have already uploaded a file, it will be overwritten!
+                            >If you have already uploaded a file, it will be used for reviewing anymore!
                         </b-alert>
                         <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
                         <b-alert show variant="secondary">Allowed file types: .pdf/.zip/.doc/.docx</b-alert>
@@ -62,17 +71,20 @@ export default {
             fileProgress: 0,
             // existing data
             group: {},
-            latestSubmission: null
-        }
-    },
-    computed: {
-        submissionFilePath() {
-            // Get the submission file path.
-            return `/api/submissions/${this.latestSubmission.id}/file`
+            submissions: [],
+            latestSubmission: null,
+            submissionFields: [
+                { key: "id", label: "ID" },
+                { key: "file", label: "File" },
+                { key: "userNetid", label: "Submitted by" },
+                { key: "date", label: "​​​Date" },
+                { key: "latest", label: "Latest" }
+            ]
         }
     },
     async created() {
         await this.fetchGroup()
+        await this.fetchSubmissions()
         await this.fetchLatestSubmission()
     },
     methods: {
@@ -80,6 +92,10 @@ export default {
             // Fetch the group information.
             const res = await api.assignments.getGroup(this.$route.params.assignmentId)
             this.group = res.data
+        },
+        async fetchSubmissions() {
+            const res = await api.assignments.getSubmissions(this.$route.params.assignmentId, this.group.id)
+            this.submissions = res.data
         },
         async fetchLatestSubmission() {
             // Fetch the submission.
@@ -105,7 +121,12 @@ export default {
 
             // Reset and fetch new submission.
             this.resetFile()
+            await this.fetchSubmissions()
             await this.fetchLatestSubmission()
+        },
+        submissionFilePath(id) {
+            // Get the submission file path.
+            return `/api/submissions/${id}/file`
         },
         resetFile() {
             // Reset the upload modal state.

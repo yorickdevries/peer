@@ -11,6 +11,10 @@ export default {
     getGroup(id) {
         return client.get(`assignments/${id}/group`)
     },
+    getSubmissions(assignmentId, groupId) {
+        const params = { groupId }
+        return client.get(`assignments/${assignmentId}/submissions`, { params: params })
+    },
     getLatestSubmission(assignmentId, groupId) {
         const params = { groupId }
         return client.get(`assignments/${assignmentId}/latestsubmission`, { params: params })
