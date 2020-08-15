@@ -36,7 +36,7 @@
                 <b-card header="Group Information" no-body>
                     <b-card-body>
                         <p>
-                            This assignment is made in a group. The group members you are with for this assignment are
+                            This assignment is made in a group. The group users you are with for this assignment are
                             displayed here. As a group you share the same submission.
                         </p>
                         <dl>
@@ -49,8 +49,8 @@
                             <dt>Group Members</dt>
                             <dt>
                                 <ul>
-                                    <li v-for="member in group.users" :key="member.netid" class="font-weight-light">
-                                        {{ member.netid }}
+                                    <li v-for="user in group.users" :key="user.netid" class="font-weight-light">
+                                        {{ user.netid }}
                                     </li>
                                 </ul>
                             </dt>
@@ -115,7 +115,7 @@ export default {
         async fetchLatestSubmission() {
             // Fetch the submission.
             const res = await api.assignments.getLatestSubmission(this.$route.params.assignmentId, this.group.id)
-            this.submission = res.data
+            this.latestSubmission = res.data
         }
     }
 }
