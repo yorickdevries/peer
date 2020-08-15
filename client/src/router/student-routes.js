@@ -27,14 +27,14 @@ export default [
                         component: () => import("../components/student-dashboard/assignment/Information")
                     },
                     {
-                        path: "hand-in",
-                        name: "student-dashboard.course.assignment.hand-in",
-                        component: () => import("../components/student-dashboard/assignment/HandIn")
+                        path: "submission",
+                        name: "student-dashboard.course.assignment.submission",
+                        component: () => import("../components/student-dashboard/assignment/Submission")
                     },
                     {
-                        path: "peer-review",
-                        name: "student-dashboard.course.assignment.peer-review",
-                        component: () => import("../components/student-dashboard/assignment/PeerReviewList")
+                        path: "review",
+                        name: "student-dashboard.course.assignment.review-list",
+                        component: () => import("../components/student-dashboard/assignment/ReviewList")
                     },
                     {
                         path: "feedback",
