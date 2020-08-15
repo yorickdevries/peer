@@ -167,6 +167,7 @@
                                             v-if="changeFile"
                                             placeholder="Choose a file..."
                                             accept=".pdf,.zip,.doc,.docx"
+                                            :state="Boolean(newFile)"
                                             v-model="newFile"
                                         >
                                         </b-form-file>

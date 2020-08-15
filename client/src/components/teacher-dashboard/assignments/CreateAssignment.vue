@@ -141,6 +141,7 @@
                                 <b-form-file
                                     placeholder="Choose a file..."
                                     accept=".pdf,.zip,.doc,.docx"
+                                    :state="Boolean(assignment.file)"
                                     v-model="assignment.file"
                                 >
                                 </b-form-file>

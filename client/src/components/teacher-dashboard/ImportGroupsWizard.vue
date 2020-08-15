@@ -12,7 +12,14 @@
         </b-alert>
         <!--File upload-->
         <b-form-group label="CSV file from Brightspace" class="mb-0">
-            <b-form-file v-model="file" accept=".csv" placeholder="Choose a .csv file..." required> </b-form-file>
+            <b-form-file
+                v-model="file"
+                accept=".csv"
+                placeholder="Choose a .csv file..."
+                required
+                :state="Boolean(file)"
+            >
+            </b-form-file>
             <b-button variant="primary" class="mt-3" @click="importGroups">Import groups</b-button>
         </b-form-group>
     </b-card>
