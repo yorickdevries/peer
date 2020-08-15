@@ -1,31 +1,29 @@
 <template>
     <b-container fluid class="px-0">
         <b-row>
-            <!--Hand-In Form-->
             <b-col>
                 <!--Submission Information-->
                 <b-card header="Submission" class="h-100">
-                    <b-alert show variant="secondary">Allowed file types: .pdf/.zip/.doc/.docx</b-alert>
-                    <b-alert v-if="hasUploadedSubmission" show variant="success">
+                    <b-alert v-if="latestSubmission" show variant="success">
                         <dl class="mb-0">
                             <dt>This is the latest submission you have made:</dt>
                             <dd></dd>
                             <dt>File</dt>
                             <dd>
                                 <a :href="submissionFilePath" target="_blank">
-                                    {{ submission.file.name }}{{ submission.file.extension }}
+                                    {{ latestSubmission.file.name }}{{ latestSubmission.file.extension }}
                                 </a>
                             </dd>
                             <dt>Submitted by</dt>
-                            <dd>{{ submission.userNetid }}</dd>
+                            <dd>{{ latestSubmission.userNetid }}</dd>
                             <dt>Date</dt>
-                            <dd>{{ submission.updatedAt | formatDate }}</dd>
+                            <dd>{{ latestSubmission.updatedAt | formatDate }}</dd>
                         </dl>
                     </b-alert>
                     <b-alert v-else show variant="danger">You have not yet made a submission</b-alert>
 
                     <!-- Modal Button -->
-                    <b-button v-b-modal="'uploadModal'" variant="primary" @click="onFileReset"
+                    <b-button v-b-modal="'uploadModal'" variant="primary" @click="resetFile"
                         >Upload / Overwrite Submission</b-button
                     >
 
@@ -35,13 +33,13 @@
                             >If you have already uploaded a file, it will be overwritten!
                         </b-alert>
                         <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
-
+                        <b-alert show variant="secondary">Allowed file types: .pdf/.zip/.doc/.docx</b-alert>
                         <b-form-file
-                            placeholder="Choose a file..."
-                            accept=".pdf,.zip,.doc,.docx"
                             v-model="file"
+                            accept=".pdf,.zip,.doc,.docx"
+                            placeholder="Choose a file..."
+                            required
                             :state="Boolean(file)"
-                            ref="file"
                         />
                         <b-button variant="primary" class="mt-3" @click="submitSubmission()">Upload</b-button>
                     </b-modal>
@@ -52,60 +50,47 @@
 </template>
 
 <script>
-import api from "../../../api/api_temp"
+import api from "../../../api/api"
 import notifications from "../../../mixins/notifications"
 
 export default {
     mixins: [notifications],
     data() {
         return {
+            // new file to upload
             file: null,
             fileProgress: 0,
-            acceptFiles: ".pdf,.zip,.doc,.docx",
-            submission: {
-                userNetid: null,
-                assignmentId: null,
-                file: {
-                    name: null,
-                    extension: null
-                },
-                updatedAt: null
-            },
-            assignment: {
-                title: null,
-                description: null,
-                due_date: null,
-                publish_date: null,
-                id: null,
-                course_id: null,
-                filename: ""
-            },
-            groupId: null
+            // existing data
+            group: {},
+            latestSubmission: null
         }
     },
     computed: {
         submissionFilePath() {
             // Get the submission file path.
-            return `/api/oldroutes/submissions/${this.submission.id}/file`
-        },
-        hasUploadedSubmission() {
-            // Returns whether an submission has been uploaded or not.
-            return this.submission.id !== undefined
+            return `/api/submissions/${this.latestSubmission.id}/file`
         }
     },
     async created() {
-        await this.fetchAssignment()
-        await this.fetchGroupId()
-        await this.fetchSubmission()
+        await this.fetchGroup()
+        await this.fetchLatestSubmission()
     },
     methods: {
+        async fetchGroup() {
+            // Fetch the group information.
+            const res = await api.assignments.getGroup(this.$route.params.assignmentId)
+            this.group = res.data
+        },
+        async fetchLatestSubmission() {
+            // Fetch the submission.
+            const res = await api.assignments.getLatestSubmission(this.$route.params.assignmentId, this.group.id)
+            this.latestSubmission = res.data
+        },
         async submitSubmission() {
-            // Create the form data with the file.
-            let formData = new FormData()
-            formData.append("assignmentId", this.assignment.id)
-            formData.append("groupId", this.groupId)
-            formData.append("file", this.file)
-
+            if (!this.file) {
+                this.showErrorMessage({ message: "No file selected" })
+                return
+            }
             // Config set for the HTTP request & updating the progress field.
             let config = {
                 "Content-Type": "multipart/form-data",
@@ -113,57 +98,19 @@ export default {
                     this.fileProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
                 }
             }
-
             // Perform upload.
-            try {
-                await api.postSubmission(formData, config)
-                this.showSuccessMessage({ message: "Successfully submitted new submission." })
-                this.$refs.uploadModal.hide()
-            } catch (e) {
-                this.showErrorMessage({ message: `Did not upload file. ${e.response.data.error}` })
-                this.$refs.uploadModal.hide()
-            }
+            await api.submissions.post(this.group.id, this.$route.params.assignmentId, this.file, config)
+            this.showSuccessMessage({ message: "Successfully submitted submission." })
+            this.$refs.uploadModal.hide()
 
-            // Clear file.
-            this.onFileReset()
-
-            // Re-fetch new submission.
-            await this.fetchSubmission()
+            // Reset and fetch new submission.
+            this.resetFile()
+            await this.fetchLatestSubmission()
         },
-        async fetchAssignment() {
-            // Fetch the assignment.
-            let res = await api.getAssignment(this.$route.params.assignmentId)
-            this.assignment = res.data
-        },
-        async fetchGroupId() {
-            let res = await api.getGroupAsStudent(this.assignment.id)
-            this.groupId = res.data.id
-        },
-        async fetchSubmission() {
-            // Fetch the submission.
-            var res
-            try {
-                res = await api.getLatestSubmissionAsStudent(this.assignment.id, this.groupId)
-                this.submission = res.data
-            } catch (e) {
-                this.onSubmissionReset()
-            }
-        },
-        onFileReset() {
+        resetFile() {
             // Reset the upload modal state.
             this.fileProgress = 0
             this.file = null
-            this.$refs.file.reset()
-        },
-        onSubmissionReset() {
-            this.submission = {
-                userNetid: null,
-                assignmentId: null,
-                file: {
-                    name: null,
-                    extension: null
-                }
-            }
         }
     }
 }

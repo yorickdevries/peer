@@ -15,6 +15,7 @@ import checkboxquestionoptions from "./checkboxquestionoptions"
 import rangequestions from "./rangequestions"
 import uploadquestions from "./uploadquestions"
 import groups from "./groups"
+import submissions from "./submissions"
 
 export default {
     getAuthenticated: () => {
@@ -37,5 +38,6 @@ export default {
     checkboxquestionoptions: checkboxquestionoptions,
     rangequestions: rangequestions,
     uploadquestions: uploadquestions,
-    groups: groups
+    groups: groups,
+    submissions: submissions
 }
