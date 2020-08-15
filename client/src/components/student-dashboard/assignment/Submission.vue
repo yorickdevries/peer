@@ -74,7 +74,7 @@ export default {
             submissions: [],
             latestSubmission: null,
             submissionFields: [
-                { key: "id", label: "ID" },
+                { key: "id", label: "ID", sortable: true },
                 { key: "file", label: "File" },
                 { key: "userNetid", label: "Submitted by" },
                 { key: "date", label: "​​​Date" },
