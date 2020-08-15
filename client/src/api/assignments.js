@@ -93,5 +93,8 @@ export default {
             formData.append("file", file)
         }
         return client.patch(`assignments/${id}`, formData)
+    },
+    enroll(id) {
+        return client.post(`assignments/${id}/enroll`)
     }
 }

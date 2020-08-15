@@ -7,15 +7,12 @@ export default {
     get(id) {
         return client.get(`courses/${id}`)
     },
-    // getCourseRole(courseId) {
-    //     return client.get(`${courseId}/enrollment`)
-    // },
-    // getCourseUnenrolledAssignmentsAsStudent(courseId) {
-    //     return client.get(`${courseId}/enrollableassignments`)
-    // },
-    // getCourseEnrolledAssignmentsAsStudent(courseId) {
-    //     return client.get(`${courseId}/enrolledassignments`)
-    // },
+    getEnrollableAssignments(id) {
+        return client.get(`courses/${id}/enrollableassignments`)
+    },
+    getEnrolledAssignments(id) {
+        return client.get(`courses/${id}/enrolledassignments`)
+    },
     enroll(id) {
         return client.post(`courses/${id}/enroll`)
     },
