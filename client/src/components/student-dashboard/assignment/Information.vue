@@ -1,7 +1,7 @@
 <template>
     <b-container fluid class="p-0">
         <b-row>
-            <b-col cols="8">
+            <b-col cols="7">
                 <!--Assignment Details-->
                 <b-card header="Assignment Details" class="h-100">
                     <span class="font-weight-bold">Description</span>
@@ -31,12 +31,12 @@
                     </b-button>
                 </b-card>
             </b-col>
-            <b-col cols="4" v-if="group.users.length > 1">
+            <b-col cols="5">
                 <!--Group Information-->
                 <b-card header="Group Information" no-body>
                     <b-card-body>
                         <p>
-                            This assignment is made in a group. The group users you are with for this assignment are
+                            This assignment is made in a group. The group members you are with for this assignment are
                             displayed here. As a group you share the same submission.
                         </p>
                         <dl>
@@ -47,13 +47,8 @@
                             <dd>{{ group.name }}</dd>
 
                             <dt>Group Members</dt>
-                            <dt>
-                                <ul>
-                                    <li v-for="user in group.users" :key="user.netid" class="font-weight-light">
-                                        {{ user.netid }}
-                                    </li>
-                                </ul>
-                            </dt>
+                            <b-table striped outlined show-empty stacked="md" :items="group.users" :fields="userFields">
+                            </b-table>
 
                             <dt>Latest Submission</dt>
                             <dd>
@@ -83,7 +78,12 @@ export default {
         return {
             assignment: {},
             group: {},
-            latestSubmission: null
+            latestSubmission: null,
+            userFields: [
+                { key: "displayName", label: "Name" },
+                { key: "netid", label: "NetID" },
+                { key: "email", label: "​​​Email" }
+            ]
         }
     },
     computed: {
