@@ -138,7 +138,7 @@ export default {
     },
     async created() {
         // reviews
-        const res1 = await api.reviewofsubmissions.get(this.$route.params.assignmentId, undefined)
+        const res1 = await api.reviewofsubmissions.getAllForAssignment(this.$route.params.assignmentId, undefined)
         this.reviews = res1.data
         // groups
         const res2 = await api.groups.getAllForAssignment(this.$route.params.assignmentId)

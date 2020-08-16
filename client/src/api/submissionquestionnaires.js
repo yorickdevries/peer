@@ -8,6 +8,9 @@ export default {
     get(id) {
         return client.get(`submissionquestionnaires/${id}`)
     },
+    getReviews(id) {
+        return client.get(`submissionquestionnaires/${id}/reviews`)
+    },
     copyQuestions(id, copyFromQuestionnaireId) {
         const body = { copyFromQuestionnaireId }
         return client.patch(`submissionquestionnaires/${id}/copyquestions`, body)
