@@ -8,6 +8,10 @@ export default {
         const body = { submitted, flaggedByReviewer }
         return client.patch(`reviewofsubmissions/${id}`, body)
     },
+    submitAll(assignmentId) {
+        const params = { assignmentId }
+        return client.patch("reviewofsubmissions/submitall", null, { params: params })
+    },
     getAnswers(id) {
         return client.get(`reviewofsubmissions/${id}/answers`)
     },

@@ -161,7 +161,7 @@ const assignmentIdSchema = Joi.object({
 });
 router.patch(
   "/submitall",
-  validateBody(assignmentIdSchema),
+  validateQuery(assignmentIdSchema),
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
@@ -200,14 +200,16 @@ router.patch(
       return;
     }
     const submitted = false;
-    const reviews = await questionnaire.getReviews(submitted);
-    for (const review of reviews) {
+    const unsubmittedReviews = await questionnaire.getReviews(submitted);
+    const submittedReviews = [];
+    for (const review of unsubmittedReviews) {
       if (await review.canBeSubmitted()) {
         review.submitted = true;
         await review.save();
+        submittedReviews.push(review);
       }
     }
-    const sortedReviews = _.sortBy(reviews, "id");
+    const sortedReviews = _.sortBy(submittedReviews, "id");
     res.send(sortedReviews);
   }
 );

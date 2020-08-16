@@ -261,18 +261,9 @@ export default {
             this.showSuccessMessage({ message: "Groups have successfully been shuffled and assigned submissions." })
         },
         async submitAllFilledReviews() {
-            return
-            // try {
-            //     let res = await api.client.get(`
-            //                                     reviewofsubmissions/submitall?assignmentId=${assignment.id}
-            //                                     `)
-            //     const rubricId = res.data.id
-            //     const result = await api.submitAllFilledReviews(rubricId)
-            //     const submittedReviews = result.data.submittedReviews
-            //     this.showSuccessMessage({ message: "Submitted " + submittedReviews + " Reviews" })
-            // } catch (e) {
-            //     this.showErrorMessage({ message: e.response.data.error })
-            // }
+            const res = await api.reviewofsubmissions.submitAll(this.$route.params.assignmentId)
+            const submittedReviews = res.data
+            this.showSuccessMessage({ message: "Submitted " + submittedReviews.length + " Reviews" })
         }
     }
 }
