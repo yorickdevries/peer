@@ -10,33 +10,32 @@
                 </a>
             </b-col>
         </b-row>
-        <!--Form-->
-        <b-card no-body class="mt-3">
+        <!--Form, load only when answers are available-->
+        <b-card v-if="answers" no-body class="mt-3">
             <!--Title-->
             <b-card-body v-if="!reviewsAreReadOnly">
                 <h4>Assignment Questionnaire</h4>
                 <h6 class="card-subtitle text-muted">Give the review to one of your peers here.</h6>
             </b-card-body>
-            <b-list-group flush>
-                <!--Questions-->
-                <b-list-group-item
-                    class="py-4"
-                    v-for="question in submissionQuestionnaire.questions"
-                    :key="question.id"
-                >
-                    <!--Question Information-->
-                    <div class="mb-2">
-                        <h5 class="text-primary">
-                            Question {{ question.number }} of {{ submissionQuestionnaire.questions.length }}
-                        </h5>
-                        <b-badge pill v-if="question.optional" variant="secondary" class="ml-2 float-right p-1">
-                            OPTIONAL
-                        </b-badge>
-                        <b-badge v-else variant="danger" class="ml-2 float-right p-1">
-                            REQUIRED
-                        </b-badge>
-                        <p>{{ question.text }}</p>
-                    </div>
+
+            <!--Question Information-->
+            <b-card v-for="question in questionnaire.questions" :key="question.id" class="mb-3" no-body>
+                <b-card-header class="d-flex align-items-center">
+                    <span class="w-100">Question {{ question.number }}</span>
+                    <b-badge variant="primary" class="ml-2 float-right p-1"
+                        >{{ question.type.toUpperCase() }} QUESTION
+                    </b-badge>
+                    <b-badge pill v-if="question.optional" variant="secondary" class="ml-2 float-right p-1">
+                        OPTIONAL
+                    </b-badge>
+                    <b-badge v-else variant="danger" class="ml-2 float-right p-1">
+                        REQUIRED
+                    </b-badge>
+                </b-card-header>
+
+                <b-card-body>
+                    <!-- Text-->
+                    <h4>{{ question.text }}</h4>
 
                     <!-- OPEN QUESTION -->
                     <b-form-textarea
@@ -125,16 +124,15 @@
                     </b-form-group>
 
                     <!--Save Button-->
-                    <b-card-body>
-                        <b-button
-                            :variant="(answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'"
-                            :disabled="!answers[question.id].changed"
-                            @click="saveAnswer(question, answers[question.id])"
-                            >Save Answer</b-button
-                        >
-                    </b-card-body>
-                </b-list-group-item>
-            </b-list-group>
+                    <br />
+                    <b-button
+                        :variant="(answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'"
+                        :disabled="!answers[question.id].changed"
+                        @click="saveAnswer(question, answers[question.id])"
+                        >Save Answer</b-button
+                    >
+                </b-card-body>
+            </b-card>
 
             <template v-if="!reviewsAreReadOnly">
                 <!--Save/Submit Buttons-->
@@ -186,7 +184,7 @@ export default {
     props: ["reviewId", "reviewsAreReadOnly"],
     data() {
         return {
-            submissionQuestionnaire: {},
+            questionnaire: {},
             review: {},
             // all answers will be saved in this object
             answers: null
@@ -213,14 +211,16 @@ export default {
         },
         async fetchSubmissionQuestionnaire() {
             const res = await api.submissionquestionnaires.get(this.review.questionnaireId)
-            this.submissionQuestionnaire = res.data
+            this.questionnaire = res.data
         },
         async fetchAnswers() {
+            // remove existing answers
+            this.answers = null
             const res = await api.reviewofsubmissions.getAnswers(this.reviewId)
             const existingAnswers = res.data
             // construct answer map
             const answers = {}
-            for (const question of this.submissionQuestionnaire.questions) {
+            for (const question of this.questionnaire.questions) {
                 // answer variable which gets replaced if an answer is present
                 let answer = null
                 // find existing answer

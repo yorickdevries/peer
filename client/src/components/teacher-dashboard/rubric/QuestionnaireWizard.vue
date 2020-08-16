@@ -45,6 +45,7 @@
             <!--Render questions-->
             <b-row v-if="questionnaire">
                 <b-col>
+                    <!--Question Information-->
                     <b-card v-for="question in questionnaire.questions" :key="question.id" class="mb-3" no-body>
                         <b-card-header class="d-flex align-items-center">
                             <span class="w-100">Question {{ question.number }}</span>
@@ -62,26 +63,59 @@
                         <b-card-body>
                             <!-- Text-->
                             <h4>{{ question.text }}</h4>
-                            <!-- Options-->
-                            <div v-if="question.type === 'multiplechoice'">
-                                Options:
-                                <div v-for="option in question.options" :key="option.id">
-                                    <b-form-checkbox disabled="true">{{ option.text }}</b-form-checkbox>
-                                </div>
-                            </div>
-                            <div v-if="question.type === 'checkbox'">
-                                Options:
-                                <div v-for="option in question.options" :key="option.id">
-                                    <b-form-radio disabled="true">{{ option.text }}</b-form-radio>
-                                </div>
-                            </div>
-                            <!-- Range-->
-                            <div v-if="question.range">Max range: {{ question.range }}</div>
-                            <!-- Allowed extensions-->
-                            <div v-if="question.extensions">Allowed extensions: {{ question.extensions }}</div>
+
+                            <!-- OPEN QUESTION -->
+                            <b-form-textarea
+                                v-if="question.type === 'open'"
+                                placeholder="Enter your answer"
+                                :rows="10"
+                                :max-rows="15"
+                                readonly
+                                required
+                            />
+
+                            <!-- MULTIPLE CHOICE QUESTION -->
+                            <b-form-radio-group v-if="question.type === 'multiplechoice'" stacked required disabled>
+                                <b-form-radio v-for="option in question.options" :key="option.id" :value="option">{{
+                                    option.text
+                                }}</b-form-radio>
+                            </b-form-radio-group>
+
+                            <!-- CHECKBOX QUESTION -->
+                            <b-form-checkbox-group v-if="question.type === 'checkbox'" stacked required disabled>
+                                <b-form-checkbox v-for="option in question.options" :key="option.id" :value="option">{{
+                                    option.text
+                                }}</b-form-checkbox>
+                            </b-form-checkbox-group>
+
+                            <!-- RANGE QUESTION -->
+                            <StarRating
+                                v-if="question.type === 'range'"
+                                class="align-middle"
+                                :border-color="'#007bff'"
+                                :active-color="'#007bff'"
+                                :border-width="2"
+                                :item-size="20"
+                                :spacing="5"
+                                inline
+                                :rating="question.range"
+                                :max-rating="question.range"
+                                :show-rating="true"
+                                read-only
+                            />
+
+                            <!-- UPLOAD QUESTION -->
+                            <b-form-group v-if="question.type === 'upload'" class="mb-0">
+                                <b-alert show variant="warning" class="p-2">
+                                    Currently, no file has been uploaded. <br />
+                                    Allowed file types: {{ question.extensions }}
+                                </b-alert>
+                                <b-form-file placeholder="Choose a new file..." disabled> </b-form-file>
+                            </b-form-group>
+
                             <!-- Edit button-->
                             <br />
-                            <b-button v-b-modal="`editModal${question.id}`" variant="primary">
+                            <b-button v-b-modal="`editModal${question.id}`" variant="primary float-right">
                                 Edit/Delete Question
                             </b-button>
                             <b-modal :id="`editModal${question.id}`" centered hide-footer class="p-0 m-0">
@@ -104,12 +138,14 @@ import notifications from "../../../mixins/notifications"
 import _ from "lodash"
 import CreateQuestionWizard from "./CreateQuestionWizard"
 import EditQuestionWizard from "./EditQuestionWizard"
+import { StarRating } from "vue-rate-it"
 
 export default {
     mixins: [notifications],
     components: {
         CreateQuestionWizard,
-        EditQuestionWizard
+        EditQuestionWizard,
+        StarRating
     },
     data() {
         return {
