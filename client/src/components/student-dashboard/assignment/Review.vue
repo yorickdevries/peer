@@ -117,7 +117,7 @@
                             placeholder="Choose a new file..."
                             v-model="answers[question.id].newAnswer"
                             :state="Boolean(answers[question.id].newAnswer)"
-                            @input="answers[question.id].changed = true"
+                            @input="answers[question.id].changed = Boolean(answers[question.id].newAnswer)"
                             :accept="`${question.extensions}`"
                             :disabled="reviewsAreReadOnly || review.submitted"
                         >
