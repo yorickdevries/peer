@@ -16,6 +16,7 @@ import rangequestions from "./rangequestions"
 import uploadquestions from "./uploadquestions"
 import groups from "./groups"
 import submissions from "./submissions"
+import reviewofsubmissions from "./reviewofsubmissions"
 
 export default {
     getAuthenticated: () => {
@@ -39,5 +40,6 @@ export default {
     rangequestions: rangequestions,
     uploadquestions: uploadquestions,
     groups: groups,
-    submissions: submissions
+    submissions: submissions,
+    reviewofsubmissions: reviewofsubmissions
 }

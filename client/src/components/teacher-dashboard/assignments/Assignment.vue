@@ -29,41 +29,30 @@
                                         <b-card header="Actions">
                                             <dl class="mb-0">
                                                 <!--Shuffling-->
-                                                <dt>Assign reviews</dt>
+                                                <dt>Distribute Reviews</dt>
                                                 <dd>
-                                                    This action will shuffle the groups and assign the groups to each
-                                                    other.
-                                                </dd>
-                                                <dd>
-                                                    <b-form-checkbox
-                                                        id="selfAssign"
-                                                        name="selfAssign"
-                                                        v-model="selfAssign"
-                                                    >
-                                                        <small>
-                                                            I want to let students review their own assignments.
-                                                        </small>
-                                                    </b-form-checkbox>
+                                                    This action will distribute reviews to users of groups which made a
+                                                    submission.
                                                 </dd>
                                                 <b-button
-                                                    v-b-modal="`shufflingModal`"
+                                                    v-b-modal="`distributeReviews`"
                                                     class="mb-3"
                                                     variant="primary"
                                                     size="sm"
-                                                    >Assign reviews
+                                                    >Distribute Reviews
                                                 </b-button>
                                                 <b-modal
-                                                    id="shufflingModal"
-                                                    @ok="shuffleGroups"
+                                                    id="distributeReviews"
+                                                    @ok="distributeReviews"
                                                     title="Confirmation"
                                                     centered
                                                 >
-                                                    Are you sure you want to assign the reviews?
+                                                    Are you sure you want to distribute the reviews?
                                                     <ul>
                                                         <li>Can (and should be) done only once per assignment.</li>
                                                         <li>
-                                                            Make sure to assign reviews after students have made their
-                                                            submission.
+                                                            Make sure to assign reviews after all students have made
+                                                            their submission.
                                                         </li>
                                                     </ul>
                                                 </b-modal>
@@ -266,21 +255,10 @@ export default {
         this.assignment = res.data
     },
     methods: {
-        async shuffleGroups() {
-            return
-            // try {
-            //     // Check if the user wants to self-assign shuffle instead.
-            //     // TODO: add new API calls
-            //     if (this.selfAssign) {
-            //         await api.client.get(`/assignments/${assignment.id}/distributeReviews/1`)
-            //     } else {
-            //         await api.client.get(`/assignments/${assignment.id}/distributeReviews/0`)
-            //     }
-
-            //     this.showSuccessMessage({ message: "Groups have successfully been shuffled and assigned submissions." })
-            // } catch (e) {
-            //     this.showErrorMessage({ message: e.response.data.error })
-            // }
+        async distributeReviews() {
+            console.log(this.$route.params.assignmentId)
+            await api.reviewofsubmissions.distribute(this.$route.params.assignmentId)
+            this.showSuccessMessage({ message: "Groups have successfully been shuffled and assigned submissions." })
         },
         async submitAllFilledReviews() {
             return
