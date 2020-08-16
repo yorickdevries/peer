@@ -983,6 +983,9 @@ const migrateDB = async function (): Promise<void> {
   const sortedOldReviews = _.sortBy(oldReviews, "id");
   console.log("num reviews: ", sortedOldReviews.length);
   const reviewMap: Map<number, Review> = new Map<number, Review>();
+
+  const reviewEvaluatedMap: Map<number, Review> = new Map<number, Review>();
+
   for (const oldReview of sortedOldReviews) {
     // correct incorrect change made in the past
     if (
@@ -1031,6 +1034,8 @@ const migrateDB = async function (): Promise<void> {
       throw new Error("both submission and review are defined!");
     }
     let review: Review;
+    // set when a review needs to be skipped
+    let skipReview = false;
     if (submission) {
       if (!(questionnaire instanceof SubmissionQuestionnaire)) {
         throw new Error("Wrong questionnaire type");
@@ -1070,11 +1075,25 @@ const migrateDB = async function (): Promise<void> {
         null,
         evaluatedReview
       );
+      // set evaluatedReview to map and check for duplicate review evaluations
+      if (reviewEvaluatedMap.has(evaluatedReview.id)) {
+        // console.log(review);
+        // console.log(reviewEvaluatedMap.get(evaluatedReview.id));
+        //throw new Error("A review is evaluated twice!");
+        skipReview = true;
+      } else {
+        // set for later lookup
+        reviewEvaluatedMap.set(evaluatedReview.id, review);
+      }
     } else {
       throw new Error("both submission and review are not defined!");
     }
-    await review.save();
-    reviewMap.set(oldId, review);
+    if (!skipReview) {
+      await review.save();
+      reviewMap.set(oldId, review);
+    } else {
+      console.log("skipped review: ", review);
+    }
   }
   // QuestionAnswer,
   // CheckboxQuestionAnswer,
