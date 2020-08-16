@@ -17,6 +17,11 @@ import uploadquestions from "./uploadquestions"
 import groups from "./groups"
 import submissions from "./submissions"
 import reviewofsubmissions from "./reviewofsubmissions"
+import openquestionanswers from "./openquestionanswers"
+import multiplechoicequestionanswers from "./multiplechoicequestionanswers"
+import checkboxquestionanswers from "./checkboxquestionanswers"
+import rangequestionanswers from "./rangequestionanswers"
+import uploadquestionanswers from "./uploadquestionanswers"
 
 export default {
     getAuthenticated: () => {
@@ -41,5 +46,10 @@ export default {
     uploadquestions: uploadquestions,
     groups: groups,
     submissions: submissions,
-    reviewofsubmissions: reviewofsubmissions
+    reviewofsubmissions: reviewofsubmissions,
+    openquestionanswers: openquestionanswers,
+    multiplechoicequestionanswers: multiplechoicequestionanswers,
+    checkboxquestionanswers: checkboxquestionanswers,
+    rangequestionanswers: rangequestionanswers,
+    uploadquestionanswers: uploadquestionanswers
 }
