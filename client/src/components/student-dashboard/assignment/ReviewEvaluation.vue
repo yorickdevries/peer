@@ -44,7 +44,7 @@
                 <b-alert variant="info" show>
                     This is a review you have received from one of your peers on your submission.
                 </b-alert>
-                <PeerReview :reviewId="review.review.id" :readOnly="true"></PeerReview>
+                <Review :reviewId="review.review.id" :readOnly="true"></Review>
             </b-modal>
         </div>
 
@@ -214,12 +214,12 @@
 import api from "../../../api/api_old"
 import { StarRating } from "vue-rate-it"
 import notifications from "../../../mixins/notifications"
-import PeerReview from "./PeerReview"
+import Review from "./Review"
 import SessionCheck from "../../general/SessionCheck"
 
 export default {
     mixins: [notifications],
-    components: { PeerReview, StarRating, SessionCheck },
+    components: { Review, StarRating, SessionCheck },
     props: ["reviewId"],
     data() {
         return {
