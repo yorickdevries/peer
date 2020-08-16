@@ -6,7 +6,7 @@
             </b-col>
         </b-row>
         <b-row>
-            <b-col cols="12">
+            <b-col>
                 <b-card no-body>
                     <b-row class="px-3 pt-0">
                         <b-col class="p-0 d-flex flex-wrap">
