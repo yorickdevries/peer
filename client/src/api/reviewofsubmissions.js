@@ -8,6 +8,10 @@ export default {
         const body = { submitted, flaggedByReviewer }
         return client.patch(`reviewofsubmissions/${id}`, body)
     },
+    setApproval(id, approvalByTA) {
+        const body = { approvalByTA }
+        return client.patch(`reviewofsubmissions/${id}/approval`, body)
+    },
     submitAll(assignmentId) {
         const params = { assignmentId }
         return client.patch("reviewofsubmissions/submitall", null, { params: params })
