@@ -9,6 +9,9 @@ export default {
         const params = { assignmentId }
         return client.get("submissions/latest", { params: params })
     },
+    getFeedback(id) {
+        return client.get(`submissions/${id}/feedback`)
+    },
     post(groupId, assignmentId, file, config) {
         // Create formData and append data
         const formData = new FormData()
