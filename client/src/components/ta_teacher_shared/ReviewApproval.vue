@@ -46,8 +46,8 @@
                             <div v-if="review.submitted">
                                 <dl>
                                     <dt>Current approval status</dt>
-                                    <dd v-if="review.approvalByTA">Approved</dd>
-                                    <dd v-if="review.approvalByTA === false">Disapproved</dd>
+                                    <dd v-if="review.approvalByTA">Approved 👍</dd>
+                                    <dd v-if="review.approvalByTA === false">Disapproved 👎</dd>
                                     <dd v-if="review.approvalByTA === null">No action yet by any TA.</dd>
                                     <dd><small>(You can change this on the bottom of the page)</small></dd>
                                 </dl>
@@ -166,8 +166,8 @@
                 <div>
                     <dl>
                         <dt>Current approval status</dt>
-                        <dd v-if="review.approvalByTA">Approved</dd>
-                        <dd v-if="review.approvalByTA === false">Disapproved</dd>
+                        <dd v-if="review.approvalByTA">Approved 👍</dd>
+                        <dd v-if="review.approvalByTA === false">Disapproved 👎</dd>
                         <dd v-if="review.approvalByTA === null">No action yet by any TA.</dd>
                         <dd>
                             <b-button

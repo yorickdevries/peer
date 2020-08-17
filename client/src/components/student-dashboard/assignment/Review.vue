@@ -1,13 +1,34 @@
 <template>
     <div>
-        <!--Download-->
         <b-row>
-            <b-col>
-                <a target="_blank" :href="reviewFilePath">
-                    <button type="button" class="btn btn-success success w-100" style="height: 3rem">
-                        Click here to download the file that you have to review
-                    </button>
-                </a>
+            <!--Download-->
+            <b-col cols="6">
+                <div>
+                    <dl>
+                        <dt>Download</dt>
+                        <dd>The download for the submission this review is about.</dd>
+                        <a target="_blank" :href="reviewFilePath">
+                            <button type="button" class="btn btn-success success w-100" style="height: 3rem">
+                                Download Submission
+                            </button>
+                        </a>
+                    </dl>
+                </div>
+            </b-col>
+
+            <!--Approval-->
+            <b-col cols="6">
+                <div v-if="review.submitted">
+                    <dl>
+                        <dt>Current approval status</dt>
+                        <dd v-if="review.approvalByTA">Approved 👍</dd>
+                        <dd v-if="review.approvalByTA === false">Disapproved 👎</dd>
+                        <dd v-if="review.approvalByTA === null">No action yet by any TA.</dd>
+                    </dl>
+                </div>
+                <div v-else>
+                    <dt>Review is not submitted</dt>
+                </div>
             </b-col>
         </b-row>
         <!--Form, load only when answers are available-->
