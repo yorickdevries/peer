@@ -178,9 +178,7 @@ import { StarRating } from "vue-rate-it"
 
 export default {
     mixins: [notifications],
-    components: {
-        StarRating
-    },
+    components: { StarRating },
     props: ["reviewId", "reviewsAreReadOnly"],
     data() {
         return {
