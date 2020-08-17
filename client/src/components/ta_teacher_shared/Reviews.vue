@@ -91,7 +91,14 @@
             </template>
 
             <template v-slot:cell(action)="data">
-                <b-button variant="primary" size="sm" :to="{ name: null, params: { reviewId: data.item.id } }"
+                <!-- note: the name needs to be different for TAs-->
+                <b-button
+                    variant="primary"
+                    size="sm"
+                    :to="{
+                        name: 'teacher-dashboard.assignments.assignment.review',
+                        params: { reviewId: data.item.id }
+                    }"
                     >See review (TODO)</b-button
                 >
             </template>
