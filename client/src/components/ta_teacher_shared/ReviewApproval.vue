@@ -66,7 +66,9 @@
                     <!--Question Information-->
                     <b-card v-for="question in questionnaire.questions" :key="question.id" class="mb-3" no-body>
                         <b-card-header class="d-flex align-items-center">
-                            <span class="w-100">Question {{ question.number }}</span>
+                            <span class="w-100"
+                                >Question {{ question.number }} of {{ questionnaire.questions.length }}</span
+                            >
                             <b-badge variant="primary" class="ml-2 float-right p-1"
                                 >{{ question.type.toUpperCase() }} QUESTION
                             </b-badge>
