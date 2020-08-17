@@ -25,7 +25,7 @@
                     <b-button
                         variant="primary w-100"
                         v-if="assignment.externalLink"
-                        :href="assignment.externalLink"
+                        :href="'//' + assignment.externalLink"
                         target="_blank"
                         >Go to Assignment (redirect)
                     </b-button>

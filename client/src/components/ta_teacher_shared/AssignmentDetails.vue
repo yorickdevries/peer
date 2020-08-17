@@ -41,7 +41,7 @@
             <dt>Assignment Link</dt>
             <dd v-if="assignment.externalLink == null">No assignment link given</dd>
             <dd v-else>
-                <a :href="assignment.externalLink" target="_blank">{{ assignment.externalLink }}</a>
+                <a :href="'//' + assignment.externalLink" target="_blank">{{ assignment.externalLink }}</a>
             </dd>
         </dl>
     </b-card>
