@@ -27,7 +27,6 @@
                                 active-class="bg-light"
                                 class="flex-fill p-0"
                                 :to="{ name: 'student-dashboard.course.assignment.submission' }"
-                                :disabled="!isInSubmissionState"
                             >
                                 <div class="text-center border-right border-bottom py-3">
                                     <div class="lead font-weight-bold">

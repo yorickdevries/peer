@@ -32,7 +32,11 @@
                     <b-alert v-else show variant="danger">You have not yet made a submission</b-alert>
 
                     <!-- Modal Button -->
-                    <b-button v-b-modal="'uploadModal'" variant="primary" @click="resetFile"
+                    <b-button
+                        v-b-modal="'uploadModal'"
+                        :disabled="new Date() > new Date(assignment.dueDate)"
+                        variant="primary"
+                        @click="resetFile"
                         >Upload new Submission</b-button
                     >
 
@@ -66,6 +70,7 @@ export default {
     mixins: [notifications],
     data() {
         return {
+            assignment: {},
             // new file to upload
             file: null,
             fileProgress: 0,
@@ -83,11 +88,16 @@ export default {
         }
     },
     async created() {
+        await this.fetchAssignment()
         await this.fetchGroup()
         await this.fetchSubmissions()
         await this.fetchLatestSubmission()
     },
     methods: {
+        async fetchAssignment() {
+            const res = await api.assignments.get(this.$route.params.assignmentId)
+            this.assignment = res.data
+        },
         async fetchGroup() {
             // Fetch the group information.
             const res = await api.assignments.getGroup(this.$route.params.assignmentId)
