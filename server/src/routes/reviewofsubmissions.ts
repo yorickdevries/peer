@@ -300,11 +300,12 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
   const assignmentState = assignment.getState();
-  if (await review.isTeacherInCourse(user) ||
+  if (
+    (await review.isTeacherInCourse(user)) ||
     // reviewer should access the review when reviewing
-    (await review.isReviewer(user)) &&
-    (assignmentState === AssignmentState.REVIEW ||
-      assignmentState === AssignmentState.FEEDBACK)
+    ((await review.isReviewer(user)) &&
+      (assignmentState === AssignmentState.REVIEW ||
+        assignmentState === AssignmentState.FEEDBACK))
   ) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const submission = review.submission!;
