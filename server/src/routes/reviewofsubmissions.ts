@@ -296,15 +296,11 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
   }
-  if (await review.isTeacherInCourse(user)) {
-    res.send(review);
-    return;
-  }
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
   const assignmentState = assignment.getState();
-  if (
+  if (await review.isTeacherInCourse(user) ||
     // reviewer should access the review when reviewing
     (await review.isReviewer(user)) &&
     (assignmentState === AssignmentState.REVIEW ||
