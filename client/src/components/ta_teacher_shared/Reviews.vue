@@ -81,12 +81,12 @@
 
             <template v-slot:cell(approvalByTA)="data">
                 <span v-if="data.item.approvalByTA === null">No action yet by any TA</span>
-                <span v-if="data.item.approvalByTA === true">Approved</span>
-                <span v-if="data.item.approvalByTA === false">Disapproved</span>
+                <span v-if="data.item.approvalByTA === true">Approved 👍</span>
+                <span v-if="data.item.approvalByTA === false">Disapproved 👎</span>
             </template>
 
             <template v-slot:cell(approvingTA)="data">
-                <span v-if="data.item.approvingTA">{{ data.item.approvingTA }}</span>
+                <span v-if="data.item.approvingTA">{{ data.item.approvingTA.netid }}</span>
                 <span v-if="data.item.approvingTA === null">None</span>
             </template>
 
@@ -99,7 +99,7 @@
                         name: 'teacher-dashboard.assignments.assignment.review',
                         params: { reviewId: data.item.id }
                     }"
-                    >See review (TODO)</b-button
+                    >Show review</b-button
                 >
             </template>
         </b-table>
