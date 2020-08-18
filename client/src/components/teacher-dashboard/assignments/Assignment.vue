@@ -190,9 +190,14 @@
                                 </b-row>
                             </b-tab>
 
-                            <!--Questionnaire Wizard-->
-                            <b-tab title="Questionnaire">
-                                <QuestionnaireWizard></QuestionnaireWizard>
+                            <!--Submissionquestionnaire Wizard-->
+                            <b-tab title="Submissionquestionnaire">
+                                <SubmissionQuestionnaireWizard></SubmissionQuestionnaireWizard>
+                            </b-tab>
+
+                            <!--Reviewquestionnaire Wizard-->
+                            <b-tab v-if="assignment.reviewEvaluation" title="Reviewquestionnaire">
+                                <ReviewQuestionnaireWizard></ReviewQuestionnaireWizard>
                             </b-tab>
 
                             <!--Submissions-->
@@ -223,7 +228,8 @@
 <script>
 import api from "../../../api/api"
 import BreadcrumbTitle from "../../BreadcrumbTitle"
-import QuestionnaireWizard from "../questionnaire/QuestionnaireWizard"
+import SubmissionQuestionnaireWizard from "../questionnaire/SubmissionQuestionnaireWizard"
+import ReviewQuestionnaireWizard from "../questionnaire/ReviewQuestionnaireWizard"
 import ImportGroupsWizard from "../ImportGroupsWizard"
 import Groups from "../Groups"
 import Reviews from "../../ta_teacher_shared/Reviews"
@@ -237,7 +243,8 @@ export default {
     components: {
         CopyGroupsWizard,
         BreadcrumbTitle,
-        QuestionnaireWizard,
+        SubmissionQuestionnaireWizard,
+        ReviewQuestionnaireWizard,
         Groups,
         ImportGroupsWizard,
         Reviews,

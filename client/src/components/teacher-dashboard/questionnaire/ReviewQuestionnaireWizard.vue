@@ -1,45 +1,64 @@
 <template>
     <div>
         <b-alert :show="blockQuestionnaireEditing" variant="info"
-            >Questionnaire editing is not allowed anymore since the peer review publish date has already
-            passed.</b-alert
+            >Questionnaire editing is not allowed anymore since the peer review due date has already passed.</b-alert
         >
         <b-container v-bind:class="{ 'disabled-view': blockQuestionnaireEditing }">
             <b-card class="mb-3 mt-3">
                 <div class="d-flex justify-content-between">
-                    <div v-if="questionnaire === null">
-                        <b-button @click="makeQuestionnaire" class="mb-3" variant="primary"
-                            >Make questionnaire</b-button
-                        >
-                    </div>
-                    <div v-if="questionnaire">
-                        <b-button v-b-modal="'createModal'" variant="primary">
-                            Create new Question
-                        </b-button>
-                        <b-modal id="createModal" centered hide-footer class="p-0 m-0">
-                            <CreateQuestionWizard
-                                :questionnaireId="questionnaire.id"
-                                :questionNumber="nextQuestionNumber"
-                                @questionSaved="getQuestionnaire"
-                            ></CreateQuestionWizard>
-                        </b-modal>
-                    </div>
-                    <div v-if="questionnaire && questionnaire.questions.length === 0">
-                        <div class="text-muted">Copy questions from another questionnaire</div>
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <b-button variant="primary" @click="copyQuestionnaire">Copy</b-button>
-                            </div>
-                            <b-form-select v-model="questionnaireIdToCopyFrom">
-                                <b-form-select-option
-                                    v-for="questionnaire in allQuestionnairesOfCourse"
-                                    :key="questionnaire.id"
-                                    :value="questionnaire.id"
-                                    >{{ questionnaire.name }}</b-form-select-option
+                    <b-row>
+                        <b-col>
+                            <div v-if="questionnaire === null">
+                                <b-button @click="makeQuestionnaire" class="mb-3" variant="primary"
+                                    >Make questionnaire</b-button
                                 >
-                            </b-form-select>
-                        </div>
-                    </div>
+                            </div>
+                            <div v-else>
+                                <b-button v-b-modal="'createModal'" variant="primary">
+                                    Create new Question
+                                </b-button>
+                                <b-modal id="createModal" centered hide-footer class="p-0 m-0">
+                                    <CreateQuestionWizard
+                                        :questionnaireId="questionnaire.id"
+                                        :questionNumber="nextQuestionNumber"
+                                        @questionSaved="getQuestionnaire"
+                                    ></CreateQuestionWizard>
+                                </b-modal>
+                            </div>
+                        </b-col>
+                        <b-col>
+                            <div v-if="questionnaire && questionnaire.questions.length === 0">
+                                <div class="text-muted">Copy questions from another questionnaire</div>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <b-button variant="primary" @click="copyQuestionnaire">Copy</b-button>
+                                    </div>
+                                    <b-form-select v-model="questionnaireIdToCopyFrom">
+                                        <b-form-select-option
+                                            v-for="questionnaire in allQuestionnairesOfCourse"
+                                            :key="questionnaire.id"
+                                            :value="questionnaire.id"
+                                            >{{ questionnaire.name }}</b-form-select-option
+                                        >
+                                    </b-form-select>
+                                </div>
+                            </div>
+                        </b-col>
+                        <b-col>
+                            <div v-if="questionnaire && questionnaire.questions.length === 0">
+                                <div class="text-muted">
+                                    Load default review evaluation questions into questionnaire
+                                </div>
+                                <div class="input-group mb-2">
+                                    <div class="input-group-prepend">
+                                        <b-button variant="primary" @click="defaultQuestions"
+                                            >Default questions</b-button
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                        </b-col>
+                    </b-row>
                 </div>
             </b-card>
             <!--Render questions-->
@@ -162,7 +181,7 @@ export default {
         blockQuestionnaireEditing() {
             // block edit in case the reviews have already been published
             if (this.assignment) {
-                return new Date() > new Date(this.assignment.reviewPublishDate)
+                return new Date() > new Date(this.assignment.reviewDueDate)
             } else {
                 return true
             }
@@ -179,28 +198,30 @@ export default {
         }
     },
     async created() {
-        await this.getAssignment()
-        await this.getQuestionnaire()
-        await this.getAllQuestionnairesOfCourse()
+        await this.fetchData()
     },
     methods: {
+        async fetchData() {
+            await this.getAssignment()
+            await this.getQuestionnaire()
+            await this.getAllQuestionnairesOfCourse()
+        },
         async getAssignment() {
             const res = await api.assignments.get(this.$route.params.assignmentId)
             this.assignment = res.data
         },
         async getQuestionnaire() {
-            if (this.assignment.submissionQuestionnaireId) {
-                const res = await api.submissionquestionnaires.get(this.assignment.submissionQuestionnaireId)
+            if (this.assignment.reviewQuestionnaireId) {
+                const res = await api.reviewquestionnaires.get(this.assignment.reviewQuestionnaireId)
                 this.questionnaire = res.data
             } else {
                 this.questionnaire = null
             }
         },
         async makeQuestionnaire() {
-            await api.submissionquestionnaires.post(this.assignment.id)
+            await api.reviewquestionnaires.post(this.assignment.id)
             this.showSuccessMessage({ message: "Questionnaire made, you can now add questions." })
-            await this.getAssignment()
-            await this.getQuestionnaire()
+            await this.fetchData()
         },
         async getAllQuestionnairesOfCourse() {
             const res = await api.assignments.getAllForCourse(this.$route.params.courseId)
@@ -208,26 +229,32 @@ export default {
             // iterate over assignments
             this.allQuestionnairesOfCourse = []
             for (const assignment of allAssignmentsOfCourse) {
-                if (assignment.id !== this.assignment.id) {
-                    if (assignment.submissionQuestionnaireId) {
-                        this.allQuestionnairesOfCourse.push({
-                            name: assignment.name + " (submissionquestionnaire)",
-                            id: assignment.submissionQuestionnaireId
-                        })
-                    }
-                    if (assignment.reviewQuestionnaireId) {
-                        this.allQuestionnairesOfCourse.push({
-                            name: assignment.name + " (reviewquestionnaire)",
-                            id: assignment.reviewQuestionnaireId
-                        })
-                    }
+                if (
+                    assignment.submissionQuestionnaireId &&
+                    assignment.submissionQuestionnaireId !== this.questionnaire.id
+                ) {
+                    this.allQuestionnairesOfCourse.push({
+                        name: assignment.name + " (submissionquestionnaire)",
+                        id: assignment.submissionQuestionnaireId
+                    })
+                }
+                if (assignment.reviewQuestionnaireId && assignment.reviewQuestionnaireId !== this.questionnaire.id) {
+                    this.allQuestionnairesOfCourse.push({
+                        name: assignment.name + " (reviewquestionnaire)",
+                        id: assignment.reviewQuestionnaireId
+                    })
                 }
             }
         },
         async copyQuestionnaire() {
-            await api.submissionquestionnaires.copyQuestions(this.questionnaire.id, this.questionnaireIdToCopyFrom)
+            await api.reviewquestionnaires.copyQuestions(this.questionnaire.id, this.questionnaireIdToCopyFrom)
             this.showSuccessMessage({ message: "succesfully copied over questions" })
-            await this.getQuestionnaire()
+            await this.fetchData()
+        },
+        async defaultQuestions() {
+            await api.reviewquestionnaires.defaultQuestions(this.questionnaire.id, this.questionnaireIdToCopyFrom)
+            this.showSuccessMessage({ message: "succesfully loaded default questions" })
+            await this.fetchData()
         }
     }
 }

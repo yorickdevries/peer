@@ -7,6 +7,7 @@ import courses from "./courses"
 import enrollments from "./enrollments"
 import assignments from "./assignments"
 import submissionquestionnaires from "./submissionquestionnaires"
+import reviewquestionnaires from "./reviewquestionnaires"
 import openquestions from "./openquestions"
 import multiplechoicequestions from "./multiplechoicequestions"
 import multiplechoicequestionoptions from "./multiplechoicequestionoptions"
@@ -37,6 +38,7 @@ export default {
     enrollments: enrollments,
     assignments: assignments,
     submissionquestionnaires: submissionquestionnaires,
+    reviewquestionnaires: reviewquestionnaires,
     openquestions: openquestions,
     multiplechoicequestions: multiplechoicequestions,
     multiplechoicequestionoptions: multiplechoicequestionoptions,
