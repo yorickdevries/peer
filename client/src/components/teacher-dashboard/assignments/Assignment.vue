@@ -190,6 +190,11 @@
                                 </b-row>
                             </b-tab>
 
+                            <!--Groups-->
+                            <b-tab title="Groups">
+                                <Groups :assignmentId="assignment.id"></Groups>
+                            </b-tab>
+
                             <!--Submissionquestionnaire Wizard-->
                             <b-tab title="Submissionquestionnaire">
                                 <SubmissionQuestionnaireWizard></SubmissionQuestionnaireWizard>
@@ -211,11 +216,6 @@
                                     :assignmentId="assignment.id"
                                     :pathName="'teacher-dashboard.assignments.assignment.review'"
                                 ></Reviews>
-                            </b-tab>
-
-                            <!--Groups-->
-                            <b-tab title="Groups">
-                                <Groups :assignmentId="assignment.id"></Groups>
                             </b-tab>
                         </b-tabs>
                     </b-card>
