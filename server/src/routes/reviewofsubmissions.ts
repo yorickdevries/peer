@@ -423,6 +423,7 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   const submissionQuestionnaire = await review.getQuestionnaire();
   const assignment = await submissionQuestionnaire.getAssignment();
   if (
+    !(await review.isTeacherInCourse(user)) &&
     !(
       (await review.isReviewed(user)) &&
       assignment.isAtState(AssignmentState.FEEDBACK) &&

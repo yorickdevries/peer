@@ -57,6 +57,27 @@
                             </div>
                         </b-col>
                     </b-row>
+
+                    <!--See Review Evaluation is exist-->
+                    <b-row v-if="reviewEvaluation">
+                        <b-col>
+                            <b-button
+                                v-b-modal="`reviewModal${review.id}`"
+                                variant="warning"
+                                class="w-100"
+                                style="height: 3rem"
+                                >Show Review Evaluation</b-button
+                            >
+                            <b-modal
+                                :title="`Review (ID: ${review.id})`"
+                                :id="`reviewModal${review.id}`"
+                                size="lg"
+                                hide-footer
+                            >
+                                <ReviewEvaluation :feedbackReviewId="review.id"></ReviewEvaluation>
+                            </b-modal>
+                        </b-col>
+                    </b-row>
                 </b-card-body>
             </b-card>
 
@@ -199,15 +220,17 @@ import _ from "lodash"
 import notifications from "../../mixins/notifications"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 import { StarRating } from "vue-rate-it"
+import ReviewEvaluation from "../student-dashboard/assignment/ReviewEvaluation"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle, StarRating },
+    components: { BreadcrumbTitle, StarRating, ReviewEvaluation },
     data() {
         return {
             assignment: {},
             questionnaire: {},
             review: {},
+            reviewEvaluation: null,
             // all answers will be saved in this object
             answers: null
         }
@@ -227,6 +250,7 @@ export default {
             await this.fetchReview()
             await this.fetchSubmissionQuestionnaire()
             await this.fetchAnswers()
+            await this.fetchReviewEvaluation()
         },
         async fetchAssignment() {
             // Fetch the assignment information.
@@ -236,6 +260,15 @@ export default {
         async fetchReview() {
             const res = await api.reviewofsubmissions.get(this.$route.params.reviewId)
             this.review = res.data
+        },
+        async fetchReviewEvaluation() {
+            // Retrieve the review evaluation.
+            try {
+                const res = await api.reviewofsubmissions.getEvaluation(this.$route.params.reviewId)
+                this.reviewEvaluation = res.data
+            } catch (error) {
+                this.reviewEvaluation = null
+            }
         },
         async fetchSubmissionQuestionnaire() {
             const res = await api.submissionquestionnaires.get(this.review.questionnaireId)
