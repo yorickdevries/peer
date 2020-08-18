@@ -187,6 +187,13 @@ export default abstract class Review extends BaseModel {
     if (this.submitted && !(await this.canBeSubmitted())) {
       throw new Error("A non-optional question isn't answered yet.");
     }
+    // submitted and submittedAt
+    if (this.submitted && !this.submittedAt) {
+      throw new Error("submittedAt needs to be defined");
+    }
+    if (!this.submitted && this.submittedAt) {
+      throw new Error("submittedAt needs to be null");
+    }
     // if all succeeds the super validateOrReject can be called
     return super.validateOrReject();
   }

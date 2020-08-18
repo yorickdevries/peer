@@ -205,6 +205,7 @@ router.patch(
     for (const review of unsubmittedReviews) {
       if (await review.canBeSubmitted()) {
         review.submitted = true;
+        review.submittedAt = new Date();
         await review.save();
         submittedReviews.push(review);
       }
@@ -384,6 +385,11 @@ router.patch(
     }
     // set new values
     review.submitted = req.body.submitted;
+    if (review.submitted) {
+      review.submittedAt = new Date();
+    } else {
+      review.submittedAt = null;
+    }
     review.flaggedByReviewer = req.body.flaggedByReviewer;
     await review.save();
     const anonymousReview = review.getAnonymousVersion();
