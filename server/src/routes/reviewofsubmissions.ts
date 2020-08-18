@@ -422,19 +422,6 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   // get assignmentstate
   const submissionQuestionnaire = await review.getQuestionnaire();
   const assignment = await submissionQuestionnaire.getAssignment();
-  if (
-    !(await review.isTeacherInCourse(user)) &&
-    !(
-      (await review.isReviewed(user)) &&
-      assignment.isAtState(AssignmentState.FEEDBACK) &&
-      review.submitted
-    )
-  ) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("You are not allowed to evaluate this review");
-    return;
-  }
   const reviewEvaluation = await ReviewOfReview.findOne({
     where: { reviewOfSubmission: review.id },
   });
@@ -442,9 +429,26 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.NOT_FOUND).send("Evaluation is not found");
     return;
   }
-  // otherwise the review can be sent
-  const anonymousReview = reviewEvaluation.getAnonymousVersionWithReviewerNetid();
-  res.send(anonymousReview);
+  if (await review.isTeacherInCourse(user)) {
+    res.send(reviewEvaluation.getAnonymousVersionWithReviewerNetid());
+    return;
+  }
+  if (
+    (await review.isReviewed(user)) &&
+    assignment.isAtState(AssignmentState.FEEDBACK) &&
+    review.submitted
+  ) {
+    res.send(reviewEvaluation.getAnonymousVersionWithReviewerNetid());
+    return;
+  }
+  if ((await reviewEvaluation.isReviewed(user)) && reviewEvaluation.submitted) {
+    res.send(reviewEvaluation.getAnonymousVersion());
+    return;
+  }
+  res
+    .status(HttpStatusCode.FORBIDDEN)
+    .send("You are not allowed to evaluate this review");
+  return;
 });
 
 // make an evaluation as student

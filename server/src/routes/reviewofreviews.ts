@@ -55,13 +55,18 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
   }
   // check whether the reviewofreview is about the submission the user was part of
   const reviewOfSubmission = await reviewOfReview.getReviewOfSubmission();
-  if (!(await reviewOfSubmission.isReviewed(user))) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("You are not allowed to evaluate this review");
+  if (await reviewOfSubmission.isReviewed(user)) {
+    res.send(sortedReviewAnswers);
     return;
   }
-  res.send(sortedReviewAnswers);
+  if ((await reviewOfReview.isReviewed(user)) && reviewOfReview.submitted) {
+    res.send(sortedReviewAnswers);
+    return;
+  }
+  res
+    .status(HttpStatusCode.FORBIDDEN)
+    .send("You are not allowed to evaluate this review");
+  return;
 });
 
 // Joi inputvalidation for query
