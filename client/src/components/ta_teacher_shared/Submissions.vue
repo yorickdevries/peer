@@ -125,7 +125,7 @@ export default {
     methods: {
         async fetchSubmissions() {
             // all submissions
-            const res1 = await api.submissions.get(this.$route.params.assignmentId)
+            const res1 = await api.submissions.getAllForAssignment(this.$route.params.assignmentId)
             this.allSubmissions = res1.data
             // latest submissions
             const res2 = await api.submissions.getLatest(this.$route.params.assignmentId)
