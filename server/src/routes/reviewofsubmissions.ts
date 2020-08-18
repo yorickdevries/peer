@@ -542,7 +542,6 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
         null,
         null,
         null,
-        null,
         review
       );
       // set startedAt
@@ -668,7 +667,6 @@ router.post(
             reviewAssignment.reviewer,
             false,
             false,
-            null,
             null,
             null,
             null,

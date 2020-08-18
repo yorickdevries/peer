@@ -3,9 +3,6 @@ import _ from "lodash";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import Question from "../models/Question";
 
-// TODO Fields like savedAt, StartedAt etc are not set yet
-// These should be tested with the frontend to be sure they are triggered properly
-
 const parseSubmissionReviewsForExport = async function (
   submissionQuestionnaire: SubmissionQuestionnaire
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,8 +51,6 @@ const parseSubmissionReviewsForExport = async function (
     parsedReview["Submission review started_at"] = review.startedAt;
     // Submission review downloaded_at
     parsedReview["Submission review downloaded_at"] = review.downloadedAt;
-    // Submission review saved_at
-    parsedReview["Submission review saved_at"] = review.savedAt;
     // Submission review submitted_at
     parsedReview["Submission review submitted_at"] = review.submittedAt;
     // Submission review done
@@ -99,8 +94,6 @@ const parseSubmissionReviewsForExport = async function (
     // Review evaluation downloaded_at
     parsedReview["Review evaluation downloaded_at"] =
       reviewEvaluation?.downloadedAt;
-    // Review evaluation saved_at
-    parsedReview["Review evaluation saved_at"] = reviewEvaluation?.savedAt;
     // Review evaluation submitted_at
     parsedReview["Review evaluation submitted_at"] =
       reviewEvaluation?.submittedAt;
