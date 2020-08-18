@@ -62,17 +62,20 @@
             <b-col cols="6" />
             <!--Approval-->
             <b-col cols="6">
-                <div v-if="review.submitted">
-                    <dl>
-                        <dt>Current approval status</dt>
-                        <dd v-if="review.approvalByTA">Approved 👍</dd>
-                        <dd v-if="review.approvalByTA === false">Disapproved 👎</dd>
-                        <dd v-if="review.approvalByTA === null">No action yet by any TA.</dd>
-                    </dl>
-                </div>
-                <div v-else>
-                    <dt>Review is not submitted</dt>
-                </div>
+                <dl>
+                    <dt>Current submission status</dt>
+                    <dd>{{ review.submitted ? "" : "Not " }}Submitted</dd>
+                </dl>
+                <dl>
+                    <dt>Current report status</dt>
+                    <dd>{{ review.flaggedByReviewer ? "" : "Not " }}Reported as insufficient</dd>
+                </dl>
+                <dl v-if="review.submitted">
+                    <dt>Current approval status</dt>
+                    <dd v-if="review.approvalByTA">Approved 👍</dd>
+                    <dd v-if="review.approvalByTA === false">Disapproved 👎</dd>
+                    <dd v-if="review.approvalByTA === null">No action yet by any TA.</dd>
+                </dl>
             </b-col>
         </b-row>
 
