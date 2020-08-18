@@ -3,12 +3,17 @@
         <!--See Review-->
         <b-row>
             <b-col>
-                <b-button v-b-modal="`modal_${feedbackReviewId}`" variant="success" class="w-100" style="height: 3rem">
+                <b-button
+                    v-b-modal="`reviewModal${feedbackReviewId}`"
+                    variant="success"
+                    class="w-100"
+                    style="height: 3rem"
+                >
                     Show Review (ID: {{ feedbackReviewId }})
                 </b-button>
                 <b-modal
                     :title="`Review (ID: ${feedbackReviewId})`"
-                    :id="`modal_${feedbackReviewId}`"
+                    :id="`reviewModal${feedbackReviewId}`"
                     size="lg"
                     hide-footer
                 >
