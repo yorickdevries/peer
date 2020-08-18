@@ -231,23 +231,34 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
   const assignmentState = assignment.getState();
+  const anonymousReview = review.getAnonymousVersion();
+  // reviewer should access the review when reviewing
   if (
-    // reviewer should access the review when reviewing
-    ((await review.isReviewer(user)) &&
-      (assignmentState === AssignmentState.REVIEW ||
-        assignmentState === AssignmentState.FEEDBACK)) ||
-    // reviewed user should access the review when getting feedback and the review is finished
-    ((await review.isReviewed(user)) &&
-      assignmentState === AssignmentState.FEEDBACK &&
-      review.submitted)
+    (await review.isReviewer(user)) &&
+    (assignmentState === AssignmentState.REVIEW ||
+      assignmentState === AssignmentState.FEEDBACK)
   ) {
-    const anonymousReview = review.getAnonymousVersion();
+    // set startedAt if not defined yet
+    if (!review.startedAt) {
+      review.startedAt = new Date();
+      await review.save();
+    }
+    res.send(anonymousReview);
+    return;
+  }
+  // reviewed user should access the review when getting feedback and the review is finished
+  if (
+    (await review.isReviewed(user)) &&
+    assignmentState === AssignmentState.FEEDBACK &&
+    review.submitted
+  ) {
     res.send(anonymousReview);
     return;
   }
   res
     .status(HttpStatusCode.FORBIDDEN)
     .send("You are not allowed to view this review");
+  return;
 });
 
 // get a review answers eitehr as teacher or student
@@ -511,6 +522,8 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
         null,
         review
       );
+      // set startedAt
+      reviewEvaluation.startedAt = new Date();
       await transactionalEntityManager.save(reviewEvaluation);
     }
   );
