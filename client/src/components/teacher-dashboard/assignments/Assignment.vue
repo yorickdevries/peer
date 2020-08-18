@@ -1,4 +1,3 @@
-<!--NOTE: WHEN MORE ENDPOINTS ARE CONFIGURED, THIS FILE NEEDS TO BE REVISED-->
 <template>
     <div>
         <b-container>
@@ -135,14 +134,14 @@
                                                 <dt>Export reviews</dt>
                                                 <dd>Exports a file with all reviews for this assignment.</dd>
                                                 <dd>
-                                                    Also includes any evaluations which students have given to each
-                                                    other's reviews.
+                                                    Also includes any evaluations which students have given on
+                                                    eachother's reviews.
                                                 </dd>
                                                 <b-button
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `api_temp/reviewofsubmissions/exportreviews?assignmentId=${assignment.id}&exportType=csv`
+                                                        `/api/reviewofsubmissions/exportreviews?assignmentId=${assignment.id}&exportType=csv`
                                                     "
                                                     class="mb-3 mr-2"
                                                 >
@@ -152,7 +151,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `api_temp/reviewofsubmissions/exportreviews?assignmentId=${assignment.id}&exportType=xls`
+                                                        `/api/reviewofsubmissions/exportreviews?assignmentId=${assignment.id}&exportType=xls`
                                                     "
                                                     class="mb-3"
                                                 >
@@ -163,14 +162,14 @@
                                                 <dt>Export grades</dt>
                                                 <dd>
                                                     Exports a file with an aggregation of the review
-                                                    approval/disapproval amounts of each student for this assignment.
+                                                    approval/disapproval numbers of each student for this assignment.
                                                 </dd>
                                                 <b-button
                                                     class="mr-2"
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `api_temp/reviewofsubmissions/exportgrades?assignmentId=${assignment.id}&exportType=csv`
+                                                        `/api/reviewofsubmissions/exportgrades?assignmentId=${assignment.id}&exportType=csv`
                                                     "
                                                 >
                                                     Download grades .csv
@@ -179,7 +178,7 @@
                                                     size="sm"
                                                     variant="primary"
                                                     :href="
-                                                        `api_temp/reviewofsubmissions/exportgrades?assignmentId=${assignment.id}&exportType=xls`
+                                                        `/api/reviewofsubmissions/exportgrades?assignmentId=${assignment.id}&exportType=xls`
                                                     "
                                                 >
                                                     Download grades .xls
@@ -253,7 +252,6 @@ export default {
     },
     data() {
         return {
-            selfAssign: false,
             assignment: {}
         }
     },

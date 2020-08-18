@@ -61,11 +61,12 @@ const parseSubmissionReviewsForExport = async function (
     // Submission review done
     parsedReview["Submission review done"] = review.submitted;
     // Approval status
-    parsedReview["Approval status"] = review.approvalByTA;
+    parsedReview["Submission review Approval status"] = review.approvalByTA;
     // TA netid
-    parsedReview["TA netid"] = review.approvingTA?.netid;
+    parsedReview["Submission review TA netid"] = review.approvingTA?.netid;
     // Reviewer reported the submission
-    parsedReview["Reviewer reported the submission"] = review.flaggedByReviewer;
+    parsedReview["Submission review Reviewer reported the submission"] =
+      review.flaggedByReviewer;
 
     // iterate over all questions
     for (const question of questions) {
@@ -103,8 +104,17 @@ const parseSubmissionReviewsForExport = async function (
     // Review evaluation submitted_at
     parsedReview["Review evaluation submitted_at"] =
       reviewEvaluation?.submittedAt;
-    // Review evaluation done
+    // Submission review done
     parsedReview["Review evaluation done"] = reviewEvaluation?.submitted;
+    // Approval status
+    parsedReview["Review evaluation Approval status"] =
+      reviewEvaluation?.approvalByTA;
+    // TA netid
+    parsedReview["Review evaluation TA netid"] =
+      reviewEvaluation?.approvingTA?.netid;
+    // Reviewer reported the submission
+    parsedReview["Review evaluation Reviewer reported the submission"] =
+      reviewEvaluation?.flaggedByReviewer;
 
     // iterate over all questions
     for (const question of reviewEvaluationQuestions) {
