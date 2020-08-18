@@ -223,7 +223,7 @@
 <script>
 import api from "../../../api/api"
 import BreadcrumbTitle from "../../BreadcrumbTitle"
-import QuestionnaireWizard from "../rubric/QuestionnaireWizard"
+import QuestionnaireWizard from "../questionnaire/QuestionnaireWizard"
 import ImportGroupsWizard from "../ImportGroupsWizard"
 import Groups from "../Groups"
 import Reviews from "../../ta_teacher_shared/Reviews"
