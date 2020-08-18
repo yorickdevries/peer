@@ -1,7 +1,10 @@
 import client from "./axiosClient"
 
 export default {
-    get(assignmentId) {
+    // get(id) {
+    //     return client.get(`submissions/${id}`)
+    // },
+    getAllForAssignment(assignmentId) {
         const params = { assignmentId }
         return client.get("submissions", { params: params })
     },
