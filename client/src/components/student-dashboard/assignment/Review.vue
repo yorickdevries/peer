@@ -139,7 +139,7 @@
                             :state="Boolean(answers[question.id].newAnswer)"
                             @input="answers[question.id].changed = Boolean(answers[question.id].newAnswer)"
                             :accept="`${question.extensions}`"
-                            :disabled="reviewsAreReadOnly || review.submitted"
+                            :disabled="review.submitted || reviewsAreReadOnly"
                         >
                         </b-form-file>
                     </b-form-group>
@@ -203,8 +203,8 @@ export default {
     props: ["reviewId", "reviewsAreReadOnly"],
     data() {
         return {
-            questionnaire: {},
             review: {},
+            questionnaire: {},
             // all answers will be saved in this object
             answers: null
         }

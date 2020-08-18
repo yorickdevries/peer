@@ -18,6 +18,7 @@ import uploadquestions from "./uploadquestions"
 import groups from "./groups"
 import submissions from "./submissions"
 import reviewofsubmissions from "./reviewofsubmissions"
+import reviewofreviews from "./reviewofreviews"
 import openquestionanswers from "./openquestionanswers"
 import multiplechoicequestionanswers from "./multiplechoicequestionanswers"
 import checkboxquestionanswers from "./checkboxquestionanswers"
@@ -49,6 +50,7 @@ export default {
     groups: groups,
     submissions: submissions,
     reviewofsubmissions: reviewofsubmissions,
+    reviewofreviews: reviewofreviews,
     openquestionanswers: openquestionanswers,
     multiplechoicequestionanswers: multiplechoicequestionanswers,
     checkboxquestionanswers: checkboxquestionanswers,

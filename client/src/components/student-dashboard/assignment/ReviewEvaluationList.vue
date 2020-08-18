@@ -12,7 +12,7 @@
                                 <b-badge v-if="!review.submitted" variant="danger" class="mr-2">DUE</b-badge>
                             </div>
                         </template>
-                        <ReviewEvaluation :reviewId="review.id"></ReviewEvaluation>
+                        <ReviewEvaluation :feedbackReviewId="review.id"></ReviewEvaluation>
                     </b-tab>
                 </b-tabs>
             </b-card>
