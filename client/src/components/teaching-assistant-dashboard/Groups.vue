@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 
 export default {
     data() {
@@ -86,7 +86,7 @@ export default {
     props: ["assignmentId"],
     async created() {
         try {
-            let res = await api.getAssignmentGroups(this.assignmentId)
+            let res = await api.groups.getAllForAssignment(this.assignmentId)
             this.groups = res.data
         } catch (e) {
             console.log(e)
@@ -94,9 +94,10 @@ export default {
     },
     methods: {
         async showDetails(row) {
+            const res = await api.groups.get(row.item.id)
+            // set the users in the row element
+            row.item.users = res.data.users
             row.toggleDetails()
-            let res = await api.getUsersGroupById(row.item.id)
-            this.$set(row.item, "members", res.data)
         }
     }
 }

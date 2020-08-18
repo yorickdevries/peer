@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 export default {
     components: { BreadcrumbTitle },
@@ -122,8 +122,8 @@ export default {
     },
     async created() {
         // Fetch course information.
-        let course = await api.getCourse(this.$route.params.courseId)
-        let assignments = await api.getCourseAssignments(this.$route.params.courseId)
+        let course = await api.courses.get(this.$route.params.courseId)
+        let assignments = await api.assignments.getAllForCourse(this.$route.params.courseId)
 
         // Assign fetched data.
         this.assignments = assignments.data

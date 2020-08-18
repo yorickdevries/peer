@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 import Navbar from "../Navbar"
 
 export default {
@@ -27,7 +27,7 @@ export default {
     },
     async created() {
         // Fetch course information (for navbar).
-        let res = await api.getCourse(this.$route.params.courseId)
+        let res = await api.courses.get(this.$route.params.courseId)
         this.course = res.data
     }
 }
