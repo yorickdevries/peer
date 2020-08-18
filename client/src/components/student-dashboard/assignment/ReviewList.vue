@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-card v-if="this.reviews.length === 0">No reviews available.</b-card>
+        <b-card v-if="reviews.length === 0">No reviews available.</b-card>
         <div v-else>
             <b-alert variant="info" :show="reviewsAreReadOnly"
                 >The review due date has passed, you can only view your response(s).</b-alert
