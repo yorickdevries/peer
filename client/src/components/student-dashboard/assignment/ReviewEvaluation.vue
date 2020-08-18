@@ -6,14 +6,19 @@
                 <b-button v-b-modal="`modal_${feedbackReviewId}`" variant="success" class="w-100" style="height: 3rem">
                     Show Review (ID: {{ feedbackReviewId }})
                 </b-button>
+                <b-modal
+                    :title="`Review (ID: ${feedbackReviewId})`"
+                    :id="`modal_${feedbackReviewId}`"
+                    size="lg"
+                    hide-footer
+                >
+                    <b-alert variant="info" show>
+                        This is a review you have received from one of your peers on your submission.
+                    </b-alert>
+                    <Review :reviewId="feedbackReviewId" :reviewsAreReadOnly="true"></Review>
+                </b-modal>
             </b-col>
         </b-row>
-        <b-modal :title="`Review (ID: ${feedbackReviewId})`" :id="`modal_${feedbackReviewId}`" size="lg" hide-footer>
-            <b-alert variant="info" show>
-                This is a review you have received from one of your peers on your submission.
-            </b-alert>
-            <Review :reviewId="feedbackReviewId" :reviewsAreReadOnly="true"></Review>
-        </b-modal>
         <br />
 
         <!--Button/info if no evaluation exists yet.-->
