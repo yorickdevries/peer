@@ -307,28 +307,45 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
   }
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const submission = review.submission!;
+  const file = submission.file;
+  const fileName = file.getFileNamewithExtension();
+  const filePath = file.getPath();
+  if (await review.isTeacherInCourse(user)) {
+    res.download(filePath, fileName);
+    return;
+  }
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
   const assignmentState = assignment.getState();
   if (
-    (await review.isTeacherInCourse(user)) ||
-    // reviewer should access the review when reviewing
-    ((await review.isReviewer(user)) &&
-      (assignmentState === AssignmentState.REVIEW ||
-        assignmentState === AssignmentState.FEEDBACK))
+    (await review.isReviewer(user)) &&
+    (assignmentState === AssignmentState.REVIEW ||
+      assignmentState === AssignmentState.FEEDBACK)
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const submission = review.submission!;
-    const file = submission.file;
-    const fileName = file.getFileNamewithExtension();
-    const filePath = file.getPath();
+    // set downloadedAt if not defined yet
+    if (!review.downloadedAt) {
+      review.downloadedAt = new Date();
+      await review.save();
+    }
+    res.download(filePath, fileName);
+    return;
+  }
+  // reviewed user should access the review when getting feedback and the review is finished
+  if (
+    (await review.isReviewed(user)) &&
+    assignmentState === AssignmentState.FEEDBACK &&
+    review.submitted
+  ) {
     res.download(filePath, fileName);
     return;
   }
   res
     .status(HttpStatusCode.FORBIDDEN)
     .send("You are not allowed to view this review");
+  return;
 });
 
 // Joi inputvalidation for query
