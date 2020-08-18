@@ -1,54 +1,60 @@
 <template>
     <div>
-        <b-card v-if="noReviews">No reviews available.</b-card>
-
-        <b-card v-else no-body>
-            <b-tabs card>
-                <b-tab v-for="(peerReview, index) in peerReviews" :key="peerReview.id">
-                    <template slot="title">
-                        <div class="d-flex align-items-center">
-                            <span>Review {{ index + 1 }}</span>
-                        </div>
-                    </template>
-                    <ReviewEvaluation :reviewId="peerReview.review.id"></ReviewEvaluation>
-                </b-tab>
-            </b-tabs>
-        </b-card>
+        <b-card v-if="feedbackReviews.length === 0">No reviews available.</b-card>
+        <div v-else>
+            <b-card no-body>
+                <b-tabs card>
+                    <b-tab v-for="review in feedbackReviews" :key="review.id">
+                        <template slot="title">
+                            <div class="d-flex align-items-center">
+                                <b-badge variant="warning" class="mr-2">ID: {{ review.id }}</b-badge>
+                                <b-badge v-if="review.submitted" variant="success" class="mr-2">DONE</b-badge>
+                                <b-badge v-if="!review.submitted" variant="danger" class="mr-2">DUE</b-badge>
+                            </div>
+                        </template>
+                        <ReviewEvaluation :reviewId="review.id"></ReviewEvaluation>
+                    </b-tab>
+                </b-tabs>
+            </b-card>
+        </div>
     </div>
 </template>
 
 <script>
-import api from "../../../api/api_old"
+import api from "../../../api/api"
 import ReviewEvaluation from "./ReviewEvaluation"
 
 export default {
     components: { ReviewEvaluation },
     data() {
         return {
-            // Peer reviews from others to you.
-            peerReviews: []
-        }
-    },
-    computed: {
-        noReviews() {
-            return this.peerReviews.length === 0
+            group: null,
+            latestSubmission: null,
+            feedbackReviews: []
         }
     },
     async created() {
-        // Retrieve reviews given to you.
-        const { data: receivedIds } = await api.getFeedbackOfAssignment(this.$route.params.assignmentId)
-        const receivedFlatIds = receivedIds.map(value => value.id)
-
-        this.peerReviews = await this.foreignKeyJoinOfPeerReviews(receivedFlatIds)
+        await this.fetchData()
     },
     methods: {
-        async foreignKeyJoinOfPeerReviews(ids) {
-            let peerReviews = []
-            for (let i = 0; i < ids.length; i++) {
-                let { data } = await api.getPeerReview(ids[i])
-                peerReviews.push(data)
-            }
-            return peerReviews
+        async fetchData() {
+            await this.fetchGroup()
+            await this.fetchLatestSubmission()
+            await this.fetchFeedbackReviews()
+        },
+        async fetchGroup() {
+            // Fetch the group information.
+            const res = await api.assignments.getGroup(this.$route.params.assignmentId)
+            this.group = res.data
+        },
+        async fetchLatestSubmission() {
+            // Fetch the submission.
+            const res = await api.assignments.getLatestSubmission(this.$route.params.assignmentId, this.group.id)
+            this.latestSubmission = res.data
+        },
+        async fetchFeedbackReviews() {
+            const res = await api.submissions.getFeedback(this.latestSubmission.id)
+            this.feedbackReviews = res.data
         }
     }
 }
