@@ -48,11 +48,11 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   }
   if (
     // not a teacher
-    !(await assignment.isTeacherInCourse(user))
+    !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
-      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
     return;
   }
   const submissions = await assignment.getSubmissions();
@@ -77,11 +77,11 @@ router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
   }
   if (
     // not a teacher
-    !(await assignment.isTeacherInCourse(user))
+    !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
-      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
     return;
   }
   const latestSubmissionsOfEachGroup = await assignment.getLatestSubmissionsOfEachGroup();
@@ -103,7 +103,10 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   const group = await submission.getGroup();
   const assignment = await submission.getAssignment();
   if (
-    !((await group.hasUser(user)) || (await assignment.isTeacherInCourse(user)))
+    !(
+      (await group.hasUser(user)) ||
+      (await assignment.isTeacherOrTeachingAssistantInCourse(user))
+    )
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
@@ -127,7 +130,10 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   const group = await submission.getGroup();
   const assignment = await submission.getAssignment();
   if (
-    !((await group.hasUser(user)) || (await assignment.isTeacherInCourse(user)))
+    !(
+      (await group.hasUser(user)) ||
+      (await assignment.isTeacherOrTeachingAssistantInCourse(user))
+    )
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)

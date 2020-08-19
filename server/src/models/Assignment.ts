@@ -362,4 +362,9 @@ export default class Assignment extends BaseModel {
     const course = await this.getCourse();
     return await course.isTeacher(user);
   }
+
+  async isTeacherOrTeachingAssistantInCourse(user: User): Promise<boolean> {
+    const course = await this.getCourse();
+    return await course.isTeacherOrTeachingAssistant(user);
+  }
 }

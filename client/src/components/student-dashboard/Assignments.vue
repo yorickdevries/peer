@@ -5,20 +5,17 @@
                 <BreadcrumbTitle :items="['Assignments']" class="mt-3" />
             </b-col>
         </b-row>
-
         <b-row>
             <b-col>
                 <b-card no-body>
                     <b-tabs card fill>
                         <b-row>
                             <b-col>
-                                <!--Enrollable Assignments (Single User)-->
-                                <b-tab active :title-link-class="{}">
+                                <!--Enrollable-->
+                                <b-tab active>
                                     <template slot="title">
                                         Open for enrollment
-                                        <b-badge v-if="enrollableAssignments" variant="info">{{
-                                            enrollableAssignments.length
-                                        }}</b-badge>
+                                        <b-badge variant="info">{{ enrollableAssignments.length }}</b-badge>
                                     </template>
                                     <p class="text-muted">
                                         Open for enrollment means you can enroll yourself for the assignment. In some
@@ -27,15 +24,13 @@
                                     <span v-if="enrollableAssignments.length === 0"
                                         >There are currently no assignments open for enrollment.</span
                                     >
-                                    <b-card
-                                        v-for="(assignment, index) in enrollableAssignments"
-                                        :key="assignment.id"
-                                        no-body
-                                        :class="{ 'mb-3': index !== enrollableAssignments.length - 1 }"
-                                    >
+                                    <b-card v-for="assignment in enrollableAssignments" :key="assignment.id" no-body>
                                         <b-card-body>
-                                            <h4>{{ assignment.title | truncate(100) }}</h4>
-                                            <p>{{ assignment.description | truncate(100) }}</p>
+                                            <h4>{{ assignment.name }}</h4>
+                                            <p v-if="assignment.description != null">
+                                                {{ assignment.description | truncate(200) }}
+                                            </p>
+                                            <p v-else><i>No assignment description</i></p>
                                             <b-button
                                                 variant="outline-primary"
                                                 @click="enrollInAssignment(assignment.id)"
@@ -45,36 +40,36 @@
                                     </b-card>
                                 </b-tab>
 
-                                <!--Active Assignments-->
-                                <b-tab :title-link-class="{}">
+                                <!--Submission-->
+                                <b-tab>
                                     <template slot="title"
                                         >Ready for submission
-                                        <b-badge v-if="activeAssignments" variant="info">{{
-                                            activeAssignments.length
-                                        }}</b-badge></template
-                                    >
+                                        <b-badge variant="info">{{ assignmentsInSubmissionState.length }}</b-badge>
+                                    </template>
                                     <p class="text-muted">
                                         Ready for submission means that the assignment is open for submitting a solution
                                         to the assignment.
                                     </p>
-                                    <span v-if="activeAssignments.length === 0"
+                                    <span v-if="assignmentsInSubmissionState.length === 0"
                                         >There are currently no assignments ready for submission.</span
                                     >
                                     <b-card
-                                        v-for="(assignment, index) in activeAssignments"
+                                        v-for="assignment in assignmentsInSubmissionState"
                                         :key="assignment.id"
                                         no-body
-                                        :class="{ 'mb-3': index !== activeAssignments.length - 1 }"
                                     >
                                         <b-card-body>
-                                            <h4>{{ assignment.title }}</h4>
-                                            <p>{{ assignment.description | truncate(100) }}</p>
+                                            <h4>{{ assignment.name }}</h4>
+                                            <p v-if="assignment.description != null">
+                                                {{ assignment.description | truncate(200) }}
+                                            </p>
+                                            <p v-else><i>No assignment description</i></p>
                                             <b-button
                                                 variant="primary"
                                                 :to="{
                                                     name: 'student-dashboard.course.assignment',
                                                     params: {
-                                                        courseId: assignment.course_id,
+                                                        courseId: assignment.courseId,
                                                         assignmentId: assignment.id
                                                     }
                                                 }"
@@ -84,43 +79,45 @@
                                     </b-card>
                                 </b-tab>
 
-                                <!--Review Assignments-->
-                                <b-tab :title-link-class="{}">
+                                <!--Review-->
+                                <b-tab>
                                     <template slot="title"
                                         >Ready for review
-                                        <b-badge v-if="readyForSubmissionAssignments" variant="info">{{
-                                            readyForSubmissionAssignments.length
+                                        <b-badge variant="info">{{
+                                            assignmentsInWaitingForReviewOrReviewState.length
                                         }}</b-badge></template
                                     >
                                     <p class="text-muted">
                                         Ready for review means that the assignment is open for reviewing a solution from
                                         other students.
                                     </p>
-                                    <span v-if="readyForSubmissionAssignments.length === 0"
+                                    <span v-if="assignmentsInWaitingForReviewOrReviewState.length === 0"
                                         >There are currently no assignments ready for review.</span
                                     >
                                     <b-card
-                                        v-for="(assignment, index) in readyForSubmissionAssignments"
+                                        v-for="assignment in assignmentsInWaitingForReviewOrReviewState"
                                         :key="assignment.id"
                                         no-body
-                                        :class="{ 'mb-3': index !== readyForSubmissionAssignments.length - 1 }"
                                     >
                                         <b-card-body>
                                             <b-badge
-                                                v-if="assignmentIsBetweenHandInDueAndReviewStart(assignment)"
+                                                v-if="isInWaitingForReviewState(assignment)"
                                                 class="mb-2"
                                                 variant="danger"
                                                 >Review opens at:
-                                                {{ assignment.review_publish_date | formatDate }}</b-badge
+                                                {{ assignment.reviewPublishDate | formatDate }}</b-badge
                                             >
-                                            <h4>{{ assignment.title }}</h4>
-                                            <p>{{ assignment.description | truncate(100) }}</p>
+                                            <h4>{{ assignment.name }}</h4>
+                                            <p v-if="assignment.description != null">
+                                                {{ assignment.description | truncate(200) }}
+                                            </p>
+                                            <p v-else><i>No assignment description</i></p>
                                             <b-button
                                                 variant="primary"
                                                 :to="{
                                                     name: 'student-dashboard.course.assignment',
                                                     params: {
-                                                        courseId: assignment.course_id,
+                                                        courseId: assignment.courseId,
                                                         assignmentId: assignment.id
                                                     }
                                                 }"
@@ -130,36 +127,38 @@
                                     </b-card>
                                 </b-tab>
 
-                                <!--Closed Assignments-->
-                                <b-tab :title-link-class="{}">
+                                <!--Feedback-->
+                                <b-tab>
                                     <template slot="title"
                                         >Feedback available
-                                        <b-badge v-if="closedAssignments" variant="info">{{
-                                            closedAssignments.length
+                                        <b-badge variant="info">{{
+                                            assignmentsInFeedbackState.length
                                         }}</b-badge></template
                                     >
                                     <p class="text-muted">
                                         Ready for feedback means that the feedback is available for the submission you
                                         handed in.
                                     </p>
-                                    <span v-if="closedAssignments.length === 0"
+                                    <span v-if="assignmentsInFeedbackState.length === 0"
                                         >There are currently no assignments for which the feedback is available.</span
                                     >
                                     <b-card
-                                        v-for="(assignment, index) in closedAssignments"
+                                        v-for="assignment in assignmentsInFeedbackState"
                                         :key="assignment.id"
                                         no-body
-                                        :class="{ 'mb-3': index !== closedAssignments.length - 1 }"
                                     >
                                         <b-card-body>
-                                            <h4>{{ assignment.title | truncate(100) }}</h4>
-                                            <p>{{ assignment.description | truncate(100) }}</p>
+                                            <h4>{{ assignment.name }}</h4>
+                                            <p v-if="assignment.description != null">
+                                                {{ assignment.description | truncate(200) }}
+                                            </p>
+                                            <p v-else><i>No assignment description</i></p>
                                             <b-button
                                                 variant="primary"
                                                 :to="{
                                                     name: 'student-dashboard.course.assignment',
                                                     params: {
-                                                        courseId: assignment.course_id,
+                                                        courseId: assignment.courseId,
                                                         assignmentId: assignment.id
                                                     }
                                                 }"
@@ -178,72 +177,58 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
+import _ from "lodash"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 import notifications from "../../mixins/notifications"
-
-// Reason for :title-link-class="{ }" on b-tab.
-// https://github.com/bootstrap-vue/bootstrap-vue/issues/2148
 
 export default {
     mixins: [notifications],
     components: { BreadcrumbTitle },
     data() {
         return {
-            assignments: [],
-            enrollableAssignments: []
+            enrollableAssignments: [],
+            enrolledAssignments: [],
+            assignments: []
         }
     },
     computed: {
-        activeAssignments() {
-            let now = new Date()
-            return this.assignments.filter(
-                assignment => now > new Date(assignment.publish_date) && now < new Date(assignment.due_date)
-            )
+        assignmentsInSubmissionState() {
+            return _.filter(this.enrolledAssignments, assignment => {
+                return new Date() < new Date(assignment.dueDate)
+            })
         },
-        readyForSubmissionAssignments() {
-            let now = new Date()
-            return this.assignments.filter(
-                assignment => now > new Date(assignment.due_date) && now < new Date(assignment.review_due_date)
-            )
+        assignmentsInWaitingForReviewOrReviewState() {
+            return _.filter(this.enrolledAssignments, assignment => {
+                return new Date() > new Date(assignment.dueDate) && new Date() < new Date(assignment.reviewDueDate)
+            })
         },
-        closedAssignments() {
-            let now = new Date()
-            return this.assignments.filter(assignment => now > new Date(assignment.review_due_date))
+        assignmentsInFeedbackState() {
+            return _.filter(this.enrolledAssignments, assignment => {
+                return new Date() > new Date(assignment.reviewDueDate)
+            })
         }
     },
     async created() {
-        await this.fetch()
+        await this.fetchAssignments()
     },
     methods: {
-        async enrollInAssignment(assignmentId) {
-            try {
-                await api.enrollInAssignment(assignmentId)
-                await this.fetch()
-                this.showSuccessMessage({ message: "Enrolled in course." })
-            } catch (e) {
-                this.showErrorMessage()
-                console.log(e)
-            }
-        },
-        async fetch() {
+        async fetchAssignments() {
             // Fetch assignments.
-            let resAssignment = await api.getCourseEnrolledAssignments(this.$route.params.courseId)
-            this.assignments = resAssignment.data
-
-            // Fetch not yet enrolled assignments.
-            try {
-                let { data: enrollableAssignments } = await api.getCourseAssignmentsUnenrolled(
-                    this.$route.params.courseId
-                )
-                this.enrollableAssignments = enrollableAssignments
-            } catch (e) {
-                this.showErrorMessage({ message: "Could not load assignments that you are not yet enrolled in." })
-            }
+            // enrollable
+            const res1 = await api.courses.getEnrollableAssignments(this.$route.params.courseId)
+            this.enrollableAssignments = res1.data
+            // enrolled
+            const res2 = await api.courses.getEnrolledAssignments(this.$route.params.courseId)
+            this.enrolledAssignments = res2.data
         },
-        assignmentIsBetweenHandInDueAndReviewStart(assignment) {
-            let now = new Date()
-            return now > new Date(assignment.due_date) && now < new Date(assignment.review_publish_date)
+        async enrollInAssignment(assignmentId) {
+            await api.assignments.enroll(assignmentId)
+            this.showSuccessMessage({ message: "Enrolled in assignment." })
+            this.fetchAssignments()
+        },
+        isInWaitingForReviewState(assignment) {
+            return new Date() > new Date(assignment.dueDate) && new Date() < new Date(assignment.reviewPublishDate)
         }
     }
 }

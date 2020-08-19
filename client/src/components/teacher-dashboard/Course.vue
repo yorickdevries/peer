@@ -20,53 +20,24 @@
                         </div>
                     </b-card>
                 </b-col>
-
-                <!--Export-->
-                <b-col cols="4">
-                    <b-card header="Export">
-                        <dl class="mb-0">
-                            <dt>Export Review Grades</dt>
-                            <dd>
-                                Exports a file with an aggregation of the review approval/disapproval amounts of each
-                                student for all the assignments in the course.
-                            </dd>
-                            <b-button
-                                class="mr-2"
-                                variant="primary"
-                                size="sm"
-                                :href="`/api/courses/${course.id}/gradeExport/csv`"
-                                >Download .csv</b-button
-                            >
-                            <b-button variant="primary" size="sm" :href="`/api/courses/${course.id}/gradeExport/xls`"
-                                >Download .xls</b-button
-                            >
-                        </dl>
-                    </b-card>
-                </b-col>
             </b-row>
         </b-container>
     </div>
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 
 export default {
     components: { BreadcrumbTitle },
     data() {
         return {
-            course: {
-                id: null,
-                name: null,
-                description: null
-            }
+            course: {}
         }
     },
     async created() {
-        let id = this.$route.params.courseId
-        this.course.id = id
-        let res = await api.getCourse(id)
+        let res = await api.courses.get(this.$route.params.courseId)
         this.course = res.data
     }
 }

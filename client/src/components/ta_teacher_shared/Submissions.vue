@@ -4,7 +4,7 @@
         <b-row>
             <b-col cols="6" class="mb-3">
                 <b-form-group horizontal label="Filter" class="mb-0 mr-4">
-                    <b-input-group class="mb-2">
+                    <b-input-group>
                         <b-form-input v-model="filter" placeholder="Type to search" />
                         <b-input-group-append>
                             <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
@@ -13,11 +13,11 @@
 
                     <b-button-group class="mx-auto">
                         <button
-                            @click="setLatestSubmissionsActive(false)"
+                            @click="onlyLatestSubmissions = false"
                             :class="{
-                                'bg-primary': !latestSubmissionsActive,
-                                'btn-outline-primary': latestSubmissionsActive,
-                                'text-white': !latestSubmissionsActive
+                                'bg-primary': !onlyLatestSubmissions,
+                                'btn-outline-primary': onlyLatestSubmissions,
+                                'text-white': !onlyLatestSubmissions
                             }"
                             class="btn btn-sm"
                             size="sm"
@@ -25,18 +25,17 @@
                             All submissions
                         </button>
                         <button
-                            @click="setLatestSubmissionsActive(true)"
+                            @click="onlyLatestSubmissions = true"
                             :class="{
-                                'bg-primary': latestSubmissionsActive,
-                                'btn-outline-primary': !latestSubmissionsActive,
-                                'text-white': latestSubmissionsActive
+                                'bg-primary': onlyLatestSubmissions,
+                                'btn-outline-primary': !onlyLatestSubmissions,
+                                'text-white': onlyLatestSubmissions
                             }"
                             class="btn btn-sm"
                             size="sm"
                         >
                             Latest submissions
                         </button>
-                        <!--<button @click="setLatestSubmissionsActive(false)" :class="{'bg-primary': !latestSubmissionsActive, 'btn-outline-primary': latestSubmissionsActive, 'text-white': !latestSubmissionsActive}" class="btn btn-sm" size="sm">Latest submissions</button>-->
                     </b-button-group>
                 </b-form-group>
             </b-col>
@@ -46,41 +45,36 @@
                 </b-form-group>
             </b-col>
         </b-row>
-
         <!--Table-->
         <b-table
             striped
             outlined
             show-empty
             stacked="md"
-            :items="submissionsAndGroups"
+            :items="selectedSubmissions"
             :fields="fields"
             :current-page="currentPage"
             :per-page="Number(perPage)"
             :filter="filter"
         >
-            <template slot="file_path" slot-scope="data">
-                <a :href="`/api/submissions/${data.item.id}/file`" target="_blank"> {{ data.value }} </a>
+            <template v-slot:cell(file)="data">
+                <a :href="submissionFilePath(data.item.id)" target="_blank">
+                    {{ data.item.file.name }}{{ data.item.file.extension }}
+                </a>
             </template>
 
-            <template slot="formattedDate" slot-scope="row">
-                {{ row.item.date | formatDate }}
+            <template v-slot:cell(groupName)="data">
+                {{ getGroup(data.item.groupId).name }}
             </template>
 
-            <template slot="actions" slot-scope="row">
-                <b-button @click.stop="row.toggleDetails" variant="primary" size="sm"
-                    >{{ row.detailsShowing ? "Hide" : "Show/Edit Comments" }}
-                </b-button>
-            </template>
-
-            <template slot="row-details" slot-scope="row">
-                <SubmissionCommentWizard :submissionId="row.item.id" />
+            <template v-slot:cell(date)="data">
+                {{ data.item.updatedAt | formatDate }}
             </template>
         </b-table>
 
         <!--Pagination-->
         <b-pagination
-            :total-rows="this.submissions.length"
+            :total-rows="this.selectedSubmissions.length"
             :per-page="Number(perPage)"
             v-model="currentPage"
             class="my-0"
@@ -89,68 +83,66 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
-import SubmissionCommentWizard from "./SubmissionCommentsWizard"
+import api from "../../api/api"
+import _ from "lodash"
 
 export default {
-    components: { SubmissionCommentWizard },
-    props: ["assignmentId"],
     data() {
         return {
-            submissions: [],
+            allSubmissions: [],
+            latestSubmissions: [],
+            // groups to get groupName from
             groups: [],
-            submissionsAndGroups: [],
-            currentPage: 1,
+            // boolean to show all or only latest
+            onlyLatestSubmissions: true,
+            // for navigation
             fields: [
-                { key: "user_netid", label: "Username" },
-                { key: "group_id", label: "Group ID" },
-                { key: "group_name", label: "Group name" },
-                "formattedDate",
-                { key: "comment_count", label: "# of comments" },
-                { key: "file_path", label: "Download" },
-                "actions"
+                { key: "id", label: "ID", sortable: true },
+                { key: "file", label: "File" },
+                { key: "groupId", label: "Group ID" },
+                { key: "groupName", label: "Group name" },
+                { key: "userNetid", label: "Submitted by" },
+                { key: "date", label: "​​​Date" }
             ],
-            perPage: 5,
-            latestSubmissionsActive: true,
-            filter: null
+            currentPage: 1,
+            perPage: 10,
+            filter: ""
         }
     },
     async created() {
         await this.fetchSubmissions()
+        await this.fetchGroups()
+    },
+    computed: {
+        selectedSubmissions() {
+            if (this.onlyLatestSubmissions) {
+                return this.latestSubmissions
+            } else {
+                return this.allSubmissions
+            }
+        }
     },
     methods: {
         async fetchSubmissions() {
-            let res
-            try {
-                if (this.latestSubmissionsActive) {
-                    res = await api.getAssignmentAllLatestSubmissions(this.assignmentId)
-                } else {
-                    res = await api.getAssignmentAllSubmissions(this.assignmentId)
-                }
-                this.submissions = res.data
-                await this.fetchGroups()
-            } catch (error) {
-                console.log(error)
-            }
-        },
-        async setLatestSubmissionsActive(boolean) {
-            this.latestSubmissionsActive = boolean
-            await this.fetchSubmissions()
+            // all submissions
+            const res1 = await api.submissions.getAllForAssignment(this.$route.params.assignmentId)
+            this.allSubmissions = res1.data
+            // latest submissions
+            const res2 = await api.submissions.getLatest(this.$route.params.assignmentId)
+            this.latestSubmissions = res2.data
         },
         async fetchGroups() {
-            let res = await api.getAssignmentGroups(this.assignmentId)
+            const res = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
             this.groups = res.data
-            this.concatenateArrays(this.submissions, this.groups)
         },
-        concatenateArrays(submissions, groups) {
-            this.submissionsAndGroups = this.submissions
-            for (let i = 0; i < submissions.length; i++) {
-                for (let j = 0; j < groups.length; j++) {
-                    if (groups[j].id === submissions[i].group_id) {
-                        this.submissionsAndGroups[i].group_name = groups[j].group_name
-                    }
-                }
-            }
+        getGroup(id) {
+            return _.find(this.groups, group => {
+                return group.id === id
+            })
+        },
+        submissionFilePath(id) {
+            // Get the submission file path.
+            return `/api/submissions/${id}/file`
         }
     }
 }
