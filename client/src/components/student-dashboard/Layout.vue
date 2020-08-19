@@ -1,7 +1,6 @@
 <template>
     <div>
         <Navbar :title="course.name" :links="navbarItems" role="student" />
-
         <transition name="slide-right" mode="out-in">
             <keep-alive exclude="Assignment">
                 <router-view></router-view>
@@ -21,14 +20,12 @@ export default {
     data() {
         return {
             navbarItems: [{ to: { name: "student-dashboard.course.assignments" }, text: "Assignments" }],
-            course: {
-                name: null
-            }
+            course: {}
         }
     },
     async created() {
         // Fetch course information (for navbar).
-        let res = await api.getCourse(this.$route.params.courseId)
+        const res = await api.courses.get(this.$route.params.courseId)
         this.course = res.data
     }
 }

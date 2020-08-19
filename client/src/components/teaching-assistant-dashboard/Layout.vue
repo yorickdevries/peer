@@ -1,7 +1,6 @@
 <template>
     <div>
         <Navbar :title="course.name" :links="navbarItems" role="ta" variant="danger" />
-
         <transition name="slide-right" mode="out-in">
             <router-view></router-view>
         </transition>
@@ -9,7 +8,7 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 import Navbar from "../Navbar"
 
 export default {
@@ -18,16 +17,13 @@ export default {
     },
     data() {
         return {
-            navbarItems: [{ to: { name: "teaching-assistant-dashboard.course" }, text: "Assignments" }],
-            course: {
-                name: null
-            },
-            role: ""
+            navbarItems: [{ to: { name: "teaching-assistant-dashboard.course" }, text: "Course Home" }],
+            course: {}
         }
     },
     async created() {
         // Fetch course information (for navbar).
-        let res = await api.getCourse(this.$route.params.courseId)
+        let res = await api.courses.get(this.$route.params.courseId)
         this.course = res.data
     }
 }

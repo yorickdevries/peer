@@ -1,11 +1,24 @@
+import api from "../api/api"
+
 export default [
     {
         path: "/teaching-assistant-dashboard/courses/:courseId",
         name: "teaching-assistant-dashboard.course",
-
         redirect: { name: "teaching-assistant-dashboard.course.home" },
-
         component: () => import("../components/teaching-assistant-dashboard/Layout"),
+        beforeEnter: async (to, from, next) => {
+            try {
+                const res = await api.courses.enrollment(to.params.courseId)
+                const enrollment = res.data
+                if (enrollment.role !== "teachingassistant") {
+                    throw new Error("Wrong role")
+                }
+                next()
+            } catch (error) {
+                //redirect to root
+                next("/")
+            }
+        },
         children: [
             {
                 path: "",
@@ -19,7 +32,7 @@ export default [
             },
             {
                 path: "assignment/:assignmentId/reviews/:reviewId",
-                name: "teaching-assistant-dashboard.course.assignment.reviews",
+                name: "teaching-assistant-dashboard.course.assignment.review",
                 component: () => import("../components/ta_teacher_shared/ReviewApproval")
             }
         ]

@@ -19,6 +19,7 @@
                                 v-model="course.courseCode"
                                 type="text"
                                 placeholder="Please enter the course code"
+                                required
                             >
                             </b-form-input>
                         </b-form-group>
@@ -32,11 +33,22 @@
                         </b-form-group>
 
                         <b-form-group label="Faculty" description="">
-                            <b-form-select :options="faculties" v-model="course.facultyName"></b-form-select>
+                            <b-form-select v-model="course.faculty" required>
+                                <b-form-select-option v-for="faculty in faculties" :key="faculty.name" :value="faculty"
+                                    >{{ faculty.name }} - {{ faculty.longName }}
+                                </b-form-select-option>
+                            </b-form-select>
                         </b-form-group>
 
                         <b-form-group label="Academic Year" description="">
-                            <b-form-select :options="academic_years" v-model="course.academicYearName"></b-form-select>
+                            <b-form-select v-model="course.academicYear" required>
+                                <b-form-select-option
+                                    v-for="academicYear in academicYears"
+                                    :key="academicYear.name"
+                                    :value="academicYear"
+                                    >{{ academicYear.name }}</b-form-select-option
+                                >
+                            </b-form-select>
                         </b-form-group>
 
                         <b-form-group label="">
@@ -62,62 +74,39 @@ export default {
         return {
             course: {
                 name: null,
-                description: null,
+                courseCode: null,
                 enrollable: false,
-                facultyName: null,
-                academicYearName: null,
-                courseCode: null
+                faculty: null,
+                academicYear: null,
+                description: null
             },
             faculties: [],
-            academic_years: []
+            academicYears: []
         }
     },
     async created() {
         await this.fetchFaculties()
-        await this.fetchAcademicYears()
-        await this.fetchactiveAcademicYears()
+        await this.fetchActiveAcademicYears()
     },
     methods: {
-        async fetchactiveAcademicYears() {
-            try {
-                let res = await api.getAcademicYears(true)
-                this.course.academicYearName = res.data[0].name
-            } catch (e) {
-                console.log(e)
-            }
-        },
-
         async fetchFaculties() {
-            try {
-                let res = await api.getFaculties()
-
-                this.faculties = res.data.map(entry => {
-                    return { value: entry.name, text: entry.name }
-                })
-            } catch (e) {
-                console.log(e)
-            }
+            let res = await api.faculties.get()
+            this.faculties = res.data
         },
-
-        async fetchAcademicYears() {
-            try {
-                let res = await api.getAllAcademicYears()
-                this.academic_years = res.data.map(entry => {
-                    return { value: entry.name, text: entry.name }
-                })
-            } catch (e) {
-                console.log(e)
-            }
+        async fetchActiveAcademicYears() {
+            const res = await api.academicyears.get(true)
+            this.academicYears = res.data
         },
-
         async onSubmit() {
-            try {
-                await api.createCourse(this.course)
-                this.$router.push({ name: "courses" })
-                location.reload()
-            } catch (e) {
-                this.showErrorMessage()
-            }
+            const res = await api.courses.post(
+                this.course.name,
+                this.course.courseCode,
+                this.course.enrollable,
+                this.course.faculty.name,
+                this.course.academicYear.name,
+                this.course.description
+            )
+            this.$router.push({ name: "teacher-dashboard.course", params: { courseId: res.data.id } })
         }
     }
 }

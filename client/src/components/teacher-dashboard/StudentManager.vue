@@ -2,10 +2,9 @@
     <b-container>
         <!--Header-->
         <BreadcrumbTitle :items="['Student Management']" class="mt-3"></BreadcrumbTitle>
-
-        <b-card>
-            <b-row>
-                <b-col>
+        <b-row>
+            <b-col>
+                <b-card header="Student Manager">
                     <!--Table Options-->
                     <b-row>
                         <b-col cols="6" class="mb-3">
@@ -31,7 +30,7 @@
                         outlined
                         show-empty
                         stacked="md"
-                        :items="students"
+                        :items="enrollments"
                         :fields="fields"
                         :current-page="currentPage"
                         :per-page="Number(perPage)"
@@ -41,31 +40,38 @@
 
                     <!--Pagination-->
                     <b-pagination
-                        :total-rows="this.students.length"
+                        :total-rows="this.enrollments.length"
                         :per-page="Number(perPage)"
                         v-model="currentPage"
                         class="my-0"
                     />
-                </b-col>
-            </b-row>
-        </b-card>
+                </b-card>
+            </b-col>
+        </b-row>
     </b-container>
 </template>
 
 <script>
 import api from "../../api/api"
+import notifications from "../../mixins/notifications"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 
 export default {
+    mixins: [notifications],
     components: { BreadcrumbTitle },
     data() {
         return {
-            students: [],
+            enrollments: [],
+            // for navigation
+            fields: [
+                { key: "user.displayName", label: "Name" },
+                { key: "user.netid", label: "NetID" },
+                { key: "user.email", label: "​​​Email" },
+                { key: "user.studentNumber", label: "Studentnumber" }
+            ],
             currentPage: 1,
-            fields: [{ key: "userNetid", label: "NetID" }],
-            perPage: 5,
-            filter: null,
-            netid: ""
+            perPage: 10,
+            filter: ""
         }
     },
     async created() {
@@ -73,12 +79,8 @@ export default {
     },
     methods: {
         async fetchStudents() {
-            try {
-                let res = await api.getEnrolledUsersWithRole(this.$route.params.courseId, "student")
-                this.students = res.data
-            } catch (e) {
-                console.log(e)
-            }
+            const res = await api.enrollments.get(this.$route.params.courseId, "student")
+            this.enrollments = res.data
         }
     }
 }

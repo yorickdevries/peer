@@ -1,33 +1,59 @@
-import axios from "axios"
-import { succesInterceptor, errorInterceptor } from "./axiosInterceptors"
-import assignmentApi from "./assignmentApi"
-import courseApi from "./courseApi"
-import facultiesApi from "./facultyApi"
-import academicYearsApi from "./academicYearsApi"
-import enrollmentApi from "./enrollmentApi"
-import submissionApi from "./submissionApi"
-import submissionquestionnairesApi from "./submissionquestionnairesApi"
-
-const client = axios.create({
-    baseURL: "/api/",
-    json: true
-})
-// Add a response interceptor
-client.interceptors.response.use(succesInterceptor, errorInterceptor)
+import client from "./axiosClient"
+// subroutes
+import users from "./users"
+import faculties from "./faculties"
+import academicyears from "./academicyears"
+import courses from "./courses"
+import enrollments from "./enrollments"
+import assignments from "./assignments"
+import submissionquestionnaires from "./submissionquestionnaires"
+import reviewquestionnaires from "./reviewquestionnaires"
+import openquestions from "./openquestions"
+import multiplechoicequestions from "./multiplechoicequestions"
+import multiplechoicequestionoptions from "./multiplechoicequestionoptions"
+import checkboxquestions from "./checkboxquestions"
+import checkboxquestionoptions from "./checkboxquestionoptions"
+import rangequestions from "./rangequestions"
+import uploadquestions from "./uploadquestions"
+import groups from "./groups"
+import submissions from "./submissions"
+import reviewofsubmissions from "./reviewofsubmissions"
+import reviewofreviews from "./reviewofreviews"
+import openquestionanswers from "./openquestionanswers"
+import multiplechoicequestionanswers from "./multiplechoicequestionanswers"
+import checkboxquestionanswers from "./checkboxquestionanswers"
+import rangequestionanswers from "./rangequestionanswers"
+import uploadquestionanswers from "./uploadquestionanswers"
 
 export default {
-    client,
-    getAuthenticated: async () => {
+    getAuthenticated: () => {
         return client.get("authenticated")
     },
-    getUserInfo() {
+    getMe() {
         return client.get("me")
     },
-    ...assignmentApi,
-    ...courseApi,
-    ...facultiesApi,
-    ...academicYearsApi,
-    ...enrollmentApi,
-    ...submissionApi,
-    ...submissionquestionnairesApi
+    users: users,
+    faculties: faculties,
+    academicyears: academicyears,
+    courses: courses,
+    enrollments: enrollments,
+    assignments: assignments,
+    submissionquestionnaires: submissionquestionnaires,
+    reviewquestionnaires: reviewquestionnaires,
+    openquestions: openquestions,
+    multiplechoicequestions: multiplechoicequestions,
+    multiplechoicequestionoptions: multiplechoicequestionoptions,
+    checkboxquestions: checkboxquestions,
+    checkboxquestionoptions: checkboxquestionoptions,
+    rangequestions: rangequestions,
+    uploadquestions: uploadquestions,
+    groups: groups,
+    submissions: submissions,
+    reviewofsubmissions: reviewofsubmissions,
+    reviewofreviews: reviewofreviews,
+    openquestionanswers: openquestionanswers,
+    multiplechoicequestionanswers: multiplechoicequestionanswers,
+    checkboxquestionanswers: checkboxquestionanswers,
+    rangequestionanswers: rangequestionanswers,
+    uploadquestionanswers: uploadquestionanswers
 }

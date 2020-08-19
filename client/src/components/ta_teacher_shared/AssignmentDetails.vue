@@ -4,6 +4,12 @@
             <dt>Description</dt>
             <dd>{{ assignment.description }}</dd>
 
+            <dt>Enrollable</dt>
+            <dd>{{ assignment.enrollable }}</dd>
+
+            <dt>Review Evaluation</dt>
+            <dd>{{ assignment.reviewEvaluation }}</dd>
+
             <dt>Publish date and time</dt>
             <dd>{{ assignment.publishDate | formatDate }}</dd>
 
@@ -16,10 +22,10 @@
             <dt>Peer review due date and time</dt>
             <dd>{{ assignment.reviewDueDate | formatDate }}</dd>
 
-            <dt v-if="assignment.reviewEvaluationDueDate != null">Review evaluation due date and time</dt>
-            <dd v-if="assignment.reviewEvaluationDueDate != null">
-                {{ assignment.reviewEvaluationDueDate | formatDate }}
-            </dd>
+            <div v-if="assignment.reviewEvaluation">
+                <dt>Review evaluation due date and time</dt>
+                <dd>{{ assignment.reviewEvaluationDueDate | formatDate }}</dd>
+            </div>
 
             <dt>Amount of peer reviews assigned per student</dt>
             <dd>{{ assignment.reviewsPerUser }}</dd>
@@ -35,7 +41,7 @@
             <dt>Assignment Link</dt>
             <dd v-if="assignment.externalLink == null">No assignment link given</dd>
             <dd v-else>
-                <a :href="assignment.externalLink" target="_blank">{{ assignment.externalLink }}</a>
+                <a :href="'//' + assignment.externalLink" target="_blank">{{ assignment.externalLink }}</a>
             </dd>
         </dl>
     </b-card>

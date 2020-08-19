@@ -32,6 +32,10 @@
                             <template slot="button-content">
                                 <span class="p-3 align-middle">{{ user.displayName }}</span>
                             </template>
+                            <b-dropdown-item v-b-modal.userinfo-modal>Userinfo</b-dropdown-item>
+                            <b-modal id="userinfo-modal" hide-header hide-footer>
+                                <UserInfo :user="user"></UserInfo>
+                            </b-modal>
                             <b-dropdown-item href="/api/logout">Sign-out</b-dropdown-item>
                         </b-nav-item-dropdown>
                     </b-navbar-nav>
@@ -60,9 +64,11 @@
 
 <script>
 import api from "../api/api"
+import UserInfo from "./general/UserInfo"
 
 export default {
     props: ["links", "title", "role", "variant"],
+    components: { UserInfo },
     data() {
         return {
             authenticated: null,
@@ -100,17 +106,19 @@ export default {
     async mounted() {
         // Fetch authentication & user information.
         await this.refreshAuthenticated()
-        await this.refreshUser()
+        if (this.authenticated) {
+            await this.refreshMe()
+        }
     },
     methods: {
         async refreshAuthenticated() {
             // Refresh whether user is authenticated.
-            let res = await api.getAuthenticated()
+            const res = await api.getAuthenticated()
             this.authenticated = res.data.authenticated
         },
-        async refreshUser() {
+        async refreshMe() {
             // Refresh user information.
-            let res = await api.getUserInfo()
+            const res = await api.getMe()
             this.user = res.data
         }
     }

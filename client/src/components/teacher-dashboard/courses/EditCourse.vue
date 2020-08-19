@@ -4,7 +4,7 @@
             <!--Header-->
             <b-row>
                 <b-col>
-                    <h1 class="mt-5">Edit {{ course.name }}</h1>
+                    <h1 class="mt-5">Edit Course</h1>
                 </b-col>
             </b-row>
 
@@ -17,7 +17,7 @@
                                 <b-form-input
                                     v-model="course.name"
                                     type="text"
-                                    placeholder="Please enter the course name here"
+                                    placeholder="Please enter the course name"
                                     required
                                 >
                                 </b-form-input>
@@ -27,29 +27,41 @@
                                     v-model="course.courseCode"
                                     type="text"
                                     placeholder="Please enter the course code"
+                                    required
                                 >
                                 </b-form-input>
                             </b-form-group>
                             <b-form-group label="Course description">
-                                <b-form-textarea
+                                <b-form-input
                                     v-model="course.description"
-                                    id="textareadescription"
-                                    placeholder="Please enter the course description here"
-                                    :rows="4"
-                                    required
+                                    type="text"
+                                    placeholder="Please enter a course description"
                                 >
-                                </b-form-textarea>
+                                </b-form-input>
                             </b-form-group>
+
                             <b-form-group label="Faculty" description="">
-                                <b-form-select :options="faculties" v-model="course.faculty.name"></b-form-select>
+                                <b-form-select v-model="course.faculty" required>
+                                    <b-form-select-option
+                                        v-for="faculty in faculties"
+                                        :key="faculty.name"
+                                        :value="faculty"
+                                        >{{ faculty.name }} - {{ faculty.longName }}
+                                    </b-form-select-option>
+                                </b-form-select>
                             </b-form-group>
 
                             <b-form-group label="Academic Year" description="">
-                                <b-form-select
-                                    :options="academicYears"
-                                    v-model="course.academicYear.name"
-                                ></b-form-select>
+                                <b-form-select v-model="course.academicYear" required>
+                                    <b-form-select-option
+                                        v-for="academicYear in academicYears"
+                                        :key="academicYear.name"
+                                        :value="academicYear"
+                                        >{{ academicYear.name }}</b-form-select-option
+                                    >
+                                </b-form-select>
                             </b-form-group>
+
                             <b-form-group label="">
                                 <b-form-checkbox id="enrollable" v-model="course.enrollable">
                                     Students can enroll themselves for this course
@@ -70,63 +82,39 @@ import api from "../../../api/api"
 export default {
     data() {
         return {
-            course: {
-                id: null,
-                name: null,
-                description: null,
-                enrollable: false,
-                faculty: {
-                    name: null,
-                    longName: null
-                },
-                academicYear: {
-                    name: null,
-                    active: null
-                },
-                courseCode: null
-            },
+            course: {},
             faculties: [],
             academicYears: []
         }
     },
     async created() {
-        let id = this.$route.params.courseId
-        this.course.id = id
-        let res = await api.getCourse(id)
+        // get courses
+        let res = await api.courses.get(this.$route.params.courseId)
         this.course = res.data
-
         await this.fetchFaculties()
-        await this.fetchAcademicYears()
+        await this.fetchActiveAcademicYears()
     },
     methods: {
         async fetchFaculties() {
-            try {
-                let res = await api.getFaculties()
-
-                this.faculties = res.data.map(entry => {
-                    return { value: entry.name, text: entry.name }
-                })
-            } catch (e) {
-                console.log(e)
-            }
+            let res = await api.faculties.get()
+            this.faculties = res.data
         },
-
-        async fetchAcademicYears() {
-            try {
-                let res = await api.getAcademicYears(true)
-                this.academicYears = res.data.map(entry => {
-                    return { value: entry.name, text: entry.name }
-                })
-            } catch (e) {
-                console.log(e)
-            }
+        async fetchActiveAcademicYears() {
+            const res = await api.academicyears.get(true)
+            this.academicYears = res.data
         },
-
         async onSubmit() {
-            let res = await api.saveCourse(this.course.id, this.course)
-            console.log(this.course)
-            console.log(res)
+            await api.courses.patch(
+                this.course.id,
+                this.course.name,
+                this.course.courseCode,
+                this.course.enrollable,
+                this.course.faculty.name,
+                this.course.academicYear.name,
+                this.course.description
+            )
             this.$router.push({ name: "teacher-dashboard.course", params: { courseId: this.course.id } })
+            location.reload()
         }
     }
 }
