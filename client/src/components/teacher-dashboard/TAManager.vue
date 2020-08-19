@@ -68,8 +68,8 @@
                     <br />
                     <div v-if="selectedNetid">
                         <div v-if="!selectedUser">
-                            No user with <b>{{ selectedNetid }}</b> has ever logged into Peer before, if you are sure
-                            you have the right netID, you can click the button below
+                            No user with <b>{{ selectedNetid }}</b> has ever logged into Peer before or you are not an
+                            employee, if you are sure you have the right netID, you can click the button below
                         </div>
                         <b-button @click="addTeachingAssistant" variant="primary" size="sm"
                             >Add <b>{{ selectedNetid }}</b> as teaching assistant</b-button
