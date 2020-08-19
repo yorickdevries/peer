@@ -1091,7 +1091,7 @@ const migrateDB = async function (): Promise<void> {
       await review.save();
       reviewMap.set(oldId, review);
     } else {
-      console.log("skipped review: ", review);
+      console.log("skipped review");
     }
   }
   // QuestionAnswer,
