@@ -2,9 +2,7 @@ export default [
     {
         path: "/teaching-assistant-dashboard/courses/:courseId",
         name: "teaching-assistant-dashboard.course",
-
         redirect: { name: "teaching-assistant-dashboard.course.home" },
-
         component: () => import("../components/teaching-assistant-dashboard/Layout"),
         children: [
             {
@@ -19,7 +17,7 @@ export default [
             },
             {
                 path: "assignment/:assignmentId/reviews/:reviewId",
-                name: "teaching-assistant-dashboard.course.assignment.reviews",
+                name: "teaching-assistant-dashboard.course.assignment.review",
                 component: () => import("../components/ta_teacher_shared/ReviewApproval")
             }
         ]

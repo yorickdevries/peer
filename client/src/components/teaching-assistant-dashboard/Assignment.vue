@@ -2,7 +2,7 @@
     <div>
         <b-container>
             <!--Header-->
-            <BreadcrumbTitle :items="['Assignment', assignment.title]" class="mt-3"></BreadcrumbTitle>
+            <BreadcrumbTitle :items="['Assignments', assignment.name]" class="mt-3"></BreadcrumbTitle>
 
             <!--Tab Layout-->
             <b-card no-body>
@@ -12,22 +12,22 @@
                         <AssignmentDetails :assignment="assignment"></AssignmentDetails>
                     </b-tab>
 
+                    <!--Groups-->
+                    <b-tab title="Groups">
+                        <Groups :assignmentId="assignment.id"></Groups>
+                    </b-tab>
+
                     <!--Submissions-->
                     <b-tab title="Submissions">
-                        <Submissions :assignmentId="$route.params.assignmentId"></Submissions>
+                        <Submissions :assignmentId="assignment.id"></Submissions>
                     </b-tab>
 
                     <!--Reviews-->
                     <b-tab title="Reviews">
                         <Reviews
-                            :assignmentId="$route.params.assignmentId"
-                            :pathName="'teaching-assistant-dashboard.course.assignment.reviews'"
+                            :assignmentId="assignment.id"
+                            :pathName="'teacing-assistant-dashboard.assignments.assignment.review'"
                         ></Reviews>
-                    </b-tab>
-
-                    <!--Groups-->
-                    <b-tab title="Groups">
-                        <Groups :assignment-id="$route.params.assignmentId"></Groups>
                     </b-tab>
                 </b-tabs>
             </b-card>
@@ -53,23 +53,12 @@ export default {
     },
     data() {
         return {
-            items: [
-                {
-                    text: "Course Home",
-                    active: true
-                }
-            ],
-            assignment: {
-                id: null,
-                title: "",
-                due_date: ""
-            }
+            assignment: {}
         }
     },
     async created() {
-        // Fetch course information.
-        let { data } = await api.assignments.get(this.$route.params.assignmentId)
-        this.assignment = data
+        let res = await api.assignments.get(this.$route.params.assignmentId)
+        this.assignment = res.data
     }
 }
 </script>

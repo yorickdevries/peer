@@ -1,7 +1,6 @@
 <template>
     <div>
         <Navbar :title="course.name" :links="navbarItems" role="ta" variant="danger" />
-
         <transition name="slide-right" mode="out-in">
             <router-view></router-view>
         </transition>
@@ -18,11 +17,8 @@ export default {
     },
     data() {
         return {
-            navbarItems: [{ to: { name: "teaching-assistant-dashboard.course" }, text: "Assignments" }],
-            course: {
-                name: null
-            },
-            role: ""
+            navbarItems: [{ to: { name: "teaching-assistant-dashboard.course" }, text: "Course Home" }],
+            course: {}
         }
     },
     async created() {

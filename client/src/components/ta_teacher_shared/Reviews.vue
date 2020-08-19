@@ -96,7 +96,9 @@
                     variant="primary"
                     size="sm"
                     :to="{
-                        name: 'teacher-dashboard.assignments.assignment.review',
+                        name: $router.currentRoute.name.includes('teacher')
+                            ? 'teacher-dashboard.assignments.assignment.review'
+                            : 'teaching-assistant-dashboard.course.assignment.review',
                         params: { reviewId: data.item.id }
                     }"
                     >Show review</b-button
