@@ -1051,7 +1051,6 @@ const migrateDB = async function (): Promise<void> {
         null,
         null,
         null,
-        null,
         submission
       );
     } else if (
@@ -1067,7 +1066,6 @@ const migrateDB = async function (): Promise<void> {
         user,
         false,
         false,
-        null,
         null,
         null,
         null,
@@ -1320,8 +1318,10 @@ const migrateDB = async function (): Promise<void> {
         : null;
       review.submittedAt = submittedAt;
       // saved_at timestamptz,
-      const savedAt = oldReview.saved_at ? oldReview.saved_at : null;
-      review.savedAt = savedAt;
+
+      // skip saved at
+      // const savedAt = oldReview.saved_at ? oldReview.saved_at : null;
+      // review.savedAt = savedAt;
       // approved boolean,
       const oldApproval = oldReview.approved;
       // ta_netid varchar(500),
