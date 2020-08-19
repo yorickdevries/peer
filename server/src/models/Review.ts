@@ -231,6 +231,11 @@ export default abstract class Review extends BaseModel {
     return await questionnaire.isTeacherInCourse(user);
   }
 
+  async isTeacherOrTeachingAssistantInCourse(user: User): Promise<boolean> {
+    const questionnaire = await this.getQuestionnaire();
+    return await questionnaire.isTeacherOrTeachingAssistantInCourse(user);
+  }
+
   // checks whether the user is the reviewer
   async isReviewer(user: User): Promise<boolean> {
     return this.reviewer.netid === user.netid;

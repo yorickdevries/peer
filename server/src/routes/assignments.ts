@@ -47,10 +47,10 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
       .send(ResponseMessage.COURSE_NOT_FOUND);
     return;
   }
-  if (!(await course.isEnrolled(user, UserRole.TEACHER))) {
+  if (!(await course.isTeacherOrTeachingAssistant(user))) {
     res
       .status(HttpStatusCode.FORBIDDEN)
-      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
     return;
   }
   const allAssignments = await course.getAssignments();
@@ -79,7 +79,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   }
   if (
     !(
-      (await assignment.isTeacherInCourse(user)) ||
+      (await assignment.isTeacherOrTeachingAssistantInCourse(user)) ||
       (await assignment.isEnrolledInGroup(user))
     )
   ) {
@@ -113,7 +113,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   }
   if (
     !(
-      (await assignment.isTeacherInCourse(user)) ||
+      (await assignment.isTeacherOrTeachingAssistantInCourse(user)) ||
       (await assignment.isEnrolledInGroup(user))
     )
   ) {

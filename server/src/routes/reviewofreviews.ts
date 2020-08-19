@@ -22,7 +22,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
   }
-  if (await reviewOfReview.isTeacherInCourse(user)) {
+  if (await reviewOfReview.isTeacherOrTeachingAssistantInCourse(user)) {
     res.send(reviewOfReview);
     return;
   }
@@ -49,7 +49,7 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
   }
   const reviewAnswers = await reviewOfReview.getQuestionAnswers();
   const sortedReviewAnswers = _.sortBy(reviewAnswers, "questionId");
-  if (await reviewOfReview.isTeacherInCourse(user)) {
+  if (await reviewOfReview.isTeacherOrTeachingAssistantInCourse(user)) {
     res.send(sortedReviewAnswers);
     return;
   }

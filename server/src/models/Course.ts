@@ -148,6 +148,13 @@ export default class Course extends BaseModel {
     return this.isEnrolled(user, UserRole.TEACHER);
   }
 
+  async isTeacherOrTeachingAssistant(user: User): Promise<boolean> {
+    return (
+      (await this.isEnrolled(user, UserRole.TEACHER)) ||
+      (await this.isEnrolled(user, UserRole.TEACHING_ASSISTANT))
+    );
+  }
+
   // get all enrollable courses for a certain user
   static async getEnrollable(user: User): Promise<Course[]> {
     // all enrollable courses

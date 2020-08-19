@@ -46,11 +46,11 @@ router.get("/", validateQuery(assignmentSubmitIdSchema), async (req, res) => {
   }
   if (
     // not a teacher
-    !(await assignment.isTeacherInCourse(user))
+    !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
-      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
     return;
   }
   const questionnaire = await assignment.getSubmissionQuestionnaire();
@@ -224,7 +224,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
   }
-  if (await review.isTeacherInCourse(user)) {
+  if (await review.isTeacherOrTeachingAssistantInCourse(user)) {
     res.send(review);
     return;
   }
@@ -273,7 +273,7 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
   }
   const reviewAnswers = await review.getQuestionAnswers();
   const sortedReviewAnswers = _.sortBy(reviewAnswers, "questionId");
-  if (await review.isTeacherInCourse(user)) {
+  if (await review.isTeacherOrTeachingAssistantInCourse(user)) {
     res.send(sortedReviewAnswers);
     return;
   }
@@ -313,7 +313,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   const file = submission.file;
   const fileName = file.getFileNamewithExtension();
   const filePath = file.getPath();
-  if (await review.isTeacherInCourse(user)) {
+  if (await review.isTeacherOrTeachingAssistantInCourse(user)) {
     res.download(filePath, fileName);
     return;
   }
@@ -417,8 +417,10 @@ router.patch(
         .send(ResponseMessage.REVIEW_NOT_FOUND);
       return;
     }
-    if (!(await review.isTeacherInCourse(user))) {
-      res.status(HttpStatusCode.FORBIDDEN).send("You are not a teacher");
+    if (!(await review.isTeacherOrTeachingAssistantInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
       return;
     }
     if (!review.submitted) {
@@ -433,6 +435,15 @@ router.patch(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The assignment is not in feedback state");
+      return;
+    }
+    if (
+      review.approvingTA !== null &&
+      review.approvingTA.netid !== user.netid
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The review has already been evaluated by another TA");
       return;
     }
     // set new values
@@ -463,7 +474,7 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.NOT_FOUND).send("Evaluation is not found");
     return;
   }
-  if (await review.isTeacherInCourse(user)) {
+  if (await review.isTeacherOrTeachingAssistantInCourse(user)) {
     res.send(reviewEvaluation.getAnonymousVersionWithReviewerNetid());
     return;
   }
