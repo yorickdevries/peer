@@ -94,7 +94,7 @@ export default {
             this.faculties = res.data
         },
         async fetchActiveAcademicYears() {
-            const res = await api.academicYears.get(true)
+            const res = await api.academicyears.get(true)
             this.academicYears = res.data
         },
         async onSubmit() {

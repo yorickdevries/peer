@@ -317,7 +317,7 @@ export default {
             this.faculties = res.data
         },
         async fetchAcademicYears() {
-            const res = await api.academicYears.get()
+            const res = await api.academicyears.get()
             this.academicYears = res.data
             for (let academicYear of this.academicYears) {
                 if (academicYear.active) {

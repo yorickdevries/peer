@@ -2,7 +2,7 @@ import client from "./axiosClient"
 // subroutes
 import users from "./users"
 import faculties from "./faculties"
-import academicYears from "./academicyyears"
+import academicyears from "./academicyears"
 import courses from "./courses"
 import enrollments from "./enrollments"
 import assignments from "./assignments"
@@ -34,7 +34,7 @@ export default {
     },
     users: users,
     faculties: faculties,
-    academicYears: academicYears,
+    academicyears: academicyears,
     courses: courses,
     enrollments: enrollments,
     assignments: assignments,
