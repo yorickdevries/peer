@@ -232,6 +232,9 @@
                     >
                     <!--Submit Modal-->
                     <b-modal :id="`submit${review.id}`" title="Submit Confirmation" @ok="submitReview">
+                        <b-alert v-if="unSavedAnswers" show variant="warning" class="p-2"
+                            >There are one or more unsaved answers</b-alert
+                        >
                         Do you really want to submit? This marks the review as finished and all unsaved changes will be
                         discarded.
                     </b-modal>
@@ -264,6 +267,15 @@ export default {
         }
     },
     computed: {
+        unSavedAnswers() {
+            if (!this.answers) {
+                return false
+            }
+            const unSavedAnswers = _.filter(this.answers, answer => {
+                return answer.changed
+            })
+            return unSavedAnswers.length > 0
+        },
         userIsOwner() {
             return this.review.reviewerNetid === this.user.netid
         },
