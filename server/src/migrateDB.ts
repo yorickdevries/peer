@@ -1077,7 +1077,8 @@ const migrateDB = async function (): Promise<void> {
       );
       // set evaluatedReview to map and check for duplicate review evaluations
       if (reviewEvaluatedMap.has(evaluatedReview.id)) {
-        // console.log(review);
+        console.log("oldid: ", oldId);
+        console.log("skipped review of ", review.reviewer.netid);
         // console.log(reviewEvaluatedMap.get(evaluatedReview.id));
         //throw new Error("A review is evaluated twice!");
         skipReview = true;
@@ -1286,72 +1287,77 @@ const migrateDB = async function (): Promise<void> {
     // id SERIAL,
     const oldId = oldReview.id;
     const review = reviewMap.get(oldId)!;
+    if (review) {
+      // User_netid varchar(500) NOT NULL,
+      // already set
 
-    // User_netid varchar(500) NOT NULL,
-    // already set
-
-    // Submission_id int,
-    //aleady set
-    // evaluated_review_id int, (this review should be defiend as we go over all reviews in order of id)
-    // already set
-    // flagged BOOLEAN NOT NULL DEFAULT FALSE,
-    const flagged = oldReview.flagged;
-    review.flaggedByReviewer = flagged;
-    // Rubric_id int NOT NULL,
-    // already set
-    // done BOOLEAN NOT NULL DEFAULT FALSE,
-    const done = oldReview.done;
-    review.submitted = done;
-    // creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    const creationDate = oldReview.creation_date;
-    review.createdAt = creationDate;
-    // started_at timestamptz,
-    const startedAt = oldReview.started_at ? oldReview.started_at : null;
-    review.startedAt = startedAt;
-    // downloaded_at timestamptz,
-    const downloadedAt = oldReview.downloaded_at
-      ? oldReview.downloaded_at
-      : null;
-    review.downloadedAt = downloadedAt;
-    // submitted_at timestamptz,
-    const submittedAt = oldReview.submitted_at ? oldReview.submitted_at : null;
-    review.submittedAt = submittedAt;
-    // saved_at timestamptz,
-    const savedAt = oldReview.saved_at ? oldReview.saved_at : null;
-    review.savedAt = savedAt;
-    // approved boolean,
-    const oldApproval = oldReview.approved;
-    // ta_netid varchar(500),
-    let tauser = oldReview.ta_netid ? userMap.get(oldReview.ta_netid)! : null;
-    let approval;
-    // setting approval by otto when it was not registered yet
-    if (typeof oldApproval === "boolean") {
-      approval = oldApproval;
-      if (tauser === null && oldReview.rubric_id <= 22) {
-        tauser = userMap.get("owvisser")!;
+      // Submission_id int,
+      //aleady set
+      // evaluated_review_id int, (this review should be defiend as we go over all reviews in order of id)
+      // already set
+      // flagged BOOLEAN NOT NULL DEFAULT FALSE,
+      const flagged = oldReview.flagged;
+      review.flaggedByReviewer = flagged;
+      // Rubric_id int NOT NULL,
+      // already set
+      // done BOOLEAN NOT NULL DEFAULT FALSE,
+      const done = oldReview.done;
+      review.submitted = done;
+      // creation_date timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      const creationDate = oldReview.creation_date;
+      review.createdAt = creationDate;
+      // started_at timestamptz,
+      const startedAt = oldReview.started_at ? oldReview.started_at : null;
+      review.startedAt = startedAt;
+      // downloaded_at timestamptz,
+      const downloadedAt = oldReview.downloaded_at
+        ? oldReview.downloaded_at
+        : null;
+      review.downloadedAt = downloadedAt;
+      // submitted_at timestamptz,
+      const submittedAt = oldReview.submitted_at
+        ? oldReview.submitted_at
+        : null;
+      review.submittedAt = submittedAt;
+      // saved_at timestamptz,
+      const savedAt = oldReview.saved_at ? oldReview.saved_at : null;
+      review.savedAt = savedAt;
+      // approved boolean,
+      const oldApproval = oldReview.approved;
+      // ta_netid varchar(500),
+      let tauser = oldReview.ta_netid ? userMap.get(oldReview.ta_netid)! : null;
+      let approval;
+      // setting approval by otto when it was not registered yet
+      if (typeof oldApproval === "boolean") {
+        approval = oldApproval;
+        if (tauser === null && oldReview.rubric_id <= 22) {
+          tauser = userMap.get("owvisser")!;
+        }
+      } else {
+        approval = null;
       }
+      review.approvalByTA = approval;
+      review.approvingTA = tauser;
+
+      // unsubmitting these unfilled reviews which were submitted due to a bug?
+      if (oldId === 3577 || oldId === 4743 || oldId === 6247) {
+        review.submitted = false;
+        review.approvalByTA = null;
+        review.approvingTA = null;
+        console.log("unsubmitted review: " + oldId);
+      }
+      if (oldId === 32252) {
+        review.approvalByTA = null;
+        review.approvingTA = null;
+        console.log("approval removed review: " + oldId);
+      }
+
+      // log the errors to the console so they can be solved in one go
+      await review.save();
+      reviewMap.set(oldId, review);
     } else {
-      approval = null;
+      console.log("skipped review,", oldId);
     }
-    review.approvalByTA = approval;
-    review.approvingTA = tauser;
-
-    // unsubmitting these unfilled reviews which were submitted due to a bug?
-    if (oldId === 3577 || oldId === 4743 || oldId === 6247) {
-      review.submitted = false;
-      review.approvalByTA = null;
-      review.approvingTA = null;
-      console.log("unsubmitted review: " + oldId);
-    }
-    if (oldId === 32252) {
-      review.approvalByTA = null;
-      review.approvingTA = null;
-      console.log("approval removed review: " + oldId);
-    }
-
-    // log the errors to the console so they can be solved in one go
-    await review.save();
-    reviewMap.set(oldId, review);
   }
 
   console.log("Done migration");
