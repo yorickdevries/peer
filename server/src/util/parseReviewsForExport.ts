@@ -3,9 +3,6 @@ import _ from "lodash";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import Question from "../models/Question";
 
-// TODO Fields like savedAt, StartedAt etc are not set yet
-// These should be tested with the frontend to be sure they are triggered properly
-
 const parseSubmissionReviewsForExport = async function (
   submissionQuestionnaire: SubmissionQuestionnaire
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,18 +51,17 @@ const parseSubmissionReviewsForExport = async function (
     parsedReview["Submission review started_at"] = review.startedAt;
     // Submission review downloaded_at
     parsedReview["Submission review downloaded_at"] = review.downloadedAt;
-    // Submission review saved_at
-    parsedReview["Submission review saved_at"] = review.savedAt;
     // Submission review submitted_at
     parsedReview["Submission review submitted_at"] = review.submittedAt;
     // Submission review done
     parsedReview["Submission review done"] = review.submitted;
     // Approval status
-    parsedReview["Approval status"] = review.approvalByTA;
+    parsedReview["Submission review Approval status"] = review.approvalByTA;
     // TA netid
-    parsedReview["TA netid"] = review.approvingTA?.netid;
+    parsedReview["Submission review TA netid"] = review.approvingTA?.netid;
     // Reviewer reported the submission
-    parsedReview["Reviewer reported the submission"] = review.flaggedByReviewer;
+    parsedReview["Submission review Reviewer reported the submission"] =
+      review.flaggedByReviewer;
 
     // iterate over all questions
     for (const question of questions) {
@@ -98,13 +94,20 @@ const parseSubmissionReviewsForExport = async function (
     // Review evaluation downloaded_at
     parsedReview["Review evaluation downloaded_at"] =
       reviewEvaluation?.downloadedAt;
-    // Review evaluation saved_at
-    parsedReview["Review evaluation saved_at"] = reviewEvaluation?.savedAt;
     // Review evaluation submitted_at
     parsedReview["Review evaluation submitted_at"] =
       reviewEvaluation?.submittedAt;
-    // Review evaluation done
+    // Submission review done
     parsedReview["Review evaluation done"] = reviewEvaluation?.submitted;
+    // Approval status
+    parsedReview["Review evaluation Approval status"] =
+      reviewEvaluation?.approvalByTA;
+    // TA netid
+    parsedReview["Review evaluation TA netid"] =
+      reviewEvaluation?.approvingTA?.netid;
+    // Reviewer reported the submission
+    parsedReview["Review evaluation Reviewer reported the submission"] =
+      reviewEvaluation?.flaggedByReviewer;
 
     // iterate over all questions
     for (const question of reviewEvaluationQuestions) {

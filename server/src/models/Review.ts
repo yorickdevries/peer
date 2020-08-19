@@ -90,15 +90,6 @@ export default abstract class Review extends BaseModel {
   @IsDate()
   downloadedAt: Date | null;
 
-  // saved_at timestamptz,
-  @Column({
-    type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
-    nullable: true,
-  })
-  @IsOptional()
-  @IsDate()
-  savedAt: Date | null;
-
   // submitted_at timestamptz,
   @Column({
     type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
@@ -136,7 +127,6 @@ export default abstract class Review extends BaseModel {
     submitted: boolean,
     startedAt: Date | null,
     downloadedAt: Date | null,
-    savedAt: Date | null,
     submittedAt: Date | null,
     approvalByTA: boolean | null,
     approvingTA: User | null
@@ -148,7 +138,6 @@ export default abstract class Review extends BaseModel {
     this.submitted = submitted;
     this.startedAt = startedAt;
     this.downloadedAt = downloadedAt;
-    this.savedAt = savedAt;
     this.submittedAt = submittedAt;
     this.approvalByTA = approvalByTA;
     this.approvingTA = approvingTA;
@@ -186,6 +175,13 @@ export default abstract class Review extends BaseModel {
     // check whether the review is allowed to be submitted
     if (this.submitted && !(await this.canBeSubmitted())) {
       throw new Error("A non-optional question isn't answered yet.");
+    }
+    // submitted and submittedAt
+    if (this.submitted && !this.submittedAt) {
+      throw new Error("submittedAt needs to be defined");
+    }
+    if (!this.submitted && this.submittedAt) {
+      throw new Error("submittedAt needs to be null");
     }
     // if all succeeds the super validateOrReject can be called
     return super.validateOrReject();
@@ -233,6 +229,11 @@ export default abstract class Review extends BaseModel {
   async isTeacherInCourse(user: User): Promise<boolean> {
     const questionnaire = await this.getQuestionnaire();
     return await questionnaire.isTeacherInCourse(user);
+  }
+
+  async isTeacherOrTeachingAssistantInCourse(user: User): Promise<boolean> {
+    const questionnaire = await this.getQuestionnaire();
+    return await questionnaire.isTeacherOrTeachingAssistantInCourse(user);
   }
 
   // checks whether the user is the reviewer

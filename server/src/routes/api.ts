@@ -5,6 +5,7 @@ import checkAndSetAuthentication from "../middleware/authentication/checkAuthent
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ResponseMessage from "../enum/ResponseMessage";
 // routes
+import users from "./users";
 import faculties from "./faculties";
 import academicyears from "./academicyears";
 import courses from "./courses";
@@ -29,9 +30,6 @@ import uploadquestionanswers from "./uploadquestionanswers";
 import multiplechoicequestionanswers from "./multiplechoicequestionanswers";
 import checkboxquestionanswers from "./checkboxquestionanswers";
 
-// old routes, can be deleted when not needed anymore
-import oldRoutes from "../old_api/routes/api";
-
 const router = express.Router();
 router.use(eventLogger);
 
@@ -55,6 +53,7 @@ router.get("/me", async (req, res) => {
 });
 
 // TODO: Complete routing of the new API
+router.use("/users", users);
 router.use("/faculties", faculties);
 router.use("/academicyears", academicyears);
 router.use("/courses", courses);
@@ -78,9 +77,6 @@ router.use("/rangequestionanswers", rangequestionanswers);
 router.use("/uploadquestionanswers", uploadquestionanswers);
 router.use("/multiplechoicequestionanswers", multiplechoicequestionanswers);
 router.use("/checkboxquestionanswers", checkboxquestionanswers);
-
-// old routes, can be deleted when not needed anymore
-router.use("/oldroutes", oldRoutes);
 
 // If no other routes apply, send a 404
 router.use((_req, res) => {

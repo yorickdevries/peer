@@ -123,6 +123,11 @@ export default class Group extends BaseModel {
 
   async isTeacherInCourse(user: User): Promise<boolean> {
     const course = await this.getCourse();
-    return await course.isEnrolled(user, UserRole.TEACHER);
+    return await course.isTeacher(user);
+  }
+
+  async isTeacherOrTeachingAssistantInCourse(user: User): Promise<boolean> {
+    const course = await this.getCourse();
+    return await course.isTeacherOrTeachingAssistant(user);
   }
 }

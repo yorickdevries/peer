@@ -19,7 +19,6 @@ export default class ReviewOfReview extends Review {
     submitted: boolean,
     startedAt: Date | null,
     downloadedAt: Date | null,
-    savedAt: Date | null,
     submittedAt: Date | null,
     approvalByTA: boolean | null,
     approvingTA: User | null,
@@ -32,7 +31,6 @@ export default class ReviewOfReview extends Review {
       submitted,
       startedAt,
       downloadedAt,
-      savedAt,
       submittedAt,
       approvalByTA,
       approvingTA

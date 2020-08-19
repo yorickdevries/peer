@@ -15,9 +15,9 @@
             <b-form-file
                 v-model="file"
                 accept=".csv"
-                :state="Boolean(file)"
                 placeholder="Choose a .csv file..."
                 required
+                :state="Boolean(file)"
             >
             </b-form-file>
             <b-button variant="primary" class="mt-3" @click="importGroups">Import groups</b-button>
@@ -26,36 +26,20 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
 import notifications from "../../mixins/notifications"
 
 export default {
     mixins: [notifications],
-    props: ["assignmentId"],
     data() {
         return {
-            groupColumn: undefined,
-            file: true,
-            fileProgress: 0,
-            uploadSuccess: null,
-            acceptFiles: ".csv"
+            file: null
         }
     },
     methods: {
-        // Submit to back-end
         async importGroups() {
-            // Compose object to send to server
-            let formData = new FormData()
-            formData.append("groupColumn", this.groupColumn)
-            formData.append("groupFile", this.file)
-
-            // Send files to server
-            try {
-                await api.client.post(`/assignments/${this.assignmentId}/importgroups`, formData)
-                this.showSuccessMessage()
-            } catch (e) {
-                this.showErrorMessage({ message: e.response.data.error })
-            }
+            await api.groups.import(this.$route.params.assignmentId, this.file)
+            this.showSuccessMessage()
         }
     }
 }
