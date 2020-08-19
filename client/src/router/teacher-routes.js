@@ -1,8 +1,23 @@
+import api from "../api/api"
+
 export default [
     {
         path: "/teacher-dashboard",
         name: "teacher-dashboard",
         component: () => import("../components/teacher-dashboard/Layout"),
+        beforeEnter: async (to, from, next) => {
+            try {
+                const res = await api.courses.enrollment(to.params.courseId)
+                const enrollment = res.data
+                if (enrollment.role !== "teacher") {
+                    throw new Error("Wrong role")
+                }
+                next()
+            } catch (error) {
+                //redirect to root
+                next("/")
+            }
+        },
         children: [
             {
                 path: "courses/:courseId",

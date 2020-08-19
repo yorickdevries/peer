@@ -16,9 +16,9 @@ export default {
     enroll(id) {
         return client.post(`courses/${id}/enroll`)
     },
-    // enrollment(id) {
-    //     return client.get(`courses/${id}/enrollment`)
-    // },
+    enrollment(id) {
+        return client.get(`courses/${id}/enrollment`)
+    },
     post(name, courseCode, enrollable, facultyName, academicYearName, description) {
         if (!description) {
             description = null
