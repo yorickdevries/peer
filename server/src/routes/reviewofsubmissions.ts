@@ -338,7 +338,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   // reviewed user should access the review when getting feedback and the review is finished
   if (
     (await review.isReviewed(user)) &&
-    assignmentState === AssignmentState.FEEDBACK &&
+    assignment.isAtState(AssignmentState.FEEDBACK) &&
     review.submitted
   ) {
     res.download(filePath, fileName);
