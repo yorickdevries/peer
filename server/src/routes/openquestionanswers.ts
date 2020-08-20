@@ -1,10 +1,6 @@
 import express from "express";
 import Joi from "@hapi/joi";
-import {
-  validateBody,
-  validateParams,
-  idSchema,
-} from "../middleware/validation";
+import { validateBody, validateQuery } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import OpenQuestion from "../models/OpenQuestion";
 import ResponseMessage from "../enum/ResponseMessage";
@@ -98,14 +94,23 @@ router.post("/", validateBody(openAnswerSchema), async (req, res) => {
   res.send(openAnswer);
 });
 
+// Joi inputvalidation
+const deleteOpenAnswerSchema = Joi.object({
+  openQuestionId: Joi.number().integer().required(),
+  reviewId: Joi.number().integer().required(),
+});
 // delete an openAnswer
-router.delete("/:id", validateParams(idSchema), async (req, res) => {
+router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const questionAnswerId: number = req.params.id as any;
-  const questionAnswer = await OpenQuestionAnswer.findOne(questionAnswerId);
+  const questionAnswer = await OpenQuestionAnswer.findOne({
+    where: {
+      questionId: req.query.openQuestionId,
+      reviewId: req.query.reviewId,
+    },
+  });
   if (!questionAnswer) {
     res
       .status(HttpStatusCode.NOT_FOUND)
