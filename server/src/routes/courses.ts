@@ -206,7 +206,7 @@ router.get(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const course = await Course.findOne(req.params.courseId);
+    const course = await Course.findOne(req.params.id);
     if (!course) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -232,7 +232,7 @@ router.get(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const course = await Course.findOne(req.params.courseId);
+    const course = await Course.findOne(req.params.id);
     if (!course) {
       res
         .status(HttpStatusCode.BAD_REQUEST)

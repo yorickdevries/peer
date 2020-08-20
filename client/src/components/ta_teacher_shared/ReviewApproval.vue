@@ -3,7 +3,7 @@
         <b-container>
             <!--Header-->
             <BreadcrumbTitle
-                :items="['Assignments', assignment.title, 'Reviews', peerReview.review.id]"
+                :items="['Assignments', assignment.name, 'Reviews', review.id]"
                 class="mt-3"
             ></BreadcrumbTitle>
 
@@ -12,10 +12,12 @@
                 <b-card-header class="d-flex justify-content-between align-items-center">
                     <div>Review information</div>
                     <div>
-                        <b-button size="sm" variant="secondary" @click="backToReviewList" class="mr-2"
+                        <b-button size="sm" variant="secondary" @click="goToReviewList" class="mr-2"
                             >Back to Assignment</b-button
                         >
-                        <b-button size="sm" variant="primary" @click="goToNextReview">Next (Random) Review</b-button>
+                        <b-button size="sm" variant="primary" @click="goToNextReviewWithoutApproval"
+                            >Next (Random) Review Without Approval</b-button
+                        >
                     </div>
                 </b-card-header>
                 <b-card-body>
@@ -26,8 +28,12 @@
                                 <dl>
                                     <dt>Download</dt>
                                     <dd>The download for the submission this review is about.</dd>
-                                    <a target="_blank" :href="peerReviewFilePath">
-                                        <button type="button" class="btn btn-success success">
+                                    <a target="_blank" :href="reviewFilePath">
+                                        <button
+                                            type="button"
+                                            class="btn btn-success success w-100"
+                                            style="height: 3rem"
+                                        >
                                             Download Submission
                                         </button>
                                     </a>
@@ -37,143 +43,171 @@
 
                         <!--Approval-->
                         <b-col cols="6">
-                            <div>
-                                <dl>
-                                    <dt>Current approval status</dt>
-                                    <dd v-if="peerReview.review.approved">Approved</dd>
-                                    <dd v-if="peerReview.review.approved === false">Disapproved</dd>
-                                    <dd v-if="peerReview.review.approved === null || peerReview.undefined">
-                                        No action yet by any TA.
-                                    </dd>
-                                    <dd><small>(You can change this on the bottom of the page)</small></dd>
-                                </dl>
-                            </div>
+                            <dl>
+                                <dt>Current submission status</dt>
+                                <dd>{{ review.submitted ? "" : "Not " }}Submitted</dd>
+                            </dl>
+                            <dl>
+                                <dt>Current report status</dt>
+                                <dd>{{ review.flaggedByReviewer ? "" : "Not " }}Reported as insufficient</dd>
+                            </dl>
+                            <dl v-if="review.submitted">
+                                <dt>Current approval status</dt>
+                                <dd v-if="review.approvalByTA">Approved 👍</dd>
+                                <dd v-if="review.approvalByTA === false">Disapproved 👎</dd>
+                                <dd v-if="review.approvalByTA === null">No action yet by any TA.</dd>
+                            </dl>
+                        </b-col>
+                    </b-row>
+
+                    <!--See Review Evaluation is exist-->
+                    <b-row v-if="reviewEvaluation">
+                        <b-col>
+                            <b-button
+                                v-b-modal="`reviewModal${review.id}`"
+                                variant="warning"
+                                class="w-100"
+                                style="height: 3rem"
+                                >Show Review Evaluation</b-button
+                            >
+                            <b-modal
+                                :title="`Review (ID: ${review.id})`"
+                                :id="`reviewModal${review.id}`"
+                                size="lg"
+                                hide-footer
+                            >
+                                <ReviewEvaluation :feedbackReviewId="review.id"></ReviewEvaluation>
+                            </b-modal>
                         </b-col>
                     </b-row>
                 </b-card-body>
             </b-card>
 
-            <b-card no-body class="mt-3">
+            <b-card v-if="answers" no-body class="mt-3">
                 <!--Form-->
                 <b-list-group flush>
-                    <!--Questions-->
-                    <b-list-group-item
-                        class="py-4"
-                        v-for="pair in peerReviewSorted.form"
-                        :key="pair.question.id + pair.question.type_question"
-                    >
-                        <!--Question Information-->
-                        <div class="mb-2">
-                            <h5 class="text-primary">
-                                Question {{ pair.question.question_number }} of {{ totalAmountOfQuestions }}
-                            </h5>
-                            <b-badge
-                                pill
-                                v-if="pair.question.optional"
-                                variant="secondary"
-                                class="ml-2 float-right p-1"
+                    <!--Question Information-->
+                    <b-card v-for="question in questionnaire.questions" :key="question.id" class="mb-3" no-body>
+                        <b-card-header class="d-flex align-items-center">
+                            <span class="w-100"
+                                >Question {{ question.number }} of {{ questionnaire.questions.length }}</span
                             >
+                            <b-badge variant="primary" class="ml-2 float-right p-1"
+                                >{{ question.type.toUpperCase() }} QUESTION
+                            </b-badge>
+                            <b-badge pill v-if="question.optional" variant="secondary" class="ml-2 float-right p-1">
                                 OPTIONAL
                             </b-badge>
                             <b-badge v-else variant="danger" class="ml-2 float-right p-1">
                                 REQUIRED
                             </b-badge>
-                            <p>{{ pair.question.question }}</p>
-                        </div>
+                        </b-card-header>
 
-                        <!-- OPEN QUESTION -->
-                        <b-form-textarea
-                            v-if="pair.question.type_question === 'open'"
-                            id="textarea1"
-                            placeholder="Enter something"
-                            :rows="10"
-                            :max-rows="15"
-                            v-model="pair.answer.answer"
-                            :readonly="true"
-                            required
-                        />
+                        <b-card-body>
+                            <!-- Text-->
+                            <h4>{{ question.text }}</h4>
 
-                        <!-- RANGE QUESTION -->
-                        <StarRating
-                            v-else-if="pair.question.type_question === 'range'"
-                            class="align-middle"
-                            :border-color="'#007bff'"
-                            :active-color="'#007bff'"
-                            :border-width="2"
-                            :item-size="20"
-                            :spacing="5"
-                            inline
-                            :max-rating="Number(pair.question.range)"
-                            :show-rating="false"
-                            :read-only="true"
-                            v-model="pair.answer.answer"
-                        />
+                            <!-- OPEN QUESTION -->
+                            <b-form-textarea
+                                v-if="question.type === 'open'"
+                                placeholder="Enter your answer"
+                                :rows="10"
+                                :max-rows="15"
+                                v-model="answers[question.id].answer"
+                                readonly
+                                required
+                            />
 
-                        <!-- MPC QUESTION -->
-                        <b-form-group v-else-if="pair.question.type_question === 'mc'">
+                            <!-- MULTIPLE CHOICE QUESTION -->
                             <b-form-radio-group
-                                :options="transformOptionsToHTMLOptions(pair.question.option)"
-                                v-model="pair.answer.answer"
+                                v-if="question.type === 'multiplechoice'"
+                                v-model="answers[question.id].answer"
                                 stacked
                                 required
-                                :disabled="true"
+                                disabled
                             >
+                                <b-form-radio v-for="option in question.options" :key="option.id" :value="option">{{
+                                    option.text
+                                }}</b-form-radio>
                             </b-form-radio-group>
-                        </b-form-group>
 
-                        <!-- CHECKBOX QUESTION -->
-                        <b-form-group v-else-if="pair.question.type_question === 'checkbox'">
+                            <!-- CHECKBOX QUESTION -->
                             <b-form-checkbox-group
-                                :options="transformOptionsToHTMLOptions(pair.question.option)"
-                                v-model="pair.answer.answer"
+                                v-if="question.type === 'checkbox'"
+                                v-model="answers[question.id].answer"
                                 stacked
                                 required
-                                :disabled="true"
+                                disabled
                             >
+                                <b-form-checkbox v-for="option in question.options" :key="option.id" :value="option">{{
+                                    option.text
+                                }}</b-form-checkbox>
                             </b-form-checkbox-group>
-                        </b-form-group>
 
-                        <!-- UPLOAD QUESTION -->
-                        <template v-if="pair.question.type_question === 'upload'">
-                            <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
-                                <!--Buttons for toggling new assignment upload-->
-                                <div>
-                                    <div v-if="pair.answer.answer">
-                                        File uploaded:
-                                        <a :href="uploadQuestionFilePath(peerReview.review.id, pair.question.id)">
-                                            {{ pair.answer.answer }}
-                                        </a>
-                                    </div>
-                                    <div v-else>No file has been uploaded.</div>
-                                </div>
-                            </b-alert>
-                        </template>
-                    </b-list-group-item>
+                            <!-- RANGE QUESTION -->
+                            <StarRating
+                                v-if="question.type === 'range'"
+                                v-model="answers[question.id].answer"
+                                class="align-middle"
+                                :border-color="'#007bff'"
+                                :active-color="'#007bff'"
+                                :border-width="2"
+                                :item-size="20"
+                                :spacing="5"
+                                inline
+                                :max-rating="question.range"
+                                :show-rating="true"
+                                read-only
+                            />
+
+                            <!-- UPLOAD QUESTION -->
+                            <b-form-group v-if="question.type === 'upload'" class="mb-0">
+                                <!--Show whether file has been uploaded-->
+                                <b-alert v-if="answers[question.id].answer" show variant="success" class="p-2"
+                                    >File uploaded:
+                                    <a :href="uploadAnswerFilePath(review.id, question.id)">
+                                        {{ answers[question.id].answer.name
+                                        }}{{ answers[question.id].answer.extension }}
+                                    </a>
+                                </b-alert>
+                                <!--Show note if a file has been uploaded and review not submitted-->
+                                <b-alert v-if="answers[question.id].answer" show variant="secondary" class="p-2"
+                                    >Note: uploading a new file will overwrite your current file. <br />
+                                    Allowed file types: {{ question.extensions }}
+                                </b-alert>
+                                <b-alert v-else show variant="warning" class="p-2">
+                                    Currently, no file has been uploaded. <br />
+                                    Allowed file types: {{ question.extensions }}
+                                </b-alert>
+                                <b-form-file placeholder="Choose a new file..." disabled> </b-form-file>
+                            </b-form-group>
+                        </b-card-body>
+                    </b-card>
                 </b-list-group>
             </b-card>
 
-            <b-card class="mt-3">
+            <b-card v-if="review.submitted" class="mt-3">
                 <!--Approval-->
                 <div>
                     <dl>
                         <dt>Current approval status</dt>
-                        <dd v-if="peerReview.review.approved">Approved</dd>
-                        <dd v-if="peerReview.review.approved === false">Disapproved</dd>
-                        <dd v-if="peerReview.review.approved === null || peerReview.undefined">
-                            No action yet by any TA.
-                        </dd>
+                        <dd v-if="review.approvalByTA">Approved 👍</dd>
+                        <dd v-if="review.approvalByTA === false">Disapproved 👎</dd>
+                        <dd v-if="review.approvalByTA === null">No action yet by any TA.</dd>
                         <dd>
                             <b-button
                                 variant="danger"
                                 class="mr-2"
-                                @click="disapprove"
-                                :disabled="peerReview.review.approved === false"
+                                @click="updateReviewApproval(false)"
+                                :disabled="review.approvalByTA === false"
+                                >Disapprove 👎</b-button
                             >
-                                Disapprove 👎
-                            </b-button>
-                            <b-button variant="success" @click="approve" :disabled="peerReview.review.approved">
-                                Approve 👍
-                            </b-button>
+                            <b-button
+                                variant="success"
+                                @click="updateReviewApproval(true)"
+                                :disabled="review.approvalByTA === true"
+                                >Approve 👍</b-button
+                            >
                         </dd>
                     </dl>
                 </div>
@@ -183,119 +217,142 @@
 </template>
 
 <script>
-import api from "../../api/api_old"
+import api from "../../api/api"
+import _ from "lodash"
 import notifications from "../../mixins/notifications"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 import { StarRating } from "vue-rate-it"
+import ReviewEvaluation from "../student-dashboard/assignment/ReviewEvaluation"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle, StarRating },
+    components: { BreadcrumbTitle, StarRating, ReviewEvaluation },
     data() {
         return {
-            peerReview: {
-                review: {
-                    id: null,
-                    rubric_id: null,
-                    file_path: "",
-                    comment: null,
-                    done: null,
-                    approved: null
-                },
-                form: []
-            },
-            assignment: {
-                title: ""
-            }
+            assignment: {},
+            questionnaire: {},
+            review: {},
+            reviewEvaluation: null,
+            // all answers will be saved in this object
+            answers: null
         }
     },
     computed: {
-        peerReviewSorted() {
-            // Returns the review object, but sorted on question number.
-            return {
-                review: this.peerReview.review,
-                form: this.peerReview.form.slice().sort((a, b) => {
-                    return a.question.question_number - b.question.question_number
-                })
-            }
-        },
-        totalAmountOfQuestions() {
-            return this.peerReview.form.length
-        },
-        peerReviewFilePath() {
+        reviewFilePath() {
             // Get the submission file path.
-            return `/api/oldroutes/reviews/${this.peerReview.review.id}/file`
+            return `/api/reviewofsubmissions/${this.review.id}/file`
         }
     },
     async created() {
-        // Load review.
-        try {
-            const { data: peerReview } = await api.getPeerReview(this.$route.params.reviewId)
-            this.peerReview = peerReview
-        } catch (e) {
-            this.showErrorMessage({ message: "Review could not be loaded." })
-        }
-
-        // Load assignment info.
-        try {
-            const rubric = (await api.getRubric(this.peerReview.review.rubric_id)).data
-            const { data: assignment } = await api.getAssignment(rubric.assignment_id)
-            this.assignment = assignment
-        } catch (e) {
-            this.showErrorMessage()
-        }
+        await this.fetchData()
     },
     methods: {
-        transformOptionsToHTMLOptions(options) {
-            // Transforms the option array from the API to a HTML option array.
-            return options.map(option => {
-                return { text: option.option, value: option.id }
-            })
+        async fetchData() {
+            await this.fetchAssignment()
+            await this.fetchReview()
+            await this.fetchSubmissionQuestionnaire()
+            await this.fetchAnswers()
+            await this.fetchReviewEvaluation()
         },
-        async disapprove() {
-            this.peerReview.review.approved = false
-            await this.updateApproval()
+        async fetchAssignment() {
+            // Fetch the assignment information.
+            const res = await api.assignments.get(this.$route.params.assignmentId)
+            this.assignment = res.data
         },
-        async approve() {
-            this.peerReview.review.approved = true
-            await this.updateApproval()
+        async fetchReview() {
+            const res = await api.reviewofsubmissions.get(this.$route.params.reviewId)
+            this.review = res.data
         },
-        async updateApproval() {
+        async fetchReviewEvaluation() {
+            // Retrieve the review evaluation.
             try {
-                await api.client.post(`/reviews/${this.peerReview.review.id}/grade`, {
-                    approved: this.peerReview.review.approved
+                const res = await api.reviewofsubmissions.getEvaluation(this.$route.params.reviewId)
+                this.reviewEvaluation = res.data
+            } catch (error) {
+                this.reviewEvaluation = null
+            }
+        },
+        async fetchSubmissionQuestionnaire() {
+            const res = await api.submissionquestionnaires.get(this.review.questionnaireId)
+            this.questionnaire = res.data
+        },
+        async fetchAnswers() {
+            // remove existing answers
+            this.answers = null
+            const res = await api.reviewofsubmissions.getAnswers(this.$route.params.reviewId)
+            const existingAnswers = res.data
+            // construct answer map
+            const answers = {}
+            for (const question of this.questionnaire.questions) {
+                // answer variable which gets replaced if an answer is present
+                let answer = null
+                // find existing answer
+                const existingAnswer = _.find(existingAnswers, answer => {
+                    return answer.questionId === question.id
                 })
-                this.showSuccessMessage({ message: "Review approval status changed" })
-            } catch (e) {
-                this.showErrorMessage({ message: "Something went wrong with approving/disapproving this review" })
+                if (existingAnswer) {
+                    // get the right field from the answer
+                    switch (question.type) {
+                        case "open":
+                            answer = existingAnswer.openAnswer
+                            break
+                        case "multiplechoice":
+                            answer = existingAnswer.multipleChoiceAnswer
+                            break
+                        case "checkbox":
+                            answer = existingAnswer.checkboxAnswer
+                            break
+                        case "range":
+                            answer = existingAnswer.rangeAnswer
+                            break
+                        case "upload":
+                            answer = existingAnswer.uploadAnswer
+                            break
+                        default:
+                            return this.showErrorMessage({ message: "Invalid question" })
+                    }
+                }
+                // changed is not used here
+                answers[question.id] = { answer: answer, changed: false }
             }
+            // set the answer object so all fields are reactive now
+            this.answers = answers
         },
-        async goToNextReview() {
-            try {
-                const { data } = await api.client.get(`assignments/${this.assignment.id}/randomReview`)
-                const randomId = data.id
-                this.$router.push({ name: this.$router.currentRoute.name, params: { reviewId: randomId } })
-                location.reload()
-            } catch (e) {
-                this.showErrorMessage({ message: "All reviews have been reviewed already!" })
-            }
+        async updateReviewApproval(approvalByTA) {
+            await api.reviewofsubmissions.setApproval(this.review.id, approvalByTA)
+            this.showSuccessMessage({ message: "Review approval status changed" })
+            await this.fetchReview()
         },
-        backToReviewList() {
-            console.log(this.$router.currentRoute)
+        goToReviewList() {
             if (this.$router.currentRoute.name.includes("teacher")) {
                 this.$router.push({
-                    name: "teacher-dashboard.assignments.assignment",
-                    params: { assignmentId: this.assignment.id }
+                    name: "teacher-dashboard.assignments.assignment"
                 })
             } else {
                 this.$router.push({
-                    name: "teaching-assistant-dashboard.course.assignment",
-                    params: { assignmentId: this.assignment.id }
+                    name: "teaching-assistant-dashboard.course.assignment"
                 })
             }
         },
-        uploadQuestionFilePath(reviewId, questionId) {
-            return `/api/oldroutes/reviews/${reviewId}/questions/${questionId}/file`
+        async goToNextReviewWithoutApproval() {
+            const res = await api.reviewofsubmissions.getAllForAssignment(this.$route.params.assignmentId, true)
+            const reviews = res.data
+            const reviewsWithoutApproval = _.filter(reviews, review => {
+                return review.approvalByTA === null
+            })
+            if (reviewsWithoutApproval.length === 0) {
+                this.showErrorMessage({ message: "No submitted reviews without approval are available" })
+            } else {
+                const randomReviewWithoutApproval = _.sample(reviewsWithoutApproval)
+                this.$router.push({
+                    name: this.$router.currentRoute.name,
+                    params: { reviewId: randomReviewWithoutApproval.id }
+                })
+                location.reload()
+            }
+        },
+        uploadAnswerFilePath(reviewId, questionId) {
+            return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`
         }
     }
 }

@@ -1,9 +1,24 @@
+import api from "../api/api"
+
 export default [
     {
         path: "/student-dashboard/courses/:courseId",
         name: "student-dashboard.course",
         redirect: { name: "student-dashboard.course.home" },
         component: () => import("../components/student-dashboard/Layout"),
+        beforeEnter: async (to, from, next) => {
+            try {
+                const res = await api.courses.enrollment(to.params.courseId)
+                const enrollment = res.data
+                if (enrollment.role !== "student") {
+                    throw new Error("Wrong role")
+                }
+                next()
+            } catch (error) {
+                //redirect to root
+                next("/")
+            }
+        },
         children: [
             {
                 path: "",
@@ -27,14 +42,14 @@ export default [
                         component: () => import("../components/student-dashboard/assignment/Information")
                     },
                     {
-                        path: "hand-in",
-                        name: "student-dashboard.course.assignment.hand-in",
-                        component: () => import("../components/student-dashboard/assignment/HandIn")
+                        path: "submission",
+                        name: "student-dashboard.course.assignment.submission",
+                        component: () => import("../components/student-dashboard/assignment/Submission")
                     },
                     {
-                        path: "peer-review",
-                        name: "student-dashboard.course.assignment.peer-review",
-                        component: () => import("../components/student-dashboard/assignment/PeerReviewList")
+                        path: "review",
+                        name: "student-dashboard.course.assignment.review-list",
+                        component: () => import("../components/student-dashboard/assignment/ReviewList")
                     },
                     {
                         path: "feedback",

@@ -152,12 +152,6 @@ router.post(
     await getManager().transaction(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
-        // file info
-        const fileBuffer = req.file.buffer;
-        const fileExtension = path.extname(req.file.originalname);
-        const fileName = path.basename(req.file.originalname, fileExtension);
-        const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
-
         // fetch existing answer if present
         uploadAnswer = await transactionalEntityManager.findOne(
           UploadQuestionAnswer,
@@ -168,31 +162,39 @@ router.post(
             },
           }
         );
-
-        let file: File;
+        let oldFile: File | undefined = undefined;
         // if an answer is already present, replace the fileinfo
-        if (uploadAnswer?.uploadAnswer) {
-          file = uploadAnswer.uploadAnswer;
-          file.name = fileName;
-          file.extension = fileExtension;
-          file.hash = fileHash;
-        } else {
-          // make new file and answer
-          file = new File(fileName, fileExtension, fileHash);
-          uploadAnswer = new UploadQuestionAnswer(question, review, file);
+        if (uploadAnswer) {
+          oldFile = uploadAnswer.uploadAnswer;
         }
 
+        // new File
+        const fileBuffer = req.file.buffer;
+        const fileExtension = path.extname(req.file.originalname);
+        const fileName = path.basename(req.file.originalname, fileExtension);
+        const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+        // make new file and answer
+        const newFile = new File(fileName, fileExtension, fileHash);
+        // save to database
+        await transactionalEntityManager.save(newFile);
+        if (uploadAnswer) {
+          uploadAnswer.uploadAnswer = newFile;
+        } else {
+          uploadAnswer = new UploadQuestionAnswer(question, review, newFile);
+        }
         // create/update uploadAnswer
-        await transactionalEntityManager.save(file);
-        // call validateOrReject separately as this is not called in case only the file is changed
-        // and not the uploadAnser itself
-        await uploadAnswer.validateOrReject();
         await transactionalEntityManager.save(uploadAnswer);
 
         // save the file to disk lastly (overwites exisitng if present)
         // (if this goes wrong all previous steps are rolled back)
-        const filePath = path.resolve(uploadFolder, file.id.toString());
+        const filePath = path.resolve(uploadFolder, newFile.id.toString());
         await fsPromises.writeFile(filePath, req.file.buffer);
+        // remove the old file from the disk
+        if (oldFile?.id) {
+          const filePath = path.resolve(uploadFolder, oldFile.id.toString());
+          await fsPromises.unlink(filePath);
+          await transactionalEntityManager.remove(oldFile);
+        }
       }
     );
     // reload the answer

@@ -12,8 +12,40 @@ import ResponseMessage from "../enum/ResponseMessage";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { AssignmentState } from "../enum/AssignmentState";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
+import _ from "lodash";
 
 const router = express.Router();
+
+// get the checkbox question
+router.get("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  const question = await CheckboxQuestion.findOne(req.params.id);
+  if (!question) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
+    return;
+  }
+  // students can only access it when the assignment is in review state
+  const questionnaire = await question.getQuestionnaire();
+  const assignment = await questionnaire.getAssignment();
+  const assignmentState = assignment.getState();
+  if (
+    !(await questionnaire.isTeacherInCourse(user)) &&
+    !(
+      (await assignment.isEnrolledInGroup(user)) &&
+      (assignmentState === AssignmentState.REVIEW ||
+        assignmentState === AssignmentState.FEEDBACK)
+    )
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not allowed to view this question");
+    return;
+  }
+  const sortedOptions = _.sortBy(question.options, "text");
+  question.options = sortedOptions;
+  res.send(question);
+});
 
 // Joi inputvalidation
 const questionSchema = Joi.object({

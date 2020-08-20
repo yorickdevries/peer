@@ -67,6 +67,11 @@ export default abstract class Questionnaire extends BaseModel {
     return await assignment.isTeacherInCourse(user);
   }
 
+  async isTeacherOrTeachingAssistantInCourse(user: User): Promise<boolean> {
+    const assignment = await this.getAssignment();
+    return await assignment.isTeacherOrTeachingAssistantInCourse(user);
+  }
+
   async getReviewsWhereUserIsReviewer(user: User): Promise<Review[]> {
     const reviews = await this.getReviews();
     const userReviews: Review[] = [];
