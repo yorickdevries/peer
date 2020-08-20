@@ -842,8 +842,9 @@ describe("Integration", () => {
 
     // open the feedback for the students
     res = await request(server)
-      .patch(`/api/reviewofsubmissions/openfeedback`)
-      .send({ assignmentId: assignment.id })
+      .patch(
+        `/api/reviewofsubmissions/openfeedback?assignmentId=${assignment.id}`
+      )
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     assignment = JSON.parse(res.text);
