@@ -58,12 +58,15 @@ export default class Submission extends BaseModel {
   )
   reviewOfSubmissions?: ReviewOfSubmission[];
 
+  latestSubmission?: boolean;
+
   constructor(user: User, group: Group, assignment: Assignment, file: File) {
     super();
     this.user = user;
     this.group = group;
     this.assignment = assignment;
     this.file = file;
+    this.latestSubmission = true;
   }
 
   // validation: check whether the group is in the assingment and the user in the group
