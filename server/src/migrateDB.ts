@@ -1279,6 +1279,7 @@ const migrateDB = async function (): Promise<void> {
     throw new Error("there are reviewcomments!");
   }
 
+  const currentDate = new Date();
   console.log("updateing reviews");
   // update all reviews (they can now be subbmitted as the questions are there)
   for (const oldReview of sortedOldReviews) {
@@ -1313,9 +1314,11 @@ const migrateDB = async function (): Promise<void> {
         : null;
       review.downloadedAt = downloadedAt;
       // submitted_at timestamptz,
-      const submittedAt = oldReview.submitted_at
-        ? oldReview.submitted_at
-        : null;
+      let submittedAt = oldReview.submitted_at ? oldReview.submitted_at : null;
+      // in case the review has been submitted before this was logged
+      if (done && !submittedAt) {
+        submittedAt = currentDate;
+      }
       review.submittedAt = submittedAt;
       // saved_at timestamptz,
 
@@ -1342,6 +1345,7 @@ const migrateDB = async function (): Promise<void> {
       // unsubmitting these unfilled reviews which were submitted due to a bug?
       if (oldId === 3577 || oldId === 4743 || oldId === 6247) {
         review.submitted = false;
+        review.submittedAt = null;
         review.approvalByTA = null;
         review.approvingTA = null;
         console.log("unsubmitted review: " + oldId);
