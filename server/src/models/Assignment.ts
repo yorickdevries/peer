@@ -316,6 +316,9 @@ export default class Assignment extends BaseModel {
   async getLatestSubmission(group: Group): Promise<Submission | undefined> {
     const submissions = await this.getSubmissions(group);
     const latestSubmission = _.filter(submissions, ['latestSubmission', true]);
+    if (latestSubmission.length == 0) {
+      return undefined;
+    }
     return latestSubmission[0];
   }
 
