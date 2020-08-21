@@ -425,7 +425,11 @@ export default {
                     return this.showErrorMessage({ message: "Invalid question" })
             }
             // reset answer
-            answer.answer = null
+            if (question.type === "checkbox") {
+                answer.answer = []
+            } else {
+                answer.answer = null
+            }
             // reset changed boolean
             answer.changed = false
             // set boolean so the answer is not present in the database
