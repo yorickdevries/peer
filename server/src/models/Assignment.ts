@@ -315,8 +315,8 @@ export default class Assignment extends BaseModel {
 
   async getLatestSubmission(group: Group): Promise<Submission | undefined> {
     const submissions = await this.getSubmissions(group);
-    const latestSubmission = _.maxBy(submissions, "id");
-    return latestSubmission;
+    const latestSubmission = _.filter(submissions, ['latestSubmission', true]);
+    return latestSubmission[0];
   }
 
   private async getSubmissionsOfGroup(group: Group): Promise<Submission[]> {
