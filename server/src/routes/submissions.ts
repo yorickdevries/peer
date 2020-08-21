@@ -230,10 +230,18 @@ router.post(
         .send("The assignment is not in submission state");
       return;
     }
-    // make the submission here in a transaction
+
+    // Set boolean of latest submission of older submissions to false
+    const allSubmission = await assignment.getSubmissions(group);
+    for (const submission of allSubmission) {
+        submission.latestSubmission = false;
+        await submission.save();
+    }
+
+      // make the submission here in a transaction
     let submission: Submission;
 
-    // start transaction make sure the file and submission are both saved
+      // start transaction make sure the file and submission are both saved
     await getManager().transaction(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
@@ -256,6 +264,8 @@ router.post(
         await fsPromises.writeFile(filePath, req.file.buffer);
       }
     );
+
+
     // reload submission to get all data
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await submission!.reload();
