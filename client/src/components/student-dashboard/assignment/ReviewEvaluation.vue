@@ -194,8 +194,14 @@
                         </b-form-file>
                     </b-form-group>
 
-                    <!--Save Button-->
                     <br />
+                    <!--Delete / Save Button-->
+                    <b-button
+                        :variant="(answers[question.id].exists ? 'danger' : 'outline-danger') + ' float-right'"
+                        :disabled="!answers[question.id].exists || review.submitted"
+                        @click="deleteAnswer(question, answers[question.id])"
+                        >Delete Answer</b-button
+                    >
                     <b-button
                         :variant="(answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'"
                         :disabled="!answers[question.id].changed"
@@ -326,6 +332,7 @@ export default {
                 const existingAnswer = _.find(existingAnswers, answer => {
                     return answer.questionId === question.id
                 })
+                const answerExists = existingAnswer ? true : false
                 if (existingAnswer) {
                     // get the right field from the answer
                     switch (question.type) {
@@ -350,12 +357,12 @@ export default {
                 }
                 if (question.type === "upload") {
                     // set new answer to null so it can be used for upload
-                    answers[question.id] = { answer: answer, newAnswer: null, changed: false }
+                    answers[question.id] = { answer: answer, newAnswer: null, exists: answerExists, changed: false }
                 } else if (question.type === "checkbox" && !answer) {
                     // set the answer object as changed/empty list as this can be saved directly as well
-                    answers[question.id] = { answer: [], changed: true }
+                    answers[question.id] = { answer: [], exists: answerExists, changed: true }
                 } else {
-                    answers[question.id] = { answer: answer, changed: false }
+                    answers[question.id] = { answer: answer, exists: answerExists, changed: false }
                 }
             }
             // set the answer object so all fields are reactive now
@@ -392,7 +399,38 @@ export default {
             }
             // reset changed boolean
             answer.changed = false
+            // set boolean so the answer is present in the database
+            answer.exists = true
             this.showSuccessMessage({ message: "Succesfuly saved answer" })
+        },
+        async deleteAnswer(question, answer) {
+            switch (question.type) {
+                case "open":
+                    await api.openquestionanswers.delete(question.id, this.review.id)
+                    break
+                case "multiplechoice":
+                    await api.multiplechoicequestionanswers.delete(question.id, this.review.id)
+                    break
+                case "checkbox":
+                    await api.checkboxquestionanswers.delete(question.id, this.review.id)
+                    break
+                case "range":
+                    await api.rangequestionanswers.delete(question.id, this.review.id)
+                    break
+                case "upload":
+                    await api.uploadquestionanswers.delete(question.id, this.review.id)
+                    answer.newAnswer = null
+                    break
+                default:
+                    return this.showErrorMessage({ message: "Invalid question" })
+            }
+            // reset answer
+            answer.answer = null
+            // reset changed boolean
+            answer.changed = false
+            // set boolean so the answer is not present in the database
+            answer.exists = false
+            this.showSuccessMessage({ message: "Succesfuly deleted answer" })
         },
         async submitReview() {
             await api.reviewofreviews.patch(this.review.id, true, this.review.flaggedByReviewer)

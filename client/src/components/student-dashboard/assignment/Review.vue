@@ -362,22 +362,19 @@ export default {
                 case "open":
                     await api.openquestionanswers.delete(question.id, this.review.id)
                     break
-                // case "multiplechoice":
-                //     await api.multiplechoicequestionanswers.post(question.id, this.review.id, answer.answer.id)
-                //     break
-                // case "checkbox":
-                //     await api.checkboxquestionanswers.post(question.id, this.review.id, _.map(answer.answer, "id"))
-                //     break
-                // case "range":
-                //     await api.rangequestionanswers.post(question.id, this.review.id, answer.answer)
-                //     break
-                // case "upload":
-                //     // set the answer after upload is succesful
-                //     answer.answer = (
-                //         await api.uploadquestionanswers.post(question.id, this.review.id, answer.newAnswer)
-                //     ).data.uploadAnswer
-                //     answer.newAnswer = null
-                //     break
+                case "multiplechoice":
+                    await api.multiplechoicequestionanswers.delete(question.id, this.review.id)
+                    break
+                case "checkbox":
+                    await api.checkboxquestionanswers.delete(question.id, this.review.id)
+                    break
+                case "range":
+                    await api.rangequestionanswers.delete(question.id, this.review.id)
+                    break
+                case "upload":
+                    await api.uploadquestionanswers.delete(question.id, this.review.id)
+                    answer.newAnswer = null
+                    break
                 default:
                     return this.showErrorMessage({ message: "Invalid question" })
             }
