@@ -231,12 +231,8 @@ router.post(
       return;
     }
 
-    // Set boolean of latest submission of older submissions to false
-    const allSubmission = await assignment.getSubmissions(group);
-    for (const submission of allSubmission) {
-        submission.latestSubmission = false;
-        await submission.save();
-    }
+        // Set boolean of latest submission of older submissions to false
+    assignment.unsubmitAllSubmissions(group);
 
       // make the submission here in a transaction
     let submission: Submission;

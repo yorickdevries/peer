@@ -322,6 +322,14 @@ export default class Assignment extends BaseModel {
     return latestSubmission[0];
   }
 
+  async unsubmitAllSubmissions(group: Group) {
+    const submissions = await this.getSubmissions(group);
+    for(const submission of submissions) {
+      submission.latestSubmission = false;
+      submission.save();
+    }
+  }
+
   private async getSubmissionsOfGroup(group: Group): Promise<Submission[]> {
     return Submission.find({
       where: {
