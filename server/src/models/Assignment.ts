@@ -315,7 +315,7 @@ export default class Assignment extends BaseModel {
 
   async getLatestSubmission(group: Group): Promise<Submission | undefined> {
     const submissions = await this.getSubmissions(group);
-    const latestSubmission = _.filter(submissions, ['latestSubmission', true]);
+    const latestSubmission = _.filter(submissions, ["latestSubmission", true]);
     if (latestSubmission.length == 0) {
       return undefined;
     }
@@ -324,9 +324,9 @@ export default class Assignment extends BaseModel {
 
   async unsubmitAllSubmissions(group: Group) {
     const submissions = await this.getSubmissions(group);
-    for(const submission of submissions) {
+    for (const submission of submissions) {
       submission.latestSubmission = false;
-      submission.save();
+      await submission.save();
     }
   }
 
