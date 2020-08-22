@@ -165,6 +165,7 @@ router.get("/:id/group", validateParams(idSchema), async (req, res) => {
 const querySubmissionSchema = Joi.object({
   groupId: Joi.number().integer().required(),
 });
+
 // get the submissions of a group
 router.get(
   "/:id/submissions",
@@ -200,6 +201,43 @@ router.get(
     res.send(sortedSubmissions);
   }
 );
+
+// unsubmit submission from the assignment
+router.patch(
+    "/:id/unsubmit",
+    validateParams(idSchema),
+    validateQuery(querySubmissionSchema),
+    async (req, res) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const user = req.user!;
+        const assignmentId = req.params.id;
+        // this value has been parsed by the validate function
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const groupId: number = req.query.groupId as any;
+        const assignment = await Assignment.findOne(assignmentId);
+        if (!assignment) {
+            res
+                .status(HttpStatusCode.BAD_REQUEST)
+                .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+            return;
+        }
+        const group = await Group.findOne(groupId);
+        if (!group) {
+            res
+                .status(HttpStatusCode.BAD_REQUEST)
+                .send(ResponseMessage.GROUP_NOT_FOUND);
+            return;
+        }
+        if (!(await group.hasUser(user))) {
+            res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
+            return;
+        }
+        await assignment.unsubmitAllSubmissions(group);
+        const submissions = await assignment.getSubmissions(group);
+        res.send(submissions);
+    }
+);
+
 
 // get the latest submission of a group
 // we should swicth to specific annotation of submissions which indicate whether they are the latest
