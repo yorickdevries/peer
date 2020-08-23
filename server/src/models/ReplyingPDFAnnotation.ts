@@ -8,8 +8,11 @@ import CommentingPDFAnnotation from "./CommentingPDFAnnotation";
 
 @ChildEntity(PDFAnnotationMotivation.REPLYING)
 export default class ReplyingPDFAnnotation extends PDFAnnotation {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @ManyToOne((_type) => CommentingPDFAnnotation, { eager: true })
+  @ManyToOne(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (_type) => CommentingPDFAnnotation,
+    (commentingPDFAnnotation) => commentingPDFAnnotation.replyingPDFAnnotations
+  )
   // can be null as it is in the same table as commentingPDFAnnotation
   commentingPDFAnnotation?: CommentingPDFAnnotation;
 
@@ -27,20 +30,33 @@ export default class ReplyingPDFAnnotation extends PDFAnnotation {
 
   // custom validation which is run before saving
   async validateOrReject(): Promise<void> {
+    const commentingPDFAnnotation = this.commentingPDFAnnotation
+      ? this.commentingPDFAnnotation
+      : await this.getCommentingPDFAnnotation();
+
     const file = this.file ? this.file : await this.getFile();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const commentingPDFAnnotationFile = await this.commentingPDFAnnotation!.getFile();
+    const commentingPDFAnnotationFile = await commentingPDFAnnotation.getFile();
     if (file.id !== commentingPDFAnnotationFile.id) {
       throw new Error("The commentingPDFAnnotation is of another file");
     }
     const review = this.review ? this.review : await this.getReview();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const commentingPDFAnnotationReview = await this.commentingPDFAnnotation!.getReview();
+    const commentingPDFAnnotationReview = await commentingPDFAnnotation.getReview();
     if (review.id !== commentingPDFAnnotationReview.id) {
       throw new Error("The commentingPDFAnnotation is of another review");
     }
     // if it succeeds the super validateOrReject can be called
     return super.validateOrReject();
+  }
+
+  async getCommentingPDFAnnotation(): Promise<CommentingPDFAnnotation> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return (
+      await ReplyingPDFAnnotation.findOneOrFail(this.id, {
+        relations: ["commentingPDFAnnotation"],
+      })
+    ).commentingPDFAnnotation!;
   }
 
   // https://www.w3.org/TR/annotation-model/
@@ -57,7 +73,7 @@ export default class ReplyingPDFAnnotation extends PDFAnnotation {
       motivation: this.motivation,
       target: {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        source: this.commentingPDFAnnotation!.id,
+        source: (await this.getCommentingPDFAnnotation()).id,
       },
       creator: {
         type: "Person",

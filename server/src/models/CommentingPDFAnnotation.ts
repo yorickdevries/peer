@@ -1,10 +1,11 @@
 import PDFAnnotationMotivation from "../enum/PDFAnnotationMotivation";
-import { ChildEntity, Column } from "typeorm";
+import { ChildEntity, Column, OneToMany } from "typeorm";
 import PDFAnnotation from "./PDFAnnotation";
 import { IsDefined } from "class-validator";
 import User from "./User";
 import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
+import ReplyingPDFAnnotation from "./ReplyingPDFAnnotation";
 
 @ChildEntity(PDFAnnotationMotivation.COMMENTING)
 export default class CommentingPDFAnnotation extends PDFAnnotation {
@@ -14,6 +15,13 @@ export default class CommentingPDFAnnotation extends PDFAnnotation {
   @IsDefined()
   // eslint-disable-next-line @typescript-eslint/ban-types
   selector: object;
+
+  @OneToMany(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (_type) => ReplyingPDFAnnotation,
+    (replyingPDFAnnotation) => replyingPDFAnnotation.commentingPDFAnnotation
+  )
+  replyingPDFAnnotations?: ReplyingPDFAnnotation[];
 
   constructor(
     id: string,
@@ -35,6 +43,15 @@ export default class CommentingPDFAnnotation extends PDFAnnotation {
     }
     // if it succeeds the super validateOrReject can be called
     return super.validateOrReject();
+  }
+
+  async getReplyingPDFAnnotations(): Promise<ReplyingPDFAnnotation[]> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return (
+      await CommentingPDFAnnotation.findOneOrFail(this.id, {
+        relations: ["replyingPDFAnnotations"],
+      })
+    ).replyingPDFAnnotations!;
   }
 
   // https://www.w3.org/TR/annotation-model/
