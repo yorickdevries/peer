@@ -46,7 +46,7 @@
                 </b-modal>
             </b-col>
         </b-row>
-        <PDFAnnotator :reviewId="reviewId"></PDFAnnotator>
+        <PDFAnnotator v-if="fileMetadata.extension === '.pdf'" :reviewId="reviewId"></PDFAnnotator>
 
         <!--Form, load only when answers are available-->
         <b-card v-if="answers" no-body class="mt-3">
