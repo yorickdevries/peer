@@ -52,6 +52,7 @@ export default {
             this.fileMetadata = res.data
         },
         renderPDF() {
+            // Documentation: https://www.adobe.io/apis/documentcloud/dcsdk/docs.html
             // inject the PDF embed API script
             const script = document.createElement("script")
             script.setAttribute("src", "https://documentcloud.adobe.com/view-sdk/main.js")
