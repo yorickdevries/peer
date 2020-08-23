@@ -110,15 +110,19 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
   const user = req.user!;
   const review = await ReviewOfSubmission.findOne(req.body.reviewId);
   if (!review) {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(ResponseMessage.REVIEW_NOT_FOUND);
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
   }
   const file = await File.findOne(req.body.fileId);
   if (!file) {
-    res.status(HttpStatusCode.BAD_REQUEST).send("File not found");
+    res.status(HttpStatusCode.NOT_FOUND).send("File not found");
     return;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  if (review.submission!.file.id !== file.id) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send("File and review do not correspond");
   }
   if (!(await review.isReviewer(user))) {
     res
