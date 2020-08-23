@@ -35,9 +35,6 @@
             </b-col>
         </b-row>
 
-        <!--Annotation view-->
-        <div id="adobe-dc-view" style="height: 1000px"></div>
-
         <!--See Review Evaluation is exist-->
         <b-row v-if="reviewEvaluation">
             <b-col>
@@ -49,6 +46,8 @@
                 </b-modal>
             </b-col>
         </b-row>
+        <PDFAnnotator :reviewId="reviewId"></PDFAnnotator>
+
         <!--Form, load only when answers are available-->
         <b-card v-if="answers" no-body class="mt-3">
             <!--Title-->
@@ -221,17 +220,18 @@
 <script>
 import api from "../../../api/api"
 import _ from "lodash"
-import axios from "axios"
 import notifications from "../../../mixins/notifications"
 import { StarRating } from "vue-rate-it"
 import ReviewEvaluation from "./ReviewEvaluation"
+import PDFAnnotator from "./PDFAnnotator"
 
 export default {
     mixins: [notifications],
-    components: { StarRating, ReviewEvaluation },
+    components: { StarRating, ReviewEvaluation, PDFAnnotator },
     props: ["reviewId", "reviewsAreReadOnly"],
     data() {
         return {
+            fileMetadata: null,
             review: {},
             reviewEvaluation: null,
             questionnaire: {},
@@ -251,112 +251,23 @@ export default {
         },
         reviewFilePath() {
             // Get the submission file path.
-            return `/api/reviewofsubmissions/${this.reviewId}/file`
+            return `/api/reviewofsubmissions/${this.review.id}/file`
         }
     },
     async created() {
         await this.fetchData()
     },
-    async mounted() {
-        // inject the PDF embed API script
-        const script = document.createElement("script")
-        script.setAttribute("src", "https://documentcloud.adobe.com/view-sdk/main.js")
-        document.head.appendChild(script)
-
-        // construct the file promise
-        const filePath = this.reviewFilePath
-        const filePromise = new Promise(function(resolve, reject) {
-            axios
-                .get(filePath, { responseType: "arraybuffer" })
-                .then(res => {
-                    resolve(res.data)
-                })
-                .catch(error => reject(error))
-        })
-
-        document.addEventListener("adobe_dc_view_sdk.ready", function() {
-            // AdobeDC is loaded via the script, so eslint is disabled
-            // eslint-disable-next-line no-undef
-            const adobeDCView = new AdobeDC.View({
-                clientId: "b3c8121ca4ba4dd0af5424097b94538d",
-                divId: "adobe-dc-view"
-            })
-
-            // Set user profile
-            // eslint-disable-next-line no-undef
-            adobeDCView.registerCallback(AdobeDC.View.Enum.CallbackType.GET_USER_PROFILE_API, function() {
-                return new Promise((resolve, reject) => {
-                    api.getMe()
-                        .then(res => {
-                            // fetch user info
-                            const profile = {
-                                userProfile: {
-                                    name: res.data.netid,
-                                    firstName: res.data.firstName,
-                                    lastName: res.data.lastName,
-                                    email: res.data.email
-                                }
-                            }
-                            resolve({
-                                // eslint-disable-next-line no-undef
-                                code: AdobeDC.View.Enum.ApiResponseCode.SUCCESS,
-                                data: profile
-                            })
-                        })
-                        .catch(error => reject(error))
-                })
-            })
-
-            // Store the UI options in a constant
-            const previewConfig = {
-                defaultViewMode: "FIT_WIDTH",
-                enableAnnotationAPIs: true
-            }
-            const previewFilePromise = adobeDCView.previewFile(
-                {
-                    content: { promise: filePromise },
-                    metaData: { fileName: "Review File.pdf", id: String(1) } // id needs to be a string
-                },
-                previewConfig
-            )
-
-            /* Use the annotation manager interface to invoke the commenting APIs */
-            previewFilePromise.then(function(adobeViewer) {
-                adobeViewer.getAnnotationManager().then(function(annotationManager) {
-                    /* API to add annotations */
-                    // annotationManager
-                    //     .addAnnotations(annotations)
-                    //     .then(function() {
-                    //         console.log("Annotations added through API successfully")
-                    //     })
-                    //     .catch(function(error) {
-                    //         console.log(error)
-                    //     })
-
-                    /* API to register events listener */
-                    // TODO: properly connect these to API
-                    annotationManager.registerEventListener(
-                        function(event) {
-                            console.log("annotationManager", annotationManager)
-                            console.log(event.type)
-                            console.log(event.data)
-                        },
-                        {
-                            /* Pass the list of events in listenOn. */
-                            /* If no event is passed in listenOn, then all the annotation events will be received. */
-                            listenOn: ["ANNOTATION_ADDED", "ANNOTATION_UPDATED", "ANNOTATION_DELETED"]
-                        }
-                    )
-                })
-            })
-        })
-    },
     methods: {
         async fetchData() {
+            await this.fetchFileMetadata()
             await this.fetchReview()
             await this.fetchSubmissionQuestionnaire()
             await this.fetchAnswers()
             await this.fetchReviewEvaluation()
+        },
+        async fetchFileMetadata() {
+            const res = await api.reviewofsubmissions.getFileMetadata(this.reviewId)
+            this.fileMetadata = res.data
         },
         async fetchReview() {
             const res = await api.reviewofsubmissions.get(this.reviewId)
