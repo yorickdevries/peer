@@ -7,7 +7,9 @@
             The review is submitted, any annotations will not be saved</b-alert
         >
         <!--Annotation view-->
-        <div id="adobe-dc-view" style="height: 1000px"></div>
+        <div id="adobe-dc-view" style="height: 1000px">
+            <b-alert show variant="primary">LOADING REVIEW PDF</b-alert>
+        </div>
     </div>
 </template>
 
