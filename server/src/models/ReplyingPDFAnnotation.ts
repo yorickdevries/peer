@@ -60,8 +60,8 @@ export default class ReplyingPDFAnnotation extends PDFAnnotation {
   }
 
   // https://www.w3.org/TR/annotation-model/
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  async getWebAnnotationVersion(): Promise<object> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async getWebAnnotationVersion(): Promise<any> {
     const annotation = {
       "@context": [
         "https://www.w3.org/ns/anno.jsonld",

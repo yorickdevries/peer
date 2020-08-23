@@ -47,8 +47,8 @@ export default abstract class PDFAnnotation extends BaseModel {
   @ManyToOne((_type) => ReviewOfSubmission, { nullable: false })
   review?: ReviewOfSubmission;
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  abstract getWebAnnotationVersion(): Promise<object>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  abstract getWebAnnotationVersion(): Promise<any>;
 
   constructor(
     id: string,

@@ -65,22 +65,28 @@ router.get("/", validateQuery(getAnnotationSchema), async (req, res) => {
   }
   // FINISHED GETTING THE ANNOTATIONS
 
-  if (await review.isTeacherOrTeachingAssistantInCourse(user)) {
-    res.send(webAnnotations);
-    return;
-  }
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
   if (
+    (await review.isTeacherOrTeachingAssistantInCourse(user)) ||
     // reviewer should access the review when reviewing
     ((await review.isReviewer(user)) &&
-      assignment.isAtOrAfterState(AssignmentState.REVIEW)) ||
-    // reviewed user should access the review when getting feedback and the review is finished
-    ((await review.isReviewed(user)) &&
-      assignment.isAtState(AssignmentState.FEEDBACK) &&
-      review.submitted)
+      assignment.isAtOrAfterState(AssignmentState.REVIEW))
   ) {
+    res.send(webAnnotations);
+    return;
+  }
+  // reviewed user should access the review when getting feedback and the review is finished
+  if (
+    (await review.isReviewed(user)) &&
+    assignment.isAtState(AssignmentState.FEEDBACK) &&
+    review.submitted
+  ) {
+    // anomise the annotations for the reviewed
+    for (const webAnnotation of webAnnotations) {
+      webAnnotation.creator.name = `reviewer ${review.id}`;
+    }
     res.send(webAnnotations);
     return;
   }
