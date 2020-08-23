@@ -91,14 +91,21 @@ export default {
                                     data: profile
                                 })
                             })
-                            .catch(error => reject(error))
+                            .catch(error =>
+                                reject({
+                                    // eslint-disable-next-line no-undef
+                                    code: AdobeDC.View.Enum.ApiResponseCode.FAIL,
+                                    data: error
+                                })
+                            )
                     })
                 })
 
                 // Store the UI options in a constant
                 const previewConfig = {
                     defaultViewMode: "FIT_WIDTH",
-                    enableAnnotationAPIs: true
+                    enableAnnotationAPIs: true,
+                    includePDFAnnotations: true
                 }
                 const previewFilePromise = adobeDCView.previewFile(
                     {
@@ -118,8 +125,12 @@ export default {
                         const res = await api.pdfannotations.get(reviewId, fileId)
                         const annotations = res.data
                         /* API to add annotations */
-                        if (annotations.length > 0) {
-                            await annotationManager.addAnnotations(annotations)
+                        for (const annotation of annotations) {
+                            try {
+                                await annotationManager.addAnnotations([annotation])
+                            } catch (error) {
+                                console.log(error)
+                            }
                         }
 
                         /* API to register events listener */
