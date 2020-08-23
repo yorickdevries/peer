@@ -239,6 +239,29 @@ router.delete(
         .send("The review is already submitted");
       return;
     }
+    const questionnaire = await review.getQuestionnaire();
+    const assignment = await questionnaire.getAssignment();
+    if (
+      questionnaire instanceof SubmissionQuestionnaire &&
+      !assignment.isAtState(AssignmentState.REVIEW)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is not in reviewstate");
+      return;
+    }
+    if (
+      questionnaire instanceof ReviewQuestionnaire &&
+      !(
+        assignment.isAtState(AssignmentState.FEEDBACK) &&
+        moment().isBefore(assignment.reviewEvaluationDueDate)
+      )
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The reviewevaluation is passed");
+      return;
+    }
     const file = questionAnswer.uploadAnswer;
     const filePath = file.getPath();
 

@@ -134,6 +134,27 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
       .send("The review is already submitted");
     return;
   }
+  const questionnaire = await review.getQuestionnaire();
+  const assignment = await questionnaire.getAssignment();
+  if (
+    questionnaire instanceof SubmissionQuestionnaire &&
+    !assignment.isAtState(AssignmentState.REVIEW)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("The assignment is not in reviewstate");
+    return;
+  }
+  if (
+    questionnaire instanceof ReviewQuestionnaire &&
+    !(
+      assignment.isAtState(AssignmentState.FEEDBACK) &&
+      moment().isBefore(assignment.reviewEvaluationDueDate)
+    )
+  ) {
+    res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
+    return;
+  }
   // start transaction to make sure an asnwer isnt deleted from a submitted review
   await getManager().transaction(
     "SERIALIZABLE",
