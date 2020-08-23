@@ -300,6 +300,49 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
 });
 
 // get a review file either as teacher or student
+router.get("/:id/filemetadata", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  const review = await ReviewOfSubmission.findOne(req.params.id);
+  if (!review) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
+    return;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const submission = review.submission!;
+  const file = submission.file;
+  if (await review.isTeacherOrTeachingAssistantInCourse(user)) {
+    res.send(file);
+    return;
+  }
+  // get assignmentstate
+  const questionnaire = await review.getQuestionnaire();
+  const assignment = await questionnaire.getAssignment();
+  const assignmentState = assignment.getState();
+  if (
+    (await review.isReviewer(user)) &&
+    (assignmentState === AssignmentState.REVIEW ||
+      assignmentState === AssignmentState.FEEDBACK)
+  ) {
+    res.send(file);
+    return;
+  }
+  // reviewed user should access the review when getting feedback and the review is finished
+  if (
+    (await review.isReviewed(user)) &&
+    assignmentState === AssignmentState.FEEDBACK &&
+    review.submitted
+  ) {
+    res.send(file);
+    return;
+  }
+  res
+    .status(HttpStatusCode.FORBIDDEN)
+    .send("You are not allowed to view this review");
+  return;
+});
+
+// get a review file either as teacher or student
 router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;

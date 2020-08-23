@@ -9,7 +9,7 @@
                         <dd>The download for the submission this review is about.</dd>
                         <a target="_blank" :href="reviewFilePath">
                             <button type="button" class="btn btn-success success w-100" style="height: 3rem">
-                                Download Submission
+                                Download Submission ({{ reviewFileName }})
                             </button>
                         </a>
                     </dl>
@@ -252,6 +252,9 @@ export default {
         reviewFilePath() {
             // Get the submission file path.
             return `/api/reviewofsubmissions/${this.review.id}/file`
+        },
+        reviewFileName() {
+            return this.fileMetadata.name + this.fileMetadata.extension
         }
     },
     async created() {

@@ -4,6 +4,9 @@ export default {
     get(id) {
         return client.get(`reviewofsubmissions/${id}`)
     },
+    getFileMetadata(id) {
+        return client.get(`reviewofsubmissions/${id}/filemetadata`)
+    },
     patch(id, submitted, flaggedByReviewer) {
         const body = { submitted, flaggedByReviewer }
         return client.patch(`reviewofsubmissions/${id}`, body)
