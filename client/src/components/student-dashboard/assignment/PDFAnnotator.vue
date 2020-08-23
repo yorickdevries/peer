@@ -1,6 +1,14 @@
 <template>
-    <!--Annotation view-->
-    <div id="adobe-dc-view" style="height: 1000px"></div>
+    <div>
+        <b-alert v-if="readOnly" show variant="warning">
+            The review is read only, any annotations will not be saved</b-alert
+        >
+        <b-alert v-else-if="review.submitted" show variant="warning">
+            The review is submitted, any annotations will not be saved</b-alert
+        >
+        <!--Annotation view-->
+        <div id="adobe-dc-view" style="height: 1000px"></div>
+    </div>
 </template>
 
 <script>
@@ -8,7 +16,7 @@ import api from "../../../api/api"
 import axios from "axios"
 
 export default {
-    props: ["reviewId"],
+    props: ["reviewId", "readOnly"],
     data() {
         return {
             // my API key for localhost
