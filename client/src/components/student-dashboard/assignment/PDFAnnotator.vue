@@ -3,7 +3,7 @@
         <b-alert v-if="readOnly" show variant="warning">
             The review is read only, any annotations will not be saved</b-alert
         >
-        <b-alert v-else-if="review.submitted" show variant="warning">
+        <b-alert v-else-if="!review || review.submitted" show variant="warning">
             The review is submitted, any annotations will not be saved</b-alert
         >
         <!--Annotation view-->
@@ -18,7 +18,7 @@ import api from "../../../api/api"
 import axios from "axios"
 
 export default {
-    props: ["reviewId", "readOnly"],
+    props: ["reviewId", "submissionId", "readOnly"],
     data() {
         return {
             // my API key for localhost
@@ -29,8 +29,14 @@ export default {
     },
     computed: {
         reviewFilePath() {
-            // Get the submission file path.
-            return `/api/reviewofsubmissions/${this.review.id}/file`
+            if (this.review) {
+                // Get the submission file path.
+                return `/api/reviewofsubmissions/${this.review.id}/file`
+            } else if (this.submission) {
+                return `/api/submissions/${this.submission.id}/file`
+            } else {
+                return ""
+            }
         },
         reviewFileName() {
             return this.fileMetadata.name + this.fileMetadata.extension
@@ -39,17 +45,30 @@ export default {
     async mounted() {
         // the page needs to be mounted as the pdf library is dynamically inserted
         await this.fetchReview()
+        await this.fetchSubmission()
         await this.fetchFileMetadata()
         this.renderPDF()
     },
     methods: {
         async fetchReview() {
-            const res = await api.reviewofsubmissions.get(this.reviewId)
-            this.review = res.data
+            if (this.reviewId) {
+                const res = await api.reviewofsubmissions.get(this.reviewId)
+                this.review = res.data
+            }
+        },
+        async fetchSubmission() {
+            if (this.submissionId) {
+                const res = await api.submissions.get(this.submissionId)
+                this.submission = res.data
+            }
         },
         async fetchFileMetadata() {
-            const res = await api.reviewofsubmissions.getFileMetadata(this.review.id)
-            this.fileMetadata = res.data
+            if (this.review) {
+                const res = await api.reviewofsubmissions.getFileMetadata(this.review.id)
+                this.fileMetadata = res.data
+            } else if (this.submission) {
+                this.fileMetadata = this.submission.file
+            }
         },
         renderPDF() {
             // Documentation: https://www.adobe.io/apis/documentcloud/dcsdk/docs.html
@@ -60,7 +79,9 @@ export default {
 
             // get fields into constants
             const clientId = this.adobeDCViewClientId
-            const reviewId = this.review.id
+            // set as null when review is not known
+            const review = this.review
+            const submission = this.submission
             // file info
             const fileName = this.reviewFileName
             const fileId = this.fileMetadata.id
@@ -133,41 +154,61 @@ export default {
                 previewFilePromise.then(function(adobeViewer) {
                     adobeViewer.getAnnotationManager().then(async function(annotationManager) {
                         // get existing annotations
-                        const res = await api.pdfannotations.get(reviewId, fileId)
-                        const annotations = res.data
-                        /* API to add annotations */
-                        for (const annotation of annotations) {
-                            try {
-                                await annotationManager.addAnnotations([annotation])
-                            } catch (error) {
-                                console.log(error)
+                        let reviews = []
+                        // add single review
+                        if (review) {
+                            reviews.push(review)
+                        }
+                        // add all feedback of submission
+                        if (submission) {
+                            const res = await api.submissions.getFeedback(submission.id)
+                            const feedbackReviews = res.data
+                            for (const feedbackReview of feedbackReviews) {
+                                reviews.push(feedbackReview)
+                            }
+                        }
+
+                        // iterate over all reviews to get annotations
+                        for (const review of reviews) {
+                            const res = await api.pdfannotations.get(review.id, fileId)
+                            const annotations = res.data
+                            /* API to add annotations */
+                            for (const annotation of annotations) {
+                                try {
+                                    await annotationManager.addAnnotations([annotation])
+                                } catch (error) {
+                                    console.log(error)
+                                }
                             }
                         }
 
                         /* API to register events listener */
-                        annotationManager.registerEventListener(
-                            async function(event) {
-                                switch (event.type) {
-                                    case "ANNOTATION_ADDED":
-                                        await api.pdfannotations.post(event.data, reviewId, fileId)
-                                        break
-                                    case "ANNOTATION_UPDATED":
-                                        await api.pdfannotations.patch(event.data.id, event.data)
-                                        break
-                                    case "ANNOTATION_DELETED":
-                                        await api.pdfannotations.delete(event.data.id)
-                                        break
-                                    default:
-                                        console.log(`Invalid event: ${event.type}`)
-                                        return
+                        // only if a review is known
+                        if (review) {
+                            annotationManager.registerEventListener(
+                                async function(event) {
+                                    switch (event.type) {
+                                        case "ANNOTATION_ADDED":
+                                            await api.pdfannotations.post(event.data, review.id, fileId)
+                                            break
+                                        case "ANNOTATION_UPDATED":
+                                            await api.pdfannotations.patch(event.data.id, event.data)
+                                            break
+                                        case "ANNOTATION_DELETED":
+                                            await api.pdfannotations.delete(event.data.id)
+                                            break
+                                        default:
+                                            console.log(`Invalid event: ${event.type}`)
+                                            return
+                                    }
+                                },
+                                {
+                                    /* Pass the list of events in listenOn. */
+                                    /* If no event is passed in listenOn, then all the annotation events will be received. */
+                                    listenOn: ["ANNOTATION_ADDED", "ANNOTATION_UPDATED", "ANNOTATION_DELETED"]
                                 }
-                            },
-                            {
-                                /* Pass the list of events in listenOn. */
-                                /* If no event is passed in listenOn, then all the annotation events will be received. */
-                                listenOn: ["ANNOTATION_ADDED", "ANNOTATION_UPDATED", "ANNOTATION_DELETED"]
-                            }
-                        )
+                            )
+                        }
                     })
                 })
             })
