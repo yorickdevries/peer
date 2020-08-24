@@ -31,7 +31,6 @@ export default {
     computed: {
         filePath() {
             if (this.review) {
-                // Get the submission file path.
                 return `/api/reviewofsubmissions/${this.review.id}/file`
             } else if (this.submission) {
                 return `/api/submissions/${this.submission.id}/file`
@@ -185,7 +184,7 @@ export default {
                         }
 
                         /* API to register events listener */
-                        // only if a review is known
+                        // only if a review is known and the view is not readonly
                         if (review && !readOnly) {
                             annotationManager.registerEventListener(
                                 async function(event) {

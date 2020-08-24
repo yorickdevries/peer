@@ -75,7 +75,7 @@ export default abstract class PDFAnnotation extends BaseModel {
     const submission = await review.submission!;
     const submissionFile = submission.file;
     if (file.id !== submissionFile.id) {
-      throw new Error("the file is not corresponding to the review");
+      throw new Error("The file is not corresponding to the review");
     }
     // check whether the user is the reviewer
     const reviewUser = review.reviewer;
