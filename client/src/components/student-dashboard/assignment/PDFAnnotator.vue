@@ -24,11 +24,12 @@ export default {
             // my API key for localhost
             adobeDCViewClientId: "b3c8121ca4ba4dd0af5424097b94538d",
             review: null,
+            submission: null,
             fileMetadata: null
         }
     },
     computed: {
-        reviewFilePath() {
+        filePath() {
             if (this.review) {
                 // Get the submission file path.
                 return `/api/reviewofsubmissions/${this.review.id}/file`
@@ -86,7 +87,7 @@ export default {
             // file info
             const fileName = this.reviewFileName
             const fileId = this.fileMetadata.id
-            const filePath = this.reviewFilePath
+            const filePath = this.filePath
             // construct the file promise
             const filePromise = new Promise(function(resolve, reject) {
                 axios
