@@ -82,6 +82,7 @@ export default {
             // set as null when review is not known
             const review = this.review
             const submission = this.submission
+            const readOnly = this.readOnly
             // file info
             const fileName = this.reviewFileName
             const fileId = this.fileMetadata.id
@@ -184,7 +185,7 @@ export default {
 
                         /* API to register events listener */
                         // only if a review is known
-                        if (review) {
+                        if (review && !readOnly) {
                             annotationManager.registerEventListener(
                                 async function(event) {
                                     switch (event.type) {
