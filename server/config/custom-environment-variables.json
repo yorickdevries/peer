@@ -1,7 +1,8 @@
 {
     "database": {
         "host": "MYSQL_HOST",
-        "password": "MYSQL_ROOT_PASSWORD",
+        "username": "MYSQL_USER",
+        "password": "MYSQL_PASSWORD",
         "database": "MYSQL_DATABASE",
         "connectionUrl": "JAWSDB_URL"
     },

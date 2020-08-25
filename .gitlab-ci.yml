@@ -5,9 +5,11 @@ variables:
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: password
   POSTGRES_HOST: postgres
-  MYSQL_DATABASE: peer_database
   MYSQL_ROOT_PASSWORD: password
-  MYSQL_HOST: mysql
+  MYSQL_DATABASE: peer
+  MYSQL_USER: peer
+  MYSQL_PASSWORD: password
+  MYSQL_HOST: mariadb
 
 stages:
     - static-analysis
@@ -102,7 +104,7 @@ migration:
   variables:
     NODE_ENV: production
   services:
-  - mysql:8
+  - mariadb:10.5
   script:
   - cd server && npm install
   - npm run build
@@ -116,7 +118,7 @@ start_server:
   variables:
     NODE_ENV: production
   services:
-  - mysql:8
+  - mariadb:10.5
   script:
   - cd server && npm install
   - npm run build
@@ -131,7 +133,7 @@ start_server_old:
     NODE_ENV: development
   services:
   - postgres:12
-  - mysql:8
+  - mariadb:10.5
   script:
   - cd server && npm install
   - npm run build
