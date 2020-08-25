@@ -621,7 +621,7 @@ const migrateDB = async function (): Promise<void> {
     // also saves the file to disk
     const file = await constructFile(fileBuffer, filePath);
     if (
-      sortedOldSubmission.file_path !==
+      sortedOldSubmission.file_path ===
       "1589811923162-Report 1 on AFM Sterre Schouten.pdf"
     ) {
       console.log("skipping", sortedOldSubmission.file_path);
