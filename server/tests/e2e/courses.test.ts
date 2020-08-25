@@ -99,7 +99,7 @@ describe("Courses", () => {
       .set("cookie", studentCookie);
     // assertions
     const courses = JSON.parse(res4.text);
-    expect(courses).toMatchObject([course1]);
-    expect(courses).not.toMatchObject([course2, course3]);
+    expect(courses).toMatchObject([course1, course2]);
+    expect(courses).not.toMatchObject([course3]);
   });
 });
