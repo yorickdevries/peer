@@ -620,7 +620,12 @@ const migrateDB = async function (): Promise<void> {
     const fileBuffer = fs.readFileSync(filePath);
     // also saves the file to disk
     const file = await constructFile(fileBuffer, filePath);
-    fs.unlinkSync(filePath);
+    if (sortedOldSubmission.file_path !== "1589811923162-Report 1 on AFM Sterre Schouten.pdf") {
+      console.log("skipping", sortedOldSubmission.file_path)
+    } else {
+      fs.unlinkSync(filePath);
+    }
+    
 
     const date = sortedOldSubmission.date;
 
