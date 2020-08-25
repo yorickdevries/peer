@@ -6,8 +6,8 @@ This application uses Node 14.x
 ## Build Instructions
 1. Run a Postgres server on `localhost:5432` with password `password`
 2. Create 2 Postgres databases called `peer_development` and `peer_test`
-3. Run a MySQL server on `localhost:3306` with password `password`
-4. Create a MySQL database called `peer_development`
+3. Run a MariaDB server on `localhost:3306` with user `peer` and password `password`
+4. Create a MariaDB database called `peer`
 5. Run `npm install` in root
 6. Run `npm run build_newdata_old` in root to build the aplication and initialize the database in `peer_development`. Alternatively, run `npm run build` to just build the application without initializing data.
 7. Run `npm start` in root to start the server.
