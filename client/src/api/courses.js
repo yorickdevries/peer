@@ -19,18 +19,18 @@ export default {
     enrollment(id) {
         return client.get(`courses/${id}/enrollment`)
     },
-    post(name, courseCode, enrollable, facultyName, academicYearName, description) {
+    post(name, courseCode, enrollable, facultyId, academicYearId, description) {
         if (!description) {
             description = null
         }
-        const course = { name, courseCode, enrollable, facultyName, academicYearName, description }
+        const course = { name, courseCode, enrollable, facultyId, academicYearId, description }
         return client.post("courses/", course)
     },
-    patch(id, name, courseCode, enrollable, facultyName, academicYearName, description) {
+    patch(id, name, courseCode, enrollable, facultyId, academicYearId, description) {
         if (!description) {
             description = null
         }
-        const course = { name, courseCode, enrollable, facultyName, academicYearName, description }
+        const course = { name, courseCode, enrollable, facultyId, academicYearId, description }
         return client.patch(`courses/${id}`, course)
     }
 }
