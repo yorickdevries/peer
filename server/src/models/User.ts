@@ -18,7 +18,9 @@ import parseNetID from "../util/parseNetID";
 
 @Entity()
 export default class User extends BaseModel {
-  @PrimaryColumn()
+  // length of 191 due to UTF-8MB4 encoding of strings
+  // see also: https://github.com/gogs/gogs/issues/4894#issuecomment-348861978
+  @PrimaryColumn({ length: 191 })
   @IsDefined()
   @IsString()
   @IsNotEmpty()
