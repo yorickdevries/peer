@@ -2,7 +2,7 @@ import parseNetID from "./parseNetID";
 import {
   parseAndSaveAffiliation,
   parseAndSaveStudy,
-  parseAndSaveOrganizationUnit,
+  parseAndSaveOrganisationUnit,
 } from "./parseAndSaveSSOFields";
 import User from "../models/User";
 
@@ -25,7 +25,7 @@ const saveUserFromSSO = async function (
       parseNetID(netid),
       await parseAndSaveAffiliation(affiliation),
       await parseAndSaveStudy(study),
-      await parseAndSaveOrganizationUnit(organisationUnit),
+      await parseAndSaveOrganisationUnit(organisationUnit),
       studentNumber ? studentNumber : null,
       firstName ? firstName : null,
       prefix ? prefix : null,

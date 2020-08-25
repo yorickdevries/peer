@@ -155,7 +155,7 @@ const parseAndSaveOrganisationUnit = async function (
   return ssoFields;
 };
 
-export default {
+export {
   parseAndSaveAffiliation,
   parseAndSaveStudy,
   parseAndSaveOrganisationUnit,
