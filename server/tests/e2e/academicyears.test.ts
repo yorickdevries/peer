@@ -25,6 +25,11 @@ describe("Academic Years", () => {
   });
 
   test("Get active academic years", async () => {
+    const existingAcademicYears = await AcademicYear.find();
+    for(const existingAcademicYear of existingAcademicYears) {
+      await existingAcademicYear.remove();
+    }
+
     //insert some academic years
     await new AcademicYear("2018/2019", false).save();
     await new AcademicYear("2019/2020", true).save();
