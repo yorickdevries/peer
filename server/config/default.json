@@ -1,11 +1,11 @@
 {
     "database": {
-        "type": "mysql",
+        "type": "mariadb",
         "host": "localhost",
         "port": 3306,
-        "username": "root",
+        "username": "peer",
         "password": "password",
-        "database": "peer_development"
+        "database": "peer"
     },
     "old_database": {
         "connection": {
