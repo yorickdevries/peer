@@ -1,9 +1,10 @@
 import parseNetID from "./parseNetID";
-import parseAndSaveSSOFields from "./parseAndSaveSSOFields";
+import {
+  parseAndSaveAffiliation,
+  parseAndSaveStudy,
+  parseAndSaveOrganisationUnit,
+} from "./parseAndSaveSSOFields";
 import User from "../models/User";
-import Affiliation from "../models/Affiliation";
-import Study from "../models/Study";
-import OrganisationUnit from "../models/OrganisationUnit";
 
 // This route checks the user and updates it in the database
 const saveUserFromSSO = async function (
@@ -22,9 +23,9 @@ const saveUserFromSSO = async function (
     // Try to save the user to database
     const user = new User(
       parseNetID(netid),
-      await parseAndSaveSSOFields(affiliation, Affiliation),
-      await parseAndSaveSSOFields(study, Study),
-      await parseAndSaveSSOFields(organisationUnit, OrganisationUnit),
+      await parseAndSaveAffiliation(affiliation),
+      await parseAndSaveStudy(study),
+      await parseAndSaveOrganisationUnit(organisationUnit),
       studentNumber ? studentNumber : null,
       firstName ? firstName : null,
       prefix ? prefix : null,

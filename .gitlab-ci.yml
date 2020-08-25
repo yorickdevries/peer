@@ -104,7 +104,7 @@ migration:
   variables:
     NODE_ENV: production
   services:
-  - mariadb:10.5
+  - mariadb:10.1
   script:
   - cd server && npm install
   - npm run build
@@ -118,7 +118,7 @@ start_server:
   variables:
     NODE_ENV: production
   services:
-  - mariadb:10.5
+  - mariadb:10.1
   script:
   - cd server && npm install
   - npm run build
@@ -133,7 +133,7 @@ start_server_old:
     NODE_ENV: development
   services:
   - postgres:12
-  - mariadb:10.5
+  - mariadb:10.1
   script:
   - cd server && npm install
   - npm run build

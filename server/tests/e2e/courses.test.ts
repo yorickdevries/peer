@@ -31,8 +31,8 @@ describe("Courses", () => {
         name: "CourseName",
         courseCode: "ABC123",
         enrollable: false,
-        facultyName: "EEMCS",
-        academicYearName: "2019/2020",
+        facultyId: 1,
+        academicYearId: 3,
         description: null,
       })
       .set("cookie", sessionCookie);
@@ -56,8 +56,8 @@ describe("Courses", () => {
         name: "CourseName1",
         courseCode: "ABC123",
         enrollable: true,
-        facultyName: "EEMCS",
-        academicYearName: "2019/2020",
+        facultyId: 1,
+        academicYearId: 3,
         description: null,
       })
       .set("cookie", teacherCookie);
@@ -70,8 +70,8 @@ describe("Courses", () => {
         name: "oldName",
         courseCode: "ABC123",
         enrollable: true,
-        facultyName: "EEMCS",
-        academicYearName: "2018/2019",
+        facultyId: 1,
+        academicYearId: 3,
         description: null,
       })
       .set("cookie", teacherCookie);
@@ -84,8 +84,8 @@ describe("Courses", () => {
         name: "nonEnrollableCourse",
         courseCode: "ABC123",
         enrollable: false,
-        facultyName: "EEMCS",
-        academicYearName: "2019/2020",
+        facultyId: 1,
+        academicYearId: 3,
         description: null,
       })
       .set("cookie", teacherCookie);
@@ -99,7 +99,7 @@ describe("Courses", () => {
       .set("cookie", studentCookie);
     // assertions
     const courses = JSON.parse(res4.text);
-    expect(courses).toMatchObject([course1]);
-    expect(courses).not.toMatchObject([course2, course3]);
+    expect(courses).toMatchObject([course1, course2]);
+    expect(courses).not.toMatchObject([course3]);
   });
 });
