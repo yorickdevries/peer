@@ -26,7 +26,7 @@ describe("Academic Years", () => {
 
   test("Get active academic years", async () => {
     const existingAcademicYears = await AcademicYear.find();
-    for(const existingAcademicYear of existingAcademicYears) {
+    for (const existingAcademicYear of existingAcademicYears) {
       await existingAcademicYear.remove();
     }
 
