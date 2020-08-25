@@ -1,7 +1,7 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class initial1598375594242 implements MigrationInterface {
-    name = 'initial1598375594242'
+export class initial1598377913080 implements MigrationInterface {
+    name = 'initial1598377913080'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query("CREATE TABLE `affiliation` (`createdAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `id` int NOT NULL AUTO_INCREMENT, `name` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB");
@@ -10,7 +10,7 @@ export class initial1598375594242 implements MigrationInterface {
         await queryRunner.query("CREATE TABLE `user` (`createdAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `netid` varchar(63) NOT NULL, `studentNumber` int NULL, `firstName` varchar(255) NULL, `prefix` varchar(255) NULL, `lastName` varchar(255) NULL, `email` varchar(255) NULL, `displayName` varchar(255) NULL, PRIMARY KEY (`netid`)) ENGINE=InnoDB");
         await queryRunner.query("CREATE TABLE `faculty` (`createdAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `id` int NOT NULL AUTO_INCREMENT, `name` varchar(255) NOT NULL, `longName` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB");
         await queryRunner.query("CREATE TABLE `academic_year` (`createdAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `id` int NOT NULL AUTO_INCREMENT, `name` varchar(255) NOT NULL, `active` tinyint NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB");
-        await queryRunner.query("CREATE TABLE `enrollment` (`createdAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `userNetid` varchar(255) NOT NULL, `courseId` int NOT NULL, `role` varchar(255) NOT NULL, PRIMARY KEY (`userNetid`, `courseId`)) ENGINE=InnoDB");
+        await queryRunner.query("CREATE TABLE `enrollment` (`createdAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `userNetid` varchar(63) NOT NULL, `courseId` int NOT NULL, `role` varchar(255) NOT NULL, PRIMARY KEY (`userNetid`, `courseId`)) ENGINE=InnoDB");
         await queryRunner.query("CREATE TABLE `group` (`createdAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `id` int NOT NULL AUTO_INCREMENT, `name` varchar(255) NOT NULL, `courseId` int NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB");
         await queryRunner.query("CREATE TABLE `file` (`createdAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `id` int NOT NULL AUTO_INCREMENT, `name` varchar(255) NOT NULL, `extension` varchar(255) NOT NULL, `hash` varchar(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB");
         await queryRunner.query("CREATE TABLE `question` (`createdAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `id` int NOT NULL AUTO_INCREMENT, `type` varchar(255) NOT NULL, `text` text NOT NULL, `number` int NOT NULL, `optional` tinyint NOT NULL, `range` int NULL, `extensions` varchar(255) NULL, `questionnaireId` int NOT NULL, INDEX `IDX_91578dceeb42466b9285f29e4b` (`type`), PRIMARY KEY (`id`)) ENGINE=InnoDB");
