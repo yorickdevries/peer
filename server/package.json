@@ -10,7 +10,7 @@
     "lint-fix": "eslint . --ext .ts --fix",
     "test": "jest ./tests",
     "coverage": "jest --collectCoverage ./tests",
-    "initdata": "node ./dist/scripts/initializeData.ts",
+    "initdata": "node ./dist/scripts/initializeData.js",
     "typeorm": "ts-node ./node_modules/typeorm/cli.js --config src/ormconfig.ts",
     "typeorm:migration:generate": "npm run typeorm migration:generate -- -n",
     "typeorm:migration:run": "npm run typeorm migration:run"
