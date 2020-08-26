@@ -1326,9 +1326,10 @@ const migrateDB = async function (): Promise<void> {
       if (done && !submittedAt) {
         submittedAt = currentDate;
       }
+      // remove submittedat
       if (!done && submittedAt) {
         submittedAt = null;
-        console.log("removed submittedAt from:", oldId);
+        console.log("removed submittedat from: ", oldId);
       }
       review.submittedAt = submittedAt;
       // saved_at timestamptz,
