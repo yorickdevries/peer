@@ -16,7 +16,7 @@
         "certificate": "./exampleData/certificate/peer_tudelft_nl.key.dummy",
         "key": "./exampleData/certificate/peer_tudelft_nl.crt.dummy"
     },
-    "SP_metadata_file": "./SP_Metadata.xml",
+    "ServiceProviderMetadataFile": "./ServiceProviderMetadata.xml",
     "url": "https://peer.tudelft.nl/",
     "uploadFolder": "/data_nfs/peer/uploadFolder/"
 }
