@@ -14,34 +14,6 @@
     "typeorm:migration:generate": "npm run typeorm migration:generate -- -n",
     "typeorm:migration:run": "npm run typeorm migration:run"
   },
-  "nyc": {
-    "check-coverage": true,
-    "lines": 50,
-    "all": true,
-    "extension": [
-      ".js",
-      ".jsx",
-      ".ts",
-      ".tsx"
-    ],
-    "include": [
-      "src/**/*.ts"
-    ],
-    "exclude": [
-      "**/*.d.ts",
-      "src/bin/www.ts",
-      "src/scripts/*.ts"
-    ],
-    "reporter": [
-      "text",
-      "text-summary"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
-    "sourceMap": true,
-    "instrument": true
-  },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
     "@types/compression": "^1.7.0",
