@@ -5,14 +5,5 @@
         "password": "MYSQL_PASSWORD",
         "database": "MYSQL_DATABASE",
         "connectionUrl": "JAWSDB_URL"
-    },
-    "old_database": {
-        "connection": {
-            "user": "POSTGRES_USER",
-            "host": "POSTGRES_HOST",
-            "database": "POSTGRES_DB",
-            "password": "POSTGRES_PASSWORD"
-        },
-        "connectionUrl": "DATABASE_URL"
     }
 }
