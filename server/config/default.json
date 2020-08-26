@@ -11,16 +11,16 @@
         "secret": "add something random here",
         "maxAge": 43200000 // 12 hours in ms
     },
-    "exampleData": {
-        "exampleAssignmentFolder": "./exampleData/assignments",
-        "exampleSubmissionFolder": "./exampleData/submissions",
-        "exampleReviewFolder": "./exampleData/reviews"
-    },
     "allowedExtensions": [".pdf", ".zip", ".doc", ".docx"],
     "maxFileSize": 52428800, // 50 MB
     "uploadFolder": "./files/development/",
     "rangeQuestion": {
         "min": 1,
         "max": 50
+    },
+    "exampleData": {
+        "exampleAssignmentFolder": "./exampleData/assignments",
+        "exampleSubmissionFolder": "./exampleData/submissions",
+        "exampleReviewFolder": "./exampleData/reviews"
     }
 }
