@@ -1,6 +1,10 @@
 <template>
     <div>
-        <b-container>
+        <b-container v-if="!assignment">
+            <div>Loading Assignment</div>
+        </b-container>
+
+        <b-container v-else>
             <!--Header and action-->
             <BreadcrumbTitle :items="['Assignments', assignment.name]" class="mt-3">
                 <b-button
@@ -248,7 +252,7 @@ export default {
     },
     data() {
         return {
-            assignment: {}
+            assignment: null
         }
     },
     async created() {

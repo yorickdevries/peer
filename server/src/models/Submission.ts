@@ -85,38 +85,18 @@ export default class Submission extends BaseModel {
   }
 
   async getGroup(): Promise<Group> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Submission.findOneOrFail(this.id, {
-        relations: ["group"],
-      })
-    ).group!;
+    return Group.findOneOrFail(this.groupId);
   }
 
   async getAssignment(): Promise<Assignment> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Submission.findOneOrFail(this.id, {
-        relations: ["assignment"],
-      })
-    ).assignment!;
+    return Assignment.findOneOrFail(this.assignmentId);
   }
 
   async getUser(): Promise<User> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Submission.findOneOrFail(this.id, {
-        relations: ["user"],
-      })
-    ).user!;
+    return User.findOneOrFail(this.userNetid);
   }
 
   async getReviewOfSubmissions(): Promise<ReviewOfSubmission[]> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Submission.findOneOrFail(this.id, {
-        relations: ["reviewOfSubmissions"],
-      })
-    ).reviewOfSubmissions!;
+    return ReviewOfSubmission.find({ where: { submission: this } });
   }
 }

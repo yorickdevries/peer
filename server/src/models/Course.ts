@@ -87,12 +87,7 @@ export default class Course extends BaseModel {
   }
 
   async getAssignments(): Promise<Assignment[]> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Course.findOneOrFail(this.id, {
-        relations: ["assignments"],
-      })
-    ).assignments!;
+    return await Assignment.find({ where: { course: this } });
   }
 
   async getEnrollableAssignments(user: User): Promise<Assignment[]> {
