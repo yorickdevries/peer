@@ -108,7 +108,7 @@
 
         <!--Pagination-->
         <b-pagination
-            :total-datas="this.selectedReviews.length"
+            :total-rows="this.selectedReviews.length"
             :per-page="Number(perPage)"
             v-model="currentPage"
             class="my-0"
