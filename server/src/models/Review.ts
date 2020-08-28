@@ -209,7 +209,7 @@ export default abstract class Review extends BaseModel {
   }
 
   async getQuestionAnswers(): Promise<QuestionAnswer[]> {
-    QuestionAnswer.findOneOrFail({ where: { review: this } });
+    return QuestionAnswer.findOneOrFail({ where: { review: this } });
   }
 
   // checks whether the user is teacher
