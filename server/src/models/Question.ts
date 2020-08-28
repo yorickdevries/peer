@@ -50,6 +50,8 @@ export default abstract class Question extends BaseModel {
   optional: boolean;
 
   // Rubric_id int NOT NULL,
+  @RelationId((question: Question) => question.questionnaire)
+  questionnaireId!: number;
   @ManyToOne(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => Questionnaire,
@@ -74,12 +76,7 @@ export default abstract class Question extends BaseModel {
   }
 
   async getQuestionnaire(): Promise<Questionnaire> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Question.findOneOrFail(this.id, {
-        relations: ["questionnaire"],
-      })
-    ).questionnaire!;
+    return Questionnaire.findOneOrFail(this.questionnaireId);
   }
 
   // checks whether the user is teacher
