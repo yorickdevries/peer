@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="questionnaire">
         <b-alert :show="blockQuestionnaireEditing" variant="info"
             >Questionnaire editing is not allowed anymore since the peer review due date has already passed.</b-alert
         >

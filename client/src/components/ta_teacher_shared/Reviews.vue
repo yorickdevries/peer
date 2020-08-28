@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="reviews">
         <!--Table Options-->
         <b-row>
             <b-col cols="6" class="mb-3">
@@ -123,7 +123,7 @@ import _ from "lodash"
 export default {
     data() {
         return {
-            reviews: [],
+            reviews: null,
             // groups to get groupName from
             groups: [],
             // in case of null, all reviews will be shown

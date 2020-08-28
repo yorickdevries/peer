@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="allSubmissions && latestSubmissions && groups">
         <!--Table Options-->
         <b-row>
             <b-col cols="6" class="mb-3">
@@ -89,10 +89,10 @@ import _ from "lodash"
 export default {
     data() {
         return {
-            allSubmissions: [],
-            latestSubmissions: [],
+            allSubmissions: null,
+            latestSubmissions: null,
             // groups to get groupName from
-            groups: [],
+            groups: null,
             // boolean to show all or only latest
             onlyLatestSubmissions: true,
             // for navigation
