@@ -4,6 +4,7 @@ import {
   ManyToOne,
   Entity,
   TableInheritance,
+  RelationId,
 } from "typeorm";
 import {
   IsDefined,
