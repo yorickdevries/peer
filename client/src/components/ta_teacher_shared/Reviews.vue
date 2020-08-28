@@ -125,7 +125,7 @@ export default {
         return {
             reviews: null,
             // groups to get groupName from
-            groups: [],
+            groups: null,
             // in case of null, all reviews will be shown
             onlySubmittedReviews: null,
             // for navigation
@@ -147,8 +147,13 @@ export default {
     },
     async created() {
         // reviews
-        const res1 = await api.reviewofsubmissions.getAllForAssignment(this.$route.params.assignmentId, undefined)
-        this.reviews = res1.data
+        try {
+            const res1 = await api.reviewofsubmissions.getAllForAssignment(this.$route.params.assignmentId, undefined)
+            this.reviews = res1.data
+        } catch (error) {
+            // in case no submissionquestionnaire is present, this call will result in an error
+            this.reviews = []
+        }
         // groups
         const res2 = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
         this.groups = res2.data
