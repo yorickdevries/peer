@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, RelationId } from "typeorm";
-import { IsDefined } from "class-validator";
+import { IsDefined, IsEnum } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import Course from "./Course";
@@ -24,6 +24,7 @@ export default class Enrollment extends BaseModel {
 
   @Column()
   @IsDefined()
+  @IsEnum(UserRole)
   role: UserRole;
 
   constructor(user: User, course: Course, role: UserRole) {

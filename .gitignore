@@ -2,6 +2,7 @@
 **/node_modules/
 /server/dist/
 /server/files/
+/server/productionData/
 /server/coverage/
 
 # local env files
