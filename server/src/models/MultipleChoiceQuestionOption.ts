@@ -1,10 +1,15 @@
 import QuestionOption from "./QuestionOption";
-import { ChildEntity, ManyToOne } from "typeorm";
+import { ChildEntity, ManyToOne, RelationId } from "typeorm";
 import QuestionOptionType from "../enum/QuestionOptionType";
 import MultipleChoiceQuestion from "./MultipleChoiceQuestion";
 
 @ChildEntity(QuestionOptionType.MULTIPLE_CHOICE)
 export default class MultipleChoiceQuestionOption extends QuestionOption {
+  @RelationId(
+    (multipleChoiceQuestionOption: MultipleChoiceQuestionOption) =>
+      multipleChoiceQuestionOption.question
+  )
+  questionId!: number;
   @ManyToOne(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => MultipleChoiceQuestion,
@@ -21,11 +26,6 @@ export default class MultipleChoiceQuestionOption extends QuestionOption {
   }
 
   async getQuestion(): Promise<MultipleChoiceQuestion> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await MultipleChoiceQuestionOption.findOneOrFail(this.id, {
-        relations: ["question"],
-      })
-    ).question!;
+    return MultipleChoiceQuestion.findOneOrFail(this.questionId);
   }
 }
