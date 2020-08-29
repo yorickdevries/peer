@@ -6,13 +6,13 @@
 </template>
 
 <script>
-import Footer from './components/Footer'
+import Footer from "./components/Footer"
 export default {
     components: { Footer }
 }
 </script>
 
-<style>
+<style lang="scss">
 .site {
     display: flex;
     min-height: 100vh;
@@ -22,5 +22,4 @@ export default {
 .site-content {
     flex: 1;
 }
-
 </style>

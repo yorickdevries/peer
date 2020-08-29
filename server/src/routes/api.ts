@@ -1,155 +1,86 @@
-import fs from "fs-extra";
 import express from "express";
-import assignments from "./assignments";
+import { eventLogger } from "../middleware/logger";
+import authenticationRoutes from "./authentication";
+import checkAndSetAuthentication from "../middleware/authentication/checkAuthentication";
+import HttpStatusCode from "../enum/HttpStatusCode";
+import ResponseMessage from "../enum/ResponseMessage";
+// routes
+import users from "./users";
+import faculties from "./faculties";
+import academicyears from "./academicyears";
 import courses from "./courses";
+import enrollments from "./enrollments";
+import assignments from "./assignments";
 import groups from "./groups";
-import reviews from "./reviews";
-import rubrics from "./rubric";
 import submissions from "./submissions";
-import security from "../security";
-import UserPS from "../prepared_statements/user_ps";
-import session from "express-session";
-import sessionFileStore from "session-file-store";
-import passport from "passport";
-import config from "../config";
-import passportConfiguration from "../passport";
-import mockPassportConfiguration from "../passport_mock";
-import { eventLogger } from "../logger";
+import submissionquestionnaires from "./submissionquestionnaires";
+import reviewquestionnaires from "./reviewquestionnaires";
+import checkboxquestions from "./checkboxquestions";
+import multiplechoicequestions from "./multiplechoicequestions";
+import openquestions from "./openquestions";
+import rangequestions from "./rangequestions";
+import uploadquestions from "./uploadquestions";
+import checkboxquestionoptions from "./checkboxquestionoptions";
+import multiplechoicequestionoptions from "./multiplechoicequestionoptions";
+import reviewofsubmissions from "./reviewofsubmissions";
+import reviewofreviews from "./reviewofreviews";
+import openquestionanswers from "./openquestionanswers";
+import rangequestionanswers from "./rangequestionanswers";
+import uploadquestionanswers from "./uploadquestionanswers";
+import multiplechoicequestionanswers from "./multiplechoicequestionanswers";
+import checkboxquestionanswers from "./checkboxquestionanswers";
 
-const router = express();
+const router = express.Router();
 router.use(eventLogger);
 
-// session support is required to use Passport
-const fileStore = sessionFileStore(session);
-// needs a random secret
-const sessionConfig: any = {
-    cookie: {maxAge: config.session.maxAge},
-    resave: true,
-    saveUninitialized: true,
-    secret: config.session.secret
-  };
-// Depending of current mode, setup the session store
-if (process.env.NODE_ENV === "production") {
-    sessionConfig.store = new fileStore();
-}
-router.use(session(sessionConfig));
+// initialize login/logout authentication routes
+authenticationRoutes(router);
 
-// initialize passport middleware
-router.use(passport.initialize());
-router.use(passport.session());
-
-// Depending of current mode, setup the login method
-if (process.env.NODE_ENV === "production" ) {
-    passportConfiguration(passport);
-  } else {
-    router.get("/mocklogin/:netid/:affiliation",
-    function(req, res, next) {
-        console.log("Mocked login: " + req.params.netid + ", " + req.params.affiliation);
-        // make Mocked passport configuration
-        mockPassportConfiguration(passport, req.params.netid, req.params.affiliation);
-        next();
-    },
-    passport.authenticate("mock"),
-    function(req, res, next) {
-        res.redirect("/");
-    });
-}
-
-// Login route
-router.get("/login", passport.authenticate("saml",
-  {
-    successRedirect: "https://peer.ewi.tudelft.nl/",
-    failureRedirect: "/login"
-  })
-);
-
-// Callback of the login route
-router.post("/login/callback", passport.authenticate("saml",
-  {
-    failureRedirect: "/",
-    failureFlash: true
-  }), function(req, res) {
-    res.redirect("/");
-    }
-);
-
-// Route to logout.
-router.get("/logout", function(req, res) {
-    req.logout();
-    // TODO: invalidate session on IP
-    res.redirect("/");
+// Check authentication route
+router.get("/authenticated", (req, res) => {
+  res.send({ authenticated: req.isAuthenticated() });
 });
 
-// Retrieve SP metadata
-router.get("/metadata.xml", async function(req, res) {
-  const file = await fs.readFile("./SP_Metadata.xml");
-  res.type("application/xml");
-  res.send(file);
+// Check always whether someone is logged in before accessing the other routes below
+// additionally fixes the user object so all fields are copied over from the database
+router.use(checkAndSetAuthentication);
+
+// Route to get the current userinfo from SSO
+// might need to be moved to /users route
+router.get("/me", async (req, res) => {
+  // the user is defined as it is checked and set with checkAndSetAuthentication
+  res.send(req.user);
 });
 
-// This route checks the user and updates it in the database
-router.use(async function(req: any, res, next) {
-    const userinfo = req.user;
-    // check whether userinfo exists
-    if (userinfo == undefined || userinfo.netid == undefined) {
-        // no user logged in
-        next();
-    } else {
-        // get userinfo
-        const netid = userinfo.netid;
-        const studentNumber = userinfo.studentNumber;
-        const firstName = userinfo.firstName;
-        const prefix = userinfo.prefix;
-        const lastName = userinfo.lastName;
-        const email = userinfo.email;
-        const affiliation = userinfo.affiliation;
-        const displayName = userinfo.displayName;
-        const study = userinfo.study;
-        const organisationUnit = userinfo.organisationUnit;
-        try {
-            // check whether user is in the database
-            const userExists: any = await UserPS.executeExistsUserById(netid);
-            // in case the user is not in the database
-            if (!userExists.exists) {
-                // Adding user
-                await UserPS.executeAddUser(netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName, study, organisationUnit);
-            } else {
-                // Updating userinfo
-                await UserPS.executeUpdateUser(netid, studentNumber, firstName, prefix, lastName, email, affiliation, displayName, study, organisationUnit);
-            }
-            next();
-        } catch (err) {
-            next(err);
-        }
-    }
-});
-
-// Authentication route
-router.get("/authenticated", function(req: any, res) {
-    res.json({ authenticated: req.isAuthenticated() });
-});
-
-// Check always whether someone is logged in
-router.use(security.authorization.authorizeCheck);
-
-// Routing
-router.use("/assignments", assignments);
+// TODO: Complete routing of the new API
+router.use("/users", users);
+router.use("/faculties", faculties);
+router.use("/academicyears", academicyears);
 router.use("/courses", courses);
+router.use("/enrollments", enrollments);
+router.use("/assignments", assignments);
 router.use("/groups", groups);
-router.use("/reviews", reviews);
-router.use("/rubric", rubrics);
 router.use("/submissions", submissions);
-
-// Route to get the userinfo
-router.get("/user", function(req: any, res, next) {
-    res.json({
-        user: req.user
-    });
-});
+router.use("/submissionquestionnaires", submissionquestionnaires);
+router.use("/reviewquestionnaires", reviewquestionnaires);
+router.use("/checkboxquestions", checkboxquestions);
+router.use("/multiplechoicequestions", multiplechoicequestions);
+router.use("/openquestions", openquestions);
+router.use("/rangequestions", rangequestions);
+router.use("/uploadquestions", uploadquestions);
+router.use("/checkboxquestionoptions", checkboxquestionoptions);
+router.use("/multiplechoicequestionoptions", multiplechoicequestionoptions);
+router.use("/reviewofsubmissions", reviewofsubmissions);
+router.use("/reviewofreviews", reviewofreviews);
+router.use("/openquestionanswers", openquestionanswers);
+router.use("/rangequestionanswers", rangequestionanswers);
+router.use("/uploadquestionanswers", uploadquestionanswers);
+router.use("/multiplechoicequestionanswers", multiplechoicequestionanswers);
+router.use("/checkboxquestionanswers", checkboxquestionanswers);
 
 // If no other routes apply, send a 404
-router.use(function(req, res) {
-    res.sendStatus(404);
+router.use((_req, res) => {
+  res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
 });
 
 export default router;

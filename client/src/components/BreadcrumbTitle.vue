@@ -8,24 +8,24 @@
 </template>
 
 <script>
-    export default {
-        props: {
-            items: Array
-        },
-        computed: {
-            hasDefaultSlot() {
-                return !!this.$slots.default
-            },
-        },
-        methods: {
-            breadcrumbItems(items) {
-                return items.map(item => {
-                    return {
-                        text: item,
-                        active: true
-                    }
-                })
-            }
+export default {
+    props: {
+        items: Array
+    },
+    computed: {
+        hasDefaultSlot() {
+            return !!this.$slots.default
+        }
+    },
+    methods: {
+        breadcrumbItems(items) {
+            return items.map(item => {
+                return {
+                    text: item,
+                    active: true
+                }
+            })
         }
     }
+}
 </script>

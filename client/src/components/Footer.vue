@@ -6,32 +6,45 @@
                 <div>For support, contact: <a href="mailto:eip-ewi@tudelft.nl">eip-ewi@tudelft.nl</a></div>
             </div>
             <div class="mr-auto"></div>
-            <b-img :src="require('../assets/images/tu_delft_logo_black.png')" alt="tu-delft-logo" height="30px" class="mr-5 mb-3"></b-img>
+            <div>{{ timezoneString }}</div>
+            <div class="mr-auto"></div>
+            <b-img
+                :src="require('../assets/images/tu_delft_logo_black.png')"
+                alt="tu-delft-logo"
+                height="30px"
+                class="mr-5 mb-3"
+            ></b-img>
             <div class="float-right ">
                 <a href="#">Back to top</a>
             </div>
         </div>
-
     </footer>
-
 </template>
 
 <script>
-    export default {
-        name: "Footer",
-        methods: {
-            scrollToTop() {
-                window.scrollTo(0,0);
-            }
-        }    }
+export default {
+    name: "Footer",
+    computed: {
+        timezoneString() {
+            const re = /([A-Z]+[+-][0-9]+.*)/
+            const timezone = new Date().toString().match(re)[1]
+            return "Timezone: " + timezone
+        }
+    },
+    methods: {
+        scrollToTop() {
+            window.scrollTo(0, 0)
+        }
+    }
+}
 </script>
 
 <style scoped>
-    footer {
-        height: 125px;
-    }
+footer {
+    height: 125px;
+}
 
-    footer p {
-        margin-bottom: .25rem;
-    }
+footer p {
+    margin-bottom: 0.25rem;
+}
 </style>

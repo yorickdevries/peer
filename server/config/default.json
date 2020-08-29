@@ -1,0 +1,26 @@
+{
+    "database": {
+        "type": "mariadb",
+        "host": "localhost",
+        "port": 3306,
+        "username": "peer",
+        "password": "password",
+        "database": "peer"
+    },
+    "session": {
+        "secret": "add something random here",
+        "maxAge": 43200000 // 12 hours in ms
+    },
+    "allowedExtensions": [".pdf", ".zip", ".doc", ".docx"],
+    "maxFileSize": 52428800, // 50 MB
+    "uploadFolder": "./files/development/",
+    "rangeQuestion": {
+        "min": 1,
+        "max": 50
+    },
+    "exampleData": {
+        "exampleAssignmentFolder": "./exampleData/assignments",
+        "exampleSubmissionFolder": "./exampleData/submissions",
+        "exampleReviewFolder": "./exampleData/reviews"
+    }
+}

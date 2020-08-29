@@ -1,16 +1,21 @@
 {
   "name": "peer_review",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "scripts": {
-    "postinstall": "cd server && npm install && cd ../client && npm install & cd ..",
-    "start": "npm run build && npm run start_server",
-    "start_newdata": "npm run build_newdata && npm run start_server",
+    "postinstall": "cd server && npm install && cd ../client && npm install && cd ..",
     "build": "npm run build_server && npm run build_client",
-    "build_newdata": "npm run build_server && npm run build_data && npm run build_client",
     "build_server": "npm run build --prefix ./server",
-    "build_data": "npm run data_init --prefix ./server",
     "build_client": "npm run build --prefix ./client",
-    "start_server": "npm run start_server --prefix ./server",
-    "test_all": "npm run tslint --prefix ./server && npm run build_newdata && npm run coverage --prefix ./server"
-  }
+    "start": "npm run start --prefix ./server",
+    "dev_server": "npm run dev --prefix ./server",
+    "dev_client": "npm run serve --prefix ./client",
+    "heroku-postbuild": "npm run postinstall && npm run build"
+  },
+  "engines": {
+    "node": "14.x"
+  },
+  "cacheDirectories": [
+    "server/node_modules",
+    "client/node_modules"
+  ]
 }
