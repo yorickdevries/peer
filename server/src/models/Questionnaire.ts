@@ -43,21 +43,16 @@ export default abstract class Questionnaire extends BaseModel {
   abstract getAssignment(): Promise<Assignment>;
 
   async getReviews(submitted?: boolean): Promise<Review[]> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const allReviews = (
-      await Questionnaire.findOneOrFail(this.id, {
-        relations: ["reviews"],
-      })
-    ).reviews!;
-
+    const where: {
+      questionnaire: Questionnaire;
+      submitted?: boolean;
+    } = {
+      questionnaire: this,
+    };
     if (submitted !== undefined) {
-      const filteredReviews = _.filter(allReviews, (review) => {
-        return review.submitted === submitted;
-      });
-      return filteredReviews;
-    } else {
-      return allReviews;
+      where.submitted = submitted;
     }
+    return await Review.find({ where: where });
   }
 
   // checks whether the user is teacher

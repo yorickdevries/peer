@@ -4,14 +4,13 @@ Peer reviewing can now be done without any hassle with paper. Submit, review and
 This application uses Node 14.x
 
 ## Build Instructions
-1. Run a Postgres server on `localhost:5432` with password `password`
-2. Create 2 Postgres databases called `peer_development` and `peer_test`
-3. Run a MariaDB server on `localhost:3306` with user `peer` and password `password`
-4. Create a MariaDB database called `peer`
-5. Run `npm install` in root
-6. Run `npm run build_newdata_old` in root to build the aplication and initialize the database in `peer_development`. Alternatively, run `npm run build` to just build the application without initializing data.
-7. Run `npm start` in root to start the server.
-8. Access the site through [http://localhost:3000](http://localhost:3000)
+1. Run a MariaDB server on `localhost:3306` with user `peer` and password `password`
+2. Create a MariaDB database called `peer`
+3. Run `npm install` in root
+4. Run `npm run build` in root to build the aplication.
+5. Run `npm run initdata` in ./server to initialize basic database elements like faculties and academic years.
+6. Run `npm run start` in root to start the server.
+7. Access the site through [http://localhost:3000](http://localhost:3000)
 
 - On the site you can mock a SSO-login login using http://localhost:3000/api/login
 - Only users with the affiliation `employee` can create courses

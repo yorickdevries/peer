@@ -7,37 +7,9 @@
         "password": "password",
         "database": "peer"
     },
-    "old_database": {
-        "connection": {
-            "user": "postgres",
-            "host": "localhost",
-            "database": "peer_development",
-            "password": "password",
-            "port": 5432
-          },
-        "schemaQueryFile": "./database_dumps_old/ED3-DataBaseSchema.sql",
-        "fullQueryFile": "./database_dumps_old/ED3-FullData.sql"
-        },
     "session": {
         "secret": "add something random here",
         "maxAge": 43200000 // 12 hours in ms
-    },
-    "reviews": {
-        "fileFolder": "./productionData/reviews",
-        "maxSizeReviewFile": 52428800 // 50 MB
-    },
-    "assignments": {
-        "fileFolder": "./productionData/assignments",
-        "maxSizeAssignmentFile": 52428800 // 50 MB
-    },
-    "submissions": {
-        "fileFolder": "./productionData/submissions",
-        "maxSizeSubmissionFile": 52428800 // 50 MB
-    },
-    "exampleData": {
-        "exampleAssignmentFolder": "./exampleData/assignments",
-        "exampleSubmissionFolder": "./exampleData/submissions",
-        "exampleReviewFolder": "./exampleData/reviews"
     },
     "allowedExtensions": [".pdf", ".zip", ".doc", ".docx"],
     "maxFileSize": 52428800, // 50 MB
@@ -45,5 +17,10 @@
     "rangeQuestion": {
         "min": 1,
         "max": 50
+    },
+    "exampleData": {
+        "exampleAssignmentFolder": "./exampleData/assignments",
+        "exampleSubmissionFolder": "./exampleData/submissions",
+        "exampleReviewFolder": "./exampleData/reviews"
     }
 }

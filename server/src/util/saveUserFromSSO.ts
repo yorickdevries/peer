@@ -9,7 +9,7 @@ import User from "../models/User";
 // This route checks the user and updates it in the database
 const saveUserFromSSO = async function (
   netid: string,
-  studentNumber?: number,
+  studentNumber?: string,
   firstName?: string,
   prefix?: string,
   lastName?: string,
@@ -26,7 +26,7 @@ const saveUserFromSSO = async function (
       await parseAndSaveAffiliation(affiliation),
       await parseAndSaveStudy(study),
       await parseAndSaveOrganisationUnit(organisationUnit),
-      studentNumber ? studentNumber : null,
+      studentNumber ? parseInt(studentNumber) : null,
       firstName ? firstName : null,
       prefix ? prefix : null,
       lastName ? lastName : null,

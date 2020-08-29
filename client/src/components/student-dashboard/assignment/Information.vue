@@ -14,7 +14,7 @@
                     </p>
                     <span class="font-weight-bold">Review Due Date</span>
                     <p>
-                        At this date the submission for the assignment needs to be submitted in the submission tab:<br />{{
+                        At this date the review for the assignment needs to be submitted in the review tab:<br />{{
                             assignment.reviewDueDate | formatDate
                         }}
                     </p>

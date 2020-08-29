@@ -1,10 +1,6 @@
 image: node:14
 
 variables:
-  POSTGRES_DB: peer_database
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: password
-  POSTGRES_HOST: postgres
   MYSQL_ROOT_PASSWORD: password
   MYSQL_DATABASE: peer
   MYSQL_USER: peer
@@ -15,12 +11,11 @@ stages:
     - static-analysis
     - build
     - test
-    - coverage
     - migration
     - start
     - sast
 
-server-lint:
+lint-server:
   stage: static-analysis
   variables:
     NODE_ENV: development
@@ -31,7 +26,7 @@ server-lint:
   - merge_requests
   - pushes
 
-client-lint:
+lint-client:
   stage: static-analysis
   variables:
     NODE_ENV: development
@@ -42,7 +37,7 @@ client-lint:
   - merge_requests
   - pushes
 
-build_server:
+build-server:
   stage: build
   variables:
     NODE_ENV: production
@@ -53,7 +48,7 @@ build_server:
   - merge_requests
   - pushes
 
-build_client:
+build-client:
   stage: build
   variables:
     NODE_ENV: production
@@ -79,25 +74,12 @@ coverage:
   stage: test
   variables:
     NODE_ENV: test
-  allow_failure: true
   script:
   - cd server && npm install
   - npm run coverage
   only:
   - merge_requests
   - pushes
-
-test_old:
-  stage: test
-  variables:
-    NODE_ENV: test
-  services:
-  - postgres:12
-  script:
-  - cd server && npm install
-  - npm run test_old
-  only:
-  - merge_requests
 
 migration:
   stage: migration
@@ -113,7 +95,7 @@ migration:
   - merge_requests
   - pushes
 
-start_server:
+start-server:
   stage: start
   variables:
     NODE_ENV: production
@@ -122,26 +104,11 @@ start_server:
   script:
   - cd server && npm install
   - npm run build
+  - npm run typeorm:migration:run
   - timeout 30s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
   only:
   - merge_requests
   - pushes
-
-start_server_old:
-  stage: start
-  variables:
-    NODE_ENV: development
-  services:
-  - postgres:12
-  - mariadb:10.1
-  script:
-  - cd server && npm install
-  - npm run build
-  - export NODE_ENV="development"
-  - npm run data_init_old
-  - timeout 30s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
-  only:
-  - merge_requests
 
 sast:
   stage: sast
@@ -164,4 +131,3 @@ sast:
   only:
   - merge_requests
   - pushes
-

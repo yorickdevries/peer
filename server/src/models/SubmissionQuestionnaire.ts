@@ -18,11 +18,8 @@ export default class SubmissionQuestionnaire extends Questionnaire {
   }
 
   async getAssignment(): Promise<Assignment> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await SubmissionQuestionnaire.findOneOrFail(this.id, {
-        relations: ["assignmentOfSubmissionQuestionnaire"],
-      })
-    ).assignmentOfSubmissionQuestionnaire!;
+    return Assignment.findOneOrFail({
+      where: { submissionQuestionnaire: this },
+    });
   }
 }

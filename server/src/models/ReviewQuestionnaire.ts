@@ -18,11 +18,6 @@ export default class ReviewQuestionnaire extends Questionnaire {
   }
 
   async getAssignment(): Promise<Assignment> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await ReviewQuestionnaire.findOneOrFail(this.id, {
-        relations: ["assignmentOfReviewQuestionnaire"],
-      })
-    ).assignmentOfReviewQuestionnaire!;
+    return Assignment.findOneOrFail({ where: { reviewQuestionnaire: this } });
   }
 }
