@@ -1,34 +1,46 @@
-image: node:10
+image: node:14
 
 variables:
-  POSTGRES_DB: peer_database
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: password
-  NODE_ENV: development
+  MYSQL_ROOT_PASSWORD: password
+  MYSQL_DATABASE: peer
+  MYSQL_USER: peer
+  MYSQL_PASSWORD: password
+  MYSQL_HOST: mariadb
 
 stages:
     - static-analysis
     - build
     - test
-    - coverage
+    - migration
     - start
     - sast
 
-tslint:
+lint-server:
   stage: static-analysis
+  variables:
+    NODE_ENV: development
   script:
   - cd server && npm install
-  - npm run tslint
+  - npm run lint
   only:
   - merge_requests
   - pushes
 
-build_server:
+lint-client:
+  stage: static-analysis
+  variables:
+    NODE_ENV: development
+  script:
+  - cd client && npm install
+  - npm run lint
+  only:
+  - merge_requests
+  - pushes
+
+build-server:
   stage: build
   variables:
     NODE_ENV: production
-  services:
-  - postgres:10.3
   script:
   - cd server && npm install
   - npm run build
@@ -36,12 +48,10 @@ build_server:
   - merge_requests
   - pushes
 
-build_client:
+build-client:
   stage: build
   variables:
     NODE_ENV: production
-  services:
-  - postgres:10.3
   script:
   - cd client && npm install
   - npm run build
@@ -51,42 +61,51 @@ build_client:
 
 test:
   stage: test
-  services:
-  - postgres:10.3
+  variables:
+    NODE_ENV: test
   script:
   - cd server && npm install
   - npm run test
-  tags:
-  - longJob
   only:
   - merge_requests
   - pushes
 
 coverage:
-  stage: coverage
-  services:
-  - postgres:10.3
+  stage: test
+  variables:
+    NODE_ENV: test
   script:
   - cd server && npm install
   - npm run coverage
-  tags:
-  - longJob
   only:
   - merge_requests
   - pushes
 
-start_server:
+migration:
+  stage: migration
+  variables:
+    NODE_ENV: production
+  services:
+  - mariadb:10.1
+  script:
+  - cd server && npm install
+  - npm run build
+  - npm run typeorm:migration:run
+  only:
+  - merge_requests
+  - pushes
+
+start-server:
   stage: start
   variables:
     NODE_ENV: production
   services:
-  - postgres:10.3
+  - mariadb:10.1
   script:
   - cd server && npm install
   - npm run build
-  - export NODE_ENV="development"
-  - npm run data_init
-  - timeout 30s npm run start_server || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
+  - npm run typeorm:migration:run
+  - timeout 30s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
   only:
   - merge_requests
   - pushes
@@ -112,4 +131,3 @@ sast:
   only:
   - merge_requests
   - pushes
-

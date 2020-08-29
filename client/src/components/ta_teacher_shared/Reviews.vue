@@ -1,131 +1,184 @@
 <template>
-    <div>
-
+    <div v-if="reviews">
         <!--Table Options-->
         <b-row>
             <b-col cols="6" class="mb-3">
                 <b-form-group horizontal label="Filter" class="mb-0 mr-4">
-                    <b-input-group class="mb-2">
-                        <b-form-input v-model="filter" placeholder="Type to search"/>
+                    <b-input-group>
+                        <b-form-input v-model="filter" placeholder="Type to search" />
                         <b-input-group-append>
                             <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
                         </b-input-group-append>
                     </b-input-group>
 
                     <b-button-group class="mx-auto">
-                        <button @click="setShowOnlyDoneReviews(undefined)"
-                                :class="{'bg-primary': showOnlyDoneReviews === undefined, 'btn-outline-primary': showOnlyDoneReviews !== undefined, 'text-white': showOnlyDoneReviews === undefined}"
-                                class="btn btn-sm" size="sm">All reviews
+                        <button
+                            @click="onlySubmittedReviews = null"
+                            :class="{
+                                'bg-primary': onlySubmittedReviews === null,
+                                'btn-outline-primary': onlySubmittedReviews !== null,
+                                'text-white': onlySubmittedReviews === null
+                            }"
+                            class="btn btn-sm"
+                            size="sm"
+                        >
+                            All reviews
                         </button>
-                        <button @click="setShowOnlyDoneReviews(true)"
-                                :class="{'bg-primary': showOnlyDoneReviews === true, 'btn-outline-primary': showOnlyDoneReviews !== true, 'text-white': showOnlyDoneReviews === true}"
-                                class="btn btn-sm" size="sm">Done reviews
+                        <button
+                            @click="onlySubmittedReviews = true"
+                            :class="{
+                                'bg-primary': onlySubmittedReviews === true,
+                                'btn-outline-primary': onlySubmittedReviews !== true,
+                                'text-white': onlySubmittedReviews === true
+                            }"
+                            class="btn btn-sm"
+                            size="sm"
+                        >
+                            Submitted reviews
                         </button>
-                        <button @click="setShowOnlyDoneReviews(false)"
-                                :class="{'bg-primary': showOnlyDoneReviews === false, 'btn-outline-primary': showOnlyDoneReviews !== false, 'text-white': showOnlyDoneReviews === false}"
-                                class="btn btn-sm" size="sm">Not done reviews
+                        <button
+                            @click="onlySubmittedReviews = false"
+                            :class="{
+                                'bg-primary': onlySubmittedReviews === false,
+                                'btn-outline-primary': onlySubmittedReviews !== false,
+                                'text-white': onlySubmittedReviews === false
+                            }"
+                            class="btn btn-sm"
+                            size="sm"
+                        >
+                            Unsubmitted reviews
                         </button>
                     </b-button-group>
-
                 </b-form-group>
             </b-col>
             <b-col cols="6">
                 <b-form-group horizontal label="Per page">
-                    <b-form-input type="number" v-model="perPage"/>
+                    <b-form-input type="number" v-model="perPage" />
                 </b-form-group>
             </b-col>
         </b-row>
-
         <!--Table-->
-        <b-table striped
-                 outlined
-                 show-empty
-                 stacked="md"
-                 :items=reviews
-                 :fields="fields"
-                 :current-page="currentPage"
-                 :per-page="Number(perPage)"
-                 :filter="filter">
-
-            <template slot="done" slot-scope="row">
-                <span v-if="row.item.done">Done</span>
-                <span v-if="row.item.done === false">Not done</span>
+        <b-table
+            striped
+            outlined
+            show-empty
+            stacked="md"
+            :items="selectedReviews"
+            :fields="fields"
+            :current-page="currentPage"
+            :per-page="Number(perPage)"
+            :filter="filter"
+        >
+            <template v-slot:cell(submissionFile)="data">
+                <a :href="submissionFilePath(data.item.submission.id)" target="_blank">
+                    {{ data.item.submission.file.name }}{{ data.item.submission.file.extension }}
+                </a>
             </template>
 
-            <template slot="approved" slot-scope="row">
-                <span v-if="row.item.approved">Approved</span>
-                <span v-if="row.item.approved === false">Disapproved</span>
-                <span v-if="row.item.approved === null">No action yet by any TA</span>
+            <template v-slot:cell(submissionGroupName)="data">
+                {{ getGroup(data.item.submission.groupId).name }}
             </template>
 
-            <template slot="ta_netid" slot-scope="row">
-                <span v-if="row.item.ta_netid">{{ row.item.ta_netid }}</span>
-                <span v-if="row.item.ta_netid === null">None</span>
+            <template v-slot:cell(approvalByTA)="data">
+                <span v-if="data.item.approvalByTA === null">No action yet by any TA</span>
+                <span v-if="data.item.approvalByTA === true">Approved 👍</span>
+                <span v-if="data.item.approvalByTA === false">Disapproved 👎</span>
             </template>
 
-            <template slot="actions" slot-scope="row">
-                <b-button variant="primary" size="sm" :to="{name: pathName, params: { reviewId: row.item.id }}">See review</b-button>
+            <template v-slot:cell(approvingTA)="data">
+                <span v-if="data.item.approvingTA">{{ data.item.approvingTA.netid }}</span>
+                <span v-if="data.item.approvingTA === null">None</span>
+            </template>
+
+            <template v-slot:cell(action)="data">
+                <!-- note: the name needs to be different for TAs-->
+                <b-button
+                    variant="primary"
+                    size="sm"
+                    :to="{
+                        name: $router.currentRoute.name.includes('teacher')
+                            ? 'teacher-dashboard.assignments.assignment.review'
+                            : 'teaching-assistant-dashboard.course.assignment.review',
+                        params: { reviewId: data.item.id }
+                    }"
+                    >Show review</b-button
+                >
             </template>
         </b-table>
 
         <!--Pagination-->
-        <b-pagination :total-rows=this.reviews.length :per-page="Number(perPage)" v-model="currentPage" class="my-0"/>
+        <b-pagination
+            :total-rows="this.selectedReviews.length"
+            :per-page="Number(perPage)"
+            v-model="currentPage"
+            class="my-0"
+        />
     </div>
 </template>
 
 <script>
-    import api from "../../api"
+import api from "../../api/api"
+import _ from "lodash"
 
-    export default {
-        props: ["assignmentId", "pathName"],
-        data() {
-            return {
-                reviews: [],
-                allReviews: [],
-                doneReviews: [],
-                notDoneReviews: [],
-                currentPage: 1,
-                fields: [
-                    {key: 'reviewer', label: 'Reviewer'},
-                    {key: 'submitter', label: 'Submitter'},
-                    {key: 'done', label: 'Status'},
-                    {key: 'approved', label: 'Approval Status'},
-                    {key: 'ta_netid', label: 'Graded by TA'},
-                    {key: 'flagged', label: 'Reviewer reported the submission'},
-                    'actions'
-                ],
-                perPage: 5,
-                filter: null,
-                showOnlyDoneReviews: undefined,
-            }
-        },
-        async created() {
-            let res = await api.getAssignmentReviews(this.assignmentId, undefined)
-            this.allReviews = res.data
-            this.reviews = res.data
-
-            this.processReviews()
-        },
-        methods: {
-            processReviews() {
-              for (let i = 0; i < this.allReviews.length; i++) {
-                  if (this.allReviews[i].done === true) {
-                      this.doneReviews.push(this.allReviews[i])
-                  } else {
-                      this.notDoneReviews.push(this.allReviews[i])
-                  }
-              }
-            },
-            async setShowOnlyDoneReviews(state) {
-                this.showOnlyDoneReviews = state
-                if (state === undefined) {
-                    this.reviews = this.allReviews
-                } else if (state === true) {
-                    this.reviews = this.doneReviews
-                } else if (state === false) {
-                    this.reviews = this.notDoneReviews
-                }
+export default {
+    data() {
+        return {
+            reviews: null,
+            // groups to get groupName from
+            groups: null,
+            // in case of null, all reviews will be shown
+            onlySubmittedReviews: null,
+            // for navigation
+            fields: [
+                { key: "reviewer.netid", label: "Reviewer" },
+                { key: "submissionFile", label: "Submission file" },
+                { key: "submission.groupId", label: "Group ID of submission" },
+                { key: "submissionGroupName", label: "Group name of submission" },
+                { key: "flaggedByReviewer", label: "Reviewer flagged the submission" },
+                { key: "submitted", label: "Review submitted" },
+                { key: "approvalByTA", label: "Approval by TA" },
+                { key: "approvingTA", label: "Approving TA" },
+                { key: "action", label: "Action" }
+            ],
+            currentPage: 1,
+            perPage: 10,
+            filter: ""
+        }
+    },
+    async created() {
+        // reviews
+        try {
+            const res1 = await api.reviewofsubmissions.getAllForAssignment(this.$route.params.assignmentId, undefined)
+            this.reviews = res1.data
+        } catch (error) {
+            // in case no submissionquestionnaire is present, this call will result in an error
+            this.reviews = []
+        }
+        // groups
+        const res2 = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
+        this.groups = res2.data
+    },
+    computed: {
+        selectedReviews() {
+            if (this.onlySubmittedReviews === null) {
+                return this.reviews
+            } else {
+                return _.filter(this.reviews, review => {
+                    return review.submitted === this.onlySubmittedReviews
+                })
             }
         }
+    },
+    methods: {
+        getGroup(id) {
+            return _.find(this.groups, group => {
+                return group.id === id
+            })
+        },
+        submissionFilePath(id) {
+            // Get the submission file path.
+            return `/api/submissions/${id}/file`
+        }
     }
+}
 </script>

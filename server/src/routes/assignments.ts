@@ -1,668 +1,494 @@
-// Imports
-import path from "path";
-import fs from "fs-extra";
-import index from "../security/index";
-import AssignmentPS from "../prepared_statements/assignment_ps";
-import UserPS from "../prepared_statements/user_ps";
-import GroupPS, { default as GroupsPS } from "../prepared_statements/group_ps";
-import ReviewPS from "../prepared_statements/review_ps";
-import ExportResultsPS from "../prepared_statements/export_results_ps";
-import GroupParser from "../groupParser";
-import reviewDistribution from "../review_distribution/reviewDistribution";
-import ReviewDistributionTwoAssignments from "../review_distribution/reviewDistributionTwoAssignments";
-import ReviewDistributionThreeAssignments from "../review_distribution/reviewDistributionThreeAssignments";
-import config from "../config";
-import FileExport from "../fileExport";
-import upload from "../middleware/upload";
-
-// Router
 import express from "express";
-import SubmissionsPS from "../prepared_statements/submissions_ps";
-import ReviewUpdate from "../reviewUpdate";
-import { generateRubric } from "../models/rubric_factory";
-import evaluationReviewRubricConfig from "../evaluationReviewRubricConfig";
+import Joi from "@hapi/joi";
+import { getManager } from "typeorm";
+import {
+  validateBody,
+  validateQuery,
+  validateParams,
+  idSchema,
+} from "../middleware/validation";
+import Assignment from "../models/Assignment";
+import Course from "../models/Course";
+import UserRole from "../enum/UserRole";
+import File from "../models/File";
+import HttpStatusCode from "../enum/HttpStatusCode";
+import upload from "../middleware/upload";
+import config from "config";
+import hasha from "hasha";
+import path from "path";
+import fsPromises from "fs/promises";
+import _ from "lodash";
+import ResponseMessage from "../enum/ResponseMessage";
+import Group from "../models/Group";
+import { AssignmentState } from "../enum/AssignmentState";
 
-const router = express();
-// Needed for the tests (tests need to change)
-router.use(express.json());
+const router = express.Router();
 
-const fileFolder = config.assignments.fileFolder;
+// config values
+const uploadFolder = config.get("uploadFolder") as string;
+const allowedExtensions = config.get("allowedExtensions") as string[];
+const maxFileSize = config.get("maxFileSize") as number;
 
-/**
- * Route to get all information about an assignment
- * @params assignment_id - assignment id
- */
-router.route("/:assignment_id")
-    .get(index.authorization.enrolledAssignmentCheck, (req, res) => {
-        AssignmentPS.executeGetAssignmentById(req.params.assignment_id)
-        .then((data) => {
-            res.json(data);
-        }).catch((error) => {
-            res.sendStatus(400);
-        });
-    });
-
-
-/**
- * Route to post and update an assignment.
- */
-router.post("/", upload("assignmentFile", config.allowed_extensions, config.assignments.maxSizeAssignmentFile), index.authorization.enrolledAsTeacherAssignmentCheckForPost, async function(req: any, res: any) {
-    try {
-        let fileName: string | null;
-        let filePath: string | undefined = undefined;
-
-        if (req.file == undefined) {
-            // tslint:disable-next-line
-            fileName = null;
-        } else {
-            fileName = Date.now() + "-" + req.file.originalname;
-            filePath = path.join(fileFolder, fileName);
-        }
-
-        if (req.body.review_evaluation === true) {
-            if (req.body.review_evaluation_due_date == undefined) {
-                res.status(400);
-                res.json({ error: "If the review evaluation is turned on, you should enter a review evaluation due date." });
-                return;
-            }
-        }
-
-        if (req.body.external_link != undefined && !req.body.external_link.startsWith("http")) {
-            res.status(400);
-            res.json({ error: "Invalid external link" });
-            return;
-        }
-
-        const result: any = await AssignmentPS.executeAddAssignment(
-            req.body.title,
-            req.body.description,
-            req.body.course_id,
-            req.body.reviews_per_user,
-            fileName,
-            req.body.publish_date,
-            req.body.due_date,
-            req.body.review_publish_date,
-            req.body.review_due_date,
-            req.body.one_person_groups,
-            req.body.review_evaluation,
-            req.body.external_link,
-            req.body.review_evaluation_due_date
-        );
-
-        if (filePath) {
-            // writing the file if no error is there
-            await fs.writeFile(filePath, req.file.buffer);
-        }
-
-        // Generate a default review evaluation rubric if review evaluation is turned on.
-        if (result.review_evaluation) {
-            await generateRubric(evaluationReviewRubricConfig, result.id);
-        }
-
-        res.json(result);
-    } catch (err) {
-        res.status(400);
-        res.json({ error: "An error occurred while creating the assignment" });
-    }
+// Joi inputvalidation
+const queryCourseIdSchema = Joi.object({
+  courseId: Joi.number().integer().required(),
+});
+// get all all assignments (for teacher) for specific course
+router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  // this value has been parsed by the validate function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const courseId: number = req.query.courseId as any;
+  const course = await Course.findOne(courseId);
+  if (!course) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.COURSE_NOT_FOUND);
+    return;
+  }
+  if (!(await course.isTeacherOrTeachingAssistant(user))) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
+    return;
+  }
+  const allAssignments = await course.getAssignments();
+  const sortedAllAssignments = _.sortBy(allAssignments, "id");
+  res.send(sortedAllAssignments);
 });
 
-/**
- * Route to update an assignment.
- * Removes the old assignment (also from the files folder - if a file is uploaded)
- * and adds the new assignment.
- */
-router.put("/:assignment_id", upload("assignmentFile", config.allowed_extensions, config.assignments.maxSizeAssignmentFile), index.authorization.enrolledAsTeacherAssignmentCheck, async function(req: any, res: any) {
-    try {
-        const oldFilename: string = (await AssignmentPS.executeGetAssignmentById(req.params.assignment_id)).filename;
-        // Determine whether a file is uploaded and set the filename accordingly.
-        const updatedFileName: string = (req.file) ? Date.now() + "-" + req.file.originalname : oldFilename;
-
-        const current: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-
-        if (current.review_evaluation === true) {
-            if (req.body.review_evaluation_due_date == undefined) {
-                res.status(400);
-                res.json({ error: "If the review evaluation is turned on, you should enter a review evaluation due date." });
-                return;
-            }
-        }
-
-        if (req.body.external_link != undefined && !req.body.external_link.startsWith("http")) {
-            res.status(400);
-            res.json({ error: "Invalid external link" });
-            return;
-        }
-
-        // Update the assignment in the database.
-        const result: any = await AssignmentPS.executeUpdateAssignmentById(
-            req.body.title,
-            req.body.description,
-            req.body.reviews_per_user,
-            updatedFileName,
-            req.body.publish_date,
-            req.body.due_date,
-            req.body.review_publish_date,
-            req.body.review_due_date,
-            req.params.assignment_id,
-            req.body.external_link,
-            req.body.review_evaluation_due_date
-        );
-
-        // Remove the old file and add the new file if a file is uploaded
-        // (ie. name of the file is not undefined).
-        if (req.file) {
-            // Assemble the file path. Updated file name is the new file name.
-            // It can never be the old since req.file would be undefined.
-            const newFilePath = path.join(fileFolder, updatedFileName);
-
-            // Remove the old file and write the new file.
-            if (oldFilename) {
-                const oldFilePath = path.join(fileFolder, oldFilename);
-                await fs.unlink(oldFilePath);
-            }
-            await fs.writeFile(newFilePath, req.file.buffer);
-        }
-        res.json(result);
-    } catch (err) {
-        // Send appropriate error.
-        res.status(400);
-        res.json({ error: "An error occurred while updating the assignment" });
-    }
+router.get("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  const assignment = await Assignment.findOne(req.params.id);
+  if (!assignment) {
+    res
+      .status(HttpStatusCode.NOT_FOUND)
+      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+    return;
+  }
+  if (
+    (await assignment.isEnrolledInGroup(user)) &&
+    (await assignment.getState()) === AssignmentState.UNPUBLISHED
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("This assignment is not published yet");
+    return;
+  }
+  if (
+    !(
+      (await assignment.isTeacherOrTeachingAssistantInCourse(user)) ||
+      (await assignment.isEnrolledInGroup(user))
+    )
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not allowed to view this assignment");
+    return;
+  }
+  res.send(assignment);
 });
 
-/**
- * Route to get a file from an assignment.
- * @param id - assignment id.
- */
-router.get("/:assignment_id/file", index.authorization.enrolledAssignmentCheck, async (req, res) => {
-    try {
-        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-        const fileName = path.join(fileFolder, assignment.filename);
-        res.download(fileName);
-    } catch (err) {
-        res.sendStatus(400);
-    }
+// get an assignment file by assignment id
+router.get("/:id/file", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  const assignment = await Assignment.findOne(req.params.id);
+  if (!assignment) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+    return;
+  }
+  if (
+    (await assignment.isEnrolledInGroup(user)) &&
+    (await assignment.getState()) === AssignmentState.UNPUBLISHED
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("This assignment is not published yet");
+    return;
+  }
+  if (
+    !(
+      (await assignment.isTeacherOrTeachingAssistantInCourse(user)) ||
+      (await assignment.isEnrolledInGroup(user))
+    )
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not allowed to view this assignment");
+    return;
+  }
+  // get the file
+  const file = assignment.file;
+  if (!file) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send("This assignment does not have a file attached.");
+    return;
+  }
+  const fileName = file.getFileNamewithExtension();
+  const filePath = file.getPath();
+  res.download(filePath, fileName);
 });
 
-/**
- * Route to get all submissions of a certain assignment of your specific group.
- * @user netid - netId.
- * @params assignment_id - assignment_id.
- */
-router.route("/:assignment_id/submissions", )
-    .get((req: any, res) => {
-        AssignmentPS.executeGetSubmissionsByAssignmentId(
-            req.user.netid,
-            req.params.assignment_id
-        ).then((data) => {
-            res.json(data);
-        }).catch((error) => {
-            res.sendStatus(400);
-        });
-    });
+// get the group by assignment id
+router.get("/:id/group", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  const assignment = await Assignment.findOne(req.params.id);
+  if (!assignment) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+    return;
+  }
+  const group = await assignment.getGroup(user);
+  if (!group) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.GROUP_NOT_FOUND);
+    return;
+  }
+  const groupUsers = await group.getUsers();
+  // remove the sensitive info
+  const users = _.map(groupUsers, (user) => {
+    return _.pick(user, ["netid", "displayName", "email"]);
+  });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  group.users = users as any;
+  res.send(group);
+});
 
-/**
- * Route to get the latest submission of a certain assignment of an assignment id.
- */
-router.route("/:id/latestsubmission")
-.get(async (req: any, res) => {
-    const netId = req.user.netid;
+// Joi inputvalidation for query
+const querySubmissionSchema = Joi.object({
+  groupId: Joi.number().integer().required(),
+});
+// get the submissions of a group
+router.get(
+  "/:id/submissions",
+  validateParams(idSchema),
+  validateQuery(querySubmissionSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
     const assignmentId = req.params.id;
-    // get the groupId of this user for this assignment
-    try {
-        const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
-        const groupId = groupAssignment.group_id;
-        // get the latest submission
-        const result: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
-        res.json(result);
-    } catch {
-        res.status(400);
-        res.json({error: "No latest submission could be found"});
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const groupId: number = req.query.groupId as any;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
     }
+    const group = await Group.findOne(groupId);
+    if (!group) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.GROUP_NOT_FOUND);
+      return;
+    }
+    if (!(await group.hasUser(user))) {
+      res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
+      return;
+    }
+    const submissions = await assignment.getSubmissions(group);
+    const sortedSubmissions = _.sortBy(submissions, "id");
+    res.send(sortedSubmissions);
+  }
+);
+
+// get the latest submission of a group
+// we should swicth to specific annotation of submissions which indicate whether they are the latest
+router.get(
+  "/:id/latestsubmission",
+  validateParams(idSchema),
+  validateQuery(querySubmissionSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const assignmentId = req.params.id;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const groupId: number = req.query.groupId as any;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    const group = await Group.findOne(groupId);
+    if (!group) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.GROUP_NOT_FOUND);
+      return;
+    }
+    if (!(await group.hasUser(user))) {
+      res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
+      return;
+    }
+    const latestSubmission = await assignment.getLatestSubmission(group);
+    if (!latestSubmission) {
+      res
+        .status(HttpStatusCode.NOT_FOUND)
+        .send("No submissions have been made yet");
+      return;
+    }
+    res.send(latestSubmission);
+  }
+);
+
+// Joi inputvalidation
+const assignmentSchema = Joi.object({
+  name: Joi.string().required(),
+  courseId: Joi.number().integer().required(),
+  reviewsPerUser: Joi.number().integer().required(),
+  enrollable: Joi.boolean().required(),
+  reviewEvaluation: Joi.boolean().required(),
+  publishDate: Joi.date().required(),
+  dueDate: Joi.date().required(),
+  reviewPublishDate: Joi.date().required(),
+  reviewDueDate: Joi.date().required(),
+  reviewEvaluationDueDate: Joi.date().allow(null).required(),
+  description: Joi.string().allow(null).required(),
+  file: Joi.allow(null),
+  externalLink: Joi.string().allow(null).required(),
 });
-
-/**
- * Route to get all submissions per assignment
- * @params assignment_id - assignment_id
- */
-router.route("/:assignment_id/allsubmissions")
-    .get(index.authorization.enrolledAsTAOrTeacherAssignment, (req, res) => {
-        SubmissionsPS.executeGetAllSubmissionsByAssignmentId(req.params.assignment_id)
-        .then((data) => {
-            res.json(data);
-        }).catch((error) => {
-            res.sendStatus(400);
-        });
-    });
-
-/**
- * Route to get all latest submissions per assignment
- * @params assignment_id - assignment_id
- */
-router.route("/:assignment_id/alllatestsubmissions")
-    .get(index.authorization.enrolledAsTAOrTeacherAssignment, (req, res) => {
-        SubmissionsPS.executeGetLatestSubmissionsByAssignmentId(req.params.assignment_id)
-        .then((data) => {
-            res.json(data);
-        }).catch((error) => {
-            res.sendStatus(400);
-        });
-    });
-
-
-/**
- * Route to request a list of reviews
- * @user.netid - NetId
- * @params assignment_id - assignment_Id
- */
-router.route("/:assignment_id/reviews")
-    .get((req: any, res) => {
-        ReviewPS.executeGetSubmissionReviewsByUserIdAndAssignmentId(req.user.netid, req.params.assignment_id)
-        .then((data) => {
-            res.json(data);
-        }).catch((error) => {
-            res.sendStatus(400);
-        });
-    });
-
-/**
- * Route to distribute reviews for a certain assignment
- */
-router.route("/:assignment_id/distributeReviews/:selfassign")
-    .get(index.authorization.enrolledAsTeacherAssignmentCheck, (req: any, res) => {
-        reviewDistribution.distributeReviews(req.params.assignment_id, req.params.selfassign)
-        .then((data) => {
-            res.json(data);
-        }).catch((error) => {
-            res.status(400);
-            res.json({error: error.message});
-        });
-    });
-
-/**
- * Route to get the reviews belonging to an assignment.
- * @param id - assignment id.
- */
-router.get("/:assignment_id/allreviews/:done", index.authorization.enrolledAsTAOrTeacherAssignment, async (req: any, res) => {
-    let isDone: boolean | undefined = undefined;
-    if (req.params.done === "true") {
-        isDone = true;
-    } else if (req.params.done === "false") {
-        isDone = false;
+// post an assignment in a course
+router.post(
+  "/",
+  upload(allowedExtensions, maxFileSize, "file"),
+  validateBody(assignmentSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const course = await Course.findOne(req.body.courseId);
+    if (!course) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(`Course with id ${req.body.courseId} does not exist`);
+      return;
     }
-
-    try {
-        res.json(await ReviewPS.executeGetAllSubmissionReviewsByAssignmentId(req.params.assignment_id, isDone));
-    } catch (e) {
-        res.sendStatus(400);
+    if (!(await course.isEnrolled(user, UserRole.TEACHER))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not a teacher of the course");
+      return;
     }
-});
-
-/**
- * Route to distribute reviews between two assignments
- * See Class for implementation details
- */
-router.route("/distributeReviewsTwoAssignments/:assignment_id1/:assignment_id2/:reviews_per_user")
-    .get(index.authorization.enrolledAsTeacherTwoAssignmentsCheck, (req: any, res) => {
-        ReviewDistributionTwoAssignments.distributeReviews(req.params.assignment_id1, req.params.assignment_id2, req.params.reviews_per_user)
-        .then((data) => {
-            res.json(data);
-        }).catch((error) => {
-            res.status(400);
-            res.json({error: error.message});
-        });
-    });
-
-/**
- * Route to distribute reviews between three assignments
- * See Class for implementation details
- */
-router.route("/distributeReviewsThreeAssignments/:assignment_id1/:assignment_id2/:assignment_id3/:reviews_per_user_per_other_assignment")
-    .get(index.authorization.enrolledAsTeacherThreeAssignmentsCheck, (req: any, res) => {
-        ReviewDistributionThreeAssignments.distributeReviews(req.params.assignment_id1, req.params.assignment_id2, req.params.assignment_id3, req.params.reviews_per_user_per_other_assignment)
-        .then((data) => {
-            res.json(data);
-        }).catch((error) => {
-            res.status(400);
-            res.json({error: error.message});
-        });
-    });
-
-/**
- * Route to import groups for a specific assignment.
- */
-
- // CSV of max 1 MB (in bytes)
-const maxSizeGroupsfile = 1 * 1024 * 1024;
-router.post("/:assignment_id/importgroups", upload("groupFile", [".csv"], maxSizeGroupsfile), index.authorization.enrolledAsTeacherAssignmentCheck, (req: any, res) => {
-    // error if no file was uploaded or no group column defined
-    if (req.file == undefined) {
-        res.status(400);
-        res.json({error: "No file uploaded"});
-    } else {
-        const assignmentId = req.params.assignment_id;
-        GroupParser.importGroups(req.file.buffer, assignmentId)
-        .then((data) => {
-            res.json(data);
-        }).catch((error) => {
-            res.status(400);
-            res.json({error: error.message});
-        });
-    }
-});
-
-/**
- * Route to copy the groups from one assignment to another.
- * @param assignment_id - the assignment to copy the groups from.
- * @body targetAssignmentId - the assignment to copy the groups to.
- */
-router.post("/:assignment_id/copygroups", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
-    try {
-        const assignmentToCopyId = req.params.assignment_id;
-        const targetAssignmentId = req.body.target_assignment_id;
-
-        const targetAssignment: any = await AssignmentPS.executeGetAssignmentById(targetAssignmentId);
-        const existingGroups: any = await AssignmentPS.executeGetGroupsByAssignmentId(assignmentToCopyId);
-
-        for (const group of existingGroups) {
-            // Copy the group
-            const newGroupId = await GroupParser.createGroupForAssignment(group.group_name, targetAssignmentId);
-
-            // Copy the group users
-            const existingGroupUsers: any = await AssignmentPS.executeGetUsersOfGroup(group.id);
-            for (const groupUser of existingGroupUsers) {
-                await GroupParser.addStudentToGroup(groupUser.user_netid, targetAssignmentId, targetAssignment.course_id, newGroupId);
-            }
+    let assignment: Assignment;
+    // start transaction make sure the file and assignment are both saved
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        // create the file object or leave it as null if no file is uploaded
+        let file: File | null = null;
+        if (req.file) {
+          // file info
+          const fileBuffer = req.file.buffer;
+          const fileExtension = path.extname(req.file.originalname);
+          const fileName = path.basename(req.file.originalname, fileExtension);
+          const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+          file = new File(fileName, fileExtension, fileHash);
+          await transactionalEntityManager.save(file);
         }
+        // create assignment
+        assignment = new Assignment(
+          req.body.name,
+          course,
+          req.body.reviewsPerUser,
+          req.body.enrollable,
+          req.body.reviewEvaluation,
+          req.body.publishDate,
+          req.body.dueDate,
+          req.body.reviewPublishDate,
+          req.body.reviewDueDate,
+          req.body.reviewEvaluationDueDate,
+          req.body.description,
+          file, // possibly null
+          req.body.externalLink,
+          null, // submissionQuestionnaire (initially empty)
+          null // reviewQuestionnaire (initially empty)
+        );
+        await transactionalEntityManager.save(assignment);
 
-        res.sendStatus(200);
-    } catch {
-        res.sendStatus(400);
-    }
-});
-
-/**
- * Route to get your group for this assignment
- * @param id - assignment id.
- */
-router.get("/:id/group", async (req: any, res) => {
-    try {
-        const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.user.netid, req.params.id);
-        const groupId = group.group_groupid;
-        const groupmembers = await GroupPS.executeGetUsersOfGroupById(groupId);
-        res.json({group, groupmembers});
-    } catch {
-        res.sendStatus(400);
-    }
-});
-
-/**
- * Route to get review Ids of a certain person.
- */
-router.get("/:id/feedback", async (req: any, res) => {
-    try {
-        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.id);
-        if (new Date(assignment.review_due_date) > new Date()) {
-            res.status(401);
-            res.json({ error: "You can only access the review after the review due date is passed." });
-        } else {
-            const assignmentId = req.params.id;
-            const group = await UserPS.executeGetGroupsByNetIdByAssignmentId(req.user.netid, req.params.id);
-            const groupId = group.group_groupid;
-            const submission: any = await SubmissionsPS.executeGetLatestSubmissionByAssignmentIdByGroupId(assignmentId, groupId);
-            const submissionId = submission.id;
-            res.json(await ReviewPS.executeGetReviewsBySubmissionId(submissionId));
+        // save the file to disk lastly
+        // (if this goes wrong all previous steps are rolled back)
+        if (file?.id && req.file) {
+          const filePath = path.resolve(uploadFolder, file.id.toString());
+          await fsPromises.writeFile(filePath, req.file.buffer);
         }
-    } catch {
-        res.sendStatus(400);
-    }
-});
+      }
+    );
+    // reload assignment to get all data
+    // assignment should be defined now (else we would be in the catch)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    await assignment!.reload();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    res.send(assignment!);
+  }
+);
 
-/**
- * Route to get review ids of the reviews a student gave.
- */
-router.get("/:id/feedbackGivenToOthers", async (req: any, res) => {
-    try {
-        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.id);
-        if (new Date(assignment.review_due_date) > new Date()) {
-            res.status(401);
-            res.json({ error: "You can only access the review after the review due date is passed." });
-        } else {
-            res.json(await ReviewPS.executeGetAllDoneSubmissionReviewsOfStudent(req.params.id, req.user.netid));
+// Joi inputvalidation
+const assignmentPatchSchema = Joi.object({
+  name: Joi.string().required(),
+  reviewsPerUser: Joi.number().integer().required(),
+  enrollable: Joi.boolean().required(),
+  reviewEvaluation: Joi.boolean().required(),
+  publishDate: Joi.date().required(),
+  dueDate: Joi.date().required(),
+  reviewPublishDate: Joi.date().required(),
+  reviewDueDate: Joi.date().required(),
+  reviewEvaluationDueDate: Joi.date().allow(null).required(),
+  description: Joi.string().allow(null).required(),
+  file: Joi.allow(null),
+  externalLink: Joi.string().allow(null).required(),
+});
+// patch an assignment in a course
+router.patch(
+  "/:id",
+  upload(allowedExtensions, maxFileSize, "file"),
+  validateParams(idSchema),
+  validateBody(assignmentPatchSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const assignmentId = req.params.id;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (!(await assignment.isTeacherInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not a teacher of the course");
+      return;
+    }
+    // either a new file can be sent or a file can be removed, not both
+    if (req.file && req.body.file === null) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("Both a file is uploaded and the body is set to null");
+      return;
+    }
+    // start transaction make sure the file and assignment are both saved
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        let oldFile: File | null | undefined = undefined;
+        // in case a new file is sent or file is set to null, the old one needs to be deleted
+        if (req.file || req.body.file === null) {
+          oldFile = assignment.file;
         }
-    } catch {
-        res.sendStatus(400);
-    }
-});
-
-
-/**
- * Route to get all groups of an assignment
- */
-router.get("/:assignment_id/groups", index.authorization.enrolledAsTAOrTeacherAssignment, (req: any, res) => {
-    AssignmentPS.executeGetGroupsByAssignmentId(req.params.assignment_id)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
-        res.sendStatus(400);
-    });
-});
-
-/**
- * Route to enroll in an assignment as 1 person group.
- * Only possible for assignments with 1 person groups.
- * Student should be enrolled in the course.
- * @param id - assignment id.
- */
-router.get("/:assignment_id/enroll", index.authorization.enrolledAsStudentAssignment, async (req: any, res) => {
-    try {
-        const assignment: any = await AssignmentPS.executeGetAssignmentById(req.params.assignment_id);
-
-        // Check if the assignment due date is not passed, one person groups is enabled and student is without group.
-        // Send custom error json (not throwing error and displaying that) since database error messages are confidential.
-        if (new Date(assignment.due_date) <= new Date()) {
-            res.status(400);
-            res.json({error: "Student can only enroll until the assignment due date deadline."});
-        } else if (new Date(assignment.publish_date) >= new Date()) {
-            res.status(400);
-            res.json({error: "Student can only enroll until after the assignment publish date."});
-        } else if (assignment.one_person_groups === false) {
-            res.status(400);
-            res.json({error: "Assignment has one person groups not enabled."});
-        } else if (await GroupParser.studentIsInGroup(req.user.netid, req.params.assignment_id) === true) {
-            res.status(400);
-            res.json({error: "Student is already in a group enrolled for this assignment."});
-        } else {
-            // Create group and add assignment and student.
-            const groupId = await GroupParser.createGroupForAssignment(req.user.netid, req.params.assignment_id);
-            await GroupPS.executeAddStudenttoGroup(req.user.netid, groupId);
-            res.sendStatus(200);
+        let newFile: File | null | undefined = undefined;
+        if (req.body.file === null) {
+          newFile = null;
         }
-    } catch {
-        res.sendStatus(400);
-    }
-});
-
-/**
- * Export the approved ratings of each student for a specific assignment.
- * @param assignment_id - id of the assignment.
- */
-router.get("/:assignment_id/gradeExport/:exporttype", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res: any) => {
-    try {
-        const exportData = await ExportResultsPS.executeGetStudentSubmissionReviewExportAssignment(req.params.assignment_id);
-        const filename: string = await FileExport.filenameForAssignment(req.params.assignment_id);
-        // export in required format
-        FileExport.exportJSONToFile(exportData, filename, req.params.exporttype, res);
-    } catch {
-        res.sendStatus(400);
-    }
-});
-
-/**
- * Export the approved reviews of each student for a specific assignment.
- * json format for excel csv export
- * [{
- * Reviewer net id, Reviewer studentnumber, Reviewer group,
- * Submitter net id, Submitter studentnumber, Submitter group,
- * Approval status, TA net id
- * question1: answer, ..., question(n): answer
- * }]
- * @param assignment_id - id of the assignment.
- */
-router.get("/:assignment_id/reviewsExport/:exporttype", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res: any) => {
-    const addQuestionsToReviewJson = (questions: any, reviewJson: any, reviewType: string) => {
-        // Loop through the questions and add (question, answer) to the review json object.
-        for (let questionNumber = 0; questionNumber < questions.length; questionNumber++) {
-            const item = questions[questionNumber];
-            const questionText = reviewType + String(item.question.question_number) + ". " + item.question.question;
-            if (item.question.type_question == "mc") {
-                const answer = item.answer.answer;
-                // find the right chosen option in the list
-                let chosenOption = undefined;
-                const options = item.question.option;
-                for (let j = 0; j < options.length; j++) {
-                    if (options[j].id == answer) {
-                        chosenOption = options[j].option;
-                    }
-                }
-                reviewJson[questionText] = chosenOption;
-            } else if (item.question.type_question == "checkbox") {
-                const chosenOptionIds = item.answer.answer;
-                if (chosenOptionIds) {
-                    const chosenOptions = [];
-                    const options = item.question.option;
-                    for (const chosenOptionId of chosenOptionIds) {
-                        const chosenOption = options.find((option: any) => option.id == chosenOptionId);
-                        chosenOptions.push(chosenOption.option);
-                    }
-                    reviewJson[questionText] = chosenOptions;
-                } else {
-                    reviewJson[questionText] = undefined;
-                }
-            }
-            else {
-                reviewJson[questionText] = item.answer.answer;
-            }
+        // create the file object
+        if (req.file) {
+          // file info
+          const fileBuffer = req.file.buffer;
+          const fileExtension = path.extname(req.file.originalname);
+          const fileName = path.basename(req.file.originalname, fileExtension);
+          const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+          newFile = new File(fileName, fileExtension, fileHash);
+          await transactionalEntityManager.save(newFile);
         }
-    };
-    try {
-        const exportData: Array<any> = [];
-        const filename: string = await FileExport.filenameForAssignment(req.params.assignment_id);
-        const reviews: any = await ReviewPS.executeGetSubmissionReviewsByAssignmentId(req.params.assignment_id);
-
-        // Loop through the reviews, add to export data.
-        for (let i = 0; i < reviews.length; i++) {
-            // Get the questions and review entry of this review.
-            const review: any = reviews[i];
-            const reviewQuestions: any = (await ReviewUpdate.getReview(review.id)).form;
-            const submission: any = await SubmissionsPS.executeGetSubmissionById(review.submission_id);
-            // Get information about reviewer and submitter.
-            const reviewer: any = await UserPS.executeGetUserById(review.user_netid);
-            const submitter: any = await UserPS.executeGetUserById(submission.user_netid);
-            const reviewGroup: any = await GroupPS.executeGetGroupNameForUserAndAssignment(reviewer.netid, req.params.assignment_id);
-            const submitterGroup: any = await GroupPS.executeGetGroupById(submission.group_id);
-
-            // Create and fill current review json item.
-            const reviewJson: any = {};
-
-            // submitter info
-            reviewJson["Submitter netid"] = submitter.netid;
-            reviewJson["Submitter studentnumber"] = submitter.studentnumber;
-            reviewJson["Submitter group id"] = submitterGroup.id;
-            reviewJson["Submitter group name"] = submitterGroup.group_name;
-
-            // reviewer info
-            reviewJson["Reviewer netid"] = reviewer.netid;
-            reviewJson["Reviewer studentnumber"] = reviewer.studentnumber;
-            if (reviewGroup[0] != undefined) {
-                reviewJson["Reviewer group id"] = reviewGroup[0].group_id;
-                reviewJson["Reviewer group name"] = reviewGroup[0].group_name;
-            }
-
-            // review info
-            reviewJson["Submission review started_at"] = review.started_at;
-            reviewJson["Submission review downloaded_at"] = review.downloaded_at;
-            reviewJson["Submission review saved_at"] = review.saved_at;
-            reviewJson["Submission review submitted_at"] = review.submitted_at;
-            reviewJson["Submission review done"] = review.done;
-            reviewJson["Approval status"] = review.approved;
-            reviewJson["TA netid"] = review.ta_netid;
-            reviewJson["Reviewer reported the submission"] = review.flagged;
-
-            // R for review
-            const reviewType = "R";
-            addQuestionsToReviewJson(reviewQuestions, reviewJson, reviewType);
-
-            // get the evaluation (if present)
-            try {
-                // if this line below fails, then the error is caught
-                const reviewEvaluation: any = (await ReviewPS.executeGetFullReviewEvaluation(review.id));
-                const evaluator: any = await UserPS.executeGetUserById(reviewEvaluation.user_netid);
-                // info about evaluator
-                reviewJson["Evaluator netid"] = evaluator.netid;
-                reviewJson["Evaluator studentnumber"] = evaluator.studentnumber;
-
-                // info about evaluation
-                reviewJson["Review evaluation started_at"] = reviewEvaluation.started_at;
-                reviewJson["Review evaluation downloaded_at"] = reviewEvaluation.downloaded_at;
-                reviewJson["Review evaluation saved_at"] = reviewEvaluation.saved_at;
-                reviewJson["Review evaluation submitted_at"] = reviewEvaluation.submitted_at;
-                reviewJson["Review evaluation done"] = reviewEvaluation.done;
-                const reviewEvaluationQuestions = (await ReviewUpdate.getReview(reviewEvaluation.id)).form;
-                // E for evaluation
-                const reviewType = "E";
-                addQuestionsToReviewJson(reviewEvaluationQuestions, reviewJson, reviewType);
-            } catch (error) {
-                // set to not done as there is no evaluation
-                reviewJson["Review evaluation done"] = false;
-            }
-            exportData.push(reviewJson);
+        // update assignment fields
+        // undefined values will not be changed
+        assignment.name = req.body.name;
+        assignment.reviewsPerUser = req.body.reviewsPerUser;
+        assignment.enrollable = req.body.enrollable;
+        assignment.reviewEvaluation = req.body.reviewEvaluation;
+        assignment.publishDate = req.body.publishDate;
+        assignment.dueDate = req.body.dueDate;
+        assignment.reviewPublishDate = req.body.reviewPublishDate;
+        assignment.reviewDueDate = req.body.reviewDueDate;
+        assignment.reviewEvaluationDueDate = req.body.reviewEvaluationDueDate;
+        assignment.description = req.body.description;
+        if (newFile !== undefined) {
+          assignment.file = newFile;
         }
+        assignment.externalLink = req.body.externalLink;
+        await transactionalEntityManager.save(assignment);
 
-        const exportType = req.params.exporttype;
-        // export in required format
-        FileExport.exportJSONToFile(exportData, filename, exportType, res);
-    } catch {
-        res.sendStatus(400);
-    }
-});
-
-/**
- * Route to create a group.
- * @param assignment_id - id of the assignment.
- */
-router.post("/:assignment_id/groups", index.authorization.enrolledAsTeacherAssignmentCheck, async (req: any, res) => {
-    try {
-        const group: any = await GroupsPS.executeAddGroup(req.body.group_name);
-        await GroupPS.executeAddGrouptoAssignment(group.id, req.params.assignment_id);
-        res.sendStatus(200);
-    } catch (e) {
-        console.log(e);
-        res.sendStatus(400);
-    }
-});
-
-/**
- * Route to get a random review id.
- * @param assignment_id - id of the assignment.
- */
-router.get("/:assignment_id/randomReview", index.authorization.enrolledAsTAOrTeacherAssignment, async (req: any, res) => {
-    try {
-        const availableReviews: any = await ReviewPS.executeGetAllDoneSubmissionReviewsByAssignmentIdUnreviewed(req.params.assignment_id);
-
-        // Check if there are any reviews left. Send 400 to front-end to display 'There are no reviews left' message.
-        if (availableReviews.length == 0) {
-            res.sendStatus(400);
-            return;
+        // save the file to disk
+        if (newFile?.id && req.file) {
+          const filePath = path.resolve(uploadFolder, newFile.id.toString());
+          await fsPromises.writeFile(filePath, req.file.buffer);
         }
+        // remove the old file from the disk
+        if (oldFile?.id) {
+          const filePath = path.resolve(uploadFolder, oldFile.id.toString());
+          await fsPromises.unlink(filePath);
+          await transactionalEntityManager.remove(oldFile);
+        }
+      }
+    );
+    // reload assignment to get all data
+    // assignment should be defined now (else we would be in the catch)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    await assignment!.reload();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    res.send(assignment!);
+  }
+);
 
-        // Get a random review and respond.
-        const randomReview: number = Math.floor(Math.random() * (availableReviews.length));
-        res.json({ id: availableReviews[randomReview].id });
-    } catch (e) {
-        console.log(e);
-        res.sendStatus(400);
+router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  const assignment = await Assignment.findOne(req.params.id);
+  if (!assignment) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+    return;
+  }
+  if (!(await assignment.isEnrollable(user))) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("The assignment is not enrollable");
+    return;
+  }
+  const course = await assignment.getCourse();
+  const group = new Group(user.netid, course, [user], [assignment]);
+  // save the group in an transaction to make sure no 2 groups are saved at the same time
+  await getManager().transaction(
+    "SERIALIZABLE",
+    async (transactionalEntityManager) => {
+      // find all groups to check for group existence
+      const allGroups = await transactionalEntityManager.find(Group, {
+        relations: ["users", "assignments"],
+      });
+      const alreadyExists = _.some(allGroups, (group) => {
+        return (
+          _.some(group.users, (groupUser) => {
+            return groupUser.netid === user.netid;
+          }) &&
+          _.some(group.assignments, (groupAssignment) => {
+            return groupAssignment.id === assignment.id;
+          })
+        );
+      });
+      if (alreadyExists) {
+        // throw error if a group already exists
+        // Can happen if 2 concurrent calls are made
+        throw new Error("Group already exists");
+      } else {
+        await transactionalEntityManager.save(group);
+      }
     }
+  );
+  // reload the group
+  await group.reload();
+  res.send(group);
 });
 
 export default router;

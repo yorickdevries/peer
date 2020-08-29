@@ -1,141 +1,267 @@
-// Imports
-import path from "path";
-import fs from "fs-extra";
-import SubmissionsPS from "../prepared_statements/submissions_ps";
-import AssignmentPS from "../prepared_statements/assignment_ps";
-import index from "../security/index";
-import config from "../config";
-import upload from "../middleware/upload";
-
-// Router
 import express from "express";
+import Joi from "@hapi/joi";
+import {
+  validateQuery,
+  validateBody,
+  idSchema,
+  validateParams,
+} from "../middleware/validation";
+import Assignment from "../models/Assignment";
+import HttpStatusCode from "../enum/HttpStatusCode";
+import Group from "../models/Group";
+import config from "config";
+import Submission from "../models/Submission";
+import File from "../models/File";
+import path from "path";
+import hasha from "hasha";
+import fsPromises from "fs/promises";
+import upload from "../middleware/upload";
+import { AssignmentState } from "../enum/AssignmentState";
+import { getManager } from "typeorm";
+import ResponseMessage from "../enum/ResponseMessage";
+import _ from "lodash";
 
-const router = express();
-// Needed for the tests (tests need to change)
-router.use(express.json());
+// config values
+const uploadFolder = config.get("uploadFolder") as string;
+const allowedExtensions = config.get("allowedExtensions") as string[];
+const maxFileSize = config.get("maxFileSize") as number;
 
-/**
- * Route to get one submission with a specific id.
- * @param id - submission id.
- * @authorization user should be TA, teacher or part of the group which has submitted.
- */
-router.get("/:id", index.authorization.getSubmissionAuth, (req, res) => {
-    SubmissionsPS.executeGetSubmissionById(req.params.id)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
-        res.sendStatus(400);
-    });
+const router = express.Router();
+
+// Joi inputvalidation for query
+const assignmentIdSchema = Joi.object({
+  assignmentId: Joi.number().integer().required(),
+});
+// get all the submissions for an assignment
+router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  // this value has been parsed by the validate function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const assignmentId: number = req.query.assignmentId as any;
+  const assignment = await Assignment.findOne(assignmentId);
+  if (!assignment) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+    return;
+  }
+  if (
+    // not a teacher
+    !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
+    return;
+  }
+  const submissions = await assignment.getSubmissions();
+  const sortedSubmissions = _.sortBy(submissions, "id");
+  res.send(sortedSubmissions);
 });
 
-/**
- * Route to make a new submission.
- * @authorization the user should be part of a group in the course.
- */
-router.post("/", upload("submissionFile", config.allowed_extensions, config.submissions.maxSizeSubmissionFile), index.authorization.postSubmissionAuth, index.authorization.checkSubmissionBetweenPublishDue, async function(req: any, res: any, next: any) {
-    // error if no file was uploaded or no group column defined
-    if (req.file == undefined) {
-        res.status(400);
-        res.json({error: "No file uploaded"});
-    } else {
-        try {
-            const fileFolder = config.submissions.fileFolder;
-            const fileName = Date.now() + "-" + req.file.originalname;
-            const filePath = path.join(fileFolder, fileName);
-            const netId = req.user.netid;
-            const assignmentId = req.body.assignmentId;
-            // get the groupId of this user for this assignment
-            const groupAssignment: any = await AssignmentPS.executeGetGroupOfNetIdByAssignmentId(netId, assignmentId);
-            const groupId = groupAssignment.group_id;
+// get all the latest submissions for an assignment
+// we should swicth to specific annotation of submissions which indicate whether they are the latest
+router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  // this value has been parsed by the validate function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const assignmentId: number = req.query.assignmentId as any;
+  const assignment = await Assignment.findOne(assignmentId);
+  if (!assignment) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+    return;
+  }
+  if (
+    // not a teacher
+    !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
+    return;
+  }
+  const latestSubmissionsOfEachGroup = await assignment.getLatestSubmissionsOfEachGroup();
+  const sortedSubmissions = _.sortBy(latestSubmissionsOfEachGroup, "id");
+  res.send(sortedSubmissions);
+});
 
-            // add to database
-            const result: any = await SubmissionsPS.executeCreateSubmission(netId, groupId, assignmentId, fileName);
-            // writing the file if no error is there
-            await fs.writeFile(filePath, req.file.buffer);
-            res.json(result);
-        } catch (err) {
-            res.status(400);
-            res.json({ error: "An error occurred while creating the submission" });
-        }
+// get the submission
+router.get("/:id", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  const submission = await Submission.findOne(req.params.id);
+  if (!submission) {
+    res
+      .status(HttpStatusCode.NOT_FOUND)
+      .send(ResponseMessage.SUBMISSION_NOT_FOUND);
+    return;
+  }
+  const group = await submission.getGroup();
+  const assignment = await submission.getAssignment();
+  if (
+    !(
+      (await group.hasUser(user)) ||
+      (await assignment.isTeacherOrTeachingAssistantInCourse(user))
+    )
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not part of this group or teacher of the course");
+    return;
+  }
+  res.send(submission);
+});
+
+// get the submission file
+router.get("/:id/file", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  const submission = await Submission.findOne(req.params.id);
+  if (!submission) {
+    res
+      .status(HttpStatusCode.NOT_FOUND)
+      .send(ResponseMessage.SUBMISSION_NOT_FOUND);
+    return;
+  }
+  const group = await submission.getGroup();
+  const assignment = await submission.getAssignment();
+  if (
+    !(
+      (await group.hasUser(user)) ||
+      (await assignment.isTeacherOrTeachingAssistantInCourse(user))
+    )
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not part of this group or teacher of the course");
+    return;
+  }
+  // get the file
+  const file = submission.file;
+  const fileName = file.getFileNamewithExtension();
+  const filePath = file.getPath();
+  res.download(filePath, fileName);
+});
+
+// get the feedback of a submission
+router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  const submission = await Submission.findOne(req.params.id);
+  if (!submission) {
+    res
+      .status(HttpStatusCode.NOT_FOUND)
+      .send(ResponseMessage.SUBMISSION_NOT_FOUND);
+    return;
+  }
+  const assignment = await submission.getAssignment();
+  const assignmentState = assignment.getState();
+  if (assignmentState !== AssignmentState.FEEDBACK) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("You are not allowed to view reviews");
+    return;
+  }
+  const group = await submission.getGroup();
+  if (!(await group.hasUser(user))) {
+    res.status(HttpStatusCode.FORBIDDEN).send("You are not part of this group");
+    return;
+  }
+  const reviewOfSubmissions = await submission.getReviewOfSubmissions();
+  const submittedReviews = _.filter(reviewOfSubmissions, (review) => {
+    return review.submitted;
+  });
+  const anonymousReviews = _.map(submittedReviews, (review) => {
+    return review.getAnonymousVersion();
+  });
+  const sortedReviews = _.sortBy(anonymousReviews, "id");
+  res.send(sortedReviews);
+});
+
+// Joi inputvalidation
+const submissionSchema = Joi.object({
+  groupId: Joi.number().integer().required(),
+  assignmentId: Joi.number().integer().required(),
+});
+// post a submission in a course
+router.post(
+  "/",
+  upload(allowedExtensions, maxFileSize, "file"),
+  validateBody(submissionSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    if (!req.file) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("File is needed for the submission");
+      return;
     }
-});
-
-/**
- * Route to get a file from a submission.
- * @authorization user should part of the group which has submitted or the reviewer for the submission..
- * @param id - submission id.
- */
-router.get("/:id/file", index.authorization.getSubmissionFileAuth, async (req, res) => {
-    try {
-        const submission: any = await SubmissionsPS.executeGetSubmissionById(req.params.id);
-        const filePath = path.join(config.submissions.fileFolder, submission.file_path);
-        res.download(filePath);
-    } catch (err) {
-        res.sendStatus(400);
+    const group = await Group.findOne(req.body.groupId);
+    if (!group) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.GROUP_NOT_FOUND);
+      return;
     }
-});
+    const assignment = await Assignment.findOne(req.body.assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (
+      !(await group.hasUser(user)) ||
+      !(await group.hasAssignment(assignment))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not allowed to submit.");
+      return;
+    }
+    if (!(assignment.getState() === AssignmentState.SUBMISSION)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is not in submission state");
+      return;
+    }
+    // make the submission here in a transaction
+    let submission: Submission;
 
-/**
- * Get all submission comments.
- * @authorization user should be TA, teacher or part of the group which has submitted.
- * @param id - an id of a submission.
- * @return database return value.
- */
-router.get("/:id/allComments", index.authorization.getSubmissionAuth, (req, res) => {
-    SubmissionsPS.executeGetAllSubmissionComments(req.params.id)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
-        res.sendStatus(400);
-    });
-});
+    // start transaction make sure the file and submission are both saved
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        // create the file object
+        const fileBuffer = req.file.buffer;
+        const fileExtension = path.extname(req.file.originalname);
+        const fileName = path.basename(req.file.originalname, fileExtension);
+        const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+        const file = new File(fileName, fileExtension, fileHash);
 
-/**
- * Put submission comments.
- * @authorization user should be TA, teacher or part of the group which has submitted.
- * @param submissionCommentId - an id of a submission.
- * @body comment - a comment of the review.
- * @return database return value.
- */
-router.put("/:submissionCommentId/comment", index.authorization.putSubmissionCommentAuth, (req, res) => {
-    SubmissionsPS.executeUpdateSubmissionComment(req.params.submissionCommentId, req.body.comment)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
-        res.sendStatus(400);
-    });
-});
+        await transactionalEntityManager.save(file);
 
-/**
- * Post all submission comments.
- * @authorization user should be TA, teacher or part of the group which has submitted.
- * @param id - an id of a submission.
- * @body netid - a netid.
- * @body comment - a comment of the review.
- * @return database return value.
- */
-router.post("/:id/comment", index.authorization.getSubmissionAuth, (req: any, res) => {
-    SubmissionsPS.executeAddSubmissionComment(req.params.id,  req.user.netid, req.body.comment)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
-        res.sendStatus(400);
-    });
-});
+        // create submission
+        submission = new Submission(user, group, assignment, file);
+        await transactionalEntityManager.save(submission);
 
-/**
- * Delete submission comments.
- * @authorization user should be TA, teacher or part of the group which has submitted.
- * @param submissionCommentId - an id of a submission.
- * @return database return value.
- */
-router.delete("/:submissionCommentId/comment", (req, res) => {
-    SubmissionsPS.executeDeleteSubmissionComment(req.params.submissionCommentId)
-    .then((data) => {
-        res.json(data);
-    }).catch((error) => {
-        res.sendStatus(400);
-    });
-});
+        // save the file to disk lastly
+        // (if this goes wrong all previous steps are rolled back)
+        const filePath = path.resolve(uploadFolder, file.id.toString());
+        await fsPromises.writeFile(filePath, req.file.buffer);
+      }
+    );
+    // reload submission to get all data
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    await submission!.reload();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    res.send(submission!);
+  }
+);
 
 export default router;

@@ -2,6 +2,7 @@
 **/node_modules/
 /server/dist/
 /server/files/
+/server/coverage/
 
 # local env files
 .env.local
@@ -11,6 +12,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
 # Coverage output
 */.nyc_output
@@ -22,7 +24,7 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
-*.sw*
+*.sw?
 
 # intellij
 .idea/*

@@ -1,9 +1,9 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import StudentRoutes from './student-routes'
-import TeacherRoutes from './teacher-routes'
-import TeachingAssistantRoutes from './teaching-assistant-routes'
-Vue.use(Router)
+import Vue from "vue"
+import VueRouter from "vue-router"
+import StudentRoutes from "./student-routes"
+import TeacherRoutes from "./teacher-routes"
+import TeachingAssistantRoutes from "./teaching-assistant-routes"
+Vue.use(VueRouter)
 
 /**
  * Naming convention for routes:
@@ -11,36 +11,36 @@ Vue.use(Router)
  * Path of a route: use '-' for any multi-word URL parts
  */
 
-export default new Router({
-    mode: 'history',
+export default new VueRouter({
+    mode: "history",
     routes: [
         {
-            path: '/',
-            name: 'general',
-            redirect: { name: 'landing-page' },
-            component: () => import('../components/general/Layout'),
+            path: "/",
+            name: "general",
+            redirect: { name: "landing-page" },
+            component: () => import("../components/general/Layout"),
             children: [
                 {
-                    path: '/',
-                    name: 'landing-page',
-                    component: () => import('../components/general/LandingPage')
+                    path: "/",
+                    name: "landing-page",
+                    component: () => import("../components/general/LandingPage")
                 },
                 {
-                    path: '/courses',
-                    name: 'courses',
-                    component: () => import('../components/general/Courses')
+                    path: "/courses",
+                    name: "courses",
+                    component: () => import("../components/general/Courses")
                 },
                 {
-                    path: '/privacy',
-                    name: 'privacy-statement',
-                    component: () => import('../components/general/PrivacyPolicy')
+                    path: "/privacy",
+                    name: "privacy-statement",
+                    component: () => import("../components/general/PrivacyPolicy")
                 }
             ]
         },
         ...StudentRoutes,
         ...TeacherRoutes,
         ...TeachingAssistantRoutes,
-        { path: '*', redirect: '/404' },
-        { path: '/404', component: () => import('../components/404') },
+        { path: "*", redirect: "/404" },
+        { path: "/404", component: () => import("../components/404") }
     ]
 })
