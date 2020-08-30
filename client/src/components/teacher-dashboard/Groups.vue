@@ -1,5 +1,48 @@
 <template>
     <div>
+        <b-row>
+            <b-col>
+                <!--Importing-->
+                <template v-if="assignment.enrollable">
+                    <dt>Import groups</dt>
+                    <dd>
+                        Not available. On creation of the assignment, this assignment has been set as self-enrollable.
+                    </dd>
+                </template>
+                <template v-else>
+                    <dt>Import groups</dt>
+                    <dd>This action will import the groups in the assignment.</dd>
+                    <b-button v-b-modal="'importGroups'" variant="primary" size="sm" class="mb-3"
+                        >Import groups
+                    </b-button>
+
+                    <!--Import Group Modal-->
+                    <b-modal id="importGroups" centered hide-header hide-footer class="p-0 m-0" size="lg">
+                        <ImportGroupsWizard></ImportGroupsWizard>
+                    </b-modal>
+                </template>
+            </b-col>
+            <b-col>
+                <!--Copying-->
+                <template v-if="assignment.enrollable">
+                    <dt>Copy groups</dt>
+                    <dd>
+                        Not available. On creation of the assignment, this assignment has been set as self-enrollable.
+                    </dd>
+                </template>
+                <template v-else>
+                    <dt>Copy groups</dt>
+                    <dd>
+                        This action will import the groups of another assignment to this assignment.
+                    </dd>
+                    <b-button v-b-modal="'copyGroups'" variant="primary" size="sm">Copy groups </b-button>
+                    <b-modal id="copyGroups" centered hide-header hide-footer class="p-0 m-0" size="lg">
+                        <CopyGroupsWizard></CopyGroupsWizard>
+                    </b-modal>
+                </template>
+            </b-col>
+        </b-row>
+        <hr />
         <b-alert variant="danger" show>Modifying groups should be done with caution!</b-alert>
         <!--Table Options-->
         <b-row>
@@ -95,11 +138,18 @@
 <script>
 import notifications from "../../mixins/notifications"
 import api from "../../api/api"
+import ImportGroupsWizard from "./ImportGroupsWizard"
+import CopyGroupsWizard from "./CopyGroupsWizard"
 
 export default {
     mixins: [notifications],
+    components: {
+        ImportGroupsWizard,
+        CopyGroupsWizard
+    },
     data() {
         return {
+            assignment: null,
             groups: [],
             // for navigation
             groupFields: [
@@ -124,9 +174,14 @@ export default {
         }
     },
     async created() {
+        await this.fetchAssignment()
         await this.fetchGroups()
     },
     methods: {
+        async fetchAssignment() {
+            let res = await api.assignments.get(this.$route.params.assignmentId)
+            this.assignment = res.data
+        },
         async fetchGroups() {
             let res = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
             this.groups = res.data

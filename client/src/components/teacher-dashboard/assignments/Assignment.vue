@@ -119,71 +119,6 @@
                                             Submit Reviews
                                         </b-button>
 
-                                        <hr />
-
-                                        <!--Importing-->
-                                        <template v-if="assignment.enrollable">
-                                            <dt>Import groups</dt>
-                                            <dd>
-                                                Not available. On creation of the assignment, this assignment has been
-                                                set as self-enrollable.
-                                            </dd>
-                                        </template>
-                                        <template v-else>
-                                            <dt>Import groups</dt>
-                                            <dd>This action will import the groups in the assignment.</dd>
-                                            <b-button
-                                                v-b-modal="'importGroups'"
-                                                variant="primary"
-                                                size="sm"
-                                                class="mb-3"
-                                                >Import groups
-                                            </b-button>
-
-                                            <!--Import Group Modal-->
-                                            <b-modal
-                                                id="importGroups"
-                                                centered
-                                                hide-header
-                                                hide-footer
-                                                class="p-0 m-0"
-                                                size="lg"
-                                            >
-                                                <ImportGroupsWizard></ImportGroupsWizard>
-                                            </b-modal>
-                                        </template>
-
-                                        <!--Copying-->
-                                        <template v-if="assignment.enrollable">
-                                            <dt>Copy groups</dt>
-                                            <dd>
-                                                Not available. On creation of the assignment, this assignment has been
-                                                set as self-enrollable.
-                                            </dd>
-                                        </template>
-                                        <template v-else>
-                                            <dt>Copy groups</dt>
-                                            <dd>
-                                                This action will import the groups of another assignment to this
-                                                assignment.
-                                            </dd>
-                                            <b-button v-b-modal="'copyGroups'" variant="primary" size="sm"
-                                                >Copy groups
-                                            </b-button>
-                                            <b-modal
-                                                id="copyGroups"
-                                                centered
-                                                hide-header
-                                                hide-footer
-                                                class="p-0 m-0"
-                                                size="lg"
-                                            >
-                                                <CopyGroupsWizard></CopyGroupsWizard>
-                                            </b-modal>
-                                        </template>
-
-                                        <hr />
-
                                         <!--Exporting Reviews-->
                                         <dt>Export reviews</dt>
                                         <dd>Exports a file with all reviews for this assignment.</dd>
@@ -282,13 +217,11 @@ import _ from "lodash"
 import BreadcrumbTitle from "../../BreadcrumbTitle"
 import SubmissionQuestionnaireWizard from "../questionnaire/SubmissionQuestionnaireWizard"
 import ReviewQuestionnaireWizard from "../questionnaire/ReviewQuestionnaireWizard"
-import ImportGroupsWizard from "../ImportGroupsWizard"
 import Groups from "../Groups"
 import Reviews from "../../ta_teacher_shared/Reviews"
 import Submissions from "../../ta_teacher_shared/Submissions"
 import AssignmentDetails from "../../ta_teacher_shared/AssignmentDetails"
 import notifications from "../../../mixins/notifications"
-import CopyGroupsWizard from "../CopyGroupsWizard"
 import { FormWizard, WizardStep, TabContent } from "vue-form-wizard"
 import "vue-form-wizard/dist/vue-form-wizard.min.css"
 
@@ -298,12 +231,10 @@ export default {
         FormWizard,
         WizardStep,
         TabContent,
-        CopyGroupsWizard,
         BreadcrumbTitle,
         SubmissionQuestionnaireWizard,
         ReviewQuestionnaireWizard,
         Groups,
-        ImportGroupsWizard,
         Reviews,
         Submissions,
         AssignmentDetails
