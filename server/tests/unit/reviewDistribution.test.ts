@@ -12,6 +12,7 @@ import File from "../../src/models/File";
 import generateDistribution from "../../src/util/reviewDistribution";
 import Enrollment from "../../src/models/Enrollment";
 import UserRole from "../../src/enum/UserRole";
+import Extensions from "../../src/enum/Extensions";
 
 describe("Review distribution", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -61,7 +62,7 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      ".pdf"
+      Extensions.PDF
     );
     await assignment.save();
 
@@ -159,7 +160,7 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      ".pdf"
+      Extensions.PDF
     );
     await assignment.save();
 
@@ -263,7 +264,7 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      ".pdf"
+      Extensions.PDF
     );
     await assignment.save();
 
