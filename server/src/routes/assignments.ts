@@ -540,7 +540,7 @@ router.patch(
     if (!assignment.isAtState(AssignmentState.SUBMISSION)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is not in unpublished state");
+        .send("The assignment is not in submission state");
       return;
     }
     const submissions = await assignment.getLatestSubmissionsOfEachGroup();
