@@ -36,6 +36,14 @@
                             <!--Publish and due date of the assignment-->
                             <b-row class="mb-3">
                                 <b-col>
+                                    <b-alert variant="info" show>
+                                        NOTE: These dates are just mean of communication to students. Advancing through
+                                        the assignment stages should be done manually.
+                                    </b-alert>
+                                </b-col>
+                            </b-row>
+                            <b-row class="mb-3">
+                                <b-col>
                                     <b-form-group>
                                         <template slot="label">
                                             Publish date and time
@@ -236,6 +244,10 @@
                                         </b-form-checkbox>
                                     </b-form-group>
                                     <b-form-group v-if="assignment.reviewEvaluation">
+                                        <b-alert variant="warning" show>
+                                            NOTE: This is a hard deadline for students to be able to make review
+                                            evaluations
+                                        </b-alert>
                                         <template slot="label"
                                             >Review evaluation due date and time
                                             <b-badge
