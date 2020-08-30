@@ -68,7 +68,7 @@
             </template>
 
             <template v-slot:cell(date)="data">
-                {{ data.item.updatedAt | formatDate }}
+                {{ data.item.createdAt | formatDate }}
             </template>
         </b-table>
 
