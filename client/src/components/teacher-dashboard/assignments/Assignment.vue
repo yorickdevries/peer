@@ -54,6 +54,33 @@
                                             <div slot="footer"></div>
                                         </FormWizard>
 
+                                        <!--Publish assignment-->
+                                        <div v-if="assignment.state === 'unpublished'">
+                                            <dt>Publish assignment</dt>
+                                            <dd>Publish the assignment so students are able to make submissions</dd>
+                                            <b-button
+                                                v-b-modal="'publishAssignment'"
+                                                class="mb-3"
+                                                variant="primary"
+                                                size="sm"
+                                                >Publish
+                                            </b-button>
+                                            <b-modal
+                                                id="publishAssignment"
+                                                @ok="publishAssignment"
+                                                title="Confirmation"
+                                                centered
+                                            >
+                                                Are you sure you want to publish the assignment?
+                                                <ul>
+                                                    <li>
+                                                        After publication the allowed submission extensions cannot be
+                                                        changed.
+                                                    </li>
+                                                </ul>
+                                            </b-modal>
+                                        </div>
+
                                         <!--Shuffling-->
                                         <dt>Distribute Reviews</dt>
                                         <dd>
@@ -304,12 +331,20 @@ export default {
         }
     },
     async created() {
-        let res = await api.assignments.get(this.$route.params.assignmentId)
-        this.assignment = res.data
+        await this.fetchAssignment()
     },
     methods: {
+        async fetchAssignment() {
+            this.assignment = null
+            let res = await api.assignments.get(this.$route.params.assignmentId)
+            this.assignment = res.data
+        },
+        async publishAssignment() {
+            await api.assignments.publish(this.$route.params.assignmentId)
+            this.showSuccessMessage({ message: "Assignment succesfully published" })
+            await this.fetchAssignment()
+        },
         async distributeReviews() {
-            console.log(this.$route.params.assignmentId)
             await api.reviewofsubmissions.distribute(this.$route.params.assignmentId)
             this.showSuccessMessage({ message: "Groups have successfully been shuffled and assigned submissions." })
         },
