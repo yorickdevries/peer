@@ -134,21 +134,46 @@
                                                 <ul>
                                                     <li>Can (and should be) done only once per assignment.</li>
                                                     <li>
-                                                        The submission questionnaire cannot be changed after this
-                                                        action.
+                                                        The submissionquestionnaire cannot be changed after this action.
                                                     </li>
                                                 </ul>
                                             </b-modal>
                                         </div>
 
-                                        <!--Submit Reviews-->
-                                        <dt>Submit Reviews</dt>
-                                        <dd>
-                                            This action will set all reviews which are fully filled in to done.
-                                        </dd>
-                                        <b-button variant="primary" size="sm" @click="submitAllFilledReviews">
-                                            Submit Reviews
-                                        </b-button>
+                                        <!--Open feedback-->
+                                        <div v-if="assignment.state === 'review'">
+                                            <dt>Open Feedback</dt>
+                                            <dd>
+                                                This action will open the the feedback for the reviewed students
+                                            </dd>
+                                            <b-button
+                                                v-b-modal="'openFeedback'"
+                                                class="mb-3"
+                                                variant="primary"
+                                                size="sm"
+                                                >Open Feedback
+                                            </b-button>
+                                            <b-modal id="openFeedback" @ok="openFeedback" title="Confirmation" centered>
+                                                Are you sure you want to open the feedback?
+                                                <ul>
+                                                    <li>All submitted reviews cannot be changed anymore</li>
+                                                    <li>
+                                                        All reviews which are fully filled in (all non-optional
+                                                        questions are answered) will be submitted as well
+                                                    </li>
+                                                    <li>
+                                                        All reviews which are not submitted yet can still be completed
+                                                    </li>
+                                                    <li>
+                                                        If review evaluation is enabled, students can evaluate their
+                                                        reviews till the deadline you specified
+                                                    </li>
+                                                    <li>
+                                                        The reviewquestionnaire cannot be changed after this action.
+                                                    </li>
+                                                </ul>
+                                            </b-modal>
+                                        </div>
 
                                         <!--Exporting Reviews-->
                                         <dt>Export reviews</dt>
@@ -316,10 +341,10 @@ export default {
             this.showSuccessMessage({ message: "Reviews succesfully assigned" })
             await this.fetchAssignment()
         },
-        async submitAllFilledReviews() {
-            const res = await api.reviewofsubmissions.submitAll(this.$route.params.assignmentId)
-            const submittedReviews = res.data
-            this.showSuccessMessage({ message: "Submitted " + submittedReviews.length + " Reviews" })
+        async openFeedback() {
+            await api.reviewofsubmissions.openFeedback(this.$route.params.assignmentId)
+            this.showSuccessMessage({ message: "Feedback succesfully opened" })
+            await this.fetchAssignment()
         }
     }
 }

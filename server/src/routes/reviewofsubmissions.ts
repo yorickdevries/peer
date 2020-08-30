@@ -200,6 +200,32 @@ router.patch(
         .send("No reviewQuestionnaire is present to evaluate the reviews");
       return;
     }
+    const reviewQuestionnaire = await assignment.getReviewQuestionnaire();
+    if (reviewQuestionnaire) {
+      if (reviewQuestionnaire.questions.length === 0) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("The questionnaire doesn't have questions");
+        return;
+      }
+      // check whether there is a question without option:
+      for (const question of reviewQuestionnaire.questions) {
+        if (
+          question instanceof CheckboxQuestion ||
+          question instanceof MultipleChoiceQuestion
+        ) {
+          if (question.options.length === 0) {
+            res
+              .status(HttpStatusCode.FORBIDDEN)
+              .send(
+                "One of the questions in the questionnaire doesn't have options"
+              );
+            return;
+          }
+        }
+      }
+    }
+
     const questionnaire = await assignment.getSubmissionQuestionnaire();
     if (!questionnaire) {
       res
@@ -609,6 +635,12 @@ router.post(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
+      return;
+    }
+    if (questionnaire.questions.length === 0) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The questionnaire doesn't have questions");
       return;
     }
     // check whether there is a question without option:
