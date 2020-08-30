@@ -87,12 +87,7 @@ export default class Course extends BaseModel {
   }
 
   async getAssignments(): Promise<Assignment[]> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Course.findOneOrFail(this.id, {
-        relations: ["assignments"],
-      })
-    ).assignments!;
+    return await Assignment.find({ where: { course: this } });
   }
 
   async getEnrollableAssignments(user: User): Promise<Assignment[]> {
@@ -146,6 +141,13 @@ export default class Course extends BaseModel {
 
   async isTeacher(user: User): Promise<boolean> {
     return this.isEnrolled(user, UserRole.TEACHER);
+  }
+
+  async isTeacherOrTeachingAssistant(user: User): Promise<boolean> {
+    return (
+      (await this.isEnrolled(user, UserRole.TEACHER)) ||
+      (await this.isEnrolled(user, UserRole.TEACHING_ASSISTANT))
+    );
   }
 
   // get all enrollable courses for a certain user

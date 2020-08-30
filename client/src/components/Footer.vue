@@ -6,6 +6,8 @@
                 <div>For support, contact: <a href="mailto:eip-ewi@tudelft.nl">eip-ewi@tudelft.nl</a></div>
             </div>
             <div class="mr-auto"></div>
+            <div>{{ timezoneString }}</div>
+            <div class="mr-auto"></div>
             <b-img
                 :src="require('../assets/images/tu_delft_logo_black.png')"
                 alt="tu-delft-logo"
@@ -22,6 +24,13 @@
 <script>
 export default {
     name: "Footer",
+    computed: {
+        timezoneString() {
+            const re = /([A-Z]+[+-][0-9]+.*)/
+            const timezone = new Date().toString().match(re)[1]
+            return "Timezone: " + timezone
+        }
+    },
     methods: {
         scrollToTop() {
             window.scrollTo(0, 0)

@@ -81,12 +81,7 @@ export default class Group extends BaseModel {
   }
 
   async getCourse(): Promise<Course> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Group.findOneOrFail(this.id, {
-        relations: ["course"],
-      })
-    ).course!;
+    return Course.findOneOrFail(this.courseId);
   }
 
   async getUsers(): Promise<User[]> {
@@ -123,6 +118,11 @@ export default class Group extends BaseModel {
 
   async isTeacherInCourse(user: User): Promise<boolean> {
     const course = await this.getCourse();
-    return await course.isEnrolled(user, UserRole.TEACHER);
+    return await course.isTeacher(user);
+  }
+
+  async isTeacherOrTeachingAssistantInCourse(user: User): Promise<boolean> {
+    const course = await this.getCourse();
+    return await course.isTeacherOrTeachingAssistant(user);
   }
 }

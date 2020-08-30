@@ -82,9 +82,11 @@ const passportConfiguration = function (passport: PassportStatic): void {
     const metadataXML = strategy.generateServiceProviderMetadata(
       decryptionCert
     );
-    const metadata_path = path.resolve(config.get("SP_metadata_file"));
-    fs.writeFileSync(metadata_path, metadataXML);
-    console.log(`metadataXML written to: ${metadata_path}`);
+    const metadataPath = path.resolve(
+      config.get("ServiceProviderMetadataFile")
+    );
+    fs.writeFileSync(metadataPath, metadataXML);
+    console.log(`metadataXML written to: ${metadataPath}`);
     passport.use("saml", strategy);
 
     passport.serializeUser((user, done) => {

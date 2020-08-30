@@ -108,8 +108,8 @@ describe("Integration", () => {
         name: "CourseName",
         courseCode: "ABC123",
         enrollable: true,
-        facultyName: "EEMCS",
-        academicYearName: "2019/2020",
+        facultyId: 1,
+        academicYearId: 3,
         description: null,
       })
       .set("cookie", await teacherCookie());
@@ -131,8 +131,8 @@ describe("Integration", () => {
         name: "CourseName",
         courseCode: "ABC123",
         enrollable: true,
-        facultyName: "EEMCS",
-        academicYearName: "2019/2020",
+        facultyId: 1,
+        academicYearId: 3,
         description: null,
       })
       .set("cookie", await studentCookie1());
@@ -146,8 +146,8 @@ describe("Integration", () => {
         name: "AntoherName",
         courseCode: "XYZ123",
         enrollable: false,
-        facultyName: "3mE",
-        academicYearName: "2019/2020",
+        facultyId: 1,
+        academicYearId: 3,
         description: null,
       })
       .set("cookie", await teacherCookie2());

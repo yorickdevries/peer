@@ -24,7 +24,6 @@ export default class ReviewOfSubmission extends Review {
     submitted: boolean,
     startedAt: Date | null,
     downloadedAt: Date | null,
-    savedAt: Date | null,
     submittedAt: Date | null,
     approvalByTA: boolean | null,
     approvingTA: User | null,
@@ -37,7 +36,6 @@ export default class ReviewOfSubmission extends Review {
       submitted,
       startedAt,
       downloadedAt,
-      savedAt,
       submittedAt,
       approvalByTA,
       approvingTA
@@ -48,7 +46,9 @@ export default class ReviewOfSubmission extends Review {
   // custom validation which is run before saving
   async validateOrReject(): Promise<void> {
     // validation: questionnaire and submission should correspond to same assignment
-    const questionnaire = await this.getQuestionnaire();
+    const questionnaire = this.questionnaire
+      ? this.questionnaire
+      : await this.getQuestionnaire();
     const questionnaireAssignment = await questionnaire.getAssignment();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const submissionAssignment = await this.submission!.getAssignment();

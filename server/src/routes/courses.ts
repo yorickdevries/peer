@@ -53,8 +53,8 @@ const courseSchema = Joi.object({
   name: Joi.string().required(),
   courseCode: Joi.string().required(),
   enrollable: Joi.boolean().required(),
-  facultyName: Joi.string().required(),
-  academicYearName: Joi.string().required(),
+  facultyId: Joi.number().integer().required(),
+  academicYearId: Joi.number().integer().required(),
   description: Joi.string().allow(null).required(),
 });
 // post a course
@@ -67,14 +67,14 @@ router.post(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     // find the faculty and academic year in the database
-    const faculty = await Faculty.findOne(req.body.facultyName);
+    const faculty = await Faculty.findOne(req.body.facultyId);
     if (!faculty) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send("The specified faculty is not found");
       return;
     }
-    const academicYear = await AcademicYear.findOne(req.body.academicYearName);
+    const academicYear = await AcademicYear.findOne(req.body.academicYearId);
     if (!academicYear) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -131,14 +131,14 @@ router.patch(
       return;
     }
     // find the faculty and academic year in the database
-    const faculty = await Faculty.findOne(req.body.facultyName);
+    const faculty = await Faculty.findOne(req.body.facultyId);
     if (!faculty) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send("The specified faculty is not found");
       return;
     }
-    const academicYear = await AcademicYear.findOne(req.body.academicYearName);
+    const academicYear = await AcademicYear.findOne(req.body.academicYearId);
     if (!academicYear) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -206,7 +206,7 @@ router.get(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const course = await Course.findOne(req.params.courseId);
+    const course = await Course.findOne(req.params.id);
     if (!course) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -232,7 +232,7 @@ router.get(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const course = await Course.findOne(req.params.courseId);
+    const course = await Course.findOne(req.params.id);
     if (!course) {
       res
         .status(HttpStatusCode.BAD_REQUEST)

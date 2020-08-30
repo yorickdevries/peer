@@ -4,7 +4,7 @@
             <!--Header-->
             <b-row>
                 <b-col>
-                    <h1 class="mt-5">Edit {{ assignment.title }}</h1>
+                    <h1 class="mt-5">Edit {{ assignment.name }}</h1>
                 </b-col>
             </b-row>
 
@@ -13,12 +13,12 @@
                 <b-col>
                     <b-card>
                         <b-form @submit.prevent="onSubmit">
-                            <!--Assignment title-->
-                            <b-form-group label="Assignment title">
+                            <!--Assignment name-->
+                            <b-form-group label="Assignment name">
                                 <b-form-input
-                                    v-model="assignment.title"
+                                    v-model="assignment.name"
                                     type="text"
-                                    placeholder="Please enter the course name here"
+                                    placeholder="Please enter the assignment name here"
                                     required
                                 >
                                 </b-form-input>
@@ -27,16 +27,12 @@
                             <b-form-group label="Description">
                                 <b-form-textarea
                                     v-model="assignment.description"
-                                    id="textareadescription"
-                                    placeholder="Please enter the course description here"
-                                    :rows="4"
-                                    required
+                                    type="text"
+                                    placeholder="Please enter the assignment description here"
                                 >
                                 </b-form-textarea>
                             </b-form-group>
-
                             <hr />
-
                             <!--Publish and due date of the assignment-->
                             <b-row class="mb-3">
                                 <b-col>
@@ -52,14 +48,10 @@
                                         </template>
                                         <datepicker
                                             placeholder="Select date"
-                                            v-model="assignment.publish_day"
-                                        ></datepicker>
-                                        <b-form-input
-                                            v-model="assignment.publish_time"
-                                            type="time"
-                                            placeholder="00:00"
+                                            v-model="assignment.publishDay"
                                             required
-                                        >
+                                        ></datepicker>
+                                        <b-form-input v-model="assignment.publishTime" type="time" required>
                                         </b-form-input>
                                     </b-form-group>
                                 </b-col>
@@ -74,18 +66,15 @@
                                                 >?</b-badge
                                             >
                                         </template>
-                                        <datepicker placeholder="Select date" v-model="assignment.due_day"></datepicker>
-                                        <b-form-input
-                                            v-model="assignment.due_time"
-                                            type="time"
-                                            placeholder="00:00"
+                                        <datepicker
+                                            placeholder="Select date"
+                                            v-model="assignment.dueDay"
                                             required
-                                        >
-                                        </b-form-input>
+                                        ></datepicker>
+                                        <b-form-input v-model="assignment.dueTime" type="time" required> </b-form-input>
                                     </b-form-group>
                                 </b-col>
                             </b-row>
-
                             <!--Publish and due date of the peer review-->
                             <b-row>
                                 <b-col>
@@ -101,14 +90,10 @@
                                         </template>
                                         <datepicker
                                             placeholder="Select date"
-                                            v-model="assignment.review_publish_day"
-                                        ></datepicker>
-                                        <b-form-input
-                                            v-model="assignment.review_publish_time"
-                                            type="time"
-                                            placeholder="00:00"
+                                            v-model="assignment.reviewPublishDay"
                                             required
-                                        >
+                                        ></datepicker>
+                                        <b-form-input v-model="assignment.reviewPublishTime" type="time" required>
                                         </b-form-input>
                                     </b-form-group>
                                 </b-col>
@@ -125,14 +110,10 @@
                                         </template>
                                         <datepicker
                                             placeholder="Select date"
-                                            v-model="assignment.review_due_day"
-                                        ></datepicker>
-                                        <b-form-input
-                                            v-model="assignment.review_due_time"
-                                            type="time"
-                                            placeholder="00:00"
+                                            v-model="assignment.reviewDueDay"
                                             required
-                                        >
+                                        ></datepicker>
+                                        <b-form-input v-model="assignment.reviewDueTime" type="time" required>
                                         </b-form-input>
                                     </b-form-group>
                                 </b-col>
@@ -143,9 +124,9 @@
                             <!--Number of peer reviews per student-->
                             <b-form-group label="Number of reviews that each student needs to do">
                                 <b-form-input
-                                    v-model="assignment.reviews_per_user"
+                                    v-model="assignment.reviewsPerUser"
                                     type="number"
-                                    :state="checkPeerNumber"
+                                    :state="checkReviewsPerUser"
                                     placeholder="Enter an integer larger than 0"
                                     required
                                 >
@@ -153,42 +134,57 @@
                             </b-form-group>
 
                             <!--File upload-->
-                            <b-form-group label="Assignment file" class="mb-3">
+                            <b-form-group
+                                label="Assignment file"
+                                description="Add a file for the assignment (optional)."
+                            >
                                 <!--Show currently uploaded file-->
                                 <b-alert class="d-flex justify-content-between flex-wrap" show variant="secondary">
-                                    <div v-if="assignment.filename">
-                                        You currently have uploaded the file: <br /><a
-                                            :href="assignmentFilePath"
-                                            :download="assignment.filename"
-                                            target="_blank"
-                                            >{{ assignment.filename }}</a
+                                    <div v-if="assignment.file">
+                                        You currently have uploaded the file: <br />
+                                        <a :href="assignmentFilePath"
+                                            >{{ assignment.file.name }}{{ assignment.file.extension }}</a
                                         >
                                     </div>
                                     <p v-else class="text-danger mb-0">You did not upload a file yet</p>
-                                    <!--Buttons for toggling new assignment upload-->
-                                    <b-button v-if="!uploadNewFile" variant="success" @click="uploadNewFile = true"
-                                        >Change file</b-button
+
+                                    <!--Remove current file-->
+                                    <b-button v-if="assignment.file" variant="danger" @click="assignment.file = null"
+                                        >Remove file</b-button
                                     >
+                                    <!--Buttons for toggling new assignment upload-->
                                     <b-button
-                                        v-else
-                                        variant="danger"
-                                        @click="
-                                            uploadNewFile = false
-                                            file = null
-                                            fileProgress = 0
-                                        "
-                                        >Cancel</b-button
+                                        v-if="!assignment.file && !changeFile"
+                                        variant="success"
+                                        @click="changeFile = true"
+                                        >Add file</b-button
                                     >
                                 </b-alert>
-                                <b-form-file
-                                    v-if="uploadNewFile"
-                                    placeholder="Choose a new file..."
-                                    accept=".pdf,.zip,.doc,.docx"
-                                    v-model="file"
-                                    :state="Boolean(file)"
-                                >
-                                </b-form-file>
-                                <p class="mb-0" v-if="uploadNewFile && file">
+
+                                <b-row>
+                                    <b-col>
+                                        <b-form-file
+                                            v-if="changeFile"
+                                            placeholder="Choose a file..."
+                                            accept=".pdf,.zip,.doc,.docx"
+                                            :state="Boolean(newFile)"
+                                            v-model="newFile"
+                                        >
+                                        </b-form-file>
+                                    </b-col>
+                                    <b-col cols="2">
+                                        <b-button
+                                            v-if="changeFile"
+                                            variant="danger"
+                                            @click="
+                                                changeFile = false
+                                                newFile = null
+                                            "
+                                            >Cancel</b-button
+                                        >
+                                    </b-col>
+                                </b-row>
+                                <p class="mb-0" v-if="changeFile && newFile">
                                     File will be uploaded when you press the "save changes" button
                                 </p>
                             </b-form-group>
@@ -198,42 +194,38 @@
                                 label="Assignment link"
                                 description="Add a link where the assignment can be found for the student (optional)."
                             >
-                                <b-form-input v-model="assignment.external_link"></b-form-input>
+                                <b-form-input v-model="assignment.externalLink"></b-form-input>
                             </b-form-group>
 
-                            <b-form-group
-                                label="Assignment Type"
-                                description="This can not be changed after creating the assignment."
-                            >
-                                <b-form-radio-group
-                                    v-model="assignment.one_person_groups"
-                                    :options="[
-                                        { value: true, text: 'Individual' },
-                                        { value: false, text: 'Group' }
-                                    ]"
-                                    stacked
-                                    disabled
-                                    name="radiosStacked"
-                                >
-                                </b-form-radio-group>
+                            <b-form-group>
+                                <b-form-checkbox v-model="assignment.enrollable">
+                                    Self enrollable
+                                    <b-badge
+                                        v-b-tooltip.hover
+                                        title="Allow students to enroll themselves into groups of 1 person"
+                                        variant="primary"
+                                        >?</b-badge
+                                    >
+                                </b-form-checkbox>
                             </b-form-group>
+
                             <b-row>
                                 <b-col>
                                     <b-form-group
                                         label="Students can evaluate their received reviews"
                                         description="This can not be changed after creating the assignment."
                                     >
-                                        <b-form-checkbox v-model="assignment.review_evaluation" disabled>
+                                        <b-form-checkbox v-model="assignment.reviewEvaluation">
                                             Enable review evaluation
                                             <b-badge
                                                 v-b-tooltip.hover
-                                                title="This will enable students to fill in a non-customisable evaluation form about their received reviews"
+                                                title="This will enable students to fill in a evaluation form about their received reviews"
                                                 variant="primary"
                                                 >?</b-badge
                                             >
                                         </b-form-checkbox>
                                     </b-form-group>
-                                    <b-form-group v-if="assignment.review_evaluation">
+                                    <b-form-group v-if="assignment.reviewEvaluation">
                                         <template slot="label"
                                             >Review evaluation due date and time
                                             <b-badge
@@ -245,20 +237,14 @@
                                         </template>
                                         <datepicker
                                             placeholder="Select date"
-                                            v-model="assignment.review_evaluation_due_day"
+                                            v-model="assignment.reviewEvaluationDueDay"
                                         ></datepicker>
-                                        <b-form-input
-                                            v-model="assignment.review_evaluation_due_time"
-                                            type="time"
-                                            placeholder="00:00"
-                                            required
-                                        >
+                                        <b-form-input v-model="assignment.reviewEvaluationDueTime" type="time">
                                         </b-form-input>
                                     </b-form-group>
                                 </b-col>
                                 <b-col></b-col>
                             </b-row>
-
                             <b-button type="submit" variant="primary">Save changes</b-button>
                         </b-form>
                     </b-card>
@@ -269,7 +255,8 @@
 </template>
 
 <script>
-import api from "../../../api/api_old"
+import api from "../../../api/api"
+import moment from "moment"
 import notifications from "../../../mixins/notifications"
 import Datepicker from "vuejs-datepicker"
 
@@ -280,327 +267,170 @@ export default {
     },
     data() {
         return {
-            file: null,
-            fileProgress: 0,
-            uploadNewFile: false,
-            acceptFiles: ".pdf,.zip,.doc,.docx",
-            assignment: {
-                id: null,
-                title: null,
-                description: null,
-                course_id: null,
-                publish_date: null,
-                publish_day: null,
-                publish_time: null,
-                due_date: null,
-                due_day: null,
-                due_time: null,
-                review_publish_date: null,
-                review_publish_day: null,
-                review_publish_time: null,
-                review_due_date: null,
-                review_due_day: null,
-                review_due_time: null,
-                review_evaluation_due_day: null,
-                review_evaluation_due_time: null,
-                review_evaluation_due_date: null,
-                reviews_per_user: null,
-                filename: null,
-                one_person_groups: null,
-                review_evaluation: null,
-                external_link: null
-            },
-            course: {
-                id: null,
-                name: null,
-                description: null
-            }
+            // boolean which indicates whether the current file needs to be changed
+            changeFile: false,
+            // new file which replaces oldfile (or is added when no oldfile is present)
+            newFile: null,
+            assignment: {}
         }
     },
     computed: {
-        checkPeerNumber() {
-            if (this.assignment.reviews_per_user == null) return null
-            else return this.assignment.reviews_per_user > 0
+        checkReviewsPerUser() {
+            if (this.assignment.reviewsPerUser == null) {
+                return null
+            } else {
+                return this.assignment.reviewsPerUser > 0
+            }
         },
         assignmentFilePath() {
             // Get the assignment file path.
-            return `/api/oldroutes/assignments/${this.assignment.id}/file`
+            return `/api/assignments/${this.assignment.id}/file`
         }
     },
     async created() {
         // Load necessary data
-        let cid = this.$route.params.courseId
-        let aid = this.$route.params.assignmentId
-        this.course.id = cid
-        this.assignment.id = aid
-        let res = await api.getAssignment(aid)
+        let res = await api.assignments.get(this.$route.params.assignmentId)
         this.assignment = res.data
 
-        // Define function for correct formatting time
-        function timeToInputFormat(time) {
-            let str = ""
-            str =
-                time.getHours() < 10
-                    ? str + "0" + time.getHours().toString() + ":"
-                    : str + time.getHours().toString() + ":"
-            str = time.getMinutes() < 10 ? str + "0" + time.getMinutes().toString() : str + time.getMinutes().toString()
-            return str
-        }
-
-        // Load publish date and time
-        let pdate = new Date(res.data.publish_date)
-        this.assignment.publish_day = pdate
-        this.assignment.publish_time = timeToInputFormat(pdate)
-
-        // Load due date and time
-        let ddate = new Date(res.data.due_date)
-        this.assignment.due_day = ddate
-        this.assignment.due_time = timeToInputFormat(ddate)
-
-        // Load review publish date and time
-        let rpdate = new Date(res.data.review_publish_date)
-        this.assignment.review_publish_day = rpdate
-        this.assignment.review_publish_time = timeToInputFormat(rpdate)
-
-        // Load review due date and time
-        let rddate = new Date(res.data.review_due_date)
-        this.assignment.review_due_day = rddate
-        this.assignment.review_due_time = timeToInputFormat(rddate)
-
-        // Load review evaluation due date and time
-        let reddate = new Date(res.data.review_evaluation_due_date)
-        this.assignment.review_evaluation_due_day = reddate
-        this.assignment.review_evaluation_due_time = timeToInputFormat(reddate)
+        // split day from time
+        // publish
+        this.assignment.publishDay = this.extractDay(new Date(this.assignment.publishDate))
+        this.assignment.publishTime = this.extractTime(new Date(this.assignment.publishDate))
+        // due
+        this.assignment.dueDay = this.extractDay(new Date(this.assignment.dueDate))
+        this.assignment.dueTime = this.extractTime(new Date(this.assignment.dueDate))
+        // reviewPublish
+        this.assignment.reviewPublishDay = this.extractDay(new Date(this.assignment.reviewPublishDate))
+        this.assignment.reviewPublishTime = this.extractTime(new Date(this.assignment.reviewPublishDate))
+        // reviewDue
+        this.assignment.reviewDueDay = this.extractDay(new Date(this.assignment.reviewDueDate))
+        this.assignment.reviewDueTime = this.extractTime(new Date(this.assignment.reviewDueDate))
+        // reviewEvaluationDue
+        this.assignment.reviewEvaluationDueDay = this.assignment.reviewEvaluationDueDate
+            ? this.extractDay(new Date(this.assignment.reviewEvaluationDueDate))
+            : null
+        this.assignment.reviewEvaluationDueTime = this.assignment.reviewEvaluationDueDate
+            ? this.extractTime(new Date(this.assignment.reviewEvaluationDueDate))
+            : "23:59"
     },
     methods: {
+        extractDay(date) {
+            const day = new Date()
+            day.setFullYear(date.getFullYear(), date.getMonth(), date.getDate())
+            day.setHours(12)
+            day.setMinutes(0)
+            day.setSeconds(0)
+            day.setMilliseconds(0)
+            return day
+        },
+        extractTime(date) {
+            return moment(new Date(date)).format("HH:mm")
+        },
         async onSubmit() {
-            // Check for empty date and time fields
-            let validationResult1 = this.checkFormat()
-            if (validationResult1.error) {
-                this.showErrorMessage({ message: validationResult1.error })
-            } else {
-                // Load date from fields in variables of type Date
-                // Note that these are only the dates, not the times, as these are in different input fields
-                let pdate = this.assignment.publish_day
-                let ddate = this.assignment.due_day
-                let rpdate = this.assignment.review_publish_day
-                let rddate = this.assignment.review_due_day
-                let reddate = this.assignment.review_evaluation_due_day
-
-                // Check for daylight saving time issues
-                let validationResult2 = this.checkDST(pdate, ddate, rpdate, rddate, reddate)
-                if (validationResult2.title) {
-                    this.showErrorMessage({
-                        title: validationResult2.title,
-                        message:
-                            "Due to switching to daylight saving time, you cannot choose a time between 02:00 and 02:59 on this date"
-                    })
-                } else {
-                    // Get the hours from the input field and set in variable
-                    pdate.setHours(this.assignment.publish_time.split(":")[0])
-                    ddate.setHours(this.assignment.due_time.split(":")[0])
-                    rpdate.setHours(this.assignment.review_publish_time.split(":")[0])
-                    rddate.setHours(this.assignment.review_due_time.split(":")[0])
-                    reddate.setHours(this.assignment.review_evaluation_due_time.split(":")[0])
-
-                    // Get the minutes from the input field and set in variable
-                    pdate.setMinutes(this.assignment.publish_time.split(":")[1])
-                    ddate.setMinutes(this.assignment.due_time.split(":")[1])
-                    rpdate.setMinutes(this.assignment.review_publish_time.split(":")[1])
-                    rddate.setMinutes(this.assignment.review_due_time.split(":")[1])
-                    reddate.setMinutes(this.assignment.review_evaluation_due_time.split(":")[1])
-
-                    // Set the date fields of the assignment. These are now Date objects
-                    // These values are the day and time of the deadline
-                    this.assignment.publish_date = pdate
-                    this.assignment.due_date = ddate
-                    this.assignment.review_publish_date = rpdate
-                    this.assignment.review_due_date = rddate
-                    this.assignment.review_evaluation_due_date = reddate
-
-                    // Check order of dates
-                    let validationResult3 = this.checkDatesLogical()
-                    if (validationResult3.error) {
-                        this.showErrorMessage({ message: validationResult3.error })
-                    } else {
-                        this.assignment.publish_date = pdate.toJSON()
-                        this.assignment.due_date = ddate.toJSON()
-                        this.assignment.review_publish_date = rpdate.toJSON()
-                        this.assignment.review_due_date = rddate.toJSON()
-                        this.assignment.review_evaluation_due_date = reddate.toJSON()
-
-                        // Create formData and append data
-                        let formData = new FormData()
-                        formData.append("title", this.assignment.title)
-                        formData.append("description", this.assignment.description)
-                        formData.append("course_id", this.assignment.course_id)
-
-                        formData.append("publish_date", this.assignment.publish_date)
-                        formData.append("due_date", this.assignment.due_date)
-                        formData.append("review_publish_date", this.assignment.review_publish_date)
-                        formData.append("review_due_date", this.assignment.review_due_date)
-
-                        // Send review evaluation date only if applicable
-                        if (this.assignment.review_evaluation) {
-                            formData.append("review_evaluation_due_date", this.assignment.review_evaluation_due_date)
-                        }
-                        formData.append("reviews_per_user", this.assignment.reviews_per_user)
-                        formData.append("review_evaluation", this.assignment.review_evaluation)
-                        if (this.assignment.external_link != null && this.assignment.external_link != "") {
-                            formData.append("external_link", this.assignment.external_link)
-                        }
-
-                        // Add file if a new one has been uploaded
-                        if (this.file != null) {
-                            formData.append("assignmentFile", this.file)
-                        }
-                        // Update assignment in database
-                        try {
-                            await api.saveAssignment(this.assignment.id, formData)
-                            this.showSuccessMessage({ message: "Updated assignment successfully" })
-                            // Redirect to updated assignment
-                            this.$router.push({
-                                name: "teacher-dashboard.assignments.assignment",
-                                params: { courseId: this.course.id, assignmentId: this.assignment.id }
-                            })
-                        } catch (e) {
-                            this.showErrorMessage({ message: e.response.data.error })
-                        }
-                    }
+            // these will be constructed in the try/catch
+            let publishDate = null
+            let dueDate = null
+            let reviewPublishDate = null
+            let reviewDueDate = null
+            let reviewEvaluationDueDate = null
+            try {
+                // Check for empty date fields
+                this.checkDateFormat()
+                publishDate = this.constructDate(this.assignment.publishDay, this.assignment.publishTime)
+                dueDate = this.constructDate(this.assignment.dueDay, this.assignment.dueTime)
+                reviewPublishDate = this.constructDate(
+                    this.assignment.reviewPublishDay,
+                    this.assignment.reviewPublishTime
+                )
+                reviewDueDate = this.constructDate(this.assignment.reviewDueDay, this.assignment.reviewDueTime)
+                if (this.assignment.reviewEvaluation) {
+                    reviewEvaluationDueDate = this.constructDate(
+                        this.assignment.reviewEvaluationDueDay,
+                        this.assignment.reviewEvaluationDueTime
+                    )
                 }
+                // Check order of dates
+                if (
+                    publishDate >= dueDate ||
+                    dueDate >= reviewPublishDate ||
+                    reviewPublishDate >= reviewDueDate ||
+                    (this.assignment.reviewEvaluation && reviewDueDate >= reviewEvaluationDueDate)
+                ) {
+                    throw new Error("dates are not in chronological order")
+                }
+            } catch (error) {
+                this.showErrorMessage({ message: String(error) })
+                return
             }
+            // set file
+            let file
+            if (this.newFile) {
+                // will be replaced
+                file = this.newFile
+            } else if (this.assignment.file === null) {
+                // will be removed
+                file = null
+            } else {
+                // will not be changed
+                file = undefined
+            }
+            // call post api
+            await api.assignments.patch(
+                this.assignment.id,
+                this.assignment.name,
+                this.assignment.reviewsPerUser,
+                this.assignment.enrollable,
+                this.assignment.reviewEvaluation,
+                publishDate,
+                dueDate,
+                reviewPublishDate,
+                reviewDueDate,
+                reviewEvaluationDueDate,
+                this.assignment.description,
+                this.assignment.externalLink,
+                file
+            )
+            this.showSuccessMessage({ message: "Updated assignment successfully" })
+            // Redirect to updated assignment
+            this.$router.push({
+                name: "teacher-dashboard.assignments.assignment",
+                params: { courseId: this.$route.params.courseId, assignmentId: this.assignment.id }
+            })
         },
-        checkFormat() {
+        checkDateFormat() {
             // Check whether all dates and time are nonempty and conform time input format
-            if (this.assignment.publish_day === null) {
-                return { error: "Publish date cannot be empty!" }
-            } else if (this.assignment.due_day === null) {
-                return { error: "Hand-in date cannot be empty!" }
-            } else if (this.assignment.review_publish_day === null) {
-                return { error: "Review start date cannot be empty!" }
-            } else if (this.assignment.review_due_day === null) {
-                return { error: "Review due date cannot be empty!" }
-            } else if (this.assignment.review_evaluation && this.assignment.review_evaluation_due_day === null) {
-                return { error: "Review evaluation due date cannot be empty!" }
-            } else if (this.assignment.publish_time === "") {
-                return { error: "Publish time cannot be empty!" }
-            } else if (!this.checkTimeFormat(this.assignment.publish_time)) {
-                return { error: "There is an error in your publish time! Format should be like 00:00" }
-            } else if (this.assignment.due_time === "") {
-                return { error: "Hand-in time cannot be empty!" }
-            } else if (!this.checkTimeFormat(this.assignment.due_time)) {
-                return { error: "There is an error in your hand-in time! Format should be like 00:00" }
-            } else if (this.assignment.review_publish_time === "") {
-                return { error: "Review start time cannot be empty!" }
-            } else if (!this.checkTimeFormat(this.assignment.review_publish_time)) {
-                return { error: "There is an error in your review start time! Format should be like 00:00" }
-            } else if (this.assignment.review_due_time === "") {
-                return { error: "Review due time cannot be empty!" }
-            } else if (!this.checkTimeFormat(this.assignment.review_due_time)) {
-                return { error: "There is an error in your review due time! Format should be like 00:00" }
-            } else if (this.assignment.review_evaluation && this.assignment.review_evaluation_due_time === "") {
-                return { error: "Review evaluation due time cannot be empty!" }
-            } else if (this.assignment.review_evaluation && !this.checkTimeFormat(this.assignment.review_due_time)) {
-                return { error: "There is an error in your review evaluation due time! Format should be like 00:00" }
+            // publish
+            if (!this.assignment.publishDay) {
+                throw new Error("Publish date cannot be empty!")
+                // due
+            } else if (!this.assignment.dueDay) {
+                throw new Error("Hand-in date cannot be empty!")
+                // reviewPublish
+            } else if (!this.assignment.reviewPublishDay) {
+                throw new Error("Review start date cannot be empty!")
+                // reviewDue
+            } else if (!this.assignment.reviewDueDay) {
+                throw new Error("Review due date cannot be empty!")
+                // reviewEvaluationDue
+            } else if (this.assignment.reviewEvaluation && !this.assignment.reviewEvaluationDueDay) {
+                throw new Error("Review evaluation due date cannot be empty!")
             } else {
-                return true
+                return
             }
         },
-        checkTimeFormat(time) {
-            var re = /^[0-2][0-9]:[0-5][0-9]$/
-            console.log(re.test(time))
-            return re.test(time)
-        },
-        checkDST(pdate, ddate, rpdate, rddate, reddate) {
-            // Instantiate new dates to avoid changing the passed value
-            let pdate2 = new Date(pdate)
-            let ddate2 = new Date(ddate)
-            let rpdate2 = new Date(rpdate)
-            let rddate2 = new Date(rddate)
-            let reddate2 = new Date(reddate)
-
-            // Checking whether Daylight Saving Time is starting on the given day (changing from GMT+1 to GMT+2)
-            // This causes deadlines set between 02:00 and 02:59 to be equal to 03:00-03:59 when converting to UTC
-            // As a result, a deadline set at 02:00, will actually be set at 03:00
-            // For some reason, Safari handles Daylight Saving Time differently. We should have a look if MomentJS can help with this issue
-            if (
-                pdate2.setHours(this.assignment.publish_time.split(":")[0]) ===
-                pdate2.setHours(parseInt(this.assignment.publish_time.split(":")[0]) + 1)
-            ) {
-                return { title: "Error in publish time" }
-            } else if (
-                ddate2.setHours(this.assignment.due_time.split(":")[0]) ===
-                ddate2.setHours(parseInt(this.assignment.due_time.split(":")[0]) + 1)
-            ) {
-                return { title: "Error in hand-in time" }
-            } else if (
-                rpdate2.setHours(this.assignment.review_publish_time.split(":")[0]) ===
-                rpdate2.setHours(parseInt(this.assignment.review_publish_time.split(":")[0]) + 1)
-            ) {
-                return { title: "Error in review start time" }
-            } else if (
-                rddate2.setHours(this.assignment.review_due_time.split(":")[0]) ===
-                rddate2.setHours(parseInt(this.assignment.review_due_time.split(":")[0]) + 1)
-            ) {
-                return { title: "Error in review due time" }
-            } else if (
-                this.assignment.review_evaluation &&
-                reddate2.setHours(this.assignment.review_evaluation_due_time.split(":")[0]) ===
-                    reddate2.setHours(parseInt(this.assignment.review_evaluation_due_time.split(":")[0]) + 1)
-            ) {
-                return { title: "Error in review evaluation due time" }
-            } else {
-                return true
+        constructDate(day, time) {
+            const re = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
+            if (!re.test(time)) {
+                throw new Error(`invalid time: ${time}`)
             }
-        },
-        checkDatesLogical() {
-            // Checks whether deadlines have been entered in chronological order
-            // Check publish date
-            if (
-                this.assignment.publish_date >= this.assignment.due_date ||
-                this.assignment.publish_date >= this.assignment.review_publish_date ||
-                this.assignment.publish_date >= this.assignment.review_due_date ||
-                (this.assignment.review_evaluation &&
-                    this.assignment.publish_date >= this.assignment.review_evaluation_due_date)
-            ) {
-                return { error: "Publish date should be before other dates!" }
-            }
-            // Check due date
-            else if (
-                this.assignment.due_date >= this.assignment.review_publish_date ||
-                this.assignment.due_date >= this.assignment.review_due_date
-            ) {
-                return { error: "Due date should be before review dates!" }
-            }
-            // Show different warning in case of error with review evaluation date
-            else if (
-                this.assignment.review_evaluation &&
-                this.assignment.due_date >= this.assignment.review_evaluation_due_date
-            ) {
-                return { error: "Due date should be before review evaluation date!" }
-            }
-            // Check review publish date
-            else if (this.assignment.review_publish_date >= this.assignment.review_due_date) {
-                return { error: "Review start date should be before review due date!" }
-            }
-            // Show different warning in case of error with review evaluation date
-            else if (
-                this.assignment.review_evaluation &&
-                this.assignment.review_publish_date >= this.assignment.review_evaluation_due_date
-            ) {
-                return { error: "Review start date should be before review evaluation due date!" }
-            }
-            // Check review evaluation date
-            else if (
-                this.assignment.review_evaluation &&
-                this.assignment.review_due_date >= this.assignment.review_evaluation_due_date
-            ) {
-                return { error: "Review due date should be before review evaluation date" }
-            }
-            // Return true if all dates have been chronologically ordered
-            else {
-                return true
-            }
+            // construct the full date
+            const date = new Date()
+            date.setFullYear(day.getFullYear(), day.getMonth(), day.getDate())
+            date.setHours(time.split(":")[0])
+            date.setMinutes(time.split(":")[1])
+            date.setSeconds(0)
+            date.setMilliseconds(0)
+            return date
         }
     }
 }

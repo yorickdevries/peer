@@ -147,12 +147,6 @@ router.post(
     await getManager().transaction(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
-        // file info
-        const fileBuffer = req.file.buffer;
-        const fileExtension = path.extname(req.file.originalname);
-        const fileName = path.basename(req.file.originalname, fileExtension);
-        const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
-
         // fetch existing answer if present
         uploadAnswer = await transactionalEntityManager.findOne(
           UploadQuestionAnswer,
@@ -163,31 +157,39 @@ router.post(
             },
           }
         );
-
-        let file: File;
+        let oldFile: File | undefined = undefined;
         // if an answer is already present, replace the fileinfo
-        if (uploadAnswer?.uploadAnswer) {
-          file = uploadAnswer.uploadAnswer;
-          file.name = fileName;
-          file.extension = fileExtension;
-          file.hash = fileHash;
-        } else {
-          // make new file and answer
-          file = new File(fileName, fileExtension, fileHash);
-          uploadAnswer = new UploadQuestionAnswer(question, review, file);
+        if (uploadAnswer) {
+          oldFile = uploadAnswer.uploadAnswer;
         }
 
+        // new File
+        const fileBuffer = req.file.buffer;
+        const fileExtension = path.extname(req.file.originalname);
+        const fileName = path.basename(req.file.originalname, fileExtension);
+        const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+        // make new file and answer
+        const newFile = new File(fileName, fileExtension, fileHash);
+        // save to database
+        await transactionalEntityManager.save(newFile);
+        if (uploadAnswer) {
+          uploadAnswer.uploadAnswer = newFile;
+        } else {
+          uploadAnswer = new UploadQuestionAnswer(question, review, newFile);
+        }
         // create/update uploadAnswer
-        await transactionalEntityManager.save(file);
-        // call validateOrReject separately as this is not called in case only the file is changed
-        // and not the uploadAnser itself
-        await uploadAnswer.validateOrReject();
         await transactionalEntityManager.save(uploadAnswer);
 
         // save the file to disk lastly (overwites exisitng if present)
         // (if this goes wrong all previous steps are rolled back)
-        const filePath = path.resolve(uploadFolder, file.id.toString());
+        const filePath = path.resolve(uploadFolder, newFile.id.toString());
         await fsPromises.writeFile(filePath, req.file.buffer);
+        // remove the old file from the disk
+        if (oldFile?.id) {
+          const filePath = path.resolve(uploadFolder, oldFile.id.toString());
+          await fsPromises.unlink(filePath);
+          await transactionalEntityManager.remove(oldFile);
+        }
       }
     );
     // reload the answer
@@ -195,6 +197,70 @@ router.post(
     await uploadAnswer!.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(uploadAnswer!);
+  }
+);
+
+// Joi inputvalidation
+const deleteUploadAnswerSchema = Joi.object({
+  uploadQuestionId: Joi.number().integer().required(),
+  reviewId: Joi.number().integer().required(),
+});
+// delete an uploadAnswer
+router.delete(
+  "/",
+  validateQuery(deleteUploadAnswerSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const questionAnswer = await UploadQuestionAnswer.findOne({
+      where: {
+        questionId: req.query.uploadQuestionId,
+        reviewId: req.query.reviewId,
+      },
+    });
+    if (!questionAnswer) {
+      res
+        .status(HttpStatusCode.NOT_FOUND)
+        .send(ResponseMessage.QUESTIONANSWER_NOT_FOUND);
+      return;
+    }
+    const review = await questionAnswer.getReview();
+    if (!(await review.isReviewer(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You are not the reviewer of this review");
+      return;
+    }
+    if (review.submitted) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The review is already submitted");
+      return;
+    }
+    const file = questionAnswer.uploadAnswer;
+    const filePath = file.getPath();
+
+    // start transaction to make sure an asnwer isnt deleted from a submitted review
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        // const review
+        const reviewToCheck = await transactionalEntityManager.findOneOrFail(
+          Review,
+          review.id
+        );
+        if (reviewToCheck.submitted) {
+          throw new Error("The review is already submitted");
+        }
+        await transactionalEntityManager.remove(questionAnswer);
+        // delete file as well
+        await transactionalEntityManager.remove(file);
+        await fsPromises.unlink(filePath);
+      }
+    );
+    res.send(questionAnswer);
   }
 );
 

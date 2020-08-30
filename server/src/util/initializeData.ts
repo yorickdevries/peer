@@ -19,8 +19,12 @@ const initializeData = async function (): Promise<void> {
     ["AS", "Applied Sciences"],
     ["3mE", "Mechanical, Maritime and Materials Engineering"],
   ];
-  for (const faculty of faculties) {
-    await new Faculty(faculty[0], faculty[1]).save();
+  const existingFaculties = await Faculty.find();
+  if (existingFaculties.length === 0) {
+    for (const faculty of faculties) {
+      await new Faculty(faculty[0], faculty[1]).save();
+    }
+    console.log("Initialized Faculties");
   }
 
   // Academic Years
@@ -30,10 +34,14 @@ const initializeData = async function (): Promise<void> {
     ["2019/2020", true],
     ["2020/2021", true],
   ];
-  for (const academicYear of academicYears) {
-    await new AcademicYear(academicYear[0], academicYear[1]).save();
+
+  const existingAcademicYears = await AcademicYear.find();
+  if (existingAcademicYears.length === 0) {
+    for (const academicYear of academicYears) {
+      await new AcademicYear(academicYear[0], academicYear[1]).save();
+    }
+    console.log("Initialized Academic Years");
   }
-  console.log("Initialized Faculties and Academic Years");
 
   // file folder
   const uploadFolder = path.resolve(config.get("uploadFolder") as string);

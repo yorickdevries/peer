@@ -46,11 +46,11 @@ router.get("/", validateQuery(assignmentSubmitIdSchema), async (req, res) => {
   }
   if (
     // not a teacher
-    !(await assignment.isTeacherInCourse(user))
+    !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
-      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
     return;
   }
   const questionnaire = await assignment.getSubmissionQuestionnaire();
@@ -161,7 +161,7 @@ const assignmentIdSchema = Joi.object({
 });
 router.patch(
   "/submitall",
-  validateBody(assignmentIdSchema),
+  validateQuery(assignmentIdSchema),
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
@@ -200,14 +200,17 @@ router.patch(
       return;
     }
     const submitted = false;
-    const reviews = await questionnaire.getReviews(submitted);
-    for (const review of reviews) {
+    const unsubmittedReviews = await questionnaire.getReviews(submitted);
+    const submittedReviews = [];
+    for (const review of unsubmittedReviews) {
       if (await review.canBeSubmitted()) {
         review.submitted = true;
+        review.submittedAt = new Date();
         await review.save();
+        submittedReviews.push(review);
       }
     }
-    const sortedReviews = _.sortBy(reviews, "id");
+    const sortedReviews = _.sortBy(submittedReviews, "id");
     res.send(sortedReviews);
   }
 );
@@ -221,7 +224,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
   }
-  if (await review.isTeacherInCourse(user)) {
+  if (await review.isTeacherOrTeachingAssistantInCourse(user)) {
     res.send(review);
     return;
   }
@@ -229,23 +232,34 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
   const assignmentState = assignment.getState();
+  const anonymousReview = review.getAnonymousVersion();
+  // reviewer should access the review when reviewing
   if (
-    // reviewer should access the review when reviewing
-    ((await review.isReviewer(user)) &&
-      (assignmentState === AssignmentState.REVIEW ||
-        assignmentState === AssignmentState.FEEDBACK)) ||
-    // reviewed user should access the review when getting feedback and the review is finished
-    ((await review.isReviewed(user)) &&
-      assignmentState === AssignmentState.FEEDBACK &&
-      review.submitted)
+    (await review.isReviewer(user)) &&
+    (assignmentState === AssignmentState.REVIEW ||
+      assignmentState === AssignmentState.FEEDBACK)
   ) {
-    const anonymousReview = review.getAnonymousVersion();
+    // set startedAt if not defined yet
+    if (!review.startedAt) {
+      review.startedAt = new Date();
+      await review.save();
+    }
+    res.send(anonymousReview);
+    return;
+  }
+  // reviewed user should access the review when getting feedback and the review is finished
+  if (
+    (await review.isReviewed(user)) &&
+    assignmentState === AssignmentState.FEEDBACK &&
+    review.submitted
+  ) {
     res.send(anonymousReview);
     return;
   }
   res
     .status(HttpStatusCode.FORBIDDEN)
     .send("You are not allowed to view this review");
+  return;
 });
 
 // get a review answers eitehr as teacher or student
@@ -259,7 +273,7 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
   }
   const reviewAnswers = await review.getQuestionAnswers();
   const sortedReviewAnswers = _.sortBy(reviewAnswers, "questionId");
-  if (await review.isTeacherInCourse(user)) {
+  if (await review.isTeacherOrTeachingAssistantInCourse(user)) {
     res.send(sortedReviewAnswers);
     return;
   }
@@ -294,8 +308,13 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
   }
-  if (await review.isTeacherInCourse(user)) {
-    res.send(review);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const submission = review.submission!;
+  const file = submission.file;
+  const fileName = file.getFileNamewithExtension();
+  const filePath = file.getPath();
+  if (await review.isTeacherOrTeachingAssistantInCourse(user)) {
+    res.download(filePath, fileName);
     return;
   }
   // get assignmentstate
@@ -303,22 +322,31 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   const assignment = await questionnaire.getAssignment();
   const assignmentState = assignment.getState();
   if (
-    // reviewer should access the review when reviewing
     (await review.isReviewer(user)) &&
     (assignmentState === AssignmentState.REVIEW ||
       assignmentState === AssignmentState.FEEDBACK)
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const submission = review.submission!;
-    const file = submission.file;
-    const fileName = file.getFileNamewithExtension();
-    const filePath = file.getPath();
+    // set downloadedAt if not defined yet
+    if (!review.downloadedAt) {
+      review.downloadedAt = new Date();
+      await review.save();
+    }
+    res.download(filePath, fileName);
+    return;
+  }
+  // reviewed user should access the review when getting feedback and the review is finished
+  if (
+    (await review.isReviewed(user)) &&
+    assignmentState === AssignmentState.FEEDBACK &&
+    review.submitted
+  ) {
     res.download(filePath, fileName);
     return;
   }
   res
     .status(HttpStatusCode.FORBIDDEN)
     .send("You are not allowed to view this review");
+  return;
 });
 
 // Joi inputvalidation for query
@@ -357,6 +385,11 @@ router.patch(
     }
     // set new values
     review.submitted = req.body.submitted;
+    if (review.submitted) {
+      review.submittedAt = new Date();
+    } else {
+      review.submittedAt = null;
+    }
     review.flaggedByReviewer = req.body.flaggedByReviewer;
     await review.save();
     const anonymousReview = review.getAnonymousVersion();
@@ -384,8 +417,10 @@ router.patch(
         .send(ResponseMessage.REVIEW_NOT_FOUND);
       return;
     }
-    if (!(await review.isTeacherInCourse(user))) {
-      res.status(HttpStatusCode.FORBIDDEN).send("You are not a teacher");
+    if (!(await review.isTeacherOrTeachingAssistantInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
       return;
     }
     if (!review.submitted) {
@@ -400,6 +435,15 @@ router.patch(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The assignment is not in feedback state");
+      return;
+    }
+    if (
+      review.approvingTA !== null &&
+      review.approvingTA.netid !== user.netid
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The review has already been evaluated by another TA");
       return;
     }
     // set new values
@@ -423,18 +467,6 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   // get assignmentstate
   const submissionQuestionnaire = await review.getQuestionnaire();
   const assignment = await submissionQuestionnaire.getAssignment();
-  if (
-    !(
-      (await review.isReviewed(user)) &&
-      assignment.isAtState(AssignmentState.FEEDBACK) &&
-      review.submitted
-    )
-  ) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("You are not allowed to evaluate this review");
-    return;
-  }
   const reviewEvaluation = await ReviewOfReview.findOne({
     where: { reviewOfSubmission: review.id },
   });
@@ -442,9 +474,26 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.NOT_FOUND).send("Evaluation is not found");
     return;
   }
-  // otherwise the review can be sent
-  const anonymousReview = reviewEvaluation.getAnonymousVersionWithReviewerNetid();
-  res.send(anonymousReview);
+  if (await review.isTeacherOrTeachingAssistantInCourse(user)) {
+    res.send(reviewEvaluation.getAnonymousVersionWithReviewerNetid());
+    return;
+  }
+  if (
+    (await review.isReviewed(user)) &&
+    assignment.isAtState(AssignmentState.FEEDBACK) &&
+    review.submitted
+  ) {
+    res.send(reviewEvaluation.getAnonymousVersionWithReviewerNetid());
+    return;
+  }
+  if ((await reviewEvaluation.isReviewed(user)) && reviewEvaluation.submitted) {
+    res.send(reviewEvaluation.getAnonymousVersion());
+    return;
+  }
+  res
+    .status(HttpStatusCode.FORBIDDEN)
+    .send("You are not allowed to evaluate this review");
+  return;
 });
 
 // make an evaluation as student
@@ -504,9 +553,10 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
         null,
         null,
         null,
-        null,
         review
       );
+      // set startedAt
+      reviewEvaluation.startedAt = new Date();
       await transactionalEntityManager.save(reviewEvaluation);
     }
   );
@@ -628,7 +678,6 @@ router.post(
             reviewAssignment.reviewer,
             false,
             false,
-            null,
             null,
             null,
             null,

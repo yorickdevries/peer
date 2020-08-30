@@ -19,12 +19,11 @@ import VueNotifications from "vue-notifications"
 import izitoast from "izitoast"
 import "izitoast/dist/css/iziToast.min.css"
 
-function toast({ title, message, type, timeout, cb }) {
+function toast({ title, message, type, timeout }) {
     return izitoast[type]({
         title,
         message,
         timeout,
-        onOpened: cb,
         position: "bottomCenter"
     })
 }

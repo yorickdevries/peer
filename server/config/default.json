@@ -1,49 +1,26 @@
 {
     "database": {
-        "type": "mysql",
+        "type": "mariadb",
         "host": "localhost",
         "port": 3306,
-        "username": "root",
+        "username": "peer",
         "password": "password",
-        "database": "peer_development"
+        "database": "peer"
     },
-    "old_database": {
-        "connection": {
-            "user": "postgres",
-            "host": "localhost",
-            "database": "peer_development",
-            "password": "password",
-            "port": 5432
-          },
-        "schemaQueryFile": "./database_dumps_old/ED3-DataBaseSchema.sql",
-        "fullQueryFile": "./database_dumps_old/ED3-FullData.sql"
-        },
     "session": {
         "secret": "add something random here",
         "maxAge": 43200000 // 12 hours in ms
-    },
-    "reviews": {
-        "fileFolder": "./files/development/reviews",
-        "maxSizeReviewFile": 52428800 // 50 MB
-    },
-    "assignments": {
-        "fileFolder": "./files/development/assignments",
-        "maxSizeAssignmentFile": 52428800 // 50 MB
-    },
-    "submissions": {
-        "fileFolder": "./files/development/submissions",
-        "maxSizeSubmissionFile": 52428800 // 50 MB
-    },
-    "exampleData": {
-        "exampleAssignmentFolder": "./exampleData/assignments",
-        "exampleSubmissionFolder": "./exampleData/submissions",
-        "exampleReviewFolder": "./exampleData/reviews"
     },
     "allowedExtensions": [".pdf", ".zip", ".doc", ".docx"],
     "maxFileSize": 52428800, // 50 MB
     "uploadFolder": "./files/development/",
     "rangeQuestion": {
         "min": 1,
-        "max": 100
+        "max": 50
+    },
+    "exampleData": {
+        "exampleAssignmentFolder": "./exampleData/assignments",
+        "exampleSubmissionFolder": "./exampleData/submissions",
+        "exampleReviewFolder": "./exampleData/reviews"
     }
 }

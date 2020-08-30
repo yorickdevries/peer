@@ -33,7 +33,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   const assignment = await questionnaire.getAssignment();
   const assignmentState = assignment.getState();
   if (
-    !(await questionnaire.isTeacherInCourse(user)) &&
+    !(await questionnaire.isTeacherOrTeachingAssistantInCourse(user)) &&
     !(
       (await assignment.isEnrolledInGroup(user)) &&
       (assignmentState === AssignmentState.REVIEW ||

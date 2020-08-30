@@ -39,17 +39,17 @@ const baseConfig = {
 let connectionConfig: ConnectionOptions;
 
 switch (databaseConfig.type) {
-  case "mysql": {
-    let mysqlConfig;
+  case "mariadb": {
+    let mariadbConfig;
     if (databaseConfig.connectionUrl) {
       // Use the URL to set up the connection (like for Heroku)
-      mysqlConfig = {
+      mariadbConfig = {
         type: databaseConfig.type,
         url: databaseConfig.connectionUrl,
       };
     } else {
       // use the other parameters
-      mysqlConfig = {
+      mariadbConfig = {
         type: databaseConfig.type,
         host: databaseConfig.host,
         port: databaseConfig.port,
@@ -58,7 +58,7 @@ switch (databaseConfig.type) {
         database: databaseConfig.database,
       };
     }
-    connectionConfig = { ...baseConfig, ...mysqlConfig };
+    connectionConfig = { ...baseConfig, ...mariadbConfig };
     break;
   }
   // in memory database for testing

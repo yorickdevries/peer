@@ -45,11 +45,11 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   }
   if (
     // not a teacher
-    !(await assignment.isTeacherInCourse(user))
+    !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
-      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
     return;
   }
   const groups = await assignment.getGroups();
@@ -65,10 +65,10 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
     return;
   }
-  if (!(await group.isTeacherInCourse(user))) {
+  if (!(await group.isTeacherOrTeachingAssistantInCourse(user))) {
     res
       .status(HttpStatusCode.FORBIDDEN)
-      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
     return;
   }
   const users = await group.getUsers();
@@ -241,6 +241,17 @@ router.patch(
     // check whether the assignments are still in submissionstate
     const groupAssignments = await group.getAssignments();
     for (const assignment of groupAssignments) {
+      const submissions = await assignment.getSubmissions();
+      if (
+        _.some(submissions, (submission) => {
+          return submission.userNetid === user.netid;
+        })
+      ) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("User has already made a submission for the assignment");
+        return;
+      }
       if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
         res
           .status(HttpStatusCode.BAD_REQUEST)

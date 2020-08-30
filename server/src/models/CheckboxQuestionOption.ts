@@ -1,10 +1,15 @@
 import QuestionOption from "./QuestionOption";
-import { ChildEntity, ManyToOne } from "typeorm";
+import { ChildEntity, ManyToOne, RelationId } from "typeorm";
 import QuestionOptionType from "../enum/QuestionOptionType";
 import CheckboxQuestion from "./CheckboxQuestion";
 
 @ChildEntity(QuestionOptionType.CHECKBOX)
 export default class CheckboxQuestionOption extends QuestionOption {
+  @RelationId(
+    (checkboxQuestionOption: CheckboxQuestionOption) =>
+      checkboxQuestionOption.question
+  )
+  questionId!: number;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => CheckboxQuestion, (question) => question.options, {
     nullable: false,
@@ -17,11 +22,6 @@ export default class CheckboxQuestionOption extends QuestionOption {
   }
 
   async getQuestion(): Promise<CheckboxQuestion> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await CheckboxQuestionOption.findOneOrFail(this.id, {
-        relations: ["question"],
-      })
-    ).question!;
+    return CheckboxQuestion.findOneOrFail(this.questionId);
   }
 }
