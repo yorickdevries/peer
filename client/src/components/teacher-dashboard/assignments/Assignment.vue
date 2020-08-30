@@ -29,6 +29,31 @@
                             <b-col cols="8">
                                 <b-card header="Actions">
                                     <dl class="mb-0">
+                                        <FormWizard
+                                            title="Assignment state progression"
+                                            :subtitle="'Current state: ' + assignment.state"
+                                            color="#00A6D6"
+                                            :startIndex="currentStateIndex"
+                                        >
+                                            <!--Remove clickabillity of steps-->
+                                            <template slot="step" slot-scope="props">
+                                                <WizardStep
+                                                    :tab="props.tab"
+                                                    :transition="props.transition"
+                                                    :index="props.index"
+                                                ></WizardStep>
+                                            </template>
+                                            <TabContent
+                                                v-for="(assignmentState, index) in assignmentStates"
+                                                :key="index"
+                                                :title="assignmentState.name"
+                                                :icon="assignmentState.icon"
+                                            >
+                                            </TabContent>
+                                            <!--Trick to remove the Next button-->
+                                            <div slot="footer"></div>
+                                        </FormWizard>
+
                                         <!--Shuffling-->
                                         <dt>Distribute Reviews</dt>
                                         <dd>
@@ -226,6 +251,7 @@
 
 <script>
 import api from "../../../api/api"
+import _ from "lodash"
 import BreadcrumbTitle from "../../BreadcrumbTitle"
 import SubmissionQuestionnaireWizard from "../questionnaire/SubmissionQuestionnaireWizard"
 import ReviewQuestionnaireWizard from "../questionnaire/ReviewQuestionnaireWizard"
@@ -236,10 +262,15 @@ import Submissions from "../../ta_teacher_shared/Submissions"
 import AssignmentDetails from "../../ta_teacher_shared/AssignmentDetails"
 import notifications from "../../../mixins/notifications"
 import CopyGroupsWizard from "../CopyGroupsWizard"
+import { FormWizard, WizardStep, TabContent } from "vue-form-wizard"
+import "vue-form-wizard/dist/vue-form-wizard.min.css"
 
 export default {
     mixins: [notifications],
     components: {
+        FormWizard,
+        WizardStep,
+        TabContent,
         CopyGroupsWizard,
         BreadcrumbTitle,
         SubmissionQuestionnaireWizard,
@@ -252,7 +283,24 @@ export default {
     },
     data() {
         return {
-            assignment: null
+            assignment: null,
+            assignmentStates: [
+                { name: "unpublished", icon: "fas fa-eye-slash" },
+                { name: "submission", icon: "fas fa-file-pdf" },
+                { name: "waitingforreview", icon: "fas fa-user-clock" },
+                { name: "review", icon: "fas fa-glasses" },
+                { name: "feedback", icon: "fas fa-comments" }
+            ]
+        }
+    },
+    computed: {
+        currentStateIndex() {
+            if (!this.assignment) {
+                return -1
+            }
+            return _.findIndex(this.assignmentStates, o => {
+                return o.name === this.assignment.state
+            })
         }
     },
     async created() {
