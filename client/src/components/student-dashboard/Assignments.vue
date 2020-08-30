@@ -212,7 +212,7 @@ export default {
         },
         assignmentsInWaitingForReviewOrReviewState() {
             return _.filter(this.enrolledAssignments, assignment => {
-                return assignment.state === "watingforreview" || assignment.state === "review"
+                return assignment.state === "waitingforreview" || assignment.state === "review"
             })
         },
         assignmentsInFeedbackState() {
@@ -240,7 +240,7 @@ export default {
             this.fetchAssignments()
         },
         isInWaitingForReviewState(assignment) {
-            return assignment.state === "watingforreview"
+            return assignment.state === "waitingforreview"
         }
     }
 }
