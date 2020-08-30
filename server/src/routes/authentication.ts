@@ -44,9 +44,11 @@ const authenticationRoutes = function (router: Router): void {
     );
 
     // Retrieve SP metadata (Only works in production)
-    const metadata_path = path.resolve(config.get("SP_metadata_file"));
+    const metadataPath = path.resolve(
+      config.get("ServiceProviderMetadataFile")
+    );
     router.get("/metadata.xml", async (_, res) => {
-      res.sendFile(metadata_path);
+      res.sendFile(metadataPath);
     });
   } else {
     // Mock Login form

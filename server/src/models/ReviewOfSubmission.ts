@@ -46,7 +46,9 @@ export default class ReviewOfSubmission extends Review {
   // custom validation which is run before saving
   async validateOrReject(): Promise<void> {
     // validation: questionnaire and submission should correspond to same assignment
-    const questionnaire = await this.getQuestionnaire();
+    const questionnaire = this.questionnaire
+      ? this.questionnaire
+      : await this.getQuestionnaire();
     const questionnaireAssignment = await questionnaire.getAssignment();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const submissionAssignment = await this.submission!.getAssignment();

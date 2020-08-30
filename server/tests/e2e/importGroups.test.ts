@@ -33,8 +33,8 @@ describe("Group import", () => {
         name: "CourseName",
         courseCode: "ABC123",
         enrollable: true,
-        facultyName: "EEMCS",
-        academicYearName: "2019/2020",
+        facultyId: 1,
+        academicYearId: 3,
         description: null,
       })
       .set("cookie", teacherCookie);
@@ -55,7 +55,8 @@ describe("Group import", () => {
       .field("reviewDueDate", new Date("2020-04-01T10:00Z").toISOString())
       .field("reviewEvaluationDueDate", "null")
       .field("description", "Example description")
-      .field("externalLink", "null");
+      .field("externalLink", "null")
+      .field("submissionExtensions", ".pdf");
     assignmentId = JSON.parse(res2.text).id;
 
     // set date to the moment that the assignment is published

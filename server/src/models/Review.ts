@@ -145,7 +145,9 @@ export default abstract class Review extends BaseModel {
 
   // custom validation which is run before saving
   async validateOrReject(): Promise<void> {
-    const questionnaire = await this.getQuestionnaire();
+    const questionnaire = this.questionnaire
+      ? this.questionnaire
+      : await this.getQuestionnaire();
     const assignment = await questionnaire.getAssignment();
     const course = await assignment.getCourse();
     if (!(await course.isEnrolled(this.reviewer, UserRole.STUDENT))) {
@@ -203,26 +205,11 @@ export default abstract class Review extends BaseModel {
   }
 
   async getQuestionnaire(): Promise<Questionnaire> {
-    // validation needs the questionnaire, so it cannot be fectehd via the id
-    if (this.questionnaire) {
-      return this.questionnaire;
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return (
-        await Review.findOneOrFail(this.id, {
-          relations: ["questionnaire"],
-        })
-      ).questionnaire!;
-    }
+    return Questionnaire.findOneOrFail(this.questionnaireId);
   }
 
   async getQuestionAnswers(): Promise<QuestionAnswer[]> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Review.findOneOrFail(this.id, {
-        relations: ["questionAnswers"],
-      })
-    ).questionAnswers!;
+    return QuestionAnswer.find({ where: { review: this } });
   }
 
   // checks whether the user is teacher

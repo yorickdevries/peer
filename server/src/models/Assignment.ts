@@ -33,6 +33,7 @@ import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
 import _ from "lodash";
+import Extensions from "../enum/Extensions";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -141,6 +142,15 @@ export default class Assignment extends BaseModel {
   @IsNotEmpty()
   externalLink: string | null;
 
+  @Column()
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(Extensions)
+  // can be in the form: ".pdf,.zip,.doc,.docx"
+  // needs later to be revised to a list of strings
+  submissionExtensions: Extensions;
+
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
   // course_id int NOT NULL, FK
@@ -174,7 +184,8 @@ export default class Assignment extends BaseModel {
     file: File | null,
     externalLink: string | null,
     submissionQuestionnaire: SubmissionQuestionnaire | null,
-    reviewQuestionnaire: ReviewQuestionnaire | null
+    reviewQuestionnaire: ReviewQuestionnaire | null,
+    submissionExtensions: Extensions
   ) {
     super();
     this.name = name;
@@ -193,6 +204,7 @@ export default class Assignment extends BaseModel {
     this.externalLink = externalLink;
     this.submissionQuestionnaire = submissionQuestionnaire;
     this.reviewQuestionnaire = reviewQuestionnaire;
+    this.submissionExtensions = submissionExtensions;
   }
 
   // custom validation which is run before saving
@@ -244,12 +256,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getCourse(): Promise<Course> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Assignment.findOneOrFail(this.id, {
-        relations: ["course"],
-      })
-    ).course!;
+    return Course.findOneOrFail(this.courseId);
   }
 
   async getGroups(): Promise<Group[]> {
@@ -262,33 +269,28 @@ export default class Assignment extends BaseModel {
   }
 
   async getSubmissionQuestionnaire(): Promise<SubmissionQuestionnaire | null> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Assignment.findOneOrFail(this.id, {
-        relations: ["submissionQuestionnaire"],
-      })
-    ).submissionQuestionnaire!;
+    if (!this.submissionQuestionnaireId) {
+      return null;
+    } else {
+      return SubmissionQuestionnaire.findOneOrFail(
+        this.submissionQuestionnaireId
+      );
+    }
   }
 
   async getReviewQuestionnaire(): Promise<ReviewQuestionnaire | null> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Assignment.findOneOrFail(this.id, {
-        relations: ["reviewQuestionnaire"],
-      })
-    ).reviewQuestionnaire!;
+    if (!this.reviewQuestionnaireId) {
+      return null;
+    } else {
+      return ReviewQuestionnaire.findOneOrFail(this.reviewQuestionnaireId);
+    }
   }
 
   async getSubmissions(group?: Group): Promise<Submission[]> {
     if (group) {
       return this.getSubmissionsOfGroup(group);
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return (
-        await Assignment.findOneOrFail(this.id, {
-          relations: ["submissions"],
-        })
-      ).submissions!;
+      return Submission.find({ where: { assignment: this } });
     }
   }
 

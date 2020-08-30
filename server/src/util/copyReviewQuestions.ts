@@ -10,6 +10,7 @@ import UploadQuestion from "../models/UploadQuestion";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import Questionnaire from "../models/Questionnaire";
 import Question from "../models/Question";
+import Extensions from "../enum/Extensions";
 
 interface QuestionTemplate {
   text: string;
@@ -17,7 +18,7 @@ interface QuestionTemplate {
   optional: boolean;
   type: QuestionType;
   range?: number;
-  extensions?: string;
+  extensions?: Extensions;
   options?: { text: string }[];
 }
 

@@ -34,7 +34,7 @@
 
                         <b-form-group label="Faculty" description="">
                             <b-form-select v-model="course.faculty" required>
-                                <b-form-select-option v-for="faculty in faculties" :key="faculty.name" :value="faculty"
+                                <b-form-select-option v-for="faculty in faculties" :key="faculty.id" :value="faculty"
                                     >{{ faculty.name }} - {{ faculty.longName }}
                                 </b-form-select-option>
                             </b-form-select>
@@ -44,7 +44,7 @@
                             <b-form-select v-model="course.academicYear" required>
                                 <b-form-select-option
                                     v-for="academicYear in academicYears"
-                                    :key="academicYear.name"
+                                    :key="academicYear.id"
                                     :value="academicYear"
                                     >{{ academicYear.name }}</b-form-select-option
                                 >
@@ -102,8 +102,8 @@ export default {
                 this.course.name,
                 this.course.courseCode,
                 this.course.enrollable,
-                this.course.faculty.name,
-                this.course.academicYear.name,
+                this.course.faculty.id,
+                this.course.academicYear.id,
                 this.course.description
             )
             this.$router.push({ name: "teacher-dashboard.course", params: { courseId: res.data.id } })

@@ -120,19 +120,6 @@
                             </b-row>
 
                             <hr />
-
-                            <!--Number of peer reviews per student-->
-                            <b-form-group label="Number of reviews that each student needs to do">
-                                <b-form-input
-                                    v-model="assignment.reviewsPerUser"
-                                    type="number"
-                                    :state="checkReviewsPerUser"
-                                    placeholder="Enter an integer larger than 0"
-                                    required
-                                >
-                                </b-form-input>
-                            </b-form-group>
-
                             <!--File upload-->
                             <b-form-group
                                 label="Assignment file"
@@ -153,6 +140,29 @@
                                 description="Add a link where the assignment can be found for the student (optional)."
                             >
                                 <b-form-input v-model="assignment.externalLink"></b-form-input>
+                            </b-form-group>
+
+                            <!--Allowed Submission extensions-->
+                            <b-form-group
+                                label="Allowed submission file extensions"
+                                description="The extensions for the submission files that are allowed."
+                            >
+                                <b-form-select
+                                    :options="extensionTypes"
+                                    v-model="assignment.submissionExtensions"
+                                ></b-form-select>
+                            </b-form-group>
+
+                            <!--Number of peer reviews per student-->
+                            <b-form-group label="Number of reviews that each student needs to do">
+                                <b-form-input
+                                    v-model="assignment.reviewsPerUser"
+                                    type="number"
+                                    :state="checkReviewsPerUser"
+                                    placeholder="Enter an integer larger than 0"
+                                    required
+                                >
+                                </b-form-input>
                             </b-form-group>
 
                             <b-form-group>
@@ -241,8 +251,15 @@ export default {
                 reviewEvaluationDueTime: "23:59",
                 description: null,
                 file: null,
-                externalLink: null
-            }
+                externalLink: null,
+                submissionExtensions: ".pdf"
+            },
+            extensionTypes: [
+                { value: ".pdf", text: ".pdf" },
+                { value: ".zip", text: ".zip" },
+                { value: ".doc,.docx", text: ".doc,.docx" },
+                { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" }
+            ]
         }
     },
     computed: {
@@ -305,7 +322,8 @@ export default {
                 reviewEvaluationDueDate,
                 this.assignment.description,
                 this.assignment.externalLink,
-                this.assignment.file
+                this.assignment.file,
+                this.assignment.submissionExtensions
             )
             this.showSuccessMessage({ message: "Assignment was successfully created" })
             this.$router.push({

@@ -32,7 +32,8 @@ export default {
         reviewEvaluationDueDate,
         description,
         externalLink,
-        file
+        file,
+        submissionExtensions
     ) {
         // Create formData and append data
         const formData = new FormData()
@@ -59,6 +60,7 @@ export default {
         }
         formData.append("externalLink", externalLink)
         formData.append("file", file)
+        formData.append("submissionExtensions", submissionExtensions)
         return client.post("assignments/", formData)
     },
     patch(
@@ -74,7 +76,8 @@ export default {
         reviewEvaluationDueDate,
         description,
         externalLink,
-        file
+        file,
+        submissionExtensions
     ) {
         // Create formData and append data
         const formData = new FormData()
@@ -103,6 +106,7 @@ export default {
         if (file !== undefined) {
             formData.append("file", file)
         }
+        formData.append("submissionExtensions", submissionExtensions)
         return client.patch(`assignments/${id}`, formData)
     },
     enroll(id) {
