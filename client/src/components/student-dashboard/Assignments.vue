@@ -27,6 +27,9 @@
                                     <b-card v-for="assignment in enrollableAssignments" :key="assignment.id" no-body>
                                         <b-card-body>
                                             <h4>{{ assignment.name }}</h4>
+                                            <b-badge variant="secondary" class="ml-2 float-right p-1">
+                                                {{ assignment.state.toUpperCase() }}</b-badge
+                                            >
                                             <p v-if="assignment.description != null">
                                                 {{ assignment.description | truncate(200) }}
                                             </p>
@@ -60,6 +63,9 @@
                                     >
                                         <b-card-body>
                                             <h4>{{ assignment.name }}</h4>
+                                            <b-badge variant="secondary" class="ml-2 float-right p-1">
+                                                {{ assignment.state.toUpperCase() }}</b-badge
+                                            >
                                             <p v-if="assignment.description != null">
                                                 {{ assignment.description | truncate(200) }}
                                             </p>
@@ -108,6 +114,9 @@
                                                 {{ assignment.reviewPublishDate | formatDate }}</b-badge
                                             >
                                             <h4>{{ assignment.name }}</h4>
+                                            <b-badge variant="secondary" class="ml-2 float-right p-1">
+                                                {{ assignment.state.toUpperCase() }}</b-badge
+                                            >
                                             <p v-if="assignment.description != null">
                                                 {{ assignment.description | truncate(200) }}
                                             </p>
@@ -149,6 +158,9 @@
                                     >
                                         <b-card-body>
                                             <h4>{{ assignment.name }}</h4>
+                                            <b-badge variant="secondary" class="ml-2 float-right p-1">
+                                                {{ assignment.state.toUpperCase() }}</b-badge
+                                            >
                                             <p v-if="assignment.description != null">
                                                 {{ assignment.description | truncate(200) }}
                                             </p>
@@ -195,17 +207,17 @@ export default {
     computed: {
         assignmentsInSubmissionState() {
             return _.filter(this.enrolledAssignments, assignment => {
-                return new Date() < new Date(assignment.dueDate)
+                return assignment.state === "submission"
             })
         },
         assignmentsInWaitingForReviewOrReviewState() {
             return _.filter(this.enrolledAssignments, assignment => {
-                return new Date() > new Date(assignment.dueDate) && new Date() < new Date(assignment.reviewDueDate)
+                return assignment.state === "watingforreview" || assignment.state === "review"
             })
         },
         assignmentsInFeedbackState() {
             return _.filter(this.enrolledAssignments, assignment => {
-                return new Date() > new Date(assignment.reviewDueDate)
+                return assignment.state === "feedback"
             })
         }
     },
@@ -228,7 +240,7 @@ export default {
             this.fetchAssignments()
         },
         isInWaitingForReviewState(assignment) {
-            return new Date() > new Date(assignment.dueDate) && new Date() < new Date(assignment.reviewPublishDate)
+            return assignment.state === "watingforreview"
         }
     }
 }

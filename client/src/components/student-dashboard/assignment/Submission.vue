@@ -34,7 +34,7 @@
                     <!-- Modal Button -->
                     <b-button
                         v-b-modal="'uploadModal'"
-                        :disabled="new Date() > new Date(assignment.dueDate)"
+                        :disabled="assignment.state !== 'submission'"
                         variant="primary"
                         @click="resetFile"
                         >Upload new Submission</b-button

@@ -125,24 +125,21 @@ export default {
     },
     computed: {
         isInSubmissionState() {
-            return new Date() < new Date(this.assignment.dueDate)
+            return this.assignment.state === "submission"
         },
         isInOrAfterReviewState() {
-            return new Date() > new Date(this.assignment.reviewPublishDate)
+            return this.assignment.state === "review" || this.assignment.state === "feedback"
         },
         isInReviewState() {
-            return (
-                new Date() > new Date(this.assignment.reviewPublishDate) &&
-                new Date() < new Date(this.assignment.reviewDueDate)
-            )
+            return this.assignment.state === "review"
         },
         isInFeedbackState() {
-            return new Date() > new Date(this.assignment.reviewDueDate)
+            return this.assignment.state === "feedback"
         },
         isEvaluationActive() {
             return (
                 this.assignment.reviewEvaluation &&
-                new Date() > new Date(this.assignment.reviewDueDate) &&
+                this.assignment.state === "feedback" &&
                 new Date() < new Date(this.assignment.reviewEvaluationDueDate)
             )
         }
