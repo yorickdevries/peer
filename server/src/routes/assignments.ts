@@ -259,7 +259,9 @@ const assignmentSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
-  submissionExtensions: Joi.string().valid(...Object.values(Extensions)),
+  submissionExtensions: Joi.string()
+    .valid(...Object.values(Extensions))
+    .required(),
 });
 // post an assignment in a course
 router.post(
@@ -350,7 +352,9 @@ const assignmentPatchSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
-  submissionExtensions: Joi.string().valid(...Object.values(Extensions)),
+  submissionExtensions: Joi.string()
+    .valid(...Object.values(Extensions))
+    .required(),
 });
 // patch an assignment in a course
 router.patch(

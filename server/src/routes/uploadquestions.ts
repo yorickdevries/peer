@@ -51,7 +51,9 @@ const questionSchema = Joi.object({
   number: Joi.number().integer().required(),
   optional: Joi.boolean().required(),
   questionnaireId: Joi.number().integer().required(),
-  extensions: Joi.string().valid(...Object.values(Extensions)),
+  extensions: Joi.string()
+    .valid(...Object.values(Extensions))
+    .required(),
 });
 // post a question
 router.post("/", validateBody(questionSchema), async (req, res) => {
@@ -105,7 +107,9 @@ const questionPatchSchema = Joi.object({
   text: Joi.string().required(),
   number: Joi.number().integer().required(),
   optional: Joi.boolean().required(),
-  extensions: Joi.string().valid(...Object.values(Extensions)),
+  extensions: Joi.string()
+    .valid(...Object.values(Extensions))
+    .required(),
 });
 // patch a question
 router.patch(
