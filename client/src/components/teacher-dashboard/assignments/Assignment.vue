@@ -110,34 +110,36 @@
                                             </b-modal>
                                         </div>
 
-                                        <!--Shuffling-->
-                                        <dt>Distribute Reviews</dt>
-                                        <dd>
-                                            This action will distribute reviews to users of groups which made a
-                                            submission.
-                                        </dd>
-                                        <b-button
-                                            v-b-modal="`distributeReviews`"
-                                            class="mb-3"
-                                            variant="primary"
-                                            size="sm"
-                                            >Distribute Reviews
-                                        </b-button>
-                                        <b-modal
-                                            id="distributeReviews"
-                                            @ok="distributeReviews"
-                                            title="Confirmation"
-                                            centered
-                                        >
-                                            Are you sure you want to distribute the reviews?
-                                            <ul>
-                                                <li>Can (and should be) done only once per assignment.</li>
-                                                <li>
-                                                    Make sure to assign reviews after all students have made their
-                                                    submission.
-                                                </li>
-                                            </ul>
-                                        </b-modal>
+                                        <!--Distribute Reviews-->
+                                        <div v-if="assignment.state === 'waitingforreview'">
+                                            <dt>Distribute Reviews</dt>
+                                            <dd>
+                                                This action will distribute reviews to users of groups which made a
+                                                submission.
+                                            </dd>
+                                            <b-button
+                                                v-b-modal="'distributeReviews'"
+                                                class="mb-3"
+                                                variant="primary"
+                                                size="sm"
+                                                >Distribute Reviews
+                                            </b-button>
+                                            <b-modal
+                                                id="distributeReviews"
+                                                @ok="distributeReviews"
+                                                title="Confirmation"
+                                                centered
+                                            >
+                                                Are you sure you want to distribute the reviews?
+                                                <ul>
+                                                    <li>Can (and should be) done only once per assignment.</li>
+                                                    <li>
+                                                        The submission questionnaire cannot be changed after this
+                                                        action.
+                                                    </li>
+                                                </ul>
+                                            </b-modal>
+                                        </div>
 
                                         <!--Submit Reviews-->
                                         <dt>Submit Reviews</dt>
@@ -311,7 +313,8 @@ export default {
         },
         async distributeReviews() {
             await api.reviewofsubmissions.distribute(this.$route.params.assignmentId)
-            this.showSuccessMessage({ message: "Groups have successfully been shuffled and assigned submissions." })
+            this.showSuccessMessage({ message: "Reviews succesfully assigned" })
+            await this.fetchAssignment()
         },
         async submitAllFilledReviews() {
             const res = await api.reviewofsubmissions.submitAll(this.$route.params.assignmentId)

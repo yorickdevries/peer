@@ -22,6 +22,8 @@ import ReviewOfReview from "../models/ReviewOfReview";
 import makeGradeSummaries from "../util/makeGradeSummary";
 import exportJSONToFile from "../util/exportJSONToFile";
 import parseReviewsForExport from "../util/parseReviewsForExport";
+import CheckboxQuestion from "../models/CheckboxQuestion";
+import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 
 const router = express.Router();
 
@@ -609,6 +611,23 @@ router.post(
         .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
       return;
     }
+    // check whether there is a question without option:
+    for (const question of questionnaire.questions) {
+      if (
+        question instanceof CheckboxQuestion ||
+        question instanceof MultipleChoiceQuestion
+      ) {
+        if (question.options.length === 0) {
+          res
+            .status(HttpStatusCode.FORBIDDEN)
+            .send(
+              "One of the questions in the questionnaire doesn't have options"
+            );
+          return;
+        }
+      }
+    }
+
     // check for existing reviews
     const existingReviews = await questionnaire.getReviews();
     if (existingReviews.length > 0) {
