@@ -19,6 +19,7 @@ import {
   IsPositive,
   IsDate,
   IsUrl,
+  IsEnum,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import Group from "./Group";
@@ -32,6 +33,7 @@ import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
 import _ from "lodash";
+import Extensions from "../enum/Extensions";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -139,9 +141,10 @@ export default class Assignment extends BaseModel {
   @IsDefined()
   @IsString()
   @IsNotEmpty()
+  @IsEnum(Extensions)
   // can be in the form: ".pdf,.zip,.doc,.docx"
   // needs later to be revised to a list of strings
-  submissionExtensions: string;
+  submissionExtensions: Extensions;
 
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
@@ -177,7 +180,7 @@ export default class Assignment extends BaseModel {
     externalLink: string | null,
     submissionQuestionnaire: SubmissionQuestionnaire | null,
     reviewQuestionnaire: ReviewQuestionnaire | null,
-    submissionExtensions: string
+    submissionExtensions: Extensions
   ) {
     super();
     this.name = name;

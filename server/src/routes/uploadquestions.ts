@@ -12,6 +12,7 @@ import ResponseMessage from "../enum/ResponseMessage";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { AssignmentState } from "../enum/AssignmentState";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
+import Extensions from "../enum/Extensions";
 
 const router = express.Router();
 
@@ -50,7 +51,7 @@ const questionSchema = Joi.object({
   number: Joi.number().integer().required(),
   optional: Joi.boolean().required(),
   questionnaireId: Joi.number().integer().required(),
-  extensions: Joi.string().required(),
+  extensions: Joi.string().valid(...Object.values(Extensions)),
 });
 // post a question
 router.post("/", validateBody(questionSchema), async (req, res) => {
@@ -104,7 +105,7 @@ const questionPatchSchema = Joi.object({
   text: Joi.string().required(),
   number: Joi.number().integer().required(),
   optional: Joi.boolean().required(),
-  extensions: Joi.string().required(),
+  extensions: Joi.string().valid(...Object.values(Extensions)),
 });
 // patch a question
 router.patch(
