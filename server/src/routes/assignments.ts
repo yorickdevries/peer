@@ -543,6 +543,13 @@ router.patch(
         .send("The assignment is not in unpublished state");
       return;
     }
+    const submissions = await assignment.getLatestSubmissionsOfEachGroup();
+    if (submissions.length === 0) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("There are no submissions for this assignment");
+      return;
+    }
     assignment.state = AssignmentState.WAITING_FOR_REVIEW;
     await assignment.save();
     res.send(assignment);
