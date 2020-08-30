@@ -81,6 +81,35 @@
                                             </b-modal>
                                         </div>
 
+                                        <!--Close submission stage-->
+                                        <div v-if="assignment.state === 'submission'">
+                                            <dt>Close submission state</dt>
+                                            <dd>Close the assignment for receiving submissions</dd>
+                                            <b-button
+                                                v-b-modal="'closeSubmission'"
+                                                class="mb-3"
+                                                variant="primary"
+                                                size="sm"
+                                                >Close submission
+                                            </b-button>
+                                            <b-modal
+                                                id="closeSubmission"
+                                                @ok="closeSubmission"
+                                                title="Confirmation"
+                                                centered
+                                            >
+                                                Are you sure you want to close the submission state?
+                                                <ul>
+                                                    <li>
+                                                        After this no new submissions can be made by students anymore.
+                                                    </li>
+                                                    <li>
+                                                        After this the groups cannot be changed anymore
+                                                    </li>
+                                                </ul>
+                                            </b-modal>
+                                        </div>
+
                                         <!--Shuffling-->
                                         <dt>Distribute Reviews</dt>
                                         <dd>
@@ -273,6 +302,11 @@ export default {
         async publishAssignment() {
             await api.assignments.publish(this.$route.params.assignmentId)
             this.showSuccessMessage({ message: "Assignment succesfully published" })
+            await this.fetchAssignment()
+        },
+        async closeSubmission() {
+            await api.assignments.closeSubmission(this.$route.params.assignmentId)
+            this.showSuccessMessage({ message: "Assignment succesfully closed" })
             await this.fetchAssignment()
         },
         async distributeReviews() {
