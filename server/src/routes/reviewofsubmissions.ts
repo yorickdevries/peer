@@ -349,11 +349,9 @@ router.get("/:id/filemetadata", validateParams(idSchema), async (req, res) => {
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
-  const assignmentState = assignment.getState();
   if (
     (await review.isReviewer(user)) &&
-    (assignmentState === AssignmentState.REVIEW ||
-      assignmentState === AssignmentState.FEEDBACK)
+    assignment.isAtOrAfterState(AssignmentState.REVIEW)
   ) {
     // replace the filename with "File" before sending
     file.name = "File";
@@ -363,7 +361,7 @@ router.get("/:id/filemetadata", validateParams(idSchema), async (req, res) => {
   // reviewed user should access the review when getting feedback and the review is finished
   if (
     (await review.isReviewed(user)) &&
-    assignmentState === AssignmentState.FEEDBACK &&
+    assignment.isAtState(AssignmentState.FEEDBACK) &&
     review.submitted
   ) {
     res.send(file);
