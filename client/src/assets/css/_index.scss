@@ -35,6 +35,9 @@ $navbar-dark-active-color:          rgba(#FFFFFF, 1);
 @import '~bootstrap';            // Bootstrap
 @import '~bootstrap-vue';     // Bootstrap-Vue
 
+// Import Font Awesome
+@import '~@fortawesome/fontawesome-free/css/all.css';
+
 /**
   ======================
   Non-Bootstrap CSS

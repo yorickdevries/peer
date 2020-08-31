@@ -168,7 +168,7 @@ export default {
         blockQuestionnaireEditing() {
             // block edit in case the reviews have already been published
             if (this.assignment) {
-                return new Date() > new Date(this.assignment.reviewPublishDate)
+                return this.assignment.state === "review" || this.assignment.state === "feedback"
             } else {
                 return true
             }

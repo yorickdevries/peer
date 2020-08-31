@@ -18,9 +18,9 @@ export default {
         const body = { approvalByTA }
         return client.patch(`reviewofsubmissions/${id}/approval`, body)
     },
-    submitAll(assignmentId) {
+    openFeedback(assignmentId) {
         const params = { assignmentId }
-        return client.patch("reviewofsubmissions/submitall", null, { params: params })
+        return client.patch("reviewofsubmissions/openfeedback", null, { params: params })
     },
     getAnswers(id) {
         return client.get(`reviewofsubmissions/${id}/answers`)

@@ -10,7 +10,7 @@ import fs from "fs";
 import path from "path";
 import { advanceTo, clear } from "jest-date-mock";
 
-describe("Integration", () => {
+describe("Group import", () => {
   // will be initialized and closed in beforeAll / afterAll
   let connection: Connection;
   let server: http.Server;

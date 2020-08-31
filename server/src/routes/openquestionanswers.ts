@@ -7,7 +7,6 @@ import ResponseMessage from "../enum/ResponseMessage";
 import Review from "../models/Review";
 import { AssignmentState } from "../enum/AssignmentState";
 import OpenQuestionAnswer from "../models/OpenQuestionAnswer";
-import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import moment from "moment";
 import { getManager } from "typeorm";
@@ -59,15 +58,6 @@ router.post("/", validateBody(openAnswerSchema), async (req, res) => {
     return;
   }
   const assignment = await questionnaire.getAssignment();
-  if (
-    questionnaire instanceof SubmissionQuestionnaire &&
-    !assignment.isAtState(AssignmentState.REVIEW)
-  ) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("The assignment is not in reviewstate");
-    return;
-  }
   if (
     questionnaire instanceof ReviewQuestionnaire &&
     !(

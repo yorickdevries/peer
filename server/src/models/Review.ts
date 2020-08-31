@@ -13,7 +13,6 @@ import User from "./User";
 import ReviewType from "../enum/ReviewType";
 import Questionnaire from "./Questionnaire";
 import UserRole from "../enum/UserRole";
-import _ from "lodash";
 import QuestionAnswer from "./QuestionAnswer";
 import Question from "./Question";
 
@@ -250,11 +249,8 @@ export default abstract class Review extends BaseModel {
   }
 
   async getAnswer(question: Question): Promise<QuestionAnswer | undefined> {
-    const questionAnswers = this.questionAnswers
-      ? this.questionAnswers
-      : await this.getQuestionAnswers();
-    return _.find(questionAnswers, (questionAnswer) => {
-      return questionAnswer.questionId === question.id;
+    return QuestionAnswer.findOne({
+      where: { review: this, question: question },
     });
   }
 }

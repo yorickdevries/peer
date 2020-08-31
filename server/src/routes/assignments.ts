@@ -71,7 +71,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   }
   if (
     (await assignment.isEnrolledInGroup(user)) &&
-    (await assignment.getState()) === AssignmentState.UNPUBLISHED
+    (await assignment.isAtState(AssignmentState.UNPUBLISHED))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
@@ -105,7 +105,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   }
   if (
     (await assignment.isEnrolledInGroup(user)) &&
-    (await assignment.getState()) === AssignmentState.UNPUBLISHED
+    (await assignment.isAtState(AssignmentState.UNPUBLISHED))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
@@ -487,6 +487,75 @@ router.patch(
   }
 );
 
+// publish an assignment from unpublished state
+router.patch("/:id/publish", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  const assignmentId = req.params.id;
+  const assignment = await Assignment.findOne(assignmentId);
+  if (!assignment) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+    return;
+  }
+  if (!(await assignment.isTeacherInCourse(user))) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("User is not a teacher of the course");
+    return;
+  }
+  if (!assignment.isAtState(AssignmentState.UNPUBLISHED)) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("The assignment is not in unpublished state");
+    return;
+  }
+  assignment.state = AssignmentState.SUBMISSION;
+  await assignment.save();
+  res.send(assignment);
+});
+
+// close an assignment from submission state
+router.patch(
+  "/:id/closesubmission",
+  validateParams(idSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const assignmentId = req.params.id;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (!(await assignment.isTeacherInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not a teacher of the course");
+      return;
+    }
+    if (!assignment.isAtState(AssignmentState.SUBMISSION)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is not in submission state");
+      return;
+    }
+    const submissions = await assignment.getLatestSubmissionsOfEachGroup();
+    if (submissions.length === 0) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("There are no submissions for this assignment");
+      return;
+    }
+    assignment.state = AssignmentState.WAITING_FOR_REVIEW;
+    await assignment.save();
+    res.send(assignment);
+  }
+);
+
 router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
@@ -509,21 +578,15 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   await getManager().transaction(
     "SERIALIZABLE",
     async (transactionalEntityManager) => {
-      // find all groups to check for group existence
-      const allGroups = await transactionalEntityManager.find(Group, {
-        relations: ["users", "assignments"],
-      });
-      const alreadyExists = _.some(allGroups, (group) => {
-        return (
-          _.some(group.users, (groupUser) => {
-            return groupUser.netid === user.netid;
-          }) &&
-          _.some(group.assignments, (groupAssignment) => {
-            return groupAssignment.id === assignment.id;
-          })
-        );
-      });
-      if (alreadyExists) {
+      // get group
+      const existingGroup = await transactionalEntityManager
+        .createQueryBuilder(Group, "group")
+        .leftJoin("group.assignments", "assignment")
+        .leftJoin("group.users", "user")
+        .where("assignment.id = :id", { id: assignment.id })
+        .andWhere("user.netid = :netid", { netid: user.netid })
+        .getOne();
+      if (existingGroup) {
         // throw error if a group already exists
         // Can happen if 2 concurrent calls are made
         throw new Error("Group already exists");

@@ -8,6 +8,7 @@ import {
   JoinColumn,
   OneToMany,
   RelationId,
+  getManager,
 } from "typeorm";
 import {
   IsDefined,
@@ -66,6 +67,11 @@ export default class Assignment extends BaseModel {
   @IsDefined()
   @IsBoolean()
   reviewEvaluation: boolean;
+
+  @Column()
+  @IsDefined()
+  @IsEnum(AssignmentState)
+  state: AssignmentState;
 
   // publish_date timestamptz NOT NULL,
   @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
@@ -188,6 +194,7 @@ export default class Assignment extends BaseModel {
     this.reviewsPerUser = reviewsPerUser;
     this.enrollable = enrollable;
     this.reviewEvaluation = reviewEvaluation;
+    this.state = AssignmentState.UNPUBLISHED; // initial state
     this.publishDate = publishDate;
     this.dueDate = dueDate;
     this.reviewPublishDate = reviewPublishDate;
@@ -212,7 +219,10 @@ export default class Assignment extends BaseModel {
         "reviewEvaluationDueDate is defined while reviewEvaluation is turned off"
       );
     }
-    if (!this.reviewEvaluation && this.reviewQuestionnaire) {
+    if (
+      !this.reviewEvaluation &&
+      (this.reviewQuestionnaire || this.reviewQuestionnaireId)
+    ) {
       throw new Error(
         "reviewQuestionnaire is defined while reviewEvaluation is turned off"
       );
@@ -231,35 +241,19 @@ export default class Assignment extends BaseModel {
     return super.validateOrReject();
   }
 
-  // check whether the user is enrolled in this assignment
-  getState(): AssignmentState {
-    if (moment().isBefore(this.publishDate)) {
-      return AssignmentState.UNPUBLISHED;
-    } else if (moment().isBefore(this.dueDate)) {
-      return AssignmentState.SUBMISSION;
-    } else if (moment().isBefore(this.reviewPublishDate)) {
-      return AssignmentState.WAITING_FOR_REVIEW;
-    } else if (moment().isBefore(this.reviewDueDate)) {
-      return AssignmentState.REVIEW;
-    } else {
-      return AssignmentState.FEEDBACK;
-    }
-  }
-
   isAtState(otherState: AssignmentState): boolean {
-    const currentState = this.getState();
-    return currentState === otherState;
+    return this.state === otherState;
   }
 
   isAtOrAfterState(otherState: AssignmentState): boolean {
-    const currentState = this.getState();
+    const currentState = this.state;
     const currentStateIndex = assignmentStateOrder.indexOf(currentState);
     const otherStateIndex = assignmentStateOrder.indexOf(otherState);
     return currentStateIndex >= otherStateIndex;
   }
 
   isAtOrBeforeState(otherState: AssignmentState): boolean {
-    const currentState = this.getState();
+    const currentState = this.state;
     const currentStateIndex = assignmentStateOrder.indexOf(currentState);
     const otherStateIndex = assignmentStateOrder.indexOf(otherState);
     return currentStateIndex <= otherStateIndex;
@@ -270,12 +264,12 @@ export default class Assignment extends BaseModel {
   }
 
   async getGroups(): Promise<Group[]> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Assignment.findOneOrFail(this.id, {
-        relations: ["groups"],
-      })
-    ).groups!;
+    const groups = await getManager()
+      .createQueryBuilder(Group, "group")
+      .leftJoin("group.assignments", "assignment")
+      .where("assignment.id = :id", { id: this.id })
+      .getMany();
+    return groups;
   }
 
   async getSubmissionQuestionnaire(): Promise<SubmissionQuestionnaire | null> {
@@ -332,13 +326,14 @@ export default class Assignment extends BaseModel {
   }
 
   async getGroup(user: User): Promise<Group | undefined> {
-    const groups = await this.getGroups();
-    for (const group of groups) {
-      if (await group.hasUser(user)) {
-        return group;
-      }
-    }
-    return undefined;
+    const group = await getManager()
+      .createQueryBuilder(Group, "group")
+      .leftJoin("group.assignments", "assignment")
+      .leftJoin("group.users", "user")
+      .where("assignment.id = :id", { id: this.id })
+      .andWhere("user.netid = :netid", { netid: user.netid })
+      .getOne();
+    return group;
   }
 
   // check whether the assignment is enrollable for a user

@@ -8,6 +8,12 @@ export default {
     get(id) {
         return client.get(`assignments/${id}`)
     },
+    publish(id) {
+        return client.patch(`assignments/${id}/publish`)
+    },
+    closeSubmission(id) {
+        return client.patch(`assignments/${id}/closesubmission`)
+    },
     getGroup(id) {
         return client.get(`assignments/${id}/group`)
     },

@@ -244,7 +244,7 @@ router.patch(
       const submissions = await assignment.getSubmissions();
       if (
         _.some(submissions, (submission) => {
-          return submission.userNetid === user.netid;
+          return submission.userNetid === removedUser.netid;
         })
       ) {
         res
@@ -305,13 +305,7 @@ router.post(
         .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
       return;
     }
-    const assignmentState = await assignment.getState();
-    if (
-      !(
-        assignmentState === AssignmentState.UNPUBLISHED ||
-        assignmentState === AssignmentState.SUBMISSION
-      )
-    ) {
+    if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The submission state has passed");
@@ -382,14 +376,11 @@ router.post(
     await getManager().transaction(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const existingGroups = (
-          await transactionalEntityManager.findOneOrFail(
-            Assignment,
-            assignment.id,
-            { relations: ["groups"] }
-          )
-        ).groups!;
+        const existingGroups = await transactionalEntityManager
+          .createQueryBuilder(Group, "group")
+          .leftJoin("group.assignments", "assignment")
+          .where("assignment.id = :id", { id: assignment.id })
+          .getMany();
         if (existingGroups.length > 0) {
           throw new Error("There are already groups for this assignment");
         }
@@ -453,13 +444,7 @@ router.post("/", validateBody(groupSchema), async (req, res) => {
       .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
     return;
   }
-  const assignmentState = await assignment.getState();
-  if (
-    !(
-      assignmentState === AssignmentState.UNPUBLISHED ||
-      assignmentState === AssignmentState.SUBMISSION
-    )
-  ) {
+  if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("The submission state has passed");
@@ -516,13 +501,7 @@ router.post(
         .send("Both assignments should be from the same course");
       return;
     }
-    const assignmentState = await assignment.getState();
-    if (
-      !(
-        assignmentState === AssignmentState.UNPUBLISHED ||
-        assignmentState === AssignmentState.SUBMISSION
-      )
-    ) {
+    if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The submission state has passed");
@@ -540,16 +519,11 @@ router.post(
     await getManager().transaction(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const existingGroups = (
-          await transactionalEntityManager.findOneOrFail(
-            Assignment,
-            assignment.id,
-            {
-              relations: ["groups"],
-            }
-          )
-        ).groups!;
+        const existingGroups = await transactionalEntityManager
+          .createQueryBuilder(Group, "group")
+          .leftJoin("group.assignments", "assignment")
+          .where("assignment.id = :id", { id: assignment.id })
+          .getMany();
         if (existingGroups.length > 0) {
           throw new Error("There are already groups for this assignment");
         }

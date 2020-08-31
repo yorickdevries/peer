@@ -28,13 +28,11 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   // students can only access it when the assignment is in review state
   const questionnaire = await question.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
-  const assignmentState = assignment.getState();
   if (
     !(await questionnaire.isTeacherInCourse(user)) &&
     !(
       (await assignment.isEnrolledInGroup(user)) &&
-      (assignmentState === AssignmentState.REVIEW ||
-        assignmentState === AssignmentState.FEEDBACK)
+      assignment.isAtOrAfterState(AssignmentState.REVIEW)
     )
   ) {
     res

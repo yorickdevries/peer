@@ -31,13 +31,11 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   }
   // students can only access it when the assignment is in review state
   const assignment = await questionnaire.getAssignment();
-  const assignmentState = assignment.getState();
   if (
     !(await questionnaire.isTeacherOrTeachingAssistantInCourse(user)) &&
     !(
       (await assignment.isEnrolledInGroup(user)) &&
-      (assignmentState === AssignmentState.REVIEW ||
-        assignmentState === AssignmentState.FEEDBACK)
+      assignment.isAtOrAfterState(AssignmentState.REVIEW)
     )
   ) {
     res
@@ -184,13 +182,7 @@ router.get("/:id/reviews", validateParams(idSchema), async (req, res) => {
     return;
   }
   const assignment = await questionnaire.getAssignment();
-  const assignmentState = assignment.getState();
-  if (
-    !(
-      assignmentState === AssignmentState.REVIEW ||
-      assignmentState === AssignmentState.FEEDBACK
-    )
-  ) {
+  if (!assignment.isAtOrAfterState(AssignmentState.REVIEW)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not allowed to view reviews");

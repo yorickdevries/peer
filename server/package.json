@@ -7,6 +7,7 @@
     "start": "node ./dist/bin/www.js",
     "dev": "nodemon",
     "migratesubmissionextensions": "ts-node ./src/migrateSubmissionExtensions.ts",
+    "migrateassignmentstate": "ts-node ./src/migrateAssignmentState.ts",
     "lint": "eslint . --ext .ts",
     "lint-fix": "eslint . --ext .ts --fix",
     "test": "jest ./tests",
