@@ -10,7 +10,7 @@
                         <dd>The download for the submission this review is about.</dd>
                         <a target="_blank" :href="reviewFilePath">
                             <button type="button" class="btn btn-success success w-100" style="height: 3rem">
-                                Download Submission
+                                Download Submission ({{ reviewFileName }})
                             </button>
                         </a>
                     </dl>
@@ -35,6 +35,8 @@
                 </dl>
             </b-col>
         </b-row>
+        <PDFAnnotator v-if="fileMetadata.extension === '.pdf'" :reviewId="reviewId" :readOnly="false"></PDFAnnotator>
+
         <!--Form, load only when answers are available-->
         <b-card v-if="answers" no-body class="mt-3">
             <!--Title-->
@@ -209,13 +211,15 @@ import api from "../../../api/api"
 import _ from "lodash"
 import notifications from "../../../mixins/notifications"
 import { StarRating } from "vue-rate-it"
+import PDFAnnotator from "./PDFAnnotator"
 
 export default {
     mixins: [notifications],
-    components: { StarRating },
+    components: { StarRating, PDFAnnotator },
     props: ["reviewId", "reviewsAreReadOnly"],
     data() {
         return {
+            fileMetadata: null,
             review: {},
             questionnaire: {},
             // all answers will be saved in this object
@@ -235,6 +239,9 @@ export default {
         reviewFilePath() {
             // Get the submission file path.
             return `/api/reviewofsubmissions/${this.review.id}/file`
+        },
+        reviewFileName() {
+            return this.fileMetadata.name + this.fileMetadata.extension
         }
     },
     async created() {
@@ -242,9 +249,14 @@ export default {
     },
     methods: {
         async fetchData() {
+            await this.fetchFileMetadata()
             await this.fetchReview()
             await this.fetchSubmissionQuestionnaire()
             await this.fetchAnswers()
+        },
+        async fetchFileMetadata() {
+            const res = await api.reviewofsubmissions.getFileMetadata(this.reviewId)
+            this.fileMetadata = res.data
         },
         async fetchReview() {
             const res = await api.reviewofsubmissions.get(this.reviewId)

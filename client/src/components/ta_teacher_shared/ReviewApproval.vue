@@ -59,11 +59,6 @@
                             </dl>
                         </b-col>
                     </b-row>
-                    <PDFAnnotator
-                        v-if="fileMetadata.extension === '.pdf'"
-                        :reviewId="$route.params.reviewId"
-                        :readOnly="true"
-                    ></PDFAnnotator>
 
                     <!--See Review Evaluation is exist-->
                     <b-row v-if="reviewEvaluation">
@@ -83,6 +78,16 @@
                             >
                                 <ReviewEvaluation :feedbackReviewId="review.id"></ReviewEvaluation>
                             </b-modal>
+                        </b-col>
+                    </b-row>
+
+                    <b-row>
+                        <b-col>
+                            <PDFAnnotator
+                                v-if="fileMetadata.extension === '.pdf'"
+                                :reviewId="$route.params.reviewId"
+                                :readOnly="true"
+                            ></PDFAnnotator>
                         </b-col>
                     </b-row>
                 </b-card-body>
