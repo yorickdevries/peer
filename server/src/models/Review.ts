@@ -13,7 +13,6 @@ import User from "./User";
 import ReviewType from "../enum/ReviewType";
 import Questionnaire from "./Questionnaire";
 import UserRole from "../enum/UserRole";
-import _ from "lodash";
 import QuestionAnswer from "./QuestionAnswer";
 import Question from "./Question";
 
