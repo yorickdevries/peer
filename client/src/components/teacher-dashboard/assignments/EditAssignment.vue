@@ -197,6 +197,10 @@
                                 label="Allowed submission file extensions"
                                 description="The extensions for the submission files that are allowed."
                             >
+                                <b-alert v-if="assignment.submissionExtensions !== '.pdf'" variant="danger" show>
+                                    It is advised to choose '.pdf' as extension because only those files can be directly
+                                    annotated within this website
+                                </b-alert>
                                 <b-form-select
                                     :options="extensionTypes"
                                     v-model="assignment.submissionExtensions"
