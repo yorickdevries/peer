@@ -834,6 +834,34 @@ describe("Integration", () => {
       flaggedByReviewer: false,
     });
 
+    // get the reviews the other student needs to do
+    res = await request(server)
+      .get(
+        `/api/submissionquestionnaires/${submissionQuestionnaire.id}/reviews`
+      )
+      .set("cookie", await studentCookie2());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    // 1 review is present
+    const reviews2 = JSON.parse(res.text);
+    expect(reviews2.length).toBe(1);
+    const review2 = reviews2[0];
+
+    //flag a review
+    res = await request(server)
+      .patch(`/api/reviewofsubmissions/${review2.id}`)
+      .send({
+        submitted: true,
+        flaggedByReviewer: true,
+      })
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject({
+      id: review2.id,
+      submitted: true,
+      flaggedByReviewer: true,
+    });
+
     // get the current answers for the review
     res = await request(server)
       .get(`/api/reviewofsubmissions/${review.id}/answers`)
