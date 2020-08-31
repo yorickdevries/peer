@@ -16,7 +16,6 @@ import User from "../models/User";
 import Submission from "../models/Submission";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { getManager } from "typeorm";
-import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
 import ReviewOfReview from "../models/ReviewOfReview";
 import makeGradeSummaries from "../util/makeGradeSummary";
@@ -24,6 +23,7 @@ import exportJSONToFile from "../util/exportJSONToFile";
 import parseReviewsForExport from "../util/parseReviewsForExport";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
+import Review from "../models/Review";
 
 const router = express.Router();
 
@@ -707,15 +707,9 @@ router.post(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const existingReviews = (
-          await transactionalEntityManager.findOneOrFail(
-            SubmissionQuestionnaire,
-            questionnaire.id,
-            {
-              relations: ["reviews"],
-            }
-          )
-        ).reviews!;
+        const existingReviews = await transactionalEntityManager.find(Review, {
+          where: { questionnaire: questionnaire },
+        });
         if (existingReviews.length > 0) {
           throw new Error("There are already reviews for this assignment");
         }
