@@ -89,6 +89,20 @@ const migrateDB = async function (): Promise<void> {
         }
       }
     }
+    const reviewQuestionnaire = await assignment.getReviewQuestionnaire();
+    if (assignment.reviewEvaluation && !reviewQuestionnaire) {
+      // should never happen due to forced creation
+      throw new Error("No evaluation while it is needed!");
+    }
+    if (assignment.reviewEvaluation && !assignment.reviewQuestionnaireId) {
+      // should never happen due to forced creation
+      throw new Error("No evaluationid while it is needed!");
+    }
+    if (!assignment.reviewEvaluation && reviewQuestionnaire) {
+      // should never happen due to forced creation
+      throw new Error("evaluation exists while not needed");
+    }
+
     // console.log(assignment.id);
     // if (
     //   state === AssignmentState.UNPUBLISHED ||
