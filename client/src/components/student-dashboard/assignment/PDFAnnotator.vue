@@ -7,7 +7,7 @@
             The review is submitted, any annotations will not be saved</b-alert
         >
         <!--Annotation view-->
-        <div id="adobe-dc-view" style="height: 1000px">
+        <div :id="pdfDivId" style="height: 1000px">
             <b-alert show variant="primary">LOADING REVIEW PDF</b-alert>
         </div>
     </div>
@@ -18,6 +18,7 @@ import api from "../../../api/api"
 import axios from "axios"
 
 export default {
+    // either "reviewId" or "submissionId" is passed, not both
     props: ["reviewId", "submissionId", "readOnly"],
     data() {
         return {
@@ -28,7 +29,8 @@ export default {
                     : "b3c8121ca4ba4dd0af5424097b94538d",
             review: null,
             submission: null,
-            fileMetadata: null
+            fileMetadata: null,
+            pdfDivId: null
         }
     },
     computed: {
@@ -50,6 +52,8 @@ export default {
         await this.fetchReview()
         await this.fetchSubmission()
         await this.fetchFileMetadata()
+        // generate random number for id
+        this.pdfDivId = "adobe-dc-view-" + String(Math.floor(Math.random() * Math.pow(10, 9)))
         this.renderPDF()
     },
     methods: {
@@ -82,6 +86,7 @@ export default {
 
             // get fields into constants
             const clientId = this.adobeDCViewClientId
+            const pdfDivId = this.pdfDivId
             // set as null when review is not known
             const review = this.review
             const submission = this.submission
@@ -106,7 +111,7 @@ export default {
                 // eslint-disable-next-line no-undef
                 const adobeDCView = new AdobeDC.View({
                     clientId: clientId,
-                    divId: "adobe-dc-view"
+                    divId: pdfDivId
                 })
 
                 // Set user profile
