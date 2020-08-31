@@ -6,6 +6,7 @@ import {
   JoinTable,
   RelationId,
   ManyToOne,
+  getManager,
 } from "typeorm";
 import { IsDefined, IsString, IsNotEmpty } from "class-validator";
 import BaseModel from "./BaseModel";
@@ -34,7 +35,7 @@ export default class Group extends BaseModel {
   course?: Course;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @ManyToMany((_type) => User)
+  @ManyToMany((_type) => User, (user) => user.groups)
   @JoinTable()
   users?: User[];
 
@@ -85,21 +86,22 @@ export default class Group extends BaseModel {
   }
 
   async getUsers(): Promise<User[]> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Group.findOneOrFail(this.id, {
-        relations: ["users"],
-      })
-    ).users!;
+    const users = await getManager()
+      .createQueryBuilder(User, "user")
+      .leftJoin("user.groups", "group")
+      .where("group.id = :id", { id: this.id })
+      .getMany();
+
+    return users;
   }
 
   async getAssignments(): Promise<Assignment[]> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Group.findOneOrFail(this.id, {
-        relations: ["assignments"],
-      })
-    ).assignments!;
+    const assignments = await getManager()
+      .createQueryBuilder(Assignment, "assignment")
+      .leftJoin("assignment.groups", "group")
+      .where("group.id = :id", { id: this.id })
+      .getMany();
+    return assignments;
   }
 
   async hasUser(user: User): Promise<boolean> {

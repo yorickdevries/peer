@@ -8,6 +8,7 @@ import {
   JoinColumn,
   OneToMany,
   RelationId,
+  getManager,
 } from "typeorm";
 import {
   IsDefined,
@@ -260,12 +261,12 @@ export default class Assignment extends BaseModel {
   }
 
   async getGroups(): Promise<Group[]> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Assignment.findOneOrFail(this.id, {
-        relations: ["groups"],
-      })
-    ).groups!;
+    const groups = await getManager()
+      .createQueryBuilder(Group, "group")
+      .leftJoin("group.assignments", "assignment")
+      .where("assignment.id = :id", { id: this.id })
+      .getMany();
+    return groups;
   }
 
   async getSubmissionQuestionnaire(): Promise<SubmissionQuestionnaire | null> {
@@ -322,13 +323,14 @@ export default class Assignment extends BaseModel {
   }
 
   async getGroup(user: User): Promise<Group | undefined> {
-    const groups = await this.getGroups();
-    for (const group of groups) {
-      if (await group.hasUser(user)) {
-        return group;
-      }
-    }
-    return undefined;
+    const group = await getManager()
+      .createQueryBuilder(Group, "group")
+      .leftJoin("group.assignments", "assignment")
+      .leftJoin("group.users", "user")
+      .where("assignment.id = :id", { id: this.id })
+      .andWhere("user.netid = :netid", { netid: user.netid })
+      .getOne();
+    return group;
   }
 
   // check whether the assignment is enrollable for a user
