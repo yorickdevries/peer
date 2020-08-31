@@ -12,6 +12,8 @@ import File from "../../src/models/File";
 import generateDistribution from "../../src/util/reviewDistribution";
 import Enrollment from "../../src/models/Enrollment";
 import UserRole from "../../src/enum/UserRole";
+import { AssignmentState } from "../../src/enum/AssignmentState";
+import Extensions from "../../src/enum/Extensions";
 
 describe("Review distribution", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -60,8 +62,11 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null
+      null,
+      Extensions.PDF
     );
+    await assignment.save();
+    assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
 
     // students
@@ -157,8 +162,11 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null
+      null,
+      Extensions.PDF
     );
+    await assignment.save();
+    assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
 
     // students
@@ -260,8 +268,11 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null
+      null,
+      Extensions.PDF
     );
+    await assignment.save();
+    assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
 
     const student1 = new User(`student1`);

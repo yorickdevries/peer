@@ -15,6 +15,7 @@ import Affiliation from "./Affiliation";
 import Study from "./Study";
 import OrganisationUnit from "./OrganisationUnit";
 import parseNetID from "../util/parseNetID";
+import Group from "./Group";
 
 @Entity()
 export default class User extends BaseModel {
@@ -85,6 +86,11 @@ export default class User extends BaseModel {
   })
   @JoinTable()
   organisationUnit: OrganisationUnit[];
+
+  // User groups
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @ManyToMany((_type) => Group, (group) => group.users)
+  groups?: Group[];
 
   constructor(
     netid: string,

@@ -1,18 +1,15 @@
 import express from "express";
 import User from "../models/User";
-import { validateParams } from "../middleware/validation";
-import Joi from "@hapi/joi";
+import { validateParams, idStringSchema } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import _ from "lodash";
 import checkEmployee from "../middleware/authentication/checkEmployee";
 const router = express.Router();
 
-// Joi inputvalidation
-const netidSchema = Joi.object({ netid: Joi.string().required() });
 router.get(
   "/:netid",
   checkEmployee,
-  validateParams(netidSchema),
+  validateParams(idStringSchema),
   async (req, res) => {
     const user = await User.findOne(req.params.netid);
     if (!user) {

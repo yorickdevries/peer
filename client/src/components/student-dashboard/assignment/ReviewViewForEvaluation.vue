@@ -1,68 +1,22 @@
+<!--This extra file doesn't import review evaluation and will therefore not lead to circular referencing-->
 <template>
     <div>
-        <!--See Review-->
         <b-row>
-            <b-col>
-                <b-button
-                    v-b-modal="`reviewModal${feedbackReviewId}`"
-                    variant="success"
-                    class="w-100"
-                    style="height: 3rem"
-                >
-                    Show Review (ID: {{ feedbackReviewId }})
-                </b-button>
-                <b-modal
-                    :title="`Review (ID: ${feedbackReviewId})`"
-                    :id="`reviewModal${feedbackReviewId}`"
-                    size="lg"
-                    hide-footer
-                >
-                    <b-alert variant="info" show>
-                        This is a review you have received from one of your peers on your submission.
-                    </b-alert>
-                    <ReviewViewForEvaluation
-                        :reviewId="feedbackReviewId"
-                        :reviewsAreReadOnly="true"
-                    ></ReviewViewForEvaluation>
-                </b-modal>
-            </b-col>
-        </b-row>
-        <br />
-
-        <!--Button/info if no evaluation exists yet.-->
-        <div v-if="!review">
-            <b-alert show variant="info">
-                You can give an evaluation of a review that you have received by clicking the button down below.
-                <br />
-                <b>Note: Only one member of your group can evaluate this review.</b>
-                <div>
-                    <b-button @click="createEvaluation()" variant="primary" class="mt-2">
-                        I want to evaluate this review
-                    </b-button>
-                </div>
-            </b-alert>
-        </div>
-        <div v-else>
-            <!--Notification if owner-->
-            <b-alert v-if="userIsOwner" variant="secondary" show>
-                You are the owner of this evaluation. You can change or submit this evaluation.
-            </b-alert>
-            <b-alert v-else variant="secondary" show>
-                Another group member ({{ review.reviewerNetid }}) is the owner of this evaluation. Only they can change
-                or submit this evaluation.
-            </b-alert>
-            <!--Notification if submitted-->
-            <b-alert v-if="review.submitted" variant="success" show>
-                This evaluation has been submitted.
-            </b-alert>
-            <b-alert v-else variant="danger" show>
-                This evaluation has not yet been submitted.
-            </b-alert>
-        </div>
-
-        <b-row v-if="review">
             <!--Download-->
-            <b-col cols="6" />
+            <b-col cols="6">
+                <div>
+                    <dl>
+                        <dt>Download</dt>
+                        <dd>The download for the submission this review is about.</dd>
+                        <a target="_blank" :href="reviewFilePath">
+                            <button type="button" class="btn btn-success success w-100" style="height: 3rem">
+                                Download Submission ({{ reviewFileName }})
+                            </button>
+                        </a>
+                    </dl>
+                </div>
+            </b-col>
+
             <!--Approval-->
             <b-col cols="6">
                 <dl>
@@ -81,15 +35,22 @@
                 </dl>
             </b-col>
         </b-row>
+        <b-row>
+            <b-col>
+                <PDFAnnotator
+                    v-if="fileMetadata.extension === '.pdf'"
+                    :reviewId="reviewId"
+                    :readOnly="false"
+                ></PDFAnnotator>
+            </b-col>
+        </b-row>
 
         <!--Form, load only when answers are available-->
         <b-card v-if="answers" no-body class="mt-3">
             <!--Title-->
             <b-card-body v-if="!reviewsAreReadOnly">
-                <h4>Review Evaluation</h4>
-                <h6 class="card-subtitle text-muted">
-                    Evaluate the review you have gotten from one of your peers here.
-                </h6>
+                <h4>Assignment Questionnaire</h4>
+                <h6 class="card-subtitle text-muted">Give the review to one of your peers here.</h6>
             </b-card-body>
 
             <!--Question Information-->
@@ -224,10 +185,10 @@
                             name="reportButton"
                             class="float-left"
                         >
-                            Report this review.
+                            Report this submission.
                         </b-form-checkbox>
                         <br />
-                        <small>Only report if the review is empty or not serious.</small>
+                        <small>Only report if the submission is empty or not serious.</small>
                     </div>
                     <b-button
                         v-if="!review.submitted"
@@ -258,19 +219,17 @@ import api from "../../../api/api"
 import _ from "lodash"
 import notifications from "../../../mixins/notifications"
 import { StarRating } from "vue-rate-it"
-import ReviewViewForEvaluation from "./ReviewViewForEvaluation"
+import PDFAnnotator from "./PDFAnnotator"
 
 export default {
     mixins: [notifications],
-    components: { ReviewViewForEvaluation, StarRating },
-    props: ["feedbackReviewId"],
+    components: { StarRating, PDFAnnotator },
+    props: ["reviewId", "reviewsAreReadOnly"],
     data() {
         return {
-            // current user
-            user: null,
-            // review made as evaluation
-            review: null,
-            questionnaire: null,
+            fileMetadata: null,
+            review: {},
+            questionnaire: {},
             // all answers will be saved in this object
             answers: null
         }
@@ -285,11 +244,12 @@ export default {
             })
             return unSavedAnswers.length > 0
         },
-        userIsOwner() {
-            return this.review.reviewerNetid === this.user.netid
+        reviewFilePath() {
+            // Get the submission file path.
+            return `/api/reviewofsubmissions/${this.review.id}/file`
         },
-        reviewsAreReadOnly() {
-            return !this.userIsOwner
+        reviewFileName() {
+            return this.fileMetadata.name + this.fileMetadata.extension
         }
     },
     async created() {
@@ -297,34 +257,27 @@ export default {
     },
     methods: {
         async fetchData() {
-            await this.fetchUser()
+            await this.fetchFileMetadata()
             await this.fetchReview()
-            if (this.review) {
-                await this.fetchReviewQuestionnaire()
-                await this.fetchAnswers()
-            }
+            await this.fetchSubmissionQuestionnaire()
+            await this.fetchAnswers()
         },
-        async fetchUser() {
-            let res = await api.getMe()
-            this.user = res.data
+        async fetchFileMetadata() {
+            const res = await api.reviewofsubmissions.getFileMetadata(this.reviewId)
+            this.fileMetadata = res.data
         },
         async fetchReview() {
-            // Retrieve the review evaluation.
-            try {
-                const res = await api.reviewofsubmissions.getEvaluation(this.feedbackReviewId)
-                this.review = res.data
-            } catch (error) {
-                this.review = null
-            }
+            const res = await api.reviewofsubmissions.get(this.reviewId)
+            this.review = res.data
         },
-        async fetchReviewQuestionnaire() {
-            const res = await api.reviewquestionnaires.get(this.review.questionnaireId)
+        async fetchSubmissionQuestionnaire() {
+            const res = await api.submissionquestionnaires.get(this.review.questionnaireId)
             this.questionnaire = res.data
         },
         async fetchAnswers() {
             // remove existing answers
             this.answers = null
-            const res = await api.reviewofreviews.getAnswers(this.review.id)
+            const res = await api.reviewofsubmissions.getAnswers(this.reviewId)
             const existingAnswers = res.data
             // construct answer map
             const answers = {}
@@ -370,11 +323,6 @@ export default {
             }
             // set the answer object so all fields are reactive now
             this.answers = answers
-        },
-        async createEvaluation() {
-            await api.reviewofsubmissions.postEvaluation(this.feedbackReviewId)
-            this.showSuccessMessage({ message: "Succesfully created evaluation" })
-            await this.fetchData()
         },
         async saveAnswer(question, answer) {
             switch (question.type) {
@@ -440,12 +388,14 @@ export default {
             this.showSuccessMessage({ message: "Succesfuly deleted answer" })
         },
         async submitReview() {
-            await api.reviewofreviews.patch(this.review.id, true, this.review.flaggedByReviewer)
+            await api.reviewofsubmissions.patch(this.review.id, true, this.review.flaggedByReviewer)
+            this.$emit("reviewChanged")
             this.showSubmitMessage()
             await this.fetchData()
         },
         async unSubmitReview() {
-            await api.reviewofreviews.patch(this.review.id, false, this.review.flaggedByReviewer)
+            await api.reviewofsubmissions.patch(this.review.id, false, this.review.flaggedByReviewer)
+            this.$emit("reviewChanged")
             this.showUnSubmitMessage()
             await this.fetchData()
         },

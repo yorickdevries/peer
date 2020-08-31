@@ -34,7 +34,7 @@
                     <!-- Modal Button -->
                     <b-button
                         v-b-modal="'uploadModal'"
-                        :disabled="new Date() > new Date(assignment.dueDate)"
+                        :disabled="assignment.state !== 'submission'"
                         variant="primary"
                         @click="resetFile"
                         >Upload new Submission</b-button
@@ -46,10 +46,12 @@
                             >If you have already uploaded a file, it will be used for reviewing anymore!
                         </b-alert>
                         <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
-                        <b-alert show variant="secondary">Allowed file types: .pdf/.zip/.doc/.docx</b-alert>
+                        <b-alert show variant="secondary"
+                            >Allowed file types: {{ assignment.submissionExtensions }}</b-alert
+                        >
                         <b-form-file
                             v-model="file"
-                            accept=".pdf,.zip,.doc,.docx"
+                            :accept="assignment.submissionExtensions"
                             placeholder="Choose a file..."
                             required
                             :state="Boolean(file)"

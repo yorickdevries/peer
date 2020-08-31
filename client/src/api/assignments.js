@@ -8,6 +8,12 @@ export default {
     get(id) {
         return client.get(`assignments/${id}`)
     },
+    publish(id) {
+        return client.patch(`assignments/${id}/publish`)
+    },
+    closeSubmission(id) {
+        return client.patch(`assignments/${id}/closesubmission`)
+    },
     getGroup(id) {
         return client.get(`assignments/${id}/group`)
     },
@@ -32,7 +38,8 @@ export default {
         reviewEvaluationDueDate,
         description,
         externalLink,
-        file
+        file,
+        submissionExtensions
     ) {
         // Create formData and append data
         const formData = new FormData()
@@ -59,6 +66,7 @@ export default {
         }
         formData.append("externalLink", externalLink)
         formData.append("file", file)
+        formData.append("submissionExtensions", submissionExtensions)
         return client.post("assignments/", formData)
     },
     patch(
@@ -74,7 +82,8 @@ export default {
         reviewEvaluationDueDate,
         description,
         externalLink,
-        file
+        file,
+        submissionExtensions
     ) {
         // Create formData and append data
         const formData = new FormData()
@@ -103,6 +112,7 @@ export default {
         if (file !== undefined) {
             formData.append("file", file)
         }
+        formData.append("submissionExtensions", submissionExtensions)
         return client.patch(`assignments/${id}`, formData)
     },
     enroll(id) {

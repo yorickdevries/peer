@@ -8,7 +8,6 @@ import Review from "../models/Review";
 import { AssignmentState } from "../enum/AssignmentState";
 import MultipleChoiceQuestionAnswer from "../models/MultipleChoiceQuestionAnswer";
 import MultipleChoiceQuestionOption from "../models/MultipleChoiceQuestionOption";
-import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import moment from "moment";
 import { getManager } from "typeorm";
@@ -78,15 +77,6 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
   }
   const assignment = await questionnaire.getAssignment();
   if (
-    questionnaire instanceof SubmissionQuestionnaire &&
-    !assignment.isAtState(AssignmentState.REVIEW)
-  ) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("The assignment is not in reviewstate");
-    return;
-  }
-  if (
     questionnaire instanceof ReviewQuestionnaire &&
     !(
       assignment.isAtState(AssignmentState.FEEDBACK) &&
@@ -153,6 +143,20 @@ router.delete(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The review is already submitted");
+      return;
+    }
+    const questionnaire = await review.getQuestionnaire();
+    const assignment = await questionnaire.getAssignment();
+    if (
+      questionnaire instanceof ReviewQuestionnaire &&
+      !(
+        assignment.isAtState(AssignmentState.FEEDBACK) &&
+        moment().isBefore(assignment.reviewEvaluationDueDate)
+      )
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The reviewevaluation is passed");
       return;
     }
     // start transaction to make sure an asnwer isnt deleted from a submitted review

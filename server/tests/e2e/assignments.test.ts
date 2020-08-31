@@ -63,7 +63,8 @@ describe("Assignments", () => {
       .field("reviewDueDate", new Date("2020-06-26T10:00Z").toISOString())
       .field("reviewEvaluationDueDate", "null")
       .field("description", "Example description")
-      .field("externalLink", "null");
+      .field("externalLink", "null")
+      .field("submissionExtensions", ".pdf");
 
     expect(res2.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res2.text)).toMatchObject({
@@ -109,7 +110,8 @@ describe("Assignments", () => {
       .field("reviewDueDate", new Date("2020-06-26T10:00Z").toISOString())
       .field("reviewEvaluationDueDate", "null")
       .field("description", "Example description")
-      .field("externalLink", "null");
+      .field("externalLink", "null")
+      .field("submissionExtensions", ".pdf");
 
     expect(res2.status).not.toBe(HttpStatusCode.OK);
   });
