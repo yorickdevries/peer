@@ -355,6 +355,8 @@ router.get("/:id/filemetadata", validateParams(idSchema), async (req, res) => {
     (assignmentState === AssignmentState.REVIEW ||
       assignmentState === AssignmentState.FEEDBACK)
   ) {
+    // replace the filename with "File" before sending
+    file.name = "File";
     res.send(file);
     return;
   }
@@ -385,9 +387,9 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const submission = review.submission!;
   const file = submission.file;
-  const fileName = file.getFileNamewithExtension();
   const filePath = file.getPath();
   if (await review.isTeacherOrTeachingAssistantInCourse(user)) {
+    const fileName = file.getFileNamewithExtension();
     res.download(filePath, fileName);
     return;
   }
@@ -403,6 +405,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
       review.downloadedAt = new Date();
       await review.save();
     }
+    const fileName = file.getAnonymousFileNamewithExtension();
     res.download(filePath, fileName);
     return;
   }
@@ -412,6 +415,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
     assignment.isAtState(AssignmentState.FEEDBACK) &&
     review.submitted
   ) {
+    const fileName = file.getFileNamewithExtension();
     res.download(filePath, fileName);
     return;
   }
