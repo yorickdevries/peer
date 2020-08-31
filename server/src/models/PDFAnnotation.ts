@@ -15,7 +15,9 @@ import PDFAnnotationMotivation from "../enum/PDFAnnotationMotivation";
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "motivation" } })
 export default abstract class PDFAnnotation extends BaseModel {
-  @PrimaryColumn("varchar")
+  // length of max 191 due to UTF-8MB4 encoding of strings
+  // see also: https://github.com/gogs/gogs/issues/4894#issuecomment-348861978
+  @PrimaryColumn({ length: 63 })
   @IsDefined()
   @IsString()
   @IsNotEmpty()
