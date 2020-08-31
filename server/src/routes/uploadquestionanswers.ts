@@ -46,15 +46,23 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
     // is teacher
     (await assignment.isTeacherInCourse(user)) ||
     // or reviwer
-    (await review.isReviewer(user)) ||
-    // or reviewed
-    (assignment.isAtState(AssignmentState.FEEDBACK) &&
-      (await review.isReviewed(user)) &&
-      review.submitted)
+    (await review.isReviewer(user))
   ) {
     // get the file
     const file = uploadQuestionAnswer.uploadAnswer;
     const fileName = file.getFileNamewithExtension();
+    const filePath = file.getPath();
+    res.download(filePath, fileName);
+    return;
+  }
+  if (
+    assignment.isAtState(AssignmentState.FEEDBACK) &&
+    (await review.isReviewed(user)) &&
+    review.submitted
+  ) {
+    // get the file
+    const file = uploadQuestionAnswer.uploadAnswer;
+    const fileName = file.getAnonymousFileNamewithExtension();
     const filePath = file.getPath();
     res.download(filePath, fileName);
     return;
@@ -227,6 +235,20 @@ router.delete(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The review is already submitted");
+      return;
+    }
+    const questionnaire = await review.getQuestionnaire();
+    const assignment = await questionnaire.getAssignment();
+    if (
+      questionnaire instanceof ReviewQuestionnaire &&
+      !(
+        assignment.isAtState(AssignmentState.FEEDBACK) &&
+        moment().isBefore(assignment.reviewEvaluationDueDate)
+      )
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The reviewevaluation is passed");
       return;
     }
     const file = questionAnswer.uploadAnswer;

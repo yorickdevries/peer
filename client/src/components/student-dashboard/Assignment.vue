@@ -101,7 +101,7 @@
                     <b-card-body>
                         <b-row>
                             <b-col>
-                                <keep-alive><router-view></router-view></keep-alive>
+                                <router-view></router-view>
                             </b-col>
                         </b-row>
                     </b-card-body>

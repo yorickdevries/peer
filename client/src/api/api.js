@@ -24,6 +24,7 @@ import multiplechoicequestionanswers from "./multiplechoicequestionanswers"
 import checkboxquestionanswers from "./checkboxquestionanswers"
 import rangequestionanswers from "./rangequestionanswers"
 import uploadquestionanswers from "./uploadquestionanswers"
+import pdfannotations from "./pdfannotations"
 
 export default {
     getAuthenticated: () => {
@@ -55,5 +56,6 @@ export default {
     multiplechoicequestionanswers: multiplechoicequestionanswers,
     checkboxquestionanswers: checkboxquestionanswers,
     rangequestionanswers: rangequestionanswers,
-    uploadquestionanswers: uploadquestionanswers
+    uploadquestionanswers: uploadquestionanswers,
+    pdfannotations: pdfannotations
 }

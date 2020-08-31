@@ -34,7 +34,7 @@
                                             class="btn btn-success success w-100"
                                             style="height: 3rem"
                                         >
-                                            Download Submission
+                                            Download Submission ({{ reviewFileName }})
                                         </button>
                                     </a>
                                 </dl>
@@ -78,6 +78,16 @@
                             >
                                 <ReviewEvaluation :feedbackReviewId="review.id"></ReviewEvaluation>
                             </b-modal>
+                        </b-col>
+                    </b-row>
+
+                    <b-row>
+                        <b-col>
+                            <PDFAnnotator
+                                v-if="fileMetadata.extension === '.pdf'"
+                                :reviewId="$route.params.reviewId"
+                                :readOnly="true"
+                            ></PDFAnnotator>
                         </b-col>
                     </b-row>
                 </b-card-body>
@@ -223,14 +233,16 @@ import notifications from "../../mixins/notifications"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 import { StarRating } from "vue-rate-it"
 import ReviewEvaluation from "../student-dashboard/assignment/ReviewEvaluation"
+import PDFAnnotator from "../student-dashboard/assignment/PDFAnnotator"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle, StarRating, ReviewEvaluation },
+    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, PDFAnnotator },
     data() {
         return {
             assignment: {},
             questionnaire: {},
+            fileMetadata: {},
             review: {},
             reviewEvaluation: null,
             // all answers will be saved in this object
@@ -241,6 +253,9 @@ export default {
         reviewFilePath() {
             // Get the submission file path.
             return `/api/reviewofsubmissions/${this.review.id}/file`
+        },
+        reviewFileName() {
+            return this.fileMetadata.name + this.fileMetadata.extension
         }
     },
     async created() {
@@ -250,6 +265,7 @@ export default {
         async fetchData() {
             await this.fetchAssignment()
             await this.fetchReview()
+            await this.fetchFileMetadata()
             await this.fetchSubmissionQuestionnaire()
             await this.fetchAnswers()
             await this.fetchReviewEvaluation()
@@ -258,6 +274,10 @@ export default {
             // Fetch the assignment information.
             const res = await api.assignments.get(this.$route.params.assignmentId)
             this.assignment = res.data
+        },
+        async fetchFileMetadata() {
+            const res = await api.reviewofsubmissions.getFileMetadata(this.review.id)
+            this.fileMetadata = res.data
         },
         async fetchReview() {
             const res = await api.reviewofsubmissions.get(this.$route.params.reviewId)

@@ -8,6 +8,10 @@ const idSchema = Joi.object({
   id: Joi.number().integer().required(),
 });
 
+const idStringSchema = Joi.object({
+  id: Joi.string().required(),
+});
+
 const validate = (
   schema: Joi.ObjectSchema,
   field: "body" | "query" | "params"
@@ -53,4 +57,10 @@ const validateParams = (schema: Joi.ObjectSchema): RequestHandler => {
   return validate(schema, "params");
 };
 
-export { idSchema, validateBody, validateQuery, validateParams };
+export {
+  idSchema,
+  idStringSchema,
+  validateBody,
+  validateQuery,
+  validateParams,
+};

@@ -34,6 +34,9 @@ import RangeQuestionAnswer from "./RangeQuestionAnswer";
 import UploadQuestionAnswer from "./UploadQuestionAnswer";
 import SubmissionComment from "./SubmissionComment";
 import ReviewComment from "./ReviewComment";
+import PDFAnnotation from "./PDFAnnotation";
+import CommentingPDFAnnotation from "./CommentingPDFAnnotation";
+import ReplyingPDFAnnotation from "./ReplyingPDFAnnotation";
 // End of All Database models
 
 const entityList = [
@@ -72,6 +75,9 @@ const entityList = [
   UploadQuestionAnswer,
   SubmissionComment,
   ReviewComment,
+  PDFAnnotation,
+  CommentingPDFAnnotation,
+  ReplyingPDFAnnotation,
 ];
 
 export default entityList;

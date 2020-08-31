@@ -172,13 +172,8 @@ router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
       .send("No submissionquestionnaire is defined");
     return;
   }
-  const reviews = await submissionQuestionnaire.getReviewsWhereUserIsReviewer(
-    user
-  );
   if (
-    _.some(reviews, (review) => {
-      return !review.submitted;
-    })
+    await submissionQuestionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(user)
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
