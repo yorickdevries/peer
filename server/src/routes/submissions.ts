@@ -165,6 +165,28 @@ router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
       .send("You are not allowed to view reviews");
     return;
   }
+  const submissionQuestionnaire = await assignment.getSubmissionQuestionnaire();
+  if (!submissionQuestionnaire) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("No submissionquestionnaire is defined");
+    return;
+  }
+  const reviews = await submissionQuestionnaire.getReviewsWhereUserIsReviewer(
+    user
+  );
+  if (
+    _.some(reviews, (review) => {
+      return !review.submitted;
+    })
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "One of youre reviews isn't submitted, you are not allowed to see feedback"
+      );
+    return;
+  }
   const group = await submission.getGroup();
   if (!(await group.hasUser(user))) {
     res.status(HttpStatusCode.FORBIDDEN).send("You are not part of this group");
