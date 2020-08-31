@@ -46,12 +46,9 @@ export default class CommentingPDFAnnotation extends PDFAnnotation {
   }
 
   async getReplyingPDFAnnotations(): Promise<ReplyingPDFAnnotation[]> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await CommentingPDFAnnotation.findOneOrFail(this.id, {
-        relations: ["replyingPDFAnnotations"],
-      })
-    ).replyingPDFAnnotations!;
+    return ReplyingPDFAnnotation.find({
+      where: { commentingPDFAnnotation: this },
+    });
   }
 
   // https://www.w3.org/TR/annotation-model/

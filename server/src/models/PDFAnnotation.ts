@@ -4,6 +4,7 @@ import {
   ManyToOne,
   Column,
   TableInheritance,
+  RelationId,
 } from "typeorm";
 import { IsString, IsNotEmpty, IsDefined } from "class-validator";
 import BaseModel from "./BaseModel";
@@ -35,16 +36,22 @@ export default abstract class PDFAnnotation extends BaseModel {
   bodyValue: string;
 
   // user (creator)
+  @RelationId((pdfAnnotation: PDFAnnotation) => pdfAnnotation.user)
+  userNetid!: string;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, { nullable: false })
   user?: User;
 
   // file (source)
+  @RelationId((pdfAnnotation: PDFAnnotation) => pdfAnnotation.file)
+  fileId!: number;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => File, { nullable: false })
   file?: File;
 
   // review
+  @RelationId((pdfAnnotation: PDFAnnotation) => pdfAnnotation.review)
+  reviewId!: number;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => ReviewOfSubmission, { nullable: false })
   review?: ReviewOfSubmission;
@@ -89,29 +96,14 @@ export default abstract class PDFAnnotation extends BaseModel {
   }
 
   async getUser(): Promise<User> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await PDFAnnotation.findOneOrFail(this.id, {
-        relations: ["user"],
-      })
-    ).user!;
+    return User.findOneOrFail(this.userNetid);
   }
 
   async getFile(): Promise<File> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await PDFAnnotation.findOneOrFail(this.id, {
-        relations: ["file"],
-      })
-    ).file!;
+    return File.findOneOrFail(this.fileId);
   }
 
   async getReview(): Promise<ReviewOfSubmission> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await PDFAnnotation.findOneOrFail(this.id, {
-        relations: ["review"],
-      })
-    ).review!;
+    return ReviewOfSubmission.findOneOrFail(this.reviewId);
   }
 }

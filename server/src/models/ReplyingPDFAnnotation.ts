@@ -1,5 +1,5 @@
 import PDFAnnotationMotivation from "../enum/PDFAnnotationMotivation";
-import { ChildEntity, ManyToOne } from "typeorm";
+import { ChildEntity, ManyToOne, RelationId } from "typeorm";
 import PDFAnnotation from "./PDFAnnotation";
 import User from "./User";
 import File from "./File";
@@ -8,6 +8,11 @@ import CommentingPDFAnnotation from "./CommentingPDFAnnotation";
 
 @ChildEntity(PDFAnnotationMotivation.REPLYING)
 export default class ReplyingPDFAnnotation extends PDFAnnotation {
+  @RelationId(
+    (replyingPDFAnnotation: ReplyingPDFAnnotation) =>
+      replyingPDFAnnotation.commentingPDFAnnotation
+  )
+  commentingPDFAnnotationId!: string;
   @ManyToOne(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => CommentingPDFAnnotation,
@@ -51,12 +56,9 @@ export default class ReplyingPDFAnnotation extends PDFAnnotation {
   }
 
   async getCommentingPDFAnnotation(): Promise<CommentingPDFAnnotation> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await ReplyingPDFAnnotation.findOneOrFail(this.id, {
-        relations: ["commentingPDFAnnotation"],
-      })
-    ).commentingPDFAnnotation!;
+    return CommentingPDFAnnotation.findOneOrFail(
+      this.commentingPDFAnnotationId
+    );
   }
 
   // https://www.w3.org/TR/annotation-model/
