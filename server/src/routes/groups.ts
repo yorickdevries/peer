@@ -244,7 +244,7 @@ router.patch(
       const submissions = await assignment.getSubmissions();
       if (
         _.some(submissions, (submission) => {
-          return submission.userNetid === user.netid;
+          return submission.userNetid === removedUser.netid;
         })
       ) {
         res
