@@ -8,8 +8,8 @@
                         <template slot="title">
                             <div class="d-flex align-items-center">
                                 <b-badge variant="warning" class="mr-2">ID: {{ review.id }}</b-badge>
-                                <b-badge v-if="review.submitted" variant="success" class="mr-2">DONE</b-badge>
-                                <b-badge v-if="!review.submitted" variant="danger" class="mr-2">DUE</b-badge>
+                                <b-badge v-if="review.evaluationDone" variant="success" class="mr-2">DONE</b-badge>
+                                <b-badge v-if="!review.evaluationDone" variant="danger" class="mr-2">DUE</b-badge>
                             </div>
                         </template>
                         <ReviewEvaluation :feedbackReviewId="review.id"></ReviewEvaluation>
@@ -54,7 +54,19 @@ export default {
         },
         async fetchFeedbackReviews() {
             const res = await api.submissions.getFeedback(this.latestSubmission.id)
-            this.feedbackReviews = res.data
+            const reviews = res.data
+
+            for (const review of reviews) {
+                // Retrieve the review evaluation.
+                try {
+                    const res = await api.reviewofsubmissions.getEvaluation(review.id)
+                    const evaluation = res.data
+                    review.evaluationDone = evaluation.submitted
+                } catch (error) {
+                    review.evaluationDone = false
+                }
+            }
+            this.feedbackReviews = reviews
         }
     }
 }
