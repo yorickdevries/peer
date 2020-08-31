@@ -97,6 +97,10 @@ const migrateDB = async function (): Promise<void> {
     //   console.log(reviews.length, reviewsof.length);
     // }
     // if (state !== AssignmentState.FEEDBACK) {
+    if (assignment.courseId >= 35 && state !== AssignmentState.UNPUBLISHED) {
+      console.log("unpublished " + assignment.id);
+      state = AssignmentState.UNPUBLISHED;
+    }
     console.log(`C${assignment.courseId} : A${assignment.id} : ${state}`);
     // }
     assignment.state = state;
