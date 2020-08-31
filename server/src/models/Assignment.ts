@@ -219,7 +219,10 @@ export default class Assignment extends BaseModel {
         "reviewEvaluationDueDate is defined while reviewEvaluation is turned off"
       );
     }
-    if (!this.reviewEvaluation && this.reviewQuestionnaire) {
+    if (
+      !this.reviewEvaluation &&
+      (this.reviewQuestionnaire || this.reviewQuestionnaireId)
+    ) {
       throw new Error(
         "reviewQuestionnaire is defined while reviewEvaluation is turned off"
       );
