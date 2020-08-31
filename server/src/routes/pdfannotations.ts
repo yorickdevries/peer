@@ -142,14 +142,6 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
       .send("The review is already submitted");
     return;
   }
-  const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
-  if (!assignment.isAtState(AssignmentState.REVIEW)) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("The assignment is not in reviewstate");
-    return;
-  }
   // create the annotation
   const annotation = req.body.annotation;
   const existingAnnotation = await PDFAnnotation.findOne(annotation.id);
@@ -247,14 +239,6 @@ router.patch(
         .send("The review is already submitted");
       return;
     }
-    const questionnaire = await review.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
-    if (!assignment.isAtState(AssignmentState.REVIEW)) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is not in reviewstate");
-      return;
-    }
     // perform patch
     if (annotation instanceof CommentingPDFAnnotation) {
       annotation.selector = req.body.annotation.target.selector;
@@ -286,14 +270,6 @@ router.delete("/:id", validateParams(idStringSchema), async (req, res) => {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("The review is already submitted");
-    return;
-  }
-  const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
-  if (!assignment.isAtState(AssignmentState.REVIEW)) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("The assignment is not in reviewstate");
     return;
   }
   if (annotation instanceof CommentingPDFAnnotation) {
