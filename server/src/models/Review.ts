@@ -250,11 +250,8 @@ export default abstract class Review extends BaseModel {
   }
 
   async getAnswer(question: Question): Promise<QuestionAnswer | undefined> {
-    const questionAnswers = this.questionAnswers
-      ? this.questionAnswers
-      : await this.getQuestionAnswers();
-    return _.find(questionAnswers, (questionAnswer) => {
-      return questionAnswer.questionId === question.id;
+    return QuestionAnswer.findOne({
+      where: { review: this, question: question },
     });
   }
 }
