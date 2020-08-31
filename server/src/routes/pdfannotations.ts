@@ -83,6 +83,14 @@ router.get("/", validateQuery(getAnnotationSchema), async (req, res) => {
     assignment.isAtState(AssignmentState.FEEDBACK) &&
     review.submitted
   ) {
+    if (await questionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(user)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "One of youre reviews isn't submitted, you are not allowed to see feedback"
+        );
+      return;
+    }
     // anomise the annotations for the reviewed
     for (const webAnnotation of webAnnotations) {
       webAnnotation.creator.name = `reviewer ${review.id}`;
