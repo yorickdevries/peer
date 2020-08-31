@@ -36,6 +36,14 @@
                             <!--Publish and due date of the assignment-->
                             <b-row class="mb-3">
                                 <b-col>
+                                    <b-alert variant="info" show>
+                                        NOTE: These dates are just mean of communication to students. Advancing through
+                                        the assignment stages should be done manually.
+                                    </b-alert>
+                                </b-col>
+                            </b-row>
+                            <b-row class="mb-3">
+                                <b-col>
                                     <b-form-group>
                                         <template slot="label">
                                             Publish date and time
@@ -120,19 +128,6 @@
                             </b-row>
 
                             <hr />
-
-                            <!--Number of peer reviews per student-->
-                            <b-form-group label="Number of reviews that each student needs to do">
-                                <b-form-input
-                                    v-model="assignment.reviewsPerUser"
-                                    type="number"
-                                    :state="checkReviewsPerUser"
-                                    placeholder="Enter an integer larger than 0"
-                                    required
-                                >
-                                </b-form-input>
-                            </b-form-group>
-
                             <!--File upload-->
                             <b-form-group
                                 label="Assignment file"
@@ -197,6 +192,29 @@
                                 <b-form-input v-model="assignment.externalLink"></b-form-input>
                             </b-form-group>
 
+                            <!--Allowed Submission extensions-->
+                            <b-form-group
+                                label="Allowed submission file extensions"
+                                description="The extensions for the submission files that are allowed."
+                            >
+                                <b-form-select
+                                    :options="extensionTypes"
+                                    v-model="assignment.submissionExtensions"
+                                ></b-form-select>
+                            </b-form-group>
+
+                            <!--Number of peer reviews per student-->
+                            <b-form-group label="Number of reviews that each student needs to do">
+                                <b-form-input
+                                    v-model="assignment.reviewsPerUser"
+                                    type="number"
+                                    :state="checkReviewsPerUser"
+                                    placeholder="Enter an integer larger than 0"
+                                    required
+                                >
+                                </b-form-input>
+                            </b-form-group>
+
                             <b-form-group>
                                 <b-form-checkbox v-model="assignment.enrollable">
                                     Self enrollable
@@ -226,6 +244,10 @@
                                         </b-form-checkbox>
                                     </b-form-group>
                                     <b-form-group v-if="assignment.reviewEvaluation">
+                                        <b-alert variant="warning" show>
+                                            NOTE: This is a hard deadline for students to be able to make review
+                                            evaluations
+                                        </b-alert>
                                         <template slot="label"
                                             >Review evaluation due date and time
                                             <b-badge
@@ -271,7 +293,13 @@ export default {
             changeFile: false,
             // new file which replaces oldfile (or is added when no oldfile is present)
             newFile: null,
-            assignment: {}
+            assignment: {},
+            extensionTypes: [
+                { value: ".pdf", text: ".pdf" },
+                { value: ".zip", text: ".zip" },
+                { value: ".doc,.docx", text: ".doc,.docx" },
+                { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" }
+            ]
         }
     },
     computed: {
@@ -388,7 +416,8 @@ export default {
                 reviewEvaluationDueDate,
                 this.assignment.description,
                 this.assignment.externalLink,
-                file
+                file,
+                this.assignment.submissionExtensions
             )
             this.showSuccessMessage({ message: "Updated assignment successfully" })
             // Redirect to updated assignment

@@ -15,10 +15,13 @@ import Affiliation from "./Affiliation";
 import Study from "./Study";
 import OrganisationUnit from "./OrganisationUnit";
 import parseNetID from "../util/parseNetID";
+import Group from "./Group";
 
 @Entity()
 export default class User extends BaseModel {
-  @PrimaryColumn()
+  // length of max 191 due to UTF-8MB4 encoding of strings
+  // see also: https://github.com/gogs/gogs/issues/4894#issuecomment-348861978
+  @PrimaryColumn({ length: 63 })
   @IsDefined()
   @IsString()
   @IsNotEmpty()
@@ -83,6 +86,11 @@ export default class User extends BaseModel {
   })
   @JoinTable()
   organisationUnit: OrganisationUnit[];
+
+  // User groups
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @ManyToMany((_type) => Group, (group) => group.users)
+  groups?: Group[];
 
   constructor(
     netid: string,

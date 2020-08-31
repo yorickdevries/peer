@@ -12,6 +12,7 @@ import ResponseMessage from "../enum/ResponseMessage";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { AssignmentState } from "../enum/AssignmentState";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
+import Extensions from "../enum/Extensions";
 
 const router = express.Router();
 
@@ -27,13 +28,11 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   // students can only access it when the assignment is in review state
   const questionnaire = await question.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
-  const assignmentState = assignment.getState();
   if (
     !(await questionnaire.isTeacherInCourse(user)) &&
     !(
       (await assignment.isEnrolledInGroup(user)) &&
-      (assignmentState === AssignmentState.REVIEW ||
-        assignmentState === AssignmentState.FEEDBACK)
+      assignment.isAtOrAfterState(AssignmentState.REVIEW)
     )
   ) {
     res
@@ -50,7 +49,9 @@ const questionSchema = Joi.object({
   number: Joi.number().integer().required(),
   optional: Joi.boolean().required(),
   questionnaireId: Joi.number().integer().required(),
-  extensions: Joi.string().required(),
+  extensions: Joi.string()
+    .valid(...Object.values(Extensions))
+    .required(),
 });
 // post a question
 router.post("/", validateBody(questionSchema), async (req, res) => {
@@ -104,7 +105,9 @@ const questionPatchSchema = Joi.object({
   text: Joi.string().required(),
   number: Joi.number().integer().required(),
   optional: Joi.boolean().required(),
-  extensions: Joi.string().required(),
+  extensions: Joi.string()
+    .valid(...Object.values(Extensions))
+    .required(),
 });
 // patch a question
 router.patch(

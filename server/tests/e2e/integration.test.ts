@@ -8,8 +8,9 @@ import mockLoginCookie from "../helpers/mockLoginCookie";
 import initializeData from "../../src/util/initializeData";
 import fs from "fs";
 import path from "path";
-import { advanceTo, clear } from "jest-date-mock";
+import { clear, advanceTo } from "jest-date-mock";
 import UserRole from "../../src/enum/UserRole";
+import { AssignmentState } from "../../src/enum/AssignmentState";
 
 describe("Integration", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -37,8 +38,6 @@ describe("Integration", () => {
 
   test("Integration test", async () => {
     let res; // will store all responses
-    // set the mocktime
-    advanceTo(new Date("2020-01-01T10:00Z"));
 
     // log in as teacher
     const teacherCookie = async () => {
@@ -108,8 +107,8 @@ describe("Integration", () => {
         name: "CourseName",
         courseCode: "ABC123",
         enrollable: true,
-        facultyName: "EEMCS",
-        academicYearName: "2019/2020",
+        facultyId: 1,
+        academicYearId: 3,
         description: null,
       })
       .set("cookie", await teacherCookie());
@@ -131,8 +130,8 @@ describe("Integration", () => {
         name: "CourseName",
         courseCode: "ABC123",
         enrollable: true,
-        facultyName: "EEMCS",
-        academicYearName: "2019/2020",
+        facultyId: 1,
+        academicYearId: 3,
         description: null,
       })
       .set("cookie", await studentCookie1());
@@ -146,8 +145,8 @@ describe("Integration", () => {
         name: "AntoherName",
         courseCode: "XYZ123",
         enrollable: false,
-        facultyName: "3mE",
-        academicYearName: "2019/2020",
+        facultyId: 1,
+        academicYearId: 3,
         description: null,
       })
       .set("cookie", await teacherCookie2());
@@ -211,11 +210,13 @@ describe("Integration", () => {
         new Date("2020-05-01T10:00Z").toISOString()
       )
       .field("description", "Example description")
-      .field("externalLink", "null");
+      .field("externalLink", "null")
+      .field("submissionExtensions", ".pdf");
     expect(res.status).toBe(HttpStatusCode.OK);
     let assignment = JSON.parse(res.text);
     expect(assignment).toMatchObject({
       name: "Example title",
+      state: AssignmentState.UNPUBLISHED,
     });
 
     // get all assignments of a course by the teacher
@@ -430,8 +431,16 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
 
-    // set date to the moment that the assignment is published
-    advanceTo(new Date("2020-01-15T10:00Z"));
+    // publish an assingment for the course
+    res = await request(server)
+      .patch(`/api/assignments/${assignment.id}/publish`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    assignment = JSON.parse(res.text);
+    expect(assignment).toMatchObject({
+      name: "Example title",
+      state: AssignmentState.SUBMISSION,
+    });
 
     // check available courses as student
     res = await request(server)
@@ -682,8 +691,16 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject(submission1);
 
-    // set date to the moment that the submission is closed
-    advanceTo(new Date("2020-02-15T10:00Z"));
+    // close the submission phase of an assingment for the course
+    res = await request(server)
+      .patch(`/api/assignments/${assignment.id}/closesubmission`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    assignment = JSON.parse(res.text);
+    expect(assignment).toMatchObject({
+      name: "Example title",
+      state: AssignmentState.WAITING_FOR_REVIEW,
+    });
 
     // distribute the reviews as teacher
     res = await request(server)
@@ -702,9 +719,6 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     // 2 reviews are present
     expect(JSON.parse(res.text).length).toBe(2);
-
-    // set date to the moment that the reviews are opened
-    advanceTo(new Date("2020-03-15T10:00Z"));
 
     // get the questionnaire as student
     res = await request(server)
@@ -820,6 +834,34 @@ describe("Integration", () => {
       flaggedByReviewer: false,
     });
 
+    // get the reviews the other student needs to do
+    res = await request(server)
+      .get(
+        `/api/submissionquestionnaires/${submissionQuestionnaire.id}/reviews`
+      )
+      .set("cookie", await studentCookie2());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    // 1 review is present
+    const reviews2 = JSON.parse(res.text);
+    expect(reviews2.length).toBe(1);
+    const review2 = reviews2[0];
+
+    //flag a review
+    res = await request(server)
+      .patch(`/api/reviewofsubmissions/${review2.id}`)
+      .send({
+        submitted: true,
+        flaggedByReviewer: true,
+      })
+      .set("cookie", await studentCookie2());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject({
+      id: review2.id,
+      submitted: true,
+      flaggedByReviewer: true,
+    });
+
     // get the current answers for the review
     res = await request(server)
       .get(`/api/reviewofsubmissions/${review.id}/answers`)
@@ -827,7 +869,20 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text).length).toBe(5);
 
-    // set date to the moment that the feedback is available
+    // open the feedback for the students
+    res = await request(server)
+      .patch(
+        `/api/reviewofsubmissions/openfeedback?assignmentId=${assignment.id}`
+      )
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    assignment = JSON.parse(res.text);
+    expect(assignment).toMatchObject({
+      name: "Example title",
+      state: AssignmentState.FEEDBACK,
+    });
+
+    // set the moment to a time between review due and evualuation due
     advanceTo(new Date("2020-04-15T10:00Z"));
 
     // approve a review as teacher

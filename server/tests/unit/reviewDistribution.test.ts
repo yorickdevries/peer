@@ -12,6 +12,8 @@ import File from "../../src/models/File";
 import generateDistribution from "../../src/util/reviewDistribution";
 import Enrollment from "../../src/models/Enrollment";
 import UserRole from "../../src/enum/UserRole";
+import { AssignmentState } from "../../src/enum/AssignmentState";
+import Extensions from "../../src/enum/Extensions";
 
 describe("Review distribution", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -29,9 +31,9 @@ describe("Review distribution", () => {
 
   test("regular review distribution", async () => {
     // academic year
-    const academicYear = await AcademicYear.findOneOrFail("2019/2020");
+    const academicYear = await AcademicYear.findOneOrFail(1);
     /// faculty
-    const faculty = await Faculty.findOneOrFail("EEMCS");
+    const faculty = await Faculty.findOneOrFail(1);
 
     // course
     const course = new Course(
@@ -60,8 +62,11 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null
+      null,
+      Extensions.PDF
     );
+    await assignment.save();
+    assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
 
     // students
@@ -126,9 +131,9 @@ describe("Review distribution", () => {
 
   test("review distribution with uneven groups", async () => {
     // academic year
-    const academicYear = await AcademicYear.findOneOrFail("2019/2020");
+    const academicYear = await AcademicYear.findOneOrFail(1);
     /// faculty
-    const faculty = await Faculty.findOneOrFail("EEMCS");
+    const faculty = await Faculty.findOneOrFail(1);
 
     // course
     const course = new Course(
@@ -157,8 +162,11 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null
+      null,
+      Extensions.PDF
     );
+    await assignment.save();
+    assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
 
     // students
@@ -229,9 +237,9 @@ describe("Review distribution", () => {
 
   test("situation where review distribution is not possible", async () => {
     // academic year
-    const academicYear = await AcademicYear.findOneOrFail("2019/2020");
+    const academicYear = await AcademicYear.findOneOrFail(1);
     /// faculty
-    const faculty = await Faculty.findOneOrFail("EEMCS");
+    const faculty = await Faculty.findOneOrFail(1);
 
     // course
     const course = new Course(
@@ -260,8 +268,11 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null
+      null,
+      Extensions.PDF
     );
+    await assignment.save();
+    assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
 
     const student1 = new User(`student1`);

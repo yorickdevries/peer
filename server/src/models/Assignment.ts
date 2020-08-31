@@ -8,6 +8,7 @@ import {
   JoinColumn,
   OneToMany,
   RelationId,
+  getManager,
 } from "typeorm";
 import {
   IsDefined,
@@ -19,6 +20,7 @@ import {
   IsPositive,
   IsDate,
   IsUrl,
+  IsEnum,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import Group from "./Group";
@@ -32,6 +34,7 @@ import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
 import _ from "lodash";
+import Extensions from "../enum/Extensions";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -64,6 +67,11 @@ export default class Assignment extends BaseModel {
   @IsDefined()
   @IsBoolean()
   reviewEvaluation: boolean;
+
+  @Column()
+  @IsDefined()
+  @IsEnum(AssignmentState)
+  state: AssignmentState;
 
   // publish_date timestamptz NOT NULL,
   @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
@@ -135,6 +143,15 @@ export default class Assignment extends BaseModel {
   @IsNotEmpty()
   externalLink: string | null;
 
+  @Column()
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(Extensions)
+  // can be in the form: ".pdf,.zip,.doc,.docx"
+  // needs later to be revised to a list of strings
+  submissionExtensions: Extensions;
+
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
   // course_id int NOT NULL, FK
@@ -168,7 +185,8 @@ export default class Assignment extends BaseModel {
     file: File | null,
     externalLink: string | null,
     submissionQuestionnaire: SubmissionQuestionnaire | null,
-    reviewQuestionnaire: ReviewQuestionnaire | null
+    reviewQuestionnaire: ReviewQuestionnaire | null,
+    submissionExtensions: Extensions
   ) {
     super();
     this.name = name;
@@ -176,6 +194,7 @@ export default class Assignment extends BaseModel {
     this.reviewsPerUser = reviewsPerUser;
     this.enrollable = enrollable;
     this.reviewEvaluation = reviewEvaluation;
+    this.state = AssignmentState.UNPUBLISHED; // initial state
     this.publishDate = publishDate;
     this.dueDate = dueDate;
     this.reviewPublishDate = reviewPublishDate;
@@ -186,6 +205,7 @@ export default class Assignment extends BaseModel {
     this.externalLink = externalLink;
     this.submissionQuestionnaire = submissionQuestionnaire;
     this.reviewQuestionnaire = reviewQuestionnaire;
+    this.submissionExtensions = submissionExtensions;
   }
 
   // custom validation which is run before saving
@@ -199,7 +219,10 @@ export default class Assignment extends BaseModel {
         "reviewEvaluationDueDate is defined while reviewEvaluation is turned off"
       );
     }
-    if (!this.reviewEvaluation && this.reviewQuestionnaire) {
+    if (
+      !this.reviewEvaluation &&
+      (this.reviewQuestionnaire || this.reviewQuestionnaireId)
+    ) {
       throw new Error(
         "reviewQuestionnaire is defined while reviewEvaluation is turned off"
       );
@@ -218,86 +241,60 @@ export default class Assignment extends BaseModel {
     return super.validateOrReject();
   }
 
-  // check whether the user is enrolled in this assignment
-  getState(): AssignmentState {
-    if (moment().isBefore(this.publishDate)) {
-      return AssignmentState.UNPUBLISHED;
-    } else if (moment().isBefore(this.dueDate)) {
-      return AssignmentState.SUBMISSION;
-    } else if (moment().isBefore(this.reviewPublishDate)) {
-      return AssignmentState.WAITING_FOR_REVIEW;
-    } else if (moment().isBefore(this.reviewDueDate)) {
-      return AssignmentState.REVIEW;
-    } else {
-      return AssignmentState.FEEDBACK;
-    }
-  }
-
   isAtState(otherState: AssignmentState): boolean {
-    const currentState = this.getState();
-    return currentState === otherState;
+    return this.state === otherState;
   }
 
   isAtOrAfterState(otherState: AssignmentState): boolean {
-    const currentState = this.getState();
+    const currentState = this.state;
     const currentStateIndex = assignmentStateOrder.indexOf(currentState);
     const otherStateIndex = assignmentStateOrder.indexOf(otherState);
     return currentStateIndex >= otherStateIndex;
   }
 
   isAtOrBeforeState(otherState: AssignmentState): boolean {
-    const currentState = this.getState();
+    const currentState = this.state;
     const currentStateIndex = assignmentStateOrder.indexOf(currentState);
     const otherStateIndex = assignmentStateOrder.indexOf(otherState);
     return currentStateIndex <= otherStateIndex;
   }
 
   async getCourse(): Promise<Course> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Assignment.findOneOrFail(this.id, {
-        relations: ["course"],
-      })
-    ).course!;
+    return Course.findOneOrFail(this.courseId);
   }
 
   async getGroups(): Promise<Group[]> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Assignment.findOneOrFail(this.id, {
-        relations: ["groups"],
-      })
-    ).groups!;
+    const groups = await getManager()
+      .createQueryBuilder(Group, "group")
+      .leftJoin("group.assignments", "assignment")
+      .where("assignment.id = :id", { id: this.id })
+      .getMany();
+    return groups;
   }
 
   async getSubmissionQuestionnaire(): Promise<SubmissionQuestionnaire | null> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Assignment.findOneOrFail(this.id, {
-        relations: ["submissionQuestionnaire"],
-      })
-    ).submissionQuestionnaire!;
+    if (!this.submissionQuestionnaireId) {
+      return null;
+    } else {
+      return SubmissionQuestionnaire.findOneOrFail(
+        this.submissionQuestionnaireId
+      );
+    }
   }
 
   async getReviewQuestionnaire(): Promise<ReviewQuestionnaire | null> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await Assignment.findOneOrFail(this.id, {
-        relations: ["reviewQuestionnaire"],
-      })
-    ).reviewQuestionnaire!;
+    if (!this.reviewQuestionnaireId) {
+      return null;
+    } else {
+      return ReviewQuestionnaire.findOneOrFail(this.reviewQuestionnaireId);
+    }
   }
 
   async getSubmissions(group?: Group): Promise<Submission[]> {
     if (group) {
       return this.getSubmissionsOfGroup(group);
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return (
-        await Assignment.findOneOrFail(this.id, {
-          relations: ["submissions"],
-        })
-      ).submissions!;
+      return Submission.find({ where: { assignment: this } });
     }
   }
 
@@ -329,13 +326,14 @@ export default class Assignment extends BaseModel {
   }
 
   async getGroup(user: User): Promise<Group | undefined> {
-    const groups = await this.getGroups();
-    for (const group of groups) {
-      if (await group.hasUser(user)) {
-        return group;
-      }
-    }
-    return undefined;
+    const group = await getManager()
+      .createQueryBuilder(Group, "group")
+      .leftJoin("group.assignments", "assignment")
+      .leftJoin("group.users", "user")
+      .where("assignment.id = :id", { id: this.id })
+      .andWhere("user.netid = :netid", { netid: user.netid })
+      .getOne();
+    return group;
   }
 
   // check whether the assignment is enrollable for a user

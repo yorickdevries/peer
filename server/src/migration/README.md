@@ -7,7 +7,7 @@ This is the recommended method by TypeORM once you have data on production, to a
 
 #### Usage
 In `/server` folder:
-1. Generate migration: `npm run typeorm:migration:generate <myEntity-migration>`
+1. Generate migration based on current database state and TypeORM schema: `npm run typeorm:migration:generate <myEntity-migration>`
 2. Check your migration queries in `src/migration`
 3. Apply migrations: `npm run typeorm:migration:run`
 

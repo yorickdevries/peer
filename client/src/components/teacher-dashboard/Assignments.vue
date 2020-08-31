@@ -11,7 +11,10 @@
             <!--Course Cards-->
             <b-row>
                 <b-col cols="6" v-for="assignment in assignments" :key="assignment.id">
-                    <b-card :title="assignment.name" :sub-title="assignment.state" class="mb-3">
+                    <b-card :title="assignment.name" class="mb-3">
+                        <b-badge variant="secondary" class="ml-2 float-right p-1">
+                            {{ assignment.state.toUpperCase() }}</b-badge
+                        >
                         <p class="card-text">
                             {{ assignment.description }}
                         </p>
