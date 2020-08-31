@@ -6,6 +6,7 @@
     "build": "tsc",
     "start": "node ./dist/bin/www.js",
     "dev": "nodemon",
+    "migratesubmissionextensions": "ts-node ./src/migrateSubmissionExtensions.ts",
     "lint": "eslint . --ext .ts",
     "lint-fix": "eslint . --ext .ts --fix",
     "test": "jest ./tests",

@@ -248,6 +248,7 @@ router.post(
 
         // create submission
         submission = new Submission(user, group, assignment, file);
+        // this checks for the right extension in the validate function
         await transactionalEntityManager.save(submission);
 
         // save the file to disk lastly

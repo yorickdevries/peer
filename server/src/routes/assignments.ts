@@ -21,6 +21,7 @@ import _ from "lodash";
 import ResponseMessage from "../enum/ResponseMessage";
 import Group from "../models/Group";
 import { AssignmentState } from "../enum/AssignmentState";
+import Extensions from "../enum/Extensions";
 
 const router = express.Router();
 
@@ -258,6 +259,9 @@ const assignmentSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
+  submissionExtensions: Joi.string()
+    .valid(...Object.values(Extensions))
+    .required(),
 });
 // post an assignment in a course
 router.post(
@@ -312,7 +316,8 @@ router.post(
           file, // possibly null
           req.body.externalLink,
           null, // submissionQuestionnaire (initially empty)
-          null // reviewQuestionnaire (initially empty)
+          null, // reviewQuestionnaire (initially empty)
+          req.body.submissionExtensions
         );
         await transactionalEntityManager.save(assignment);
 
@@ -347,6 +352,9 @@ const assignmentPatchSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
+  submissionExtensions: Joi.string()
+    .valid(...Object.values(Extensions))
+    .required(),
 });
 // patch an assignment in a course
 router.patch(
@@ -376,6 +384,43 @@ router.patch(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("Both a file is uploaded and the body is set to null");
+      return;
+    }
+    // check whether certain fields can be changed
+    if (
+      assignment.isAtOrAfterState(AssignmentState.REVIEW) &&
+      assignment.reviewsPerUser !== req.body.reviewsPerUser
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change reviewsPerUser at this state");
+      return;
+    }
+    if (
+      !assignment.isAtOrBeforeState(AssignmentState.SUBMISSION) &&
+      assignment.enrollable !== req.body.enrollable
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change enrollable at this state");
+      return;
+    }
+    if (
+      assignment.isAtOrAfterState(AssignmentState.FEEDBACK) &&
+      assignment.reviewEvaluation !== req.body.reviewEvaluation
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change reviewEvaluation at this state");
+      return;
+    }
+    if (
+      !assignment.isAtState(AssignmentState.UNPUBLISHED) &&
+      assignment.submissionExtensions !== req.body.submissionExtensions
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change submissionExtensions at this state");
       return;
     }
     // start transaction make sure the file and assignment are both saved
@@ -417,6 +462,7 @@ router.patch(
           assignment.file = newFile;
         }
         assignment.externalLink = req.body.externalLink;
+        assignment.submissionExtensions = req.body.submissionExtensions;
         await transactionalEntityManager.save(assignment);
 
         // save the file to disk
