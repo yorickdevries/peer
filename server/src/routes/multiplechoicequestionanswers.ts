@@ -148,15 +148,6 @@ router.delete(
     const questionnaire = await review.getQuestionnaire();
     const assignment = await questionnaire.getAssignment();
     if (
-      questionnaire instanceof SubmissionQuestionnaire &&
-      !assignment.isAtState(AssignmentState.REVIEW)
-    ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is not in reviewstate");
-      return;
-    }
-    if (
       questionnaire instanceof ReviewQuestionnaire &&
       !(
         assignment.isAtState(AssignmentState.FEEDBACK) &&
