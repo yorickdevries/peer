@@ -578,21 +578,15 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   await getManager().transaction(
     "SERIALIZABLE",
     async (transactionalEntityManager) => {
-      // find all groups to check for group existence
-      const allGroups = await transactionalEntityManager.find(Group, {
-        relations: ["users", "assignments"],
-      });
-      const alreadyExists = _.some(allGroups, (group) => {
-        return (
-          _.some(group.users, (groupUser) => {
-            return groupUser.netid === user.netid;
-          }) &&
-          _.some(group.assignments, (groupAssignment) => {
-            return groupAssignment.id === assignment.id;
-          })
-        );
-      });
-      if (alreadyExists) {
+      // get group
+      const existingGroup = await transactionalEntityManager
+        .createQueryBuilder(Group, "group")
+        .leftJoin("group.assignments", "assignment")
+        .leftJoin("group.users", "user")
+        .where("assignment.id = :id", { id: assignment.id })
+        .andWhere("user.netid = :netid", { netid: user.netid })
+        .getOne();
+      if (existingGroup) {
         // throw error if a group already exists
         // Can happen if 2 concurrent calls are made
         throw new Error("Group already exists");
