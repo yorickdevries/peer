@@ -35,7 +35,15 @@
                 </dl>
             </b-col>
         </b-row>
-        <PDFAnnotator v-if="fileMetadata.extension === '.pdf'" :reviewId="reviewId" :readOnly="false"></PDFAnnotator>
+        <b-row>
+            <b-col>
+                <PDFAnnotator
+                    v-if="fileMetadata.extension === '.pdf'"
+                    :reviewId="reviewId"
+                    :readOnly="false"
+                ></PDFAnnotator>
+            </b-col>
+        </b-row>
 
         <!--Form, load only when answers are available-->
         <b-card v-if="answers" no-body class="mt-3">
