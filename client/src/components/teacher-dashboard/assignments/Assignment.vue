@@ -174,60 +174,6 @@
                                                 </ul>
                                             </b-modal>
                                         </div>
-
-                                        <!--Exporting Reviews-->
-                                        <dt>Export reviews</dt>
-                                        <dd>Exports a file with all reviews for this assignment.</dd>
-                                        <dd>
-                                            Also includes any evaluations which students have given on eachother's
-                                            reviews.
-                                        </dd>
-                                        <b-button
-                                            size="sm"
-                                            variant="primary"
-                                            :href="
-                                                `/api/reviewofsubmissions/exportreviews?assignmentId=${assignment.id}&exportType=csv`
-                                            "
-                                            class="mb-3 mr-2"
-                                        >
-                                            Download reviews .csv
-                                        </b-button>
-                                        <b-button
-                                            size="sm"
-                                            variant="primary"
-                                            :href="
-                                                `/api/reviewofsubmissions/exportreviews?assignmentId=${assignment.id}&exportType=xls`
-                                            "
-                                            class="mb-3"
-                                        >
-                                            Download reviews .xls
-                                        </b-button>
-
-                                        <!--Exporting Grades-->
-                                        <dt>Export grades</dt>
-                                        <dd>
-                                            Exports a file with an aggregation of the review approval/disapproval
-                                            numbers of each student for this assignment.
-                                        </dd>
-                                        <b-button
-                                            class="mr-2"
-                                            size="sm"
-                                            variant="primary"
-                                            :href="
-                                                `/api/reviewofsubmissions/exportgrades?assignmentId=${assignment.id}&exportType=csv`
-                                            "
-                                        >
-                                            Download grades .csv
-                                        </b-button>
-                                        <b-button
-                                            size="sm"
-                                            variant="primary"
-                                            :href="
-                                                `/api/reviewofsubmissions/exportgrades?assignmentId=${assignment.id}&exportType=xls`
-                                            "
-                                        >
-                                            Download grades .xls
-                                        </b-button>
                                     </dl>
                                 </b-card>
                             </b-col>
