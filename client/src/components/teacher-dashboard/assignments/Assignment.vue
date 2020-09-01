@@ -61,14 +61,14 @@
                                             <dt>Publish assignment</dt>
                                             <dd>Publish the assignment so students are able to make submissions</dd>
                                             <b-button
-                                                v-b-modal="'publishAssignment'"
+                                                v-b-modal="`publishAssignment${assignment.id}`"
                                                 class="mb-3"
                                                 variant="primary"
                                                 size="sm"
                                                 >Publish
                                             </b-button>
                                             <b-modal
-                                                id="publishAssignment"
+                                                :id="`publishAssignment${assignment.id}`"
                                                 @ok="publishAssignment"
                                                 title="Confirmation"
                                                 centered
@@ -88,14 +88,14 @@
                                             <dt>Close submission state</dt>
                                             <dd>Close the assignment for receiving submissions</dd>
                                             <b-button
-                                                v-b-modal="'closeSubmission'"
+                                                v-b-modal="`closeSubmission${assignment.id}`"
                                                 class="mb-3"
                                                 variant="primary"
                                                 size="sm"
                                                 >Close submission
                                             </b-button>
                                             <b-modal
-                                                id="closeSubmission"
+                                                :id="`closeSubmission${assignment.id}`"
                                                 @ok="closeSubmission"
                                                 title="Confirmation"
                                                 centered
@@ -120,14 +120,14 @@
                                                 submission.
                                             </dd>
                                             <b-button
-                                                v-b-modal="'distributeReviews'"
+                                                v-b-modal="`distributeReviews${assignment.id}`"
                                                 class="mb-3"
                                                 variant="primary"
                                                 size="sm"
                                                 >Distribute Reviews
                                             </b-button>
                                             <b-modal
-                                                id="distributeReviews"
+                                                :id="`distributeReviews${assignment.id}`"
                                                 @ok="distributeReviews"
                                                 title="Confirmation"
                                                 centered
@@ -149,13 +149,18 @@
                                                 This action will open the the feedback for the reviewed students
                                             </dd>
                                             <b-button
-                                                v-b-modal="'openFeedback'"
+                                                v-b-modal="`openFeedback${assignment.id}`"
                                                 class="mb-3"
                                                 variant="primary"
                                                 size="sm"
                                                 >Open Feedback
                                             </b-button>
-                                            <b-modal id="openFeedback" @ok="openFeedback" title="Confirmation" centered>
+                                            <b-modal
+                                                :id="`openFeedback${assignment.id}`"
+                                                @ok="openFeedback"
+                                                title="Confirmation"
+                                                centered
+                                            >
                                                 Are you sure you want to open the feedback?
                                                 <ul>
                                                     <li>All submitted reviews cannot be changed anymore</li>

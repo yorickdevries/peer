@@ -14,10 +14,10 @@
                                 >
                             </div>
                             <div v-else>
-                                <b-button v-b-modal="'createModal'" variant="primary">
+                                <b-button v-b-modal="`createModal${questionnaire.id}`" variant="primary">
                                     Create new Question
                                 </b-button>
-                                <b-modal id="createModal" centered hide-footer class="p-0 m-0">
+                                <b-modal :id="`createModal${questionnaire.id}`" centered hide-footer class="p-0 m-0">
                                     <CreateQuestionWizard
                                         :questionnaireId="questionnaire.id"
                                         :questionNumber="nextQuestionNumber"
