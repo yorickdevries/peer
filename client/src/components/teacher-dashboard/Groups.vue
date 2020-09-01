@@ -12,12 +12,19 @@
                 <template v-else>
                     <dt>Import groups</dt>
                     <dd>This action will import the groups in the assignment.</dd>
-                    <b-button v-b-modal="'importGroups'" variant="primary" size="sm" class="mb-3"
+                    <b-button v-b-modal="`importGroups${assignment.id}`" variant="primary" size="sm" class="mb-3"
                         >Import groups
                     </b-button>
 
                     <!--Import Group Modal-->
-                    <b-modal id="importGroups" centered hide-header hide-footer class="p-0 m-0" size="lg">
+                    <b-modal
+                        :id="`importGroups${assignment.id}`"
+                        centered
+                        hide-header
+                        hide-footer
+                        class="p-0 m-0"
+                        size="lg"
+                    >
                         <ImportGroupsWizard></ImportGroupsWizard>
                     </b-modal>
                 </template>
@@ -35,8 +42,17 @@
                     <dd>
                         This action will import the groups of another assignment to this assignment.
                     </dd>
-                    <b-button v-b-modal="'copyGroups'" variant="primary" size="sm">Copy groups </b-button>
-                    <b-modal id="copyGroups" centered hide-header hide-footer class="p-0 m-0" size="lg">
+                    <b-button v-b-modal="`copyGroups${assignment.id}`" variant="primary" size="sm"
+                        >Copy groups
+                    </b-button>
+                    <b-modal
+                        :id="`copyGroups${assignment.id}`"
+                        centered
+                        hide-header
+                        hide-footer
+                        class="p-0 m-0"
+                        size="lg"
+                    >
                         <CopyGroupsWizard></CopyGroupsWizard>
                     </b-modal>
                 </template>
@@ -66,11 +82,11 @@
         <!--Create Group-->
         <b-row>
             <b-col class="mb-3">
-                <b-button variant="success" v-b-modal.createGroup>Create Group</b-button>
+                <b-button variant="success" v-b-modal="`createGroup${assignment.id}`">Create Group</b-button>
             </b-col>
         </b-row>
 
-        <b-modal id="createGroup" centered title="Create Group" @ok="createGroup()">
+        <b-modal :id="`createGroup${assignment.id}`" centered title="Create Group" @ok="createGroup()">
             <div>Group name:</div>
             <b-input v-model="newGroupName"></b-input>
         </b-modal>
