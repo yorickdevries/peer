@@ -33,7 +33,7 @@
 
                     <!-- Modal Button -->
                     <b-button
-                        v-b-modal="'uploadModal'"
+                        v-b-modal="`uploadModal${assignment.id}`"
                         :disabled="assignment.state !== 'submission'"
                         variant="primary"
                         @click="resetFile"
@@ -41,7 +41,13 @@
                     >
 
                     <!-- Upload Modal-->
-                    <b-modal id="uploadModal" ref="uploadModal" centered hide-footer title="Upload Submission">
+                    <b-modal
+                        :id="`uploadModal${assignment.id}`"
+                        ref="uploadModal"
+                        centered
+                        hide-footer
+                        title="Upload Submission"
+                    >
                         <b-alert show variant="warning"
                             >If you have already uploaded a file, it will be used for reviewing anymore!
                         </b-alert>
