@@ -16,12 +16,14 @@ import User from "../models/User";
 import Submission from "../models/Submission";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { getManager } from "typeorm";
-import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
 import ReviewOfReview from "../models/ReviewOfReview";
 import makeGradeSummaries from "../util/makeGradeSummary";
 import exportJSONToFile from "../util/exportJSONToFile";
 import parseReviewsForExport from "../util/parseReviewsForExport";
+import CheckboxQuestion from "../models/CheckboxQuestion";
+import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
+import Review from "../models/Review";
 
 const router = express.Router();
 
@@ -160,7 +162,7 @@ const assignmentIdSchema = Joi.object({
   assignmentId: Joi.number().integer().required(),
 });
 router.patch(
-  "/submitall",
+  "/openfeedback",
   validateQuery(assignmentIdSchema),
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -185,13 +187,45 @@ router.patch(
       return;
     }
     // get assignmentstate
-    const assignmentState = assignment.getState();
-    if (assignmentState !== AssignmentState.FEEDBACK) {
+    if (!assignment.isAtState(AssignmentState.REVIEW)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is not in feedback state");
+        .send("The assignment is not in review state");
       return;
     }
+    // check whether review evaluation is enabled and questionnaire is present
+    if (assignment.reviewEvaluation && !assignment.reviewQuestionnaireId) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("No reviewQuestionnaire is present to evaluate the reviews");
+      return;
+    }
+    const reviewQuestionnaire = await assignment.getReviewQuestionnaire();
+    if (reviewQuestionnaire) {
+      if (reviewQuestionnaire.questions.length === 0) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("The questionnaire doesn't have questions");
+        return;
+      }
+      // check whether there is a question without option:
+      for (const question of reviewQuestionnaire.questions) {
+        if (
+          question instanceof CheckboxQuestion ||
+          question instanceof MultipleChoiceQuestion
+        ) {
+          if (question.options.length === 0) {
+            res
+              .status(HttpStatusCode.FORBIDDEN)
+              .send(
+                "One of the questions in the questionnaire doesn't have options"
+              );
+            return;
+          }
+        }
+      }
+    }
+
     const questionnaire = await assignment.getSubmissionQuestionnaire();
     if (!questionnaire) {
       res
@@ -210,8 +244,9 @@ router.patch(
         submittedReviews.push(review);
       }
     }
-    const sortedReviews = _.sortBy(submittedReviews, "id");
-    res.send(sortedReviews);
+    assignment.state = AssignmentState.FEEDBACK;
+    await assignment.save();
+    res.send(assignment);
   }
 );
 
@@ -231,13 +266,11 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
-  const assignmentState = assignment.getState();
   const anonymousReview = review.getAnonymousVersion();
   // reviewer should access the review when reviewing
   if (
     (await review.isReviewer(user)) &&
-    (assignmentState === AssignmentState.REVIEW ||
-      assignmentState === AssignmentState.FEEDBACK)
+    assignment.isAtOrAfterState(AssignmentState.REVIEW)
   ) {
     // set startedAt if not defined yet
     if (!review.startedAt) {
@@ -250,7 +283,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   // reviewed user should access the review when getting feedback and the review is finished
   if (
     (await review.isReviewed(user)) &&
-    assignmentState === AssignmentState.FEEDBACK &&
+    assignment.isAtState(AssignmentState.FEEDBACK) &&
     review.submitted
   ) {
     res.send(anonymousReview);
@@ -280,15 +313,13 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
-  const assignmentState = assignment.getState();
   if (
     // reviewer should access the review when reviewing
     ((await review.isReviewer(user)) &&
-      (assignmentState === AssignmentState.REVIEW ||
-        assignmentState === AssignmentState.FEEDBACK)) ||
+      assignment.isAtOrAfterState(AssignmentState.REVIEW)) ||
     // reviewed user should access the review when getting feedback and the review is finished
     ((await review.isReviewed(user)) &&
-      assignmentState === AssignmentState.FEEDBACK &&
+      assignment.isAtState(AssignmentState.FEEDBACK) &&
       review.submitted)
   ) {
     res.send(sortedReviewAnswers);
@@ -297,6 +328,49 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
   res
     .status(HttpStatusCode.FORBIDDEN)
     .send("You are not allowed to view this review");
+});
+
+// get a review file either as teacher or student
+router.get("/:id/filemetadata", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  const review = await ReviewOfSubmission.findOne(req.params.id);
+  if (!review) {
+    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
+    return;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const submission = review.submission!;
+  const file = submission.file;
+  if (await review.isTeacherOrTeachingAssistantInCourse(user)) {
+    res.send(file);
+    return;
+  }
+  // get assignmentstate
+  const questionnaire = await review.getQuestionnaire();
+  const assignment = await questionnaire.getAssignment();
+  if (
+    (await review.isReviewer(user)) &&
+    assignment.isAtOrAfterState(AssignmentState.REVIEW)
+  ) {
+    // replace the filename with "File" before sending
+    file.name = "File";
+    res.send(file);
+    return;
+  }
+  // reviewed user should access the review when getting feedback and the review is finished
+  if (
+    (await review.isReviewed(user)) &&
+    assignment.isAtState(AssignmentState.FEEDBACK) &&
+    review.submitted
+  ) {
+    res.send(file);
+    return;
+  }
+  res
+    .status(HttpStatusCode.FORBIDDEN)
+    .send("You are not allowed to view this review");
+  return;
 });
 
 // get a review file either as teacher or student
@@ -311,35 +385,35 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const submission = review.submission!;
   const file = submission.file;
-  const fileName = file.getFileNamewithExtension();
   const filePath = file.getPath();
   if (await review.isTeacherOrTeachingAssistantInCourse(user)) {
+    const fileName = file.getFileNamewithExtension();
     res.download(filePath, fileName);
     return;
   }
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
-  const assignmentState = assignment.getState();
   if (
     (await review.isReviewer(user)) &&
-    (assignmentState === AssignmentState.REVIEW ||
-      assignmentState === AssignmentState.FEEDBACK)
+    assignment.isAtOrAfterState(AssignmentState.REVIEW)
   ) {
     // set downloadedAt if not defined yet
     if (!review.downloadedAt) {
       review.downloadedAt = new Date();
       await review.save();
     }
+    const fileName = file.getAnonymousFileNamewithExtension();
     res.download(filePath, fileName);
     return;
   }
   // reviewed user should access the review when getting feedback and the review is finished
   if (
     (await review.isReviewed(user)) &&
-    assignmentState === AssignmentState.FEEDBACK &&
+    assignment.isAtState(AssignmentState.FEEDBACK) &&
     review.submitted
   ) {
+    const fileName = file.getFileNamewithExtension();
     res.download(filePath, fileName);
     return;
   }
@@ -376,8 +450,8 @@ router.patch(
     // get assignmentstate
     const questionnaire = await review.getQuestionnaire();
     const assignment = await questionnaire.getAssignment();
-    const assignmentState = assignment.getState();
-    if (assignmentState !== AssignmentState.REVIEW) {
+    // Review cannot be changed (unsubmitted/flagged) in feedback phase when submitted
+    if (assignment.isAtState(AssignmentState.FEEDBACK) && review.submitted) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The assignment is not in review state");
@@ -430,8 +504,7 @@ router.patch(
     // get assignmentstate
     const questionnaire = await review.getQuestionnaire();
     const assignment = await questionnaire.getAssignment();
-    const assignmentState = assignment.getState();
-    if (assignmentState !== AssignmentState.FEEDBACK) {
+    if (!assignment.isAtState(AssignmentState.FEEDBACK)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The assignment is not in feedback state");
@@ -594,14 +667,12 @@ router.post(
       return;
     }
     // assignmentstate
-    const assignmentState = assignment.getState();
-    if (
-      assignmentState === AssignmentState.UNPUBLISHED ||
-      assignmentState === AssignmentState.SUBMISSION
-    ) {
+    if (!assignment.isAtState(AssignmentState.WAITING_FOR_REVIEW)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("The submission state has not been passed");
+        .send(
+          "The submission state has not been passed or reviews are already assigned"
+        );
       return;
     }
     const questionnaire = await assignment.getSubmissionQuestionnaire();
@@ -611,6 +682,29 @@ router.post(
         .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
       return;
     }
+    if (questionnaire.questions.length === 0) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The questionnaire doesn't have questions");
+      return;
+    }
+    // check whether there is a question without option:
+    for (const question of questionnaire.questions) {
+      if (
+        question instanceof CheckboxQuestion ||
+        question instanceof MultipleChoiceQuestion
+      ) {
+        if (question.options.length === 0) {
+          res
+            .status(HttpStatusCode.FORBIDDEN)
+            .send(
+              "One of the questions in the questionnaire doesn't have options"
+            );
+          return;
+        }
+      }
+    }
+
     // check for existing reviews
     const existingReviews = await questionnaire.getReviews();
     if (existingReviews.length > 0) {
@@ -658,15 +752,9 @@ router.post(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const existingReviews = (
-          await transactionalEntityManager.findOneOrFail(
-            SubmissionQuestionnaire,
-            questionnaire.id,
-            {
-              relations: ["reviews"],
-            }
-          )
-        ).reviews!;
+        const existingReviews = await transactionalEntityManager.find(Review, {
+          where: { questionnaire: questionnaire },
+        });
         if (existingReviews.length > 0) {
           throw new Error("There are already reviews for this assignment");
         }
@@ -688,6 +776,9 @@ router.post(
           await transactionalEntityManager.save(review);
           reviews.push(review);
         }
+        // set the proper assignmentstate
+        assignment.state = AssignmentState.REVIEW;
+        await transactionalEntityManager.save(assignment);
       }
     );
     // reload the groups from the database

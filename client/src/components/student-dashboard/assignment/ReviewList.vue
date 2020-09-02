@@ -2,8 +2,8 @@
     <div>
         <b-card v-if="reviews.length === 0">No reviews available.</b-card>
         <div v-else>
-            <b-alert variant="info" :show="reviewsAreReadOnly"
-                >The review due date has passed, you can only view your response(s).</b-alert
+            <b-alert variant="info" :show="assignment.state === 'feedback'"
+                >The review phase has passed, make sure to submit your reviews as soon as possible.</b-alert
             >
             <b-card no-body>
                 <b-tabs card>
@@ -18,7 +18,7 @@
                         <Review
                             :reviewId="review.id"
                             @reviewChanged="fetchReviews"
-                            :reviewsAreReadOnly="reviewsAreReadOnly"
+                            :reviewsAreReadOnly="false"
                         ></Review>
                     </b-tab>
                 </b-tabs>
@@ -39,11 +39,6 @@ export default {
         return {
             assignment: {},
             reviews: []
-        }
-    },
-    computed: {
-        reviewsAreReadOnly() {
-            return new Date() > new Date(this.assignment.reviewDueDate)
         }
     },
     async created() {

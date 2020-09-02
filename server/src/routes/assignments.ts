@@ -21,6 +21,7 @@ import _ from "lodash";
 import ResponseMessage from "../enum/ResponseMessage";
 import Group from "../models/Group";
 import { AssignmentState } from "../enum/AssignmentState";
+import Extensions from "../enum/Extensions";
 
 const router = express.Router();
 
@@ -70,7 +71,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   }
   if (
     (await assignment.isEnrolledInGroup(user)) &&
-    (await assignment.getState()) === AssignmentState.UNPUBLISHED
+    (await assignment.isAtState(AssignmentState.UNPUBLISHED))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
@@ -104,7 +105,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   }
   if (
     (await assignment.isEnrolledInGroup(user)) &&
-    (await assignment.getState()) === AssignmentState.UNPUBLISHED
+    (await assignment.isAtState(AssignmentState.UNPUBLISHED))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
@@ -295,6 +296,9 @@ const assignmentSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
+  submissionExtensions: Joi.string()
+    .valid(...Object.values(Extensions))
+    .required(),
 });
 // post an assignment in a course
 router.post(
@@ -349,7 +353,8 @@ router.post(
           file, // possibly null
           req.body.externalLink,
           null, // submissionQuestionnaire (initially empty)
-          null // reviewQuestionnaire (initially empty)
+          null, // reviewQuestionnaire (initially empty)
+          req.body.submissionExtensions
         );
         await transactionalEntityManager.save(assignment);
 
@@ -384,6 +389,9 @@ const assignmentPatchSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
+  submissionExtensions: Joi.string()
+    .valid(...Object.values(Extensions))
+    .required(),
 });
 // patch an assignment in a course
 router.patch(
@@ -413,6 +421,43 @@ router.patch(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("Both a file is uploaded and the body is set to null");
+      return;
+    }
+    // check whether certain fields can be changed
+    if (
+      assignment.isAtOrAfterState(AssignmentState.REVIEW) &&
+      assignment.reviewsPerUser !== req.body.reviewsPerUser
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change reviewsPerUser at this state");
+      return;
+    }
+    if (
+      !assignment.isAtOrBeforeState(AssignmentState.SUBMISSION) &&
+      assignment.enrollable !== req.body.enrollable
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change enrollable at this state");
+      return;
+    }
+    if (
+      assignment.isAtOrAfterState(AssignmentState.FEEDBACK) &&
+      assignment.reviewEvaluation !== req.body.reviewEvaluation
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change reviewEvaluation at this state");
+      return;
+    }
+    if (
+      !assignment.isAtState(AssignmentState.UNPUBLISHED) &&
+      assignment.submissionExtensions !== req.body.submissionExtensions
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change submissionExtensions at this state");
       return;
     }
     // start transaction make sure the file and assignment are both saved
@@ -454,6 +499,7 @@ router.patch(
           assignment.file = newFile;
         }
         assignment.externalLink = req.body.externalLink;
+        assignment.submissionExtensions = req.body.submissionExtensions;
         await transactionalEntityManager.save(assignment);
 
         // save the file to disk
@@ -475,6 +521,75 @@ router.patch(
     await assignment!.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(assignment!);
+  }
+);
+
+// publish an assignment from unpublished state
+router.patch("/:id/publish", validateParams(idSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  const assignmentId = req.params.id;
+  const assignment = await Assignment.findOne(assignmentId);
+  if (!assignment) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+    return;
+  }
+  if (!(await assignment.isTeacherInCourse(user))) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("User is not a teacher of the course");
+    return;
+  }
+  if (!assignment.isAtState(AssignmentState.UNPUBLISHED)) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("The assignment is not in unpublished state");
+    return;
+  }
+  assignment.state = AssignmentState.SUBMISSION;
+  await assignment.save();
+  res.send(assignment);
+});
+
+// close an assignment from submission state
+router.patch(
+  "/:id/closesubmission",
+  validateParams(idSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const assignmentId = req.params.id;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (!(await assignment.isTeacherInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not a teacher of the course");
+      return;
+    }
+    if (!assignment.isAtState(AssignmentState.SUBMISSION)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is not in submission state");
+      return;
+    }
+    const submissions = await assignment.getLatestSubmissionsOfEachGroup();
+    if (submissions.length === 0) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("There are no submissions for this assignment");
+      return;
+    }
+    assignment.state = AssignmentState.WAITING_FOR_REVIEW;
+    await assignment.save();
+    res.send(assignment);
   }
 );
 
@@ -500,21 +615,15 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   await getManager().transaction(
     "SERIALIZABLE",
     async (transactionalEntityManager) => {
-      // find all groups to check for group existence
-      const allGroups = await transactionalEntityManager.find(Group, {
-        relations: ["users", "assignments"],
-      });
-      const alreadyExists = _.some(allGroups, (group) => {
-        return (
-          _.some(group.users, (groupUser) => {
-            return groupUser.netid === user.netid;
-          }) &&
-          _.some(group.assignments, (groupAssignment) => {
-            return groupAssignment.id === assignment.id;
-          })
-        );
-      });
-      if (alreadyExists) {
+      // get group
+      const existingGroup = await transactionalEntityManager
+        .createQueryBuilder(Group, "group")
+        .leftJoin("group.assignments", "assignment")
+        .leftJoin("group.users", "user")
+        .where("assignment.id = :id", { id: assignment.id })
+        .andWhere("user.netid = :netid", { netid: user.netid })
+        .getOne();
+      if (existingGroup) {
         // throw error if a group already exists
         // Can happen if 2 concurrent calls are made
         throw new Error("Group already exists");

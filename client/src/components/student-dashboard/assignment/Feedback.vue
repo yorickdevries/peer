@@ -1,7 +1,15 @@
 <template>
     <b-container fluid class="px-0">
-        <b-row>
-            <b-col>
+        <b-tabs card>
+            <b-tab title="PDF Annotation Feedback">
+                <PDFAnnotator
+                    v-if="latestSubmission.file.extension === '.pdf'"
+                    :submissionId="latestSubmission.id"
+                    :readOnly="true"
+                ></PDFAnnotator>
+                <div v-else>Your submission was not a .pdf file, so it was not annotated by reviewers</div>
+            </b-tab>
+            <b-tab title="Questionnaire Feedback">
                 <!--Feedback Information-->
                 <b-card header="Feedback" class="h-100">
                     <div v-if="feedbackReviews.length === 0">No feedback available.</div>
@@ -147,8 +155,8 @@
                         </b-row>
                     </div>
                 </b-card>
-            </b-col>
-        </b-row>
+            </b-tab>
+        </b-tabs>
     </b-container>
 </template>
 
@@ -156,11 +164,10 @@
 import api from "../../../api/api"
 import _ from "lodash"
 import { StarRating } from "vue-rate-it"
+import PDFAnnotator from "./PDFAnnotator"
 
 export default {
-    components: {
-        StarRating
-    },
+    components: { StarRating, PDFAnnotator },
     data() {
         return {
             assignment: {},

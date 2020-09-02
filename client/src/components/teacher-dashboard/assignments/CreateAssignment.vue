@@ -36,6 +36,14 @@
                             <!--Publish and due date of the assignment-->
                             <b-row class="mb-3">
                                 <b-col>
+                                    <b-alert variant="info" show>
+                                        NOTE: These dates are just mean of communication to students. Advancing through
+                                        the assignment stages should be done manually.
+                                    </b-alert>
+                                </b-col>
+                            </b-row>
+                            <b-row class="mb-3">
+                                <b-col>
                                     <b-form-group>
                                         <template slot="label">
                                             Publish date and time
@@ -120,19 +128,6 @@
                             </b-row>
 
                             <hr />
-
-                            <!--Number of peer reviews per student-->
-                            <b-form-group label="Number of reviews that each student needs to do">
-                                <b-form-input
-                                    v-model="assignment.reviewsPerUser"
-                                    type="number"
-                                    :state="checkReviewsPerUser"
-                                    placeholder="Enter an integer larger than 0"
-                                    required
-                                >
-                                </b-form-input>
-                            </b-form-group>
-
                             <!--File upload-->
                             <b-form-group
                                 label="Assignment file"
@@ -153,6 +148,33 @@
                                 description="Add a link where the assignment can be found for the student (optional)."
                             >
                                 <b-form-input v-model="assignment.externalLink"></b-form-input>
+                            </b-form-group>
+
+                            <!--Allowed Submission extensions-->
+                            <b-form-group
+                                label="Allowed submission file extensions"
+                                description="The extensions for the submission files that are allowed."
+                            >
+                                <b-alert v-if="assignment.submissionExtensions !== '.pdf'" variant="danger" show>
+                                    It is advised to choose '.pdf' as extension because only those files can be directly
+                                    annotated within this website
+                                </b-alert>
+                                <b-form-select
+                                    :options="extensionTypes"
+                                    v-model="assignment.submissionExtensions"
+                                ></b-form-select>
+                            </b-form-group>
+
+                            <!--Number of peer reviews per student-->
+                            <b-form-group label="Number of reviews that each student needs to do">
+                                <b-form-input
+                                    v-model="assignment.reviewsPerUser"
+                                    type="number"
+                                    :state="checkReviewsPerUser"
+                                    placeholder="Enter an integer larger than 0"
+                                    required
+                                >
+                                </b-form-input>
                             </b-form-group>
 
                             <b-form-group>
@@ -184,6 +206,10 @@
                                         </b-form-checkbox>
                                     </b-form-group>
                                     <b-form-group v-if="assignment.reviewEvaluation">
+                                        <b-alert variant="warning" show>
+                                            NOTE: This is a hard deadline for students to be able to make review
+                                            evaluations
+                                        </b-alert>
                                         <template slot="label"
                                             >Review evaluation due date and time
                                             <b-badge
@@ -241,8 +267,15 @@ export default {
                 reviewEvaluationDueTime: "23:59",
                 description: null,
                 file: null,
-                externalLink: null
-            }
+                externalLink: null,
+                submissionExtensions: ".pdf"
+            },
+            extensionTypes: [
+                { value: ".pdf", text: ".pdf" },
+                { value: ".zip", text: ".zip" },
+                { value: ".doc,.docx", text: ".doc,.docx" },
+                { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" }
+            ]
         }
     },
     computed: {
@@ -305,7 +338,8 @@ export default {
                 reviewEvaluationDueDate,
                 this.assignment.description,
                 this.assignment.externalLink,
-                this.assignment.file
+                this.assignment.file,
+                this.assignment.submissionExtensions
             )
             this.showSuccessMessage({ message: "Assignment was successfully created" })
             this.$router.push({

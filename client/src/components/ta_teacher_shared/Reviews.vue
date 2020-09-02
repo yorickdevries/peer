@@ -1,5 +1,63 @@
 <template>
-    <div>
+    <div v-if="reviews">
+        <b-row v-if="$router.currentRoute.name.includes('teacher')">
+            <b-col>
+                <!--Exporting Reviews-->
+                <dt>Export reviews</dt>
+                <dd>Exports a file with all reviews for this assignment.</dd>
+                <dd>
+                    Also includes any evaluations which students have given on eachother's reviews.
+                </dd>
+                <b-button
+                    size="sm"
+                    variant="primary"
+                    :href="
+                        `/api/reviewofsubmissions/exportreviews?assignmentId=${this.$route.params.assignmentId}&exportType=csv`
+                    "
+                    class="mb-3 mr-2"
+                >
+                    Download reviews .csv
+                </b-button>
+                <b-button
+                    size="sm"
+                    variant="primary"
+                    :href="
+                        `/api/reviewofsubmissions/exportreviews?assignmentId=${this.$route.params.assignmentId}&exportType=xls`
+                    "
+                    class="mb-3"
+                >
+                    Download reviews .xls
+                </b-button>
+            </b-col>
+            <b-col>
+                <!--Exporting Grades-->
+                <dt>Export grades</dt>
+                <dd>
+                    Exports a file with an aggregation of the review approval/disapproval numbers of each student for
+                    this assignment.
+                </dd>
+                <b-button
+                    class="mr-2"
+                    size="sm"
+                    variant="primary"
+                    :href="
+                        `/api/reviewofsubmissions/exportgrades?assignmentId=${this.$route.params.assignmentId}&exportType=csv`
+                    "
+                >
+                    Download grades .csv
+                </b-button>
+                <b-button
+                    size="sm"
+                    variant="primary"
+                    :href="
+                        `/api/reviewofsubmissions/exportgrades?assignmentId=${this.$route.params.assignmentId}&exportType=xls`
+                    "
+                >
+                    Download grades .xls
+                </b-button>
+            </b-col>
+        </b-row>
+        <hr />
         <!--Table Options-->
         <b-row>
             <b-col cols="6" class="mb-3">
@@ -108,7 +166,7 @@
 
         <!--Pagination-->
         <b-pagination
-            :total-datas="this.selectedReviews.length"
+            :total-rows="this.selectedReviews.length"
             :per-page="Number(perPage)"
             v-model="currentPage"
             class="my-0"
@@ -123,9 +181,9 @@ import _ from "lodash"
 export default {
     data() {
         return {
-            reviews: [],
+            reviews: null,
             // groups to get groupName from
-            groups: [],
+            groups: null,
             // in case of null, all reviews will be shown
             onlySubmittedReviews: null,
             // for navigation
@@ -147,8 +205,13 @@ export default {
     },
     async created() {
         // reviews
-        const res1 = await api.reviewofsubmissions.getAllForAssignment(this.$route.params.assignmentId, undefined)
-        this.reviews = res1.data
+        try {
+            const res1 = await api.reviewofsubmissions.getAllForAssignment(this.$route.params.assignmentId, undefined)
+            this.reviews = res1.data
+        } catch (error) {
+            // in case no submissionquestionnaire is present, this call will result in an error
+            this.reviews = []
+        }
         // groups
         const res2 = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
         this.groups = res2.data

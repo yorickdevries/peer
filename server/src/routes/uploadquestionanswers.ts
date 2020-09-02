@@ -14,7 +14,6 @@ import { getManager } from "typeorm";
 import path from "path";
 import hasha from "hasha";
 import fsPromises from "fs/promises";
-import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import moment from "moment";
 
@@ -47,15 +46,23 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
     // is teacher
     (await assignment.isTeacherInCourse(user)) ||
     // or reviwer
-    (await review.isReviewer(user)) ||
-    // or reviewed
-    (assignment.isAtState(AssignmentState.FEEDBACK) &&
-      (await review.isReviewed(user)) &&
-      review.submitted)
+    (await review.isReviewer(user))
   ) {
     // get the file
     const file = uploadQuestionAnswer.uploadAnswer;
     const fileName = file.getFileNamewithExtension();
+    const filePath = file.getPath();
+    res.download(filePath, fileName);
+    return;
+  }
+  if (
+    assignment.isAtState(AssignmentState.FEEDBACK) &&
+    (await review.isReviewed(user)) &&
+    review.submitted
+  ) {
+    // get the file
+    const file = uploadQuestionAnswer.uploadAnswer;
+    const fileName = file.getAnonymousFileNamewithExtension();
     const filePath = file.getPath();
     res.download(filePath, fileName);
     return;
@@ -119,15 +126,6 @@ router.post(
       return;
     }
     const assignment = await questionnaire.getAssignment();
-    if (
-      questionnaire instanceof SubmissionQuestionnaire &&
-      !assignment.isAtState(AssignmentState.REVIEW)
-    ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is not in reviewstate");
-      return;
-    }
     if (
       questionnaire instanceof ReviewQuestionnaire &&
       !(
@@ -197,6 +195,84 @@ router.post(
     await uploadAnswer!.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(uploadAnswer!);
+  }
+);
+
+// Joi inputvalidation
+const deleteUploadAnswerSchema = Joi.object({
+  uploadQuestionId: Joi.number().integer().required(),
+  reviewId: Joi.number().integer().required(),
+});
+// delete an uploadAnswer
+router.delete(
+  "/",
+  validateQuery(deleteUploadAnswerSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const questionAnswer = await UploadQuestionAnswer.findOne({
+      where: {
+        questionId: req.query.uploadQuestionId,
+        reviewId: req.query.reviewId,
+      },
+    });
+    if (!questionAnswer) {
+      res
+        .status(HttpStatusCode.NOT_FOUND)
+        .send(ResponseMessage.QUESTIONANSWER_NOT_FOUND);
+      return;
+    }
+    const review = await questionAnswer.getReview();
+    if (!(await review.isReviewer(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You are not the reviewer of this review");
+      return;
+    }
+    if (review.submitted) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The review is already submitted");
+      return;
+    }
+    const questionnaire = await review.getQuestionnaire();
+    const assignment = await questionnaire.getAssignment();
+    if (
+      questionnaire instanceof ReviewQuestionnaire &&
+      !(
+        assignment.isAtState(AssignmentState.FEEDBACK) &&
+        moment().isBefore(assignment.reviewEvaluationDueDate)
+      )
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The reviewevaluation is passed");
+      return;
+    }
+    const file = questionAnswer.uploadAnswer;
+    const filePath = file.getPath();
+
+    // start transaction to make sure an asnwer isnt deleted from a submitted review
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        // const review
+        const reviewToCheck = await transactionalEntityManager.findOneOrFail(
+          Review,
+          review.id
+        );
+        if (reviewToCheck.submitted) {
+          throw new Error("The review is already submitted");
+        }
+        await transactionalEntityManager.remove(questionAnswer);
+        // delete file as well
+        await transactionalEntityManager.remove(file);
+        await fsPromises.unlink(filePath);
+      }
+    );
+    res.send(questionAnswer);
   }
 );
 

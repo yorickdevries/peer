@@ -30,6 +30,9 @@
             <dt>Amount of peer reviews assigned per student</dt>
             <dd>{{ assignment.reviewsPerUser }}</dd>
 
+            <dt>Allowed submission file extensions</dt>
+            <dd>{{ assignment.submissionExtensions }}</dd>
+
             <dt>Assignment File</dt>
             <dd v-if="assignment.file == null" class="text-danger">No assignment file uploaded</dd>
             <dd v-else>

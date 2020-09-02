@@ -8,5 +8,9 @@ export default {
         formData.append("reviewId", reviewId)
         formData.append("file", file)
         return client.post("uploadquestionanswers", formData)
+    },
+    delete(uploadQuestionId, reviewId) {
+        const params = { uploadQuestionId, reviewId }
+        return client.delete("uploadquestionanswers", { params: params })
     }
 }

@@ -5,8 +5,6 @@ import http from "http";
 import createDatabaseConnection from "../databaseConnection";
 import app from "../app";
 
-import initializeData from "../util/initializeData";
-
 console.log("Currently running in: " + app.get("env"));
 
 // Normalize a port into a number, string, or false.
@@ -29,13 +27,6 @@ createDatabaseConnection()
     console.log(
       `Connected to ${connection.options.type} database: ${connection.options.database}`
     );
-    // initialize data in case of running in development
-    if (["development", undefined].includes(process.env.NODE_ENV)) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      initializeData().then(() => {
-        console.log("Initialized data");
-      });
-    }
 
     // Listen on provided port, on all network interfaces.
     server.listen(port);

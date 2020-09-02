@@ -38,7 +38,7 @@
                                         <b-form-select-option :value="null">All</b-form-select-option>
                                         <b-form-select-option
                                             v-for="faculty in faculties"
-                                            :key="faculty.name"
+                                            :key="faculty.id"
                                             :value="faculty"
                                             >{{ faculty.name }} - {{ faculty.longName }}
                                         </b-form-select-option>
@@ -51,7 +51,7 @@
                                         <b-form-select-option :value="null">All</b-form-select-option>
                                         <b-form-select-option
                                             v-for="academicYear in academicYears"
-                                            :key="academicYear.name"
+                                            :key="academicYear.id"
                                             :value="academicYear"
                                             >{{ academicYear.name }}</b-form-select-option
                                         >
@@ -154,7 +154,7 @@
                                         <b-form-select-option :value="null">All</b-form-select-option>
                                         <b-form-select-option
                                             v-for="faculty in faculties"
-                                            :key="faculty.name"
+                                            :key="faculty.id"
                                             :value="faculty"
                                             >{{ faculty.name }} - {{ faculty.longName }}
                                         </b-form-select-option>
@@ -167,7 +167,7 @@
                                         <b-form-select-option :value="null">All</b-form-select-option>
                                         <b-form-select-option
                                             v-for="academicYear in academicYears"
-                                            :key="academicYear.name"
+                                            :key="academicYear.id"
                                             :value="academicYear"
                                             >{{ academicYear.name }}</b-form-select-option
                                         >
@@ -280,9 +280,9 @@ export default {
                 const course = enrollment.course
                 return (
                     (course.name.toLowerCase().includes(this.filterOptions.name.toLowerCase()) || this.filter === "") &&
-                    (this.filterOptions.faculty == null || course.faculty.name === this.filterOptions.faculty.name) &&
+                    (this.filterOptions.faculty == null || course.faculty.id === this.filterOptions.faculty.id) &&
                     (this.filterOptions.academicYear == null ||
-                        course.academicYear.name === this.filterOptions.academicYear.name)
+                        course.academicYear.id === this.filterOptions.academicYear.id)
                 )
             })
         },
@@ -290,9 +290,9 @@ export default {
             return this.enrollableCourses.filter(course => {
                 return (
                     (course.name.toLowerCase().includes(this.filterOptions.name.toLowerCase()) || this.filter === "") &&
-                    (this.filterOptions.faculty == null || course.faculty.name === this.filterOptions.faculty.name) &&
+                    (this.filterOptions.faculty == null || course.faculty.id === this.filterOptions.faculty.id) &&
                     (this.filterOptions.academicYear == null ||
-                        course.academicYear.name === this.filterOptions.academicYear.name)
+                        course.academicYear.id === this.filterOptions.academicYear.id)
                 )
             })
         }

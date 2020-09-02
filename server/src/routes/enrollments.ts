@@ -48,7 +48,9 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
 const enrollmentSchema = Joi.object({
   courseId: Joi.number().integer().required(),
   userNetid: Joi.string().required(),
-  role: Joi.string().valid(...Object.values(UserRole)),
+  role: Joi.string()
+    .valid(...Object.values(UserRole))
+    .required(),
 });
 // create an enrollment for a course
 router.post("/", validateBody(enrollmentSchema), async (req, res) => {

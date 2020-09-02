@@ -41,6 +41,10 @@ export default class File extends BaseModel {
     return this.name + this.extension;
   }
 
+  getAnonymousFileNamewithExtension(): string {
+    return "File" + this.extension;
+  }
+
   getPath(): string {
     const filePath = path.resolve(uploadFolder, this.id.toString());
     return filePath;

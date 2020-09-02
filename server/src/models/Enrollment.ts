@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, RelationId } from "typeorm";
-import { IsDefined } from "class-validator";
+import { IsDefined, IsEnum } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import Course from "./Course";
@@ -7,7 +7,8 @@ import UserRole from "../enum/UserRole";
 
 @Entity()
 export default class Enrollment extends BaseModel {
-  @PrimaryColumn()
+  // length of max 191 due to UTF-8MB4 encoding of strings
+  @PrimaryColumn({ length: 63 })
   @RelationId((enrollment: Enrollment) => enrollment.user)
   userNetid!: string;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -23,6 +24,7 @@ export default class Enrollment extends BaseModel {
 
   @Column()
   @IsDefined()
+  @IsEnum(UserRole)
   role: UserRole;
 
   constructor(user: User, course: Course, role: UserRole) {

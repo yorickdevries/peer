@@ -11,7 +11,7 @@ const mockPassportConfiguration = async function (
   // save the user to the database
   const userNetid = await saveUserFromSSO(
     netid,
-    1234567,
+    "1234567",
     "First",
     undefined,
     "Last",
