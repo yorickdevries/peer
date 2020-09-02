@@ -617,24 +617,55 @@ describe("Integration", () => {
       "../../exampleData/submissions/submission1.pdf"
     );
     res = await request(server)
-      .post("/api/submissions")
-      .set("cookie", await studentCookie1())
-      .attach(
-        "file",
-        fs.readFileSync(exampleSubmissionFile1),
-        "submission1.pdf"
-      )
-      .field("groupId", group1.id)
-      .field("assignmentId", assignment.id);
+          .post("/api/submissions")
+          .set("cookie", await studentCookie1())
+          .attach(
+              "file",
+              fs.readFileSync(exampleSubmissionFile1),
+              "submission1.pdf"
+          )
+          .field("groupId", group1.id)
+          .field("assignmentId", assignment.id);
 
     expect(res.status).toBe(HttpStatusCode.OK);
     const submission1 = JSON.parse(res.text);
 
     // make a submission for student 2
+
+    res = await request(server)
+        .post("/api/submissions")
+        .set("cookie", await studentCookie2())
+        .attach(
+            "file",
+            fs.readFileSync(exampleSubmissionFile1),
+            "submission1.pdf"
+        )
+        .field("groupId", group2.id)
+        .field("assignmentId", assignment.id);
     const exampleSubmissionFile2 = path.resolve(
-      __dirname,
-      "../../exampleData/submissions/submission2.pdf"
+    __dirname,
+    "../../exampleData/submissions/submission2.pdf"
     );
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // unsubmit the submission
+    res = await request(server)
+        .patch(`/api/assignments/${assignment.id}/unsubmit?groupId=${group2.id}`)
+         .set("cookie", await studentCookie2());
+      // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    console.log(JSON.parse(res.text));
+
+
+    res = await request(server)
+          .get(`/api/assignments/${assignment.id}/submissions?groupId=${group2.id}`)
+          .set("cookie", await studentCookie2());
+      // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject([undefined]);
+
+
+
     res = await request(server)
       .post("/api/submissions")
       .set("cookie", await studentCookie2())
@@ -651,7 +682,7 @@ describe("Integration", () => {
 
     // get all submissions for this assignment by this group
     res = await request(server)
-      .get(`/api/assignments/${assignment.id}/submissions?groupId=${group1.id}`)
+      .get(`/api/assignments/${assignment.id}/submissions`)
       .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
