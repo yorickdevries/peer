@@ -1,4 +1,5 @@
 import {
+  Column,
   Entity,
   PrimaryGeneratedColumn,
   JoinColumn,
@@ -58,7 +59,8 @@ export default class Submission extends BaseModel {
   )
   reviewOfSubmissions?: ReviewOfSubmission[];
 
-  latestSubmission?: boolean;
+  @Column()
+  latestSubmission: boolean;
 
   constructor(user: User, group: Group, assignment: Assignment, file: File) {
     super();

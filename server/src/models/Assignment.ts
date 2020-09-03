@@ -319,14 +319,11 @@ export default class Assignment extends BaseModel {
     return latestSubmission[0];
   }
 
-  async unsubmitAllSubmissions(group: Group) {
+  async unsubmitAllSubmissions(group: Group): Promise<void> {
     const submissions = await this.getSubmissions(group);
     for (const submission of submissions) {
-      console.log(submission.latestSubmission);
       submission.latestSubmission = false;
-      console.log(submission.latestSubmission);
-      await submission.save();
-      console.log(submission.latestSubmission);
+      await Submission.save(submission);
     }
   }
 

@@ -654,16 +654,16 @@ describe("Integration", () => {
          .set("cookie", await studentCookie2());
       // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    console.log(JSON.parse(res.text));
+    const unsubmittedsSubmission = JSON.parse(res.text)[0];
 
 
     res = await request(server)
-          .get(`/api/assignments/${assignment.id}/submissions?groupId=${group2.id}`)
-          .set("cookie", await studentCookie2());
+        .get(
+            `/api/assignments/${assignment.id}/latestsubmission?groupId=${group2.id}`
+        )
+        .set("cookie", await studentCookie2());
       // assertions
-    expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject([undefined]);
-
+    expect(res.text).toEqual("No submissions have been made yet");
 
 
     res = await request(server)
@@ -682,7 +682,7 @@ describe("Integration", () => {
 
     // get all submissions for this assignment by this group
     res = await request(server)
-      .get(`/api/assignments/${assignment.id}/submissions`)
+      .get(`/api/assignments/${assignment.id}/submissions?groupId=${group1.id}`)
       .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -704,7 +704,7 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject([submission1, submission2]);
+    expect(JSON.parse(res.text)).toMatchObject([submission1, unsubmittedsSubmission, submission2]);
 
     // get latest submissions for this assignment as teacher
     res = await request(server)

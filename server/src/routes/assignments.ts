@@ -233,8 +233,10 @@ router.patch(
       res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
       return;
     }
-    await assignment.unsubmitAllSubmissions(group);
+    const unsubmitSubmission = await assignment.unsubmitAllSubmissions(group);
     const submissions = await assignment.getSubmissions(group);
+    console.log(unsubmitSubmission);
+    console.log(submissions);
     res.send(submissions);
   }
 );
