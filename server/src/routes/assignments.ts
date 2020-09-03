@@ -229,8 +229,8 @@ router.patch(
         .send(ResponseMessage.GROUP_NOT_FOUND);
       return;
     }
-    if (!(await group.hasUser(user))) {
-      res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
+    if (!((await group.hasUser(user)) || await assignment.isTeacherInCourse(user))) {
+      res.status(HttpStatusCode.FORBIDDEN).send("User is not part of the group or is not a teacher");
       return;
     }
     const unsubmitSubmission = await assignment.unsubmitAllSubmissions(group);
