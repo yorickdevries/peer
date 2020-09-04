@@ -302,9 +302,9 @@ export default class Assignment extends BaseModel {
     const finalSubmissionsOfEachGroup: Submission[] = [];
     const groups = await this.getGroups();
     for (const group of groups) {
-      const finalSubmissions = await this.getFinalSubmission(group);
-      if (finalSubmissions) {
-        finalSubmissionsOfEachGroup.push(finalSubmissions);
+      const finalSubmission = await this.getFinalSubmission(group);
+      if (finalSubmission) {
+        finalSubmissionsOfEachGroup.push(finalSubmission);
       }
     }
     return finalSubmissionsOfEachGroup;
