@@ -715,7 +715,7 @@ router.post(
     }
 
     // now the reviews can be dirsibuted
-    const submissions = await assignment.getLatestSubmissionsOfEachGroup();
+    const submissions = await assignment.getSubmissionsToUseForReviewOfEachGroup();
     // get all unique users of the submissions (unique as several submissions might have the same user in the group)
     const users: User[] = [];
     for (const submission of submissions) {

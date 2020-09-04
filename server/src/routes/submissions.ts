@@ -60,34 +60,40 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   res.send(sortedSubmissions);
 });
 
-// get all the latest submissions for an assignment
-// we should swicth to specific annotation of submissions which indicate whether they are the latest
-router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const user = req.user!;
-  // this value has been parsed by the validate function
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const assignmentId: number = req.query.assignmentId as any;
-  const assignment = await Assignment.findOne(assignmentId);
-  if (!assignment) {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
-    return;
+// get all the submissions which will be used for reviewing for an assignment
+router.get(
+  "/submissionstouseforreview",
+  validateQuery(assignmentIdSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const assignmentId: number = req.query.assignmentId as any;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
+      return;
+    }
+    const submissionsToUseForReviewOfEachGroup = await assignment.getSubmissionsToUseForReviewOfEachGroup();
+    const sortedSubmissions = _.sortBy(
+      submissionsToUseForReviewOfEachGroup,
+      "id"
+    );
+    res.send(sortedSubmissions);
   }
-  if (
-    // not a teacher
-    !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
-  ) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
-    return;
-  }
-  const latestSubmissionsOfEachGroup = await assignment.getLatestSubmissionsOfEachGroup();
-  const sortedSubmissions = _.sortBy(latestSubmissionsOfEachGroup, "id");
-  res.send(sortedSubmissions);
-});
+);
 
 // get the submission
 router.get("/:id", validateParams(idSchema), async (req, res) => {
@@ -246,10 +252,6 @@ router.post(
         .send("The assignment is not in submission state");
       return;
     }
-
-    // Set boolean of latest submission of older submissions to false
-    await assignment.unsubmitAllSubmissions(group);
-
     // make the submission here in a transaction
     let submission: Submission;
 
@@ -257,6 +259,23 @@ router.post(
     await getManager().transaction(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
+        // unsubmit all previous submissions
+        const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
+          Submission,
+          {
+            where: {
+              assignment: assignment,
+              group: group,
+            },
+          }
+        );
+        // Set boolean of submission of older submissions to false
+        for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
+          submissionOfGroupForAssignment.useForReview = false;
+          await transactionalEntityManager.save(submissionOfGroupForAssignment);
+        }
+
+        // CONSTRUCT THE SUBMISSION
         // create the file object
         const fileBuffer = req.file.buffer;
         const fileExtension = path.extname(req.file.originalname);
@@ -267,7 +286,7 @@ router.post(
         await transactionalEntityManager.save(file);
 
         // create submission
-        submission = new Submission(user, group, assignment, file);
+        submission = new Submission(user, group, assignment, file, true);
         // this checks for the right extension in the validate function
         await transactionalEntityManager.save(submission);
 
@@ -279,6 +298,75 @@ router.post(
     );
 
     // reload submission to get all data
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    await submission!.reload();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    res.send(submission!);
+  }
+);
+
+// Joi inputvalidation
+const patchSubmissionSchema = Joi.object({
+  useForReview: Joi.boolean().required(),
+});
+// change useForReview for submission
+router.patch(
+  "/:id",
+  validateParams(idSchema),
+  validateBody(patchSubmissionSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const submission = await Submission.findOne(req.params.id);
+    if (!submission) {
+      res
+        .status(HttpStatusCode.NOT_FOUND)
+        .send(ResponseMessage.SUBMISSION_NOT_FOUND);
+      return;
+    }
+    const assignment = await submission.getAssignment();
+    if (!assignment.isAtState(AssignmentState.SUBMISSION)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You are not allowed to change the submission at this state");
+      return;
+    }
+    const group = await submission.getGroup();
+    if (!(await group.hasUser(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You are not part of this group");
+      return;
+    }
+    // perform the patch
+    const useForReview = req.body.useForReview;
+    // start transaction make sure all submissions are changed at the same time
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
+          Submission,
+          {
+            where: {
+              assignment: assignment,
+              group: group,
+            },
+          }
+        );
+        // set booleans to false for all other assignments
+        for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
+          if (submissionOfGroupForAssignment.id !== submission.id) {
+            submissionOfGroupForAssignment.useForReview = false;
+            await transactionalEntityManager.save(
+              submissionOfGroupForAssignment
+            );
+          }
+        }
+        // finally set the submission
+        submission.useForReview = useForReview;
+        await transactionalEntityManager.save(submission);
+      }
+    );
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await submission!.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
