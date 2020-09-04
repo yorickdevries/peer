@@ -93,7 +93,7 @@ export default {
             finalSubmissions: null,
             // groups to get groupName from
             groups: null,
-            // boolean to show all or only latest
+            // boolean to show all or only final submissions
             onlyFinalSubmissions: true,
             // for navigation
             fields: [
@@ -127,7 +127,7 @@ export default {
             // all submissions
             const res1 = await api.submissions.getAllForAssignment(this.$route.params.assignmentId)
             this.allSubmissions = res1.data
-            // latest submissions
+            // final submissions
             const res2 = await api.submissions.getFinal(this.$route.params.assignmentId)
             this.finalSubmissions = res2.data
         },

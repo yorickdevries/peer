@@ -52,7 +52,7 @@
 
                             <dt>Latest Submission</dt>
                             <dd>
-                                <div>Download the latest submission you have submitted with the group here.</div>
+                                <div>Download the final submission with the group here.</div>
                                 <template v-if="finalSubmission">
                                     <a :href="submissionFilePath" target="_blank">
                                         {{ finalSubmission.file.name }}{{ finalSubmission.file.extension }}

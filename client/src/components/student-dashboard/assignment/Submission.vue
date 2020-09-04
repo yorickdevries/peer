@@ -23,7 +23,7 @@
                                 {{ data.item.updatedAt | formatDate }}
                             </template>
                         </b-table>
-                        Only the latest submission will be used for reviewing
+                        Only the final submission will be used for reviewing
                         <br /><br />
                     </div>
                     <b-alert v-else show variant="danger">You have not yet made a submission</b-alert>
