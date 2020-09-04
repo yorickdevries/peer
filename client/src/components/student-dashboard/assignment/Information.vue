@@ -53,9 +53,9 @@
                             <dt>Latest Submission</dt>
                             <dd>
                                 <div>Download the latest submission you have submitted with the group here.</div>
-                                <template v-if="latestSubmission">
+                                <template v-if="finalSubmission">
                                     <a :href="submissionFilePath" target="_blank">
-                                        {{ latestSubmission.file.name }}{{ latestSubmission.file.extension }}
+                                        {{ finalSubmission.file.name }}{{ finalSubmission.file.extension }}
                                     </a>
                                 </template>
                                 <template v-else>
@@ -78,7 +78,7 @@ export default {
         return {
             assignment: {},
             group: {},
-            latestSubmission: null,
+            finalSubmission: null,
             userFields: [
                 { key: "displayName", label: "Name" },
                 { key: "netid", label: "NetID" },
@@ -93,13 +93,13 @@ export default {
         },
         submissionFilePath() {
             // Get the submission file path.
-            return `/api/submissions/${this.latestSubmission.id}/file`
+            return `/api/submissions/${this.finalSubmission.id}/file`
         }
     },
     async created() {
         await this.fetchAssignment()
         await this.fetchGroup()
-        await this.fetchLatestSubmission()
+        await this.fetchFinalSubmission()
     },
     methods: {
         async fetchAssignment() {
@@ -112,10 +112,10 @@ export default {
             const res = await api.assignments.getGroup(this.$route.params.assignmentId)
             this.group = res.data
         },
-        async fetchLatestSubmission() {
+        async fetchFinalSubmission() {
             // Fetch the submission.
             const res = await api.assignments.getFinalSubmission(this.$route.params.assignmentId, this.group.id)
-            this.latestSubmission = res.data
+            this.finalSubmission = res.data
         }
     }
 }

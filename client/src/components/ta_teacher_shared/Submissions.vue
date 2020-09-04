@@ -1,5 +1,5 @@
 <template>
-    <div v-if="allSubmissions && latestSubmissions && groups">
+    <div v-if="allSubmissions && finalSubmissions && groups">
         <!--Table Options-->
         <b-row>
             <b-col cols="6" class="mb-3">
@@ -13,11 +13,11 @@
 
                     <b-button-group class="mx-auto">
                         <button
-                            @click="onlyLatestSubmissions = false"
+                            @click="onlyFinalSubmissions = false"
                             :class="{
-                                'bg-primary': !onlyLatestSubmissions,
-                                'btn-outline-primary': onlyLatestSubmissions,
-                                'text-white': !onlyLatestSubmissions
+                                'bg-primary': !onlyFinalSubmissions,
+                                'btn-outline-primary': onlyFinalSubmissions,
+                                'text-white': !onlyFinalSubmissions
                             }"
                             class="btn btn-sm"
                             size="sm"
@@ -25,11 +25,11 @@
                             All submissions
                         </button>
                         <button
-                            @click="onlyLatestSubmissions = true"
+                            @click="onlyFinalSubmissions = true"
                             :class="{
-                                'bg-primary': onlyLatestSubmissions,
-                                'btn-outline-primary': !onlyLatestSubmissions,
-                                'text-white': onlyLatestSubmissions
+                                'bg-primary': onlyFinalSubmissions,
+                                'btn-outline-primary': !onlyFinalSubmissions,
+                                'text-white': onlyFinalSubmissions
                             }"
                             class="btn btn-sm"
                             size="sm"
@@ -90,11 +90,11 @@ export default {
     data() {
         return {
             allSubmissions: null,
-            latestSubmissions: null,
+            finalSubmissions: null,
             // groups to get groupName from
             groups: null,
             // boolean to show all or only latest
-            onlyLatestSubmissions: true,
+            onlyFinalSubmissions: true,
             // for navigation
             fields: [
                 { key: "id", label: "ID", sortable: true },
@@ -115,8 +115,8 @@ export default {
     },
     computed: {
         selectedSubmissions() {
-            if (this.onlyLatestSubmissions) {
-                return this.latestSubmissions
+            if (this.onlyFinalSubmissions) {
+                return this.finalSubmissions
             } else {
                 return this.allSubmissions
             }
@@ -129,7 +129,7 @@ export default {
             this.allSubmissions = res1.data
             // latest submissions
             const res2 = await api.submissions.getFinal(this.$route.params.assignmentId)
-            this.latestSubmissions = res2.data
+            this.finalSubmissions = res2.data
         },
         async fetchGroups() {
             const res = await api.groups.getAllForAssignment(this.$route.params.assignmentId)

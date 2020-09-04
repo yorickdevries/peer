@@ -82,7 +82,7 @@ export default {
             // existing data
             group: {},
             submissions: [],
-            latestSubmission: null,
+            finalSubmission: null,
             submissionFields: [
                 { key: "id", label: "ID", sortable: true },
                 { key: "file", label: "File" },
@@ -96,7 +96,7 @@ export default {
         await this.fetchAssignment()
         await this.fetchGroup()
         await this.fetchSubmissions()
-        await this.fetchLatestSubmission()
+        await this.fetchFinalSubmission()
     },
     methods: {
         async fetchAssignment() {
@@ -112,10 +112,10 @@ export default {
             const res = await api.assignments.getSubmissions(this.$route.params.assignmentId, this.group.id)
             this.submissions = res.data
         },
-        async fetchLatestSubmission() {
+        async fetchFinalSubmission() {
             // Fetch the submission.
             const res = await api.assignments.getFinalSubmission(this.$route.params.assignmentId, this.group.id)
-            this.latestSubmission = res.data
+            this.finalSubmission = res.data
         },
         async submitSubmission() {
             if (!this.file) {
@@ -137,7 +137,7 @@ export default {
             // Reset and fetch new submission.
             this.resetFile()
             await this.fetchSubmissions()
-            await this.fetchLatestSubmission()
+            await this.fetchFinalSubmission()
         },
         submissionFilePath(id) {
             // Get the submission file path.
