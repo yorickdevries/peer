@@ -71,7 +71,7 @@
                 {{ data.item.createdAt | formatDate }}
             </template>
             <!--Actions-->
-            <template v-slot:cell(action)="data">
+            <template v-if="$router.currentRoute.name.includes('teacher')" v-slot:cell(action)="data">
                 <!--Trigger final /  not final-->
                 <b-button
                     v-if="!data.item.final"
