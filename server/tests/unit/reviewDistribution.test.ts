@@ -108,7 +108,7 @@ describe("Review distribution", () => {
       );
       await file.save();
 
-      const submission = new Submission(student, group, assignment, file);
+      const submission = new Submission(student, group, assignment, file, true);
       await submission.save();
       submissions.push(submission);
     }
@@ -208,7 +208,7 @@ describe("Review distribution", () => {
       );
       await file.save();
 
-      const submission = new Submission(student, group, assignment, file);
+      const submission = new Submission(student, group, assignment, file, true);
       await submission.save();
       submissions.push(submission);
     }
@@ -301,7 +301,13 @@ describe("Review distribution", () => {
     );
     await file1.save();
 
-    const submission1 = new Submission(student1, group1, assignment, file1);
+    const submission1 = new Submission(
+      student1,
+      group1,
+      assignment,
+      file1,
+      true
+    );
     await submission1.save();
     submissions.push(submission1);
 
@@ -321,7 +327,13 @@ describe("Review distribution", () => {
     );
     await file1.save();
 
-    const submission2 = new Submission(student2, group2, assignment, file2);
+    const submission2 = new Submission(
+      student2,
+      group2,
+      assignment,
+      file2,
+      true
+    );
     await submission2.save();
     submissions.push(submission2);
 
