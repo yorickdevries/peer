@@ -22,9 +22,6 @@
                             <template v-slot:cell(date)="data">
                                 {{ data.item.updatedAt | formatDate }}
                             </template>
-                            <template v-slot:cell(latest)="data">
-                                {{ data.item.id === latestSubmission.id }}
-                            </template>
                         </b-table>
                         Only the latest submission will be used for reviewing
                         <br /><br />
@@ -91,7 +88,7 @@ export default {
                 { key: "file", label: "File" },
                 { key: "userNetid", label: "Submitted by" },
                 { key: "date", label: "​​​Date" },
-                { key: "latest", label: "Latest" }
+                { key: "useForReview", label: "Use for review" }
             ]
         }
     },
