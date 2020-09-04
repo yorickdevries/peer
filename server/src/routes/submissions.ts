@@ -367,8 +367,7 @@ router.patch(
         await transactionalEntityManager.save(submission);
       }
     );
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    await submission!.reload();
+    await submission.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(submission!);
   }
