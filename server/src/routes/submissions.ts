@@ -318,20 +318,23 @@ router.patch(
       return;
     }
     const assignment = await submission.getAssignment();
-    if (!assignment.isAtState(AssignmentState.SUBMISSION)) {
+    const group = await submission.getGroup();
+    if (
+      !(
+        assignment.isAtState(AssignmentState.SUBMISSION) &&
+        (await group.hasUser(user))
+      ) &&
+      !(
+        assignment.isAtOrBeforeState(AssignmentState.WAITING_FOR_REVIEW) &&
+        (await assignment.isTeacherInCourse(user))
+      )
+    ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("You are not allowed to change the submission at this state");
       return;
     }
-    const group = await submission.getGroup();
-    if (!(await group.hasUser(user))) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("You are not part of this group");
-      return;
-    }
-    // perform the patch
+    // otherwise, perform the patch
     const final = req.body.final;
     // start transaction make sure all submissions are changed at the same time
     await getManager().transaction(
