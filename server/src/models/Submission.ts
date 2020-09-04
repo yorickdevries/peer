@@ -8,7 +8,7 @@ import {
   RelationId,
   OneToMany,
 } from "typeorm";
-import { IsDefined } from "class-validator";
+import { IsDefined, IsBoolean } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import Assignment from "../models/Assignment";
@@ -60,15 +60,23 @@ export default class Submission extends BaseModel {
   reviewOfSubmissions?: ReviewOfSubmission[];
 
   @Column()
-  latestSubmission: boolean;
+  @IsDefined()
+  @IsBoolean()
+  useForReview: boolean;
 
-  constructor(user: User, group: Group, assignment: Assignment, file: File) {
+  constructor(
+    user: User,
+    group: Group,
+    assignment: Assignment,
+    file: File,
+    useForReview: boolean
+  ) {
     super();
     this.user = user;
     this.group = group;
     this.assignment = assignment;
     this.file = file;
-    this.latestSubmission = true;
+    this.useForReview = useForReview;
   }
 
   // validation: check whether the group is in the assingment and the user in the group
