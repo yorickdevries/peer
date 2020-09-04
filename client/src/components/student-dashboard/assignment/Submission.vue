@@ -27,9 +27,9 @@
                                 <!--Trigger final /  not final-->
                                 <b-button
                                     v-if="!data.item.final"
+                                    v-b-modal="`changeSubmissionToFinalModal${data.item.id}`"
                                     size="sm"
                                     variant="secondary"
-                                    @click="changeSubmissionToFinal(data.item.id)"
                                     class="mr-2"
                                 >
                                     Make final
@@ -43,12 +43,21 @@
                                     >Make not final
                                 </b-button>
                                 <b-modal
+                                    :id="`changeSubmissionToFinalModal${data.item.id}`"
+                                    @ok="changeSubmissionToFinal(data.item.id)"
+                                    title="Confirmation"
+                                    centered
+                                >
+                                    Are you sure you want to make this submission final? This means the other final
+                                    submissions of the group will be set to non-final.
+                                </b-modal>
+                                <b-modal
                                     :id="`changeSubmissionToNotFinalModal${data.item.id}`"
                                     @ok="changeSubmissionToNotFinal(data.item.id)"
                                     title="Confirmation"
                                     centered
                                 >
-                                    Are you sure you want to make the submission not final anymore? This means you will
+                                    Are you sure you want to make this submission not final anymore? This means you will
                                     not participate in the reviews.
                                 </b-modal>
                             </template>
