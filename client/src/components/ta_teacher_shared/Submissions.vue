@@ -124,8 +124,10 @@
 <script>
 import api from "../../api/api"
 import _ from "lodash"
+import notifications from "../../mixins/notifications"
 
 export default {
+    mixins: [notifications],
     data() {
         return {
             allSubmissions: null,
