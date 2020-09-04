@@ -88,7 +88,7 @@ export default {
                 { key: "file", label: "File" },
                 { key: "userNetid", label: "Submitted by" },
                 { key: "date", label: "​​​Date" },
-                { key: "final", label: "Use for review" }
+                { key: "final", label: "Final" }
             ]
         }
     },

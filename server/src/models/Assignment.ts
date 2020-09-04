@@ -299,28 +299,28 @@ export default class Assignment extends BaseModel {
   }
 
   async getFinalSubmissionsOfEachGroup(): Promise<Submission[]> {
-    const FinalSubmissionsOfEachGroup: Submission[] = [];
+    const finalSubmissionsOfEachGroup: Submission[] = [];
     const groups = await this.getGroups();
     for (const group of groups) {
-      const FinalSubmissions = await this.getFinalSubmission(group);
-      if (FinalSubmissions) {
-        FinalSubmissionsOfEachGroup.push(FinalSubmissions);
+      const finalSubmissions = await this.getFinalSubmission(group);
+      if (finalSubmissions) {
+        finalSubmissionsOfEachGroup.push(finalSubmissions);
       }
     }
-    return FinalSubmissionsOfEachGroup;
+    return finalSubmissionsOfEachGroup;
   }
 
   async getFinalSubmission(group: Group): Promise<Submission | undefined> {
     const submissions = await this.getSubmissions(group);
-    const FinalSubmissions = _.filter(submissions, (submission) => {
+    const finalSubmissions = _.filter(submissions, (submission) => {
       return submission.final;
     });
-    if (FinalSubmissions.length === 0) {
+    if (finalSubmissions.length === 0) {
       return undefined;
-    } else if (FinalSubmissions.length === 1) {
-      return FinalSubmissions[0];
+    } else if (finalSubmissions.length === 1) {
+      return finalSubmissions[0];
     } else {
-      throw new Error("There are multiple FinalSubmissions");
+      throw new Error("There are multiple finalSubmissions");
     }
   }
 

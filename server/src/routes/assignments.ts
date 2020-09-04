@@ -233,14 +233,14 @@ router.get(
       res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
       return;
     }
-    const FinalSubmission = await assignment.getFinalSubmission(group);
-    if (!FinalSubmission) {
+    const finalSubmission = await assignment.getFinalSubmission(group);
+    if (!finalSubmission) {
       res
         .status(HttpStatusCode.NOT_FOUND)
         .send("No submissions have been made yet");
       return;
     }
-    res.send(FinalSubmission);
+    res.send(finalSubmission);
   }
 );
 

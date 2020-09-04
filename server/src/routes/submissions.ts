@@ -83,8 +83,8 @@ router.get("/final", validateQuery(assignmentIdSchema), async (req, res) => {
       .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
     return;
   }
-  const FinalSubmissionsOfEachGroup = await assignment.getFinalSubmissionsOfEachGroup();
-  const sortedSubmissions = _.sortBy(FinalSubmissionsOfEachGroup, "id");
+  const finalSubmissionsOfEachGroup = await assignment.getFinalSubmissionsOfEachGroup();
+  const sortedSubmissions = _.sortBy(finalSubmissionsOfEachGroup, "id");
   res.send(sortedSubmissions);
 });
 
