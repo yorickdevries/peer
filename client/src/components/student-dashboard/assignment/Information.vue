@@ -114,10 +114,7 @@ export default {
         },
         async fetchLatestSubmission() {
             // Fetch the submission.
-            const res = await api.assignments.getSubmissionToUseForReview(
-                this.$route.params.assignmentId,
-                this.group.id
-            )
+            const res = await api.assignments.getFinalSubmission(this.$route.params.assignmentId, this.group.id)
             this.latestSubmission = res.data
         }
     }

@@ -205,7 +205,7 @@ router.get(
 
 // get the submission which will be used for reviewing of a group
 router.get(
-  "/:id/submissiontouseforreview",
+  "/:id/finalsubmission",
   validateParams(idSchema),
   validateQuery(querySubmissionSchema),
   async (req, res) => {
@@ -233,16 +233,14 @@ router.get(
       res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
       return;
     }
-    const submissionToUseForReview = await assignment.getSubmissionToUseForReview(
-      group
-    );
-    if (!submissionToUseForReview) {
+    const FinalSubmission = await assignment.getFinalSubmission(group);
+    if (!FinalSubmission) {
       res
         .status(HttpStatusCode.NOT_FOUND)
         .send("No submissions have been made yet");
       return;
     }
-    res.send(submissionToUseForReview);
+    res.send(FinalSubmission);
   }
 );
 
@@ -545,7 +543,7 @@ router.patch(
         .send("The assignment is not in submission state");
       return;
     }
-    const submissions = await assignment.getSubmissionsToUseForReviewOfEachGroup();
+    const submissions = await assignment.getFinalSubmissionsOfEachGroup();
     if (submissions.length === 0) {
       res
         .status(HttpStatusCode.FORBIDDEN)

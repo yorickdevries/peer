@@ -8,9 +8,9 @@ export default {
         const params = { assignmentId }
         return client.get("submissions", { params: params })
     },
-    getSubmissionsToUseForReview(assignmentId) {
+    getFinalSubmissions(assignmentId) {
         const params = { assignmentId }
-        return client.get("submissions/submissionstouseforreview", { params: params })
+        return client.get("submissions/FinalSubmissions", { params: params })
     },
     getFeedback(id) {
         return client.get(`submissions/${id}/feedback`)

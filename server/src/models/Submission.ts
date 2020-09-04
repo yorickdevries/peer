@@ -62,21 +62,21 @@ export default class Submission extends BaseModel {
   @Column()
   @IsDefined()
   @IsBoolean()
-  useForReview: boolean;
+  final: boolean;
 
   constructor(
     user: User,
     group: Group,
     assignment: Assignment,
     file: File,
-    useForReview: boolean
+    final: boolean
   ) {
     super();
     this.user = user;
     this.group = group;
     this.assignment = assignment;
     this.file = file;
-    this.useForReview = useForReview;
+    this.final = final;
   }
 
   // validation: check whether the group is in the assingment and the user in the group

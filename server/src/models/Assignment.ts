@@ -298,33 +298,29 @@ export default class Assignment extends BaseModel {
     }
   }
 
-  async getSubmissionsToUseForReviewOfEachGroup(): Promise<Submission[]> {
-    const submissionsToUseForReviewOfEachGroup: Submission[] = [];
+  async getFinalSubmissionsOfEachGroup(): Promise<Submission[]> {
+    const FinalSubmissionsOfEachGroup: Submission[] = [];
     const groups = await this.getGroups();
     for (const group of groups) {
-      const submissionsToUseForReview = await this.getSubmissionToUseForReview(
-        group
-      );
-      if (submissionsToUseForReview) {
-        submissionsToUseForReviewOfEachGroup.push(submissionsToUseForReview);
+      const FinalSubmissions = await this.getFinalSubmission(group);
+      if (FinalSubmissions) {
+        FinalSubmissionsOfEachGroup.push(FinalSubmissions);
       }
     }
-    return submissionsToUseForReviewOfEachGroup;
+    return FinalSubmissionsOfEachGroup;
   }
 
-  async getSubmissionToUseForReview(
-    group: Group
-  ): Promise<Submission | undefined> {
+  async getFinalSubmission(group: Group): Promise<Submission | undefined> {
     const submissions = await this.getSubmissions(group);
-    const submissionsToUseForReview = _.filter(submissions, (submission) => {
-      return submission.useForReview;
+    const FinalSubmissions = _.filter(submissions, (submission) => {
+      return submission.final;
     });
-    if (submissionsToUseForReview.length === 0) {
+    if (FinalSubmissions.length === 0) {
       return undefined;
-    } else if (submissionsToUseForReview.length === 1) {
-      return submissionsToUseForReview[0];
+    } else if (FinalSubmissions.length === 1) {
+      return FinalSubmissions[0];
     } else {
-      throw new Error("There are multiple submissionsToUseForReview");
+      throw new Error("There are multiple FinalSubmissions");
     }
   }
 

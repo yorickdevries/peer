@@ -62,7 +62,7 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
 
 // get all the submissions which will be used for reviewing for an assignment
 router.get(
-  "/submissionstouseforreview",
+  "/final",
   validateQuery(assignmentIdSchema),
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -86,11 +86,8 @@ router.get(
         .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
       return;
     }
-    const submissionsToUseForReviewOfEachGroup = await assignment.getSubmissionsToUseForReviewOfEachGroup();
-    const sortedSubmissions = _.sortBy(
-      submissionsToUseForReviewOfEachGroup,
-      "id"
-    );
+    const FinalSubmissionsOfEachGroup = await assignment.getFinalSubmissionsOfEachGroup();
+    const sortedSubmissions = _.sortBy(FinalSubmissionsOfEachGroup, "id");
     res.send(sortedSubmissions);
   }
 );
@@ -271,7 +268,7 @@ router.post(
         );
         // Set boolean of submission of older submissions to false
         for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
-          submissionOfGroupForAssignment.useForReview = false;
+          submissionOfGroupForAssignment.final = false;
           await transactionalEntityManager.save(submissionOfGroupForAssignment);
         }
 
@@ -307,9 +304,9 @@ router.post(
 
 // Joi inputvalidation
 const patchSubmissionSchema = Joi.object({
-  useForReview: Joi.boolean().required(),
+  final: Joi.boolean().required(),
 });
-// change useForReview for submission
+// change final for submission
 router.patch(
   "/:id",
   validateParams(idSchema),
@@ -339,7 +336,7 @@ router.patch(
       return;
     }
     // perform the patch
-    const useForReview = req.body.useForReview;
+    const final = req.body.final;
     // start transaction make sure all submissions are changed at the same time
     await getManager().transaction(
       "SERIALIZABLE",
@@ -356,14 +353,14 @@ router.patch(
         // set booleans to false for all other assignments
         for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
           if (submissionOfGroupForAssignment.id !== submission.id) {
-            submissionOfGroupForAssignment.useForReview = false;
+            submissionOfGroupForAssignment.final = false;
             await transactionalEntityManager.save(
               submissionOfGroupForAssignment
             );
           }
         }
         // finally set the submission
-        submission.useForReview = useForReview;
+        submission.final = final;
         await transactionalEntityManager.save(submission);
       }
     );
