@@ -298,32 +298,33 @@ export default class Assignment extends BaseModel {
     }
   }
 
-  async getLatestSubmissionsOfEachGroup(): Promise<Submission[]> {
-    const latestSubmissionsOfEachGroup: Submission[] = [];
+  async getSubmissionsToUseForReviewOfEachGroup(): Promise<Submission[]> {
+    const submissionsToUseForReviewOfEachGroup: Submission[] = [];
     const groups = await this.getGroups();
     for (const group of groups) {
-      const latestSubmission = await this.getLatestSubmission(group);
-      if (latestSubmission) {
-        latestSubmissionsOfEachGroup.push(latestSubmission);
+      const submissionsToUseForReview = await this.getSubmissionToUseForReview(
+        group
+      );
+      if (submissionsToUseForReview) {
+        submissionsToUseForReviewOfEachGroup.push(submissionsToUseForReview);
       }
     }
-    return latestSubmissionsOfEachGroup;
+    return submissionsToUseForReviewOfEachGroup;
   }
 
-  async getLatestSubmission(group: Group): Promise<Submission | undefined> {
+  async getSubmissionToUseForReview(
+    group: Group
+  ): Promise<Submission | undefined> {
     const submissions = await this.getSubmissions(group);
-    const latestSubmission = _.filter(submissions, ["latestSubmission", true]);
-    if (latestSubmission.length == 0) {
+    const submissionsToUseForReview = _.filter(submissions, (submission) => {
+      return submission.useForReview;
+    });
+    if (submissionsToUseForReview.length === 0) {
       return undefined;
-    }
-    return latestSubmission[0];
-  }
-
-  async unsubmitAllSubmissions(group: Group): Promise<void> {
-    const submissions = await this.getSubmissions(group);
-    for (const submission of submissions) {
-      submission.latestSubmission = false;
-      await Submission.save(submission);
+    } else if (submissionsToUseForReview.length === 1) {
+      return submissionsToUseForReview[0];
+    } else {
+      throw new Error("There are multiple submissionsToUseForReview");
     }
   }
 
