@@ -128,7 +128,7 @@ export default {
             const res1 = await api.submissions.getAllForAssignment(this.$route.params.assignmentId)
             this.allSubmissions = res1.data
             // latest submissions
-            const res2 = await api.submissions.getFinalSubmissions(this.$route.params.assignmentId)
+            const res2 = await api.submissions.getFinal(this.$route.params.assignmentId)
             this.latestSubmissions = res2.data
         },
         async fetchGroups() {

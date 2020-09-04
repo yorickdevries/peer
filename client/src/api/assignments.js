@@ -23,7 +23,7 @@ export default {
     },
     getFinalSubmission(assignmentId, groupId) {
         const params = { groupId }
-        return client.get(`assignments/${assignmentId}/FinalSubmission`, { params: params })
+        return client.get(`assignments/${assignmentId}/finalsubmission`, { params: params })
     },
     post(
         name,

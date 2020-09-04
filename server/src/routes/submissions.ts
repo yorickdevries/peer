@@ -61,36 +61,32 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
 });
 
 // get all the submissions which will be used for reviewing for an assignment
-router.get(
-  "/final",
-  validateQuery(assignmentIdSchema),
-  async (req, res) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const user = req.user!;
-    // this value has been parsed by the validate function
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const assignmentId: number = req.query.assignmentId as any;
-    const assignment = await Assignment.findOne(assignmentId);
-    if (!assignment) {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
-      return;
-    }
-    if (
-      // not a teacher
-      !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
-    ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
-      return;
-    }
-    const FinalSubmissionsOfEachGroup = await assignment.getFinalSubmissionsOfEachGroup();
-    const sortedSubmissions = _.sortBy(FinalSubmissionsOfEachGroup, "id");
-    res.send(sortedSubmissions);
+router.get("/final", validateQuery(assignmentIdSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  // this value has been parsed by the validate function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const assignmentId: number = req.query.assignmentId as any;
+  const assignment = await Assignment.findOne(assignmentId);
+  if (!assignment) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+    return;
   }
-);
+  if (
+    // not a teacher
+    !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
+    return;
+  }
+  const FinalSubmissionsOfEachGroup = await assignment.getFinalSubmissionsOfEachGroup();
+  const sortedSubmissions = _.sortBy(FinalSubmissionsOfEachGroup, "id");
+  res.send(sortedSubmissions);
+});
 
 // get the submission
 router.get("/:id", validateParams(idSchema), async (req, res) => {
