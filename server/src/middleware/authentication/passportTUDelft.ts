@@ -38,8 +38,6 @@ const passportConfiguration = function (passport: PassportStatic): void {
       );
       const key = fs.readFileSync(path.resolve(passportConfig.key), "utf-8");
 
-      ppConfig.privateCert = key;
-
       // Information to make the Metadata.xml file
       const decryptionCert = cert;
       ppConfig.decryptionPvk = key;
