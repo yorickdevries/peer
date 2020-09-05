@@ -9,7 +9,6 @@ import {
 } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import Course from "../models/Course";
-import UserRole from "../enum/UserRole";
 import File from "../models/File";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import upload from "../middleware/upload";
@@ -278,7 +277,7 @@ router.post(
         .send(`Course with id ${req.body.courseId} does not exist`);
       return;
     }
-    if (!(await course.isEnrolled(user, UserRole.TEACHER))) {
+    if (!(await course.isTeacher(user))) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("User is not a teacher of the course");
