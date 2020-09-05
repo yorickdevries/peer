@@ -10,7 +10,10 @@
             >PDF viewing and annotation is experimental, in case of any error, you can always download the file with the
             button above.
             <br />
-            <b>NOTE: Altough annotations contain your netid, this will not be shown to the reviewed person.</b>
+            <b
+                >NOTE: Altough annotations contain your netid, anonymous annotations will be shown to the reviewed
+                person.</b
+            >
         </b-alert>
         <!--Annotation view-->
         <div :id="pdfDivId" style="height: 1000px">
