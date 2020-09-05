@@ -9,7 +9,6 @@
     },
     "passport": {
         "idpUrl": "https://login.tudelft.nl/sso/saml2/idp/metadata.php",
-        "realm": "urn:nodejs:passport-saml-metadata-example-app",
         "protocol": "saml2",
         "issuer": "peer.tudelft.nl",
         "callbackUrl": "https://peer.tudelft.nl/api/login/callback",
