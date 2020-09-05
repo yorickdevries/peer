@@ -199,7 +199,8 @@
                             >
                                 <b-alert v-if="assignment.submissionExtensions !== '.pdf'" variant="danger" show>
                                     It is advised to choose '.pdf' as extension because only those files can be directly
-                                    annotated within this website
+                                    annotated within this website. This is a new experimental feature, the students can
+                                    always download the submission files as well.
                                 </b-alert>
                                 <b-form-select
                                     :options="extensionTypes"
