@@ -31,7 +31,7 @@
                                 <div class="text-center border-right border-bottom py-3">
                                     <div class="lead font-weight-bold">
                                         Submission
-                                        <b-badge variant="success" v-if="isInSubmissionState">Open</b-badge>
+                                        <b-badge variant="success" v-if="isSubmissionActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
                                     <div class="text-muted">Due: {{ assignment.dueDate | formatDateCompact }}</div>
@@ -126,6 +126,13 @@ export default {
     computed: {
         isInSubmissionState() {
             return this.assignment.state === "submission"
+        },
+        isSubmissionActive() {
+            return (
+                this.isInSubmissionState &&
+                // either late submission must be enabled or the due date should not have been passed
+                (this.assignment.lateSubmissions || new Date() < new Date(this.assignment.dueDate))
+            )
         },
         isInOrAfterReviewState() {
             return this.assignment.state === "review" || this.assignment.state === "feedback"
