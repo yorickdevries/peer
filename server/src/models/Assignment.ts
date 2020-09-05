@@ -152,6 +152,18 @@ export default class Assignment extends BaseModel {
   // needs later to be revised to a list of strings
   submissionExtensions: Extensions;
 
+  @Column()
+  @IsDefined()
+  @IsBoolean()
+  // enables making submissions after the due date
+  lateSubmissions: boolean;
+
+  @Column()
+  @IsDefined()
+  @IsBoolean()
+  // enables making submissionreviews after the due date
+  lateSubmissionReviews: boolean;
+
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
   // course_id int NOT NULL, FK
@@ -186,7 +198,9 @@ export default class Assignment extends BaseModel {
     externalLink: string | null,
     submissionQuestionnaire: SubmissionQuestionnaire | null,
     reviewQuestionnaire: ReviewQuestionnaire | null,
-    submissionExtensions: Extensions
+    submissionExtensions: Extensions,
+    lateSubmissions: boolean,
+    lateSubmissionReviews: boolean
   ) {
     super();
     this.name = name;
@@ -206,6 +220,8 @@ export default class Assignment extends BaseModel {
     this.submissionQuestionnaire = submissionQuestionnaire;
     this.reviewQuestionnaire = reviewQuestionnaire;
     this.submissionExtensions = submissionExtensions;
+    this.lateSubmissions = lateSubmissions;
+    this.lateSubmissionReviews = lateSubmissionReviews;
   }
 
   // custom validation which is run before saving
