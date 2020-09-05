@@ -2,8 +2,11 @@
     <div>
         <b-card v-if="reviews.length === 0">No reviews available.</b-card>
         <div v-else>
-            <b-alert variant="info" :show="assignment.state === 'feedback'"
+            <b-alert variant="info" :show="assignment.state === 'feedback' && isReviewActive"
                 >The review phase has passed, make sure to submit your reviews as soon as possible.</b-alert
+            >
+            <b-alert variant="danger" :show="assignment.state === 'feedback' && !isReviewActive"
+                >The review phase has passed, you are not allowed to change any review anymore</b-alert
             >
             <b-card no-body>
                 <b-tabs card>
@@ -18,7 +21,7 @@
                         <Review
                             :reviewId="review.id"
                             @reviewChanged="fetchReviews"
-                            :reviewsAreReadOnly="false"
+                            :reviewsAreReadOnly="!isReviewActive"
                         ></Review>
                     </b-tab>
                 </b-tabs>
@@ -39,6 +42,14 @@ export default {
         return {
             assignment: {},
             reviews: []
+        }
+    },
+    computed: {
+        isReviewActive() {
+            return (
+                // either late submission must be enabled or the due date should not have been passed
+                this.assignment.lateSubmissionReviews || new Date() < new Date(this.assignment.reviewDueDate)
+            )
         }
     },
     async created() {

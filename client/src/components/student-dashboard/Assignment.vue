@@ -47,8 +47,8 @@
                             >
                                 <div class="text-center border-right border-bottom py-3">
                                     <div class="lead font-weight-bold">
-                                        Peer Review
-                                        <b-badge variant="success" v-if="isInReviewState">Open</b-badge>
+                                        Review
+                                        <b-badge variant="success" v-if="isReviewActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
                                     <span class="text-muted"
@@ -127,6 +127,15 @@ export default {
         isInSubmissionState() {
             return this.assignment.state === "submission"
         },
+        isInReviewState() {
+            return this.assignment.state === "review"
+        },
+        isInFeedbackState() {
+            return this.assignment.state === "feedback"
+        },
+        isInOrAfterReviewState() {
+            return this.isInReviewState || this.isInFeedbackState
+        },
         isSubmissionActive() {
             return (
                 this.isInSubmissionState &&
@@ -134,19 +143,17 @@ export default {
                 (this.assignment.lateSubmissions || new Date() < new Date(this.assignment.dueDate))
             )
         },
-        isInOrAfterReviewState() {
-            return this.assignment.state === "review" || this.assignment.state === "feedback"
-        },
-        isInReviewState() {
-            return this.assignment.state === "review"
-        },
-        isInFeedbackState() {
-            return this.assignment.state === "feedback"
+        isReviewActive() {
+            return (
+                this.isInOrAfterReviewState &&
+                // either late submissionreviews must be enabled or the due date should not have been passed
+                (this.assignment.lateSubmissionReviews || new Date() < new Date(this.assignment.reviewDueDate))
+            )
         },
         isEvaluationActive() {
             return (
+                this.isInFeedbackState &&
                 this.assignment.reviewEvaluation &&
-                this.assignment.state === "feedback" &&
                 new Date() < new Date(this.assignment.reviewEvaluationDueDate)
             )
         }
