@@ -6,6 +6,10 @@
         <b-alert v-else-if="!review || review.submitted" show variant="warning">
             The review is submitted, any annotations will not be saved</b-alert
         >
+        <b-alert show variant="secondary"
+            >PDF viewing and annotation is experimental, in case of any error, you can always download the file with the
+            button above</b-alert
+        >
         <!--Annotation view-->
         <div :id="pdfDivId" style="height: 1000px">
             <b-alert show variant="primary">LOADING REVIEW PDF</b-alert>
