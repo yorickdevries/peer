@@ -65,8 +65,8 @@ describe("Assignments", () => {
       .field("description", "Example description")
       .field("externalLink", "null")
       .field("submissionExtensions", ".pdf")
-      .field("latesubmissions", true)
-      .field("latesubmissionreviews", true);
+      .field("lateSubmissions", true)
+      .field("lateSubmissionReviews", true);
 
     expect(res2.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res2.text)).toMatchObject({
@@ -114,8 +114,8 @@ describe("Assignments", () => {
       .field("description", "Example description")
       .field("externalLink", "null")
       .field("submissionExtensions", ".pdf")
-      .field("latesubmissions", true)
-      .field("latesubmissionreviews", true);
+      .field("lateSubmissions", true)
+      .field("lateSubmissionReviews", true);
 
     expect(res2.status).not.toBe(HttpStatusCode.OK);
   });
