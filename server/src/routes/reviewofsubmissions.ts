@@ -354,7 +354,7 @@ router.get("/:id/filemetadata", validateParams(idSchema), async (req, res) => {
     assignment.isAtOrAfterState(AssignmentState.REVIEW)
   ) {
     // replace the filename with "File" before sending
-    file.name = "File";
+    file.name = file.getAnonymousFileName();
     res.send(file);
     return;
   }
