@@ -278,7 +278,7 @@ router.post(
         .send(`Course with id ${req.body.courseId} does not exist`);
       return;
     }
-    if (!(await course.isEnrolled(user, UserRole.TEACHER))) {
+    if (!(await course.isTeacher(user))) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("User is not a teacher of the course");

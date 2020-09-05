@@ -161,13 +161,7 @@ export default abstract class Review extends BaseModel {
       throw new Error("Approving TA should be set");
     }
     if (this.approvingTA) {
-      if (
-        !(await course.isEnrolled(
-          this.approvingTA,
-          UserRole.TEACHING_ASSISTANT
-        )) &&
-        !(await course.isEnrolled(this.approvingTA, UserRole.TEACHER))
-      ) {
+      if (!(await course.isTeacherOrTeachingAssistant(this.approvingTA))) {
         throw new Error(
           `${this.approvingTA.netid} should be enrolled in the course`
         );
