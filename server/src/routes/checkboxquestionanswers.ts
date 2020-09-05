@@ -90,23 +90,34 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
     res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
     return;
   }
+  let checkboxAnswer: CheckboxQuestionAnswer | undefined;
   // make or overwrite checkboxAnswer;
-  let checkboxAnswer = await CheckboxQuestionAnswer.findOne({
-    where: {
-      reviewId: review.id,
-      questionId: question.id,
-    },
-  });
-  if (checkboxAnswer) {
-    checkboxAnswer.checkboxAnswer = checkboxQuestionOptions;
-  } else {
-    checkboxAnswer = new CheckboxQuestionAnswer(
-      question,
-      review,
-      checkboxQuestionOptions
-    );
-  }
-  await checkboxAnswer.save();
+  await getManager().transaction(
+    "SERIALIZABLE",
+    async (transactionalEntityManager) => {
+      checkboxAnswer = await transactionalEntityManager.findOne(
+        CheckboxQuestionAnswer,
+        {
+          where: {
+            reviewId: review.id,
+            questionId: question.id,
+          },
+        }
+      );
+      if (checkboxAnswer) {
+        checkboxAnswer.checkboxAnswer = checkboxQuestionOptions;
+      } else {
+        checkboxAnswer = new CheckboxQuestionAnswer(
+          question,
+          review,
+          checkboxQuestionOptions
+        );
+      }
+      await transactionalEntityManager.save(checkboxAnswer);
+    }
+  );
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  await checkboxAnswer!.reload();
   res.send(checkboxAnswer);
 });
 

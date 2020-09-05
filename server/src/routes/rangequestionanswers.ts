@@ -68,23 +68,34 @@ router.post("/", validateBody(rangeAnswerSchema), async (req, res) => {
     res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
     return;
   }
+  let rangeAnswer: RangeQuestionAnswer | undefined;
   // make or overwrite rangeAnswer;
-  let rangeAnswer = await RangeQuestionAnswer.findOne({
-    where: {
-      reviewId: review.id,
-      questionId: question.id,
-    },
-  });
-  if (rangeAnswer) {
-    rangeAnswer.rangeAnswer = req.body.rangeAnswer;
-  } else {
-    rangeAnswer = new RangeQuestionAnswer(
-      question,
-      review,
-      req.body.rangeAnswer
-    );
-  }
-  await rangeAnswer.save();
+  await getManager().transaction(
+    "SERIALIZABLE",
+    async (transactionalEntityManager) => {
+      rangeAnswer = await transactionalEntityManager.findOne(
+        RangeQuestionAnswer,
+        {
+          where: {
+            reviewId: review.id,
+            questionId: question.id,
+          },
+        }
+      );
+      if (rangeAnswer) {
+        rangeAnswer.rangeAnswer = req.body.rangeAnswer;
+      } else {
+        rangeAnswer = new RangeQuestionAnswer(
+          question,
+          review,
+          req.body.rangeAnswer
+        );
+      }
+      await transactionalEntityManager.save(rangeAnswer);
+    }
+  );
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  await rangeAnswer!.reload();
   res.send(rangeAnswer);
 });
 
