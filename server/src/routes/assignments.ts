@@ -9,7 +9,6 @@ import {
 } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import Course from "../models/Course";
-import UserRole from "../enum/UserRole";
 import File from "../models/File";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import upload from "../middleware/upload";
