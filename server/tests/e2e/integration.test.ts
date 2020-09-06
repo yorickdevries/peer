@@ -712,9 +712,7 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     // 2 reviews are generated
     // timeout needs te be set as review distribution is asynchronous
-    setTimeout(() => {
-      console.log("Waited 0.5 second");
-    }, 500);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // get the reviews as teacher
     res = await request(server)
@@ -882,9 +880,7 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     // timeout needs te be set as opening feedback is asynchronous
-    setTimeout(() => {
-      console.log("Waited 0.5 second");
-    }, 500);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // set the moment to a time between review due and evualuation due
     advanceTo(new Date("2020-04-15T10:00Z"));

@@ -42,13 +42,15 @@ app.use((error: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(`Error occured at ${new Date()}: ${errorString}`);
 
   // Send generic 500 error response
-  res.status(HttpStatusCode.INTERNAL_SERVER_ERROR);
-  if (process.env.NODE_ENV === "production") {
-    res.send(ResponseMessage.INTERNAL_SERVER_ERROR);
-  } else {
-    // Send error to frontend if not in production
-    res.send(errorString);
-    throw error;
+  if (!res.headersSent) {
+    res.status(HttpStatusCode.INTERNAL_SERVER_ERROR);
+    if (process.env.NODE_ENV === "production") {
+      res.send(ResponseMessage.INTERNAL_SERVER_ERROR);
+    } else {
+      // Send error to frontend if not in production
+      res.send(errorString);
+      throw error;
+    }
   }
 });
 

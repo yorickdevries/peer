@@ -62,6 +62,7 @@
                                             <dd>Publish the assignment so students are able to make submissions</dd>
                                             <b-button
                                                 v-b-modal="`publishAssignment${assignment.id}`"
+                                                :disabled="disableButton"
                                                 class="mb-3"
                                                 variant="primary"
                                                 size="sm"
@@ -89,6 +90,7 @@
                                             <dd>Close the assignment for receiving submissions</dd>
                                             <b-button
                                                 v-b-modal="`closeSubmission${assignment.id}`"
+                                                :disabled="disableButton"
                                                 class="mb-3"
                                                 variant="primary"
                                                 size="sm"
@@ -121,6 +123,7 @@
                                             </dd>
                                             <b-button
                                                 v-b-modal="`distributeReviews${assignment.id}`"
+                                                :disabled="disableButton"
                                                 class="mb-3"
                                                 variant="primary"
                                                 size="sm"
@@ -134,9 +137,13 @@
                                             >
                                                 Are you sure you want to distribute the reviews?
                                                 <ul>
-                                                    <li>Can (and should be) done only once per assignment.</li>
                                                     <li>
                                                         The submissionquestionnaire cannot be changed after this action.
+                                                    </li>
+                                                    <li>Only press this button <b>once</b> per assignment.</li>
+                                                    <li>
+                                                        If you pressed this button earlier, it can be that reviews are
+                                                        still being assigned.
                                                     </li>
                                                 </ul>
                                             </b-modal>
@@ -150,6 +157,7 @@
                                             </dd>
                                             <b-button
                                                 v-b-modal="`openFeedback${assignment.id}`"
+                                                :disabled="disableButton"
                                                 class="mb-3"
                                                 variant="primary"
                                                 size="sm"
@@ -166,7 +174,8 @@
                                                     <li>All submitted reviews cannot be changed anymore</li>
                                                     <li>
                                                         All reviews which are fully filled in (all non-optional
-                                                        questions are answered) will be submitted as well
+                                                        questions are answered) or flagged as not serious will be
+                                                        submitted as well
                                                     </li>
                                                     <li>
                                                         All reviews which are not submitted yet can still be completed
@@ -258,7 +267,8 @@ export default {
                 { name: "waitingforreview", icon: "fas fa-user-clock" },
                 { name: "review", icon: "fas fa-glasses" },
                 { name: "feedback", icon: "fas fa-comments" }
-            ]
+            ],
+            disableButton: false
         }
     },
     computed: {
@@ -281,24 +291,31 @@ export default {
             this.assignment = res.data
         },
         async publishAssignment() {
+            this.disableButton = true
             await api.assignments.publish(this.$route.params.assignmentId)
             this.showSuccessMessage({ message: "Assignment succesfully published" })
             await this.fetchAssignment()
         },
         async closeSubmission() {
+            this.disableButton = true
             await api.assignments.closeSubmission(this.$route.params.assignmentId)
             this.showSuccessMessage({ message: "Assignment succesfully closed" })
             await this.fetchAssignment()
         },
         async distributeReviews() {
+            this.disableButton = true
             await api.reviewofsubmissions.distribute(this.$route.params.assignmentId)
-            this.showSuccessMessage({ message: "Reviews succesfully assigned" })
-            await this.fetchAssignment()
+            this.showSuccessMessage({
+                message: "Reviews are being distributed, check back in a few minutes to see the results"
+            })
         },
         async openFeedback() {
+            this.disableButton = true
             await api.reviewofsubmissions.openFeedback(this.$route.params.assignmentId)
-            this.showSuccessMessage({ message: "Feedback succesfully opened" })
-            await this.fetchAssignment()
+            this.showSuccessMessage({
+                message:
+                    "All completely filled in reviews are being submitted and feedback will be opened therafter, check back in a few minutes to see the results"
+            })
         }
     }
 }
