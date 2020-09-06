@@ -143,6 +143,70 @@
                         <b-input v-model="newUserNetId" placeholder="Enter valid NetID here."></b-input>
                     </dd>
                 </b-card>
+                <b-card>
+                    <div v-if="row.item.submissions.length > 0">
+                        <dt>Submissions</dt>
+                        <b-table
+                            striped
+                            outlined
+                            show-empty
+                            stacked="md"
+                            :items="row.item.submissions"
+                            :fields="submissionFields"
+                        >
+                            <template v-slot:cell(file)="data">
+                                <a :href="submissionFilePath(data.item.id)" target="_blank">
+                                    {{ data.item.file.name }}{{ data.item.file.extension }}
+                                </a>
+                            </template>
+                            <template v-slot:cell(date)="data">
+                                {{ data.item.createdAt | formatDate }}
+                            </template>
+                            <!--Actions-->
+                            <template v-slot:cell(action)="data">
+                                <!--Trigger final /  not final-->
+                                <b-button
+                                    v-if="!data.item.final"
+                                    v-b-modal="`changeSubmissionToFinalModal${data.item.id}`"
+                                    size="sm"
+                                    variant="secondary"
+                                    class="mr-2"
+                                >
+                                    Make final
+                                </b-button>
+                                <b-button
+                                    v-else
+                                    v-b-modal="`changeSubmissionToNotFinalModal${data.item.id}`"
+                                    size="sm"
+                                    variant="danger"
+                                    class="mr-2"
+                                    >Make not final
+                                </b-button>
+                                <b-modal
+                                    :id="`changeSubmissionToFinalModal${data.item.id}`"
+                                    @ok="changeSubmissionToFinal(data.item.id)"
+                                    title="Confirmation"
+                                    centered
+                                >
+                                    Are you sure you want to make this submission final? This means the other final
+                                    submissions of the group will be set to non-final.
+                                </b-modal>
+                                <b-modal
+                                    :id="`changeSubmissionToNotFinalModal${data.item.id}`"
+                                    @ok="changeSubmissionToNotFinal(data.item.id)"
+                                    title="Confirmation"
+                                    centered
+                                >
+                                    Are you sure you want to make this submission not final anymore? This means the
+                                    group will not participate in the reviews.
+                                </b-modal>
+                            </template>
+                        </b-table>
+                        Only the final submission will be used for reviewing
+                        <br /><br />
+                    </div>
+                    <b-alert v-else show variant="danger">The group has not yet made a submission</b-alert>
+                </b-card>
             </template>
         </b-table>
 
@@ -178,6 +242,14 @@ export default {
                 { key: "netid", label: "NetID" },
                 { key: "email", label: "​​​Email" },
                 { key: "studentNumber", label: "Studentnumber" },
+                { key: "action", label: "Action" }
+            ],
+            submissionFields: [
+                { key: "id", label: "ID", sortable: true },
+                { key: "file", label: "File" },
+                { key: "userNetid", label: "Submitted by" },
+                { key: "date", label: "​​​Date" },
+                { key: "final", label: "Final" },
                 { key: "action", label: "Action" }
             ],
             currentPage: 1,
@@ -217,9 +289,15 @@ export default {
             this.showSuccessMessage({ message: "Succesfully deleted group." })
         },
         async showDetails(row) {
+            // fetch the users
             const res = await api.groups.get(row.item.id)
             // set the users in the row element
             row.item.users = res.data.users
+
+            // fetch the submissions
+            const res2 = await api.assignments.getSubmissions(this.$route.params.assignmentId, row.item.id)
+            // set the submissions in the row element
+            row.item.submissions = res2.data
             row.toggleDetails()
         },
         async addUserToGroup(groupId, userNetid) {
@@ -235,6 +313,20 @@ export default {
             await api.groups.removeUser(groupId, userNetid)
             await this.fetchGroups()
             this.showSuccessMessage({ message: "Succesfully removed user from group." })
+        },
+        submissionFilePath(id) {
+            // Get the submission file path.
+            return `/api/submissions/${id}/file`
+        },
+        async changeSubmissionToFinal(id) {
+            await api.submissions.patch(id, true)
+            this.showSuccessMessage({ message: "Set submission as final" })
+            await this.fetchGroups()
+        },
+        async changeSubmissionToNotFinal(id) {
+            await api.submissions.patch(id, false)
+            this.showSuccessMessage({ message: "Set submission as not final" })
+            await this.fetchGroups()
         }
     }
 }
