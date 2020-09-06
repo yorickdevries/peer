@@ -23,6 +23,7 @@ import parseSubmissionReviewsForExport from "../util/parseReviewsForExport";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 import Review from "../models/Review";
+import AssignmentExport from "../models/AssignmentExport";
 
 const router = express.Router();
 
@@ -110,9 +111,24 @@ router.get(
     }
     const submitted = true;
     const reviews = await questionnaire.getReviews(submitted);
+    // make sure there is something to export
+    if (reviews.length == 0) {
+      res.status(HttpStatusCode.BAD_REQUEST);
+      res.send("Nothing to export.");
+      return;
+    }
+    const assignmentExport = new AssignmentExport(user, assignment, null);
+    await assignmentExport.save();
+    res.send(assignmentExport);
+    // asynchronically make export
     const gradeSummaries = makeGradeSummaries(reviews);
     const filename = `assignment${assignment.id}_grades`;
-    exportJSONToFile(gradeSummaries, filename, exportType, res);
+    await exportJSONToFile(
+      gradeSummaries,
+      filename,
+      exportType,
+      assignmentExport
+    );
   }
 );
 
@@ -150,9 +166,26 @@ router.get(
         .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
       return;
     }
+    // make sure there is something to export
+    const reviews = await questionnaire.getReviews();
+    if (reviews.length == 0) {
+      res.status(HttpStatusCode.BAD_REQUEST);
+      res.send("Nothing to export.");
+      return;
+    }
+    // make export entry without file
+    const assignmentExport = new AssignmentExport(user, assignment, null);
+    await assignmentExport.save();
+    res.send(assignmentExport);
+    // asynchronically make export
     const parsedReviews = await parseSubmissionReviewsForExport(questionnaire);
     const filename = `assignment${assignment.id}_reviews`;
-    exportJSONToFile(parsedReviews, filename, exportType, res);
+    await exportJSONToFile(
+      parsedReviews,
+      filename,
+      exportType,
+      assignmentExport
+    );
   }
 );
 
