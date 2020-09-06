@@ -117,8 +117,7 @@
 
             <!--Actions-->
             <template v-slot:row-details="row">
-                <b-card>
-                    <dt>Group Members</dt>
+                <b-card header="Group Members" class="h-100">
                     <!--Table-->
                     <b-table striped outlined show-empty stacked="md" :items="row.item.users" :fields="userFields">
                         <template v-slot:cell(action)="data">
@@ -143,9 +142,8 @@
                         <b-input v-model="newUserNetId" placeholder="Enter valid NetID here."></b-input>
                     </dd>
                 </b-card>
-                <b-card>
+                <b-card header="Submissions" class="h-100">
                     <div v-if="row.item.submissions.length > 0">
-                        <dt>Submissions</dt>
                         <b-table
                             striped
                             outlined
@@ -206,6 +204,39 @@
                         <br /><br />
                     </div>
                     <b-alert v-else show variant="danger">The group has not yet made a submission</b-alert>
+
+                    <!-- Modal Button -->
+                    <b-button
+                        v-b-modal="`uploadModal${row.item.id}`"
+                        :disabled="!(assignment.state === 'submission' || assignment.state === 'waitingforreview')"
+                        variant="primary"
+                        @click="resetFile(row.item)"
+                        >Upload new Submission</b-button
+                    >
+
+                    <!-- Upload Modal-->
+                    <b-modal
+                        :id="`uploadModal${row.item.id}`"
+                        ref="uploadModal"
+                        centered
+                        hide-footer
+                        :title="`Upload Submission for group ${row.item.name}`"
+                    >
+                        <b-alert show variant="warning"
+                            >If the group already uploaded a file, it will not be used for reviewing anymore!
+                        </b-alert>
+                        <b-alert show variant="secondary"
+                            >Allowed file types: {{ assignment.submissionExtensions }}</b-alert
+                        >
+                        <b-form-file
+                            v-model="row.item.newFile"
+                            :accept="assignment.submissionExtensions"
+                            placeholder="Choose a file..."
+                            required
+                            :state="Boolean(row.item.newFile)"
+                        />
+                        <b-button variant="primary" class="mt-3" @click="submitSubmission(row.item)">Upload</b-button>
+                    </b-modal>
                 </b-card>
             </template>
         </b-table>
@@ -314,9 +345,26 @@ export default {
             await this.fetchGroups()
             this.showSuccessMessage({ message: "Succesfully removed user from group." })
         },
+        async submitSubmission(rowItem) {
+            const file = rowItem.newFile
+            const groupId = rowItem.id
+            if (!file) {
+                this.showErrorMessage({ message: "No file selected" })
+                return
+            }
+            let config = { "Content-Type": "multipart/form-data" }
+            // Perform upload.
+            await api.submissions.post(groupId, this.$route.params.assignmentId, file, config)
+            this.showSuccessMessage({ message: "Successfully submitted submission." })
+            this.resetFile(rowItem)
+            await this.fetchGroups()
+        },
         submissionFilePath(id) {
             // Get the submission file path.
             return `/api/submissions/${id}/file`
+        },
+        resetFile(rowItem) {
+            rowItem.newFile = null
         },
         async changeSubmissionToFinal(id) {
             await api.submissions.patch(id, true)
