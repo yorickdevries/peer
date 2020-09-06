@@ -13,7 +13,6 @@ import _ from "lodash";
 import { AssignmentState } from "../enum/AssignmentState";
 import generateReviewDistribution from "../util/reviewDistribution";
 import User from "../models/User";
-import Submission from "../models/Submission";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { getManager } from "typeorm";
 import moment from "moment";
@@ -233,20 +232,19 @@ router.patch(
         .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
       return;
     }
+    // send message that reviews are being submitted
+    res.send();
     const submitted = false;
     const unsubmittedReviews = await questionnaire.getReviews(submitted);
-    const submittedReviews = [];
     for (const review of unsubmittedReviews) {
       if (await review.canBeSubmitted()) {
         review.submitted = true;
         review.submittedAt = new Date();
         await review.save();
-        submittedReviews.push(review);
       }
     }
     assignment.state = AssignmentState.FEEDBACK;
     await assignment.save();
-    res.send(assignment);
   }
 );
 
@@ -731,6 +729,8 @@ router.post(
         .send("There are already reviews for this assignment");
       return;
     }
+    // send message that reviews are being distributed
+    res.send();
 
     // now the reviews can be dirsibuted
     const submissions = await assignment.getLatestSubmissionsOfEachGroup();
@@ -748,22 +748,11 @@ router.post(
         }
       }
     }
-    interface reviewAssignment {
-      reviewer: User;
-      submission: Submission;
-    }
-    let reviewDistribution: reviewAssignment[];
-    try {
-      // can throw error
-      reviewDistribution = await generateReviewDistribution(
-        submissions,
-        users,
-        assignment.reviewsPerUser
-      );
-    } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
-      return;
-    }
+    const reviewDistribution = await generateReviewDistribution(
+      submissions,
+      users,
+      assignment.reviewsPerUser
+    );
     // create all reviews in an transaction
     const reviews: ReviewOfSubmission[] = [];
     await getManager().transaction(
@@ -799,11 +788,6 @@ router.post(
         await transactionalEntityManager.save(assignment);
       }
     );
-    // reload the groups from the database
-    for (const review of reviews) {
-      await review.reload();
-    }
-    res.send(reviews);
   }
 );
 
