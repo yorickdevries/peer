@@ -37,6 +37,7 @@ import ReviewComment from "./ReviewComment";
 import PDFAnnotation from "./PDFAnnotation";
 import CommentingPDFAnnotation from "./CommentingPDFAnnotation";
 import ReplyingPDFAnnotation from "./ReplyingPDFAnnotation";
+import AssignmentExport from "./AssignmentExport";
 // End of All Database models
 
 const entityList = [
@@ -78,6 +79,7 @@ const entityList = [
   PDFAnnotation,
   CommentingPDFAnnotation,
   ReplyingPDFAnnotation,
+  AssignmentExport,
 ];
 
 export default entityList;
