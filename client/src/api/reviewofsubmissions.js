@@ -35,5 +35,13 @@ export default {
     distribute(assignmentId) {
         const params = { assignmentId }
         return client.post("reviewofsubmissions/distribute", null, { params: params })
+    },
+    exportReviews(assignmentId, exportType) {
+        const params = { assignmentId, exportType }
+        return client.post("reviewofsubmissions/exportreviews", null, { params: params })
+    },
+    exportGrades(assignmentId, exportType) {
+        const params = { assignmentId, exportType }
+        return client.post("reviewofsubmissions/exportgrades", null, { params: params })
     }
 }

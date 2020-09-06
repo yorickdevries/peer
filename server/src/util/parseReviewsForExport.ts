@@ -11,6 +11,7 @@ const parseSubmissionReviewsForExport = async function (
   const questions = _.sortBy(submissionQuestionnaire.questions, (question) => {
     return question.number;
   });
+
   const reviews = (await submissionQuestionnaire.getReviews()) as ReviewOfSubmission[];
   const assignment = await submissionQuestionnaire.getAssignment();
 
@@ -29,8 +30,12 @@ const parseSubmissionReviewsForExport = async function (
     const reviewer = review.reviewer;
     const reviewerGroup = await assignment.getGroup(reviewer);
 
+    const pdfAnnotations = await review.getPDFAnnotations();
+
     // id
     parsedReview["id"] = review.id;
+
+    // SUBMITTER
     // Submitter netid
     parsedReview["Submitter netid"] = submitter.netid;
     // Submitter studentnumber
@@ -39,6 +44,8 @@ const parseSubmissionReviewsForExport = async function (
     parsedReview["Submitter group id"] = submitterGroup.id;
     // Submitter group name
     parsedReview["Submitter group name"] = submitterGroup.name;
+
+    // REVIEWER
     // Reviewer netid
     parsedReview["Reviewer netid"] = reviewer.netid;
     // Reviewer studentnumber
@@ -47,22 +54,28 @@ const parseSubmissionReviewsForExport = async function (
     parsedReview["Reviewer group id"] = reviewerGroup?.id;
     // Reviewer group name
     parsedReview["Reviewer group name"] = reviewerGroup?.name;
+
+    // REVIEW INFO
     // Submission review started_at
-    parsedReview["Submission review started_at"] = review.startedAt;
+    parsedReview["Submissionreview started at"] = review.startedAt;
     // Submission review downloaded_at
-    parsedReview["Submission review downloaded_at"] = review.downloadedAt;
+    parsedReview["Submissionreview downloaded at"] = review.downloadedAt;
     // Submission review submitted_at
-    parsedReview["Submission review submitted_at"] = review.submittedAt;
+    parsedReview["Submissionreview submitted at"] = review.submittedAt;
     // Submission review done
-    parsedReview["Submission review done"] = review.submitted;
+    parsedReview["Submissionreview submitted"] = review.submitted;
     // Approval status
-    parsedReview["Submission review Approval status"] = review.approvalByTA;
+    parsedReview["Submissionreview approval by TA"] = review.approvalByTA;
     // TA netid
-    parsedReview["Submission review TA netid"] = review.approvingTA?.netid;
+    parsedReview["Submissionreview TA netid"] = review.approvingTA?.netid;
     // Reviewer reported the submission
-    parsedReview["Submission review Reviewer reported the submission"] =
+    parsedReview["Submissionreview Reviewer reported the submission"] =
       review.flaggedByReviewer;
 
+    // number of pdf annotations
+    parsedReview["number of PDF annotations"] = pdfAnnotations.length;
+
+    // QUESTIONS
     // iterate over all questions
     for (const question of questions) {
       const questionText = `R${question.number}. ${question.text}`;
@@ -84,29 +97,31 @@ const parseSubmissionReviewsForExport = async function (
     }
     const reviewEvaluationReviewer = reviewEvaluation?.reviewer;
 
+    // EVALUATOR
     // Evaluator netid
     parsedReview["Evaluator netid"] = reviewEvaluationReviewer?.netid;
     // Evaluator studentnumber
     parsedReview["Evaluator studentnumber"] =
       reviewEvaluationReviewer?.studentNumber;
+
     // Review evaluation started_at
-    parsedReview["Review evaluation started_at"] = reviewEvaluation?.startedAt;
+    parsedReview["Reviewevaluation started at"] = reviewEvaluation?.startedAt;
     // Review evaluation downloaded_at
-    parsedReview["Review evaluation downloaded_at"] =
+    parsedReview["Reviewevaluation downloaded at"] =
       reviewEvaluation?.downloadedAt;
     // Review evaluation submitted_at
-    parsedReview["Review evaluation submitted_at"] =
+    parsedReview["Reviewevaluation submitted at"] =
       reviewEvaluation?.submittedAt;
     // Submission review done
-    parsedReview["Review evaluation done"] = reviewEvaluation?.submitted;
+    parsedReview["Reviewevaluation submitted"] = reviewEvaluation?.submitted;
     // Approval status
-    parsedReview["Review evaluation Approval status"] =
+    parsedReview["Reviewevaluation approval by TA"] =
       reviewEvaluation?.approvalByTA;
     // TA netid
-    parsedReview["Review evaluation TA netid"] =
+    parsedReview["Reviewevaluation TA netid"] =
       reviewEvaluation?.approvingTA?.netid;
     // Reviewer reported the submission
-    parsedReview["Review evaluation Reviewer reported the submission"] =
+    parsedReview["Reviewevaluation Reviewer reported the submission"] =
       reviewEvaluation?.flaggedByReviewer;
 
     // iterate over all questions

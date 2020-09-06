@@ -35,6 +35,7 @@ import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
 import _ from "lodash";
 import Extensions from "../enum/Extensions";
+import AssignmentExport from "./AssignmentExport";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -181,6 +182,13 @@ export default class Assignment extends BaseModel {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => Submission, (submission) => submission.assignment)
   submissions?: Submission[];
+
+  @OneToMany(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (_type) => AssignmentExport,
+    (assignmentExport) => assignmentExport.assignment
+  )
+  assignmentExports?: AssignmentExport[];
 
   constructor(
     name: string,
@@ -369,6 +377,10 @@ export default class Assignment extends BaseModel {
       }
     }
     return false;
+  }
+
+  async getAssignmentExports(): Promise<AssignmentExport[]> {
+    return AssignmentExport.find({ where: { assignment: this } });
   }
 
   // check whether the assignment contains groups

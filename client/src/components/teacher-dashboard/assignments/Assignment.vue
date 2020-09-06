@@ -224,6 +224,11 @@
                             :pathName="'teacher-dashboard.assignments.assignment.review'"
                         ></Reviews>
                     </b-tab>
+
+                    <!--Assignment Exports-->
+                    <b-tab title="Exports">
+                        <AssignmentExports></AssignmentExports>
+                    </b-tab>
                 </b-tabs>
             </b-card>
         </b-container>
@@ -239,6 +244,7 @@ import ReviewQuestionnaireWizard from "../questionnaire/ReviewQuestionnaireWizar
 import Groups from "../Groups"
 import Reviews from "../../ta_teacher_shared/Reviews"
 import Submissions from "../../ta_teacher_shared/Submissions"
+import AssignmentExports from "../AssignmentExports"
 import AssignmentDetails from "../../ta_teacher_shared/AssignmentDetails"
 import notifications from "../../../mixins/notifications"
 import { FormWizard, WizardStep, TabContent } from "vue-form-wizard"
@@ -256,7 +262,8 @@ export default {
         Groups,
         Reviews,
         Submissions,
-        AssignmentDetails
+        AssignmentDetails,
+        AssignmentExports
     },
     data() {
         return {
