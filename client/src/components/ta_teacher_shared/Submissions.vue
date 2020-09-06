@@ -34,7 +34,7 @@
                             class="btn btn-sm"
                             size="sm"
                         >
-                            Latest submissions
+                            Final submissions
                         </button>
                     </b-button-group>
                 </b-form-group>

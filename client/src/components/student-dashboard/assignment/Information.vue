@@ -50,7 +50,7 @@
                             <b-table striped outlined show-empty stacked="md" :items="group.users" :fields="userFields">
                             </b-table>
 
-                            <dt>Latest Submission</dt>
+                            <dt>Final Submission</dt>
                             <dd>
                                 <div>Download the final submission with the group here.</div>
                                 <template v-if="finalSubmission">
