@@ -75,7 +75,7 @@ const assignmentExportIdSchema = Joi.object({
   assignmentId: Joi.number().integer().required(),
   exportType: Joi.string().valid("csv", "xls"),
 });
-router.get(
+router.post(
   "/exportgrades",
   validateQuery(assignmentExportIdSchema),
   async (req, res) => {
@@ -132,7 +132,7 @@ router.get(
   }
 );
 
-router.get(
+router.post(
   "/exportreviews",
   validateQuery(assignmentExportIdSchema),
   async (req, res) => {
