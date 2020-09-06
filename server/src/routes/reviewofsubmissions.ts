@@ -13,17 +13,17 @@ import _ from "lodash";
 import { AssignmentState } from "../enum/AssignmentState";
 import generateReviewDistribution from "../util/reviewDistribution";
 import User from "../models/User";
-import Submission from "../models/Submission";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { getManager } from "typeorm";
 import moment from "moment";
 import ReviewOfReview from "../models/ReviewOfReview";
 import makeGradeSummaries from "../util/makeGradeSummary";
 import exportJSONToFile from "../util/exportJSONToFile";
-import parseReviewsForExport from "../util/parseReviewsForExport";
+import parseSubmissionReviewsForExport from "../util/parseReviewsForExport";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 import Review from "../models/Review";
+import AssignmentExport from "../models/AssignmentExport";
 
 const router = express.Router();
 
@@ -75,7 +75,7 @@ const assignmentExportIdSchema = Joi.object({
   assignmentId: Joi.number().integer().required(),
   exportType: Joi.string().valid("csv", "xls"),
 });
-router.get(
+router.post(
   "/exportgrades",
   validateQuery(assignmentExportIdSchema),
   async (req, res) => {
@@ -111,13 +111,28 @@ router.get(
     }
     const submitted = true;
     const reviews = await questionnaire.getReviews(submitted);
+    // make sure there is something to export
+    if (reviews.length == 0) {
+      res.status(HttpStatusCode.BAD_REQUEST);
+      res.send("Nothing to export.");
+      return;
+    }
+    const assignmentExport = new AssignmentExport(user, assignment, null);
+    await assignmentExport.save();
+    res.send(assignmentExport);
+    // asynchronically make export
     const gradeSummaries = makeGradeSummaries(reviews);
     const filename = `assignment${assignment.id}_grades`;
-    exportJSONToFile(gradeSummaries, filename, exportType, res);
+    await exportJSONToFile(
+      gradeSummaries,
+      filename,
+      exportType,
+      assignmentExport
+    );
   }
 );
 
-router.get(
+router.post(
   "/exportreviews",
   validateQuery(assignmentExportIdSchema),
   async (req, res) => {
@@ -151,9 +166,26 @@ router.get(
         .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
       return;
     }
-    const parsedReviews = await parseReviewsForExport(questionnaire);
+    // make sure there is something to export
+    const reviews = await questionnaire.getReviews();
+    if (reviews.length == 0) {
+      res.status(HttpStatusCode.BAD_REQUEST);
+      res.send("Nothing to export.");
+      return;
+    }
+    // make export entry without file
+    const assignmentExport = new AssignmentExport(user, assignment, null);
+    await assignmentExport.save();
+    res.send(assignmentExport);
+    // asynchronically make export
+    const parsedReviews = await parseSubmissionReviewsForExport(questionnaire);
     const filename = `assignment${assignment.id}_reviews`;
-    exportJSONToFile(parsedReviews, filename, exportType, res);
+    await exportJSONToFile(
+      parsedReviews,
+      filename,
+      exportType,
+      assignmentExport
+    );
   }
 );
 
@@ -233,20 +265,19 @@ router.patch(
         .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
       return;
     }
+    // send message that reviews are being submitted
+    res.send();
     const submitted = false;
     const unsubmittedReviews = await questionnaire.getReviews(submitted);
-    const submittedReviews = [];
     for (const review of unsubmittedReviews) {
       if (await review.canBeSubmitted()) {
         review.submitted = true;
         review.submittedAt = new Date();
         await review.save();
-        submittedReviews.push(review);
       }
     }
     assignment.state = AssignmentState.FEEDBACK;
     await assignment.save();
-    res.send(assignment);
   }
 );
 
@@ -731,6 +762,8 @@ router.post(
         .send("There are already reviews for this assignment");
       return;
     }
+    // send message that reviews are being distributed
+    res.send();
 
     // now the reviews can be dirsibuted
     const submissions = await assignment.getFinalSubmissionsOfEachGroup();
@@ -748,22 +781,11 @@ router.post(
         }
       }
     }
-    interface reviewAssignment {
-      reviewer: User;
-      submission: Submission;
-    }
-    let reviewDistribution: reviewAssignment[];
-    try {
-      // can throw error
-      reviewDistribution = await generateReviewDistribution(
-        submissions,
-        users,
-        assignment.reviewsPerUser
-      );
-    } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
-      return;
-    }
+    const reviewDistribution = await generateReviewDistribution(
+      submissions,
+      users,
+      assignment.reviewsPerUser
+    );
     // create all reviews in an transaction
     const reviews: ReviewOfSubmission[] = [];
     await getManager().transaction(
@@ -799,11 +821,6 @@ router.post(
         await transactionalEntityManager.save(assignment);
       }
     );
-    // reload the groups from the database
-    for (const review of reviews) {
-      await review.reload();
-    }
-    res.send(reviews);
   }
 );
 

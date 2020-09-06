@@ -745,7 +745,8 @@ describe("Integration", () => {
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     // 2 reviews are generated
-    expect(JSON.parse(res.text).length).toBe(2);
+    // timeout needs te be set as review distribution is asynchronous
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // get the reviews as teacher
     res = await request(server)
@@ -912,11 +913,8 @@ describe("Integration", () => {
       )
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
-    assignment = JSON.parse(res.text);
-    expect(assignment).toMatchObject({
-      name: "Example title",
-      state: AssignmentState.FEEDBACK,
-    });
+    // timeout needs te be set as opening feedback is asynchronous
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // set the moment to a time between review due and evualuation due
     advanceTo(new Date("2020-04-15T10:00Z"));
