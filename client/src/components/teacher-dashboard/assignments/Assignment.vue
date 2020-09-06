@@ -303,7 +303,6 @@ export default {
             await this.fetchAssignment()
         },
         async distributeReviews() {
-            // disable button
             this.disableButton = true
             await api.reviewofsubmissions.distribute(this.$route.params.assignmentId)
             this.showSuccessMessage({
