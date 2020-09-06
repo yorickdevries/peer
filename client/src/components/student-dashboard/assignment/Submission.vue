@@ -85,7 +85,7 @@
                         title="Upload Submission"
                     >
                         <b-alert show variant="warning"
-                            >If you have already uploaded a file, it will be used for reviewing anymore!
+                            >If you have already uploaded a file, it will not be used for reviewing anymore!
                         </b-alert>
                         <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
                         <b-alert show variant="secondary"
