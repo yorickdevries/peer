@@ -231,27 +231,43 @@ router.post(
         .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
       return;
     }
+    if (!(await group.hasAssignment(assignment))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("Group is not part of the assignment.");
+      return;
+    }
     if (
-      !(await group.hasUser(user)) ||
-      !(await group.hasAssignment(assignment))
+      !(await group.hasUser(user)) &&
+      !(await assignment.isTeacherInCourse(user))
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("User is not allowed to submit.");
+        .send("You are not allowed to make a submission");
       return;
     }
-    if (!assignment.isAtState(AssignmentState.SUBMISSION)) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is not in submission state");
-      return;
-    }
-    if (!assignment.lateSubmissions && moment().isAfter(assignment.dueDate)) {
+    if (
+      (await group.hasUser(user)) &&
+      (!assignment.isAtState(AssignmentState.SUBMISSION) ||
+        (!assignment.lateSubmissions && moment().isAfter(assignment.dueDate)))
+    ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send(
-          "The due date for submission has passed and late submissions are not allowed by the teacher"
+          "The assignment is not in submission state or the deadline has passed"
         );
+      return;
+    }
+    if (
+      (await assignment.isTeacherInCourse(user)) &&
+      !(
+        assignment.isAtState(AssignmentState.SUBMISSION) ||
+        assignment.isAtState(AssignmentState.WAITING_FOR_REVIEW)
+      )
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is not in submission or waitingforreview state");
       return;
     }
     // make the submission here in a transaction
@@ -329,18 +345,36 @@ router.patch(
     const assignment = await submission.getAssignment();
     const group = await submission.getGroup();
     if (
+      !(await group.hasUser(user)) &&
+      !(await assignment.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You are not allowed to make a submission");
+      return;
+    }
+    if (
+      (await group.hasUser(user)) &&
+      (!assignment.isAtState(AssignmentState.SUBMISSION) ||
+        (!assignment.lateSubmissions && moment().isAfter(assignment.dueDate)))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The assignment is not in submission state or the deadline has passed"
+        );
+      return;
+    }
+    if (
+      (await assignment.isTeacherInCourse(user)) &&
       !(
-        assignment.isAtState(AssignmentState.SUBMISSION) &&
-        (await group.hasUser(user))
-      ) &&
-      !(
-        assignment.isAtOrBeforeState(AssignmentState.WAITING_FOR_REVIEW) &&
-        (await assignment.isTeacherInCourse(user))
+        assignment.isAtState(AssignmentState.SUBMISSION) ||
+        assignment.isAtState(AssignmentState.WAITING_FOR_REVIEW)
       )
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("You are not allowed to change the submission at this state");
+        .send("The assignment is not in submission or waitingforreview state");
       return;
     }
     // otherwise, perform the patch
