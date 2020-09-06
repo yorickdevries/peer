@@ -87,7 +87,10 @@ export default class Submission extends BaseModel {
       ? this.assignment
       : await this.getAssignment();
     // might need to be changed if a teacher submits on behalf of a group
-    if (!(await group.hasUser(user))) {
+    if (
+      !(await group.hasUser(user)) &&
+      !(await assignment.isTeacherInCourse(user))
+    ) {
       throw new Error("User is not part of this group");
     }
     if (!(await group.hasAssignment(assignment))) {
