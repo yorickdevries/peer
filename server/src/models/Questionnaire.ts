@@ -68,14 +68,7 @@ export default abstract class Questionnaire extends BaseModel {
   }
 
   async getReviewsWhereUserIsReviewer(user: User): Promise<Review[]> {
-    const reviews = await this.getReviews();
-    const userReviews: Review[] = [];
-    for (const review of reviews) {
-      if (await review.isReviewer(user)) {
-        userReviews.push(review);
-      }
-    }
-    return userReviews;
+    return Review.find({ where: { questionnaire: this, reviewer: user } });
   }
 
   async hasReviewsWhereUserIsReviewer(user: User): Promise<boolean> {

@@ -80,6 +80,15 @@
                                             required
                                         ></datepicker>
                                         <b-form-input v-model="assignment.dueTime" type="time" required> </b-form-input>
+                                        <b-form-checkbox v-model="assignment.lateSubmissions">
+                                            Allow late submissions after the deadline
+                                            <b-badge
+                                                v-b-tooltip.hover
+                                                title="This allows submissions to be made until the assignment is manually closed by the teacher"
+                                                variant="primary"
+                                                >?</b-badge
+                                            >
+                                        </b-form-checkbox>
                                     </b-form-group>
                                 </b-col>
                             </b-row>
@@ -123,6 +132,20 @@
                                         ></datepicker>
                                         <b-form-input v-model="assignment.reviewDueTime" type="time" required>
                                         </b-form-input>
+                                        <b-form-checkbox v-model="assignment.lateSubmissionReviews">
+                                            Allow late submission reviews after the deadline
+                                            <b-badge
+                                                v-b-tooltip.hover
+                                                title="Students can finish any unfinished reviews after the deadline. Students with unfinished reviews cannot access their feedback and are so motivated to finish reviews when they are late."
+                                                variant="primary"
+                                                >?</b-badge
+                                            >
+                                        </b-form-checkbox>
+                                        <b-alert v-if="!assignment.lateSubmissionReviews" variant="danger" show
+                                            >It is advised to enable late submission reviews because students are only
+                                            allowed to access any feedback when they have submitted all their
+                                            reviews.</b-alert
+                                        >
                                     </b-form-group>
                                 </b-col>
                             </b-row>
@@ -157,7 +180,8 @@
                             >
                                 <b-alert v-if="assignment.submissionExtensions !== '.pdf'" variant="danger" show>
                                     It is advised to choose '.pdf' as extension because only those files can be directly
-                                    annotated within this website
+                                    annotated within this website. This is a new experimental feature, the students can
+                                    always download the submission files as well.
                                 </b-alert>
                                 <b-form-select
                                     :options="extensionTypes"
@@ -268,7 +292,9 @@ export default {
                 description: null,
                 file: null,
                 externalLink: null,
-                submissionExtensions: ".pdf"
+                submissionExtensions: ".pdf",
+                lateSubmissions: true,
+                lateSubmissionReviews: true
             },
             extensionTypes: [
                 { value: ".pdf", text: ".pdf" },
@@ -339,7 +365,9 @@ export default {
                 this.assignment.description,
                 this.assignment.externalLink,
                 this.assignment.file,
-                this.assignment.submissionExtensions
+                this.assignment.submissionExtensions,
+                this.assignment.lateSubmissions,
+                this.assignment.lateSubmissionReviews
             )
             this.showSuccessMessage({ message: "Assignment was successfully created" })
             this.$router.push({

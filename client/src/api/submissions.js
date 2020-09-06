@@ -8,9 +8,9 @@ export default {
         const params = { assignmentId }
         return client.get("submissions", { params: params })
     },
-    getLatest(assignmentId) {
+    getFinal(assignmentId) {
         const params = { assignmentId }
-        return client.get("submissions/latest", { params: params })
+        return client.get("submissions/final", { params: params })
     },
     getFeedback(id) {
         return client.get(`submissions/${id}/feedback`)
@@ -22,5 +22,9 @@ export default {
         formData.append("assignmentId", assignmentId)
         formData.append("file", file)
         return client.post("submissions", formData, config)
+    },
+    patch(id, final) {
+        const body = { final: final }
+        return client.patch(`submissions/${id}`, body)
     }
 }

@@ -30,7 +30,7 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
       .send(ResponseMessage.COURSE_NOT_FOUND);
     return;
   }
-  if (!(await course.isEnrolled(user, UserRole.TEACHER))) {
+  if (!(await course.isTeacher(user))) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
@@ -70,7 +70,7 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
       .send(ResponseMessage.COURSE_NOT_FOUND);
     return;
   }
-  if (!(await course.isEnrolled(user, UserRole.TEACHER))) {
+  if (!(await course.isTeacher(user))) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send(ResponseMessage.NOT_TEACHER_IN_COURSE);

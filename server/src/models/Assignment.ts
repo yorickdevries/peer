@@ -152,6 +152,18 @@ export default class Assignment extends BaseModel {
   // needs later to be revised to a list of strings
   submissionExtensions: Extensions;
 
+  @Column()
+  @IsDefined()
+  @IsBoolean()
+  // enables making submissions after the due date
+  lateSubmissions: boolean;
+
+  @Column()
+  @IsDefined()
+  @IsBoolean()
+  // enables making submissionreviews after the due date
+  lateSubmissionReviews: boolean;
+
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
   // course_id int NOT NULL, FK
@@ -186,7 +198,9 @@ export default class Assignment extends BaseModel {
     externalLink: string | null,
     submissionQuestionnaire: SubmissionQuestionnaire | null,
     reviewQuestionnaire: ReviewQuestionnaire | null,
-    submissionExtensions: Extensions
+    submissionExtensions: Extensions,
+    lateSubmissions: boolean,
+    lateSubmissionReviews: boolean
   ) {
     super();
     this.name = name;
@@ -206,6 +220,8 @@ export default class Assignment extends BaseModel {
     this.submissionQuestionnaire = submissionQuestionnaire;
     this.reviewQuestionnaire = reviewQuestionnaire;
     this.submissionExtensions = submissionExtensions;
+    this.lateSubmissions = lateSubmissions;
+    this.lateSubmissionReviews = lateSubmissionReviews;
   }
 
   // custom validation which is run before saving
@@ -298,32 +314,29 @@ export default class Assignment extends BaseModel {
     }
   }
 
-  async getLatestSubmissionsOfEachGroup(): Promise<Submission[]> {
-    const latestSubmissionsOfEachGroup: Submission[] = [];
+  async getFinalSubmissionsOfEachGroup(): Promise<Submission[]> {
+    const finalSubmissionsOfEachGroup: Submission[] = [];
     const groups = await this.getGroups();
     for (const group of groups) {
-      const latestSubmission = await this.getLatestSubmission(group);
-      if (latestSubmission) {
-        latestSubmissionsOfEachGroup.push(latestSubmission);
+      const finalSubmission = await this.getFinalSubmission(group);
+      if (finalSubmission) {
+        finalSubmissionsOfEachGroup.push(finalSubmission);
       }
     }
-    return latestSubmissionsOfEachGroup;
+    return finalSubmissionsOfEachGroup;
   }
 
-  async getLatestSubmission(group: Group): Promise<Submission | undefined> {
+  async getFinalSubmission(group: Group): Promise<Submission | undefined> {
     const submissions = await this.getSubmissions(group);
-    const latestSubmission = _.filter(submissions, ["latestSubmission", true]);
-    if (latestSubmission.length == 0) {
+    const finalSubmissions = _.filter(submissions, (submission) => {
+      return submission.final;
+    });
+    if (finalSubmissions.length === 0) {
       return undefined;
-    }
-    return latestSubmission[0];
-  }
-
-  async unsubmitAllSubmissions(group: Group): Promise<void> {
-    const submissions = await this.getSubmissions(group);
-    for (const submission of submissions) {
-      submission.latestSubmission = false;
-      await Submission.save(submission);
+    } else if (finalSubmissions.length === 1) {
+      return finalSubmissions[0];
+    } else {
+      throw new Error("There are multiple finalSubmissions");
     }
   }
 

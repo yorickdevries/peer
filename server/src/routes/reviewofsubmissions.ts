@@ -354,7 +354,7 @@ router.get("/:id/filemetadata", validateParams(idSchema), async (req, res) => {
     assignment.isAtOrAfterState(AssignmentState.REVIEW)
   ) {
     // replace the filename with "File" before sending
-    file.name = "File";
+    file.name = file.getAnonymousFileName();
     res.send(file);
     return;
   }
@@ -450,6 +450,17 @@ router.patch(
     // get assignmentstate
     const questionnaire = await review.getQuestionnaire();
     const assignment = await questionnaire.getAssignment();
+    if (
+      !assignment.lateSubmissionReviews &&
+      moment().isAfter(assignment.reviewDueDate)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+        );
+      return;
+    }
     // Review cannot be changed (unsubmitted/flagged) in feedback phase when submitted
     if (assignment.isAtState(AssignmentState.FEEDBACK) && review.submitted) {
       res
@@ -465,6 +476,13 @@ router.patch(
       review.submittedAt = null;
     }
     review.flaggedByReviewer = req.body.flaggedByReviewer;
+    // check whether the review can be submitted before trying to save
+    if (review.submitted && !(await review.canBeSubmitted())) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("A non-optional question isn't answered yet.");
+      return;
+    }
     await review.save();
     const anonymousReview = review.getAnonymousVersion();
     res.send(anonymousReview);
@@ -715,7 +733,7 @@ router.post(
     }
 
     // now the reviews can be dirsibuted
-    const submissions = await assignment.getLatestSubmissionsOfEachGroup();
+    const submissions = await assignment.getFinalSubmissionsOfEachGroup();
     // get all unique users of the submissions (unique as several submissions might have the same user in the group)
     const users: User[] = [];
     for (const submission of submissions) {

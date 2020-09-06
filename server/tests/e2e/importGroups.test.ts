@@ -56,7 +56,9 @@ describe("Group import", () => {
       .field("reviewEvaluationDueDate", "null")
       .field("description", "Example description")
       .field("externalLink", "null")
-      .field("submissionExtensions", ".pdf");
+      .field("submissionExtensions", ".pdf")
+      .field("lateSubmissions", true)
+      .field("lateSubmissionReviews", true);
     assignmentId = JSON.parse(res2.text).id;
 
     // set date to the moment that the assignment is published

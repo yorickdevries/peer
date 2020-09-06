@@ -8,7 +8,7 @@ import {
   RelationId,
   OneToMany,
 } from "typeorm";
-import { IsDefined } from "class-validator";
+import { IsDefined, IsBoolean } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import Assignment from "../models/Assignment";
@@ -60,15 +60,23 @@ export default class Submission extends BaseModel {
   reviewOfSubmissions?: ReviewOfSubmission[];
 
   @Column()
-  latestSubmission: boolean;
+  @IsDefined()
+  @IsBoolean()
+  final: boolean;
 
-  constructor(user: User, group: Group, assignment: Assignment, file: File) {
+  constructor(
+    user: User,
+    group: Group,
+    assignment: Assignment,
+    file: File,
+    final: boolean
+  ) {
     super();
     this.user = user;
     this.group = group;
     this.assignment = assignment;
     this.file = file;
-    this.latestSubmission = true;
+    this.final = final;
   }
 
   // validation: check whether the group is in the assingment and the user in the group
@@ -79,7 +87,10 @@ export default class Submission extends BaseModel {
       ? this.assignment
       : await this.getAssignment();
     // might need to be changed if a teacher submits on behalf of a group
-    if (!(await group.hasUser(user))) {
+    if (
+      !(await group.hasUser(user)) &&
+      !(await assignment.isTeacherInCourse(user))
+    ) {
       throw new Error("User is not part of this group");
     }
     if (!(await group.hasAssignment(assignment))) {

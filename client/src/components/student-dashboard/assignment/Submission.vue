@@ -20,13 +20,49 @@
                                 </a>
                             </template>
                             <template v-slot:cell(date)="data">
-                                {{ data.item.updatedAt | formatDate }}
+                                {{ data.item.createdAt | formatDate }}
                             </template>
-                            <template v-slot:cell(latest)="data">
-                                {{ data.item.id === latestSubmission.id }}
+                            <!--Actions-->
+                            <template v-slot:cell(action)="data">
+                                <!--Trigger final /  not final-->
+                                <b-button
+                                    v-if="!data.item.final"
+                                    v-b-modal="`changeSubmissionToFinalModal${data.item.id}`"
+                                    size="sm"
+                                    variant="secondary"
+                                    class="mr-2"
+                                >
+                                    Make final
+                                </b-button>
+                                <b-button
+                                    v-else
+                                    v-b-modal="`changeSubmissionToNotFinalModal${data.item.id}`"
+                                    size="sm"
+                                    variant="danger"
+                                    class="mr-2"
+                                    >Make not final
+                                </b-button>
+                                <b-modal
+                                    :id="`changeSubmissionToFinalModal${data.item.id}`"
+                                    @ok="changeSubmissionToFinal(data.item.id)"
+                                    title="Confirmation"
+                                    centered
+                                >
+                                    Are you sure you want to make this submission final? This means the other final
+                                    submissions of the group will be set to non-final.
+                                </b-modal>
+                                <b-modal
+                                    :id="`changeSubmissionToNotFinalModal${data.item.id}`"
+                                    @ok="changeSubmissionToNotFinal(data.item.id)"
+                                    title="Confirmation"
+                                    centered
+                                >
+                                    Are you sure you want to make this submission not final anymore? This means you will
+                                    not participate in the reviews.
+                                </b-modal>
                             </template>
                         </b-table>
-                        Only the latest submission will be used for reviewing
+                        Only the final submission will be used for reviewing
                         <br /><br />
                     </div>
                     <b-alert v-else show variant="danger">You have not yet made a submission</b-alert>
@@ -49,7 +85,7 @@
                         title="Upload Submission"
                     >
                         <b-alert show variant="warning"
-                            >If you have already uploaded a file, it will be used for reviewing anymore!
+                            >If you have already uploaded a file, it will not be used for reviewing anymore!
                         </b-alert>
                         <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
                         <b-alert show variant="secondary"
@@ -85,13 +121,13 @@ export default {
             // existing data
             group: {},
             submissions: [],
-            latestSubmission: null,
             submissionFields: [
                 { key: "id", label: "ID", sortable: true },
                 { key: "file", label: "File" },
                 { key: "userNetid", label: "Submitted by" },
                 { key: "date", label: "​​​Date" },
-                { key: "latest", label: "Latest" }
+                { key: "final", label: "Final" },
+                { key: "action", label: "Action" }
             ]
         }
     },
@@ -99,7 +135,6 @@ export default {
         await this.fetchAssignment()
         await this.fetchGroup()
         await this.fetchSubmissions()
-        await this.fetchLatestSubmission()
     },
     methods: {
         async fetchAssignment() {
@@ -114,11 +149,6 @@ export default {
         async fetchSubmissions() {
             const res = await api.assignments.getSubmissions(this.$route.params.assignmentId, this.group.id)
             this.submissions = res.data
-        },
-        async fetchLatestSubmission() {
-            // Fetch the submission.
-            const res = await api.assignments.getLatestSubmission(this.$route.params.assignmentId, this.group.id)
-            this.latestSubmission = res.data
         },
         async submitSubmission() {
             if (!this.file) {
@@ -140,7 +170,6 @@ export default {
             // Reset and fetch new submission.
             this.resetFile()
             await this.fetchSubmissions()
-            await this.fetchLatestSubmission()
         },
         submissionFilePath(id) {
             // Get the submission file path.
@@ -150,6 +179,16 @@ export default {
             // Reset the upload modal state.
             this.fileProgress = 0
             this.file = null
+        },
+        async changeSubmissionToFinal(id) {
+            await api.submissions.patch(id, true)
+            this.showSuccessMessage({ message: "Set submission as final" })
+            await this.fetchSubmissions()
+        },
+        async changeSubmissionToNotFinal(id) {
+            await api.submissions.patch(id, false)
+            this.showSuccessMessage({ message: "Set submission as not final" })
+            await this.fetchSubmissions()
         }
     }
 }

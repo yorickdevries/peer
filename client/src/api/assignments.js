@@ -21,9 +21,9 @@ export default {
         const params = { groupId }
         return client.get(`assignments/${assignmentId}/submissions`, { params: params })
     },
-    getLatestSubmission(assignmentId, groupId) {
+    getFinalSubmission(assignmentId, groupId) {
         const params = { groupId }
-        return client.get(`assignments/${assignmentId}/latestsubmission`, { params: params })
+        return client.get(`assignments/${assignmentId}/finalsubmission`, { params: params })
     },
     post(
         name,
@@ -39,7 +39,9 @@ export default {
         description,
         externalLink,
         file,
-        submissionExtensions
+        submissionExtensions,
+        lateSubmissions,
+        lateSubmissionReviews
     ) {
         // Create formData and append data
         const formData = new FormData()
@@ -67,6 +69,8 @@ export default {
         formData.append("externalLink", externalLink)
         formData.append("file", file)
         formData.append("submissionExtensions", submissionExtensions)
+        formData.append("lateSubmissions", lateSubmissions)
+        formData.append("lateSubmissionReviews", lateSubmissionReviews)
         return client.post("assignments/", formData)
     },
     patch(
@@ -83,7 +87,9 @@ export default {
         description,
         externalLink,
         file,
-        submissionExtensions
+        submissionExtensions,
+        lateSubmissions,
+        lateSubmissionReviews
     ) {
         // Create formData and append data
         const formData = new FormData()
@@ -113,6 +119,8 @@ export default {
             formData.append("file", file)
         }
         formData.append("submissionExtensions", submissionExtensions)
+        formData.append("lateSubmissions", lateSubmissions)
+        formData.append("lateSubmissionReviews", lateSubmissionReviews)
         return client.patch(`assignments/${id}`, formData)
     },
     enroll(id) {

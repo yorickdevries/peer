@@ -20,6 +20,7 @@ import { AssignmentState } from "../enum/AssignmentState";
 import { getManager } from "typeorm";
 import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
+import moment from "moment";
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
@@ -60,9 +61,8 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   res.send(sortedSubmissions);
 });
 
-// get all the latest submissions for an assignment
-// we should swicth to specific annotation of submissions which indicate whether they are the latest
-router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
+// get all the submissions which will be used for reviewing for an assignment
+router.get("/final", validateQuery(assignmentIdSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // this value has been parsed by the validate function
@@ -84,8 +84,8 @@ router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
       .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
     return;
   }
-  const latestSubmissionsOfEachGroup = await assignment.getLatestSubmissionsOfEachGroup();
-  const sortedSubmissions = _.sortBy(latestSubmissionsOfEachGroup, "id");
+  const finalSubmissionsOfEachGroup = await assignment.getFinalSubmissionsOfEachGroup();
+  const sortedSubmissions = _.sortBy(finalSubmissionsOfEachGroup, "id");
   res.send(sortedSubmissions);
 });
 
@@ -231,25 +231,45 @@ router.post(
         .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
       return;
     }
+    if (!(await group.hasAssignment(assignment))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("Group is not part of the assignment.");
+      return;
+    }
     if (
-      !(await group.hasUser(user)) ||
-      !(await group.hasAssignment(assignment))
+      !(await group.hasUser(user)) &&
+      !(await assignment.isTeacherInCourse(user))
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("User is not allowed to submit.");
+        .send("You are not allowed to make a submission");
       return;
     }
-    if (!assignment.isAtState(AssignmentState.SUBMISSION)) {
+    if (
+      (await group.hasUser(user)) &&
+      (!assignment.isAtState(AssignmentState.SUBMISSION) ||
+        (!assignment.lateSubmissions && moment().isAfter(assignment.dueDate)))
+    ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is not in submission state");
+        .send(
+          "The assignment is not in submission state or the deadline has passed"
+        );
       return;
     }
-
-    // Set boolean of latest submission of older submissions to false
-    await assignment.unsubmitAllSubmissions(group);
-
+    if (
+      (await assignment.isTeacherInCourse(user)) &&
+      !(
+        assignment.isAtState(AssignmentState.SUBMISSION) ||
+        assignment.isAtState(AssignmentState.WAITING_FOR_REVIEW)
+      )
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is not in submission or waitingforreview state");
+      return;
+    }
     // make the submission here in a transaction
     let submission: Submission;
 
@@ -257,6 +277,23 @@ router.post(
     await getManager().transaction(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
+        // unsubmit all previous submissions
+        const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
+          Submission,
+          {
+            where: {
+              assignment: assignment,
+              group: group,
+            },
+          }
+        );
+        // Set boolean of submission of older submissions to false
+        for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
+          submissionOfGroupForAssignment.final = false;
+          await transactionalEntityManager.save(submissionOfGroupForAssignment);
+        }
+
+        // CONSTRUCT THE SUBMISSION
         // create the file object
         const fileBuffer = req.file.buffer;
         const fileExtension = path.extname(req.file.originalname);
@@ -267,7 +304,7 @@ router.post(
         await transactionalEntityManager.save(file);
 
         // create submission
-        submission = new Submission(user, group, assignment, file);
+        submission = new Submission(user, group, assignment, file, true);
         // this checks for the right extension in the validate function
         await transactionalEntityManager.save(submission);
 
@@ -281,6 +318,95 @@ router.post(
     // reload submission to get all data
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await submission!.reload();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    res.send(submission!);
+  }
+);
+
+// Joi inputvalidation
+const patchSubmissionSchema = Joi.object({
+  final: Joi.boolean().required(),
+});
+// change final for submission
+router.patch(
+  "/:id",
+  validateParams(idSchema),
+  validateBody(patchSubmissionSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const submission = await Submission.findOne(req.params.id);
+    if (!submission) {
+      res
+        .status(HttpStatusCode.NOT_FOUND)
+        .send(ResponseMessage.SUBMISSION_NOT_FOUND);
+      return;
+    }
+    const assignment = await submission.getAssignment();
+    const group = await submission.getGroup();
+    if (
+      !(await group.hasUser(user)) &&
+      !(await assignment.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You are not allowed to make a submission");
+      return;
+    }
+    if (
+      (await group.hasUser(user)) &&
+      (!assignment.isAtState(AssignmentState.SUBMISSION) ||
+        (!assignment.lateSubmissions && moment().isAfter(assignment.dueDate)))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The assignment is not in submission state or the deadline has passed"
+        );
+      return;
+    }
+    if (
+      (await assignment.isTeacherInCourse(user)) &&
+      !(
+        assignment.isAtState(AssignmentState.SUBMISSION) ||
+        assignment.isAtState(AssignmentState.WAITING_FOR_REVIEW)
+      )
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is not in submission or waitingforreview state");
+      return;
+    }
+    // otherwise, perform the patch
+    const final = req.body.final;
+    // start transaction make sure all submissions are changed at the same time
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
+          Submission,
+          {
+            where: {
+              assignment: assignment,
+              group: group,
+            },
+          }
+        );
+        // set booleans to false for all other assignments
+        for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
+          if (submissionOfGroupForAssignment.id !== submission.id) {
+            submissionOfGroupForAssignment.final = false;
+            await transactionalEntityManager.save(
+              submissionOfGroupForAssignment
+            );
+          }
+        }
+        // finally set the submission
+        submission.final = final;
+        await transactionalEntityManager.save(submission);
+      }
+    );
+    await submission.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(submission!);
   }

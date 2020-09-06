@@ -211,7 +211,9 @@ describe("Integration", () => {
       )
       .field("description", "Example description")
       .field("externalLink", "null")
-      .field("submissionExtensions", ".pdf");
+      .field("submissionExtensions", ".pdf")
+      .field("lateSubmissions", true)
+      .field("lateSubmissionReviews", true);
     expect(res.status).toBe(HttpStatusCode.OK);
     let assignment = JSON.parse(res.text);
     expect(assignment).toMatchObject({
@@ -631,7 +633,6 @@ describe("Integration", () => {
     const submission1 = JSON.parse(res.text);
 
     // make a submission for student 2
-
     res = await request(server)
       .post("/api/submissions")
       .set("cookie", await studentCookie2())
@@ -647,18 +648,20 @@ describe("Integration", () => {
       "../../exampleData/submissions/submission2.pdf"
     );
     expect(res.status).toBe(HttpStatusCode.OK);
+    const submission3 = JSON.parse(res.text);
 
     // unsubmit the submission
     res = await request(server)
-      .patch(`/api/assignments/${assignment.id}/unsubmit?groupId=${group2.id}`)
+      .patch(`/api/submissions/${submission3.id}`)
+      .send({ final: false })
       .set("cookie", await studentCookie2());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    const unsubmittedsSubmission = JSON.parse(res.text)[0];
+    const unsubmittedsSubmission = JSON.parse(res.text);
 
     res = await request(server)
       .get(
-        `/api/assignments/${assignment.id}/latestsubmission?groupId=${group2.id}`
+        `/api/assignments/${assignment.id}/finalsubmission?groupId=${group2.id}`
       )
       .set("cookie", await studentCookie2());
     // assertions
@@ -686,10 +689,10 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([submission1]);
 
-    // get latest submissions for this assignment by this group
+    // get final submissions for this assignment by this group
     res = await request(server)
       .get(
-        `/api/assignments/${assignment.id}/latestsubmission?groupId=${group1.id}`
+        `/api/assignments/${assignment.id}/finalsubmission?groupId=${group1.id}`
       )
       .set("cookie", await studentCookie1());
     // assertions
@@ -708,9 +711,9 @@ describe("Integration", () => {
       submission2,
     ]);
 
-    // get latest submissions for this assignment as teacher
+    // get final submissions for this assignment as teacher
     res = await request(server)
-      .get(`/api/submissions/latest?assignmentId=${assignment.id}`)
+      .get(`/api/submissions/final?assignmentId=${assignment.id}`)
       .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);

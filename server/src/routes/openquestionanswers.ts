@@ -8,6 +8,7 @@ import Review from "../models/Review";
 import { AssignmentState } from "../enum/AssignmentState";
 import OpenQuestionAnswer from "../models/OpenQuestionAnswer";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
+import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
 import { getManager } from "typeorm";
 
@@ -68,19 +69,46 @@ router.post("/", validateBody(openAnswerSchema), async (req, res) => {
     res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
     return;
   }
-  // make or overwrite openAnswer;
-  let openAnswer = await OpenQuestionAnswer.findOne({
-    where: {
-      reviewId: review.id,
-      questionId: question.id,
-    },
-  });
-  if (openAnswer) {
-    openAnswer.openAnswer = req.body.openAnswer;
-  } else {
-    openAnswer = new OpenQuestionAnswer(question, review, req.body.openAnswer);
+  if (
+    questionnaire instanceof SubmissionQuestionnaire &&
+    !assignment.lateSubmissionReviews &&
+    moment().isAfter(assignment.reviewDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+      );
+    return;
   }
-  await openAnswer.save();
+  let openAnswer: OpenQuestionAnswer | undefined;
+  // make or overwrite openAnswer;
+  await getManager().transaction(
+    "SERIALIZABLE",
+    async (transactionalEntityManager) => {
+      openAnswer = await transactionalEntityManager.findOne(
+        OpenQuestionAnswer,
+        {
+          where: {
+            reviewId: review.id,
+            questionId: question.id,
+          },
+        }
+      );
+      if (openAnswer) {
+        openAnswer.openAnswer = req.body.openAnswer;
+      } else {
+        openAnswer = new OpenQuestionAnswer(
+          question,
+          review,
+          req.body.openAnswer
+        );
+      }
+      await transactionalEntityManager.save(openAnswer);
+    }
+  );
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  await openAnswer!.reload();
   res.send(openAnswer);
 });
 
@@ -130,6 +158,18 @@ router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
     )
   ) {
     res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
+    return;
+  }
+  if (
+    questionnaire instanceof SubmissionQuestionnaire &&
+    !assignment.lateSubmissionReviews &&
+    moment().isAfter(assignment.reviewDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+      );
     return;
   }
   // start transaction to make sure an asnwer isnt deleted from a submitted review
