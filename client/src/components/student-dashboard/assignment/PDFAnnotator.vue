@@ -211,7 +211,7 @@ export default {
                                             await api.pdfannotations.post(event.data, review.id, fileId)
                                             izitoast.success({
                                                 title: "Success",
-                                                message: "Succesfully created anntotation",
+                                                message: "Succesfully created annotation",
                                                 position: "bottomCenter"
                                             })
                                             break
@@ -219,7 +219,7 @@ export default {
                                             await api.pdfannotations.patch(event.data.id, event.data)
                                             izitoast.success({
                                                 title: "Success",
-                                                message: "Succesfully changed anntotation",
+                                                message: "Succesfully changed annotation",
                                                 position: "bottomCenter"
                                             })
                                             break
@@ -227,7 +227,7 @@ export default {
                                             await api.pdfannotations.delete(event.data.id)
                                             izitoast.success({
                                                 title: "Success",
-                                                message: "Succesfully deleted anntotation",
+                                                message: "Succesfully deleted annotation",
                                                 position: "bottomCenter"
                                             })
                                             break
