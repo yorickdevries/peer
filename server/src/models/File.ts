@@ -41,8 +41,12 @@ export default class File extends BaseModel {
     return this.name + this.extension;
   }
 
+  getAnonymousFileName(): string {
+    return `File-${this.id}`;
+  }
+
   getAnonymousFileNamewithExtension(): string {
-    return "File" + this.extension;
+    return `${this.getAnonymousFileName()}${this.extension}`;
   }
 
   getPath(): string {

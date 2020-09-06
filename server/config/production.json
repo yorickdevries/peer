@@ -9,12 +9,11 @@
     },
     "passport": {
         "idpUrl": "https://login.tudelft.nl/sso/saml2/idp/metadata.php",
-        "realm": "urn:nodejs:passport-saml-metadata-example-app",
         "protocol": "saml2",
         "issuer": "peer.tudelft.nl",
         "callbackUrl": "https://peer.tudelft.nl/api/login/callback",
-        "certificate": "./exampleData/certificate/peer_tudelft_nl.key.dummy",
-        "key": "./exampleData/certificate/peer_tudelft_nl.crt.dummy"
+        "certificate": "./exampleData/certificate/peer_ewi_tudelft_nl.crt.dummy",
+        "key": "./exampleData/certificate/peer.ewi.tudelft.nl.key.dummy"
     },
     "ServiceProviderMetadataFile": "./ServiceProviderMetadata.xml",
     "url": "https://peer.tudelft.nl/",

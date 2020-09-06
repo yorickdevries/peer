@@ -9,6 +9,7 @@ import { AssignmentState } from "../enum/AssignmentState";
 import CheckboxQuestionAnswer from "../models/CheckboxQuestionAnswer";
 import CheckboxQuestionOption from "../models/CheckboxQuestionOption";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
+import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
 import { getManager } from "typeorm";
 
@@ -90,23 +91,46 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
     res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
     return;
   }
-  // make or overwrite checkboxAnswer;
-  let checkboxAnswer = await CheckboxQuestionAnswer.findOne({
-    where: {
-      reviewId: review.id,
-      questionId: question.id,
-    },
-  });
-  if (checkboxAnswer) {
-    checkboxAnswer.checkboxAnswer = checkboxQuestionOptions;
-  } else {
-    checkboxAnswer = new CheckboxQuestionAnswer(
-      question,
-      review,
-      checkboxQuestionOptions
-    );
+  if (
+    questionnaire instanceof SubmissionQuestionnaire &&
+    !assignment.lateSubmissionReviews &&
+    moment().isAfter(assignment.reviewDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+      );
+    return;
   }
-  await checkboxAnswer.save();
+  let checkboxAnswer: CheckboxQuestionAnswer | undefined;
+  // make or overwrite checkboxAnswer;
+  await getManager().transaction(
+    "SERIALIZABLE",
+    async (transactionalEntityManager) => {
+      checkboxAnswer = await transactionalEntityManager.findOne(
+        CheckboxQuestionAnswer,
+        {
+          where: {
+            reviewId: review.id,
+            questionId: question.id,
+          },
+        }
+      );
+      if (checkboxAnswer) {
+        checkboxAnswer.checkboxAnswer = checkboxQuestionOptions;
+      } else {
+        checkboxAnswer = new CheckboxQuestionAnswer(
+          question,
+          review,
+          checkboxQuestionOptions
+        );
+      }
+      await transactionalEntityManager.save(checkboxAnswer);
+    }
+  );
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  await checkboxAnswer!.reload();
   res.send(checkboxAnswer);
 });
 
@@ -161,6 +185,18 @@ router.delete(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The reviewevaluation is passed");
+      return;
+    }
+    if (
+      questionnaire instanceof SubmissionQuestionnaire &&
+      !assignment.lateSubmissionReviews &&
+      moment().isAfter(assignment.reviewDueDate)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+        );
       return;
     }
     // start transaction to make sure an asnwer isnt deleted from a submitted review

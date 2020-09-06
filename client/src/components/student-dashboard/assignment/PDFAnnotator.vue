@@ -6,6 +6,15 @@
         <b-alert v-else-if="!review || review.submitted" show variant="warning">
             The review is submitted, any annotations will not be saved</b-alert
         >
+        <b-alert show variant="secondary"
+            >PDF viewing and annotation is experimental, in case of any error, you can always download the file with the
+            button above.
+            <br />
+            <b
+                >NOTE: Altough annotations contain your netid, anonymous annotations will be shown to the reviewed
+                person.</b
+            >
+        </b-alert>
         <!--Annotation view-->
         <div :id="pdfDivId" style="height: 1000px">
             <b-alert show variant="primary">LOADING REVIEW PDF</b-alert>
@@ -16,6 +25,7 @@
 <script>
 import api from "../../../api/api"
 import axios from "axios"
+import izitoast from "izitoast"
 
 export default {
     // either "reviewId" or "submissionId" is passed, not both
@@ -199,12 +209,27 @@ export default {
                                     switch (event.type) {
                                         case "ANNOTATION_ADDED":
                                             await api.pdfannotations.post(event.data, review.id, fileId)
+                                            izitoast.success({
+                                                title: "Success",
+                                                message: "Succesfully created annotation",
+                                                position: "bottomCenter"
+                                            })
                                             break
                                         case "ANNOTATION_UPDATED":
                                             await api.pdfannotations.patch(event.data.id, event.data)
+                                            izitoast.success({
+                                                title: "Success",
+                                                message: "Succesfully changed annotation",
+                                                position: "bottomCenter"
+                                            })
                                             break
                                         case "ANNOTATION_DELETED":
                                             await api.pdfannotations.delete(event.data.id)
+                                            izitoast.success({
+                                                title: "Success",
+                                                message: "Succesfully deleted annotation",
+                                                position: "bottomCenter"
+                                            })
                                             break
                                         default:
                                             console.log(`Invalid event: ${event.type}`)

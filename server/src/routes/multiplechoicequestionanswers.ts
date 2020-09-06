@@ -9,6 +9,7 @@ import { AssignmentState } from "../enum/AssignmentState";
 import MultipleChoiceQuestionAnswer from "../models/MultipleChoiceQuestionAnswer";
 import MultipleChoiceQuestionOption from "../models/MultipleChoiceQuestionOption";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
+import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
 import { getManager } from "typeorm";
 
@@ -86,23 +87,41 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
     res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
     return;
   }
-  // make or overwrite multipleChoiceAnswer;
-  let multipleChoiceAnswer = await MultipleChoiceQuestionAnswer.findOne({
-    where: {
-      reviewId: review.id,
-      questionId: question.id,
-    },
-  });
-  if (multipleChoiceAnswer) {
-    multipleChoiceAnswer.multipleChoiceAnswer = questionOption;
-  } else {
-    multipleChoiceAnswer = new MultipleChoiceQuestionAnswer(
-      question,
-      review,
-      questionOption
-    );
+  if (
+    questionnaire instanceof SubmissionQuestionnaire &&
+    !assignment.lateSubmissionReviews &&
+    moment().isAfter(assignment.reviewDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+      );
+    return;
   }
-  await multipleChoiceAnswer.save();
+  let multipleChoiceAnswer: MultipleChoiceQuestionAnswer | undefined;
+  // make or overwrite multipleChoiceAnswer;
+  await getManager().transaction(
+    "SERIALIZABLE",
+    async (transactionalEntityManager) => {
+      multipleChoiceAnswer = await transactionalEntityManager.findOne(
+        MultipleChoiceQuestionAnswer,
+        { where: { reviewId: review.id, questionId: question.id } }
+      );
+      if (multipleChoiceAnswer) {
+        multipleChoiceAnswer.multipleChoiceAnswer = questionOption;
+      } else {
+        multipleChoiceAnswer = new MultipleChoiceQuestionAnswer(
+          question,
+          review,
+          questionOption
+        );
+      }
+      await transactionalEntityManager.save(multipleChoiceAnswer);
+    }
+  );
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  await multipleChoiceAnswer!.reload();
   res.send(multipleChoiceAnswer);
 });
 
@@ -157,6 +176,18 @@ router.delete(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The reviewevaluation is passed");
+      return;
+    }
+    if (
+      questionnaire instanceof SubmissionQuestionnaire &&
+      !assignment.lateSubmissionReviews &&
+      moment().isAfter(assignment.reviewDueDate)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+        );
       return;
     }
     // start transaction to make sure an asnwer isnt deleted from a submitted review
