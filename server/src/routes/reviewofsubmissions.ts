@@ -19,7 +19,7 @@ import moment from "moment";
 import ReviewOfReview from "../models/ReviewOfReview";
 import makeGradeSummaries from "../util/makeGradeSummary";
 import exportJSONToFile from "../util/exportJSONToFile";
-import parseReviewsForExport from "../util/parseReviewsForExport";
+import parseSubmissionReviewsForExport from "../util/parseReviewsForExport";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 import Review from "../models/Review";
@@ -150,7 +150,7 @@ router.get(
         .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
       return;
     }
-    const parsedReviews = await parseReviewsForExport(questionnaire);
+    const parsedReviews = await parseSubmissionReviewsForExport(questionnaire);
     const filename = `assignment${assignment.id}_reviews`;
     exportJSONToFile(parsedReviews, filename, exportType, res);
   }
