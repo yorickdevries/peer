@@ -63,7 +63,9 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      Extensions.PDF
+      Extensions.PDF,
+      true,
+      true
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
@@ -163,7 +165,9 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      Extensions.PDF
+      Extensions.PDF,
+      true,
+      true
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
@@ -269,7 +273,9 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      Extensions.PDF
+      Extensions.PDF,
+      true,
+      true
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;

@@ -99,7 +99,7 @@ router.patch(
     if (!moment().isBefore(assignment.reviewEvaluationDueDate)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is not in review state");
+        .send("The review evaluation deadline has passed");
       return;
     }
     // set new values
