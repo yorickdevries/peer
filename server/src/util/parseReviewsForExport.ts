@@ -52,9 +52,9 @@ const parseSubmissionReviewsForExport = async function (
     parsedReview["Reviewer group id"] = reviewerGroup?.id;
     // Reviewer group name
     parsedReview["Reviewer group name"] = reviewerGroup?.name;
-    // Submission review started_at
 
     // REVIEW INFO
+    // Submission review started_at
     parsedReview["Submissionreview started at"] = review.startedAt;
     // Submission review downloaded_at
     parsedReview["Submissionreview downloaded at"] = review.downloadedAt;
