@@ -379,6 +379,10 @@ export default class Assignment extends BaseModel {
     return false;
   }
 
+  async getAssignmentExports(): Promise<AssignmentExport[]> {
+    return AssignmentExport.find({ where: { assignment: this } });
+  }
+
   // check whether the assignment contains groups
   async hasGroups(): Promise<boolean> {
     return (await this.getGroups()).length > 0;

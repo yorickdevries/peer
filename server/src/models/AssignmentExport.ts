@@ -23,6 +23,11 @@ export default class AssignmentExport extends BaseModel {
   @ManyToOne((_type) => User, { nullable: false })
   user?: User;
 
+  // User who triggered the export
+  @RelationId(
+    (assignmentExport: AssignmentExport) => assignmentExport.assignment
+  )
+  assignmentId!: number;
   @ManyToOne(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => Assignment,
@@ -42,5 +47,9 @@ export default class AssignmentExport extends BaseModel {
     this.user = user;
     this.assignment = assignment;
     this.file = file;
+  }
+
+  async getAssignment(): Promise<Assignment> {
+    return Assignment.findOneOrFail(this.assignmentId);
   }
 }
