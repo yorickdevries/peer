@@ -70,45 +70,6 @@
             <template v-slot:cell(date)="data">
                 {{ data.item.createdAt | formatDate }}
             </template>
-            <!--Actions-->
-            <template v-if="$router.currentRoute.name.includes('teacher')" v-slot:cell(action)="data">
-                <!--Trigger final /  not final-->
-                <b-button
-                    v-if="!data.item.final"
-                    v-b-modal="`changeSubmissionToFinalModal${data.item.id}`"
-                    size="sm"
-                    variant="secondary"
-                    class="mr-2"
-                >
-                    Make final
-                </b-button>
-                <b-button
-                    v-else
-                    v-b-modal="`changeSubmissionToNotFinalModal${data.item.id}`"
-                    size="sm"
-                    variant="danger"
-                    class="mr-2"
-                    >Make not final
-                </b-button>
-                <b-modal
-                    :id="`changeSubmissionToFinalModal${data.item.id}`"
-                    @ok="changeSubmissionToFinal(data.item.id)"
-                    title="Confirmation"
-                    centered
-                >
-                    Are you sure you want to make this submission final? This means the other final submissions of the
-                    group will be set to non-final.
-                </b-modal>
-                <b-modal
-                    :id="`changeSubmissionToNotFinalModal${data.item.id}`"
-                    @ok="changeSubmissionToNotFinal(data.item.id)"
-                    title="Confirmation"
-                    centered
-                >
-                    Are you sure you want to make this submission not final anymore? This means the group will not
-                    participate in the reviews.
-                </b-modal>
-            </template>
         </b-table>
 
         <!--Pagination-->
@@ -124,10 +85,8 @@
 <script>
 import api from "../../api/api"
 import _ from "lodash"
-import notifications from "../../mixins/notifications"
 
 export default {
-    mixins: [notifications],
     data() {
         return {
             allSubmissions: null,
@@ -144,8 +103,7 @@ export default {
                 { key: "groupName", label: "Group name" },
                 { key: "userNetid", label: "Submitted by" },
                 { key: "date", label: "​​​Date" },
-                { key: "final", label: "Final" },
-                { key: "action", label: "Action" }
+                { key: "final", label: "Final" }
             ],
             currentPage: 1,
             perPage: 10,
@@ -186,16 +144,6 @@ export default {
         submissionFilePath(id) {
             // Get the submission file path.
             return `/api/submissions/${id}/file`
-        },
-        async changeSubmissionToFinal(id) {
-            await api.submissions.patch(id, true)
-            this.showSuccessMessage({ message: "Set submission as final" })
-            await this.fetchSubmissions()
-        },
-        async changeSubmissionToNotFinal(id) {
-            await api.submissions.patch(id, false)
-            this.showSuccessMessage({ message: "Set submission as not final" })
-            await this.fetchSubmissions()
         }
     }
 }
