@@ -5,8 +5,8 @@
             <b-alert variant="info" :show="assignment.state === 'feedback' && isReviewActive"
                 >The review phase has passed, make sure to submit your reviews as soon as possible.</b-alert
             >
-            <b-alert variant="danger" :show="assignment.state === 'feedback' && !isReviewActive"
-                >The review phase has passed, you are not allowed to change any review anymore</b-alert
+            <b-alert variant="danger" :show="!isReviewActive"
+                >The review deadline has passed, you are not allowed to change any review anymore</b-alert
             >
             <b-card no-body>
                 <b-tabs card>
