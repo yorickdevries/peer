@@ -82,7 +82,7 @@
                                 active-class="bg-light"
                                 class="flex-fill p-0"
                                 :to="{ name: 'student-dashboard.course.assignment.review-evaluation' }"
-                                :disabled="!isEvaluationActive"
+                                :disabled="!isInFeedbackState"
                             >
                                 <div class="text-center border-bottom py-3">
                                     <div class="lead font-weight-bold ">
