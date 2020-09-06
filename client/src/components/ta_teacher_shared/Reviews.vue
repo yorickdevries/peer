@@ -9,24 +9,22 @@
                     Also includes any evaluations which students have given on eachother's reviews.
                 </dd>
                 <b-button
+                    :disabled="disableReviewExportButton"
                     size="sm"
                     variant="primary"
-                    :href="
-                        `/api/reviewofsubmissions/exportreviews?assignmentId=${this.$route.params.assignmentId}&exportType=csv`
-                    "
+                    @click="exportReviews('csv')"
                     class="mb-3 mr-2"
                 >
-                    Download reviews .csv
+                    Export reviews .csv
                 </b-button>
                 <b-button
+                    :disabled="disableReviewExportButton"
                     size="sm"
                     variant="primary"
-                    :href="
-                        `/api/reviewofsubmissions/exportreviews?assignmentId=${this.$route.params.assignmentId}&exportType=xls`
-                    "
-                    class="mb-3"
+                    @click="exportReviews('xls')"
+                    class="mb-3 mr-2"
                 >
-                    Download reviews .xls
+                    Export reviews .xls
                 </b-button>
             </b-col>
             <b-col>
@@ -37,23 +35,22 @@
                     this assignment.
                 </dd>
                 <b-button
-                    class="mr-2"
+                    :disabled="disableGradeExportButton"
                     size="sm"
                     variant="primary"
-                    :href="
-                        `/api/reviewofsubmissions/exportgrades?assignmentId=${this.$route.params.assignmentId}&exportType=csv`
-                    "
+                    @click="exportGrades('csv')"
+                    class="mb-3 mr-2"
                 >
-                    Download grades .csv
+                    Export grades .csv
                 </b-button>
                 <b-button
+                    :disabled="disableGradeExportButton"
                     size="sm"
                     variant="primary"
-                    :href="
-                        `/api/reviewofsubmissions/exportgrades?assignmentId=${this.$route.params.assignmentId}&exportType=xls`
-                    "
+                    @click="exportGrades('xls')"
+                    class="mb-3 mr-2"
                 >
-                    Download grades .xls
+                    Export grades .xls
                 </b-button>
             </b-col>
         </b-row>
@@ -177,8 +174,10 @@
 <script>
 import api from "../../api/api"
 import _ from "lodash"
+import notifications from "../../mixins/notifications"
 
 export default {
+    mixins: [notifications],
     data() {
         return {
             reviews: null,
@@ -200,7 +199,9 @@ export default {
             ],
             currentPage: 1,
             perPage: 10,
-            filter: ""
+            filter: "",
+            disableReviewExportButton: false,
+            disableGradeExportButton: false
         }
     },
     async created() {
@@ -236,6 +237,20 @@ export default {
         submissionFilePath(id) {
             // Get the submission file path.
             return `/api/submissions/${id}/file`
+        },
+        async exportReviews(exportType) {
+            this.disableReviewExportButton = true
+            await api.reviewofsubmissions.exportReviews(this.$route.params.assignmentId, exportType)
+            this.showSuccessMessage({
+                message: "Export is being generated, you can download it in the exports tab when ready"
+            })
+        },
+        async exportGrades(exportType) {
+            this.disableGradeExportButton = true
+            await api.reviewofsubmissions.exportGrades(this.$route.params.assignmentId, exportType)
+            this.showSuccessMessage({
+                message: "Export is being generated, you can download it in the exports tab when ready"
+            })
         }
     }
 }

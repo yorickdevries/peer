@@ -5,6 +5,7 @@ import User from "./User";
 import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import Review from "./Review";
 import ReviewOfReview from "./ReviewOfReview";
+import PDFAnnotation from "./PDFAnnotation";
 
 @ChildEntity(ReviewType.REVIEW_OF_SUBMISSION)
 export default class ReviewOfSubmission extends Review {
@@ -75,5 +76,9 @@ export default class ReviewOfSubmission extends Review {
       },
     });
     return reviewOfReview;
+  }
+
+  async getPDFAnnotations(): Promise<PDFAnnotation[]> {
+    return await PDFAnnotation.find({ where: { review: this } });
   }
 }

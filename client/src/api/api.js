@@ -25,6 +25,7 @@ import checkboxquestionanswers from "./checkboxquestionanswers"
 import rangequestionanswers from "./rangequestionanswers"
 import uploadquestionanswers from "./uploadquestionanswers"
 import pdfannotations from "./pdfannotations"
+import assignmentexports from "./assignmentexports"
 
 export default {
     getAuthenticated: () => {
@@ -57,5 +58,6 @@ export default {
     checkboxquestionanswers: checkboxquestionanswers,
     rangequestionanswers: rangequestionanswers,
     uploadquestionanswers: uploadquestionanswers,
-    pdfannotations: pdfannotations
+    pdfannotations: pdfannotations,
+    assignmentexports: assignmentexports
 }
