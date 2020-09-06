@@ -20,6 +20,7 @@ import { AssignmentState } from "../enum/AssignmentState";
 import { getManager } from "typeorm";
 import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
+import moment from "moment";
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
@@ -243,6 +244,14 @@ router.post(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The assignment is not in submission state");
+      return;
+    }
+    if (!assignment.lateSubmissions && moment().isAfter(assignment.dueDate)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The due date for submission has passed and late submissions are not allowed by the teacher"
+        );
       return;
     }
     // make the submission here in a transaction

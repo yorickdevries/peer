@@ -8,6 +8,7 @@ import Review from "../models/Review";
 import { AssignmentState } from "../enum/AssignmentState";
 import RangeQuestionAnswer from "../models/RangeQuestionAnswer";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
+import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
 import { getManager } from "typeorm";
 
@@ -68,23 +69,46 @@ router.post("/", validateBody(rangeAnswerSchema), async (req, res) => {
     res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
     return;
   }
-  // make or overwrite rangeAnswer;
-  let rangeAnswer = await RangeQuestionAnswer.findOne({
-    where: {
-      reviewId: review.id,
-      questionId: question.id,
-    },
-  });
-  if (rangeAnswer) {
-    rangeAnswer.rangeAnswer = req.body.rangeAnswer;
-  } else {
-    rangeAnswer = new RangeQuestionAnswer(
-      question,
-      review,
-      req.body.rangeAnswer
-    );
+  if (
+    questionnaire instanceof SubmissionQuestionnaire &&
+    !assignment.lateSubmissionReviews &&
+    moment().isAfter(assignment.reviewDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+      );
+    return;
   }
-  await rangeAnswer.save();
+  let rangeAnswer: RangeQuestionAnswer | undefined;
+  // make or overwrite rangeAnswer;
+  await getManager().transaction(
+    "SERIALIZABLE",
+    async (transactionalEntityManager) => {
+      rangeAnswer = await transactionalEntityManager.findOne(
+        RangeQuestionAnswer,
+        {
+          where: {
+            reviewId: review.id,
+            questionId: question.id,
+          },
+        }
+      );
+      if (rangeAnswer) {
+        rangeAnswer.rangeAnswer = req.body.rangeAnswer;
+      } else {
+        rangeAnswer = new RangeQuestionAnswer(
+          question,
+          review,
+          req.body.rangeAnswer
+        );
+      }
+      await transactionalEntityManager.save(rangeAnswer);
+    }
+  );
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  await rangeAnswer!.reload();
   res.send(rangeAnswer);
 });
 
@@ -134,6 +158,18 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
     )
   ) {
     res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
+    return;
+  }
+  if (
+    questionnaire instanceof SubmissionQuestionnaire &&
+    !assignment.lateSubmissionReviews &&
+    moment().isAfter(assignment.reviewDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+      );
     return;
   }
   // start transaction to make sure an asnwer isnt deleted from a submitted review

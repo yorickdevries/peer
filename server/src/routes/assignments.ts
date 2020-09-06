@@ -9,7 +9,6 @@ import {
 } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import Course from "../models/Course";
-import UserRole from "../enum/UserRole";
 import File from "../models/File";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import upload from "../middleware/upload";
@@ -262,6 +261,8 @@ const assignmentSchema = Joi.object({
   submissionExtensions: Joi.string()
     .valid(...Object.values(Extensions))
     .required(),
+  lateSubmissions: Joi.boolean().required(),
+  lateSubmissionReviews: Joi.boolean().required(),
 });
 // post an assignment in a course
 router.post(
@@ -278,7 +279,7 @@ router.post(
         .send(`Course with id ${req.body.courseId} does not exist`);
       return;
     }
-    if (!(await course.isEnrolled(user, UserRole.TEACHER))) {
+    if (!(await course.isTeacher(user))) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("User is not a teacher of the course");
@@ -317,7 +318,9 @@ router.post(
           req.body.externalLink,
           null, // submissionQuestionnaire (initially empty)
           null, // reviewQuestionnaire (initially empty)
-          req.body.submissionExtensions
+          req.body.submissionExtensions,
+          req.body.lateSubmissions,
+          req.body.lateSubmissionReviews
         );
         await transactionalEntityManager.save(assignment);
 
@@ -355,6 +358,8 @@ const assignmentPatchSchema = Joi.object({
   submissionExtensions: Joi.string()
     .valid(...Object.values(Extensions))
     .required(),
+  lateSubmissions: Joi.boolean().required(),
+  lateSubmissionReviews: Joi.boolean().required(),
 });
 // patch an assignment in a course
 router.patch(
@@ -403,6 +408,15 @@ router.patch(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("You cannot change enrollable at this state");
+      return;
+    }
+    if (
+      !assignment.isAtOrBeforeState(AssignmentState.SUBMISSION) &&
+      assignment.lateSubmissions !== req.body.lateSubmissions
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change lateSubmissions at this state");
       return;
     }
     if (
@@ -463,6 +477,8 @@ router.patch(
         }
         assignment.externalLink = req.body.externalLink;
         assignment.submissionExtensions = req.body.submissionExtensions;
+        assignment.lateSubmissions = req.body.lateSubmissions;
+        assignment.lateSubmissionReviews = req.body.lateSubmissionReviews;
         await transactionalEntityManager.save(assignment);
 
         // save the file to disk

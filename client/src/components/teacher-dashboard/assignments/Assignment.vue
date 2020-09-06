@@ -170,6 +170,7 @@
                                                     </li>
                                                     <li>
                                                         All reviews which are not submitted yet can still be completed
+                                                        when late submission reviews are allowed
                                                     </li>
                                                     <li>
                                                         If review evaluation is enabled, students can evaluate their

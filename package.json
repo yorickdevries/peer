@@ -6,6 +6,7 @@
     "build": "npm run build_server && npm run build_client",
     "build_server": "npm run build --prefix ./server",
     "build_client": "npm run build --prefix ./client",
+    "lint-fix": "npm run lint-fix --prefix ./server && npm run lint-fix --prefix ./client",
     "start": "npm run start --prefix ./server",
     "dev_server": "npm run dev --prefix ./server",
     "dev_client": "npm run serve --prefix ./client",

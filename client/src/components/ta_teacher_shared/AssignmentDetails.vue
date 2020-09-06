@@ -16,11 +16,17 @@
             <dt>Assignment due date and time</dt>
             <dd>{{ assignment.dueDate | formatDate }}</dd>
 
+            <dt>Allow late submissions</dt>
+            <dd>{{ assignment.lateSubmissions }}</dd>
+
             <dt>Peer review publish date and time</dt>
             <dd>{{ assignment.reviewPublishDate | formatDate }}</dd>
 
             <dt>Peer review due date and time</dt>
             <dd>{{ assignment.reviewDueDate | formatDate }}</dd>
+
+            <dt>Allow late submission reviews</dt>
+            <dd>{{ assignment.lateSubmissionReviews }}</dd>
 
             <div v-if="assignment.reviewEvaluation">
                 <dt>Review evaluation due date and time</dt>
