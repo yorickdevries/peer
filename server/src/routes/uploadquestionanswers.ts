@@ -15,6 +15,7 @@ import path from "path";
 import hasha from "hasha";
 import fsPromises from "fs/promises";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
+import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
 
 const router = express.Router();
@@ -138,7 +139,18 @@ router.post(
         .send("The reviewevaluation is passed");
       return;
     }
-
+    if (
+      questionnaire instanceof SubmissionQuestionnaire &&
+      !assignment.lateSubmissionReviews &&
+      moment().isAfter(assignment.reviewDueDate)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+        );
+      return;
+    }
     // uploadAnswer
     let uploadAnswer: UploadQuestionAnswer | undefined;
     // start transaction make sure the file and submission are both saved
@@ -249,6 +261,18 @@ router.delete(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The reviewevaluation is passed");
+      return;
+    }
+    if (
+      questionnaire instanceof SubmissionQuestionnaire &&
+      !assignment.lateSubmissionReviews &&
+      moment().isAfter(assignment.reviewDueDate)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+        );
       return;
     }
     const file = questionAnswer.uploadAnswer;

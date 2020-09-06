@@ -450,6 +450,17 @@ router.patch(
     // get assignmentstate
     const questionnaire = await review.getQuestionnaire();
     const assignment = await questionnaire.getAssignment();
+    if (
+      !assignment.lateSubmissionReviews &&
+      moment().isAfter(assignment.reviewDueDate)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+        );
+      return;
+    }
     // Review cannot be changed (unsubmitted/flagged) in feedback phase when submitted
     if (assignment.isAtState(AssignmentState.FEEDBACK) && review.submitted) {
       res

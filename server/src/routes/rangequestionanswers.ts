@@ -8,6 +8,7 @@ import Review from "../models/Review";
 import { AssignmentState } from "../enum/AssignmentState";
 import RangeQuestionAnswer from "../models/RangeQuestionAnswer";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
+import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
 import { getManager } from "typeorm";
 
@@ -66,6 +67,18 @@ router.post("/", validateBody(rangeAnswerSchema), async (req, res) => {
     )
   ) {
     res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
+    return;
+  }
+  if (
+    questionnaire instanceof SubmissionQuestionnaire &&
+    !assignment.lateSubmissionReviews &&
+    moment().isAfter(assignment.reviewDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+      );
     return;
   }
   let rangeAnswer: RangeQuestionAnswer | undefined;
@@ -145,6 +158,18 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
     )
   ) {
     res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
+    return;
+  }
+  if (
+    questionnaire instanceof SubmissionQuestionnaire &&
+    !assignment.lateSubmissionReviews &&
+    moment().isAfter(assignment.reviewDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+      );
     return;
   }
   // start transaction to make sure an asnwer isnt deleted from a submitted review

@@ -16,6 +16,7 @@ import ReplyingPDFAnnotation from "../models/ReplyingPDFAnnotation";
 import { getManager } from "typeorm";
 import ResponseMessage from "../enum/ResponseMessage";
 import { AssignmentState } from "../enum/AssignmentState";
+import moment from "moment";
 
 const router = express.Router();
 
@@ -150,6 +151,20 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
       .send("The review is already submitted");
     return;
   }
+  // get assignment
+  const questionnaire = await review.getQuestionnaire();
+  const assignment = await questionnaire.getAssignment();
+  if (
+    !assignment.lateSubmissionReviews &&
+    moment().isAfter(assignment.reviewDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+      );
+    return;
+  }
   // create the annotation
   const annotation = req.body.annotation;
   const existingAnnotation = await PDFAnnotation.findOne(annotation.id);
@@ -247,6 +262,20 @@ router.patch(
         .send("The review is already submitted");
       return;
     }
+    // get assignment
+    const questionnaire = await review.getQuestionnaire();
+    const assignment = await questionnaire.getAssignment();
+    if (
+      !assignment.lateSubmissionReviews &&
+      moment().isAfter(assignment.reviewDueDate)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+        );
+      return;
+    }
     // perform patch
     if (annotation instanceof CommentingPDFAnnotation) {
       annotation.selector = req.body.annotation.target.selector;
@@ -278,6 +307,20 @@ router.delete("/:id", validateParams(idStringSchema), async (req, res) => {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("The review is already submitted");
+    return;
+  }
+  // get assignment
+  const questionnaire = await review.getQuestionnaire();
+  const assignment = await questionnaire.getAssignment();
+  if (
+    !assignment.lateSubmissionReviews &&
+    moment().isAfter(assignment.reviewDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+      );
     return;
   }
   if (annotation instanceof CommentingPDFAnnotation) {

@@ -25,6 +25,7 @@
 <script>
 import api from "../../../api/api"
 import axios from "axios"
+import izitoast from "izitoast"
 
 export default {
     // either "reviewId" or "submissionId" is passed, not both
@@ -208,12 +209,27 @@ export default {
                                     switch (event.type) {
                                         case "ANNOTATION_ADDED":
                                             await api.pdfannotations.post(event.data, review.id, fileId)
+                                            izitoast.success({
+                                                title: "Success",
+                                                message: "Succesfully created anntotation",
+                                                position: "bottomCenter"
+                                            })
                                             break
                                         case "ANNOTATION_UPDATED":
                                             await api.pdfannotations.patch(event.data.id, event.data)
+                                            izitoast.success({
+                                                title: "Success",
+                                                message: "Succesfully changed anntotation",
+                                                position: "bottomCenter"
+                                            })
                                             break
                                         case "ANNOTATION_DELETED":
                                             await api.pdfannotations.delete(event.data.id)
+                                            izitoast.success({
+                                                title: "Success",
+                                                message: "Succesfully deleted anntotation",
+                                                position: "bottomCenter"
+                                            })
                                             break
                                         default:
                                             console.log(`Invalid event: ${event.type}`)
