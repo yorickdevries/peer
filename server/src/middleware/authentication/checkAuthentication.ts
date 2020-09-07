@@ -43,6 +43,9 @@ const checkAndSetAuthentication = async function (
       console.log("end0", req.originalUrl, netid, new Date());
     } catch (error) {
       console.log("error0", req.originalUrl, netid, new Date(), error);
+    } finally {
+      await connection.close();
+      console.log("done0");
     }
 
     let user;
