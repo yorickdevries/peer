@@ -84,7 +84,7 @@
                                             Allow late submissions after the deadline
                                             <b-badge
                                                 v-b-tooltip.hover
-                                                title="This allows submissions to be made until the assignment is manually closed by the teacher"
+                                                title="This allows submissions to be made until the submission phase is manually closed by the teacher"
                                                 variant="primary"
                                                 >?</b-badge
                                             >
@@ -136,7 +136,7 @@
                                             Allow late submission reviews after the deadline
                                             <b-badge
                                                 v-b-tooltip.hover
-                                                title="Students can finish any unfinished reviews after the deadline. Students with unfinished reviews cannot access their feedback and are so motivated to finish reviews when they are late."
+                                                title="Students can finish any unfinished reviews after the deadline. Students with unfinished reviews cannot access their feedback and are thereby motivated to finish reviews when they are late."
                                                 variant="primary"
                                                 >?</b-badge
                                             >
@@ -299,6 +299,7 @@ export default {
             extensionTypes: [
                 { value: ".pdf", text: ".pdf" },
                 { value: ".zip", text: ".zip" },
+                { value: ".pdf,.zip", text: ".pdf,.zip" },
                 { value: ".doc,.docx", text: ".doc,.docx" },
                 { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" }
             ]
