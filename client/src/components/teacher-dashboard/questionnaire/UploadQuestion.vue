@@ -46,6 +46,7 @@ export default {
             extensionTypes: [
                 { value: ".pdf", text: ".pdf" },
                 { value: ".zip", text: ".zip" },
+                { value: ".pdf,.zip", text: ".pdf,.zip" },
                 { value: ".doc,.docx", text: ".doc,.docx" },
                 { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" }
             ]
