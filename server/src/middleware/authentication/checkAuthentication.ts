@@ -15,12 +15,7 @@ const databaseConfig: {
   connectionUrl?: string;
 } = config.get("database");
 
-const connection = mysql.createConnection({
-  host: databaseConfig.host,
-  user: databaseConfig.username,
-  password: databaseConfig.password,
-  database: databaseConfig.database,
-});
+
 
 const checkAndSetAuthentication = async function (
   req: Request,
@@ -30,6 +25,13 @@ const checkAndSetAuthentication = async function (
   if (req.isAuthenticated() && req.user?.netid) {
     // set req.user to the User object
     const netid = req.user.netid;
+
+    const connection = mysql.createConnection({
+      host: databaseConfig.host,
+      user: databaseConfig.username,
+      password: databaseConfig.password,
+      database: databaseConfig.database,
+    });
 
     console.log("start0", req.originalUrl, netid, new Date());
     connection.query(
