@@ -15,7 +15,6 @@ const databaseConfig: {
   connectionUrl?: string;
 } = config.get("database");
 
-
 const checkAndSetAuthentication = async function (
   req: Request,
   res: Response,
