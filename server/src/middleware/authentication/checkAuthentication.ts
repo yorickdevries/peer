@@ -36,12 +36,11 @@ const checkAndSetAuthentication = async function (
     try {
       const [
         rows,
-        fields,
       ] = await connection.execute(
         `SELECT * FROM \`user\` WHERE \`netid\` = ?`,
         [netid]
       );
-      console.log(rows, fields);
+      console.log(rows);
       console.log("end0", req.originalUrl, netid, new Date());
     } catch (error) {
       console.log("error0", req.originalUrl, netid, new Date(), error);
