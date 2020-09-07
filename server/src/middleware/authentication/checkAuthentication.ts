@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import HttpStatusCode from "../../enum/HttpStatusCode";
 import User from "../../models/User";
 
-import mysql from "mysql2";
+import mysql from "mysql2/promise";
 import config from "config";
 
 const databaseConfig: {
@@ -16,7 +16,6 @@ const databaseConfig: {
 } = config.get("database");
 
 
-
 const checkAndSetAuthentication = async function (
   req: Request,
   res: Response,
@@ -26,7 +25,7 @@ const checkAndSetAuthentication = async function (
     // set req.user to the User object
     const netid = req.user.netid;
 
-    const connection = mysql.createConnection({
+    const connection = await mysql.createConnection({
       host: databaseConfig.host,
       user: databaseConfig.username,
       password: databaseConfig.password,
@@ -34,18 +33,19 @@ const checkAndSetAuthentication = async function (
     });
 
     console.log("start0", req.originalUrl, netid, new Date());
-    connection.query(
-      `SELECT * FROM \`user\` WHERE \`netid\` = '${netid}'`,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-      (error: any, results: any, _fields: any) => {
-        if (error) {
-          console.log("error0", req.originalUrl, netid, new Date(), error);
-        } else {
-          console.log(results);
-          console.log("end0", req.originalUrl, netid, new Date());
-        }
-      }
-    );
+    try {
+      const [
+        rows,
+        fields,
+      ] = await connection.execute(
+        `SELECT * FROM \`user\` WHERE \`netid\` = ?`,
+        [netid]
+      );
+      console.log(rows, fields);
+      console.log("end0", req.originalUrl, netid, new Date());
+    } catch (error) {
+      console.log("error0", req.originalUrl, netid, new Date(), error);
+    }
 
     let user;
     console.log("start1", req.originalUrl, netid, new Date());
