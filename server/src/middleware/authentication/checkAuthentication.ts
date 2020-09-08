@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import HttpStatusCode from "../../enum/HttpStatusCode";
 import User from "../../models/User";
+
 const checkAndSetAuthentication = async function (
   req: Request,
   res: Response,
