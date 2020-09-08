@@ -286,8 +286,31 @@ router.post(
       return;
     }
 
-    // variables
-    let assignment: Assignment;
+    // create asignment and validate
+    const assignment = new Assignment(
+      req.body.name,
+      course,
+      req.body.reviewsPerUser,
+      req.body.enrollable,
+      req.body.reviewEvaluation,
+      req.body.publishDate,
+      req.body.dueDate,
+      req.body.reviewPublishDate,
+      req.body.reviewDueDate,
+      req.body.reviewEvaluationDueDate,
+      req.body.description,
+      null, // file, will be set later
+      req.body.externalLink,
+      null, // submissionQuestionnaire (initially empty)
+      null, // reviewQuestionnaire (initially empty)
+      req.body.submissionExtensions,
+      req.body.lateSubmissions,
+      req.body.lateSubmissionReviews
+    );
+    // check validity
+    await assignment.validateOrReject();
+
+    // if this goes well, the file can be attached
     // create the file object or leave it as null if no file is uploaded
     let file: File | null = null;
     if (req.file) {
@@ -298,40 +321,8 @@ router.post(
       const fileHash =
         "0000000000000000000000000000000000000000000000000000000000000000";
       file = new File(fileName, fileExtension, fileHash);
-    }
-    // start transaction make sure the file and assignment are both saved
-    await getManager().transaction(
-      "SERIALIZABLE",
-      async (transactionalEntityManager) => {
-        if (file) {
-          await transactionalEntityManager.save(file);
-        }
-        // create assignment
-        assignment = new Assignment(
-          req.body.name,
-          course,
-          req.body.reviewsPerUser,
-          req.body.enrollable,
-          req.body.reviewEvaluation,
-          req.body.publishDate,
-          req.body.dueDate,
-          req.body.reviewPublishDate,
-          req.body.reviewDueDate,
-          req.body.reviewEvaluationDueDate,
-          req.body.description,
-          file, // possibly null
-          req.body.externalLink,
-          null, // submissionQuestionnaire (initially empty)
-          null, // reviewQuestionnaire (initially empty)
-          req.body.submissionExtensions,
-          req.body.lateSubmissions,
-          req.body.lateSubmissionReviews
-        );
-        await transactionalEntityManager.save(assignment);
-      }
-    );
-    // save the file to disk lastly
-    if (file && req.file) {
+      await file.save();
+
       // where the file is temporary saved
       const tempPath = req.file.path;
       // new place where the file will be saved
@@ -340,10 +331,8 @@ router.post(
       await fsPromises.copyFile(tempPath, filePath);
       await fsPromises.unlink(tempPath);
     }
-    // reload assignment to get all data
-    // assignment should be defined now (else we would be in the catch)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    await assignment!.reload();
+    assignment.file = file;
+    await assignment.save();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(assignment!);
   }
@@ -447,6 +436,26 @@ router.patch(
     }
 
     // variables
+    // change values of assignment
+    // update assignment fields
+    assignment.name = req.body.name;
+    assignment.reviewsPerUser = req.body.reviewsPerUser;
+    assignment.enrollable = req.body.enrollable;
+    assignment.reviewEvaluation = req.body.reviewEvaluation;
+    assignment.publishDate = req.body.publishDate;
+    assignment.dueDate = req.body.dueDate;
+    assignment.reviewPublishDate = req.body.reviewPublishDate;
+    assignment.reviewDueDate = req.body.reviewDueDate;
+    assignment.reviewEvaluationDueDate = req.body.reviewEvaluationDueDate;
+    assignment.description = req.body.description;
+    assignment.externalLink = req.body.externalLink;
+    assignment.submissionExtensions = req.body.submissionExtensions;
+    assignment.lateSubmissions = req.body.lateSubmissions;
+    assignment.lateSubmissionReviews = req.body.lateSubmissionReviews;
+    // check validity
+    await assignment.validateOrReject();
+
+    // save old existing file
     let oldFile: File | null | undefined = undefined;
     // in case a new file is sent or file is set to null, the old one needs to be deleted
     if (req.file || req.body.file === null) {
@@ -464,41 +473,8 @@ router.patch(
       const fileHash =
         "0000000000000000000000000000000000000000000000000000000000000000";
       newFile = new File(fileName, fileExtension, fileHash);
-    }
-    // start transaction make sure the file and assignment are both saved
-    await getManager().transaction(
-      "SERIALIZABLE",
-      async (transactionalEntityManager) => {
-        // create the file object
-        if (newFile) {
-          await transactionalEntityManager.save(newFile);
-        }
-        // update assignment fields
-        // undefined values will not be changed
-        assignment.name = req.body.name;
-        assignment.reviewsPerUser = req.body.reviewsPerUser;
-        assignment.enrollable = req.body.enrollable;
-        assignment.reviewEvaluation = req.body.reviewEvaluation;
-        assignment.publishDate = req.body.publishDate;
-        assignment.dueDate = req.body.dueDate;
-        assignment.reviewPublishDate = req.body.reviewPublishDate;
-        assignment.reviewDueDate = req.body.reviewDueDate;
-        assignment.reviewEvaluationDueDate = req.body.reviewEvaluationDueDate;
-        assignment.description = req.body.description;
-        if (newFile !== undefined) {
-          assignment.file = newFile;
-        }
-        assignment.externalLink = req.body.externalLink;
-        assignment.submissionExtensions = req.body.submissionExtensions;
-        assignment.lateSubmissions = req.body.lateSubmissions;
-        assignment.lateSubmissionReviews = req.body.lateSubmissionReviews;
-        await transactionalEntityManager.save(assignment);
-        // remove old file
-        await transactionalEntityManager.remove(oldFile);
-      }
-    );
-    // save the file to disk
-    if (newFile && req.file) {
+      await newFile.save();
+
       // where the file is temporary saved
       const tempPath = req.file.path;
       // new place where the file will be saved
@@ -507,15 +483,17 @@ router.patch(
       await fsPromises.copyFile(tempPath, filePath);
       await fsPromises.unlink(tempPath);
     }
+    // change the file in case it is not undefined
+    if (newFile !== undefined) {
+      assignment.file = newFile;
+    }
+    await assignment.save();
     // remove the old file from the disk
     if (oldFile) {
+      await oldFile.remove();
       const filePath = path.resolve(uploadFolder, oldFile.id.toString());
       await fsPromises.unlink(filePath);
     }
-    // reload assignment to get all data
-    // assignment should be defined now (else we would be in the catch)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    await assignment!.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(assignment!);
   }
