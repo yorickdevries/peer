@@ -26,12 +26,12 @@ const exportJSONToFile = async function (
     },
   });
 
-    // create the file object
-    const fileBuffer = Buffer.from(result);
-    const fileExtension = `.${exportType}`;
-    const fileHash =
-      "0000000000000000000000000000000000000000000000000000000000000000";
-    const file = new File(fileName, fileExtension, fileHash);
+  // create the file object
+  const fileBuffer = Buffer.from(result);
+  const fileExtension = `.${exportType}`;
+  const fileHash =
+    "0000000000000000000000000000000000000000000000000000000000000000";
+  const file = new File(fileName, fileExtension, fileHash);
 
   // start transaction make sure the file and assignmentExport are both saved
   await getManager().transaction(
@@ -44,11 +44,10 @@ const exportJSONToFile = async function (
       await transactionalEntityManager.save(assignmentExport);
     }
   );
-      // save the file to disk lastly
-      // (if this goes wrong all previous steps are rolled back)
-      const filePath = path.resolve(uploadFolder, file.id.toString());
-      await fsPromises.writeFile(filePath, fileBuffer);
-
+  // save the file to disk lastly
+  // (if this goes wrong all previous steps are rolled back)
+  const filePath = path.resolve(uploadFolder, file.id.toString());
+  await fsPromises.writeFile(filePath, fileBuffer);
 };
 
 export default exportJSONToFile;
