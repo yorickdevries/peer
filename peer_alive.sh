@@ -1,6 +1,6 @@
 #!/bin/bash
 DATE=$(date +"%Y%m%d%H%M%S")
-curl -I --max-time 5 https://peer.tudelft.nl/api/faculties
+curl --max-time 5 https://peer.tudelft.nl/api/faculties
 
 if [ $? -eq 0 ]
 then
