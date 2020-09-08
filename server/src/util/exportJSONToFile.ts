@@ -25,29 +25,30 @@ const exportJSONToFile = async function (
       return content;
     },
   });
+
+    // create the file object
+    const fileBuffer = Buffer.from(result);
+    const fileExtension = `.${exportType}`;
+    const fileHash =
+      "0000000000000000000000000000000000000000000000000000000000000000";
+    const file = new File(fileName, fileExtension, fileHash);
+
   // start transaction make sure the file and assignmentExport are both saved
   await getManager().transaction(
     "SERIALIZABLE",
     async (transactionalEntityManager) => {
-      // create the file object
-      const fileBuffer = Buffer.from(result);
-      const fileExtension = `.${exportType}`;
-      const fileHash =
-        "0000000000000000000000000000000000000000000000000000000000000000";
-      const file = new File(fileName, fileExtension, fileHash);
       await transactionalEntityManager.save(file);
-
       // add to assignmentExport
       assignmentExport.file = file;
       // this checks for the right extension in the validate function
       await transactionalEntityManager.save(assignmentExport);
-
+    }
+  );
       // save the file to disk lastly
       // (if this goes wrong all previous steps are rolled back)
       const filePath = path.resolve(uploadFolder, file.id.toString());
       await fsPromises.writeFile(filePath, fileBuffer);
-    }
-  );
+
 };
 
 export default exportJSONToFile;
