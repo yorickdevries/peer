@@ -282,6 +282,18 @@ router.post(
   upload([".csv"], maxFileSize, "file"),
   validateBody(assignmentIdSchema),
   async (req, res) => {
+    let groupNameWithNetidLists: groupNameWithNetidList[];
+    try {
+      // read file and remove file
+      const fileBuffer = await fsPromises.readFile(req.file.path);
+      await fsPromises.unlink(req.file.path);
+      // can throw an error if malformed
+      groupNameWithNetidLists = await parseGroupCSV(fileBuffer);
+    } catch (error) {
+      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
+      return;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     if (!req.file) {
@@ -323,16 +335,7 @@ router.post(
       groupName: string;
       netids: string[];
     }
-    let groupNameWithNetidLists: groupNameWithNetidList[];
-    try {
-      // can throw an error if malformed
-      const fileBuffer = await fsPromises.readFile(req.file.path);
-      await fsPromises.unlink(req.file.path);
-      groupNameWithNetidLists = await parseGroupCSV(fileBuffer);
-    } catch (error) {
-      res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
-      return;
-    }
+
     // save the users and enroll them in the course
     await getManager().transaction(
       "SERIALIZABLE",
