@@ -17,7 +17,6 @@ import path from "path";
 import fsPromises from "fs/promises";
 import upload from "../middleware/upload";
 import { AssignmentState } from "../enum/AssignmentState";
-import { getManager } from "typeorm";
 import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
 import moment from "moment";
@@ -255,28 +254,20 @@ router.post(
         );
       return;
     }
-    // make the submission here in a transaction
-    let submission: Submission;
+
     // construct file
     // const fileBuffer = req.file.buffer;
     const fileExtension = path.extname(req.file.originalname);
+    // check validity of extension
+    if (!assignment.submissionExtensions.split(",").includes(fileExtension)) {
+      throw new Error("The file is of the wrong extension");
+    }
     const fileName = path.basename(req.file.originalname, fileExtension);
     const fileHash =
       "0000000000000000000000000000000000000000000000000000000000000000";
     const file = new File(fileName, fileExtension, fileHash);
+    await file.save();
 
-    // start transaction make sure the file and submission are both saved
-    await getManager().transaction(
-      "SERIALIZABLE",
-      async (transactionalEntityManager) => {
-        await transactionalEntityManager.save(file);
-        // create submission
-        submission = new Submission(user, group, assignment, file);
-        // this checks for the right extension in the validate function
-        await transactionalEntityManager.save(submission);
-      }
-    );
-    // save the file to disk lastly
     // where the file is temporary saved
     const tempPath = req.file.path;
     // new place where the file will be saved
@@ -285,11 +276,11 @@ router.post(
     await fsPromises.copyFile(tempPath, filePath);
     await fsPromises.unlink(tempPath);
 
-    // reload submission to get all data
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    await submission!.reload();
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    res.send(submission!);
+    // make the submission here in a transaction
+    const submission = new Submission(user, group, assignment, file);
+    await submission.save();
+
+    res.send(submission);
   }
 );
 
