@@ -153,6 +153,19 @@ router.post(
     }
     // uploadAnswer
     let uploadAnswer: UploadQuestionAnswer | undefined;
+
+    // oldfile in case of update
+    let oldFile: File | undefined;
+
+    // new File
+    // const fileBuffer = req.file.buffer;
+    const fileExtension = path.extname(req.file.originalname);
+    const fileName = path.basename(req.file.originalname, fileExtension);
+    const fileHash =
+      "0000000000000000000000000000000000000000000000000000000000000000";
+    // make new file and answer
+    const newFile = new File(fileName, fileExtension, fileHash);
+
     // start transaction make sure the file and submission are both saved
     await getManager().transaction(
       "SERIALIZABLE",
@@ -167,20 +180,10 @@ router.post(
             },
           }
         );
-        let oldFile: File | undefined = undefined;
         // if an answer is already present, replace the fileinfo
         if (uploadAnswer) {
           oldFile = uploadAnswer.uploadAnswer;
         }
-
-        // new File
-        // const fileBuffer = req.file.buffer;
-        const fileExtension = path.extname(req.file.originalname);
-        const fileName = path.basename(req.file.originalname, fileExtension);
-        const fileHash =
-          "0000000000000000000000000000000000000000000000000000000000000000";
-        // make new file and answer
-        const newFile = new File(fileName, fileExtension, fileHash);
         // save to database
         await transactionalEntityManager.save(newFile);
         if (uploadAnswer) {
@@ -190,24 +193,22 @@ router.post(
         }
         // create/update uploadAnswer
         await transactionalEntityManager.save(uploadAnswer);
-
-        // save the file to disk lastly (overwites exisitng if present)
-        // (if this goes wrong all previous steps are rolled back)
-        // where the file is temporary saved
-        const tempPath = req.file.path;
-        // new place where the file will be saved
-        const filePath = path.resolve(uploadFolder, newFile.id.toString());
-        // copy and delete old file
-        await fsPromises.copyFile(tempPath, filePath);
-        await fsPromises.unlink(tempPath);
-        // remove the old file from the disk
-        if (oldFile?.id) {
-          const filePath = path.resolve(uploadFolder, oldFile.id.toString());
-          await fsPromises.unlink(filePath);
-          await transactionalEntityManager.remove(oldFile);
-        }
       }
     );
+    // where the file is temporary saved
+    const tempPath = req.file.path;
+    // new place where the file will be saved
+    const filePath = path.resolve(uploadFolder, newFile.id.toString());
+    // copy and delete old file
+    await fsPromises.copyFile(tempPath, filePath);
+    await fsPromises.unlink(tempPath);
+    // remove the old file from the disk
+    if (oldFile) {
+      const filePath = path.resolve(uploadFolder, oldFile.id.toString());
+      await fsPromises.unlink(filePath);
+      await oldFile.remove();
+    }
+
     // reload the answer
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await uploadAnswer!.reload();
@@ -299,9 +300,10 @@ router.delete(
         await transactionalEntityManager.remove(questionAnswer);
         // delete file as well
         await transactionalEntityManager.remove(file);
-        await fsPromises.unlink(filePath);
       }
     );
+    // unlink outside of transaction
+    await fsPromises.unlink(filePath);
     res.send(questionAnswer);
   }
 );

@@ -20,6 +20,7 @@ import Enrollment from "../models/Enrollment";
 import UserRole from "../enum/UserRole";
 import Group from "../models/Group";
 import ResponseMessage from "../enum/ResponseMessage";
+import fsPromises from "fs/promises";
 
 const router = express.Router();
 
@@ -325,7 +326,9 @@ router.post(
     let groupNameWithNetidLists: groupNameWithNetidList[];
     try {
       // can throw an error if malformed
-      groupNameWithNetidLists = await parseGroupCSV(req.file.buffer);
+      const fileBuffer = await fsPromises.readFile(req.file.path);
+      await fsPromises.unlink(req.file.path);
+      groupNameWithNetidLists = await parseGroupCSV(fileBuffer);
     } catch (error) {
       res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
       return;

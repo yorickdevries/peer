@@ -257,37 +257,34 @@ router.post(
     }
     // make the submission here in a transaction
     let submission: Submission;
+    // construct file
+    // const fileBuffer = req.file.buffer;
+    const fileExtension = path.extname(req.file.originalname);
+    const fileName = path.basename(req.file.originalname, fileExtension);
+    const fileHash =
+      "0000000000000000000000000000000000000000000000000000000000000000";
+    const file = new File(fileName, fileExtension, fileHash);
 
     // start transaction make sure the file and submission are both saved
     await getManager().transaction(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
-        // create the file object
-        // const fileBuffer = req.file.buffer;
-        const fileExtension = path.extname(req.file.originalname);
-        const fileName = path.basename(req.file.originalname, fileExtension);
-        const fileHash =
-          "0000000000000000000000000000000000000000000000000000000000000000";
-        const file = new File(fileName, fileExtension, fileHash);
-
         await transactionalEntityManager.save(file);
-
         // create submission
         submission = new Submission(user, group, assignment, file);
         // this checks for the right extension in the validate function
         await transactionalEntityManager.save(submission);
-
-        // save the file to disk lastly
-        // (if this goes wrong all previous steps are rolled back)
-        // where the file is temporary saved
-        const tempPath = req.file.path;
-        // new place where the file will be saved
-        const filePath = path.resolve(uploadFolder, file.id.toString());
-        // copy and delete old file
-        await fsPromises.copyFile(tempPath, filePath);
-        await fsPromises.unlink(tempPath);
       }
     );
+    // save the file to disk lastly
+    // where the file is temporary saved
+    const tempPath = req.file.path;
+    // new place where the file will be saved
+    const filePath = path.resolve(uploadFolder, file.id.toString());
+    // copy and delete old file
+    await fsPromises.copyFile(tempPath, filePath);
+    await fsPromises.unlink(tempPath);
+
     // reload submission to get all data
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await submission!.reload();
