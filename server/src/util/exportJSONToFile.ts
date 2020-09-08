@@ -3,7 +3,6 @@ import AssignmentExport from "../models/AssignmentExport";
 import File from "../models/File";
 import path from "path";
 import config from "config";
-import { getManager } from "typeorm";
 // import hasha from "hasha";
 import fsPromises from "fs/promises";
 const uploadFolder = config.get("uploadFolder") as string;
@@ -32,22 +31,17 @@ const exportJSONToFile = async function (
   const fileHash =
     "0000000000000000000000000000000000000000000000000000000000000000";
   const file = new File(fileName, fileExtension, fileHash);
+  await file.save();
 
-  // start transaction make sure the file and assignmentExport are both saved
-  await getManager().transaction(
-    "SERIALIZABLE",
-    async (transactionalEntityManager) => {
-      await transactionalEntityManager.save(file);
-      // add to assignmentExport
-      assignmentExport.file = file;
-      // this checks for the right extension in the validate function
-      await transactionalEntityManager.save(assignmentExport);
-    }
-  );
   // save the file to disk lastly
   // (if this goes wrong all previous steps are rolled back)
   const filePath = path.resolve(uploadFolder, file.id.toString());
   await fsPromises.writeFile(filePath, fileBuffer);
+
+  // add to assignmentExport
+  assignmentExport.file = file;
+  // this checks for the right extension in the validate function
+  await assignmentExport.save();
 };
 
 export default exportJSONToFile;
