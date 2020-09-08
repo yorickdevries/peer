@@ -151,14 +151,11 @@ router.post(
         );
       return;
     }
-    // uploadAnswer
-    let uploadAnswer: UploadQuestionAnswer | undefined;
-
     // oldfile in case of update
     let oldFile: File | undefined;
 
-    // new File
-    // const fileBuffer = req.file.buffer;
+    // file info
+    //const fileBuffer = req.file.buffer;
     const fileExtension = path.extname(req.file.originalname);
     if (!question.extensions.split(",").includes(fileExtension)) {
       throw new Error("The file is of the wrong extension");
@@ -166,7 +163,6 @@ router.post(
     const fileName = path.basename(req.file.originalname, fileExtension);
     const fileHash =
       "0000000000000000000000000000000000000000000000000000000000000000";
-    // make new file and answer
     const newFile = new File(fileName, fileExtension, fileHash);
     await newFile.save();
 
@@ -178,6 +174,8 @@ router.post(
     await fsPromises.copyFile(tempPath, filePath);
     await fsPromises.unlink(tempPath);
 
+    // uploadAnswer
+    let uploadAnswer: UploadQuestionAnswer | undefined;
     // start transaction make sure the file and submission are both saved
     await getManager().transaction(
       "SERIALIZABLE",
@@ -209,9 +207,9 @@ router.post(
 
     // remove the old file from the disk
     if (oldFile) {
+      await oldFile.remove();
       const filePath = path.resolve(uploadFolder, oldFile.id.toString());
       await fsPromises.unlink(filePath);
-      await oldFile.remove();
     }
 
     // reload the answer
