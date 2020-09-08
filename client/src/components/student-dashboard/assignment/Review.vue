@@ -56,6 +56,40 @@
                 ></PDFAnnotator>
             </b-col>
         </b-row>
+        <br />
+        <template v-if="!reviewsAreReadOnly">
+            <!--Save/Submit Buttons-->
+            <b-card-body>
+                <div>
+                    <b-form-checkbox
+                        :disabled="review.submitted"
+                        v-model="review.flaggedByReviewer"
+                        name="reportButton"
+                        class="float-left"
+                    >
+                        Report this submission.
+                    </b-form-checkbox>
+                    <br />
+                    <small>Only report if the submission is empty or not serious.</small>
+                </div>
+                <b-button
+                    v-if="!review.submitted"
+                    variant="success float-right"
+                    type="submit"
+                    v-b-modal="`submit${review.id}`"
+                    :disabled="buttonDisabled"
+                    >Submit Review</b-button
+                >
+                <b-button
+                    v-else
+                    variant="outline-success float-right"
+                    @click="unSubmitReview"
+                    :disabled="buttonDisabled"
+                    >Unsubmit Review</b-button
+                >
+            </b-card-body>
+        </template>
+        <br />
 
         <!--Form, load only when answers are available-->
         <b-card v-if="answers" no-body class="mt-3">
