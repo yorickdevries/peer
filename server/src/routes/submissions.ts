@@ -255,8 +255,8 @@ router.post(
       return;
     }
 
-    // construct file
-    // const fileBuffer = req.file.buffer;
+    // file info
+    //const fileBuffer = req.file.buffer;
     const fileExtension = path.extname(req.file.originalname);
     // check validity of extension
     if (!assignment.submissionExtensions.split(",").includes(fileExtension)) {

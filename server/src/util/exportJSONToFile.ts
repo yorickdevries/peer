@@ -34,7 +34,6 @@ const exportJSONToFile = async function (
   await file.save();
 
   // save the file to disk lastly
-  // (if this goes wrong all previous steps are rolled back)
   const filePath = path.resolve(uploadFolder, file.id.toString());
   await fsPromises.writeFile(filePath, fileBuffer);
 

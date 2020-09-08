@@ -452,7 +452,7 @@ router.patch(
     assignment.submissionExtensions = req.body.submissionExtensions;
     assignment.lateSubmissions = req.body.lateSubmissions;
     assignment.lateSubmissionReviews = req.body.lateSubmissionReviews;
-    // check validity
+    // check validity without file
     await assignment.validateOrReject();
 
     // save old existing file
