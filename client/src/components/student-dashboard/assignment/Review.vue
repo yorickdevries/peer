@@ -218,7 +218,12 @@
                         >Unsubmit Review</b-button
                     >
                     <!--Submit Modal-->
-                    <b-modal :id="`submit${review.id}`" title="Submit Confirmation" @ok="submitReview">
+                    <b-modal
+                        :id="`submit${review.id}`"
+                        title="Submit Confirmation"
+                        :disabled="buttonDisabled"
+                        @ok="submitReview"
+                    >
                         <b-alert v-if="unSavedAnswers" show variant="warning" class="p-2"
                             >There are one or more unsaved answers</b-alert
                         >
