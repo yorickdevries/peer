@@ -392,7 +392,7 @@ export default {
                 answer.exists = true
                 this.showSuccessMessage({ message: "Succesfuly saved answer" })
             } catch (error) {
-                this.showErrorMessage(error)
+                this.showErrorMessage({ message: error })
             }
             this.buttonDisabled = false
         },
@@ -431,7 +431,7 @@ export default {
                 answer.exists = false
                 this.showSuccessMessage({ message: "Succesfuly deleted answer" })
             } catch (error) {
-                this.showErrorMessage(error)
+                this.showErrorMessage({ message: error })
             }
             this.buttonDisabled = false
         },
