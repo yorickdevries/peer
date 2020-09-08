@@ -18,4 +18,5 @@
     "ServiceProviderMetadataFile": "./ServiceProviderMetadata.xml",
     "url": "https://peer.tudelft.nl/",
     "uploadFolder": "/data_nfs/peer/uploadFolder/",
-    "temporaryFolder": "/data_nfs/peer/temp/",
+    "temporaryFolder": "/data_nfs/peer/temp/"
+}
