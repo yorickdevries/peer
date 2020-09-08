@@ -207,8 +207,9 @@ router.post(
 
     // remove the old file from the disk
     if (oldFile) {
+      const oldId = oldFile.id;
       await oldFile.remove();
-      const filePath = path.resolve(uploadFolder, oldFile.id.toString());
+      const filePath = path.resolve(uploadFolder, oldId.toString());
       await fsPromises.unlink(filePath);
     }
 

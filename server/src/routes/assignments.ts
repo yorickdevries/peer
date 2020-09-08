@@ -490,8 +490,9 @@ router.patch(
     await assignment.save();
     // remove the old file from the disk
     if (oldFile) {
+      const oldId = oldFile.id;
       await oldFile.remove();
-      const filePath = path.resolve(uploadFolder, oldFile.id.toString());
+      const filePath = path.resolve(uploadFolder, oldId.toString());
       await fsPromises.unlink(filePath);
     }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
