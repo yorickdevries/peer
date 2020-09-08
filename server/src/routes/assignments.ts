@@ -493,6 +493,8 @@ router.patch(
         assignment.lateSubmissions = req.body.lateSubmissions;
         assignment.lateSubmissionReviews = req.body.lateSubmissionReviews;
         await transactionalEntityManager.save(assignment);
+        // remove old file
+        await transactionalEntityManager.remove(oldFile);
       }
     );
     // save the file to disk
@@ -509,7 +511,6 @@ router.patch(
     if (oldFile) {
       const filePath = path.resolve(uploadFolder, oldFile.id.toString());
       await fsPromises.unlink(filePath);
-      await oldFile.remove();
     }
     // reload assignment to get all data
     // assignment should be defined now (else we would be in the catch)
