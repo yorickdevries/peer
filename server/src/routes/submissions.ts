@@ -13,7 +13,7 @@ import config from "config";
 import Submission from "../models/Submission";
 import File from "../models/File";
 import path from "path";
-import hasha from "hasha";
+// import hasha from "hasha";
 import fsPromises from "fs/promises";
 import upload from "../middleware/upload";
 import { AssignmentState } from "../enum/AssignmentState";
@@ -263,10 +263,11 @@ router.post(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
         // create the file object
-        const fileBuffer = req.file.buffer;
+        // const fileBuffer = req.file.buffer;
         const fileExtension = path.extname(req.file.originalname);
         const fileName = path.basename(req.file.originalname, fileExtension);
-        const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+        const fileHash =
+          "0000000000000000000000000000000000000000000000000000000000000000";
         const file = new File(fileName, fileExtension, fileHash);
 
         await transactionalEntityManager.save(file);
@@ -278,8 +279,13 @@ router.post(
 
         // save the file to disk lastly
         // (if this goes wrong all previous steps are rolled back)
+        // where the file is temporary saved
+        const tempPath = req.file.path;
+        // new place where the file will be saved
         const filePath = path.resolve(uploadFolder, file.id.toString());
-        await fsPromises.writeFile(filePath, req.file.buffer);
+        // copy and delete old file
+        await fsPromises.copyFile(tempPath, filePath);
+        await fsPromises.unlink(tempPath);
       }
     );
     // reload submission to get all data

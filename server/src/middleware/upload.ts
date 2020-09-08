@@ -3,6 +3,9 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
 import multer from "multer";
 import HttpStatusCode from "../enum/HttpStatusCode";
 
+import config from "config";
+const tempFolder = config.get("temporaryFolder") as string;
+
 // Middleware creator to parse the multipart data into a file and body
 export default function upload(
   allowedExtensions: string[],
@@ -25,7 +28,7 @@ export default function upload(
 
   // options for multer
   const options: multer.Options = {
-    storage: multer.memoryStorage(), // stored in memory, can later be moved to temp folder
+    dest: tempFolder,
     fileFilter: fileFilter,
     limits: { fileSize: maxFileSize },
   };

@@ -12,7 +12,7 @@ import upload from "../middleware/upload";
 import config from "config";
 import { getManager } from "typeorm";
 import path from "path";
-import hasha from "hasha";
+// import hasha from "hasha";
 import fsPromises from "fs/promises";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
@@ -174,10 +174,11 @@ router.post(
         }
 
         // new File
-        const fileBuffer = req.file.buffer;
+        // const fileBuffer = req.file.buffer;
         const fileExtension = path.extname(req.file.originalname);
         const fileName = path.basename(req.file.originalname, fileExtension);
-        const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+        const fileHash =
+          "0000000000000000000000000000000000000000000000000000000000000000";
         // make new file and answer
         const newFile = new File(fileName, fileExtension, fileHash);
         // save to database
@@ -192,8 +193,13 @@ router.post(
 
         // save the file to disk lastly (overwites exisitng if present)
         // (if this goes wrong all previous steps are rolled back)
+        // where the file is temporary saved
+        const tempPath = req.file.path;
+        // new place where the file will be saved
         const filePath = path.resolve(uploadFolder, newFile.id.toString());
-        await fsPromises.writeFile(filePath, req.file.buffer);
+        // copy and delete old file
+        await fsPromises.copyFile(tempPath, filePath);
+        await fsPromises.unlink(tempPath);
         // remove the old file from the disk
         if (oldFile?.id) {
           const filePath = path.resolve(uploadFolder, oldFile.id.toString());

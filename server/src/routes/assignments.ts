@@ -13,7 +13,7 @@ import File from "../models/File";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import upload from "../middleware/upload";
 import config from "config";
-import hasha from "hasha";
+// import hasha from "hasha";
 import path from "path";
 import fsPromises from "fs/promises";
 import _ from "lodash";
@@ -294,10 +294,11 @@ router.post(
         let file: File | null = null;
         if (req.file) {
           // file info
-          const fileBuffer = req.file.buffer;
+          //const fileBuffer = req.file.buffer;
           const fileExtension = path.extname(req.file.originalname);
           const fileName = path.basename(req.file.originalname, fileExtension);
-          const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+          const fileHash =
+            "0000000000000000000000000000000000000000000000000000000000000000";
           file = new File(fileName, fileExtension, fileHash);
           await transactionalEntityManager.save(file);
         }
@@ -327,8 +328,13 @@ router.post(
         // save the file to disk lastly
         // (if this goes wrong all previous steps are rolled back)
         if (file?.id && req.file) {
+          // where the file is temporary saved
+          const tempPath = req.file.path;
+          // new place where the file will be saved
           const filePath = path.resolve(uploadFolder, file.id.toString());
-          await fsPromises.writeFile(filePath, req.file.buffer);
+          // copy and delete old file
+          await fsPromises.copyFile(tempPath, filePath);
+          await fsPromises.unlink(tempPath);
         }
       }
     );
@@ -453,10 +459,11 @@ router.patch(
         // create the file object
         if (req.file) {
           // file info
-          const fileBuffer = req.file.buffer;
+          //const fileBuffer = req.file.buffer;
           const fileExtension = path.extname(req.file.originalname);
           const fileName = path.basename(req.file.originalname, fileExtension);
-          const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+          const fileHash =
+            "0000000000000000000000000000000000000000000000000000000000000000";
           newFile = new File(fileName, fileExtension, fileHash);
           await transactionalEntityManager.save(newFile);
         }
@@ -483,8 +490,13 @@ router.patch(
 
         // save the file to disk
         if (newFile?.id && req.file) {
+          // where the file is temporary saved
+          const tempPath = req.file.path;
+          // new place where the file will be saved
           const filePath = path.resolve(uploadFolder, newFile.id.toString());
-          await fsPromises.writeFile(filePath, req.file.buffer);
+          // copy and delete old file
+          await fsPromises.copyFile(tempPath, filePath);
+          await fsPromises.unlink(tempPath);
         }
         // remove the old file from the disk
         if (oldFile?.id) {

@@ -4,7 +4,7 @@ import File from "../models/File";
 import path from "path";
 import config from "config";
 import { getManager } from "typeorm";
-import hasha from "hasha";
+// import hasha from "hasha";
 import fsPromises from "fs/promises";
 const uploadFolder = config.get("uploadFolder") as string;
 
@@ -32,7 +32,8 @@ const exportJSONToFile = async function (
       // create the file object
       const fileBuffer = Buffer.from(result);
       const fileExtension = `.${exportType}`;
-      const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+      const fileHash =
+        "0000000000000000000000000000000000000000000000000000000000000000";
       const file = new File(fileName, fileExtension, fileHash);
       await transactionalEntityManager.save(file);
 
