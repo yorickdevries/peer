@@ -160,11 +160,23 @@ router.post(
     // new File
     // const fileBuffer = req.file.buffer;
     const fileExtension = path.extname(req.file.originalname);
+    if (!question.extensions.split(",").includes(fileExtension)) {
+      throw new Error("The file is of the wrong extension");
+    }
     const fileName = path.basename(req.file.originalname, fileExtension);
     const fileHash =
       "0000000000000000000000000000000000000000000000000000000000000000";
     // make new file and answer
     const newFile = new File(fileName, fileExtension, fileHash);
+    await newFile.save();
+
+    // where the file is temporary saved
+    const tempPath = req.file.path;
+    // new place where the file will be saved
+    const filePath = path.resolve(uploadFolder, newFile.id.toString());
+    // copy and delete old file
+    await fsPromises.copyFile(tempPath, filePath);
+    await fsPromises.unlink(tempPath);
 
     // start transaction make sure the file and submission are both saved
     await getManager().transaction(
@@ -180,12 +192,11 @@ router.post(
             },
           }
         );
-        // if an answer is already present, replace the fileinfo
+        // if an answer is already present, save to constant
         if (uploadAnswer) {
           oldFile = uploadAnswer.uploadAnswer;
         }
         // save to database
-        await transactionalEntityManager.save(newFile);
         if (uploadAnswer) {
           uploadAnswer.uploadAnswer = newFile;
         } else {
@@ -195,13 +206,7 @@ router.post(
         await transactionalEntityManager.save(uploadAnswer);
       }
     );
-    // where the file is temporary saved
-    const tempPath = req.file.path;
-    // new place where the file will be saved
-    const filePath = path.resolve(uploadFolder, newFile.id.toString());
-    // copy and delete old file
-    await fsPromises.copyFile(tempPath, filePath);
-    await fsPromises.unlink(tempPath);
+
     // remove the old file from the disk
     if (oldFile) {
       const filePath = path.resolve(uploadFolder, oldFile.id.toString());
