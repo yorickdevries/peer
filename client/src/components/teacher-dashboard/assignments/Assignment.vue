@@ -19,7 +19,7 @@
             </BreadcrumbTitle>
 
             <b-card no-body>
-                <b-tabs card>
+                <b-tabs card lazy>
                     <!--Details & Action-->
                     <b-tab title="Home" active>
                         <b-row>

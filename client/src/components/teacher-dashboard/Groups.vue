@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="groups">
         <b-row>
             <b-col>
                 <!--Importing-->
@@ -166,7 +166,7 @@ export default {
     data() {
         return {
             assignment: null,
-            groups: [],
+            groups: null,
             // for navigation
             groupFields: [
                 { key: "id", label: "Group ID", sortable: true },

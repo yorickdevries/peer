@@ -1,5 +1,5 @@
 <template>
-    <div v-if="reviews">
+    <div v-if="reviews && groups">
         <b-row v-if="$router.currentRoute.name.includes('teacher')">
             <b-col>
                 <!--Exporting Reviews-->
