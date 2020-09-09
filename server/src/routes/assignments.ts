@@ -327,9 +327,8 @@ router.post(
       const tempPath = req.file.path;
       // new place where the file will be saved
       const filePath = path.resolve(uploadFolder, file.id.toString());
-      // copy and delete old file
-      await fsPromises.copyFile(tempPath, filePath);
-      await fsPromises.unlink(tempPath);
+      // move file
+      await fsPromises.rename(tempPath, filePath);
     }
     assignment.file = file;
     await assignment.save();
@@ -479,9 +478,8 @@ router.patch(
       const tempPath = req.file.path;
       // new place where the file will be saved
       const filePath = path.resolve(uploadFolder, newFile.id.toString());
-      // copy and delete old file
-      await fsPromises.copyFile(tempPath, filePath);
-      await fsPromises.unlink(tempPath);
+      // move file
+      await fsPromises.rename(tempPath, filePath);
     }
     // change the file in case it is not undefined
     if (newFile !== undefined) {

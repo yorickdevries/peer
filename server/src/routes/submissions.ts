@@ -272,9 +272,8 @@ router.post(
     const tempPath = req.file.path;
     // new place where the file will be saved
     const filePath = path.resolve(uploadFolder, file.id.toString());
-    // copy and delete old file
-    await fsPromises.copyFile(tempPath, filePath);
-    await fsPromises.unlink(tempPath);
+    // move file
+    await fsPromises.rename(tempPath, filePath);
 
     // make the submission here in a transaction
     const submission = new Submission(user, group, assignment, file);
