@@ -1,7 +1,7 @@
 #!/bin/bash
 DATE=$(date +"%Y%m%d%H%M%S")
-RESPONSECODE=$(curl --head --max-time 10 -s -o /dev/null -w "%{http_code}" https://peer.tudelft.nl/api/faculties)
-curl --max-time 10 https://peer.tudelft.nl/api/faculties
+RESPONSECODE=$(curl --head --max-time 20 -s -o /dev/null -w "%{http_code}" https://peer.tudelft.nl/api/faculties)
+curl --max-time 20 https://peer.tudelft.nl/api/faculties
 
 if [[ $? -eq 0 && $RESPONSECODE -eq 200 ]]
 then
