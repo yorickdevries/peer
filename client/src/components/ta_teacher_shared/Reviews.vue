@@ -1,5 +1,5 @@
 <template>
-    <div v-if="reviews && groups">
+    <div v-if="reviews">
         <b-row v-if="$router.currentRoute.name.includes('teacher')">
             <b-col>
                 <!--Exporting Reviews-->
@@ -130,10 +130,6 @@
                 </a>
             </template>
 
-            <template v-slot:cell(submissionGroupName)="data">
-                {{ getGroup(data.item.submission.groupId).name }}
-            </template>
-
             <template v-slot:cell(approvalByTA)="data">
                 <span v-if="data.item.approvalByTA === null">No action yet by any TA</span>
                 <span v-if="data.item.approvalByTA === true">Approved 👍</span>
@@ -181,8 +177,6 @@ export default {
     data() {
         return {
             reviews: null,
-            // groups to get groupName from
-            groups: null,
             // in case of null, all reviews will be shown
             onlySubmittedReviews: null,
             // for navigation
@@ -208,14 +202,22 @@ export default {
         // reviews
         try {
             const res1 = await api.reviewofsubmissions.getAllForAssignment(this.$route.params.assignmentId, undefined)
-            this.reviews = res1.data
+            const reviews = res1.data
+            // set the full groups
+            const res2 = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
+            const groups = res2.data
+            // set submissiongroups
+            for (const review of reviews) {
+                const submissionGroup = _.find(groups, group => {
+                    return group.id === review.submission.groupId
+                })
+                review.submissionGroupName = submissionGroup.name
+            }
+            this.reviews = reviews
         } catch (error) {
             // in case no submissionquestionnaire is present, this call will result in an error
             this.reviews = []
         }
-        // groups
-        const res2 = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
-        this.groups = res2.data
     },
     computed: {
         selectedReviews() {
@@ -229,11 +231,6 @@ export default {
         }
     },
     methods: {
-        getGroup(id) {
-            return _.find(this.groups, group => {
-                return group.id === id
-            })
-        },
         submissionFilePath(id) {
             // Get the submission file path.
             return `/api/submissions/${id}/file`
