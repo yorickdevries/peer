@@ -28,40 +28,6 @@
             </b-col>
         </b-row>
         <br />
-        <template v-if="!reviewsAreReadOnly">
-            <!--Save/Submit Buttons-->
-            <b-card-body>
-                <div>
-                    <b-form-checkbox
-                        :disabled="review.submitted"
-                        v-model="review.flaggedByReviewer"
-                        name="reportButton"
-                        class="float-left"
-                    >
-                        Report this review.
-                    </b-form-checkbox>
-                    <br />
-                    <small>Only report if the review is empty or not serious.</small>
-                </div>
-                <b-button
-                    v-if="!review.submitted"
-                    variant="success float-right"
-                    type="submit"
-                    v-b-modal="`submit${review.id}`"
-                    :disabled="buttonDisabled"
-                    >Submit Review</b-button
-                >
-                <b-button
-                    v-else
-                    variant="outline-success float-right"
-                    @click="unSubmitReview"
-                    :disabled="buttonDisabled"
-                    >Unsubmit Review</b-button
-                >
-            </b-card-body>
-        </template>
-        <br />
-
         <!--Button/info if no evaluation exists yet.-->
         <div v-if="!review">
             <b-alert show variant="info">
@@ -124,6 +90,40 @@
                     Evaluate the review you have gotten from one of your peers here.
                 </h6>
             </b-card-body>
+
+            <template v-if="!reviewsAreReadOnly">
+                <!--Save/Submit Buttons-->
+                <b-card-body>
+                    <div>
+                        <b-form-checkbox
+                            :disabled="review.submitted"
+                            v-model="review.flaggedByReviewer"
+                            name="reportButton"
+                            class="float-left"
+                        >
+                            Report this review.
+                        </b-form-checkbox>
+                        <br />
+                        <small>Only report if the review is empty or not serious.</small>
+                    </div>
+                    <b-button
+                        v-if="!review.submitted"
+                        variant="success float-right"
+                        type="submit"
+                        v-b-modal="`submit${review.id}`"
+                        :disabled="buttonDisabled"
+                        >Submit Review</b-button
+                    >
+                    <b-button
+                        v-else
+                        variant="outline-success float-right"
+                        @click="unSubmitReview"
+                        :disabled="buttonDisabled"
+                        >Unsubmit Review</b-button
+                    >
+                </b-card-body>
+            </template>
+            <br />
 
             <!--Question Information-->
             <b-card v-for="question in questionnaire.questions" :key="question.id" class="mb-3" no-body>
