@@ -60,35 +60,6 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   res.send(sortedSubmissions);
 });
 
-// get all the latest submissions for an assignment
-// we should swicth to specific annotation of submissions which indicate whether they are the latest
-router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const user = req.user!;
-  // this value has been parsed by the validate function
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const assignmentId: number = req.query.assignmentId as any;
-  const assignment = await Assignment.findOne(assignmentId);
-  if (!assignment) {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
-    return;
-  }
-  if (
-    // not a teacher
-    !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
-  ) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
-    return;
-  }
-  const latestSubmissionsOfEachGroup = await assignment.getLatestSubmissionsOfEachGroup();
-  const sortedSubmissions = _.sortBy(latestSubmissionsOfEachGroup, "id");
-  res.send(sortedSubmissions);
-});
-
 // get the submission
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
