@@ -77,8 +77,8 @@
                                                 Are you sure you want to publish the assignment?
                                                 <ul>
                                                     <li>
-                                                        After publication the allowed submission extensions cannot be
-                                                        changed.
+                                                        After publication the allowed submission file extensions cannot
+                                                        be changed.
                                                     </li>
                                                 </ul>
                                             </b-modal>
