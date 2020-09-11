@@ -5,6 +5,7 @@ import path from "path";
 import config from "config";
 // import hasha from "hasha";
 import fsPromises from "fs/promises";
+import { getManager } from "typeorm";
 const uploadFolder = config.get("uploadFolder") as string;
 
 // Method to export data to an export with the indicated fileName to the res object
@@ -31,16 +32,24 @@ const exportJSONToFile = async function (
   const fileHash =
     "0000000000000000000000000000000000000000000000000000000000000000";
   const file = new File(fileName, fileExtension, fileHash);
-  await file.save();
 
-  // save the file to disk lastly
-  const filePath = path.resolve(uploadFolder, file.id.toString());
-  await fsPromises.writeFile(filePath, fileBuffer);
+  await getManager().transaction(
+    "SERIALIZABLE",
+    async (transactionalEntityManager) => {
+      // save file entry to database
+      await transactionalEntityManager.save(file);
 
-  // add to assignmentExport
-  assignmentExport.file = file;
-  // this checks for the right extension in the validate function
-  await assignmentExport.save();
+      // add to assignmentExport
+      assignmentExport.file = file;
+      await transactionalEntityManager.save(assignmentExport);
+
+      // write the file (so if this fails everything above fails)
+      // new place where the file will be saved
+      const filePath = path.resolve(uploadFolder, file.id.toString());
+      // write
+      await fsPromises.writeFile(filePath, fileBuffer);
+    }
+  );
 };
 
 export default exportJSONToFile;

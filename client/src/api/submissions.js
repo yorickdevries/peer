@@ -8,10 +8,6 @@ export default {
         const params = { assignmentId }
         return client.get("submissions", { params: params })
     },
-    getLatest(assignmentId) {
-        const params = { assignmentId }
-        return client.get("submissions/latest", { params: params })
-    },
     getFeedback(id) {
         return client.get(`submissions/${id}/feedback`)
     },

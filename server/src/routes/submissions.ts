@@ -20,6 +20,7 @@ import { AssignmentState } from "../enum/AssignmentState";
 import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
 import moment from "moment";
+import { getManager } from "typeorm";
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
@@ -57,35 +58,6 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   }
   const submissions = await assignment.getSubmissions();
   const sortedSubmissions = _.sortBy(submissions, "id");
-  res.send(sortedSubmissions);
-});
-
-// get all the latest submissions for an assignment
-// we should swicth to specific annotation of submissions which indicate whether they are the latest
-router.get("/latest", validateQuery(assignmentIdSchema), async (req, res) => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const user = req.user!;
-  // this value has been parsed by the validate function
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const assignmentId: number = req.query.assignmentId as any;
-  const assignment = await Assignment.findOne(assignmentId);
-  if (!assignment) {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
-    return;
-  }
-  if (
-    // not a teacher
-    !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
-  ) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
-    return;
-  }
-  const latestSubmissionsOfEachGroup = await assignment.getLatestSubmissionsOfEachGroup();
-  const sortedSubmissions = _.sortBy(latestSubmissionsOfEachGroup, "id");
   res.send(sortedSubmissions);
 });
 
@@ -256,30 +228,37 @@ router.post(
     }
 
     // file info
-    //const fileBuffer = req.file.buffer;
     const fileExtension = path.extname(req.file.originalname);
-    // check validity of extension
-    if (!assignment.submissionExtensions.split(",").includes(fileExtension)) {
-      throw new Error("The file is of the wrong extension");
-    }
     const fileName = path.basename(req.file.originalname, fileExtension);
     const fileHash =
       "0000000000000000000000000000000000000000000000000000000000000000";
     const file = new File(fileName, fileExtension, fileHash);
-    await file.save();
 
-    // where the file is temporary saved
-    const tempPath = req.file.path;
-    // new place where the file will be saved
-    const filePath = path.resolve(uploadFolder, file.id.toString());
-    // move file
-    await fsPromises.rename(tempPath, filePath);
+    let submission: Submission;
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        // save file entry to database
+        await transactionalEntityManager.save(file);
 
-    // make the submission here in a transaction
-    const submission = new Submission(user, group, assignment, file);
-    await submission.save();
+        submission = new Submission(user, group, assignment, file);
+        await transactionalEntityManager.save(submission);
 
-    res.send(submission);
+        // move the file (so if this fails everything above fails)
+        // where the file is temporary saved
+        const tempPath = req.file.path;
+        // new place where the file will be saved
+        const filePath = path.resolve(uploadFolder, file.id.toString());
+        // move file
+        await fsPromises.rename(tempPath, filePath);
+      }
+    );
+
+    // reload the submission
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    await submission!.reload();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    res.send(submission!);
   }
 );
 

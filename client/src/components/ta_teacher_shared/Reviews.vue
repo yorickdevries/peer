@@ -211,7 +211,9 @@ export default {
                 const submissionGroup = _.find(groups, group => {
                     return group.id === review.submission.groupId
                 })
-                review.submissionGroupName = submissionGroup.name
+                if (submissionGroup) {
+                    review.submissionGroupName = submissionGroup.name
+                }
             }
             this.reviews = reviews
         } catch (error) {
