@@ -151,27 +151,15 @@ router.post(
         );
       return;
     }
-    // oldfile in case of update
-    let oldFile: File | undefined;
-
-    // file info
-    //const fileBuffer = req.file.buffer;
+    // construct file to be saved in transaction
     const fileExtension = path.extname(req.file.originalname);
-    if (!question.extensions.split(",").includes(fileExtension)) {
-      throw new Error("The file is of the wrong extension");
-    }
     const fileName = path.basename(req.file.originalname, fileExtension);
     const fileHash =
       "0000000000000000000000000000000000000000000000000000000000000000";
     const newFile = new File(fileName, fileExtension, fileHash);
-    await newFile.save();
 
-    // where the file is temporary saved
-    const tempPath = req.file.path;
-    // new place where the file will be saved
-    const filePath = path.resolve(uploadFolder, newFile.id.toString());
-    // move file
-    await fsPromises.rename(tempPath, filePath);
+    // oldfile in case of update
+    let oldFile: File | undefined;
 
     // uploadAnswer
     let uploadAnswer: UploadQuestionAnswer | undefined;
@@ -189,11 +177,13 @@ router.post(
             },
           }
         );
-        // if an answer is already present, save to constant
+        // if an answer is already present, save old file to constant
         if (uploadAnswer) {
           oldFile = uploadAnswer.uploadAnswer;
         }
-        // save to database
+        // save file entry to database
+        await transactionalEntityManager.save(newFile);
+        // save answer to database
         if (uploadAnswer) {
           uploadAnswer.uploadAnswer = newFile;
         } else {
@@ -201,10 +191,18 @@ router.post(
         }
         // create/update uploadAnswer
         await transactionalEntityManager.save(uploadAnswer);
+
+        // move the file (so if this fails everything above fails)
+        // where the file is temporary saved now
+        const tempPath = req.file.path;
+        // new place where the file will be saved
+        const filePath = path.resolve(uploadFolder, newFile.id.toString());
+        // move file
+        await fsPromises.rename(tempPath, filePath);
       }
     );
-
-    // remove the old file from the disk
+    // remove old file lastly so no data is lost
+    // worst case this fails and we have a orphan file
     if (oldFile) {
       const oldId = oldFile.id;
       await oldFile.remove();
@@ -303,10 +301,10 @@ router.delete(
         await transactionalEntityManager.remove(questionAnswer);
         // delete file as well
         await transactionalEntityManager.remove(file);
+        // remove file from disk
+        await fsPromises.unlink(filePath);
       }
     );
-    // unlink outside of transaction
-    await fsPromises.unlink(filePath);
     res.send(questionAnswer);
   }
 );
