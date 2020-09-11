@@ -21,7 +21,7 @@ import parseSubmissionReviewsForExport from "../util/parseReviewsForExport";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 import AssignmentExport from "../models/AssignmentExport";
-import startDistributeReviewsForAssignmentWorker from "../workers/pool";
+import { startDistributeReviewsForAssignmentWorker } from "../workers/pool";
 
 const router = express.Router();
 

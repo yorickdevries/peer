@@ -7,17 +7,17 @@ import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { getManager } from "typeorm";
 import Review from "../models/Review";
 import { AssignmentState } from "../enum/AssignmentState";
-import workerpool from "workerpool";
-import createDatabaseConnection from "../databaseConnection";
+import ensureConnection from "./ensureConnection";
 
 interface reviewAssignment {
   reviewer: User;
   submission: Submission;
 }
 
-const distributeReviewsForAssignment = async function (assignmentId: number) {
-  // create database connection for this script
-  await createDatabaseConnection();
+const distributeReviewsForAssignment = async function (
+  assignmentId: number
+): Promise<string> {
+  await ensureConnection();
 
   const assignment = await Assignment.findOneOrFail(assignmentId);
   const questionnaire = await assignment.getSubmissionQuestionnaire();
@@ -302,7 +302,4 @@ const performMaxFlow = async function (
   }
 };
 
-// create a worker and register public functions
-workerpool.worker({
-  distributeReviewsForAssignment: distributeReviewsForAssignment,
-});
+export default distributeReviewsForAssignment;
