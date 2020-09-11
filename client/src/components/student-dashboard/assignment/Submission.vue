@@ -27,9 +27,9 @@
                             </template>
                         </b-table>
                         Only the latest submission will be used for reviewing
-                        <br /><br />
                     </div>
                     <b-alert v-else show variant="danger">You have not yet made a submission</b-alert>
+                    <b-alert show variant="warning">Maximum file size for submission: 50MB</b-alert>
 
                     <!-- Modal Button -->
                     <b-button
