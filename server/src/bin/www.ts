@@ -5,6 +5,18 @@ import http from "http";
 import createDatabaseConnection from "../databaseConnection";
 import app from "../app";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+if (process[Symbol.for("ts-node.register.instance")]) {
+  process.env.TS_NODE = "true";
+}
+
+if (process.env.TS_NODE) {
+  console.log("Running under TS Node");
+} else {
+  console.log("Running under Node.JS");
+}
+
 console.log("Currently running in: " + app.get("env"));
 
 // Normalize a port into a number, string, or false.
