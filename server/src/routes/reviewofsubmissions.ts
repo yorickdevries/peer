@@ -21,7 +21,10 @@ import parseSubmissionReviewsForExport from "../util/parseReviewsForExport";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 import AssignmentExport from "../models/AssignmentExport";
-import { startDistributeReviewsForAssignmentWorker } from "../workers/pool";
+import {
+  startDistributeReviewsForAssignmentWorker,
+  startOpenFeedbackForAssignmentWorker,
+} from "../workers/pool";
 
 const router = express.Router();
 
@@ -263,19 +266,11 @@ router.patch(
         .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
       return;
     }
+    // offload a function to a worker
+    startOpenFeedbackForAssignmentWorker(assignmentId);
+
     // send message that reviews are being submitted
     res.send();
-    const submitted = false;
-    const unsubmittedReviews = await questionnaire.getReviews(submitted);
-    for (const review of unsubmittedReviews) {
-      if (await review.canBeSubmitted()) {
-        review.submitted = true;
-        review.submittedAt = new Date();
-        await review.save();
-      }
-    }
-    assignment.state = AssignmentState.FEEDBACK;
-    await assignment.save();
   }
 );
 

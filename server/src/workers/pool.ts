@@ -49,4 +49,13 @@ const startDistributeReviewsForAssignmentWorker = function (
   startWorker("distributeReviewsForAssignment", [assignmentId]);
 };
 
-export { startDistributeReviewsForAssignmentWorker };
+const startOpenFeedbackForAssignmentWorker = function (
+  assignmentId: number
+): void {
+  startWorker("openFeedbackForAssignment", [assignmentId]);
+};
+
+export {
+  startDistributeReviewsForAssignmentWorker,
+  startOpenFeedbackForAssignmentWorker,
+};
