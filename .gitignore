@@ -3,6 +3,7 @@
 /server/dist/
 /server/files/
 /server/coverage/
+/server/sessions/
 
 # local env files
 .env.local
