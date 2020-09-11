@@ -20,6 +20,7 @@ import { AssignmentState } from "../enum/AssignmentState";
 import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
 import moment from "moment";
+import { getManager } from "typeorm";
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
@@ -227,30 +228,37 @@ router.post(
     }
 
     // file info
-    //const fileBuffer = req.file.buffer;
     const fileExtension = path.extname(req.file.originalname);
-    // check validity of extension
-    if (!assignment.submissionExtensions.split(",").includes(fileExtension)) {
-      throw new Error("The file is of the wrong extension");
-    }
     const fileName = path.basename(req.file.originalname, fileExtension);
     const fileHash =
       "0000000000000000000000000000000000000000000000000000000000000000";
     const file = new File(fileName, fileExtension, fileHash);
-    await file.save();
 
-    // where the file is temporary saved
-    const tempPath = req.file.path;
-    // new place where the file will be saved
-    const filePath = path.resolve(uploadFolder, file.id.toString());
-    // move file
-    await fsPromises.rename(tempPath, filePath);
+    let submission: Submission;
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        // save file entry to database
+        await transactionalEntityManager.save(file);
 
-    // make the submission here in a transaction
-    const submission = new Submission(user, group, assignment, file);
-    await submission.save();
+        submission = new Submission(user, group, assignment, file);
+        await transactionalEntityManager.save(submission);
 
-    res.send(submission);
+        // move the file (so if this fails everything above fails)
+        // where the file is temporary saved
+        const tempPath = req.file.path;
+        // new place where the file will be saved
+        const filePath = path.resolve(uploadFolder, file.id.toString());
+        // move file
+        await fsPromises.rename(tempPath, filePath);
+      }
+    );
+
+    // reload the submission
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    await submission!.reload();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    res.send(submission!);
   }
 );
 
