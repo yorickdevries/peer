@@ -21,6 +21,7 @@ import UserRole from "../enum/UserRole";
 import Group from "../models/Group";
 import ResponseMessage from "../enum/ResponseMessage";
 import fsPromises from "fs/promises";
+import { startImportGroupsForAssignmentWorker } from "../workers/pool";
 
 const router = express.Router();
 
@@ -282,6 +283,11 @@ router.post(
   upload([".csv"], maxFileSize, "file"),
   validateBody(assignmentIdSchema),
   async (req, res) => {
+    interface groupNameWithNetidList {
+      groupName: string;
+      netids: string[];
+    }
+
     let groupNameWithNetidLists: groupNameWithNetidList[];
     try {
       // read file and remove file
@@ -330,98 +336,15 @@ router.post(
         .send("There are already groups for this assignment");
       return;
     }
-    // still need to be saved
-    interface groupNameWithNetidList {
-      groupName: string;
-      netids: string[];
-    }
 
-    // save the users and enroll them in the course
-    await getManager().transaction(
-      "SERIALIZABLE",
-      async (transactionalEntityManager) => {
-        const course = await transactionalEntityManager.findOneOrFail(
-          Course,
-          assignment.courseId
-        );
-
-        // iterate over all groups
-        for (const groupNameWithNetidList of groupNameWithNetidLists) {
-          const netids = groupNameWithNetidList.netids;
-          // get or make users
-          for (const netid of netids) {
-            let user = await transactionalEntityManager.findOne(User, netid);
-            // in case the user doesnt exists in the database yet, create it
-            if (!user) {
-              user = new User(netid);
-              await transactionalEntityManager.save(user);
-            }
-            // enroll user in the course if not already
-            let enrollment = await transactionalEntityManager.findOne(
-              Enrollment,
-              { where: { userNetid: user.netid, courseId: course.id } }
-            );
-
-            if (enrollment) {
-              if (enrollment.role !== UserRole.STUDENT) {
-                throw new Error(
-                  `${netid} is ${enrollment.role} in this course`
-                );
-              }
-            } else {
-              // enroll the user as student in the course
-              enrollment = new Enrollment(user, course, UserRole.STUDENT);
-              await transactionalEntityManager.save(enrollment);
-            }
-          }
-        }
-      }
+    // offload a function to a worker
+    startImportGroupsForAssignmentWorker(
+      assignment.id,
+      groupNameWithNetidLists
     );
-    // save the users of the groups in the course
-    const groups: Group[] = [];
-    await getManager().transaction(
-      "SERIALIZABLE",
-      async (transactionalEntityManager) => {
-        const existingGroups = await transactionalEntityManager
-          .createQueryBuilder(Group, "group")
-          .leftJoin("group.assignments", "assignment")
-          .where("assignment.id = :id", { id: assignment.id })
-          .getMany();
-        if (existingGroups.length > 0) {
-          throw new Error("There are already groups for this assignment");
-        }
 
-        const course = await transactionalEntityManager.findOneOrFail(
-          Course,
-          assignment.courseId
-        );
-
-        // iterate over all groups
-        for (const groupNameWithNetidList of groupNameWithNetidLists) {
-          const netids = groupNameWithNetidList.netids;
-          // get or make users
-          const users = [];
-          for (const netid of netids) {
-            const user = await transactionalEntityManager.findOneOrFail(
-              User,
-              netid
-            );
-            users.push(user);
-          }
-
-          const groupName = groupNameWithNetidList.groupName;
-          // make the group
-          const group = new Group(groupName, course, users, [assignment]);
-          await transactionalEntityManager.save(group);
-          groups.push(group);
-        }
-      }
-    );
-    // reload the groups from the database
-    for (const group of groups) {
-      await group.reload();
-    }
-    res.send(groups);
+    // send message that groups are being made
+    res.send();
   }
 );
 

@@ -11,51 +11,117 @@ const startWorker = function (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionArguments: any[]
 ) {
-  if (process.env.TS_NODE) {
-    // run the function directly in this process (TS Node/development)
-    const workerFunction = workerFunctions[functionName];
-    if (workerFunction.length === functionArguments.length) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const workerFunctionArguments = functionArguments as any;
-      // run the function directly
-      // eslint-disable-next-line prefer-spread
-      workerFunction
-        .apply(null, workerFunctionArguments)
-        .then((result) => {
-          console.log(result);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    } else {
-      throw new Error("Invalid number of function arguments");
-    }
-  } else {
-    // run worker in a seperate process (Node.js/production)
-    pool
-      .exec(functionName, functionArguments)
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
+  pool
+    .exec(functionName, functionArguments)
+    .then((result) => {
+      console.log(result);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
 };
 
 const startDistributeReviewsForAssignmentWorker = function (
   assignmentId: number
 ): void {
-  startWorker("distributeReviewsForAssignment", [assignmentId]);
+  if (process.env.TS_NODE) {
+    // run the function directly in this process (TS Node/development)
+    const result = workerFunctions.distributeReviewsForAssignment(assignmentId);
+    console.log(result);
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("distributeReviewsForAssignment", [assignmentId]);
+  }
 };
 
 const startOpenFeedbackForAssignmentWorker = function (
   assignmentId: number
 ): void {
-  startWorker("openFeedbackForAssignment", [assignmentId]);
+  if (process.env.TS_NODE) {
+    // run the function directly in this process (TS Node/development)
+    const result = workerFunctions.openFeedbackForAssignment(assignmentId);
+    console.log(result);
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("openFeedbackForAssignment", [assignmentId]);
+  }
+};
+
+interface groupNameWithNetidList {
+  groupName: string;
+  netids: string[];
+}
+
+const startImportGroupsForAssignmentWorker = function (
+  assignmentId: number,
+  groupNameWithNetidLists: groupNameWithNetidList[]
+): void {
+  if (process.env.TS_NODE) {
+    // run the function directly in this process (TS Node/development)
+    const result = workerFunctions.importGroupsForAssignment(
+      assignmentId,
+      groupNameWithNetidLists
+    );
+    console.log(result);
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("importGroupsForAssignment", [
+      assignmentId,
+      groupNameWithNetidLists,
+    ]);
+  }
+};
+
+const startExportGradesForAssignmentWorker = function (
+  assignmentId: number,
+  assignmentExportId: number,
+  exportType: "xls" | "csv"
+): void {
+  if (process.env.TS_NODE) {
+    // run the function directly in this process (TS Node/development)
+    const result = workerFunctions.exportGradesForAssignment(
+      assignmentId,
+      assignmentExportId,
+      exportType
+    );
+    console.log(result);
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("exportGradesForAssignment", [
+      assignmentId,
+      assignmentExportId,
+      exportType,
+    ]);
+  }
+};
+
+const startExportReviewsForAssignmentWorker = function (
+  assignmentId: number,
+  assignmentExportId: number,
+  exportType: "xls" | "csv"
+): void {
+  if (process.env.TS_NODE) {
+    // run the function directly in this process (TS Node/development)
+    const result = workerFunctions.exportReviewsForAssignment(
+      assignmentId,
+      assignmentExportId,
+      exportType
+    );
+    console.log(result);
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("exportReviewsForAssignment", [
+      assignmentId,
+      assignmentExportId,
+      exportType,
+    ]);
+  }
 };
 
 export {
   startDistributeReviewsForAssignmentWorker,
   startOpenFeedbackForAssignmentWorker,
+  startImportGroupsForAssignmentWorker,
+  startExportGradesForAssignmentWorker,
+  startExportReviewsForAssignmentWorker,
 };

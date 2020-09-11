@@ -15,15 +15,14 @@ import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { getManager } from "typeorm";
 import moment from "moment";
 import ReviewOfReview from "../models/ReviewOfReview";
-import makeGradeSummaries from "../util/makeGradeSummary";
-import exportJSONToFile from "../util/exportJSONToFile";
-import parseSubmissionReviewsForExport from "../util/parseReviewsForExport";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 import AssignmentExport from "../models/AssignmentExport";
 import {
   startDistributeReviewsForAssignmentWorker,
   startOpenFeedbackForAssignmentWorker,
+  startExportGradesForAssignmentWorker,
+  startExportReviewsForAssignmentWorker,
 } from "../workers/pool";
 
 const router = express.Router();
@@ -120,16 +119,16 @@ router.post(
     }
     const assignmentExport = new AssignmentExport(user, assignment, null);
     await assignmentExport.save();
-    res.send(assignmentExport);
-    // asynchronically make export
-    const gradeSummaries = makeGradeSummaries(reviews);
-    const filename = `assignment${assignment.id}_grades`;
-    await exportJSONToFile(
-      gradeSummaries,
-      filename,
-      exportType,
-      assignmentExport
+
+    // offload a function to a worker
+    startExportGradesForAssignmentWorker(
+      assignment.id,
+      assignmentExport.id,
+      exportType
     );
+
+    // send message that grades are being exported
+    res.send(assignmentExport);
   }
 );
 
@@ -177,16 +176,16 @@ router.post(
     // make export entry without file
     const assignmentExport = new AssignmentExport(user, assignment, null);
     await assignmentExport.save();
-    res.send(assignmentExport);
-    // asynchronically make export
-    const parsedReviews = await parseSubmissionReviewsForExport(questionnaire);
-    const filename = `assignment${assignment.id}_reviews`;
-    await exportJSONToFile(
-      parsedReviews,
-      filename,
-      exportType,
-      assignmentExport
+
+    // offload a function to a worker
+    startExportReviewsForAssignmentWorker(
+      assignment.id,
+      assignmentExport.id,
+      exportType
     );
+
+    // send message that reviews are being exported
+    res.send(assignmentExport);
   }
 );
 
