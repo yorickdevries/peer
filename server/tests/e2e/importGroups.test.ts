@@ -86,13 +86,6 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.OK);
-    const result = JSON.parse(res.text);
-    expect(result).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ name: "ED 4" }),
-        expect.objectContaining({ name: "ED 3" }),
-      ])
-    );
   });
 
   test("import with big file", async () => {
@@ -168,13 +161,6 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.OK);
-    const result = JSON.parse(res.text);
-    expect(result).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ name: "4" }),
-        expect.objectContaining({ name: "ED 3" }),
-      ])
-    );
   });
 
   //bad weather tests
@@ -252,13 +238,6 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.OK);
-    const result = JSON.parse(res.text);
-    expect(result).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ name: "ED 4" }),
-        expect.objectContaining({ name: "ED 3" }),
-      ])
-    );
   });
 
   test("student is not defined, but group is 2", async () => {
@@ -289,13 +268,6 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.OK);
-    const result = JSON.parse(res.text);
-    expect(result).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ name: "ED 4" }),
-        expect.objectContaining({ name: "ED 3" }),
-      ])
-    );
   });
 
   test("invalid assignment id", async () => {
