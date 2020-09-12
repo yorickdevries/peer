@@ -1,6 +1,7 @@
 import workerpool from "workerpool";
 import path from "path";
 import workerFunctions from "./workerFunctions";
+import isTSNode from "../util/isTSNode";
 
 // refer to the compiled .js workers
 const pool = workerpool.pool(path.resolve(__dirname, "./workers.js"));
@@ -24,7 +25,7 @@ const startWorker = function (
 const startDistributeReviewsForAssignmentWorker = function (
   assignmentId: number
 ): void {
-  if (process.env.TS_NODE) {
+  if (isTSNode) {
     // run the function directly in this process (TS Node/development)
     workerFunctions
       .distributeReviewsForAssignment(assignmentId)
@@ -43,7 +44,7 @@ const startDistributeReviewsForAssignmentWorker = function (
 const startOpenFeedbackForAssignmentWorker = function (
   assignmentId: number
 ): void {
-  if (process.env.TS_NODE) {
+  if (isTSNode) {
     // run the function directly in this process (TS Node/development)
     workerFunctions
       .openFeedbackForAssignment(assignmentId)
@@ -68,7 +69,7 @@ const startImportGroupsForAssignmentWorker = function (
   assignmentId: number,
   groupNameWithNetidLists: groupNameWithNetidList[]
 ): void {
-  if (process.env.TS_NODE) {
+  if (isTSNode) {
     // run the function directly in this process (TS Node/development)
     workerFunctions
       .importGroupsForAssignment(assignmentId, groupNameWithNetidLists)
@@ -91,7 +92,7 @@ const startCopyGroupsForAssignmentWorker = function (
   assignmentId: number,
   copyFromAssignmentId: number
 ): void {
-  if (process.env.TS_NODE) {
+  if (isTSNode) {
     // run the function directly in this process (TS Node/development)
     workerFunctions
       .copyGroupsForAssignment(assignmentId, copyFromAssignmentId)
@@ -115,7 +116,7 @@ const startExportGradesForAssignmentWorker = function (
   assignmentExportId: number,
   exportType: "xls" | "csv"
 ): void {
-  if (process.env.TS_NODE) {
+  if (isTSNode) {
     // run the function directly in this process (TS Node/development)
     workerFunctions
       .exportGradesForAssignment(assignmentId, assignmentExportId, exportType)
@@ -140,7 +141,7 @@ const startExportReviewsForAssignmentWorker = function (
   assignmentExportId: number,
   exportType: "xls" | "csv"
 ): void {
-  if (process.env.TS_NODE) {
+  if (isTSNode) {
     // run the function directly in this process (TS Node/development)
     workerFunctions
       .exportReviewsForAssignment(assignmentId, assignmentExportId, exportType)

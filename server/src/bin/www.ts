@@ -4,14 +4,9 @@
 import http from "http";
 import createDatabaseConnection from "../databaseConnection";
 import app from "../app";
+import isTSNode from "../util/isTSNode";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-if (process[Symbol.for("ts-node.register.instance")]) {
-  process.env.TS_NODE = "true";
-}
-
-if (process.env.TS_NODE) {
+if (isTSNode) {
   console.log("Running under TS Node");
 } else {
   console.log("Running under Node.JS");
