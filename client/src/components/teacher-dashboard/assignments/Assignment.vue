@@ -121,6 +121,10 @@
                                                 This action will distribute reviews to users of groups which made a
                                                 submission.
                                             </dd>
+                                            <b-alert v-if="showDistributeAlert" show
+                                                >Reviews are being distributed, check back in a few minutes to see the
+                                                results</b-alert
+                                            >
                                             <b-button
                                                 v-b-modal="`distributeReviews${assignment.id}`"
                                                 :disabled="disableButton"
@@ -155,6 +159,11 @@
                                             <dd>
                                                 This action will open the the feedback for the reviewed students
                                             </dd>
+                                            <b-alert v-if="showOpenFeedbackAlert" show
+                                                >All flagged and completely filled in reviews are being submitted and
+                                                feedback will be opened therafter, check back in a few minutes to see
+                                                the results</b-alert
+                                            >
                                             <b-button
                                                 v-b-modal="`openFeedback${assignment.id}`"
                                                 :disabled="disableButton"
@@ -275,7 +284,9 @@ export default {
                 { name: "review", icon: "fas fa-glasses" },
                 { name: "feedback", icon: "fas fa-comments" }
             ],
-            disableButton: false
+            disableButton: false,
+            showDistributeAlert: false,
+            showOpenFeedbackAlert: false
         }
     },
     computed: {
@@ -301,28 +312,27 @@ export default {
             this.disableButton = true
             await api.assignments.publish(this.$route.params.assignmentId)
             this.showSuccessMessage({ message: "Assignment succesfully published" })
+            this.disableButton = false
             await this.fetchAssignment()
         },
         async closeSubmission() {
             this.disableButton = true
             await api.assignments.closeSubmission(this.$route.params.assignmentId)
             this.showSuccessMessage({ message: "Assignment succesfully closed" })
+            this.disableButton = false
             await this.fetchAssignment()
         },
         async distributeReviews() {
             this.disableButton = true
             await api.reviewofsubmissions.distribute(this.$route.params.assignmentId)
-            this.showSuccessMessage({
-                message: "Reviews are being distributed, check back in a few minutes to see the results"
-            })
+            this.showSuccessMessage()
+            this.showDistributeAlert = true
         },
         async openFeedback() {
             this.disableButton = true
             await api.reviewofsubmissions.openFeedback(this.$route.params.assignmentId)
-            this.showSuccessMessage({
-                message:
-                    "All completely filled in reviews are being submitted and feedback will be opened therafter, check back in a few minutes to see the results"
-            })
+            this.showSuccessMessage()
+            this.showOpenFeedbackAlert = true
         }
     }
 }
