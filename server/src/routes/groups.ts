@@ -10,22 +10,20 @@ import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import _ from "lodash";
 import upload from "../middleware/upload";
-import config from "config";
 import parseGroupCSV from "../util/parseGroupCSV";
 import { AssignmentState } from "../enum/AssignmentState";
-import Course from "../models/Course";
-import { getManager } from "typeorm";
 import User from "../models/User";
 import Enrollment from "../models/Enrollment";
 import UserRole from "../enum/UserRole";
 import Group from "../models/Group";
 import ResponseMessage from "../enum/ResponseMessage";
 import fsPromises from "fs/promises";
-import { startImportGroupsForAssignmentWorker } from "../workers/pool";
+import {
+  startCopyGroupsForAssignmentWorker,
+  startImportGroupsForAssignmentWorker,
+} from "../workers/pool";
 
 const router = express.Router();
-
-const maxFileSize = config.get("maxFileSize") as number;
 
 // Joi inputvalidation for query
 const assignmentIdSchema = Joi.object({
@@ -277,6 +275,9 @@ router.patch(
   }
 );
 
+// 1 MB
+const maxFileSize = 1048576;
+
 // import groups from a brightspace export
 router.post(
   "/import",
@@ -442,47 +443,12 @@ router.post(
         .send("There are already groups for this assignment");
       return;
     }
-    const copyFromAssignmentGroups = await copyFromAssignment.getGroups();
-    // save the users of the groups in the course
-    const groups: Group[] = [];
-    await getManager().transaction(
-      "SERIALIZABLE",
-      async (transactionalEntityManager) => {
-        const existingGroups = await transactionalEntityManager
-          .createQueryBuilder(Group, "group")
-          .leftJoin("group.assignments", "assignment")
-          .where("assignment.id = :id", { id: assignment.id })
-          .getMany();
-        if (existingGroups.length > 0) {
-          throw new Error("There are already groups for this assignment");
-        }
-        const course = await transactionalEntityManager.findOneOrFail(
-          Course,
-          assignment.courseId
-        );
-        // iterate over all groups
-        for (const copyFromAssignmentGroup of copyFromAssignmentGroups) {
-          const groupWithUsers = await transactionalEntityManager.findOneOrFail(
-            Group,
-            copyFromAssignmentGroup.id,
-            { relations: ["users"] }
-          );
-          // get users
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const users = groupWithUsers.users!;
-          const groupName = groupWithUsers.name;
-          // make the new group
-          const group = new Group(groupName, course, users, [assignment]);
-          await transactionalEntityManager.save(group);
-          groups.push(group);
-        }
-      }
-    );
-    // reload the groups from the database
-    for (const group of groups) {
-      await group.reload();
-    }
-    res.send(groups);
+
+    // offload a function to a worker
+    startCopyGroupsForAssignmentWorker(assignment.id, copyFromAssignment.id);
+
+    // send message that groups are being made
+    res.send();
   }
 );
 

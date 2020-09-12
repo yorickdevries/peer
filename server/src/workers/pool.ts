@@ -26,8 +26,14 @@ const startDistributeReviewsForAssignmentWorker = function (
 ): void {
   if (process.env.TS_NODE) {
     // run the function directly in this process (TS Node/development)
-    const result = workerFunctions.distributeReviewsForAssignment(assignmentId);
-    console.log(result);
+    workerFunctions
+      .distributeReviewsForAssignment(assignmentId)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   } else {
     // run worker in a seperate process (Node.js/production)
     startWorker("distributeReviewsForAssignment", [assignmentId]);
@@ -39,8 +45,14 @@ const startOpenFeedbackForAssignmentWorker = function (
 ): void {
   if (process.env.TS_NODE) {
     // run the function directly in this process (TS Node/development)
-    const result = workerFunctions.openFeedbackForAssignment(assignmentId);
-    console.log(result);
+    workerFunctions
+      .openFeedbackForAssignment(assignmentId)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   } else {
     // run worker in a seperate process (Node.js/production)
     startWorker("openFeedbackForAssignment", [assignmentId]);
@@ -58,16 +70,42 @@ const startImportGroupsForAssignmentWorker = function (
 ): void {
   if (process.env.TS_NODE) {
     // run the function directly in this process (TS Node/development)
-    const result = workerFunctions.importGroupsForAssignment(
-      assignmentId,
-      groupNameWithNetidLists
-    );
-    console.log(result);
+    workerFunctions
+      .importGroupsForAssignment(assignmentId, groupNameWithNetidLists)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   } else {
     // run worker in a seperate process (Node.js/production)
     startWorker("importGroupsForAssignment", [
       assignmentId,
       groupNameWithNetidLists,
+    ]);
+  }
+};
+
+const startCopyGroupsForAssignmentWorker = function (
+  assignmentId: number,
+  copyFromAssignmentId: number
+): void {
+  if (process.env.TS_NODE) {
+    // run the function directly in this process (TS Node/development)
+    workerFunctions
+      .copyGroupsForAssignment(assignmentId, copyFromAssignmentId)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("copyGroupsForAssignment", [
+      assignmentId,
+      copyFromAssignmentId,
     ]);
   }
 };
@@ -79,12 +117,14 @@ const startExportGradesForAssignmentWorker = function (
 ): void {
   if (process.env.TS_NODE) {
     // run the function directly in this process (TS Node/development)
-    const result = workerFunctions.exportGradesForAssignment(
-      assignmentId,
-      assignmentExportId,
-      exportType
-    );
-    console.log(result);
+    workerFunctions
+      .exportGradesForAssignment(assignmentId, assignmentExportId, exportType)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   } else {
     // run worker in a seperate process (Node.js/production)
     startWorker("exportGradesForAssignment", [
@@ -102,12 +142,14 @@ const startExportReviewsForAssignmentWorker = function (
 ): void {
   if (process.env.TS_NODE) {
     // run the function directly in this process (TS Node/development)
-    const result = workerFunctions.exportReviewsForAssignment(
-      assignmentId,
-      assignmentExportId,
-      exportType
-    );
-    console.log(result);
+    workerFunctions
+      .exportReviewsForAssignment(assignmentId, assignmentExportId, exportType)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   } else {
     // run worker in a seperate process (Node.js/production)
     startWorker("exportReviewsForAssignment", [
@@ -122,6 +164,7 @@ export {
   startDistributeReviewsForAssignmentWorker,
   startOpenFeedbackForAssignmentWorker,
   startImportGroupsForAssignmentWorker,
+  startCopyGroupsForAssignmentWorker,
   startExportGradesForAssignmentWorker,
   startExportReviewsForAssignmentWorker,
 };
