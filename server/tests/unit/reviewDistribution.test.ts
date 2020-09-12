@@ -9,7 +9,7 @@ import Course from "../../src/models/Course";
 import AcademicYear from "../../src/models/AcademicYear";
 import Faculty from "../../src/models/Faculty";
 import File from "../../src/models/File";
-import generateDistribution from "../../src/util/reviewDistribution";
+import { generateReviewDistribution } from "../../src/workers/distributeReviews";
 import Enrollment from "../../src/models/Enrollment";
 import UserRole from "../../src/enum/UserRole";
 import { AssignmentState } from "../../src/enum/AssignmentState";
@@ -117,7 +117,7 @@ describe("Review distribution", () => {
 
     const reviewsPerUser = 3;
     // need to be made into an object
-    const reviewAssignments = await generateDistribution(
+    const reviewAssignments = await generateReviewDistribution(
       submissions,
       students,
       reviewsPerUser
@@ -224,7 +224,7 @@ describe("Review distribution", () => {
     // so the algorithm should find a less fair solution
     const reviewsPerUser = 3;
     // need to be made into an object
-    const reviewAssignments = await generateDistribution(
+    const reviewAssignments = await generateReviewDistribution(
       submissions,
       students,
       reviewsPerUser
@@ -333,7 +333,7 @@ describe("Review distribution", () => {
 
     const reviewsPerUser = 1;
     // need to be made into an object
-    const generateDistributionPromise = generateDistribution(
+    const generateDistributionPromise = generateReviewDistribution(
       submissions,
       [student2, student3],
       reviewsPerUser

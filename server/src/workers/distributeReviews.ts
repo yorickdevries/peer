@@ -302,4 +302,4 @@ const performMaxFlow = async function (
   }
 };
 
-export default distributeReviewsForAssignment;
+export { distributeReviewsForAssignment, generateReviewDistribution };

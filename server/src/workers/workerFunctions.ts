@@ -1,4 +1,4 @@
-import distributeReviewsForAssignment from "./distributeReviews";
+import { distributeReviewsForAssignment } from "./distributeReviews";
 import openFeedbackForAssignment from "./openFeedback";
 import importGroupsForAssignment from "./importGroups";
 import copyGroupsForAssignment from "./copyGroups";
