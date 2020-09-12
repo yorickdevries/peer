@@ -86,6 +86,9 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.OK);
+        // timeout needs te be set as group import is asynchronous
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
   });
 
   test("import with big file", async () => {
@@ -101,6 +104,8 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
+        // timeout needs te be set as group import is asynchronous
+        await new Promise((resolve) => setTimeout(resolve, 1000));
   });
 
   test("import with file without groupcolumn", async () => {
@@ -161,6 +166,9 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.OK);
+        // timeout needs te be set as group import is asynchronous
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
   });
 
   //bad weather tests
@@ -238,6 +246,9 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.OK);
+        // timeout needs te be set as group import is asynchronous
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
   });
 
   test("student is not defined, but group is 2", async () => {
@@ -253,6 +264,9 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.OK);
+        // timeout needs te be set as group import is asynchronous
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
   });
 
   test("some netids are without @ symbol", async () => {
@@ -268,6 +282,9 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.OK);
+        // timeout needs te be set as group import is asynchronous
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
   });
 
   test("invalid assignment id", async () => {
