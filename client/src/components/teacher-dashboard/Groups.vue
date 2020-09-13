@@ -107,7 +107,7 @@
             <template v-slot:cell(actions)="row">
                 <!--Show Details-->
                 <b-button size="sm" @click="showDetails(row)" class="mr-2">
-                    {{ row.detailsShowing ? "Hide" : "Show" }} Edit Group
+                    {{ row.detailsShowing ? "Hide" : "Show" }} Edit Group/Submissions
                 </b-button>
                 <!--Delete Group-->
                 <b-button size="sm" @click="deleteGroup(row.item.id)" class="mr-2" variant="danger">

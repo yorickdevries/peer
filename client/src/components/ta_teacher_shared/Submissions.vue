@@ -1,5 +1,6 @@
 <template>
     <div v-if="allSubmissions && finalSubmissions && groups">
+        <b-alert show>As teacher you can change submissions for groups in the group tab</b-alert>
         <!--Table Options-->
         <b-row>
             <b-col cols="6" class="mb-3">
