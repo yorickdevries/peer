@@ -122,21 +122,9 @@ export default {
             }
         },
         finalSubmissions() {
-            const finalSubmissions = []
-            if (this.groups && this.allSubmissions) {
-                for (const group of this.groups) {
-                    const submissionsOfGroup = _.filter(this.allSubmissions, function(submission) {
-                        return submission.groupId === group.id
-                    })
-                    const latestSubmission = _.maxBy(submissionsOfGroup, function(submission) {
-                        return submission.id
-                    })
-                    if (latestSubmission) {
-                        finalSubmissions.push(latestSubmission)
-                    }
-                }
-            }
-            return finalSubmissions
+            return _.filter(this.allSubmissions, function(submission) {
+                return submission.final
+            })
         }
     },
     methods: {
