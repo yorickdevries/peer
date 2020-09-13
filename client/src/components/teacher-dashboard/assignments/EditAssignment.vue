@@ -295,7 +295,7 @@
                                 </b-col>
                                 <b-col></b-col>
                             </b-row>
-                            <b-button type="submit" variant="primary">Save changes</b-button>
+                            <b-button type="submit" variant="primary" :disabled="buttonDisabled">Save changes</b-button>
                         </b-form>
                     </b-card>
                 </b-col>
@@ -328,7 +328,8 @@ export default {
                 { value: ".pdf,.zip", text: ".pdf,.zip" },
                 { value: ".doc,.docx", text: ".doc,.docx" },
                 { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" }
-            ]
+            ],
+            buttonDisabled: false
         }
     },
     computed: {
@@ -384,6 +385,7 @@ export default {
             return moment(new Date(date)).format("HH:mm")
         },
         async onSubmit() {
+            this.buttonDisabled = true
             // these will be constructed in the try/catch
             let publishDate = null
             let dueDate = null
@@ -416,6 +418,8 @@ export default {
                     throw new Error("dates are not in chronological order")
                 }
             } catch (error) {
+                // enable button again
+                this.buttonDisabled = false
                 this.showErrorMessage({ message: String(error) })
                 return
             }
@@ -432,30 +436,35 @@ export default {
                 file = undefined
             }
             // call post api
-            await api.assignments.patch(
-                this.assignment.id,
-                this.assignment.name,
-                this.assignment.reviewsPerUser,
-                this.assignment.enrollable,
-                this.assignment.reviewEvaluation,
-                publishDate,
-                dueDate,
-                reviewPublishDate,
-                reviewDueDate,
-                reviewEvaluationDueDate,
-                this.assignment.description,
-                this.assignment.externalLink,
-                file,
-                this.assignment.submissionExtensions,
-                this.assignment.lateSubmissions,
-                this.assignment.lateSubmissionReviews
-            )
-            this.showSuccessMessage({ message: "Updated assignment successfully" })
-            // Redirect to updated assignment
-            this.$router.push({
-                name: "teacher-dashboard.assignments.assignment",
-                params: { courseId: this.$route.params.courseId, assignmentId: this.assignment.id }
-            })
+            try {
+                await api.assignments.patch(
+                    this.assignment.id,
+                    this.assignment.name,
+                    this.assignment.reviewsPerUser,
+                    this.assignment.enrollable,
+                    this.assignment.reviewEvaluation,
+                    publishDate,
+                    dueDate,
+                    reviewPublishDate,
+                    reviewDueDate,
+                    reviewEvaluationDueDate,
+                    this.assignment.description,
+                    this.assignment.externalLink,
+                    file,
+                    this.assignment.submissionExtensions,
+                    this.assignment.lateSubmissions,
+                    this.assignment.lateSubmissionReviews
+                )
+                this.showSuccessMessage({ message: "Updated assignment successfully" })
+                // Redirect to updated assignment
+                this.$router.push({
+                    name: "teacher-dashboard.assignments.assignment",
+                    params: { courseId: this.$route.params.courseId, assignmentId: this.assignment.id }
+                })
+            } catch (error) {
+                // enable button again
+                this.buttonDisabled = false
+            }
         },
         checkDateFormat() {
             // Check whether all dates and time are nonempty and conform time input format

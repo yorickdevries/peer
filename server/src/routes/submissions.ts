@@ -13,14 +13,13 @@ import config from "config";
 import Submission from "../models/Submission";
 import File from "../models/File";
 import path from "path";
-import hasha from "hasha";
 import fsPromises from "fs/promises";
 import upload from "../middleware/upload";
 import { AssignmentState } from "../enum/AssignmentState";
-import { getManager } from "typeorm";
 import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
 import moment from "moment";
+import { getManager } from "typeorm";
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
@@ -58,34 +57,6 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   }
   const submissions = await assignment.getSubmissions();
   const sortedSubmissions = _.sortBy(submissions, "id");
-  res.send(sortedSubmissions);
-});
-
-// get all the submissions which will be used for reviewing for an assignment
-router.get("/final", validateQuery(assignmentIdSchema), async (req, res) => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const user = req.user!;
-  // this value has been parsed by the validate function
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const assignmentId: number = req.query.assignmentId as any;
-  const assignment = await Assignment.findOne(assignmentId);
-  if (!assignment) {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
-    return;
-  }
-  if (
-    // not a teacher
-    !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
-  ) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
-    return;
-  }
-  const finalSubmissionsOfEachGroup = await assignment.getFinalSubmissionsOfEachGroup();
-  const sortedSubmissions = _.sortBy(finalSubmissionsOfEachGroup, "id");
   res.send(sortedSubmissions);
 });
 
@@ -270,10 +241,14 @@ router.post(
         .send("The assignment is not in submission or waitingforreview state");
       return;
     }
-    // make the submission here in a transaction
-    let submission: Submission;
 
-    // start transaction make sure the file and submission are both saved
+    // file info
+    const fileExtension = path.extname(req.file.originalname);
+    const fileName = path.basename(req.file.originalname, fileExtension);
+    const fileHash = null;
+    const file = new File(fileName, fileExtension, fileHash);
+
+    let submission: Submission;
     await getManager().transaction(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
@@ -293,14 +268,7 @@ router.post(
           await transactionalEntityManager.save(submissionOfGroupForAssignment);
         }
 
-        // CONSTRUCT THE SUBMISSION
-        // create the file object
-        const fileBuffer = req.file.buffer;
-        const fileExtension = path.extname(req.file.originalname);
-        const fileName = path.basename(req.file.originalname, fileExtension);
-        const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
-        const file = new File(fileName, fileExtension, fileHash);
-
+        // save file entry to database
         await transactionalEntityManager.save(file);
 
         // create submission
@@ -308,14 +276,17 @@ router.post(
         // this checks for the right extension in the validate function
         await transactionalEntityManager.save(submission);
 
-        // save the file to disk lastly
-        // (if this goes wrong all previous steps are rolled back)
+        // move the file (so if this fails everything above fails)
+        // where the file is temporary saved
+        const tempPath = req.file.path;
+        // new place where the file will be saved
         const filePath = path.resolve(uploadFolder, file.id.toString());
-        await fsPromises.writeFile(filePath, req.file.buffer);
+        // move file
+        await fsPromises.rename(tempPath, filePath);
       }
     );
 
-    // reload submission to get all data
+    // reload the submission
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await submission!.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

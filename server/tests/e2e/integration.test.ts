@@ -711,14 +711,6 @@ describe("Integration", () => {
       submission2,
     ]);
 
-    // get final submissions for this assignment as teacher
-    res = await request(server)
-      .get(`/api/submissions/final?assignmentId=${assignment.id}`)
-      .set("cookie", await teacherCookie());
-    // assertions
-    expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject([submission1, submission2]);
-
     // get a single submission as teacher
     res = await request(server)
       .get(`/api/submissions/${submission1.id}`)

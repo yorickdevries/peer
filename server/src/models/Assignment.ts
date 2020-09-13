@@ -323,6 +323,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getFinalSubmissionsOfEachGroup(): Promise<Submission[]> {
+    console.log("THIS FUNCTION TAKES TOO MUCH IO AND NEEDS TO BE REPLACED");
     const finalSubmissionsOfEachGroup: Submission[] = [];
     const groups = await this.getGroups();
     for (const group of groups) {

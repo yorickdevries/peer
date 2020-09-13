@@ -5,7 +5,7 @@
             <b-col cols="6" class="mb-3">
                 <b-form-group horizontal label="Filter" class="mb-0 mr-4">
                     <b-input-group>
-                        <b-form-input v-model="filter" placeholder="Type to search" />
+                        <b-form-input v-model="filter" debounce="1000" placeholder="Type to search" />
                         <b-input-group-append>
                             <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
                         </b-input-group-append>
@@ -90,7 +90,6 @@ export default {
     data() {
         return {
             allSubmissions: null,
-            finalSubmissions: null,
             // groups to get groupName from
             groups: null,
             // boolean to show all or only final submissions
@@ -121,6 +120,23 @@ export default {
             } else {
                 return this.allSubmissions
             }
+        },
+        finalSubmissions() {
+            const finalSubmissions = []
+            if (this.groups && this.allSubmissions) {
+                for (const group of this.groups) {
+                    const submissionsOfGroup = _.filter(this.allSubmissions, function(submission) {
+                        return submission.groupId === group.id
+                    })
+                    const latestSubmission = _.maxBy(submissionsOfGroup, function(submission) {
+                        return submission.id
+                    })
+                    if (latestSubmission) {
+                        finalSubmissions.push(latestSubmission)
+                    }
+                }
+            }
+            return finalSubmissions
         }
     },
     methods: {
@@ -128,9 +144,6 @@ export default {
             // all submissions
             const res1 = await api.submissions.getAllForAssignment(this.$route.params.assignmentId)
             this.allSubmissions = res1.data
-            // final submissions
-            const res2 = await api.submissions.getFinal(this.$route.params.assignmentId)
-            this.finalSubmissions = res2.data
         },
         async fetchGroups() {
             const res = await api.groups.getAllForAssignment(this.$route.params.assignmentId)

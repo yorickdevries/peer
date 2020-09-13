@@ -39,7 +39,7 @@ export default {
     methods: {
         async importGroups() {
             await api.groups.import(this.$route.params.assignmentId, this.file)
-            this.showSuccessMessage()
+            this.showSuccessMessage({ message: "Groups are being imported" })
         }
     }
 }
