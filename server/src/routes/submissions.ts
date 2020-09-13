@@ -202,27 +202,43 @@ router.post(
         .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
       return;
     }
+    if (!(await group.hasAssignment(assignment))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("Group is not part of the assignment.");
+      return;
+    }
     if (
-      !(await group.hasUser(user)) ||
-      !(await group.hasAssignment(assignment))
+      !(await group.hasUser(user)) &&
+      !(await assignment.isTeacherInCourse(user))
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("User is not allowed to submit.");
+        .send("You are not allowed to make a submission");
       return;
     }
-    if (!assignment.isAtState(AssignmentState.SUBMISSION)) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is not in submission state");
-      return;
-    }
-    if (!assignment.lateSubmissions && moment().isAfter(assignment.dueDate)) {
+    if (
+      (await group.hasUser(user)) &&
+      (!assignment.isAtState(AssignmentState.SUBMISSION) ||
+        (!assignment.lateSubmissions && moment().isAfter(assignment.dueDate)))
+    ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send(
-          "The due date for submission has passed and late submissions are not allowed by the teacher"
+          "The assignment is not in submission state or the deadline has passed"
         );
+      return;
+    }
+    if (
+      (await assignment.isTeacherInCourse(user)) &&
+      !(
+        assignment.isAtState(AssignmentState.SUBMISSION) ||
+        assignment.isAtState(AssignmentState.WAITING_FOR_REVIEW)
+      )
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is not in submission or waitingforreview state");
       return;
     }
 
@@ -236,10 +252,28 @@ router.post(
     await getManager().transaction(
       "SERIALIZABLE",
       async (transactionalEntityManager) => {
+        // unsubmit all previous submissions
+        const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
+          Submission,
+          {
+            where: {
+              assignment: assignment,
+              group: group,
+            },
+          }
+        );
+        // Set boolean of submission of older submissions to false
+        for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
+          submissionOfGroupForAssignment.final = false;
+          await transactionalEntityManager.save(submissionOfGroupForAssignment);
+        }
+
         // save file entry to database
         await transactionalEntityManager.save(file);
 
-        submission = new Submission(user, group, assignment, file);
+        // create submission
+        submission = new Submission(user, group, assignment, file, true);
+        // this checks for the right extension in the validate function
         await transactionalEntityManager.save(submission);
 
         // move the file (so if this fails everything above fails)
@@ -255,6 +289,95 @@ router.post(
     // reload the submission
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await submission!.reload();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    res.send(submission!);
+  }
+);
+
+// Joi inputvalidation
+const patchSubmissionSchema = Joi.object({
+  final: Joi.boolean().required(),
+});
+// change final for submission
+router.patch(
+  "/:id",
+  validateParams(idSchema),
+  validateBody(patchSubmissionSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const submission = await Submission.findOne(req.params.id);
+    if (!submission) {
+      res
+        .status(HttpStatusCode.NOT_FOUND)
+        .send(ResponseMessage.SUBMISSION_NOT_FOUND);
+      return;
+    }
+    const assignment = await submission.getAssignment();
+    const group = await submission.getGroup();
+    if (
+      !(await group.hasUser(user)) &&
+      !(await assignment.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You are not allowed to make a submission");
+      return;
+    }
+    if (
+      (await group.hasUser(user)) &&
+      (!assignment.isAtState(AssignmentState.SUBMISSION) ||
+        (!assignment.lateSubmissions && moment().isAfter(assignment.dueDate)))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The assignment is not in submission state or the deadline has passed"
+        );
+      return;
+    }
+    if (
+      (await assignment.isTeacherInCourse(user)) &&
+      !(
+        assignment.isAtState(AssignmentState.SUBMISSION) ||
+        assignment.isAtState(AssignmentState.WAITING_FOR_REVIEW)
+      )
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment is not in submission or waitingforreview state");
+      return;
+    }
+    // otherwise, perform the patch
+    const final = req.body.final;
+    // start transaction make sure all submissions are changed at the same time
+    await getManager().transaction(
+      "SERIALIZABLE",
+      async (transactionalEntityManager) => {
+        const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
+          Submission,
+          {
+            where: {
+              assignment: assignment,
+              group: group,
+            },
+          }
+        );
+        // set booleans to false for all other assignments
+        for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
+          if (submissionOfGroupForAssignment.id !== submission.id) {
+            submissionOfGroupForAssignment.final = false;
+            await transactionalEntityManager.save(
+              submissionOfGroupForAssignment
+            );
+          }
+        }
+        // finally set the submission
+        submission.final = final;
+        await transactionalEntityManager.save(submission);
+      }
+    );
+    await submission.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(submission!);
   }

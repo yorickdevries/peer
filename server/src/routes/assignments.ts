@@ -164,6 +164,7 @@ router.get("/:id/group", validateParams(idSchema), async (req, res) => {
 const querySubmissionSchema = Joi.object({
   groupId: Joi.number().integer().required(),
 });
+
 // get the submissions of a group
 router.get(
   "/:id/submissions",
@@ -190,8 +191,13 @@ router.get(
         .send(ResponseMessage.GROUP_NOT_FOUND);
       return;
     }
-    if (!(await group.hasUser(user))) {
-      res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
+    if (
+      !(await group.hasUser(user)) &&
+      !(await assignment.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not part of the group");
       return;
     }
     const submissions = await assignment.getSubmissions(group);
@@ -200,10 +206,9 @@ router.get(
   }
 );
 
-// get the latest submission of a group
-// we should swicth to specific annotation of submissions which indicate whether they are the latest
+// get the submission which will be used for reviewing of a group
 router.get(
-  "/:id/latestsubmission",
+  "/:id/finalsubmission",
   validateParams(idSchema),
   validateQuery(querySubmissionSchema),
   async (req, res) => {
@@ -228,17 +233,19 @@ router.get(
       return;
     }
     if (!(await group.hasUser(user))) {
-      res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not part of the group");
       return;
     }
-    const latestSubmission = await assignment.getLatestSubmission(group);
-    if (!latestSubmission) {
+    const finalSubmission = await assignment.getFinalSubmission(group);
+    if (!finalSubmission) {
       res
         .status(HttpStatusCode.NOT_FOUND)
         .send("No submissions have been made yet");
       return;
     }
-    res.send(latestSubmission);
+    res.send(finalSubmission);
   }
 );
 
@@ -586,7 +593,7 @@ router.patch(
         .send("The assignment is not in submission state");
       return;
     }
-    const submissions = await assignment.getLatestSubmissionsOfEachGroup();
+    const submissions = await assignment.getFinalSubmissionsOfEachGroup();
     if (submissions.length === 0) {
       res
         .status(HttpStatusCode.FORBIDDEN)

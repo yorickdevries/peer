@@ -142,6 +142,10 @@
                                                 Are you sure you want to distribute the reviews?
                                                 <ul>
                                                     <li>
+                                                        The submissions which take part in the reviews are definite
+                                                        after this action.
+                                                    </li>
+                                                    <li>
                                                         The submissionquestionnaire cannot be changed after this action.
                                                     </li>
                                                     <li>Only press this button <b>once</b> per assignment.</li>

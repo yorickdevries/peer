@@ -21,9 +21,9 @@ export default {
         const params = { groupId }
         return client.get(`assignments/${assignmentId}/submissions`, { params: params })
     },
-    getLatestSubmission(assignmentId, groupId) {
+    getFinalSubmission(assignmentId, groupId) {
         const params = { groupId }
-        return client.get(`assignments/${assignmentId}/latestsubmission`, { params: params })
+        return client.get(`assignments/${assignmentId}/finalsubmission`, { params: params })
     },
     post(
         name,

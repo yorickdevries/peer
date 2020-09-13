@@ -33,7 +33,6 @@ import Submission from "./Submission";
 import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
-import _ from "lodash";
 import Extensions from "../enum/Extensions";
 import AssignmentExport from "./AssignmentExport";
 
@@ -322,25 +321,6 @@ export default class Assignment extends BaseModel {
     }
   }
 
-  async getLatestSubmissionsOfEachGroup(): Promise<Submission[]> {
-    console.log("THIS FUNCTION TAKE TOO MUCH IO AND NEEDS TO BE REPLACED");
-    const latestSubmissionsOfEachGroup: Submission[] = [];
-    const groups = await this.getGroups();
-    for (const group of groups) {
-      const latestSubmission = await this.getLatestSubmission(group);
-      if (latestSubmission) {
-        latestSubmissionsOfEachGroup.push(latestSubmission);
-      }
-    }
-    return latestSubmissionsOfEachGroup;
-  }
-
-  async getLatestSubmission(group: Group): Promise<Submission | undefined> {
-    const submissions = await this.getSubmissions(group);
-    const latestSubmission = _.maxBy(submissions, "id");
-    return latestSubmission;
-  }
-
   private async getSubmissionsOfGroup(group: Group): Promise<Submission[]> {
     return Submission.find({
       where: {
@@ -348,6 +328,23 @@ export default class Assignment extends BaseModel {
         group: group,
       },
     });
+  }
+
+  async getFinalSubmissionsOfEachGroup(): Promise<Submission[]> {
+    return await Submission.find({ where: { assignment: this, final: true } });
+  }
+
+  async getFinalSubmission(group: Group): Promise<Submission | undefined> {
+    const finalSubmissions = await Submission.find({
+      where: { assignment: this, group: group, final: true },
+    });
+    if (finalSubmissions.length === 0) {
+      return undefined;
+    } else if (finalSubmissions.length === 1) {
+      return finalSubmissions[0];
+    } else {
+      throw new Error("There are multiple finalSubmissions");
+    }
   }
 
   async getGroup(user: User): Promise<Group | undefined> {

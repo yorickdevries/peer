@@ -107,7 +107,7 @@
             <template v-slot:cell(actions)="row">
                 <!--Show Details-->
                 <b-button size="sm" @click="showDetails(row)" class="mr-2">
-                    {{ row.detailsShowing ? "Hide" : "Show" }} Edit Group
+                    {{ row.detailsShowing ? "Hide" : "Show" }} Edit Group/Submissions
                 </b-button>
                 <!--Delete Group-->
                 <b-button size="sm" @click="deleteGroup(row.item.id)" class="mr-2" variant="danger">
@@ -117,8 +117,7 @@
 
             <!--Actions-->
             <template v-slot:row-details="row">
-                <b-card>
-                    <dt>Group Members</dt>
+                <b-card header="Group Members" class="h-100">
                     <!--Table-->
                     <b-table striped outlined show-empty stacked="md" :items="row.item.users" :fields="userFields">
                         <template v-slot:cell(action)="data">
@@ -142,6 +141,108 @@
                         >
                         <b-input v-model="newUserNetId" placeholder="Enter valid NetID here."></b-input>
                     </dd>
+                </b-card>
+                <b-card header="Submissions" class="h-100">
+                    <div v-if="row.item.submissions.length > 0">
+                        <b-table
+                            striped
+                            outlined
+                            show-empty
+                            stacked="md"
+                            :items="row.item.submissions"
+                            :fields="submissionFields"
+                        >
+                            <template v-slot:cell(file)="data">
+                                <a :href="submissionFilePath(data.item.id)" target="_blank">
+                                    {{ data.item.file.name }}{{ data.item.file.extension }}
+                                </a>
+                            </template>
+                            <template v-slot:cell(date)="data">
+                                {{ data.item.createdAt | formatDate }}
+                            </template>
+                            <!--Actions-->
+                            <template v-slot:cell(action)="data">
+                                <!--Trigger final /  not final-->
+                                <b-button
+                                    v-if="!data.item.final"
+                                    v-b-modal="`changeSubmissionToFinalModal${data.item.id}`"
+                                    :disabled="
+                                        !(assignment.state === 'submission' || assignment.state === 'waitingforreview')
+                                    "
+                                    size="sm"
+                                    variant="secondary"
+                                    class="mr-2"
+                                >
+                                    Make final
+                                </b-button>
+                                <b-button
+                                    v-else
+                                    v-b-modal="`changeSubmissionToNotFinalModal${data.item.id}`"
+                                    :disabled="
+                                        !(assignment.state === 'submission' || assignment.state === 'waitingforreview')
+                                    "
+                                    size="sm"
+                                    variant="danger"
+                                    class="mr-2"
+                                    >Make not final
+                                </b-button>
+                                <b-modal
+                                    :id="`changeSubmissionToFinalModal${data.item.id}`"
+                                    @ok="changeSubmissionToFinal(data.item.id)"
+                                    title="Confirmation"
+                                    centered
+                                >
+                                    Are you sure you want to make this submission final? This means the other final
+                                    submissions of the group will be set to non-final.
+                                </b-modal>
+                                <b-modal
+                                    :id="`changeSubmissionToNotFinalModal${data.item.id}`"
+                                    @ok="changeSubmissionToNotFinal(data.item.id)"
+                                    title="Confirmation"
+                                    centered
+                                >
+                                    Are you sure you want to make this submission not final anymore? This means the
+                                    group will not participate in the reviews.
+                                </b-modal>
+                            </template>
+                        </b-table>
+                        Only the final submission will be used for reviewing
+                        <br /><br />
+                    </div>
+                    <b-alert v-else show variant="danger">The group has not yet made a submission</b-alert>
+
+                    <!-- Modal Button -->
+                    <b-button
+                        v-b-modal="`uploadModal${row.item.id}`"
+                        :disabled="!(assignment.state === 'submission' || assignment.state === 'waitingforreview')"
+                        variant="primary"
+                        @click="resetFile(row.item)"
+                        >Upload new Submission</b-button
+                    >
+
+                    <!-- Upload Modal-->
+                    <b-modal
+                        :id="`uploadModal${row.item.id}`"
+                        ref="uploadModal"
+                        centered
+                        hide-footer
+                        :title="`Upload Submission for group ${row.item.name}`"
+                    >
+                        <b-alert show variant="warning"
+                            >If the group already uploaded a file, it will not be used for reviewing anymore!
+                        </b-alert>
+                        <b-alert show variant="secondary"
+                            >Allowed file types: {{ assignment.submissionExtensions }}</b-alert
+                        >
+                        <b-form-file
+                            v-model="row.item.newFile"
+                            :accept="assignment.submissionExtensions"
+                            placeholder="Choose a file..."
+                            required
+                            :state="Boolean(row.item.newFile)"
+                        />
+                        <b-button variant="primary" class="mt-3" @click="submitSubmission(row.item)">Upload</b-button>
+                    </b-modal>
                 </b-card>
             </template>
         </b-table>
@@ -178,6 +279,14 @@ export default {
                 { key: "netid", label: "NetID" },
                 { key: "email", label: "​​​Email" },
                 { key: "studentNumber", label: "Studentnumber" },
+                { key: "action", label: "Action" }
+            ],
+            submissionFields: [
+                { key: "id", label: "ID", sortable: true },
+                { key: "file", label: "File" },
+                { key: "userNetid", label: "Submitted by" },
+                { key: "date", label: "​​​Date" },
+                { key: "final", label: "Final" },
                 { key: "action", label: "Action" }
             ],
             currentPage: 1,
@@ -217,9 +326,15 @@ export default {
             this.showSuccessMessage({ message: "Succesfully deleted group." })
         },
         async showDetails(row) {
+            // fetch the users
             const res = await api.groups.get(row.item.id)
             // set the users in the row element
             row.item.users = res.data.users
+
+            // fetch the submissions
+            const res2 = await api.assignments.getSubmissions(this.$route.params.assignmentId, row.item.id)
+            // set the submissions in the row element
+            row.item.submissions = res2.data
             row.toggleDetails()
         },
         async addUserToGroup(groupId, userNetid) {
@@ -235,6 +350,37 @@ export default {
             await api.groups.removeUser(groupId, userNetid)
             await this.fetchGroups()
             this.showSuccessMessage({ message: "Succesfully removed user from group." })
+        },
+        async submitSubmission(rowItem) {
+            const file = rowItem.newFile
+            const groupId = rowItem.id
+            if (!file) {
+                this.showErrorMessage({ message: "No file selected" })
+                return
+            }
+            let config = { "Content-Type": "multipart/form-data" }
+            // Perform upload.
+            await api.submissions.post(groupId, this.$route.params.assignmentId, file, config)
+            this.showSuccessMessage({ message: "Successfully submitted submission." })
+            this.resetFile(rowItem)
+            await this.fetchGroups()
+        },
+        submissionFilePath(id) {
+            // Get the submission file path.
+            return `/api/submissions/${id}/file`
+        },
+        resetFile(rowItem) {
+            rowItem.newFile = null
+        },
+        async changeSubmissionToFinal(id) {
+            await api.submissions.patch(id, true)
+            this.showSuccessMessage({ message: "Set submission as final" })
+            await this.fetchGroups()
+        },
+        async changeSubmissionToNotFinal(id) {
+            await api.submissions.patch(id, false)
+            this.showSuccessMessage({ message: "Set submission as not final" })
+            await this.fetchGroups()
         }
     }
 }

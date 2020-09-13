@@ -633,10 +633,40 @@ describe("Integration", () => {
     const submission1 = JSON.parse(res.text);
 
     // make a submission for student 2
+    res = await request(server)
+      .post("/api/submissions")
+      .set("cookie", await studentCookie2())
+      .attach(
+        "file",
+        fs.readFileSync(exampleSubmissionFile1),
+        "submission1.pdf"
+      )
+      .field("groupId", group2.id)
+      .field("assignmentId", assignment.id);
     const exampleSubmissionFile2 = path.resolve(
       __dirname,
       "../../exampleData/submissions/submission2.pdf"
     );
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const submission3 = JSON.parse(res.text);
+
+    // unsubmit the submission
+    res = await request(server)
+      .patch(`/api/submissions/${submission3.id}`)
+      .send({ final: false })
+      .set("cookie", await studentCookie2());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const unsubmittedsSubmission = JSON.parse(res.text);
+
+    res = await request(server)
+      .get(
+        `/api/assignments/${assignment.id}/finalsubmission?groupId=${group2.id}`
+      )
+      .set("cookie", await studentCookie2());
+    // assertions
+    expect(res.text).toEqual("No submissions have been made yet");
+
     res = await request(server)
       .post("/api/submissions")
       .set("cookie", await studentCookie2())
@@ -659,10 +689,10 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([submission1]);
 
-    // get latest submissions for this assignment by this group
+    // get final submissions for this assignment by this group
     res = await request(server)
       .get(
-        `/api/assignments/${assignment.id}/latestsubmission?groupId=${group1.id}`
+        `/api/assignments/${assignment.id}/finalsubmission?groupId=${group1.id}`
       )
       .set("cookie", await studentCookie1());
     // assertions
@@ -675,7 +705,11 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject([submission1, submission2]);
+    expect(JSON.parse(res.text)).toMatchObject([
+      submission1,
+      unsubmittedsSubmission,
+      submission2,
+    ]);
 
     // get a single submission as teacher
     res = await request(server)

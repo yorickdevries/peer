@@ -18,5 +18,9 @@ export default {
         formData.append("assignmentId", assignmentId)
         formData.append("file", file)
         return client.post("submissions", formData, config)
+    },
+    patch(id, final) {
+        const body = { final: final }
+        return client.patch(`submissions/${id}`, body)
     }
 }

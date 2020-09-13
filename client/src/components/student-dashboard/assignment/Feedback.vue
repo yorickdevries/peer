@@ -3,8 +3,8 @@
         <b-tabs card>
             <b-tab title="PDF Annotation Feedback">
                 <PDFAnnotator
-                    v-if="latestSubmission.file.extension === '.pdf'"
-                    :submissionId="latestSubmission.id"
+                    v-if="finalSubmission.file.extension === '.pdf'"
+                    :submissionId="finalSubmission.id"
                     :readOnly="true"
                 ></PDFAnnotator>
                 <div v-else>Your submission was not a .pdf file, so it was not annotated by reviewers</div>
@@ -172,7 +172,7 @@ export default {
         return {
             assignment: {},
             group: {},
-            latestSubmission: null,
+            finalSubmission: null,
             questionnaire: {},
             feedbackReviews: [],
             answers: null,
@@ -192,7 +192,7 @@ export default {
         async fetchData() {
             await this.fetchAssignment()
             await this.fetchGroup()
-            await this.fetchLatestSubmission()
+            await this.fetchFinalSubmission()
             await this.fetchSubmissionQuestionnaire()
             await this.fetchFeedbackReviews()
             await this.aggregateFeedback()
@@ -207,17 +207,17 @@ export default {
             const res = await api.assignments.getGroup(this.$route.params.assignmentId)
             this.group = res.data
         },
-        async fetchLatestSubmission() {
+        async fetchFinalSubmission() {
             // Fetch the submission.
-            const res = await api.assignments.getLatestSubmission(this.$route.params.assignmentId, this.group.id)
-            this.latestSubmission = res.data
+            const res = await api.assignments.getFinalSubmission(this.$route.params.assignmentId, this.group.id)
+            this.finalSubmission = res.data
         },
         async fetchSubmissionQuestionnaire() {
             const res = await api.submissionquestionnaires.get(this.assignment.submissionQuestionnaireId)
             this.questionnaire = res.data
         },
         async fetchFeedbackReviews() {
-            const res = await api.submissions.getFeedback(this.latestSubmission.id)
+            const res = await api.submissions.getFeedback(this.finalSubmission.id)
             this.feedbackReviews = res.data
         },
         async aggregateFeedback() {

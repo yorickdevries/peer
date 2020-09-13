@@ -1,5 +1,6 @@
 <template>
-    <div v-if="allSubmissions && latestSubmissions && groups">
+    <div v-if="allSubmissions && finalSubmissions && groups">
+        <b-alert show>As teacher you can change submissions for groups in the group tab</b-alert>
         <!--Table Options-->
         <b-row>
             <b-col cols="6" class="mb-3">
@@ -13,11 +14,11 @@
 
                     <b-button-group class="mx-auto">
                         <button
-                            @click="onlyLatestSubmissions = false"
+                            @click="onlyFinalSubmissions = false"
                             :class="{
-                                'bg-primary': !onlyLatestSubmissions,
-                                'btn-outline-primary': onlyLatestSubmissions,
-                                'text-white': !onlyLatestSubmissions
+                                'bg-primary': !onlyFinalSubmissions,
+                                'btn-outline-primary': onlyFinalSubmissions,
+                                'text-white': !onlyFinalSubmissions
                             }"
                             class="btn btn-sm"
                             size="sm"
@@ -25,16 +26,16 @@
                             All submissions
                         </button>
                         <button
-                            @click="onlyLatestSubmissions = true"
+                            @click="onlyFinalSubmissions = true"
                             :class="{
-                                'bg-primary': onlyLatestSubmissions,
-                                'btn-outline-primary': !onlyLatestSubmissions,
-                                'text-white': onlyLatestSubmissions
+                                'bg-primary': onlyFinalSubmissions,
+                                'btn-outline-primary': !onlyFinalSubmissions,
+                                'text-white': onlyFinalSubmissions
                             }"
                             class="btn btn-sm"
                             size="sm"
                         >
-                            Latest submissions
+                            Final submissions
                         </button>
                     </b-button-group>
                 </b-form-group>
@@ -92,8 +93,8 @@ export default {
             allSubmissions: null,
             // groups to get groupName from
             groups: null,
-            // boolean to show all or only latest
-            onlyLatestSubmissions: true,
+            // boolean to show all or only final submissions
+            onlyFinalSubmissions: true,
             // for navigation
             fields: [
                 { key: "id", label: "ID", sortable: true },
@@ -101,7 +102,8 @@ export default {
                 { key: "groupId", label: "Group ID" },
                 { key: "groupName", label: "Group name" },
                 { key: "userNetid", label: "Submitted by" },
-                { key: "date", label: "​​​Date" }
+                { key: "date", label: "​​​Date" },
+                { key: "final", label: "Final" }
             ],
             currentPage: 1,
             perPage: 10,
@@ -114,28 +116,16 @@ export default {
     },
     computed: {
         selectedSubmissions() {
-            if (this.onlyLatestSubmissions) {
-                return this.latestSubmissions
+            if (this.onlyFinalSubmissions) {
+                return this.finalSubmissions
             } else {
                 return this.allSubmissions
             }
         },
-        latestSubmissions() {
-            const latestSubmissions = []
-            if (this.groups && this.allSubmissions) {
-                for (const group of this.groups) {
-                    const submissionsOfGroup = _.filter(this.allSubmissions, function(submission) {
-                        return submission.groupId === group.id
-                    })
-                    const latestSubmission = _.maxBy(submissionsOfGroup, function(submission) {
-                        return submission.id
-                    })
-                    if (latestSubmission) {
-                        latestSubmissions.push(latestSubmission)
-                    }
-                }
-            }
-            return latestSubmissions
+        finalSubmissions() {
+            return _.filter(this.allSubmissions, function(submission) {
+                return submission.final
+            })
         }
     },
     methods: {
