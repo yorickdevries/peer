@@ -13,8 +13,7 @@
     "initdata": "node ./dist/scripts/initializeData.js",
     "typeorm": "ts-node ./node_modules/typeorm/cli.js --config src/ormconfig.ts",
     "typeorm:migration:generate": "npm run typeorm migration:generate -- -n",
-    "typeorm:migration:run": "npm run typeorm migration:run",
-    "migrate-final-submissions": "ts-node src/migrateFinalSubmission.ts"
+    "typeorm:migration:run": "npm run typeorm migration:run"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
