@@ -88,6 +88,19 @@ describe("Group import", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     // timeout needs te be set as group import is asynchronous
     await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // get all groups by the teacher
+    const res2 = await request(server)
+      .get(`/api/groups?assignmentId=${assignmentId}`)
+      .set("cookie", teacherCookie);
+    // assertions
+    expect(res2.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res2.text)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: "ED 4" }),
+        expect.objectContaining({ name: "ED 3" }),
+      ])
+    );
   });
 
   test("import with big file", async () => {
@@ -167,6 +180,19 @@ describe("Group import", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     // timeout needs te be set as group import is asynchronous
     await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // get all groups by the teacher
+    const res2 = await request(server)
+      .get(`/api/groups?assignmentId=${assignmentId}`)
+      .set("cookie", teacherCookie);
+    // assertions
+    expect(res2.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res2.text)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: "4" }),
+        expect.objectContaining({ name: "ED 3" }),
+      ])
+    );
   });
 
   //bad weather tests
@@ -246,6 +272,19 @@ describe("Group import", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     // timeout needs te be set as group import is asynchronous
     await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // get all groups by the teacher
+    const res2 = await request(server)
+      .get(`/api/groups?assignmentId=${assignmentId}`)
+      .set("cookie", teacherCookie);
+    // assertions
+    expect(res2.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res2.text)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: "ED 4" }),
+        expect.objectContaining({ name: "ED 3" }),
+      ])
+    );
   });
 
   test("student is not defined, but group is 2", async () => {
@@ -280,6 +319,19 @@ describe("Group import", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     // timeout needs te be set as group import is asynchronous
     await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // get all groups by the teacher
+    const res2 = await request(server)
+      .get(`/api/groups?assignmentId=${assignmentId}`)
+      .set("cookie", teacherCookie);
+    // assertions
+    expect(res2.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res2.text)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: "ED 4" }),
+        expect.objectContaining({ name: "ED 3" }),
+      ])
+    );
   });
 
   test("invalid assignment id", async () => {
