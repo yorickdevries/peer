@@ -94,7 +94,7 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
   // TODO: these checks should be done in an transaction
   const assignments = await group.getAssignments();
   for (const assignment of assignments) {
-    const submission = await assignment.getLatestSubmission(group);
+    const submission = await assignment.getFinalSubmission(group);
     if (submission) {
       res
         .status(HttpStatusCode.FORBIDDEN)

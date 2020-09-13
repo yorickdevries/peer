@@ -29,7 +29,7 @@ export default {
     data() {
         return {
             group: null,
-            latestSubmission: null,
+            finalSubmission: null,
             feedbackReviews: []
         }
     },
@@ -39,7 +39,7 @@ export default {
     methods: {
         async fetchData() {
             await this.fetchGroup()
-            await this.fetchLatestSubmission()
+            await this.fetchFinalSubmission()
             await this.fetchFeedbackReviews()
         },
         async fetchGroup() {
@@ -47,13 +47,13 @@ export default {
             const res = await api.assignments.getGroup(this.$route.params.assignmentId)
             this.group = res.data
         },
-        async fetchLatestSubmission() {
+        async fetchFinalSubmission() {
             // Fetch the submission.
-            const res = await api.assignments.getLatestSubmission(this.$route.params.assignmentId, this.group.id)
-            this.latestSubmission = res.data
+            const res = await api.assignments.getFinalSubmission(this.$route.params.assignmentId, this.group.id)
+            this.finalSubmission = res.data
         },
         async fetchFeedbackReviews() {
-            const res = await api.submissions.getFeedback(this.latestSubmission.id)
+            const res = await api.submissions.getFeedback(this.finalSubmission.id)
             const reviews = res.data
 
             for (const review of reviews) {
