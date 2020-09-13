@@ -3,7 +3,6 @@ import AssignmentExport from "../models/AssignmentExport";
 import File from "../models/File";
 import path from "path";
 import config from "config";
-// import hasha from "hasha";
 import fsPromises from "fs/promises";
 import { getManager } from "typeorm";
 const uploadFolder = config.get("uploadFolder") as string;
@@ -29,8 +28,7 @@ const exportJSONToFile = async function (
   // create the file object
   const fileBuffer = Buffer.from(result);
   const fileExtension = `.${exportType}`;
-  const fileHash =
-    "0000000000000000000000000000000000000000000000000000000000000000";
+  const fileHash = null;
   const file = new File(fileName, fileExtension, fileHash);
 
   await getManager().transaction(

@@ -13,7 +13,6 @@ import File from "../models/File";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import upload from "../middleware/upload";
 import config from "config";
-// import hasha from "hasha";
 import path from "path";
 import fsPromises from "fs/promises";
 import _ from "lodash";
@@ -314,8 +313,7 @@ router.post(
     if (req.file) {
       const fileExtension = path.extname(req.file.originalname);
       const fileName = path.basename(req.file.originalname, fileExtension);
-      const fileHash =
-        "0000000000000000000000000000000000000000000000000000000000000000";
+      const fileHash = null;
       file = new File(fileName, fileExtension, fileHash);
     }
 
@@ -456,8 +454,7 @@ router.patch(
       // file info
       const fileExtension = path.extname(req.file.originalname);
       const fileName = path.basename(req.file.originalname, fileExtension);
-      const fileHash =
-        "0000000000000000000000000000000000000000000000000000000000000000";
+      const fileHash = null;
       newFile = new File(fileName, fileExtension, fileHash);
     }
 

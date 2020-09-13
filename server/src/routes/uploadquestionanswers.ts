@@ -12,7 +12,6 @@ import upload from "../middleware/upload";
 import config from "config";
 import { getManager } from "typeorm";
 import path from "path";
-// import hasha from "hasha";
 import fsPromises from "fs/promises";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
@@ -154,8 +153,7 @@ router.post(
     // construct file to be saved in transaction
     const fileExtension = path.extname(req.file.originalname);
     const fileName = path.basename(req.file.originalname, fileExtension);
-    const fileHash =
-      "0000000000000000000000000000000000000000000000000000000000000000";
+    const fileHash = null;
     const newFile = new File(fileName, fileExtension, fileHash);
 
     // oldfile in case of update

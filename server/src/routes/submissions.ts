@@ -13,7 +13,6 @@ import config from "config";
 import Submission from "../models/Submission";
 import File from "../models/File";
 import path from "path";
-// import hasha from "hasha";
 import fsPromises from "fs/promises";
 import upload from "../middleware/upload";
 import { AssignmentState } from "../enum/AssignmentState";
@@ -230,8 +229,7 @@ router.post(
     // file info
     const fileExtension = path.extname(req.file.originalname);
     const fileName = path.basename(req.file.originalname, fileExtension);
-    const fileHash =
-      "0000000000000000000000000000000000000000000000000000000000000000";
+    const fileHash = null;
     const file = new File(fileName, fileExtension, fileHash);
 
     let submission: Submission;
