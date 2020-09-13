@@ -11,19 +11,19 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
 import { AssignmentState } from "../enum/AssignmentState";
-import generateReviewDistribution from "../util/reviewDistribution";
-import User from "../models/User";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { getManager } from "typeorm";
 import moment from "moment";
 import ReviewOfReview from "../models/ReviewOfReview";
-import makeGradeSummaries from "../util/makeGradeSummary";
-import exportJSONToFile from "../util/exportJSONToFile";
-import parseSubmissionReviewsForExport from "../util/parseReviewsForExport";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
-import Review from "../models/Review";
 import AssignmentExport from "../models/AssignmentExport";
+import {
+  startDistributeReviewsForAssignmentWorker,
+  startOpenFeedbackForAssignmentWorker,
+  startExportGradesForAssignmentWorker,
+  startExportReviewsForAssignmentWorker,
+} from "../workers/pool";
 
 const router = express.Router();
 
@@ -119,16 +119,16 @@ router.post(
     }
     const assignmentExport = new AssignmentExport(user, assignment, null);
     await assignmentExport.save();
-    res.send(assignmentExport);
-    // asynchronically make export
-    const gradeSummaries = makeGradeSummaries(reviews);
-    const filename = `assignment${assignment.id}_grades`;
-    await exportJSONToFile(
-      gradeSummaries,
-      filename,
-      exportType,
-      assignmentExport
+
+    // offload a function to a worker
+    startExportGradesForAssignmentWorker(
+      assignment.id,
+      assignmentExport.id,
+      exportType
     );
+
+    // send message that grades are being exported
+    res.send(assignmentExport);
   }
 );
 
@@ -176,16 +176,16 @@ router.post(
     // make export entry without file
     const assignmentExport = new AssignmentExport(user, assignment, null);
     await assignmentExport.save();
-    res.send(assignmentExport);
-    // asynchronically make export
-    const parsedReviews = await parseSubmissionReviewsForExport(questionnaire);
-    const filename = `assignment${assignment.id}_reviews`;
-    await exportJSONToFile(
-      parsedReviews,
-      filename,
-      exportType,
-      assignmentExport
+
+    // offload a function to a worker
+    startExportReviewsForAssignmentWorker(
+      assignment.id,
+      assignmentExport.id,
+      exportType
     );
+
+    // send message that reviews are being exported
+    res.send(assignmentExport);
   }
 );
 
@@ -265,19 +265,11 @@ router.patch(
         .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
       return;
     }
+    // offload a function to a worker
+    startOpenFeedbackForAssignmentWorker(assignmentId);
+
     // send message that reviews are being submitted
     res.send();
-    const submitted = false;
-    const unsubmittedReviews = await questionnaire.getReviews(submitted);
-    for (const review of unsubmittedReviews) {
-      if (await review.canBeSubmitted()) {
-        review.submitted = true;
-        review.submittedAt = new Date();
-        await review.save();
-      }
-    }
-    assignment.state = AssignmentState.FEEDBACK;
-    await assignment.save();
   }
 );
 
@@ -762,65 +754,11 @@ router.post(
         .send("There are already reviews for this assignment");
       return;
     }
+    // offload a function to a worker
+    startDistributeReviewsForAssignmentWorker(assignment.id);
+
     // send message that reviews are being distributed
     res.send();
-
-    // now the reviews can be dirsibuted
-    const submissions = await assignment.getLatestSubmissionsOfEachGroup();
-    // get all unique users of the submissions (unique as several submissions might have the same user in the group)
-    const users: User[] = [];
-    for (const submission of submissions) {
-      const group = await submission.getGroup();
-      const groupUsers = await group.getUsers();
-      for (const groupUser of groupUsers) {
-        const alreadyContainsUser = _.some(users, (user) => {
-          return user.netid === groupUser.netid;
-        });
-        if (!alreadyContainsUser) {
-          users.push(groupUser);
-        }
-      }
-    }
-    const reviewDistribution = await generateReviewDistribution(
-      submissions,
-      users,
-      assignment.reviewsPerUser
-    );
-    // create all reviews in an transaction
-    const reviews: ReviewOfSubmission[] = [];
-    await getManager().transaction(
-      "SERIALIZABLE",
-      async (transactionalEntityManager) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const existingReviews = await transactionalEntityManager.find(Review, {
-          where: { questionnaire: questionnaire },
-        });
-        if (existingReviews.length > 0) {
-          throw new Error("There are already reviews for this assignment");
-        }
-        // iterate over reviewDistribution
-        for (const reviewAssignment of reviewDistribution) {
-          // make the review
-          const review = new ReviewOfSubmission(
-            questionnaire,
-            reviewAssignment.reviewer,
-            false,
-            false,
-            null,
-            null,
-            null,
-            null,
-            null,
-            reviewAssignment.submission
-          );
-          await transactionalEntityManager.save(review);
-          reviews.push(review);
-        }
-        // set the proper assignmentstate
-        assignment.state = AssignmentState.REVIEW;
-        await transactionalEntityManager.save(assignment);
-      }
-    );
   }
 );
 

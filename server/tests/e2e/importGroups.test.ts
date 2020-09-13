@@ -86,8 +86,16 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.OK);
-    const result = JSON.parse(res.text);
-    expect(result).toEqual(
+    // timeout needs te be set as group import is asynchronous
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // get all groups by the teacher
+    const res2 = await request(server)
+      .get(`/api/groups?assignmentId=${assignmentId}`)
+      .set("cookie", teacherCookie);
+    // assertions
+    expect(res2.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res2.text)).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "ED 4" }),
         expect.objectContaining({ name: "ED 3" }),
@@ -108,6 +116,8 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
+    // timeout needs te be set as group import is asynchronous
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   });
 
   test("import with file without groupcolumn", async () => {
@@ -168,8 +178,16 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.OK);
-    const result = JSON.parse(res.text);
-    expect(result).toEqual(
+    // timeout needs te be set as group import is asynchronous
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // get all groups by the teacher
+    const res2 = await request(server)
+      .get(`/api/groups?assignmentId=${assignmentId}`)
+      .set("cookie", teacherCookie);
+    // assertions
+    expect(res2.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res2.text)).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "4" }),
         expect.objectContaining({ name: "ED 3" }),
@@ -252,8 +270,16 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.OK);
-    const result = JSON.parse(res.text);
-    expect(result).toEqual(
+    // timeout needs te be set as group import is asynchronous
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // get all groups by the teacher
+    const res2 = await request(server)
+      .get(`/api/groups?assignmentId=${assignmentId}`)
+      .set("cookie", teacherCookie);
+    // assertions
+    expect(res2.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res2.text)).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "ED 4" }),
         expect.objectContaining({ name: "ED 3" }),
@@ -274,6 +300,8 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.OK);
+    // timeout needs te be set as group import is asynchronous
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   });
 
   test("some netids are without @ symbol", async () => {
@@ -289,8 +317,16 @@ describe("Group import", () => {
       .attach("file", fs.readFileSync(groupCSV), "file.csv")
       .field("assignmentId", assignmentId);
     expect(res.status).toBe(HttpStatusCode.OK);
-    const result = JSON.parse(res.text);
-    expect(result).toEqual(
+    // timeout needs te be set as group import is asynchronous
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // get all groups by the teacher
+    const res2 = await request(server)
+      .get(`/api/groups?assignmentId=${assignmentId}`)
+      .set("cookie", teacherCookie);
+    // assertions
+    expect(res2.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res2.text)).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "ED 4" }),
         expect.objectContaining({ name: "ED 3" }),

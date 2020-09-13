@@ -9,7 +9,7 @@ import Course from "../../src/models/Course";
 import AcademicYear from "../../src/models/AcademicYear";
 import Faculty from "../../src/models/Faculty";
 import File from "../../src/models/File";
-import generateDistribution from "../../src/util/reviewDistribution";
+import { generateReviewDistribution } from "../../src/workers/distributeReviews";
 import Enrollment from "../../src/models/Enrollment";
 import UserRole from "../../src/enum/UserRole";
 import { AssignmentState } from "../../src/enum/AssignmentState";
@@ -103,11 +103,7 @@ describe("Review distribution", () => {
       ]);
       await group.save();
       // make submission
-      const file = new File(
-        "filename",
-        ".pdf",
-        "0000000000000000000000000000000000000000000000000000000000000000"
-      );
+      const file = new File("filename", ".pdf", null);
       await file.save();
 
       const submission = new Submission(student, group, assignment, file);
@@ -117,7 +113,7 @@ describe("Review distribution", () => {
 
     const reviewsPerUser = 3;
     // need to be made into an object
-    const reviewAssignments = await generateDistribution(
+    const reviewAssignments = await generateReviewDistribution(
       submissions,
       students,
       reviewsPerUser
@@ -205,11 +201,7 @@ describe("Review distribution", () => {
       ]);
       await group.save();
       // make submission
-      const file = new File(
-        "filename",
-        ".pdf",
-        "0000000000000000000000000000000000000000000000000000000000000000"
-      );
+      const file = new File("filename", ".pdf", null);
       await file.save();
 
       const submission = new Submission(student, group, assignment, file);
@@ -224,7 +216,7 @@ describe("Review distribution", () => {
     // so the algorithm should find a less fair solution
     const reviewsPerUser = 3;
     // need to be made into an object
-    const reviewAssignments = await generateDistribution(
+    const reviewAssignments = await generateReviewDistribution(
       submissions,
       students,
       reviewsPerUser
@@ -300,11 +292,7 @@ describe("Review distribution", () => {
     const group1 = new Group(`group1`, course, [student1], [assignment]);
     await group1.save();
     // make submission
-    const file1 = new File(
-      "filename",
-      ".pdf",
-      "0000000000000000000000000000000000000000000000000000000000000000"
-    );
+    const file1 = new File("filename", ".pdf", null);
     await file1.save();
 
     const submission1 = new Submission(student1, group1, assignment, file1);
@@ -320,11 +308,7 @@ describe("Review distribution", () => {
     );
     await group2.save();
     // make submission
-    const file2 = new File(
-      "filename",
-      ".pdf",
-      "0000000000000000000000000000000000000000000000000000000000000000"
-    );
+    const file2 = new File("filename", ".pdf", null);
     await file1.save();
 
     const submission2 = new Submission(student2, group2, assignment, file2);
@@ -333,7 +317,7 @@ describe("Review distribution", () => {
 
     const reviewsPerUser = 1;
     // need to be made into an object
-    const generateDistributionPromise = generateDistribution(
+    const generateDistributionPromise = generateReviewDistribution(
       submissions,
       [student2, student3],
       reviewsPerUser

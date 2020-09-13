@@ -4,6 +4,13 @@
 import http from "http";
 import createDatabaseConnection from "../databaseConnection";
 import app from "../app";
+import isTSNode from "../util/isTSNode";
+
+if (isTSNode) {
+  console.log("Running under TS Node");
+} else {
+  console.log("Running under Node.JS");
+}
 
 console.log("Currently running in: " + app.get("env"));
 

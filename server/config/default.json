@@ -14,6 +14,7 @@
     "allowedExtensions": [".pdf", ".zip", ".doc", ".docx"],
     "maxFileSize": 52428800, // 50 MB
     "uploadFolder": "./files/development/",
+    "temporaryFolder": "./files/temp/",
     "rangeQuestion": {
         "min": 1,
         "max": 50

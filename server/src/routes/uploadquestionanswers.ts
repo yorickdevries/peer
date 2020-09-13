@@ -12,7 +12,6 @@ import upload from "../middleware/upload";
 import config from "config";
 import { getManager } from "typeorm";
 import path from "path";
-import hasha from "hasha";
 import fsPromises from "fs/promises";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
@@ -151,6 +150,15 @@ router.post(
         );
       return;
     }
+    // construct file to be saved in transaction
+    const fileExtension = path.extname(req.file.originalname);
+    const fileName = path.basename(req.file.originalname, fileExtension);
+    const fileHash = null;
+    const newFile = new File(fileName, fileExtension, fileHash);
+
+    // oldfile in case of update
+    let oldFile: File | undefined;
+
     // uploadAnswer
     let uploadAnswer: UploadQuestionAnswer | undefined;
     // start transaction make sure the file and submission are both saved
@@ -167,21 +175,13 @@ router.post(
             },
           }
         );
-        let oldFile: File | undefined = undefined;
-        // if an answer is already present, replace the fileinfo
+        // if an answer is already present, save old file to constant
         if (uploadAnswer) {
           oldFile = uploadAnswer.uploadAnswer;
         }
-
-        // new File
-        const fileBuffer = req.file.buffer;
-        const fileExtension = path.extname(req.file.originalname);
-        const fileName = path.basename(req.file.originalname, fileExtension);
-        const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
-        // make new file and answer
-        const newFile = new File(fileName, fileExtension, fileHash);
-        // save to database
+        // save file entry to database
         await transactionalEntityManager.save(newFile);
+        // save answer to database
         if (uploadAnswer) {
           uploadAnswer.uploadAnswer = newFile;
         } else {
@@ -190,18 +190,24 @@ router.post(
         // create/update uploadAnswer
         await transactionalEntityManager.save(uploadAnswer);
 
-        // save the file to disk lastly (overwites exisitng if present)
-        // (if this goes wrong all previous steps are rolled back)
+        // move the file (so if this fails everything above fails)
+        // where the file is temporary saved now
+        const tempPath = req.file.path;
+        // new place where the file will be saved
         const filePath = path.resolve(uploadFolder, newFile.id.toString());
-        await fsPromises.writeFile(filePath, req.file.buffer);
-        // remove the old file from the disk
-        if (oldFile?.id) {
-          const filePath = path.resolve(uploadFolder, oldFile.id.toString());
-          await fsPromises.unlink(filePath);
-          await transactionalEntityManager.remove(oldFile);
-        }
+        // move file
+        await fsPromises.rename(tempPath, filePath);
       }
     );
+    // remove old file lastly so no data is lost
+    // worst case this fails and we have a orphan file
+    if (oldFile) {
+      const oldId = oldFile.id;
+      await oldFile.remove();
+      const filePath = path.resolve(uploadFolder, oldId.toString());
+      await fsPromises.unlink(filePath);
+    }
+
     // reload the answer
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await uploadAnswer!.reload();
@@ -293,6 +299,7 @@ router.delete(
         await transactionalEntityManager.remove(questionAnswer);
         // delete file as well
         await transactionalEntityManager.remove(file);
+        // remove file from disk
         await fsPromises.unlink(filePath);
       }
     );

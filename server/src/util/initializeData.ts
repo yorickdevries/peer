@@ -48,6 +48,10 @@ const initializeData = async function (): Promise<void> {
   await fs.promises.mkdir(uploadFolder, { recursive: true });
   console.log("Created upload folder");
 
+  const tempFolder = path.resolve(config.get("temporaryFolder") as string);
+  await fs.promises.mkdir(tempFolder, { recursive: true });
+  console.log("Created temp folder");
+
   return;
 };
 
