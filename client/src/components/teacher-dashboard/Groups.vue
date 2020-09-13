@@ -166,6 +166,9 @@
                                 <b-button
                                     v-if="!data.item.final"
                                     v-b-modal="`changeSubmissionToFinalModal${data.item.id}`"
+                                    :disabled="
+                                        !(assignment.state === 'submission' || assignment.state === 'waitingforreview')
+                                    "
                                     size="sm"
                                     variant="secondary"
                                     class="mr-2"
@@ -175,6 +178,9 @@
                                 <b-button
                                     v-else
                                     v-b-modal="`changeSubmissionToNotFinalModal${data.item.id}`"
+                                    :disabled="
+                                        !(assignment.state === 'submission' || assignment.state === 'waitingforreview')
+                                    "
                                     size="sm"
                                     variant="danger"
                                     class="mr-2"

@@ -28,6 +28,7 @@
                                 <b-button
                                     v-if="!data.item.final"
                                     v-b-modal="`changeSubmissionToFinalModal${data.item.id}`"
+                                    :disabled="!isSubmissionActive"
                                     size="sm"
                                     variant="secondary"
                                     class="mr-2"
@@ -37,6 +38,7 @@
                                 <b-button
                                     v-else
                                     v-b-modal="`changeSubmissionToNotFinalModal${data.item.id}`"
+                                    :disabled="!isSubmissionActive"
                                     size="sm"
                                     variant="danger"
                                     class="mr-2"
@@ -71,7 +73,7 @@
                     <!-- Modal Button -->
                     <b-button
                         v-b-modal="`uploadModal${assignment.id}`"
-                        :disabled="assignment.state !== 'submission'"
+                        :disabled="!isSubmissionActive"
                         variant="primary"
                         @click="resetFile"
                         >Upload new Submission</b-button
@@ -133,6 +135,15 @@ export default {
                 { key: "action", label: "Action" }
             ],
             buttonDisabled: false
+        }
+    },
+    computed: {
+        isSubmissionActive() {
+            return (
+                this.assignment.state === "submission" &&
+                // either late submission must be enabled or the due date should not have been passed
+                (this.assignment.lateSubmissions || new Date() < new Date(this.assignment.dueDate))
+            )
         }
     },
     async created() {
