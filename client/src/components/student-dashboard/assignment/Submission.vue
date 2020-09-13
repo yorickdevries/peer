@@ -27,9 +27,9 @@
                             </template>
                         </b-table>
                         Only the latest submission will be used for reviewing
-                        <br /><br />
                     </div>
                     <b-alert v-else show variant="danger">You have not yet made a submission</b-alert>
+                    <b-alert show variant="warning">Maximum file size for submission: 50MB</b-alert>
 
                     <!-- Modal Button -->
                     <b-button
@@ -62,7 +62,9 @@
                             required
                             :state="Boolean(file)"
                         />
-                        <b-button variant="primary" class="mt-3" @click="submitSubmission()">Upload</b-button>
+                        <b-button variant="primary" class="mt-3" :disabled="buttonDisabled" @click="submitSubmission()"
+                            >Upload</b-button
+                        >
                     </b-modal>
                 </b-card>
             </b-col>
@@ -92,7 +94,8 @@ export default {
                 { key: "userNetid", label: "Submitted by" },
                 { key: "date", label: "​​​Date" },
                 { key: "latest", label: "Latest" }
-            ]
+            ],
+            buttonDisabled: false
         }
     },
     async created() {
@@ -121,8 +124,10 @@ export default {
             this.latestSubmission = res.data
         },
         async submitSubmission() {
+            this.buttonDisabled = true
             if (!this.file) {
                 this.showErrorMessage({ message: "No file selected" })
+                this.buttonDisabled = false
                 return
             }
             // Config set for the HTTP request & updating the progress field.
@@ -133,14 +138,20 @@ export default {
                 }
             }
             // Perform upload.
-            await api.submissions.post(this.group.id, this.$route.params.assignmentId, this.file, config)
-            this.showSuccessMessage({ message: "Successfully submitted submission." })
+            try {
+                await api.submissions.post(this.group.id, this.$route.params.assignmentId, this.file, config)
+                this.showSuccessMessage({ message: "Successfully submitted submission." })
+            } catch (error) {
+                this.buttonDisabled = false
+                return
+            }
             this.$refs.uploadModal.hide()
 
             // Reset and fetch new submission.
             this.resetFile()
             await this.fetchSubmissions()
             await this.fetchLatestSubmission()
+            this.buttonDisabled = false
         },
         submissionFilePath(id) {
             // Get the submission file path.

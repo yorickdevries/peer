@@ -50,7 +50,7 @@ export default {
     methods: {
         async copyGroups() {
             await api.groups.copy(this.$route.params.assignmentId, this.assignmentToCopyGroupsFrom.id)
-            this.showSuccessMessage()
+            this.showSuccessMessage({ message: "Groups are being copied" })
         }
     }
 }

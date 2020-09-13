@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="groups">
         <b-row>
             <b-col>
                 <!--Importing-->
@@ -65,7 +65,7 @@
             <b-col cols="6" class="mb-3">
                 <b-form-group horizontal label="Filter" class="mb-0 mr-4">
                     <b-input-group>
-                        <b-form-input v-model="filter" placeholder="Type to search" />
+                        <b-form-input v-model="filter" debounce="1000" placeholder="Type to search" />
                         <b-input-group-append>
                             <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
                         </b-input-group-append>
@@ -166,7 +166,7 @@ export default {
     data() {
         return {
             assignment: null,
-            groups: [],
+            groups: null,
             // for navigation
             groupFields: [
                 { key: "id", label: "Group ID", sortable: true },

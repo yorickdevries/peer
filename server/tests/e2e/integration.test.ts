@@ -677,14 +677,6 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([submission1, submission2]);
 
-    // get latest submissions for this assignment as teacher
-    res = await request(server)
-      .get(`/api/submissions/latest?assignmentId=${assignment.id}`)
-      .set("cookie", await teacherCookie());
-    // assertions
-    expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject([submission1, submission2]);
-
     // get a single submission as teacher
     res = await request(server)
       .get(`/api/submissions/${submission1.id}`)

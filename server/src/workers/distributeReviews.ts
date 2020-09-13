@@ -2,11 +2,86 @@ import jsgraphs from "js-graph-algorithms";
 import _ from "lodash";
 import Submission from "../models/Submission";
 import User from "../models/User";
+import Assignment from "../models/Assignment";
+import ReviewOfSubmission from "../models/ReviewOfSubmission";
+import { getManager } from "typeorm";
+import Review from "../models/Review";
+import { AssignmentState } from "../enum/AssignmentState";
+import ensureConnection from "./ensureConnection";
 
 interface reviewAssignment {
   reviewer: User;
   submission: Submission;
 }
+
+const distributeReviewsForAssignment = async function (
+  assignmentId: number
+): Promise<string> {
+  await ensureConnection();
+
+  const assignment = await Assignment.findOneOrFail(assignmentId);
+  const questionnaire = await assignment.getSubmissionQuestionnaire();
+  if (!questionnaire) {
+    throw new Error("Questionnaire not found");
+  }
+  // now the reviews can be dirsibuted
+  const submissions = await assignment.getLatestSubmissionsOfEachGroup();
+  // get all unique users of the submissions (unique as several submissions might have the same user in the group)
+  const users: User[] = [];
+  for (const submission of submissions) {
+    const group = await submission.getGroup();
+    const groupUsers = await group.getUsers();
+    for (const groupUser of groupUsers) {
+      const alreadyContainsUser = _.some(users, (user) => {
+        return user.netid === groupUser.netid;
+      });
+      if (!alreadyContainsUser) {
+        users.push(groupUser);
+      }
+    }
+  }
+  const reviewDistribution = await generateReviewDistribution(
+    submissions,
+    users,
+    assignment.reviewsPerUser
+  );
+  // create all reviews in an transaction
+  const reviews: ReviewOfSubmission[] = [];
+  await getManager().transaction(
+    "SERIALIZABLE",
+    async (transactionalEntityManager) => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const existingReviews = await transactionalEntityManager.find(Review, {
+        where: { questionnaire: questionnaire },
+      });
+      if (existingReviews.length > 0) {
+        throw new Error("There are already reviews for this assignment");
+      }
+      // iterate over reviewDistribution
+      for (const reviewAssignment of reviewDistribution) {
+        // make the review
+        const review = new ReviewOfSubmission(
+          questionnaire,
+          reviewAssignment.reviewer,
+          false,
+          false,
+          null,
+          null,
+          null,
+          null,
+          null,
+          reviewAssignment.submission
+        );
+        await transactionalEntityManager.save(review);
+        reviews.push(review);
+      }
+      // set the proper assignmentstate
+      assignment.state = AssignmentState.REVIEW;
+      await transactionalEntityManager.save(assignment);
+    }
+  );
+  return `Distributed ${reviews.length} reviews for assignment ${assignment.id}`;
+};
 
 // Takes care of the distribution of reviews of submissions over the students
 const generateReviewDistribution = async function (
@@ -227,4 +302,4 @@ const performMaxFlow = async function (
   }
 };
 
-export default generateReviewDistribution;
+export { distributeReviewsForAssignment, generateReviewDistribution };
