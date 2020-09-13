@@ -80,6 +80,7 @@ const distributeReviewsForAssignment = async function (
       await transactionalEntityManager.save(assignment);
     }
   );
+  return `Distributed ${reviews.length} reviews for assignment ${assignment.id}`;
 };
 
 // Takes care of the distribution of reviews of submissions over the students
