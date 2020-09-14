@@ -6,7 +6,7 @@
         <b-alert v-else-if="!review || review.submitted" show variant="warning">
             The review is submitted, any annotations will not be saved</b-alert
         >
-        <b-alert show variant="secondary"
+        <b-alert v-else show variant="secondary"
             >PDF viewing and annotation is experimental, in case of any error, you can always download the file with the
             button above.
             <br />
@@ -176,10 +176,14 @@ export default {
                         }
                         // add all feedback of submission
                         if (vm.submission) {
-                            const res = await api.submissions.getFeedback(vm.submission.id)
-                            const feedbackReviews = res.data
-                            for (const feedbackReview of feedbackReviews) {
-                                reviews.push(feedbackReview)
+                            try {
+                                const res = await api.submissions.getFeedback(vm.submission.id)
+                                const feedbackReviews = res.data
+                                for (const feedbackReview of feedbackReviews) {
+                                    reviews.push(feedbackReview)
+                                }
+                            } catch (error) {
+                                console.log(error)
                             }
                         }
 
