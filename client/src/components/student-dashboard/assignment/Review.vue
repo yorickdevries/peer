@@ -87,6 +87,13 @@
                     :disabled="buttonDisabled"
                     >Unsubmit Review</b-button
                 >
+                <b-button
+                    v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                    variant="info float-right"
+                    @click="saveAllAnswers"
+                    :disabled="buttonDisabled"
+                    >Save all unsaved answers</b-button
+                >
             </b-card-body>
         </template>
         <br />
@@ -251,6 +258,13 @@
                         :disabled="buttonDisabled"
                         >Unsubmit Review</b-button
                     >
+                    <b-button
+                        v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                        variant="info float-right"
+                        @click="saveAllAnswers"
+                        :disabled="buttonDisabled"
+                        >Save all unsaved answers</b-button
+                    >
                     <!--Submit Modal-->
                     <b-modal
                         :id="`submit${review.id}`"
@@ -304,12 +318,11 @@ export default {
             for (const questionId in this.answers) {
                 const answer = this.answers[questionId]
                 if (answer.changed) {
-                    const question = _.find(this.questionnaire.questions, question => {
-                        return question.id === parseInt(questionId)
-                    })
+                    const question = this.getQuestion(questionId)
                     questionNumbersOfUnsavedAnswers.push(question.number)
                 }
             }
+            questionNumbersOfUnsavedAnswers.sort()
             return questionNumbersOfUnsavedAnswers
         },
         reviewFilePath() {
@@ -402,6 +415,11 @@ export default {
             // set the answer object so all fields are reactive now
             this.answers = answers
         },
+        getQuestion(questionId) {
+            return _.find(this.questionnaire.questions, question => {
+                return question.id === parseInt(questionId)
+            })
+        },
         async saveAnswer(question, answer) {
             this.buttonDisabled = true
             try {
@@ -474,6 +492,22 @@ export default {
                 this.showSuccessMessage({ message: "Succesfuly deleted answer" })
             } catch (error) {
                 this.showErrorMessage({ message: error })
+            }
+            this.buttonDisabled = false
+        },
+        async saveAllAnswers() {
+            this.buttonDisabled = true
+            for (const questionId in this.answers) {
+                const answer = this.answers[questionId]
+                if (answer.changed) {
+                    const question = this.getQuestion(questionId)
+                    try {
+                        await this.saveAnswer(question, answer)
+                    } finally {
+                        // saving answer enables the button, so it will be disabled again
+                        this.buttonDisabled = true
+                    }
+                }
             }
             this.buttonDisabled = false
         },
