@@ -318,7 +318,11 @@ export default {
             return `/api/reviewofsubmissions/${this.review.id}/file`
         },
         reviewFileName() {
-            return this.fileMetadata.name + this.fileMetadata.extension
+            if (this.fileMetadata) {
+                return this.fileMetadata.name + this.fileMetadata.extension
+            } else {
+                return ""
+            }
         }
     },
     async created() {
