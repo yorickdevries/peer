@@ -196,6 +196,10 @@ export default {
             await this.fetchSubmissionQuestionnaire()
             await this.fetchFeedbackReviews()
             await this.aggregateFeedback()
+            // automatically open first question
+            if (this.questionnaire.questions.length !== 0) {
+                this.question = this.questionnaire.questions[0]
+            }
         },
         async fetchAssignment() {
             // Fetch the assignment information.
