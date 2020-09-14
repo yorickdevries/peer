@@ -134,7 +134,7 @@
                     <b-form-radio-group
                         v-if="question.type === 'multiplechoice'"
                         v-model="answers[question.id].answer"
-                        @input="answers[question.id].changed = true"
+                        @input="answers[question.id].answer !== null ? (answers[question.id].changed = true) : ''"
                         stacked
                         required
                         :disabled="review.submitted || reviewsAreReadOnly"
