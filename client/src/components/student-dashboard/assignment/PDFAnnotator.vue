@@ -195,7 +195,7 @@ export default {
 
                         /* API to register events listener */
                         // only if a review is known and the view is not readonly
-                        if (vm.review && !vm.readOnly) {
+                        if (vm.review && !vm.review.submitted && !vm.readOnly) {
                             annotationManager.registerEventListener(
                                 async function(event) {
                                     switch (event.type) {

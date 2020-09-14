@@ -50,8 +50,8 @@
         <b-row>
             <b-col>
                 <PDFAnnotator
-                    v-if="fileMetadata.extension === '.pdf'"
-                    :reviewId="reviewId"
+                    v-if="viewPDF && fileMetadata.extension === '.pdf'"
+                    :reviewId="review.id"
                     :readOnly="false"
                 ></PDFAnnotator>
             </b-col>
@@ -301,6 +301,8 @@ export default {
         return {
             fileMetadata: null,
             review: {},
+            // dont view pdf until data is fetched
+            viewPDF: false,
             reviewEvaluation: null,
             questionnaire: {},
             // all answers will be saved in this object
@@ -338,8 +340,10 @@ export default {
     },
     methods: {
         async fetchData() {
-            await this.fetchFileMetadata()
+            this.viewPDF = false
             await this.fetchReview()
+            await this.fetchFileMetadata()
+            this.viewPDF = true
             await this.fetchSubmissionQuestionnaire()
             await this.fetchAnswers()
             await this.fetchReviewEvaluation()
