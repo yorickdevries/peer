@@ -87,6 +87,13 @@
                     :disabled="buttonDisabled"
                     >Unsubmit Review</b-button
                 >
+                <b-button
+                    v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                    variant="info float-right"
+                    @click="saveAllAnswers"
+                    :disabled="buttonDisabled"
+                    >Save all unsaved answers</b-button
+                >
             </b-card-body>
         </template>
         <br />
@@ -134,7 +141,7 @@
                     <b-form-radio-group
                         v-if="question.type === 'multiplechoice'"
                         v-model="answers[question.id].answer"
-                        @input="answers[question.id].changed = true"
+                        @input="answers[question.id].answer !== null ? (answers[question.id].changed = true) : ''"
                         stacked
                         required
                         :disabled="review.submitted || reviewsAreReadOnly"
@@ -251,6 +258,13 @@
                         :disabled="buttonDisabled"
                         >Unsubmit Review</b-button
                     >
+                    <b-button
+                        v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                        variant="info float-right"
+                        @click="saveAllAnswers"
+                        :disabled="buttonDisabled"
+                        >Save all unsaved answers</b-button
+                    >
                     <!--Submit Modal-->
                     <b-modal
                         :id="`submit${review.id}`"
@@ -258,8 +272,9 @@
                         :disabled="buttonDisabled"
                         @ok="submitReview"
                     >
-                        <b-alert v-if="unSavedAnswers" show variant="warning" class="p-2"
-                            >There are one or more unsaved answers</b-alert
+                        <b-alert v-if="questionNumbersOfUnsavedAnswers.length > 0" show variant="warning" class="p-2"
+                            >There are one or more unsaved answers for the following questions:
+                            {{ questionNumbersOfUnsavedAnswers }}</b-alert
                         >
                         Do you really want to submit? This marks the review as finished and all unsaved changes will be
                         discarded.
@@ -295,14 +310,20 @@ export default {
         }
     },
     computed: {
-        unSavedAnswers() {
+        questionNumbersOfUnsavedAnswers() {
+            const questionNumbersOfUnsavedAnswers = []
             if (!this.answers) {
-                return false
+                return questionNumbersOfUnsavedAnswers
             }
-            const unSavedAnswers = _.filter(this.answers, answer => {
-                return answer.changed
-            })
-            return unSavedAnswers.length > 0
+            for (const questionId in this.answers) {
+                const answer = this.answers[questionId]
+                if (answer.changed) {
+                    const question = this.getQuestion(questionId)
+                    questionNumbersOfUnsavedAnswers.push(question.number)
+                }
+            }
+            questionNumbersOfUnsavedAnswers.sort()
+            return questionNumbersOfUnsavedAnswers
         },
         reviewFilePath() {
             // Get the submission file path.
@@ -394,6 +415,11 @@ export default {
             // set the answer object so all fields are reactive now
             this.answers = answers
         },
+        getQuestion(questionId) {
+            return _.find(this.questionnaire.questions, question => {
+                return question.id === parseInt(questionId)
+            })
+        },
         async saveAnswer(question, answer) {
             this.buttonDisabled = true
             try {
@@ -466,6 +492,22 @@ export default {
                 this.showSuccessMessage({ message: "Succesfuly deleted answer" })
             } catch (error) {
                 this.showErrorMessage({ message: error })
+            }
+            this.buttonDisabled = false
+        },
+        async saveAllAnswers() {
+            this.buttonDisabled = true
+            for (const questionId in this.answers) {
+                const answer = this.answers[questionId]
+                if (answer.changed) {
+                    const question = this.getQuestion(questionId)
+                    try {
+                        await this.saveAnswer(question, answer)
+                    } finally {
+                        // saving answer enables the button, so it will be disabled again
+                        this.buttonDisabled = true
+                    }
+                }
             }
             this.buttonDisabled = false
         },
