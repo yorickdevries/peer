@@ -94,21 +94,13 @@ export default {
             script.setAttribute("src", "https://documentcloud.adobe.com/view-sdk/main.js")
             document.head.appendChild(script)
 
-            // get fields into constants
-            const clientId = this.adobeDCViewClientId
-            const pdfDivId = this.pdfDivId
-            // set as null when review is not known
-            const review = this.review
-            const submission = this.submission
-            const readOnly = this.readOnly
-            // file info
-            const fileName = this.reviewFileName
-            const fileId = this.fileMetadata.id
-            const filePath = this.filePath
+            // set vue model to constant
+            const vm = this
+
             // construct the file promise
             const filePromise = new Promise(function(resolve, reject) {
                 axios
-                    .get(filePath, { responseType: "arraybuffer" })
+                    .get(vm.filePath, { responseType: "arraybuffer" })
                     .then(res => {
                         resolve(res.data)
                     })
@@ -120,8 +112,8 @@ export default {
                 // AdobeDC is loaded via the script, so eslint is disabled:
                 // eslint-disable-next-line no-undef
                 const adobeDCView = new AdobeDC.View({
-                    clientId: clientId,
-                    divId: pdfDivId
+                    clientId: vm.adobeDCViewClientId,
+                    divId: vm.pdfDivId
                 })
 
                 // Set user profile
@@ -162,8 +154,8 @@ export default {
                     {
                         content: { promise: filePromise },
                         metaData: {
-                            fileName: fileName,
-                            id: String(fileId) // id needs to be a string
+                            fileName: vm.reviewFileName,
+                            id: String(vm.fileMetadata.id) // id needs to be a string
                         }
                     },
                     previewConfig
@@ -175,12 +167,12 @@ export default {
                         // get existing annotations
                         let reviews = []
                         // add single review
-                        if (review) {
-                            reviews.push(review)
+                        if (vm.review) {
+                            reviews.push(vm.review)
                         }
                         // add all feedback of submission
-                        if (submission) {
-                            const res = await api.submissions.getFeedback(submission.id)
+                        if (vm.submission) {
+                            const res = await api.submissions.getFeedback(vm.submission.id)
                             const feedbackReviews = res.data
                             for (const feedbackReview of feedbackReviews) {
                                 reviews.push(feedbackReview)
@@ -189,7 +181,7 @@ export default {
 
                         // iterate over all reviews to get annotations
                         for (const review of reviews) {
-                            const res = await api.pdfannotations.get(review.id, fileId)
+                            const res = await api.pdfannotations.get(review.id, vm.fileMetadata.id)
                             const annotations = res.data
                             /* API to add annotations */
                             for (const annotation of annotations) {
@@ -203,12 +195,12 @@ export default {
 
                         /* API to register events listener */
                         // only if a review is known and the view is not readonly
-                        if (review && !readOnly) {
+                        if (vm.review && !vm.readOnly) {
                             annotationManager.registerEventListener(
                                 async function(event) {
                                     switch (event.type) {
                                         case "ANNOTATION_ADDED":
-                                            await api.pdfannotations.post(event.data, review.id, fileId)
+                                            await api.pdfannotations.post(event.data, vm.review.id, vm.fileMetadata.id)
                                             izitoast.success({
                                                 title: "Success",
                                                 message: "Succesfully created annotation",
