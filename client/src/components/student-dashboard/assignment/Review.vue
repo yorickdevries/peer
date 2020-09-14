@@ -258,8 +258,9 @@
                         :disabled="buttonDisabled"
                         @ok="submitReview"
                     >
-                        <b-alert v-if="unSavedAnswers" show variant="warning" class="p-2"
-                            >There are one or more unsaved answers</b-alert
+                        <b-alert v-if="questionNumbersOfUnsavedAnswers.length > 0" show variant="warning" class="p-2"
+                            >There are one or more unsaved answers for the following questions:
+                            {{ questionNumbersOfUnsavedAnswers }}</b-alert
                         >
                         Do you really want to submit? This marks the review as finished and all unsaved changes will be
                         discarded.
@@ -295,14 +296,21 @@ export default {
         }
     },
     computed: {
-        unSavedAnswers() {
+        questionNumbersOfUnsavedAnswers() {
+            const questionNumbersOfUnsavedAnswers = []
             if (!this.answers) {
-                return false
+                return questionNumbersOfUnsavedAnswers
             }
-            const unSavedAnswers = _.filter(this.answers, answer => {
-                return answer.changed
-            })
-            return unSavedAnswers.length > 0
+            for (const questionId in this.answers) {
+                const answer = this.answers[questionId]
+                if (answer.changed) {
+                    const question = _.find(this.questionnaire.questions, question => {
+                        return question.id === parseInt(questionId)
+                    })
+                    questionNumbersOfUnsavedAnswers.push(question.number)
+                }
+            }
+            return questionNumbersOfUnsavedAnswers
         },
         reviewFilePath() {
             // Get the submission file path.
