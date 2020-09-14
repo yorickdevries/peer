@@ -80,12 +80,11 @@
                             </b-modal>
                         </b-col>
                     </b-row>
-
                     <b-row>
                         <b-col>
                             <PDFAnnotator
                                 v-if="fileMetadata.extension === '.pdf'"
-                                :reviewId="$route.params.reviewId"
+                                :reviewId="review.id"
                                 :readOnly="true"
                             ></PDFAnnotator>
                         </b-col>
