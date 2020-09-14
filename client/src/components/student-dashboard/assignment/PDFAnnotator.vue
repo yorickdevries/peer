@@ -6,7 +6,7 @@
         <b-alert v-else-if="!review || review.submitted" show variant="warning">
             The review is submitted, any annotations will not be saved</b-alert
         >
-        <b-alert show variant="secondary"
+        <b-alert v-else show variant="secondary"
             >PDF viewing and annotation is experimental, in case of any error, you can always download the file with the
             button above.
             <br />
@@ -54,7 +54,11 @@ export default {
             }
         },
         reviewFileName() {
-            return this.fileMetadata.name + this.fileMetadata.extension
+            if (this.fileMetadata) {
+                return this.fileMetadata.name + this.fileMetadata.extension
+            } else {
+                return ""
+            }
         }
     },
     async mounted() {
@@ -94,21 +98,13 @@ export default {
             script.setAttribute("src", "https://documentcloud.adobe.com/view-sdk/main.js")
             document.head.appendChild(script)
 
-            // get fields into constants
-            const clientId = this.adobeDCViewClientId
-            const pdfDivId = this.pdfDivId
-            // set as null when review is not known
-            const review = this.review
-            const submission = this.submission
-            const readOnly = this.readOnly
-            // file info
-            const fileName = this.reviewFileName
-            const fileId = this.fileMetadata.id
-            const filePath = this.filePath
+            // set vue model to constant
+            const vm = this
+
             // construct the file promise
             const filePromise = new Promise(function(resolve, reject) {
                 axios
-                    .get(filePath, { responseType: "arraybuffer" })
+                    .get(vm.filePath, { responseType: "arraybuffer" })
                     .then(res => {
                         resolve(res.data)
                     })
@@ -120,8 +116,8 @@ export default {
                 // AdobeDC is loaded via the script, so eslint is disabled:
                 // eslint-disable-next-line no-undef
                 const adobeDCView = new AdobeDC.View({
-                    clientId: clientId,
-                    divId: pdfDivId
+                    clientId: vm.adobeDCViewClientId,
+                    divId: vm.pdfDivId
                 })
 
                 // Set user profile
@@ -162,8 +158,8 @@ export default {
                     {
                         content: { promise: filePromise },
                         metaData: {
-                            fileName: fileName,
-                            id: String(fileId) // id needs to be a string
+                            fileName: vm.reviewFileName,
+                            id: String(vm.fileMetadata.id) // id needs to be a string
                         }
                     },
                     previewConfig
@@ -175,21 +171,25 @@ export default {
                         // get existing annotations
                         let reviews = []
                         // add single review
-                        if (review) {
-                            reviews.push(review)
+                        if (vm.review) {
+                            reviews.push(vm.review)
                         }
                         // add all feedback of submission
-                        if (submission) {
-                            const res = await api.submissions.getFeedback(submission.id)
-                            const feedbackReviews = res.data
-                            for (const feedbackReview of feedbackReviews) {
-                                reviews.push(feedbackReview)
+                        if (vm.submission) {
+                            try {
+                                const res = await api.submissions.getFeedback(vm.submission.id)
+                                const feedbackReviews = res.data
+                                for (const feedbackReview of feedbackReviews) {
+                                    reviews.push(feedbackReview)
+                                }
+                            } catch (error) {
+                                console.log(error)
                             }
                         }
 
                         // iterate over all reviews to get annotations
                         for (const review of reviews) {
-                            const res = await api.pdfannotations.get(review.id, fileId)
+                            const res = await api.pdfannotations.get(review.id, vm.fileMetadata.id)
                             const annotations = res.data
                             /* API to add annotations */
                             for (const annotation of annotations) {
@@ -203,12 +203,12 @@ export default {
 
                         /* API to register events listener */
                         // only if a review is known and the view is not readonly
-                        if (review && !readOnly) {
+                        if (vm.review && !vm.review.submitted && !vm.readOnly) {
                             annotationManager.registerEventListener(
                                 async function(event) {
                                     switch (event.type) {
                                         case "ANNOTATION_ADDED":
-                                            await api.pdfannotations.post(event.data, review.id, fileId)
+                                            await api.pdfannotations.post(event.data, vm.review.id, vm.fileMetadata.id)
                                             izitoast.success({
                                                 title: "Success",
                                                 message: "Succesfully created annotation",
@@ -240,6 +240,35 @@ export default {
                                     /* Pass the list of events in listenOn. */
                                     /* If no event is passed in listenOn, then all the annotation events will be received. */
                                     listenOn: ["ANNOTATION_ADDED", "ANNOTATION_UPDATED", "ANNOTATION_DELETED"]
+                                }
+                            )
+                        } else {
+                            annotationManager.registerEventListener(
+                                async function(event) {
+                                    if (event.type === "ANNOTATION_SELECTED" || event.type === "ANNOTATION_CLICKED") {
+                                        annotationManager.unselectAnnotation()
+                                    } else {
+                                        if (event.type === "ANNOTATION_ADDED") {
+                                            // not allowed, so directly deleting it
+                                            annotationManager.deleteAnnotations({ annotationIds: [event.data.id] })
+                                        }
+                                        izitoast.error({
+                                            title: "Error",
+                                            message: "Invalid action: " + event.type,
+                                            position: "bottomCenter"
+                                        })
+                                    }
+                                },
+                                {
+                                    /* Pass the list of events in listenOn. */
+                                    /* If no event is passed in listenOn, then all the annotation events will be received. */
+                                    listenOn: [
+                                        "ANNOTATION_ADDED",
+                                        "ANNOTATION_UPDATED",
+                                        "ANNOTATION_DELETED",
+                                        "ANNOTATION_SELECTED",
+                                        "ANNOTATION_CLICKED"
+                                    ]
                                 }
                             )
                         }

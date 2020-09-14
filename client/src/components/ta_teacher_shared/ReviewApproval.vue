@@ -83,7 +83,7 @@
                     <b-row>
                         <b-col>
                             <PDFAnnotator
-                                v-if="fileMetadata.extension === '.pdf'"
+                                v-if="viewPDF && fileMetadata.extension === '.pdf'"
                                 :reviewId="review.id"
                                 :readOnly="true"
                             ></PDFAnnotator>
@@ -243,6 +243,8 @@ export default {
             questionnaire: {},
             fileMetadata: {},
             review: {},
+            // dont view pdf until data is fetched
+            viewPDF: false,
             reviewEvaluation: null,
             // all answers will be saved in this object
             answers: null
@@ -254,7 +256,11 @@ export default {
             return `/api/reviewofsubmissions/${this.review.id}/file`
         },
         reviewFileName() {
-            return this.fileMetadata.name + this.fileMetadata.extension
+            if (this.fileMetadata) {
+                return this.fileMetadata.name + this.fileMetadata.extension
+            } else {
+                return ""
+            }
         }
     },
     async created() {
@@ -263,8 +269,10 @@ export default {
     methods: {
         async fetchData() {
             await this.fetchAssignment()
+            this.viewPDF = false
             await this.fetchReview()
             await this.fetchFileMetadata()
+            this.viewPDF = true
             await this.fetchSubmissionQuestionnaire()
             await this.fetchAnswers()
             await this.fetchReviewEvaluation()
