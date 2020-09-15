@@ -56,10 +56,21 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
     return;
   }
   if (
-    assignment.isAtState(AssignmentState.FEEDBACK) &&
     (await review.isReviewed(user)) &&
+    assignment.isAtState(AssignmentState.FEEDBACK) &&
     review.submitted
   ) {
+    if (
+      assignment.blockFeedback &&
+      (await questionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "One of youre reviews isn't submitted, you are not allowed to see feedback"
+        );
+      return;
+    }
     // get the file
     const file = uploadQuestionAnswer.uploadAnswer;
     const fileName = file.getAnonymousFileNamewithExtension();
