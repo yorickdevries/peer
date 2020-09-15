@@ -171,7 +171,7 @@ export default class Assignment extends BaseModel {
   lateSubmissionReviews: boolean;
 
   @Column("boolean", { nullable: true })
-  @IsDefined()
+  @IsOptional()
   @IsBoolean()
   // enables making review evaluations after the due date
   lateReviewEvaluations: boolean | null;
