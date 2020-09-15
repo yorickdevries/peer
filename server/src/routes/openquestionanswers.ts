@@ -81,6 +81,18 @@ router.post("/", validateBody(openAnswerSchema), async (req, res) => {
       );
     return;
   }
+  if (
+    questionnaire instanceof ReviewQuestionnaire &&
+    !assignment.lateReviewEvaluations &&
+    moment().isAfter(assignment.reviewEvaluationDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for review evaluation has passed and late review evaluations are not allowed by the teacher"
+      );
+    return;
+  }
   let openAnswer: OpenQuestionAnswer | undefined;
   // make or overwrite openAnswer;
   await getManager().transaction(
@@ -169,6 +181,18 @@ router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
       .status(HttpStatusCode.FORBIDDEN)
       .send(
         "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+      );
+    return;
+  }
+  if (
+    questionnaire instanceof ReviewQuestionnaire &&
+    !assignment.lateReviewEvaluations &&
+    moment().isAfter(assignment.reviewEvaluationDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for review evaluation has passed and late review evaluations are not allowed by the teacher"
       );
     return;
   }

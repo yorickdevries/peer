@@ -103,6 +103,18 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
       );
     return;
   }
+  if (
+    questionnaire instanceof ReviewQuestionnaire &&
+    !assignment.lateReviewEvaluations &&
+    moment().isAfter(assignment.reviewEvaluationDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for review evaluation has passed and late review evaluations are not allowed by the teacher"
+      );
+    return;
+  }
   let checkboxAnswer: CheckboxQuestionAnswer | undefined;
   // make or overwrite checkboxAnswer;
   await getManager().transaction(
@@ -196,6 +208,18 @@ router.delete(
         .status(HttpStatusCode.FORBIDDEN)
         .send(
           "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+        );
+      return;
+    }
+    if (
+      questionnaire instanceof ReviewQuestionnaire &&
+      !assignment.lateReviewEvaluations &&
+      moment().isAfter(assignment.reviewEvaluationDueDate)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The due date for review evaluation has passed and late review evaluations are not allowed by the teacher"
         );
       return;
     }
