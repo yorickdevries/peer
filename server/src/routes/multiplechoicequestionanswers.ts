@@ -5,7 +5,6 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 import ResponseMessage from "../enum/ResponseMessage";
 import Review from "../models/Review";
-import { AssignmentState } from "../enum/AssignmentState";
 import MultipleChoiceQuestionAnswer from "../models/MultipleChoiceQuestionAnswer";
 import MultipleChoiceQuestionOption from "../models/MultipleChoiceQuestionOption";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
@@ -77,16 +76,6 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
     return;
   }
   const assignment = await questionnaire.getAssignment();
-  if (
-    questionnaire instanceof ReviewQuestionnaire &&
-    !(
-      assignment.isAtState(AssignmentState.FEEDBACK) &&
-      moment().isBefore(assignment.reviewEvaluationDueDate)
-    )
-  ) {
-    res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
-    return;
-  }
   if (
     questionnaire instanceof SubmissionQuestionnaire &&
     !assignment.lateSubmissionReviews &&
@@ -178,18 +167,6 @@ router.delete(
     }
     const questionnaire = await review.getQuestionnaire();
     const assignment = await questionnaire.getAssignment();
-    if (
-      questionnaire instanceof ReviewQuestionnaire &&
-      !(
-        assignment.isAtState(AssignmentState.FEEDBACK) &&
-        moment().isBefore(assignment.reviewEvaluationDueDate)
-      )
-    ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The reviewevaluation is passed");
-      return;
-    }
     if (
       questionnaire instanceof SubmissionQuestionnaire &&
       !assignment.lateSubmissionReviews &&
