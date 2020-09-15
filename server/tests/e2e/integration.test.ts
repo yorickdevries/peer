@@ -215,7 +215,7 @@ describe("Integration", () => {
       .field("blockFeedback", true)
       .field("lateSubmissions", true)
       .field("lateSubmissionReviews", true)
-      .field("submissionExtensions", "null");
+      .field("lateReviewEvaluations", "null");
     expect(res.status).toBe(HttpStatusCode.OK);
     let assignment = JSON.parse(res.text);
     expect(assignment).toMatchObject({
