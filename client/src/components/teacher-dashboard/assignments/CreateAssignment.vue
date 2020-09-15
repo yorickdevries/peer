@@ -312,10 +312,10 @@ export default {
                 file: null,
                 externalLink: null,
                 submissionExtensions: ".pdf",
+                blockFeedback: true,
                 lateSubmissions: true,
                 lateSubmissionReviews: true,
-                lateReviewEvaluations: true,
-                blockFeedback: true
+                lateReviewEvaluations: true
             },
             extensionTypes: [
                 { value: ".pdf", text: ".pdf" },
@@ -393,8 +393,10 @@ export default {
                     this.assignment.externalLink,
                     this.assignment.file,
                     this.assignment.submissionExtensions,
+                    this.assignment.blockFeedback,
                     this.assignment.lateSubmissions,
-                    this.assignment.lateSubmissionReviews
+                    this.assignment.lateSubmissionReviews,
+                    this.assignment.lateReviewEvaluations
                 )
                 this.showSuccessMessage({ message: "Assignment was successfully created" })
                 this.$router.push({

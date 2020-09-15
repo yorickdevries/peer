@@ -469,8 +469,10 @@ export default {
                     this.assignment.externalLink,
                     file,
                     this.assignment.submissionExtensions,
+                    this.assignment.blockFeedback,
                     this.assignment.lateSubmissions,
-                    this.assignment.lateSubmissionReviews
+                    this.assignment.lateSubmissionReviews,
+                    this.assignment.lateReviewEvaluations
                 )
                 this.showSuccessMessage({ message: "Updated assignment successfully" })
                 // Redirect to updated assignment

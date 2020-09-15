@@ -40,8 +40,10 @@ export default {
         externalLink,
         file,
         submissionExtensions,
+        blockFeedback,
         lateSubmissions,
-        lateSubmissionReviews
+        lateSubmissionReviews,
+        lateReviewEvaluations
     ) {
         // Create formData and append data
         const formData = new FormData()
@@ -69,8 +71,10 @@ export default {
         formData.append("externalLink", externalLink)
         formData.append("file", file)
         formData.append("submissionExtensions", submissionExtensions)
+        formData.append("blockFeedback", blockFeedback)
         formData.append("lateSubmissions", lateSubmissions)
         formData.append("lateSubmissionReviews", lateSubmissionReviews)
+        formData.append("lateReviewEvaluations", lateReviewEvaluations)
         return client.post("assignments/", formData)
     },
     patch(
@@ -88,8 +92,10 @@ export default {
         externalLink,
         file,
         submissionExtensions,
+        blockFeedback,
         lateSubmissions,
-        lateSubmissionReviews
+        lateSubmissionReviews,
+        lateReviewEvaluations
     ) {
         // Create formData and append data
         const formData = new FormData()
@@ -119,8 +125,10 @@ export default {
             formData.append("file", file)
         }
         formData.append("submissionExtensions", submissionExtensions)
+        formData.append("blockFeedback", blockFeedback)
         formData.append("lateSubmissions", lateSubmissions)
         formData.append("lateSubmissionReviews", lateSubmissionReviews)
+        formData.append("lateReviewEvaluations", lateReviewEvaluations)
         return client.patch(`assignments/${id}`, formData)
     },
     enroll(id) {
