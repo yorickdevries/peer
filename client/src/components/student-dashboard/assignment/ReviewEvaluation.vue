@@ -81,7 +81,7 @@
             </b-col>
         </b-row>
 
-        <template v-if="!reviewsAreReadOnly">
+        <template v-if="review && !reviewsAreReadOnly">
             <!--Save/Submit Buttons-->
             <b-card-body>
                 <div>
@@ -333,7 +333,7 @@ import ReviewViewForEvaluation from "./ReviewViewForEvaluation"
 export default {
     mixins: [notifications],
     components: { ReviewViewForEvaluation, StarRating },
-    props: ["feedbackReviewId"],
+    props: ["feedbackReviewId", "reviewEvaluationsAreReadOnly"],
     data() {
         return {
             // current user
@@ -382,7 +382,7 @@ export default {
             return this.review.reviewerNetid === this.user.netid
         },
         reviewsAreReadOnly() {
-            return !this.userIsOwner
+            return !this.userIsOwner || this.reviewEvaluationsAreReadOnly
         }
     },
     async created() {

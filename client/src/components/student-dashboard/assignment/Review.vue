@@ -42,7 +42,10 @@
                     >Show Review Evaluation</b-button
                 >
                 <b-modal :title="`Review (ID: ${review.id})`" :id="`reviewModal${review.id}`" size="lg" hide-footer>
-                    <ReviewEvaluation :feedbackReviewId="reviewId"></ReviewEvaluation>
+                    <ReviewEvaluation
+                        :feedbackReviewId="reviewId"
+                        :reviewEvaluationsAreReadOnly="true"
+                    ></ReviewEvaluation>
                 </b-modal>
             </b-col>
         </b-row>

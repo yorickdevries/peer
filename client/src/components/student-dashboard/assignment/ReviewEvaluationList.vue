@@ -12,7 +12,10 @@
                                 <b-badge v-if="!review.evaluationDone" variant="danger" class="mr-2">DUE</b-badge>
                             </div>
                         </template>
-                        <ReviewEvaluation :feedbackReviewId="review.id"></ReviewEvaluation>
+                        <ReviewEvaluation
+                            :feedbackReviewId="review.id"
+                            :reviewEvaluationsAreReadOnly="!isReviewEvaluationActive"
+                        ></ReviewEvaluation>
                     </b-tab>
                 </b-tabs>
             </b-card>
@@ -28,9 +31,17 @@ export default {
     components: { ReviewEvaluation },
     data() {
         return {
+            assignment: {},
             group: null,
             finalSubmission: null,
             feedbackReviews: []
+        }
+    },
+    computed: {
+        isReviewEvaluationActive() {
+            return (
+                this.assignment.lateReviewEvaluations || new Date() < new Date(this.assignment.reviewEvaluationDueDate)
+            )
         }
     },
     async created() {
@@ -38,9 +49,14 @@ export default {
     },
     methods: {
         async fetchData() {
+            await this.fetchAssignment()
             await this.fetchGroup()
             await this.fetchFinalSubmission()
             await this.fetchFeedbackReviews()
+        },
+        async fetchAssignment() {
+            const res = await api.assignments.get(this.$route.params.assignmentId)
+            this.assignment = res.data
         },
         async fetchGroup() {
             // Fetch the group information.
