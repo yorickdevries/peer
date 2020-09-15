@@ -7,8 +7,8 @@
             The review is submitted, any annotations will not be saved</b-alert
         >
         <b-alert v-else show variant="secondary"
-            >PDF viewing and annotation is experimental, in case of any error, you can always download the file with the
-            button above.
+            >PDF viewing and annotation is experimental, in case of any error while doing a review, you can always
+            download the file with a button above.
             <br />
             <b
                 >NOTE: Altough annotations contain your netid, anonymous annotations will be shown to the reviewed
