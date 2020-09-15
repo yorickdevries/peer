@@ -52,7 +52,7 @@
                 <PDFAnnotator
                     v-if="viewPDF && fileMetadata.extension === '.pdf'"
                     :reviewId="review.id"
-                    :readOnly="false"
+                    :readOnly="reviewsAreReadOnly"
                 ></PDFAnnotator>
             </b-col>
         </b-row>
