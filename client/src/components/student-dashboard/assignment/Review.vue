@@ -224,7 +224,7 @@
                     >
                     <b-button
                         :variant="(answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'"
-                        :disabled="!answers[question.id].changed || buttonDisabled"
+                        :disabled="!answers[question.id].changed || review.submitted || buttonDisabled"
                         @click="saveAnswer(question, answers[question.id])"
                         >Save Answer</b-button
                     >
@@ -275,7 +275,7 @@
                         :ok-disabled="
                             buttonDisabled ||
                                 (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 &&
-                                    !this.review.flaggedByReviewer)
+                                    !review.flaggedByReviewer)
                         "
                         @ok="submitReview"
                     >
