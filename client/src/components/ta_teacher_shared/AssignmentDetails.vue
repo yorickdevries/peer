@@ -7,9 +7,6 @@
             <dt>Enrollable</dt>
             <dd>{{ assignment.enrollable }}</dd>
 
-            <dt>Review Evaluation</dt>
-            <dd>{{ assignment.reviewEvaluation }}</dd>
-
             <dt>Publish date and time</dt>
             <dd>{{ assignment.publishDate | formatDate }}</dd>
 
@@ -28,12 +25,21 @@
             <dt>Allow late submission reviews</dt>
             <dd>{{ assignment.lateSubmissionReviews }}</dd>
 
+            <dt>Block feedback for students who did not finish their reviews</dt>
+            <dd>{{ assignment.blockFeedback }}</dd>
+
+            <dt>Review Evaluation</dt>
+            <dd>{{ assignment.reviewEvaluation }}</dd>
+
             <div v-if="assignment.reviewEvaluation">
                 <dt>Review evaluation due date and time</dt>
                 <dd>{{ assignment.reviewEvaluationDueDate | formatDate }}</dd>
+
+                <dt>Allow late review evaluations</dt>
+                <dd>{{ assignment.lateReviewEvaluations }}</dd>
             </div>
 
-            <dt>Amount of peer reviews assigned per student</dt>
+            <dt>Number of peer reviews assigned per student</dt>
             <dd>{{ assignment.reviewsPerUser }}</dd>
 
             <dt>Allowed submission file extensions</dt>
