@@ -65,8 +65,10 @@ describe("Assignments", () => {
       .field("description", "Example description")
       .field("externalLink", "null")
       .field("submissionExtensions", ".pdf")
+      .field("blockFeedback", true)
       .field("lateSubmissions", true)
-      .field("lateSubmissionReviews", true);
+      .field("lateSubmissionReviews", true)
+      .field("submissionExtensions", "null");
 
     expect(res2.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res2.text)).toMatchObject({
