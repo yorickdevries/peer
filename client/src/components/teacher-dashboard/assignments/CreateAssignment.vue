@@ -314,8 +314,8 @@ export default {
                 submissionExtensions: ".pdf",
                 lateSubmissions: true,
                 lateSubmissionReviews: true,
-                blockFeedback: true,
-                lateReviewEvaluations: true
+                lateReviewEvaluations: true,
+                blockFeedback: true
             },
             extensionTypes: [
                 { value: ".pdf", text: ".pdf" },
