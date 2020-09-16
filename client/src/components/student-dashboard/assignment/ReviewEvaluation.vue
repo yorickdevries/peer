@@ -39,7 +39,7 @@
                         @click="createEvaluation()"
                         variant="primary"
                         class="mt-2"
-                        :disabled="buttonDisabled || reviewEvaluationsAreReadOnly"
+                        :disabled="buttonDisabled || reviewsAreReadOnly"
                     >
                         I want to evaluate this review
                     </b-button>
@@ -86,7 +86,7 @@
             </b-col>
         </b-row>
 
-        <template v-if="userIsOwner && !reviewEvaluationsAreReadOnly">
+        <template v-if="userIsOwner && !reviewsAreReadOnly">
             <!--Save/Submit Buttons-->
             <b-card-body>
                 <div>
@@ -130,7 +130,7 @@
         <!--Form, load only when answers are available-->
         <b-card v-if="answers" no-body class="mt-3">
             <!--Title-->
-            <b-card-body v-if="userIsOwner && !reviewEvaluationsAreReadOnly">
+            <b-card-body v-if="userIsOwner && !reviewsAreReadOnly">
                 <h4>Review Evaluation</h4>
                 <h6 class="card-subtitle text-muted">
                     Evaluate the review you have gotten from one of your peers here.
@@ -266,7 +266,7 @@
                 </b-card-body>
             </b-card>
 
-            <template v-if="userIsOwner && !reviewEvaluationsAreReadOnly">
+            <template v-if="userIsOwner && !reviewsAreReadOnly">
                 <!--Save/Submit Buttons-->
                 <b-card-body>
                     <div>
@@ -345,7 +345,7 @@ import ReviewViewForEvaluation from "./ReviewViewForEvaluation"
 export default {
     mixins: [notifications],
     components: { ReviewViewForEvaluation, StarRating },
-    props: ["feedbackReviewId", "reviewEvaluationsAreReadOnly"],
+    props: ["feedbackReviewId", "reviewsAreReadOnly"],
     data() {
         return {
             // current user
@@ -398,7 +398,7 @@ export default {
             }
         },
         questionsCanBeChanged() {
-            return !(this.review.submitted || !this.userIsOwner || this.reviewEvaluationsAreReadOnly)
+            return !(this.review.submitted || !this.userIsOwner || this.reviewsAreReadOnly)
         }
     },
     async created() {

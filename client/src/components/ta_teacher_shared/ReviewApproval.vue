@@ -78,7 +78,7 @@
                             >
                                 <ReviewEvaluation
                                     :feedbackReviewId="review.id"
-                                    :reviewEvaluationsAreReadOnly="true"
+                                    :reviewsAreReadOnly="true"
                                 ></ReviewEvaluation>
                             </b-modal>
                         </b-col>

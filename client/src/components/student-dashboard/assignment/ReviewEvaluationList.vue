@@ -14,7 +14,7 @@
                         </template>
                         <ReviewEvaluation
                             :feedbackReviewId="review.id"
-                            :reviewEvaluationsAreReadOnly="!isReviewEvaluationActive"
+                            :reviewsAreReadOnly="!isReviewEvaluationActive"
                         ></ReviewEvaluation>
                     </b-tab>
                 </b-tabs>
