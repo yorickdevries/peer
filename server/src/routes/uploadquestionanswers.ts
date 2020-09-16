@@ -44,7 +44,7 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
   const assignment = await questionnaire.getAssignment();
   if (
     // is teacher
-    (await assignment.isTeacherInCourse(user)) ||
+    (await assignment.isTeacherOrTeachingAssistantInCourse(user)) ||
     // or reviwer
     (await review.isReviewer(user))
   ) {
