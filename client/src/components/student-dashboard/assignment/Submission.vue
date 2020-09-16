@@ -3,7 +3,7 @@
         <!--Submission Information-->
         <b-card header="Submission" class="h-100">
             <b-row>
-                <b-col cols="6">
+                <b-col>
                     <div v-if="submissions.length > 0">
                         <dt>These are the submission you have made:</dt>
                         <b-table
@@ -106,8 +106,9 @@
                         >
                     </b-modal>
                 </b-col>
-                <b-col cols="1"></b-col>
-                <b-col cols="5">
+            </b-row>
+            <b-row>
+                <b-col>
                     <dt>You can view your final submission here:</dt>
                     <div v-if="finalSubmission && finalSubmission.file.extension === '.pdf'">
                         <b-alert show variant="secondary">
@@ -186,6 +187,7 @@ export default {
             this.group = res.data
         },
         async fetchSubmissions() {
+            this.submissions = []
             const res = await api.assignments.getSubmissions(this.$route.params.assignmentId, this.group.id)
             this.submissions = res.data
         },

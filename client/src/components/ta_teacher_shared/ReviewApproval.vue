@@ -76,7 +76,10 @@
                                 size="lg"
                                 hide-footer
                             >
-                                <ReviewEvaluation :feedbackReviewId="review.id"></ReviewEvaluation>
+                                <ReviewEvaluation
+                                    :feedbackReviewId="review.id"
+                                    :reviewsAreReadOnly="true"
+                                ></ReviewEvaluation>
                             </b-modal>
                         </b-col>
                     </b-row>

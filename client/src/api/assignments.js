@@ -40,8 +40,10 @@ export default {
         externalLink,
         file,
         submissionExtensions,
+        blockFeedback,
         lateSubmissions,
-        lateSubmissionReviews
+        lateSubmissionReviews,
+        lateReviewEvaluations
     ) {
         // Create formData and append data
         const formData = new FormData()
@@ -54,11 +56,6 @@ export default {
         formData.append("dueDate", dueDate.toISOString())
         formData.append("reviewPublishDate", reviewPublishDate.toISOString())
         formData.append("reviewDueDate", reviewDueDate.toISOString())
-        if (reviewEvaluationDueDate) {
-            formData.append("reviewEvaluationDueDate", reviewEvaluationDueDate.toISOString())
-        } else {
-            formData.append("reviewEvaluationDueDate", null)
-        }
         if (!description) {
             description = null
         }
@@ -69,8 +66,16 @@ export default {
         formData.append("externalLink", externalLink)
         formData.append("file", file)
         formData.append("submissionExtensions", submissionExtensions)
+        formData.append("blockFeedback", blockFeedback)
         formData.append("lateSubmissions", lateSubmissions)
         formData.append("lateSubmissionReviews", lateSubmissionReviews)
+        if (reviewEvaluation) {
+            formData.append("reviewEvaluationDueDate", reviewEvaluationDueDate.toISOString())
+            formData.append("lateReviewEvaluations", lateReviewEvaluations)
+        } else {
+            formData.append("reviewEvaluationDueDate", null)
+            formData.append("lateReviewEvaluations", null)
+        }
         return client.post("assignments/", formData)
     },
     patch(
@@ -88,8 +93,10 @@ export default {
         externalLink,
         file,
         submissionExtensions,
+        blockFeedback,
         lateSubmissions,
-        lateSubmissionReviews
+        lateSubmissionReviews,
+        lateReviewEvaluations
     ) {
         // Create formData and append data
         const formData = new FormData()
@@ -101,11 +108,6 @@ export default {
         formData.append("dueDate", dueDate.toISOString())
         formData.append("reviewPublishDate", reviewPublishDate.toISOString())
         formData.append("reviewDueDate", reviewDueDate.toISOString())
-        if (reviewEvaluationDueDate) {
-            formData.append("reviewEvaluationDueDate", reviewEvaluationDueDate.toISOString())
-        } else {
-            formData.append("reviewEvaluationDueDate", null)
-        }
         if (!description) {
             description = null
         }
@@ -119,8 +121,16 @@ export default {
             formData.append("file", file)
         }
         formData.append("submissionExtensions", submissionExtensions)
+        formData.append("blockFeedback", blockFeedback)
         formData.append("lateSubmissions", lateSubmissions)
         formData.append("lateSubmissionReviews", lateSubmissionReviews)
+        if (reviewEvaluation) {
+            formData.append("reviewEvaluationDueDate", reviewEvaluationDueDate.toISOString())
+            formData.append("lateReviewEvaluations", lateReviewEvaluations)
+        } else {
+            formData.append("reviewEvaluationDueDate", null)
+            formData.append("lateReviewEvaluations", null)
+        }
         return client.patch(`assignments/${id}`, formData)
     },
     enroll(id) {

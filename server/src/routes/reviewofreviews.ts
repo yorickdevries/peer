@@ -96,10 +96,25 @@ router.patch(
     // get assignmentstate
     const questionnaire = await review.getQuestionnaire();
     const assignment = await questionnaire.getAssignment();
-    if (!moment().isBefore(assignment.reviewEvaluationDueDate)) {
+    if (
+      !assignment.lateReviewEvaluations &&
+      moment().isAfter(assignment.reviewEvaluationDueDate)
+    ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("The review evaluation deadline has passed");
+        .send(
+          "The due date for review evaluation has passed and late review evaluations are not allowed by the teacher"
+        );
+      return;
+    }
+    // Review cannot be changed (unsubmitted/flagged) in after the deadline when submitted
+    if (
+      moment().isAfter(assignment.reviewEvaluationDueDate) &&
+      review.submitted
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The due date for review evaluation has passed");
       return;
     }
     // set new values

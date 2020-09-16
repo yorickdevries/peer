@@ -154,7 +154,8 @@ export default {
             return (
                 this.isInFeedbackState &&
                 this.assignment.reviewEvaluation &&
-                new Date() < new Date(this.assignment.reviewEvaluationDueDate)
+                (this.assignment.lateReviewEvaluations ||
+                    new Date() < new Date(this.assignment.reviewEvaluationDueDate))
             )
         }
     },

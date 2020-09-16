@@ -35,7 +35,12 @@
                 <br />
                 <b>Note: Only one member of your group can evaluate this review.</b>
                 <div>
-                    <b-button @click="createEvaluation()" variant="primary" class="mt-2" :disabled="buttonDisabled">
+                    <b-button
+                        @click="createEvaluation()"
+                        variant="primary"
+                        class="mt-2"
+                        :disabled="buttonDisabled || reviewsAreReadOnly"
+                    >
                         I want to evaluate this review
                     </b-button>
                 </div>
@@ -81,7 +86,7 @@
             </b-col>
         </b-row>
 
-        <template v-if="!reviewsAreReadOnly">
+        <template v-if="userIsOwner && !reviewsAreReadOnly">
             <!--Save/Submit Buttons-->
             <b-card-body>
                 <div>
@@ -125,7 +130,7 @@
         <!--Form, load only when answers are available-->
         <b-card v-if="answers" no-body class="mt-3">
             <!--Title-->
-            <b-card-body v-if="!reviewsAreReadOnly">
+            <b-card-body v-if="userIsOwner && !reviewsAreReadOnly">
                 <h4>Review Evaluation</h4>
                 <h6 class="card-subtitle text-muted">
                     Evaluate the review you have gotten from one of your peers here.
@@ -159,7 +164,7 @@
                         :max-rows="15"
                         v-model="answers[question.id].answer"
                         @input="answers[question.id].changed = true"
-                        :readonly="review.submitted || reviewsAreReadOnly"
+                        :readonly="!questionsCanBeChanged"
                         required
                     />
 
@@ -170,7 +175,7 @@
                         @input="answers[question.id].answer !== null ? (answers[question.id].changed = true) : ''"
                         stacked
                         required
-                        :disabled="review.submitted || reviewsAreReadOnly"
+                        :disabled="!questionsCanBeChanged"
                     >
                         <b-form-radio v-for="option in question.options" :key="option.id" :value="option">{{
                             option.text
@@ -184,7 +189,7 @@
                         @input="answers[question.id].changed = true"
                         stacked
                         required
-                        :disabled="review.submitted || reviewsAreReadOnly"
+                        :disabled="!questionsCanBeChanged"
                     >
                         <b-form-checkbox v-for="option in question.options" :key="option.id" :value="option">{{
                             option.text
@@ -205,7 +210,7 @@
                         inline
                         :max-rating="question.range"
                         :show-rating="true"
-                        :read-only="review.submitted || reviewsAreReadOnly"
+                        :read-only="!questionsCanBeChanged"
                     />
 
                     <!-- UPLOAD QUESTION -->
@@ -232,7 +237,7 @@
                             :state="Boolean(answers[question.id].newAnswer)"
                             @input="answers[question.id].changed = Boolean(answers[question.id].newAnswer)"
                             :accept="`${question.extensions}`"
-                            :disabled="review.submitted || reviewsAreReadOnly"
+                            :disabled="!questionsCanBeChanged"
                         >
                         </b-form-file>
                     </b-form-group>
@@ -241,20 +246,27 @@
                     <!--Delete / Save Button-->
                     <b-button
                         :variant="(answers[question.id].exists ? 'danger' : 'outline-danger') + ' float-right'"
-                        :disabled="!answers[question.id].exists || review.submitted || buttonDisabled"
+                        :disabled="
+                            !answers[question.id].exists || review.submitted || buttonDisabled || !questionsCanBeChanged
+                        "
                         @click="deleteAnswer(question, answers[question.id])"
                         >Delete Answer</b-button
                     >
                     <b-button
                         :variant="(answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'"
-                        :disabled="!answers[question.id].changed || buttonDisabled"
+                        :disabled="
+                            !answers[question.id].changed ||
+                                review.submitted ||
+                                buttonDisabled ||
+                                !questionsCanBeChanged
+                        "
                         @click="saveAnswer(question, answers[question.id])"
                         >Save Answer</b-button
                     >
                 </b-card-body>
             </b-card>
 
-            <template v-if="!reviewsAreReadOnly">
+            <template v-if="userIsOwner && !reviewsAreReadOnly">
                 <!--Save/Submit Buttons-->
                 <b-card-body>
                     <div>
@@ -298,7 +310,7 @@
                         :ok-disabled="
                             buttonDisabled ||
                                 (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 &&
-                                    !this.review.flaggedByReviewer)
+                                    !review.flaggedByReviewer)
                         "
                         @ok="submitReview"
                     >
@@ -333,7 +345,7 @@ import ReviewViewForEvaluation from "./ReviewViewForEvaluation"
 export default {
     mixins: [notifications],
     components: { ReviewViewForEvaluation, StarRating },
-    props: ["feedbackReviewId"],
+    props: ["feedbackReviewId", "reviewsAreReadOnly"],
     data() {
         return {
             // current user
@@ -379,10 +391,14 @@ export default {
             return questionNumbersOfUnansweredNonOptionalQuestions
         },
         userIsOwner() {
-            return this.review.reviewerNetid === this.user.netid
+            if (this.review && this.user) {
+                return this.review.reviewerNetid === this.user.netid
+            } else {
+                return false
+            }
         },
-        reviewsAreReadOnly() {
-            return !this.userIsOwner
+        questionsCanBeChanged() {
+            return !(this.review.submitted || !this.userIsOwner || this.reviewsAreReadOnly)
         }
     },
     async created() {
