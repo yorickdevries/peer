@@ -245,30 +245,20 @@ export default {
                         } else {
                             annotationManager.registerEventListener(
                                 async function(event) {
-                                    if (event.type === "ANNOTATION_SELECTED" || event.type === "ANNOTATION_CLICKED") {
-                                        annotationManager.unselectAnnotation()
-                                    } else {
-                                        if (event.type === "ANNOTATION_ADDED") {
-                                            // not allowed, so directly deleting it
-                                            annotationManager.deleteAnnotations({ annotationIds: [event.data.id] })
-                                        }
-                                        izitoast.error({
-                                            title: "Error",
-                                            message: "Invalid action: " + event.type,
-                                            position: "bottomCenter"
-                                        })
+                                    if (event.type === "ANNOTATION_ADDED") {
+                                        // not allowed, so directly deleting it
+                                        annotationManager.deleteAnnotations({ annotationIds: [event.data.id] })
                                     }
+                                    izitoast.error({
+                                        title: "Error",
+                                        message: "Invalid action: " + event.type,
+                                        position: "bottomCenter"
+                                    })
                                 },
                                 {
                                     /* Pass the list of events in listenOn. */
                                     /* If no event is passed in listenOn, then all the annotation events will be received. */
-                                    listenOn: [
-                                        "ANNOTATION_ADDED",
-                                        "ANNOTATION_UPDATED",
-                                        "ANNOTATION_DELETED",
-                                        "ANNOTATION_SELECTED",
-                                        "ANNOTATION_CLICKED"
-                                    ]
+                                    listenOn: ["ANNOTATION_ADDED", "ANNOTATION_UPDATED", "ANNOTATION_DELETED"]
                                 }
                             )
                         }
