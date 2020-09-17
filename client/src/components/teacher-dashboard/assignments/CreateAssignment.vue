@@ -132,20 +132,32 @@
                                         ></datepicker>
                                         <b-form-input v-model="assignment.reviewDueTime" type="time" required>
                                         </b-form-input>
+                                        <br />
+                                        <b-alert
+                                            v-if="!assignment.lateSubmissionReviews || !assignment.blockFeedback"
+                                            variant="danger"
+                                            show
+                                            >It is advised to enable late submission reviews and blocking of feedback as
+                                            this encourages students to more actively make reviews.</b-alert
+                                        >
                                         <b-form-checkbox v-model="assignment.lateSubmissionReviews">
-                                            Allow late submission reviews after the deadline
+                                            Allow late submission reviews indefinetely after the deadline
                                             <b-badge
                                                 v-b-tooltip.hover
-                                                title="Students can finish any unfinished reviews after the deadline. Students with unfinished reviews cannot access their feedback and are thereby motivated to finish reviews when they are late."
+                                                title="Students can finish any unsubmitted reviews any time after the deadline. When feedback is open, submitted reviews cannot be unsubmitted anymore."
                                                 variant="primary"
                                                 >?</b-badge
                                             >
                                         </b-form-checkbox>
-                                        <b-alert v-if="!assignment.lateSubmissionReviews" variant="danger" show
-                                            >It is advised to enable late submission reviews because students are only
-                                            allowed to access any feedback when they have submitted all their
-                                            reviews.</b-alert
-                                        >
+                                        <b-form-checkbox v-model="assignment.blockFeedback">
+                                            Block feedback for students who did not finish their reviews
+                                            <b-badge
+                                                v-b-tooltip.hover
+                                                title="Students are only allowed to access any feedback when they have submitted all their reviews."
+                                                variant="primary"
+                                                >?</b-badge
+                                            >
+                                        </b-form-checkbox>
                                     </b-form-group>
                                 </b-col>
                             </b-row>
@@ -180,8 +192,8 @@
                             >
                                 <b-alert v-if="assignment.submissionExtensions !== '.pdf'" variant="danger" show>
                                     It is advised to choose '.pdf' as extension because only those files can be directly
-                                    annotated within this website. This is a new experimental feature, the students can
-                                    always download the submission files as well.
+                                    annotated within this website. This is a new experimental feature and some pdf's
+                                    might not render, but the students can always download the submission files as well.
                                 </b-alert>
                                 <b-form-select
                                     :options="extensionTypes"
@@ -230,10 +242,6 @@
                                         </b-form-checkbox>
                                     </b-form-group>
                                     <b-form-group v-if="assignment.reviewEvaluation">
-                                        <b-alert variant="warning" show>
-                                            NOTE: This is a hard deadline for students to be able to make review
-                                            evaluations
-                                        </b-alert>
                                         <template slot="label"
                                             >Review evaluation due date and time
                                             <b-badge
@@ -249,6 +257,15 @@
                                         ></datepicker>
                                         <b-form-input v-model="assignment.reviewEvaluationDueTime" type="time">
                                         </b-form-input>
+                                        <b-form-checkbox v-model="assignment.lateReviewEvaluations">
+                                            Allow late review evaluations indefinetely after the deadline
+                                            <b-badge
+                                                v-b-tooltip.hover
+                                                title="Students can finish any unsubmitted review evaluations any time after the deadline. After the deadline, submitted reviews cannot be unsubmitted anymore."
+                                                variant="primary"
+                                                >?</b-badge
+                                            >
+                                        </b-form-checkbox>
                                     </b-form-group>
                                 </b-col>
                                 <b-col></b-col>
@@ -295,8 +312,10 @@ export default {
                 file: null,
                 externalLink: null,
                 submissionExtensions: ".pdf",
+                blockFeedback: true,
                 lateSubmissions: true,
-                lateSubmissionReviews: true
+                lateSubmissionReviews: true,
+                lateReviewEvaluations: true
             },
             extensionTypes: [
                 { value: ".pdf", text: ".pdf" },
@@ -374,8 +393,10 @@ export default {
                     this.assignment.externalLink,
                     this.assignment.file,
                     this.assignment.submissionExtensions,
+                    this.assignment.blockFeedback,
                     this.assignment.lateSubmissions,
-                    this.assignment.lateSubmissionReviews
+                    this.assignment.lateSubmissionReviews,
+                    this.assignment.lateReviewEvaluations
                 )
                 this.showSuccessMessage({ message: "Assignment was successfully created" })
                 this.$router.push({

@@ -44,7 +44,7 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
   const assignment = await questionnaire.getAssignment();
   if (
     // is teacher
-    (await assignment.isTeacherInCourse(user)) ||
+    (await assignment.isTeacherOrTeachingAssistantInCourse(user)) ||
     // or reviwer
     (await review.isReviewer(user))
   ) {
@@ -56,10 +56,21 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
     return;
   }
   if (
-    assignment.isAtState(AssignmentState.FEEDBACK) &&
     (await review.isReviewed(user)) &&
+    assignment.isAtState(AssignmentState.FEEDBACK) &&
     review.submitted
   ) {
+    if (
+      assignment.blockFeedback &&
+      (await questionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "One of youre reviews isn't submitted, you are not allowed to see feedback"
+        );
+      return;
+    }
     // get the file
     const file = uploadQuestionAnswer.uploadAnswer;
     const fileName = file.getAnonymousFileNamewithExtension();
@@ -127,18 +138,6 @@ router.post(
     }
     const assignment = await questionnaire.getAssignment();
     if (
-      questionnaire instanceof ReviewQuestionnaire &&
-      !(
-        assignment.isAtState(AssignmentState.FEEDBACK) &&
-        moment().isBefore(assignment.reviewEvaluationDueDate)
-      )
-    ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The reviewevaluation is passed");
-      return;
-    }
-    if (
       questionnaire instanceof SubmissionQuestionnaire &&
       !assignment.lateSubmissionReviews &&
       moment().isAfter(assignment.reviewDueDate)
@@ -147,6 +146,18 @@ router.post(
         .status(HttpStatusCode.FORBIDDEN)
         .send(
           "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+        );
+      return;
+    }
+    if (
+      questionnaire instanceof ReviewQuestionnaire &&
+      !assignment.lateReviewEvaluations &&
+      moment().isAfter(assignment.reviewEvaluationDueDate)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The due date for review evaluation has passed and late review evaluations are not allowed by the teacher"
         );
       return;
     }
@@ -258,18 +269,6 @@ router.delete(
     const questionnaire = await review.getQuestionnaire();
     const assignment = await questionnaire.getAssignment();
     if (
-      questionnaire instanceof ReviewQuestionnaire &&
-      !(
-        assignment.isAtState(AssignmentState.FEEDBACK) &&
-        moment().isBefore(assignment.reviewEvaluationDueDate)
-      )
-    ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The reviewevaluation is passed");
-      return;
-    }
-    if (
       questionnaire instanceof SubmissionQuestionnaire &&
       !assignment.lateSubmissionReviews &&
       moment().isAfter(assignment.reviewDueDate)
@@ -278,6 +277,18 @@ router.delete(
         .status(HttpStatusCode.FORBIDDEN)
         .send(
           "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+        );
+      return;
+    }
+    if (
+      questionnaire instanceof ReviewQuestionnaire &&
+      !assignment.lateReviewEvaluations &&
+      moment().isAfter(assignment.reviewEvaluationDueDate)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The due date for review evaluation has passed and late review evaluations are not allowed by the teacher"
         );
       return;
     }

@@ -267,8 +267,10 @@ const assignmentSchema = Joi.object({
   submissionExtensions: Joi.string()
     .valid(...Object.values(Extensions))
     .required(),
+  blockFeedback: Joi.boolean().required(),
   lateSubmissions: Joi.boolean().required(),
   lateSubmissionReviews: Joi.boolean().required(),
+  lateReviewEvaluations: Joi.boolean().allow(null).required(),
 });
 // post an assignment in a course
 router.post(
@@ -310,8 +312,10 @@ router.post(
       null, // submissionQuestionnaire (initially empty)
       null, // reviewQuestionnaire (initially empty)
       req.body.submissionExtensions,
+      req.body.blockFeedback,
       req.body.lateSubmissions,
-      req.body.lateSubmissionReviews
+      req.body.lateSubmissionReviews,
+      req.body.lateReviewEvaluations
     );
 
     // construct file to be saved in transaction
@@ -373,8 +377,10 @@ const assignmentPatchSchema = Joi.object({
   submissionExtensions: Joi.string()
     .valid(...Object.values(Extensions))
     .required(),
+  blockFeedback: Joi.boolean().required(),
   lateSubmissions: Joi.boolean().required(),
   lateSubmissionReviews: Joi.boolean().required(),
+  lateReviewEvaluations: Joi.boolean().allow(null).required(),
 });
 // patch an assignment in a course
 router.patch(
@@ -495,8 +501,10 @@ router.patch(
         assignment.description = req.body.description;
         assignment.externalLink = req.body.externalLink;
         assignment.submissionExtensions = req.body.submissionExtensions;
+        assignment.blockFeedback = req.body.blockFeedback;
         assignment.lateSubmissions = req.body.lateSubmissions;
         assignment.lateSubmissionReviews = req.body.lateSubmissionReviews;
+        assignment.lateReviewEvaluations = req.body.lateReviewEvaluations;
 
         // change the file in case it is not undefined
         if (newFile !== undefined) {

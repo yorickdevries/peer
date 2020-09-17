@@ -57,8 +57,10 @@ describe("Group import", () => {
       .field("description", "Example description")
       .field("externalLink", "null")
       .field("submissionExtensions", ".pdf")
+      .field("blockFeedback", true)
       .field("lateSubmissions", true)
-      .field("lateSubmissionReviews", true);
+      .field("lateSubmissionReviews", true)
+      .field("lateReviewEvaluations", "null");
     assignmentId = JSON.parse(res2.text).id;
 
     // set date to the moment that the assignment is published

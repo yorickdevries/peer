@@ -84,7 +84,10 @@ router.get("/", validateQuery(getAnnotationSchema), async (req, res) => {
     assignment.isAtState(AssignmentState.FEEDBACK) &&
     review.submitted
   ) {
-    if (await questionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(user)) {
+    if (
+      assignment.blockFeedback &&
+      (await questionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(user))
+    ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send(

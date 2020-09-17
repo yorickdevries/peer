@@ -212,8 +212,10 @@ describe("Integration", () => {
       .field("description", "Example description")
       .field("externalLink", "null")
       .field("submissionExtensions", ".pdf")
+      .field("blockFeedback", true)
       .field("lateSubmissions", true)
-      .field("lateSubmissionReviews", true);
+      .field("lateSubmissionReviews", true)
+      .field("lateReviewEvaluations", false);
     expect(res.status).toBe(HttpStatusCode.OK);
     let assignment = JSON.parse(res.text);
     expect(assignment).toMatchObject({

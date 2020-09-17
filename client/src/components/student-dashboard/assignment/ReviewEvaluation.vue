@@ -35,7 +35,12 @@
                 <br />
                 <b>Note: Only one member of your group can evaluate this review.</b>
                 <div>
-                    <b-button @click="createEvaluation()" variant="primary" class="mt-2" :disabled="buttonDisabled">
+                    <b-button
+                        @click="createEvaluation()"
+                        variant="primary"
+                        class="mt-2"
+                        :disabled="buttonDisabled || reviewsAreReadOnly"
+                    >
                         I want to evaluate this review
                     </b-button>
                 </div>
@@ -81,49 +86,56 @@
             </b-col>
         </b-row>
 
+        <template v-if="userIsOwner && !reviewsAreReadOnly">
+            <!--Save/Submit Buttons-->
+            <b-card-body>
+                <div>
+                    <b-form-checkbox
+                        :disabled="review.submitted"
+                        v-model="review.flaggedByReviewer"
+                        name="reportButton"
+                        class="float-left"
+                    >
+                        Report this review.
+                    </b-form-checkbox>
+                    <br />
+                    <small>Only report if the review is empty or not serious.</small>
+                </div>
+                <b-button
+                    v-if="!review.submitted"
+                    variant="success float-right"
+                    type="submit"
+                    v-b-modal="`submit${review.id}`"
+                    :disabled="buttonDisabled"
+                    >Submit Review</b-button
+                >
+                <b-button
+                    v-else
+                    variant="outline-success float-right"
+                    @click="unSubmitReview"
+                    :disabled="buttonDisabled"
+                    >Unsubmit Review</b-button
+                >
+                <b-button
+                    v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                    variant="info float-right"
+                    @click="saveAllAnswers"
+                    :disabled="buttonDisabled"
+                    >Save all unsaved answers</b-button
+                >
+            </b-card-body>
+        </template>
+        <br />
+
         <!--Form, load only when answers are available-->
         <b-card v-if="answers" no-body class="mt-3">
             <!--Title-->
-            <b-card-body v-if="!reviewsAreReadOnly">
+            <b-card-body v-if="userIsOwner && !reviewsAreReadOnly">
                 <h4>Review Evaluation</h4>
                 <h6 class="card-subtitle text-muted">
                     Evaluate the review you have gotten from one of your peers here.
                 </h6>
             </b-card-body>
-
-            <template v-if="!reviewsAreReadOnly">
-                <!--Save/Submit Buttons-->
-                <b-card-body>
-                    <div>
-                        <b-form-checkbox
-                            :disabled="review.submitted"
-                            v-model="review.flaggedByReviewer"
-                            name="reportButton"
-                            class="float-left"
-                        >
-                            Report this review.
-                        </b-form-checkbox>
-                        <br />
-                        <small>Only report if the review is empty or not serious.</small>
-                    </div>
-                    <b-button
-                        v-if="!review.submitted"
-                        variant="success float-right"
-                        type="submit"
-                        v-b-modal="`submit${review.id}`"
-                        :disabled="buttonDisabled"
-                        >Submit Review</b-button
-                    >
-                    <b-button
-                        v-else
-                        variant="outline-success float-right"
-                        @click="unSubmitReview"
-                        :disabled="buttonDisabled"
-                        >Unsubmit Review</b-button
-                    >
-                </b-card-body>
-            </template>
-            <br />
 
             <!--Question Information-->
             <b-card v-for="question in questionnaire.questions" :key="question.id" class="mb-3" no-body>
@@ -152,7 +164,7 @@
                         :max-rows="15"
                         v-model="answers[question.id].answer"
                         @input="answers[question.id].changed = true"
-                        :readonly="review.submitted || reviewsAreReadOnly"
+                        :readonly="!questionsCanBeChanged"
                         required
                     />
 
@@ -160,10 +172,10 @@
                     <b-form-radio-group
                         v-if="question.type === 'multiplechoice'"
                         v-model="answers[question.id].answer"
-                        @input="answers[question.id].changed = true"
+                        @input="answers[question.id].answer !== null ? (answers[question.id].changed = true) : ''"
                         stacked
                         required
-                        :disabled="review.submitted || reviewsAreReadOnly"
+                        :disabled="!questionsCanBeChanged"
                     >
                         <b-form-radio v-for="option in question.options" :key="option.id" :value="option">{{
                             option.text
@@ -177,7 +189,7 @@
                         @input="answers[question.id].changed = true"
                         stacked
                         required
-                        :disabled="review.submitted || reviewsAreReadOnly"
+                        :disabled="!questionsCanBeChanged"
                     >
                         <b-form-checkbox v-for="option in question.options" :key="option.id" :value="option">{{
                             option.text
@@ -198,7 +210,7 @@
                         inline
                         :max-rating="question.range"
                         :show-rating="true"
-                        :read-only="review.submitted || reviewsAreReadOnly"
+                        :read-only="!questionsCanBeChanged"
                     />
 
                     <!-- UPLOAD QUESTION -->
@@ -225,7 +237,7 @@
                             :state="Boolean(answers[question.id].newAnswer)"
                             @input="answers[question.id].changed = Boolean(answers[question.id].newAnswer)"
                             :accept="`${question.extensions}`"
-                            :disabled="review.submitted || reviewsAreReadOnly"
+                            :disabled="!questionsCanBeChanged"
                         >
                         </b-form-file>
                     </b-form-group>
@@ -234,20 +246,27 @@
                     <!--Delete / Save Button-->
                     <b-button
                         :variant="(answers[question.id].exists ? 'danger' : 'outline-danger') + ' float-right'"
-                        :disabled="!answers[question.id].exists || review.submitted || buttonDisabled"
+                        :disabled="
+                            !answers[question.id].exists || review.submitted || buttonDisabled || !questionsCanBeChanged
+                        "
                         @click="deleteAnswer(question, answers[question.id])"
                         >Delete Answer</b-button
                     >
                     <b-button
                         :variant="(answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'"
-                        :disabled="!answers[question.id].changed || buttonDisabled"
+                        :disabled="
+                            !answers[question.id].changed ||
+                                review.submitted ||
+                                buttonDisabled ||
+                                !questionsCanBeChanged
+                        "
                         @click="saveAnswer(question, answers[question.id])"
                         >Save Answer</b-button
                     >
                 </b-card-body>
             </b-card>
 
-            <template v-if="!reviewsAreReadOnly">
+            <template v-if="userIsOwner && !reviewsAreReadOnly">
                 <!--Save/Submit Buttons-->
                 <b-card-body>
                     <div>
@@ -277,15 +296,35 @@
                         :disabled="buttonDisabled"
                         >Unsubmit Review</b-button
                     >
+                    <b-button
+                        v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                        variant="info float-right"
+                        @click="saveAllAnswers"
+                        :disabled="buttonDisabled"
+                        >Save all unsaved answers</b-button
+                    >
                     <!--Submit Modal-->
                     <b-modal
                         :id="`submit${review.id}`"
                         title="Submit Confirmation"
-                        :disabled="buttonDisabled"
+                        :ok-disabled="
+                            buttonDisabled ||
+                                (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 &&
+                                    !review.flaggedByReviewer)
+                        "
                         @ok="submitReview"
                     >
-                        <b-alert v-if="unSavedAnswers" show variant="warning" class="p-2"
-                            >There are one or more unsaved answers</b-alert
+                        <b-alert v-if="questionNumbersOfUnsavedAnswers.length > 0" show variant="warning" class="p-2"
+                            >There are one or more unsaved answers for the following questions:
+                            {{ questionNumbersOfUnsavedAnswers }}</b-alert
+                        >
+                        <b-alert
+                            v-if="questionNumbersOfUnansweredNonOptionalQuestions.length > 0"
+                            show
+                            variant="danger"
+                            class="p-2"
+                            >There are one or more answers missing for the following non-optional questions:
+                            {{ questionNumbersOfUnansweredNonOptionalQuestions }}</b-alert
                         >
                         Do you really want to submit? This marks the review as finished and all unsaved changes will be
                         discarded.
@@ -306,7 +345,7 @@ import ReviewViewForEvaluation from "./ReviewViewForEvaluation"
 export default {
     mixins: [notifications],
     components: { ReviewViewForEvaluation, StarRating },
-    props: ["feedbackReviewId"],
+    props: ["feedbackReviewId", "reviewsAreReadOnly"],
     data() {
         return {
             // current user
@@ -321,20 +360,45 @@ export default {
         }
     },
     computed: {
-        unSavedAnswers() {
+        questionNumbersOfUnsavedAnswers() {
+            const questionNumbersOfUnsavedAnswers = []
             if (!this.answers) {
-                return false
+                return questionNumbersOfUnsavedAnswers
             }
-            const unSavedAnswers = _.filter(this.answers, answer => {
-                return answer.changed
-            })
-            return unSavedAnswers.length > 0
+            for (const questionId in this.answers) {
+                const answer = this.answers[questionId]
+                if (answer.changed) {
+                    const question = this.getQuestion(questionId)
+                    questionNumbersOfUnsavedAnswers.push(question.number)
+                }
+            }
+            questionNumbersOfUnsavedAnswers.sort()
+            return questionNumbersOfUnsavedAnswers
+        },
+        questionNumbersOfUnansweredNonOptionalQuestions() {
+            const questionNumbersOfUnansweredNonOptionalQuestions = []
+            if (!this.answers) {
+                return questionNumbersOfUnansweredNonOptionalQuestions
+            }
+            for (const questionId in this.answers) {
+                const answer = this.answers[questionId]
+                const question = this.getQuestion(questionId)
+                if (!answer.exists && !question.optional) {
+                    questionNumbersOfUnansweredNonOptionalQuestions.push(question.number)
+                }
+            }
+            questionNumbersOfUnansweredNonOptionalQuestions.sort()
+            return questionNumbersOfUnansweredNonOptionalQuestions
         },
         userIsOwner() {
-            return this.review.reviewerNetid === this.user.netid
+            if (this.review && this.user) {
+                return this.review.reviewerNetid === this.user.netid
+            } else {
+                return false
+            }
         },
-        reviewsAreReadOnly() {
-            return !this.userIsOwner
+        questionsCanBeChanged() {
+            return !(this.review.submitted || !this.userIsOwner || this.reviewsAreReadOnly)
         }
     },
     async created() {
@@ -426,6 +490,11 @@ export default {
                 this.buttonDisabled = false
             }
         },
+        getQuestion(questionId) {
+            return _.find(this.questionnaire.questions, question => {
+                return question.id === parseInt(questionId)
+            })
+        },
         async saveAnswer(question, answer) {
             this.buttonDisabled = true
             try {
@@ -498,6 +567,22 @@ export default {
                 this.showSuccessMessage({ message: "Succesfuly deleted answer" })
             } catch (error) {
                 this.showErrorMessage({ message: error })
+            }
+            this.buttonDisabled = false
+        },
+        async saveAllAnswers() {
+            this.buttonDisabled = true
+            for (const questionId in this.answers) {
+                const answer = this.answers[questionId]
+                if (answer.changed) {
+                    const question = this.getQuestion(questionId)
+                    try {
+                        await this.saveAnswer(question, answer)
+                    } finally {
+                        // saving answer enables the button, so it will be disabled again
+                        this.buttonDisabled = true
+                    }
+                }
             }
             this.buttonDisabled = false
         },

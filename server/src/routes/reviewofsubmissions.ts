@@ -625,10 +625,17 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   if (
     !(
       (await review.isReviewed(user)) &&
+      !(
+        assignment.blockFeedback &&
+        (await submissionQuestionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(
+          user
+        ))
+      ) &&
       assignment.isAtState(AssignmentState.FEEDBACK) &&
       review.submitted &&
       assignment.reviewEvaluation &&
-      moment().isBefore(assignment.reviewEvaluationDueDate)
+      (assignment.lateReviewEvaluations ||
+        !moment().isAfter(assignment.reviewEvaluationDueDate))
     )
   ) {
     res

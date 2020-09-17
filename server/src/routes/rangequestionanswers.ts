@@ -5,7 +5,6 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import RangeQuestion from "../models/RangeQuestion";
 import ResponseMessage from "../enum/ResponseMessage";
 import Review from "../models/Review";
-import { AssignmentState } from "../enum/AssignmentState";
 import RangeQuestionAnswer from "../models/RangeQuestionAnswer";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
@@ -60,16 +59,6 @@ router.post("/", validateBody(rangeAnswerSchema), async (req, res) => {
   }
   const assignment = await questionnaire.getAssignment();
   if (
-    questionnaire instanceof ReviewQuestionnaire &&
-    !(
-      assignment.isAtState(AssignmentState.FEEDBACK) &&
-      moment().isBefore(assignment.reviewEvaluationDueDate)
-    )
-  ) {
-    res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
-    return;
-  }
-  if (
     questionnaire instanceof SubmissionQuestionnaire &&
     !assignment.lateSubmissionReviews &&
     moment().isAfter(assignment.reviewDueDate)
@@ -78,6 +67,18 @@ router.post("/", validateBody(rangeAnswerSchema), async (req, res) => {
       .status(HttpStatusCode.FORBIDDEN)
       .send(
         "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+      );
+    return;
+  }
+  if (
+    questionnaire instanceof ReviewQuestionnaire &&
+    !assignment.lateReviewEvaluations &&
+    moment().isAfter(assignment.reviewEvaluationDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for review evaluation has passed and late review evaluations are not allowed by the teacher"
       );
     return;
   }
@@ -151,16 +152,6 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
   if (
-    questionnaire instanceof ReviewQuestionnaire &&
-    !(
-      assignment.isAtState(AssignmentState.FEEDBACK) &&
-      moment().isBefore(assignment.reviewEvaluationDueDate)
-    )
-  ) {
-    res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
-    return;
-  }
-  if (
     questionnaire instanceof SubmissionQuestionnaire &&
     !assignment.lateSubmissionReviews &&
     moment().isAfter(assignment.reviewDueDate)
@@ -169,6 +160,18 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
       .status(HttpStatusCode.FORBIDDEN)
       .send(
         "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+      );
+    return;
+  }
+  if (
+    questionnaire instanceof ReviewQuestionnaire &&
+    !assignment.lateReviewEvaluations &&
+    moment().isAfter(assignment.reviewEvaluationDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for review evaluation has passed and late review evaluations are not allowed by the teacher"
       );
     return;
   }

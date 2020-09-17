@@ -17,7 +17,7 @@
                         <b-row>
                             <!--Side-bar for questions -->
                             <b-col class="pl-0">
-                                <b-list-group>
+                                <b-list-group style="max-height: 1000px; overflow-y: auto">
                                     <b-list-group-item
                                         v-for="questionnaireQuestion in questionnaire.questions"
                                         :key="questionnaireQuestion.id"
@@ -196,6 +196,10 @@ export default {
             await this.fetchSubmissionQuestionnaire()
             await this.fetchFeedbackReviews()
             await this.aggregateFeedback()
+            // automatically open first question
+            if (this.questionnaire.questions.length !== 0) {
+                this.question = this.questionnaire.questions[0]
+            }
         },
         async fetchAssignment() {
             // Fetch the assignment information.

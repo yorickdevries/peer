@@ -1,9 +1,9 @@
 <template>
     <b-container fluid class="px-0">
-        <b-row>
-            <b-col>
-                <!--Submission Information-->
-                <b-card header="Submission" class="h-100">
+        <!--Submission Information-->
+        <b-card header="Submission" class="h-100">
+            <b-row>
+                <b-col>
                     <div v-if="submissions.length > 0">
                         <dt>These are the submission you have made:</dt>
                         <b-table
@@ -105,18 +105,38 @@
                             >Upload</b-button
                         >
                     </b-modal>
-                </b-card>
-            </b-col>
-        </b-row>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col>
+                    <dt>You can view your final submission here:</dt>
+                    <div v-if="finalSubmission && finalSubmission.file.extension === '.pdf'">
+                        <b-alert show variant="secondary">
+                            In case the viewer shows any errors, your .pdf is malformed and no pdf annotations can be
+                            made by your reviewers in the browser</b-alert
+                        >
+                        <PDFAnnotator :submissionId="finalSubmission.id" :readOnly="true"></PDFAnnotator>
+                    </div>
+                    <div>
+                        <b-alert show variant="secondary">
+                            Your final submission is not a .pdf file, so it will not be rendered in the browser</b-alert
+                        >
+                    </div>
+                </b-col>
+            </b-row>
+        </b-card>
     </b-container>
 </template>
 
 <script>
 import api from "../../../api/api"
+import _ from "lodash"
+import PDFAnnotator from "./PDFAnnotator"
 import notifications from "../../../mixins/notifications"
 
 export default {
     mixins: [notifications],
+    components: { PDFAnnotator },
     data() {
         return {
             assignment: {},
@@ -144,6 +164,11 @@ export default {
                 // either late submission must be enabled or the due date should not have been passed
                 (this.assignment.lateSubmissions || new Date() < new Date(this.assignment.dueDate))
             )
+        },
+        finalSubmission() {
+            return _.find(this.submissions, submission => {
+                return submission.final
+            })
         }
     },
     async created() {
@@ -162,6 +187,7 @@ export default {
             this.group = res.data
         },
         async fetchSubmissions() {
+            this.submissions = []
             const res = await api.assignments.getSubmissions(this.$route.params.assignmentId, this.group.id)
             this.submissions = res.data
         },

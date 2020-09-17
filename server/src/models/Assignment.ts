@@ -155,6 +155,12 @@ export default class Assignment extends BaseModel {
   @Column()
   @IsDefined()
   @IsBoolean()
+  // indicates whether feedback should be blocked for students with unsubmitted reviews
+  blockFeedback: boolean;
+
+  @Column()
+  @IsDefined()
+  @IsBoolean()
   // enables making submissions after the due date
   lateSubmissions: boolean;
 
@@ -163,6 +169,12 @@ export default class Assignment extends BaseModel {
   @IsBoolean()
   // enables making submissionreviews after the due date
   lateSubmissionReviews: boolean;
+
+  @Column("boolean", { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  // enables making review evaluations after the due date
+  lateReviewEvaluations: boolean | null;
 
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
@@ -206,8 +218,10 @@ export default class Assignment extends BaseModel {
     submissionQuestionnaire: SubmissionQuestionnaire | null,
     reviewQuestionnaire: ReviewQuestionnaire | null,
     submissionExtensions: Extensions,
+    blockFeedback: boolean,
     lateSubmissions: boolean,
-    lateSubmissionReviews: boolean
+    lateSubmissionReviews: boolean,
+    lateReviewEvaluations: boolean | null
   ) {
     super();
     this.name = name;
@@ -227,17 +241,27 @@ export default class Assignment extends BaseModel {
     this.submissionQuestionnaire = submissionQuestionnaire;
     this.reviewQuestionnaire = reviewQuestionnaire;
     this.submissionExtensions = submissionExtensions;
+    this.blockFeedback = blockFeedback;
     this.lateSubmissions = lateSubmissions;
     this.lateSubmissionReviews = lateSubmissionReviews;
+    this.lateReviewEvaluations = lateReviewEvaluations;
   }
 
   // custom validation which is run before saving
   validateOrReject(): Promise<void> {
     // check whether the boolean is correctly set
-    if (this.reviewEvaluation && !this.reviewEvaluationDueDate) {
-      throw new Error("reviewEvaluationDueDate must be defined");
+    if (
+      this.reviewEvaluation &&
+      (!this.reviewEvaluationDueDate || this.lateReviewEvaluations === null)
+    ) {
+      throw new Error(
+        "reviewEvaluationDueDate/lateReviewEvaluations must be defined"
+      );
     }
-    if (!this.reviewEvaluation && this.reviewEvaluationDueDate) {
+    if (
+      !this.reviewEvaluation &&
+      (this.reviewEvaluationDueDate || this.lateReviewEvaluations !== null)
+    ) {
       throw new Error(
         "reviewEvaluationDueDate is defined while reviewEvaluation is turned off"
       );

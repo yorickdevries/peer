@@ -38,12 +38,53 @@
         <b-row>
             <b-col>
                 <PDFAnnotator
-                    v-if="fileMetadata.extension === '.pdf'"
-                    :reviewId="reviewId"
+                    v-if="viewPDF && fileMetadata.extension === '.pdf'"
+                    :reviewId="review.id"
                     :readOnly="false"
                 ></PDFAnnotator>
             </b-col>
         </b-row>
+        <br />
+        <template v-if="!reviewsAreReadOnly">
+            <!--Save/Submit Buttons-->
+            <b-card-body>
+                <div>
+                    <b-form-checkbox
+                        :disabled="review.submitted"
+                        v-model="review.flaggedByReviewer"
+                        name="reportButton"
+                        class="float-left"
+                    >
+                        Report this submission.
+                    </b-form-checkbox>
+                    <br />
+                    <small>Only report if the submission is empty or not serious.</small>
+                </div>
+                <b-button
+                    v-if="!review.submitted"
+                    variant="success float-right"
+                    type="submit"
+                    v-b-modal="`submit${review.id}`"
+                    :disabled="buttonDisabled"
+                    >Submit Review</b-button
+                >
+                <b-button
+                    v-else
+                    variant="outline-success float-right"
+                    @click="unSubmitReview"
+                    :disabled="buttonDisabled"
+                    >Unsubmit Review</b-button
+                >
+                <b-button
+                    v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                    variant="info float-right"
+                    @click="saveAllAnswers"
+                    :disabled="buttonDisabled"
+                    >Save all unsaved answers</b-button
+                >
+            </b-card-body>
+        </template>
+        <br />
 
         <!--Form, load only when answers are available-->
         <b-card v-if="answers" no-body class="mt-3">
@@ -88,7 +129,7 @@
                     <b-form-radio-group
                         v-if="question.type === 'multiplechoice'"
                         v-model="answers[question.id].answer"
-                        @input="answers[question.id].changed = true"
+                        @input="answers[question.id].answer !== null ? (answers[question.id].changed = true) : ''"
                         stacked
                         required
                         :disabled="review.submitted || reviewsAreReadOnly"
@@ -162,13 +203,13 @@
                     <!--Delete / Save Button-->
                     <b-button
                         :variant="(answers[question.id].exists ? 'danger' : 'outline-danger') + ' float-right'"
-                        :disabled="!answers[question.id].exists || review.submitted"
+                        :disabled="!answers[question.id].exists || review.submitted || buttonDisabled"
                         @click="deleteAnswer(question, answers[question.id])"
                         >Delete Answer</b-button
                     >
                     <b-button
                         :variant="(answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'"
-                        :disabled="!answers[question.id].changed"
+                        :disabled="!answers[question.id].changed || review.submitted || buttonDisabled"
                         @click="saveAnswer(question, answers[question.id])"
                         >Save Answer</b-button
                     >
@@ -195,15 +236,45 @@
                         variant="success float-right"
                         type="submit"
                         v-b-modal="`submit${review.id}`"
+                        :disabled="buttonDisabled"
                         >Submit Review</b-button
                     >
-                    <b-button v-else variant="outline-success float-right" @click="unSubmitReview"
+                    <b-button
+                        v-else
+                        variant="outline-success float-right"
+                        @click="unSubmitReview"
+                        :disabled="buttonDisabled"
                         >Unsubmit Review</b-button
                     >
+                    <b-button
+                        v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                        variant="info float-right"
+                        @click="saveAllAnswers"
+                        :disabled="buttonDisabled"
+                        >Save all unsaved answers</b-button
+                    >
                     <!--Submit Modal-->
-                    <b-modal :id="`submit${review.id}`" title="Submit Confirmation" @ok="submitReview">
-                        <b-alert v-if="unSavedAnswers" show variant="warning" class="p-2"
-                            >There are one or more unsaved answers</b-alert
+                    <b-modal
+                        :id="`submit${review.id}`"
+                        title="Submit Confirmation"
+                        :ok-disabled="
+                            buttonDisabled ||
+                                (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 &&
+                                    !review.flaggedByReviewer)
+                        "
+                        @ok="submitReview"
+                    >
+                        <b-alert v-if="questionNumbersOfUnsavedAnswers.length > 0" show variant="warning" class="p-2"
+                            >There are one or more unsaved answers for the following questions:
+                            {{ questionNumbersOfUnsavedAnswers }}</b-alert
+                        >
+                        <b-alert
+                            v-if="questionNumbersOfUnansweredNonOptionalQuestions.length > 0"
+                            show
+                            variant="danger"
+                            class="p-2"
+                            >There are one or more answers missing for the following non-optional questions:
+                            {{ questionNumbersOfUnansweredNonOptionalQuestions }}</b-alert
                         >
                         Do you really want to submit? This marks the review as finished and all unsaved changes will be
                         discarded.
@@ -229,27 +300,56 @@ export default {
         return {
             fileMetadata: null,
             review: {},
+            // dont view pdf until data is fetched
+            viewPDF: false,
             questionnaire: {},
             // all answers will be saved in this object
-            answers: null
+            answers: null,
+            // disable save/delete buttons when a call is busy
+            buttonDisabled: false
         }
     },
     computed: {
-        unSavedAnswers() {
+        questionNumbersOfUnsavedAnswers() {
+            const questionNumbersOfUnsavedAnswers = []
             if (!this.answers) {
-                return false
+                return questionNumbersOfUnsavedAnswers
             }
-            const unSavedAnswers = _.filter(this.answers, answer => {
-                return answer.changed
-            })
-            return unSavedAnswers.length > 0
+            for (const questionId in this.answers) {
+                const answer = this.answers[questionId]
+                if (answer.changed) {
+                    const question = this.getQuestion(questionId)
+                    questionNumbersOfUnsavedAnswers.push(question.number)
+                }
+            }
+            questionNumbersOfUnsavedAnswers.sort()
+            return questionNumbersOfUnsavedAnswers
+        },
+        questionNumbersOfUnansweredNonOptionalQuestions() {
+            const questionNumbersOfUnansweredNonOptionalQuestions = []
+            if (!this.answers) {
+                return questionNumbersOfUnansweredNonOptionalQuestions
+            }
+            for (const questionId in this.answers) {
+                const answer = this.answers[questionId]
+                const question = this.getQuestion(questionId)
+                if (!answer.exists && !question.optional) {
+                    questionNumbersOfUnansweredNonOptionalQuestions.push(question.number)
+                }
+            }
+            questionNumbersOfUnansweredNonOptionalQuestions.sort()
+            return questionNumbersOfUnansweredNonOptionalQuestions
         },
         reviewFilePath() {
             // Get the submission file path.
             return `/api/reviewofsubmissions/${this.review.id}/file`
         },
         reviewFileName() {
-            return this.fileMetadata.name + this.fileMetadata.extension
+            if (this.fileMetadata) {
+                return this.fileMetadata.name + this.fileMetadata.extension
+            } else {
+                return ""
+            }
         }
     },
     async created() {
@@ -257,8 +357,10 @@ export default {
     },
     methods: {
         async fetchData() {
-            await this.fetchFileMetadata()
+            this.viewPDF = false
             await this.fetchReview()
+            await this.fetchFileMetadata()
+            this.viewPDF = true
             await this.fetchSubmissionQuestionnaire()
             await this.fetchAnswers()
         },
@@ -324,80 +426,123 @@ export default {
             // set the answer object so all fields are reactive now
             this.answers = answers
         },
+        getQuestion(questionId) {
+            return _.find(this.questionnaire.questions, question => {
+                return question.id === parseInt(questionId)
+            })
+        },
         async saveAnswer(question, answer) {
-            switch (question.type) {
-                case "open":
-                    await api.openquestionanswers.post(question.id, this.review.id, answer.answer)
-                    break
-                case "multiplechoice":
-                    await api.multiplechoicequestionanswers.post(question.id, this.review.id, answer.answer.id)
-                    break
-                case "checkbox":
-                    await api.checkboxquestionanswers.post(question.id, this.review.id, _.map(answer.answer, "id"))
-                    break
-                case "range":
-                    await api.rangequestionanswers.post(question.id, this.review.id, answer.answer)
-                    break
-                case "upload":
-                    // set the answer after upload is succesful
-                    answer.answer = (
-                        await api.uploadquestionanswers.post(question.id, this.review.id, answer.newAnswer)
-                    ).data.uploadAnswer
-                    answer.newAnswer = null
-                    break
-                default:
-                    return this.showErrorMessage({ message: "Invalid question" })
+            this.buttonDisabled = true
+            try {
+                switch (question.type) {
+                    case "open":
+                        await api.openquestionanswers.post(question.id, this.review.id, answer.answer)
+                        break
+                    case "multiplechoice":
+                        await api.multiplechoicequestionanswers.post(question.id, this.review.id, answer.answer.id)
+                        break
+                    case "checkbox":
+                        await api.checkboxquestionanswers.post(question.id, this.review.id, _.map(answer.answer, "id"))
+                        break
+                    case "range":
+                        await api.rangequestionanswers.post(question.id, this.review.id, answer.answer)
+                        break
+                    case "upload":
+                        // set the answer after upload is succesful
+                        answer.answer = (
+                            await api.uploadquestionanswers.post(question.id, this.review.id, answer.newAnswer)
+                        ).data.uploadAnswer
+                        answer.newAnswer = null
+                        break
+                    default:
+                        throw new Error("Invalid question")
+                }
+                // reset changed boolean
+                answer.changed = false
+                // set boolean so the answer is present in the database
+                answer.exists = true
+                this.showSuccessMessage({ message: "Succesfuly saved answer" })
+            } catch (error) {
+                this.showErrorMessage({ message: error })
             }
-            // reset changed boolean
-            answer.changed = false
-            // set boolean so the answer is present in the database
-            answer.exists = true
-            this.showSuccessMessage({ message: "Succesfuly saved answer" })
+            this.buttonDisabled = false
         },
         async deleteAnswer(question, answer) {
-            switch (question.type) {
-                case "open":
-                    await api.openquestionanswers.delete(question.id, this.review.id)
-                    break
-                case "multiplechoice":
-                    await api.multiplechoicequestionanswers.delete(question.id, this.review.id)
-                    break
-                case "checkbox":
-                    await api.checkboxquestionanswers.delete(question.id, this.review.id)
-                    break
-                case "range":
-                    await api.rangequestionanswers.delete(question.id, this.review.id)
-                    break
-                case "upload":
-                    await api.uploadquestionanswers.delete(question.id, this.review.id)
-                    answer.newAnswer = null
-                    break
-                default:
-                    return this.showErrorMessage({ message: "Invalid question" })
+            this.buttonDisabled = true
+            try {
+                switch (question.type) {
+                    case "open":
+                        await api.openquestionanswers.delete(question.id, this.review.id)
+                        break
+                    case "multiplechoice":
+                        await api.multiplechoicequestionanswers.delete(question.id, this.review.id)
+                        break
+                    case "checkbox":
+                        await api.checkboxquestionanswers.delete(question.id, this.review.id)
+                        break
+                    case "range":
+                        await api.rangequestionanswers.delete(question.id, this.review.id)
+                        break
+                    case "upload":
+                        await api.uploadquestionanswers.delete(question.id, this.review.id)
+                        answer.newAnswer = null
+                        break
+                    default:
+                        throw new Error("Invalid question")
+                }
+                // reset answer
+                if (question.type === "checkbox") {
+                    answer.answer = []
+                } else {
+                    answer.answer = null
+                }
+                // reset changed boolean
+                answer.changed = false
+                // set boolean so the answer is not present in the database
+                answer.exists = false
+                this.showSuccessMessage({ message: "Succesfuly deleted answer" })
+            } catch (error) {
+                this.showErrorMessage({ message: error })
             }
-            // reset answer
-            if (question.type === "checkbox") {
-                answer.answer = []
-            } else {
-                answer.answer = null
+            this.buttonDisabled = false
+        },
+        async saveAllAnswers() {
+            this.buttonDisabled = true
+            for (const questionId in this.answers) {
+                const answer = this.answers[questionId]
+                if (answer.changed) {
+                    const question = this.getQuestion(questionId)
+                    try {
+                        await this.saveAnswer(question, answer)
+                    } finally {
+                        // saving answer enables the button, so it will be disabled again
+                        this.buttonDisabled = true
+                    }
+                }
             }
-            // reset changed boolean
-            answer.changed = false
-            // set boolean so the answer is not present in the database
-            answer.exists = false
-            this.showSuccessMessage({ message: "Succesfuly deleted answer" })
+            this.buttonDisabled = false
         },
         async submitReview() {
-            await api.reviewofsubmissions.patch(this.review.id, true, this.review.flaggedByReviewer)
-            this.$emit("reviewChanged")
-            this.showSubmitMessage()
-            await this.fetchData()
+            this.buttonDisabled = true
+            try {
+                await api.reviewofsubmissions.patch(this.review.id, true, this.review.flaggedByReviewer)
+                this.$emit("reviewChanged")
+                this.showSubmitMessage()
+                await this.fetchData()
+            } finally {
+                this.buttonDisabled = false
+            }
         },
         async unSubmitReview() {
-            await api.reviewofsubmissions.patch(this.review.id, false, this.review.flaggedByReviewer)
-            this.$emit("reviewChanged")
-            this.showUnSubmitMessage()
-            await this.fetchData()
+            this.buttonDisabled = true
+            try {
+                await api.reviewofsubmissions.patch(this.review.id, false, this.review.flaggedByReviewer)
+                this.$emit("reviewChanged")
+                this.showUnSubmitMessage()
+                await this.fetchData()
+            } finally {
+                this.buttonDisabled = false
+            }
         },
         uploadAnswerFilePath(reviewId, questionId) {
             return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`
