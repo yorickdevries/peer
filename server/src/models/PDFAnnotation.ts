@@ -57,7 +57,7 @@ export default abstract class PDFAnnotation extends BaseModel {
   review?: ReviewOfSubmission;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  abstract getWebAnnotationVersion(): Promise<any>;
+  abstract getWebAnnotationVersion(): any;
 
   constructor(
     id: string,
