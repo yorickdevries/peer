@@ -53,7 +53,7 @@ export default class CommentingPDFAnnotation extends PDFAnnotation {
 
   // https://www.w3.org/TR/annotation-model/
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async getWebAnnotationVersion(): Promise<any> {
+  getWebAnnotationVersion(): any {
     const annotation = {
       "@context": [
         "https://www.w3.org/ns/anno.jsonld",
@@ -64,12 +64,12 @@ export default class CommentingPDFAnnotation extends PDFAnnotation {
       bodyValue: this.bodyValue,
       motivation: this.motivation,
       target: {
-        source: String((await this.getFile()).id),
+        source: String(this.fileId),
         selector: this.selector,
       },
       creator: {
         type: "Person",
-        name: (await this.getUser()).netid,
+        name: this.userNetid,
       },
       created: this.createdAt,
       modified: this.updatedAt,
