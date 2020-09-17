@@ -75,11 +75,11 @@ export default class ReplyingPDFAnnotation extends PDFAnnotation {
       motivation: this.motivation,
       target: {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        source: (await this.getCommentingPDFAnnotation()).id,
+        source: this.commentingPDFAnnotationId,
       },
       creator: {
         type: "Person",
-        name: (await this.getUser()).netid,
+        name: this.userNetid,
       },
       created: this.createdAt,
       modified: this.updatedAt,

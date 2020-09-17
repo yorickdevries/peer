@@ -64,12 +64,12 @@ export default class CommentingPDFAnnotation extends PDFAnnotation {
       bodyValue: this.bodyValue,
       motivation: this.motivation,
       target: {
-        source: String((await this.getFile()).id),
+        source: String(this.fileId),
         selector: this.selector,
       },
       creator: {
         type: "Person",
-        name: (await this.getUser()).netid,
+        name: this.userNetid,
       },
       created: this.createdAt,
       modified: this.updatedAt,
