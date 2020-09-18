@@ -124,7 +124,7 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
   const user = req.user!;
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const questionAnswer = await RangeQuestionAnswer.findOne({
+  let questionAnswer = await RangeQuestionAnswer.findOne({
     where: {
       questionId: req.query.rangeQuestionId,
       reviewId: req.query.reviewId,
@@ -187,6 +187,15 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
       if (reviewToCheck.submitted) {
         throw new Error("The review is already submitted");
       }
+      questionAnswer = await transactionalEntityManager.findOneOrFail(
+        RangeQuestionAnswer,
+        {
+          where: {
+            questionId: req.query.rangeQuestionId,
+            reviewId: req.query.reviewId,
+          },
+        }
+      );
       await transactionalEntityManager.remove(questionAnswer);
     }
   );

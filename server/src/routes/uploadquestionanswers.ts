@@ -241,7 +241,7 @@ router.delete(
     const user = req.user!;
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const questionAnswer = await UploadQuestionAnswer.findOne({
+    let questionAnswer = await UploadQuestionAnswer.findOne({
       where: {
         questionId: req.query.uploadQuestionId,
         reviewId: req.query.reviewId,
@@ -305,7 +305,7 @@ router.delete(
         if (reviewToCheck.submitted) {
           throw new Error("The review is already submitted");
         }
-        const questionAnswer = await transactionalEntityManager.findOneOrFail(
+        questionAnswer = await transactionalEntityManager.findOneOrFail(
           UploadQuestionAnswer,
           {
             where: {

@@ -140,7 +140,7 @@ router.delete(
     const user = req.user!;
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const questionAnswer = await MultipleChoiceQuestionAnswer.findOne({
+    let questionAnswer = await MultipleChoiceQuestionAnswer.findOne({
       where: {
         questionId: req.query.multipleChoiceQuestionId,
         reviewId: req.query.reviewId,
@@ -203,6 +203,15 @@ router.delete(
         if (reviewToCheck.submitted) {
           throw new Error("The review is already submitted");
         }
+        questionAnswer = await transactionalEntityManager.findOneOrFail(
+          MultipleChoiceQuestionAnswer,
+          {
+            where: {
+              questionId: req.query.multipleChoiceQuestionId,
+              reviewId: req.query.reviewId,
+            },
+          }
+        );
         await transactionalEntityManager.remove(questionAnswer);
       }
     );
