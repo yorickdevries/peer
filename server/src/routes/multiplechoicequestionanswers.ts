@@ -103,7 +103,7 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
   let multipleChoiceAnswer: MultipleChoiceQuestionAnswer | undefined;
   // make or overwrite multipleChoiceAnswer;
   await getManager().transaction(
-    "SERIALIZABLE",
+    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
     async (transactionalEntityManager) => {
       multipleChoiceAnswer = await transactionalEntityManager.findOne(
         MultipleChoiceQuestionAnswer,
@@ -140,7 +140,7 @@ router.delete(
     const user = req.user!;
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const questionAnswer = await MultipleChoiceQuestionAnswer.findOne({
+    let questionAnswer = await MultipleChoiceQuestionAnswer.findOne({
       where: {
         questionId: req.query.multipleChoiceQuestionId,
         reviewId: req.query.reviewId,
@@ -193,7 +193,7 @@ router.delete(
     }
     // start transaction to make sure an asnwer isnt deleted from a submitted review
     await getManager().transaction(
-      "SERIALIZABLE",
+      process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // const review
         const reviewToCheck = await transactionalEntityManager.findOneOrFail(
@@ -203,6 +203,15 @@ router.delete(
         if (reviewToCheck.submitted) {
           throw new Error("The review is already submitted");
         }
+        questionAnswer = await transactionalEntityManager.findOneOrFail(
+          MultipleChoiceQuestionAnswer,
+          {
+            where: {
+              questionId: req.query.multipleChoiceQuestionId,
+              reviewId: req.query.reviewId,
+            },
+          }
+        );
         await transactionalEntityManager.remove(questionAnswer);
       }
     );

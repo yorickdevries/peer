@@ -646,7 +646,7 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   // create the reviewEvaluation
   let reviewEvaluation: ReviewOfReview;
   await getManager().transaction(
-    "SERIALIZABLE",
+    "SERIALIZABLE", // serializable is the only way double reviewevaluations can be prevented
     async (transactionalEntityManager) => {
       // check whether the review is already evaluated
       const existingReview = await transactionalEntityManager.findOne(

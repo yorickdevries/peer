@@ -46,9 +46,8 @@ const distributeReviewsForAssignment = async function (
     assignment.reviewsPerUser
   );
   // create all reviews in an transaction
-  const reviews: ReviewOfSubmission[] = [];
   await getManager().transaction(
-    "SERIALIZABLE",
+    "SERIALIZABLE", // serializable is the only way to make sure to reviews exist before creating them
     async (transactionalEntityManager) => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const existingReviews = await transactionalEntityManager.find(Review, {
@@ -73,14 +72,13 @@ const distributeReviewsForAssignment = async function (
           reviewAssignment.submission
         );
         await transactionalEntityManager.save(review);
-        reviews.push(review);
       }
       // set the proper assignmentstate
       assignment.state = AssignmentState.REVIEW;
       await transactionalEntityManager.save(assignment);
     }
   );
-  return `Distributed ${reviews.length} reviews for assignment ${assignment.id}`;
+  return `Distributed ${reviewDistribution.length} reviews for assignment ${assignment.id}`;
 };
 
 // Takes care of the distribution of reviews of submissions over the students

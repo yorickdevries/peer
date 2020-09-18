@@ -29,7 +29,7 @@ const parseAndSaveAffiliation = async function (
         let ssoField = await Affiliation.findOne({ where: { name: name } });
         if (!ssoField) {
           await getManager().transaction(
-            "SERIALIZABLE",
+            "SERIALIZABLE", // serializable is the only way double entries can be prevented
             async (transactionalEntityManager) => {
               // fetch existing answer if present
               ssoField = await transactionalEntityManager.findOne(Affiliation, {
@@ -76,7 +76,7 @@ const parseAndSaveStudy = async function (input: any): Promise<Study[]> {
         let ssoField = await Study.findOne({ where: { name: name } });
         if (!ssoField) {
           await getManager().transaction(
-            "SERIALIZABLE",
+            "SERIALIZABLE", // serializable is the only way double entries can be prevented
             async (transactionalEntityManager) => {
               // fetch existing answer if present
               ssoField = await transactionalEntityManager.findOne(Study, {
@@ -127,7 +127,7 @@ const parseAndSaveOrganisationUnit = async function (
         });
         if (!ssoField) {
           await getManager().transaction(
-            "SERIALIZABLE",
+            "SERIALIZABLE", // serializable is the only way double entries can be prevented
             async (transactionalEntityManager) => {
               // fetch existing answer if present
               ssoField = await transactionalEntityManager.findOne(

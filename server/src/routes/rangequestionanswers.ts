@@ -85,7 +85,7 @@ router.post("/", validateBody(rangeAnswerSchema), async (req, res) => {
   let rangeAnswer: RangeQuestionAnswer | undefined;
   // make or overwrite rangeAnswer;
   await getManager().transaction(
-    "SERIALIZABLE",
+    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
     async (transactionalEntityManager) => {
       rangeAnswer = await transactionalEntityManager.findOne(
         RangeQuestionAnswer,
@@ -124,7 +124,7 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
   const user = req.user!;
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const questionAnswer = await RangeQuestionAnswer.findOne({
+  let questionAnswer = await RangeQuestionAnswer.findOne({
     where: {
       questionId: req.query.rangeQuestionId,
       reviewId: req.query.reviewId,
@@ -177,7 +177,7 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
   }
   // start transaction to make sure an asnwer isnt deleted from a submitted review
   await getManager().transaction(
-    "SERIALIZABLE",
+    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
     async (transactionalEntityManager) => {
       // const review
       const reviewToCheck = await transactionalEntityManager.findOneOrFail(
@@ -187,6 +187,15 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
       if (reviewToCheck.submitted) {
         throw new Error("The review is already submitted");
       }
+      questionAnswer = await transactionalEntityManager.findOneOrFail(
+        RangeQuestionAnswer,
+        {
+          where: {
+            questionId: req.query.rangeQuestionId,
+            reviewId: req.query.reviewId,
+          },
+        }
+      );
       await transactionalEntityManager.remove(questionAnswer);
     }
   );

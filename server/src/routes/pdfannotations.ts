@@ -329,7 +329,7 @@ router.delete("/:id", validateParams(idStringSchema), async (req, res) => {
   if (annotation instanceof CommentingPDFAnnotation) {
     // delete annotation including replies
     await getManager().transaction(
-      "SERIALIZABLE",
+      "SERIALIZABLE", // serializable is the only way phantom replyingPDFAnnotations can be prevented
       async (transactionalEntityManager) => {
         const commentingPDFAnnotationWithReplies = await transactionalEntityManager.findOneOrFail(
           CommentingPDFAnnotation,

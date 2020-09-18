@@ -76,9 +76,18 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
       .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
     return;
   }
+  const existingEnrollment = await Enrollment.findOne({
+    where: { userNetid: userNetid, courseId: course.id },
+  });
+  if (existingEnrollment) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("User is already enrolled in this course");
+    return;
+  }
   let enrollment: Enrollment;
   await getManager().transaction(
-    "SERIALIZABLE",
+    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "READ COMMITTED",
     async (transactionalEntityManager) => {
       let user = await transactionalEntityManager.findOne(User, userNetid);
       // in case the user doesnt exists in the database yet, create it
@@ -87,17 +96,8 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
         await transactionalEntityManager.save(user);
       }
       // enroll user in the course if not already
-      const existingEnrollment = await transactionalEntityManager.findOne(
-        Enrollment,
-        {
-          where: { userNetid: user.netid, courseId: course.id },
-        }
-      );
-      if (existingEnrollment) {
-        throw new Error("User is already enrolled in this course");
-      }
-      // enroll the user as student in the course
       enrollment = new Enrollment(user, course, role);
+      // in case another enrollment is made in the meantime it will error due to primary key constraints
       await transactionalEntityManager.save(enrollment);
     }
   );
