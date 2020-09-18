@@ -77,10 +77,10 @@ export default abstract class Questionnaire extends BaseModel {
   }
 
   async hasUnsubmittedReviewsWhereUserIsReviewer(user: User): Promise<boolean> {
-    const reviews = await this.getReviewsWhereUserIsReviewer(user);
-    return _.some(reviews, (review) => {
-      return !review.submitted;
+    const reviews = await Review.find({
+      where: { questionnaire: this, reviewer: user, submitted: false },
     });
+    return reviews.length > 0;
   }
 
   containsQuestion(question: Question): boolean {

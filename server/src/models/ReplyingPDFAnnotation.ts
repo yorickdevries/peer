@@ -38,17 +38,12 @@ export default class ReplyingPDFAnnotation extends PDFAnnotation {
     const commentingPDFAnnotation = this.commentingPDFAnnotation
       ? this.commentingPDFAnnotation
       : await this.getCommentingPDFAnnotation();
-
     const file = this.file ? this.file : await this.getFile();
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const commentingPDFAnnotationFile = await commentingPDFAnnotation.getFile();
-    if (file.id !== commentingPDFAnnotationFile.id) {
+    if (file.id !== commentingPDFAnnotation.fileId) {
       throw new Error("The commentingPDFAnnotation is of another file");
     }
     const review = this.review ? this.review : await this.getReview();
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const commentingPDFAnnotationReview = await commentingPDFAnnotation.getReview();
-    if (review.id !== commentingPDFAnnotationReview.id) {
+    if (review.id !== commentingPDFAnnotation.reviewId) {
       throw new Error("The commentingPDFAnnotation is of another review");
     }
     // if it succeeds the super validateOrReject can be called
@@ -63,7 +58,7 @@ export default class ReplyingPDFAnnotation extends PDFAnnotation {
 
   // https://www.w3.org/TR/annotation-model/
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async getWebAnnotationVersion(): Promise<any> {
+  getWebAnnotationVersion(): any {
     const annotation = {
       "@context": [
         "https://www.w3.org/ns/anno.jsonld",
@@ -75,11 +70,11 @@ export default class ReplyingPDFAnnotation extends PDFAnnotation {
       motivation: this.motivation,
       target: {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        source: (await this.getCommentingPDFAnnotation()).id,
+        source: this.commentingPDFAnnotationId,
       },
       creator: {
         type: "Person",
-        name: (await this.getUser()).netid,
+        name: this.userNetid,
       },
       created: this.createdAt,
       modified: this.updatedAt,

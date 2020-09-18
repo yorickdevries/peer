@@ -59,10 +59,10 @@ router.get("/", validateQuery(getAnnotationSchema), async (req, res) => {
   const webAnnotations = [];
   // sort the webannotations so comments are loaded before replys
   for (const annotation of commentingPDFAnnotations) {
-    webAnnotations.push(await annotation.getWebAnnotationVersion());
+    webAnnotations.push(annotation.getWebAnnotationVersion());
   }
   for (const annotation of replyingPDFAnnotations) {
-    webAnnotations.push(await annotation.getWebAnnotationVersion());
+    webAnnotations.push(annotation.getWebAnnotationVersion());
   }
   // FINISHED GETTING THE ANNOTATIONS
 

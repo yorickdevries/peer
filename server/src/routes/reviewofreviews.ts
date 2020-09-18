@@ -125,13 +125,6 @@ router.patch(
       review.submittedAt = null;
     }
     review.flaggedByReviewer = req.body.flaggedByReviewer;
-    // check whether the review can be submitted before trying to save
-    if (review.submitted && !(await review.canBeSubmitted())) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("A non-optional question isn't answered yet.");
-      return;
-    }
     await review.save();
     const anonymousReview = review.getAnonymousVersion();
     res.send(anonymousReview);
