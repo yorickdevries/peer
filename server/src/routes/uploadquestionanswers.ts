@@ -307,6 +307,19 @@ router.delete(
         if (reviewToCheck.submitted) {
           throw new Error("The review is already submitted");
         }
+        const questionAnswer = await transactionalEntityManager.findOneOrFail(
+          UploadQuestionAnswer,
+          {
+            where: {
+              questionId: req.query.uploadQuestionId,
+              reviewId: req.query.reviewId,
+            },
+          }
+        );
+        // get fileinfo
+        const file = questionAnswer.uploadAnswer;
+        const filePath = file.getPath();
+
         await transactionalEntityManager.remove(questionAnswer);
         // delete file as well
         await transactionalEntityManager.remove(file);
