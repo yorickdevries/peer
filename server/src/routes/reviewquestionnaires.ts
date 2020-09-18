@@ -100,7 +100,7 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   // start transaction make sure the questionnaire and assignment are both saved
   // and no questionnaire is made in the mean time
   await getManager().transaction(
-    "REPEATABLE READ",
+    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
     async (transactionalEntityManager) => {
       // get the assignment with questionnaires
       const assignment = await transactionalEntityManager.findOneOrFail(

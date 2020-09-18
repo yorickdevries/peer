@@ -103,7 +103,7 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
   let multipleChoiceAnswer: MultipleChoiceQuestionAnswer | undefined;
   // make or overwrite multipleChoiceAnswer;
   await getManager().transaction(
-    "REPEATABLE READ",
+    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
     async (transactionalEntityManager) => {
       multipleChoiceAnswer = await transactionalEntityManager.findOne(
         MultipleChoiceQuestionAnswer,
@@ -193,7 +193,7 @@ router.delete(
     }
     // start transaction to make sure an asnwer isnt deleted from a submitted review
     await getManager().transaction(
-      "REPEATABLE READ",
+      process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // const review
         const reviewToCheck = await transactionalEntityManager.findOneOrFail(

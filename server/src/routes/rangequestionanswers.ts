@@ -85,7 +85,7 @@ router.post("/", validateBody(rangeAnswerSchema), async (req, res) => {
   let rangeAnswer: RangeQuestionAnswer | undefined;
   // make or overwrite rangeAnswer;
   await getManager().transaction(
-    "REPEATABLE READ",
+    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
     async (transactionalEntityManager) => {
       rangeAnswer = await transactionalEntityManager.findOne(
         RangeQuestionAnswer,
@@ -177,7 +177,7 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
   }
   // start transaction to make sure an asnwer isnt deleted from a submitted review
   await getManager().transaction(
-    "REPEATABLE READ",
+    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
     async (transactionalEntityManager) => {
       // const review
       const reviewToCheck = await transactionalEntityManager.findOneOrFail(
