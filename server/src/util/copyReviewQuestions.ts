@@ -130,7 +130,7 @@ const addDefaultReviewEvaluationQuestions = async function (
   reviewQuestionnaire: ReviewQuestionnaire
 ): Promise<void> {
   await getManager().transaction(
-    "SERIALIZABLE",
+    "SERIALIZABLE", // serializable is the only way to make sure not questions exist prior to adding questions
     async (transactionalEntityManager) => {
       const questionnaire = await transactionalEntityManager.findOne(
         ReviewQuestionnaire,
@@ -230,7 +230,7 @@ const addCopyOfQuestions = async function (
   questions: Question[]
 ): Promise<void> {
   await getManager().transaction(
-    "SERIALIZABLE",
+    "SERIALIZABLE", // serializable is the only way to make sure not questions exist prior to adding questions
     async (transactionalEntityManager) => {
       const questionnaire = await transactionalEntityManager.findOne(
         Questionnaire,

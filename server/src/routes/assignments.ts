@@ -330,7 +330,7 @@ router.post(
 
     // start transaction make sure the file and assignment are both saved
     await getManager().transaction(
-      "SERIALIZABLE",
+      "READ COMMITTED",
       async (transactionalEntityManager) => {
         if (file) {
           // save file entry to database
@@ -476,7 +476,7 @@ router.patch(
 
     // start transaction make sure the file and assignment are both saved
     await getManager().transaction(
-      "SERIALIZABLE",
+      "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // fetch assignment form database
         assignment = await transactionalEntityManager.findOneOrFail(
@@ -634,7 +634,7 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   const group = new Group(user.netid, course, [user], [assignment]);
   // save the group in an transaction to make sure no 2 groups are saved at the same time
   await getManager().transaction(
-    "SERIALIZABLE",
+    "SERIALIZABLE", // serializable is the only way double groups can be prevented
     async (transactionalEntityManager) => {
       // get group
       const existingGroup = await transactionalEntityManager

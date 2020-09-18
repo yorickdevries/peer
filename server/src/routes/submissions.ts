@@ -253,7 +253,7 @@ router.post(
 
     let submission: Submission;
     await getManager().transaction(
-      "SERIALIZABLE",
+      "SERIALIZABLE", // serializable is the only way double final submissions can be prevented
       async (transactionalEntityManager) => {
         // unsubmit all previous submissions
         const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
@@ -355,7 +355,7 @@ router.patch(
     const final = req.body.final;
     // start transaction make sure all submissions are changed at the same time
     await getManager().transaction(
-      "SERIALIZABLE",
+      "SERIALIZABLE", // serializable is the only way double final submissions can be prevented
       async (transactionalEntityManager) => {
         const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
           Submission,

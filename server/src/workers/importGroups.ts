@@ -22,7 +22,7 @@ const importGroupsForAssignment = async function (
 
   // save the users and enroll them in the course
   await getManager().transaction(
-    "SERIALIZABLE",
+    "REPEATABLE READ", // make sure the role isnt changed while importing
     async (transactionalEntityManager) => {
       const course = await transactionalEntityManager.findOneOrFail(
         Course,
@@ -62,7 +62,7 @@ const importGroupsForAssignment = async function (
   // save the users of the groups in the course
   const groups: Group[] = [];
   await getManager().transaction(
-    "SERIALIZABLE",
+    "SERIALIZABLE", // serializable is the only way to make sure to groups exist before import
     async (transactionalEntityManager) => {
       const existingGroups = await transactionalEntityManager
         .createQueryBuilder(Group, "group")

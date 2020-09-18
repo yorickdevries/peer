@@ -103,7 +103,7 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
   let multipleChoiceAnswer: MultipleChoiceQuestionAnswer | undefined;
   // make or overwrite multipleChoiceAnswer;
   await getManager().transaction(
-    "SERIALIZABLE",
+    "REPEATABLE READ",
     async (transactionalEntityManager) => {
       multipleChoiceAnswer = await transactionalEntityManager.findOne(
         MultipleChoiceQuestionAnswer,

@@ -85,7 +85,7 @@ router.post("/", validateBody(openAnswerSchema), async (req, res) => {
   let openAnswer: OpenQuestionAnswer | undefined;
   // make or overwrite openAnswer;
   await getManager().transaction(
-    "SERIALIZABLE",
+    "REPEATABLE READ",
     async (transactionalEntityManager) => {
       openAnswer = await transactionalEntityManager.findOne(
         OpenQuestionAnswer,
@@ -177,7 +177,7 @@ router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
   }
   // start transaction to make sure an asnwer isnt deleted from a submitted review
   await getManager().transaction(
-    "SERIALIZABLE",
+    "REPEATABLE READ",
     async (transactionalEntityManager) => {
       // const review
       const reviewToCheck = await transactionalEntityManager.findOneOrFail(

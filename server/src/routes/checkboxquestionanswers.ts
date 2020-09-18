@@ -107,7 +107,7 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
   let checkboxAnswer: CheckboxQuestionAnswer | undefined;
   // make or overwrite checkboxAnswer;
   await getManager().transaction(
-    "SERIALIZABLE",
+    "REPEATABLE READ",
     async (transactionalEntityManager) => {
       checkboxAnswer = await transactionalEntityManager.findOne(
         CheckboxQuestionAnswer,
@@ -202,7 +202,7 @@ router.delete(
     }
     // start transaction to make sure an asnwer isnt deleted from a submitted review
     await getManager().transaction(
-      "SERIALIZABLE",
+      "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // const review
         const reviewToCheck = await transactionalEntityManager.findOneOrFail(

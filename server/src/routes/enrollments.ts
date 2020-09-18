@@ -78,7 +78,7 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
   }
   let enrollment: Enrollment;
   await getManager().transaction(
-    "SERIALIZABLE",
+    "READ COMMITTED", // in case another enrollment is made in the meantime it will error due to primary key constraints
     async (transactionalEntityManager) => {
       let user = await transactionalEntityManager.findOne(User, userNetid);
       // in case the user doesnt exists in the database yet, create it
