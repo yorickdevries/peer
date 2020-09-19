@@ -46,7 +46,7 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
     // is teacher
     (await assignment.isTeacherOrTeachingAssistantInCourse(user)) ||
     // or reviwer
-    (await review.isReviewer(user))
+    review.isReviewer(user)
   ) {
     // get the file
     const file = uploadQuestionAnswer.uploadAnswer;
@@ -117,7 +117,7 @@ router.post(
         .send(ResponseMessage.REVIEW_NOT_FOUND);
       return;
     }
-    if (!(await review.isReviewer(user))) {
+    if (!review.isReviewer(user)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("You are not the reviewer of this review");
@@ -254,7 +254,7 @@ router.delete(
       return;
     }
     const review = await questionAnswer.getReview();
-    if (!(await review.isReviewer(user))) {
+    if (!review.isReviewer(user)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("You are not the reviewer of this review");

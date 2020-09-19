@@ -89,7 +89,7 @@ router.patch(
         .send(ResponseMessage.REVIEW_NOT_FOUND);
       return;
     }
-    if (!(await review.isReviewer(user))) {
+    if (!review.isReviewer(user)) {
       res.status(HttpStatusCode.FORBIDDEN).send("You are not the reviewer");
       return;
     }
