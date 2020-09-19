@@ -284,6 +284,15 @@ router.post(
   upload([".csv"], maxFileSize, "file"),
   validateBody(assignmentIdSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    if (!req.file) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("File is needed for the import");
+      return;
+    }
+
     interface groupNameWithNetidList {
       groupName: string;
       netids: string[];
@@ -298,15 +307,6 @@ router.post(
       groupNameWithNetidLists = await parseGroupCSV(fileBuffer);
     } catch (error) {
       res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
-      return;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const user = req.user!;
-    if (!req.file) {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send("File is needed for the import");
       return;
     }
     const assignment = await Assignment.findOne(req.body.assignmentId);
