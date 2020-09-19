@@ -127,6 +127,8 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
           checkboxQuestionOptions
         );
       }
+      // validation isnt done automatically as the changed field is a list
+      await checkboxAnswer.validateOrReject();
       await transactionalEntityManager.save(checkboxAnswer);
     }
   );
