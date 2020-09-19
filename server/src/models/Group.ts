@@ -117,8 +117,8 @@ export default class Group extends BaseModel {
     const groupAssignment = await getManager()
       .createQueryBuilder(Assignment, "assignment")
       .leftJoin("assignment.groups", "group")
-      .where("group.id = :id", { id: this.id })
-      .andWhere("assignment.id = :id", { id: assignment.id })
+      .where("group.id = :gid", { gid: this.id })
+      .andWhere("assignment.id = :aid", { aid: assignment.id })
       .getOne();
     return groupAssignment ? true : false;
   }
