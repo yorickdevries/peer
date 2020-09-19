@@ -38,7 +38,7 @@ router.post("/", validateBody(rangeAnswerSchema), async (req, res) => {
       .send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
   }
-  if (!(await review.isReviewer(user))) {
+  if (!review.isReviewer(user)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not the reviewer of this review");
@@ -137,7 +137,7 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
     return;
   }
   const review = await questionAnswer.getReview();
-  if (!(await review.isReviewer(user))) {
+  if (!review.isReviewer(user)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not the reviewer of this review");

@@ -72,7 +72,7 @@ router.get("/", validateQuery(getAnnotationSchema), async (req, res) => {
   if (
     (await review.isTeacherOrTeachingAssistantInCourse(user)) ||
     // reviewer should access the review when reviewing
-    ((await review.isReviewer(user)) &&
+    (review.isReviewer(user) &&
       assignment.isAtOrAfterState(AssignmentState.REVIEW))
   ) {
     res.send(webAnnotations);
@@ -142,7 +142,7 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
       .status(HttpStatusCode.BAD_REQUEST)
       .send("File and review do not correspond");
   }
-  if (!(await review.isReviewer(user))) {
+  if (!review.isReviewer(user)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not the reviewer of this review");
@@ -253,7 +253,7 @@ router.patch(
       return;
     }
     const review = await annotation.getReview();
-    if (!(await review.isReviewer(user))) {
+    if (!review.isReviewer(user)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("You are not the reviewer of this review");
@@ -300,7 +300,7 @@ router.delete("/:id", validateParams(idStringSchema), async (req, res) => {
     return;
   }
   const review = await annotation.getReview();
-  if (!(await review.isReviewer(user))) {
+  if (!review.isReviewer(user)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not the reviewer of this review");

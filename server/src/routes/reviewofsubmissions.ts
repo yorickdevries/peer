@@ -292,7 +292,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   const anonymousReview = review.getAnonymousVersion();
   // reviewer should access the review when reviewing
   if (
-    (await review.isReviewer(user)) &&
+    review.isReviewer(user) &&
     assignment.isAtOrAfterState(AssignmentState.REVIEW)
   ) {
     // set startedAt if not defined yet
@@ -338,7 +338,7 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
   const assignment = await questionnaire.getAssignment();
   if (
     // reviewer should access the review when reviewing
-    ((await review.isReviewer(user)) &&
+    (review.isReviewer(user) &&
       assignment.isAtOrAfterState(AssignmentState.REVIEW)) ||
     // reviewed user should access the review when getting feedback and the review is finished
     ((await review.isReviewed(user)) &&
@@ -373,7 +373,7 @@ router.get("/:id/filemetadata", validateParams(idSchema), async (req, res) => {
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
   if (
-    (await review.isReviewer(user)) &&
+    review.isReviewer(user) &&
     assignment.isAtOrAfterState(AssignmentState.REVIEW)
   ) {
     // replace the filename with "File" before sending
@@ -418,7 +418,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   const questionnaire = await review.getQuestionnaire();
   const assignment = await questionnaire.getAssignment();
   if (
-    (await review.isReviewer(user)) &&
+    review.isReviewer(user) &&
     assignment.isAtOrAfterState(AssignmentState.REVIEW)
   ) {
     // set downloadedAt if not defined yet
@@ -466,7 +466,7 @@ router.patch(
         .send(ResponseMessage.REVIEW_NOT_FOUND);
       return;
     }
-    if (!(await review.isReviewer(user))) {
+    if (!review.isReviewer(user)) {
       res.status(HttpStatusCode.FORBIDDEN).send("You are not the reviewer");
       return;
     }

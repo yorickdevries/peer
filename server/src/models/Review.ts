@@ -217,7 +217,7 @@ export default abstract class Review extends BaseModel {
   }
 
   // checks whether the user is the reviewer
-  async isReviewer(user: User): Promise<boolean> {
+  isReviewer(user: User): boolean {
     return this.reviewer.netid === user.netid;
   }
 

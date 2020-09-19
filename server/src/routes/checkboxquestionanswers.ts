@@ -41,7 +41,7 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
       .send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
   }
-  if (!(await review.isReviewer(user))) {
+  if (!review.isReviewer(user)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not the reviewer of this review");
@@ -127,6 +127,8 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
           checkboxQuestionOptions
         );
       }
+      // validation isnt done automatically as the changed field is a list
+      await checkboxAnswer.validateOrReject();
       await transactionalEntityManager.save(checkboxAnswer);
     }
   );
@@ -162,7 +164,7 @@ router.delete(
       return;
     }
     const review = await questionAnswer.getReview();
-    if (!(await review.isReviewer(user))) {
+    if (!review.isReviewer(user)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("You are not the reviewer of this review");
