@@ -14,6 +14,7 @@ const openFeedbackForAssignment = async function (
   }
   const submitted = false;
   const unsubmittedReviews = await questionnaire.getReviews(submitted);
+  // note: might want to do this all in a transaction but that might block things a lot
   for (const review of unsubmittedReviews) {
     if (await review.canBeSubmitted()) {
       review.submitted = true;

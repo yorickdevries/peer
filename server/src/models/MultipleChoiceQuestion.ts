@@ -3,7 +3,6 @@ import Question from "./Question";
 import { ChildEntity, OneToMany } from "typeorm";
 import QuestionType from "../enum/QuestionType";
 import MultipleChoiceQuestionOption from "./MultipleChoiceQuestionOption";
-import _ from "lodash";
 
 @ChildEntity(QuestionType.MULTIPLE_CHOICE)
 export default class MultipleChoiceQuestion extends Question {
@@ -27,8 +26,6 @@ export default class MultipleChoiceQuestion extends Question {
   }
 
   containsOption(option: MultipleChoiceQuestionOption): boolean {
-    return _.some(this.options, (o) => {
-      return o.id === option.id;
-    });
+    return this.id === option.questionId;
   }
 }

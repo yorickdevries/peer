@@ -46,7 +46,7 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
     // is teacher
     (await assignment.isTeacherOrTeachingAssistantInCourse(user)) ||
     // or reviwer
-    (await review.isReviewer(user))
+    review.isReviewer(user)
   ) {
     // get the file
     const file = uploadQuestionAnswer.uploadAnswer;
@@ -117,7 +117,7 @@ router.post(
         .send(ResponseMessage.REVIEW_NOT_FOUND);
       return;
     }
-    if (!(await review.isReviewer(user))) {
+    if (!review.isReviewer(user)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("You are not the reviewer of this review");
@@ -174,7 +174,7 @@ router.post(
     let uploadAnswer: UploadQuestionAnswer | undefined;
     // start transaction make sure the file and submission are both saved
     await getManager().transaction(
-      "SERIALIZABLE",
+      process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // fetch existing answer if present
         uploadAnswer = await transactionalEntityManager.findOne(
@@ -241,7 +241,7 @@ router.delete(
     const user = req.user!;
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const questionAnswer = await UploadQuestionAnswer.findOne({
+    let questionAnswer = await UploadQuestionAnswer.findOne({
       where: {
         questionId: req.query.uploadQuestionId,
         reviewId: req.query.reviewId,
@@ -254,7 +254,7 @@ router.delete(
       return;
     }
     const review = await questionAnswer.getReview();
-    if (!(await review.isReviewer(user))) {
+    if (!review.isReviewer(user)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("You are not the reviewer of this review");
@@ -292,12 +292,10 @@ router.delete(
         );
       return;
     }
-    const file = questionAnswer.uploadAnswer;
-    const filePath = file.getPath();
 
     // start transaction to make sure an asnwer isnt deleted from a submitted review
     await getManager().transaction(
-      "SERIALIZABLE",
+      process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // const review
         const reviewToCheck = await transactionalEntityManager.findOneOrFail(
@@ -307,6 +305,19 @@ router.delete(
         if (reviewToCheck.submitted) {
           throw new Error("The review is already submitted");
         }
+        questionAnswer = await transactionalEntityManager.findOneOrFail(
+          UploadQuestionAnswer,
+          {
+            where: {
+              questionId: req.query.uploadQuestionId,
+              reviewId: req.query.reviewId,
+            },
+          }
+        );
+        // get fileinfo
+        const file = questionAnswer.uploadAnswer;
+        const filePath = file.getPath();
+
         await transactionalEntityManager.remove(questionAnswer);
         // delete file as well
         await transactionalEntityManager.remove(file);

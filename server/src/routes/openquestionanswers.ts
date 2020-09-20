@@ -38,7 +38,7 @@ router.post("/", validateBody(openAnswerSchema), async (req, res) => {
       .send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
   }
-  if (!(await review.isReviewer(user))) {
+  if (!review.isReviewer(user)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not the reviewer of this review");
@@ -85,7 +85,7 @@ router.post("/", validateBody(openAnswerSchema), async (req, res) => {
   let openAnswer: OpenQuestionAnswer | undefined;
   // make or overwrite openAnswer;
   await getManager().transaction(
-    "SERIALIZABLE",
+    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
     async (transactionalEntityManager) => {
       openAnswer = await transactionalEntityManager.findOne(
         OpenQuestionAnswer,
@@ -124,7 +124,7 @@ router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
   const user = req.user!;
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const questionAnswer = await OpenQuestionAnswer.findOne({
+  let questionAnswer = await OpenQuestionAnswer.findOne({
     where: {
       questionId: req.query.openQuestionId,
       reviewId: req.query.reviewId,
@@ -137,7 +137,7 @@ router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
     return;
   }
   const review = await questionAnswer.getReview();
-  if (!(await review.isReviewer(user))) {
+  if (!review.isReviewer(user)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not the reviewer of this review");
@@ -177,7 +177,7 @@ router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
   }
   // start transaction to make sure an asnwer isnt deleted from a submitted review
   await getManager().transaction(
-    "SERIALIZABLE",
+    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
     async (transactionalEntityManager) => {
       // const review
       const reviewToCheck = await transactionalEntityManager.findOneOrFail(
@@ -187,6 +187,15 @@ router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
       if (reviewToCheck.submitted) {
         throw new Error("The review is already submitted");
       }
+      questionAnswer = await transactionalEntityManager.findOneOrFail(
+        OpenQuestionAnswer,
+        {
+          where: {
+            questionId: req.query.openQuestionId,
+            reviewId: req.query.reviewId,
+          },
+        }
+      );
       await transactionalEntityManager.remove(questionAnswer);
     }
   );

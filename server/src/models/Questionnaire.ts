@@ -11,7 +11,6 @@ import Question from "./Question";
 import User from "./User";
 import QuestionnaireType from "../enum/QuestionnaireType";
 import Review from "./Review";
-import _ from "lodash";
 
 // formely called rubric
 @Entity()
@@ -84,8 +83,6 @@ export default abstract class Questionnaire extends BaseModel {
   }
 
   containsQuestion(question: Question): boolean {
-    return _.some(this.questions, (q) => {
-      return q.id === question.id;
-    });
+    return this.id === question.questionnaireId;
   }
 }
