@@ -24,7 +24,7 @@ const distributeReviewsForAssignment = async function (
   if (!questionnaire) {
     throw new Error("Questionnaire not found");
   }
-  // now the reviews can be dirsibuted
+  // now the reviews can be distributed
   const submissions = await assignment.getFinalSubmissionsOfEachGroup();
   // get all unique users of the submissions (unique as several submissions might have the same user in the group)
   const users: User[] = [];
