@@ -31,7 +31,7 @@ const openFeedbackForAssignment = async function (
   }
   assignment.state = AssignmentState.FEEDBACK;
   await assignment.save();
-  return `Opened feedback for assignment ${assignment.id}, ${submittedCounter} extra reviews are submitted, ${unsubmittedCounter} reviews are still unsubmitted`;
+  return `Opened feedback for assignment ${assignment.id}, ${submittedCounter} additional reviews are submitted, ${unsubmittedCounter} reviews are still unsubmitted`;
 };
 
 export default openFeedbackForAssignment;
