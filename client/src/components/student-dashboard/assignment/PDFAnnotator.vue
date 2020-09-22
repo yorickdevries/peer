@@ -7,8 +7,8 @@
             The review is submitted, any annotations will not be saved</b-alert
         >
         <b-alert v-else show variant="secondary"
-            >PDF viewing and annotation is experimental, in case of any error while doing a review, you can always
-            download the file with a button above.
+            >PDF viewing and annotation is experimental, in case of any error or when the pdf is not properly loading
+            while doing a review, you can always download the file with a button above.
             <br />
             <b
                 >NOTE: Altough annotations contain your netid, anonymous annotations will be shown to the reviewed
@@ -16,9 +16,8 @@
             >
         </b-alert>
         <!--Annotation view-->
-        <div :id="pdfDivId" style="height: 1000px">
-            <b-alert show variant="primary">LOADING REVIEW PDF</b-alert>
-        </div>
+        <b-alert :show="!showPdf" variant="primary">LOADING REVIEW PDF</b-alert>
+        <div v-show="showPdf" :id="pdfDivId" style="height: 1000px" />
     </div>
 </template>
 
@@ -40,7 +39,8 @@ export default {
             review: null,
             submission: null,
             fileMetadata: null,
-            pdfDivId: null
+            pdfDivId: null,
+            showPdf: false
         }
     },
     computed: {
@@ -262,6 +262,8 @@ export default {
                                 }
                             )
                         }
+                        // when everything is loaded show the pdf
+                        vm.showPdf = true
                     })
                 })
             })
