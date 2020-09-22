@@ -195,7 +195,7 @@ export default abstract class Review extends BaseModel {
           const answer = _.find(answers, (answer) => {
             return answer.questionId === question.id;
           });
-          // if no answer is present, throw error
+          // if no answer is present, return false
           if (!answer) {
             return false;
           }

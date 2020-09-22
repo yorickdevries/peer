@@ -17,7 +17,7 @@ const submitReview = async function (
         Review,
         review.id
       );
-      // change flagged by review if it passed in the method
+      // change flagged by review if its passed in the method
       if (flaggedByReviewer !== undefined) {
         review.flaggedByReviewer = flaggedByReviewer;
       }
@@ -46,7 +46,7 @@ const submitReview = async function (
           }
         }
       }
-      // set submitted on true ans save review
+      // set submitted on true and save review
       review.submitted = true;
       review.submittedAt = new Date();
       await transactionalEntityManager.save(review);
