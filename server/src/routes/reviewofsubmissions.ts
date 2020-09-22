@@ -24,6 +24,7 @@ import {
   startExportGradesForAssignmentWorker,
   startExportReviewsForAssignmentWorker,
 } from "../workers/pool";
+import submitReview from "../util/submitReview";
 
 const router = express.Router();
 
@@ -491,15 +492,20 @@ router.patch(
         .send("The assignment is not in review state");
       return;
     }
+    const submitted = req.body.submitted;
+    const flaggedByReviewer = req.body.flaggedByReviewer;
     // set new values
-    review.submitted = req.body.submitted;
-    if (review.submitted) {
-      review.submittedAt = new Date();
+    if (submitted) {
+      // submit review in transaction
+      await submitReview(review, flaggedByReviewer);
+      await review.reload();
     } else {
+      // just set the fields
+      review.flaggedByReviewer = flaggedByReviewer;
+      review.submitted = false;
       review.submittedAt = null;
+      await review.save();
     }
-    review.flaggedByReviewer = req.body.flaggedByReviewer;
-    await review.save();
     const anonymousReview = review.getAnonymousVersion();
     res.send(anonymousReview);
     return;
