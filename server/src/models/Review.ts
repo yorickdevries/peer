@@ -15,6 +15,7 @@ import Questionnaire from "./Questionnaire";
 import UserRole from "../enum/UserRole";
 import QuestionAnswer from "./QuestionAnswer";
 import Question from "./Question";
+import _ from "lodash";
 
 interface AnonymousReview {
   id: number;
@@ -183,12 +184,19 @@ export default abstract class Review extends BaseModel {
   }
 
   async canBeSubmitted(): Promise<boolean> {
-    const questionnaire = await this.getQuestionnaire();
     // check whether the review is allowed to be submitted
     if (!this.flaggedByReviewer) {
+      // check whether all non-optional questions are answered
+      const answers = await this.getQuestionAnswers();
+      const questionnaire = await this.getQuestionnaire();
       for (const question of questionnaire.questions) {
+        // only check question if not optional
         if (!question.optional) {
-          if (!(await this.getAnswer(question))) {
+          const answer = _.find(answers, (answer) => {
+            return answer.questionId === question.id;
+          });
+          // if no answer is present, throw error
+          if (!answer) {
             return false;
           }
         }
