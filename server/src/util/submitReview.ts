@@ -17,6 +17,7 @@ const submitReview = async function (
         Review,
         review.id
       );
+      // check whether the review is allowed to be submitted
       if (!flaggedByReviewer) {
         // check whether all non-optional questions are answered
         const answers = await transactionalEntityManager.find(QuestionAnswer, {
