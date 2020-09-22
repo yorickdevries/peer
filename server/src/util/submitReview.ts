@@ -7,7 +7,7 @@ import Review from "../models/Review";
 // submit review if fully filled in
 const submitReview = async function (
   review: Review,
-  flaggedByReviewer: boolean
+  flaggedByReviewer?: boolean
 ): Promise<Review> {
   await getManager().transaction(
     process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
@@ -17,8 +17,12 @@ const submitReview = async function (
         Review,
         review.id
       );
+      // change flagged by review if it passed in the method
+      if (flaggedByReviewer !== undefined) {
+        review.flaggedByReviewer = flaggedByReviewer;
+      }
       // check whether the review is allowed to be submitted
-      if (!flaggedByReviewer) {
+      if (!review.flaggedByReviewer) {
         // check whether all non-optional questions are answered
         const answers = await transactionalEntityManager.find(QuestionAnswer, {
           where: { review: review },
@@ -42,7 +46,6 @@ const submitReview = async function (
           }
         }
       }
-      review.flaggedByReviewer = flaggedByReviewer;
       // set submitted on true ans save review
       review.submitted = true;
       review.submittedAt = new Date();
