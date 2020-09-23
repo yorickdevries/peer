@@ -56,6 +56,7 @@ switch (databaseConfig.type) {
         username: databaseConfig.username,
         password: databaseConfig.password,
         database: databaseConfig.database,
+        extra: { connectionLimit: 50 },
       };
     }
     connectionConfig = { ...baseConfig, ...mariadbConfig };
