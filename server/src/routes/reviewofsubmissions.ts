@@ -677,6 +677,7 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
       );
       // set startedAt
       reviewEvaluation.startedAt = new Date();
+      await reviewEvaluation.validateOrReject();
       await transactionalEntityManager.save(reviewEvaluation);
     }
   );

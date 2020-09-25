@@ -118,6 +118,7 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
           questionOption
         );
       }
+      await multipleChoiceAnswer.validateOrReject();
       await transactionalEntityManager.save(multipleChoiceAnswer);
     }
   );

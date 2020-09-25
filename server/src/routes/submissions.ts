@@ -268,15 +268,18 @@ router.post(
         // Set boolean of submission of older submissions to false
         for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
           submissionOfGroupForAssignment.final = false;
+          await submissionOfGroupForAssignment.validateOrReject();
           await transactionalEntityManager.save(submissionOfGroupForAssignment);
         }
 
         // save file entry to database
+        await file.validateOrReject();
         await transactionalEntityManager.save(file);
 
         // create submission
         submission = new Submission(user, group, assignment, file, true);
         // this checks for the right extension in the validate function
+        await submission.validateOrReject();
         await transactionalEntityManager.save(submission);
 
         // move the file (so if this fails everything above fails)
@@ -370,6 +373,7 @@ router.patch(
         for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
           if (submissionOfGroupForAssignment.id !== submission.id) {
             submissionOfGroupForAssignment.final = false;
+            await submissionOfGroupForAssignment.validateOrReject();
             await transactionalEntityManager.save(
               submissionOfGroupForAssignment
             );
@@ -377,6 +381,7 @@ router.patch(
         }
         // finally set the submission
         submission.final = final;
+        await submission.validateOrReject();
         await transactionalEntityManager.save(submission);
       }
     );

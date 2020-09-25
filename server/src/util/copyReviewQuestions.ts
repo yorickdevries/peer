@@ -151,6 +151,7 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionToCopy.optional,
               questionnaire
             );
+            await question.validateOrReject();
             await transactionalEntityManager.save(question);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
@@ -158,6 +159,7 @@ const addDefaultReviewEvaluationQuestions = async function (
                 optionToCopy.text,
                 question
               );
+              await option.validateOrReject();
               await transactionalEntityManager.save(option);
             }
             break;
@@ -169,6 +171,7 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionToCopy.optional,
               questionnaire
             );
+            await question.validateOrReject();
             await transactionalEntityManager.save(question);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
@@ -176,6 +179,7 @@ const addDefaultReviewEvaluationQuestions = async function (
                 optionToCopy.text,
                 question
               );
+              await option.validateOrReject();
               await transactionalEntityManager.save(option);
             }
             break;
@@ -187,6 +191,7 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionToCopy.optional,
               questionnaire
             );
+            await question.validateOrReject();
             await transactionalEntityManager.save(question);
             break;
           }
@@ -199,6 +204,7 @@ const addDefaultReviewEvaluationQuestions = async function (
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               questionToCopy.range!
             );
+            await question.validateOrReject();
             await transactionalEntityManager.save(question);
             break;
           }
@@ -211,6 +217,7 @@ const addDefaultReviewEvaluationQuestions = async function (
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               questionToCopy.extensions!
             );
+            await question.validateOrReject();
             await transactionalEntityManager.save(question);
             break;
           }
@@ -250,6 +257,7 @@ const addCopyOfQuestions = async function (
             questionToCopy.optional,
             questionnaire
           );
+          await question.validateOrReject();
           await transactionalEntityManager.save(question);
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           for (const optionToCopy of questionToCopy.options!) {
@@ -257,6 +265,7 @@ const addCopyOfQuestions = async function (
               optionToCopy.text,
               question
             );
+            await option.validateOrReject();
             await transactionalEntityManager.save(option);
           }
         } else if (questionToCopy instanceof MultipleChoiceQuestion) {
@@ -266,6 +275,7 @@ const addCopyOfQuestions = async function (
             questionToCopy.optional,
             questionnaire
           );
+          await question.validateOrReject();
           await transactionalEntityManager.save(question);
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           for (const optionToCopy of questionToCopy.options!) {
@@ -273,6 +283,7 @@ const addCopyOfQuestions = async function (
               optionToCopy.text,
               question
             );
+            await option.validateOrReject();
             await transactionalEntityManager.save(option);
           }
         } else if (questionToCopy instanceof OpenQuestion) {
@@ -282,6 +293,7 @@ const addCopyOfQuestions = async function (
             questionToCopy.optional,
             questionnaire
           );
+          await question.validateOrReject();
           await transactionalEntityManager.save(question);
         } else if (questionToCopy instanceof RangeQuestion) {
           const question = new RangeQuestion(
@@ -291,6 +303,7 @@ const addCopyOfQuestions = async function (
             questionnaire,
             questionToCopy.range
           );
+          await question.validateOrReject();
           await transactionalEntityManager.save(question);
         } else if (questionToCopy instanceof UploadQuestion) {
           const question = new UploadQuestion(
@@ -300,6 +313,7 @@ const addCopyOfQuestions = async function (
             questionnaire,
             questionToCopy.extensions
           );
+          await question.validateOrReject();
           await transactionalEntityManager.save(question);
         } else {
           throw new Error("Invalid QuestionType");

@@ -334,10 +334,12 @@ router.post(
       async (transactionalEntityManager) => {
         if (file) {
           // save file entry to database
+          await file.validateOrReject();
           await transactionalEntityManager.save(file);
           // set file as field of assignment
           assignment.file = file;
         }
+        await assignment.validateOrReject();
         await transactionalEntityManager.save(assignment);
 
         if (file) {
@@ -510,11 +512,13 @@ router.patch(
         if (newFile !== undefined) {
           if (newFile) {
             // save file entry to database
+            await newFile.validateOrReject();
             await transactionalEntityManager.save(newFile);
           }
           // set file as field of assignment
           assignment.file = newFile;
         }
+        await assignment.validateOrReject();
         await transactionalEntityManager.save(assignment);
 
         if (newFile) {
@@ -649,6 +653,7 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
         // Can happen if 2 concurrent calls are made
         throw new Error("Group already exists");
       } else {
+        await group.validateOrReject();
         await transactionalEntityManager.save(group);
       }
     }

@@ -191,6 +191,7 @@ router.post(
           oldFile = uploadAnswer.uploadAnswer;
         }
         // save file entry to database
+        await newFile.validateOrReject();
         await transactionalEntityManager.save(newFile);
         // save answer to database
         if (uploadAnswer) {
@@ -199,6 +200,7 @@ router.post(
           uploadAnswer = new UploadQuestionAnswer(question, review, newFile);
         }
         // create/update uploadAnswer
+        await uploadAnswer.validateOrReject();
         await transactionalEntityManager.save(uploadAnswer);
 
         // move the file (so if this fails everything above fails)

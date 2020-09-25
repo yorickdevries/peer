@@ -35,10 +35,12 @@ const exportJSONToFile = async function (
     process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "READ COMMITTED",
     async (transactionalEntityManager) => {
       // save file entry to database
+      await file.validateOrReject();
       await transactionalEntityManager.save(file);
 
       // add to assignmentExport
       assignmentExport.file = file;
+      await assignmentExport.validateOrReject();
       await transactionalEntityManager.save(assignmentExport);
 
       // write the file (so if this fails everything above fails)

@@ -49,6 +49,7 @@ const submitReview = async function (
       // set submitted on true and save review
       review.submitted = true;
       review.submittedAt = new Date();
+      await review.validateOrReject();
       await transactionalEntityManager.save(review);
     }
   );

@@ -105,6 +105,7 @@ router.post("/", validateBody(openAnswerSchema), async (req, res) => {
           req.body.openAnswer
         );
       }
+      await openAnswer.validateOrReject();
       await transactionalEntityManager.save(openAnswer);
     }
   );
