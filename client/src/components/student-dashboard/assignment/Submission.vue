@@ -118,7 +118,7 @@
                         >
                         <PDFAnnotator :submissionId="finalSubmission.id" :readOnly="true"></PDFAnnotator>
                     </div>
-                    <div>
+                    <div v-else>
                         <b-alert show variant="secondary">
                             Your final submission is not a .pdf file, so it will not be rendered in the browser</b-alert
                         >
