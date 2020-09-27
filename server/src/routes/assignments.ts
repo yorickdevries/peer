@@ -636,6 +636,8 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   }
   const course = await assignment.getCourse();
   const group = new Group(user.netid, course, [user], [assignment]);
+  // validate outside transaction as it otherwise might block the transaction
+  await group.validateOrReject();
   // save the group in an transaction to make sure no 2 groups are saved at the same time
   await getManager().transaction(
     "SERIALIZABLE", // serializable is the only way double groups can be prevented
@@ -653,7 +655,6 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
         // Can happen if 2 concurrent calls are made
         throw new Error("Group already exists");
       } else {
-        await group.validateOrReject();
         await transactionalEntityManager.save(group);
       }
     }
