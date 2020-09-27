@@ -100,30 +100,20 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
       );
     return;
   }
-  let multipleChoiceAnswer: MultipleChoiceQuestionAnswer | undefined;
   // make or overwrite multipleChoiceAnswer;
-  await getManager().transaction(
-    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
-    async (transactionalEntityManager) => {
-      multipleChoiceAnswer = await transactionalEntityManager.findOne(
-        MultipleChoiceQuestionAnswer,
-        { where: { reviewId: review.id, questionId: question.id } }
-      );
-      if (multipleChoiceAnswer) {
-        multipleChoiceAnswer.multipleChoiceAnswer = questionOption;
-      } else {
-        multipleChoiceAnswer = new MultipleChoiceQuestionAnswer(
-          question,
-          review,
-          questionOption
-        );
-      }
-      await multipleChoiceAnswer.validateOrReject();
-      await transactionalEntityManager.save(multipleChoiceAnswer);
-    }
-  );
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  await multipleChoiceAnswer!.reload();
+  let multipleChoiceAnswer = await MultipleChoiceQuestionAnswer.findOne({
+    where: { reviewId: review.id, questionId: question.id },
+  });
+  if (multipleChoiceAnswer) {
+    multipleChoiceAnswer.multipleChoiceAnswer = questionOption;
+  } else {
+    multipleChoiceAnswer = new MultipleChoiceQuestionAnswer(
+      question,
+      review,
+      questionOption
+    );
+  }
+  await multipleChoiceAnswer.save();
   res.send(multipleChoiceAnswer);
 });
 

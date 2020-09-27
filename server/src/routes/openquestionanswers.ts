@@ -82,35 +82,19 @@ router.post("/", validateBody(openAnswerSchema), async (req, res) => {
       );
     return;
   }
-  let openAnswer: OpenQuestionAnswer | undefined;
   // make or overwrite openAnswer;
-  await getManager().transaction(
-    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
-    async (transactionalEntityManager) => {
-      openAnswer = await transactionalEntityManager.findOne(
-        OpenQuestionAnswer,
-        {
-          where: {
-            reviewId: review.id,
-            questionId: question.id,
-          },
-        }
-      );
-      if (openAnswer) {
-        openAnswer.openAnswer = req.body.openAnswer;
-      } else {
-        openAnswer = new OpenQuestionAnswer(
-          question,
-          review,
-          req.body.openAnswer
-        );
-      }
-      await openAnswer.validateOrReject();
-      await transactionalEntityManager.save(openAnswer);
-    }
-  );
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  await openAnswer!.reload();
+  let openAnswer = await OpenQuestionAnswer.findOne({
+    where: {
+      reviewId: review.id,
+      questionId: question.id,
+    },
+  });
+  if (openAnswer) {
+    openAnswer.openAnswer = req.body.openAnswer;
+  } else {
+    openAnswer = new OpenQuestionAnswer(question, review, req.body.openAnswer);
+  }
+  await openAnswer.save();
   res.send(openAnswer);
 });
 
