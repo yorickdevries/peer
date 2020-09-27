@@ -356,6 +356,10 @@ router.patch(
     }
     // otherwise, perform the patch
     const final = req.body.final;
+    // finally set the submission
+    submission.final = final;
+    await submission.validateOrReject();
+
     // start transaction make sure all submissions are changed at the same time
     await getManager().transaction(
       "SERIALIZABLE", // serializable is the only way double final submissions can be prevented
@@ -373,15 +377,13 @@ router.patch(
         for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
           if (submissionOfGroupForAssignment.id !== submission.id) {
             submissionOfGroupForAssignment.final = false;
-            await submissionOfGroupForAssignment.validateOrReject();
+            // do not validate as this might block transaction
+            // await submissionOfGroupForAssignment.validateOrReject();
             await transactionalEntityManager.save(
               submissionOfGroupForAssignment
             );
           }
         }
-        // finally set the submission
-        submission.final = final;
-        await submission.validateOrReject();
         await transactionalEntityManager.save(submission);
       }
     );
