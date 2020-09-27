@@ -649,6 +649,16 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
       .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
     return;
   }
+  const existingReview = await ReviewOfReview.findOne({
+    where: { reviewOfSubmission: review.id },
+  });
+  if (existingReview) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("There already exists a reviewEvaluation");
+    return;
+  }
+
   // create the reviewEvaluation
   const reviewEvaluation = new ReviewOfReview(
     reviewQuestionnaire,
