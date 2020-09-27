@@ -167,6 +167,10 @@ router.post(
     const fileHash = null;
     const newFile = new File(fileName, fileExtension, fileHash);
 
+    // new Upload Answer
+    const newUploadAnser = new UploadQuestionAnswer(question, review, newFile);
+    await newUploadAnser.validateOrReject();
+
     // oldfile in case of update
     let oldFile: File | undefined;
 
@@ -197,10 +201,10 @@ router.post(
         if (uploadAnswer) {
           uploadAnswer.uploadAnswer = newFile;
         } else {
-          uploadAnswer = new UploadQuestionAnswer(question, review, newFile);
+          uploadAnswer = newUploadAnser;
         }
         // create/update uploadAnswer
-        await uploadAnswer.validateOrReject();
+        // validation is done for newUploadAnser outside the transaction
         await transactionalEntityManager.save(uploadAnswer);
 
         // move the file (so if this fails everything above fails)
