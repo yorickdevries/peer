@@ -56,7 +56,7 @@ switch (databaseConfig.type) {
         username: databaseConfig.username,
         password: databaseConfig.password,
         database: databaseConfig.database,
-        // set connectionlimit to 1 in development to detetc deadlocks early
+        // set connectionlimit to 1 in development to detect deadlocks early
         extra: {
           connectionLimit: process.env.NODE_ENV === "production" ? 50 : 1,
         },
