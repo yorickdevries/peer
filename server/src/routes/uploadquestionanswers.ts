@@ -16,6 +16,7 @@ import fsPromises from "fs/promises";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
+import removePDFMetadata from "../util/removePDFMetadata";
 
 const router = express.Router();
 
@@ -164,6 +165,10 @@ router.post(
     // construct file to be saved in transaction
     const fileExtension = path.extname(req.file.originalname);
     const fileName = path.basename(req.file.originalname, fileExtension);
+    // run removePDFMetadata in case the file is a pdf
+    if (fileExtension === ".pdf") {
+      await removePDFMetadata(req.file.path);
+    }
     const fileHash = null;
     const newFile = new File(fileName, fileExtension, fileHash);
 

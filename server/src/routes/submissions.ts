@@ -20,6 +20,7 @@ import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
 import moment from "moment";
 import { getManager } from "typeorm";
+import removePDFMetadata from "../util/removePDFMetadata";
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
@@ -248,6 +249,10 @@ router.post(
     // file info
     const fileExtension = path.extname(req.file.originalname);
     const fileName = path.basename(req.file.originalname, fileExtension);
+    // run removePDFMetadata in case the file is a pdf
+    if (fileExtension === ".pdf") {
+      await removePDFMetadata(req.file.path);
+    }
     const fileHash = null;
     const file = new File(fileName, fileExtension, fileHash);
 
