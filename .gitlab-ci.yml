@@ -11,6 +11,7 @@ stages:
     - static-analysis
     - build
     - test
+    - coverage
     - migration
     - start
     - sast
@@ -73,7 +74,7 @@ test:
   - pushes
 
 coverage:
-  stage: test
+  stage: coverage
   variables:
     NODE_ENV: test
   services:
