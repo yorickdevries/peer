@@ -93,11 +93,13 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
       // in case the user doesnt exists in the database yet, create it
       if (!user) {
         user = new User(userNetid);
+        await user.validateOrReject();
         await transactionalEntityManager.save(user);
       }
       // enroll user in the course if not already
       enrollment = new Enrollment(user, course, role);
       // in case another enrollment is made in the meantime it will error due to primary key constraints
+      await enrollment.validateOrReject();
       await transactionalEntityManager.save(enrollment);
     }
   );

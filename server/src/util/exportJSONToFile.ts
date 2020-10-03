@@ -1,10 +1,14 @@
-import exportFromJSON from "export-from-json";
 import AssignmentExport from "../models/AssignmentExport";
 import File from "../models/File";
 import path from "path";
 import config from "config";
 import fsPromises from "fs/promises";
 import { getManager } from "typeorm";
+
+// parse libraries
+import { parse } from "json2csv";
+import exportFromJSON from "export-from-json";
+
 const uploadFolder = config.get("uploadFolder") as string;
 
 // Method to export data to an export with the indicated fileName to the res object
@@ -15,16 +19,20 @@ const exportJSONToFile = async function (
   exportType: "xls" | "csv",
   assignmentExport: AssignmentExport
 ): Promise<void> {
-  const result = exportFromJSON({
-    data,
-    fileName,
-    exportType,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    processor(content, _type, _fileName) {
-      return content;
-    },
-  });
-
+  let result: string;
+  if (exportType === "csv") {
+    result = parse(data);
+  } else {
+    result = exportFromJSON({
+      data,
+      fileName,
+      exportType,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      processor(content, _type, _fileName) {
+        return content;
+      },
+    });
+  }
   // create the file object
   const fileBuffer = Buffer.from(result);
   const fileExtension = `.${exportType}`;
@@ -35,10 +43,12 @@ const exportJSONToFile = async function (
     process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "READ COMMITTED",
     async (transactionalEntityManager) => {
       // save file entry to database
+      await file.validateOrReject();
       await transactionalEntityManager.save(file);
 
       // add to assignmentExport
       assignmentExport.file = file;
+      await assignmentExport.validateOrReject();
       await transactionalEntityManager.save(assignmentExport);
 
       // write the file (so if this fails everything above fails)

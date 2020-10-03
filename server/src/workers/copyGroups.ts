@@ -46,6 +46,7 @@ const copyGroupsForAssignment = async function (
         const groupName = groupWithUsers.name;
         // make the new group
         const group = new Group(groupName, course, users, [assignment]);
+        await group.validateOrReject();
         await transactionalEntityManager.save(group);
         groups.push(group);
       }

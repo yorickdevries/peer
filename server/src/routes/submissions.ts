@@ -20,6 +20,7 @@ import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
 import moment from "moment";
 import { getManager } from "typeorm";
+import removePDFMetadata from "../util/removePDFMetadata";
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
@@ -248,10 +249,17 @@ router.post(
     // file info
     const fileExtension = path.extname(req.file.originalname);
     const fileName = path.basename(req.file.originalname, fileExtension);
+    // run removePDFMetadata in case the file is a pdf
+    if (fileExtension === ".pdf") {
+      await removePDFMetadata(req.file.path);
+    }
     const fileHash = null;
     const file = new File(fileName, fileExtension, fileHash);
 
-    let submission: Submission;
+    // create submission
+    const submission = new Submission(user, group, assignment, file, true);
+    // this checks for the right extension in the validate function
+    await submission.validateOrReject();
     await getManager().transaction(
       "SERIALIZABLE", // serializable is the only way double final submissions can be prevented
       async (transactionalEntityManager) => {
@@ -268,15 +276,15 @@ router.post(
         // Set boolean of submission of older submissions to false
         for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
           submissionOfGroupForAssignment.final = false;
+          // do not validate as this might block transaction
+          //await submissionOfGroupForAssignment.validateOrReject();
           await transactionalEntityManager.save(submissionOfGroupForAssignment);
         }
 
         // save file entry to database
+        await file.validateOrReject();
         await transactionalEntityManager.save(file);
 
-        // create submission
-        submission = new Submission(user, group, assignment, file, true);
-        // this checks for the right extension in the validate function
         await transactionalEntityManager.save(submission);
 
         // move the file (so if this fails everything above fails)
@@ -353,6 +361,10 @@ router.patch(
     }
     // otherwise, perform the patch
     const final = req.body.final;
+    // finally set the submission
+    submission.final = final;
+    await submission.validateOrReject();
+
     // start transaction make sure all submissions are changed at the same time
     await getManager().transaction(
       "SERIALIZABLE", // serializable is the only way double final submissions can be prevented
@@ -370,13 +382,13 @@ router.patch(
         for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
           if (submissionOfGroupForAssignment.id !== submission.id) {
             submissionOfGroupForAssignment.final = false;
+            // do not validate as this might block transaction
+            // await submissionOfGroupForAssignment.validateOrReject();
             await transactionalEntityManager.save(
               submissionOfGroupForAssignment
             );
           }
         }
-        // finally set the submission
-        submission.final = final;
         await transactionalEntityManager.save(submission);
       }
     );

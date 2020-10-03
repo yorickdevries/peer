@@ -16,6 +16,7 @@ import fsPromises from "fs/promises";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
+import removePDFMetadata from "../util/removePDFMetadata";
 
 const router = express.Router();
 
@@ -164,8 +165,16 @@ router.post(
     // construct file to be saved in transaction
     const fileExtension = path.extname(req.file.originalname);
     const fileName = path.basename(req.file.originalname, fileExtension);
+    // run removePDFMetadata in case the file is a pdf
+    if (fileExtension === ".pdf") {
+      await removePDFMetadata(req.file.path);
+    }
     const fileHash = null;
     const newFile = new File(fileName, fileExtension, fileHash);
+
+    // new Upload Answer
+    const newUploadAnser = new UploadQuestionAnswer(question, review, newFile);
+    await newUploadAnser.validateOrReject();
 
     // oldfile in case of update
     let oldFile: File | undefined;
@@ -191,14 +200,16 @@ router.post(
           oldFile = uploadAnswer.uploadAnswer;
         }
         // save file entry to database
+        await newFile.validateOrReject();
         await transactionalEntityManager.save(newFile);
         // save answer to database
         if (uploadAnswer) {
           uploadAnswer.uploadAnswer = newFile;
         } else {
-          uploadAnswer = new UploadQuestionAnswer(question, review, newFile);
+          uploadAnswer = newUploadAnser;
         }
         // create/update uploadAnswer
+        // validation is done for newUploadAnser outside the transaction
         await transactionalEntityManager.save(uploadAnswer);
 
         // move the file (so if this fails everything above fails)

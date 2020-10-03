@@ -112,10 +112,12 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
         throw new Error("Questionnaire already exists");
       }
       // save questionnaire
+      await questionnaire.validateOrReject();
       await transactionalEntityManager.save(questionnaire);
 
       // save the assignment with the questionnaire
       assignment.reviewQuestionnaire = questionnaire;
+      await assignment.validateOrReject();
       await transactionalEntityManager.save(assignment);
     }
   );

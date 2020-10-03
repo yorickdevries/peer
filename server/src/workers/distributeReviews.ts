@@ -71,10 +71,12 @@ const distributeReviewsForAssignment = async function (
           null,
           reviewAssignment.submission
         );
+        await review.validateOrReject();
         await transactionalEntityManager.save(review);
       }
       // set the proper assignmentstate
       assignment.state = AssignmentState.REVIEW;
+      await assignment.validateOrReject();
       await transactionalEntityManager.save(assignment);
     }
   );

@@ -38,6 +38,7 @@ const importGroupsForAssignment = async function (
           // in case the user doesnt exists in the database yet, create it
           if (!user) {
             user = new User(netid);
+            await user.validateOrReject();
             await transactionalEntityManager.save(user);
           }
           // enroll user in the course if not already
@@ -53,6 +54,7 @@ const importGroupsForAssignment = async function (
           } else {
             // enroll the user as student in the course
             enrollment = new Enrollment(user, course, UserRole.STUDENT);
+            await enrollment.validateOrReject();
             await transactionalEntityManager.save(enrollment);
           }
         }
@@ -94,6 +96,7 @@ const importGroupsForAssignment = async function (
         const groupName = groupNameWithNetidList.groupName;
         // make the group
         const group = new Group(groupName, course, users, [assignment]);
+        await group.validateOrReject();
         await transactionalEntityManager.save(group);
         groups.push(group);
       }

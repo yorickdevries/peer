@@ -82,34 +82,23 @@ router.post("/", validateBody(rangeAnswerSchema), async (req, res) => {
       );
     return;
   }
-  let rangeAnswer: RangeQuestionAnswer | undefined;
   // make or overwrite rangeAnswer;
-  await getManager().transaction(
-    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
-    async (transactionalEntityManager) => {
-      rangeAnswer = await transactionalEntityManager.findOne(
-        RangeQuestionAnswer,
-        {
-          where: {
-            reviewId: review.id,
-            questionId: question.id,
-          },
-        }
-      );
-      if (rangeAnswer) {
-        rangeAnswer.rangeAnswer = req.body.rangeAnswer;
-      } else {
-        rangeAnswer = new RangeQuestionAnswer(
-          question,
-          review,
-          req.body.rangeAnswer
-        );
-      }
-      await transactionalEntityManager.save(rangeAnswer);
-    }
-  );
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  await rangeAnswer!.reload();
+  let rangeAnswer = await RangeQuestionAnswer.findOne({
+    where: {
+      reviewId: review.id,
+      questionId: question.id,
+    },
+  });
+  if (rangeAnswer) {
+    rangeAnswer.rangeAnswer = req.body.rangeAnswer;
+  } else {
+    rangeAnswer = new RangeQuestionAnswer(
+      question,
+      review,
+      req.body.rangeAnswer
+    );
+  }
+  await rangeAnswer.save();
   res.send(rangeAnswer);
 });
 

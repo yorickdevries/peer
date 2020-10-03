@@ -37,6 +37,7 @@ const parseAndSaveAffiliation = async function (
               });
               if (!ssoField) {
                 ssoField = new Affiliation(name);
+                await ssoField.validateOrReject();
                 await transactionalEntityManager.save(ssoField);
               }
             }
@@ -84,6 +85,7 @@ const parseAndSaveStudy = async function (input: any): Promise<Study[]> {
               });
               if (!ssoField) {
                 ssoField = new Study(name);
+                await ssoField.validateOrReject();
                 await transactionalEntityManager.save(ssoField);
               }
             }
@@ -138,6 +140,7 @@ const parseAndSaveOrganisationUnit = async function (
               );
               if (!ssoField) {
                 ssoField = new OrganisationUnit(name);
+                await ssoField.validateOrReject();
                 await transactionalEntityManager.save(ssoField);
               }
             }
