@@ -4,7 +4,6 @@ import entityList from "./models/entityList";
 import path from "path";
 
 // Database config for TypeORM
-
 const databaseConfig: {
   type: string;
   host: string;
@@ -63,16 +62,6 @@ switch (databaseConfig.type) {
       };
     }
     connectionConfig = { ...baseConfig, ...mariadbConfig };
-    break;
-  }
-  // in memory database for testing
-  case "sqlite": {
-    const sqliteConfig = {
-      type: databaseConfig.type,
-      database: ":memory:",
-      dropSchema: true,
-    };
-    connectionConfig = { ...baseConfig, ...sqliteConfig };
     break;
   }
   default:
