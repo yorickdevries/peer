@@ -29,7 +29,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   const assignment = await assignmentVersion.getAssignment();
   if (
     (await assignment.isEnrolledInGroup(user)) &&
-    (await assignment.getState()) === AssignmentState.UNPUBLISHED
+    assignment.isAtState(AssignmentState.UNPUBLISHED)
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
@@ -149,6 +149,17 @@ router.patch(
       }
       versionsToReview.push(versionToReview);
     }
+    // check whether certain fields can be changed
+    if (
+      assignment.isAtOrAfterState(AssignmentState.REVIEW) &&
+      assignmentVersion.reviewsPerUserPerAssignmentVersionToReview !==
+        req.body.reviewsPerUserPerAssignmentVersionToReview
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change reviewsPerUser at this state");
+      return;
+    }
     // patch assignmentVersion
     assignmentVersion.name = req.body.name;
     assignmentVersion.versionsToReview = versionsToReview;
@@ -167,6 +178,7 @@ router.patch(
 const querySubmissionSchema = Joi.object({
   groupId: Joi.number().integer().required(),
 });
+
 // get the submissions of a group
 router.get(
   "/:id/submissions",
@@ -185,7 +197,7 @@ router.get(
     if (!assignmentVersion) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
       return;
     }
     const group = await Group.findOne(groupId);
@@ -195,8 +207,13 @@ router.get(
         .send(ResponseMessage.GROUP_NOT_FOUND);
       return;
     }
-    if (!(await group.hasUser(user))) {
-      res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
+    if (
+      !(await group.hasUser(user)) &&
+      !(await assignmentVersion.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not part of the group");
       return;
     }
     const submissions = await assignmentVersion.getSubmissions(group);
@@ -205,10 +222,9 @@ router.get(
   }
 );
 
-// get the latest submission of a group
-// we should swicth to specific annotation of submissions which indicate whether they are the latest
+// get the submission which will be used for reviewing of a group
 router.get(
-  "/:id/latestsubmission",
+  "/:id/finalsubmission",
   validateParams(idSchema),
   validateQuery(querySubmissionSchema),
   async (req, res) => {
@@ -235,17 +251,20 @@ router.get(
       return;
     }
     if (!(await group.hasUser(user))) {
-      res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not part of the group");
       return;
     }
-    const latestSubmission = await assignmentVersion.getLatestSubmission(group);
-    if (!latestSubmission) {
+    console.log(assignmentVersion, group);
+    const finalSubmission = await assignmentVersion.getFinalSubmission(group);
+    if (!finalSubmission) {
       res
         .status(HttpStatusCode.NOT_FOUND)
         .send("No submissions have been made yet");
       return;
     }
-    res.send(latestSubmission);
+    res.send(finalSubmission);
   }
 );
 

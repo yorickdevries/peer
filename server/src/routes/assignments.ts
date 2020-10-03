@@ -315,16 +315,6 @@ router.patch(
         .send("User is not a teacher of the course");
       return;
     }
-    // check whether certain fields can be changed
-    if (
-      assignment.isAtOrAfterState(AssignmentState.REVIEW) &&
-      assignment.reviewsPerUser !== req.body.reviewsPerUser
-    ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("You cannot change reviewsPerUser at this state");
-      return;
-    }
     if (
       !assignment.isAtOrBeforeState(AssignmentState.SUBMISSION) &&
       assignment.enrollable !== req.body.enrollable
@@ -512,12 +502,14 @@ router.patch(
         .send("The assignment is not in submission state");
       return;
     }
-    const submissions = await assignment.getFinalSubmissionsOfEachGroup();
-    if (submissions.length === 0) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("There are no submissions for this assignment");
-      return;
+    for (const assignmentVersion of assignment.versions) {
+      const submissions = await assignmentVersion.getFinalSubmissionsOfEachGroup();
+      if (submissions.length === 0) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("There are no submissions for one of the assignment versions");
+        return;
+      }
     }
     assignment.state = AssignmentState.WAITING_FOR_REVIEW;
     await assignment.save();

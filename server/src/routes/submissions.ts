@@ -275,22 +275,26 @@ router.post(
     await getManager().transaction(
       "SERIALIZABLE", // serializable is the only way double final submissions can be prevented
       async (transactionalEntityManager) => {
-        // unsubmit all previous submissions
-        const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
-          Submission,
-          {
-            where: {
-              assignment: assignment,
-              group: group,
-            },
+        for (const assignmentVersion of assignment.versions) {
+          // unsubmit all previous submissions
+          const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
+            Submission,
+            {
+              where: {
+                assignmentVersion: assignmentVersion,
+                group: group,
+              },
+            }
+          );
+          // Set boolean of submission of older submissions to false
+          for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
+            submissionOfGroupForAssignment.final = false;
+            // do not validate as this might block transaction
+            //await submissionOfGroupForAssignment.validateOrReject();
+            await transactionalEntityManager.save(
+              submissionOfGroupForAssignment
+            );
           }
-        );
-        // Set boolean of submission of older submissions to false
-        for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
-          submissionOfGroupForAssignment.final = false;
-          // do not validate as this might block transaction
-          //await submissionOfGroupForAssignment.validateOrReject();
-          await transactionalEntityManager.save(submissionOfGroupForAssignment);
         }
 
         // save file entry to database
@@ -381,24 +385,26 @@ router.patch(
     await getManager().transaction(
       "SERIALIZABLE", // serializable is the only way double final submissions can be prevented
       async (transactionalEntityManager) => {
-        const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
-          Submission,
-          {
-            where: {
-              assignment: assignment,
-              group: group,
-            },
-          }
-        );
-        // set booleans to false for all other assignments
-        for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
-          if (submissionOfGroupForAssignment.id !== submission.id) {
-            submissionOfGroupForAssignment.final = false;
-            // do not validate as this might block transaction
-            // await submissionOfGroupForAssignment.validateOrReject();
-            await transactionalEntityManager.save(
-              submissionOfGroupForAssignment
-            );
+        for (const assignmentVersion of assignment.versions) {
+          const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
+            Submission,
+            {
+              where: {
+                assignmentVersion: assignmentVersion,
+                group: group,
+              },
+            }
+          );
+          // set booleans to false for all other assignments
+          for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
+            if (submissionOfGroupForAssignment.id !== submission.id) {
+              submissionOfGroupForAssignment.final = false;
+              // do not validate as this might block transaction
+              // await submissionOfGroupForAssignment.validateOrReject();
+              await transactionalEntityManager.save(
+                submissionOfGroupForAssignment
+              );
+            }
           }
         }
         await transactionalEntityManager.save(submission);

@@ -20,6 +20,7 @@ const distributeReviewsForAssignment = async function (
   await ensureConnection();
 
   const assignment = await Assignment.findOneOrFail(assignmentId);
+  const assignmentVersions = assignment.versions;
   const questionnaire = await assignment.getSubmissionQuestionnaire();
   if (!questionnaire) {
     throw new Error("Questionnaire not found");
@@ -55,7 +56,7 @@ const distributeReviewsForAssignment = async function (
     const reviewsPerUserPerAssignmentVersionToReview =
       assignmentVersion.reviewsPerUserPerAssignmentVersionToReview;
     // these users will be reviewing
-    const latestSubmissionsOfEachGroup = await assignmentVersion.getLatestSubmissionsOfEachGroup();
+    const latestSubmissionsOfEachGroup = await assignmentVersion.getFinalSubmissionsOfEachGroup();
     // create selfreviews if needed
     if (assignmentVersion.selfReview) {
       const selfReviewAssignments = await generateSelfReviews(
@@ -69,19 +70,12 @@ const distributeReviewsForAssignment = async function (
     // iterate over all verions which needs to be reviewed
     const versionsToReview = await assignmentVersion.getVersionsToReview();
     for (const assignmentVersionToReview of versionsToReview) {
-      const submissionsToReview = await assignmentVersionToReview.getLatestSubmissionsOfEachGroup();
-      let reviewDistributionForCurrentVersionToReview: reviewAssignment[];
-      try {
-        // can throw error
-        reviewDistributionForCurrentVersionToReview = await generateReviewDistribution(
-          submissionsToReview,
-          usersOfLatestSubmissions,
-          reviewsPerUserPerAssignmentVersionToReview
-        );
-      } catch (error) {
-        res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
-        return;
-      }
+      const submissionsToReview = await assignmentVersionToReview.getFinalSubmissionsOfEachGroup();
+      const reviewDistributionForCurrentVersionToReview = await generateReviewDistribution(
+        submissionsToReview,
+        usersOfLatestSubmissions,
+        reviewsPerUserPerAssignmentVersionToReview
+      );
       // add the distribution to fullReviewDistribution
       fullReviewDistribution.push(
         ...reviewDistributionForCurrentVersionToReview
@@ -124,7 +118,7 @@ const distributeReviewsForAssignment = async function (
       await transactionalEntityManager.save(assignment);
     }
   );
-  return `Distributed ${reviewDistribution.length} reviews for assignment ${assignment.id}`;
+  return `Distributed ${fullReviewDistribution.length} reviews for assignment ${assignment.id}`;
 };
 
 // Takes care of the distribution of reviews of submissions over the students
