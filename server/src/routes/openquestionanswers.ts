@@ -162,7 +162,7 @@ router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
   }
   // start transaction to make sure an asnwer isnt deleted from a submitted review
   await getManager().transaction(
-    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
+    "REPEATABLE READ",
     async (transactionalEntityManager) => {
       // review with update lock
       const reviewToCheck = await transactionalEntityManager

@@ -330,7 +330,7 @@ router.post(
 
     // start transaction make sure the file and assignment are both saved
     await getManager().transaction(
-      process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "READ COMMITTED",
+      "READ COMMITTED",
       async (transactionalEntityManager) => {
         if (file) {
           // save file entry to database
@@ -478,7 +478,7 @@ router.patch(
 
     // start transaction make sure the file and assignment are both saved
     await getManager().transaction(
-      process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
+      "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // fetch assignment form database
         assignment = await transactionalEntityManager.findOneOrFail(

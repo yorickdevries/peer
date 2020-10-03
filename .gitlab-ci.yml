@@ -63,6 +63,8 @@ test:
   stage: test
   variables:
     NODE_ENV: test
+  services:
+  - mariadb:10.1
   script:
   - cd server && npm install
   - npm run test
@@ -74,6 +76,8 @@ coverage:
   stage: test
   variables:
     NODE_ENV: test
+  services:
+  - mariadb:10.1
   script:
   - cd server && npm install
   - npm run coverage

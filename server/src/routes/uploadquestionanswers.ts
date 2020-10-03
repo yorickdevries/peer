@@ -183,7 +183,7 @@ router.post(
     let uploadAnswer: UploadQuestionAnswer | undefined;
     // start transaction make sure the file and submission are both saved
     await getManager().transaction(
-      process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
+      "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // fetch existing answer if present
         uploadAnswer = await transactionalEntityManager.findOne(
@@ -306,7 +306,7 @@ router.delete(
 
     // start transaction to make sure an asnwer isnt deleted from a submitted review
     await getManager().transaction(
-      process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
+      "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // review with update lock
         const reviewToCheck = await transactionalEntityManager

@@ -74,32 +74,32 @@ export default class Assignment extends BaseModel {
   state: AssignmentState;
 
   // publish_date timestamptz NOT NULL,
-  @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
+  @Column({ type: "timestamp" })
   @IsDefined()
   @IsDate()
   publishDate: Date;
 
   // due_date timestamptz NOT NULL,
-  @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
+  @Column({ type: "timestamp" })
   @IsDefined()
   @IsDate()
   dueDate: Date;
 
   // review_publish_date timestamptz NOT NULL,
-  @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
+  @Column({ type: "timestamp" })
   @IsDefined()
   @IsDate()
   reviewPublishDate: Date;
 
   // review_due_date timestamptz NOT NULL,
-  @Column({ type: process.env.NODE_ENV === "test" ? undefined : "timestamp" })
+  @Column({ type: "timestamp" })
   @IsDefined()
   @IsDate()
   reviewDueDate: Date;
 
   // review_evaluation_due_date timestamptz,
   @Column({
-    type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
+    type: "timestamp",
     nullable: true,
   })
   @IsOptional()
