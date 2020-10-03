@@ -8,7 +8,7 @@
     "dev": "nodemon",
     "lint": "eslint . --ext .ts",
     "lint-fix": "eslint . --ext .ts --fix",
-    "test": "jest ./tests",
+    "test": "jest ./tests --runInBand",
     "coverage": "jest --collectCoverage ./tests",
     "initdata": "node ./dist/scripts/initializeData.js",
     "typeorm": "ts-node ./node_modules/typeorm/cli.js --config src/ormconfig.ts",
