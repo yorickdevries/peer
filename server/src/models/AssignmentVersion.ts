@@ -119,36 +119,40 @@ export default class AssignmentVersion extends BaseModel {
     ).versionsToReview!;
   }
 
+  private async getSubmissionsOfGroup(group: Group): Promise<Submission[]> {
+    return Submission.find({
+      where: {
+        assignmentVersion: this,
+        group: group,
+      },
+    });
+  }
+
   async getSubmissions(group?: Group): Promise<Submission[]> {
     if (group) {
       return this.getSubmissionsOfGroup(group);
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return (
-        await AssignmentVersion.findOneOrFail(this.id, {
-          relations: ["submissions"],
-        })
-      ).submissions!;
+      return Submission.find({ where: { assignmentVersion: this } });
     }
   }
 
-  async getLatestSubmissionsOfEachGroup(): Promise<Submission[]> {
-    const latestSubmissionsOfEachGroup: Submission[] = [];
-    const assignment = await this.getAssignment();
-    const groups = await assignment.getGroups();
-    for (const group of groups) {
-      const latestSubmission = await this.getLatestSubmission(group);
-      if (latestSubmission) {
-        latestSubmissionsOfEachGroup.push(latestSubmission);
-      }
-    }
-    return latestSubmissionsOfEachGroup;
+  async getFinalSubmissionsOfEachGroup(): Promise<Submission[]> {
+    return await Submission.find({
+      where: { assignmentVersion: this, final: true },
+    });
   }
 
-  async getLatestSubmission(group: Group): Promise<Submission | undefined> {
-    const submissions = await this.getSubmissions(group);
-    const latestSubmission = _.maxBy(submissions, "id");
-    return latestSubmission;
+  async getFinalSubmission(group: Group): Promise<Submission | undefined> {
+    const finalSubmissions = await Submission.find({
+      where: { assignmentVersion: this, group: group, final: true },
+    });
+    if (finalSubmissions.length === 0) {
+      return undefined;
+    } else if (finalSubmissions.length === 1) {
+      return finalSubmissions[0];
+    } else {
+      throw new Error("There are multiple finalSubmissions");
+    }
   }
 
   async isTeacherInCourse(user: User): Promise<boolean> {
@@ -164,15 +168,6 @@ export default class AssignmentVersion extends BaseModel {
   async getAssignmentVersionWithVersionsToReview(): Promise<AssignmentVersion> {
     return await AssignmentVersion.findOneOrFail(this.id, {
       relations: ["versionsToReview"],
-    });
-  }
-
-  private async getSubmissionsOfGroup(group: Group): Promise<Submission[]> {
-    return Submission.find({
-      where: {
-        assignmentVersion: this,
-        group: group,
-      },
     });
   }
 }
