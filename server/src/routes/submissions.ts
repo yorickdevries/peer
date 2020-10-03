@@ -6,7 +6,7 @@ import {
   idSchema,
   validateParams,
 } from "../middleware/validation";
-import Assignment from "../models/Assignment";
+import AssignmentVersion from "../models/AssignmentVersion";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Group from "../models/Group";
 import config from "config";
@@ -30,33 +30,35 @@ const maxFileSize = config.get("maxFileSize") as number;
 const router = express.Router();
 
 // Joi inputvalidation for query
-const assignmentIdSchema = Joi.object({
-  assignmentId: Joi.number().integer().required(),
+const assignmentVersionIdSchema = Joi.object({
+  assignmentVersionId: Joi.number().integer().required(),
 });
 // get all the submissions for an assignment
-router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
+router.get("/", validateQuery(assignmentVersionIdSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const assignmentId: number = req.query.assignmentId as any;
-  const assignment = await Assignment.findOne(assignmentId);
-  if (!assignment) {
+  const assignmentVersionId: number = req.query.assignmentVersionId as any;
+  const assignmentVersion = await AssignmentVersion.findOne(
+    assignmentVersionId
+  );
+  if (!assignmentVersion) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
-      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
     return;
   }
   if (
     // not a teacher
-    !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
+    !(await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
     return;
   }
-  const submissions = await assignment.getSubmissions();
+  const submissions = await assignmentVersion.getSubmissions();
   const sortedSubmissions = _.sortBy(submissions, "id");
   res.send(sortedSubmissions);
 });
@@ -73,11 +75,11 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     return;
   }
   const group = await submission.getGroup();
-  const assignment = await submission.getAssignment();
+  const assignmentVersion = await submission.getAssignmentVersion();
   if (
     !(
       (await group.hasUser(user)) ||
-      (await assignment.isTeacherOrTeachingAssistantInCourse(user))
+      (await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user))
     )
   ) {
     res
@@ -100,11 +102,11 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
     return;
   }
   const group = await submission.getGroup();
-  const assignment = await submission.getAssignment();
+  const assignmentVersion = await submission.getAssignmentVersion();
   if (
     !(
       (await group.hasUser(user)) ||
-      (await assignment.isTeacherOrTeachingAssistantInCourse(user))
+      (await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user))
     )
   ) {
     res
@@ -130,7 +132,8 @@ router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
       .send(ResponseMessage.SUBMISSION_NOT_FOUND);
     return;
   }
-  const assignment = await submission.getAssignment();
+  const assignmentVersion = await submission.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (!assignment.isAtState(AssignmentState.FEEDBACK)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
@@ -176,7 +179,7 @@ router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
 // Joi inputvalidation
 const submissionSchema = Joi.object({
   groupId: Joi.number().integer().required(),
-  assignmentId: Joi.number().integer().required(),
+  assignmentVersionId: Joi.number().integer().required(),
 });
 // post a submission in a course
 router.post(
@@ -199,13 +202,16 @@ router.post(
         .send(ResponseMessage.GROUP_NOT_FOUND);
       return;
     }
-    const assignment = await Assignment.findOne(req.body.assignmentId);
-    if (!assignment) {
+    const assignmentVersion = await AssignmentVersion.findOne(
+      req.body.assignmentVersionId
+    );
+    if (!assignmentVersion) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
       return;
     }
+    const assignment = await assignmentVersion.getAssignment();
     if (!(await group.hasAssignment(assignment))) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -257,7 +263,13 @@ router.post(
     const file = new File(fileName, fileExtension, fileHash);
 
     // create submission
-    const submission = new Submission(user, group, assignment, file, true);
+    const submission = new Submission(
+      user,
+      group,
+      assignmentVersion,
+      file,
+      true
+    );
     // this checks for the right extension in the validate function
     await submission.validateOrReject();
     await getManager().transaction(

@@ -12,6 +12,7 @@ import File from "../../src/models/File";
 import { generateReviewDistribution } from "../../src/workers/distributeReviews";
 import Enrollment from "../../src/models/Enrollment";
 import UserRole from "../../src/enum/UserRole";
+import AssignmentVersion from "../../src/models/AssignmentVersion";
 import { AssignmentState } from "../../src/enum/AssignmentState";
 import Extensions from "../../src/enum/Extensions";
 
@@ -50,7 +51,6 @@ describe("Review distribution", () => {
     const assignment = new Assignment(
       "Example title",
       course,
-      2,
       true,
       false,
       new Date("2020-06-23T10:00Z"),
@@ -72,6 +72,19 @@ describe("Review distribution", () => {
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
+
+    // assignmentVersion
+    const assignmentVersion = new AssignmentVersion(
+      "default",
+      assignment,
+      [],
+      2,
+      false
+    );
+    await assignmentVersion.save();
+    // set review setting so users review the same assignment
+    assignmentVersion.versionsToReview = [assignmentVersion];
+    await assignmentVersion.save();
 
     // students
     const numGroups = 10;
@@ -108,7 +121,13 @@ describe("Review distribution", () => {
       const file = new File("filename", ".pdf", null);
       await file.save();
 
-      const submission = new Submission(student, group, assignment, file, true);
+      const submission = new Submission(
+        student,
+        group,
+        assignmentVersion,
+        file,
+        true
+      );
       await submission.save();
       submissions.push(submission);
     }
@@ -150,7 +169,6 @@ describe("Review distribution", () => {
     const assignment = new Assignment(
       "Example title",
       course,
-      2,
       true,
       false,
       new Date("2020-06-23T10:00Z"),
@@ -172,6 +190,19 @@ describe("Review distribution", () => {
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
+
+    // assignmentVersion
+    const assignmentVersion = new AssignmentVersion(
+      "default",
+      assignment,
+      [],
+      2,
+      false
+    );
+    await assignmentVersion.save();
+    // set review setting so users review the same assignment
+    assignmentVersion.versionsToReview = [assignmentVersion];
+    await assignmentVersion.save();
 
     // students
     const numGroups = 4;
@@ -208,7 +239,13 @@ describe("Review distribution", () => {
       const file = new File("filename", ".pdf", null);
       await file.save();
 
-      const submission = new Submission(student, group, assignment, file, true);
+      const submission = new Submission(
+        student,
+        group,
+        assignmentVersion,
+        file,
+        true
+      );
       await submission.save();
       submissions.push(submission);
     }
@@ -256,7 +293,6 @@ describe("Review distribution", () => {
     const assignment = new Assignment(
       "Example title",
       course,
-      2,
       true,
       false,
       new Date("2020-06-23T10:00Z"),
@@ -278,6 +314,19 @@ describe("Review distribution", () => {
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
+
+    // assignmentVersion
+    const assignmentVersion = new AssignmentVersion(
+      "default",
+      assignment,
+      [],
+      2,
+      false
+    );
+    await assignmentVersion.save();
+    // set review setting so users review the same assignment
+    assignmentVersion.versionsToReview = [assignmentVersion];
+    await assignmentVersion.save();
 
     const student1 = new User(`student1`);
     await student1.save();
@@ -304,7 +353,7 @@ describe("Review distribution", () => {
     const submission1 = new Submission(
       student1,
       group1,
-      assignment,
+      assignmentVersion,
       file1,
       true
     );
@@ -326,7 +375,7 @@ describe("Review distribution", () => {
     const submission2 = new Submission(
       student2,
       group2,
-      assignment,
+      assignmentVersion,
       file2,
       true
     );

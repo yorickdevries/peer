@@ -46,7 +46,6 @@ describe("Group import", () => {
       .set("cookie", teacherCookie)
       .field("name", "Example title")
       .field("courseId", courseId)
-      .field("reviewsPerUser", 2)
       .field("enrollable", true)
       .field("reviewEvaluation", false)
       .field("publishDate", new Date("2020-01-01T10:00Z").toISOString())

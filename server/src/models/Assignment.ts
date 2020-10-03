@@ -16,8 +16,6 @@ import {
   IsString,
   IsNotEmpty,
   IsBoolean,
-  IsInt,
-  IsPositive,
   IsDate,
   IsUrl,
   IsEnum,
@@ -29,12 +27,12 @@ import User from "./User";
 import File from "./File";
 import moment from "moment";
 import UserRole from "../enum/UserRole";
-import Submission from "./Submission";
 import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
 import Extensions from "../enum/Extensions";
 import AssignmentExport from "./AssignmentExport";
+import AssignmentVersion from "./AssignmentVersion";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -48,13 +46,6 @@ export default class Assignment extends BaseModel {
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  // reviews_per_user int NOT NULL,
-  @Column()
-  @IsDefined()
-  @IsInt()
-  @IsPositive()
-  reviewsPerUser: number;
 
   // one_person_groups boolean NOT NULL,
   @Column()
@@ -143,6 +134,14 @@ export default class Assignment extends BaseModel {
   @IsNotEmpty()
   externalLink: string | null;
 
+  @OneToMany(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (_type) => AssignmentVersion,
+    (assignmentVersion) => assignmentVersion.assignment,
+    { eager: true }
+  )
+  versions!: AssignmentVersion[];
+
   @Column()
   @IsDefined()
   @IsString()
@@ -190,10 +189,6 @@ export default class Assignment extends BaseModel {
   @ManyToMany((_type) => Group, (group) => group.assignments)
   groups?: Group[];
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @OneToMany((_type) => Submission, (submission) => submission.assignment)
-  submissions?: Submission[];
-
   @OneToMany(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => AssignmentExport,
@@ -204,7 +199,6 @@ export default class Assignment extends BaseModel {
   constructor(
     name: string,
     course: Course,
-    reviewsPerUser: number,
     enrollable: boolean,
     reviewEvaluation: boolean,
     publishDate: Date,
@@ -226,7 +220,6 @@ export default class Assignment extends BaseModel {
     super();
     this.name = name;
     this.course = course;
-    this.reviewsPerUser = reviewsPerUser;
     this.enrollable = enrollable;
     this.reviewEvaluation = reviewEvaluation;
     this.state = AssignmentState.UNPUBLISHED; // initial state
@@ -334,40 +327,6 @@ export default class Assignment extends BaseModel {
       return null;
     } else {
       return ReviewQuestionnaire.findOneOrFail(this.reviewQuestionnaireId);
-    }
-  }
-
-  async getSubmissions(group?: Group): Promise<Submission[]> {
-    if (group) {
-      return this.getSubmissionsOfGroup(group);
-    } else {
-      return Submission.find({ where: { assignment: this } });
-    }
-  }
-
-  private async getSubmissionsOfGroup(group: Group): Promise<Submission[]> {
-    return Submission.find({
-      where: {
-        assignment: this,
-        group: group,
-      },
-    });
-  }
-
-  async getFinalSubmissionsOfEachGroup(): Promise<Submission[]> {
-    return await Submission.find({ where: { assignment: this, final: true } });
-  }
-
-  async getFinalSubmission(group: Group): Promise<Submission | undefined> {
-    const finalSubmissions = await Submission.find({
-      where: { assignment: this, group: group, final: true },
-    });
-    if (finalSubmissions.length === 0) {
-      return undefined;
-    } else if (finalSubmissions.length === 1) {
-      return finalSubmissions[0];
-    } else {
-      throw new Error("There are multiple finalSubmissions");
     }
   }
 

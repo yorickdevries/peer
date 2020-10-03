@@ -24,27 +24,71 @@ const distributeReviewsForAssignment = async function (
   if (!questionnaire) {
     throw new Error("Questionnaire not found");
   }
-  // now the reviews can be distributed
-  const submissions = await assignment.getFinalSubmissionsOfEachGroup();
-  // get all unique users of the submissions (unique as several submissions might have the same user in the group)
-  const users: User[] = [];
-  for (const submission of submissions) {
-    const group = await submission.getGroup();
-    const groupUsers = await group.getUsers();
-    for (const groupUser of groupUsers) {
-      const alreadyContainsUser = _.some(users, (user) => {
-        return user.netid === groupUser.netid;
-      });
-      if (!alreadyContainsUser) {
-        users.push(groupUser);
+
+  const getUniqueUsersOfSubmissions = async function (
+    submissions: Submission[]
+  ) {
+    // get all unique users of the submissions (unique as several submissions might have the same user in the group)
+    const users: User[] = [];
+    for (const submission of submissions) {
+      const group = await submission.getGroup();
+      const groupUsers = await group.getUsers();
+      for (const groupUser of groupUsers) {
+        const alreadyContainsUser = _.some(users, (user) => {
+          return user.netid === groupUser.netid;
+        });
+        if (!alreadyContainsUser) {
+          users.push(groupUser);
+        }
       }
     }
+    return users;
+  };
+
+  interface reviewAssignment {
+    reviewer: User;
+    submission: Submission;
   }
-  const reviewDistribution = await generateReviewDistribution(
-    submissions,
-    users,
-    assignment.reviewsPerUser
-  );
+  const fullReviewDistribution: reviewAssignment[] = [];
+  // assignmentVersions of which the users will be reviewing
+  for (const assignmentVersion of assignmentVersions) {
+    const reviewsPerUserPerAssignmentVersionToReview =
+      assignmentVersion.reviewsPerUserPerAssignmentVersionToReview;
+    // these users will be reviewing
+    const latestSubmissionsOfEachGroup = await assignmentVersion.getLatestSubmissionsOfEachGroup();
+    // create selfreviews if needed
+    if (assignmentVersion.selfReview) {
+      const selfReviewAssignments = await generateSelfReviews(
+        latestSubmissionsOfEachGroup
+      );
+      fullReviewDistribution.push(...selfReviewAssignments);
+    }
+    const usersOfLatestSubmissions = await getUniqueUsersOfSubmissions(
+      latestSubmissionsOfEachGroup
+    );
+    // iterate over all verions which needs to be reviewed
+    const versionsToReview = await assignmentVersion.getVersionsToReview();
+    for (const assignmentVersionToReview of versionsToReview) {
+      const submissionsToReview = await assignmentVersionToReview.getLatestSubmissionsOfEachGroup();
+      let reviewDistributionForCurrentVersionToReview: reviewAssignment[];
+      try {
+        // can throw error
+        reviewDistributionForCurrentVersionToReview = await generateReviewDistribution(
+          submissionsToReview,
+          usersOfLatestSubmissions,
+          reviewsPerUserPerAssignmentVersionToReview
+        );
+      } catch (error) {
+        res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
+        return;
+      }
+      // add the distribution to fullReviewDistribution
+      fullReviewDistribution.push(
+        ...reviewDistributionForCurrentVersionToReview
+      );
+    }
+  }
+
   // create all reviews in an transaction
   await getManager().transaction(
     "SERIALIZABLE", // serializable is the only way to make sure to reviews exist before creating them
@@ -56,8 +100,8 @@ const distributeReviewsForAssignment = async function (
       if (existingReviews.length > 0) {
         throw new Error("There are already reviews for this assignment");
       }
-      // iterate over reviewDistribution
-      for (const reviewAssignment of reviewDistribution) {
+      // iterate over fullReviewDistribution
+      for (const reviewAssignment of fullReviewDistribution) {
         // make the review
         const review = new ReviewOfSubmission(
           questionnaire,
@@ -300,6 +344,24 @@ const performMaxFlow = async function (
     console.log(`MaxFlow achieved: ${reviewDistribution.length}`);
     return reviewDistribution;
   }
+};
+
+const generateSelfReviews = async function (
+  submissions: Submission[]
+): Promise<reviewAssignment[]> {
+  const selfReviewAssignments: reviewAssignment[] = [];
+  for (const submission of submissions) {
+    const group = await submission.getGroup();
+    const users = await group.getUsers();
+    for (const user of users) {
+      const selfReviewAssignment = {
+        reviewer: user,
+        submission: submission,
+      };
+      selfReviewAssignments.push(selfReviewAssignment);
+    }
+  }
+  return selfReviewAssignments;
 };
 
 export { distributeReviewsForAssignment, generateReviewDistribution };

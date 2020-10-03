@@ -11,10 +11,11 @@ import {
 import { IsDefined, IsBoolean } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
-import Assignment from "../models/Assignment";
+import AssignmentVersion from "../models/AssignmentVersion";
 import Group from "./Group";
 import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
+import Assignment from "../models/Assignment";
 
 @Entity()
 export default class Submission extends BaseModel {
@@ -37,13 +38,17 @@ export default class Submission extends BaseModel {
   group?: Group;
 
   // Assignment_id int NOT NULL,
-  @RelationId((submission: Submission) => submission.assignment)
-  assignmentId!: number;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @ManyToOne((_type) => Assignment, (assignment) => assignment.submissions, {
-    nullable: false,
-  })
-  assignment?: Assignment;
+  @RelationId((submission: Submission) => submission.assignmentVersion)
+  assignmentVersionId!: number;
+  @ManyToOne(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (_type) => AssignmentVersion,
+    (assignmentVersion) => assignmentVersion.submissions,
+    {
+      nullable: false,
+    }
+  )
+  assignmentVersion?: AssignmentVersion;
 
   // file_path varchar(500) NOT NULL,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -67,14 +72,14 @@ export default class Submission extends BaseModel {
   constructor(
     user: User,
     group: Group,
-    assignment: Assignment,
+    assignmentVersion: AssignmentVersion,
     file: File,
     final: boolean
   ) {
     super();
     this.user = user;
     this.group = group;
-    this.assignment = assignment;
+    this.assignmentVersion = assignmentVersion;
     this.file = file;
     this.final = final;
   }
@@ -83,9 +88,10 @@ export default class Submission extends BaseModel {
   async validateOrReject(): Promise<void> {
     const group = this.group ? this.group : await this.getGroup();
     const user = this.user ? this.user : await this.getUser();
-    const assignment = this.assignment
-      ? this.assignment
-      : await this.getAssignment();
+    const assignmentVersion = this.assignmentVersion
+      ? this.assignmentVersion
+      : await this.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     // might need to be changed if a teacher submits on behalf of a group
     if (
       !(await group.hasUser(user)) &&
@@ -110,8 +116,13 @@ export default class Submission extends BaseModel {
     return Group.findOneOrFail(this.groupId);
   }
 
+  async getAssignmentVersion(): Promise<AssignmentVersion> {
+    return AssignmentVersion.findOneOrFail(this.assignmentVersionId);
+  }
+
   async getAssignment(): Promise<Assignment> {
-    return Assignment.findOneOrFail(this.assignmentId);
+    const assignmentVersion = await this.getAssignmentVersion();
+    return assignmentVersion.getAssignment();
   }
 
   async getUser(): Promise<User> {

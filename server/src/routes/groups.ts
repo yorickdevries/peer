@@ -94,12 +94,15 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
   // TODO: these checks should be done in an transaction
   const assignments = await group.getAssignments();
   for (const assignment of assignments) {
-    const submission = await assignment.getFinalSubmission(group);
-    if (submission) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The group has already made submissions");
-      return;
+    const assignmentVersions = assignment.versions;
+    for (const assignmentVersion of assignmentVersions) {
+      const submissions = await assignmentVersion.getSubmissions(group);
+      if (submissions.length > 0) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("The group has already made submissions");
+        return;
+      }
     }
   }
   const users = await group.getUsers();

@@ -767,6 +767,42 @@ router.post(
         .send("There are already reviews for this assignment");
       return;
     }
+
+    // Check whether all versions are reviewed
+    // ans all VersionsToReview are not empty
+    const assignmentVersions = assignment.versions;
+    // check for every version whether it is reviewed
+    for (const assignmentVersion of assignmentVersions) {
+      if ((await assignmentVersion.getVersionsToReview()).length === 0) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send(
+            `assignmentVersion with id ${assignmentVersion.id} is not reviewing any assignmentVersions`
+          );
+        return;
+      }
+
+      let isReviewed = false;
+      // check all other assignmentversions
+      for (const otherAssignmentVersion of assignmentVersions) {
+        const versionsToReview = await otherAssignmentVersion.getVersionsToReview();
+        // check all other assignmentversions whether it is reviewing the version
+        for (const versionToReview of versionsToReview) {
+          if (versionToReview.id === assignmentVersion.id) {
+            isReviewed = true;
+          }
+        }
+      }
+      if (!isReviewed) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send(
+            `assignmentVersion with id ${assignmentVersion.id} is not reviewed by another assignmentVersion`
+          );
+        return;
+      }
+    }
+
     // offload a function to a worker
     startDistributeReviewsForAssignmentWorker(assignment.id);
 
