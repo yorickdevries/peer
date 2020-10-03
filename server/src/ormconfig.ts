@@ -33,6 +33,8 @@ const baseConfig = {
     // to be compiled into dist/ folder.
     migrationsDir: "src/migration",
   },
+  // when testing, the database is refreshed
+  dropSchema: process.env.NODE_ENV === "test" ? true : false,
 };
 // will be assigned in the switch statement
 let connectionConfig: ConnectionOptions;
