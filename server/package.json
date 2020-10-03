@@ -8,8 +8,8 @@
     "dev": "nodemon",
     "lint": "eslint . --ext .ts",
     "lint-fix": "eslint . --ext .ts --fix",
-    "test": "jest ./tests",
-    "coverage": "jest --collectCoverage ./tests",
+    "test": "jest --runInBand ./tests",
+    "coverage": "jest --runInBand --collectCoverage ./tests",
     "initdata": "node ./dist/scripts/initializeData.js",
     "typeorm": "ts-node ./node_modules/typeorm/cli.js --config src/ormconfig.ts",
     "typeorm:migration:generate": "npm run typeorm migration:generate -- -n",
@@ -79,7 +79,6 @@
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5",
     "source-map-support": "^0.5.19",
-    "sqlite3": "^5.0.0",
     "supertest": "^4.0.2",
     "ts-jest": "^26.1.0"
   }

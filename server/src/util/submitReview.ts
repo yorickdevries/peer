@@ -10,7 +10,7 @@ const submitReview = async function (
   flaggedByReviewer?: boolean
 ): Promise<Review> {
   await getManager().transaction(
-    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
+    "REPEATABLE READ",
     async (transactionalEntityManager) => {
       // reload the review in transaction
       review = await transactionalEntityManager.findOneOrFail(
@@ -24,9 +24,11 @@ const submitReview = async function (
       // check whether the review is allowed to be submitted
       if (!review.flaggedByReviewer) {
         // check whether all non-optional questions are answered
-        const answers = await transactionalEntityManager.find(QuestionAnswer, {
-          where: { review: review },
-        });
+        const answers = await transactionalEntityManager
+          .createQueryBuilder(QuestionAnswer, "question_answer")
+          .setLock("pessimistic_write")
+          .where("reviewId = :rid", { rid: review.id })
+          .getMany();
         const questionnaire = await transactionalEntityManager.findOneOrFail(
           Questionnaire,
           review.questionnaireId
