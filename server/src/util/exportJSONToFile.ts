@@ -40,7 +40,7 @@ const exportJSONToFile = async function (
   const file = new File(fileName, fileExtension, fileHash);
 
   await getManager().transaction(
-    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "READ COMMITTED",
+    "READ COMMITTED",
     async (transactionalEntityManager) => {
       // save file entry to database
       await file.validateOrReject();

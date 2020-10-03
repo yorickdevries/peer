@@ -22,7 +22,7 @@ const importGroupsForAssignment = async function (
 
   // save the users and enroll them in the course
   await getManager().transaction(
-    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ", // make sure the role isnt changed while importing
+    "REPEATABLE READ", // make sure the role isnt changed while importing
     async (transactionalEntityManager) => {
       const course = await transactionalEntityManager.findOneOrFail(
         Course,

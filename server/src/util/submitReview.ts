@@ -10,7 +10,7 @@ const submitReview = async function (
   flaggedByReviewer?: boolean
 ): Promise<Review> {
   await getManager().transaction(
-    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
+    "REPEATABLE READ",
     async (transactionalEntityManager) => {
       // reload the review in transaction
       review = await transactionalEntityManager.findOneOrFail(

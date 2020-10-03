@@ -11,7 +11,7 @@ import ReplyingPDFAnnotation from "./ReplyingPDFAnnotation";
 export default class CommentingPDFAnnotation extends PDFAnnotation {
   // selector (To annotate where the annotation is put in the document)
   // TODO make special class for this?
-  @Column({ type: process.env.NODE_ENV === "test" ? "simple-json" : "json" })
+  @Column({ type: "json" })
   @IsDefined()
   // eslint-disable-next-line @typescript-eslint/ban-types
   selector: object;
