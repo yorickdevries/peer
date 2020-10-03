@@ -705,7 +705,7 @@ describe("Integration", () => {
 
     res = await request(server)
       .get(
-        `/api/assignments/${assignment.id}/finalsubmission?groupId=${group2.id}`
+        `/api/assignmentversions/${assignmentVersion.id}/finalsubmission?groupId=${group2.id}`
       )
       .set("cookie", await studentCookie2());
     // assertions
@@ -720,7 +720,7 @@ describe("Integration", () => {
         "submission2.pdf"
       )
       .field("groupId", group2.id)
-      .field("assignmentId", assignment.id);
+      .field("assignmentVersionId", assignmentVersion.id);
 
     expect(res.status).toBe(HttpStatusCode.OK);
     const submission2 = JSON.parse(res.text);
@@ -738,7 +738,7 @@ describe("Integration", () => {
     // get final submissions for this assignment by this group
     res = await request(server)
       .get(
-        `/api/assignmentversions/${assignmentVersion.id}/latestsubmission?groupId=${group1.id}`
+        `/api/assignmentversions/${assignmentVersion.id}/finalsubmission?groupId=${group1.id}`
       )
       .set("cookie", await studentCookie1());
     // assertions
