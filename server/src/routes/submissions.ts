@@ -256,7 +256,10 @@ router.post(
     const fileHash = null;
     const file = new File(fileName, fileExtension, fileHash);
 
-    let submission: Submission;
+    // create submission
+    const submission = new Submission(user, group, assignment, file, true);
+    // this checks for the right extension in the validate function
+    await submission.validateOrReject();
     await getManager().transaction(
       "SERIALIZABLE", // serializable is the only way double final submissions can be prevented
       async (transactionalEntityManager) => {
@@ -273,15 +276,15 @@ router.post(
         // Set boolean of submission of older submissions to false
         for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
           submissionOfGroupForAssignment.final = false;
+          // do not validate as this might block transaction
+          //await submissionOfGroupForAssignment.validateOrReject();
           await transactionalEntityManager.save(submissionOfGroupForAssignment);
         }
 
         // save file entry to database
+        await file.validateOrReject();
         await transactionalEntityManager.save(file);
 
-        // create submission
-        submission = new Submission(user, group, assignment, file, true);
-        // this checks for the right extension in the validate function
         await transactionalEntityManager.save(submission);
 
         // move the file (so if this fails everything above fails)
@@ -358,6 +361,10 @@ router.patch(
     }
     // otherwise, perform the patch
     const final = req.body.final;
+    // finally set the submission
+    submission.final = final;
+    await submission.validateOrReject();
+
     // start transaction make sure all submissions are changed at the same time
     await getManager().transaction(
       "SERIALIZABLE", // serializable is the only way double final submissions can be prevented
@@ -375,13 +382,13 @@ router.patch(
         for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
           if (submissionOfGroupForAssignment.id !== submission.id) {
             submissionOfGroupForAssignment.final = false;
+            // do not validate as this might block transaction
+            // await submissionOfGroupForAssignment.validateOrReject();
             await transactionalEntityManager.save(
               submissionOfGroupForAssignment
             );
           }
         }
-        // finally set the submission
-        submission.final = final;
         await transactionalEntityManager.save(submission);
       }
     );

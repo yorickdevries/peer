@@ -649,8 +649,31 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
       .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
     return;
   }
+  const existingReview = await ReviewOfReview.findOne({
+    where: { reviewOfSubmission: review.id },
+  });
+  if (existingReview) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("There already exists a reviewEvaluation");
+    return;
+  }
+
   // create the reviewEvaluation
-  let reviewEvaluation: ReviewOfReview;
+  const reviewEvaluation = new ReviewOfReview(
+    reviewQuestionnaire,
+    user,
+    false,
+    false,
+    new Date(), // set startedAt
+    null,
+    null,
+    null,
+    null,
+    review
+  );
+  // validate outside transaction as it otherwise might block the transaction
+  await reviewEvaluation.validateOrReject();
   await getManager().transaction(
     "SERIALIZABLE", // serializable is the only way double reviewevaluations can be prevented
     async (transactionalEntityManager) => {
@@ -662,28 +685,12 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
       if (existingReview) {
         throw new Error("There already exists a reviewEvaluation");
       }
-      // create review
-      reviewEvaluation = new ReviewOfReview(
-        reviewQuestionnaire,
-        user,
-        false,
-        false,
-        null,
-        null,
-        null,
-        null,
-        null,
-        review
-      );
-      // set startedAt
-      reviewEvaluation.startedAt = new Date();
       await transactionalEntityManager.save(reviewEvaluation);
     }
   );
+  await reviewEvaluation.reload();
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  await reviewEvaluation!.reload();
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const anonymousReview = reviewEvaluation!.getAnonymousVersionWithReviewerNetid();
+  const anonymousReview = reviewEvaluation.getAnonymousVersionWithReviewerNetid();
   res.send(anonymousReview);
 });
 

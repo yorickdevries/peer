@@ -95,9 +95,11 @@ router.post(
       process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "READ COMMITTED",
       async (transactionalEntityManager) => {
         // save the course so it gets an id
+        await course.validateOrReject();
         await transactionalEntityManager.save(course);
         // here the current user needs to be enrolled as teacher fot he just created course
         const enrollment = new Enrollment(user, course, UserRole.TEACHER);
+        await enrollment.validateOrReject();
         await transactionalEntityManager.save(enrollment);
       }
     );

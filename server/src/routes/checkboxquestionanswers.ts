@@ -104,36 +104,23 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
       );
     return;
   }
-  let checkboxAnswer: CheckboxQuestionAnswer | undefined;
   // make or overwrite checkboxAnswer;
-  await getManager().transaction(
-    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
-    async (transactionalEntityManager) => {
-      checkboxAnswer = await transactionalEntityManager.findOne(
-        CheckboxQuestionAnswer,
-        {
-          where: {
-            reviewId: review.id,
-            questionId: question.id,
-          },
-        }
-      );
-      if (checkboxAnswer) {
-        checkboxAnswer.checkboxAnswer = checkboxQuestionOptions;
-      } else {
-        checkboxAnswer = new CheckboxQuestionAnswer(
-          question,
-          review,
-          checkboxQuestionOptions
-        );
-      }
-      // validation isnt done automatically as the changed field is a list
-      await checkboxAnswer.validateOrReject();
-      await transactionalEntityManager.save(checkboxAnswer);
-    }
-  );
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  await checkboxAnswer!.reload();
+  let checkboxAnswer = await CheckboxQuestionAnswer.findOne({
+    where: {
+      reviewId: review.id,
+      questionId: question.id,
+    },
+  });
+  if (checkboxAnswer) {
+    checkboxAnswer.checkboxAnswer = checkboxQuestionOptions;
+  } else {
+    checkboxAnswer = new CheckboxQuestionAnswer(
+      question,
+      review,
+      checkboxQuestionOptions
+    );
+  }
+  await checkboxAnswer.save();
   res.send(checkboxAnswer);
 });
 
