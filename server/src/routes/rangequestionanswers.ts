@@ -168,11 +168,16 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
   await getManager().transaction(
     process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "REPEATABLE READ",
     async (transactionalEntityManager) => {
-      // const review
-      const reviewToCheck = await transactionalEntityManager.findOneOrFail(
-        Review,
-        review.id
-      );
+      // review with update lock
+      const reviewToCheck = await transactionalEntityManager
+        .createQueryBuilder(Review, "review")
+        .setLock("pessimistic_write")
+        .where("id = :id", { id: review.id })
+        .getOne();
+
+      if (!reviewToCheck) {
+        throw new Error("Review does not exist");
+      }
       if (reviewToCheck.submitted) {
         throw new Error("The review is already submitted");
       }
