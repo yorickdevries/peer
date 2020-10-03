@@ -87,7 +87,7 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
   }
   let enrollment: Enrollment;
   await getManager().transaction(
-    process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "READ COMMITTED",
+    "READ COMMITTED",
     async (transactionalEntityManager) => {
       let user = await transactionalEntityManager.findOne(User, userNetid);
       // in case the user doesnt exists in the database yet, create it

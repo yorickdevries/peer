@@ -985,5 +985,5 @@ describe("Integration", () => {
       .set("cookie", await studentCookie2());
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text).length).toBe(0);
-  }, 60000); // timeout is set to 60 seconds
+  });
 });

@@ -92,7 +92,7 @@ router.post(
     );
     // start transaction to both save the course and teacher enrollment
     await getManager().transaction(
-      process.env.NODE_ENV === "test" ? "SERIALIZABLE" : "READ COMMITTED",
+      "READ COMMITTED",
       async (transactionalEntityManager) => {
         // save the course so it gets an id
         await course.validateOrReject();
