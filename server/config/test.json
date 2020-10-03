@@ -1,6 +1,6 @@
 {
     "database": {
-        "type": "sqlite"
+        "database": "test"
     },
     "uploadFolder": "./files/test/"
 }

@@ -74,7 +74,7 @@ export default abstract class Review extends BaseModel {
 
   // started_at timestamptz,
   @Column({
-    type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
+    type: "timestamp",
     nullable: true,
   })
   @IsOptional()
@@ -83,7 +83,7 @@ export default abstract class Review extends BaseModel {
 
   // downloaded_at timestamptz,
   @Column({
-    type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
+    type: "timestamp",
     nullable: true,
   })
   @IsOptional()
@@ -92,7 +92,7 @@ export default abstract class Review extends BaseModel {
 
   // submitted_at timestamptz,
   @Column({
-    type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
+    type: "timestamp",
     nullable: true,
   })
   @IsOptional()

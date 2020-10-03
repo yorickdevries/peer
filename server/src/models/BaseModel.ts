@@ -11,7 +11,7 @@ export default abstract class BaseModel extends BaseEntity {
   @CreateDateColumn(
     // set datatype to timestamp if not running in test environment
     // maybe move to separate function when more Dates are used in the database
-    { type: process.env.NODE_ENV === "test" ? undefined : "timestamp" }
+    { type: "timestamp" }
   )
   // these fields are created after saving, so @IsOptional() is added
   @IsOptional()
@@ -21,7 +21,7 @@ export default abstract class BaseModel extends BaseEntity {
   @UpdateDateColumn(
     // set datatype to timestamp if not running in test environment
     // maybe move to separate function when more Dates are used in the database
-    { type: process.env.NODE_ENV === "test" ? undefined : "timestamp" }
+    { type: "timestamp" }
   )
   // these fields are created after saving, so @IsOptional() is added
   @IsOptional()
