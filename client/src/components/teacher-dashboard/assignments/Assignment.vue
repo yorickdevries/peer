@@ -77,6 +77,10 @@
                                                 Are you sure you want to publish the assignment?
                                                 <ul>
                                                     <li>
+                                                        After publication no additional assignment versions can be
+                                                        created
+                                                    </li>
+                                                    <li>
                                                         After publication the allowed submission file extensions cannot
                                                         be changed.
                                                     </li>
