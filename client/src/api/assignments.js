@@ -114,6 +114,10 @@ export default {
         formData.append("lateSubmissionReviews", lateSubmissionReviews)
         if (reviewEvaluation) {
             formData.append("reviewEvaluationDueDate", reviewEvaluationDueDate.toISOString())
+            // change value in case the value isnt set
+            if (lateReviewEvaluations === null) {
+                lateReviewEvaluations = false
+            }
             formData.append("lateReviewEvaluations", lateReviewEvaluations)
         } else {
             formData.append("reviewEvaluationDueDate", null)
