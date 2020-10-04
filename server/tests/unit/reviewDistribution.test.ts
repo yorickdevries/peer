@@ -15,6 +15,7 @@ import UserRole from "../../src/enum/UserRole";
 import AssignmentVersion from "../../src/models/AssignmentVersion";
 import { AssignmentState } from "../../src/enum/AssignmentState";
 import Extensions from "../../src/enum/Extensions";
+import SubmissionQuestionnaire from "../../src/models/SubmissionQuestionnaire";
 
 describe("Review distribution", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -61,8 +62,6 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null,
-      null,
       Extensions.PDF,
       true,
       true,
@@ -73,13 +72,17 @@ describe("Review distribution", () => {
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
 
+    const submissionQuestionnaire = new SubmissionQuestionnaire();
+    await submissionQuestionnaire.save();
     // assignmentVersion
     const assignmentVersion = new AssignmentVersion(
       "default",
       assignment,
       [],
       2,
-      false
+      false,
+      submissionQuestionnaire,
+      null
     );
     await assignmentVersion.save();
     // set review setting so users review the same assignment
@@ -179,8 +182,6 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null,
-      null,
       Extensions.PDF,
       true,
       true,
@@ -191,13 +192,17 @@ describe("Review distribution", () => {
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
 
+    const submissionQuestionnaire = new SubmissionQuestionnaire();
+    await submissionQuestionnaire.save();
     // assignmentVersion
     const assignmentVersion = new AssignmentVersion(
       "default",
       assignment,
       [],
       2,
-      false
+      false,
+      submissionQuestionnaire,
+      null
     );
     await assignmentVersion.save();
     // set review setting so users review the same assignment
@@ -303,8 +308,6 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null,
-      null,
       Extensions.PDF,
       true,
       true,
@@ -315,13 +318,17 @@ describe("Review distribution", () => {
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
 
+    const submissionQuestionnaire = new SubmissionQuestionnaire();
+    await submissionQuestionnaire.save();
     // assignmentVersion
     const assignmentVersion = new AssignmentVersion(
       "default",
       assignment,
       [],
       2,
-      false
+      false,
+      submissionQuestionnaire,
+      null
     );
     await assignmentVersion.save();
     // set review setting so users review the same assignment
