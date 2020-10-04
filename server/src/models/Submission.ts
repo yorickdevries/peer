@@ -15,7 +15,6 @@ import AssignmentVersion from "../models/AssignmentVersion";
 import Group from "./Group";
 import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
-import Assignment from "../models/Assignment";
 
 @Entity()
 export default class Submission extends BaseModel {
