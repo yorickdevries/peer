@@ -35,14 +35,14 @@
                         <Groups :assignmentId="assignment.id"></Groups>
                     </b-tab>
 
-                    <!--Submissionquestionnaire Wizard-->
+                    <!--SubmissionQuestionnaireList-->
                     <b-tab title="Submissionquestionnaire">
-                        <SubmissionQuestionnaireWizard></SubmissionQuestionnaireWizard>
+                        <SubmissionQuestionnaireList></SubmissionQuestionnaireList>
                     </b-tab>
 
-                    <!--Reviewquestionnaire Wizard-->
+                    <!--ReviewQuestionnaireList-->
                     <b-tab v-if="assignment.reviewEvaluation" title="Reviewquestionnaire">
-                        <ReviewQuestionnaireWizard></ReviewQuestionnaireWizard>
+                        <ReviewQuestionnaireList></ReviewQuestionnaireList>
                     </b-tab>
 
                     <!--Submissions-->
@@ -73,8 +73,8 @@ import api from "../../../api/api"
 import BreadcrumbTitle from "../../BreadcrumbTitle"
 import AssignmentHome from "./AssignmentHome"
 import AssignmentVersions from "../assignmentVersions/AssignmentVersions"
-import SubmissionQuestionnaireWizard from "../questionnaire/SubmissionQuestionnaireWizard"
-import ReviewQuestionnaireWizard from "../questionnaire/ReviewQuestionnaireWizard"
+import SubmissionQuestionnaireList from "../questionnaire/SubmissionQuestionnaireList"
+import ReviewQuestionnaireList from "../questionnaire/ReviewQuestionnaireList"
 import Groups from "../Groups"
 import Reviews from "../../ta_teacher_shared/Reviews"
 import Submissions from "../../ta_teacher_shared/Submissions"
@@ -85,8 +85,8 @@ export default {
         BreadcrumbTitle,
         AssignmentHome,
         AssignmentVersions,
-        SubmissionQuestionnaireWizard,
-        ReviewQuestionnaireWizard,
+        SubmissionQuestionnaireList,
+        ReviewQuestionnaireList,
         Groups,
         Reviews,
         Submissions,
