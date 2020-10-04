@@ -468,6 +468,12 @@ router.patch("/:id/publish", validateParams(idSchema), async (req, res) => {
       .send("The assignment is not in unpublished state");
     return;
   }
+  if (assignment.versions.length === 0) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("No assignment versions have been defined");
+    return;
+  }
   assignment.state = AssignmentState.SUBMISSION;
   await assignment.save();
   res.send(assignment);
