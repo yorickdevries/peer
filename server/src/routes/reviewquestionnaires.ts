@@ -123,7 +123,7 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
       assignmentVersion.reviewQuestionnaire = questionnaire;
       // validateOrReject might cause a deadlock
       // await assignmentVersion.validateOrReject();
-      await transactionalEntityManager.save(assignment);
+      await transactionalEntityManager.save(assignmentVersion);
     }
   );
   // reload questionnaire to get all data
