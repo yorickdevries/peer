@@ -294,6 +294,10 @@ export default class Assignment extends BaseModel {
       .leftJoin("group.assignments", "assignment")
       .where("assignment.id = :id", { id: this.id })
       .getMany();
+    // reload all to get eager fields
+    for (const group of groups) {
+      await group.reload();
+    }
     return groups;
   }
 
@@ -305,6 +309,9 @@ export default class Assignment extends BaseModel {
       .where("assignment.id = :id", { id: this.id })
       .andWhere("user.netid = :netid", { netid: user.netid })
       .getOne();
+    if (group) {
+      await group.reload();
+    }
     return group;
   }
 
