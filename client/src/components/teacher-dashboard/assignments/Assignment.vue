@@ -214,6 +214,11 @@
                         </b-row>
                     </b-tab>
 
+                    <!--AssignmentVersions-->
+                    <b-tab title="Assignment Versions">
+                        <AssignmentVersions :assignmentId="assignment.id"></AssignmentVersions>
+                    </b-tab>
+
                     <!--Groups-->
                     <b-tab title="Groups">
                         <Groups :assignmentId="assignment.id"></Groups>
@@ -256,6 +261,7 @@
 import api from "../../../api/api"
 import _ from "lodash"
 import BreadcrumbTitle from "../../BreadcrumbTitle"
+import AssignmentVersions from "../assignmentVersions/AssignmentVersions"
 import SubmissionQuestionnaireWizard from "../questionnaire/SubmissionQuestionnaireWizard"
 import ReviewQuestionnaireWizard from "../questionnaire/ReviewQuestionnaireWizard"
 import Groups from "../Groups"
@@ -274,6 +280,7 @@ export default {
         WizardStep,
         TabContent,
         BreadcrumbTitle,
+        AssignmentVersions,
         SubmissionQuestionnaireWizard,
         ReviewQuestionnaireWizard,
         Groups,

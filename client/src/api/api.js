@@ -6,6 +6,7 @@ import academicyears from "./academicyears"
 import courses from "./courses"
 import enrollments from "./enrollments"
 import assignments from "./assignments"
+import assignmentversions from "./assignmentversions"
 import submissionquestionnaires from "./submissionquestionnaires"
 import reviewquestionnaires from "./reviewquestionnaires"
 import openquestions from "./openquestions"
@@ -40,6 +41,7 @@ export default {
     courses: courses,
     enrollments: enrollments,
     assignments: assignments,
+    assignmentversions: assignmentversions,
     submissionquestionnaires: submissionquestionnaires,
     reviewquestionnaires: reviewquestionnaires,
     openquestions: openquestions,
