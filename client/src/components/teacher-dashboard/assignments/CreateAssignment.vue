@@ -201,18 +201,6 @@
                                 ></b-form-select>
                             </b-form-group>
 
-                            <!--Number of peer reviews per student-->
-                            <b-form-group label="Number of reviews that each student needs to do">
-                                <b-form-input
-                                    v-model="assignment.reviewsPerUser"
-                                    type="number"
-                                    :state="checkReviewsPerUser"
-                                    placeholder="Enter an integer larger than 0"
-                                    required
-                                >
-                                </b-form-input>
-                            </b-form-group>
-
                             <b-form-group>
                                 <b-form-checkbox v-model="assignment.enrollable">
                                     Self enrollable
@@ -295,7 +283,6 @@ export default {
         return {
             assignment: {
                 name: "",
-                reviewsPerUser: null,
                 enrollable: false,
                 reviewEvaluation: false,
                 publishDay: null,
@@ -325,15 +312,6 @@ export default {
                 { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" }
             ],
             buttonDisabled: false
-        }
-    },
-    computed: {
-        checkReviewsPerUser() {
-            if (this.assignment.reviewsPerUser == null) {
-                return null
-            } else {
-                return this.assignment.reviewsPerUser > 0
-            }
         }
     },
     methods: {
@@ -381,7 +359,6 @@ export default {
                 await api.assignments.post(
                     this.assignment.name,
                     this.$route.params.courseId,
-                    this.assignment.reviewsPerUser,
                     this.assignment.enrollable,
                     this.assignment.reviewEvaluation,
                     publishDate,
