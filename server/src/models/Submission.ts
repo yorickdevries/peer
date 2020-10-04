@@ -120,11 +120,6 @@ export default class Submission extends BaseModel {
     return AssignmentVersion.findOneOrFail(this.assignmentVersionId);
   }
 
-  async getAssignment(): Promise<Assignment> {
-    const assignmentVersion = await this.getAssignmentVersion();
-    return assignmentVersion.getAssignment();
-  }
-
   async getUser(): Promise<User> {
     return User.findOneOrFail(this.userNetid);
   }

@@ -340,7 +340,8 @@ router.patch(
         .send(ResponseMessage.SUBMISSION_NOT_FOUND);
       return;
     }
-    const assignment = await submission.getAssignment();
+    const assignmentVersion = await submission.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     const group = await submission.getGroup();
     if (
       !(await group.hasUser(user)) &&

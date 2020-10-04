@@ -139,21 +139,14 @@ export default class AssignmentVersion extends BaseModel {
   }
 
   async getAssignment(): Promise<Assignment> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await AssignmentVersion.findOneOrFail(this.id, {
-        relations: ["assignment"],
-      })
-    ).assignment!;
+    return Assignment.findOneOrFail(this.assignmentId);
   }
 
   async getVersionsToReview(): Promise<AssignmentVersion[]> {
+    // note: this might not be efficient, but its the only way I know how it can be done
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return (
-      await AssignmentVersion.findOneOrFail(this.id, {
-        relations: ["versionsToReview"],
-      })
-    ).versionsToReview!;
+    return (await this.getAssignmentVersionWithVersionsToReview())
+      .versionsToReview!;
   }
 
   private async getSubmissionsOfGroup(group: Group): Promise<Submission[]> {

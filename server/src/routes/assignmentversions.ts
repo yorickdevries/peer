@@ -151,17 +151,6 @@ router.patch(
       }
       versionsToReview.push(versionToReview);
     }
-    // check whether certain fields can be changed
-    if (
-      assignment.isAtOrAfterState(AssignmentState.REVIEW) &&
-      assignmentVersion.reviewsPerUserPerAssignmentVersionToReview !==
-        req.body.reviewsPerUserPerAssignmentVersionToReview
-    ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("You cannot change reviewsPerUser at this state");
-      return;
-    }
     // patch assignmentVersion
     assignmentVersion.name = req.body.name;
     assignmentVersion.versionsToReview = versionsToReview;
@@ -199,7 +188,7 @@ router.get(
     if (!assignmentVersion) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
       return;
     }
     const group = await Group.findOne(groupId);
@@ -258,7 +247,6 @@ router.get(
         .send("User is not part of the group");
       return;
     }
-    console.log(assignmentVersion, group);
     const finalSubmission = await assignmentVersion.getFinalSubmission(group);
     if (!finalSubmission) {
       res
