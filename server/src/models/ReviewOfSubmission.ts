@@ -16,7 +16,7 @@ export default class ReviewOfSubmission extends Review {
     { eager: true }
   )
   // can be null as it is in the same table as reviewOfReview
-  submission?: Submission;
+  submission: Submission;
 
   constructor(
     questionnaire: SubmissionQuestionnaire,
@@ -53,7 +53,8 @@ export default class ReviewOfSubmission extends Review {
     const questionnaireAssignmentVersion = await questionnaire.getAssignmentVersion();
     const questionnaireAssignment = await questionnaireAssignmentVersion.getAssignment();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const submissionAssignment = await this.submission!.getAssignment();
+    const submissionAssignmentVersion = await this.submission.getAssignmentVersion();
+    const submissionAssignment = await submissionAssignmentVersion.getAssignment();
     if (questionnaireAssignment.id !== submissionAssignment.id) {
       throw new Error(
         "The questionnaire should correspond to the assignment of the submission"
