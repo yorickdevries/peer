@@ -218,8 +218,6 @@ router.post(
       req.body.description,
       null, // file, will be set later
       req.body.externalLink,
-      null, // submissionQuestionnaire (initially empty)
-      null, // reviewQuestionnaire (initially empty)
       req.body.submissionExtensions,
       req.body.blockFeedback,
       req.body.lateSubmissions,

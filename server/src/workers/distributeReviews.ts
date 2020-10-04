@@ -8,11 +8,31 @@ import { getManager } from "typeorm";
 import Review from "../models/Review";
 import { AssignmentState } from "../enum/AssignmentState";
 import ensureConnection from "./ensureConnection";
+import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 
 interface reviewAssignment {
   reviewer: User;
   submission: Submission;
+  submissionQuestionnaire: SubmissionQuestionnaire;
 }
+
+const getUniqueUsersOfSubmissions = async function (submissions: Submission[]) {
+  // get all unique users of the submissions (unique as several submissions might have the same user in the group)
+  const users: User[] = [];
+  for (const submission of submissions) {
+    const group = await submission.getGroup();
+    const groupUsers = await group.getUsers();
+    for (const groupUser of groupUsers) {
+      const alreadyContainsUser = _.some(users, (user) => {
+        return user.netid === groupUser.netid;
+      });
+      if (!alreadyContainsUser) {
+        users.push(groupUser);
+      }
+    }
+  }
+  return users;
+};
 
 const distributeReviewsForAssignment = async function (
   assignmentId: number
@@ -21,34 +41,11 @@ const distributeReviewsForAssignment = async function (
 
   const assignment = await Assignment.findOneOrFail(assignmentId);
   const assignmentVersions = assignment.versions;
-  const questionnaire = await assignment.getSubmissionQuestionnaire();
-  if (!questionnaire) {
-    throw new Error("Questionnaire not found");
-  }
-
-  const getUniqueUsersOfSubmissions = async function (
-    submissions: Submission[]
-  ) {
-    // get all unique users of the submissions (unique as several submissions might have the same user in the group)
-    const users: User[] = [];
-    for (const submission of submissions) {
-      const group = await submission.getGroup();
-      const groupUsers = await group.getUsers();
-      for (const groupUser of groupUsers) {
-        const alreadyContainsUser = _.some(users, (user) => {
-          return user.netid === groupUser.netid;
-        });
-        if (!alreadyContainsUser) {
-          users.push(groupUser);
-        }
-      }
+  for (const assignmentVersion of assignmentVersions) {
+    const questionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+    if (!questionnaire) {
+      throw new Error("Questionnaire not found");
     }
-    return users;
-  };
-
-  interface reviewAssignment {
-    reviewer: User;
-    submission: Submission;
   }
   const fullReviewDistribution: reviewAssignment[] = [];
   // assignmentVersions of which the users will be reviewing
@@ -87,18 +84,25 @@ const distributeReviewsForAssignment = async function (
   await getManager().transaction(
     "SERIALIZABLE", // serializable is the only way to make sure to reviews exist before creating them
     async (transactionalEntityManager) => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const existingReviews = await transactionalEntityManager.find(Review, {
-        where: { questionnaire: questionnaire },
-      });
-      if (existingReviews.length > 0) {
-        throw new Error("There are already reviews for this assignment");
+      for (const assignmentVersion of assignmentVersions) {
+        const questionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+        if (!questionnaire) {
+          throw new Error("Questionnaire not found");
+        }
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const existingReviews = await transactionalEntityManager.find(Review, {
+          where: { questionnaire: questionnaire },
+        });
+        if (existingReviews.length > 0) {
+          throw new Error("There are already reviews for this assignment");
+        }
       }
+
       // iterate over fullReviewDistribution
       for (const reviewAssignment of fullReviewDistribution) {
         // make the review
         const review = new ReviewOfSubmission(
-          questionnaire,
+          reviewAssignment.submissionQuestionnaire,
           reviewAssignment.reviewer,
           false,
           false,
@@ -327,7 +331,16 @@ const performMaxFlow = async function (
     if (from > 3 && to > 3) {
       const user = users[userIndexOfNodeNumber(from)];
       const submission = submissions[submissionIndexOfNodeNumber(to)];
-      reviewDistribution.push({ reviewer: user, submission: submission });
+      const assignmentVersion = await submission.getAssignmentVersion();
+      const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+      if (!submissionQuestionnaire) {
+        throw new Error("submissionQuestionnaire not found");
+      }
+      reviewDistribution.push({
+        reviewer: user,
+        submission: submission,
+        submissionQuestionnaire: submissionQuestionnaire,
+      });
     }
   }
   // check if the max flow is achieved
@@ -345,12 +358,18 @@ const generateSelfReviews = async function (
 ): Promise<reviewAssignment[]> {
   const selfReviewAssignments: reviewAssignment[] = [];
   for (const submission of submissions) {
+    const assignmentVersion = await submission.getAssignmentVersion();
+    const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+    if (!submissionQuestionnaire) {
+      throw new Error("submissionQuestionnaire not found");
+    }
     const group = await submission.getGroup();
     const users = await group.getUsers();
     for (const user of users) {
       const selfReviewAssignment = {
         reviewer: user,
         submission: submission,
+        submissionQuestionnaire: submissionQuestionnaire,
       };
       selfReviewAssignments.push(selfReviewAssignment);
     }

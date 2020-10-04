@@ -79,7 +79,8 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
     }
     checkboxQuestionOptions.push(questionOption);
   }
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     questionnaire instanceof SubmissionQuestionnaire &&
     !assignment.lateSubmissionReviews &&
@@ -164,7 +165,8 @@ router.delete(
       return;
     }
     const questionnaire = await review.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (
       questionnaire instanceof SubmissionQuestionnaire &&
       !assignment.lateSubmissionReviews &&

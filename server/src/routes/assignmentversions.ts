@@ -85,7 +85,9 @@ router.post("/", validateBody(assignmentVersionSchema), async (req, res) => {
     assignment,
     [], // no versions yet (should be changed via patch route)
     req.body.reviewsPerUserPerAssignmentVersionToReview,
-    false // default self review is false (can be changed via patch route)
+    false, // default self review is false (can be changed via patch route)
+    null, // submissionQuestionnaire (initially empty)
+    null // reviewQuestionnaire (initially empty)
   );
   await assignmentVersion.save();
   const assignmentVersionWithVersionsToReview = await assignmentVersion.getAssignmentVersionWithVersionsToReview();

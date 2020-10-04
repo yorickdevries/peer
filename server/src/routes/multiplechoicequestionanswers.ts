@@ -75,7 +75,8 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
       .send("The questionOption is not part of this question");
     return;
   }
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     questionnaire instanceof SubmissionQuestionnaire &&
     !assignment.lateSubmissionReviews &&
@@ -157,7 +158,8 @@ router.delete(
       return;
     }
     const questionnaire = await review.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (
       questionnaire instanceof SubmissionQuestionnaire &&
       !assignment.lateSubmissionReviews &&

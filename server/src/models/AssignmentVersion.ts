@@ -7,6 +7,8 @@ import {
   ManyToMany,
   OneToMany,
   JoinTable,
+  OneToOne,
+  JoinColumn,
 } from "typeorm";
 import {
   IsDefined,
@@ -19,8 +21,9 @@ import {
 import BaseModel from "./BaseModel";
 import Assignment from "../models/Assignment";
 import Submission from "./Submission";
+import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
+import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import Group from "./Group";
-import _ from "lodash";
 import User from "./User";
 
 @Entity()
@@ -69,12 +72,36 @@ export default class AssignmentVersion extends BaseModel {
   )
   submissions?: Submission[];
 
+  // submission questionaire
+  @RelationId(
+    (assignmentVersion: AssignmentVersion) =>
+      assignmentVersion.submissionQuestionnaire
+  )
+  submissionQuestionnaireId?: number; // this is undefined when questionnaire is null
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @OneToOne((_type) => SubmissionQuestionnaire)
+  @JoinColumn()
+  submissionQuestionnaire?: SubmissionQuestionnaire | null;
+
+  // review questionaire (for review evaluation)
+  @RelationId(
+    (assignmentVersion: AssignmentVersion) =>
+      assignmentVersion.reviewQuestionnaire
+  )
+  reviewQuestionnaireId?: number; // this is undefined when questionnaire is null
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @OneToOne((_type) => ReviewQuestionnaire)
+  @JoinColumn()
+  reviewQuestionnaire?: ReviewQuestionnaire | null;
+
   constructor(
     name: string,
     assignment: Assignment,
     versionsToReview: AssignmentVersion[],
     reviewsPerUserPerAssignmentVersionToReview: number,
-    selfReview: boolean
+    selfReview: boolean,
+    submissionQuestionnaire: SubmissionQuestionnaire | null,
+    reviewQuestionnaire: ReviewQuestionnaire | null
   ) {
     super();
     this.name = name;
@@ -82,6 +109,8 @@ export default class AssignmentVersion extends BaseModel {
     this.versionsToReview = versionsToReview;
     this.reviewsPerUserPerAssignmentVersionToReview = reviewsPerUserPerAssignmentVersionToReview;
     this.selfReview = selfReview;
+    this.submissionQuestionnaire = submissionQuestionnaire;
+    this.reviewQuestionnaire = reviewQuestionnaire;
   }
 
   // validation: check whether the group is in the assingment and the user in the group
@@ -96,6 +125,14 @@ export default class AssignmentVersion extends BaseModel {
       if (assignmentVersion.assignmentId !== assignment.id) {
         throw new Error("Not all versions are of the right assignment");
       }
+    }
+    if (
+      !assignment.reviewEvaluation &&
+      (this.reviewQuestionnaire || this.reviewQuestionnaireId)
+    ) {
+      throw new Error(
+        "reviewQuestionnaire is defined while reviewEvaluation is turned off"
+      );
     }
     // if it succeeds the super validateOrReject can be called
     return super.validateOrReject();
@@ -169,5 +206,23 @@ export default class AssignmentVersion extends BaseModel {
     return await AssignmentVersion.findOneOrFail(this.id, {
       relations: ["versionsToReview"],
     });
+  }
+
+  async getSubmissionQuestionnaire(): Promise<SubmissionQuestionnaire | null> {
+    if (!this.submissionQuestionnaireId) {
+      return null;
+    } else {
+      return SubmissionQuestionnaire.findOneOrFail(
+        this.submissionQuestionnaireId
+      );
+    }
+  }
+
+  async getReviewQuestionnaire(): Promise<ReviewQuestionnaire | null> {
+    if (!this.reviewQuestionnaireId) {
+      return null;
+    } else {
+      return ReviewQuestionnaire.findOneOrFail(this.reviewQuestionnaireId);
+    }
   }
 }

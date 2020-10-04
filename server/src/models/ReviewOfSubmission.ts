@@ -50,7 +50,8 @@ export default class ReviewOfSubmission extends Review {
     const questionnaire = this.questionnaire
       ? this.questionnaire
       : await this.getQuestionnaire();
-    const questionnaireAssignment = await questionnaire.getAssignment();
+    const questionnaireAssignmentVersion = await questionnaire.getAssignmentVersion();
+    const questionnaireAssignment = await questionnaireAssignmentVersion.getAssignment();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const submissionAssignment = await this.submission!.getAssignment();
     if (questionnaireAssignment.id !== submissionAssignment.id) {

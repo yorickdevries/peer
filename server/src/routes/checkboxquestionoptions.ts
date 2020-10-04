@@ -38,7 +38,8 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
     return;
   }
   const questionnaire = await question.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     questionnaire instanceof SubmissionQuestionnaire &&
     assignment.isAtOrAfterState(AssignmentState.REVIEW)
@@ -94,7 +95,8 @@ router.patch(
       return;
     }
     const questionnaire = await question.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (
       questionnaire instanceof SubmissionQuestionnaire &&
       assignment.isAtOrAfterState(AssignmentState.REVIEW)
@@ -140,7 +142,8 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
     return;
   }
   const questionnaire = await question.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     questionnaire instanceof SubmissionQuestionnaire &&
     assignment.isAtOrAfterState(AssignmentState.REVIEW)

@@ -140,7 +140,7 @@ router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
       .send("You are not allowed to view reviews");
     return;
   }
-  const submissionQuestionnaire = await assignment.getSubmissionQuestionnaire();
+  const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
   if (!submissionQuestionnaire) {
     res
       .status(HttpStatusCode.FORBIDDEN)
