@@ -238,14 +238,17 @@ export default class Assignment extends BaseModel {
       );
     }
     if (!this.reviewEvaluation) {
-      for (const assignmentVersion of this.versions) {
-        if (
-          assignmentVersion.reviewQuestionnaire ||
-          assignmentVersion.reviewQuestionnaireId
-        ) {
-          throw new Error(
-            "reviewQuestionnaire is defined while reviewEvaluation is turned off"
-          );
+      // check whether this.versions is initialized
+      if (this.versions) {
+        for (const assignmentVersion of this.versions) {
+          if (
+            assignmentVersion.reviewQuestionnaire ||
+            assignmentVersion.reviewQuestionnaireId
+          ) {
+            throw new Error(
+              "reviewQuestionnaire is defined while reviewEvaluation is turned off"
+            );
+          }
         }
       }
     }
