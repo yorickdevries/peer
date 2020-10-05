@@ -365,8 +365,11 @@ export default {
             }
         },
         async goToNextReviewWithoutApproval() {
-            const res = await api.reviewofsubmissions.getAllForAssignment(this.$route.params.assignmentId, true)
-            const reviews = res.data
+            const reviews = []
+            for (const assignmentVersion of this.assignment.versions) {
+                const res = await api.reviewofsubmissions.getAllForAssignmentVersion(assignmentVersion.id, true)
+                reviews.push(...res.data)
+            }
             const reviewsWithoutApproval = _.filter(reviews, review => {
                 return review.approvalByTA === null
             })

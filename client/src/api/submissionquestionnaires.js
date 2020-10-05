@@ -1,8 +1,8 @@
 import client from "./axiosClient"
 
 export default {
-    post(assignmentId) {
-        const body = { assignmentId: assignmentId }
+    post(assignmentVersionId) {
+        const body = { assignmentVersionId: assignmentVersionId }
         return client.post("submissionquestionnaires/", body)
     },
     get(id) {

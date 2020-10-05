@@ -16,8 +16,6 @@ import {
   IsString,
   IsNotEmpty,
   IsBoolean,
-  IsInt,
-  IsPositive,
   IsDate,
   IsUrl,
   IsEnum,
@@ -29,12 +27,10 @@ import User from "./User";
 import File from "./File";
 import moment from "moment";
 import UserRole from "../enum/UserRole";
-import Submission from "./Submission";
-import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
-import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
 import Extensions from "../enum/Extensions";
 import AssignmentExport from "./AssignmentExport";
+import AssignmentVersion from "./AssignmentVersion";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -48,13 +44,6 @@ export default class Assignment extends BaseModel {
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  // reviews_per_user int NOT NULL,
-  @Column()
-  @IsDefined()
-  @IsInt()
-  @IsPositive()
-  reviewsPerUser: number;
 
   // one_person_groups boolean NOT NULL,
   @Column()
@@ -119,22 +108,6 @@ export default class Assignment extends BaseModel {
   @JoinColumn()
   file: File | null;
 
-  // submission questionaire
-  @RelationId((assignment: Assignment) => assignment.submissionQuestionnaire)
-  submissionQuestionnaireId?: number; // this is undefined when questionnaire is null
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @OneToOne((_type) => SubmissionQuestionnaire)
-  @JoinColumn()
-  submissionQuestionnaire?: SubmissionQuestionnaire | null;
-
-  // review questionaire (for review evaluation)
-  @RelationId((assignment: Assignment) => assignment.reviewQuestionnaire)
-  reviewQuestionnaireId?: number; // this is undefined when questionnaire is null
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @OneToOne((_type) => ReviewQuestionnaire)
-  @JoinColumn()
-  reviewQuestionnaire?: ReviewQuestionnaire | null;
-
   // external_link varchar(1000),
   @Column("varchar", { nullable: true })
   @IsOptional()
@@ -142,6 +115,14 @@ export default class Assignment extends BaseModel {
   @IsString()
   @IsNotEmpty()
   externalLink: string | null;
+
+  @OneToMany(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (_type) => AssignmentVersion,
+    (assignmentVersion) => assignmentVersion.assignment,
+    { eager: true }
+  )
+  versions!: AssignmentVersion[];
 
   @Column()
   @IsDefined()
@@ -190,10 +171,6 @@ export default class Assignment extends BaseModel {
   @ManyToMany((_type) => Group, (group) => group.assignments)
   groups?: Group[];
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @OneToMany((_type) => Submission, (submission) => submission.assignment)
-  submissions?: Submission[];
-
   @OneToMany(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => AssignmentExport,
@@ -204,7 +181,6 @@ export default class Assignment extends BaseModel {
   constructor(
     name: string,
     course: Course,
-    reviewsPerUser: number,
     enrollable: boolean,
     reviewEvaluation: boolean,
     publishDate: Date,
@@ -215,8 +191,6 @@ export default class Assignment extends BaseModel {
     description: string | null,
     file: File | null,
     externalLink: string | null,
-    submissionQuestionnaire: SubmissionQuestionnaire | null,
-    reviewQuestionnaire: ReviewQuestionnaire | null,
     submissionExtensions: Extensions,
     blockFeedback: boolean,
     lateSubmissions: boolean,
@@ -226,7 +200,6 @@ export default class Assignment extends BaseModel {
     super();
     this.name = name;
     this.course = course;
-    this.reviewsPerUser = reviewsPerUser;
     this.enrollable = enrollable;
     this.reviewEvaluation = reviewEvaluation;
     this.state = AssignmentState.UNPUBLISHED; // initial state
@@ -238,8 +211,6 @@ export default class Assignment extends BaseModel {
     this.description = description;
     this.file = file;
     this.externalLink = externalLink;
-    this.submissionQuestionnaire = submissionQuestionnaire;
-    this.reviewQuestionnaire = reviewQuestionnaire;
     this.submissionExtensions = submissionExtensions;
     this.blockFeedback = blockFeedback;
     this.lateSubmissions = lateSubmissions;
@@ -266,13 +237,20 @@ export default class Assignment extends BaseModel {
         "reviewEvaluationDueDate is defined while reviewEvaluation is turned off"
       );
     }
-    if (
-      !this.reviewEvaluation &&
-      (this.reviewQuestionnaire || this.reviewQuestionnaireId)
-    ) {
-      throw new Error(
-        "reviewQuestionnaire is defined while reviewEvaluation is turned off"
-      );
+    if (!this.reviewEvaluation) {
+      // check whether this.versions is initialized
+      if (this.versions) {
+        for (const assignmentVersion of this.versions) {
+          if (
+            assignmentVersion.reviewQuestionnaire ||
+            assignmentVersion.reviewQuestionnaireId
+          ) {
+            throw new Error(
+              "reviewQuestionnaire is defined while reviewEvaluation is turned off"
+            );
+          }
+        }
+      }
     }
     // check chronological order of the dates
     if (
@@ -316,59 +294,11 @@ export default class Assignment extends BaseModel {
       .leftJoin("group.assignments", "assignment")
       .where("assignment.id = :id", { id: this.id })
       .getMany();
+    // reload all to get eager fields
+    for (const group of groups) {
+      await group.reload();
+    }
     return groups;
-  }
-
-  async getSubmissionQuestionnaire(): Promise<SubmissionQuestionnaire | null> {
-    if (!this.submissionQuestionnaireId) {
-      return null;
-    } else {
-      return SubmissionQuestionnaire.findOneOrFail(
-        this.submissionQuestionnaireId
-      );
-    }
-  }
-
-  async getReviewQuestionnaire(): Promise<ReviewQuestionnaire | null> {
-    if (!this.reviewQuestionnaireId) {
-      return null;
-    } else {
-      return ReviewQuestionnaire.findOneOrFail(this.reviewQuestionnaireId);
-    }
-  }
-
-  async getSubmissions(group?: Group): Promise<Submission[]> {
-    if (group) {
-      return this.getSubmissionsOfGroup(group);
-    } else {
-      return Submission.find({ where: { assignment: this } });
-    }
-  }
-
-  private async getSubmissionsOfGroup(group: Group): Promise<Submission[]> {
-    return Submission.find({
-      where: {
-        assignment: this,
-        group: group,
-      },
-    });
-  }
-
-  async getFinalSubmissionsOfEachGroup(): Promise<Submission[]> {
-    return await Submission.find({ where: { assignment: this, final: true } });
-  }
-
-  async getFinalSubmission(group: Group): Promise<Submission | undefined> {
-    const finalSubmissions = await Submission.find({
-      where: { assignment: this, group: group, final: true },
-    });
-    if (finalSubmissions.length === 0) {
-      return undefined;
-    } else if (finalSubmissions.length === 1) {
-      return finalSubmissions[0];
-    } else {
-      throw new Error("There are multiple finalSubmissions");
-    }
   }
 
   async getGroup(user: User): Promise<Group | undefined> {
@@ -379,6 +309,9 @@ export default class Assignment extends BaseModel {
       .where("assignment.id = :id", { id: this.id })
       .andWhere("user.netid = :netid", { netid: user.netid })
       .getOne();
+    if (group) {
+      await group.reload();
+    }
     return group;
   }
 
@@ -423,5 +356,23 @@ export default class Assignment extends BaseModel {
   async isTeacherOrTeachingAssistantInCourse(user: User): Promise<boolean> {
     const course = await this.getCourse();
     return await course.isTeacherOrTeachingAssistant(user);
+  }
+
+  async hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
+    user: User
+  ): Promise<boolean> {
+    for (const assignmentVersion of this.versions) {
+      const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+      if (submissionQuestionnaire) {
+        if (
+          await submissionQuestionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(
+            user
+          )
+        ) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }

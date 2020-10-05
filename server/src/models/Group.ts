@@ -90,7 +90,10 @@ export default class Group extends BaseModel {
       .leftJoin("user.groups", "group")
       .where("group.id = :id", { id: this.id })
       .getMany();
-
+    // reload all to get eager fields
+    for (const user of users) {
+      await user.reload();
+    }
     return users;
   }
 
@@ -100,6 +103,10 @@ export default class Group extends BaseModel {
       .leftJoin("assignment.groups", "group")
       .where("group.id = :id", { id: this.id })
       .getMany();
+    // reload all to get eager fields
+    for (const assignment of assignments) {
+      await assignment.reload();
+    }
     return assignments;
   }
 

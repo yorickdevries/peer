@@ -39,9 +39,6 @@
                 <dd>{{ assignment.lateReviewEvaluations }}</dd>
             </div>
 
-            <dt>Number of peer reviews assigned per student</dt>
-            <dd>{{ assignment.reviewsPerUser }}</dd>
-
             <dt>Allowed submission file extensions</dt>
             <dd>{{ assignment.submissionExtensions }}</dd>
 

@@ -17,10 +17,6 @@ export default {
     getGroup(id) {
         return client.get(`assignments/${id}/group`)
     },
-    getSubmissions(assignmentId, groupId) {
-        const params = { groupId }
-        return client.get(`assignments/${assignmentId}/submissions`, { params: params })
-    },
     getFinalSubmission(assignmentId, groupId) {
         const params = { groupId }
         return client.get(`assignments/${assignmentId}/finalsubmission`, { params: params })
@@ -28,7 +24,6 @@ export default {
     post(
         name,
         courseId,
-        reviewsPerUser,
         enrollable,
         reviewEvaluation,
         publishDate,
@@ -49,7 +44,6 @@ export default {
         const formData = new FormData()
         formData.append("name", name)
         formData.append("courseId", courseId)
-        formData.append("reviewsPerUser", reviewsPerUser)
         formData.append("enrollable", enrollable)
         formData.append("reviewEvaluation", reviewEvaluation)
         formData.append("publishDate", publishDate.toISOString())
@@ -81,7 +75,6 @@ export default {
     patch(
         id,
         name,
-        reviewsPerUser,
         enrollable,
         reviewEvaluation,
         publishDate,
@@ -101,7 +94,6 @@ export default {
         // Create formData and append data
         const formData = new FormData()
         formData.append("name", name)
-        formData.append("reviewsPerUser", reviewsPerUser)
         formData.append("enrollable", enrollable)
         formData.append("reviewEvaluation", reviewEvaluation)
         formData.append("publishDate", publishDate.toISOString())
@@ -126,6 +118,10 @@ export default {
         formData.append("lateSubmissionReviews", lateSubmissionReviews)
         if (reviewEvaluation) {
             formData.append("reviewEvaluationDueDate", reviewEvaluationDueDate.toISOString())
+            // change value in case the value isnt set
+            if (lateReviewEvaluations === null) {
+                lateReviewEvaluations = false
+            }
             formData.append("lateReviewEvaluations", lateReviewEvaluations)
         } else {
             formData.append("reviewEvaluationDueDate", null)

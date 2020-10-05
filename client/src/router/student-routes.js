@@ -44,7 +44,7 @@ export default [
                     {
                         path: "submission",
                         name: "student-dashboard.course.assignment.submission",
-                        component: () => import("../components/student-dashboard/assignment/Submission")
+                        component: () => import("../components/student-dashboard/assignment/SubmissionList")
                     },
                     {
                         path: "review",

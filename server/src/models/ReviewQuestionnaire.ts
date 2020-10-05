@@ -1,23 +1,25 @@
 import Questionnaire from "./Questionnaire";
 import { ChildEntity, OneToOne } from "typeorm";
-import Assignment from "./Assignment";
+import AssignmentVersion from "./AssignmentVersion";
 import QuestionnaireType from "../enum/QuestionnaireType";
 
 @ChildEntity(QuestionnaireType.REVIEW)
 export default class ReviewQuestionnaire extends Questionnaire {
   @OneToOne(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (_type) => Assignment,
-    (assignment) => assignment.reviewQuestionnaire
+    (_type) => AssignmentVersion,
+    (assignmentVersion) => assignmentVersion.reviewQuestionnaire
   )
   // cannot be named assignment as this clashed with submissionquestionnaire
-  assignmentOfReviewQuestionnaire?: Assignment;
+  assignmentVersionOfReviewQuestionnaire?: AssignmentVersion;
 
   constructor() {
     super();
   }
 
-  async getAssignment(): Promise<Assignment> {
-    return Assignment.findOneOrFail({ where: { reviewQuestionnaire: this } });
+  async getAssignmentVersion(): Promise<AssignmentVersion> {
+    return AssignmentVersion.findOneOrFail({
+      where: { reviewQuestionnaire: this },
+    });
   }
 }

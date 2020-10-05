@@ -88,6 +88,7 @@ import api from "../../api/api"
 import _ from "lodash"
 
 export default {
+    props: ["assignmentVersionId"],
     data() {
         return {
             allSubmissions: null,
@@ -131,7 +132,7 @@ export default {
     methods: {
         async fetchSubmissions() {
             // all submissions
-            const res1 = await api.submissions.getAllForAssignment(this.$route.params.assignmentId)
+            const res1 = await api.submissions.getAllForAssignmentVersion(this.assignmentVersionId)
             this.allSubmissions = res1.data
         },
         async fetchGroups() {

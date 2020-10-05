@@ -42,7 +42,8 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
   }
   const review = await uploadQuestionAnswer.getReview();
   const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     // is teacher
     (await assignment.isTeacherOrTeachingAssistantInCourse(user)) ||
@@ -63,7 +64,9 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
   ) {
     if (
       assignment.blockFeedback &&
-      (await questionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(user))
+      (await assignment.hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
+        user
+      ))
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -137,7 +140,8 @@ router.post(
         .send("The question is not part of this review");
       return;
     }
-    const assignment = await questionnaire.getAssignment();
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (
       questionnaire instanceof SubmissionQuestionnaire &&
       !assignment.lateSubmissionReviews &&
@@ -278,7 +282,8 @@ router.delete(
       return;
     }
     const questionnaire = await review.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (
       questionnaire instanceof SubmissionQuestionnaire &&
       !assignment.lateSubmissionReviews &&

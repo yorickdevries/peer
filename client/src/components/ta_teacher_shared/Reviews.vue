@@ -173,6 +173,7 @@ import _ from "lodash"
 import notifications from "../../mixins/notifications"
 
 export default {
+    props: ["assignmentVersionId"],
     mixins: [notifications],
     data() {
         return {
@@ -201,7 +202,7 @@ export default {
     async created() {
         // reviews
         try {
-            const res1 = await api.reviewofsubmissions.getAllForAssignment(this.$route.params.assignmentId, undefined)
+            const res1 = await api.reviewofsubmissions.getAllForAssignmentVersion(this.assignmentVersionId, undefined)
             const reviews = res1.data
             // set the full groups
             const res2 = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
@@ -239,14 +240,14 @@ export default {
         },
         async exportReviews(exportType) {
             this.disableReviewExportButton = true
-            await api.reviewofsubmissions.exportReviews(this.$route.params.assignmentId, exportType)
+            await api.reviewofsubmissions.exportReviews(this.assignmentVersionId, exportType)
             this.showSuccessMessage({
                 message: "Export is being generated, you can download it in the exports tab when ready"
             })
         },
         async exportGrades(exportType) {
             this.disableGradeExportButton = true
-            await api.reviewofsubmissions.exportGrades(this.$route.params.assignmentId, exportType)
+            await api.reviewofsubmissions.exportGrades(this.assignmentVersionId, exportType)
             this.showSuccessMessage({
                 message: "Export is being generated, you can download it in the exports tab when ready"
             })

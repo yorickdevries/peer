@@ -20,6 +20,7 @@ import ResponseMessage from "../enum/ResponseMessage";
 import Group from "../models/Group";
 import { AssignmentState } from "../enum/AssignmentState";
 import Extensions from "../enum/Extensions";
+import Submission from "../models/Submission";
 
 const router = express.Router();
 
@@ -165,47 +166,6 @@ const querySubmissionSchema = Joi.object({
   groupId: Joi.number().integer().required(),
 });
 
-// get the submissions of a group
-router.get(
-  "/:id/submissions",
-  validateParams(idSchema),
-  validateQuery(querySubmissionSchema),
-  async (req, res) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const user = req.user!;
-    const assignmentId = req.params.id;
-    // this value has been parsed by the validate function
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const groupId: number = req.query.groupId as any;
-    const assignment = await Assignment.findOne(assignmentId);
-    if (!assignment) {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
-      return;
-    }
-    const group = await Group.findOne(groupId);
-    if (!group) {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.GROUP_NOT_FOUND);
-      return;
-    }
-    if (
-      !(await group.hasUser(user)) &&
-      !(await assignment.isTeacherInCourse(user))
-    ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("User is not part of the group");
-      return;
-    }
-    const submissions = await assignment.getSubmissions(group);
-    const sortedSubmissions = _.sortBy(submissions, "id");
-    res.send(sortedSubmissions);
-  }
-);
-
 // get the submission which will be used for reviewing of a group
 router.get(
   "/:id/finalsubmission",
@@ -238,14 +198,24 @@ router.get(
         .send("User is not part of the group");
       return;
     }
-    const finalSubmission = await assignment.getFinalSubmission(group);
-    if (!finalSubmission) {
+    const finalSubmissions: Submission[] = [];
+    for (const assignmentVersion of assignment.versions) {
+      const finalSubmission = await assignmentVersion.getFinalSubmission(group);
+      if (finalSubmission) {
+        finalSubmissions.push(finalSubmission);
+      }
+    }
+    if (finalSubmissions.length === 0) {
       res
         .status(HttpStatusCode.NOT_FOUND)
         .send("No submissions have been made yet");
       return;
     }
-    res.send(finalSubmission);
+    if (finalSubmissions.length === 1) {
+      res.send(finalSubmissions[0]);
+    } else {
+      throw new Error("There are multiple finalSubmissions");
+    }
   }
 );
 
@@ -253,7 +223,6 @@ router.get(
 const assignmentSchema = Joi.object({
   name: Joi.string().required(),
   courseId: Joi.number().integer().required(),
-  reviewsPerUser: Joi.number().integer().required(),
   enrollable: Joi.boolean().required(),
   reviewEvaluation: Joi.boolean().required(),
   publishDate: Joi.date().required(),
@@ -298,7 +267,6 @@ router.post(
     const assignment = new Assignment(
       req.body.name,
       course,
-      req.body.reviewsPerUser,
       req.body.enrollable,
       req.body.reviewEvaluation,
       req.body.publishDate,
@@ -309,8 +277,6 @@ router.post(
       req.body.description,
       null, // file, will be set later
       req.body.externalLink,
-      null, // submissionQuestionnaire (initially empty)
-      null, // reviewQuestionnaire (initially empty)
       req.body.submissionExtensions,
       req.body.blockFeedback,
       req.body.lateSubmissions,
@@ -365,7 +331,6 @@ router.post(
 // Joi inputvalidation
 const assignmentPatchSchema = Joi.object({
   name: Joi.string().required(),
-  reviewsPerUser: Joi.number().integer().required(),
   enrollable: Joi.boolean().required(),
   reviewEvaluation: Joi.boolean().required(),
   publishDate: Joi.date().required(),
@@ -405,16 +370,6 @@ router.patch(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("User is not a teacher of the course");
-      return;
-    }
-    // check whether certain fields can be changed
-    if (
-      assignment.isAtOrAfterState(AssignmentState.REVIEW) &&
-      assignment.reviewsPerUser !== req.body.reviewsPerUser
-    ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("You cannot change reviewsPerUser at this state");
       return;
     }
     if (
@@ -492,7 +447,6 @@ router.patch(
 
         // update assignment fields
         assignment.name = req.body.name;
-        assignment.reviewsPerUser = req.body.reviewsPerUser;
         assignment.enrollable = req.body.enrollable;
         assignment.reviewEvaluation = req.body.reviewEvaluation;
         assignment.publishDate = req.body.publishDate;
@@ -573,6 +527,12 @@ router.patch("/:id/publish", validateParams(idSchema), async (req, res) => {
       .send("The assignment is not in unpublished state");
     return;
   }
+  if (assignment.versions.length === 0) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("No assignment versions have been defined");
+    return;
+  }
   assignment.state = AssignmentState.SUBMISSION;
   await assignment.save();
   res.send(assignment);
@@ -605,12 +565,14 @@ router.patch(
         .send("The assignment is not in submission state");
       return;
     }
-    const submissions = await assignment.getFinalSubmissionsOfEachGroup();
-    if (submissions.length === 0) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("There are no submissions for this assignment");
-      return;
+    for (const assignmentVersion of assignment.versions) {
+      const submissions = await assignmentVersion.getFinalSubmissionsOfEachGroup();
+      if (submissions.length === 0) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("There are no submissions for one of the assignment versions");
+        return;
+      }
     }
     assignment.state = AssignmentState.WAITING_FOR_REVIEW;
     await assignment.save();
