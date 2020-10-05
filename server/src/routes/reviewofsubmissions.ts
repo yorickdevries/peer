@@ -641,7 +641,7 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
       (await review.isReviewed(user)) &&
       !(
         assignment.blockFeedback &&
-        (await submissionQuestionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(
+        (await assignment.hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
           user
         ))
       ) &&

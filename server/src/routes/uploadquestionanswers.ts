@@ -64,7 +64,9 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
   ) {
     if (
       assignment.blockFeedback &&
-      (await questionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(user))
+      (await assignment.hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
+        user
+      ))
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)

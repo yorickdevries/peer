@@ -149,9 +149,7 @@ router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
   }
   if (
     assignment.blockFeedback &&
-    (await submissionQuestionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(
-      user
-    ))
+    (await assignment.hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(user))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)

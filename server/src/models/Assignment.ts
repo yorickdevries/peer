@@ -357,4 +357,22 @@ export default class Assignment extends BaseModel {
     const course = await this.getCourse();
     return await course.isTeacherOrTeachingAssistant(user);
   }
+
+  async hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
+    user: User
+  ): Promise<boolean> {
+    for (const assignmentVersion of this.versions) {
+      const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+      if (submissionQuestionnaire) {
+        if (
+          await submissionQuestionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(
+            user
+          )
+        ) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }
