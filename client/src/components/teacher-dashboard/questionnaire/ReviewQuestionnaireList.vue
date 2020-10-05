@@ -36,14 +36,8 @@ export default {
         }
     },
     async created() {
-        await this.fetchAssignment()
-        await this.fetchReviews()
-    },
-    methods: {
-        async fetchAssignment() {
-            const res = await api.assignments.get(this.$route.params.assignmentId)
-            this.assignment = res.data
-        }
+        const res = await api.assignments.get(this.$route.params.assignmentId)
+        this.assignment = res.data
     }
 }
 </script>
