@@ -36,7 +36,8 @@
             <!--selfReview-->
             <b-form-group>
                 <b-form-checkbox v-model="assignmentVersion.selfReview"
-                    >Let students make a review of their own submission</b-form-checkbox
+                    >Let students who made a submission for this version also make a review of their own
+                    submission</b-form-checkbox
                 >
             </b-form-group>
             <b-button variant="primary" class="mt-3" @click="editAssignmentVersion">Edit Assignment Version</b-button>
