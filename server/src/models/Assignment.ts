@@ -16,8 +16,6 @@ import {
   IsString,
   IsNotEmpty,
   IsBoolean,
-  IsInt,
-  IsPositive,
   IsDate,
   IsUrl,
   IsEnum,
@@ -29,9 +27,6 @@ import User from "./User";
 import File from "./File";
 import moment from "moment";
 import UserRole from "../enum/UserRole";
-import Submission from "./Submission";
-import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
-import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
 import Extensions from "../enum/Extensions";
 import AssignmentExport from "./AssignmentExport";
@@ -49,13 +44,6 @@ export default class Assignment extends BaseModel {
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  // reviews_per_user int NOT NULL,
-  @Column()
-  @IsDefined()
-  @IsInt()
-  @IsPositive()
-  reviewsPerUser: number;
 
   // one_person_groups boolean NOT NULL,
   @Column()
@@ -120,22 +108,6 @@ export default class Assignment extends BaseModel {
   @JoinColumn()
   file: File | null;
 
-  // submission questionaire
-  @RelationId((assignment: Assignment) => assignment.submissionQuestionnaire)
-  submissionQuestionnaireId?: number; // this is undefined when questionnaire is null
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @OneToOne((_type) => SubmissionQuestionnaire)
-  @JoinColumn()
-  submissionQuestionnaire?: SubmissionQuestionnaire | null;
-
-  // review questionaire (for review evaluation)
-  @RelationId((assignment: Assignment) => assignment.reviewQuestionnaire)
-  reviewQuestionnaireId?: number; // this is undefined when questionnaire is null
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @OneToOne((_type) => ReviewQuestionnaire)
-  @JoinColumn()
-  reviewQuestionnaire?: ReviewQuestionnaire | null;
-
   // external_link varchar(1000),
   @Column("varchar", { nullable: true })
   @IsOptional()
@@ -199,10 +171,6 @@ export default class Assignment extends BaseModel {
   @ManyToMany((_type) => Group, (group) => group.assignments)
   groups?: Group[];
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @OneToMany((_type) => Submission, (submission) => submission.assignment)
-  submissions?: Submission[];
-
   @OneToMany(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => AssignmentExport,
@@ -213,7 +181,6 @@ export default class Assignment extends BaseModel {
   constructor(
     name: string,
     course: Course,
-    reviewsPerUser: number,
     enrollable: boolean,
     reviewEvaluation: boolean,
     publishDate: Date,
@@ -224,8 +191,6 @@ export default class Assignment extends BaseModel {
     description: string | null,
     file: File | null,
     externalLink: string | null,
-    submissionQuestionnaire: SubmissionQuestionnaire | null,
-    reviewQuestionnaire: ReviewQuestionnaire | null,
     submissionExtensions: Extensions,
     blockFeedback: boolean,
     lateSubmissions: boolean,
@@ -235,7 +200,6 @@ export default class Assignment extends BaseModel {
     super();
     this.name = name;
     this.course = course;
-    this.reviewsPerUser = reviewsPerUser;
     this.enrollable = enrollable;
     this.reviewEvaluation = reviewEvaluation;
     this.state = AssignmentState.UNPUBLISHED; // initial state
@@ -247,8 +211,6 @@ export default class Assignment extends BaseModel {
     this.description = description;
     this.file = file;
     this.externalLink = externalLink;
-    this.submissionQuestionnaire = submissionQuestionnaire;
-    this.reviewQuestionnaire = reviewQuestionnaire;
     this.submissionExtensions = submissionExtensions;
     this.blockFeedback = blockFeedback;
     this.lateSubmissions = lateSubmissions;
