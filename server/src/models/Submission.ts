@@ -15,6 +15,7 @@ import AssignmentVersion from "../models/AssignmentVersion";
 import Group from "./Group";
 import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
+import Assignment from "./Assignment";
 
 @Entity()
 export default class Submission extends BaseModel {
@@ -48,6 +49,15 @@ export default class Submission extends BaseModel {
     }
   )
   assignmentVersion?: AssignmentVersion;
+
+  // Assignment_id int NOT NULL,
+  @RelationId((submission: Submission) => submission.assignment)
+  assignmentId!: number;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @ManyToOne((_type) => Assignment, (assignment) => assignment.submissions, {
+    nullable: false,
+  })
+  assignment?: Assignment;
 
   // file_path varchar(500) NOT NULL,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
