@@ -47,6 +47,30 @@ const distributeReviewsForAssignment = async function (
       throw new Error("Questionnaire not found");
     }
   }
+  // check for every version whether it is reviewed
+  for (const assignmentVersion of assignmentVersions) {
+    if ((await assignmentVersion.getVersionsToReview()).length === 0) {
+      throw new Error(
+        `assignmentVersion with id ${assignmentVersion.id} is not reviewing any assignmentVersions`
+      );
+    }
+    let isReviewed = false;
+    // check all other assignmentversions
+    for (const otherAssignmentVersion of assignmentVersions) {
+      const versionsToReview = await otherAssignmentVersion.getVersionsToReview();
+      // check all other assignmentversions whether it is reviewing the version
+      for (const versionToReview of versionsToReview) {
+        if (versionToReview.id === assignmentVersion.id) {
+          isReviewed = true;
+        }
+      }
+    }
+    if (!isReviewed) {
+      throw new Error(
+        `assignmentVersion with id ${assignmentVersion.id} is not reviewed by another assignmentVersion`
+      );
+    }
+  }
   const fullReviewDistribution: reviewAssignment[] = [];
   // assignmentVersions of which the users will be reviewing
   for (const assignmentVersion of assignmentVersions) {
