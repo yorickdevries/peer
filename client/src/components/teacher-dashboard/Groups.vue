@@ -151,6 +151,7 @@
                             stacked="md"
                             :items="row.item.submissions"
                             :fields="submissionFields"
+                            sort-by="id"
                         >
                             <template v-slot:cell(file)="data">
                                 <a :href="submissionFilePath(data.item.id)" target="_blank">
@@ -231,6 +232,12 @@
                         <b-alert show variant="warning"
                             >If the group already uploaded a file, it will not be used for reviewing anymore!
                         </b-alert>
+                        Select the assignment version for the submission:
+                        <b-form-select
+                            v-model="row.item.assignmentVersionId"
+                            :options="assignmentVersionOptions"
+                        ></b-form-select>
+                        <hr />
                         <b-alert show variant="secondary"
                             >Allowed file types: {{ assignment.submissionExtensions }}</b-alert
                         >
@@ -283,6 +290,7 @@ export default {
             ],
             submissionFields: [
                 { key: "id", label: "ID", sortable: true },
+                { key: "assignmentVersionId", label: "Assignment version ID" },
                 { key: "file", label: "File" },
                 { key: "userNetid", label: "Submitted by" },
                 { key: "date", label: "​​​Date" },
@@ -296,6 +304,20 @@ export default {
             newGroupName: "",
             // add new user
             newUserNetId: ""
+        }
+    },
+    computed: {
+        assignmentVersionOptions() {
+            const options = []
+            if (this.assignment) {
+                for (const assignmentVersion of this.assignment.versions) {
+                    options.push({
+                        value: assignmentVersion.id,
+                        text: `${assignmentVersion.name} (ID: ${assignmentVersion.id})`
+                    })
+                }
+            }
+            return options
         }
     },
     async created() {
@@ -332,9 +354,13 @@ export default {
             row.item.users = res.data.users
 
             // fetch the submissions
-            const res2 = await api.assignments.getSubmissions(this.$route.params.assignmentId, row.item.id)
+            const submissions = []
+            for (const assignmentVersion of this.assignment.versions) {
+                const res2 = await api.assignmentversions.getSubmissions(assignmentVersion.id, row.item.id)
+                submissions.push(...res2.data)
+            }
             // set the submissions in the row element
-            row.item.submissions = res2.data
+            row.item.submissions = submissions
             row.toggleDetails()
         },
         async addUserToGroup(groupId, userNetid) {
@@ -360,7 +386,7 @@ export default {
             }
             let config = { "Content-Type": "multipart/form-data" }
             // Perform upload.
-            await api.submissions.post(groupId, this.$route.params.assignmentId, file, config)
+            await api.submissions.post(groupId, rowItem.assignmentVersionId, file, config)
             this.showSuccessMessage({ message: "Successfully submitted submission." })
             this.resetFile(rowItem)
             await this.fetchGroups()
