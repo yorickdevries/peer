@@ -76,7 +76,7 @@ const distributeReviewsForAssignment = async function (
   for (const assignmentVersion of assignmentVersions) {
     const reviewsPerUserPerAssignmentVersionToReview =
       assignmentVersion.reviewsPerUserPerAssignmentVersionToReview;
-    // these users will be reviewing
+    // the users of these submissions will be reviewing
     const latestSubmissionsOfEachGroup = await assignmentVersion.getFinalSubmissionsOfEachGroup();
     // create selfreviews if needed
     if (assignmentVersion.selfReview) {
