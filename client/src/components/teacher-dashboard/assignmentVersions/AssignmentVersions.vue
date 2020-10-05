@@ -94,7 +94,11 @@
             <!--Actions-->
             <template v-slot:cell(actions)="row">
                 <!--Edit assignmentVersion-->
-                <b-button v-b-modal="`editAssignmentVersion${row.item.id}`" variant="primary" class="mb-3"
+                <b-button
+                    v-b-modal="`editAssignmentVersion${row.item.id}`"
+                    variant="primary"
+                    class="mb-3"
+                    :disabled="assignment.state === 'review' || assignment.state === 'feedback'"
                     >Edit Assignment Version
                 </b-button>
                 <!--Custom Modal-->
