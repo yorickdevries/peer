@@ -14,20 +14,17 @@
 
                     <!--Groups-->
                     <b-tab title="Groups">
-                        <Groups :assignmentId="assignment.id"></Groups>
+                        <Groups></Groups>
                     </b-tab>
 
                     <!--Submissions-->
                     <b-tab title="Submissions">
-                        <Submissions :assignmentId="assignment.id"></Submissions>
+                        <SubmissionList></SubmissionList>
                     </b-tab>
 
                     <!--Reviews-->
                     <b-tab title="Reviews">
-                        <Reviews
-                            :assignmentId="assignment.id"
-                            :pathName="'teacing-assistant-dashboard.assignments.assignment.review'"
-                        ></Reviews>
+                        <ReviewList></ReviewList>
                     </b-tab>
                 </b-tabs>
             </b-card>
@@ -38,27 +35,33 @@
 <script>
 import api from "../../api/api"
 import BreadcrumbTitle from "../BreadcrumbTitle"
-import Submissions from "../ta_teacher_shared/Submissions"
-import Reviews from "../ta_teacher_shared/Reviews"
-import Groups from "./Groups"
 import AssignmentDetails from "../ta_teacher_shared/AssignmentDetails"
+import Groups from "./Groups"
+import ReviewList from "../ta_teacher_shared/ReviewList"
+import SubmissionList from "../ta_teacher_shared/SubmissionList"
 
 export default {
     components: {
         BreadcrumbTitle,
-        Submissions,
-        Reviews,
+        AssignmentDetails,
         Groups,
-        AssignmentDetails
+        ReviewList,
+        SubmissionList
     },
     data() {
         return {
-            assignment: {}
+            assignment: null
         }
     },
     async created() {
-        let res = await api.assignments.get(this.$route.params.assignmentId)
-        this.assignment = res.data
+        await this.fetchAssignment()
+    },
+    methods: {
+        async fetchAssignment() {
+            this.assignment = null
+            let res = await api.assignments.get(this.$route.params.assignmentId)
+            this.assignment = res.data
+        }
     }
 }
 </script>
