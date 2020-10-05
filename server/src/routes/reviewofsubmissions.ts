@@ -189,7 +189,7 @@ router.post(
 
     // offload a function to a worker
     startExportReviewsForAssignmentVersionWorker(
-      assignment.id,
+      assignmentVersion.id,
       assignmentExport.id,
       exportType
     );
