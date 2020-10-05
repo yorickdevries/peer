@@ -213,49 +213,4 @@ router.get(
   }
 );
 
-// get the submission which will be used for reviewing of a group
-router.get(
-  "/:id/finalsubmission",
-  validateParams(idSchema),
-  validateQuery(querySubmissionSchema),
-  async (req, res) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const user = req.user!;
-    const assignmentVersionId = req.params.id;
-    // this value has been parsed by the validate function
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const groupId: number = req.query.groupId as any;
-    const assignmentVersion = await AssignmentVersion.findOne(
-      assignmentVersionId
-    );
-    if (!assignmentVersion) {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
-      return;
-    }
-    const group = await Group.findOne(groupId);
-    if (!group) {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.GROUP_NOT_FOUND);
-      return;
-    }
-    if (!(await group.hasUser(user))) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("User is not part of the group");
-      return;
-    }
-    const finalSubmission = await assignmentVersion.getFinalSubmission(group);
-    if (!finalSubmission) {
-      res
-        .status(HttpStatusCode.NOT_FOUND)
-        .send("No submissions have been made yet");
-      return;
-    }
-    res.send(finalSubmission);
-  }
-);
-
 export default router;

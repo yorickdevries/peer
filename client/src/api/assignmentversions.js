@@ -16,5 +16,9 @@ export default {
             selfReview
         }
         return client.patch(`assignmentversions/${id}`, body)
+    },
+    getSubmissions(assignmentVersionId, groupId) {
+        const params = { groupId }
+        return client.get(`assignmentversions/${assignmentVersionId}/submissions`, { params: params })
     }
 }

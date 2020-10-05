@@ -11,11 +11,11 @@ export default {
     getFeedback(id) {
         return client.get(`submissions/${id}/feedback`)
     },
-    post(groupId, assignmentId, file, config) {
+    post(groupId, assignmentVersionId, file, config) {
         // Create formData and append data
         const formData = new FormData()
         formData.append("groupId", groupId)
-        formData.append("assignmentId", assignmentId)
+        formData.append("assignmentVersionId", assignmentVersionId)
         formData.append("file", file)
         return client.post("submissions", formData, config)
     },
