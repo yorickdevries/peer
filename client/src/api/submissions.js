@@ -4,8 +4,8 @@ export default {
     get(id) {
         return client.get(`submissions/${id}`)
     },
-    getAllForAssignment(assignmentId) {
-        const params = { assignmentId }
+    getAllForAssignmentVersion(assignmentVersionId) {
+        const params = { assignmentVersionId }
         return client.get("submissions", { params: params })
     },
     getFeedback(id) {

@@ -32,7 +32,7 @@
 
                     <!--Groups-->
                     <b-tab title="Groups">
-                        <Groups :assignmentId="assignment.id"></Groups>
+                        <Groups></Groups>
                     </b-tab>
 
                     <!--SubmissionQuestionnaireList-->
@@ -47,15 +47,12 @@
 
                     <!--Submissions-->
                     <b-tab title="Submissions">
-                        <Submissions :assignmentId="assignment.id"></Submissions>
+                        <SubmissionList></SubmissionList>
                     </b-tab>
 
                     <!--Reviews-->
                     <b-tab title="Reviews">
-                        <Reviews
-                            :assignmentId="assignment.id"
-                            :pathName="'teacher-dashboard.assignments.assignment.review'"
-                        ></Reviews>
+                        <Reviews></Reviews>
                     </b-tab>
 
                     <!--Assignment Exports-->
@@ -77,7 +74,7 @@ import SubmissionQuestionnaireList from "../questionnaire/SubmissionQuestionnair
 import ReviewQuestionnaireList from "../questionnaire/ReviewQuestionnaireList"
 import Groups from "../Groups"
 import Reviews from "../../ta_teacher_shared/Reviews"
-import Submissions from "../../ta_teacher_shared/Submissions"
+import SubmissionList from "../../ta_teacher_shared/SubmissionList"
 import AssignmentExports from "../AssignmentExports"
 
 export default {
@@ -89,7 +86,7 @@ export default {
         ReviewQuestionnaireList,
         Groups,
         Reviews,
-        Submissions,
+        SubmissionList,
         AssignmentExports
     },
     data() {
