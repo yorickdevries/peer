@@ -707,7 +707,7 @@ describe("Integration", () => {
 
     res = await request(server)
       .get(
-        `/api/assignmentversions/${assignmentVersion.id}/finalsubmission?groupId=${group2.id}`
+        `/api/assignments/${assignment.id}/finalsubmission?groupId=${group2.id}`
       )
       .set("cookie", await studentCookie2());
     // assertions
@@ -740,7 +740,7 @@ describe("Integration", () => {
     // get final submissions for this assignment by this group
     res = await request(server)
       .get(
-        `/api/assignmentversions/${assignmentVersion.id}/finalsubmission?groupId=${group1.id}`
+        `/api/assignments/${assignment.id}/finalsubmission?groupId=${group1.id}`
       )
       .set("cookie", await studentCookie1());
     // assertions
