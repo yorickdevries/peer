@@ -52,7 +52,7 @@
 
                     <!--Reviews-->
                     <b-tab title="Reviews">
-                        <Reviews></Reviews>
+                        <ReviewList></ReviewList>
                     </b-tab>
 
                     <!--Assignment Exports-->
@@ -73,7 +73,7 @@ import AssignmentVersions from "../assignmentVersions/AssignmentVersions"
 import SubmissionQuestionnaireList from "../questionnaire/SubmissionQuestionnaireList"
 import ReviewQuestionnaireList from "../questionnaire/ReviewQuestionnaireList"
 import Groups from "../Groups"
-import Reviews from "../../ta_teacher_shared/Reviews"
+import ReviewList from "../../ta_teacher_shared/ReviewList"
 import SubmissionList from "../../ta_teacher_shared/SubmissionList"
 import AssignmentExports from "../AssignmentExports"
 
@@ -85,7 +85,7 @@ export default {
         SubmissionQuestionnaireList,
         ReviewQuestionnaireList,
         Groups,
-        Reviews,
+        ReviewList,
         SubmissionList,
         AssignmentExports
     },
