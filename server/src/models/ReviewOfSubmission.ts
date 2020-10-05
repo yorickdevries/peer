@@ -51,13 +51,11 @@ export default class ReviewOfSubmission extends Review {
       ? this.questionnaire
       : await this.getQuestionnaire();
     const questionnaireAssignmentVersion = await questionnaire.getAssignmentVersion();
-    const questionnaireAssignment = await questionnaireAssignmentVersion.getAssignment();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const submissionAssignmentVersion = await this.submission.getAssignmentVersion();
-    const submissionAssignment = await submissionAssignmentVersion.getAssignment();
-    if (questionnaireAssignment.id !== submissionAssignment.id) {
+    if (questionnaireAssignmentVersion.id !== submissionAssignmentVersion.id) {
       throw new Error(
-        "The questionnaire should correspond to the assignment of the submission"
+        "The questionnaire should correspond to the assignmentversion of the submission"
       );
     }
     // if all succeeds the super validateOrReject can be called
