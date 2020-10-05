@@ -162,6 +162,7 @@ import EditQuestionWizard from "./EditQuestionWizard"
 import { StarRating } from "vue-rate-it"
 
 export default {
+    props: ["assignmentVersionId"],
     mixins: [notifications],
     components: {
         CreateQuestionWizard,
@@ -171,6 +172,7 @@ export default {
     data() {
         return {
             assignment: null,
+            assignmentVersion: null,
             questionnaire: null,
             // enables copying of a questonnaire to another
             allQuestionnairesOfCourse: [],
@@ -203,6 +205,7 @@ export default {
     methods: {
         async fetchData() {
             await this.getAssignment()
+            await this.getAssignmentVersion()
             await this.getQuestionnaire()
             await this.getAllQuestionnairesOfCourse()
         },
@@ -210,16 +213,20 @@ export default {
             const res = await api.assignments.get(this.$route.params.assignmentId)
             this.assignment = res.data
         },
+        async getAssignmentVersion() {
+            const res = await api.assignmentversions.get(this.assignmentVersionId)
+            this.assignmentVersion = res.data
+        },
         async getQuestionnaire() {
-            if (this.assignment.reviewQuestionnaireId) {
-                const res = await api.reviewquestionnaires.get(this.assignment.reviewQuestionnaireId)
+            if (this.assignmentVersion.reviewQuestionnaireId) {
+                const res = await api.reviewquestionnaires.get(this.assignmentVersion.reviewQuestionnaireId)
                 this.questionnaire = res.data
             } else {
                 this.questionnaire = null
             }
         },
         async makeQuestionnaire() {
-            await api.reviewquestionnaires.post(this.assignment.id)
+            await api.reviewquestionnaires.post(this.assignmentVersion.id)
             this.showSuccessMessage({ message: "Questionnaire made, you can now add questions." })
             await this.fetchData()
         },
@@ -229,20 +236,25 @@ export default {
             // iterate over assignments
             this.allQuestionnairesOfCourse = []
             for (const assignment of allAssignmentsOfCourse) {
-                if (
-                    assignment.submissionQuestionnaireId &&
-                    assignment.submissionQuestionnaireId !== this.questionnaire.id
-                ) {
-                    this.allQuestionnairesOfCourse.push({
-                        name: assignment.name + " (submissionquestionnaire)",
-                        id: assignment.submissionQuestionnaireId
-                    })
-                }
-                if (assignment.reviewQuestionnaireId && assignment.reviewQuestionnaireId !== this.questionnaire.id) {
-                    this.allQuestionnairesOfCourse.push({
-                        name: assignment.name + " (reviewquestionnaire)",
-                        id: assignment.reviewQuestionnaireId
-                    })
+                for (const assignmentVersion of assignment.versions) {
+                    if (
+                        assignmentVersion.submissionQuestionnaireId &&
+                        assignmentVersion.submissionQuestionnaireId !== this.questionnaire.id
+                    ) {
+                        this.allQuestionnairesOfCourse.push({
+                            name: assignment.name + "-" + assignmentVersion.name + " (submissionquestionnaire)",
+                            id: assignmentVersion.submissionQuestionnaireId
+                        })
+                    }
+                    if (
+                        assignmentVersion.reviewQuestionnaireId &&
+                        assignmentVersion.reviewQuestionnaireId !== this.questionnaire.id
+                    ) {
+                        this.allQuestionnairesOfCourse.push({
+                            name: assignment.name + "-" + assignmentVersion.name + " (reviewquestionnaire)",
+                            id: assignmentVersion.reviewQuestionnaireId
+                        })
+                    }
                 }
             }
         },

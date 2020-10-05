@@ -21,16 +21,17 @@ import AssignmentExport from "../models/AssignmentExport";
 import {
   startDistributeReviewsForAssignmentWorker,
   startOpenFeedbackForAssignmentWorker,
-  startExportGradesForAssignmentWorker,
-  startExportReviewsForAssignmentWorker,
+  startExportGradesForAssignmentVersionWorker,
+  startExportReviewsForAssignmentVersionWorker,
 } from "../workers/pool";
 import submitReview from "../util/submitReview";
+import AssignmentVersion from "../models/AssignmentVersion";
 
 const router = express.Router();
 
 // Joi inputvalidation for query
 const assignmentSubmitIdSchema = Joi.object({
-  assignmentId: Joi.number().integer().required(),
+  assignmentVersionId: Joi.number().integer().required(),
   submitted: Joi.boolean(),
 });
 // get all the reviews for an assignment
@@ -39,24 +40,26 @@ router.get("/", validateQuery(assignmentSubmitIdSchema), async (req, res) => {
   const user = req.user!;
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const assignmentId: number = req.query.assignmentId as any;
-  const assignment = await Assignment.findOne(assignmentId);
-  if (!assignment) {
+  const assignmentVersionId: number = req.query.assignmentVersionId as any;
+  const assignmentVersion = await AssignmentVersion.findOne(
+    assignmentVersionId
+  );
+  if (!assignmentVersion) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
-      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
     return;
   }
   if (
     // not a teacher
-    !(await assignment.isTeacherOrTeachingAssistantInCourse(user))
+    !(await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
     return;
   }
-  const questionnaire = await assignment.getSubmissionQuestionnaire();
+  const questionnaire = await assignmentVersion.getSubmissionQuestionnaire();
   if (!questionnaire) {
     res
       .status(HttpStatusCode.FORBIDDEN)
@@ -73,7 +76,7 @@ router.get("/", validateQuery(assignmentSubmitIdSchema), async (req, res) => {
 
 // Joi inputvalidation for query
 const assignmentExportIdSchema = Joi.object({
-  assignmentId: Joi.number().integer().required(),
+  assignmentVersionId: Joi.number().integer().required(),
   exportType: Joi.string().valid("csv", "xls"),
 });
 router.post(
@@ -84,26 +87,28 @@ router.post(
     const user = req.user!;
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const assignmentId: number = req.query.assignmentId as any;
+    const assignmentVersionId: number = req.query.assignmentVersionId as any;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const exportType: "csv" | "xls" = req.query.exportType as any;
-    const assignment = await Assignment.findOne(assignmentId);
-    if (!assignment) {
+    const assignmentVersion = await AssignmentVersion.findOne(
+      assignmentVersionId
+    );
+    if (!assignmentVersion) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
       return;
     }
     if (
       // not a teacher
-      !(await assignment.isTeacherInCourse(user))
+      !(await assignmentVersion.isTeacherInCourse(user))
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
       return;
     }
-    const questionnaire = await assignment.getSubmissionQuestionnaire();
+    const questionnaire = await assignmentVersion.getSubmissionQuestionnaire();
     if (!questionnaire) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -118,12 +123,13 @@ router.post(
       res.send("Nothing to export.");
       return;
     }
+    const assignment = await assignmentVersion.getAssignment();
     const assignmentExport = new AssignmentExport(user, assignment, null);
     await assignmentExport.save();
 
     // offload a function to a worker
-    startExportGradesForAssignmentWorker(
-      assignment.id,
+    startExportGradesForAssignmentVersionWorker(
+      assignmentVersion.id,
       assignmentExport.id,
       exportType
     );
@@ -141,26 +147,28 @@ router.post(
     const user = req.user!;
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const assignmentId: number = req.query.assignmentId as any;
+    const assignmentVersionId: number = req.query.assignmentVersionId as any;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const exportType: "csv" | "xls" = req.query.exportType as any;
-    const assignment = await Assignment.findOne(assignmentId);
-    if (!assignment) {
+    const assignmentVersion = await AssignmentVersion.findOne(
+      assignmentVersionId
+    );
+    if (!assignmentVersion) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
       return;
     }
     if (
       // not a teacher
-      !(await assignment.isTeacherInCourse(user))
+      !(await assignmentVersion.isTeacherInCourse(user))
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
       return;
     }
-    const questionnaire = await assignment.getSubmissionQuestionnaire();
+    const questionnaire = await assignmentVersion.getSubmissionQuestionnaire();
     if (!questionnaire) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -175,12 +183,13 @@ router.post(
       return;
     }
     // make export entry without file
+    const assignment = await assignmentVersion.getAssignment();
     const assignmentExport = new AssignmentExport(user, assignment, null);
     await assignmentExport.save();
 
     // offload a function to a worker
-    startExportReviewsForAssignmentWorker(
-      assignment.id,
+    startExportReviewsForAssignmentVersionWorker(
+      assignmentVersion.id,
       assignmentExport.id,
       exportType
     );
@@ -227,44 +236,42 @@ router.patch(
       return;
     }
     // check whether review evaluation is enabled and questionnaire is present
-    if (assignment.reviewEvaluation && !assignment.reviewQuestionnaireId) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("No reviewQuestionnaire is present to evaluate the reviews");
-      return;
-    }
-    const reviewQuestionnaire = await assignment.getReviewQuestionnaire();
-    if (reviewQuestionnaire) {
-      if (reviewQuestionnaire.questions.length === 0) {
-        res
-          .status(HttpStatusCode.FORBIDDEN)
-          .send("The questionnaire doesn't have questions");
-        return;
-      }
-      // check whether there is a question without option:
-      for (const question of reviewQuestionnaire.questions) {
-        if (
-          question instanceof CheckboxQuestion ||
-          question instanceof MultipleChoiceQuestion
-        ) {
-          if (question.options.length === 0) {
-            res
-              .status(HttpStatusCode.FORBIDDEN)
-              .send(
-                "One of the questions in the questionnaire doesn't have options"
-              );
-            return;
-          }
+    if (assignment.reviewEvaluation) {
+      for (const assignmentVersion of assignment.versions) {
+        if (!assignmentVersion.reviewQuestionnaireId) {
+          res
+            .status(HttpStatusCode.FORBIDDEN)
+            .send("No reviewQuestionnaire is present to evaluate the reviews");
+          return;
         }
       }
     }
-
-    const questionnaire = await assignment.getSubmissionQuestionnaire();
-    if (!questionnaire) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
-      return;
+    for (const assignmentVersion of assignment.versions) {
+      const reviewQuestionnaire = await assignmentVersion.getReviewQuestionnaire();
+      if (reviewQuestionnaire) {
+        if (reviewQuestionnaire.questions.length === 0) {
+          res
+            .status(HttpStatusCode.FORBIDDEN)
+            .send("The questionnaire doesn't have questions");
+          return;
+        }
+        // check whether there is a question without option:
+        for (const question of reviewQuestionnaire.questions) {
+          if (
+            question instanceof CheckboxQuestion ||
+            question instanceof MultipleChoiceQuestion
+          ) {
+            if (question.options.length === 0) {
+              res
+                .status(HttpStatusCode.FORBIDDEN)
+                .send(
+                  "One of the questions in the questionnaire doesn't have options"
+                );
+              return;
+            }
+          }
+        }
+      }
     }
     // offload a function to a worker
     startOpenFeedbackForAssignmentWorker(assignmentId);
@@ -289,7 +296,8 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   }
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   const anonymousReview = review.getAnonymousVersion();
   // reviewer should access the review when reviewing
   if (
@@ -336,7 +344,8 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
   }
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     // reviewer should access the review when reviewing
     (review.isReviewer(user) &&
@@ -372,7 +381,8 @@ router.get("/:id/filemetadata", validateParams(idSchema), async (req, res) => {
   }
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     review.isReviewer(user) &&
     assignment.isAtOrAfterState(AssignmentState.REVIEW)
@@ -417,7 +427,8 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   }
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     review.isReviewer(user) &&
     assignment.isAtOrAfterState(AssignmentState.REVIEW)
@@ -473,7 +484,8 @@ router.patch(
     }
     // get assignmentstate
     const questionnaire = await review.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (
       !assignment.lateSubmissionReviews &&
       moment().isAfter(assignment.reviewDueDate)
@@ -543,7 +555,8 @@ router.patch(
     }
     // get assignmentstate
     const questionnaire = await review.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (!assignment.isAtState(AssignmentState.FEEDBACK)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -579,7 +592,8 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   }
   // get assignmentstate
   const submissionQuestionnaire = await review.getQuestionnaire();
-  const assignment = await submissionQuestionnaire.getAssignment();
+  const assignmentVersion = await submissionQuestionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   const reviewEvaluation = await ReviewOfReview.findOne({
     where: { reviewOfSubmission: review.id },
   });
@@ -620,13 +634,14 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   }
   // get assignmentstate
   const submissionQuestionnaire = await review.getQuestionnaire();
-  const assignment = await submissionQuestionnaire.getAssignment();
+  const assignmentVersion = await submissionQuestionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     !(
       (await review.isReviewed(user)) &&
       !(
         assignment.blockFeedback &&
-        (await submissionQuestionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(
+        (await assignment.hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
           user
         ))
       ) &&
@@ -642,7 +657,7 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
       .send("You are not allowed to evaluate this review");
     return;
   }
-  const reviewQuestionnaire = await assignment.getReviewQuestionnaire();
+  const reviewQuestionnaire = await assignmentVersion.getReviewQuestionnaire();
   if (!reviewQuestionnaire) {
     res
       .status(HttpStatusCode.FORBIDDEN)
@@ -729,44 +744,81 @@ router.post(
         );
       return;
     }
-    const questionnaire = await assignment.getSubmissionQuestionnaire();
-    if (!questionnaire) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
-      return;
-    }
-    if (questionnaire.questions.length === 0) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The questionnaire doesn't have questions");
-      return;
-    }
-    // check whether there is a question without option:
-    for (const question of questionnaire.questions) {
-      if (
-        question instanceof CheckboxQuestion ||
-        question instanceof MultipleChoiceQuestion
-      ) {
-        if (question.options.length === 0) {
-          res
-            .status(HttpStatusCode.FORBIDDEN)
-            .send(
-              "One of the questions in the questionnaire doesn't have options"
-            );
-          return;
+    for (const assignmentVersion of assignment.versions) {
+      const questionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+      if (!questionnaire) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
+        return;
+      }
+      if (questionnaire.questions.length === 0) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("The questionnaire doesn't have questions");
+        return;
+      }
+      // check whether there is a question without option:
+      for (const question of questionnaire.questions) {
+        if (
+          question instanceof CheckboxQuestion ||
+          question instanceof MultipleChoiceQuestion
+        ) {
+          if (question.options.length === 0) {
+            res
+              .status(HttpStatusCode.FORBIDDEN)
+              .send(
+                "One of the questions in the questionnaire doesn't have options"
+              );
+            return;
+          }
         }
+      }
+      // check for existing reviews
+      const existingReviews = await questionnaire.getReviews();
+      if (existingReviews.length > 0) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("There are already reviews for this assignment");
+        return;
       }
     }
 
-    // check for existing reviews
-    const existingReviews = await questionnaire.getReviews();
-    if (existingReviews.length > 0) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("There are already reviews for this assignment");
-      return;
+    // Check whether all versions are reviewed
+    // ans all VersionsToReview are not empty
+    const assignmentVersions = assignment.versions;
+    // check for every version whether it is reviewed
+    for (const assignmentVersion of assignmentVersions) {
+      if ((await assignmentVersion.getVersionsToReview()).length === 0) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send(
+            `assignmentVersion with id ${assignmentVersion.id} is not reviewing any assignmentVersions`
+          );
+        return;
+      }
+
+      let isReviewed = false;
+      // check all other assignmentversions
+      for (const otherAssignmentVersion of assignmentVersions) {
+        const versionsToReview = await otherAssignmentVersion.getVersionsToReview();
+        // check all other assignmentversions whether it is reviewing the version
+        for (const versionToReview of versionsToReview) {
+          if (versionToReview.id === assignmentVersion.id) {
+            isReviewed = true;
+          }
+        }
+      }
+      if (!isReviewed) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send(
+            `assignmentVersion with id ${assignmentVersion.id} is not reviewed by another assignmentVersion`
+          );
+        return;
+      }
     }
+
     // offload a function to a worker
     startDistributeReviewsForAssignmentWorker(assignment.id);
 

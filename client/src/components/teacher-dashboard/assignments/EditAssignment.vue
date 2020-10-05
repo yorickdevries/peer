@@ -243,18 +243,6 @@
                                 ></b-form-select>
                             </b-form-group>
 
-                            <!--Number of peer reviews per student-->
-                            <b-form-group label="Number of reviews that each student needs to do">
-                                <b-form-input
-                                    v-model="assignment.reviewsPerUser"
-                                    type="number"
-                                    :state="checkReviewsPerUser"
-                                    placeholder="Enter an integer larger than 0"
-                                    required
-                                >
-                                </b-form-input>
-                            </b-form-group>
-
                             <b-form-group>
                                 <b-form-checkbox v-model="assignment.enrollable">
                                     Self enrollable
@@ -350,13 +338,6 @@ export default {
         }
     },
     computed: {
-        checkReviewsPerUser() {
-            if (this.assignment.reviewsPerUser == null) {
-                return null
-            } else {
-                return this.assignment.reviewsPerUser > 0
-            }
-        },
         assignmentFilePath() {
             // Get the assignment file path.
             return `/api/assignments/${this.assignment.id}/file`
@@ -457,7 +438,6 @@ export default {
                 await api.assignments.patch(
                     this.assignment.id,
                     this.assignment.name,
-                    this.assignment.reviewsPerUser,
                     this.assignment.enrollable,
                     this.assignment.reviewEvaluation,
                     publishDate,

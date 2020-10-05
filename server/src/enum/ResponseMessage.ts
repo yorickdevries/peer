@@ -8,6 +8,7 @@ enum ResponseMessage {
   USER_NOT_FOUND = "The specified user is not found",
   COURSE_NOT_FOUND = "The specified course is not found",
   ASSIGNMENT_NOT_FOUND = "The specified assignment is not found",
+  ASSIGNMENTVERSION_NOT_FOUND = "The specified assignmentversion is not found",
   GROUP_NOT_FOUND = "The specified group is not found",
   QUESTIONNAIRE_NOT_FOUND = "The specified questionnaire is not found",
   QUESTION_NOT_FOUND = "The specified question is not found",

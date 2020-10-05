@@ -65,8 +65,12 @@ export default {
             this.assignment = res.data
         },
         async fetchReviews() {
-            const res = await api.submissionquestionnaires.getReviews(this.assignment.submissionQuestionnaireId)
-            this.reviews = res.data
+            const reviews = []
+            for (const assignmentVersion of this.assignment.versions) {
+                const res = await api.submissionquestionnaires.getReviews(assignmentVersion.submissionQuestionnaireId)
+                reviews.push(...res.data)
+            }
+            this.reviews = reviews
         }
     }
 }

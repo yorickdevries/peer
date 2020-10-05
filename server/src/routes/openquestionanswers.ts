@@ -57,7 +57,8 @@ router.post("/", validateBody(openAnswerSchema), async (req, res) => {
       .send("The question is not part of this review");
     return;
   }
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     questionnaire instanceof SubmissionQuestionnaire &&
     !assignment.lateSubmissionReviews &&
@@ -135,7 +136,8 @@ router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
     return;
   }
   const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     questionnaire instanceof SubmissionQuestionnaire &&
     !assignment.lateSubmissionReviews &&

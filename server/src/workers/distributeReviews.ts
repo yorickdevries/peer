@@ -8,24 +8,15 @@ import { getManager } from "typeorm";
 import Review from "../models/Review";
 import { AssignmentState } from "../enum/AssignmentState";
 import ensureConnection from "./ensureConnection";
+import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 
 interface reviewAssignment {
   reviewer: User;
   submission: Submission;
+  submissionQuestionnaire: SubmissionQuestionnaire;
 }
 
-const distributeReviewsForAssignment = async function (
-  assignmentId: number
-): Promise<string> {
-  await ensureConnection();
-
-  const assignment = await Assignment.findOneOrFail(assignmentId);
-  const questionnaire = await assignment.getSubmissionQuestionnaire();
-  if (!questionnaire) {
-    throw new Error("Questionnaire not found");
-  }
-  // now the reviews can be distributed
-  const submissions = await assignment.getFinalSubmissionsOfEachGroup();
+const getUniqueUsersOfSubmissions = async function (submissions: Submission[]) {
   // get all unique users of the submissions (unique as several submissions might have the same user in the group)
   const users: User[] = [];
   for (const submission of submissions) {
@@ -40,27 +31,102 @@ const distributeReviewsForAssignment = async function (
       }
     }
   }
-  const reviewDistribution = await generateReviewDistribution(
-    submissions,
-    users,
-    assignment.reviewsPerUser
-  );
+  return users;
+};
+
+const distributeReviewsForAssignment = async function (
+  assignmentId: number
+): Promise<string> {
+  await ensureConnection();
+
+  const assignment = await Assignment.findOneOrFail(assignmentId);
+  const assignmentVersions = assignment.versions;
+  for (const assignmentVersion of assignmentVersions) {
+    const questionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+    if (!questionnaire) {
+      throw new Error("Questionnaire not found");
+    }
+  }
+  // check for every version whether it is reviewed
+  for (const assignmentVersion of assignmentVersions) {
+    if ((await assignmentVersion.getVersionsToReview()).length === 0) {
+      throw new Error(
+        `assignmentVersion with id ${assignmentVersion.id} is not reviewing any assignmentVersions`
+      );
+    }
+    let isReviewed = false;
+    // check all other assignmentversions
+    for (const otherAssignmentVersion of assignmentVersions) {
+      const versionsToReview = await otherAssignmentVersion.getVersionsToReview();
+      // check all other assignmentversions whether it is reviewing the version
+      for (const versionToReview of versionsToReview) {
+        if (versionToReview.id === assignmentVersion.id) {
+          isReviewed = true;
+        }
+      }
+    }
+    if (!isReviewed) {
+      throw new Error(
+        `assignmentVersion with id ${assignmentVersion.id} is not reviewed by another assignmentVersion`
+      );
+    }
+  }
+  const fullReviewDistribution: reviewAssignment[] = [];
+  // assignmentVersions of which the users will be reviewing
+  for (const assignmentVersion of assignmentVersions) {
+    const reviewsPerUserPerAssignmentVersionToReview =
+      assignmentVersion.reviewsPerUserPerAssignmentVersionToReview;
+    // the users of these submissions will be reviewing
+    const latestSubmissionsOfEachGroup = await assignmentVersion.getFinalSubmissionsOfEachGroup();
+    // create selfreviews if needed
+    if (assignmentVersion.selfReview) {
+      const selfReviewAssignments = await generateSelfReviews(
+        latestSubmissionsOfEachGroup
+      );
+      fullReviewDistribution.push(...selfReviewAssignments);
+    }
+    const usersOfLatestSubmissions = await getUniqueUsersOfSubmissions(
+      latestSubmissionsOfEachGroup
+    );
+    // iterate over all verions which needs to be reviewed
+    const versionsToReview = await assignmentVersion.getVersionsToReview();
+    for (const assignmentVersionToReview of versionsToReview) {
+      const submissionsToReview = await assignmentVersionToReview.getFinalSubmissionsOfEachGroup();
+      const reviewDistributionForCurrentVersionToReview = await generateReviewDistribution(
+        submissionsToReview,
+        usersOfLatestSubmissions,
+        reviewsPerUserPerAssignmentVersionToReview
+      );
+      // add the distribution to fullReviewDistribution
+      fullReviewDistribution.push(
+        ...reviewDistributionForCurrentVersionToReview
+      );
+    }
+  }
+
   // create all reviews in an transaction
   await getManager().transaction(
     "SERIALIZABLE", // serializable is the only way to make sure to reviews exist before creating them
     async (transactionalEntityManager) => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const existingReviews = await transactionalEntityManager.find(Review, {
-        where: { questionnaire: questionnaire },
-      });
-      if (existingReviews.length > 0) {
-        throw new Error("There are already reviews for this assignment");
+      for (const assignmentVersion of assignmentVersions) {
+        const questionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+        if (!questionnaire) {
+          throw new Error("Questionnaire not found");
+        }
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const existingReviews = await transactionalEntityManager.find(Review, {
+          where: { questionnaire: questionnaire },
+        });
+        if (existingReviews.length > 0) {
+          throw new Error("There are already reviews for this assignment");
+        }
       }
-      // iterate over reviewDistribution
-      for (const reviewAssignment of reviewDistribution) {
+
+      // iterate over fullReviewDistribution
+      for (const reviewAssignment of fullReviewDistribution) {
         // make the review
         const review = new ReviewOfSubmission(
-          questionnaire,
+          reviewAssignment.submissionQuestionnaire,
           reviewAssignment.reviewer,
           false,
           false,
@@ -80,7 +146,7 @@ const distributeReviewsForAssignment = async function (
       await transactionalEntityManager.save(assignment);
     }
   );
-  return `Distributed ${reviewDistribution.length} reviews for assignment ${assignment.id}`;
+  return `Distributed ${fullReviewDistribution.length} reviews for assignment ${assignment.id}`;
 };
 
 // Takes care of the distribution of reviews of submissions over the students
@@ -94,7 +160,7 @@ const generateReviewDistribution = async function (
     throw new Error("reviewsPerUser should be a positive integer");
   }
   // If there are less submissions than required to review per person, then no division can be made
-  if (submissions.length - 1 < reviewsPerUser) {
+  if (submissions.length < reviewsPerUser) {
     throw new Error(
       `There are not enough submissions to assign the required number of reviewsPerUser: ${reviewsPerUser}`
     );
@@ -289,7 +355,16 @@ const performMaxFlow = async function (
     if (from > 3 && to > 3) {
       const user = users[userIndexOfNodeNumber(from)];
       const submission = submissions[submissionIndexOfNodeNumber(to)];
-      reviewDistribution.push({ reviewer: user, submission: submission });
+      const assignmentVersion = await submission.getAssignmentVersion();
+      const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+      if (!submissionQuestionnaire) {
+        throw new Error("submissionQuestionnaire not found");
+      }
+      reviewDistribution.push({
+        reviewer: user,
+        submission: submission,
+        submissionQuestionnaire: submissionQuestionnaire,
+      });
     }
   }
   // check if the max flow is achieved
@@ -300,6 +375,30 @@ const performMaxFlow = async function (
     console.log(`MaxFlow achieved: ${reviewDistribution.length}`);
     return reviewDistribution;
   }
+};
+
+const generateSelfReviews = async function (
+  submissions: Submission[]
+): Promise<reviewAssignment[]> {
+  const selfReviewAssignments: reviewAssignment[] = [];
+  for (const submission of submissions) {
+    const assignmentVersion = await submission.getAssignmentVersion();
+    const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+    if (!submissionQuestionnaire) {
+      throw new Error("submissionQuestionnaire not found");
+    }
+    const group = await submission.getGroup();
+    const users = await group.getUsers();
+    for (const user of users) {
+      const selfReviewAssignment = {
+        reviewer: user,
+        submission: submission,
+        submissionQuestionnaire: submissionQuestionnaire,
+      };
+      selfReviewAssignments.push(selfReviewAssignment);
+    }
+  }
+  return selfReviewAssignments;
 };
 
 export { distributeReviewsForAssignment, generateReviewDistribution };

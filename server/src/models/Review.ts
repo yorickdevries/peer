@@ -148,7 +148,8 @@ export default abstract class Review extends BaseModel {
     const questionnaire = this.questionnaire
       ? this.questionnaire
       : await this.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     const course = await assignment.getCourse();
     if (!(await course.isEnrolled(this.reviewer, UserRole.STUDENT))) {
       throw new Error(

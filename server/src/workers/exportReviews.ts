@@ -1,18 +1,20 @@
-import Assignment from "../models/Assignment";
+import AssignmentVersion from "../models/AssignmentVersion";
 import AssignmentExport from "../models/AssignmentExport";
 import exportJSONToFile from "../util/exportJSONToFile";
 import parseSubmissionReviewsForExport from "../util/parseReviewsForExport";
 import ensureConnection from "./ensureConnection";
 
-const exportReviewsForAssignment = async function (
-  assignmentId: number,
+const exportReviewsForAssignmentVersion = async function (
+  assignmentVersionId: number,
   assignmentExportId: number,
   exportType: "xls" | "csv"
 ): Promise<string> {
   await ensureConnection();
 
-  const assignment = await Assignment.findOneOrFail(assignmentId);
-  const questionnaire = await assignment.getSubmissionQuestionnaire();
+  const assignmentVersion = await AssignmentVersion.findOneOrFail(
+    assignmentVersionId
+  );
+  const questionnaire = await assignmentVersion.getSubmissionQuestionnaire();
   if (!questionnaire) {
     throw new Error("Questionnaire not found");
   }
@@ -22,10 +24,10 @@ const exportReviewsForAssignment = async function (
 
   // asynchronically make export
   const parsedReviews = await parseSubmissionReviewsForExport(questionnaire);
-  const filename = `assignment${assignment.id}_reviews`;
+  const filename = `assignmentversion${assignmentVersion.id}_reviews`;
   await exportJSONToFile(parsedReviews, filename, exportType, assignmentExport);
 
-  return `Exported Reviews for assignment ${assignment.id}`;
+  return `Exported Reviews for assignmentVersion ${assignmentVersion.id}`;
 };
 
-export default exportReviewsForAssignment;
+export default exportReviewsForAssignmentVersion;

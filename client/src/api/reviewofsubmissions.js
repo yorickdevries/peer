@@ -28,20 +28,20 @@ export default {
     getAnswers(id) {
         return client.get(`reviewofsubmissions/${id}/answers`)
     },
-    getAllForAssignment(assignmentId, submitted) {
-        const params = { assignmentId, submitted }
+    getAllForAssignmentVersion(assignmentVersionId, submitted) {
+        const params = { assignmentVersionId, submitted }
         return client.get("reviewofsubmissions", { params: params })
     },
     distribute(assignmentId) {
         const params = { assignmentId }
         return client.post("reviewofsubmissions/distribute", null, { params: params })
     },
-    exportReviews(assignmentId, exportType) {
-        const params = { assignmentId, exportType }
+    exportReviews(assignmentVersionId, exportType) {
+        const params = { assignmentVersionId, exportType }
         return client.post("reviewofsubmissions/exportreviews", null, { params: params })
     },
-    exportGrades(assignmentId, exportType) {
-        const params = { assignmentId, exportType }
+    exportGrades(assignmentVersionId, exportType) {
+        const params = { assignmentVersionId, exportType }
         return client.post("reviewofsubmissions/exportgrades", null, { params: params })
     }
 }

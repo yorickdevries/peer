@@ -96,7 +96,8 @@ router.patch(
     }
     // get assignmentstate
     const questionnaire = await review.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (
       !assignment.lateReviewEvaluations &&
       moment().isAfter(assignment.reviewEvaluationDueDate)

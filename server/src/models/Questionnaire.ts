@@ -6,7 +6,7 @@ import {
   Column,
 } from "typeorm";
 import BaseModel from "./BaseModel";
-import Assignment from "./Assignment";
+import AssignmentVersion from "./AssignmentVersion";
 import Question from "./Question";
 import User from "./User";
 import QuestionnaireType from "../enum/QuestionnaireType";
@@ -39,7 +39,7 @@ export default abstract class Questionnaire extends BaseModel {
     super();
   }
 
-  abstract getAssignment(): Promise<Assignment>;
+  abstract getAssignmentVersion(): Promise<AssignmentVersion>;
 
   async getReviews(submitted?: boolean): Promise<Review[]> {
     const where: {
@@ -57,13 +57,13 @@ export default abstract class Questionnaire extends BaseModel {
   // checks whether the user is teacher
   // of the corresponding assignment and course
   async isTeacherInCourse(user: User): Promise<boolean> {
-    const assignment = await this.getAssignment();
-    return await assignment.isTeacherInCourse(user);
+    const assignmentVersion = await this.getAssignmentVersion();
+    return await assignmentVersion.isTeacherInCourse(user);
   }
 
   async isTeacherOrTeachingAssistantInCourse(user: User): Promise<boolean> {
-    const assignment = await this.getAssignment();
-    return await assignment.isTeacherOrTeachingAssistantInCourse(user);
+    const assignmentVersion = await this.getAssignmentVersion();
+    return await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user);
   }
 
   async getReviewsWhereUserIsReviewer(user: User): Promise<Review[]> {

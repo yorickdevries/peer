@@ -68,7 +68,8 @@ router.get("/", validateQuery(getAnnotationSchema), async (req, res) => {
 
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     (await review.isTeacherOrTeachingAssistantInCourse(user)) ||
     // reviewer should access the review when reviewing
@@ -86,7 +87,9 @@ router.get("/", validateQuery(getAnnotationSchema), async (req, res) => {
   ) {
     if (
       assignment.blockFeedback &&
-      (await questionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(user))
+      (await assignment.hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
+        user
+      ))
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -156,7 +159,8 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
   }
   // get assignment
   const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     !assignment.lateSubmissionReviews &&
     moment().isAfter(assignment.reviewDueDate)
@@ -267,7 +271,8 @@ router.patch(
     }
     // get assignment
     const questionnaire = await review.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (
       !assignment.lateSubmissionReviews &&
       moment().isAfter(assignment.reviewDueDate)
@@ -314,7 +319,8 @@ router.delete("/:id", validateParams(idStringSchema), async (req, res) => {
   }
   // get assignment
   const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     !assignment.lateSubmissionReviews &&
     moment().isAfter(assignment.reviewDueDate)

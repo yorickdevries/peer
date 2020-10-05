@@ -171,6 +171,7 @@ export default {
     data() {
         return {
             assignment: {},
+            assignmentversion: null,
             group: {},
             finalSubmission: null,
             questionnaire: {},
@@ -193,6 +194,7 @@ export default {
             await this.fetchAssignment()
             await this.fetchGroup()
             await this.fetchFinalSubmission()
+            await this.fetchAssignmentVersion()
             await this.fetchSubmissionQuestionnaire()
             await this.fetchFeedbackReviews()
             await this.aggregateFeedback()
@@ -216,8 +218,12 @@ export default {
             const res = await api.assignments.getFinalSubmission(this.$route.params.assignmentId, this.group.id)
             this.finalSubmission = res.data
         },
+        async fetchAssignmentVersion() {
+            const res = await api.assignmentversions.get(this.finalSubmission.assignmentVersionId)
+            this.assignmentVersion = res.data
+        },
         async fetchSubmissionQuestionnaire() {
-            const res = await api.submissionquestionnaires.get(this.assignment.submissionQuestionnaireId)
+            const res = await api.submissionquestionnaires.get(this.assignmentVersion.submissionQuestionnaireId)
             this.questionnaire = res.data
         },
         async fetchFeedbackReviews() {
