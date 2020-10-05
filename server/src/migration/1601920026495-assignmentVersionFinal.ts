@@ -13,17 +13,9 @@ export class assignmentVersionFinal1601920026495 implements MigrationInterface {
         await queryRunner.query("ALTER TABLE `assignment` DROP COLUMN `reviewsPerUser`");
         await queryRunner.query("ALTER TABLE `assignment` DROP COLUMN `submissionQuestionnaireId`");
         await queryRunner.query("ALTER TABLE `assignment` DROP COLUMN `reviewQuestionnaireId`");
-        await queryRunner.query("ALTER TABLE `assignment` CHANGE `publishDate` `publishDate` timestamp NOT NULL");
-        await queryRunner.query("ALTER TABLE `assignment` CHANGE `dueDate` `dueDate` timestamp NOT NULL");
-        await queryRunner.query("ALTER TABLE `assignment` CHANGE `reviewPublishDate` `reviewPublishDate` timestamp NOT NULL");
-        await queryRunner.query("ALTER TABLE `assignment` CHANGE `reviewDueDate` `reviewDueDate` timestamp NOT NULL");
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query("ALTER TABLE `assignment` CHANGE `reviewDueDate` `reviewDueDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'");
-        await queryRunner.query("ALTER TABLE `assignment` CHANGE `reviewPublishDate` `reviewPublishDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'");
-        await queryRunner.query("ALTER TABLE `assignment` CHANGE `dueDate` `dueDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'");
-        await queryRunner.query("ALTER TABLE `assignment` CHANGE `publishDate` `publishDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'");
         await queryRunner.query("ALTER TABLE `assignment` ADD `reviewQuestionnaireId` int NULL");
         await queryRunner.query("ALTER TABLE `assignment` ADD `submissionQuestionnaireId` int NULL");
         await queryRunner.query("ALTER TABLE `assignment` ADD `reviewsPerUser` int NOT NULL");
