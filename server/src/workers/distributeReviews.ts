@@ -136,7 +136,7 @@ const generateReviewDistribution = async function (
     throw new Error("reviewsPerUser should be a positive integer");
   }
   // If there are less submissions than required to review per person, then no division can be made
-  if (submissions.length - 1 < reviewsPerUser) {
+  if (submissions.length < reviewsPerUser) {
     throw new Error(
       `There are not enough submissions to assign the required number of reviewsPerUser: ${reviewsPerUser}`
     );
