@@ -17,7 +17,7 @@ const databaseConfig: {
 const baseConfig = {
   entities: entityList,
   // We are using migrations, synchronize should be set to false in production.
-  synchronize: false,
+  synchronize: process.env.NODE_ENV === "production" ? false : true,
 
   // Run migrations automatically,
   // you can disable this if you prefer running migration manually.
