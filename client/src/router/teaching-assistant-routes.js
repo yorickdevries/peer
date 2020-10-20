@@ -34,6 +34,11 @@ export default [
                 path: "assignment/:assignmentId/reviews/:reviewId",
                 name: "teaching-assistant-dashboard.course.assignment.review",
                 component: () => import("../components/ta_teacher_shared/ReviewApproval")
+            },
+            {
+                path: "courses/:courseId/assignments/:assignmentId/submissions/:submissionId",
+                name: "teacher-dashboard.assignments.assignment.submission",
+                component: () => import("../components/ta_teacher_shared/SubmissionApproval")
             }
         ]
     }
