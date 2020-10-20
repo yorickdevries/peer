@@ -1,6 +1,32 @@
 <template>
     <div v-if="allSubmissions && finalSubmissions && groups">
         <b-alert show>As teacher you can change submissions for groups in the group tab</b-alert>
+        <b-row v-if="$router.currentRoute.name.includes('teacher')">
+            <b-col>
+                <!--Exporting Submissions-->
+                <dt>Export submissions</dt>
+                <dd>Exports a file with info of all submissions for this assignment.</dd>
+                <b-button
+                    :disabled="disableSubmissionExportButton"
+                    size="sm"
+                    variant="primary"
+                    @click="exportSubmissions('csv')"
+                    class="mb-3 mr-2"
+                >
+                    Export submissions .csv
+                </b-button>
+                <b-button
+                    :disabled="disableSubmissionExportButton"
+                    size="sm"
+                    variant="primary"
+                    @click="exportSubmissions('xls')"
+                    class="mb-3 mr-2"
+                >
+                    Export submissions .xls
+                </b-button>
+            </b-col>
+        </b-row>
+        <hr />
         <!--Table Options-->
         <b-row>
             <b-col cols="6" class="mb-3">
@@ -112,9 +138,11 @@
 <script>
 import api from "../../api/api"
 import _ from "lodash"
+import notifications from "../../mixins/notifications"
 
 export default {
     props: ["assignmentVersionId"],
+    mixins: [notifications],
     data() {
         return {
             allSubmissions: null,
@@ -176,6 +204,13 @@ export default {
         submissionFilePath(id) {
             // Get the submission file path.
             return `/api/submissions/${id}/file`
+        },
+        async exportSubmissions(exportType) {
+            this.disableSubmissionExportButton = true
+            await api.submissions.exportSubmissions(this.assignmentVersionId, exportType)
+            this.showSuccessMessage({
+                message: "Export is being generated, you can download it in the exports tab when ready"
+            })
         }
     }
 }
