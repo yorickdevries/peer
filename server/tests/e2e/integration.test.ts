@@ -703,7 +703,6 @@ describe("Integration", () => {
       .set("cookie", await studentCookie2());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    const unsubmittedsSubmission = JSON.parse(res.text);
 
     res = await request(server)
       .get(
@@ -726,6 +725,14 @@ describe("Integration", () => {
 
     expect(res.status).toBe(HttpStatusCode.OK);
     const submission2 = JSON.parse(res.text);
+
+    // get all submissions for this assignment by this group
+    res = await request(server)
+      .get(`/api/submissions/${submission3.id}`)
+      .set("cookie", await studentCookie2());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const unsubmittedSubmission = JSON.parse(res.text);
 
     // get all submissions for this assignment by this group
     res = await request(server)
@@ -755,7 +762,7 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([
       submission1,
-      unsubmittedsSubmission,
+      unsubmittedSubmission,
       submission2,
     ]);
 
