@@ -21,6 +21,8 @@ import _ from "lodash";
 import moment from "moment";
 import { getManager } from "typeorm";
 import removePDFMetadata from "../util/removePDFMetadata";
+import AssignmentExport from "../models/AssignmentExport";
+import { startExportSubmissionsForAssignmentVersionWorker } from "../workers/pool";
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
@@ -454,6 +456,64 @@ router.patch(
     await submission.save();
     res.send(submission);
     return;
+  }
+);
+
+// Joi inputvalidation for query
+const assignmentExportIdSchema = Joi.object({
+  assignmentVersionId: Joi.number().integer().required(),
+  exportType: Joi.string().valid("csv", "xls"),
+});
+router.post(
+  "/export",
+  validateQuery(assignmentExportIdSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const assignmentVersionId: number = req.query.assignmentVersionId as any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const exportType: "csv" | "xls" = req.query.exportType as any;
+    const assignmentVersion = await AssignmentVersion.findOne(
+      assignmentVersionId
+    );
+    if (!assignmentVersion) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignmentVersion.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    // make sure there is something to export
+    const submissions = await assignmentVersion.getSubmissions();
+    if (submissions.length == 0) {
+      res.status(HttpStatusCode.BAD_REQUEST);
+      res.send("Nothing to export.");
+      return;
+    }
+    // make export entry without file
+    const assignment = await assignmentVersion.getAssignment();
+    const assignmentExport = new AssignmentExport(user, assignment, null);
+    await assignmentExport.save();
+
+    // offload a function to a worker
+    startExportSubmissionsForAssignmentVersionWorker(
+      assignmentVersion.id,
+      assignmentExport.id,
+      exportType
+    );
+
+    // send message that reviews are being exported
+    res.send(assignmentExport);
   }
 );
 

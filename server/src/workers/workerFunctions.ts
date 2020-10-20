@@ -4,6 +4,7 @@ import importGroupsForAssignment from "./importGroups";
 import copyGroupsForAssignment from "./copyGroups";
 import exportGradesForAssignmentVersion from "./exportGrades";
 import exportReviewsForAssignmentVersion from "./exportReviews";
+import exportSubmissionsForAssignmentVersion from "./exportSubmissions";
 
 const workerFunctions = {
   distributeReviewsForAssignment: distributeReviewsForAssignment,
@@ -12,6 +13,7 @@ const workerFunctions = {
   copyGroupsForAssignment: copyGroupsForAssignment,
   exportGradesForAssignmentVersion: exportGradesForAssignmentVersion,
   exportReviewsForAssignmentVersion: exportReviewsForAssignmentVersion,
+  exportSubmissionsForAssignmentVersion: exportSubmissionsForAssignmentVersion,
 };
 
 export default workerFunctions;
