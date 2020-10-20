@@ -26,5 +26,9 @@ export default {
     setApproval(id, approvalByTA) {
         const body = { approvalByTA }
         return client.patch(`submissions/${id}/approval`, body)
+    },
+    export(assignmentVersionId, exportType) {
+        const params = { assignmentVersionId, exportType }
+        return client.post("submissions/export", null, { params: params })
     }
 }

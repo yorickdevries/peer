@@ -207,7 +207,7 @@ export default {
         },
         async exportSubmissions(exportType) {
             this.disableSubmissionExportButton = true
-            await api.submissions.exportSubmissions(this.assignmentVersionId, exportType)
+            await api.submissions.export(this.assignmentVersionId, exportType)
             this.showSuccessMessage({
                 message: "Export is being generated, you can download it in the exports tab when ready"
             })
