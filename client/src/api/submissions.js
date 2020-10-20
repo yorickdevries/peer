@@ -22,5 +22,9 @@ export default {
     patch(id, final) {
         const body = { final: final }
         return client.patch(`submissions/${id}`, body)
+    },
+    setApproval(id, approvalByTA) {
+        const body = { approvalByTA }
+        return client.patch(`submissions/${id}/approval`, body)
     }
 }
