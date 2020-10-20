@@ -415,4 +415,46 @@ router.patch(
   }
 );
 
+const submissionApprovalSchema = Joi.object({
+  approvalByTA: Joi.boolean().required(),
+});
+// change a review approval
+router.patch(
+  "/:id/approval",
+  validateParams(idSchema),
+  validateBody(submissionApprovalSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const submission = await Submission.findOne(req.params.id);
+    if (!submission) {
+      res
+        .status(HttpStatusCode.NOT_FOUND)
+        .send(ResponseMessage.SUBMISSION_NOT_FOUND);
+      return;
+    }
+    if (!(await submission.isTeacherOrTeachingAssistantInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
+      return;
+    }
+    if (
+      submission.approvingTA !== null &&
+      submission.approvingTA.netid !== user.netid
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The submission has already been evaluated by another TA");
+      return;
+    }
+    // set new values
+    submission.approvalByTA = req.body.approvalByTA;
+    submission.approvingTA = user;
+    await submission.save();
+    res.send(submission);
+    return;
+  }
+);
+
 export default router;
