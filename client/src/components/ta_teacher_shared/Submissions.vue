@@ -71,6 +71,32 @@
             <template v-slot:cell(date)="data">
                 {{ data.item.createdAt | formatDate }}
             </template>
+
+            <template v-slot:cell(approvalByTA)="data">
+                <span v-if="data.item.approvalByTA === null">No action yet by any TA</span>
+                <span v-if="data.item.approvalByTA === true">Approved 👍</span>
+                <span v-if="data.item.approvalByTA === false">Disapproved 👎</span>
+            </template>
+
+            <template v-slot:cell(approvingTA)="data">
+                <span v-if="data.item.approvingTA">{{ data.item.approvingTA.netid }}</span>
+                <span v-if="data.item.approvingTA === null">None</span>
+            </template>
+
+            <template v-slot:cell(action)="data">
+                <!-- note: the name needs to be different for TAs-->
+                <b-button
+                    variant="primary"
+                    size="sm"
+                    :to="{
+                        name: $router.currentRoute.name.includes('teacher')
+                            ? 'teacher-dashboard.assignments.assignment.submission'
+                            : 'teaching-assistant-dashboard.course.assignment.submission',
+                        params: { submissionId: data.item.id }
+                    }"
+                    >Show submission</b-button
+                >
+            </template>
         </b-table>
 
         <!--Pagination-->
@@ -104,7 +130,10 @@ export default {
                 { key: "groupName", label: "Group name" },
                 { key: "userNetid", label: "Submitted by" },
                 { key: "date", label: "​​​Date" },
-                { key: "final", label: "Final" }
+                { key: "final", label: "Final" },
+                { key: "approvalByTA", label: "Approval by TA" },
+                { key: "approvingTA", label: "Approving TA" },
+                { key: "action", label: "Action" }
             ],
             currentPage: 1,
             perPage: 10,
