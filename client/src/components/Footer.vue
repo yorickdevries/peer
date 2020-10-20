@@ -3,7 +3,7 @@
         <div class="container d-flex align-items-center h-100">
             <div class="float-left ">
                 <router-link @click.native="scrollToTop" to="/privacy">Privacy Policy</router-link>
-                <div>For support, contact: <a href="mailto:eip-ewi@tudelft.nl">eip-ewi@tudelft.nl</a></div>
+                <div>For technical support, contact: <a href="mailto:eip-ewi@tudelft.nl">eip-ewi@tudelft.nl</a></div>
             </div>
             <div class="mr-auto"></div>
             <div>{{ timezoneString }}</div>
