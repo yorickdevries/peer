@@ -165,7 +165,8 @@ export default {
             ],
             currentPage: 1,
             perPage: 10,
-            filter: ""
+            filter: "",
+            disableSubmissionExportButton: false
         }
     },
     async created() {
