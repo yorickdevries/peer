@@ -169,6 +169,35 @@ const startExportReviewsForAssignmentVersionWorker = function (
   }
 };
 
+const startExportSubmissionsForAssignmentVersionWorker = function (
+  assignmentVersionId: number,
+  assignmentExportId: number,
+  exportType: "xls" | "csv"
+): void {
+  if (isTSNode) {
+    // run the function directly in this process (TS Node/development)
+    workerFunctions
+      .exportSubmissionsForAssignmentVersion(
+        assignmentVersionId,
+        assignmentExportId,
+        exportType
+      )
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("exportSubmissionsForAssignmentVersion", [
+      assignmentVersionId,
+      assignmentExportId,
+      exportType,
+    ]);
+  }
+};
+
 export {
   startDistributeReviewsForAssignmentWorker,
   startOpenFeedbackForAssignmentWorker,
@@ -176,4 +205,5 @@ export {
   startCopyGroupsForAssignmentWorker,
   startExportGradesForAssignmentVersionWorker,
   startExportReviewsForAssignmentVersionWorker,
+  startExportSubmissionsForAssignmentVersionWorker,
 };

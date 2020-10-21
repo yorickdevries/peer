@@ -50,6 +50,11 @@ export default [
                 component: () => import("../components/ta_teacher_shared/ReviewApproval")
             },
             {
+                path: "courses/:courseId/assignments/:assignmentId/submissions/:submissionId",
+                name: "teacher-dashboard.assignments.assignment.submission",
+                component: () => import("../components/ta_teacher_shared/SubmissionApproval")
+            },
+            {
                 path: "courses/:courseId/assignments/:assignmentId/edit",
                 name: "teacher-dashboard.assignments.assignment.edit",
                 component: () => import("../components/teacher-dashboard/assignments/EditAssignment")

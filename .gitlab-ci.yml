@@ -76,6 +76,7 @@ coverage:
   stage: test
   variables:
     NODE_ENV: test
+  allow_failure: true
   services:
   - mariadb:10.1
   script:

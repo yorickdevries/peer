@@ -1,6 +1,32 @@
 <template>
     <div v-if="allSubmissions && finalSubmissions && groups">
         <b-alert show>As teacher you can change submissions for groups in the group tab</b-alert>
+        <b-row v-if="$router.currentRoute.name.includes('teacher')">
+            <b-col>
+                <!--Exporting Submissions-->
+                <dt>Export submissions</dt>
+                <dd>Exports a file with info of all submissions for this assignment.</dd>
+                <b-button
+                    :disabled="disableSubmissionExportButton"
+                    size="sm"
+                    variant="primary"
+                    @click="exportSubmissions('csv')"
+                    class="mb-3 mr-2"
+                >
+                    Export submissions .csv
+                </b-button>
+                <b-button
+                    :disabled="disableSubmissionExportButton"
+                    size="sm"
+                    variant="primary"
+                    @click="exportSubmissions('xls')"
+                    class="mb-3 mr-2"
+                >
+                    Export submissions .xls
+                </b-button>
+            </b-col>
+        </b-row>
+        <hr />
         <!--Table Options-->
         <b-row>
             <b-col cols="6" class="mb-3">
@@ -71,6 +97,32 @@
             <template v-slot:cell(date)="data">
                 {{ data.item.createdAt | formatDate }}
             </template>
+
+            <template v-slot:cell(approvalByTA)="data">
+                <span v-if="data.item.approvalByTA === null">No action yet by any TA</span>
+                <span v-if="data.item.approvalByTA === true">Approved 👍</span>
+                <span v-if="data.item.approvalByTA === false">Disapproved 👎</span>
+            </template>
+
+            <template v-slot:cell(approvingTA)="data">
+                <span v-if="data.item.approvingTA">{{ data.item.approvingTA.netid }}</span>
+                <span v-if="data.item.approvingTA === null">None</span>
+            </template>
+
+            <template v-slot:cell(action)="data">
+                <!-- note: the name needs to be different for TAs-->
+                <b-button
+                    variant="primary"
+                    size="sm"
+                    :to="{
+                        name: $router.currentRoute.name.includes('teacher')
+                            ? 'teacher-dashboard.assignments.assignment.submission'
+                            : 'teaching-assistant-dashboard.course.assignment.submission',
+                        params: { submissionId: data.item.id }
+                    }"
+                    >Show submission</b-button
+                >
+            </template>
         </b-table>
 
         <!--Pagination-->
@@ -86,9 +138,11 @@
 <script>
 import api from "../../api/api"
 import _ from "lodash"
+import notifications from "../../mixins/notifications"
 
 export default {
     props: ["assignmentVersionId"],
+    mixins: [notifications],
     data() {
         return {
             allSubmissions: null,
@@ -104,11 +158,15 @@ export default {
                 { key: "groupName", label: "Group name" },
                 { key: "userNetid", label: "Submitted by" },
                 { key: "date", label: "​​​Date" },
-                { key: "final", label: "Final" }
+                { key: "final", label: "Final" },
+                { key: "approvalByTA", label: "Approval by TA" },
+                { key: "approvingTA", label: "Approving TA" },
+                { key: "action", label: "Action" }
             ],
             currentPage: 1,
             perPage: 10,
-            filter: ""
+            filter: "",
+            disableSubmissionExportButton: false
         }
     },
     async created() {
@@ -147,6 +205,13 @@ export default {
         submissionFilePath(id) {
             // Get the submission file path.
             return `/api/submissions/${id}/file`
+        },
+        async exportSubmissions(exportType) {
+            this.disableSubmissionExportButton = true
+            await api.submissions.export(this.assignmentVersionId, exportType)
+            this.showSuccessMessage({
+                message: "Export is being generated, you can download it in the exports tab when ready"
+            })
         }
     }
 }

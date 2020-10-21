@@ -8,7 +8,7 @@ import {
   RelationId,
   OneToMany,
 } from "typeorm";
-import { IsDefined, IsBoolean } from "class-validator";
+import { IsDefined, IsBoolean, IsOptional } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import AssignmentVersion from "../models/AssignmentVersion";
@@ -68,6 +68,17 @@ export default class Submission extends BaseModel {
   @IsBoolean()
   final: boolean;
 
+  // approved boolean,
+  @Column("boolean", { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  approvalByTA: boolean | null;
+
+  // ta_netid varchar(500),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @ManyToOne((_type) => User, { eager: true })
+  approvingTA: User | null;
+
   constructor(
     user: User,
     group: Group,
@@ -81,6 +92,9 @@ export default class Submission extends BaseModel {
     this.assignmentVersion = assignmentVersion;
     this.file = file;
     this.final = final;
+    // set default on null
+    this.approvalByTA = null;
+    this.approvingTA = null;
   }
 
   // validation: check whether the group is in the assingment and the user in the group
@@ -125,5 +139,10 @@ export default class Submission extends BaseModel {
 
   async getReviewOfSubmissions(): Promise<ReviewOfSubmission[]> {
     return ReviewOfSubmission.find({ where: { submission: this } });
+  }
+
+  async isTeacherOrTeachingAssistantInCourse(user: User): Promise<boolean> {
+    const assignmentVersion = await this.getAssignmentVersion();
+    return await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user);
   }
 }
