@@ -5,6 +5,7 @@ import http from "http";
 import createDatabaseConnection from "../databaseConnection";
 import app from "../app";
 import isTSNode from "../util/isTSNode";
+import sendTestMail from "../util/mailer";
 
 if (isTSNode) {
   console.log("Running under TS Node");
@@ -44,6 +45,15 @@ createDatabaseConnection()
     const startMessage = `Started server at ${new Date()}`;
     console.log(startMessage);
     console.error(startMessage);
+
+    sendTestMail(startMessage)
+      .then(() => {
+        console.log("Sent test mail");
+      })
+      .catch((error) => {
+        console.error(error);
+        console.error("Failed to send test mail");
+      });
 
     // Event listener for HTTP server "error" event.
     function onError(error: NodeJS.ErrnoException) {
