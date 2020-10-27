@@ -12,7 +12,10 @@
                                 <b-badge v-if="!review.evaluationDone" variant="danger" class="mr-2">DUE</b-badge>
                             </div>
                         </template>
-                        <ReviewEvaluation :feedbackReviewId="review.id"></ReviewEvaluation>
+                        <ReviewEvaluation
+                            :feedbackReviewId="review.id"
+                            :reviewsAreReadOnly="!isReviewEvaluationActive"
+                        ></ReviewEvaluation>
                     </b-tab>
                 </b-tabs>
             </b-card>
@@ -28,9 +31,17 @@ export default {
     components: { ReviewEvaluation },
     data() {
         return {
+            assignment: {},
             group: null,
-            latestSubmission: null,
+            finalSubmission: null,
             feedbackReviews: []
+        }
+    },
+    computed: {
+        isReviewEvaluationActive() {
+            return (
+                this.assignment.lateReviewEvaluations || new Date() < new Date(this.assignment.reviewEvaluationDueDate)
+            )
         }
     },
     async created() {
@@ -38,22 +49,27 @@ export default {
     },
     methods: {
         async fetchData() {
+            await this.fetchAssignment()
             await this.fetchGroup()
-            await this.fetchLatestSubmission()
+            await this.fetchFinalSubmission()
             await this.fetchFeedbackReviews()
+        },
+        async fetchAssignment() {
+            const res = await api.assignments.get(this.$route.params.assignmentId)
+            this.assignment = res.data
         },
         async fetchGroup() {
             // Fetch the group information.
             const res = await api.assignments.getGroup(this.$route.params.assignmentId)
             this.group = res.data
         },
-        async fetchLatestSubmission() {
+        async fetchFinalSubmission() {
             // Fetch the submission.
-            const res = await api.assignments.getLatestSubmission(this.$route.params.assignmentId, this.group.id)
-            this.latestSubmission = res.data
+            const res = await api.assignments.getFinalSubmission(this.$route.params.assignmentId, this.group.id)
+            this.finalSubmission = res.data
         },
         async fetchFeedbackReviews() {
-            const res = await api.submissions.getFeedback(this.latestSubmission.id)
+            const res = await api.submissions.getFeedback(this.finalSubmission.id)
             const reviews = res.data
 
             for (const review of reviews) {

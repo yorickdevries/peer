@@ -1,6 +1,6 @@
 import express from "express";
 import Joi from "@hapi/joi";
-import Assignment from "../models/Assignment";
+import AssignmentVersion from "../models/AssignmentVersion";
 import {
   validateBody,
   validateParams,
@@ -30,7 +30,8 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     return;
   }
   // students can only access it when the assignment is in review state
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     !(await questionnaire.isTeacherOrTeachingAssistantInCourse(user)) &&
     !(
@@ -61,14 +62,16 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
 
 // Joi inputvalidation
 const questionnaireSchema = Joi.object({
-  assignmentId: Joi.number().integer().required(),
+  assignmentVersionId: Joi.number().integer().required(),
 });
 // post a questionnaire in an assignment
 router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const assignment = await Assignment.findOne(req.body.assignmentId);
-  if (!assignment) {
+  const assignmentVersion = await AssignmentVersion.findOne(
+    req.body.assignmentVersionId
+  );
+  if (!assignmentVersion) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
       .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
@@ -76,14 +79,14 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   }
   if (
     // not a teacher
-    !(await assignment.isTeacherInCourse(user))
+    !(await assignmentVersion.isTeacherInCourse(user))
   ) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
     return;
   }
-  if (await assignment.getSubmissionQuestionnaire()) {
+  if (await assignmentVersion.getSubmissionQuestionnaire()) {
     res.status(HttpStatusCode.FORBIDDEN).send("Questionnaire already exists");
     return;
   }
@@ -91,23 +94,26 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   // start transaction make sure the questionnaire and assignment are both saved
   // and no questionnaire is made in the mean time
   await getManager().transaction(
-    "SERIALIZABLE",
+    "REPEATABLE READ",
     async (transactionalEntityManager) => {
-      // get the assignment with questionnaires
-      const assignment = await transactionalEntityManager.findOneOrFail(
-        Assignment,
-        req.body.assignmentId
+      // get the assignmentVersion with questionnaires
+      const assignmentVersion = await transactionalEntityManager.findOneOrFail(
+        AssignmentVersion,
+        req.body.assignmentVersionId
       );
       // make sure the questionnaire not already exists
-      if (assignment.submissionQuestionnaireId) {
+      if (assignmentVersion.submissionQuestionnaireId) {
         throw new Error("Questionnaire already exists");
       }
       // save questionnaire
+      await questionnaire.validateOrReject();
       await transactionalEntityManager.save(questionnaire);
 
       // save the assignment with the questionnaire
-      assignment.submissionQuestionnaire = questionnaire;
-      await transactionalEntityManager.save(assignment);
+      assignmentVersion.submissionQuestionnaire = questionnaire;
+      // validateOrReject might cause a deadlock
+      //await assignmentVersion.validateOrReject();
+      await transactionalEntityManager.save(assignmentVersion);
     }
   );
   // reload questionnaire to get all data
@@ -158,7 +164,8 @@ router.patch(
         .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
       return;
     }
-    const assignment = await questionnaire.getAssignment();
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (assignment.isAtOrAfterState(AssignmentState.REVIEW)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -181,7 +188,8 @@ router.get("/:id/reviews", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
     return;
   }
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (!assignment.isAtOrAfterState(AssignmentState.REVIEW)) {
     res
       .status(HttpStatusCode.FORBIDDEN)

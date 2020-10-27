@@ -10,6 +10,7 @@ import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
 import ReviewOfReview from "../models/ReviewOfReview";
 import moment from "moment";
+import submitReview from "../util/submitReview";
 
 const router = express.Router();
 
@@ -89,35 +90,49 @@ router.patch(
         .send(ResponseMessage.REVIEW_NOT_FOUND);
       return;
     }
-    if (!(await review.isReviewer(user))) {
+    if (!review.isReviewer(user)) {
       res.status(HttpStatusCode.FORBIDDEN).send("You are not the reviewer");
       return;
     }
     // get assignmentstate
     const questionnaire = await review.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
-    if (!moment().isBefore(assignment.reviewEvaluationDueDate)) {
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
+    if (
+      !assignment.lateReviewEvaluations &&
+      moment().isAfter(assignment.reviewEvaluationDueDate)
+    ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("The review evaluation deadline has passed");
+        .send(
+          "The due date for review evaluation has passed and late review evaluations are not allowed by the teacher"
+        );
       return;
     }
+    // Review cannot be changed (unsubmitted/flagged) in after the deadline when submitted
+    if (
+      moment().isAfter(assignment.reviewEvaluationDueDate) &&
+      review.submitted
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The due date for review evaluation has passed");
+      return;
+    }
+    const submitted = req.body.submitted;
+    const flaggedByReviewer = req.body.flaggedByReviewer;
     // set new values
-    review.submitted = req.body.submitted;
-    if (review.submitted) {
-      review.submittedAt = new Date();
+    if (submitted) {
+      // submit review in transaction
+      await submitReview(review, flaggedByReviewer);
+      await review.reload();
     } else {
+      // just set the fields
+      review.flaggedByReviewer = flaggedByReviewer;
+      review.submitted = false;
       review.submittedAt = null;
+      await review.save();
     }
-    review.flaggedByReviewer = req.body.flaggedByReviewer;
-    // check whether the review can be submitted before trying to save
-    if (review.submitted && !(await review.canBeSubmitted())) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("A non-optional question isn't answered yet.");
-      return;
-    }
-    await review.save();
     const anonymousReview = review.getAnonymousVersion();
     res.send(anonymousReview);
     return;

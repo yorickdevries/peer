@@ -16,6 +16,7 @@ import fsPromises from "fs/promises";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
+import removePDFMetadata from "../util/removePDFMetadata";
 
 const router = express.Router();
 
@@ -41,12 +42,13 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
   }
   const review = await uploadQuestionAnswer.getReview();
   const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     // is teacher
-    (await assignment.isTeacherInCourse(user)) ||
+    (await assignment.isTeacherOrTeachingAssistantInCourse(user)) ||
     // or reviwer
-    (await review.isReviewer(user))
+    review.isReviewer(user)
   ) {
     // get the file
     const file = uploadQuestionAnswer.uploadAnswer;
@@ -56,10 +58,23 @@ router.get("/file", validateQuery(querySchema), async (req, res) => {
     return;
   }
   if (
-    assignment.isAtState(AssignmentState.FEEDBACK) &&
     (await review.isReviewed(user)) &&
+    assignment.isAtState(AssignmentState.FEEDBACK) &&
     review.submitted
   ) {
+    if (
+      assignment.blockFeedback &&
+      (await assignment.hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
+        user
+      ))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "One of youre reviews isn't submitted, you are not allowed to see feedback"
+        );
+      return;
+    }
     // get the file
     const file = uploadQuestionAnswer.uploadAnswer;
     const fileName = file.getAnonymousFileNamewithExtension();
@@ -106,7 +121,7 @@ router.post(
         .send(ResponseMessage.REVIEW_NOT_FOUND);
       return;
     }
-    if (!(await review.isReviewer(user))) {
+    if (!review.isReviewer(user)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("You are not the reviewer of this review");
@@ -125,19 +140,8 @@ router.post(
         .send("The question is not part of this review");
       return;
     }
-    const assignment = await questionnaire.getAssignment();
-    if (
-      questionnaire instanceof ReviewQuestionnaire &&
-      !(
-        assignment.isAtState(AssignmentState.FEEDBACK) &&
-        moment().isBefore(assignment.reviewEvaluationDueDate)
-      )
-    ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The reviewevaluation is passed");
-      return;
-    }
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (
       questionnaire instanceof SubmissionQuestionnaire &&
       !assignment.lateSubmissionReviews &&
@@ -150,11 +154,31 @@ router.post(
         );
       return;
     }
+    if (
+      questionnaire instanceof ReviewQuestionnaire &&
+      !assignment.lateReviewEvaluations &&
+      moment().isAfter(assignment.reviewEvaluationDueDate)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The due date for review evaluation has passed and late review evaluations are not allowed by the teacher"
+        );
+      return;
+    }
     // construct file to be saved in transaction
     const fileExtension = path.extname(req.file.originalname);
     const fileName = path.basename(req.file.originalname, fileExtension);
+    // run removePDFMetadata in case the file is a pdf
+    if (fileExtension === ".pdf") {
+      await removePDFMetadata(req.file.path);
+    }
     const fileHash = null;
     const newFile = new File(fileName, fileExtension, fileHash);
+
+    // new Upload Answer
+    const newUploadAnser = new UploadQuestionAnswer(question, review, newFile);
+    await newUploadAnser.validateOrReject();
 
     // oldfile in case of update
     let oldFile: File | undefined;
@@ -163,7 +187,7 @@ router.post(
     let uploadAnswer: UploadQuestionAnswer | undefined;
     // start transaction make sure the file and submission are both saved
     await getManager().transaction(
-      "SERIALIZABLE",
+      "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // fetch existing answer if present
         uploadAnswer = await transactionalEntityManager.findOne(
@@ -180,14 +204,16 @@ router.post(
           oldFile = uploadAnswer.uploadAnswer;
         }
         // save file entry to database
+        await newFile.validateOrReject();
         await transactionalEntityManager.save(newFile);
         // save answer to database
         if (uploadAnswer) {
           uploadAnswer.uploadAnswer = newFile;
         } else {
-          uploadAnswer = new UploadQuestionAnswer(question, review, newFile);
+          uploadAnswer = newUploadAnser;
         }
         // create/update uploadAnswer
+        // validation is done for newUploadAnser outside the transaction
         await transactionalEntityManager.save(uploadAnswer);
 
         // move the file (so if this fails everything above fails)
@@ -230,7 +256,7 @@ router.delete(
     const user = req.user!;
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const questionAnswer = await UploadQuestionAnswer.findOne({
+    let questionAnswer = await UploadQuestionAnswer.findOne({
       where: {
         questionId: req.query.uploadQuestionId,
         reviewId: req.query.reviewId,
@@ -243,7 +269,7 @@ router.delete(
       return;
     }
     const review = await questionAnswer.getReview();
-    if (!(await review.isReviewer(user))) {
+    if (!review.isReviewer(user)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("You are not the reviewer of this review");
@@ -256,19 +282,8 @@ router.delete(
       return;
     }
     const questionnaire = await review.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
-    if (
-      questionnaire instanceof ReviewQuestionnaire &&
-      !(
-        assignment.isAtState(AssignmentState.FEEDBACK) &&
-        moment().isBefore(assignment.reviewEvaluationDueDate)
-      )
-    ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The reviewevaluation is passed");
-      return;
-    }
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (
       questionnaire instanceof SubmissionQuestionnaire &&
       !assignment.lateSubmissionReviews &&
@@ -281,21 +296,49 @@ router.delete(
         );
       return;
     }
-    const file = questionAnswer.uploadAnswer;
-    const filePath = file.getPath();
+    if (
+      questionnaire instanceof ReviewQuestionnaire &&
+      !assignment.lateReviewEvaluations &&
+      moment().isAfter(assignment.reviewEvaluationDueDate)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The due date for review evaluation has passed and late review evaluations are not allowed by the teacher"
+        );
+      return;
+    }
 
     // start transaction to make sure an asnwer isnt deleted from a submitted review
     await getManager().transaction(
-      "SERIALIZABLE",
+      "REPEATABLE READ",
       async (transactionalEntityManager) => {
-        // const review
-        const reviewToCheck = await transactionalEntityManager.findOneOrFail(
-          Review,
-          review.id
-        );
+        // review with update lock
+        const reviewToCheck = await transactionalEntityManager
+          .createQueryBuilder(Review, "review")
+          .setLock("pessimistic_write")
+          .where("id = :id", { id: review.id })
+          .getOne();
+
+        if (!reviewToCheck) {
+          throw new Error("Review does not exist");
+        }
         if (reviewToCheck.submitted) {
           throw new Error("The review is already submitted");
         }
+        questionAnswer = await transactionalEntityManager.findOneOrFail(
+          UploadQuestionAnswer,
+          {
+            where: {
+              questionId: req.query.uploadQuestionId,
+              reviewId: req.query.reviewId,
+            },
+          }
+        );
+        // get fileinfo
+        const file = questionAnswer.uploadAnswer;
+        const filePath = file.getPath();
+
         await transactionalEntityManager.remove(questionAnswer);
         // delete file as well
         await transactionalEntityManager.remove(file);

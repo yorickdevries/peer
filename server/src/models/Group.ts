@@ -12,7 +12,6 @@ import { IsDefined, IsString, IsNotEmpty } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import Assignment from "./Assignment";
-import _ from "lodash";
 import UserRole from "../enum/UserRole";
 import Course from "./Course";
 
@@ -91,7 +90,10 @@ export default class Group extends BaseModel {
       .leftJoin("user.groups", "group")
       .where("group.id = :id", { id: this.id })
       .getMany();
-
+    // reload all to get eager fields
+    for (const user of users) {
+      await user.reload();
+    }
     return users;
   }
 
@@ -101,21 +103,31 @@ export default class Group extends BaseModel {
       .leftJoin("assignment.groups", "group")
       .where("group.id = :id", { id: this.id })
       .getMany();
+    // reload all to get eager fields
+    for (const assignment of assignments) {
+      await assignment.reload();
+    }
     return assignments;
   }
 
   async hasUser(user: User): Promise<boolean> {
-    const groupUsers = await this.getUsers();
-    return _.some(groupUsers, (groupUser) => {
-      return groupUser.netid === user.netid;
-    });
+    const groupUser = await getManager()
+      .createQueryBuilder(User, "user")
+      .leftJoin("user.groups", "group")
+      .where("group.id = :id", { id: this.id })
+      .andWhere("user.netid = :netid", { netid: user.netid })
+      .getOne();
+    return groupUser ? true : false;
   }
 
   async hasAssignment(assignment: Assignment): Promise<boolean> {
-    const groupAssignments = await this.getAssignments();
-    return _.some(groupAssignments, (groupAssignment) => {
-      return groupAssignment.id === assignment.id;
-    });
+    const groupAssignment = await getManager()
+      .createQueryBuilder(Assignment, "assignment")
+      .leftJoin("assignment.groups", "group")
+      .where("group.id = :gid", { gid: this.id })
+      .andWhere("assignment.id = :aid", { aid: assignment.id })
+      .getOne();
+    return groupAssignment ? true : false;
   }
 
   async isTeacherInCourse(user: User): Promise<boolean> {

@@ -12,8 +12,10 @@ import File from "../../src/models/File";
 import { generateReviewDistribution } from "../../src/workers/distributeReviews";
 import Enrollment from "../../src/models/Enrollment";
 import UserRole from "../../src/enum/UserRole";
+import AssignmentVersion from "../../src/models/AssignmentVersion";
 import { AssignmentState } from "../../src/enum/AssignmentState";
 import Extensions from "../../src/enum/Extensions";
+import SubmissionQuestionnaire from "../../src/models/SubmissionQuestionnaire";
 
 describe("Review distribution", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -50,7 +52,6 @@ describe("Review distribution", () => {
     const assignment = new Assignment(
       "Example title",
       course,
-      2,
       true,
       false,
       new Date("2020-06-23T10:00Z"),
@@ -61,15 +62,32 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null,
-      null,
       Extensions.PDF,
       true,
-      true
+      true,
+      true,
+      null
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
+
+    const submissionQuestionnaire = new SubmissionQuestionnaire();
+    await submissionQuestionnaire.save();
+    // assignmentVersion
+    const assignmentVersion = new AssignmentVersion(
+      "default",
+      assignment,
+      [],
+      2,
+      false,
+      submissionQuestionnaire,
+      null
+    );
+    await assignmentVersion.save();
+    // set review setting so users review the same assignment
+    assignmentVersion.versionsToReview = [assignmentVersion];
+    await assignmentVersion.save();
 
     // students
     const numGroups = 10;
@@ -106,7 +124,13 @@ describe("Review distribution", () => {
       const file = new File("filename", ".pdf", null);
       await file.save();
 
-      const submission = new Submission(student, group, assignment, file);
+      const submission = new Submission(
+        student,
+        group,
+        assignmentVersion,
+        file,
+        true
+      );
       await submission.save();
       submissions.push(submission);
     }
@@ -148,7 +172,6 @@ describe("Review distribution", () => {
     const assignment = new Assignment(
       "Example title",
       course,
-      2,
       true,
       false,
       new Date("2020-06-23T10:00Z"),
@@ -159,15 +182,32 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null,
-      null,
       Extensions.PDF,
       true,
-      true
+      true,
+      true,
+      null
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
+
+    const submissionQuestionnaire = new SubmissionQuestionnaire();
+    await submissionQuestionnaire.save();
+    // assignmentVersion
+    const assignmentVersion = new AssignmentVersion(
+      "default",
+      assignment,
+      [],
+      2,
+      false,
+      submissionQuestionnaire,
+      null
+    );
+    await assignmentVersion.save();
+    // set review setting so users review the same assignment
+    assignmentVersion.versionsToReview = [assignmentVersion];
+    await assignmentVersion.save();
 
     // students
     const numGroups = 4;
@@ -204,7 +244,13 @@ describe("Review distribution", () => {
       const file = new File("filename", ".pdf", null);
       await file.save();
 
-      const submission = new Submission(student, group, assignment, file);
+      const submission = new Submission(
+        student,
+        group,
+        assignmentVersion,
+        file,
+        true
+      );
       await submission.save();
       submissions.push(submission);
     }
@@ -252,7 +298,6 @@ describe("Review distribution", () => {
     const assignment = new Assignment(
       "Example title",
       course,
-      2,
       true,
       false,
       new Date("2020-06-23T10:00Z"),
@@ -263,15 +308,32 @@ describe("Review distribution", () => {
       null,
       null,
       null,
-      null,
-      null,
       Extensions.PDF,
       true,
-      true
+      true,
+      true,
+      null
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
+
+    const submissionQuestionnaire = new SubmissionQuestionnaire();
+    await submissionQuestionnaire.save();
+    // assignmentVersion
+    const assignmentVersion = new AssignmentVersion(
+      "default",
+      assignment,
+      [],
+      2,
+      false,
+      submissionQuestionnaire,
+      null
+    );
+    await assignmentVersion.save();
+    // set review setting so users review the same assignment
+    assignmentVersion.versionsToReview = [assignmentVersion];
+    await assignmentVersion.save();
 
     const student1 = new User(`student1`);
     await student1.save();
@@ -295,7 +357,13 @@ describe("Review distribution", () => {
     const file1 = new File("filename", ".pdf", null);
     await file1.save();
 
-    const submission1 = new Submission(student1, group1, assignment, file1);
+    const submission1 = new Submission(
+      student1,
+      group1,
+      assignmentVersion,
+      file1,
+      true
+    );
     await submission1.save();
     submissions.push(submission1);
 
@@ -311,7 +379,13 @@ describe("Review distribution", () => {
     const file2 = new File("filename", ".pdf", null);
     await file1.save();
 
-    const submission2 = new Submission(student2, group2, assignment, file2);
+    const submission2 = new Submission(
+      student2,
+      group2,
+      assignmentVersion,
+      file2,
+      true
+    );
     await submission2.save();
     submissions.push(submission2);
 

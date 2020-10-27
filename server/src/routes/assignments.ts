@@ -20,6 +20,7 @@ import ResponseMessage from "../enum/ResponseMessage";
 import Group from "../models/Group";
 import { AssignmentState } from "../enum/AssignmentState";
 import Extensions from "../enum/Extensions";
+import Submission from "../models/Submission";
 
 const router = express.Router();
 
@@ -164,46 +165,10 @@ router.get("/:id/group", validateParams(idSchema), async (req, res) => {
 const querySubmissionSchema = Joi.object({
   groupId: Joi.number().integer().required(),
 });
-// get the submissions of a group
-router.get(
-  "/:id/submissions",
-  validateParams(idSchema),
-  validateQuery(querySubmissionSchema),
-  async (req, res) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const user = req.user!;
-    const assignmentId = req.params.id;
-    // this value has been parsed by the validate function
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const groupId: number = req.query.groupId as any;
-    const assignment = await Assignment.findOne(assignmentId);
-    if (!assignment) {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
-      return;
-    }
-    const group = await Group.findOne(groupId);
-    if (!group) {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.GROUP_NOT_FOUND);
-      return;
-    }
-    if (!(await group.hasUser(user))) {
-      res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
-      return;
-    }
-    const submissions = await assignment.getSubmissions(group);
-    const sortedSubmissions = _.sortBy(submissions, "id");
-    res.send(sortedSubmissions);
-  }
-);
 
-// get the latest submission of a group
-// we should swicth to specific annotation of submissions which indicate whether they are the latest
+// get the submission which will be used for reviewing of a group
 router.get(
-  "/:id/latestsubmission",
+  "/:id/finalsubmission",
   validateParams(idSchema),
   validateQuery(querySubmissionSchema),
   async (req, res) => {
@@ -228,17 +193,29 @@ router.get(
       return;
     }
     if (!(await group.hasUser(user))) {
-      res.status(HttpStatusCode.FORBIDDEN).send("User is part of the group");
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not part of the group");
       return;
     }
-    const latestSubmission = await assignment.getLatestSubmission(group);
-    if (!latestSubmission) {
+    const finalSubmissions: Submission[] = [];
+    for (const assignmentVersion of assignment.versions) {
+      const finalSubmission = await assignmentVersion.getFinalSubmission(group);
+      if (finalSubmission) {
+        finalSubmissions.push(finalSubmission);
+      }
+    }
+    if (finalSubmissions.length === 0) {
       res
         .status(HttpStatusCode.NOT_FOUND)
         .send("No submissions have been made yet");
       return;
     }
-    res.send(latestSubmission);
+    if (finalSubmissions.length === 1) {
+      res.send(finalSubmissions[0]);
+    } else {
+      throw new Error("There are multiple finalSubmissions");
+    }
   }
 );
 
@@ -246,7 +223,6 @@ router.get(
 const assignmentSchema = Joi.object({
   name: Joi.string().required(),
   courseId: Joi.number().integer().required(),
-  reviewsPerUser: Joi.number().integer().required(),
   enrollable: Joi.boolean().required(),
   reviewEvaluation: Joi.boolean().required(),
   publishDate: Joi.date().required(),
@@ -260,8 +236,10 @@ const assignmentSchema = Joi.object({
   submissionExtensions: Joi.string()
     .valid(...Object.values(Extensions))
     .required(),
+  blockFeedback: Joi.boolean().required(),
   lateSubmissions: Joi.boolean().required(),
   lateSubmissionReviews: Joi.boolean().required(),
+  lateReviewEvaluations: Joi.boolean().allow(null).required(),
 });
 // post an assignment in a course
 router.post(
@@ -289,7 +267,6 @@ router.post(
     const assignment = new Assignment(
       req.body.name,
       course,
-      req.body.reviewsPerUser,
       req.body.enrollable,
       req.body.reviewEvaluation,
       req.body.publishDate,
@@ -300,11 +277,11 @@ router.post(
       req.body.description,
       null, // file, will be set later
       req.body.externalLink,
-      null, // submissionQuestionnaire (initially empty)
-      null, // reviewQuestionnaire (initially empty)
       req.body.submissionExtensions,
+      req.body.blockFeedback,
       req.body.lateSubmissions,
-      req.body.lateSubmissionReviews
+      req.body.lateSubmissionReviews,
+      req.body.lateReviewEvaluations
     );
 
     // construct file to be saved in transaction
@@ -319,14 +296,16 @@ router.post(
 
     // start transaction make sure the file and assignment are both saved
     await getManager().transaction(
-      "SERIALIZABLE",
+      "READ COMMITTED",
       async (transactionalEntityManager) => {
         if (file) {
           // save file entry to database
+          await file.validateOrReject();
           await transactionalEntityManager.save(file);
           // set file as field of assignment
           assignment.file = file;
         }
+        await assignment.validateOrReject();
         await transactionalEntityManager.save(assignment);
 
         if (file) {
@@ -352,7 +331,6 @@ router.post(
 // Joi inputvalidation
 const assignmentPatchSchema = Joi.object({
   name: Joi.string().required(),
-  reviewsPerUser: Joi.number().integer().required(),
   enrollable: Joi.boolean().required(),
   reviewEvaluation: Joi.boolean().required(),
   publishDate: Joi.date().required(),
@@ -366,8 +344,10 @@ const assignmentPatchSchema = Joi.object({
   submissionExtensions: Joi.string()
     .valid(...Object.values(Extensions))
     .required(),
+  blockFeedback: Joi.boolean().required(),
   lateSubmissions: Joi.boolean().required(),
   lateSubmissionReviews: Joi.boolean().required(),
+  lateReviewEvaluations: Joi.boolean().allow(null).required(),
 });
 // patch an assignment in a course
 router.patch(
@@ -390,16 +370,6 @@ router.patch(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("User is not a teacher of the course");
-      return;
-    }
-    // check whether certain fields can be changed
-    if (
-      assignment.isAtOrAfterState(AssignmentState.REVIEW) &&
-      assignment.reviewsPerUser !== req.body.reviewsPerUser
-    ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("You cannot change reviewsPerUser at this state");
       return;
     }
     if (
@@ -463,7 +433,7 @@ router.patch(
 
     // start transaction make sure the file and assignment are both saved
     await getManager().transaction(
-      "SERIALIZABLE",
+      "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // fetch assignment form database
         assignment = await transactionalEntityManager.findOneOrFail(
@@ -477,7 +447,6 @@ router.patch(
 
         // update assignment fields
         assignment.name = req.body.name;
-        assignment.reviewsPerUser = req.body.reviewsPerUser;
         assignment.enrollable = req.body.enrollable;
         assignment.reviewEvaluation = req.body.reviewEvaluation;
         assignment.publishDate = req.body.publishDate;
@@ -488,18 +457,22 @@ router.patch(
         assignment.description = req.body.description;
         assignment.externalLink = req.body.externalLink;
         assignment.submissionExtensions = req.body.submissionExtensions;
+        assignment.blockFeedback = req.body.blockFeedback;
         assignment.lateSubmissions = req.body.lateSubmissions;
         assignment.lateSubmissionReviews = req.body.lateSubmissionReviews;
+        assignment.lateReviewEvaluations = req.body.lateReviewEvaluations;
 
         // change the file in case it is not undefined
         if (newFile !== undefined) {
           if (newFile) {
             // save file entry to database
+            await newFile.validateOrReject();
             await transactionalEntityManager.save(newFile);
           }
           // set file as field of assignment
           assignment.file = newFile;
         }
+        await assignment.validateOrReject();
         await transactionalEntityManager.save(assignment);
 
         if (newFile) {
@@ -554,6 +527,12 @@ router.patch("/:id/publish", validateParams(idSchema), async (req, res) => {
       .send("The assignment is not in unpublished state");
     return;
   }
+  if (assignment.versions.length === 0) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("No assignment versions have been defined");
+    return;
+  }
   assignment.state = AssignmentState.SUBMISSION;
   await assignment.save();
   res.send(assignment);
@@ -586,12 +565,14 @@ router.patch(
         .send("The assignment is not in submission state");
       return;
     }
-    const submissions = await assignment.getLatestSubmissionsOfEachGroup();
-    if (submissions.length === 0) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("There are no submissions for this assignment");
-      return;
+    for (const assignmentVersion of assignment.versions) {
+      const submissions = await assignmentVersion.getFinalSubmissionsOfEachGroup();
+      if (submissions.length === 0) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("There are no submissions for one of the assignment versions");
+        return;
+      }
     }
     assignment.state = AssignmentState.WAITING_FOR_REVIEW;
     await assignment.save();
@@ -617,9 +598,11 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   }
   const course = await assignment.getCourse();
   const group = new Group(user.netid, course, [user], [assignment]);
+  // validate outside transaction as it otherwise might block the transaction
+  await group.validateOrReject();
   // save the group in an transaction to make sure no 2 groups are saved at the same time
   await getManager().transaction(
-    "SERIALIZABLE",
+    "SERIALIZABLE", // serializable is the only way double groups can be prevented
     async (transactionalEntityManager) => {
       // get group
       const existingGroup = await transactionalEntityManager

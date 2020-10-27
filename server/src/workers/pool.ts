@@ -111,15 +111,19 @@ const startCopyGroupsForAssignmentWorker = function (
   }
 };
 
-const startExportGradesForAssignmentWorker = function (
-  assignmentId: number,
+const startExportGradesForAssignmentVersionWorker = function (
+  assignmentVersionId: number,
   assignmentExportId: number,
   exportType: "xls" | "csv"
 ): void {
   if (isTSNode) {
     // run the function directly in this process (TS Node/development)
     workerFunctions
-      .exportGradesForAssignment(assignmentId, assignmentExportId, exportType)
+      .exportGradesForAssignmentVersion(
+        assignmentVersionId,
+        assignmentExportId,
+        exportType
+      )
       .then((result) => {
         console.log(result);
       })
@@ -128,23 +132,27 @@ const startExportGradesForAssignmentWorker = function (
       });
   } else {
     // run worker in a seperate process (Node.js/production)
-    startWorker("exportGradesForAssignment", [
-      assignmentId,
+    startWorker("exportGradesForAssignmentVersion", [
+      assignmentVersionId,
       assignmentExportId,
       exportType,
     ]);
   }
 };
 
-const startExportReviewsForAssignmentWorker = function (
-  assignmentId: number,
+const startExportReviewsForAssignmentVersionWorker = function (
+  assignmentVersionId: number,
   assignmentExportId: number,
   exportType: "xls" | "csv"
 ): void {
   if (isTSNode) {
     // run the function directly in this process (TS Node/development)
     workerFunctions
-      .exportReviewsForAssignment(assignmentId, assignmentExportId, exportType)
+      .exportReviewsForAssignmentVersion(
+        assignmentVersionId,
+        assignmentExportId,
+        exportType
+      )
       .then((result) => {
         console.log(result);
       })
@@ -153,8 +161,37 @@ const startExportReviewsForAssignmentWorker = function (
       });
   } else {
     // run worker in a seperate process (Node.js/production)
-    startWorker("exportReviewsForAssignment", [
-      assignmentId,
+    startWorker("exportReviewsForAssignmentVersion", [
+      assignmentVersionId,
+      assignmentExportId,
+      exportType,
+    ]);
+  }
+};
+
+const startExportSubmissionsForAssignmentVersionWorker = function (
+  assignmentVersionId: number,
+  assignmentExportId: number,
+  exportType: "xls" | "csv"
+): void {
+  if (isTSNode) {
+    // run the function directly in this process (TS Node/development)
+    workerFunctions
+      .exportSubmissionsForAssignmentVersion(
+        assignmentVersionId,
+        assignmentExportId,
+        exportType
+      )
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("exportSubmissionsForAssignmentVersion", [
+      assignmentVersionId,
       assignmentExportId,
       exportType,
     ]);
@@ -166,6 +203,7 @@ export {
   startOpenFeedbackForAssignmentWorker,
   startImportGroupsForAssignmentWorker,
   startCopyGroupsForAssignmentWorker,
-  startExportGradesForAssignmentWorker,
-  startExportReviewsForAssignmentWorker,
+  startExportGradesForAssignmentVersionWorker,
+  startExportReviewsForAssignmentVersionWorker,
+  startExportSubmissionsForAssignmentVersionWorker,
 };

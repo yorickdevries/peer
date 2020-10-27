@@ -4,7 +4,6 @@ import entityList from "./models/entityList";
 import path from "path";
 
 // Database config for TypeORM
-
 const databaseConfig: {
   type: string;
   host: string;
@@ -34,6 +33,8 @@ const baseConfig = {
     // to be compiled into dist/ folder.
     migrationsDir: "src/migration",
   },
+  // when testing, the database is refreshed
+  dropSchema: process.env.NODE_ENV === "test" ? true : false,
 };
 // will be assigned in the switch statement
 let connectionConfig: ConnectionOptions;
@@ -56,19 +57,12 @@ switch (databaseConfig.type) {
         username: databaseConfig.username,
         password: databaseConfig.password,
         database: databaseConfig.database,
+        extra: {
+          connectionLimit: process.env.NODE_ENV === "production" ? 50 : 10,
+        },
       };
     }
     connectionConfig = { ...baseConfig, ...mariadbConfig };
-    break;
-  }
-  // in memory database for testing
-  case "sqlite": {
-    const sqliteConfig = {
-      type: databaseConfig.type,
-      database: ":memory:",
-      dropSchema: true,
-    };
-    connectionConfig = { ...baseConfig, ...sqliteConfig };
     break;
   }
   default:

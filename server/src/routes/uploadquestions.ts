@@ -27,7 +27,8 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   }
   // students can only access it when the assignment is in review state
   const questionnaire = await question.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     !(await questionnaire.isTeacherInCourse(user)) &&
     !(
@@ -70,7 +71,8 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
       .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
     return;
   }
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     questionnaire instanceof SubmissionQuestionnaire &&
     assignment.isAtOrAfterState(AssignmentState.REVIEW)
@@ -134,7 +136,8 @@ router.patch(
       return;
     }
     const questionnaire = await question.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (
       questionnaire instanceof SubmissionQuestionnaire &&
       assignment.isAtOrAfterState(AssignmentState.REVIEW)
@@ -184,7 +187,8 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
     return;
   }
   const questionnaire = await question.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     questionnaire instanceof SubmissionQuestionnaire &&
     assignment.isAtOrAfterState(AssignmentState.REVIEW)

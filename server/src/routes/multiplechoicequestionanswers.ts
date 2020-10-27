@@ -5,7 +5,6 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 import ResponseMessage from "../enum/ResponseMessage";
 import Review from "../models/Review";
-import { AssignmentState } from "../enum/AssignmentState";
 import MultipleChoiceQuestionAnswer from "../models/MultipleChoiceQuestionAnswer";
 import MultipleChoiceQuestionOption from "../models/MultipleChoiceQuestionOption";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
@@ -42,7 +41,7 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
       .send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
   }
-  if (!(await review.isReviewer(user))) {
+  if (!review.isReviewer(user)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not the reviewer of this review");
@@ -76,17 +75,8 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
       .send("The questionOption is not part of this question");
     return;
   }
-  const assignment = await questionnaire.getAssignment();
-  if (
-    questionnaire instanceof ReviewQuestionnaire &&
-    !(
-      assignment.isAtState(AssignmentState.FEEDBACK) &&
-      moment().isBefore(assignment.reviewEvaluationDueDate)
-    )
-  ) {
-    res.status(HttpStatusCode.FORBIDDEN).send("The reviewevaluation is passed");
-    return;
-  }
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     questionnaire instanceof SubmissionQuestionnaire &&
     !assignment.lateSubmissionReviews &&
@@ -99,29 +89,32 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
       );
     return;
   }
-  let multipleChoiceAnswer: MultipleChoiceQuestionAnswer | undefined;
-  // make or overwrite multipleChoiceAnswer;
-  await getManager().transaction(
-    "SERIALIZABLE",
-    async (transactionalEntityManager) => {
-      multipleChoiceAnswer = await transactionalEntityManager.findOne(
-        MultipleChoiceQuestionAnswer,
-        { where: { reviewId: review.id, questionId: question.id } }
+  if (
+    questionnaire instanceof ReviewQuestionnaire &&
+    !assignment.lateReviewEvaluations &&
+    moment().isAfter(assignment.reviewEvaluationDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for review evaluation has passed and late review evaluations are not allowed by the teacher"
       );
-      if (multipleChoiceAnswer) {
-        multipleChoiceAnswer.multipleChoiceAnswer = questionOption;
-      } else {
-        multipleChoiceAnswer = new MultipleChoiceQuestionAnswer(
-          question,
-          review,
-          questionOption
-        );
-      }
-      await transactionalEntityManager.save(multipleChoiceAnswer);
-    }
-  );
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  await multipleChoiceAnswer!.reload();
+    return;
+  }
+  // make or overwrite multipleChoiceAnswer;
+  let multipleChoiceAnswer = await MultipleChoiceQuestionAnswer.findOne({
+    where: { reviewId: review.id, questionId: question.id },
+  });
+  if (multipleChoiceAnswer) {
+    multipleChoiceAnswer.multipleChoiceAnswer = questionOption;
+  } else {
+    multipleChoiceAnswer = new MultipleChoiceQuestionAnswer(
+      question,
+      review,
+      questionOption
+    );
+  }
+  await multipleChoiceAnswer.save();
   res.send(multipleChoiceAnswer);
 });
 
@@ -139,7 +132,7 @@ router.delete(
     const user = req.user!;
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const questionAnswer = await MultipleChoiceQuestionAnswer.findOne({
+    let questionAnswer = await MultipleChoiceQuestionAnswer.findOne({
       where: {
         questionId: req.query.multipleChoiceQuestionId,
         reviewId: req.query.reviewId,
@@ -152,7 +145,7 @@ router.delete(
       return;
     }
     const review = await questionAnswer.getReview();
-    if (!(await review.isReviewer(user))) {
+    if (!review.isReviewer(user)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("You are not the reviewer of this review");
@@ -165,19 +158,8 @@ router.delete(
       return;
     }
     const questionnaire = await review.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
-    if (
-      questionnaire instanceof ReviewQuestionnaire &&
-      !(
-        assignment.isAtState(AssignmentState.FEEDBACK) &&
-        moment().isBefore(assignment.reviewEvaluationDueDate)
-      )
-    ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The reviewevaluation is passed");
-      return;
-    }
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (
       questionnaire instanceof SubmissionQuestionnaire &&
       !assignment.lateSubmissionReviews &&
@@ -190,18 +172,44 @@ router.delete(
         );
       return;
     }
+    if (
+      questionnaire instanceof ReviewQuestionnaire &&
+      !assignment.lateReviewEvaluations &&
+      moment().isAfter(assignment.reviewEvaluationDueDate)
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(
+          "The due date for review evaluation has passed and late review evaluations are not allowed by the teacher"
+        );
+      return;
+    }
     // start transaction to make sure an asnwer isnt deleted from a submitted review
     await getManager().transaction(
-      "SERIALIZABLE",
+      "REPEATABLE READ",
       async (transactionalEntityManager) => {
-        // const review
-        const reviewToCheck = await transactionalEntityManager.findOneOrFail(
-          Review,
-          review.id
-        );
+        // review with update lock
+        const reviewToCheck = await transactionalEntityManager
+          .createQueryBuilder(Review, "review")
+          .setLock("pessimistic_write")
+          .where("id = :id", { id: review.id })
+          .getOne();
+
+        if (!reviewToCheck) {
+          throw new Error("Review does not exist");
+        }
         if (reviewToCheck.submitted) {
           throw new Error("The review is already submitted");
         }
+        questionAnswer = await transactionalEntityManager.findOneOrFail(
+          MultipleChoiceQuestionAnswer,
+          {
+            where: {
+              questionId: req.query.multipleChoiceQuestionId,
+              reviewId: req.query.reviewId,
+            },
+          }
+        );
         await transactionalEntityManager.remove(questionAnswer);
       }
     );

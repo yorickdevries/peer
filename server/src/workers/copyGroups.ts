@@ -19,7 +19,7 @@ const copyGroupsForAssignment = async function (
   // save the users of the groups in the course
   const groups: Group[] = [];
   await getManager().transaction(
-    "SERIALIZABLE",
+    "SERIALIZABLE", // serializable is the only way to make sure to groups exist before import
     async (transactionalEntityManager) => {
       const existingGroups = await transactionalEntityManager
         .createQueryBuilder(Group, "group")
@@ -46,6 +46,7 @@ const copyGroupsForAssignment = async function (
         const groupName = groupWithUsers.name;
         // make the new group
         const group = new Group(groupName, course, users, [assignment]);
+        await group.validateOrReject();
         await transactionalEntityManager.save(group);
         groups.push(group);
       }

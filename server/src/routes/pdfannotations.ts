@@ -59,20 +59,21 @@ router.get("/", validateQuery(getAnnotationSchema), async (req, res) => {
   const webAnnotations = [];
   // sort the webannotations so comments are loaded before replys
   for (const annotation of commentingPDFAnnotations) {
-    webAnnotations.push(await annotation.getWebAnnotationVersion());
+    webAnnotations.push(annotation.getWebAnnotationVersion());
   }
   for (const annotation of replyingPDFAnnotations) {
-    webAnnotations.push(await annotation.getWebAnnotationVersion());
+    webAnnotations.push(annotation.getWebAnnotationVersion());
   }
   // FINISHED GETTING THE ANNOTATIONS
 
   // get assignmentstate
   const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     (await review.isTeacherOrTeachingAssistantInCourse(user)) ||
     // reviewer should access the review when reviewing
-    ((await review.isReviewer(user)) &&
+    (review.isReviewer(user) &&
       assignment.isAtOrAfterState(AssignmentState.REVIEW))
   ) {
     res.send(webAnnotations);
@@ -84,7 +85,12 @@ router.get("/", validateQuery(getAnnotationSchema), async (req, res) => {
     assignment.isAtState(AssignmentState.FEEDBACK) &&
     review.submitted
   ) {
-    if (await questionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(user)) {
+    if (
+      assignment.blockFeedback &&
+      (await assignment.hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
+        user
+      ))
+    ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send(
@@ -139,7 +145,7 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
       .status(HttpStatusCode.BAD_REQUEST)
       .send("File and review do not correspond");
   }
-  if (!(await review.isReviewer(user))) {
+  if (!review.isReviewer(user)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not the reviewer of this review");
@@ -153,7 +159,8 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
   }
   // get assignment
   const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     !assignment.lateSubmissionReviews &&
     moment().isAfter(assignment.reviewDueDate)
@@ -250,7 +257,7 @@ router.patch(
       return;
     }
     const review = await annotation.getReview();
-    if (!(await review.isReviewer(user))) {
+    if (!review.isReviewer(user)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("You are not the reviewer of this review");
@@ -264,7 +271,8 @@ router.patch(
     }
     // get assignment
     const questionnaire = await review.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     if (
       !assignment.lateSubmissionReviews &&
       moment().isAfter(assignment.reviewDueDate)
@@ -297,7 +305,7 @@ router.delete("/:id", validateParams(idStringSchema), async (req, res) => {
     return;
   }
   const review = await annotation.getReview();
-  if (!(await review.isReviewer(user))) {
+  if (!review.isReviewer(user)) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("You are not the reviewer of this review");
@@ -311,7 +319,8 @@ router.delete("/:id", validateParams(idStringSchema), async (req, res) => {
   }
   // get assignment
   const questionnaire = await review.getQuestionnaire();
-  const assignment = await questionnaire.getAssignment();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
   if (
     !assignment.lateSubmissionReviews &&
     moment().isAfter(assignment.reviewDueDate)
@@ -326,7 +335,7 @@ router.delete("/:id", validateParams(idStringSchema), async (req, res) => {
   if (annotation instanceof CommentingPDFAnnotation) {
     // delete annotation including replies
     await getManager().transaction(
-      "SERIALIZABLE",
+      "SERIALIZABLE", // serializable is the only way phantom replyingPDFAnnotations can be prevented
       async (transactionalEntityManager) => {
         const commentingPDFAnnotationWithReplies = await transactionalEntityManager.findOneOrFail(
           CommentingPDFAnnotation,

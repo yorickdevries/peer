@@ -57,7 +57,7 @@ export default abstract class PDFAnnotation extends BaseModel {
   review?: ReviewOfSubmission;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  abstract getWebAnnotationVersion(): Promise<any>;
+  abstract getWebAnnotationVersion(): any;
 
   constructor(
     id: string,
@@ -81,7 +81,7 @@ export default abstract class PDFAnnotation extends BaseModel {
     const review = this.review ? this.review : await this.getReview();
     // check whether submission and file corresponds
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const submission = await review.submission!;
+    const submission = review.submission!;
     const submissionFile = submission.file;
     if (file.id !== submissionFile.id) {
       throw new Error("The file is not corresponding to the review");

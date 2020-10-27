@@ -1,4 +1,5 @@
 import {
+  Column,
   Entity,
   PrimaryGeneratedColumn,
   JoinColumn,
@@ -7,10 +8,10 @@ import {
   RelationId,
   OneToMany,
 } from "typeorm";
-import { IsDefined } from "class-validator";
+import { IsDefined, IsBoolean, IsOptional } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
-import Assignment from "../models/Assignment";
+import AssignmentVersion from "../models/AssignmentVersion";
 import Group from "./Group";
 import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
@@ -36,13 +37,17 @@ export default class Submission extends BaseModel {
   group?: Group;
 
   // Assignment_id int NOT NULL,
-  @RelationId((submission: Submission) => submission.assignment)
-  assignmentId!: number;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @ManyToOne((_type) => Assignment, (assignment) => assignment.submissions, {
-    nullable: false,
-  })
-  assignment?: Assignment;
+  @RelationId((submission: Submission) => submission.assignmentVersion)
+  assignmentVersionId!: number;
+  @ManyToOne(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (_type) => AssignmentVersion,
+    (assignmentVersion) => assignmentVersion.submissions,
+    {
+      nullable: false,
+    }
+  )
+  assignmentVersion?: AssignmentVersion;
 
   // file_path varchar(500) NOT NULL,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -58,23 +63,53 @@ export default class Submission extends BaseModel {
   )
   reviewOfSubmissions?: ReviewOfSubmission[];
 
-  constructor(user: User, group: Group, assignment: Assignment, file: File) {
+  @Column()
+  @IsDefined()
+  @IsBoolean()
+  final: boolean;
+
+  // approved boolean,
+  @Column("boolean", { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  approvalByTA: boolean | null;
+
+  // ta_netid varchar(500),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @ManyToOne((_type) => User, { eager: true })
+  approvingTA: User | null;
+
+  constructor(
+    user: User,
+    group: Group,
+    assignmentVersion: AssignmentVersion,
+    file: File,
+    final: boolean
+  ) {
     super();
     this.user = user;
     this.group = group;
-    this.assignment = assignment;
+    this.assignmentVersion = assignmentVersion;
     this.file = file;
+    this.final = final;
+    // set default on null
+    this.approvalByTA = null;
+    this.approvingTA = null;
   }
 
   // validation: check whether the group is in the assingment and the user in the group
   async validateOrReject(): Promise<void> {
     const group = this.group ? this.group : await this.getGroup();
     const user = this.user ? this.user : await this.getUser();
-    const assignment = this.assignment
-      ? this.assignment
-      : await this.getAssignment();
+    const assignmentVersion = this.assignmentVersion
+      ? this.assignmentVersion
+      : await this.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     // might need to be changed if a teacher submits on behalf of a group
-    if (!(await group.hasUser(user))) {
+    if (
+      !(await group.hasUser(user)) &&
+      !(await assignment.isTeacherInCourse(user))
+    ) {
       throw new Error("User is not part of this group");
     }
     if (!(await group.hasAssignment(assignment))) {
@@ -94,8 +129,8 @@ export default class Submission extends BaseModel {
     return Group.findOneOrFail(this.groupId);
   }
 
-  async getAssignment(): Promise<Assignment> {
-    return Assignment.findOneOrFail(this.assignmentId);
+  async getAssignmentVersion(): Promise<AssignmentVersion> {
+    return AssignmentVersion.findOneOrFail(this.assignmentVersionId);
   }
 
   async getUser(): Promise<User> {
@@ -104,5 +139,10 @@ export default class Submission extends BaseModel {
 
   async getReviewOfSubmissions(): Promise<ReviewOfSubmission[]> {
     return ReviewOfSubmission.find({ where: { submission: this } });
+  }
+
+  async isTeacherOrTeachingAssistantInCourse(user: User): Promise<boolean> {
+    const assignmentVersion = await this.getAssignmentVersion();
+    return await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user);
   }
 }

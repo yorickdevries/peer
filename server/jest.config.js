@@ -7,4 +7,6 @@ module.exports = {
       lines: 50,
     },
   },
+  testTimeout: 60000,
+  bail: 1,
 };

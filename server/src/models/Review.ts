@@ -15,6 +15,7 @@ import Questionnaire from "./Questionnaire";
 import UserRole from "../enum/UserRole";
 import QuestionAnswer from "./QuestionAnswer";
 import Question from "./Question";
+import _ from "lodash";
 
 interface AnonymousReview {
   id: number;
@@ -73,7 +74,7 @@ export default abstract class Review extends BaseModel {
 
   // started_at timestamptz,
   @Column({
-    type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
+    type: "timestamp",
     nullable: true,
   })
   @IsOptional()
@@ -82,7 +83,7 @@ export default abstract class Review extends BaseModel {
 
   // downloaded_at timestamptz,
   @Column({
-    type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
+    type: "timestamp",
     nullable: true,
   })
   @IsOptional()
@@ -91,7 +92,7 @@ export default abstract class Review extends BaseModel {
 
   // submitted_at timestamptz,
   @Column({
-    type: process.env.NODE_ENV === "test" ? "datetime" : "timestamp",
+    type: "timestamp",
     nullable: true,
   })
   @IsOptional()
@@ -147,7 +148,8 @@ export default abstract class Review extends BaseModel {
     const questionnaire = this.questionnaire
       ? this.questionnaire
       : await this.getQuestionnaire();
-    const assignment = await questionnaire.getAssignment();
+    const assignmentVersion = await questionnaire.getAssignmentVersion();
+    const assignment = await assignmentVersion.getAssignment();
     const course = await assignment.getCourse();
     if (!(await course.isEnrolled(this.reviewer, UserRole.STUDENT))) {
       throw new Error(
@@ -183,12 +185,19 @@ export default abstract class Review extends BaseModel {
   }
 
   async canBeSubmitted(): Promise<boolean> {
-    const questionnaire = await this.getQuestionnaire();
     // check whether the review is allowed to be submitted
     if (!this.flaggedByReviewer) {
+      // check whether all non-optional questions are answered
+      const answers = await this.getQuestionAnswers();
+      const questionnaire = await this.getQuestionnaire();
       for (const question of questionnaire.questions) {
+        // only check question if not optional
         if (!question.optional) {
-          if (!(await this.getAnswer(question))) {
+          const answer = _.find(answers, (answer) => {
+            return answer.questionId === question.id;
+          });
+          // if no answer is present, return false
+          if (!answer) {
             return false;
           }
         }
@@ -217,7 +226,7 @@ export default abstract class Review extends BaseModel {
   }
 
   // checks whether the user is the reviewer
-  async isReviewer(user: User): Promise<boolean> {
+  isReviewer(user: User): boolean {
     return this.reviewer.netid === user.netid;
   }
 

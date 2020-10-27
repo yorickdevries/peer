@@ -29,7 +29,7 @@ const parseAndSaveAffiliation = async function (
         let ssoField = await Affiliation.findOne({ where: { name: name } });
         if (!ssoField) {
           await getManager().transaction(
-            "SERIALIZABLE",
+            "SERIALIZABLE", // serializable is the only way double entries can be prevented
             async (transactionalEntityManager) => {
               // fetch existing answer if present
               ssoField = await transactionalEntityManager.findOne(Affiliation, {
@@ -37,6 +37,7 @@ const parseAndSaveAffiliation = async function (
               });
               if (!ssoField) {
                 ssoField = new Affiliation(name);
+                await ssoField.validateOrReject();
                 await transactionalEntityManager.save(ssoField);
               }
             }
@@ -76,7 +77,7 @@ const parseAndSaveStudy = async function (input: any): Promise<Study[]> {
         let ssoField = await Study.findOne({ where: { name: name } });
         if (!ssoField) {
           await getManager().transaction(
-            "SERIALIZABLE",
+            "SERIALIZABLE", // serializable is the only way double entries can be prevented
             async (transactionalEntityManager) => {
               // fetch existing answer if present
               ssoField = await transactionalEntityManager.findOne(Study, {
@@ -84,6 +85,7 @@ const parseAndSaveStudy = async function (input: any): Promise<Study[]> {
               });
               if (!ssoField) {
                 ssoField = new Study(name);
+                await ssoField.validateOrReject();
                 await transactionalEntityManager.save(ssoField);
               }
             }
@@ -127,7 +129,7 @@ const parseAndSaveOrganisationUnit = async function (
         });
         if (!ssoField) {
           await getManager().transaction(
-            "SERIALIZABLE",
+            "SERIALIZABLE", // serializable is the only way double entries can be prevented
             async (transactionalEntityManager) => {
               // fetch existing answer if present
               ssoField = await transactionalEntityManager.findOne(
@@ -138,6 +140,7 @@ const parseAndSaveOrganisationUnit = async function (
               );
               if (!ssoField) {
                 ssoField = new OrganisationUnit(name);
+                await ssoField.validateOrReject();
                 await transactionalEntityManager.save(ssoField);
               }
             }

@@ -198,7 +198,6 @@ describe("Integration", () => {
       .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
       .field("name", "Example title")
       .field("courseId", course.id)
-      .field("reviewsPerUser", 1)
       .field("enrollable", true)
       .field("reviewEvaluation", true)
       .field("publishDate", new Date("2020-01-05T10:00Z").toISOString())
@@ -212,13 +211,58 @@ describe("Integration", () => {
       .field("description", "Example description")
       .field("externalLink", "null")
       .field("submissionExtensions", ".pdf")
+      .field("blockFeedback", true)
       .field("lateSubmissions", true)
-      .field("lateSubmissionReviews", true);
+      .field("lateSubmissionReviews", true)
+      .field("lateReviewEvaluations", false);
     expect(res.status).toBe(HttpStatusCode.OK);
     let assignment = JSON.parse(res.text);
     expect(assignment).toMatchObject({
       name: "Example title",
       state: AssignmentState.UNPUBLISHED,
+    });
+
+    // create assignmentversion
+    res = await request(server)
+      .post("/api/assignmentversions/")
+      .send({
+        name: "default",
+        assignmentId: assignment.id,
+        reviewsPerUserPerAssignmentVersionToReview: 1,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    let assignmentVersion = JSON.parse(res.text);
+    expect(assignmentVersion).toMatchObject({
+      name: "default",
+    });
+
+    // get an assignmentversion
+    res = await request(server)
+      .get(`/api/assignmentversions/${assignmentVersion.id}`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(assignmentVersion).toMatchObject({
+      id: assignmentVersion.id,
+      name: assignmentVersion.name,
+    });
+
+    // patch assinmentversion so the versions to review are set
+    res = await request(server)
+      .patch(`/api/assignmentversions/${assignmentVersion.id}`)
+      .send({
+        name: "default",
+        assignmentVersionsToReview: [assignmentVersion.id],
+        reviewsPerUserPerAssignmentVersionToReview: 1,
+        selfReview: false,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    assignmentVersion = JSON.parse(res.text);
+    expect(assignmentVersion).toMatchObject({
+      name: "default",
+      reviewsPerUserPerAssignmentVersionToReview: 1,
+      selfReview: false,
     });
 
     // get all assignments of a course by the teacher
@@ -232,22 +276,22 @@ describe("Integration", () => {
     res = await request(server)
       .post("/api/submissionquestionnaires/")
       .send({
-        assignmentId: assignment.id,
+        assignmentVersionId: assignmentVersion.id,
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
 
-    // get the assignment including questionnaire
+    // get the assignment version including questionnaire
     res = await request(server)
-      .get(`/api/assignments/${assignment.id}`)
+      .get(`/api/assignmentversions/${assignmentVersion.id}`)
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
-    assignment = JSON.parse(res.text);
+    assignmentVersion = JSON.parse(res.text);
 
     // get the questionnaire
     res = await request(server)
       .get(
-        `/api/submissionquestionnaires/${assignment.submissionQuestionnaireId}`
+        `/api/submissionquestionnaires/${assignmentVersion.submissionQuestionnaireId}`
       )
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -406,21 +450,23 @@ describe("Integration", () => {
     res = await request(server)
       .post("/api/reviewquestionnaires/")
       .send({
-        assignmentId: assignment.id,
+        assignmentVersionId: assignmentVersion.id,
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
 
-    // get the assignment including questionnaire
+    // get the assignment version including questionnaire
     res = await request(server)
-      .get(`/api/assignments/${assignment.id}`)
+      .get(`/api/assignmentversions/${assignmentVersion.id}`)
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
-    assignment = JSON.parse(res.text);
+    assignmentVersion = JSON.parse(res.text);
 
     // get the questionnaire
     res = await request(server)
-      .get(`/api/reviewquestionnaires/${assignment.reviewQuestionnaireId}`)
+      .get(
+        `/api/reviewquestionnaires/${assignmentVersion.reviewQuestionnaireId}`
+      )
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     const reviewQuestionnaire = JSON.parse(res.text);
@@ -627,16 +673,45 @@ describe("Integration", () => {
         "submission1.pdf"
       )
       .field("groupId", group1.id)
-      .field("assignmentId", assignment.id);
+      .field("assignmentVersionId", assignmentVersion.id);
 
     expect(res.status).toBe(HttpStatusCode.OK);
     const submission1 = JSON.parse(res.text);
 
     // make a submission for student 2
+    res = await request(server)
+      .post("/api/submissions")
+      .set("cookie", await studentCookie2())
+      .attach(
+        "file",
+        fs.readFileSync(exampleSubmissionFile1),
+        "submission1.pdf"
+      )
+      .field("groupId", group2.id)
+      .field("assignmentVersionId", assignmentVersion.id);
     const exampleSubmissionFile2 = path.resolve(
       __dirname,
       "../../exampleData/submissions/submission2.pdf"
     );
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const submission3 = JSON.parse(res.text);
+
+    // unsubmit the submission
+    res = await request(server)
+      .patch(`/api/submissions/${submission3.id}`)
+      .send({ final: false })
+      .set("cookie", await studentCookie2());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    res = await request(server)
+      .get(
+        `/api/assignments/${assignment.id}/finalsubmission?groupId=${group2.id}`
+      )
+      .set("cookie", await studentCookie2());
+    // assertions
+    expect(res.text).toEqual("No submissions have been made yet");
+
     res = await request(server)
       .post("/api/submissions")
       .set("cookie", await studentCookie2())
@@ -646,23 +721,33 @@ describe("Integration", () => {
         "submission2.pdf"
       )
       .field("groupId", group2.id)
-      .field("assignmentId", assignment.id);
+      .field("assignmentVersionId", assignmentVersion.id);
 
     expect(res.status).toBe(HttpStatusCode.OK);
     const submission2 = JSON.parse(res.text);
 
     // get all submissions for this assignment by this group
     res = await request(server)
-      .get(`/api/assignments/${assignment.id}/submissions?groupId=${group1.id}`)
+      .get(`/api/submissions/${submission3.id}`)
+      .set("cookie", await studentCookie2());
+    // assertions
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const unsubmittedSubmission = JSON.parse(res.text);
+
+    // get all submissions for this assignment by this group
+    res = await request(server)
+      .get(
+        `/api/assignmentversions/${assignmentVersion.id}/submissions?groupId=${group1.id}`
+      )
       .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject([submission1]);
 
-    // get latest submissions for this assignment by this group
+    // get final submissions for this assignment by this group
     res = await request(server)
       .get(
-        `/api/assignments/${assignment.id}/latestsubmission?groupId=${group1.id}`
+        `/api/assignments/${assignment.id}/finalsubmission?groupId=${group1.id}`
       )
       .set("cookie", await studentCookie1());
     // assertions
@@ -671,11 +756,15 @@ describe("Integration", () => {
 
     // get all submissions for this assignment as teacher
     res = await request(server)
-      .get(`/api/submissions?assignmentId=${assignment.id}`)
+      .get(`/api/submissions?assignmentVersionId=${assignmentVersion.id}`)
       .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject([submission1, submission2]);
+    expect(JSON.parse(res.text)).toMatchObject([
+      submission1,
+      unsubmittedSubmission,
+      submission2,
+    ]);
 
     // get a single submission as teacher
     res = await request(server)
@@ -708,7 +797,9 @@ describe("Integration", () => {
 
     // get the reviews as teacher
     res = await request(server)
-      .get(`/api/reviewofsubmissions?assignmentId=${assignment.id}`)
+      .get(
+        `/api/reviewofsubmissions?assignmentVersionId=${assignmentVersion.id}`
+      )
       .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -718,7 +809,7 @@ describe("Integration", () => {
     // get the questionnaire as student
     res = await request(server)
       .get(
-        `/api/submissionquestionnaires/${assignment.submissionQuestionnaireId}`
+        `/api/submissionquestionnaires/${assignmentVersion.submissionQuestionnaireId}`
       )
       .set("cookie", await studentCookie1());
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -938,7 +1029,9 @@ describe("Integration", () => {
 
     // get the reviewquestionnaire as student
     res = await request(server)
-      .get(`/api/reviewquestionnaires/${assignment.reviewQuestionnaireId}`)
+      .get(
+        `/api/reviewquestionnaires/${assignmentVersion.reviewQuestionnaireId}`
+      )
       .set("cookie", await studentCookie2());
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text).questions.length).toBe(10);
@@ -949,5 +1042,5 @@ describe("Integration", () => {
       .set("cookie", await studentCookie2());
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text).length).toBe(0);
-  }, 60000); // timeout is set to 60 seconds
+  });
 });

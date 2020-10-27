@@ -8,6 +8,7 @@ import AcademicYear from "./AcademicYear";
 import Course from "./Course";
 import Enrollment from "./Enrollment";
 import Assignment from "./Assignment";
+import AssignmentVersion from "./AssignmentVersion";
 import File from "./File";
 import Group from "./Group";
 import Submission from "./Submission";
@@ -47,6 +48,7 @@ const entityList = [
   OrganisationUnit,
   Faculty,
   AcademicYear,
+  AssignmentVersion,
   Course,
   Enrollment,
   Assignment,

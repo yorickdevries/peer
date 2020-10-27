@@ -94,12 +94,15 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
   // TODO: these checks should be done in an transaction
   const assignments = await group.getAssignments();
   for (const assignment of assignments) {
-    const submission = await assignment.getLatestSubmission(group);
-    if (submission) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The group has already made submissions");
-      return;
+    const assignmentVersions = assignment.versions;
+    for (const assignmentVersion of assignmentVersions) {
+      const submissions = await assignmentVersion.getSubmissions(group);
+      if (submissions.length > 0) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("The group has already made submissions");
+        return;
+      }
     }
   }
   const users = await group.getUsers();
@@ -241,22 +244,24 @@ router.patch(
     // check whether the assignments are still in submissionstate
     const groupAssignments = await group.getAssignments();
     for (const assignment of groupAssignments) {
-      const submissions = await assignment.getSubmissions();
-      if (
-        _.some(submissions, (submission) => {
-          return submission.userNetid === removedUser.netid;
-        })
-      ) {
-        res
-          .status(HttpStatusCode.FORBIDDEN)
-          .send("User has already made a submission for the assignment");
-        return;
-      }
-      if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
-        res
-          .status(HttpStatusCode.BAD_REQUEST)
-          .send("Assignment is already beyond submissionstate");
-        return;
+      for (const assignmentVersion of assignment.versions) {
+        const submissions = await assignmentVersion.getSubmissions();
+        if (
+          _.some(submissions, (submission) => {
+            return submission.userNetid === removedUser.netid;
+          })
+        ) {
+          res
+            .status(HttpStatusCode.FORBIDDEN)
+            .send("User has already made a submission for the assignment");
+          return;
+        }
+        if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
+          res
+            .status(HttpStatusCode.BAD_REQUEST)
+            .send("Assignment is already beyond submissionstate");
+          return;
+        }
       }
     }
     // if all is ok, the user can be removed
@@ -284,6 +289,15 @@ router.post(
   upload([".csv"], maxFileSize, "file"),
   validateBody(assignmentIdSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    if (!req.file) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("File is needed for the import");
+      return;
+    }
+
     interface groupNameWithNetidList {
       groupName: string;
       netids: string[];
@@ -298,15 +312,6 @@ router.post(
       groupNameWithNetidLists = await parseGroupCSV(fileBuffer);
     } catch (error) {
       res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
-      return;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const user = req.user!;
-    if (!req.file) {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send("File is needed for the import");
       return;
     }
     const assignment = await Assignment.findOne(req.body.assignmentId);
