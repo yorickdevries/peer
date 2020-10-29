@@ -48,11 +48,11 @@ createDatabaseConnection()
 
     sendStartupMail(startMessage)
       .then(() => {
-        console.log("Sent test mail");
+        console.log("Sent startup mail");
       })
       .catch((error) => {
         console.error(error);
-        console.error("Failed to send test mail");
+        console.error("Failed to send startup mail");
       });
 
     // Event listener for HTTP server "error" event.
