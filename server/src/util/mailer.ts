@@ -1,6 +1,9 @@
 import nodemailer from "nodemailer";
 
-const transporter = nodemailer.createTransport({ port: 25 });
+const transporter = nodemailer.createTransport({
+  host: "smtp.tudelft.nl",
+  port: 25,
+});
 
 // verify connection configuration
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
