@@ -1,3 +1,4 @@
+import isCI from "is-ci";
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
@@ -5,14 +6,16 @@ const transporter = nodemailer.createTransport({
   port: 25,
 });
 
-const sendStartupMail = function (text: string): Promise<void> {
-  const message = {
-    from: "noreply@peer.tudelft.nl",
-    to: "y.c.devries-1@student.tudelft.nl",
-    subject: "Startup mail from Peer",
-    text: text,
-  };
-  return transporter.sendMail(message);
+const sendStartupMail = async function (text: string): Promise<void> {
+  if (isCI) {
+    const message = {
+      from: "noreply@peer.tudelft.nl",
+      to: "y.c.devries-1@student.tudelft.nl",
+      subject: "Startup mail from Peer",
+      text: text,
+    };
+    await transporter.sendMail(message);
+  }
 };
 
 export { sendStartupMail };
