@@ -7,7 +7,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendStartupMail = async function (text: string): Promise<void> {
-  if (isCI) {
+  if (!isCI) {
     const message = {
       from: "noreply@peer.tudelft.nl",
       to: "y.c.devries-1@student.tudelft.nl",
