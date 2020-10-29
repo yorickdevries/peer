@@ -5,7 +5,7 @@ import http from "http";
 import createDatabaseConnection from "../databaseConnection";
 import app from "../app";
 import isTSNode from "../util/isTSNode";
-import sendTestMail from "../util/mailer";
+import { sendStartupMail } from "../util/mailer";
 
 if (isTSNode) {
   console.log("Running under TS Node");
@@ -46,7 +46,7 @@ createDatabaseConnection()
     console.log(startMessage);
     console.error(startMessage);
 
-    sendTestMail(startMessage)
+    sendStartupMail(startMessage)
       .then(() => {
         console.log("Sent test mail");
       })
