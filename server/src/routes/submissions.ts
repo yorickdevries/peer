@@ -419,6 +419,7 @@ router.patch(
 
 const submissionApprovalSchema = Joi.object({
   approvalByTA: Joi.boolean().required(),
+  commentByTA: Joi.string().allow(null).required(),
 });
 // change a review approval
 router.patch(
@@ -452,6 +453,7 @@ router.patch(
     }
     // set new values
     submission.approvalByTA = req.body.approvalByTA;
+    submission.commentByTA = req.body.commentByTA;
     submission.approvingTA = user;
     await submission.save();
     res.send(submission);
