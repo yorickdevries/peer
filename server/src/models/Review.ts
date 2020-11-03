@@ -29,6 +29,7 @@ interface AnonymousReview {
   flaggedByReviewer: boolean;
   submitted: boolean;
   approvalByTA: boolean | null;
+  commentByTA: string | null;
   questionnaireId: number;
 }
 
@@ -250,6 +251,7 @@ export default abstract class Review extends BaseModel {
       flaggedByReviewer: this.flaggedByReviewer,
       submitted: this.submitted,
       approvalByTA: this.approvalByTA,
+      commentByTA: this.commentByTA,
       questionnaireId: this.questionnaireId,
     };
   }
@@ -260,6 +262,7 @@ export default abstract class Review extends BaseModel {
       flaggedByReviewer: this.flaggedByReviewer,
       submitted: this.submitted,
       approvalByTA: this.approvalByTA,
+      commentByTA: this.commentByTA,
       questionnaireId: this.questionnaireId,
       reviewerNetid: this.reviewer.netid,
     };
