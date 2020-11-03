@@ -77,16 +77,23 @@
                                 variant="danger"
                                 class="mr-2"
                                 @click="updateSubmissionApproval(false)"
-                                :disabled="submission.approvalByTA === false"
+                                :disabled="submission.approvalByTA === false && !commentChanged"
                                 >Disapprove 👎</b-button
                             >
                             <b-button
                                 variant="success"
                                 @click="updateSubmissionApproval(true)"
-                                :disabled="submission.approvalByTA === true"
+                                :disabled="submission.approvalByTA === true && !commentChanged"
                                 >Approve 👍</b-button
                             >
                         </dd>
+                    </dl>
+                    <dl>
+                        <b-form-textarea
+                            placeholder="Add an optional comment"
+                            v-model="submission.commentByTA"
+                            @input="commentChanged = true"
+                        />
                     </dl>
                 </div>
             </b-card>
@@ -108,6 +115,7 @@ export default {
         return {
             assignment: {},
             submission: {},
+            commentChanged: false,
             // dont view pdf until data is fetched
             viewPDF: false
         }
@@ -143,9 +151,10 @@ export default {
         async fetchSubmission() {
             const res = await api.submissions.get(this.$route.params.submissionId)
             this.submission = res.data
+            this.commentChanged = false
         },
         async updateSubmissionApproval(approvalByTA) {
-            await api.submissions.setApproval(this.submission.id, approvalByTA)
+            await api.submissions.setApproval(this.submission.id, approvalByTA, this.submission.commentByTA)
             this.showSuccessMessage({ message: "Submission approval status changed" })
             await this.fetchSubmission()
         },

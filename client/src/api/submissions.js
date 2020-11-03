@@ -23,8 +23,12 @@ export default {
         const body = { final: final }
         return client.patch(`submissions/${id}`, body)
     },
-    setApproval(id, approvalByTA) {
-        const body = { approvalByTA }
+    setApproval(id, approvalByTA, commentByTA) {
+        // set to null in case of empty string
+        if (!commentByTA) {
+            commentByTA = null
+        }
+        const body = { approvalByTA, commentByTA }
         return client.patch(`submissions/${id}/approval`, body)
     },
     export(assignmentVersionId, exportType) {
