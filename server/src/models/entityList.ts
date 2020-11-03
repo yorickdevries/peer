@@ -33,8 +33,6 @@ import MultipleChoiceQuestionAnswer from "./MultipleChoiceQuestionAnswer";
 import OpenQuestionAnswer from "./OpenQuestionAnswer";
 import RangeQuestionAnswer from "./RangeQuestionAnswer";
 import UploadQuestionAnswer from "./UploadQuestionAnswer";
-import SubmissionComment from "./SubmissionComment";
-import ReviewComment from "./ReviewComment";
 import PDFAnnotation from "./PDFAnnotation";
 import CommentingPDFAnnotation from "./CommentingPDFAnnotation";
 import ReplyingPDFAnnotation from "./ReplyingPDFAnnotation";
@@ -76,8 +74,6 @@ const entityList = [
   OpenQuestionAnswer,
   RangeQuestionAnswer,
   UploadQuestionAnswer,
-  SubmissionComment,
-  ReviewComment,
   PDFAnnotation,
   CommentingPDFAnnotation,
   ReplyingPDFAnnotation,
