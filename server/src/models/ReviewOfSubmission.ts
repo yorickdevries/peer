@@ -26,8 +26,6 @@ export default class ReviewOfSubmission extends Review {
     startedAt: Date | null,
     downloadedAt: Date | null,
     submittedAt: Date | null,
-    approvalByTA: boolean | null,
-    approvingTA: User | null,
     submission: Submission
   ) {
     super(
@@ -37,9 +35,7 @@ export default class ReviewOfSubmission extends Review {
       submitted,
       startedAt,
       downloadedAt,
-      submittedAt,
-      approvalByTA,
-      approvingTA
+      submittedAt
     );
     this.submission = submission;
   }

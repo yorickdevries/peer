@@ -133,8 +133,6 @@ const distributeReviewsForAssignment = async function (
           null,
           null,
           null,
-          null,
-          null,
           reviewAssignment.submission
         );
         await review.validateOrReject();
