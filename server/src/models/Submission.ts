@@ -125,7 +125,7 @@ export default class Submission extends BaseModel {
     if (this.approvingTA && this.approvalByTA === null) {
       throw new Error("Approval should be set");
     }
-    if (!this.approvingTA && typeof this.approvalByTA === "boolean") {
+    if (!this.approvingTA && this.approvalByTA !== null) {
       throw new Error("Approving TA should be set");
     }
     if (this.approvingTA) {
