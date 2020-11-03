@@ -56,6 +56,8 @@
                                 <dd v-if="review.approvalByTA">Approved 👍</dd>
                                 <dd v-if="review.approvalByTA === false">Disapproved 👎</dd>
                                 <dd v-if="review.approvalByTA === null">No action yet by any TA.</dd>
+                                <dt>Current TA Comment</dt>
+                                <dd>{{ review.commentByTA }}</dd>
                             </dl>
                         </b-col>
                     </b-row>
@@ -211,16 +213,28 @@
                                 variant="danger"
                                 class="mr-2"
                                 @click="updateReviewApproval(false)"
-                                :disabled="review.approvalByTA === false"
+                                :disabled="review.approvalByTA === false && !commentChanged"
                                 >Disapprove 👎</b-button
                             >
                             <b-button
                                 variant="success"
                                 @click="updateReviewApproval(true)"
-                                :disabled="review.approvalByTA === true"
+                                :disabled="review.approvalByTA === true && !commentChanged"
                                 >Approve 👍</b-button
                             >
                         </dd>
+                    </dl>
+                    <dl>
+                        <b-form-textarea
+                            placeholder="Add an optional comment"
+                            v-model="review.commentByTA"
+                            @input="commentChanged = true"
+                        />
+                    </dl>
+                    <dl>
+                        <b-alert :show="commentChanged" variant="warning"
+                            >Comment changed, please don't forget to set approval to save</b-alert
+                        >
                     </dl>
                 </div>
             </b-card>
@@ -246,6 +260,7 @@ export default {
             questionnaire: {},
             fileMetadata: {},
             review: {},
+            commentChanged: false,
             // dont view pdf until data is fetched
             viewPDF: false,
             reviewEvaluation: null,
@@ -292,6 +307,7 @@ export default {
         async fetchReview() {
             const res = await api.reviewofsubmissions.get(this.$route.params.reviewId)
             this.review = res.data
+            this.commentChanged = false
         },
         async fetchReviewEvaluation() {
             // Retrieve the review evaluation.
@@ -349,7 +365,7 @@ export default {
             this.answers = answers
         },
         async updateReviewApproval(approvalByTA) {
-            await api.reviewofsubmissions.setApproval(this.review.id, approvalByTA)
+            await api.reviewofsubmissions.setApproval(this.review.id, approvalByTA, this.review.commentByTA)
             this.showSuccessMessage({ message: "Review approval status changed" })
             await this.fetchReview()
         },
