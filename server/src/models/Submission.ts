@@ -121,6 +121,20 @@ export default class Submission extends BaseModel {
     ) {
       throw new Error("The file is of the wrong extension");
     }
+    const course = await assignment.getCourse();
+    if (this.approvingTA && this.approvalByTA === null) {
+      throw new Error("Approval should be set");
+    }
+    if (!this.approvingTA && typeof this.approvalByTA === "boolean") {
+      throw new Error("Approving TA should be set");
+    }
+    if (this.approvingTA) {
+      if (!(await course.isTeacherOrTeachingAssistant(this.approvingTA))) {
+        throw new Error(
+          `${this.approvingTA.netid} should be enrolled in the course`
+        );
+      }
+    }
     // if it succeeds the super validateOrReject can be called
     return super.validateOrReject();
   }
