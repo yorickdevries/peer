@@ -51,6 +51,8 @@
                             <dd v-if="submission.approvalByTA">Approved 👍</dd>
                             <dd v-if="submission.approvalByTA === false">Disapproved 👎</dd>
                             <dd v-if="submission.approvalByTA === null">No action yet by any TA.</dd>
+                            <dt>Current TA Comment</dt>
+                            <dd>{{ submission.commentByTA }}</dd>
                         </b-col>
                     </b-row>
                     <b-row>
@@ -94,6 +96,11 @@
                             v-model="submission.commentByTA"
                             @input="commentChanged = true"
                         />
+                    </dl>
+                    <dl>
+                        <b-alert :show="commentChanged" variant="warning"
+                            >Comment changed, please don't forget to set approval to save</b-alert
+                        >
                     </dl>
                 </div>
             </b-card>
