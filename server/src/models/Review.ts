@@ -174,7 +174,10 @@ export default abstract class Review extends BaseModel {
     if (this.approvingTA && this.approvalByTA === null) {
       throw new Error("Approval should be set");
     }
-    if (!this.approvingTA && this.approvalByTA !== null) {
+    if (
+      !this.approvingTA &&
+      (this.approvalByTA !== null || this.commentByTA !== null)
+    ) {
       throw new Error("Approving TA should be set");
     }
     if (this.approvingTA) {
