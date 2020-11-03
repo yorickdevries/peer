@@ -32,6 +32,8 @@
                     <dd v-if="review.approvalByTA">Approved 👍</dd>
                     <dd v-if="review.approvalByTA === false">Disapproved 👎</dd>
                     <dd v-if="review.approvalByTA === null">No action yet by any TA.</dd>
+                    <dt>Current TA Comment</dt>
+                    <dd>{{ review.commentByTA }}</dd>
                 </dl>
             </b-col>
         </b-row>
