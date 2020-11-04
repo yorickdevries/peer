@@ -29,6 +29,8 @@ const parseSubmissionsForExport = async function (
     parsedSubmission["final"] = submission.final;
     // approvalByTA
     parsedSubmission["approval by TA"] = submission.approvalByTA;
+    // commentByTA
+    parsedSubmission["comment by TA"] = submission.commentByTA;
     // approvingTA
     parsedSubmission["TA netid"] = submission.approvingTA?.netid;
     // created At

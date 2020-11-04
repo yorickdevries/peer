@@ -973,12 +973,14 @@ describe("Integration", () => {
       .patch(`/api/reviewofsubmissions/${review.id}/approval`)
       .send({
         approvalByTA: true,
+        commentByTA: "comment",
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject({
       id: review.id,
       approvalByTA: true,
+      commentByTA: "comment",
     });
 
     // get the feedback of the other submission
