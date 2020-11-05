@@ -48,6 +48,7 @@ const sendMailToTeachersOfAssignment = async function (
   const teacherEnrollments = await course.getTeacherEnrollments();
   for (const teacherEnrollment of teacherEnrollments) {
     const teacher = await teacherEnrollment.getUser();
+    // only send mail if a mail adress is known
     if (teacher.email) {
       const message = constructMessage(teacher.email, subject, text);
       await sendMessage(message);
