@@ -1,6 +1,7 @@
 import Assignment from "../models/Assignment";
 import { AssignmentState } from "../enum/AssignmentState";
 import { sendMailToTeachersOfAssignment } from "../util/mailer";
+import ensureConnection from "../util/ensureConnection";
 
 const publishAssignmentHelper = async function (assignment: Assignment) {
   if (!assignment.isAtState(AssignmentState.UNPUBLISHED)) {
@@ -15,8 +16,10 @@ const publishAssignmentHelper = async function (assignment: Assignment) {
 };
 
 const publishAssignment = async function (
-  assignment: Assignment
+  assignmentId: number
 ): Promise<string> {
+  await ensureConnection();
+  const assignment = await Assignment.findOneOrFail(assignmentId);
   try {
     const result = await publishAssignmentHelper(assignment);
     await sendMailToTeachersOfAssignment(

@@ -524,7 +524,7 @@ router.patch("/:id/publish", validateParams(idSchema), async (req, res) => {
     return;
   }
   try {
-    const result = await publishAssignment(assignment);
+    const result = await publishAssignment(assignment.id);
     res.send(result);
     return;
   } catch (error) {
@@ -555,7 +555,7 @@ router.patch(
       return;
     }
     try {
-      const result = await closeSubmission(assignment);
+      const result = await closeSubmission(assignment.id);
       res.send(result);
       return;
     } catch (error) {
