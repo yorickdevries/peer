@@ -1,7 +1,7 @@
 import { AssignmentState } from "../enum/AssignmentState";
 import Assignment from "../models/Assignment";
 import submitReview from "../util/submitReview";
-import ensureConnection from "./ensureConnection";
+import ensureConnection from "../util/ensureConnection";
 
 const openFeedbackForAssignment = async function (
   assignmentId: number

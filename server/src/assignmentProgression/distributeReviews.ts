@@ -7,7 +7,7 @@ import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { getManager } from "typeorm";
 import Review from "../models/Review";
 import { AssignmentState } from "../enum/AssignmentState";
-import ensureConnection from "./ensureConnection";
+import ensureConnection from "../util/ensureConnection";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { sendMailToAdmin } from "../util/mailer";
 import CheckboxQuestion from "../models/CheckboxQuestion";
