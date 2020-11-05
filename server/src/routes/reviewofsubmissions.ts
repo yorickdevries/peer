@@ -15,8 +15,6 @@ import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { getManager } from "typeorm";
 import moment from "moment";
 import ReviewOfReview from "../models/ReviewOfReview";
-import CheckboxQuestion from "../models/CheckboxQuestion";
-import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 import AssignmentExport from "../models/AssignmentExport";
 import {
   startDistributeReviewsForAssignmentWorker,
@@ -227,51 +225,6 @@ router.patch(
         .status(HttpStatusCode.FORBIDDEN)
         .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
       return;
-    }
-    // get assignmentstate
-    if (!assignment.isAtState(AssignmentState.REVIEW)) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is not in review state");
-      return;
-    }
-    // check whether review evaluation is enabled and questionnaire is present
-    if (assignment.reviewEvaluation) {
-      for (const assignmentVersion of assignment.versions) {
-        if (!assignmentVersion.reviewQuestionnaireId) {
-          res
-            .status(HttpStatusCode.FORBIDDEN)
-            .send("No reviewQuestionnaire is present to evaluate the reviews");
-          return;
-        }
-      }
-    }
-    for (const assignmentVersion of assignment.versions) {
-      const reviewQuestionnaire = await assignmentVersion.getReviewQuestionnaire();
-      if (reviewQuestionnaire) {
-        if (reviewQuestionnaire.questions.length === 0) {
-          res
-            .status(HttpStatusCode.FORBIDDEN)
-            .send("The questionnaire doesn't have questions");
-          return;
-        }
-        // check whether there is a question without option:
-        for (const question of reviewQuestionnaire.questions) {
-          if (
-            question instanceof CheckboxQuestion ||
-            question instanceof MultipleChoiceQuestion
-          ) {
-            if (question.options.length === 0) {
-              res
-                .status(HttpStatusCode.FORBIDDEN)
-                .send(
-                  "One of the questions in the questionnaire doesn't have options"
-                );
-              return;
-            }
-          }
-        }
-      }
     }
     // offload a function to a worker
     startOpenFeedbackForAssignmentWorker(assignmentId);

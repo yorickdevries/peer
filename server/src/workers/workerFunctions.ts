@@ -1,5 +1,5 @@
 import { distributeReviewsForAssignment } from "../assignmentProgression/distributeReviews";
-import openFeedbackForAssignment from "./openFeedback";
+import openFeedbackForAssignment from "../assignmentProgression/openFeedback";
 import importGroupsForAssignment from "./importGroups";
 import copyGroupsForAssignment from "./copyGroups";
 import exportGradesForAssignmentVersion from "./exportGrades";
