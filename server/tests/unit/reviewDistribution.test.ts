@@ -9,7 +9,7 @@ import Course from "../../src/models/Course";
 import AcademicYear from "../../src/models/AcademicYear";
 import Faculty from "../../src/models/Faculty";
 import File from "../../src/models/File";
-import { generateReviewDistribution } from "../../src/workers/distributeReviews";
+import { generateReviewDistribution } from "../../src/assignmentProgression/distributeReviews";
 import Enrollment from "../../src/models/Enrollment";
 import UserRole from "../../src/enum/UserRole";
 import AssignmentVersion from "../../src/models/AssignmentVersion";

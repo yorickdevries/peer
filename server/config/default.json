@@ -23,5 +23,11 @@
         "exampleAssignmentFolder": "./exampleData/assignments",
         "exampleSubmissionFolder": "./exampleData/submissions",
         "exampleReviewFolder": "./exampleData/reviews"
+    },
+    "mail": {
+        "host": "localhost",
+        "port": 25,
+        "from": "noreply@mail.com",
+        "adminMail": "admin@mail.com"
     }
 }

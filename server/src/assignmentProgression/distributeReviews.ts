@@ -7,8 +7,11 @@ import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { getManager } from "typeorm";
 import Review from "../models/Review";
 import { AssignmentState } from "../enum/AssignmentState";
-import ensureConnection from "./ensureConnection";
+import ensureConnection from "../util/ensureConnection";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
+import { sendMailToTeachersOfAssignment } from "../util/mailer";
+import CheckboxQuestion from "../models/CheckboxQuestion";
+import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 
 interface reviewAssignment {
   reviewer: User;
@@ -34,21 +37,46 @@ const getUniqueUsersOfSubmissions = async function (submissions: Submission[]) {
   return users;
 };
 
-const distributeReviewsForAssignment = async function (
-  assignmentId: number
+const distributeReviewsForAssignmentHelper = async function (
+  assignment: Assignment
 ): Promise<string> {
-  await ensureConnection();
-
-  const assignment = await Assignment.findOneOrFail(assignmentId);
-  const assignmentVersions = assignment.versions;
-  for (const assignmentVersion of assignmentVersions) {
+  // assignmentstate
+  if (!assignment.isAtState(AssignmentState.WAITING_FOR_REVIEW)) {
+    throw new Error(
+      "The submission state has not been passed or reviews are already assigned"
+    );
+  }
+  for (const assignmentVersion of assignment.versions) {
     const questionnaire = await assignmentVersion.getSubmissionQuestionnaire();
     if (!questionnaire) {
       throw new Error("Questionnaire not found");
     }
+    if (questionnaire.questions.length === 0) {
+      throw new Error("The questionnaire doesn't have questions");
+    }
+    // check whether there is a question without option:
+    for (const question of questionnaire.questions) {
+      if (
+        question instanceof CheckboxQuestion ||
+        question instanceof MultipleChoiceQuestion
+      ) {
+        if (question.options.length === 0) {
+          throw new Error(
+            "One of the questions in the questionnaire doesn't have options"
+          );
+        }
+      }
+    }
+    // check for existing reviews
+    const existingReviews = await questionnaire.getReviews();
+    if (existingReviews.length > 0) {
+      throw new Error("There are already reviews for this assignment");
+    }
   }
+  // Check whether all versions are reviewed
+  // and all VersionsToReview are not empty
   // check for every version whether it is reviewed
-  for (const assignmentVersion of assignmentVersions) {
+  for (const assignmentVersion of assignment.versions) {
     if ((await assignmentVersion.getVersionsToReview()).length === 0) {
       throw new Error(
         `assignmentVersion with id ${assignmentVersion.id} is not reviewing any assignmentVersions`
@@ -56,7 +84,7 @@ const distributeReviewsForAssignment = async function (
     }
     let isReviewed = false;
     // check all other assignmentversions
-    for (const otherAssignmentVersion of assignmentVersions) {
+    for (const otherAssignmentVersion of assignment.versions) {
       const versionsToReview = await otherAssignmentVersion.getVersionsToReview();
       // check all other assignmentversions whether it is reviewing the version
       for (const versionToReview of versionsToReview) {
@@ -73,7 +101,7 @@ const distributeReviewsForAssignment = async function (
   }
   const fullReviewDistribution: reviewAssignment[] = [];
   // assignmentVersions of which the users will be reviewing
-  for (const assignmentVersion of assignmentVersions) {
+  for (const assignmentVersion of assignment.versions) {
     const reviewsPerUserPerAssignmentVersionToReview =
       assignmentVersion.reviewsPerUserPerAssignmentVersionToReview;
     // the users of these submissions will be reviewing
@@ -108,7 +136,7 @@ const distributeReviewsForAssignment = async function (
   await getManager().transaction(
     "SERIALIZABLE", // serializable is the only way to make sure to reviews exist before creating them
     async (transactionalEntityManager) => {
-      for (const assignmentVersion of assignmentVersions) {
+      for (const assignmentVersion of assignment.versions) {
         const questionnaire = await assignmentVersion.getSubmissionQuestionnaire();
         if (!questionnaire) {
           throw new Error("Questionnaire not found");
@@ -397,6 +425,29 @@ const generateSelfReviews = async function (
     }
   }
   return selfReviewAssignments;
+};
+
+const distributeReviewsForAssignment = async function (
+  assignmentId: number
+): Promise<string> {
+  await ensureConnection();
+  const assignment = await Assignment.findOneOrFail(assignmentId);
+  try {
+    const result = await distributeReviewsForAssignmentHelper(assignment);
+    await sendMailToTeachersOfAssignment(
+      "Distributed reviews for assignment",
+      result,
+      assignment
+    );
+    return result;
+  } catch (error) {
+    await sendMailToTeachersOfAssignment(
+      "Error while distributing reviews for assignment",
+      String(error),
+      assignment
+    );
+    throw error;
+  }
 };
 
 export { distributeReviewsForAssignment, generateReviewDistribution };

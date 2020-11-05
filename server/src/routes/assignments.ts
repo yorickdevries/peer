@@ -21,6 +21,8 @@ import Group from "../models/Group";
 import { AssignmentState } from "../enum/AssignmentState";
 import Extensions from "../enum/Extensions";
 import Submission from "../models/Submission";
+import publishAssignment from "../assignmentProgression/publishAssignment";
+import closeSubmission from "../assignmentProgression/closeSubmission";
 
 const router = express.Router();
 
@@ -521,21 +523,14 @@ router.patch("/:id/publish", validateParams(idSchema), async (req, res) => {
       .send("User is not a teacher of the course");
     return;
   }
-  if (!assignment.isAtState(AssignmentState.UNPUBLISHED)) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("The assignment is not in unpublished state");
+  try {
+    const result = await publishAssignment(assignment);
+    res.send(result);
+    return;
+  } catch (error) {
+    res.status(HttpStatusCode.FORBIDDEN).send(String(error));
     return;
   }
-  if (assignment.versions.length === 0) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("No assignment versions have been defined");
-    return;
-  }
-  assignment.state = AssignmentState.SUBMISSION;
-  await assignment.save();
-  res.send(assignment);
 });
 
 // close an assignment from submission state
@@ -559,24 +554,14 @@ router.patch(
         .send("User is not a teacher of the course");
       return;
     }
-    if (!assignment.isAtState(AssignmentState.SUBMISSION)) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is not in submission state");
+    try {
+      const result = await closeSubmission(assignment);
+      res.send(result);
+      return;
+    } catch (error) {
+      res.status(HttpStatusCode.FORBIDDEN).send(String(error));
       return;
     }
-    for (const assignmentVersion of assignment.versions) {
-      const submissions = await assignmentVersion.getFinalSubmissionsOfEachGroup();
-      if (submissions.length === 0) {
-        res
-          .status(HttpStatusCode.FORBIDDEN)
-          .send("There are no submissions for one of the assignment versions");
-        return;
-      }
-    }
-    assignment.state = AssignmentState.WAITING_FOR_REVIEW;
-    await assignment.save();
-    res.send(assignment);
   }
 );
 

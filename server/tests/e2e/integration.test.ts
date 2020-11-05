@@ -216,7 +216,7 @@ describe("Integration", () => {
       .field("lateSubmissionReviews", true)
       .field("lateReviewEvaluations", false);
     expect(res.status).toBe(HttpStatusCode.OK);
-    let assignment = JSON.parse(res.text);
+    const assignment = JSON.parse(res.text);
     expect(assignment).toMatchObject({
       name: "Example title",
       state: AssignmentState.UNPUBLISHED,
@@ -484,11 +484,6 @@ describe("Integration", () => {
       .patch(`/api/assignments/${assignment.id}/publish`)
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
-    assignment = JSON.parse(res.text);
-    expect(assignment).toMatchObject({
-      name: "Example title",
-      state: AssignmentState.SUBMISSION,
-    });
 
     // check available courses as student
     res = await request(server)
@@ -779,11 +774,6 @@ describe("Integration", () => {
       .patch(`/api/assignments/${assignment.id}/closesubmission`)
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
-    assignment = JSON.parse(res.text);
-    expect(assignment).toMatchObject({
-      name: "Example title",
-      state: AssignmentState.WAITING_FOR_REVIEW,
-    });
 
     // distribute the reviews as teacher
     res = await request(server)

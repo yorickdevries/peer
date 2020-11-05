@@ -2,7 +2,7 @@ import AssignmentVersion from "../models/AssignmentVersion";
 import AssignmentExport from "../models/AssignmentExport";
 import exportJSONToFile from "../util/exportJSONToFile";
 import parseSubmissionReviewsForExport from "../util/parseReviewsForExport";
-import ensureConnection from "./ensureConnection";
+import ensureConnection from "../util/ensureConnection";
 
 const exportReviewsForAssignmentVersion = async function (
   assignmentVersionId: number,
