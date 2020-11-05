@@ -66,6 +66,23 @@
                                     not participate in the reviews.
                                 </b-modal>
                             </template>
+
+                            <template v-slot:cell(taFeedback)="row">
+                                <b-button v-if="row.item.approvalByTA !== null" size="sm" @click="row.toggleDetails">
+                                    {{ row.detailsShowing ? "Hide" : "Show" }} Feedback
+                                </b-button>
+                            </template>
+                            <template v-slot:row-details="row">
+                                <b-card>
+                                    <!--Approval-->
+                                    <dt>Current approval status</dt>
+                                    <dd v-if="row.item.approvalByTA">Approved 👍</dd>
+                                    <dd v-if="row.item.approvalByTA === false">Disapproved 👎</dd>
+                                    <dd v-if="row.item.approvalByTA === null">No action yet by any TA.</dd>
+                                    <dt>Current TA Comment</dt>
+                                    <dd>{{ row.item.commentByTA }}</dd>
+                                </b-card>
+                            </template>
                         </b-table>
                         Only the final submission will be used for reviewing
                         <br />
@@ -163,7 +180,8 @@ export default {
                 { key: "userNetid", label: "Submitted by" },
                 { key: "date", label: "​​​Date" },
                 { key: "final", label: "Final" },
-                { key: "action", label: "Action" }
+                { key: "action", label: "Action" },
+                { key: "taFeedback", label: "TA Feedback" }
             ],
             buttonDisabled: false
         }

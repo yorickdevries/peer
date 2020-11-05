@@ -527,6 +527,7 @@ router.patch(
 // Joi inputvalidation for query
 const reviewApprovalSchema = Joi.object({
   approvalByTA: Joi.boolean().required(),
+  commentByTA: Joi.string().allow(null).required(),
 });
 // change a review approval
 router.patch(
@@ -574,6 +575,7 @@ router.patch(
     }
     // set new values
     review.approvalByTA = req.body.approvalByTA;
+    review.commentByTA = req.body.commentByTA;
     review.approvingTA = user;
     await review.save();
     res.send(review);
@@ -681,8 +683,6 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
     false,
     false,
     new Date(), // set startedAt
-    null,
-    null,
     null,
     null,
     review

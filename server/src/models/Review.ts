@@ -7,7 +7,14 @@ import {
   RelationId,
   OneToMany,
 } from "typeorm";
-import { IsOptional, IsDefined, IsBoolean, IsDate } from "class-validator";
+import {
+  IsOptional,
+  IsDefined,
+  IsBoolean,
+  IsDate,
+  IsString,
+  IsNotEmpty,
+} from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import ReviewType from "../enum/ReviewType";
@@ -22,6 +29,7 @@ interface AnonymousReview {
   flaggedByReviewer: boolean;
   submitted: boolean;
   approvalByTA: boolean | null;
+  commentByTA: string | null;
   questionnaireId: number;
 }
 
@@ -105,6 +113,13 @@ export default abstract class Review extends BaseModel {
   @IsBoolean()
   approvalByTA: boolean | null;
 
+  // ta text comment,
+  @Column("text", { nullable: true })
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  commentByTA: string | null;
+
   // ta_netid varchar(500),
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, { eager: true })
@@ -127,9 +142,7 @@ export default abstract class Review extends BaseModel {
     submitted: boolean,
     startedAt: Date | null,
     downloadedAt: Date | null,
-    submittedAt: Date | null,
-    approvalByTA: boolean | null,
-    approvingTA: User | null
+    submittedAt: Date | null
   ) {
     super();
     this.questionnaire = questionnaire;
@@ -139,8 +152,10 @@ export default abstract class Review extends BaseModel {
     this.startedAt = startedAt;
     this.downloadedAt = downloadedAt;
     this.submittedAt = submittedAt;
-    this.approvalByTA = approvalByTA;
-    this.approvingTA = approvingTA;
+    // set default on null
+    this.approvalByTA = null;
+    this.commentByTA = null;
+    this.approvingTA = null;
   }
 
   // custom validation which is run before saving
@@ -159,7 +174,10 @@ export default abstract class Review extends BaseModel {
     if (this.approvingTA && this.approvalByTA === null) {
       throw new Error("Approval should be set");
     }
-    if (!this.approvingTA && typeof this.approvalByTA === "boolean") {
+    if (
+      !this.approvingTA &&
+      (this.approvalByTA !== null || this.commentByTA !== null)
+    ) {
       throw new Error("Approving TA should be set");
     }
     if (this.approvingTA) {
@@ -236,6 +254,7 @@ export default abstract class Review extends BaseModel {
       flaggedByReviewer: this.flaggedByReviewer,
       submitted: this.submitted,
       approvalByTA: this.approvalByTA,
+      commentByTA: this.commentByTA,
       questionnaireId: this.questionnaireId,
     };
   }
@@ -246,6 +265,7 @@ export default abstract class Review extends BaseModel {
       flaggedByReviewer: this.flaggedByReviewer,
       submitted: this.submitted,
       approvalByTA: this.approvalByTA,
+      commentByTA: this.commentByTA,
       questionnaireId: this.questionnaireId,
       reviewerNetid: this.reviewer.netid,
     };

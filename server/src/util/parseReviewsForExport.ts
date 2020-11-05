@@ -67,6 +67,8 @@ const parseSubmissionReviewsForExport = async function (
     parsedReview["Submissionreview submitted"] = review.submitted;
     // Approval status
     parsedReview["Submissionreview approval by TA"] = review.approvalByTA;
+    // commentByTA
+    parsedReview["Submissionreview comment by TA"] = review?.commentByTA;
     // TA netid
     parsedReview["Submissionreview TA netid"] = review.approvingTA?.netid;
     // Reviewer reported the submission
@@ -118,6 +120,9 @@ const parseSubmissionReviewsForExport = async function (
     // Approval status
     parsedReview["Reviewevaluation approval by TA"] =
       reviewEvaluation?.approvalByTA;
+    // commentByTA
+    parsedReview["Reviewevaluation comment by TA"] =
+      reviewEvaluation?.commentByTA;
     // TA netid
     parsedReview["Reviewevaluation TA netid"] =
       reviewEvaluation?.approvingTA?.netid;

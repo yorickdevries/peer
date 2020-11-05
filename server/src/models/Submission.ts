@@ -8,7 +8,13 @@ import {
   RelationId,
   OneToMany,
 } from "typeorm";
-import { IsDefined, IsBoolean, IsOptional } from "class-validator";
+import {
+  IsDefined,
+  IsBoolean,
+  IsOptional,
+  IsString,
+  IsNotEmpty,
+} from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import AssignmentVersion from "../models/AssignmentVersion";
@@ -74,6 +80,13 @@ export default class Submission extends BaseModel {
   @IsBoolean()
   approvalByTA: boolean | null;
 
+  // ta text comment,
+  @Column("text", { nullable: true })
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  commentByTA: string | null;
+
   // ta_netid varchar(500),
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, { eager: true })
@@ -94,6 +107,7 @@ export default class Submission extends BaseModel {
     this.final = final;
     // set default on null
     this.approvalByTA = null;
+    this.commentByTA = null;
     this.approvingTA = null;
   }
 
@@ -120,6 +134,23 @@ export default class Submission extends BaseModel {
       !assignment.submissionExtensions.split(",").includes(this.file.extension)
     ) {
       throw new Error("The file is of the wrong extension");
+    }
+    const course = await assignment.getCourse();
+    if (this.approvingTA && this.approvalByTA === null) {
+      throw new Error("Approval should be set");
+    }
+    if (
+      !this.approvingTA &&
+      (this.approvalByTA !== null || this.commentByTA !== null)
+    ) {
+      throw new Error("Approving TA should be set");
+    }
+    if (this.approvingTA) {
+      if (!(await course.isTeacherOrTeachingAssistant(this.approvingTA))) {
+        throw new Error(
+          `${this.approvingTA.netid} should be enrolled in the course`
+        );
+      }
     }
     // if it succeeds the super validateOrReject can be called
     return super.validateOrReject();
