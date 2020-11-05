@@ -2,7 +2,7 @@ import { AssignmentState } from "../enum/AssignmentState";
 import Assignment from "../models/Assignment";
 import submitReview from "../util/submitReview";
 import ensureConnection from "../util/ensureConnection";
-import { sendMailToAdmin } from "../util/mailer";
+import { sendMailToTeachersOfAssignment } from "../util/mailer";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 
@@ -80,12 +80,17 @@ const openFeedbackForAssignment = async function (
   const assignment = await Assignment.findOneOrFail(assignmentId);
   try {
     const result = await openFeedbackForAssignmentHelper(assignment);
-    await sendMailToAdmin("Distributed reviews for assignment", result);
+    await sendMailToTeachersOfAssignment(
+      "Distributed reviews for assignment",
+      result,
+      assignment
+    );
     return result;
   } catch (error) {
-    await sendMailToAdmin(
+    await sendMailToTeachersOfAssignment(
       "Error while distributing reviews for assignment",
-      String(error)
+      String(error),
+      assignment
     );
     throw error;
   }

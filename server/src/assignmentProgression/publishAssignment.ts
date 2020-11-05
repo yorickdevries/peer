@@ -1,6 +1,6 @@
 import Assignment from "../models/Assignment";
 import { AssignmentState } from "../enum/AssignmentState";
-import { sendMailToAdmin } from "../util/mailer";
+import { sendMailToTeachersOfAssignment } from "../util/mailer";
 
 const publishAssignmentHelper = async function (assignment: Assignment) {
   if (!assignment.isAtState(AssignmentState.UNPUBLISHED)) {
@@ -19,10 +19,18 @@ const publishAssignment = async function (
 ): Promise<string> {
   try {
     const result = await publishAssignmentHelper(assignment);
-    await sendMailToAdmin("Published assignment", result);
+    await sendMailToTeachersOfAssignment(
+      "Published assignment",
+      result,
+      assignment
+    );
     return result;
   } catch (error) {
-    await sendMailToAdmin("Error while publishing assignment", String(error));
+    await sendMailToTeachersOfAssignment(
+      "Error while publishing assignment",
+      String(error),
+      assignment
+    );
     throw error;
   }
 };

@@ -139,6 +139,12 @@ export default class Course extends BaseModel {
     return enrollment ? true : false;
   }
 
+  async getTeacherEnrollments(): Promise<Enrollment[]> {
+    return await Enrollment.find({
+      where: { course: this, role: UserRole.TEACHER },
+    });
+  }
+
   async isTeacher(user: User): Promise<boolean> {
     return this.isEnrolled(user, UserRole.TEACHER);
   }
