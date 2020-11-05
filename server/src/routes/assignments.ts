@@ -21,6 +21,7 @@ import Group from "../models/Group";
 import { AssignmentState } from "../enum/AssignmentState";
 import Extensions from "../enum/Extensions";
 import Submission from "../models/Submission";
+import publishAssignment from "../assignmentProgression/publishAssignment";
 
 const router = express.Router();
 
@@ -521,21 +522,14 @@ router.patch("/:id/publish", validateParams(idSchema), async (req, res) => {
       .send("User is not a teacher of the course");
     return;
   }
-  if (!assignment.isAtState(AssignmentState.UNPUBLISHED)) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("The assignment is not in unpublished state");
+  try {
+    const result = await publishAssignment(assignment);
+    res.send(result);
+    return;
+  } catch (error) {
+    res.status(HttpStatusCode.FORBIDDEN).send(error);
     return;
   }
-  if (assignment.versions.length === 0) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("No assignment versions have been defined");
-    return;
-  }
-  assignment.state = AssignmentState.SUBMISSION;
-  await assignment.save();
-  res.send(assignment);
 });
 
 // close an assignment from submission state
