@@ -2,15 +2,23 @@ import isCI from "is-ci";
 import nodemailer from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
 import Assignment from "../models/Assignment";
+import config from "config";
+
+const mailConfig: {
+  host: string;
+  port: number;
+  from: string;
+  adminMail: string;
+} = config.get("mail");
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.tudelft.nl",
-  port: 25,
+  host: mailConfig.host,
+  port: mailConfig.port,
 });
 
 const constructMessage = function (to: string, subject: string, text: string) {
   return {
-    from: "noreply@peer.tudelft.nl",
+    from: mailConfig.from,
     to: to,
     subject: "[Peer] " + subject,
     text: text,
@@ -31,11 +39,7 @@ const sendMailToAdmin = async function (
   subject: string,
   text: string
 ): Promise<void> {
-  const message = constructMessage(
-    "y.c.devries-1@student.tudelft.nl",
-    subject,
-    text
-  );
+  const message = constructMessage(mailConfig.adminMail, subject, text);
   return sendMessage(message);
 };
 
