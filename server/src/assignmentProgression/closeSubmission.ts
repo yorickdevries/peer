@@ -29,7 +29,7 @@ const closeSubmission = async function (
   } catch (error) {
     await sendMailToAdmin(
       "Error while closing submissions for assignment",
-      error
+      String(error)
     );
     throw error;
   }

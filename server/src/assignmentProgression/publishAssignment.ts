@@ -22,7 +22,7 @@ const publishAssignment = async function (
     await sendMailToAdmin("Published assignment", result);
     return result;
   } catch (error) {
-    await sendMailToAdmin("Error while publishing assignment", error);
+    await sendMailToAdmin("Error while publishing assignment", String(error));
     throw error;
   }
 };

@@ -528,7 +528,7 @@ router.patch("/:id/publish", validateParams(idSchema), async (req, res) => {
     res.send(result);
     return;
   } catch (error) {
-    res.status(HttpStatusCode.FORBIDDEN).send(error);
+    res.status(HttpStatusCode.FORBIDDEN).send(String(error));
     return;
   }
 });
@@ -559,7 +559,7 @@ router.patch(
       res.send(result);
       return;
     } catch (error) {
-      res.status(HttpStatusCode.FORBIDDEN).send(error);
+      res.status(HttpStatusCode.FORBIDDEN).send(String(error));
       return;
     }
   }

@@ -439,7 +439,7 @@ const distributeReviewsForAssignment = async function (
   } catch (error) {
     await sendMailToAdmin(
       "Error while distributing reviews for assignment",
-      error
+      String(error)
     );
     throw error;
   }
