@@ -80,6 +80,11 @@ const scheduleAllJobs = async function (): Promise<void> {
   for (const assignment of assignments) {
     scheduleJobsForAssignment(assignment);
   }
+  let counter = 0;
+  for (const element of scheduledJobs) {
+    counter += element[1].length;
+  }
+  console.log(`Scheduled ${counter} jobs`);
 };
 
 export { scheduleAllJobs, scheduleJobsForAssignment };
