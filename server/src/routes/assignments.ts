@@ -243,6 +243,7 @@ const assignmentSchema = Joi.object({
   lateSubmissions: Joi.boolean().required(),
   lateSubmissionReviews: Joi.boolean().required(),
   lateReviewEvaluations: Joi.boolean().allow(null).required(),
+  automaticStateProgression: Joi.boolean().required(),
 });
 // post an assignment in a course
 router.post(
@@ -284,7 +285,8 @@ router.post(
       req.body.blockFeedback,
       req.body.lateSubmissions,
       req.body.lateSubmissionReviews,
-      req.body.lateReviewEvaluations
+      req.body.lateReviewEvaluations,
+      req.body.automaticStateProgression
     );
 
     // construct file to be saved in transaction
@@ -353,6 +355,7 @@ const assignmentPatchSchema = Joi.object({
   lateSubmissions: Joi.boolean().required(),
   lateSubmissionReviews: Joi.boolean().required(),
   lateReviewEvaluations: Joi.boolean().allow(null).required(),
+  automaticStateProgression: Joi.boolean().required(),
 });
 // patch an assignment in a course
 router.patch(
@@ -466,6 +469,8 @@ router.patch(
         assignment.lateSubmissions = req.body.lateSubmissions;
         assignment.lateSubmissionReviews = req.body.lateSubmissionReviews;
         assignment.lateReviewEvaluations = req.body.lateReviewEvaluations;
+        assignment.automaticStateProgression =
+          req.body.automaticStateProgression;
 
         // change the file in case it is not undefined
         if (newFile !== undefined) {

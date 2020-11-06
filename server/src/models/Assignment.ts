@@ -157,6 +157,12 @@ export default class Assignment extends BaseModel {
   // enables making review evaluations after the due date
   lateReviewEvaluations: boolean | null;
 
+  @Column()
+  @IsDefined()
+  @IsBoolean()
+  // lets the teacher set the possibillity to automatically progress to the next states of assignments
+  automaticStateProgression: boolean;
+
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
   // course_id int NOT NULL, FK
@@ -195,7 +201,8 @@ export default class Assignment extends BaseModel {
     blockFeedback: boolean,
     lateSubmissions: boolean,
     lateSubmissionReviews: boolean,
-    lateReviewEvaluations: boolean | null
+    lateReviewEvaluations: boolean | null,
+    automaticStateProgression: boolean
   ) {
     super();
     this.name = name;
@@ -216,6 +223,7 @@ export default class Assignment extends BaseModel {
     this.lateSubmissions = lateSubmissions;
     this.lateSubmissionReviews = lateSubmissionReviews;
     this.lateReviewEvaluations = lateReviewEvaluations;
+    this.automaticStateProgression = automaticStateProgression;
   }
 
   // custom validation which is run before saving
