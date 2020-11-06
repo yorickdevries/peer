@@ -33,16 +33,6 @@
                                 </b-form-textarea>
                             </b-form-group>
                             <hr />
-                            <!--Publish and due date of the assignment-->
-                            <b-row class="mb-3">
-                                <b-col>
-                                    <b-alert variant="info" show>
-                                        NOTE: These dates are just mean of communication to students in case automatic
-                                        state progression is not set. Advancing through the assignment stages should
-                                        then be done manually.
-                                    </b-alert>
-                                </b-col>
-                            </b-row>
                             <b-row>
                                 <b-col>
                                     <b-form-group
@@ -62,6 +52,16 @@
                                 </b-col>
                             </b-row>
                             <hr />
+                            <!--Publish and due date of the assignment-->
+                            <b-row class="mb-3">
+                                <b-col>
+                                    <b-alert variant="info" show>
+                                        NOTE: These dates are just mean of communication to students in case automatic
+                                        state progression is not set. Advancing through the assignment stages should
+                                        then be done manually.
+                                    </b-alert>
+                                </b-col>
+                            </b-row>
                             <b-row class="mb-3">
                                 <b-col>
                                     <b-form-group>

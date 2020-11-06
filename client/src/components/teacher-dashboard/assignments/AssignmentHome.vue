@@ -7,7 +7,7 @@
             <b-col cols="8">
                 <b-card header="Actions">
                     This is the state overview of the assignment. You should manually trigger the next stage when
-                    needed.
+                    automatic state progression isn't turned on.
                     <dl class="mb-0">
                         <FormWizard
                             title="Assignment state progression"
