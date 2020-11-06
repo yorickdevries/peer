@@ -22,6 +22,42 @@ const startWorker = function (
     });
 };
 
+const startPublishAssignmentWorker = function (assignmentId: number): void {
+  if (isTSNode) {
+    // run the function directly in this process (TS Node/development)
+    workerFunctions
+      .publishAssignment(assignmentId)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("publishAssignment", [assignmentId]);
+  }
+};
+
+const startCloseSubmissionForAssignmentWorker = function (
+  assignmentId: number
+): void {
+  if (isTSNode) {
+    // run the function directly in this process (TS Node/development)
+    workerFunctions
+      .closeSubmission(assignmentId)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("closeSubmission", [assignmentId]);
+  }
+};
+
 const startDistributeReviewsForAssignmentWorker = function (
   assignmentId: number
 ): void {
@@ -199,6 +235,8 @@ const startExportSubmissionsForAssignmentVersionWorker = function (
 };
 
 export {
+  startPublishAssignmentWorker,
+  startCloseSubmissionForAssignmentWorker,
   startDistributeReviewsForAssignmentWorker,
   startOpenFeedbackForAssignmentWorker,
   startImportGroupsForAssignmentWorker,

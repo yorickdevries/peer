@@ -67,7 +67,8 @@ describe("Assignments", () => {
       .field("blockFeedback", true)
       .field("lateSubmissions", true)
       .field("lateSubmissionReviews", true)
-      .field("lateReviewEvaluations", "null");
+      .field("lateReviewEvaluations", "null")
+      .field("automaticStateProgression", false);
 
     expect(res2.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res2.text)).toMatchObject({

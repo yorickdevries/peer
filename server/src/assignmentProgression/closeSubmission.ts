@@ -1,6 +1,7 @@
 import Assignment from "../models/Assignment";
 import { AssignmentState } from "../enum/AssignmentState";
 import { sendMailToTeachersOfAssignment } from "../util/mailer";
+import ensureConnection from "../util/ensureConnection";
 
 const closeSubmissionHelper = async function (assignment: Assignment) {
   if (!assignment.isAtState(AssignmentState.SUBMISSION)) {
@@ -19,9 +20,9 @@ const closeSubmissionHelper = async function (assignment: Assignment) {
   return `Closed submissions for assignment: ${assignment.name} ID: ${assignment.id}`;
 };
 
-const closeSubmission = async function (
-  assignment: Assignment
-): Promise<string> {
+const closeSubmission = async function (assignmentId: number): Promise<string> {
+  await ensureConnection();
+  const assignment = await Assignment.findOneOrFail(assignmentId);
   try {
     const result = await closeSubmissionHelper(assignment);
     await sendMailToTeachersOfAssignment(

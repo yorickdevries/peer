@@ -66,7 +66,8 @@ describe("Review distribution", () => {
       true,
       true,
       true,
-      null
+      null,
+      false
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
@@ -186,7 +187,8 @@ describe("Review distribution", () => {
       true,
       true,
       true,
-      null
+      null,
+      false
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
@@ -312,7 +314,8 @@ describe("Review distribution", () => {
       true,
       true,
       true,
-      null
+      null,
+      false
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;

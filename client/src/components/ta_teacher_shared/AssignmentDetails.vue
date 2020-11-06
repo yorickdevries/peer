@@ -39,6 +39,9 @@
                 <dd>{{ assignment.lateReviewEvaluations }}</dd>
             </div>
 
+            <dt>Automatic State Progression</dt>
+            <dd>{{ assignment.automaticStateProgression }}</dd>
+
             <dt>Allowed submission file extensions</dt>
             <dd>{{ assignment.submissionExtensions }}</dd>
 

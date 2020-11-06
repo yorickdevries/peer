@@ -6,6 +6,7 @@ import createDatabaseConnection from "../databaseConnection";
 import app from "../app";
 import isTSNode from "../util/isTSNode";
 import { sendMailToAdmin } from "../util/mailer";
+import { scheduleAllJobs } from "../assignmentProgression/scheduler";
 
 if (isTSNode) {
   console.log("Running under TS Node");
@@ -46,6 +47,7 @@ createDatabaseConnection()
     console.log(startMessage);
     console.error(startMessage);
 
+    // send startupmail
     sendMailToAdmin("Started server", startMessage)
       .then(() => {
         console.log("Sent startup mail");
@@ -53,6 +55,16 @@ createDatabaseConnection()
       .catch((error) => {
         console.error(error);
         console.error("Failed to send startup mail");
+      });
+
+    scheduleAllJobs()
+      .then(() => {
+        console.log("Scheduled jobs for assignments");
+      })
+      .catch((error) => {
+        console.error(error);
+        console.error("Failed to schedule jobs for assignments");
+        throw error;
       });
 
     // Event listener for HTTP server "error" event.
