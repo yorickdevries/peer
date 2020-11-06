@@ -43,6 +43,25 @@
                                     </b-alert>
                                 </b-col>
                             </b-row>
+                            <b-row>
+                                <b-col>
+                                    <b-form-group
+                                        label="Let the system automatically try to progress through the states of an assignment on deadlines"
+                                        description="States are: 'unpublished', 'submission', 'waiting for review', 'review' and 'feedback'"
+                                    >
+                                        <b-form-checkbox v-model="assignment.automaticStateProgression">
+                                            Enable Automatic State Progression
+                                            <b-badge
+                                                v-b-tooltip.hover
+                                                title="Not clicking this will mean you have to manually progress through the states"
+                                                variant="primary"
+                                                >?</b-badge
+                                            >
+                                        </b-form-checkbox>
+                                    </b-form-group>
+                                </b-col>
+                            </b-row>
+                            <hr />
                             <b-row class="mb-3">
                                 <b-col>
                                     <b-form-group>
@@ -293,25 +312,6 @@
                                             <b-badge
                                                 v-b-tooltip.hover
                                                 title="Students can finish any unsubmitted review evaluations any time after the deadline. After the deadline, submitted reviews cannot be unsubmitted anymore."
-                                                variant="primary"
-                                                >?</b-badge
-                                            >
-                                        </b-form-checkbox>
-                                    </b-form-group>
-                                </b-col>
-                                <b-col></b-col>
-                            </b-row>
-                            <b-row>
-                                <b-col>
-                                    <b-form-group
-                                        label="Let the system automatically try to progress through the states of an assignment on deadlines"
-                                        description="States are: 'unpublished', 'submission', 'waiting for review', 'review' and 'feedback'"
-                                    >
-                                        <b-form-checkbox v-model="assignment.automaticStateProgression">
-                                            Enable Automatic State Progression
-                                            <b-badge
-                                                v-b-tooltip.hover
-                                                title="Not clicking this will mean you have to manually progress through the states"
                                                 variant="primary"
                                                 >?</b-badge
                                             >
