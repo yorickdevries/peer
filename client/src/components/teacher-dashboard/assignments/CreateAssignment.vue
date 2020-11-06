@@ -273,6 +273,7 @@
 import api from "../../../api/api"
 import notifications from "../../../mixins/notifications"
 import Datepicker from "vuejs-datepicker"
+import moment from "moment"
 
 export default {
     mixins: [notifications],
@@ -339,14 +340,24 @@ export default {
                         this.assignment.reviewEvaluationDueTime
                     )
                 }
-                // Check order of dates
+                // check chronological order of the dates
+                // the dates must be at least 15 minutes apart from echother
                 if (
-                    publishDate >= dueDate ||
-                    dueDate >= reviewPublishDate ||
-                    reviewPublishDate >= reviewDueDate ||
-                    (this.assignment.reviewEvaluation && reviewDueDate >= reviewEvaluationDueDate)
+                    moment(publishDate)
+                        .add(15, "minutes")
+                        .isAfter(dueDate) ||
+                    moment(dueDate)
+                        .add(15, "minutes")
+                        .isAfter(reviewPublishDate) ||
+                    moment(reviewPublishDate)
+                        .add(15, "minutes")
+                        .isAfter(reviewDueDate) ||
+                    (this.assignment.reviewEvaluation &&
+                        moment(reviewDueDate)
+                            .add(15, "minutes")
+                            .isAfter(reviewEvaluationDueDate))
                 ) {
-                    throw new Error("dates are not in chronological order")
+                    throw new Error("The dates must chronologically correct and at least 15 minutes apart")
                 }
             } catch (error) {
                 // enable button again

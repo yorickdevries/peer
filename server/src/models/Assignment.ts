@@ -253,14 +253,21 @@ export default class Assignment extends BaseModel {
       }
     }
     // check chronological order of the dates
+    // the dates must be at least 15 minutes apart from echother
     if (
-      moment(this.publishDate).isAfter(this.dueDate) ||
-      moment(this.dueDate).isAfter(this.reviewPublishDate) ||
-      moment(this.reviewPublishDate).isAfter(this.reviewDueDate) ||
+      moment(this.publishDate).add(15, "minutes").isAfter(this.dueDate) ||
+      moment(this.dueDate).add(15, "minutes").isAfter(this.reviewPublishDate) ||
+      moment(this.reviewPublishDate)
+        .add(15, "minutes")
+        .isAfter(this.reviewDueDate) ||
       (this.reviewEvaluationDueDate &&
-        moment(this.reviewDueDate).isAfter(this.reviewEvaluationDueDate))
+        moment(this.reviewDueDate)
+          .add(15, "minutes")
+          .isAfter(this.reviewEvaluationDueDate))
     ) {
-      throw new Error("The dates must chronologically correct");
+      throw new Error(
+        "The dates must chronologically correct and at least 15 minutes apart"
+      );
     }
     // if all succeeds the super validateOrReject can be called
     return super.validateOrReject();
