@@ -157,6 +157,12 @@ export default class Assignment extends BaseModel {
   // enables making review evaluations after the due date
   lateReviewEvaluations: boolean | null;
 
+  @Column()
+  @IsDefined()
+  @IsBoolean()
+  // lets the teacher set the possibillity to automatically progress to the next states of assignments
+  automaticStateProgression: boolean;
+
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
   // course_id int NOT NULL, FK
@@ -195,7 +201,8 @@ export default class Assignment extends BaseModel {
     blockFeedback: boolean,
     lateSubmissions: boolean,
     lateSubmissionReviews: boolean,
-    lateReviewEvaluations: boolean | null
+    lateReviewEvaluations: boolean | null,
+    automaticStateProgression: boolean
   ) {
     super();
     this.name = name;
@@ -216,6 +223,7 @@ export default class Assignment extends BaseModel {
     this.lateSubmissions = lateSubmissions;
     this.lateSubmissionReviews = lateSubmissionReviews;
     this.lateReviewEvaluations = lateReviewEvaluations;
+    this.automaticStateProgression = automaticStateProgression;
   }
 
   // custom validation which is run before saving
@@ -253,14 +261,21 @@ export default class Assignment extends BaseModel {
       }
     }
     // check chronological order of the dates
+    // the dates must be at least 15 minutes apart from echother
     if (
-      moment(this.publishDate).isAfter(this.dueDate) ||
-      moment(this.dueDate).isAfter(this.reviewPublishDate) ||
-      moment(this.reviewPublishDate).isAfter(this.reviewDueDate) ||
+      moment(this.publishDate).add(15, "minutes").isAfter(this.dueDate) ||
+      moment(this.dueDate).add(15, "minutes").isAfter(this.reviewPublishDate) ||
+      moment(this.reviewPublishDate)
+        .add(15, "minutes")
+        .isAfter(this.reviewDueDate) ||
       (this.reviewEvaluationDueDate &&
-        moment(this.reviewDueDate).isAfter(this.reviewEvaluationDueDate))
+        moment(this.reviewDueDate)
+          .add(15, "minutes")
+          .isAfter(this.reviewEvaluationDueDate))
     ) {
-      throw new Error("The dates must chronologically correct");
+      throw new Error(
+        "The dates must chronologically correct and at least 15 minutes apart"
+      );
     }
     // if all succeeds the super validateOrReject can be called
     return super.validateOrReject();

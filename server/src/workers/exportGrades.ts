@@ -2,7 +2,7 @@ import AssignmentExport from "../models/AssignmentExport";
 import AssignmentVersion from "../models/AssignmentVersion";
 import exportJSONToFile from "../util/exportJSONToFile";
 import makeGradeSummaries from "../util/makeGradeSummary";
-import ensureConnection from "./ensureConnection";
+import ensureConnection from "../util/ensureConnection";
 
 const exportGradesForAssignmentVersion = async function (
   assignmentVersionId: number,

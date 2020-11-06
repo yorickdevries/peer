@@ -5,7 +5,7 @@ import Course from "../models/Course";
 import Enrollment from "../models/Enrollment";
 import Group from "../models/Group";
 import User from "../models/User";
-import ensureConnection from "./ensureConnection";
+import ensureConnection from "../util/ensureConnection";
 
 interface groupNameWithNetidList {
   groupName: string;

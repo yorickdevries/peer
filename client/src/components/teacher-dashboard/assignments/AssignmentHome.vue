@@ -7,7 +7,7 @@
             <b-col cols="8">
                 <b-card header="Actions">
                     This is the state overview of the assignment. You should manually trigger the next stage when
-                    needed.
+                    automatic state progression isn't turned on.
                     <dl class="mb-0">
                         <FormWizard
                             title="Assignment state progression"
@@ -46,6 +46,10 @@
                                 size="sm"
                                 >Publish
                             </b-button>
+                            <b-alert v-if="assignment.automaticStateProgression" show warning
+                                >Automatic state progression is enabled. Make sure you have created at least one
+                                assignment version before the publish date.</b-alert
+                            >
                             <b-modal
                                 :id="`publishAssignment${assignment.id}`"
                                 @ok="publishAssignment"
@@ -76,6 +80,10 @@
                                 size="sm"
                                 >Close submission
                             </b-button>
+                            <b-alert v-if="assignment.automaticStateProgression" show warning
+                                >Automatic state progression is enabled. Make sure your students have made submissions
+                                before the deadline.</b-alert
+                            >
                             <b-modal
                                 :id="`closeSubmission${assignment.id}`"
                                 @ok="closeSubmission"
@@ -100,6 +108,11 @@
                             <dd>
                                 This action will distribute reviews to users of groups which made a submission.
                             </dd>
+                            <b-alert v-if="assignment.automaticStateProgression" show warning
+                                >Automatic state progression is enabled. Make sure you finalised your
+                                submissionquestionnaires before the review publish date. In addition, make sure your
+                                review distribution is set correctly in the assignmentversions tab.</b-alert
+                            >
                             <b-alert v-if="showDistributeAlert" show
                                 >Reviews are being distributed, check back in a few minutes to see the results</b-alert
                             >
@@ -140,6 +153,10 @@
                             <dd>
                                 This action will open the the feedback for the reviewed students
                             </dd>
+                            <b-alert v-if="assignment.automaticStateProgression" show warning
+                                >Automatic state progression is enabled. In case you have set up review evaluation, make
+                                sure you finalised your reviewquestionnaires before the review due date.</b-alert
+                            >
                             <b-alert v-if="showOpenFeedbackAlert" show
                                 >All flagged and completely filled in reviews are being submitted and feedback will be
                                 opened therafter, check back in a few minutes to see the results</b-alert

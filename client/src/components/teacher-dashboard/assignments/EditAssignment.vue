@@ -33,12 +33,32 @@
                                 </b-form-textarea>
                             </b-form-group>
                             <hr />
+                            <b-row>
+                                <b-col>
+                                    <b-form-group
+                                        label="Let the system automatically try to progress through the states of an assignment on deadlines"
+                                        description="States are: 'unpublished', 'submission', 'waiting for review', 'review' and 'feedback'"
+                                    >
+                                        <b-form-checkbox v-model="assignment.automaticStateProgression">
+                                            Enable Automatic State Progression
+                                            <b-badge
+                                                v-b-tooltip.hover
+                                                title="Not clicking this will mean you have to manually progress through the states"
+                                                variant="primary"
+                                                >?</b-badge
+                                            >
+                                        </b-form-checkbox>
+                                    </b-form-group>
+                                </b-col>
+                            </b-row>
+                            <hr />
                             <!--Publish and due date of the assignment-->
                             <b-row class="mb-3">
                                 <b-col>
                                     <b-alert variant="info" show>
-                                        NOTE: These dates are just mean of communication to students. Advancing through
-                                        the assignment stages should be done manually.
+                                        NOTE: These dates are just mean of communication to students in case automatic
+                                        state progression is not set. Advancing through the assignment stages should
+                                        then be done manually.
                                     </b-alert>
                                 </b-col>
                             </b-row>
@@ -81,7 +101,8 @@
                                         ></datepicker>
                                         <b-form-input v-model="assignment.dueTime" type="time" required> </b-form-input>
                                         <b-form-checkbox v-model="assignment.lateSubmissions">
-                                            Allow late submissions after the deadline
+                                            Allow late submissions after the deadline while the submission phase isn't
+                                            closed yet
                                             <b-badge
                                                 v-b-tooltip.hover
                                                 title="This allows submissions to be made until the submission phase is manually closed by the teacher"
@@ -406,14 +427,24 @@ export default {
                         this.assignment.reviewEvaluationDueTime
                     )
                 }
-                // Check order of dates
+                // check chronological order of the dates
+                // the dates must be at least 15 minutes apart from echother
                 if (
-                    publishDate >= dueDate ||
-                    dueDate >= reviewPublishDate ||
-                    reviewPublishDate >= reviewDueDate ||
-                    (this.assignment.reviewEvaluation && reviewDueDate >= reviewEvaluationDueDate)
+                    moment(publishDate)
+                        .add(15, "minutes")
+                        .isAfter(dueDate) ||
+                    moment(dueDate)
+                        .add(15, "minutes")
+                        .isAfter(reviewPublishDate) ||
+                    moment(reviewPublishDate)
+                        .add(15, "minutes")
+                        .isAfter(reviewDueDate) ||
+                    (this.assignment.reviewEvaluation &&
+                        moment(reviewDueDate)
+                            .add(15, "minutes")
+                            .isAfter(reviewEvaluationDueDate))
                 ) {
-                    throw new Error("dates are not in chronological order")
+                    throw new Error("The dates must chronologically correct and at least 15 minutes apart")
                 }
             } catch (error) {
                 // enable button again
@@ -452,7 +483,8 @@ export default {
                     this.assignment.blockFeedback,
                     this.assignment.lateSubmissions,
                     this.assignment.lateSubmissionReviews,
-                    this.assignment.lateReviewEvaluations
+                    this.assignment.lateReviewEvaluations,
+                    this.assignment.automaticStateProgression
                 )
                 this.showSuccessMessage({ message: "Updated assignment successfully" })
                 // Redirect to updated assignment
