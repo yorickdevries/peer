@@ -41,7 +41,10 @@ const scheduleJobsForAssignment = function (assignment: Assignment): void {
       const job = schedule.scheduleJob(assignment.publishDate, () => {
         startPublishAssignmentWorker(assignment.id);
       });
-      jobsOfAssignment.push(job);
+      // job can be null if scheduled in the past
+      if (job) {
+        jobsOfAssignment.push(job);
+      }
     }
     // closeSubmission
     if (
@@ -51,7 +54,10 @@ const scheduleJobsForAssignment = function (assignment: Assignment): void {
       const job = schedule.scheduleJob(assignment.dueDate, () => {
         startCloseSubmissionForAssignmentWorker(assignment.id);
       });
-      jobsOfAssignment.push(job);
+      // job can be null if scheduled in the past
+      if (job) {
+        jobsOfAssignment.push(job);
+      }
     }
     // distributeReviews
     if (
@@ -61,7 +67,10 @@ const scheduleJobsForAssignment = function (assignment: Assignment): void {
       const job = schedule.scheduleJob(assignment.reviewPublishDate, () => {
         startDistributeReviewsForAssignmentWorker(assignment.id);
       });
-      jobsOfAssignment.push(job);
+      // job can be null if scheduled in the past
+      if (job) {
+        jobsOfAssignment.push(job);
+      }
     }
     // openFeedback
     if (
@@ -71,7 +80,10 @@ const scheduleJobsForAssignment = function (assignment: Assignment): void {
       const job = schedule.scheduleJob(assignment.reviewDueDate, () => {
         startOpenFeedbackForAssignmentWorker(assignment.id);
       });
-      jobsOfAssignment.push(job);
+      // job can be null if scheduled in the past
+      if (job) {
+        jobsOfAssignment.push(job);
+      }
     }
     // set new value
     scheduledJobs.set(assignment.id, jobsOfAssignment);
