@@ -258,6 +258,25 @@
                                 </b-col>
                                 <b-col></b-col>
                             </b-row>
+                            <b-row>
+                                <b-col>
+                                    <b-form-group
+                                        label="Let the system automatically try to progress through the states of an assignment on deadlines"
+                                        description="States are: 'unpublished', 'submission', 'waiting for review', 'review' and 'feedback'"
+                                    >
+                                        <b-form-checkbox v-model="assignment.automaticStateProgression">
+                                            Enable Automatic State Progression
+                                            <b-badge
+                                                v-b-tooltip.hover
+                                                title="Not clicking this will mean you have to manually progress through the states"
+                                                variant="primary"
+                                                >?</b-badge
+                                            >
+                                        </b-form-checkbox>
+                                    </b-form-group>
+                                </b-col>
+                                <b-col></b-col>
+                            </b-row>
                             <b-button type="submit" variant="primary" :disabled="buttonDisabled"
                                 >Create the assignment</b-button
                             >
@@ -303,7 +322,8 @@ export default {
                 blockFeedback: true,
                 lateSubmissions: true,
                 lateSubmissionReviews: true,
-                lateReviewEvaluations: true
+                lateReviewEvaluations: true,
+                automaticStateProgression: false
             },
             extensionTypes: [
                 { value: ".pdf", text: ".pdf" },
@@ -384,7 +404,8 @@ export default {
                     this.assignment.blockFeedback,
                     this.assignment.lateSubmissions,
                     this.assignment.lateSubmissionReviews,
-                    this.assignment.lateReviewEvaluations
+                    this.assignment.lateReviewEvaluations,
+                    this.assignment.automaticStateProgression
                 )
                 this.showSuccessMessage({ message: "Assignment was successfully created" })
                 this.$router.push({
