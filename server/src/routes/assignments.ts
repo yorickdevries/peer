@@ -23,6 +23,7 @@ import Extensions from "../enum/Extensions";
 import Submission from "../models/Submission";
 import publishAssignment from "../assignmentProgression/publishAssignment";
 import closeSubmission from "../assignmentProgression/closeSubmission";
+import { scheduleJobsForAssignment } from "../assignmentProgression/scheduler";
 
 const router = express.Router();
 
@@ -325,6 +326,8 @@ router.post(
     // reload the assignment
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await assignment!.reload();
+    // schedule automated tasks
+    scheduleJobsForAssignment(assignment);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(assignment!);
   }
@@ -500,6 +503,8 @@ router.patch(
     // reload the assignment
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await assignment!.reload();
+    // reschedule automated tasks
+    scheduleJobsForAssignment(assignment);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(assignment!);
   }
