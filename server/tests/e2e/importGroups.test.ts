@@ -59,7 +59,8 @@ describe("Group import", () => {
       .field("blockFeedback", true)
       .field("lateSubmissions", true)
       .field("lateSubmissionReviews", true)
-      .field("lateReviewEvaluations", "null");
+      .field("lateReviewEvaluations", "null")
+      .field("automaticStateProgression", false);
     assignmentId = JSON.parse(res2.text).id;
 
     // set date to the moment that the assignment is published
