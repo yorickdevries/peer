@@ -81,14 +81,14 @@ const openFeedbackForAssignment = async function (
   try {
     const result = await openFeedbackForAssignmentHelper(assignment);
     await sendMailToTeachersOfAssignment(
-      "Distributed reviews for assignment",
+      "Opened feedback for assignment",
       result,
       assignment
     );
     return result;
   } catch (error) {
     await sendMailToTeachersOfAssignment(
-      "Error while distributing reviews for assignment",
+      "Error while opening feedback for assignment",
       String(error),
       assignment
     );
