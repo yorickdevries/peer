@@ -176,10 +176,10 @@
 
                             <!-- UPLOAD QUESTION -->
                             <b-form-group v-if="question.type === 'upload'" class="mb-0">
-                                <b-row>
+                                <b-row v-if="answers[question.id].answer">
                                     <b-col>
                                         <!--Show whether file has been uploaded-->
-                                        <b-alert v-if="answers[question.id].answer" show variant="success" class="p-2"
+                                        <b-alert show variant="success" class="p-2"
                                             >File uploaded:
                                             <a :href="uploadAnswerFilePath(review.id, question.id)">
                                                 {{ answers[question.id].answer.name
