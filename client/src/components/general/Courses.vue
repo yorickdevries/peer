@@ -211,13 +211,29 @@
                                             <p v-else><i>No course description</i></p>
                                         </div>
                                         <div>
-                                            <b-button
-                                                variant="outline-primary"
-                                                size="sm"
-                                                @click="enrollInCourse(course.id)"
+                                            <b-button variant="outline-primary" v-b-modal="`enroll-${course.id}`"
+                                                >Enroll in Course</b-button
                                             >
-                                                Enroll in Course
-                                            </b-button>
+                                            <b-modal
+                                                :id="`enroll-${course.id}`"
+                                                :title="`Enroll in ${course.name}?`"
+                                                centered
+                                                hide-footer
+                                            >
+                                                Are you sure you want to enroll in the course "{{ course.name }}" as
+                                                <b>student</b>? This action cannot be undone.
+                                                <b-alert show
+                                                    >If you are Co-teacher or TA in this course, please ask the teacher
+                                                    to enroll you instead.</b-alert
+                                                >
+                                                <b-button
+                                                    variant="primary"
+                                                    size="sm"
+                                                    @click="enrollInCourse(course.id)"
+                                                >
+                                                    Enroll in Course
+                                                </b-button>
+                                            </b-modal>
                                         </div>
                                     </b-card-body>
                                 </b-card>

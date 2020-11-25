@@ -140,13 +140,41 @@
                                             />
                                             <!-- UPLOAD QUESTION -->
                                             <b-form-group v-if="question.type === 'upload'" class="mb-0">
-                                                <!--Show whether file has been uploaded-->
-                                                <b-alert show variant="success" class="p-2"
-                                                    >File uploaded:
-                                                    <a :href="uploadAnswerFilePath(answer.reviewId, question.id)"
-                                                        >{{ answer.name }}{{ answer.extension }}</a
-                                                    >
-                                                </b-alert>
+                                                <b-row>
+                                                    <b-col>
+                                                        <!--Show whether file has been uploaded-->
+                                                        <b-alert show variant="success" class="p-2"
+                                                            >File uploaded:
+                                                            <a
+                                                                :href="
+                                                                    uploadAnswerFilePath(answer.reviewId, question.id)
+                                                                "
+                                                                >{{ answer.name }}{{ answer.extension }}</a
+                                                            >
+                                                        </b-alert>
+                                                    </b-col>
+                                                    <b-col>
+                                                        <b-button
+                                                            v-if="answer.extension === '.pdf'"
+                                                            v-b-modal="`showPDF-${answer.reviewId}-${question.id}`"
+                                                        >
+                                                            Show PDF
+                                                        </b-button>
+                                                        <b-modal
+                                                            :id="`showPDF-${answer.reviewId}-${question.id}`"
+                                                            title="PDF"
+                                                            size="xl"
+                                                            centered
+                                                            hide-footer
+                                                        >
+                                                            <PDFViewer
+                                                                :fileUrl="
+                                                                    uploadAnswerFilePath(answer.reviewId, question.id)
+                                                                "
+                                                            />
+                                                        </b-modal>
+                                                    </b-col>
+                                                </b-row>
                                             </b-form-group>
                                         </b-list-group-item>
                                     </b-list-group>
@@ -165,9 +193,10 @@ import api from "../../../api/api"
 import _ from "lodash"
 import { StarRating } from "vue-rate-it"
 import PDFAnnotator from "./PDFAnnotator"
+import PDFViewer from "../../general/PDFViewer"
 
 export default {
-    components: { StarRating, PDFAnnotator },
+    components: { StarRating, PDFAnnotator, PDFViewer },
     data() {
         return {
             assignment: {},
