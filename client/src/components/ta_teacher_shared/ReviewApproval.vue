@@ -176,14 +176,35 @@
 
                             <!-- UPLOAD QUESTION -->
                             <b-form-group v-if="question.type === 'upload'" class="mb-0">
-                                <!--Show whether file has been uploaded-->
-                                <b-alert v-if="answers[question.id].answer" show variant="success" class="p-2"
-                                    >File uploaded:
-                                    <a :href="uploadAnswerFilePath(review.id, question.id)">
-                                        {{ answers[question.id].answer.name
-                                        }}{{ answers[question.id].answer.extension }}
-                                    </a>
-                                </b-alert>
+                                <b-row v-if="answers[question.id].answer">
+                                    <b-col>
+                                        <!--Show whether file has been uploaded-->
+                                        <b-alert show variant="success" class="p-2"
+                                            >File uploaded:
+                                            <a :href="uploadAnswerFilePath(review.id, question.id)">
+                                                {{ answers[question.id].answer.name
+                                                }}{{ answers[question.id].answer.extension }}
+                                            </a>
+                                        </b-alert>
+                                    </b-col>
+                                    <b-col>
+                                        <b-button
+                                            v-if="answers[question.id].answer.extension === '.pdf'"
+                                            v-b-modal="`showPDF-${review.id}-${question.id}`"
+                                        >
+                                            Show PDF
+                                        </b-button>
+                                        <b-modal
+                                            :id="`showPDF-${review.id}-${question.id}`"
+                                            title="PDF"
+                                            size="xl"
+                                            centered
+                                            hide-footer
+                                        >
+                                            <PDFViewer :fileUrl="uploadAnswerFilePath(review.id, question.id)" />
+                                        </b-modal>
+                                    </b-col>
+                                </b-row>
                                 <!--Show note if a file has been uploaded and review not submitted-->
                                 <b-alert v-if="answers[question.id].answer" show variant="secondary" class="p-2"
                                     >Note: uploading a new file will overwrite your current file. <br />
@@ -250,10 +271,11 @@ import BreadcrumbTitle from "../BreadcrumbTitle"
 import { StarRating } from "vue-rate-it"
 import ReviewEvaluation from "../student-dashboard/assignment/ReviewEvaluation"
 import PDFAnnotator from "../student-dashboard/assignment/PDFAnnotator"
+import PDFViewer from "../general/PDFViewer"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, PDFAnnotator },
+    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, PDFAnnotator, PDFViewer },
     data() {
         return {
             assignment: {},
