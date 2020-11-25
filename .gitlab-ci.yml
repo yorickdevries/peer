@@ -19,7 +19,6 @@ lint-server:
   stage: static-analysis
   variables:
     NODE_ENV: development
-  allow_failure: true
   script:
   - cd server && npm install
   - npm run lint
@@ -31,7 +30,6 @@ lint-client:
   stage: static-analysis
   variables:
     NODE_ENV: development
-  allow_failure: true
   script:
   - cd client && npm install
   - npm run lint
@@ -43,7 +41,6 @@ build-server:
   stage: build
   variables:
     NODE_ENV: production
-  allow_failure: true
   script:
   - cd server && npm install
   - npm run build
@@ -55,7 +52,6 @@ build-client:
   stage: build
   variables:
     NODE_ENV: production
-  allow_failure: true
   script:
   - cd client && npm install
   - npm run build
@@ -67,7 +63,6 @@ test:
   stage: test
   variables:
     NODE_ENV: test
-  allow_failure: true
   services:
   - mariadb:10.1
   script:
@@ -95,7 +90,6 @@ migration:
   stage: migration
   variables:
     NODE_ENV: production
-  allow_failure: true
   services:
   - mariadb:10.1
   script:
@@ -110,7 +104,6 @@ start-server:
   stage: start
   variables:
     NODE_ENV: production
-  allow_failure: true
   services:
   - mariadb:10.1
   script:
