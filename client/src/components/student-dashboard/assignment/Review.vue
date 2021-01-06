@@ -105,7 +105,12 @@
                 <br />
 
                 <!--Form, load only when answers are available-->
-                <b-card v-if="answers" no-body class="mt-3">
+                <b-card
+                    v-if="answers"
+                    no-body
+                    class="mt-3"
+                    :style="viewPDFNextToQuestionnaire ? 'max-height: 1000px; overflow-y: auto' : ''"
+                >
                     <!--Title-->
                     <b-card-body v-if="!reviewsAreReadOnly">
                         <h4>Assignment Questionnaire</h4>
