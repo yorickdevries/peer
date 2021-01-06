@@ -132,12 +132,12 @@
         <!--Form, load only when answers are available-->
         <b-card v-if="answers" no-body class="mt-3">
             <!--Title-->
-            <b-card-body v-if="userIsOwner && !reviewsAreReadOnly">
+            <b-card-header v-if="userIsOwner && !reviewsAreReadOnly">
                 <h4>Review Evaluation</h4>
                 <h6 class="card-subtitle text-muted">
                     Evaluate the review you have gotten from one of your peers here.
                 </h6>
-            </b-card-body>
+            </b-card-header>
 
             <!--Question Information-->
             <b-card v-for="question in questionnaire.questions" :key="question.id" class="mb-3" no-body>
