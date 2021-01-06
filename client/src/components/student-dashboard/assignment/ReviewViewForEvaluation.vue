@@ -37,275 +37,298 @@
                 </dl>
             </b-col>
         </b-row>
+
         <b-row>
-            <b-col>
+            <b-col :cols="columnWidthPDFAndQuestionnaire">
+                <!--Toggle side by side view-->
+                <b-button @click="toggleViewPDFNextToQuestionnaire()">
+                    {{ viewPDFNextToQuestionnaire ? "Stop viewing" : "View" }} PDF next to questionnaire
+                </b-button>
+                <br />
+                <br />
                 <PDFAnnotator
                     v-if="viewPDF && fileMetadata.extension === '.pdf'"
                     :reviewId="review.id"
-                    :readOnly="false"
+                    :readOnly="reviewsAreReadOnly"
                 ></PDFAnnotator>
             </b-col>
-        </b-row>
-        <br />
-        <template v-if="!reviewsAreReadOnly">
-            <!--Save/Submit Buttons-->
-            <b-card-body>
-                <div>
-                    <b-form-checkbox
-                        :disabled="review.submitted"
-                        v-model="review.flaggedByReviewer"
-                        name="reportButton"
-                        class="float-left"
-                    >
-                        Report this submission.
-                    </b-form-checkbox>
-                    <br />
-                    <small>Only report if the submission is empty or not serious.</small>
-                </div>
-                <b-button
-                    v-if="!review.submitted"
-                    variant="success float-right"
-                    type="submit"
-                    v-b-modal="`submit${review.id}`"
-                    :disabled="buttonDisabled"
-                    >Submit Review</b-button
+            <b-col :cols="columnWidthPDFAndQuestionnaire">
+                <template v-if="!reviewsAreReadOnly">
+                    <!--Save/Submit Buttons-->
+                    <b-card-body>
+                        <div>
+                            <b-form-checkbox
+                                :disabled="review.submitted"
+                                v-model="review.flaggedByReviewer"
+                                name="reportButton"
+                                class="float-left"
+                            >
+                                Report this submission.
+                            </b-form-checkbox>
+                            <br />
+                            <small>Only report if the submission is empty or not serious.</small>
+                        </div>
+                        <b-button
+                            v-if="!review.submitted"
+                            variant="success float-right"
+                            type="submit"
+                            v-b-modal="`submit${review.id}`"
+                            :disabled="buttonDisabled"
+                            >Submit Review</b-button
+                        >
+                        <b-button
+                            v-else
+                            variant="outline-success float-right"
+                            @click="unSubmitReview"
+                            :disabled="buttonDisabled"
+                            >Unsubmit Review</b-button
+                        >
+                        <b-button
+                            v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                            variant="info float-right"
+                            @click="saveAllAnswers"
+                            :disabled="buttonDisabled"
+                            >Save all unsaved answers</b-button
+                        >
+                    </b-card-body>
+                </template>
+                <br />
+
+                <!--Form, load only when answers are available-->
+                <b-card
+                    v-if="answers"
+                    no-body
+                    class="mt-3"
+                    :style="viewPDFNextToQuestionnaire ? 'max-height: 1000px; overflow-y: auto' : ''"
                 >
-                <b-button
-                    v-else
-                    variant="outline-success float-right"
-                    @click="unSubmitReview"
-                    :disabled="buttonDisabled"
-                    >Unsubmit Review</b-button
-                >
-                <b-button
-                    v-if="questionNumbersOfUnsavedAnswers.length > 0"
-                    variant="info float-right"
-                    @click="saveAllAnswers"
-                    :disabled="buttonDisabled"
-                    >Save all unsaved answers</b-button
-                >
-            </b-card-body>
-        </template>
-        <br />
+                    <!--Title-->
+                    <b-card-body v-if="!reviewsAreReadOnly">
+                        <h4>Assignment Questionnaire</h4>
+                        <h6 class="card-subtitle text-muted">Give the review to one of your peers here.</h6>
+                    </b-card-body>
 
-        <!--Form, load only when answers are available-->
-        <b-card v-if="answers" no-body class="mt-3">
-            <!--Title-->
-            <b-card-body v-if="!reviewsAreReadOnly">
-                <h4>Assignment Questionnaire</h4>
-                <h6 class="card-subtitle text-muted">Give the review to one of your peers here.</h6>
-            </b-card-body>
+                    <!--Question Information-->
+                    <b-card v-for="question in questionnaire.questions" :key="question.id" class="mb-3" no-body>
+                        <b-card-header class="d-flex align-items-center">
+                            <span class="w-100"
+                                >Question {{ question.number }} of {{ questionnaire.questions.length }}</span
+                            >
+                            <b-badge variant="primary" class="ml-2 float-right p-1"
+                                >{{ question.type.toUpperCase() }} QUESTION
+                            </b-badge>
+                            <b-badge pill v-if="question.optional" variant="secondary" class="ml-2 float-right p-1">
+                                OPTIONAL
+                            </b-badge>
+                            <b-badge v-else variant="danger" class="ml-2 float-right p-1">
+                                REQUIRED
+                            </b-badge>
+                        </b-card-header>
 
-            <!--Question Information-->
-            <b-card v-for="question in questionnaire.questions" :key="question.id" class="mb-3" no-body>
-                <b-card-header class="d-flex align-items-center">
-                    <span class="w-100">Question {{ question.number }} of {{ questionnaire.questions.length }}</span>
-                    <b-badge variant="primary" class="ml-2 float-right p-1"
-                        >{{ question.type.toUpperCase() }} QUESTION
-                    </b-badge>
-                    <b-badge pill v-if="question.optional" variant="secondary" class="ml-2 float-right p-1">
-                        OPTIONAL
-                    </b-badge>
-                    <b-badge v-else variant="danger" class="ml-2 float-right p-1">
-                        REQUIRED
-                    </b-badge>
-                </b-card-header>
+                        <b-card-body>
+                            <!-- Text-->
+                            <h4>{{ question.text }}</h4>
 
-                <b-card-body>
-                    <!-- Text-->
-                    <h4>{{ question.text }}</h4>
+                            <!-- OPEN QUESTION -->
+                            <b-form-textarea
+                                v-if="question.type === 'open'"
+                                placeholder="Enter your answer"
+                                :rows="10"
+                                :max-rows="15"
+                                v-model="answers[question.id].answer"
+                                @input="answers[question.id].changed = true"
+                                :readonly="review.submitted || reviewsAreReadOnly"
+                                required
+                            />
 
-                    <!-- OPEN QUESTION -->
-                    <b-form-textarea
-                        v-if="question.type === 'open'"
-                        placeholder="Enter your answer"
-                        :rows="10"
-                        :max-rows="15"
-                        v-model="answers[question.id].answer"
-                        @input="answers[question.id].changed = true"
-                        :readonly="review.submitted || reviewsAreReadOnly"
-                        required
-                    />
+                            <!-- MULTIPLE CHOICE QUESTION -->
+                            <b-form-radio-group
+                                v-if="question.type === 'multiplechoice'"
+                                v-model="answers[question.id].answer"
+                                @input="
+                                    answers[question.id].answer !== null ? (answers[question.id].changed = true) : ''
+                                "
+                                stacked
+                                required
+                                :disabled="review.submitted || reviewsAreReadOnly"
+                            >
+                                <b-form-radio v-for="option in question.options" :key="option.id" :value="option">{{
+                                    option.text
+                                }}</b-form-radio>
+                            </b-form-radio-group>
 
-                    <!-- MULTIPLE CHOICE QUESTION -->
-                    <b-form-radio-group
-                        v-if="question.type === 'multiplechoice'"
-                        v-model="answers[question.id].answer"
-                        @input="answers[question.id].answer !== null ? (answers[question.id].changed = true) : ''"
-                        stacked
-                        required
-                        :disabled="review.submitted || reviewsAreReadOnly"
-                    >
-                        <b-form-radio v-for="option in question.options" :key="option.id" :value="option">{{
-                            option.text
-                        }}</b-form-radio>
-                    </b-form-radio-group>
+                            <!-- CHECKBOX QUESTION -->
+                            <b-form-checkbox-group
+                                v-if="question.type === 'checkbox'"
+                                v-model="answers[question.id].answer"
+                                @input="answers[question.id].changed = true"
+                                stacked
+                                required
+                                :disabled="review.submitted || reviewsAreReadOnly"
+                            >
+                                <b-form-checkbox v-for="option in question.options" :key="option.id" :value="option">{{
+                                    option.text
+                                }}</b-form-checkbox>
+                            </b-form-checkbox-group>
 
-                    <!-- CHECKBOX QUESTION -->
-                    <b-form-checkbox-group
-                        v-if="question.type === 'checkbox'"
-                        v-model="answers[question.id].answer"
-                        @input="answers[question.id].changed = true"
-                        stacked
-                        required
-                        :disabled="review.submitted || reviewsAreReadOnly"
-                    >
-                        <b-form-checkbox v-for="option in question.options" :key="option.id" :value="option">{{
-                            option.text
-                        }}</b-form-checkbox>
-                    </b-form-checkbox-group>
+                            <!-- RANGE QUESTION -->
+                            <StarRating
+                                v-if="question.type === 'range'"
+                                v-model="answers[question.id].answer"
+                                @rating-selected="answers[question.id].changed = true"
+                                class="align-middle"
+                                :border-color="'#007bff'"
+                                :active-color="'#007bff'"
+                                :border-width="2"
+                                :item-size="20"
+                                :spacing="5"
+                                inline
+                                :max-rating="question.range"
+                                :show-rating="true"
+                                :read-only="review.submitted || reviewsAreReadOnly"
+                            />
 
-                    <!-- RANGE QUESTION -->
-                    <StarRating
-                        v-if="question.type === 'range'"
-                        v-model="answers[question.id].answer"
-                        @rating-selected="answers[question.id].changed = true"
-                        class="align-middle"
-                        :border-color="'#007bff'"
-                        :active-color="'#007bff'"
-                        :border-width="2"
-                        :item-size="20"
-                        :spacing="5"
-                        inline
-                        :max-rating="question.range"
-                        :show-rating="true"
-                        :read-only="review.submitted || reviewsAreReadOnly"
-                    />
-
-                    <!-- UPLOAD QUESTION -->
-                    <b-form-group v-if="question.type === 'upload'" class="mb-0">
-                        <b-row v-if="answers[question.id].answer">
-                            <b-col>
-                                <!--Show whether file has been uploaded-->
-                                <b-alert show variant="success" class="p-2"
-                                    >File uploaded:
-                                    <a :href="uploadAnswerFilePath(review.id, question.id)">
-                                        {{ answers[question.id].answer.name
-                                        }}{{ answers[question.id].answer.extension }}
-                                    </a>
+                            <!-- UPLOAD QUESTION -->
+                            <b-form-group v-if="question.type === 'upload'" class="mb-0">
+                                <b-row v-if="answers[question.id].answer">
+                                    <b-col>
+                                        <!--Show whether file has been uploaded-->
+                                        <b-alert show variant="success" class="p-2"
+                                            >File uploaded:
+                                            <a :href="uploadAnswerFilePath(review.id, question.id)">
+                                                {{ answers[question.id].answer.name
+                                                }}{{ answers[question.id].answer.extension }}
+                                            </a>
+                                        </b-alert>
+                                    </b-col>
+                                    <b-col>
+                                        <b-button
+                                            v-if="answers[question.id].answer.extension === '.pdf'"
+                                            v-b-modal="`showPDF-${review.id}-${question.id}`"
+                                        >
+                                            Show PDF
+                                        </b-button>
+                                        <b-modal
+                                            :id="`showPDF-${review.id}-${question.id}`"
+                                            title="PDF"
+                                            size="xl"
+                                            centered
+                                            hide-footer
+                                        >
+                                            <PDFViewer :fileUrl="uploadAnswerFilePath(review.id, question.id)" />
+                                        </b-modal>
+                                    </b-col>
+                                </b-row>
+                                <!--Show note if a file has been uploaded and review not submitted-->
+                                <b-alert v-if="answers[question.id].answer" show variant="secondary" class="p-2"
+                                    >Note: uploading a new file will overwrite your current file. <br />
+                                    Allowed file types: {{ question.extensions }}
                                 </b-alert>
-                            </b-col>
-                            <b-col>
-                                <b-button
-                                    v-if="answers[question.id].answer.extension === '.pdf'"
-                                    v-b-modal="`showPDF-${review.id}-${question.id}`"
+                                <b-alert v-else show variant="warning" class="p-2">
+                                    Currently, no file has been uploaded. <br />
+                                    Allowed file types: {{ question.extensions }}
+                                </b-alert>
+                                <b-form-file
+                                    placeholder="Choose a new file..."
+                                    v-model="answers[question.id].newAnswer"
+                                    :state="Boolean(answers[question.id].newAnswer)"
+                                    @input="answers[question.id].changed = Boolean(answers[question.id].newAnswer)"
+                                    :accept="`${question.extensions}`"
+                                    :disabled="review.submitted || reviewsAreReadOnly"
                                 >
-                                    Show PDF
-                                </b-button>
-                                <b-modal
-                                    :id="`showPDF-${review.id}-${question.id}`"
-                                    title="PDF"
-                                    size="xl"
-                                    centered
-                                    hide-footer
+                                </b-form-file>
+                            </b-form-group>
+
+                            <br />
+                            <!--Delete / Save Button-->
+                            <b-button
+                                :variant="(answers[question.id].exists ? 'danger' : 'outline-danger') + ' float-right'"
+                                :disabled="!answers[question.id].exists || review.submitted || buttonDisabled"
+                                @click="deleteAnswer(question, answers[question.id])"
+                                >Delete Answer</b-button
+                            >
+                            <b-button
+                                :variant="
+                                    (answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'
+                                "
+                                :disabled="!answers[question.id].changed || review.submitted || buttonDisabled"
+                                @click="saveAnswer(question, answers[question.id])"
+                                >Save Answer</b-button
+                            >
+                        </b-card-body>
+                    </b-card>
+
+                    <template v-if="!reviewsAreReadOnly">
+                        <!--Save/Submit Buttons-->
+                        <b-card-body>
+                            <div>
+                                <b-form-checkbox
+                                    :disabled="review.submitted"
+                                    v-model="review.flaggedByReviewer"
+                                    name="reportButton"
+                                    class="float-left"
                                 >
-                                    <PDFViewer :fileUrl="uploadAnswerFilePath(review.id, question.id)" />
-                                </b-modal>
-                            </b-col>
-                        </b-row>
-                        <!--Show note if a file has been uploaded and review not submitted-->
-                        <b-alert v-if="answers[question.id].answer" show variant="secondary" class="p-2"
-                            >Note: uploading a new file will overwrite your current file. <br />
-                            Allowed file types: {{ question.extensions }}
-                        </b-alert>
-                        <b-alert v-else show variant="warning" class="p-2">
-                            Currently, no file has been uploaded. <br />
-                            Allowed file types: {{ question.extensions }}
-                        </b-alert>
-                        <b-form-file
-                            placeholder="Choose a new file..."
-                            v-model="answers[question.id].newAnswer"
-                            :state="Boolean(answers[question.id].newAnswer)"
-                            @input="answers[question.id].changed = Boolean(answers[question.id].newAnswer)"
-                            :accept="`${question.extensions}`"
-                            :disabled="review.submitted || reviewsAreReadOnly"
-                        >
-                        </b-form-file>
-                    </b-form-group>
-
-                    <br />
-                    <!--Delete / Save Button-->
-                    <b-button
-                        :variant="(answers[question.id].exists ? 'danger' : 'outline-danger') + ' float-right'"
-                        :disabled="!answers[question.id].exists || review.submitted || buttonDisabled"
-                        @click="deleteAnswer(question, answers[question.id])"
-                        >Delete Answer</b-button
-                    >
-                    <b-button
-                        :variant="(answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'"
-                        :disabled="!answers[question.id].changed || review.submitted || buttonDisabled"
-                        @click="saveAnswer(question, answers[question.id])"
-                        >Save Answer</b-button
-                    >
-                </b-card-body>
-            </b-card>
-
-            <template v-if="!reviewsAreReadOnly">
-                <!--Save/Submit Buttons-->
-                <b-card-body>
-                    <div>
-                        <b-form-checkbox
-                            :disabled="review.submitted"
-                            v-model="review.flaggedByReviewer"
-                            name="reportButton"
-                            class="float-left"
-                        >
-                            Report this submission.
-                        </b-form-checkbox>
-                        <br />
-                        <small>Only report if the submission is empty or not serious.</small>
-                    </div>
-                    <b-button
-                        v-if="!review.submitted"
-                        variant="success float-right"
-                        type="submit"
-                        v-b-modal="`submit${review.id}`"
-                        :disabled="buttonDisabled"
-                        >Submit Review</b-button
-                    >
-                    <b-button
-                        v-else
-                        variant="outline-success float-right"
-                        @click="unSubmitReview"
-                        :disabled="buttonDisabled"
-                        >Unsubmit Review</b-button
-                    >
-                    <b-button
-                        v-if="questionNumbersOfUnsavedAnswers.length > 0"
-                        variant="info float-right"
-                        @click="saveAllAnswers"
-                        :disabled="buttonDisabled"
-                        >Save all unsaved answers</b-button
-                    >
-                    <!--Submit Modal-->
-                    <b-modal
-                        :id="`submit${review.id}`"
-                        title="Submit Confirmation"
-                        :ok-disabled="
-                            buttonDisabled ||
-                                (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 &&
-                                    !review.flaggedByReviewer)
-                        "
-                        @ok="submitReview"
-                    >
-                        <b-alert v-if="questionNumbersOfUnsavedAnswers.length > 0" show variant="warning" class="p-2"
-                            >There are one or more unsaved answers for the following questions:
-                            {{ questionNumbersOfUnsavedAnswers }}</b-alert
-                        >
-                        <b-alert
-                            v-if="questionNumbersOfUnansweredNonOptionalQuestions.length > 0"
-                            show
-                            variant="danger"
-                            class="p-2"
-                            >There are one or more answers missing for the following non-optional questions:
-                            {{ questionNumbersOfUnansweredNonOptionalQuestions }}</b-alert
-                        >
-                        Do you really want to submit? This marks the review as finished and all unsaved changes will be
-                        discarded.
-                    </b-modal>
-                </b-card-body>
-            </template>
-        </b-card>
+                                    Report this submission.
+                                </b-form-checkbox>
+                                <br />
+                                <small>Only report if the submission is empty or not serious.</small>
+                            </div>
+                            <b-button
+                                v-if="!review.submitted"
+                                variant="success float-right"
+                                type="submit"
+                                v-b-modal="`submit${review.id}`"
+                                :disabled="buttonDisabled"
+                                >Submit Review</b-button
+                            >
+                            <b-button
+                                v-else
+                                variant="outline-success float-right"
+                                @click="unSubmitReview"
+                                :disabled="buttonDisabled"
+                                >Unsubmit Review</b-button
+                            >
+                            <b-button
+                                v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                                variant="info float-right"
+                                @click="saveAllAnswers"
+                                :disabled="buttonDisabled"
+                                >Save all unsaved answers</b-button
+                            >
+                            <!--Submit Modal-->
+                            <b-modal
+                                :id="`submit${review.id}`"
+                                title="Submit Confirmation"
+                                :ok-disabled="
+                                    buttonDisabled ||
+                                        (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 &&
+                                            !review.flaggedByReviewer)
+                                "
+                                @ok="submitReview"
+                            >
+                                <b-alert
+                                    v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                                    show
+                                    variant="warning"
+                                    class="p-2"
+                                    >There are one or more unsaved answers for the following questions:
+                                    {{ questionNumbersOfUnsavedAnswers }}</b-alert
+                                >
+                                <b-alert
+                                    v-if="questionNumbersOfUnansweredNonOptionalQuestions.length > 0"
+                                    show
+                                    variant="danger"
+                                    class="p-2"
+                                    >There are one or more answers missing for the following non-optional questions:
+                                    {{ questionNumbersOfUnansweredNonOptionalQuestions }}</b-alert
+                                >
+                                Do you really want to submit? This marks the review as finished and all unsaved changes
+                                will be discarded.
+                            </b-modal>
+                        </b-card-body>
+                    </template>
+                </b-card>
+            </b-col>
+        </b-row>
     </div>
 </template>
 
@@ -331,10 +354,21 @@ export default {
             // all answers will be saved in this object
             answers: null,
             // disable save/delete buttons when a call is busy
-            buttonDisabled: false
+            buttonDisabled: false,
+            // View PDF next to questionnaire
+            viewPDFNextToQuestionnaire: false
         }
     },
     computed: {
+        columnWidthPDFAndQuestionnaire() {
+            if (this.viewPDFNextToQuestionnaire) {
+                // columns are half width
+                return 6
+            } else {
+                // columns are full width
+                return 12
+            }
+        },
         questionNumbersOfUnsavedAnswers() {
             const questionNumbersOfUnsavedAnswers = []
             if (!this.answers) {
@@ -571,6 +605,9 @@ export default {
         },
         uploadAnswerFilePath(reviewId, questionId) {
             return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`
+        },
+        toggleViewPDFNextToQuestionnaire() {
+            this.viewPDFNextToQuestionnaire = !this.viewPDFNextToQuestionnaire
         }
     }
 }
