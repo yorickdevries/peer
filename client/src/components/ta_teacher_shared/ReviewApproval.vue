@@ -79,7 +79,7 @@
                                 hide-footer
                             >
                                 <ReviewEvaluation
-                                    :feedbackReviewId="reviewId"
+                                    :feedbackReviewId="review.id"
                                     :reviewsAreReadOnly="true"
                                 ></ReviewEvaluation>
                             </b-modal>
