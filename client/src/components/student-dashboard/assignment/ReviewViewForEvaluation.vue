@@ -256,77 +256,47 @@
                             >
                         </b-card-body>
                     </b-card>
-
-                    <template v-if="!reviewsAreReadOnly">
-                        <!--Save/Submit Buttons-->
-                        <b-card-body>
-                            <div>
-                                <b-form-checkbox
-                                    :disabled="review.submitted"
-                                    v-model="review.flaggedByReviewer"
-                                    name="reportButton"
-                                    class="float-left"
-                                >
-                                    Report this submission.
-                                </b-form-checkbox>
-                                <br />
-                                <small>Only report if the submission is empty or not serious.</small>
-                            </div>
-                            <b-button
-                                v-if="!review.submitted"
-                                variant="success float-right"
-                                type="submit"
-                                v-b-modal="`submit${review.id}`"
-                                :disabled="buttonDisabled"
-                                >Submit Review</b-button
-                            >
-                            <b-button
-                                v-else
-                                variant="outline-success float-right"
-                                @click="unSubmitReview"
-                                :disabled="buttonDisabled"
-                                >Unsubmit Review</b-button
-                            >
-                            <b-button
-                                v-if="questionNumbersOfUnsavedAnswers.length > 0"
-                                variant="info float-right"
-                                @click="saveAllAnswers"
-                                :disabled="buttonDisabled"
-                                >Save all unsaved answers</b-button
-                            >
-                            <!--Submit Modal-->
-                            <b-modal
-                                :id="`submit${review.id}`"
-                                title="Submit Confirmation"
-                                :ok-disabled="
-                                    buttonDisabled ||
-                                        (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 &&
-                                            !review.flaggedByReviewer)
-                                "
-                                @ok="submitReview"
-                            >
-                                <b-alert
-                                    v-if="questionNumbersOfUnsavedAnswers.length > 0"
-                                    show
-                                    variant="warning"
-                                    class="p-2"
-                                    >There are one or more unsaved answers for the following questions:
-                                    {{ questionNumbersOfUnsavedAnswers }}</b-alert
-                                >
-                                <b-alert
-                                    v-if="questionNumbersOfUnansweredNonOptionalQuestions.length > 0"
-                                    show
-                                    variant="danger"
-                                    class="p-2"
-                                    >There are one or more answers missing for the following non-optional questions:
-                                    {{ questionNumbersOfUnansweredNonOptionalQuestions }}</b-alert
-                                >
-                                Do you really want to submit? This marks the review as finished and all unsaved changes
-                                will be discarded.
-                            </b-modal>
-                        </b-card-body>
-                    </template>
                 </b-card>
+
+                <template v-if="!reviewsAreReadOnly">
+                    <!--Save/Submit Buttons-->
+                    <b-card-body>
+                        <div>
+                            <b-form-checkbox
+                                :disabled="review.submitted"
+                                v-model="review.flaggedByReviewer"
+                                name="reportButton"
+                                class="float-left"
+                            >
+                                Report this submission.
+                            </b-form-checkbox>
+                            <br />
+                            <small>Only report if the submission is empty or not serious.</small>
+                        </div>
+                        <b-button
+                            v-if="!review.submitted"
+                            variant="success float-right"
+                            type="submit"
+                            v-b-modal="`submit${review.id}`"
+                            :disabled="buttonDisabled"
+                            >Submit Review</b-button
+                        >
+                        <b-button
+                            v-else
+                            variant="outline-success float-right"
+                            @click="unSubmitReview"
+                            :disabled="buttonDisabled"
+                            >Unsubmit Review</b-button
+                        >
+                        <b-button
+                            v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                            variant="info float-right"
+                            @click="saveAllAnswers"
+                            :disabled="buttonDisabled"
+                            >Save all unsaved answers</b-button
+                        >
+                    </b-card-body>
+                </template>
             </b-col>
         </b-row>
     </div>
