@@ -1,5 +1,5 @@
 <template>
-    <b-container>
+    <b-container fluid>
         <b-row>
             <b-col>
                 <BreadcrumbTitle :items="['Assignments', assignment.name]" class="mt-3" />
