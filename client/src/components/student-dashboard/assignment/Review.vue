@@ -43,7 +43,7 @@
                 <b-button v-b-modal="`reviewModal${review.id}`" variant="warning" class="w-100" style="height: 3rem"
                     >Show Review Evaluation</b-button
                 >
-                <b-modal :title="`Review (ID: ${review.id})`" :id="`reviewModal${review.id}`" size="lg" hide-footer>
+                <b-modal :title="`Review (ID: ${review.id})`" :id="`reviewModal${review.id}`" size="xl" hide-footer>
                     <ReviewEvaluation :feedbackReviewId="reviewId" :reviewsAreReadOnly="true"></ReviewEvaluation>
                 </b-modal>
             </b-col>
