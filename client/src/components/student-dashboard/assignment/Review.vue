@@ -48,16 +48,21 @@
                 </b-modal>
             </b-col>
         </b-row>
-
         <b-row>
-            <b-col>
+            <b-col :cols="columnWidthPDFAndQuestionnaire">
+                <!--Toggle side by side view-->
+                <b-button @click="toggleViewPDFNextToQuestionnaire()">
+                    {{ viewPDFNextToQuestionnaire ? "Stop viewing" : "View" }} PDF next to questionnaire
+                </b-button>
+                <br />
+                <br />
                 <PDFAnnotator
                     v-if="viewPDF && fileMetadata.extension === '.pdf'"
                     :reviewId="review.id"
                     :readOnly="reviewsAreReadOnly"
                 ></PDFAnnotator>
             </b-col>
-            <b-col>
+            <b-col :cols="columnWidthPDFAndQuestionnaire">
                 <template v-if="!reviewsAreReadOnly">
                     <!--Save/Submit Buttons-->
                     <b-card-body>
@@ -356,10 +361,21 @@ export default {
             // all answers will be saved in this object
             answers: null,
             // disable save/delete buttons when a call is busy
-            buttonDisabled: false
+            buttonDisabled: false,
+            // View PDF next to questionnaire
+            viewPDFNextToQuestionnaire: false
         }
     },
     computed: {
+        columnWidthPDFAndQuestionnaire() {
+            if (this.viewPDFNextToQuestionnaire) {
+                // columns are half width
+                return 6
+            } else {
+                // columns are full width
+                return 12
+            }
+        },
         questionNumbersOfUnsavedAnswers() {
             const questionNumbersOfUnsavedAnswers = []
             if (!this.answers) {
@@ -606,6 +622,9 @@ export default {
         },
         uploadAnswerFilePath(reviewId, questionId) {
             return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`
+        },
+        toggleViewPDFNextToQuestionnaire() {
+            this.viewPDFNextToQuestionnaire = !this.viewPDFNextToQuestionnaire
         }
     }
 }
