@@ -48,6 +48,7 @@
                 </b-modal>
             </b-col>
         </b-row>
+        <br />
         <b-row>
             <b-col :cols="columnWidthPDFAndQuestionnaire">
                 <!--Toggle side by side view-->
