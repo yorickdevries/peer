@@ -102,10 +102,10 @@
                     :style="viewPDFNextToQuestionnaire ? 'max-height: 1000px; overflow-y: auto' : ''"
                 >
                     <!--Title-->
-                    <b-card-body v-if="!reviewsAreReadOnly">
+                    <b-card-header v-if="!reviewsAreReadOnly">
                         <h4>Assignment Questionnaire</h4>
                         <h6 class="card-subtitle text-muted">Give the review to one of your peers here.</h6>
-                    </b-card-body>
+                    </b-card-header>
 
                     <!--Question Information-->
                     <b-card v-for="question in questionnaire.questions" :key="question.id" class="mb-3" no-body>
