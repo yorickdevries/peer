@@ -14,7 +14,7 @@
                 <b-modal
                     :title="`Review (ID: ${feedbackReviewId})`"
                     :id="`reviewModal${feedbackReviewId}`"
-                    size="lg"
+                    size="xl"
                     hide-footer
                 >
                     <b-alert variant="info" show>
