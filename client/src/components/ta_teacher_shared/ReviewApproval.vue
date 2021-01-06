@@ -97,7 +97,7 @@
                             <PDFAnnotator
                                 v-if="viewPDF && fileMetadata.extension === '.pdf'"
                                 :reviewId="review.id"
-                                :readOnly="reviewsAreReadOnly"
+                                :readOnly="true"
                             ></PDFAnnotator>
                         </b-col>
                         <b-col :cols="columnWidthPDFAndQuestionnaire">
