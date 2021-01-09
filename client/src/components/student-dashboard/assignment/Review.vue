@@ -50,18 +50,14 @@
         </b-row>
         <br />
         <b-row>
-            <b-col :cols="columnWidthPDFAndQuestionnaire">
+            <b-col :cols="columnWidthPDFAndQuestionnaire" v-if="viewPDF && fileMetadata.extension === '.pdf'">
                 <!--Toggle side by side view-->
                 <b-button @click="toggleViewPDFNextToQuestionnaire()">
                     {{ viewPDFNextToQuestionnaire ? "Stop viewing" : "View" }} PDF next to questionnaire
                 </b-button>
                 <br />
                 <br />
-                <PDFAnnotator
-                    v-if="viewPDF && fileMetadata.extension === '.pdf'"
-                    :reviewId="review.id"
-                    :readOnly="reviewsAreReadOnly"
-                ></PDFAnnotator>
+                <PDFAnnotator :reviewId="review.id" :readOnly="reviewsAreReadOnly"></PDFAnnotator>
             </b-col>
             <b-col :cols="columnWidthPDFAndQuestionnaire">
                 <template v-if="!reviewsAreReadOnly">
