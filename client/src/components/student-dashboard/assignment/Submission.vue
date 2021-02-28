@@ -80,7 +80,12 @@
                                     <dd v-if="row.item.approvalByTA === false">Disapproved 👎</dd>
                                     <dd v-if="row.item.approvalByTA === null">No action yet by any TA.</dd>
                                     <dt>Current TA Comment</dt>
-                                    <dd>{{ row.item.commentByTA }}</dd>
+                                    <b-form-textarea
+                                        :rows="10"
+                                        :max-rows="15"
+                                        v-model="row.item.commentByTA"
+                                        readonly
+                                    />
                                 </b-card>
                             </template>
                         </b-table>
