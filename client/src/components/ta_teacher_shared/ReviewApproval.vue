@@ -40,7 +40,6 @@
                                 </dl>
                             </div>
                         </b-col>
-
                         <!--Approval-->
                         <b-col cols="6">
                             <dl>
@@ -287,6 +286,23 @@
                                             >Comment changed, please don't forget to set approval to save</b-alert
                                         >
                                     </dl>
+                                </div>
+                            </b-card>
+                            <!--Submission Approval-->
+                            <b-card>
+                                <div>
+                                    <dt>Submission approval</dt>
+                                    <!-- note: the name needs to be different for TAs-->
+                                    <b-button
+                                        variant="primary"
+                                        :to="{
+                                            name: $router.currentRoute.name.includes('teacher')
+                                                ? 'teacher-dashboard.assignments.assignment.submission'
+                                                : 'teaching-assistant-dashboard.course.assignment.submission',
+                                            params: { submissionId: review.submission.id }
+                                        }"
+                                        >Show submission approval</b-button
+                                    >
                                 </div>
                             </b-card>
                         </b-col>
