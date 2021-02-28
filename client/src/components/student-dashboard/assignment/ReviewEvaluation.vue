@@ -83,7 +83,7 @@
                     <dd v-if="review.approvalByTA === false">Disapproved 👎</dd>
                     <dd v-if="review.approvalByTA === null">No action yet by any TA.</dd>
                     <dt>Current TA Comment</dt>
-                    <dd>{{ review.commentByTA }}</dd>
+                    <b-form-textarea :rows="10" :max-rows="15" v-model="review.commentByTA" readonly />
                 </dl>
             </b-col>
         </b-row>
