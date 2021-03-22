@@ -11,7 +11,7 @@
             while doing a review, you can always download the file with a button above.
             <br />
             <b
-                >NOTE: Altough annotations contain your netid, anonymous annotations will be shown to the reviewed
+                >NOTE: Although annotations contain your netid, anonymous annotations will be shown to the reviewed
                 person.</b
             >
         </b-alert>
