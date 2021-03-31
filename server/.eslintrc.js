@@ -16,5 +16,6 @@ module.exports = {
     "prefer-arrow-callback": "error",
     "@typescript-eslint/no-misused-promises": "error",
     "@typescript-eslint/no-floating-promises": "error",
+    "prettier/prettier": ["error", { "endOfLine": "auto" }],
   },
 };

@@ -6,6 +6,9 @@
         <b-form-group label="Question Text" description="The actual question that the student has to answer.">
             <b-form-textarea v-model="question.text" />
         </b-form-group>
+        <b-form-checkbox id="is-graded-checkbox" v-model="graded" name="is-graded-checkbox">
+            Grade answers
+        </b-form-checkbox>
         <b-form-group
             label="Multiple Choice Options"
             description="Delete, edit and add multiple choice options here. Make sure to save."
@@ -25,6 +28,15 @@
                             <b-button @click="option.delete = false" v-else variant="secondary" size="sm"
                                 >Undo
                             </b-button>
+                            <b-form-spinbutton
+                                v-if="graded"
+                                :id="`sb-inline-${index}`"
+                                v-model="value"
+                                step="0.1"
+                                min="-1"
+                                max="1"
+                                inline
+                            ></b-form-spinbutton>
                         </div>
                     </div>
                 </b-form>
@@ -59,13 +71,15 @@ export default {
     data() {
         return {
             // default question, can be replaced when a questionId is passed
+            graded: false,
             question: {
                 text: "",
                 number: this.questionNumber,
                 optional: false,
                 questionnaireId: this.questionnaireId,
                 options: []
-            }
+            },
+            value: 0.0
         }
     },
     async created() {

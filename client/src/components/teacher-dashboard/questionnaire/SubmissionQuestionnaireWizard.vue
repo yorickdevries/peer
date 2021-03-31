@@ -66,6 +66,9 @@
                             <b-badge v-else variant="danger" class="ml-2 float-right p-1">
                                 REQUIRED
                             </b-badge>
+                            <b-badge variant="secondary" class="ml-2 float-right p-1">
+                                GRADED
+                            </b-badge>
                         </b-card-header>
 
                         <b-card-body>
@@ -84,16 +87,16 @@
 
                             <!-- MULTIPLE CHOICE QUESTION -->
                             <b-form-radio-group v-if="question.type === 'multiplechoice'" stacked required disabled>
-                                <b-form-radio v-for="option in question.options" :key="option.id" :value="option">{{
-                                    option.text
-                                }}</b-form-radio>
+                                <b-form-radio v-for="option in question.options" :key="option.id" :value="option">
+                                    {{ option.text }} <b-badge variant="dark">Points: 0.5</b-badge>
+                                </b-form-radio>
                             </b-form-radio-group>
 
                             <!-- CHECKBOX QUESTION -->
                             <b-form-checkbox-group v-if="question.type === 'checkbox'" stacked required disabled>
-                                <b-form-checkbox v-for="option in question.options" :key="option.id" :value="option">{{
-                                    option.text
-                                }}</b-form-checkbox>
+                                <b-form-checkbox v-for="option in question.options" :key="option.id" :value="option">
+                                    {{ option.text }} <b-badge variant="dark">Points: 0.5</b-badge>
+                                </b-form-checkbox>
                             </b-form-checkbox-group>
 
                             <!-- RANGE QUESTION -->
