@@ -1,5 +1,6 @@
 import QuestionOption from "./QuestionOption";
-import { ChildEntity, ManyToOne, RelationId } from "typeorm";
+import { ChildEntity, ManyToOne, RelationId, Column } from "typeorm";
+import { IsNumber } from "class-validator";
 import QuestionOptionType from "../enum/QuestionOptionType";
 import MultipleChoiceQuestion from "./MultipleChoiceQuestion";
 
@@ -18,11 +19,18 @@ export default class MultipleChoiceQuestionOption extends QuestionOption {
       nullable: false,
     }
   )
+
+  // number of points awarded for this option
+  @Column()
+  @IsNumber()
+  points: number;
+
   question?: MultipleChoiceQuestion;
 
-  constructor(text: string, question: MultipleChoiceQuestion) {
+  constructor(text: string, question: MultipleChoiceQuestion, points: number) {
     super(text);
     this.question = question;
+    this.points = points;
   }
 
   async getQuestion(): Promise<MultipleChoiceQuestion> {
