@@ -12,6 +12,14 @@ import Questionnaire from "../models/Questionnaire";
 import Question from "../models/Question";
 import Extensions from "../enum/Extensions";
 
+interface GradedOption {
+  text: string;
+  points: number;
+}
+
+interface NonGradedOption {
+  text: string;
+}
 interface QuestionTemplate {
   text: string;
   number: number;
@@ -19,7 +27,8 @@ interface QuestionTemplate {
   type: QuestionType;
   range?: number;
   extensions?: Extensions;
-  options?: { text: string }[];
+  options?: GradedOption[] | NonGradedOption[];
+  graded?: boolean;
 }
 
 const templateQuestions: QuestionTemplate[] = [
@@ -30,6 +39,7 @@ const templateQuestions: QuestionTemplate[] = [
     optional: false,
     type: QuestionType.MULTIPLE_CHOICE,
     options: [{ text: "A: Yes" }, { text: "B: No" }],
+    graded: false,
   },
   {
     text: "Was the input factually correct?",
@@ -42,6 +52,7 @@ const templateQuestions: QuestionTemplate[] = [
       { text: "C: No, mostly not" },
       { text: "D: No, not at all" },
     ],
+    graded: false,
   },
   {
     text:
@@ -54,6 +65,7 @@ const templateQuestions: QuestionTemplate[] = [
       { text: "B: Yes, minor mistakes" },
       { text: "C: No" },
     ],
+    graded: false,
   },
   {
     text: "Did the reviewer submit any open feedback (text or pdf)?",
@@ -61,6 +73,7 @@ const templateQuestions: QuestionTemplate[] = [
     optional: false,
     type: QuestionType.MULTIPLE_CHOICE,
     options: [{ text: "A: Yes" }, { text: "B: No" }],
+    graded: false,
   },
   {
     text: "If there was any open feedback, how much?",
@@ -73,6 +86,7 @@ const templateQuestions: QuestionTemplate[] = [
       { text: "C: Much" },
       { text: "D: Not applicable" },
     ],
+    graded: false,
   },
   {
     text:
@@ -85,6 +99,7 @@ const templateQuestions: QuestionTemplate[] = [
       { text: "B: No" },
       { text: "C: Not applicable" },
     ],
+    graded: false,
   },
   {
     text:
@@ -97,6 +112,7 @@ const templateQuestions: QuestionTemplate[] = [
       { text: "B: No" },
       { text: "C: Not applicable" },
     ],
+    graded: false,
   },
   {
     text: "Overall, do you agree with the reviewer's assessment of the work?",
@@ -109,6 +125,7 @@ const templateQuestions: QuestionTemplate[] = [
       { text: "C: No, mostly not" },
       { text: "D: No, not at all" },
     ],
+    graded: false,
   },
   {
     text: "What overall grade would you give the review?",
@@ -145,19 +162,25 @@ const addDefaultReviewEvaluationQuestions = async function (
       for (const questionToCopy of templateQuestions) {
         switch (questionToCopy.type) {
           case QuestionType.CHECKBOX: {
+            const isGraded = Boolean(questionToCopy.graded);
             const question = new CheckboxQuestion(
               questionToCopy.text,
               questionToCopy.number,
               questionToCopy.optional,
-              questionnaire
+              questionnaire,
+              isGraded
             );
             await question.validateOrReject();
             await transactionalEntityManager.save(question);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
+              if (!isGradedInstance(optionToCopy)) {
+                break;
+              }
               const option = new CheckboxQuestionOption(
                 optionToCopy.text,
-                question
+                question,
+                optionToCopy.points
               );
               await option.validateOrReject();
               await transactionalEntityManager.save(option);
@@ -165,19 +188,25 @@ const addDefaultReviewEvaluationQuestions = async function (
             break;
           }
           case QuestionType.MULTIPLE_CHOICE: {
+            const isGraded = Boolean(questionToCopy.graded);
             const question = new MultipleChoiceQuestion(
               questionToCopy.text,
               questionToCopy.number,
               questionToCopy.optional,
-              questionnaire
+              questionnaire,
+              isGraded
             );
             await question.validateOrReject();
             await transactionalEntityManager.save(question);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
+              if (!isGradedInstance(optionToCopy)) {
+                break;
+              }
               const option = new MultipleChoiceQuestionOption(
                 optionToCopy.text,
-                question
+                question,
+                optionToCopy.points
               );
               await option.validateOrReject();
               await transactionalEntityManager.save(option);
@@ -251,37 +280,49 @@ const addCopyOfQuestions = async function (
       }
       for (const questionToCopy of questions) {
         if (questionToCopy instanceof CheckboxQuestion) {
+          const isGraded = Boolean(questionToCopy.graded);
           const question = new CheckboxQuestion(
             questionToCopy.text,
             questionToCopy.number,
             questionToCopy.optional,
-            questionnaire
+            questionnaire,
+            isGraded
           );
           await question.validateOrReject();
           await transactionalEntityManager.save(question);
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           for (const optionToCopy of questionToCopy.options!) {
+            if (!isGradedInstance(optionToCopy)) {
+              break;
+            }
             const option = new CheckboxQuestionOption(
               optionToCopy.text,
-              question
+              question,
+              optionToCopy.points
             );
             await option.validateOrReject();
             await transactionalEntityManager.save(option);
           }
         } else if (questionToCopy instanceof MultipleChoiceQuestion) {
+          const isGraded = Boolean(questionToCopy.graded);
           const question = new MultipleChoiceQuestion(
             questionToCopy.text,
             questionToCopy.number,
             questionToCopy.optional,
-            questionnaire
+            questionnaire,
+            isGraded
           );
           await question.validateOrReject();
           await transactionalEntityManager.save(question);
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           for (const optionToCopy of questionToCopy.options!) {
+            if (!isGradedInstance(optionToCopy)) {
+              break;
+            }
             const option = new MultipleChoiceQuestionOption(
               optionToCopy.text,
-              question
+              question,
+              optionToCopy.points
             );
             await option.validateOrReject();
             await transactionalEntityManager.save(option);
@@ -322,6 +363,12 @@ const addCopyOfQuestions = async function (
     }
   );
   return;
+};
+
+const isGradedInstance = function (
+  obj: NonGradedOption | GradedOption
+): obj is GradedOption {
+  return "points" in obj;
 };
 
 export { addDefaultReviewEvaluationQuestions, addCopyOfQuestions };

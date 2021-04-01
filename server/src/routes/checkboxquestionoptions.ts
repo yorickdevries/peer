@@ -19,6 +19,7 @@ const router = express.Router();
 const questionOptionSchema = Joi.object({
   text: Joi.string().required(),
   checkboxQuestionId: Joi.number().integer().required(),
+  points: Joi.number(),
 });
 // post a questionoption
 router.post("/", validateBody(questionOptionSchema), async (req, res) => {
@@ -58,7 +59,11 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
       .send("The assignment is already in feedback state");
     return;
   }
-  const questionOption = new CheckboxQuestionOption(req.body.text, question);
+  const questionOption = new CheckboxQuestionOption(
+    req.body.text,
+    question,
+    req.body.points
+  );
   await questionOption.save();
   res.send(questionOption);
 });

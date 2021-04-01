@@ -19,6 +19,7 @@ const router = express.Router();
 const questionOptionSchema = Joi.object({
   text: Joi.string().required(),
   multipleChoiceQuestionId: Joi.number().integer().required(),
+  points: Joi.number(),
 });
 // post a question
 router.post("/", validateBody(questionOptionSchema), async (req, res) => {
@@ -62,7 +63,8 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
   }
   const questionOption = new MultipleChoiceQuestionOption(
     req.body.text,
-    question
+    question,
+    req.body.points
   );
   await questionOption.save();
   res.send(questionOption);
