@@ -38,6 +38,18 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
       .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
     return;
   }
+  if (question.graded && req.body.points === undefined) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.NON_GRADED_OPTION_FOR_QUESTION_GRADED);
+    return;
+  }
+  if (!question.graded && req.body.points !== undefined) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.GRADED_OPTION_FOR_NON_QUESTION_GRADED);
+    return;
+  }
   const questionnaire = await question.getQuestionnaire();
   const assignmentVersion = await questionnaire.getAssignmentVersion();
   const assignment = await assignmentVersion.getAssignment();
