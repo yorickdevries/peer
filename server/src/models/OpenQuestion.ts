@@ -11,6 +11,6 @@ export default class OpenQuestion extends Question {
     optional: boolean,
     questionnaire: Questionnaire
   ) {
-    super(text, number, optional, questionnaire);
+    super(text, number, optional, false, questionnaire);
   }
 }

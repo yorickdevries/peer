@@ -1,7 +1,6 @@
 import Questionnaire from "./Questionnaire";
 import Question from "./Question";
-import { ChildEntity, OneToMany, Column } from "typeorm";
-import { IsDefined, IsBoolean } from "class-validator";
+import { ChildEntity, OneToMany } from "typeorm";
 import QuestionType from "../enum/QuestionType";
 import CheckboxQuestionOption from "./CheckboxQuestionOption";
 
@@ -17,21 +16,14 @@ export default class CheckboxQuestion extends Question {
   )
   options!: CheckboxQuestionOption[];
 
-  // is question graded
-  @Column()
-  @IsDefined()
-  @IsBoolean()
-  graded: boolean;
-
   constructor(
     text: string,
     number: number,
     optional: boolean,
-    questionnaire: Questionnaire,
-    graded: boolean
+    graded: boolean,
+    questionnaire: Questionnaire
   ) {
-    super(text, number, optional, questionnaire);
-    this.graded = graded;
+    super(text, number, optional, graded, questionnaire);
   }
 
   containsOption(option: CheckboxQuestionOption): boolean {

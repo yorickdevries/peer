@@ -4,7 +4,13 @@ import {
   Entity,
   TableInheritance,
 } from "typeorm";
-import { IsDefined, IsString, IsNotEmpty } from "class-validator";
+import {
+  IsDefined,
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsNumber,
+} from "class-validator";
 import BaseModel from "./BaseModel";
 import QuestionOptionType from "../enum/QuestionType";
 import Question from "./Question";
@@ -27,11 +33,18 @@ export default abstract class QuestionOption extends BaseModel {
   @IsNotEmpty()
   text: string;
 
+  // number of points awarded for this option
+  @Column("float", { nullable: true, precision: 8, scale: 2 })
+  @IsOptional()
+  @IsNumber()
+  points: number | null;
+
   abstract question?: Question;
 
-  constructor(text: string) {
+  constructor(text: string, points: number | null) {
     super();
     this.text = text;
+    this.points = points;
   }
 
   abstract getQuestion(): Promise<Question>;

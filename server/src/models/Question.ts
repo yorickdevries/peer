@@ -50,6 +50,12 @@ export default abstract class Question extends BaseModel {
   @IsBoolean()
   optional: boolean;
 
+  // is question graded
+  @Column()
+  @IsDefined()
+  @IsBoolean()
+  graded: boolean;
+
   // Rubric_id int NOT NULL,
   @RelationId((question: Question) => question.questionnaire)
   questionnaireId!: number;
@@ -67,12 +73,14 @@ export default abstract class Question extends BaseModel {
     text: string,
     number: number,
     optional: boolean,
+    graded: boolean,
     questionnaire: Questionnaire
   ) {
     super();
     this.text = text;
     this.number = number;
     this.optional = optional;
+    this.graded = graded;
     this.questionnaire = questionnaire;
   }
 

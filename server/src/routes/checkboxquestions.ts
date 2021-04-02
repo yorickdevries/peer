@@ -95,8 +95,8 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
     req.body.text,
     req.body.number,
     req.body.optional,
-    questionnaire,
-    req.body.graded
+    req.body.graded,
+    questionnaire
   );
   await question.save();
   res.send(question);

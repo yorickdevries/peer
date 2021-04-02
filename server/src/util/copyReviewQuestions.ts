@@ -12,14 +12,11 @@ import Questionnaire from "../models/Questionnaire";
 import Question from "../models/Question";
 import Extensions from "../enum/Extensions";
 
-interface GradedOption {
+interface Option {
   text: string;
-  points: number;
+  points?: number;
 }
 
-interface NonGradedOption {
-  text: string;
-}
 interface QuestionTemplate {
   text: string;
   number: number;
@@ -27,8 +24,8 @@ interface QuestionTemplate {
   type: QuestionType;
   range?: number;
   extensions?: Extensions;
-  options?: GradedOption[] | NonGradedOption[];
-  graded?: boolean;
+  options?: Option[];
+  graded: boolean;
 }
 
 const templateQuestions: QuestionTemplate[] = [
@@ -133,6 +130,7 @@ const templateQuestions: QuestionTemplate[] = [
     optional: false,
     type: QuestionType.RANGE,
     range: 10,
+    graded: false,
   },
   {
     text:
@@ -140,6 +138,7 @@ const templateQuestions: QuestionTemplate[] = [
     number: 10,
     optional: false,
     type: QuestionType.OPEN,
+    graded: false,
   },
 ];
 
@@ -162,25 +161,21 @@ const addDefaultReviewEvaluationQuestions = async function (
       for (const questionToCopy of templateQuestions) {
         switch (questionToCopy.type) {
           case QuestionType.CHECKBOX: {
-            const isGraded = Boolean(questionToCopy.graded);
             const question = new CheckboxQuestion(
               questionToCopy.text,
               questionToCopy.number,
               questionToCopy.optional,
-              questionnaire,
-              isGraded
+              questionToCopy.graded,
+              questionnaire
             );
             await question.validateOrReject();
             await transactionalEntityManager.save(question);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
-              if (!isGradedInstance(optionToCopy)) {
-                break;
-              }
               const option = new CheckboxQuestionOption(
                 optionToCopy.text,
                 question,
-                optionToCopy.points
+                optionToCopy.points || null
               );
               await option.validateOrReject();
               await transactionalEntityManager.save(option);
@@ -188,25 +183,21 @@ const addDefaultReviewEvaluationQuestions = async function (
             break;
           }
           case QuestionType.MULTIPLE_CHOICE: {
-            const isGraded = Boolean(questionToCopy.graded);
             const question = new MultipleChoiceQuestion(
               questionToCopy.text,
               questionToCopy.number,
               questionToCopy.optional,
-              questionnaire,
-              isGraded
+              questionToCopy.graded,
+              questionnaire
             );
             await question.validateOrReject();
             await transactionalEntityManager.save(question);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
-              if (!isGradedInstance(optionToCopy)) {
-                break;
-              }
               const option = new MultipleChoiceQuestionOption(
                 optionToCopy.text,
                 question,
-                optionToCopy.points
+                optionToCopy.points || null
               );
               await option.validateOrReject();
               await transactionalEntityManager.save(option);
@@ -280,21 +271,17 @@ const addCopyOfQuestions = async function (
       }
       for (const questionToCopy of questions) {
         if (questionToCopy instanceof CheckboxQuestion) {
-          const isGraded = Boolean(questionToCopy.graded);
           const question = new CheckboxQuestion(
             questionToCopy.text,
             questionToCopy.number,
             questionToCopy.optional,
-            questionnaire,
-            isGraded
+            questionToCopy.graded,
+            questionnaire
           );
           await question.validateOrReject();
           await transactionalEntityManager.save(question);
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           for (const optionToCopy of questionToCopy.options!) {
-            if (!isGradedInstance(optionToCopy)) {
-              break;
-            }
             const option = new CheckboxQuestionOption(
               optionToCopy.text,
               question,
@@ -304,21 +291,17 @@ const addCopyOfQuestions = async function (
             await transactionalEntityManager.save(option);
           }
         } else if (questionToCopy instanceof MultipleChoiceQuestion) {
-          const isGraded = Boolean(questionToCopy.graded);
           const question = new MultipleChoiceQuestion(
             questionToCopy.text,
             questionToCopy.number,
             questionToCopy.optional,
-            questionnaire,
-            isGraded
+            questionToCopy.graded,
+            questionnaire
           );
           await question.validateOrReject();
           await transactionalEntityManager.save(question);
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           for (const optionToCopy of questionToCopy.options!) {
-            if (!isGradedInstance(optionToCopy)) {
-              break;
-            }
             const option = new MultipleChoiceQuestionOption(
               optionToCopy.text,
               question,
@@ -363,12 +346,6 @@ const addCopyOfQuestions = async function (
     }
   );
   return;
-};
-
-const isGradedInstance = function (
-  obj: NonGradedOption | GradedOption
-): obj is GradedOption {
-  return "points" in obj;
 };
 
 export { addDefaultReviewEvaluationQuestions, addCopyOfQuestions };
