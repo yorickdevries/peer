@@ -307,6 +307,7 @@ describe("Integration", () => {
         number: 1,
         optional: true,
         questionnaireId: submissionQuestionnaire.id,
+        graded: false,
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -315,6 +316,7 @@ describe("Integration", () => {
       text: "This is a Checkbox question",
       number: 1,
       optional: true,
+      graded: false,
     });
 
     // post Checkbox question option in the questionnaire
@@ -353,6 +355,7 @@ describe("Integration", () => {
         number: 2,
         optional: true,
         questionnaireId: submissionQuestionnaire.id,
+        graded: false,
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -361,6 +364,7 @@ describe("Integration", () => {
       text: "This is a MC question",
       number: 2,
       optional: true,
+      graded: false,
     });
 
     // post a MC question option in the questionnaire
