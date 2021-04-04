@@ -666,6 +666,9 @@ describe("Integration", () => {
       .patch(
         `/api/reviewquestionnaires/${reviewQuestionnaire.id}/defaultquestions`
       )
+      .send({
+        graded: false,
+      })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
 
