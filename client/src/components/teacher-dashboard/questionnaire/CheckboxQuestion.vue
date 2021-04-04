@@ -64,7 +64,8 @@ export default {
                 number: this.questionNumber,
                 optional: false,
                 questionnaireId: this.questionnaireId,
-                options: []
+                options: [],
+                graded: false
             }
         }
     },
