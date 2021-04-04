@@ -672,6 +672,88 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
 
+    res = await request(server)
+      .post("/api/assignments")
+      .set("cookie", await teacherCookie())
+      .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
+      .field("name", "Example title 2")
+      .field("courseId", course.id)
+      .field("enrollable", true)
+      .field("reviewEvaluation", true)
+      .field("publishDate", new Date("2020-01-05T10:00Z").toISOString())
+      .field("dueDate", new Date("2020-02-01T10:00Z").toISOString())
+      .field("reviewPublishDate", new Date("2020-03-01T10:00Z").toISOString())
+      .field("reviewDueDate", new Date("2020-04-01T10:00Z").toISOString())
+      .field(
+        "reviewEvaluationDueDate",
+        new Date("2020-05-01T10:00Z").toISOString()
+      )
+      .field("description", "Example description")
+      .field("externalLink", "null")
+      .field("submissionExtensions", ".pdf")
+      .field("blockFeedback", true)
+      .field("lateSubmissions", true)
+      .field("lateSubmissionReviews", true)
+      .field("lateReviewEvaluations", false)
+      .field("automaticStateProgression", false);
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const assignment_2 = JSON.parse(res.text);
+    expect(assignment_2).toMatchObject({
+      name: "Example title 2",
+      state: AssignmentState.UNPUBLISHED,
+    });
+
+    // create assignmentversion
+    res = await request(server)
+      .post("/api/assignmentversions/")
+      .send({
+        name: "default 2",
+        assignmentId: assignment_2.id,
+        reviewsPerUserPerAssignmentVersionToReview: 1,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const assignmentVersion_2 = JSON.parse(res.text);
+    expect(assignmentVersion_2).toMatchObject({
+      name: "default 2",
+    });
+
+    // make a reviewquestionnaire
+    res = await request(server)
+      .post("/api/reviewquestionnaires/")
+      .send({
+        assignmentVersionId: assignmentVersion_2.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // get the assignment version including questionnaire
+    res = await request(server)
+      .get(`/api/assignmentversions/${assignmentVersion_2.id}`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const assignmentVersion_2_2 = JSON.parse(res.text);
+
+    // get the questionnaire
+    res = await request(server)
+      .get(
+        `/api/reviewquestionnaires/${assignmentVersion_2_2.reviewQuestionnaireId}`
+      )
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const reviewQuestionnaire_2 = JSON.parse(res.text);
+
+    // add default graded questions to reviewquestionnaire
+    res = await request(server)
+      .patch(
+        `/api/reviewquestionnaires/${reviewQuestionnaire_2.id}/defaultquestions`
+      )
+      .send({
+        graded: true,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
     // publish an assingment for the course
     res = await request(server)
       .patch(`/api/assignments/${assignment.id}/publish`)
