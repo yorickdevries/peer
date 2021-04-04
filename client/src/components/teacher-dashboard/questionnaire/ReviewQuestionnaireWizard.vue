@@ -49,13 +49,19 @@
                                 <div class="text-muted">
                                     Load default review evaluation questions into questionnaire
                                 </div>
-                                <div class="input-group mb-2">
-                                    <div class="input-group-prepend">
+                                <b-input-group>
+                                    <template #prepend>
                                         <b-button variant="primary" @click="defaultQuestions"
                                             >Default questions</b-button
                                         >
-                                    </div>
-                                </div>
+                                        <b-input-group-prepend is-text>
+                                            <input type="checkbox" v-model="gradedDefault" />
+                                        </b-input-group-prepend>
+                                    </template>
+                                    <template #append>
+                                        <b-input-group-text>graded?</b-input-group-text>
+                                    </template>
+                                </b-input-group>
                             </div>
                         </b-col>
                     </b-row>
@@ -179,7 +185,8 @@ export default {
             questionnaire: null,
             // enables copying of a questonnaire to another
             allQuestionnairesOfCourse: [],
-            questionnaireIdToCopyFrom: null
+            questionnaireIdToCopyFrom: null,
+            gradedDefault: false
         }
     },
     computed: {
@@ -267,7 +274,7 @@ export default {
             await this.fetchData()
         },
         async defaultQuestions() {
-            await api.reviewquestionnaires.defaultQuestions(this.questionnaire.id, this.questionnaireIdToCopyFrom)
+            await api.reviewquestionnaires.defaultQuestions(this.questionnaire.id, Boolean(this.gradedDefault))
             this.showSuccessMessage({ message: "succesfully loaded default questions" })
             await this.fetchData()
         }
