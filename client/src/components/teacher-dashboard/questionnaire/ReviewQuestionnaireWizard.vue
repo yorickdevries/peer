@@ -51,15 +51,17 @@
                                 </div>
                                 <b-input-group>
                                     <template #prepend>
-                                        <b-button variant="primary" @click="defaultQuestions"
-                                            >Default questions</b-button
-                                        >
-                                        <b-input-group-prepend is-text>
-                                            <input type="checkbox" v-model="gradedDefault" />
-                                        </b-input-group-prepend>
-                                    </template>
-                                    <template #append>
-                                        <b-input-group-text>graded?</b-input-group-text>
+                                        <b-button v-b-modal.modal-sm variant="primary">Default questions</b-button>
+                                        <b-modal id="modal-sm" size="sm" title="Graded Defaults" @ok="defaultQuestions"
+                                            >Would you like to import graded defaults?
+                                            <b-form-checkbox
+                                                id="graded-defaults"
+                                                v-model="gradedDefault"
+                                                name="graded-defaults"
+                                            >
+                                                Use graded questions
+                                            </b-form-checkbox>
+                                        </b-modal>
                                     </template>
                                 </b-input-group>
                             </div>

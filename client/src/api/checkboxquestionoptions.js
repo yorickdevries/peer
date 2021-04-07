@@ -1,12 +1,15 @@
 import client from "./axiosClient"
 
 export default {
-    post(text, checkboxQuestionId) {
-        const body = { text, checkboxQuestionId }
+    post(option, checkboxQuestionId) {
+        const { text, points } = option
+        const body =
+            points !== undefined ? { text, points: String(points), checkboxQuestionId } : { text, checkboxQuestionId }
         return client.post("checkboxquestionoptions/", body)
     },
-    patch(text, id) {
-        const body = { text }
+    patch(option, id) {
+        const { text, points } = option
+        const body = points !== undefined ? { text, points: String(points) } : { text }
         return client.patch(`checkboxquestionoptions/${id}`, body)
     },
     delete(id) {

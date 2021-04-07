@@ -6,6 +6,9 @@
         <b-form-group label="Question Text" description="The actual question that the student has to answer.">
             <b-form-textarea v-model="question.text" />
         </b-form-group>
+        <b-form-checkbox id="is-graded-checkbox" v-model="question.graded" name="is-graded-checkbox">
+            Grade answers
+        </b-form-checkbox>
         <b-form-group
             label="Multiple Choice Options"
             description="Delete, edit and add checkbox options here. Make sure to save."
@@ -25,6 +28,15 @@
                             <b-button @click="option.delete = false" v-else variant="secondary" size="sm"
                                 >Undo
                             </b-button>
+                            <b-form-spinbutton
+                                v-if="!option.delete && question.graded"
+                                :id="`sb-inline-${index}`"
+                                v-model="option.points"
+                                step="0.1"
+                                min="-1"
+                                max="1"
+                                inline
+                            ></b-form-spinbutton>
                         </div>
                     </div>
                 </b-form>
@@ -72,20 +84,42 @@ export default {
     async created() {
         await this.fetchQuestion()
     },
+    watch: {
+        "question.graded": {
+            handler: function(toGrade) {
+                const questionOptions = this.question.options
+                this.question.options = questionOptions.map(option => {
+                    const { id, text } = option
+                    return toGrade ? { id, text, points: option.points || 0.0 } : { id, text }
+                })
+            }
+        }
+    },
     methods: {
         async fetchQuestion() {
             // load the question in case an id is passed
             if (this.questionId) {
                 const res = await api.checkboxquestions.get(this.questionId)
-                this.question = res.data
+                let loadedQuestion = res.data
+                if (loadedQuestion.graded) {
+                    const formattedQuestion = this.formatGradedOptions(loadedQuestion.options)
+                    loadedQuestion.options = formattedQuestion
+                }
+                this.question = loadedQuestion
             } else {
                 // only add empty options when the question is not fetched from the database
                 this.addEmptyOption()
                 this.addEmptyOption()
             }
         },
+        formatGradedOptions(options) {
+            return options.map(option => {
+                return { id: option.id, text: option.text, points: Number(option.points) }
+            })
+        },
         addEmptyOption() {
-            this.question.options.push({ text: "" })
+            const optionPrototype = this.question.graded ? { text: "", points: 0.0 } : { text: "" }
+            this.question.options.push(optionPrototype)
         },
         markOptionforDeletion(option) {
             if (!option.id) {
@@ -113,13 +147,12 @@ export default {
                 this.question.text,
                 this.question.number,
                 this.question.optional,
-                this.question.questionnaireId
+                this.question.questionnaireId,
+                this.question.graded
             )
-            // save options as well
-            this.questionId = res.data.id
             for (const option of this.question.options) {
                 try {
-                    await api.checkboxquestionoptions.post(option.text, this.questionId)
+                    await api.checkboxquestionoptions.post(option, res.data.id)
                     this.showSuccessMessage({ message: "Successfully created checkbox question option." })
                 } catch {
                     this.showErrorMessage({ message: "failed to create checkbox question option." })
@@ -131,7 +164,8 @@ export default {
                 this.question.id,
                 this.question.text,
                 this.question.number,
-                this.question.optional
+                this.question.optional,
+                this.question.graded
             )
             for (const option of this.question.options) {
                 try {
@@ -141,11 +175,11 @@ export default {
                             await api.checkboxquestionoptions.delete(option.id)
                         } else {
                             // just patch the option text
-                            await api.checkboxquestionoptions.patch(option.text, option.id)
+                            await api.checkboxquestionoptions.patch(option, option.id)
                         }
                     } else {
                         // create the option
-                        await api.checkboxquestionoptions.post(option.text, this.question.id)
+                        await api.checkboxquestionoptions.post(option, this.question.id)
                     }
                     this.showSuccessMessage({ message: "Successfully saved checkbox question option." })
                 } catch {

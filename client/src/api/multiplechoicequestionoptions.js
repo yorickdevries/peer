@@ -1,12 +1,17 @@
 import client from "./axiosClient"
 
 export default {
-    post(text, multipleChoiceQuestionId) {
-        const body = { text, multipleChoiceQuestionId }
+    post(option, multipleChoiceQuestionId) {
+        const { text, points } = option
+        const body =
+            points !== undefined
+                ? { text, points: String(points), multipleChoiceQuestionId }
+                : { text, multipleChoiceQuestionId }
         return client.post("multiplechoicequestionoptions/", body)
     },
-    patch(text, id) {
-        const body = { text }
+    patch(option, id) {
+        const { text, points } = option
+        const body = points !== undefined ? { text, points: String(points) } : { text }
         return client.patch(`multiplechoicequestionoptions/${id}`, body)
     },
     delete(id) {

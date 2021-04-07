@@ -19,7 +19,9 @@ const router = express.Router();
 const questionOptionSchema = Joi.object({
   text: Joi.string().required(),
   checkboxQuestionId: Joi.number().integer().required(),
-  points: Joi.number(),
+  points: Joi.string()
+    .trim()
+    .regex(/[+-]?([0-9]*[.])?[0-9]+/),
 });
 // post a questionoption
 router.post("/", validateBody(questionOptionSchema), async (req, res) => {
@@ -74,7 +76,7 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
   const questionOption = new CheckboxQuestionOption(
     req.body.text,
     question,
-    req.body.points
+    Number(req.body.points)
   );
   await questionOption.save();
   res.send(questionOption);
@@ -83,6 +85,9 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
 // Joi inputvalidation
 const questionPatchSchema = Joi.object({
   text: Joi.string().required(),
+  points: Joi.string()
+    .trim()
+    .regex(/[+-]?([0-9]*[.])?[0-9]+/),
 });
 // patch a questionoption
 router.patch(
@@ -133,6 +138,9 @@ router.patch(
       return;
     }
     questionOption.text = req.body.text;
+    if (req.body.points) {
+      questionOption.points = Number(req.body.points);
+    }
     await questionOption.save();
     res.send(questionOption);
   }

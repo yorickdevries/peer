@@ -6,7 +6,7 @@
         <b-form-group label="Question Text" description="The actual question that the student has to answer.">
             <b-form-textarea v-model="question.text" />
         </b-form-group>
-        <b-form-checkbox id="is-graded-checkbox" v-model="graded" name="is-graded-checkbox">
+        <b-form-checkbox id="is-graded-checkbox" v-model="question.graded" name="is-graded-checkbox">
             Grade answers
         </b-form-checkbox>
         <b-form-group
@@ -29,9 +29,9 @@
                                 >Undo
                             </b-button>
                             <b-form-spinbutton
-                                v-if="graded"
+                                v-if="!option.delete && question.graded"
                                 :id="`sb-inline-${index}`"
-                                v-model="value"
+                                v-model="option.points"
                                 step="0.1"
                                 min="-1"
                                 max="1"
@@ -71,7 +71,6 @@ export default {
     data() {
         return {
             // default question, can be replaced when a questionId is passed
-            graded: false,
             question: {
                 text: "",
                 number: this.questionNumber,
@@ -79,27 +78,48 @@ export default {
                 questionnaireId: this.questionnaireId,
                 options: [],
                 graded: false
-            },
-            value: 0.0
+            }
         }
     },
     async created() {
         await this.fetchQuestion()
+    },
+    watch: {
+        "question.graded": {
+            handler: function(toGrade) {
+                const questionOptions = this.question.options
+                this.question.options = questionOptions.map(option => {
+                    const { id, text } = option
+                    return toGrade ? { id, text, points: option.points || 0.0 } : { id, text }
+                })
+            }
+        }
     },
     methods: {
         async fetchQuestion() {
             // load the question in case an id is passed
             if (this.questionId) {
                 const res = await api.multiplechoicequestions.get(this.questionId)
-                this.question = res.data
+                let loadedQuestion = res.data
+                if (loadedQuestion.graded) {
+                    const formattedQuestion = this.formatGradedOptions(loadedQuestion.options)
+                    loadedQuestion.options = formattedQuestion
+                }
+                this.question = loadedQuestion
             } else {
                 // only add empty options when the question is not fetched from the database
                 this.addEmptyOption()
                 this.addEmptyOption()
             }
         },
+        formatGradedOptions(options) {
+            return options.map(option => {
+                return { id: option.id, text: option.text, points: Number(option.points) }
+            })
+        },
         addEmptyOption() {
-            this.question.options.push({ text: "" })
+            const optionPrototype = this.question.graded ? { text: "", points: 0.0 } : { text: "" }
+            this.question.options.push(optionPrototype)
         },
         markOptionforDeletion(option) {
             if (!option.id) {
@@ -127,13 +147,12 @@ export default {
                 this.question.text,
                 this.question.number,
                 this.question.optional,
-                this.question.questionnaireId
+                this.question.questionnaireId,
+                this.question.graded
             )
-            // save options as well
-            this.questionId = res.data.id
             for (const option of this.question.options) {
                 try {
-                    await api.multiplechoicequestionoptions.post(option.text, this.questionId)
+                    await api.multiplechoicequestionoptions.post(option, res.data.id)
                     this.showSuccessMessage({ message: "Successfully created multiple choice question option." })
                 } catch {
                     this.showErrorMessage({ message: "failed to create multiple choice question option." })
@@ -145,7 +164,8 @@ export default {
                 this.question.id,
                 this.question.text,
                 this.question.number,
-                this.question.optional
+                this.question.optional,
+                this.question.graded
             )
             for (const option of this.question.options) {
                 try {
@@ -155,11 +175,11 @@ export default {
                             await api.multiplechoicequestionoptions.delete(option.id)
                         } else {
                             // just patch the option text
-                            await api.multiplechoicequestionoptions.patch(option.text, option.id)
+                            await api.multiplechoicequestionoptions.patch(option, option.id)
                         }
                     } else {
                         // create the option
-                        await api.multiplechoicequestionoptions.post(option.text, this.question.id)
+                        await api.multiplechoicequestionoptions.post(option, this.question.id)
                     }
                     this.showSuccessMessage({ message: "Successfully saved multiple choice question option." })
                 } catch {

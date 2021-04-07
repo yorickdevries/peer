@@ -42,7 +42,18 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     return;
   }
   const sortedOptions = _.sortBy(question.options, "text");
-  question.options = sortedOptions;
+  if (question.graded) {
+    question.options = sortedOptions.map((option) => {
+      return {
+        id: option.id,
+        text: option.text,
+        points: String(option.points),
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any;
+  } else {
+    question.options = sortedOptions;
+  }
   res.send(question);
 });
 
@@ -107,6 +118,7 @@ const questionPatchSchema = Joi.object({
   text: Joi.string().required(),
   number: Joi.number().integer().required(),
   optional: Joi.boolean().required(),
+  graded: Joi.boolean().required(),
 });
 // patch a question
 router.patch(
@@ -157,6 +169,7 @@ router.patch(
     question.text = req.body.text;
     question.number = req.body.number;
     question.optional = req.body.optional;
+    question.graded = req.body.graded;
     await question.save();
     res.send(question);
   }
