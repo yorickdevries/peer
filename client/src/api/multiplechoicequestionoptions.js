@@ -1,20 +1,15 @@
-import client from "./axiosClient"
+import { postOption, patchOption, deleteOption } from "./utils/options"
 
 export default {
     post(option, multipleChoiceQuestionId) {
-        const { text, points } = option
-        const body =
-            points !== undefined && points !== null
-                ? { text, points: String(points), multipleChoiceQuestionId }
-                : { text, multipleChoiceQuestionId }
-        return client.post("multiplechoicequestionoptions/", body)
+        let body = option
+        body.multipleChoiceQuestionId = multipleChoiceQuestionId
+        return postOption("multiplechoicequestionoptions/", body)
     },
     patch(option, id) {
-        const { text, points } = option
-        const body = points !== undefined && points !== null ? { text, points: String(points) } : { text }
-        return client.patch(`multiplechoicequestionoptions/${id}`, body)
+        return patchOption(`multiplechoicequestionoptions/${id}`, option)
     },
     delete(id) {
-        return client.delete(`multiplechoicequestionoptions/${id}`)
+        return deleteOption(`multiplechoicequestionoptions/${id}`)
     }
 }

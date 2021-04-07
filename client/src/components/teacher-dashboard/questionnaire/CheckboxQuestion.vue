@@ -90,7 +90,7 @@ export default {
                 const questionOptions = this.question.options
                 this.question.options = questionOptions.map(option => {
                     const { id, text } = option
-                    return toGrade ? { id, text, points: option.points || 0.0 } : { id, text }
+                    return toGrade ? { id, text, points: Number(option.points) || 0 } : { id, text }
                 })
             }
         }
@@ -197,7 +197,6 @@ export default {
             await api.checkboxquestions.delete(this.question.id)
             this.showSuccessMessage({ message: "Successfully deleted checkbox question." })
             this.$emit("questionSaved")
-            this.questionId = null
         }
     }
 }
