@@ -27,8 +27,9 @@ const questionOptionSchema = Joi.object({
 router.post("/", validateBody(questionOptionSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
+  const { points, multipleChoiceQuestionId, text } = req.body;
   const question = await MultipleChoiceQuestion.findOne(
-    req.body.multipleChoiceQuestionId
+    multipleChoiceQuestionId
   );
   if (!question) {
     res
@@ -42,13 +43,13 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
       .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
     return;
   }
-  if (question.graded && !req.body.points) {
+  if (question.graded && points === undefined) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
       .send(ResponseMessage.NON_GRADED_OPTION_FOR_QUESTION_GRADED);
     return;
   }
-  if (!question.graded && req.body.points) {
+  if (!question.graded && points !== undefined) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
       .send(ResponseMessage.GRADED_OPTION_FOR_NON_QUESTION_GRADED);
@@ -75,10 +76,12 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
       .send("The assignment is already in feedback state");
     return;
   }
+  const fomrattedPoints =
+    points === undefined || points === null ? null : Number(points);
   const questionOption = new MultipleChoiceQuestionOption(
-    req.body.text,
+    text,
     question,
-    Number(req.body.points)
+    fomrattedPoints
   );
   await questionOption.save();
   res.send(questionOption);
@@ -99,6 +102,7 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
+    const { points, text } = req.body;
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const questionOptionId: number = req.params.id as any;
@@ -139,9 +143,9 @@ router.patch(
         .send("The assignment is already in feedback state");
       return;
     }
-    questionOption.text = req.body.text;
-    if (req.body.points) {
-      questionOption.points = Number(req.body.points);
+    questionOption.text = text;
+    if (points || points === 0) {
+      questionOption.points = Number(points);
     }
     await questionOption.save();
     res.send(questionOption);

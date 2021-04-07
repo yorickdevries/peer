@@ -49,10 +49,15 @@ const addDefaultReviewEvaluationQuestions = async function (
             await transactionalEntityManager.save(question);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
+              const points =
+                optionToCopy.points === undefined ||
+                optionToCopy.points === null
+                  ? null
+                  : optionToCopy.points;
               const option = new CheckboxQuestionOption(
                 optionToCopy.text,
                 question,
-                optionToCopy.points || null
+                points
               );
               await option.validateOrReject();
               await transactionalEntityManager.save(option);
@@ -71,10 +76,15 @@ const addDefaultReviewEvaluationQuestions = async function (
             await transactionalEntityManager.save(question);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
+              const points =
+                optionToCopy.points === undefined ||
+                optionToCopy.points === null
+                  ? null
+                  : optionToCopy.points;
               const option = new MultipleChoiceQuestionOption(
                 optionToCopy.text,
                 question,
-                optionToCopy.points || null
+                points
               );
               await option.validateOrReject();
               await transactionalEntityManager.save(option);

@@ -387,7 +387,7 @@ describe("Integration", () => {
       .send({
         text: "option 1",
         checkboxQuestionId: checkboxQuestionGraded.id,
-        points: 0.5,
+        points: "0.5",
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -403,7 +403,7 @@ describe("Integration", () => {
       .send({
         text: "option 2",
         checkboxQuestionId: checkboxQuestionGraded.id,
-        points: 0,
+        points: "0",
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -432,7 +432,7 @@ describe("Integration", () => {
       .send({
         text: "option 2",
         checkboxQuestionId: checkboxQuestion.id,
-        points: 3,
+        points: "3",
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
@@ -527,7 +527,7 @@ describe("Integration", () => {
       .send({
         text: "option A",
         multipleChoiceQuestionId: mcQuestionGraded.id,
-        points: 0.14,
+        points: "0.14",
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -543,7 +543,7 @@ describe("Integration", () => {
       .send({
         text: "option B",
         multipleChoiceQuestionId: mcQuestionGraded.id,
-        points: 0.67,
+        points: "0.67",
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -572,7 +572,7 @@ describe("Integration", () => {
       .send({
         text: "option B",
         multipleChoiceQuestionId: mcQuestion.id,
-        points: 1,
+        points: "1",
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);

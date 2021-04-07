@@ -4,14 +4,14 @@ export default {
     post(option, multipleChoiceQuestionId) {
         const { text, points } = option
         const body =
-            points !== undefined
+            points !== undefined && points !== null
                 ? { text, points: String(points), multipleChoiceQuestionId }
                 : { text, multipleChoiceQuestionId }
         return client.post("multiplechoicequestionoptions/", body)
     },
     patch(option, id) {
         const { text, points } = option
-        const body = points !== undefined ? { text, points: String(points) } : { text }
+        const body = points !== undefined && points !== null ? { text, points: String(points) } : { text }
         return client.patch(`multiplechoicequestionoptions/${id}`, body)
     },
     delete(id) {
