@@ -28,15 +28,15 @@
                             <b-button @click="option.delete = false" v-else variant="secondary" size="sm"
                                 >Undo
                             </b-button>
-                            <b-form-spinbutton
+                            <EditableSpinButton
                                 v-if="!option.delete && question.graded"
                                 :id="`sb-inline-${index}`"
                                 v-model="option.points"
-                                step="0.1"
-                                min="-1"
-                                max="1"
+                                :value="option.points"
+                                @input="changeGradeValue(index, ...arguments)"
                                 inline
-                            ></b-form-spinbutton>
+                            >
+                            </EditableSpinButton>
                         </div>
                     </div>
                 </b-form>
@@ -64,8 +64,12 @@
 import api from "../../../api/api"
 import _ from "lodash"
 import notifications from "../../../mixins/notifications"
+import EditableSpinButton from "../../general/EditableSpinButton"
 
 export default {
+    components: {
+        EditableSpinButton
+    },
     mixins: [notifications],
     props: ["questionId", "questionnaireId", "questionNumber"],
     data() {
@@ -96,6 +100,9 @@ export default {
         }
     },
     methods: {
+        changeGradeValue(index, value) {
+            this.question.options[index].points = value
+        },
         async fetchQuestion() {
             // load the question in case an id is passed
             if (this.questionId) {
