@@ -89,7 +89,6 @@ export default {
             await api.rangequestions.delete(this.question.id)
             this.showSuccessMessage({ message: "Successfully deleted range question." })
             this.$emit("questionSaved")
-            this.questionId = null
         }
     }
 }

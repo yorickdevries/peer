@@ -42,18 +42,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     return;
   }
   const sortedOptions = _.sortBy(question.options, "text");
-  if (question.graded) {
-    question.options = sortedOptions.map((option) => {
-      return {
-        id: option.id,
-        text: option.text,
-        points: String(option.points),
-      };
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any;
-  } else {
-    question.options = sortedOptions;
-  }
+  question.options = sortedOptions;
   res.send(question);
 });
 

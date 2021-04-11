@@ -90,7 +90,7 @@
                                 <b-form-radio v-for="option in question.options" :key="option.id" :value="option">
                                     {{ option.text }}
                                     <b-badge v-if="question.graded" variant="dark"
-                                        >Points: {{ option.points || 0 }}</b-badge
+                                        >Points: {{ pointsDisplay(option.points) }}</b-badge
                                     >
                                 </b-form-radio>
                             </b-form-radio-group>
@@ -100,7 +100,7 @@
                                 <b-form-checkbox v-for="option in question.options" :key="option.id" :value="option">
                                     {{ option.text }}
                                     <b-badge v-if="question.graded" variant="dark"
-                                        >Points: {{ option.points || 0 }}</b-badge
+                                        >Points: {{ pointsDisplay(option.points) }}</b-badge
                                     >
                                 </b-form-checkbox>
                             </b-form-checkbox-group>
@@ -204,6 +204,9 @@ export default {
             await this.getAssignmentVersion()
             await this.getQuestionnaire()
             await this.getAllQuestionnairesOfCourse()
+        },
+        pointsDisplay(points) {
+            return points / 100
         },
         async getAssignment() {
             const res = await api.assignments.get(this.$route.params.assignmentId)

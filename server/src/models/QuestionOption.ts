@@ -34,7 +34,7 @@ export default abstract class QuestionOption extends BaseModel {
   text: string;
 
   // number of points awarded for this option
-  @Column("float", { nullable: true, precision: 8, scale: 2 })
+  @Column("integer", { nullable: true })
   @IsOptional()
   @IsNumber()
   points: number | null;

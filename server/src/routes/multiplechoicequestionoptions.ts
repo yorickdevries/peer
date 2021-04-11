@@ -6,6 +6,7 @@ import {
   idSchema,
 } from "../middleware/validation";
 import optionsRequests from "../util/optionsRequests";
+import MultipleChoiceQuestionOption from "../models/MultipleChoiceQuestionOption";
 
 const router = express.Router();
 
@@ -13,9 +14,7 @@ const router = express.Router();
 const questionOptionSchema = Joi.object({
   text: Joi.string().required(),
   multipleChoiceQuestionId: Joi.number().integer().required(),
-  points: Joi.string()
-    .trim()
-    .regex(/[+-]?([0-9]*[.])?[0-9]+/),
+  points: Joi.number().integer(),
 });
 
 // post a question
@@ -34,8 +33,9 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
     res.status(questionOptionObject.status).send(questionOptionObject.content);
     return;
   }
-  await questionOptionObject.content.save();
-  res.send(questionOptionObject.content);
+  const questionOption = questionOptionObject.content as MultipleChoiceQuestionOption;
+  await questionOption.save();
+  res.send(questionOption);
 });
 
 // patch an option
@@ -63,8 +63,9 @@ router.patch(
         .send(questionOptionObject.content);
       return;
     }
-    await questionOptionObject.content.save();
-    res.send(questionOptionObject.content);
+    const questionOption = questionOptionObject.content as MultipleChoiceQuestionOption;
+    await questionOption.save();
+    res.send(questionOption);
   }
 );
 
@@ -83,8 +84,9 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
     res.status(questionOptionObject.status).send(questionOptionObject.content);
     return;
   }
-  await questionOptionObject.content.remove();
-  res.send(questionOptionObject.content);
+  const questionOption = questionOptionObject.content as MultipleChoiceQuestionOption;
+  await questionOption.remove();
+  res.send(questionOption);
 });
 
 export default router;

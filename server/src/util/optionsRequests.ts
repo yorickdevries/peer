@@ -12,8 +12,7 @@ import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 interface ReturnBody {
   status: number;
   ok: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  content: any;
+  content: string | MultipleChoiceQuestionOption | CheckboxQuestion;
 }
 
 interface QuestionOption {
@@ -21,7 +20,7 @@ interface QuestionOption {
   user: Express.User;
   text: string;
   id: number;
-  points?: string;
+  points?: number;
 }
 
 // post a questionoption
@@ -94,9 +93,7 @@ const postQuestionHandler = async (
 // Joi inputvalidation
 const questionPatchSchema = Joi.object({
   text: Joi.string().required(),
-  points: Joi.string()
-    .trim()
-    .regex(/[+-]?([0-9]*[.])?[0-9]+/),
+  points: Joi.number(),
 });
 
 const patchQuestionHandler = async (
@@ -163,7 +160,7 @@ const deleteQuestionHandler = async (
 ): Promise<ReturnBody> => {
   const questionOption = isMultipleChoice
     ? await MultipleChoiceQuestionOption.findOne(id)
-    : await MultipleChoiceQuestionOption.findOne(id);
+    : await CheckboxQuestionOption.findOne(id);
   if (!questionOption) {
     return {
       status: HttpStatusCode.BAD_REQUEST,

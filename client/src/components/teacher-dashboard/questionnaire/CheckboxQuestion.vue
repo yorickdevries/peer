@@ -89,8 +89,8 @@ export default {
             handler: function(toGrade) {
                 const questionOptions = this.question.options
                 this.question.options = questionOptions.map(option => {
-                    const { id, text } = option
-                    return toGrade ? { id, text, points: Number(option.points) || 0 } : { id, text }
+                    const { id, text, points } = option
+                    return toGrade ? { id, text, points: points || 0 } : { id, text }
                 })
             }
         }
@@ -114,7 +114,8 @@ export default {
         },
         formatGradedOptions(options) {
             return options.map(option => {
-                return { id: option.id, text: option.text, points: Number(option.points) }
+                const decimals = option.points / 100
+                return { id: option.id, text: option.text, points: decimals }
             })
         },
         addEmptyOption() {

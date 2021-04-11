@@ -387,14 +387,14 @@ describe("Integration", () => {
       .send({
         text: "option 1",
         checkboxQuestionId: checkboxQuestionGraded.id,
-        points: "0.5",
+        points: 50,
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     const checkboxoptiongraded1 = JSON.parse(res.text);
     expect(checkboxoptiongraded1).toMatchObject({
       text: "option 1",
-      points: 0.5,
+      points: 50,
     });
 
     // post graded Checkbox question option in the questionnaire
@@ -403,7 +403,7 @@ describe("Integration", () => {
       .send({
         text: "option 2",
         checkboxQuestionId: checkboxQuestionGraded.id,
-        points: "0",
+        points: 0,
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -432,7 +432,7 @@ describe("Integration", () => {
       .send({
         text: "option 2",
         checkboxQuestionId: checkboxQuestion.id,
-        points: "3",
+        points: 300,
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
@@ -527,14 +527,14 @@ describe("Integration", () => {
       .send({
         text: "option A",
         multipleChoiceQuestionId: mcQuestionGraded.id,
-        points: "0.14",
+        points: 14,
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     const mcoption1graded = JSON.parse(res.text);
     expect(mcoption1graded).toMatchObject({
       text: "option A",
-      points: 0.14,
+      points: 14,
     });
 
     // post another graded MC question option in the questionnaire
@@ -543,14 +543,14 @@ describe("Integration", () => {
       .send({
         text: "option B",
         multipleChoiceQuestionId: mcQuestionGraded.id,
-        points: "0.67",
+        points: 67,
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     const mcoption2graded = JSON.parse(res.text);
     expect(mcoption2graded).toMatchObject({
       text: "option B",
-      points: 0.67,
+      points: 67,
     });
 
     // post another  MC question option in the questionnaire BAD REQUEST
@@ -572,7 +572,7 @@ describe("Integration", () => {
       .send({
         text: "option B",
         multipleChoiceQuestionId: mcQuestion.id,
-        points: "1",
+        points: 1,
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
