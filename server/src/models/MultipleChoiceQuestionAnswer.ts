@@ -41,4 +41,10 @@ export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
   getAnswerText(): string {
     return this.multipleChoiceAnswer.text;
   }
+
+  getAnswerPoints(): string {
+    const points = this.multipleChoiceAnswer.points;
+    if (!points) return String(points);
+    return String(points / 100);
+  }
 }

@@ -44,4 +44,8 @@ export default class RangeQuestionAnswer extends QuestionAnswer {
   getAnswerText(): string {
     return String(this.rangeAnswer);
   }
+
+  getAnswerPoints(): string {
+    return String(this.rangeAnswer);
+  }
 }

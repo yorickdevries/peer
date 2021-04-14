@@ -27,4 +27,8 @@ export default class OpenQuestionAnswer extends QuestionAnswer {
   getAnswerText(): string {
     return this.openAnswer;
   }
+
+  getAnswerPoints(): string {
+    return String("null");
+  }
 }

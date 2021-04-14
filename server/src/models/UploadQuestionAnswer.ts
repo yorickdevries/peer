@@ -39,4 +39,8 @@ export default class UploadQuestionAnswer extends QuestionAnswer {
   getAnswerText(): string {
     return this.uploadAnswer.getFileNamewithExtension();
   }
+
+  getAnswerPoints(): string {
+    return String("null");
+  }
 }

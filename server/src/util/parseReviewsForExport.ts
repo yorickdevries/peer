@@ -2,6 +2,8 @@ import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import _ from "lodash";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import Question from "../models/Question";
+import QuestionType from "../enum/QuestionType";
+import CheckboxQuestionAnswer from "../models/CheckboxQuestionAnswer";
 
 const parseSubmissionReviewsForExport = async function (
   submissionQuestionnaire: SubmissionQuestionnaire
@@ -81,9 +83,25 @@ const parseSubmissionReviewsForExport = async function (
     // QUESTIONS
     // iterate over all questions
     for (const question of questions) {
-      const questionText = `R${question.number}. ${question.text}`;
+      let questionText = `R${question.number}. ${question.text}`;
       const answer = await review.getAnswer(question);
       const answerText = answer?.getAnswerText();
+      if (question.graded) {
+        questionText += " (GRADED)";
+        if (question.type === QuestionType.CHECKBOX) {
+          const typedAnswer = answer as CheckboxQuestionAnswer;
+          const checkedPoints = typedAnswer.getAnswerPoints();
+          const sumOfpoints = typedAnswer.getPointsSum();
+          const questionGradeList = `R${question.number}. ${question.text}. GRADE LIST`;
+          parsedReview[questionGradeList] = checkedPoints;
+          const questionGradedSum = `R${question.number}. ${question.text}. GRADE`;
+          parsedReview[questionGradedSum] = sumOfpoints;
+        } else {
+          const answerPoints = answer?.getAnswerPoints();
+          const answerPointsText = `R${question.number}. ${question.text}. GRADE`;
+          parsedReview[answerPointsText] = answerPoints;
+        }
+      }
       parsedReview[questionText] = answerText;
     }
 
@@ -132,9 +150,25 @@ const parseSubmissionReviewsForExport = async function (
 
     // iterate over all questions
     for (const question of reviewEvaluationQuestions) {
-      const questionText = `E${question.number}. ${question.text}`;
+      let questionText = `E${question.number}. ${question.text}`;
       const answer = await reviewEvaluation?.getAnswer(question);
       const answerText = answer?.getAnswerText();
+      if (question.graded) {
+        questionText += " (GRADED)";
+        if (question.type === QuestionType.CHECKBOX) {
+          const typedAnswer = answer as CheckboxQuestionAnswer;
+          const checkedPoints = typedAnswer.getAnswerPoints();
+          const sumOfpoints = typedAnswer.getPointsSum();
+          const questionGradeList = `R${question.number}. ${question.text}. GRADE LIST`;
+          parsedReview[questionGradeList] = checkedPoints;
+          const questionGradedSum = `R${question.number}. ${question.text}. GRADE`;
+          parsedReview[questionGradedSum] = sumOfpoints;
+        } else {
+          const answerPoints = answer?.getAnswerPoints();
+          const answerPointsText = `R${question.number}. ${question.text}. GRADE`;
+          parsedReview[answerPointsText] = answerPoints;
+        }
+      }
       parsedReview[questionText] = answerText;
     }
     parsedReviews.push(parsedReview);
