@@ -28,15 +28,17 @@
                             <b-button @click="option.delete = false" v-else variant="secondary" size="sm"
                                 >Undo
                             </b-button>
-                            <EditableSpinButton
-                                v-if="!option.delete && question.graded"
-                                :id="`sb-inline-${index}`"
+                            <b-form-input
+                                v-if="question.graded"
                                 v-model="option.points"
-                                :value="option.points"
-                                @input="changeGradeValue(index, ...arguments)"
-                                inline
+                                type="number"
+                                :state="gradeIsOk(option.points)"
+                                :min="-1"
+                                :max="1"
+                                :step="0.01"
+                                required
                             >
-                            </EditableSpinButton>
+                            </b-form-input>
                         </div>
                     </div>
                 </b-form>
@@ -64,12 +66,8 @@
 import api from "../../../api/api"
 import _ from "lodash"
 import notifications from "../../../mixins/notifications"
-import EditableSpinButton from "../../general/EditableSpinButton"
 
 export default {
-    components: {
-        EditableSpinButton
-    },
     mixins: [notifications],
     props: ["questionId", "questionnaireId", "questionNumber"],
     data() {
@@ -100,8 +98,21 @@ export default {
         }
     },
     methods: {
-        changeGradeValue(index, value) {
-            this.question.options[index].points = value
+        gradeIsOk(currentValue) {
+            if (currentValue === "" || currentValue === undefined || currentValue === null) {
+                return false
+            }
+            const stringifiedNumber = String(currentValue)
+            const numberStrArr = stringifiedNumber.split(".")
+            if (currentValue > 1 || currentValue < -1) {
+                return false
+            } else if (numberStrArr.length > 2) {
+                return false
+            } else if (numberStrArr.length === 2 && numberStrArr[1].length > 2) {
+                return false
+            } else {
+                return true
+            }
         },
         async fetchQuestion() {
             // load the question in case an id is passed
@@ -126,7 +137,7 @@ export default {
             })
         },
         addEmptyOption() {
-            const optionPrototype = this.question.graded ? { text: "", points: 0.0 } : { text: "" }
+            const optionPrototype = this.question.graded ? { text: "", points: 0 } : { text: "" }
             this.question.options.push(optionPrototype)
         },
         markOptionforDeletion(option) {
