@@ -29,7 +29,8 @@
                                 >Undo
                             </b-button>
                             <b-form-input
-                                v-if="question.graded"
+                                :id="`option-${index}`"
+                                v-if="question.graded && !option.delete"
                                 v-model="option.points"
                                 type="number"
                                 :state="gradeIsOk(option.points)"
@@ -40,6 +41,9 @@
                             >
                             </b-form-input>
                         </div>
+                        <b-alert :show="!gradeIsOk(option.points)" variant="danger" dismissible>
+                            Number must be in range of -1 and 1, and have up to 2 decimal points!
+                        </b-alert>
                     </div>
                 </b-form>
             </template>
@@ -50,7 +54,14 @@
                 Make this question optional.
             </b-form-checkbox>
         </b-form-group>
-        <b-button @click="save" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
+        <b-button
+            @click="save"
+            :variant="allGradedOptionsOk ? 'outline-primary' : 'outline-light'"
+            :disabled="!allGradedOptionsOk"
+            size="sm"
+            class="mr-1"
+            >Save</b-button
+        >
         <span v-if="question.id">
             <b-btn v-b-modal="`delete${question.id}`" variant="outline-danger" size="sm">Delete</b-btn>
             <b-modal :id="`delete${question.id}`" centered title="Warning" @ok="deleteQuestion">
@@ -95,6 +106,17 @@ export default {
                     return toGrade ? { id, text, points: points || 0 } : { id, text }
                 })
             }
+        }
+    },
+    computed: {
+        allGradedOptionsOk() {
+            if (!this.question.graded) return true
+            for (const option of this.question.options) {
+                if (!this.gradeIsOk(option.points)) {
+                    return false
+                }
+            }
+            return true
         }
     },
     methods: {
