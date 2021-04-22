@@ -41,7 +41,11 @@
                             >
                             </b-form-input>
                         </div>
-                        <b-alert :show="!gradeIsOk(option.points)" variant="danger" dismissible>
+                        <b-alert
+                            :show="question.graded && !option.delete && !gradeIsOk(option.points)"
+                            variant="danger"
+                            dismissible
+                        >
                             Number must be in range of -1 and 1, and have up to 2 decimal points!
                         </b-alert>
                     </div>
