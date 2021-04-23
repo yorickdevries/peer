@@ -82,6 +82,7 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
   res.send(questionOption);
 });
 
+// Joi inputvalidation
 const questionPatchSchema = Joi.object({
   text: Joi.string().required(),
   points: Joi.number().integer().allow(null).required(),

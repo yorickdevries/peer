@@ -7,6 +7,7 @@ import {
 import {
   IsDefined,
   IsString,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsNumber,
@@ -35,8 +36,9 @@ export default abstract class QuestionOption extends BaseModel {
 
   // number of points awarded for this option
   @Column("integer", { nullable: true })
-  @IsOptional()
+  @IsInt()
   @IsNumber()
+  @IsOptional()
   points: number | null;
 
   abstract question?: Question;
