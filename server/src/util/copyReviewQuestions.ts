@@ -50,10 +50,7 @@ const addDefaultReviewEvaluationQuestions = async function (
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
               const points =
-                optionToCopy.points === undefined ||
-                optionToCopy.points === null
-                  ? null
-                  : optionToCopy.points;
+                optionToCopy.points == null ? null : optionToCopy.points;
               const option = new CheckboxQuestionOption(
                 optionToCopy.text,
                 question,
@@ -77,10 +74,7 @@ const addDefaultReviewEvaluationQuestions = async function (
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
               const points =
-                optionToCopy.points === undefined ||
-                optionToCopy.points === null
-                  ? null
-                  : optionToCopy.points;
+                optionToCopy.points == null ? null : optionToCopy.points;
               const option = new MultipleChoiceQuestionOption(
                 optionToCopy.text,
                 question,

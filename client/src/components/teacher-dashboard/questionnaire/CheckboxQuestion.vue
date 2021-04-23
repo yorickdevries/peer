@@ -125,7 +125,8 @@ export default {
     },
     methods: {
         gradeIsOk(currentValue) {
-            if (currentValue === "" || currentValue === undefined || currentValue === null) {
+            // check if grade is in -1 to 1 range and has at maximum 2 decimal points
+            if (currentValue === "" || currentValue == null) {
                 return false
             }
             const stringifiedNumber = String(currentValue)
@@ -195,6 +196,7 @@ export default {
                 this.question.questionnaireId,
                 this.question.graded
             )
+            // save options as well
             for (const option of this.question.options) {
                 try {
                     await api.checkboxquestionoptions.post(option, res.data.id)
