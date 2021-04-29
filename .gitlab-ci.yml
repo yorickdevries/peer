@@ -24,7 +24,6 @@ lint-server:
   - npm run lint
   only:
   - merge_requests
-  - pushes
 
 lint-client:
   stage: static-analysis
@@ -35,7 +34,6 @@ lint-client:
   - npm run lint
   only:
   - merge_requests
-  - pushes
 
 build-server:
   stage: build
@@ -46,7 +44,6 @@ build-server:
   - npm run build
   only:
   - merge_requests
-  - pushes
 
 build-client:
   stage: build
@@ -57,7 +54,6 @@ build-client:
   - npm run build
   only:
   - merge_requests
-  - pushes
 
 test:
   stage: test
@@ -70,7 +66,6 @@ test:
   - npm run test
   only:
   - merge_requests
-  - pushes
 
 coverage:
   stage: test
@@ -84,7 +79,6 @@ coverage:
   - npm run coverage
   only:
   - merge_requests
-  - pushes
 
 migration:
   stage: migration
@@ -98,7 +92,6 @@ migration:
   - npm run typeorm:migration:run
   only:
   - merge_requests
-  - pushes
 
 start-server:
   stage: start
@@ -113,7 +106,6 @@ start-server:
   - timeout 60s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
   only:
   - merge_requests
-  - pushes
 
 sast:
   stage: sast
@@ -135,4 +127,3 @@ sast:
       sast: gl-sast-report.json
   only:
   - merge_requests
-  - pushes
