@@ -135,4 +135,3 @@ sast:
       sast: gl-sast-report.json
   only:
   - merge_requests
-  - pushes
