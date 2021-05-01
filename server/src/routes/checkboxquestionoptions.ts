@@ -40,18 +40,6 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
       .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
     return;
   }
-  if (question.graded && points == null) {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(ResponseMessage.NON_GRADED_OPTION_FOR_QUESTION_GRADED);
-    return;
-  }
-  if (!question.graded && points != null) {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(ResponseMessage.GRADED_OPTION_FOR_NON_QUESTION_GRADED);
-    return;
-  }
   const questionnaire = await question.getQuestionnaire();
   const assignmentVersion = await questionnaire.getAssignmentVersion();
   const assignment = await assignmentVersion.getAssignment();
@@ -78,7 +66,14 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
     question,
     points
   );
-  await questionOption.save();
+  try {
+    await questionOption.save();
+  } catch (err) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.GRADING_INCONSISTENCY);
+    return;
+  }
   res.send(questionOption);
 });
 
@@ -116,18 +111,6 @@ router.patch(
         .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
       return;
     }
-    if (question.graded && points == null) {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.NON_GRADED_OPTION_FOR_QUESTION_GRADED);
-      return;
-    }
-    if (!question.graded && points != null) {
-      res
-        .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.GRADED_OPTION_FOR_NON_QUESTION_GRADED);
-      return;
-    }
     const questionnaire = await question.getQuestionnaire();
     const assignmentVersion = await questionnaire.getAssignmentVersion();
     const assignment = await assignmentVersion.getAssignment();
@@ -153,7 +136,14 @@ router.patch(
     if (points != null) {
       questionOption.points = points;
     }
-    await questionOption.save();
+    try {
+      await questionOption.save();
+    } catch (err) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.GRADING_INCONSISTENCY);
+      return;
+    }
     res.send(questionOption);
   }
 );

@@ -426,7 +426,7 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
     expect(res.text).toBe(
-      "Your provided a NON-GRADED option for a GRADED question"
+      "The option and question must be both graded or non-graded"
     );
 
     // post graded Checkbox question option in the questionnaire BAD REQUEST 2
@@ -440,7 +440,7 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
     expect(res.text).toBe(
-      "Your provided a GRADED option for a NON-GRADED question"
+      "The option and question must be both graded or non-graded"
     );
 
     // post a MC question in the questionnaire
@@ -569,7 +569,7 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
     expect(res.text).toBe(
-      "Your provided a NON-GRADED option for a GRADED question"
+      "The option and question must be both graded or non-graded"
     );
 
     // post another  MC question option in the questionnaire BAD REQUEST 2
@@ -583,7 +583,7 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
     expect(res.text).toBe(
-      "Your provided a GRADED option for a NON-GRADED question"
+      "The option and question must be both graded or non-graded"
     );
 
     // post an open question in the questionnaire
