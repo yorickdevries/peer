@@ -184,6 +184,20 @@
                             </b-row>
 
                             <hr />
+                            <!--Assignment type-->
+                            <b-form-group
+                                label="Assignment type"
+                                description="The type of assignment that this assignment is, a code review assignment or a (pdf) document review assignment"
+                            >
+                                <b-alert v-if="assignment.chosenAssignmentType == 'code'" variant="danger" show>
+                                    Code review only allows .zip extensions
+                                </b-alert>
+                                <b-form-select
+                                    :options="assignmentTypes"
+                                    v-model="assignment.chosenAssignmentType"
+                                ></b-form-select>
+                            </b-form-group>
+
                             <!--File upload-->
                             <b-form-group
                                 label="Assignment file"
@@ -253,10 +267,21 @@
                                 label="Allowed submission file extensions"
                                 description="The extensions for the submission files that are allowed."
                             >
+                                <!--TODO: Add check for document assignment-->
                                 <b-alert v-if="assignment.submissionExtensions !== '.pdf'" variant="danger" show>
                                     It is advised to choose '.pdf' as extension because only those files can be directly
                                     annotated within this website. This is a new experimental feature and some pdf's
                                     might not render, but the students can always download the submission files as well.
+                                </b-alert>
+                                <b-alert
+                                    v-if="
+                                        assignment.submissionExtensions !== '.zip' &&
+                                            assignment.chosenAssignmentType == 'code'
+                                    "
+                                    variant="danger"
+                                    show
+                                >
+                                    Code review assignments can only have .zip extensions.
                                 </b-alert>
                                 <b-form-select
                                     :options="extensionTypes"
@@ -354,6 +379,10 @@ export default {
                 { value: ".pdf,.zip", text: ".pdf,.zip" },
                 { value: ".doc,.docx", text: ".doc,.docx" },
                 { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" }
+            ],
+            assignmentTypes: [
+                { value: "document", text: "Document review assignment" },
+                { value: "code", text: "Code review assignment" }
             ],
             buttonDisabled: false
         }
@@ -465,6 +494,7 @@ export default {
                 file = undefined
             }
             // call post api
+            // TODO: add assignment type to the sending of the new assignment to the server
             try {
                 await api.assignments.patch(
                     this.assignment.id,
@@ -484,7 +514,8 @@ export default {
                     this.assignment.lateSubmissions,
                     this.assignment.lateSubmissionReviews,
                     this.assignment.lateReviewEvaluations,
-                    this.assignment.automaticStateProgression
+                    this.assignment.automaticStateProgression,
+                    this.assignment.chosenAssignmentType
                 )
                 this.showSuccessMessage({ message: "Updated assignment successfully" })
                 // Redirect to updated assignment
