@@ -189,11 +189,8 @@
                                 label="Assignment type"
                                 description="The type of assignment that this assignment is, a code review assignment or a (pdf) document review assignment"
                             >
-                                <!--<b-alert v-if="assignment.chosenAssignmentType == 'code'" variant="danger" show>
-                                    Code review assignments only allow .zip extensions.
-                                </b-alert>-->
                                 <b-form-select
-                                    @change="changeFunc"
+                                    @change="typeChangeFunc"
                                     :options="assignmentTypes"
                                     v-model="assignment.chosenAssignmentType"
                                 ></b-form-select>
@@ -493,7 +490,7 @@ export default {
             date.setMilliseconds(0)
             return date
         },
-        changeFunc() {
+        typeChangeFunc() {
             if (this.assignment.chosenAssignmentType == "document") {
                 this.extensionTypes = this.extensionTypesDocument
                 this.assignment.submissionExtensions = ".pdf"

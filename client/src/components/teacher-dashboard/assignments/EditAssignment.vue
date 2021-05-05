@@ -190,7 +190,7 @@
                                 description="The type of assignment that this assignment is, a code review assignment or a (pdf) document review assignment"
                             >
                                 <b-form-select
-                                    @change="changeFunc"
+                                    @change="typeChangeFunc"
                                     :options="assignmentTypes"
                                     v-model="assignment.chosenAssignmentType"
                                 ></b-form-select>
@@ -567,7 +567,7 @@ export default {
             date.setMilliseconds(0)
             return date
         },
-        changeFunc() {
+        typeChangeFunc() {
             if (this.assignment.chosenAssignmentType == "document") {
                 this.extensionTypes = this.extensionTypesDocument
                 this.assignment.submissionExtensions = ".pdf"
