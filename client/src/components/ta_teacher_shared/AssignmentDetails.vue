@@ -4,6 +4,9 @@
             <dt>Description</dt>
             <dd>{{ assignment.description }}</dd>
 
+            <dt>Assignment type</dt>
+            <dd>{{ assignment.chosenAssignmentType }}</dd>
+
             <dt>Enrollable</dt>
             <dd>{{ assignment.enrollable }}</dd>
 
