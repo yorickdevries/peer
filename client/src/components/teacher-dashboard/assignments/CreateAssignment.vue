@@ -187,7 +187,7 @@
                             <!--Assignment type-->
                             <b-form-group
                                 label="Assignment type"
-                                description="The type of assignment that this assignment is, a code review assignment or a (pdf) document review assignment"
+                                description="Choose the type of assignment to be submitted"
                             >
                                 <b-form-select
                                     @change="typeChangeFunc"
@@ -348,15 +348,9 @@ export default {
                 lateSubmissionReviews: true,
                 lateReviewEvaluations: true,
                 automaticStateProgression: false,
-                chosenAssignmentType: "document"
+                chosenAssignmentType: null
             },
-            extensionTypes: [
-                { value: ".pdf", text: ".pdf" },
-                { value: ".zip", text: ".zip" },
-                { value: ".pdf,.zip", text: ".pdf,.zip" },
-                { value: ".doc,.docx", text: ".doc,.docx" },
-                { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" }
-            ],
+            extensionTypes: null,
             extensionTypesDocument: [
                 { value: ".pdf", text: ".pdf" },
                 { value: ".zip", text: ".zip" },
