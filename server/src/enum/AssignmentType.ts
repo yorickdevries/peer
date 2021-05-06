@@ -1,6 +1,6 @@
 enum AssignmentType {
   DOCUMENT = "document",
-  CODE = "code"
+  CODE = "code",
 }
 
 export default AssignmentType;
