@@ -163,6 +163,18 @@ export default class Assignment extends BaseModel {
   // lets the teacher set the possibillity to automatically progress to the next states of assignments
   automaticStateProgression: boolean;
 
+  // assignment type varchar(150) NOT NULL,
+  @Column({
+    type: "varchar",
+    length: 150,
+    default: "document"
+  })
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
+  // lets the teacher choose between "document" or "code"
+  assignmentType: string;
+
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
   // course_id int NOT NULL, FK
@@ -202,7 +214,8 @@ export default class Assignment extends BaseModel {
     lateSubmissions: boolean,
     lateSubmissionReviews: boolean,
     lateReviewEvaluations: boolean | null,
-    automaticStateProgression: boolean
+    automaticStateProgression: boolean,
+    assignmentType: string
   ) {
     super();
     this.name = name;
@@ -224,6 +237,7 @@ export default class Assignment extends BaseModel {
     this.lateSubmissionReviews = lateSubmissionReviews;
     this.lateReviewEvaluations = lateReviewEvaluations;
     this.automaticStateProgression = automaticStateProgression;
+    this.assignmentType = assignmentType;
   }
 
   // custom validation which is run before saving
