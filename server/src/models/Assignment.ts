@@ -29,6 +29,7 @@ import moment from "moment";
 import UserRole from "../enum/UserRole";
 import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
 import Extensions from "../enum/Extensions";
+import AssignmentType from "../enum/AssignmentType";
 import AssignmentExport from "./AssignmentExport";
 import AssignmentVersion from "./AssignmentVersion";
 
@@ -163,17 +164,13 @@ export default class Assignment extends BaseModel {
   // lets the teacher set the possibillity to automatically progress to the next states of assignments
   automaticStateProgression: boolean;
 
-  // assignment type varchar(150) NOT NULL,
-  @Column({
-    type: "varchar",
-    length: 150,
-    default: "document"
-  })
+  @Column()
   @IsDefined()
   @IsString()
   @IsNotEmpty()
-  // lets the teacher choose between "document" or "code"
-  assignmentType: string;
+  @IsEnum(AssignmentType)
+  // lets the teacher choose the assignment type
+  assignmentType: AssignmentType;
 
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
@@ -215,7 +212,7 @@ export default class Assignment extends BaseModel {
     lateSubmissionReviews: boolean,
     lateReviewEvaluations: boolean | null,
     automaticStateProgression: boolean,
-    assignmentType: string
+    assignmentType: AssignmentType
   ) {
     super();
     this.name = name;
