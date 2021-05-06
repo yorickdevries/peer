@@ -184,6 +184,18 @@
                             </b-row>
 
                             <hr />
+                            <!--Assignment type-->
+                            <b-form-group
+                                label="Assignment type"
+                                description="Choose the type of assignment to be submitted"
+                            >
+                                <b-form-select
+                                    @change="typeChangeFunc"
+                                    :options="assignmentTypes"
+                                    v-model="assignment.chosenAssignmentType"
+                                ></b-form-select>
+                            </b-form-group>
+
                             <!--File upload-->
                             <b-form-group
                                 label="Assignment file"
@@ -211,10 +223,20 @@
                                 label="Allowed submission file extensions"
                                 description="The extensions for the submission files that are allowed."
                             >
-                                <b-alert v-if="assignment.submissionExtensions !== '.pdf'" variant="danger" show>
+                                <b-alert
+                                    v-if="
+                                        assignment.submissionExtensions !== '.pdf' &&
+                                            assignment.chosenAssignmentType == 'document'
+                                    "
+                                    variant="danger"
+                                    show
+                                >
                                     It is advised to choose '.pdf' as extension because only those files can be directly
                                     annotated within this website. This is a new experimental feature and some pdf's
                                     might not render, but the students can always download the submission files as well.
+                                </b-alert>
+                                <b-alert v-if="assignment.chosenAssignmentType == 'code'" variant="danger" show>
+                                    Code review assignments can only have .zip extensions.
                                 </b-alert>
                                 <b-form-select
                                     :options="extensionTypes"
@@ -325,14 +347,21 @@ export default {
                 lateSubmissions: true,
                 lateSubmissionReviews: true,
                 lateReviewEvaluations: true,
-                automaticStateProgression: false
+                automaticStateProgression: false,
+                chosenAssignmentType: null
             },
-            extensionTypes: [
+            extensionTypes: null,
+            extensionTypesDocument: [
                 { value: ".pdf", text: ".pdf" },
                 { value: ".zip", text: ".zip" },
                 { value: ".pdf,.zip", text: ".pdf,.zip" },
                 { value: ".doc,.docx", text: ".doc,.docx" },
                 { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" }
+            ],
+            extensionTypesCode: [{ value: ".zip", text: ".zip" }],
+            assignmentTypes: [
+                { value: "document", text: "Document review" },
+                { value: "code", text: "Code review" }
             ],
             buttonDisabled: false
         }
@@ -407,7 +436,8 @@ export default {
                     this.assignment.lateSubmissions,
                     this.assignment.lateSubmissionReviews,
                     this.assignment.lateReviewEvaluations,
-                    this.assignment.automaticStateProgression
+                    this.assignment.automaticStateProgression,
+                    this.assignment.chosenAssignmentType
                 )
                 this.showSuccessMessage({ message: "Assignment was successfully created" })
                 this.$router.push({
@@ -453,6 +483,15 @@ export default {
             date.setSeconds(0)
             date.setMilliseconds(0)
             return date
+        },
+        typeChangeFunc() {
+            if (this.assignment.chosenAssignmentType == "document") {
+                this.extensionTypes = this.extensionTypesDocument
+                this.assignment.submissionExtensions = ".pdf"
+            } else {
+                this.extensionTypes = this.extensionTypesCode
+                this.assignment.submissionExtensions = ".zip"
+            }
         }
     }
 }
