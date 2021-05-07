@@ -396,7 +396,6 @@ export default {
         // Load necessary data
         let res = await api.assignments.get(this.$route.params.assignmentId)
         this.assignment = res.data
-        console.log(this.assignment)
 
         // update the allowed extension types based on the assignment type
         const copiedExtensions = this.assignment.submissionExtensions
