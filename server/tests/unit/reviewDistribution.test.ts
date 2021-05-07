@@ -16,6 +16,7 @@ import AssignmentVersion from "../../src/models/AssignmentVersion";
 import { AssignmentState } from "../../src/enum/AssignmentState";
 import Extensions from "../../src/enum/Extensions";
 import SubmissionQuestionnaire from "../../src/models/SubmissionQuestionnaire";
+import AssignmentType from "../../src/enum/AssignmentType";
 
 describe("Review distribution", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -67,7 +68,8 @@ describe("Review distribution", () => {
       true,
       true,
       null,
-      false
+      false,
+      AssignmentType.DOCUMENT
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
@@ -188,7 +190,8 @@ describe("Review distribution", () => {
       true,
       true,
       null,
-      false
+      false,
+      AssignmentType.DOCUMENT
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
@@ -315,7 +318,8 @@ describe("Review distribution", () => {
       true,
       true,
       null,
-      false
+      false,
+      AssignmentType.DOCUMENT
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;

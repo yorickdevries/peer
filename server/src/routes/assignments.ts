@@ -20,6 +20,7 @@ import ResponseMessage from "../enum/ResponseMessage";
 import Group from "../models/Group";
 import { AssignmentState } from "../enum/AssignmentState";
 import Extensions from "../enum/Extensions";
+import AssignmentType from "../enum/AssignmentType";
 import Submission from "../models/Submission";
 import publishAssignment from "../assignmentProgression/publishAssignment";
 import closeSubmission from "../assignmentProgression/closeSubmission";
@@ -286,7 +287,8 @@ router.post(
       req.body.lateSubmissions,
       req.body.lateSubmissionReviews,
       req.body.lateReviewEvaluations,
-      req.body.automaticStateProgression
+      req.body.automaticStateProgression,
+      AssignmentType.DOCUMENT
     );
 
     // construct file to be saved in transaction
