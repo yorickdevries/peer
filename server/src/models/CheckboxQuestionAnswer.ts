@@ -47,20 +47,17 @@ export default class CheckboxQuestionAnswer extends QuestionAnswer {
     return String(answer);
   }
 
-  getAnswerPoints(): string {
-    const answer = [];
+  getAnswerPoints(): number[] {
+    let pointsSum = 0;
+    const points = [];
     for (const option of this.checkboxAnswer) {
-      const points = option.points as number;
-      answer.push(points / 100);
+      if (option.points != null) {
+        points.push(option.points);
+        pointsSum += option.points;
+      } else {
+        return [];
+      }
     }
-    return String(answer);
-  }
-
-  getPointsSum(): string {
-    let sum = 0;
-    this.checkboxAnswer.map((answer) => {
-      sum += answer.points as number;
-    });
-    return String(sum / 100);
+    return [pointsSum, ...points];
   }
 }

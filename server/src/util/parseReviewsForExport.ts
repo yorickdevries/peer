@@ -3,7 +3,6 @@ import _ from "lodash";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import Question from "../models/Question";
 import QuestionType from "../enum/QuestionType";
-import CheckboxQuestionAnswer from "../models/CheckboxQuestionAnswer";
 
 const parseSubmissionReviewsForExport = async function (
   submissionQuestionnaire: SubmissionQuestionnaire
@@ -87,22 +86,24 @@ const parseSubmissionReviewsForExport = async function (
       const answer = await review.getAnswer(question);
       const answerText = answer?.getAnswerText();
       if (question.graded) {
+        const points = answer?.getAnswerPoints();
+        const totalPoints =
+          points == null || !points.length ? "" : points[0] / 100;
+        const pointsAnswerText = questionText + " (POINTS)";
         questionText += " (GRADED)";
+        parsedReview[questionText] = answerText;
+        parsedReview[pointsAnswerText] = totalPoints;
         if (question.type === QuestionType.CHECKBOX) {
-          const typedAnswer = answer as CheckboxQuestionAnswer;
-          const checkedPoints = typedAnswer.getAnswerPoints();
-          const sumOfpoints = typedAnswer.getPointsSum();
-          const questionGradeList = `R${question.number}. ${question.text}. GRADE LIST`;
-          parsedReview[questionGradeList] = checkedPoints;
-          const questionGradedSum = `R${question.number}. ${question.text}. GRADE`;
-          parsedReview[questionGradedSum] = sumOfpoints;
-        } else {
-          const answerPoints = answer?.getAnswerPoints();
-          const answerPointsText = `R${question.number}. ${question.text}. GRADE`;
-          parsedReview[answerPointsText] = answerPoints;
+          const totalPointsList =
+            points == null || !points.length
+              ? ""
+              : points.slice(1).map((p) => p / 100);
+          const pointsAnswerListText = questionText + " (POINTS LIST)";
+          parsedReview[pointsAnswerListText] = String(totalPointsList);
         }
+      } else {
+        parsedReview[questionText] = answerText;
       }
-      parsedReview[questionText] = answerText;
     }
 
     const reviewEvaluation = await review.getReviewOfThisReview();
@@ -154,22 +155,24 @@ const parseSubmissionReviewsForExport = async function (
       const answer = await reviewEvaluation?.getAnswer(question);
       const answerText = answer?.getAnswerText();
       if (question.graded) {
+        const points = answer?.getAnswerPoints();
+        const totalPoints =
+          points == null || !points.length ? "" : points[0] / 100;
+        const pointsAnswerText = questionText + " (POINTS)";
         questionText += " (GRADED)";
+        parsedReview[questionText] = answerText;
+        parsedReview[pointsAnswerText] = totalPoints;
         if (question.type === QuestionType.CHECKBOX) {
-          const typedAnswer = answer as CheckboxQuestionAnswer;
-          const checkedPoints = typedAnswer.getAnswerPoints();
-          const sumOfpoints = typedAnswer.getPointsSum();
-          const questionGradeList = `R${question.number}. ${question.text}. GRADE LIST`;
-          parsedReview[questionGradeList] = checkedPoints;
-          const questionGradedSum = `R${question.number}. ${question.text}. GRADE`;
-          parsedReview[questionGradedSum] = sumOfpoints;
-        } else {
-          const answerPoints = answer?.getAnswerPoints();
-          const answerPointsText = `R${question.number}. ${question.text}. GRADE`;
-          parsedReview[answerPointsText] = answerPoints;
+          const totalPointsList =
+            points == null || !points.length
+              ? ""
+              : points.slice(1).map((p) => p / 100);
+          const pointsAnswerListText = questionText + " (POINTS LIST)";
+          parsedReview[pointsAnswerListText] = String(totalPointsList);
         }
+      } else {
+        parsedReview[questionText] = answerText;
       }
-      parsedReview[questionText] = answerText;
     }
     parsedReviews.push(parsedReview);
   }
