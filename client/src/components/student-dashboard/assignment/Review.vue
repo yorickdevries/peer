@@ -263,6 +263,10 @@
                             >
                         </b-card-body>
                     </b-card>
+                    <!-- TODO: Add support for single-file submissions -->
+                    <b-card v-if="fileMetadata.extension === '.zip'">
+                        <code-viewer :zipURL="reviewFilePath"></code-viewer>
+                    </b-card>
                 </b-card>
 
                 <template v-if="!reviewsAreReadOnly">
@@ -342,10 +346,11 @@ import { StarRating } from "vue-rate-it"
 import ReviewEvaluation from "./ReviewEvaluation"
 import PDFAnnotator from "./PDFAnnotator"
 import PDFViewer from "../../general/PDFViewer"
+import CodeViewer from "../../general/CodeViewer.vue"
 
 export default {
     mixins: [notifications],
-    components: { StarRating, ReviewEvaluation, PDFAnnotator, PDFViewer },
+    components: { StarRating, ReviewEvaluation, PDFAnnotator, PDFViewer, CodeViewer },
     props: ["reviewId", "reviewsAreReadOnly"],
     data() {
         return {
