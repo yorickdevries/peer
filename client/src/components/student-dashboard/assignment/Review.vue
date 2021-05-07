@@ -264,6 +264,7 @@
                         </b-card-body>
                     </b-card>
                     <!-- TODO: Add support for single-file submissions -->
+                    <!-- TODO: Add support for getting assignment type -->
                     <b-card v-if="fileMetadata.extension === '.zip'">
                         <code-viewer :zipURL="reviewFilePath"></code-viewer>
                     </b-card>

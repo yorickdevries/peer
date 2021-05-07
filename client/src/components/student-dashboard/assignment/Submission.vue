@@ -148,8 +148,13 @@
                         >
                         <PDFAnnotator :submissionId="finalSubmission.id" :readOnly="true"></PDFAnnotator>
                     </div>
-                    <!-- TODO: Use assignment type for this check once migration is done -->
-                    <div v-else-if="finalSubmission && finalSubmission.file.extension === '.zip'">
+                    <div
+                        v-else-if="
+                            finalSubmission &&
+                                finalSubmission.file.extension === '.zip' &&
+                                assignment.assignmentType === 'code'
+                        "
+                    >
                         <code-viewer :zipURL="submissionFilePath(finalSubmission.id)"></code-viewer>
                     </div>
                     <div v-else>

@@ -55,7 +55,7 @@ export default {
                 })
                 .then(function(contents) {
                     console.log(contents)
-                    // TODO: add support for more files
+                    // TODO: add support for multiple files
                     const highlighted = hljs.highlightAuto(contents[0])
                     scope.content = highlighted.value.split(/\r?\n/g)
                 })
