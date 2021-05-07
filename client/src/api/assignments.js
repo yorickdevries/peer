@@ -42,8 +42,6 @@ export default {
         automaticStateProgression,
         assignmentType
     ) {
-        // Just some filler usage of assignmentType to stop linter complaining
-        console.log(assignmentType)
         // Create formData and append data
         const formData = new FormData()
         formData.append("name", name)
@@ -75,6 +73,7 @@ export default {
             formData.append("lateReviewEvaluations", null)
         }
         formData.append("automaticStateProgression", automaticStateProgression)
+        formData.append("assignmentType", assignmentType)
         return client.post("assignments/", formData)
     },
     patch(
@@ -98,8 +97,6 @@ export default {
         automaticStateProgression,
         assignmentType
     ) {
-        // Just some filler usage of assignmentType to stop linter complaining
-        console.log(assignmentType)
         // Create formData and append data
         const formData = new FormData()
         formData.append("name", name)
@@ -137,6 +134,7 @@ export default {
             formData.append("lateReviewEvaluations", null)
         }
         formData.append("automaticStateProgression", automaticStateProgression)
+        formData.append("assignmentType", assignmentType)
         return client.patch(`assignments/${id}`, formData)
     },
     enroll(id) {
