@@ -245,6 +245,9 @@ const assignmentSchema = Joi.object({
   lateSubmissionReviews: Joi.boolean().required(),
   lateReviewEvaluations: Joi.boolean().allow(null).required(),
   automaticStateProgression: Joi.boolean().required(),
+  assignmentType: Joi.string()
+    .valid(...Object.values(AssignmentType))
+    .required(),
 });
 // post an assignment in a course
 router.post(
@@ -288,7 +291,7 @@ router.post(
       req.body.lateSubmissionReviews,
       req.body.lateReviewEvaluations,
       req.body.automaticStateProgression,
-      AssignmentType.DOCUMENT
+      req.body.assignmentType
     );
 
     // construct file to be saved in transaction
@@ -358,6 +361,9 @@ const assignmentPatchSchema = Joi.object({
   lateSubmissionReviews: Joi.boolean().required(),
   lateReviewEvaluations: Joi.boolean().allow(null).required(),
   automaticStateProgression: Joi.boolean().required(),
+  assignmentType: Joi.string()
+    .valid(...Object.values(AssignmentType))
+    .required(),
 });
 // patch an assignment in a course
 router.patch(
@@ -418,6 +424,15 @@ router.patch(
         .send("You cannot change submissionExtensions at this state");
       return;
     }
+    if (
+      !assignment.isAtState(AssignmentState.UNPUBLISHED) &&
+      assignment.assignmentType !== req.body.assignmentType
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change assignmentType at this state");
+      return;
+    }
     // either a new file can be sent or a file can be removed, not both
     if (req.file && req.body.file === null) {
       res
@@ -473,6 +488,7 @@ router.patch(
         assignment.lateReviewEvaluations = req.body.lateReviewEvaluations;
         assignment.automaticStateProgression =
           req.body.automaticStateProgression;
+        assignment.assignmentType = req.body.assignmentType;
 
         // change the file in case it is not undefined
         if (newFile !== undefined) {
