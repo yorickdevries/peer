@@ -45,7 +45,8 @@ export default class RangeQuestionAnswer extends QuestionAnswer {
     return String(this.rangeAnswer);
   }
 
-  getAnswerPoints(): string {
-    return String(this.rangeAnswer);
+  getAnswerPoints(): number[] {
+    //To be implemented in future when RangeQuestions become graded
+    return [];
   }
 }

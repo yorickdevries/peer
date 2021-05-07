@@ -28,7 +28,8 @@ export default class OpenQuestionAnswer extends QuestionAnswer {
     return this.openAnswer;
   }
 
-  getAnswerPoints(): string {
-    return String("null");
+  getAnswerPoints(): number[] {
+    //To be implemented in future when OpenQuestions become graded
+    return [];
   }
 }

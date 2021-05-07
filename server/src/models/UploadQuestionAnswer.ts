@@ -40,7 +40,8 @@ export default class UploadQuestionAnswer extends QuestionAnswer {
     return this.uploadAnswer.getFileNamewithExtension();
   }
 
-  getAnswerPoints(): string {
-    return String("null");
+  getAnswerPoints(): number[] {
+    //To be implemented in future when UploadQuestions become graded
+    return [];
   }
 }
