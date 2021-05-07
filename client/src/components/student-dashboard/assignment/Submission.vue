@@ -148,6 +148,7 @@
                         >
                         <PDFAnnotator :submissionId="finalSubmission.id" :readOnly="true"></PDFAnnotator>
                     </div>
+                    <!-- Code view component -->
                     <div
                         v-else-if="
                             finalSubmission &&
@@ -155,7 +156,7 @@
                                 assignment.assignmentType === 'code'
                         "
                     >
-                        <code-viewer :zipURL="submissionFilePath(finalSubmission.id)"></code-viewer>
+                        <CodeViewer :zipURL="submissionFilePath(finalSubmission.id)" />
                     </div>
                     <div v-else>
                         <b-alert show variant="secondary">
