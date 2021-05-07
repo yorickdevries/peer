@@ -192,7 +192,7 @@
                                 <b-form-select
                                     @change="typeChangeFunc"
                                     :options="assignmentTypes"
-                                    v-model="assignment.chosenAssignmentType"
+                                    v-model="assignment.assignmentType"
                                 ></b-form-select>
                             </b-form-group>
 
@@ -268,7 +268,7 @@
                                 <b-alert
                                     v-if="
                                         assignment.submissionExtensions !== '.pdf' &&
-                                            assignment.chosenAssignmentType == 'document'
+                                            assignment.assignmentType == 'document'
                                     "
                                     variant="danger"
                                     show
@@ -277,7 +277,7 @@
                                     annotated within this website. This is a new experimental feature and some pdf's
                                     might not render, but the students can always download the submission files as well.
                                 </b-alert>
-                                <b-alert v-if="assignment.chosenAssignmentType == 'code'" variant="danger" show>
+                                <b-alert v-if="assignment.assignmentType == 'code'" variant="danger" show>
                                     Code review assignments can only have .zip extensions.
                                 </b-alert>
                                 <b-form-select
@@ -396,9 +396,12 @@ export default {
         // Load necessary data
         let res = await api.assignments.get(this.$route.params.assignmentId)
         this.assignment = res.data
+        console.log(this.assignment)
 
         // update the allowed extension types based on the assignment type
+        const copiedExtensions = this.assignment.submissionExtensions
         this.typeChangeFunc()
+        this.assignment.submissionExtensions = copiedExtensions
 
         // split day from time
         // publish
@@ -516,7 +519,7 @@ export default {
                     this.assignment.lateSubmissionReviews,
                     this.assignment.lateReviewEvaluations,
                     this.assignment.automaticStateProgression,
-                    this.assignment.chosenAssignmentType
+                    this.assignment.assignmentType
                 )
                 this.showSuccessMessage({ message: "Updated assignment successfully" })
                 // Redirect to updated assignment
@@ -565,7 +568,7 @@ export default {
             return date
         },
         typeChangeFunc() {
-            if (this.assignment.chosenAssignmentType == "document") {
+            if (this.assignment.assignmentType == "document") {
                 this.extensionTypes = this.extensionTypesDocument
                 this.assignment.submissionExtensions = ".pdf"
             } else {
