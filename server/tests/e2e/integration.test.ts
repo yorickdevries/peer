@@ -11,6 +11,7 @@ import path from "path";
 import { clear, advanceTo } from "jest-date-mock";
 import UserRole from "../../src/enum/UserRole";
 import { AssignmentState } from "../../src/enum/AssignmentState";
+import AssignmentType from "../../src/enum/AssignmentType";
 
 describe("Integration", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -215,7 +216,8 @@ describe("Integration", () => {
       .field("lateSubmissions", true)
       .field("lateSubmissionReviews", true)
       .field("lateReviewEvaluations", false)
-      .field("automaticStateProgression", false);
+      .field("automaticStateProgression", false)
+      .field("assignmentType", AssignmentType.DOCUMENT);
     expect(res.status).toBe(HttpStatusCode.OK);
     const assignment = JSON.parse(res.text);
     expect(assignment).toMatchObject({
