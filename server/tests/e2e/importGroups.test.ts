@@ -9,6 +9,7 @@ import initializeData from "../../src/util/initializeData";
 import fs from "fs";
 import path from "path";
 import { advanceTo, clear } from "jest-date-mock";
+import AssignmentType from "../../src/enum/AssignmentType";
 
 describe("Group import", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -60,7 +61,8 @@ describe("Group import", () => {
       .field("lateSubmissions", true)
       .field("lateSubmissionReviews", true)
       .field("lateReviewEvaluations", "null")
-      .field("automaticStateProgression", false);
+      .field("automaticStateProgression", false)
+      .field("assignmentType", AssignmentType.DOCUMENT);
     assignmentId = JSON.parse(res2.text).id;
 
     // set date to the moment that the assignment is published
