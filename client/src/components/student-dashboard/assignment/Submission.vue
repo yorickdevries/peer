@@ -148,6 +148,16 @@
                         >
                         <PDFAnnotator :submissionId="finalSubmission.id" :readOnly="true"></PDFAnnotator>
                     </div>
+                    <!-- Code view component -->
+                    <div
+                        v-else-if="
+                            finalSubmission &&
+                                finalSubmission.file.extension === '.zip' &&
+                                assignment.assignmentType === 'code'
+                        "
+                    >
+                        <CodeViewer :zipURL="submissionFilePath(finalSubmission.id)" />
+                    </div>
                     <div v-else>
                         <b-alert show variant="secondary">
                             Your final submission is not a .pdf file, so it will not be rendered in the browser</b-alert
@@ -164,11 +174,11 @@ import api from "../../../api/api"
 import _ from "lodash"
 import PDFAnnotator from "./PDFAnnotator"
 import notifications from "../../../mixins/notifications"
-
+import CodeViewer from "../../general/CodeViewer.vue"
 export default {
     props: ["assignmentVersionId"],
     mixins: [notifications],
-    components: { PDFAnnotator },
+    components: { PDFAnnotator, CodeViewer },
     data() {
         return {
             assignment: null,
