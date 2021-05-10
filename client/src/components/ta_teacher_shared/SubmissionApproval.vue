@@ -58,7 +58,7 @@
                     <b-row>
                         <b-col>
                             <FileAnnotator
-                                v-if="showPDF"
+                                v-if="viewPDF"
                                 :submissionId="submission.id"
                                 :readOnly="true"
                                 :assignmentType="assignment.assignmentType"

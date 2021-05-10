@@ -50,14 +50,20 @@
         </b-row>
         <br />
         <b-row>
-            <b-col :cols="columnWidthPDFAndQuestionnaire" v-if="viewPDF && fileMetadata.extension === '.pdf'">
+            <b-col :cols="columnWidthPDFAndQuestionnaire" v-if="viewPDF">
                 <!--Toggle side by side view-->
                 <b-button @click="toggleViewPDFNextToQuestionnaire()">
-                    {{ viewPDFNextToQuestionnaire ? "Stop viewing" : "View" }} PDF next to questionnaire
+                    {{ viewPDFNextToQuestionnaire ? "Stop viewing" : "View" }} {{ assignmentType }} next to
+                    questionnaire
                 </b-button>
                 <br />
                 <br />
-                <PDFAnnotator :reviewId="review.id" :readOnly="reviewsAreReadOnly"></PDFAnnotator>
+                <FileAnnotator
+                    :reviewId="review.id"
+                    :readOnly="reviewsAreReadOnly"
+                    :assignmentType="assignmentType"
+                    :fileExtension="fileMetadata.extension"
+                />
             </b-col>
             <b-col :cols="columnWidthPDFAndQuestionnaire">
                 <template v-if="!reviewsAreReadOnly">
@@ -221,6 +227,7 @@
                                             centered
                                             hide-footer
                                         >
+                                            <!-- TODO: What to do with the upload questions? -->
                                             <PDFViewer :fileUrl="uploadAnswerFilePath(review.id, question.id)" />
                                         </b-modal>
                                     </b-col>
@@ -262,11 +269,6 @@
                                 >Save Answer</b-button
                             >
                         </b-card-body>
-                    </b-card>
-                    <!-- TODO: Add support for single-file submissions -->
-                    <!-- TODO: Add support for getting assignment type -->
-                    <b-card v-if="fileMetadata.extension === '.zip'">
-                        <CodeViewer :zipURL="reviewFilePath" />
                     </b-card>
                 </b-card>
 
@@ -345,14 +347,13 @@ import _ from "lodash"
 import notifications from "../../../mixins/notifications"
 import { StarRating } from "vue-rate-it"
 import ReviewEvaluation from "./ReviewEvaluation"
-import PDFAnnotator from "./PDFAnnotator"
+import FileAnnotator from "./FileAnnotator"
 import PDFViewer from "../../general/PDFViewer"
-import CodeViewer from "../../general/CodeViewer.vue"
 
 export default {
     mixins: [notifications],
-    components: { StarRating, ReviewEvaluation, PDFAnnotator, PDFViewer, CodeViewer },
-    props: ["reviewId", "reviewsAreReadOnly"],
+    components: { StarRating, ReviewEvaluation, FileAnnotator, PDFViewer },
+    props: ["reviewId", "reviewsAreReadOnly", "assignmentType"],
     data() {
         return {
             fileMetadata: null,

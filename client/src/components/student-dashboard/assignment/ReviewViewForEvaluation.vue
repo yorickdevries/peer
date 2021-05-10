@@ -39,14 +39,20 @@
         </b-row>
 
         <b-row>
-            <b-col :cols="columnWidthPDFAndQuestionnaire" v-if="viewPDF && fileMetadata.extension === '.pdf'">
+            <b-col :cols="columnWidthPDFAndQuestionnaire" v-if="viewPDF">
                 <!--Toggle side by side view-->
                 <b-button @click="toggleViewPDFNextToQuestionnaire()">
-                    {{ viewPDFNextToQuestionnaire ? "Stop viewing" : "View" }} PDF next to questionnaire
+                    {{ viewPDFNextToQuestionnaire ? "Stop viewing" : "View" }} {{ assignmentType }}
+                    next to questionnaire
                 </b-button>
                 <br />
                 <br />
-                <PDFAnnotator :reviewId="review.id" :readOnly="reviewsAreReadOnly"></PDFAnnotator>
+                <FileAnnotator
+                    :reviewId="review.id"
+                    :readOnly="reviewsAreReadOnly"
+                    :assignmentType="assignmentType"
+                    :fileExtension="fileMetadata.extension"
+                />
             </b-col>
             <b-col :cols="columnWidthPDFAndQuestionnaire">
                 <template v-if="!reviewsAreReadOnly">
@@ -328,13 +334,13 @@ import api from "../../../api/api"
 import _ from "lodash"
 import notifications from "../../../mixins/notifications"
 import { StarRating } from "vue-rate-it"
-import PDFAnnotator from "./PDFAnnotator"
+import FileAnnotator from "./FileAnnotator"
 import PDFViewer from "../../general/PDFViewer"
 
 export default {
     mixins: [notifications],
-    components: { StarRating, PDFAnnotator, PDFViewer },
-    props: ["reviewId", "reviewsAreReadOnly"],
+    components: { StarRating, FileAnnotator, PDFViewer },
+    props: ["reviewId", "reviewsAreReadOnly", "assignmentType"],
     data() {
         return {
             fileMetadata: null,

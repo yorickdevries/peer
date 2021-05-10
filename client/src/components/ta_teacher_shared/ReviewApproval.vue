@@ -86,17 +86,20 @@
                     </b-row>
                     <br />
                     <b-row>
-                        <b-col
-                            v-if="viewPDF && fileMetadata.extension === '.pdf'"
-                            :cols="columnWidthPDFAndQuestionnaire"
-                        >
+                        <b-col :cols="columnWidthPDFAndQuestionnaire" v-if="viewPDF">
                             <!--Toggle side by side view-->
                             <b-button @click="toggleViewPDFNextToQuestionnaire()">
-                                {{ viewPDFNextToQuestionnaire ? "Stop viewing" : "View" }} PDF next to questionnaire
+                                {{ viewPDFNextToQuestionnaire ? "Stop viewing" : "View" }}
+                                {{ assignment.assignmentType }} next to questionnaire
                             </b-button>
                             <br />
                             <br />
-                            <PDFAnnotator :reviewId="review.id" :readOnly="true"></PDFAnnotator>
+                            <FileAnnotator
+                                :reviewId="review.id"
+                                :readOnly="true"
+                                :assignmentType="assignment.assignmentType"
+                                :fileExtension="fileMetadata.extension"
+                            />
                         </b-col>
                         <b-col :cols="columnWidthPDFAndQuestionnaire">
                             <b-card
@@ -320,12 +323,12 @@ import notifications from "../../mixins/notifications"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 import { StarRating } from "vue-rate-it"
 import ReviewEvaluation from "../student-dashboard/assignment/ReviewEvaluation"
-import PDFAnnotator from "../student-dashboard/assignment/PDFAnnotator"
+import FileAnnotator from "../student-dashboard/assignment/FileAnnotator"
 import PDFViewer from "../general/PDFViewer"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, PDFAnnotator, PDFViewer },
+    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, FileAnnotator, PDFViewer },
     data() {
         return {
             assignment: {},
