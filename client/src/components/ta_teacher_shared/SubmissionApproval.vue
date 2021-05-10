@@ -57,11 +57,13 @@
                     </b-row>
                     <b-row>
                         <b-col>
-                            <PDFAnnotator
-                                v-if="viewPDF && submission.file.extension === '.pdf'"
+                            <FileAnnotator
+                                v-if="showPDF"
                                 :submissionId="submission.id"
                                 :readOnly="true"
-                            ></PDFAnnotator>
+                                :assignmentType="assignment.assignmentType"
+                                :fileExtension="submission.file.extension"
+                            />
                         </b-col>
                     </b-row>
                 </b-card-body>
@@ -113,11 +115,11 @@ import api from "../../api/api"
 import _ from "lodash"
 import notifications from "../../mixins/notifications"
 import BreadcrumbTitle from "../BreadcrumbTitle"
-import PDFAnnotator from "../student-dashboard/assignment/PDFAnnotator"
+import FileAnnotator from "../student-dashboard/assignment/FileAnnotator"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle, PDFAnnotator },
+    components: { BreadcrumbTitle, FileAnnotator },
     data() {
         return {
             assignment: {},
