@@ -10,16 +10,17 @@ import "highlight.js/styles/default.css"
 import JSZipUtils from "jszip-utils"
 import JSZip from "jszip"
 export default {
-    props: ["fileUrl", "zipURL"],
+    props: ["fileUrl", "fileExtension"],
     data() {
         return {
             content: null
         }
     },
     created() {
+        const url = this.fileUrl
+        const isZipFile = this.fileExtension.endsWith(".zip")
         // If we get a zip file, we'll try to unzip it and show one of the code files
-        if (this.zipURL) {
-            const url = this.zipURL
+        if (isZipFile) {
             // Promise to wrap the file loading in
             const promise = new JSZip.external.Promise(function(resolve, reject) {
                 JSZipUtils.getBinaryContent(url, function(err, data) {
@@ -66,7 +67,7 @@ export default {
                 .catch(console.warn)
         } else {
             // Leave support for single-submission files
-            fetch(this.fileUrl)
+            fetch(url)
                 .then(response => response.text())
                 .then(text => {
                     // hljs.highlightAuto expects a string (code) and optionally an array
