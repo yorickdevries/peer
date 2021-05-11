@@ -28,7 +28,7 @@ export default {
         CodeViewer,
         PDFAnnotator
     },
-    props: ["reviewId", "submissionId", "readOnly"],
+    props: ["reviewId", "submissionId", "readOnly", "assignmentType"],
     computed: {
         filePath() {
             if (this.reviewId) {
@@ -46,29 +46,33 @@ export default {
         }
     },
     created() {
-        fetch(this.filePath)
-            .then(res => res.blob())
-            .then(file => {
-                if (file.type.includes("text/plain")) {
-                    // The given file contains plain text and should be rendered as code
-                    this.renderAs = "code"
-                } else {
-                    // The given file contains binary data, we should test whether it is a zip or a
-                    // pdf
-                    JSZip.loadAsync(file)
-                        .then(() => {
-                            // JSZip thinks this file is a zip file, so it should be rendered as
-                            // code
-                            this.renderAs = "code"
-                        })
-                        .catch(() => {
-                            // JSZip could not unzip the file, which means it might be a pdf file
-                            // so it should be rendered as a pdf
-                            this.renderAs = "document"
-                        })
-                }
-            })
-            .catch(console.error)
+        if (this.assignmentType) {
+            this.renderAs = this.assignmentType
+        } else {
+            fetch(this.filePath)
+                .then(res => res.blob())
+                .then(file => {
+                    if (file.type.includes("text/plain")) {
+                        // The given file contains plain text and should be rendered as code
+                        this.renderAs = "code"
+                    } else {
+                        // The given file contains binary data, we should test whether it is a zip or a
+                        // pdf
+                        JSZip.loadAsync(file)
+                            .then(() => {
+                                // JSZip thinks this file is a zip file, so it should be rendered as
+                                // code
+                                this.renderAs = "code"
+                            })
+                            .catch(() => {
+                                // JSZip could not unzip the file, which means it might be a pdf file
+                                // so it should be rendered as a pdf
+                                this.renderAs = "document"
+                            })
+                    }
+                })
+                .catch(console.error)
+        }
     }
 }
 </script>

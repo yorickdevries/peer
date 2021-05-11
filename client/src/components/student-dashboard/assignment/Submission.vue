@@ -146,7 +146,11 @@
                             made by your reviewers directly in the browser. Reviewers can always download the file
                             instead.</b-alert
                         >
-                        <FileAnnotator :submissionId="finalSubmission.id" :readOnly="true" />
+                        <FileAnnotator
+                            :submissionId="finalSubmission.id"
+                            :readOnly="true"
+                            :assignmentType="assignment.assignmentType"
+                        />
                     </div>
                 </b-col>
             </b-row>
