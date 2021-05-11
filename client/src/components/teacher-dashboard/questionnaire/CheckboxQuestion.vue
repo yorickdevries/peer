@@ -100,15 +100,12 @@ export default {
     },
     async created() {
         await this.fetchQuestion()
+        this.formatOptions()
     },
     watch: {
         "question.graded": {
-            handler: function(toGrade) {
-                const questionOptions = this.question.options
-                this.question.options = questionOptions.map(option => {
-                    const { id, text, points } = option
-                    return toGrade ? { id, text, points: points || 0 } : { id, text }
-                })
+            handler: function() {
+                return this.formatOptions()
             }
         }
     },
@@ -141,6 +138,13 @@ export default {
             } else {
                 return true
             }
+        },
+        formatOptions() {
+            const questionOptions = this.question.options
+            this.question.options = questionOptions.map(option => {
+                const { id, text, points } = option
+                return this.question.graded ? { id, text, points: points || 0 } : { id, text }
+            })
         },
         async fetchQuestion() {
             // load the question in case an id is passed
@@ -198,9 +202,10 @@ export default {
                 this.question.graded
             )
             // save options as well
+            this.questionId = res.data.id
             for (const option of this.question.options) {
                 try {
-                    await api.checkboxquestionoptions.post(option, res.data.id)
+                    await api.checkboxquestionoptions.post(option.text, option.points, this.questionId)
                     this.showSuccessMessage({ message: "Successfully created checkbox question option." })
                 } catch {
                     this.showErrorMessage({ message: "failed to create checkbox question option." })
@@ -223,11 +228,11 @@ export default {
                             await api.checkboxquestionoptions.delete(option.id)
                         } else {
                             // just patch the option text
-                            await api.checkboxquestionoptions.patch(option, option.id)
+                            await api.checkboxquestionoptions.patch(option.text, option.points, option.id)
                         }
                     } else {
                         // create the option
-                        await api.checkboxquestionoptions.post(option, this.question.id)
+                        await api.checkboxquestionoptions.post(option.text, option.points, this.question.id)
                     }
                     this.showSuccessMessage({ message: "Successfully saved checkbox question option." })
                 } catch {
@@ -245,6 +250,7 @@ export default {
             await api.checkboxquestions.delete(this.question.id)
             this.showSuccessMessage({ message: "Successfully deleted checkbox question." })
             this.$emit("questionSaved")
+            this.questionId = null
         }
     }
 }

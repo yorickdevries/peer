@@ -42,8 +42,16 @@ export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
     return this.multipleChoiceAnswer.text;
   }
 
-  getAnswerPoints(): number[] {
-    const points = this.multipleChoiceAnswer.points;
-    return points == null ? [] : [points];
+  async getAnswerPoints(): Promise<number | undefined> {
+    const question = await this.getQuestion();
+    if (!question.graded) {
+      return undefined;
+    } else {
+      if (this.multipleChoiceAnswer.points == null) {
+        throw new Error("The option doesn't have points");
+      } else {
+        return this.multipleChoiceAnswer.points;
+      }
+    }
   }
 }

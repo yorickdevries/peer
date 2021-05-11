@@ -43,7 +43,7 @@ export default abstract class QuestionAnswer extends BaseModel {
   abstract getAnswerText(): string;
 
   // method to get number of points awarded for an answer (if graded)
-  abstract getAnswerPoints(): number[];
+  abstract getAnswerPoints(): Promise<number | undefined>;
 
   constructor(question: Question, review: Review) {
     super();

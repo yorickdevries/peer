@@ -83,6 +83,7 @@ export default {
             await api.openquestions.delete(this.question.id)
             this.showSuccessMessage({ message: "Successfully deleted open question." })
             this.$emit("questionSaved")
+            this.questionId = null
         }
     }
 }

@@ -3,7 +3,7 @@ import Extensions from "../enum/Extensions";
 
 interface Option {
   text: string;
-  points?: number;
+  points: number;
 }
 
 interface QuestionTemplate {
@@ -17,121 +17,7 @@ interface QuestionTemplate {
   graded: boolean;
 }
 
-const templateQuestionsUngraded: QuestionTemplate[] = [
-  {
-    text:
-      "Was the review comprehensive and complete, covering all relevant aspects of the work?",
-    number: 1,
-    optional: false,
-    type: QuestionType.MULTIPLE_CHOICE,
-    options: [{ text: "A: Yes" }, { text: "B: No" }],
-    graded: false,
-  },
-  {
-    text: "Was the input factually correct?",
-    number: 2,
-    optional: false,
-    type: QuestionType.MULTIPLE_CHOICE,
-    options: [
-      { text: "A: Yes, fully" },
-      { text: "B: Yes, mostly" },
-      { text: "C: No, mostly not" },
-      { text: "D: No, not at all" },
-    ],
-    graded: false,
-  },
-  {
-    text:
-      "Did you, during later revision of the original submission, spot any mistakes that the reviewer overlooked?",
-    number: 3,
-    optional: false,
-    type: QuestionType.MULTIPLE_CHOICE,
-    options: [
-      { text: "A: Yes, major mistakes" },
-      { text: "B: Yes, minor mistakes" },
-      { text: "C: No" },
-    ],
-    graded: false,
-  },
-  {
-    text: "Did the reviewer submit any open feedback (text or pdf)?",
-    number: 4,
-    optional: false,
-    type: QuestionType.MULTIPLE_CHOICE,
-    options: [{ text: "A: Yes" }, { text: "B: No" }],
-    graded: false,
-  },
-  {
-    text: "If there was any open feedback, how much?",
-    number: 5,
-    optional: false,
-    type: QuestionType.MULTIPLE_CHOICE,
-    options: [
-      { text: "A: Too little" },
-      { text: "B: An acceptable amount" },
-      { text: "C: Much" },
-      { text: "D: Not applicable" },
-    ],
-    graded: false,
-  },
-  {
-    text:
-      "If there was any open feedback, did you find it formulated in a clear and understandable way?",
-    number: 6,
-    optional: false,
-    type: QuestionType.MULTIPLE_CHOICE,
-    options: [
-      { text: "A: Yes" },
-      { text: "B: No" },
-      { text: "C: Not applicable" },
-    ],
-    graded: false,
-  },
-  {
-    text:
-      "If there was any open feedback, did you find it formulated in a constructive way, so giving an idea how to improve the work?",
-    number: 7,
-    optional: false,
-    type: QuestionType.MULTIPLE_CHOICE,
-    options: [
-      { text: "A: Yes" },
-      { text: "B: No" },
-      { text: "C: Not applicable" },
-    ],
-    graded: false,
-  },
-  {
-    text: "Overall, do you agree with the reviewer's assessment of the work?",
-    number: 8,
-    optional: false,
-    type: QuestionType.MULTIPLE_CHOICE,
-    options: [
-      { text: "A: Yes, fully" },
-      { text: "B: Yes, mostly" },
-      { text: "C: No, mostly not" },
-      { text: "D: No, not at all" },
-    ],
-    graded: false,
-  },
-  {
-    text: "What overall grade would you give the review?",
-    number: 9,
-    optional: false,
-    type: QuestionType.RANGE,
-    range: 10,
-    graded: false,
-  },
-  {
-    text:
-      'What do you think about the review overall? If you did not choose "Yes, fully" in question 2, then please list the factual mistakes of the review here, in a way that can be read without referring to the original submission or the review.',
-    number: 10,
-    optional: false,
-    type: QuestionType.OPEN,
-    graded: false,
-  },
-];
-
-const templateQuestionsGraded: QuestionTemplate[] = [
+const templateQuestions: QuestionTemplate[] = [
   {
     text:
       "Was the review comprehensive and complete, covering all relevant aspects of the work?",
@@ -251,4 +137,4 @@ const templateQuestionsGraded: QuestionTemplate[] = [
   },
 ];
 
-export { templateQuestionsUngraded, templateQuestionsGraded };
+export { templateQuestions };

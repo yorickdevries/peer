@@ -2,7 +2,6 @@ import QuestionOption from "./QuestionOption";
 import { ChildEntity, ManyToOne, RelationId } from "typeorm";
 import QuestionOptionType from "../enum/QuestionOptionType";
 import MultipleChoiceQuestion from "./MultipleChoiceQuestion";
-import ResponseMessage from "../enum/ResponseMessage";
 
 @ChildEntity(QuestionOptionType.MULTIPLE_CHOICE)
 export default class MultipleChoiceQuestionOption extends QuestionOption {
@@ -28,18 +27,6 @@ export default class MultipleChoiceQuestionOption extends QuestionOption {
   ) {
     super(text, points);
     this.question = question;
-  }
-
-  // custom validation which is run before saving
-  validateOrReject(): Promise<void> {
-    if (this.question) {
-      if (this.question.graded && this.points == null) {
-        throw new Error(ResponseMessage.NON_GRADED_OPTION_FOR_QUESTION_GRADED);
-      } else if (!this.question.graded && this.points != null) {
-        throw new Error(ResponseMessage.GRADED_OPTION_FOR_NON_QUESTION_GRADED);
-      }
-    }
-    return super.validateOrReject();
   }
 
   async getQuestion(): Promise<MultipleChoiceQuestion> {

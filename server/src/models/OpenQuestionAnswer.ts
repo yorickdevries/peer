@@ -28,8 +28,13 @@ export default class OpenQuestionAnswer extends QuestionAnswer {
     return this.openAnswer;
   }
 
-  getAnswerPoints(): number[] {
+  async getAnswerPoints(): Promise<undefined> {
     //To be implemented in future when OpenQuestions become graded
-    return [];
+    const question = await this.getQuestion();
+    if (!question.graded) {
+      return undefined;
+    } else {
+      throw new Error("The question is a graded question");
+    }
   }
 }

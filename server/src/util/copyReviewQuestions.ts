@@ -10,10 +10,7 @@ import UploadQuestion from "../models/UploadQuestion";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import Questionnaire from "../models/Questionnaire";
 import Question from "../models/Question";
-import {
-  templateQuestionsUngraded,
-  templateQuestionsGraded,
-} from "./templateQuestions";
+import { templateQuestions } from "./templateQuestions";
 
 const addDefaultReviewEvaluationQuestions = async function (
   reviewQuestionnaire: ReviewQuestionnaire,
@@ -32,9 +29,6 @@ const addDefaultReviewEvaluationQuestions = async function (
       if (questionnaire.questions.length > 0) {
         throw Error("Questionnaire already has questions");
       }
-      const templateQuestions = graded
-        ? templateQuestionsGraded
-        : templateQuestionsUngraded;
       for (const questionToCopy of templateQuestions) {
         switch (questionToCopy.type) {
           case QuestionType.CHECKBOX: {
@@ -42,19 +36,17 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionToCopy.text,
               questionToCopy.number,
               questionToCopy.optional,
-              questionToCopy.graded,
+              graded ? questionToCopy.graded : false,
               questionnaire
             );
             await question.validateOrReject();
             await transactionalEntityManager.save(question);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
-              const points =
-                optionToCopy.points == null ? null : optionToCopy.points;
               const option = new CheckboxQuestionOption(
                 optionToCopy.text,
                 question,
-                points
+                graded ? optionToCopy.points : null
               );
               await option.validateOrReject();
               await transactionalEntityManager.save(option);
@@ -66,19 +58,17 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionToCopy.text,
               questionToCopy.number,
               questionToCopy.optional,
-              questionToCopy.graded,
+              graded ? questionToCopy.graded : false,
               questionnaire
             );
             await question.validateOrReject();
             await transactionalEntityManager.save(question);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
-              const points =
-                optionToCopy.points == null ? null : optionToCopy.points;
               const option = new MultipleChoiceQuestionOption(
                 optionToCopy.text,
                 question,
-                points
+                graded ? optionToCopy.points : null
               );
               await option.validateOrReject();
               await transactionalEntityManager.save(option);
