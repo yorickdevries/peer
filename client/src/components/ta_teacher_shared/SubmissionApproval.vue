@@ -58,7 +58,7 @@
                     <b-row>
                         <b-col>
                             <FileAnnotator
-                                v-if="viewPDF"
+                                v-if="viewFile"
                                 :submissionId="submission.id"
                                 :readOnly="true"
                                 :assignmentType="assignment.assignmentType"
@@ -125,8 +125,8 @@ export default {
             assignment: {},
             submission: {},
             commentChanged: false,
-            // dont view pdf until data is fetched
-            viewPDF: false
+            // dont view file until data is fetched
+            viewFile: false
         }
     },
     computed: {
@@ -148,9 +148,9 @@ export default {
     methods: {
         async fetchData() {
             await this.fetchAssignment()
-            this.viewPDF = false
+            this.viewFile = false
             await this.fetchSubmission()
-            this.viewPDF = true
+            this.viewFile = true
         },
         async fetchAssignment() {
             // Fetch the assignment information.

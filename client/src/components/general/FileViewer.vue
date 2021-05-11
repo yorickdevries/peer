@@ -1,7 +1,7 @@
 <template>
     <div>
         <PDFViewer v-if="assignmentType === 'document' || fileExtension === '.pdf'" :fileUrl="fileUrl" />
-        <CodeViewer v-else-if="assignmentType === 'code'" :fileUrl="fileUrl" />
+        <CodeViewer v-else-if="assignmentType === 'code'" :fileUrl="fileUrl" :fileExtension="fileExtension" />
         <div v-else>
             <b-alert show variant="secondary">
                 No file preview is available, because the assignment type was not recognized.</b-alert

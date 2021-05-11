@@ -1,7 +1,7 @@
 <template>
     <b-container fluid class="px-0">
         <b-tabs card>
-            <b-tab title="PDF Annotation Feedback">
+            <b-tab title="File Annotation Feedback">
                 <FileAnnotator
                     :submissionId="finalSubmission.id"
                     :readOnly="true"
