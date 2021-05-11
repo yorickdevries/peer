@@ -40,8 +40,13 @@ export default class UploadQuestionAnswer extends QuestionAnswer {
     return this.uploadAnswer.getFileNamewithExtension();
   }
 
-  getAnswerPoints(): number[] {
-    //To be implemented in future when UploadQuestions become graded
-    return [];
+  async getAnswerPoints(): Promise<undefined> {
+    //To be implemented in future when OpenQuestions become graded
+    const question = await this.getQuestion();
+    if (!question.graded) {
+      return undefined;
+    } else {
+      throw new Error("The question is a graded question");
+    }
   }
 }

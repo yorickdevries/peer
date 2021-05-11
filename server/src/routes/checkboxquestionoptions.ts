@@ -26,7 +26,6 @@ const questionOptionSchema = Joi.object({
 router.post("/", validateBody(questionOptionSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const points = req.body.points;
   const question = await CheckboxQuestion.findOne(req.body.checkboxQuestionId);
   if (!question) {
     res
@@ -64,16 +63,20 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
   const questionOption = new CheckboxQuestionOption(
     req.body.text,
     question,
-    points
+    req.body.points
   );
-  try {
-    await questionOption.save();
-  } catch (err) {
+  if (question.graded && questionOption.points == null) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
-      .send(ResponseMessage.GRADING_INCONSISTENCY);
+      .send(ResponseMessage.NON_GRADED_OPTION_FOR_QUESTION_GRADED);
+    return;
+  } else if (!question.graded && questionOption.points !== null) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.GRADED_OPTION_FOR_NON_QUESTION_GRADED);
     return;
   }
+  await questionOption.save();
   res.send(questionOption);
 });
 
@@ -91,7 +94,6 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const { points, text } = req.body;
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const questionOptionId: number = req.params.id as any;
@@ -132,18 +134,20 @@ router.patch(
         .send("The assignment is already in feedback state");
       return;
     }
-    questionOption.text = text;
-    if (points != null) {
-      questionOption.points = points;
-    }
-    try {
-      await questionOption.save();
-    } catch (err) {
+    questionOption.text = req.body.text;
+    questionOption.points = req.body.points;
+    if (question.graded && questionOption.points == null) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
-        .send(ResponseMessage.GRADING_INCONSISTENCY);
+        .send(ResponseMessage.NON_GRADED_OPTION_FOR_QUESTION_GRADED);
+      return;
+    } else if (!question.graded && questionOption.points !== null) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.GRADED_OPTION_FOR_NON_QUESTION_GRADED);
       return;
     }
+    await questionOption.save();
     res.send(questionOption);
   }
 );

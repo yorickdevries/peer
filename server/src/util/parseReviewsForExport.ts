@@ -2,7 +2,8 @@ import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import _ from "lodash";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import Question from "../models/Question";
-import QuestionType from "../enum/QuestionType";
+import CheckboxQuestion from "../models/CheckboxQuestion";
+import CheckboxQuestionAnswer from "../models/CheckboxQuestionAnswer";
 
 const parseSubmissionReviewsForExport = async function (
   submissionQuestionnaire: SubmissionQuestionnaire
@@ -82,27 +83,37 @@ const parseSubmissionReviewsForExport = async function (
     // QUESTIONS
     // iterate over all questions
     for (const question of questions) {
-      let questionText = `R${question.number}. ${question.text}`;
+      const questionText = `R${question.number}. ${question.text}`;
       const answer = await review.getAnswer(question);
       const answerText = answer?.getAnswerText();
+      // answer in text form
+      parsedReview[questionText] = answerText;
       if (question.graded) {
-        const points = answer?.getAnswerPoints();
-        const totalPoints =
-          points == null || !points.length ? "" : points[0] / 100;
-        const pointsAnswerText = questionText + " (POINTS)";
-        questionText += " (GRADED)";
-        parsedReview[questionText] = answerText;
-        parsedReview[pointsAnswerText] = totalPoints;
-        if (question.type === QuestionType.CHECKBOX) {
-          const totalPointsList =
-            points == null || !points.length
-              ? ""
-              : points.slice(1).map((p) => p / 100);
-          const pointsAnswerListText = questionText + " (POINTS LIST)";
-          parsedReview[pointsAnswerListText] = String(totalPointsList);
+        let points = await answer?.getAnswerPoints();
+        if (points !== undefined) {
+          // divide by 100 for export
+          points = points / 100;
         }
-      } else {
-        parsedReview[questionText] = answerText;
+        const pointsQuestionText = questionText + " (POINTS)";
+        // answer in total points form
+        parsedReview[pointsQuestionText] = points;
+        if (question instanceof CheckboxQuestion) {
+          let pointsList = undefined;
+          if (answer instanceof CheckboxQuestionAnswer) {
+            pointsList = await answer.getAnswerPointsList();
+          }
+          if (pointsList instanceof Array) {
+            const fractionalPointsList = [];
+            for (const points of pointsList) {
+              // divide by 100 for export
+              fractionalPointsList.push(points / 100);
+            }
+            pointsList = String(fractionalPointsList);
+          }
+          const pointsListQuestionText = questionText + " (POINTS LIST)";
+          // answer in points list form
+          parsedReview[pointsListQuestionText] = pointsList;
+        }
       }
     }
 
@@ -151,27 +162,37 @@ const parseSubmissionReviewsForExport = async function (
 
     // iterate over all questions
     for (const question of reviewEvaluationQuestions) {
-      let questionText = `E${question.number}. ${question.text}`;
+      const questionText = `E${question.number}. ${question.text}`;
       const answer = await reviewEvaluation?.getAnswer(question);
       const answerText = answer?.getAnswerText();
+      // answer in text form
+      parsedReview[questionText] = answerText;
       if (question.graded) {
-        const points = answer?.getAnswerPoints();
-        const totalPoints =
-          points == null || !points.length ? "" : points[0] / 100;
-        const pointsAnswerText = questionText + " (POINTS)";
-        questionText += " (GRADED)";
-        parsedReview[questionText] = answerText;
-        parsedReview[pointsAnswerText] = totalPoints;
-        if (question.type === QuestionType.CHECKBOX) {
-          const totalPointsList =
-            points == null || !points.length
-              ? ""
-              : points.slice(1).map((p) => p / 100);
-          const pointsAnswerListText = questionText + " (POINTS LIST)";
-          parsedReview[pointsAnswerListText] = String(totalPointsList);
+        let points = await answer?.getAnswerPoints();
+        if (points !== undefined) {
+          // divide by 100 for export
+          points = points / 100;
         }
-      } else {
-        parsedReview[questionText] = answerText;
+        const pointsQuestionText = questionText + " (POINTS)";
+        // answer in total points form
+        parsedReview[pointsQuestionText] = points;
+        if (question instanceof CheckboxQuestion) {
+          let pointsList = undefined;
+          if (answer instanceof CheckboxQuestionAnswer) {
+            pointsList = await answer.getAnswerPointsList();
+          }
+          if (pointsList instanceof Array) {
+            const fractionalPointsList = [];
+            for (const points of pointsList) {
+              // divide by 100 for export
+              fractionalPointsList.push(points / 100);
+            }
+            pointsList = String(fractionalPointsList);
+          }
+          const pointsListQuestionText = questionText + " (POINTS LIST)";
+          // answer in points list form
+          parsedReview[pointsListQuestionText] = pointsList;
+        }
       }
     }
     parsedReviews.push(parsedReview);

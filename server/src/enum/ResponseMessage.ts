@@ -19,7 +19,6 @@ enum ResponseMessage {
   ANSWER_NOT_FOUND = "The specified answer is not found",
   NON_GRADED_OPTION_FOR_QUESTION_GRADED = "Your provided a NON-GRADED option for a GRADED question",
   GRADED_OPTION_FOR_NON_QUESTION_GRADED = "Your provided a GRADED option for a NON-GRADED question",
-  GRADING_INCONSISTENCY = "The option and question must be both graded or non-graded",
 }
 
 export default ResponseMessage;

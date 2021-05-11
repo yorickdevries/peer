@@ -96,6 +96,7 @@ export default {
             await api.uploadquestions.delete(this.question.id)
             this.showSuccessMessage({ message: "Successfully deleted upload question." })
             this.$emit("questionSaved")
+            this.questionId = null
         }
     }
 }

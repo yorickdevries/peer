@@ -353,6 +353,53 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
     expect(res.text).toMatch('ValidationError: "graded" is required');
 
+    // Reject on save graded checkbox
+    res = await request(server)
+      .post(`/api/checkboxquestions/`)
+      .send({
+        text: "This is a graded Checkbox question too but graded 2",
+        number: 10,
+        optional: true,
+        questionnaireId: submissionQuestionnaire.id,
+        graded: true,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const checkboxQuestionGradedToReject = JSON.parse(res.text);
+    expect(checkboxQuestionGradedToReject).toMatchObject({
+      text: "This is a graded Checkbox question too but graded 2",
+      number: 10,
+      optional: true,
+      graded: true,
+    });
+
+    res = await request(server)
+      .post(`/api/checkboxquestionoptions/`)
+      .send({
+        text: "option 1",
+        checkboxQuestionId: checkboxQuestionGradedToReject.id,
+        points: 100,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const checkboxQuestionOptionObject = JSON.parse(res.text);
+    expect(checkboxQuestionOptionObject).toMatchObject({
+      text: "option 1",
+      points: 100,
+    });
+
+    res = await request(server)
+      .patch(`/api/checkboxquestionoptions/${checkboxQuestionOptionObject.id}`)
+      .send({
+        text: "option 1",
+        points: null,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
+    expect(res.text).toMatch(
+      "Your provided a NON-GRADED option for a GRADED question"
+    );
+
     // post Checkbox question option in the questionnaire
     res = await request(server)
       .post(`/api/checkboxquestionoptions/`)
@@ -426,7 +473,7 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
     expect(res.text).toBe(
-      "The option and question must be both graded or non-graded"
+      "Your provided a NON-GRADED option for a GRADED question"
     );
 
     // post graded Checkbox question option in the questionnaire BAD REQUEST 2
@@ -440,7 +487,7 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
     expect(res.text).toBe(
-      "The option and question must be both graded or non-graded"
+      "Your provided a GRADED option for a NON-GRADED question"
     );
 
     // post a MC question in the questionnaire
@@ -569,7 +616,7 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
     expect(res.text).toBe(
-      "The option and question must be both graded or non-graded"
+      "Your provided a NON-GRADED option for a GRADED question"
     );
 
     // post another  MC question option in the questionnaire BAD REQUEST 2
@@ -583,7 +630,56 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
     expect(res.text).toBe(
-      "The option and question must be both graded or non-graded"
+      "Your provided a GRADED option for a NON-GRADED question"
+    );
+
+    // Reject on save graded checkbox
+    res = await request(server)
+      .post(`/api/multiplechoicequestions/`)
+      .send({
+        text: "This is a graded MULTIPLE CHOICE question too but graded 2",
+        number: 11,
+        optional: true,
+        questionnaireId: submissionQuestionnaire.id,
+        graded: true,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const multipleChoiceQuestionGradedToReject = JSON.parse(res.text);
+    expect(multipleChoiceQuestionGradedToReject).toMatchObject({
+      text: "This is a graded MULTIPLE CHOICE question too but graded 2",
+      number: 11,
+      optional: true,
+      graded: true,
+    });
+
+    res = await request(server)
+      .post(`/api/multiplechoicequestionoptions/`)
+      .send({
+        text: "option 1",
+        multipleChoiceQuestionId: multipleChoiceQuestionGradedToReject.id,
+        points: 100,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const multipleChoiceQuestionOptionObject = JSON.parse(res.text);
+    expect(multipleChoiceQuestionOptionObject).toMatchObject({
+      text: "option 1",
+      points: 100,
+    });
+
+    res = await request(server)
+      .patch(
+        `/api/multiplechoicequestionoptions/${multipleChoiceQuestionOptionObject.id}`
+      )
+      .send({
+        text: "option 1",
+        points: null,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
+    expect(res.text).toMatch(
+      "Your provided a NON-GRADED option for a GRADED question"
     );
 
     // post an open question in the questionnaire
@@ -1084,7 +1180,7 @@ describe("Integration", () => {
       )
       .set("cookie", await studentCookie1());
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text).questions.length).toBe(7);
+    expect(JSON.parse(res.text).questions.length).toBe(9);
 
     // get the reviews a student needs to do
     res = await request(server)

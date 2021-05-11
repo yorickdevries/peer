@@ -8,11 +8,13 @@ import {
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Questionnaire from "../models/Questionnaire";
 import CheckboxQuestion from "../models/CheckboxQuestion";
+import CheckboxQuestionOption from "../models/CheckboxQuestionOption";
 import ResponseMessage from "../enum/ResponseMessage";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { AssignmentState } from "../enum/AssignmentState";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import _ from "lodash";
+import { getManager } from "typeorm";
 
 const router = express.Router();
 
@@ -154,12 +156,44 @@ router.patch(
         .send("The assignment is already in feedback state");
       return;
     }
-    // otherwise update the question
-    question.text = req.body.text;
-    question.number = req.body.number;
-    question.optional = req.body.optional;
-    question.graded = req.body.graded;
-    await question.save();
+    // graded changed
+    const gradedChanged = question.graded !== req.body.graded;
+    if (!gradedChanged) {
+      // if grades isnt changed, we can just update the question
+      question.text = req.body.text;
+      question.number = req.body.number;
+      question.optional = req.body.optional;
+      question.graded = req.body.graded;
+      await question.save();
+    } else {
+      await getManager().transaction(
+        "SERIALIZABLE", // make sure no new options can be added in the mean time
+        async (transactionalEntityManager) => {
+          // reload the question in transaction
+          const reloadedQuestion = await transactionalEntityManager.findOneOrFail(
+            CheckboxQuestion,
+            questionId
+          );
+          const reloadedQuestionOptions = await transactionalEntityManager.find(
+            CheckboxQuestionOption,
+            { where: { question: reloadedQuestion } }
+          );
+          // update question
+          reloadedQuestion.text = req.body.text;
+          reloadedQuestion.number = req.body.number;
+          reloadedQuestion.optional = req.body.optional;
+          reloadedQuestion.graded = req.body.graded;
+          // make sure all points are valid and save the updated version
+          for (const reloadedQuestionOption of reloadedQuestionOptions) {
+            reloadedQuestionOption.points = reloadedQuestion.graded ? 0 : null;
+            await transactionalEntityManager.save(reloadedQuestionOption);
+          }
+          // lastly update the question itself (including graded value)
+          await transactionalEntityManager.save(reloadedQuestion);
+        }
+      );
+    }
+    await question.reload();
     res.send(question);
   }
 );
