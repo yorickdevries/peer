@@ -57,13 +57,7 @@
                     </b-row>
                     <b-row>
                         <b-col>
-                            <FileAnnotator
-                                v-if="viewFile"
-                                :submissionId="submission.id"
-                                :readOnly="true"
-                                :assignmentType="assignment.assignmentType"
-                                :fileExtension="submission.file.extension"
-                            />
+                            <FileAnnotator v-if="viewFile" :submissionId="submission.id" :readOnly="true" />
                         </b-col>
                     </b-row>
                 </b-card-body>

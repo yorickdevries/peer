@@ -90,16 +90,11 @@
                             <!--Toggle side by side view-->
                             <b-button @click="toggleViewFileNextToQuestionnaire()">
                                 {{ viewFileNextToQuestionnaire ? "Stop viewing" : "View" }}
-                                {{ assignment.assignmentType }} next to questionnaire
+                                submission next to questionnaire
                             </b-button>
                             <br />
                             <br />
-                            <FileAnnotator
-                                :reviewId="review.id"
-                                :readOnly="true"
-                                :assignmentType="assignment.assignmentType"
-                                :fileExtension="fileMetadata.extension"
-                            />
+                            <FileAnnotator :reviewId="review.id" :readOnly="true" />
                         </b-col>
                         <b-col :cols="columnWidthFileAndQuestionnaire">
                             <b-card

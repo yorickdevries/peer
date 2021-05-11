@@ -53,17 +53,11 @@
             <b-col :cols="columnWidthFileAndQuestionnaire" v-if="viewFile">
                 <!--Toggle side by side view-->
                 <b-button @click="toggleViewFileNextToQuestionnaire()">
-                    {{ viewFileNextToQuestionnaire ? "Stop viewing" : "View" }} {{ assignmentType }} next to
-                    questionnaire
+                    {{ viewFileNextToQuestionnaire ? "Stop viewing" : "View" }} submission next to questionnaire
                 </b-button>
                 <br />
                 <br />
-                <FileAnnotator
-                    :reviewId="review.id"
-                    :readOnly="reviewsAreReadOnly"
-                    :assignmentType="assignmentType"
-                    :fileExtension="fileMetadata.extension"
-                />
+                <FileAnnotator :reviewId="review.id" :readOnly="reviewsAreReadOnly" />
             </b-col>
             <b-col :cols="columnWidthFileAndQuestionnaire">
                 <template v-if="!reviewsAreReadOnly">
@@ -353,7 +347,7 @@ import PDFViewer from "../../general/PDFViewer"
 export default {
     mixins: [notifications],
     components: { StarRating, ReviewEvaluation, FileAnnotator, PDFViewer },
-    props: ["reviewId", "reviewsAreReadOnly", "assignmentType"],
+    props: ["reviewId", "reviewsAreReadOnly"],
     data() {
         return {
             fileMetadata: null,

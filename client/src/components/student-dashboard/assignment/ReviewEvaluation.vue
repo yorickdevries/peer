@@ -23,7 +23,6 @@
                     <ReviewViewForEvaluation
                         :reviewId="feedbackReviewId"
                         :reviewsAreReadOnly="true"
-                        :assignmentType="assignmentType"
                     ></ReviewViewForEvaluation>
                 </b-modal>
             </b-col>
@@ -371,7 +370,7 @@ import PDFViewer from "../../general/PDFViewer"
 export default {
     mixins: [notifications],
     components: { ReviewViewForEvaluation, StarRating, PDFViewer },
-    props: ["feedbackReviewId", "reviewsAreReadOnly", "assignmentType"],
+    props: ["feedbackReviewId", "reviewsAreReadOnly"],
     data() {
         return {
             // current user

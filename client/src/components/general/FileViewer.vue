@@ -1,7 +1,7 @@
 <template>
     <div>
-        <PDFViewer v-if="assignmentType === 'document' || fileExtension === '.pdf'" :fileUrl="fileUrl" />
-        <CodeViewer v-else-if="assignmentType === 'code'" :fileUrl="fileUrl" :fileExtension="fileExtension" />
+        <PDFViewer v-if="renderAs === 'document'" :fileUrl="fileUrl" />
+        <CodeViewer v-else-if="renderAs === 'code'" :fileUrl="fileUrl" />
         <div v-else>
             <b-alert show variant="secondary">
                 No file preview is available, because the assignment type was not recognized.</b-alert
@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import JSZip from "jszip"
 import CodeViewer from "./CodeViewer"
 import PDFViewer from "./PDFViewer"
 
@@ -19,14 +20,36 @@ export default {
         CodeViewer,
         PDFViewer
     },
-    props: ["fileUrl", "assignmentType"],
+    props: ["fileUrl"],
     data() {
         return {
-            fileExtension: null
+            renderAs: ""
         }
     },
     created() {
-        this.fileExtension = this.fileUrl.split(".").pop()
+        fetch(this.fileUrl)
+            .then(res => res.blob())
+            .then(file => {
+                if (file.type.includes("text/plain")) {
+                    // The given file contains plain text and should be rendered as code
+                    this.renderAs = "code"
+                } else {
+                    // The given file contains binary data, we should test whether it is a zip or a
+                    // pdf
+                    JSZip.loadAsync(file)
+                        .then(() => {
+                            // JSZip thinks this file is a zip file, so it should be rendered as
+                            // code
+                            this.renderAs = "code"
+                        })
+                        .catch(() => {
+                            // JSZip could not unzip the file, which means it might be a pdf file
+                            // so it should be rendered as a pdf
+                            this.renderAs = "document"
+                        })
+                }
+            })
+            .catch(console.error)
     }
 }
 </script>

@@ -2,12 +2,7 @@
     <b-container fluid class="px-0">
         <b-tabs card>
             <b-tab title="File Annotation Feedback">
-                <FileAnnotator
-                    :submissionId="finalSubmission.id"
-                    :readOnly="true"
-                    :assignmentType="assignment.assignmentType"
-                    :fileExtension="finalSubmission.file.extension"
-                />
+                <FileAnnotator :submissionId="finalSubmission.id" :readOnly="true" />
                 <div v-if="finalSubmission.file.extension !== '.pdf' && assignment.assignmentType === 'document'">
                     Your submission was not a .pdf file, so it was not annotated by reviewers
                 </div>

@@ -15,7 +15,6 @@
                         <ReviewEvaluation
                             :feedbackReviewId="review.id"
                             :reviewsAreReadOnly="!isReviewEvaluationActive"
-                            :assignmentType="assignment.assignmentType"
                         ></ReviewEvaluation>
                     </b-tab>
                 </b-tabs>
