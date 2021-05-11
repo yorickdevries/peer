@@ -17,6 +17,8 @@ enum ResponseMessage {
   REVIEW_NOT_FOUND = "The specified review is not found",
   SUBMISSION_NOT_FOUND = "The specified submission is not found",
   ANSWER_NOT_FOUND = "The specified answer is not found",
+  NON_GRADED_OPTION_FOR_QUESTION_GRADED = "Your provided a NON-GRADED option for a GRADED question",
+  GRADED_OPTION_FOR_NON_QUESTION_GRADED = "Your provided a GRADED option for a NON-GRADED question",
 }
 
 export default ResponseMessage;

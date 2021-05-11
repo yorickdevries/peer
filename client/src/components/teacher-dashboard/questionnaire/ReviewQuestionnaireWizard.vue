@@ -49,13 +49,21 @@
                                 <div class="text-muted">
                                     Load default review evaluation questions into questionnaire
                                 </div>
-                                <div class="input-group mb-2">
-                                    <div class="input-group-prepend">
-                                        <b-button variant="primary" @click="defaultQuestions"
-                                            >Default questions</b-button
-                                        >
-                                    </div>
-                                </div>
+                                <b-input-group>
+                                    <template #prepend>
+                                        <b-button v-b-modal.modal-sm variant="primary">Default questions</b-button>
+                                        <b-modal id="modal-sm" size="sm" title="Graded Defaults" @ok="defaultQuestions"
+                                            >Would you like to import graded defaults?
+                                            <b-form-checkbox
+                                                id="graded-defaults"
+                                                v-model="gradedDefault"
+                                                name="graded-defaults"
+                                            >
+                                                Use graded questions
+                                            </b-form-checkbox>
+                                        </b-modal>
+                                    </template>
+                                </b-input-group>
                             </div>
                         </b-col>
                     </b-row>
@@ -79,6 +87,9 @@
                             <b-badge v-else variant="danger" class="ml-2 float-right p-1">
                                 REQUIRED
                             </b-badge>
+                            <b-badge v-if="question.graded" variant="secondary" class="ml-2 float-right p-1">
+                                GRADED
+                            </b-badge>
                         </b-card-header>
 
                         <b-card-body>
@@ -97,16 +108,22 @@
 
                             <!-- MULTIPLE CHOICE QUESTION -->
                             <b-form-radio-group v-if="question.type === 'multiplechoice'" stacked required disabled>
-                                <b-form-radio v-for="option in question.options" :key="option.id" :value="option">{{
-                                    option.text
-                                }}</b-form-radio>
+                                <b-form-radio v-for="option in question.options" :key="option.id" :value="option">
+                                    {{ option.text }}
+                                    <b-badge v-if="question.graded" variant="dark"
+                                        >Points: {{ pointsDisplay(option.points) }}</b-badge
+                                    >
+                                </b-form-radio>
                             </b-form-radio-group>
 
                             <!-- CHECKBOX QUESTION -->
                             <b-form-checkbox-group v-if="question.type === 'checkbox'" stacked required disabled>
-                                <b-form-checkbox v-for="option in question.options" :key="option.id" :value="option">{{
-                                    option.text
-                                }}</b-form-checkbox>
+                                <b-form-checkbox v-for="option in question.options" :key="option.id" :value="option">
+                                    {{ option.text }}
+                                    <b-badge v-if="question.graded" variant="dark"
+                                        >Points: {{ pointsDisplay(option.points) }}</b-badge
+                                    >
+                                </b-form-checkbox>
                             </b-form-checkbox-group>
 
                             <!-- RANGE QUESTION -->
@@ -176,7 +193,8 @@ export default {
             questionnaire: null,
             // enables copying of a questonnaire to another
             allQuestionnairesOfCourse: [],
-            questionnaireIdToCopyFrom: null
+            questionnaireIdToCopyFrom: null,
+            gradedDefault: false
         }
     },
     computed: {
@@ -208,6 +226,9 @@ export default {
             await this.getAssignmentVersion()
             await this.getQuestionnaire()
             await this.getAllQuestionnairesOfCourse()
+        },
+        pointsDisplay(points) {
+            return points / 100
         },
         async getAssignment() {
             const res = await api.assignments.get(this.$route.params.assignmentId)
@@ -264,7 +285,7 @@ export default {
             await this.fetchData()
         },
         async defaultQuestions() {
-            await api.reviewquestionnaires.defaultQuestions(this.questionnaire.id, this.questionnaireIdToCopyFrom)
+            await api.reviewquestionnaires.defaultQuestions(this.questionnaire.id, Boolean(this.gradedDefault))
             this.showSuccessMessage({ message: "succesfully loaded default questions" })
             await this.fetchData()
         }

@@ -5,6 +5,7 @@ const parseSubmissionsForExport = async function (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any[]> {
   const submissions = await assignmentVersion.getSubmissions();
+  const assignment = await assignmentVersion.getAssignment();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const parsedSubmissions: any[] = [];
   for (const submission of submissions) {
@@ -38,6 +39,30 @@ const parseSubmissionsForExport = async function (
     // updated At
     parsedSubmission["updated at"] = submission.updatedAt;
 
+    const reviewOfSubmissions = await submission.getReviewOfSubmissions();
+    // filter out submitted reviews which are not self reviews
+    const submittedReviews = [];
+    for (const review of reviewOfSubmissions) {
+      const reviewerGroup = await assignment.getGroup(review.reviewer);
+      if (review.submitted && reviewerGroup?.id !== submitterGroup.id) {
+        submittedReviews.push(review);
+      }
+    }
+    let reviewNumber = 1;
+    //Iterate over every review of sumbission
+    for (const review of submittedReviews) {
+      let pointsSum = 0;
+      const reviewAnswers = await review.getQuestionAnswers();
+      for (const answer of reviewAnswers) {
+        const points = await answer.getAnswerPoints();
+        if (points !== undefined) {
+          pointsSum += points;
+        }
+      }
+      const reviewText = `Submission Review Total Points ${reviewNumber}`;
+      parsedSubmission[reviewText] = pointsSum / 100;
+      reviewNumber++;
+    }
     parsedSubmissions.push(parsedSubmission);
   }
   return parsedSubmissions;

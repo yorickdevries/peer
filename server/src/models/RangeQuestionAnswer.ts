@@ -44,4 +44,14 @@ export default class RangeQuestionAnswer extends QuestionAnswer {
   getAnswerText(): string {
     return String(this.rangeAnswer);
   }
+
+  async getAnswerPoints(): Promise<undefined> {
+    //To be implemented in future when OpenQuestions become graded
+    const question = await this.getQuestion();
+    if (!question.graded) {
+      return undefined;
+    } else {
+      throw new Error("The question is a graded question");
+    }
+  }
 }

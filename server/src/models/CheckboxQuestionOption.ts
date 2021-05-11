@@ -16,8 +16,8 @@ export default class CheckboxQuestionOption extends QuestionOption {
   })
   question?: CheckboxQuestion;
 
-  constructor(text: string, question: CheckboxQuestion) {
-    super(text);
+  constructor(text: string, question: CheckboxQuestion, points: number | null) {
+    super(text, points);
     this.question = question;
   }
 
