@@ -206,9 +206,9 @@ export default {
             for (const option of this.question.options) {
                 try {
                     await api.multiplechoicequestionoptions.post(option.text, option.points, this.questionId)
-                    this.showSuccessMessage({ message: "Successfully created multipleChoice question option." })
+                    this.showSuccessMessage({ message: "Successfully created multiple choice question option." })
                 } catch {
-                    this.showErrorMessage({ message: "failed to create multipleChoice question option." })
+                    this.showErrorMessage({ message: "failed to create multiple choice question option." })
                 }
             }
         },
