@@ -86,24 +86,26 @@
                     </b-row>
                     <br />
                     <b-row>
-                        <b-col
-                            v-if="viewPDF && fileMetadata.extension === '.pdf'"
-                            :cols="columnWidthPDFAndQuestionnaire"
-                        >
+                        <b-col :cols="columnWidthFileAndQuestionnaire" v-if="viewFile">
                             <!--Toggle side by side view-->
-                            <b-button @click="toggleViewPDFNextToQuestionnaire()">
-                                {{ viewPDFNextToQuestionnaire ? "Stop viewing" : "View" }} PDF next to questionnaire
+                            <b-button @click="toggleViewFileNextToQuestionnaire()">
+                                {{ viewFileNextToQuestionnaire ? "Stop viewing" : "View" }} submission next to
+                                questionnaire
                             </b-button>
                             <br />
                             <br />
-                            <PDFAnnotator :reviewId="review.id" :readOnly="true"></PDFAnnotator>
+                            <FileAnnotator
+                                :reviewId="review.id"
+                                :readOnly="true"
+                                :assignmentType="assignment.assignmentType"
+                            />
                         </b-col>
-                        <b-col :cols="columnWidthPDFAndQuestionnaire">
+                        <b-col :cols="columnWidthFileAndQuestionnaire">
                             <b-card
                                 v-if="answers"
                                 no-body
                                 class="mt-3"
-                                :style="viewPDFNextToQuestionnaire ? 'max-height: 1000px; overflow-y: auto' : ''"
+                                :style="viewFileNextToQuestionnaire ? 'max-height: 1000px; overflow-y: auto' : ''"
                             >
                                 <!--Form-->
                                 <b-list-group flush>
@@ -320,12 +322,12 @@ import notifications from "../../mixins/notifications"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 import { StarRating } from "vue-rate-it"
 import ReviewEvaluation from "../student-dashboard/assignment/ReviewEvaluation"
-import PDFAnnotator from "../student-dashboard/assignment/PDFAnnotator"
+import FileAnnotator from "../student-dashboard/assignment/FileAnnotator"
 import PDFViewer from "../general/PDFViewer"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, PDFAnnotator, PDFViewer },
+    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, FileAnnotator, PDFViewer },
     data() {
         return {
             assignment: {},
@@ -333,18 +335,18 @@ export default {
             fileMetadata: {},
             review: {},
             commentChanged: false,
-            // dont view pdf until data is fetched
-            viewPDF: false,
+            // dont view file until data is fetched
+            viewFile: false,
             reviewEvaluation: null,
             // all answers will be saved in this object
             answers: null,
-            // View PDF next to questionnaire
-            viewPDFNextToQuestionnaire: false
+            // View file next to questionnaire
+            viewFileNextToQuestionnaire: false
         }
     },
     computed: {
-        columnWidthPDFAndQuestionnaire() {
-            if (this.viewPDFNextToQuestionnaire) {
+        columnWidthFileAndQuestionnaire() {
+            if (this.viewFileNextToQuestionnaire) {
                 // columns are half width
                 return 6
             } else {
@@ -370,10 +372,10 @@ export default {
     methods: {
         async fetchData() {
             await this.fetchAssignment()
-            this.viewPDF = false
+            this.viewFile = false
             await this.fetchReview()
             await this.fetchFileMetadata()
-            this.viewPDF = true
+            this.viewFile = true
             await this.fetchSubmissionQuestionnaire()
             await this.fetchAnswers()
             await this.fetchReviewEvaluation()
@@ -486,8 +488,8 @@ export default {
         uploadAnswerFilePath(reviewId, questionId) {
             return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`
         },
-        toggleViewPDFNextToQuestionnaire() {
-            this.viewPDFNextToQuestionnaire = !this.viewPDFNextToQuestionnaire
+        toggleViewFileNextToQuestionnaire() {
+            this.viewFileNextToQuestionnaire = !this.viewFileNextToQuestionnaire
         }
     }
 }

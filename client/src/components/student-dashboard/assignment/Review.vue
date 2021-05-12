@@ -50,16 +50,16 @@
         </b-row>
         <br />
         <b-row>
-            <b-col :cols="columnWidthPDFAndQuestionnaire" v-if="viewPDF && fileMetadata.extension === '.pdf'">
+            <b-col :cols="columnWidthFileAndQuestionnaire" v-if="viewFile">
                 <!--Toggle side by side view-->
-                <b-button @click="toggleViewPDFNextToQuestionnaire()">
-                    {{ viewPDFNextToQuestionnaire ? "Stop viewing" : "View" }} PDF next to questionnaire
+                <b-button @click="toggleViewFileNextToQuestionnaire()">
+                    {{ viewFileNextToQuestionnaire ? "Stop viewing" : "View" }} submission next to questionnaire
                 </b-button>
                 <br />
                 <br />
-                <PDFAnnotator :reviewId="review.id" :readOnly="reviewsAreReadOnly"></PDFAnnotator>
+                <FileAnnotator :reviewId="review.id" :readOnly="reviewsAreReadOnly" :assignmentType="assignmentType" />
             </b-col>
-            <b-col :cols="columnWidthPDFAndQuestionnaire">
+            <b-col :cols="columnWidthFileAndQuestionnaire">
                 <template v-if="!reviewsAreReadOnly">
                     <!--Save/Submit Buttons-->
                     <b-card-body>
@@ -106,7 +106,7 @@
                     v-if="answers"
                     no-body
                     class="mt-3"
-                    :style="viewPDFNextToQuestionnaire ? 'max-height: 1000px; overflow-y: auto' : ''"
+                    :style="viewFileNextToQuestionnaire ? 'max-height: 1000px; overflow-y: auto' : ''"
                 >
                     <!--Title-->
                     <b-card-header v-if="!reviewsAreReadOnly">
@@ -221,6 +221,7 @@
                                             centered
                                             hide-footer
                                         >
+                                            <!-- TODO: What to do with the upload questions? -->
                                             <PDFViewer :fileUrl="uploadAnswerFilePath(review.id, question.id)" />
                                         </b-modal>
                                     </b-col>
@@ -262,11 +263,6 @@
                                 >Save Answer</b-button
                             >
                         </b-card-body>
-                    </b-card>
-                    <!-- TODO: Add support for single-file submissions -->
-                    <!-- TODO: Add support for getting assignment type -->
-                    <b-card v-if="fileMetadata.extension === '.zip'">
-                        <CodeViewer :zipURL="reviewFilePath" />
                     </b-card>
                 </b-card>
 
@@ -345,33 +341,32 @@ import _ from "lodash"
 import notifications from "../../../mixins/notifications"
 import { StarRating } from "vue-rate-it"
 import ReviewEvaluation from "./ReviewEvaluation"
-import PDFAnnotator from "./PDFAnnotator"
+import FileAnnotator from "./FileAnnotator"
 import PDFViewer from "../../general/PDFViewer"
-import CodeViewer from "../../general/CodeViewer.vue"
 
 export default {
     mixins: [notifications],
-    components: { StarRating, ReviewEvaluation, PDFAnnotator, PDFViewer, CodeViewer },
-    props: ["reviewId", "reviewsAreReadOnly"],
+    components: { StarRating, ReviewEvaluation, FileAnnotator, PDFViewer },
+    props: ["reviewId", "reviewsAreReadOnly", "assignmentType"],
     data() {
         return {
             fileMetadata: null,
             review: {},
-            // dont view pdf until data is fetched
-            viewPDF: false,
+            // dont view file until data is fetched
+            viewFile: false,
             reviewEvaluation: null,
             questionnaire: {},
             // all answers will be saved in this object
             answers: null,
             // disable save/delete buttons when a call is busy
             buttonDisabled: false,
-            // View PDF next to questionnaire
-            viewPDFNextToQuestionnaire: false
+            // View file next to questionnaire
+            viewFileNextToQuestionnaire: false
         }
     },
     computed: {
-        columnWidthPDFAndQuestionnaire() {
-            if (this.viewPDFNextToQuestionnaire) {
+        columnWidthFileAndQuestionnaire() {
+            if (this.viewFileNextToQuestionnaire) {
                 // columns are half width
                 return 6
             } else {
@@ -426,10 +421,10 @@ export default {
     },
     methods: {
         async fetchData() {
-            this.viewPDF = false
+            this.viewFile = false
             await this.fetchReview()
             await this.fetchFileMetadata()
-            this.viewPDF = true
+            this.viewFile = true
             await this.fetchSubmissionQuestionnaire()
             await this.fetchAnswers()
             await this.fetchReviewEvaluation()
@@ -626,8 +621,8 @@ export default {
         uploadAnswerFilePath(reviewId, questionId) {
             return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`
         },
-        toggleViewPDFNextToQuestionnaire() {
-            this.viewPDFNextToQuestionnaire = !this.viewPDFNextToQuestionnaire
+        toggleViewFileNextToQuestionnaire() {
+            this.viewFileNextToQuestionnaire = !this.viewFileNextToQuestionnaire
         }
     }
 }

@@ -7,32 +7,22 @@
 <script>
 import hljs from "highlight.js"
 import "highlight.js/styles/default.css"
-import JSZipUtils from "jszip-utils"
 import JSZip from "jszip"
 export default {
-    props: ["fileUrl", "zipURL"],
+    props: ["fileUrl"],
     data() {
         return {
             content: null
         }
     },
-    created() {
-        // If we get a zip file, we'll try to unzip it and show one of the code files
-        if (this.zipURL) {
-            const url = this.zipURL
-            // Promise to wrap the file loading in
-            const promise = new JSZip.external.Promise(function(resolve, reject) {
-                JSZipUtils.getBinaryContent(url, function(err, data) {
-                    if (err) {
-                        reject(err)
-                    } else {
-                        resolve(data)
-                    }
-                })
-            })
-            // Actually load the zip file
-            promise
-                .then(JSZip.loadAsync)
+    methods: {
+        async getFile() {
+            return await fetch(this.fileUrl)
+                .then(res => res.blob())
+                .catch(console.error)
+        },
+        async loadZip(file) {
+            JSZip.loadAsync(file)
                 .then(zip => {
                     const files = Object.keys(zip.files)
                         .map(name => zip.file(name))
@@ -64,10 +54,9 @@ export default {
                     this.content = highlighted.value.split(/\r?\n/g)
                 })
                 .catch(console.warn)
-        } else {
-            // Leave support for single-submission files
-            fetch(this.fileUrl)
-                .then(response => response.text())
+        },
+        async loadSingleFile(file) {
+            Promise.resolve(file.text())
                 .then(text => {
                     // hljs.highlightAuto expects a string (code) and optionally an array
                     // of language names / aliases
@@ -75,6 +64,17 @@ export default {
                     this.content = highlighted.value.split(/\r?\n/g)
                 })
                 .catch(console.warn)
+        }
+    },
+    async created() {
+        const file = await this.getFile()
+        const isZipFile = !file.type.includes("text/plain")
+
+        // If we get a zip file, we'll try to unzip it and show one of the code files
+        if (isZipFile) {
+            this.loadZip(file)
+        } else {
+            this.loadSingleFile(file)
         }
     }
 }

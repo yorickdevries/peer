@@ -140,28 +140,17 @@
             <b-row>
                 <b-col>
                     <dt>You can view your final submission here:</dt>
-                    <div v-if="finalSubmission && finalSubmission.file.extension === '.pdf'">
-                        <b-alert show variant="secondary"
+                    <div>
+                        <b-alert v-if="finalSubmission && finalSubmission.file.extension === '.pdf'" variant="secondary"
                             >In case the viewer shows any errors, your .pdf is malformed and no pdf annotations can be
                             made by your reviewers directly in the browser. Reviewers can always download the file
                             instead.</b-alert
                         >
-                        <PDFAnnotator :submissionId="finalSubmission.id" :readOnly="true"></PDFAnnotator>
-                    </div>
-                    <!-- Code view component -->
-                    <div
-                        v-else-if="
-                            finalSubmission &&
-                                finalSubmission.file.extension === '.zip' &&
-                                assignment.assignmentType === 'code'
-                        "
-                    >
-                        <CodeViewer :zipURL="submissionFilePath(finalSubmission.id)" />
-                    </div>
-                    <div v-else>
-                        <b-alert show variant="secondary">
-                            Your final submission is not a .pdf file, so it will not be rendered in the browser</b-alert
-                        >
+                        <FileAnnotator
+                            :submissionId="finalSubmission.id"
+                            :readOnly="true"
+                            :assignmentType="assignment.assignmentType"
+                        />
                     </div>
                 </b-col>
             </b-row>
@@ -172,13 +161,12 @@
 <script>
 import api from "../../../api/api"
 import _ from "lodash"
-import PDFAnnotator from "./PDFAnnotator"
+import FileAnnotator from "./FileAnnotator"
 import notifications from "../../../mixins/notifications"
-import CodeViewer from "../../general/CodeViewer.vue"
 export default {
     props: ["assignmentVersionId"],
     mixins: [notifications],
-    components: { PDFAnnotator, CodeViewer },
+    components: { FileAnnotator },
     data() {
         return {
             assignment: null,
