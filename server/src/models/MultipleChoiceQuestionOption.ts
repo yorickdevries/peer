@@ -20,8 +20,12 @@ export default class MultipleChoiceQuestionOption extends QuestionOption {
   )
   question?: MultipleChoiceQuestion;
 
-  constructor(text: string, question: MultipleChoiceQuestion) {
-    super(text);
+  constructor(
+    text: string,
+    question: MultipleChoiceQuestion,
+    points: number | null
+  ) {
+    super(text, points);
     this.question = question;
   }
 

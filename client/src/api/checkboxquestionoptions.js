@@ -1,12 +1,16 @@
 import client from "./axiosClient"
 
 export default {
-    post(text, checkboxQuestionId) {
-        const body = { text, checkboxQuestionId }
+    post(text, decimalPoints, checkboxQuestionId) {
+        // convert to integer
+        const points = isNaN(decimalPoints) ? null : parseInt(decimalPoints * 100)
+        const body = { text, checkboxQuestionId, points }
         return client.post("checkboxquestionoptions/", body)
     },
-    patch(text, id) {
-        const body = { text }
+    patch(text, decimalPoints, id) {
+        // convert to integer
+        const points = isNaN(decimalPoints) ? null : parseInt(decimalPoints * 100)
+        const body = { text, points }
         return client.patch(`checkboxquestionoptions/${id}`, body)
     },
     delete(id) {

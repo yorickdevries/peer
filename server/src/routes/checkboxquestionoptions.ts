@@ -19,7 +19,9 @@ const router = express.Router();
 const questionOptionSchema = Joi.object({
   text: Joi.string().required(),
   checkboxQuestionId: Joi.number().integer().required(),
+  points: Joi.number().integer().allow(null).required(),
 });
+
 // post a questionoption
 router.post("/", validateBody(questionOptionSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -58,7 +60,22 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
       .send("The assignment is already in feedback state");
     return;
   }
-  const questionOption = new CheckboxQuestionOption(req.body.text, question);
+  const questionOption = new CheckboxQuestionOption(
+    req.body.text,
+    question,
+    req.body.points
+  );
+  if (question.graded && questionOption.points == null) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.NON_GRADED_OPTION_FOR_QUESTION_GRADED);
+    return;
+  } else if (!question.graded && questionOption.points !== null) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.GRADED_OPTION_FOR_NON_QUESTION_GRADED);
+    return;
+  }
   await questionOption.save();
   res.send(questionOption);
 });
@@ -66,7 +83,9 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
 // Joi inputvalidation
 const questionPatchSchema = Joi.object({
   text: Joi.string().required(),
+  points: Joi.number().integer().allow(null).required(),
 });
+
 // patch a questionoption
 router.patch(
   "/:id",
@@ -116,6 +135,18 @@ router.patch(
       return;
     }
     questionOption.text = req.body.text;
+    questionOption.points = req.body.points;
+    if (question.graded && questionOption.points == null) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.NON_GRADED_OPTION_FOR_QUESTION_GRADED);
+      return;
+    } else if (!question.graded && questionOption.points !== null) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.GRADED_OPTION_FOR_NON_QUESTION_GRADED);
+      return;
+    }
     await questionOption.save();
     res.send(questionOption);
   }

@@ -19,7 +19,9 @@ const router = express.Router();
 const questionOptionSchema = Joi.object({
   text: Joi.string().required(),
   multipleChoiceQuestionId: Joi.number().integer().required(),
+  points: Joi.number().integer().allow(null).required(),
 });
+
 // post a question
 router.post("/", validateBody(questionOptionSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -62,8 +64,20 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
   }
   const questionOption = new MultipleChoiceQuestionOption(
     req.body.text,
-    question
+    question,
+    req.body.points
   );
+  if (question.graded && questionOption.points == null) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.NON_GRADED_OPTION_FOR_QUESTION_GRADED);
+    return;
+  } else if (!question.graded && questionOption.points !== null) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.GRADED_OPTION_FOR_NON_QUESTION_GRADED);
+    return;
+  }
   await questionOption.save();
   res.send(questionOption);
 });
@@ -71,7 +85,9 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
 // Joi inputvalidation
 const questionPatchSchema = Joi.object({
   text: Joi.string().required(),
+  points: Joi.number().integer().allow(null).required(),
 });
+
 // patch an option
 router.patch(
   "/:id",
@@ -121,6 +137,18 @@ router.patch(
       return;
     }
     questionOption.text = req.body.text;
+    questionOption.points = req.body.points;
+    if (question.graded && questionOption.points == null) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.NON_GRADED_OPTION_FOR_QUESTION_GRADED);
+      return;
+    } else if (!question.graded && questionOption.points !== null) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.GRADED_OPTION_FOR_NON_QUESTION_GRADED);
+      return;
+    }
     await questionOption.save();
     res.send(questionOption);
   }
