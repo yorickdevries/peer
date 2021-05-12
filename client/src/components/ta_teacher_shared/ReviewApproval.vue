@@ -89,8 +89,8 @@
                         <b-col :cols="columnWidthFileAndQuestionnaire" v-if="viewFile">
                             <!--Toggle side by side view-->
                             <b-button @click="toggleViewFileNextToQuestionnaire()">
-                                {{ viewFileNextToQuestionnaire ? "Stop viewing" : "View" }}
-                                {{ assignment.assignmentType }} next to questionnaire
+                                {{ viewFileNextToQuestionnaire ? "Stop viewing" : "View" }} submission next to
+                                questionnaire
                             </b-button>
                             <br />
                             <br />
