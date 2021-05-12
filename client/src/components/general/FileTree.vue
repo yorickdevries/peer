@@ -53,7 +53,7 @@ export default {
                 //  When no file is selected, select first file that it comes across
                 if (!this.selected) {
                     this.selected = file.name
-                    this.$emit("selected", this.selectd)
+this.$emit("selected", this.selected)
                 }
             }
         }
