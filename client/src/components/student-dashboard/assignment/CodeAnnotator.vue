@@ -9,6 +9,7 @@
         <b-alert :show="!showCode" variant="primary">LOADING CODE</b-alert>
         <b-card v-show="showCode">
             <CodeViewer :fileUrl="this.filePath" ref="codeViewer" />
+            <b-popover placement="left" target="code-0" :triggers="['click']" title="Peer user">Text</b-popover>
         </b-card>
     </div>
 </template>
