@@ -1,6 +1,6 @@
 <template>
     <div>
-        <pre><code style="display: block" v-for="(line, index) in content" :key="index" v-html="line"></code></pre>
+        <pre><code style="display: block" v-for="(line, index) in content" :linenr="index" :key="index" v-html="line"></code></pre>
     </div>
 </template>
 
