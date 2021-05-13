@@ -6,10 +6,7 @@
             :submissionId="submissionId"
             :readOnly="readOnly"
         />
-        <!--
-            TODO: Add CodeAnnotator component (?) and put it here
-         -->
-        <CodeViewer v-else-if="renderAs === 'code'" :fileUrl="filePath" />
+        <CodeWrapper v-else-if="renderAs === 'code'" :fileUrl="filePath" :readOnly="readOnly" />
         <div v-else>
             <b-alert show variant="secondary">
                 No file annotation is available, because the assignment type was not recognized.</b-alert
@@ -20,12 +17,12 @@
 
 <script>
 import JSZip from "jszip"
-import CodeViewer from "./../../general/CodeViewer"
+import CodeWrapper from "./../../general/CodeWrapper"
 import PDFAnnotator from "./PDFAnnotator"
 
 export default {
     components: {
-        CodeViewer,
+        CodeWrapper,
         PDFAnnotator
     },
     props: ["reviewId", "submissionId", "readOnly", "assignmentType"],
