@@ -4,7 +4,7 @@
             <icon class="text-muted" name="folder"></icon>
             {{ name }}
         </div>
-        <div v-if="!dir" v-bind:class="background">
+        <div v-else v-bind:class="background">
             <icon class="text-muted" name="code"></icon>
             <span v-on:click="onSelect"> {{ name }}</span>
         </div>
