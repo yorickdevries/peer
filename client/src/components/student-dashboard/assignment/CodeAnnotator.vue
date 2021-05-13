@@ -51,7 +51,8 @@ export default {
             writing: false,
             highlightedText: null,
             lineNumber: null,
-            commentText: null
+            commentText: null,
+            comments: []
         }
     },
     computed: {
@@ -115,6 +116,8 @@ export default {
             // Index starts at 0, line numbers start at 1
             this.lineNumber++
         },
+        // TODO: Update line to view comment, sort array comments on line number,
+        // send all comments to the server once finished.
         async submitComment() {
             // Update the current state
             this.writing = false
@@ -123,7 +126,11 @@ export default {
             console.log(this.commentText)
             console.log(this.lineNumber)
             console.log(this.highlightedText)
-            api.codeannotation.put(this.commentText, this.lineNumber, this.reviewId, this.file)
+            this.comments[this.comments.length] = {
+                commentText: this.commentText,
+                lineNumber: this.lineNumber,
+                highlightedText: this.highlightedText
+            }
 
             // Reset the highlighted text, comment text and line number
             this.commentText = null
