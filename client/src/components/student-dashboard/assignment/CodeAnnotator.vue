@@ -10,10 +10,10 @@
 
         <!-- The buttons and text area for the actual comments, somewhat primitive -->
         <!-- TODO: Upgrade the look of these buttons -->
-        <form @submit.prevent="writeComment">
+        <form @submit.prevent="writeComment" v-if="!readOnly">
             <button type="submit" v-if="!writing">Leave a comment on highlighted part</button>
         </form>
-        <form @submit.prevent="submitComment" v-if="writing">
+        <form @submit.prevent="submitComment" v-if="writing && !readOnly">
             <button type="submit">Submit your comment</button>
             <b-form-textarea
                 placeholder="Type your comment"
@@ -25,19 +25,17 @@
 
         <b-card v-show="showCode">
             <CodeViewer :fileUrl="this.filePath" ref="codeViewer" />
-
-            <!--<b-popover placement="left" target="code-0" :triggers="['click']" title="Peer user">Text</b-popover>-->
         </b-card>
     </div>
 </template>
 
 <script>
 import api from "../../../api/api"
-// import axios from "axios"
-// import izitoast from "izitoast"
 import CodeViewer from "../../general/CodeViewer"
+import notifications from "../../../mixins/notifications"
 
 export default {
+    mixins: [notifications],
     components: { CodeViewer },
     // either "reviewId" or "submissionId" is passed, not both
     props: ["reviewId", "submissionId", "readOnly", "filePath"],
@@ -50,7 +48,8 @@ export default {
             showCode: false,
             writing: false,
             highlightedText: null,
-            lineNumber: null,
+            startLineNumber: null,
+            endLineNumber: null,
             commentText: null,
             comments: []
         }
@@ -68,6 +67,7 @@ export default {
         await this.fetchReview()
         await this.fetchSubmission()
         await this.fetchFileMetadata()
+        await this.fetchComments()
         this.showCode = true
         this.writing = false
     },
@@ -92,50 +92,89 @@ export default {
                 this.fileMetadata = this.submission.file
             }
         },
+        async fetchComments() {
+            this.comments = api.codeannotation.get(/*null, null*/)
+        },
         async writeComment() {
-            const selectedText = window.getSelection().toString()
+            const selection = window.getSelection()
+            const selectedText = selection.toString()
 
             // Do not update the state if nothing is selected
             if (selectedText.length == 0) {
                 return
             }
 
-            // Update the current state
-            this.writing = true
-
-            // Get highlighted text
-            this.highlightedText = selectedText
-
-            // Get line number by navigating to the code element which contains the line number
-            let codeElement = window.getSelection().anchorNode.parentElement
-            while (codeElement.nodeName != "CODE") {
-                codeElement = codeElement.parentElement
+            // Get start line number by navigating to the code element which contains the line number
+            let startCodeElement = selection.anchorNode.parentElement
+            while (startCodeElement != null && startCodeElement.nodeName != "CODE") {
+                startCodeElement = startCodeElement.parentElement
             }
-            this.lineNumber = codeElement.getAttribute("linenr")
+            // Get end line number like the start line number
+            let endCodeElement = selection.focusNode.parentElement
+            while (endCodeElement != null && endCodeElement.nodeName != "CODE") {
+                endCodeElement = endCodeElement.parentElement
+            }
+
+            // TODO: error handling
+            if (startCodeElement == null || endCodeElement == null) {
+                //console.log("start is not a code element")
+                this.showErrorMessage({ message: "Please make sure to select a piece of code" })
+                return
+            }
+            this.startLineNumber = startCodeElement.getAttribute("linenr")
+            this.endLineNumber = endCodeElement.getAttribute("linenr")
 
             // Index starts at 0, line numbers start at 1
-            this.lineNumber++
+            this.startLineNumber++
+            this.endLineNumber++
+
+            // Swap begin and end if they are reversed
+            if (this.startLineNumber > this.endLineNumber) {
+                let temp = this.startLineNumber
+                this.startLineNumber = this.endLineNumber
+                this.endLineNumber = temp
+            }
+
+            // Check if there are already made comments on these lines, signal error message if yes and reset line numbers
+            for (const comment of this.comments) {
+                if (
+                    (comment.startLineNumber <= this.startLineNumber && comment.endLineNumber >= this.endLineNumber) ||
+                    (comment.startLineNumber <= this.endLineNumber && comment.endLineNumber >= this.endLineNumber) ||
+                    (comment.startLineNumber <= this.startLineNumber && comment.endLineNumber >= this.startLineNumber)
+                ) {
+                    this.startLineNumber = null
+                    this.endLineNumber = null
+                    this.showErrorMessage({ message: "Please select lines not yet commented on" })
+                    return
+                }
+            }
+
+            // Update the current state
+            this.writing = true
+            // Get highlighted text
+            this.highlightedText = selectedText
         },
-        // TODO: Update line to view comment, sort array comments on line number,
-        // send all comments to the server once finished.
+        // TODO: Update line to view comment, send all comments to the server
         async submitComment() {
             // Update the current state
             this.writing = false
 
-            // TODO: Do something with the gathered line and comment
-            console.log(this.commentText)
-            console.log(this.lineNumber)
-            console.log(this.highlightedText)
+            // Add comment to comments array
             this.comments[this.comments.length] = {
                 commentText: this.commentText,
-                lineNumber: this.lineNumber,
+                startLineNumber: this.startLineNumber,
+                endLineNumber: this.endLineNumber,
                 highlightedText: this.highlightedText
             }
+            // Send the comment to the server
+            // TODO: update this method call
+            api.codeannotation.post(this.commentText, this.startLineNumber, null, null)
 
             // Reset the highlighted text, comment text and line number
             this.commentText = null
             this.highlightedText = null
-            this.lineNumber = null
+            this.startLineNumber = null
+            this.endLineNumber = null
         }
     }
 }

@@ -2,7 +2,7 @@ import client from "./axiosClient"
 
 export default {
     //TODO: create API to send code comments to the server
-    put(annotationText, annotationLine, reviewId, fileId) {
+    post(annotationText, annotationLine, reviewId, fileId) {
         const body = {
             annotationText: annotationText,
             annotationLine: annotationLine,
@@ -10,5 +10,9 @@ export default {
             fileId: fileId
         }
         return client.post("codeannotation", body)
+    },
+    get(/*reviewId, fileId*/) {
+        //const params = { reviewId, fileId }
+        return [] //client.get("codeannotation", { params: params })
     }
 }
