@@ -8,28 +8,26 @@
         </b-alert>
         <b-alert :show="!showCode" variant="primary">LOADING CODE</b-alert>
         <b-card v-show="showCode">
-            <CodeViewer :fileUrl="this.filePath" ref="codeViewer" />
-            <b-popover placement="left" target="code-0" :triggers="['click']" title="Peer user">Text</b-popover>
+            <!-- TODO: Add implementation for actual comments -->
+            <CodeAnnotations :content="content" :comments="['I\'m a dummy comment']" />
         </b-card>
     </div>
 </template>
 
 <script>
 import api from "../../../api/api"
+import CodeAnnotations from "./CodeAnnotations"
 // import axios from "axios"
 // import izitoast from "izitoast"
-import CodeViewer from "../../general/CodeViewer"
-
 export default {
-    components: { CodeViewer },
+    components: { CodeAnnotations },
     // either "reviewId" or "submissionId" is passed, not both
-    props: ["reviewId", "submissionId", "readOnly", "filePath"],
+    props: ["reviewId", "submissionId", "readOnly", "content"],
     data() {
         return {
             review: null,
             submission: null,
             fileMetaData: null,
-            codeDivId: null,
             showCode: false
         }
     },
