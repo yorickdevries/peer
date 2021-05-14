@@ -1,7 +1,7 @@
 <template>
     <div>
         <PDFViewer v-if="renderAs === 'document'" :fileUrl="fileUrl" />
-        <CodeViewer v-else-if="renderAs === 'code'" :fileUrl="fileUrl" />
+        <CodeWrapper v-else-if="renderAs === 'code'" :fileUrl="fileUrl" :readOnly="true" />
         <div v-else>
             <b-alert show variant="secondary">
                 No file preview is available, because the assignment type was not recognized.</b-alert
@@ -12,12 +12,12 @@
 
 <script>
 import JSZip from "jszip"
-import CodeViewer from "./CodeViewer"
+import CodeWrapper from "./CodeWrapper"
 import PDFViewer from "./PDFViewer"
 
 export default {
     components: {
-        CodeViewer,
+        CodeWrapper,
         PDFViewer
     },
     props: ["fileUrl", "assignmentType"],
