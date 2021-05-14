@@ -2,9 +2,9 @@
     <span>
         <span v-for="(line, index) in content" :key="index">
             <!-- TODO: Only load comment collapsibles for actual comments, 
-                so replace the 'index === 0 ' by a less nonsensical condition and load an actual comment -->
-            <!-- If line does have a comment and is not empty -->
-            <span v-if="index === 0 && line !== ''">
+                so replace the 'index === 0' by a less nonsensical condition and load an actual comment -->
+            <!-- If line does have a comment-->
+            <span v-if="index === 0">
                 <b-card no-body>
                     <b-card-header header-tag="header" role="tab">
                         <b-container>
