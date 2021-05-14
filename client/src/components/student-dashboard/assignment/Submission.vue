@@ -141,7 +141,7 @@
                 <b-col>
                     <dt>You can view your final submission here:</dt>
                     <div v-if="finalSubmission">
-                        <b-alert v-if="finalSubmission && finalSubmission.file.extension === '.pdf'" variant="secondary"
+                        <b-alert v-if="finalSubmission.file.extension === '.pdf'" variant="secondary"
                             >In case the viewer shows any errors, your .pdf is malformed and no pdf annotations can be
                             made by your reviewers directly in the browser. Reviewers can always download the file
                             instead.</b-alert
