@@ -147,6 +147,7 @@
                             instead.</b-alert
                         >
                         <FileAnnotator
+                            :v-if="finalSubmission"
                             :submissionId="finalSubmission.id"
                             :readOnly="true"
                             :assignmentType="assignment.assignmentType"
