@@ -19,6 +19,7 @@
 import JSZip from "jszip"
 import CodeWrapper from "./../../general/CodeWrapper"
 import PDFAnnotator from "./PDFAnnotator"
+
 export default {
     components: {
         CodeWrapper,
