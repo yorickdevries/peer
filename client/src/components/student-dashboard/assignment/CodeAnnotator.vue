@@ -13,8 +13,9 @@
         <form @submit.prevent="writeComment" v-if="!readOnly">
             <button type="submit" v-if="!writing">Leave a comment on highlighted part</button>
         </form>
-        <form @submit.prevent="submitComment" v-if="writing && !readOnly">
+        <form @submit.prevent="submitComment" @reset.prevent="deleteSelection" v-if="writing && !readOnly">
             <button type="submit">Submit your comment</button>
+            <button type="reset">Delete selection and comment</button>
             <b-form-textarea
                 placeholder="Type your comment"
                 v-model="commentText"
@@ -25,20 +26,20 @@
 
         <b-card v-show="showCode">
             <!-- TODO: Add implementation for actual comments -->
-            <CodeAnnotations :content="content" :comments="['I\'m a dummy comment']" />
+            <CodeAnnotations :content="content" :comments="comments" ref="annotator" />
         </b-card>
     </div>
 </template>
 
 <script>
 import api from "../../../api/api"
-import CodeViewer from "../../general/CodeViewer"
+//import CodeViewer from "../../general/CodeViewer"
 import notifications from "../../../mixins/notifications"
 import CodeAnnotations from "./CodeAnnotations"
 
 export default {
     mixins: [notifications],
-    components: { CodeViewer },
+    components: { /*CodeViewer,*/ CodeAnnotations },
     // either "reviewId" or "submissionId" is passed, not both
     props: ["reviewId", "submissionId", "readOnly", "content"],
     data() {
@@ -103,6 +104,7 @@ export default {
 
             // Do not update the state if nothing is selected
             if (selectedText.length == 0) {
+                this.showErrorMessage({ message: "Please make sure to select a piece of code" })
                 return
             }
 
@@ -123,12 +125,8 @@ export default {
                 this.showErrorMessage({ message: "Please make sure to select a piece of code" })
                 return
             }
-            this.startLineNumber = startCodeElement.getAttribute("linenr")
-            this.endLineNumber = endCodeElement.getAttribute("linenr")
-
-            // Index starts at 0, line numbers start at 1
-            //this.startLineNumber++
-            //this.endLineNumber++
+            this.startLineNumber = parseInt(startCodeElement.getAttribute("linenr"))
+            this.endLineNumber = parseInt(endCodeElement.getAttribute("linenr"))
 
             // Swap begin and end if they are reversed
             if (this.startLineNumber > this.endLineNumber) {
@@ -168,6 +166,7 @@ export default {
                 endLineNumber: this.endLineNumber,
                 highlightedText: this.highlightedText
             }
+            this.comments.sort(this.compareArrayItems)
             // Send the comment to the server
             // TODO: update this method call
             api.codeannotation.post(this.commentText, this.startLineNumber, null, null)
@@ -177,6 +176,24 @@ export default {
             this.highlightedText = null
             this.startLineNumber = null
             this.endLineNumber = null
+            this.$refs.annotator.updateLineNumbers()
+        },
+        deleteSelection() {
+            this.commentText = null
+            this.highlightedText = null
+            this.startLineNumber = null
+            this.endLineNumber = null
+            this.writing = false
+            this.showSuccessMessage({ message: "Your selection and comment was deleted" })
+        },
+        compareArrayItems(a, b) {
+            if (a.startLineNumber > b.startLineNumber) {
+                return 1
+            }
+            if (a.startLineNumber < b.endLineNumber) {
+                return -1
+            }
+            return 0
         }
     }
 }

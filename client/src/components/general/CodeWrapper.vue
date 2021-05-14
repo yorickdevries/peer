@@ -6,9 +6,9 @@
         <div class="ml-3" style="overflow: hidden">
             <CodeViewer v-if="readOnly" :content="content" />
             <!-- TODO: Insert code annotator here -->
-            <!-- <CodeAnnotator v-else :content="content" /> -->
+            <CodeAnnotator v-else :content="content" :readOnly="readOnly" />
             <!-- TODO: Remove this when code annotator is inserted -->
-            <CodeViewer v-else :content="content" />
+            <!-- <CodeViewer v-else :content="content" /> -->
         </div>
     </div>
     <b-alert v-else show variant="primary">Loading source files</b-alert>
@@ -20,10 +20,11 @@ import "highlight.js/styles/default.css"
 import JSZip from "jszip"
 import FileTree from "./FileTree"
 import CodeViewer from "./CodeViewer"
+import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 
 export default {
     props: ["fileUrl", "readOnly"],
-    components: { CodeViewer, FileTree },
+    components: { CodeViewer, FileTree, CodeAnnotator },
     data() {
         return {
             content: null,
