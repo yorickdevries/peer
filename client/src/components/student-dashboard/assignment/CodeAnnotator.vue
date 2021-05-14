@@ -24,7 +24,8 @@
         </form>
 
         <b-card v-show="showCode">
-            <CodeViewer :fileUrl="this.filePath" ref="codeViewer" />
+            <!-- TODO: Add implementation for actual comments -->
+            <CodeAnnotations :content="content" :comments="['I\'m a dummy comment']" />
         </b-card>
     </div>
 </template>
@@ -33,12 +34,13 @@
 import api from "../../../api/api"
 import CodeViewer from "../../general/CodeViewer"
 import notifications from "../../../mixins/notifications"
+import CodeAnnotations from "./CodeAnnotations"
 
 export default {
     mixins: [notifications],
     components: { CodeViewer },
     // either "reviewId" or "submissionId" is passed, not both
-    props: ["reviewId", "submissionId", "readOnly", "filePath"],
+    props: ["reviewId", "submissionId", "readOnly", "content"],
     data() {
         return {
             review: null,
@@ -125,8 +127,8 @@ export default {
             this.endLineNumber = endCodeElement.getAttribute("linenr")
 
             // Index starts at 0, line numbers start at 1
-            this.startLineNumber++
-            this.endLineNumber++
+            //this.startLineNumber++
+            //this.endLineNumber++
 
             // Swap begin and end if they are reversed
             if (this.startLineNumber > this.endLineNumber) {
