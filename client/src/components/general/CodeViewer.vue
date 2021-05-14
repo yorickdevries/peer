@@ -31,21 +31,26 @@ pre {
         white-space: initial;
 
         code {
+            font-family: monospace, monospace;
             white-space: pre;
+
+            &::v-deep span {
+                font-family: inherit;
+            }
         }
     }
 
     &:first-of-type {
         flex-shrink: 0;
+        margin-right: 1ch;
+        border-right: 1px solid var(--gray);
+        box-sizing: content-box;
+        padding-right: 1ch;
 
         div {
             code {
                 display: inline-block;
                 text-align: right;
-                box-sizing: content-box;
-                padding-right: 1ch;
-                margin-right: 1ch;
-                border-right: 1px solid var(--gray);
             }
         }
     }
