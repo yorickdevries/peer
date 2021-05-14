@@ -1,15 +1,13 @@
 <template>
-    <div>
+    <div class="d-flex">
         <pre>
             <div v-for="(line, index) in content" :key="index + 'line'">
                 <code v-bind:style="{ width: `${maxLineNumberDigits}ch` }">{{ index + 1 }}</code>
-            </div>
-        </pre>
+            </div></pre>
         <pre>
             <div v-for="(line, index) in content" :key="index + 'code'">
                 <code v-html="line.replace(/^$/, '<br />')"></code>
-            </div>
-        </pre>
+            </div></pre>
     </div>
 </template>
 
@@ -38,6 +36,8 @@ pre {
     }
 
     &:first-of-type {
+        flex-shrink: 0;
+
         div {
             code {
                 display: inline-block;
