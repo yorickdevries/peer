@@ -1,9 +1,6 @@
 <template>
     <span>
         <span v-for="(line, index) in content" :linenr="index + 1" :key="index">
-            <!-- TODO: Only load comment collapsibles for actual comments, 
-                so replace the 'index === 0' by a less nonsensical condition and load an actual comment -->
-            <!-- If line does have a comment-->
             <span v-if="lineNumbers.includes(index + 1)">
                 <b-card no-body>
                     <b-card-header header-tag="header" role="tab">
@@ -35,11 +32,6 @@
 <script>
 export default {
     props: ["content", "comments"],
-    data() {
-        return {
-            //lineNumbers: []
-        }
-    },
     methods: {
         getCommentTextFromStartingLineNumber(lineNr) {
             for (const comment of this.comments) {
@@ -48,13 +40,6 @@ export default {
                 }
             }
             return null
-        },
-        updateLineNumbers() {
-            let lineNumbers = []
-            for (const comment of this.comments) {
-                lineNumbers[lineNumbers.length] = comment.startLineNumber
-            }
-            return lineNumbers
         }
     },
     computed: {
@@ -65,9 +50,6 @@ export default {
             }
             return retValue
         }
-    },
-    async created() {
-        this.updateLineNumbers()
     }
 }
 </script>

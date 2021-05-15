@@ -5,10 +5,7 @@
         </div>
         <div class="ml-3" style="overflow: hidden">
             <CodeViewer v-if="readOnly" :content="content" />
-            <!-- TODO: Insert code annotator here -->
             <CodeAnnotator v-else :content="content" :readOnly="readOnly" />
-            <!-- TODO: Remove this when code annotator is inserted -->
-            <!-- <CodeViewer v-else :content="content" /> -->
         </div>
     </div>
     <b-alert v-else show variant="primary">Loading source files</b-alert>

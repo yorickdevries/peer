@@ -25,7 +25,6 @@
         </form>
 
         <b-card v-show="showCode">
-            <!-- TODO: Add implementation for actual comments -->
             <CodeAnnotations :content="content" :comments="comments" ref="annotator" />
         </b-card>
     </div>
@@ -33,7 +32,6 @@
 
 <script>
 import api from "../../../api/api"
-//import CodeViewer from "../../general/CodeViewer"
 import notifications from "../../../mixins/notifications"
 import CodeAnnotations from "./CodeAnnotations"
 
@@ -96,6 +94,7 @@ export default {
             }
         },
         async fetchComments() {
+            // TODO: update method call
             this.comments = api.codeannotation.get(/*null, null*/)
         },
         async writeComment() {
@@ -119,42 +118,59 @@ export default {
                 endCodeElement = endCodeElement.parentElement
             }
 
-            // TODO: error handling
+            // If no code element is found for either the child or parent, the user is asked to
+            // confirm they have selected code
             if (startCodeElement == null || endCodeElement == null) {
-                //console.log("start is not a code element")
                 this.showErrorMessage({ message: "Please make sure to select a piece of code" })
                 return
             }
             this.startLineNumber = parseInt(startCodeElement.getAttribute("linenr"))
             this.endLineNumber = parseInt(endCodeElement.getAttribute("linenr"))
 
-            // Swap begin and end if they are reversed
+            // Swap startLineNumber and endLineNumber if startLineNumber is larger
             if (this.startLineNumber > this.endLineNumber) {
                 let temp = this.startLineNumber
                 this.startLineNumber = this.endLineNumber
                 this.endLineNumber = temp
             }
 
-            // Check if there are already made comments on these lines, signal error message if yes and reset line numbers
+            /* Check if the new comment overlaps with an already made comment. This is done by iterating over all stored comments,
+            then checking if the new comment is not either entirely before or after any of the stored. Because startLineNumber is
+            always smaller than endLineNumber, this is checked by: 
+            (!(this.startLineNumber > comment.endLineNumber || this.endLineNumber < comment.startLineNumber))
+            
+            Applying DeMorgans law gives us:
+            (this.startLineNumber <= comment.endLineNumber && this.endLineNumber >= comment.startLineNumber)
+            
+            If at any time a clash occures, the user is shown an error message and is not allowed to write a comment.*/
+            console.log("entering for loop")
             for (const comment of this.comments) {
-                if (
-                    (comment.startLineNumber <= this.startLineNumber && comment.endLineNumber >= this.endLineNumber) ||
-                    (comment.startLineNumber <= this.endLineNumber && comment.endLineNumber >= this.endLineNumber) ||
-                    (comment.startLineNumber <= this.startLineNumber && comment.endLineNumber >= this.startLineNumber)
-                ) {
+                console.log(this.startLineNumber)
+                console.log(comment.endLineNumber)
+                console.log(this.endLineNumber)
+                console.log(comment.startLineNumber)
+
+                console.log(
+                    this.startLineNumber <= comment.endLineNumber && this.endLineNumber >= comment.startLineNumber
+                )
+                console.log(
+                    !(this.startLineNumber > comment.endLineNumber || this.endLineNumber < comment.startLineNumber)
+                )
+
+                if (!(this.startLineNumber > comment.endLineNumber || this.endLineNumber < comment.startLineNumber)) {
                     this.startLineNumber = null
                     this.endLineNumber = null
                     this.showErrorMessage({ message: "Please select lines not yet commented on" })
                     return
                 }
             }
+            console.log("after for loop")
 
-            // Update the current state
+            // Update the current state and get highlighed text
             this.writing = true
-            // Get highlighted text
             this.highlightedText = selectedText
         },
-        // TODO: Update line to view comment, send all comments to the server
+        // TODO: send all comments to the server
         async submitComment() {
             // Update the current state
             this.writing = false
@@ -166,17 +182,17 @@ export default {
                 endLineNumber: this.endLineNumber,
                 highlightedText: this.highlightedText
             }
+            // TODO: Without sorting it breaks? Look into why
             this.comments.sort(this.compareArrayItems)
             // Send the comment to the server
             // TODO: update this method call
-            api.codeannotation.post(this.commentText, this.startLineNumber, null, null)
+            api.codeannotation.post(/*this.commentText, this.startLineNumber, null, null*/)
 
             // Reset the highlighted text, comment text and line number
             this.commentText = null
             this.highlightedText = null
             this.startLineNumber = null
             this.endLineNumber = null
-            this.$refs.annotator.updateLineNumbers()
         },
         deleteSelection() {
             this.commentText = null
