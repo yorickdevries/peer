@@ -4,8 +4,8 @@
             >Questionnaire editing is not allowed anymore since the peer review publish date has already
             passed.</b-alert
         >
-        <b-container v-bind:class="{ 'disabled-view': blockQuestionnaireEditing }">
-            <b-card class="mb-3 mt-3">
+        <b-container>
+            <b-card class="mb-3 mt-3" :class="{ 'disabled-view': blockQuestionnaireEditing }">
                 <div class="d-flex justify-content-between">
                     <b-row>
                         <b-col>
@@ -52,7 +52,13 @@
             <b-row v-if="questionnaire">
                 <b-col>
                     <!--Question Information-->
-                    <b-card v-for="question in questionnaire.questions" :key="question.id" class="mb-3" no-body>
+                    <b-card
+                        v-for="question in questionnaire.questions"
+                        :key="question.id"
+                        class="mb-3"
+                        :class="{ 'disabled-view': blockQuestionnaireEditing && !question.graded }"
+                        no-body
+                    >
                         <b-card-header class="d-flex align-items-center">
                             <span class="w-100"
                                 >Question {{ question.number }} of {{ questionnaire.questions.length }}</span
@@ -133,10 +139,20 @@
                             <!-- Edit button-->
                             <br />
                             <b-button v-b-modal="`editModal${question.id}`" variant="primary float-right">
-                                Edit/Delete Question
+                                {{
+                                    blockQuestionnaireEditing && question.graded
+                                        ? "Edit Points"
+                                        : "Edit/Delete Question"
+                                }}
                             </b-button>
                             <b-modal :id="`editModal${question.id}`" centered hide-footer class="p-0 m-0">
+                                <EditQuestionPointsWizard
+                                    v-if="blockQuestionnaireEditing && question.graded"
+                                    :question="question"
+                                    @questionSaved="getQuestionnaire"
+                                ></EditQuestionPointsWizard>
                                 <EditQuestionWizard
+                                    v-else
                                     :question="question"
                                     @questionSaved="getQuestionnaire"
                                 ></EditQuestionWizard>
@@ -155,6 +171,7 @@ import notifications from "../../../mixins/notifications"
 import _ from "lodash"
 import CreateQuestionWizard from "./CreateQuestionWizard"
 import EditQuestionWizard from "./EditQuestionWizard"
+import EditQuestionPointsWizard from "./EditQuestionPointsWizard"
 import { StarRating } from "vue-rate-it"
 
 export default {
@@ -163,6 +180,7 @@ export default {
     components: {
         CreateQuestionWizard,
         EditQuestionWizard,
+        EditQuestionPointsWizard,
         StarRating
     },
     data() {
