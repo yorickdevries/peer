@@ -48,6 +48,7 @@ pre {
         border-right: 1px solid var(--gray);
         box-sizing: content-box;
         padding-right: 1ch;
+        user-select: none;
 
         div {
             code {

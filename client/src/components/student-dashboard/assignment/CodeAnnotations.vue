@@ -1,49 +1,123 @@
 <template>
-    <span>
-        <span v-for="(line, index) in content" :linenr="index + 1" :key="index">
-            <span v-if="lineNumbers.includes(index + 1)">
-                <b-card no-body>
-                    <b-card-header class="p-0">
-                        <div class="d-flex justify-content-between">
-                            <pre><code style="display: block" :linenr="index + 1" v-html="line" ></code></pre>
-                            <!-- TODO: Dynamically change icon -->
-                            <div class="pr-2"><icon name="plus" v-b-toggle="`comment_${index}`" /></div>
-                        </div>
-                    </b-card-header>
-                    <b-collapse :id="`comment_${index}`" :ref="`comment_${index}`" accordion="comments">
-                        <b-card-body>{{ getCommentTextFromStartingLineNumber(index + 1) }}</b-card-body>
+    <b-card>
+        <div>
+            <pre>
+                <div v-for="(line, index) in content" :key="index + 'code'">
+                    <div class="d-flex">
+                        <code
+                            style="user-select: none"
+                            :linenr="index + 1"
+                            v-bind:style="{ width: `${maxLineNumberDigits}ch` }"
+                        >{{ index + 1 }}</code>
+                        <code
+                            v-if="!isCommentedOn(index + 1)"
+                            :linenr="index + 1"
+                            v-html="line.replace(/^$/, '<br />')"
+                        ></code><code
+                            v-else
+                            :linenr="index + 1"
+                            v-bind:class="{ comment_start: isStartingLine(index + 1), comment: true, comment_end: isEndingLine(index + 1) }"
+                            v-html="line.replace(/^$/, '<br />')"
+                            v-b-toggle="`comment_${lineNumbers[index + 1]}`"
+                        ></code>
+                    </div>
+                    <b-collapse
+                        v-if="lineNumbers[index + 1] >= 0 && lineNumbers[index + 2] === -1"
+                        :id="`comment_${lineNumbers[index + 1]}`"
+                        :ref="`comment_${lineNumbers[index + 1]}`"
+                        v-bind:style="{ marginLeft: `${maxLineNumberDigits + 2}ch` }"
+                    >
+                        <b-card-body>{{ comments[lineNumbers[index + 1]].commentText }}</b-card-body>
                     </b-collapse>
-                </b-card>
-            </span>
-            <!-- If the line doesn't have a comment -->
-            <span v-else>
-                <pre><code style="display: block" :linenr="index + 1" v-html="line"></code></pre>
-            </span>
-        </span>
-    </span>
+                </div></pre>
+        </div>
+    </b-card>
 </template>
 
 <script>
 export default {
     props: ["content", "comments"],
     methods: {
-        getCommentTextFromStartingLineNumber(lineNr) {
-            for (const comment of this.comments) {
-                if (comment.startLineNumber == lineNr) {
-                    return comment.commentText
-                }
-            }
-            return null
+        isStartingLine(lineNr) {
+            return this.isCommentedOn(lineNr) && (lineNr === 0 || this.lineNumbers[lineNr - 1] === -1)
+        },
+        isEndingLine(lineNr) {
+            return (
+                this.isCommentedOn(lineNr) &&
+                (lineNr === this.lineNumbers.length - 1 || this.lineNumbers[lineNr + 1] === -1)
+            )
+        },
+        isCommentedOn(lineNr) {
+            return lineNr >= 1 && lineNr <= this.lineNumbers.length && this.lineNumbers[lineNr] >= 0
         }
     },
     computed: {
         lineNumbers: function() {
-            let retValue = []
-            for (const comment of this.comments) {
-                retValue[retValue.length] = comment.startLineNumber
-            }
-            return retValue
+            const res = new Array(this.content.length)
+                .fill(-1)
+                .map((value, lineNr) =>
+                    this.comments.findIndex(
+                        comment => comment.startLineNumber <= lineNr && comment.endLineNumber >= lineNr
+                    )
+                )
+            return res
+        },
+        maxLineNumberDigits() {
+            return Math.ceil(Math.log(this.content.length + 1) / Math.log(10))
         }
     }
 }
 </script>
+
+<style lang="scss" scoped>
+pre {
+    white-space: pre-line;
+    display: inline-block;
+
+    div {
+        white-space: initial;
+
+        code {
+            font-family: monospace, monospace;
+            white-space: pre;
+            display: inline-block;
+            box-sizing: border-box;
+            width: 100%;
+
+            &.comment {
+                border-left: 1px solid var(--gray);
+                border-right: 1px solid var(--gray);
+                background-color: #f8f8f8;
+            }
+
+            &.comment_start {
+                border-top: 1px solid var(--gray);
+                border-top-left-radius: 3px;
+                border-top-right-radius: 3px;
+            }
+
+            &.comment_end {
+                border-bottom: 1px solid var(--gray);
+                border-bottom-left-radius: 3px;
+                border-bottom-right-radius: 3px;
+            }
+
+            &:first-of-type {
+                flex-shrink: 0;
+                margin-right: 1ch;
+                border-right: 1px solid var(--gray);
+                box-sizing: content-box;
+                padding-right: 1ch;
+                user-select: none;
+
+                display: inline-block;
+                text-align: right;
+            }
+
+            &::v-deep span {
+                font-family: inherit;
+            }
+        }
+    }
+}
+</style>
