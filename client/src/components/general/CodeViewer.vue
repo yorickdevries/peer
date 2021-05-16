@@ -1,14 +1,16 @@
 <template>
-    <div class="d-flex">
-        <pre>
-            <div v-for="(line, index) in content" :key="index + 'line'">
-                <code :linenr="index + 1" v-bind:style="{ width: `${maxLineNumberDigits}ch` }">{{ index + 1 }}</code>
-            </div></pre>
-        <pre>
-            <div v-for="(line, index) in content" :key="index + 'code'">
-                <code :linenr="index + 1" v-html="line.replace(/^$/, '<br />')"></code>
-            </div></pre>
-    </div>
+    <b-card>
+        <div class="d-flex">
+            <pre>
+                <div v-for="(line, index) in content" :key="index + 'line'">
+                    <code :linenr="index + 1" v-bind:style="{ width: `${maxLineNumberDigits}ch` }">{{ index + 1 }}</code>
+                </div></pre>
+            <pre>
+                <div v-for="(line, index) in content" :key="index + 'code'">
+                    <code :linenr="index + 1" v-html="line.replace(/^$/, '<br />')"></code>
+                </div></pre>
+        </div>
+    </b-card>
 </template>
 
 <script>
