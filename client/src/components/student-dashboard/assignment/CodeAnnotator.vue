@@ -108,12 +108,12 @@ export default {
             }
 
             // Get start line number by navigating to the code element which contains the line number
-            let startCodeElement = selection.anchorNode.parentElement
+            let startCodeElement = selection.getRangeAt(0).startContainer
             while (startCodeElement != null && startCodeElement.nodeName != "CODE") {
                 startCodeElement = startCodeElement.parentElement
             }
             // Get end line number like the start line number
-            let endCodeElement = selection.focusNode.parentElement
+            let endCodeElement = selection.getRangeAt(selection.rangeCount - 1).startContainer
             while (endCodeElement != null && endCodeElement.nodeName != "CODE") {
                 endCodeElement = endCodeElement.parentElement
             }

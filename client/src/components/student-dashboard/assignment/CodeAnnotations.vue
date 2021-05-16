@@ -1,37 +1,43 @@
 <template>
-    <b-card>
-        <div>
-            <pre>
-                <div v-for="(line, index) in content" :key="index + 'code'">
-                    <div class="d-flex">
-                        <code
-                            style="user-select: none"
-                            :linenr="index + 1"
-                            v-bind:style="{ width: `${maxLineNumberDigits}ch` }"
-                        >{{ index + 1 }}</code>
-                        <code
-                            v-if="!isCommentedOn(index + 1)"
-                            :linenr="index + 1"
-                            v-html="line.replace(/^$/, '<br />')"
-                        ></code><code
-                            v-else
-                            :linenr="index + 1"
-                            v-bind:class="{ comment_start: isStartingLine(index + 1), comment: true, comment_end: isEndingLine(index + 1) }"
-                            v-html="line.replace(/^$/, '<br />')"
-                            v-b-toggle="`comment_${lineNumbers[index + 1]}`"
-                        ></code>
-                    </div>
-                    <b-collapse
-                        v-if="lineNumbers[index + 1] >= 0 && lineNumbers[index + 2] === -1"
-                        :id="`comment_${lineNumbers[index + 1]}`"
-                        :ref="`comment_${lineNumbers[index + 1]}`"
-                        v-bind:style="{ marginLeft: `${maxLineNumberDigits + 2}ch` }"
-                    >
-                        <b-card-body>{{ comments[lineNumbers[index + 1]].commentText }}</b-card-body>
-                    </b-collapse>
-                </div></pre>
+    <pre>
+        <div v-for="(line, index) in content" :key="index + 'code'">
+            <div class="d-flex position-relative">
+                <code
+                    style="user-select: none"
+                    :linenr="index + 1"
+                    v-bind:style="{ width: `${maxLineNumberDigits}ch` }"
+                >{{ index + 1 }}</code>
+                <code
+                    v-if="!isCommentedOn(index + 1)"
+                    :linenr="index + 1"
+                    v-html="line.replace(/^$/, '<br />')"
+                ></code><code
+                    v-else
+                    :linenr="index + 1"
+                    v-bind:class="{ comment_start: isStartingLine(index + 1), comment: true, comment_end: isEndingLine(index + 1) }"
+                    v-html="line.replace(/^$/, '<br />')"
+                    v-b-toggle="`comment_${lineNumbers[index + 1]}`"
+                ></code>
+                <!-- TODO: Dynamically change icon -->
+                <icon
+                    v-if="isStartingLine(index + 1)"
+                    class="position-absolute mt-1 mr-2"
+                    style="right: 0; z-index: 1"
+                    role="button"
+                    name="plus"
+                    v-b-toggle="`comment_${lineNumbers[index + 1]}`"
+                />
+            </div>
+            <b-collapse
+                v-if="lineNumbers[index + 1] >= 0 && lineNumbers[index + 2] === -1"
+                :id="`comment_${lineNumbers[index + 1]}`"
+                :ref="`comment_${lineNumbers[index + 1]}`"
+                v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }"
+            >
+                <b-card>{{ comments[lineNumbers[index + 1]].commentText }}</b-card>
+            </b-collapse>
         </div>
-    </b-card>
+    </pre>
 </template>
 
 <script>
@@ -119,5 +125,13 @@ pre {
             }
         }
     }
+}
+
+.collapse {
+    font-family: monospace, monospace;
+}
+
+.card {
+    font-family: initial;
 }
 </style>
