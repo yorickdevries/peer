@@ -122,18 +122,30 @@ router.patch(
       questionnaire instanceof SubmissionQuestionnaire &&
       assignment.isAtOrAfterState(AssignmentState.REVIEW)
     ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is already in review state");
+      if (questionOption.text !== req.body.text || !question.graded) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("The assignment is already in review state");
+        return;
+      }
+      questionOption.points = req.body.points;
+      await questionOption.save();
+      res.send(questionOption);
       return;
     }
     if (
       questionnaire instanceof ReviewQuestionnaire &&
       assignment.isAtOrAfterState(AssignmentState.FEEDBACK)
     ) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is already in feedback state");
+      if (questionOption.text !== req.body.text || !question.graded) {
+        res
+          .status(HttpStatusCode.FORBIDDEN)
+          .send("The assignment is already in review state");
+        return;
+      }
+      questionOption.points = req.body.points;
+      await questionOption.save();
+      res.send(questionOption);
       return;
     }
     questionOption.text = req.body.text;
