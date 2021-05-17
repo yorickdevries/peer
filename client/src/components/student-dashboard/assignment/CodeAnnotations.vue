@@ -1,55 +1,166 @@
 <template>
-    <span>
-        <span v-for="(line, index) in content" :linenr="index + 1" :key="index">
-            <span v-if="lineNumbers.includes(index + 1)">
-                <b-card no-body>
-                    <b-card-header header-tag="header" role="tab">
-                        <b-container>
-                            <b-row>
-                                <b-col>
-                                    <pre><code style="display: block" :linenr="index + 1" v-html="line" ></code></pre>
-                                </b-col>
-                                <!-- TODO: Dynamically change icon -->
-                                <b-col><icon name="plus" v-b-toggle="`comment_${index}`"/></b-col>
-                            </b-row>
-                        </b-container>
-                    </b-card-header>
-                    <b-collapse :id="`comment_${index}`" :ref="`comment_${index}`" accordion="comments" role="tabpanel">
-                        <b-card-body>
-                            <b-card-text>{{ getCommentTextFromStartingLineNumber(index + 1) }}</b-card-text>
-                        </b-card-body>
-                    </b-collapse>
-                </b-card>
-            </span>
-            <!-- If the line doesn't have a comment -->
-            <span v-else>
-                <pre><code style="display: block" :linenr="index + 1" v-html="line"></code></pre>
-            </span>
-        </span>
-    </span>
+    <pre>
+        <div class="code-annotations-wrapper">
+            <div
+                class="position-relative code-annotations-line"
+                v-for="(line, index) in content"
+                :key="index + 'code'"
+            >
+                <div class="d-flex">
+                    <code
+                        class="code-annotations-linenr"
+                        :linenr="index + 1"
+                        v-bind:style="{ width: `${maxLineNumberDigits}ch` }"
+                    >{{ index + 1 }}</code>
+                    <code
+                        class="code-annotations-code"
+                        v-if="!isCommentedOn(index + 1)"
+                        :linenr="index + 1"
+                        v-html="line.replace(/^$/, '<br />')"
+                    ></code><code
+                        v-else
+                        :linenr="index + 1"
+                        v-bind:class="{ comment_start: isStartingLine(index + 1), comment: true, comment_end: isEndingLine(index + 1) }"
+                        v-html="line.replace(/^$/, '<br />')"
+                        v-b-toggle="`comment_${lineNumbers[index + 1]}`"
+                    ></code>
+                </div>
+                <!-- TODO: Dynamically change icon -->
+                <icon
+                    v-if="isStartingLine(index + 1)"
+                    class="position-absolute mt-1 mr-2"
+                    style="top: 0; right: 0; z-index: 1"
+                    role="button"
+                    name="plus"
+                    v-b-toggle="`comment_${lineNumbers[index + 1]}`"
+                />
+                <b-collapse
+                    v-if="isEndingLine(index + 1)"
+                    :id="`comment_${lineNumbers[index + 1]}`"
+                    :ref="`comment_${lineNumbers[index + 1]}`"
+                    v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }"
+                >
+                    <b-card>{{ comments[lineNumbers[index + 1]].commentText }}</b-card>
+                </b-collapse>
+            </div>
+    </div></pre>
 </template>
 
 <script>
 export default {
     props: ["content", "comments"],
     methods: {
-        getCommentTextFromStartingLineNumber(lineNr) {
-            for (const comment of this.comments) {
-                if (comment.startLineNumber == lineNr) {
-                    return comment.commentText
-                }
-            }
-            return null
+        isStartingLine(lineNr) {
+            return this.isCommentedOn(lineNr) && (lineNr === 0 || this.lineNumbers[lineNr - 1] === -1)
+        },
+        isEndingLine(lineNr) {
+            return (
+                this.isCommentedOn(lineNr) &&
+                (lineNr === this.lineNumbers.length - 1 || this.lineNumbers[lineNr + 1] === -1)
+            )
+        },
+        isCommentedOn(lineNr) {
+            return lineNr >= 1 && lineNr <= this.lineNumbers.length && this.lineNumbers[lineNr] >= 0
         }
     },
     computed: {
         lineNumbers: function() {
-            let retValue = []
-            for (const comment of this.comments) {
-                retValue[retValue.length] = comment.startLineNumber
-            }
-            return retValue
+            const res = new Array(this.content.length)
+                .fill(-1)
+                .map((_, lineNr) =>
+                    this.comments.findIndex(
+                        comment => comment.startLineNumber <= lineNr && comment.endLineNumber >= lineNr
+                    )
+                )
+            return res
+        },
+        maxLineNumberDigits() {
+            return Math.ceil(Math.log(this.content.length + 1) / Math.log(10))
         }
     }
 }
 </script>
+
+<style lang="scss" scoped>
+pre {
+    white-space: pre-line;
+    display: inline-block;
+    width: 100%;
+    background-color: white;
+    margin: 0;
+
+    .code-annotations-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: min-content;
+
+        .code-annotations-line {
+            flex-grow: 1;
+        }
+    }
+
+    .code-annotations-wrapper,
+    .code-annotations-line,
+    div {
+        white-space: initial;
+        background-color: inherit;
+
+        code {
+            background-color: inherit;
+            font-family: var(--font-family-monospace);
+            white-space: pre;
+            display: inline-block;
+            box-sizing: border-box;
+            width: 100%;
+
+            &.comment {
+                border-left: 1px solid var(--gray);
+                border-right: 1px solid var(--gray);
+                background-color: #f8f8f8;
+            }
+
+            &.comment_start {
+                border-top: 1px solid var(--gray);
+                border-top-left-radius: 3px;
+                border-top-right-radius: 3px;
+            }
+
+            &.comment_end {
+                border-bottom: 1px solid var(--gray);
+                border-bottom-left-radius: 3px;
+                border-bottom-right-radius: 3px;
+            }
+
+            &.code-annotations-linenr {
+                flex-shrink: 0;
+                margin-right: 1ch;
+                border-right: 1px solid var(--gray);
+                box-sizing: content-box;
+                padding-right: 1ch;
+                user-select: none;
+                position: sticky;
+                left: 0;
+                background-color: inherit;
+                display: inline-block;
+                text-align: right;
+            }
+
+            &.code-annotations-code {
+                padding-right: 7ch;
+            }
+
+            &::v-deep span {
+                font-family: inherit;
+            }
+        }
+    }
+}
+
+.collapse {
+    font-family: var(--font-family-monospace);
+}
+
+.card {
+    font-family: initial;
+}
+</style>
