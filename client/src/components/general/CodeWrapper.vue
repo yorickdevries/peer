@@ -11,6 +11,7 @@
                 :readOnly="readOnly"
                 :submissionId="submissionId"
                 :reviewId="reviewId"
+                :selectedFile="selected"
             />
         </div>
     </div>
