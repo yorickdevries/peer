@@ -75,7 +75,7 @@ export default {
                 questionnaireId: this.questionnaireId,
                 options: [],
                 graded: false
-            },
+            }
         }
     },
     async created() {
