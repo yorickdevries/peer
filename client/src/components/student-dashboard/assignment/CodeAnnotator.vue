@@ -177,7 +177,7 @@ export default {
             this.writing = false
 
             // Add comment to comments array using Array.splice to make CodeAnnotations.vue react to the change
-            this.comments.splice(this.comments.length, 0, {
+            this.comments.push({
                 commentText: this.commentText,
                 startLineNumber: this.startLineNumber,
                 endLineNumber: this.endLineNumber,
