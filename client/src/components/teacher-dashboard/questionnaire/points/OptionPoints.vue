@@ -11,11 +11,11 @@
         >
             <template v-for="(option, index) in question.options">
                 <b-form :key="index">
-                    <div class="input-group mb-2 w-100">
+                    <div class="input-group">
                         <div class="input-group-prepend">
                             <b-input-group-text>{{ option.text }}</b-input-group-text>
                         </div>
-                        <div class="input-group-append w-25">
+                        <div class="input-group-append">
                             <b-form-input
                                 :id="`option-${index}`"
                                 v-model="option.points"
@@ -76,13 +76,11 @@ export default {
                 options: [],
                 graded: false
             },
-            oldOptions: []
         }
     },
     async created() {
         await this.fetchQuestion()
         this.formatOptions()
-        this.oldOptions = [...this.question.options]
     },
     methods: {
         gradeIsOk(currentValue) {
@@ -130,7 +128,7 @@ export default {
         async save() {
             // patch in case the id is defined
             if (this.question.id) {
-                await this.patchQuestion()
+                await this.patchQuestionOptions()
             }
             const message = `Successfully edited ${
                 this.questionType === "multiplechoice" ? "multiple choice" : "checkbox"
@@ -139,21 +137,14 @@ export default {
             this.$emit("questionSaved")
             await this.fetchQuestion()
         },
-        async patchQuestion() {
-            const questionObject =
-                this.questionType === "multiplechoice" ? api.multiplechoicequestions : api.checkboxquestions
-            await questionObject.patch(
-                this.question.id,
-                this.question.text,
-                this.question.number,
-                this.question.optional,
-                this.question.graded
-            )
+        async patchQuestionOptions() {
+            const questionOptionType =
+                this.questionType === "multiplechoice" ? api.multiplechoicequestionoptions : api.checkboxquestionoptions
             for (const option of this.question.options) {
                 try {
                     if (option.id) {
                         // just patch the option text
-                        await questionObject.patch(option.text, option.points, option.id)
+                        await questionOptionType.patch(option.text, option.points, option.id)
                         const message = `Successfully edited ${
                             this.questionType === "multiplechoice" ? "multiple choice" : "checkbox"
                         } question option points.`
