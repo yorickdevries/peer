@@ -144,7 +144,7 @@ export default {
             
             If at any time a clash occures, the user is shown an error message and is not allowed to write a comment.*/
             for (const comment of this.comments) {
-                if (!(this.startLineNumber > comment.endLineNumber || this.endLineNumber < comment.startLineNumber)) {
+                if (this.startLineNumber <= comment.endLineNumber && this.endLineNumber >= comment.startLineNumber) {
                     this.startLineNumber = null
                     this.endLineNumber = null
                     this.showErrorMessage({ message: "Please select lines not yet commented on" })
@@ -161,15 +161,13 @@ export default {
             // Update the current state
             this.writing = false
 
-            // Add comment to comments array
-            this.comments[this.comments.length] = {
+            // Add comment to comments array using Array.splice to make CodeAnnotations.vue react to the change
+            this.comments.splice(this.comments.length, 0, {
                 commentText: this.commentText,
                 startLineNumber: this.startLineNumber,
                 endLineNumber: this.endLineNumber,
                 highlightedText: this.highlightedText
-            }
-            // TODO: Without sorting it breaks? Look into why
-            this.comments.sort(this.compareArrayItems)
+            })
             // Send the comment to the server
             // TODO: update this method call
             api.codeannotation.post(/*this.commentText, this.startLineNumber, null, null*/)
