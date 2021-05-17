@@ -1,41 +1,48 @@
 <template>
     <pre>
-        <div v-for="(line, index) in content" :key="index + 'code'">
-            <div class="d-flex position-relative">
-                <code
-                    style="user-select: none"
-                    :linenr="index + 1"
-                    v-bind:style="{ width: `${maxLineNumberDigits}ch` }"
-                >{{ index + 1 }}</code>
-                <code
-                    v-if="!isCommentedOn(index + 1)"
-                    :linenr="index + 1"
-                    v-html="line.replace(/^$/, '<br />')"
-                ></code><code
-                    v-else
-                    :linenr="index + 1"
-                    v-bind:class="{ comment_start: isStartingLine(index + 1), comment: true, comment_end: isEndingLine(index + 1) }"
-                    v-html="line.replace(/^$/, '<br />')"
-                    v-b-toggle="`comment_${lineNumbers[index + 1]}`"
-                ></code>
+        <div class="code-annotations-wrapper">
+            <div
+                class="position-relative code-annotations-line"
+                v-for="(line, index) in content"
+                :key="index + 'code'"
+            >
+                <div class="d-flex">
+                    <code
+                        class="code-annotations-linenr"
+                        :linenr="index + 1"
+                        v-bind:style="{ width: `${maxLineNumberDigits}ch` }"
+                    >{{ index + 1 }}</code>
+                    <code
+                        class="code-annotations-code"
+                        v-if="!isCommentedOn(index + 1)"
+                        :linenr="index + 1"
+                        v-html="line.replace(/^$/, '<br />')"
+                    ></code><code
+                        v-else
+                        :linenr="index + 1"
+                        v-bind:class="{ comment_start: isStartingLine(index + 1), comment: true, comment_end: isEndingLine(index + 1) }"
+                        v-html="line.replace(/^$/, '<br />')"
+                        v-b-toggle="`comment_${lineNumbers[index + 1]}`"
+                    ></code>
+                </div>
                 <!-- TODO: Dynamically change icon -->
                 <icon
                     v-if="isStartingLine(index + 1)"
                     class="position-absolute mt-1 mr-2"
-                    style="right: 0; z-index: 1"
+                    style="top: 0; right: 0; z-index: 1"
                     role="button"
                     name="plus"
                     v-b-toggle="`comment_${lineNumbers[index + 1]}`"
                 />
+                <b-collapse
+                    v-if="isEndingLine(index + 1)"
+                    :id="`comment_${lineNumbers[index + 1]}`"
+                    :ref="`comment_${lineNumbers[index + 1]}`"
+                    v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }"
+                >
+                    <b-card>{{ comments[lineNumbers[index + 1]].commentText }}</b-card>
+                </b-collapse>
             </div>
-            <b-collapse
-                v-if="lineNumbers[index + 1] >= 0 && lineNumbers[index + 2] === -1"
-                :id="`comment_${lineNumbers[index + 1]}`"
-                :ref="`comment_${lineNumbers[index + 1]}`"
-                v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }"
-            >
-                <b-card>{{ comments[lineNumbers[index + 1]].commentText }}</b-card>
-            </b-collapse>
         </div>
     </pre>
 </template>
@@ -61,7 +68,7 @@ export default {
         lineNumbers: function() {
             const res = new Array(this.content.length)
                 .fill(-1)
-                .map((value, lineNr) =>
+                .map((_, lineNr) =>
                     this.comments.findIndex(
                         comment => comment.startLineNumber <= lineNr && comment.endLineNumber >= lineNr
                     )
@@ -79,12 +86,24 @@ export default {
 pre {
     white-space: pre-line;
     display: inline-block;
+    width: 100%;
 
-    div {
+    .code-annotations-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: min-content;
+
+        .code-annotations-line {
+            flex-grow: 1;
+        }
+    }
+
+    .code-annotations-wrapper,
+    .code-annotations-line {
         white-space: initial;
 
         code {
-            font-family: monospace, monospace;
+            font-family: var(--font-family-monospace);
             white-space: pre;
             display: inline-block;
             box-sizing: border-box;
@@ -108,7 +127,7 @@ pre {
                 border-bottom-right-radius: 3px;
             }
 
-            &:first-of-type {
+            &.code-annotations-linenr {
                 flex-shrink: 0;
                 margin-right: 1ch;
                 border-right: 1px solid var(--gray);
@@ -120,6 +139,10 @@ pre {
                 text-align: right;
             }
 
+            &.code-annotations-code {
+                padding-right: 7ch;
+            }
+
             &::v-deep span {
                 font-family: inherit;
             }
@@ -128,7 +151,7 @@ pre {
 }
 
 .collapse {
-    font-family: monospace, monospace;
+    font-family: var(--font-family-monospace);
 }
 
 .card {
