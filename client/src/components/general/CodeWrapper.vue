@@ -4,7 +4,14 @@
             <FileTree :files="files" :selectedFile="selected" @selected="onSelect" />
         </div>
         <div class="ml-3" style="overflow: hidden">
-            <CodeAnnotator :content="content" :readOnly="readOnly" />
+            <CodeViewer v-if="readOnly" :content="content" />
+            <CodeAnnotator
+                v-else
+                :content="content"
+                :readOnly="readOnly"
+                :submissionId="submissionId"
+                :reviewId="reviewId"
+            />
         </div>
     </div>
     <b-alert v-else show variant="primary">Loading source files</b-alert>
@@ -15,11 +22,12 @@ import hljs from "highlight.js"
 import "highlight.js/styles/default.css"
 import JSZip from "jszip"
 import FileTree from "./FileTree"
+import CodeViewer from "./CodeViewer"
 import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 
 export default {
-    props: ["fileUrl", "readOnly"],
-    components: { FileTree, CodeAnnotator },
+    props: ["fileUrl", "readOnly", "submissionId", "reviewId"],
+    components: { CodeViewer, FileTree, CodeAnnotator },
     data() {
         return {
             content: null,
