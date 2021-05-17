@@ -1,12 +1,10 @@
 <template>
     <b-card>
         <div class="d-flex">
-            <pre>
-                <div v-for="(line, index) in content" :key="index + 'line'">
+            <pre><div v-for="(line, index) in content" :key="index + 'line'">
                     <code :linenr="index + 1" v-bind:style="{ width: `${maxLineNumberDigits}ch` }">{{ index + 1 }}</code>
                 </div></pre>
-            <pre>
-                <div v-for="(line, index) in content" :key="index + 'code'">
+            <pre><div v-for="(line, index) in content" :key="index + 'code'">
                     <code :linenr="index + 1" v-html="line.replace(/^$/, '<br />')"></code>
                 </div></pre>
         </div>
@@ -28,6 +26,7 @@ export default {
 pre {
     white-space: pre-line;
     display: inline-block;
+    margin: 0;
 
     div {
         white-space: initial;

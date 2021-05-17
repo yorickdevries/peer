@@ -111,7 +111,8 @@ pre {
     .code-annotations-wrapper {
         display: flex;
         flex-direction: column;
-        width: min-content;
+        min-width: min-content;
+        width: 100%;
 
         .code-annotations-line {
             flex-grow: 1;

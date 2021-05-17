@@ -3,18 +3,19 @@
         <div style="flex-shrink: 0; max-width: 40%">
             <FileTree :files="files" :selectedFile="selected" @selected="onSelect" />
         </div>
-        <div class="ml-3" style="overflow: hidden">
-            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade>
-                <CodeViewer v-if="readOnly" :content="content" />
-                <CodeAnnotator
-                    v-else
-                    :content="content"
-                    :readOnly="readOnly"
-                    :submissionId="submissionId"
-                    :reviewId="reviewId"
-                />
+        <div class="ml-3" style="overflow: hidden; flex-grow: 1; position: relative">
+            <b-alert variant="primary" show v-if="!content || content.length === 0">This file is empty</b-alert>
+            <CodeViewer v-else-if="readOnly" :content="content" />
+            <CodeAnnotator
+                v-else
+                :content="content"
+                :readOnly="readOnly"
+                :submissionId="submissionId"
+                :reviewId="reviewId"
+            />
+            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
                 <template #overlay>
-                    <b-spinner v-if="!showFile"></b-spinner>
+                    <b-spinner v-if="!showFile" variant="primary"></b-spinner>
                     <div v-else-if="showWarning" class="text-center">
                         <p>This file contains characters that can not be displayed properly</p>
                         <b-button variant="outline-primary" @click="showWarning = false">Show anyway</b-button>
