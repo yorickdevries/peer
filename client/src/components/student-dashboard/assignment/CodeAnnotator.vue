@@ -203,6 +203,7 @@ export default {
             }
 
             this.comments.splice(index, 1)
+            this.showSuccessMessage({ message: "Successfully deleted comment" })
         }
     }
 }
