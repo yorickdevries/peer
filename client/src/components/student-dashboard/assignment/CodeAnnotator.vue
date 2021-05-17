@@ -143,20 +143,7 @@ export default {
             (this.startLineNumber <= comment.endLineNumber && this.endLineNumber >= comment.startLineNumber)
             
             If at any time a clash occures, the user is shown an error message and is not allowed to write a comment.*/
-            console.log("entering for loop")
             for (const comment of this.comments) {
-                console.log(this.startLineNumber)
-                console.log(comment.endLineNumber)
-                console.log(this.endLineNumber)
-                console.log(comment.startLineNumber)
-
-                console.log(
-                    this.startLineNumber <= comment.endLineNumber && this.endLineNumber >= comment.startLineNumber
-                )
-                console.log(
-                    !(this.startLineNumber > comment.endLineNumber || this.endLineNumber < comment.startLineNumber)
-                )
-
                 if (!(this.startLineNumber > comment.endLineNumber || this.endLineNumber < comment.startLineNumber)) {
                     this.startLineNumber = null
                     this.endLineNumber = null
@@ -164,7 +151,6 @@ export default {
                     return
                 }
             }
-            console.log("after for loop")
 
             // Update the current state and get highlighed text
             this.writing = true

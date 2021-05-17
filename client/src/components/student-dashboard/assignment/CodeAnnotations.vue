@@ -43,8 +43,7 @@
                     <b-card>{{ comments[lineNumbers[index + 1]].commentText }}</b-card>
                 </b-collapse>
             </div>
-        </div>
-    </pre>
+    </div></pre>
 </template>
 
 <script>
@@ -87,6 +86,8 @@ pre {
     white-space: pre-line;
     display: inline-block;
     width: 100%;
+    background-color: white;
+    margin: 0;
 
     .code-annotations-wrapper {
         display: flex;
@@ -99,10 +100,13 @@ pre {
     }
 
     .code-annotations-wrapper,
-    .code-annotations-line {
+    .code-annotations-line,
+    div {
         white-space: initial;
+        background-color: inherit;
 
         code {
+            background-color: inherit;
             font-family: var(--font-family-monospace);
             white-space: pre;
             display: inline-block;
@@ -134,7 +138,9 @@ pre {
                 box-sizing: content-box;
                 padding-right: 1ch;
                 user-select: none;
-
+                position: sticky;
+                left: 0;
+                background-color: inherit;
                 display: inline-block;
                 text-align: right;
             }
