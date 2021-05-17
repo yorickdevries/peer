@@ -235,13 +235,23 @@
                                     annotated within this website. This is a new experimental feature and some pdf's
                                     might not render, but the students can always download the submission files as well.
                                 </b-alert>
-                                <b-alert v-if="assignment.assignmentType == 'code'" variant="danger" show>
-                                    Code review assignments can only have .zip extensions.
-                                </b-alert>
                                 <b-form-select
                                     :options="extensionTypes"
                                     v-model="assignment.submissionExtensions"
                                 ></b-form-select>
+                            </b-form-group>
+
+                            <b-form-group
+                                v-if="assignment.assignmentType === 'code' && assignment.submissionExtensions === '.*'"
+                                label="Whitelist specific file extensions"
+                                description="Comma separated list. Leave this unchanged to allow any file to be submitted, this includes .zip files and single files."
+                            >
+                                <b-form-input v-model="assignment.whitelistExtensions" type="text" placeholder=".*">
+                                </b-form-input>
+                                <small v-if="!validWhitelist" class="text-danger">
+                                    Invalid extensions, please specify a comma separated list of allowed file
+                                    extensions.
+                                </small>
                             </b-form-group>
 
                             <b-form-group>
@@ -343,12 +353,13 @@ export default {
                 file: null,
                 externalLink: null,
                 submissionExtensions: ".pdf",
+                whitelistExtensions: null,
                 blockFeedback: true,
                 lateSubmissions: true,
                 lateSubmissionReviews: true,
                 lateReviewEvaluations: true,
                 automaticStateProgression: false,
-                assignmentType: null
+                assignmentType: "document"
             },
             extensionTypes: null,
             extensionTypesDocument: [
@@ -358,13 +369,19 @@ export default {
                 { value: ".doc,.docx", text: ".doc,.docx" },
                 { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" }
             ],
-            extensionTypesCode: [{ value: ".zip", text: ".zip" }],
+            extensionTypesCode: [
+                { value: ".zip", text: ".zip" },
+                { value: ".*", text: ".*" }
+            ],
             assignmentTypes: [
                 { value: "document", text: "Document review" },
                 { value: "code", text: "Code review" }
             ],
             buttonDisabled: false
         }
+    },
+    created() {
+        this.typeChangeFunc()
     },
     methods: {
         async onSubmit() {
@@ -375,7 +392,20 @@ export default {
             let reviewPublishDate = null
             let reviewDueDate = null
             let reviewEvaluationDueDate = null
+            let submissionExtensions = this.assignment.submissionExtensions
             try {
+                if (!this.validWhitelist) {
+                    throw new Error("Invalid list of whitelisted file extensions")
+                }
+
+                if (
+                    this.assignment.assignmentType === "code" &&
+                    this.assignment.submissionExtensions === ".*" &&
+                    this.assignment.whitelistExtensions &&
+                    this.assignment.whitelistExtensions.length > 0
+                ) {
+                    submissionExtensions = this.assignment.whitelistExtensions
+                }
                 // Check for empty date fields
                 this.checkDateFormat()
                 publishDate = this.constructDate(this.assignment.publishDay, this.assignment.publishTime)
@@ -431,7 +461,7 @@ export default {
                     this.assignment.description,
                     this.assignment.externalLink,
                     this.assignment.file,
-                    this.assignment.submissionExtensions,
+                    submissionExtensions,
                     this.assignment.blockFeedback,
                     this.assignment.lateSubmissions,
                     this.assignment.lateSubmissionReviews,
@@ -492,6 +522,18 @@ export default {
                 this.extensionTypes = this.extensionTypesCode
                 this.assignment.submissionExtensions = ".zip"
             }
+        }
+    },
+    computed: {
+        validWhitelist() {
+            return (
+                this.assignment.assignmentType !== "code" ||
+                this.assignment.submissionExtensions !== ".*" ||
+                !this.assignment.whitelistExtensions ||
+                this.assignment.whitelistExtensions.length == 0 ||
+                // Match list of comma separated file extensions
+                /^(\.[A-Za-z*]+\s*,\s*)*(\.[A-Za-z*]+\s*)$/.test(this.assignment.whitelistExtensions)
+            )
         }
     }
 }
