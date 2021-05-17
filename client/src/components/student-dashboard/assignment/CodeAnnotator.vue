@@ -6,7 +6,7 @@
         <b-alert v-else-if="!review || review.submitted" show variant="warning">
             The review is submitted, so any annotations will not be saved.
         </b-alert>
-        <b-alert :show="!showCode" variant="primary">LOADING CODE</b-alert>
+        <b-alert :show="!showCode" variant="primary">LOADING {{ review ? "REVIEW" : "SUBMISSION" }}</b-alert>
 
         <!-- The buttons and text area for the actual comments, somewhat primitive -->
         <!-- TODO: Upgrade the look of these buttons -->
@@ -25,7 +25,13 @@
         </form>
 
         <b-card v-show="showCode">
-            <CodeAnnotations :content="content" :comments="comments" :selectedFile="selectedFile" ref="annotator" />
+            <CodeAnnotations
+                @deleted="onDeleteComment"
+                :content="content"
+                :comments="comments"
+                :selectedFile="selectedFile"
+                ref="annotator"
+            />
         </b-card>
     </div>
 </template>
@@ -45,7 +51,6 @@ export default {
             review: null,
             submission: null,
             fileMetaData: null,
-            codeDivId: null,
             showCode: false,
             writing: false,
             highlightedText: null,
@@ -197,6 +202,14 @@ export default {
             this.endLineNumber = null
             this.writing = false
             this.showSuccessMessage({ message: "Your selection and comment was deleted" })
+        },
+        onDeleteComment(index) {
+            if (index < 0 || index >= this.comments.length) {
+                return
+            }
+
+            this.comments.splice(index, 1)
+            this.showSuccessMessage({ message: "Successfully deleted comment" })
         }
     }
 }
