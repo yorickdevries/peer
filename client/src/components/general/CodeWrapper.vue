@@ -5,7 +5,13 @@
         </div>
         <div class="ml-3" style="overflow: hidden">
             <CodeViewer v-if="readOnly" :content="content" />
-            <CodeAnnotator v-else :content="content" :readOnly="readOnly" />
+            <CodeAnnotator
+                v-else
+                :content="content"
+                :readOnly="readOnly"
+                :submissionId="submissionId"
+                :reviewId="reviewId"
+            />
         </div>
     </div>
     <b-alert v-else show variant="primary">Loading source files</b-alert>
@@ -20,7 +26,7 @@ import CodeViewer from "./CodeViewer"
 import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 
 export default {
-    props: ["fileUrl", "readOnly"],
+    props: ["fileUrl", "readOnly", "submissionId", "reviewId"],
     components: { CodeViewer, FileTree, CodeAnnotator },
     data() {
         return {

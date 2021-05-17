@@ -6,7 +6,13 @@
             :submissionId="submissionId"
             :readOnly="readOnly"
         />
-        <CodeWrapper v-else-if="renderAs === 'code'" :fileUrl="filePath" :readOnly="readOnly" />
+        <CodeWrapper
+            v-else-if="renderAs === 'code'"
+            :fileUrl="filePath"
+            :readOnly="readOnly"
+            :submissionId="submissionId"
+            :reviewId="reviewId"
+        />
         <div v-else>
             <b-alert show variant="secondary">
                 No file annotation is available, because the assignment type was not recognized.</b-alert
