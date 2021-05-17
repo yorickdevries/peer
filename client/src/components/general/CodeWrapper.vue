@@ -5,7 +5,7 @@
         </div>
         <div class="ml-3" style="overflow: hidden">
             <CodeViewer v-if="readOnly" :content="content" />
-            <CodeAnnotator v-else :content="content" :readOnly="readOnly" />
+            <CodeAnnotator v-else :content="content" :readOnly="readOnly" :selectedFile="selected" />
         </div>
     </div>
     <b-alert v-else show variant="primary">Loading source files</b-alert>

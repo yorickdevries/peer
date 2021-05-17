@@ -48,7 +48,7 @@
 
 <script>
 export default {
-    props: ["content", "comments"],
+    props: ["content", "comments", "selectedFile"],
     methods: {
         isStartingLine(lineNr) {
             return this.isCommentedOn(lineNr) && (lineNr === 0 || this.lineNumbers[lineNr - 1] === -1)
@@ -69,7 +69,10 @@ export default {
                 .fill(-1)
                 .map((_, lineNr) =>
                     this.comments.findIndex(
-                        comment => comment.startLineNumber <= lineNr && comment.endLineNumber >= lineNr
+                        comment =>
+                            comment.startLineNumber <= lineNr &&
+                            comment.endLineNumber >= lineNr &&
+                            comment.selectedFile === this.selectedFile
                     )
                 )
             return res

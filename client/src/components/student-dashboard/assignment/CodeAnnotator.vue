@@ -25,7 +25,7 @@
         </form>
 
         <b-card v-show="showCode">
-            <CodeAnnotations :content="content" :comments="comments" ref="annotator" />
+            <CodeAnnotations :content="content" :comments="comments" :selectedFile="selectedFile" ref="annotator" />
         </b-card>
     </div>
 </template>
@@ -39,7 +39,7 @@ export default {
     mixins: [notifications],
     components: { /*CodeViewer,*/ CodeAnnotations },
     // either "reviewId" or "submissionId" is passed, not both
-    props: ["reviewId", "submissionId", "readOnly", "content"],
+    props: ["reviewId", "submissionId", "readOnly", "content", "selectedFile"],
     data() {
         return {
             review: null,
@@ -52,6 +52,7 @@ export default {
             startLineNumber: null,
             endLineNumber: null,
             commentText: null,
+            highlightedFile: null,
             comments: []
         }
     },
@@ -134,17 +135,25 @@ export default {
                 this.endLineNumber = temp
             }
 
-            /* Check if the new comment overlaps with an already made comment. This is done by iterating over all stored comments,
-            then checking if the new comment is not either entirely before or after any of the stored. Because startLineNumber is
-            always smaller than endLineNumber, this is checked by: 
+            /* Check if the new comment overlaps with an already made comment in the same file. 
+            This is done by iterating over all stored comments, then checking if the new comment 
+            is not either entirely before or after any of the stored and is in the same file.
+
+            Because startLineNumber is always smaller than endLineNumber, this is checked by: 
+            this.selectedFile === comment.selectedFile &&
             (!(this.startLineNumber > comment.endLineNumber || this.endLineNumber < comment.startLineNumber))
-            
+
             Applying DeMorgans law gives us:
+            this.selectedFile === comment.selectedFile &&
             (this.startLineNumber <= comment.endLineNumber && this.endLineNumber >= comment.startLineNumber)
             
             If at any time a clash occures, the user is shown an error message and is not allowed to write a comment.*/
             for (const comment of this.comments) {
-                if (this.startLineNumber <= comment.endLineNumber && this.endLineNumber >= comment.startLineNumber) {
+                if (
+                    this.selectedFile === comment.selectedFile &&
+                    this.startLineNumber <= comment.endLineNumber &&
+                    this.endLineNumber >= comment.startLineNumber
+                ) {
                     this.startLineNumber = null
                     this.endLineNumber = null
                     this.showErrorMessage({ message: "Please select lines not yet commented on" })
@@ -155,6 +164,7 @@ export default {
             // Update the current state and get highlighed text
             this.writing = true
             this.highlightedText = selectedText
+            this.highlightedFile = this.selectedFile
         },
         // TODO: send all comments to the server
         async submitComment() {
@@ -166,7 +176,8 @@ export default {
                 commentText: this.commentText,
                 startLineNumber: this.startLineNumber,
                 endLineNumber: this.endLineNumber,
-                highlightedText: this.highlightedText
+                highlightedText: this.highlightedText,
+                selectedFile: this.highlightedFile
             })
             // Send the comment to the server
             // TODO: update this method call
@@ -177,6 +188,7 @@ export default {
             this.highlightedText = null
             this.startLineNumber = null
             this.endLineNumber = null
+            this.highlightedFile = null
         },
         deleteSelection() {
             this.commentText = null
@@ -185,15 +197,6 @@ export default {
             this.endLineNumber = null
             this.writing = false
             this.showSuccessMessage({ message: "Your selection and comment was deleted" })
-        },
-        compareArrayItems(a, b) {
-            if (a.startLineNumber > b.startLineNumber) {
-                return 1
-            }
-            if (a.startLineNumber < b.endLineNumber) {
-                return -1
-            }
-            return 0
         }
     }
 }
