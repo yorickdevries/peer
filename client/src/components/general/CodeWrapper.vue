@@ -22,7 +22,6 @@ import hljs from "highlight.js"
 import "highlight.js/styles/default.css"
 import JSZip from "jszip"
 import FileTree from "./FileTree"
-import CodeViewer from "./CodeViewer"
 import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 
 export default {
