@@ -1,6 +1,5 @@
 <template>
-    <pre>
-        <div class="code-annotations-wrapper">
+    <pre><div class="code-annotations-wrapper">
             <div
                 class="position-relative code-annotations-line"
                 v-for="(line, index) in content"

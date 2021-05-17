@@ -4,14 +4,23 @@
             <FileTree :files="files" :selectedFile="selected" @selected="onSelect" />
         </div>
         <div class="ml-3" style="overflow: hidden">
-            <CodeViewer v-if="readOnly" :content="content" />
-            <CodeAnnotator
-                v-else
-                :content="content"
-                :readOnly="readOnly"
-                :submissionId="submissionId"
-                :reviewId="reviewId"
-            />
+            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade>
+                <CodeViewer v-if="readOnly" :content="content" />
+                <CodeAnnotator
+                    v-else
+                    :content="content"
+                    :readOnly="readOnly"
+                    :submissionId="submissionId"
+                    :reviewId="reviewId"
+                />
+                <template #overlay>
+                    <b-spinner v-if="!showFile"></b-spinner>
+                    <div v-else-if="showWarning" class="text-center">
+                        <p>This file contains characters that can not be displayed properly</p>
+                        <b-button variant="outline-primary" @click="showWarning = false">Show anyway</b-button>
+                    </div>
+                </template>
+            </b-overlay>
         </div>
     </div>
     <b-alert v-else show variant="primary">Loading source files</b-alert>
@@ -32,7 +41,9 @@ export default {
         return {
             content: null,
             files: null,
-            selected: null
+            selected: null,
+            showWarning: false,
+            showFile: false
         }
     },
     methods: {
@@ -41,20 +52,23 @@ export default {
                 .then(res => res.blob())
                 .catch(console.error)
         },
-        highlightContent(text) {
+        async highlightContent(text) {
             // hljs.highlightAuto expects a string (code) and optionally an array
             // of language names / aliases
             const highlighted = hljs.highlightAuto(text)
             this.content = highlighted.value.split(/\r?\n/g)
+            this.showFile = true
         },
         async loadZip(file) {
             JSZip.loadAsync(file)
-                .then(zip =>
-                    Object.keys(zip.files)
-                        .map(name => zip.file(name))
-                        // Filter out all null files
-                        .filter(file => file)
-                )
+                .then(zip => {
+                    return (
+                        Object.keys(zip.files)
+                            .map(name => zip.file(name))
+                            // Filter out all null files
+                            .filter(file => file)
+                    )
+                })
                 .then(files => (this.files = files))
                 .catch(console.warn)
         },
@@ -66,13 +80,19 @@ export default {
                 .then(text => this.highlightContent(text))
                 .catch(console.warn)
         },
-        onSelect(file) {
+        async onSelect(file) {
             if (file != this.selected) {
+                this.showFile = false
+                // A regular expression to match any `Special` characters
+                const specials = /[\u{FFF9}\u{FFFA}\u{FFFB}\u{FFFC}\u{FFFD}\u{FFFE}\u{FFFF}]/gu
                 this.selected = file
                 this.files
                     .find(f => !f.dir && f.name === file)
                     .async("string")
-                    .then(text => this.highlightContent(text))
+                    .then(text => {
+                        this.showWarning = text.match(specials) !== null
+                        this.highlightContent(text)
+                    })
                     .catch(console.warn)
             }
         }
