@@ -38,9 +38,26 @@
                     v-if="isEndingLine(index + 1)"
                     :id="`comment_${lineNumbers[index + 1]}`"
                     :ref="`comment_${lineNumbers[index + 1]}`"
-                    v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }"
-                >
-                    <b-card>{{ comments[lineNumbers[index + 1]].commentText }}</b-card>
+                    v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }">
+                    <b-card>
+                        <div class="d-flex justify-content-between">
+                            <span>{{ comments[lineNumbers[index + 1]].commentText }}</span>
+                            <icon
+                                name="trash"
+                                class="ml-auto text-danger"
+                                style="flex-shrink: 0"
+                                role="button"
+                                v-b-modal="`modal_${lineNumbers[index + 1]}`"
+                            />
+                            <b-modal
+                                @ok="deleteComment(lineNumbers[index + 1])"
+                                :id="`modal_${lineNumbers[index + 1]}`"
+                                title="Confirmation"
+                                centered>
+                                Are you sure you want to delete this comment?
+                            </b-modal>
+                        </div>
+                    </b-card>
                 </b-collapse>
             </div>
     </div></pre>
@@ -61,6 +78,9 @@ export default {
         },
         isCommentedOn(lineNr) {
             return lineNr >= 1 && lineNr <= this.lineNumbers.length && this.lineNumbers[lineNr] >= 0
+        },
+        deleteComment(index) {
+            this.$emit("deleted", index)
         }
     },
     computed: {

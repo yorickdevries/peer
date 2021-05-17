@@ -25,7 +25,7 @@
         </form>
 
         <b-card v-show="showCode">
-            <CodeAnnotations :content="content" :comments="comments" ref="annotator" />
+            <CodeAnnotations @deleted="onDeleteComment" :content="content" :comments="comments" ref="annotator" />
         </b-card>
     </div>
 </template>
@@ -195,6 +195,14 @@ export default {
                 return -1
             }
             return 0
+        },
+        onDeleteComment(index) {
+            if (index < 0 || index >= this.comments.length) {
+                return
+            }
+
+            this.comments.splice(index, 1)
+            this.showSuccessMessage({ message: "Successfully deleted comment" })
         }
     }
 }
