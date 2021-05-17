@@ -113,7 +113,7 @@ export default {
                 startCodeElement = startCodeElement.parentElement
             }
             // Get end line number like the start line number
-            let endCodeElement = selection.getRangeAt(selection.rangeCount - 1).startContainer
+            let endCodeElement = selection.getRangeAt(selection.rangeCount - 1).endContainer
             while (endCodeElement != null && endCodeElement.nodeName != "CODE") {
                 endCodeElement = endCodeElement.parentElement
             }
