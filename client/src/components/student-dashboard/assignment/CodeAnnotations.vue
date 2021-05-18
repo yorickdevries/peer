@@ -1,6 +1,5 @@
 <template>
-    <pre>
-        <div class="code-annotations-wrapper">
+    <pre><div class="code-annotations-wrapper">
             <div
                 class="position-relative code-annotations-line"
                 v-for="(line, index) in content"
@@ -115,7 +114,8 @@ pre {
     .code-annotations-wrapper {
         display: flex;
         flex-direction: column;
-        width: min-content;
+        min-width: min-content;
+        width: 100%;
 
         .code-annotations-line {
             flex-grow: 1;
