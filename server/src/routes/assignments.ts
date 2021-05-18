@@ -1,5 +1,5 @@
 import express from "express";
-import Joi from "@hapi/joi";
+import Joi, { CustomHelpers } from "@hapi/joi";
 import { getManager } from "typeorm";
 import {
   validateBody,
@@ -19,7 +19,6 @@ import _ from "lodash";
 import ResponseMessage from "../enum/ResponseMessage";
 import Group from "../models/Group";
 import { AssignmentState } from "../enum/AssignmentState";
-import Extensions from "../enum/Extensions";
 import AssignmentType from "../enum/AssignmentType";
 import Submission from "../models/Submission";
 import publishAssignment from "../assignmentProgression/publishAssignment";
@@ -223,6 +222,23 @@ router.get(
   }
 );
 
+const extensionValidation = (value: string, helpers: CustomHelpers) => {
+  const extensions = value.split(/\s*,\s*/);
+  // Remove empty extension belonging to trailing comma
+  if (extensions.length > 1 && extensions[extensions.length - 1].length == 0) {
+    extensions.pop();
+  }
+
+  for (const extension of extensions) {
+    // Match file extensions starting with . followed by 1 or more alphabetic characters or a star
+    if (!/^\.([A-Za-z]+|\*)$/.test(extension)) {
+      return helpers.error("any.invalid");
+    }
+  }
+
+  return value;
+};
+
 // Joi inputvalidation
 const assignmentSchema = Joi.object({
   name: Joi.string().required(),
@@ -237,9 +253,7 @@ const assignmentSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
-  submissionExtensions: Joi.string()
-    .valid(...Object.values(Extensions))
-    .required(),
+  submissionExtensions: Joi.string().custom(extensionValidation).required(),
   blockFeedback: Joi.boolean().required(),
   lateSubmissions: Joi.boolean().required(),
   lateSubmissionReviews: Joi.boolean().required(),
@@ -353,9 +367,7 @@ const assignmentPatchSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
-  submissionExtensions: Joi.string()
-    .valid(...Object.values(Extensions))
-    .required(),
+  submissionExtensions: Joi.string().custom(extensionValidation).required(),
   blockFeedback: Joi.boolean().required(),
   lateSubmissions: Joi.boolean().required(),
   lateSubmissionReviews: Joi.boolean().required(),

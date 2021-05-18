@@ -7,10 +7,11 @@ import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
 import path from "path";
 import initializeData from "../../src/util/initializeData";
-import fs from "fs";
 import AssignmentType from "../../src/enum/AssignmentType";
 import Course from "../../src/models/Course";
 import publishAssignment from "../../src/assignmentProgression/publishAssignment";
+import createAssignmentRequest from "../helpers/createAssignmentRequest";
+import patchAssignmentRequest from "../helpers/patchAssignmentRequest";
 
 describe("Assignments", () => {
   let connection: Connection;
@@ -57,28 +58,13 @@ describe("Assignments", () => {
   });
 
   test("make an assignment", async () => {
-    const res2 = await request(server)
-      .post("/api/assignments")
-      .set("cookie", sessionCookie)
-      .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
-      .field("name", "Example title")
-      .field("courseId", course.id)
-      .field("enrollable", false)
-      .field("reviewEvaluation", false)
-      .field("publishDate", new Date("2020-06-23T10:00Z").toISOString())
-      .field("dueDate", new Date("2020-06-24T10:00Z").toISOString())
-      .field("reviewPublishDate", new Date("2020-06-25T10:00Z").toISOString())
-      .field("reviewDueDate", new Date("2020-06-26T10:00Z").toISOString())
-      .field("reviewEvaluationDueDate", "null")
-      .field("description", "Example description")
-      .field("externalLink", "null")
-      .field("submissionExtensions", ".pdf")
-      .field("blockFeedback", true)
-      .field("lateSubmissions", true)
-      .field("lateSubmissionReviews", true)
-      .field("lateReviewEvaluations", "null")
-      .field("automaticStateProgression", false)
-      .field("assignmentType", AssignmentType.DOCUMENT);
+    const res2 = await createAssignmentRequest(
+      server,
+      course.id,
+      exampleAssignmentFile,
+      sessionCookie,
+      AssignmentType.DOCUMENT
+    );
 
     expect(res2.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res2.text)).toMatchObject({
@@ -87,55 +73,25 @@ describe("Assignments", () => {
   });
 
   test("make an assignment with invalid assignment type", async () => {
-    const res2 = await request(server)
-      .post("/api/assignments")
-      .set("cookie", sessionCookie)
-      .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
-      .field("name", "Example title")
-      .field("courseId", course.id)
-      .field("enrollable", false)
-      .field("reviewEvaluation", false)
-      .field("publishDate", new Date("2020-06-23T10:00Z").toISOString())
-      .field("dueDate", new Date("2020-06-24T10:00Z").toISOString())
-      .field("reviewPublishDate", new Date("2020-06-25T10:00Z").toISOString())
-      .field("reviewDueDate", new Date("2020-06-26T10:00Z").toISOString())
-      .field("reviewEvaluationDueDate", "null")
-      .field("description", "Example description")
-      .field("externalLink", "null")
-      .field("submissionExtensions", ".pdf")
-      .field("blockFeedback", true)
-      .field("lateSubmissions", true)
-      .field("lateSubmissionReviews", true)
-      .field("lateReviewEvaluations", "null")
-      .field("automaticStateProgression", false)
-      .field("assignmentType", "invalid");
+    const res2 = await createAssignmentRequest(
+      server,
+      course.id,
+      exampleAssignmentFile,
+      sessionCookie,
+      "invalid"
+    );
 
     expect(res2.status).toBe(HttpStatusCode.BAD_REQUEST);
   });
 
   test("invalid patch assignment with changed type", async () => {
-    const res2 = await request(server)
-      .post("/api/assignments")
-      .set("cookie", sessionCookie)
-      .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
-      .field("name", "Example title")
-      .field("courseId", course.id)
-      .field("enrollable", false)
-      .field("reviewEvaluation", false)
-      .field("publishDate", new Date("2020-06-23T10:00Z").toISOString())
-      .field("dueDate", new Date("2020-06-24T10:00Z").toISOString())
-      .field("reviewPublishDate", new Date("2020-06-25T10:00Z").toISOString())
-      .field("reviewDueDate", new Date("2020-06-26T10:00Z").toISOString())
-      .field("reviewEvaluationDueDate", "null")
-      .field("description", "Example description")
-      .field("externalLink", "null")
-      .field("submissionExtensions", ".pdf")
-      .field("blockFeedback", true)
-      .field("lateSubmissions", true)
-      .field("lateSubmissionReviews", true)
-      .field("lateReviewEvaluations", "null")
-      .field("automaticStateProgression", false)
-      .field("assignmentType", AssignmentType.DOCUMENT);
+    const res2 = await createAssignmentRequest(
+      server,
+      course.id,
+      exampleAssignmentFile,
+      sessionCookie,
+      AssignmentType.DOCUMENT
+    );
 
     const assignment = JSON.parse(res2.text);
     const res3 = await request(server)
@@ -150,54 +106,25 @@ describe("Assignments", () => {
     expect(res3.status).toBe(HttpStatusCode.OK);
     await publishAssignment(assignment.id);
 
-    const res4 = await request(server)
-      .patch(`/api/assignments/${assignment.id}`)
-      .set("cookie", sessionCookie)
-      .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
-      .field("name", "Example title")
-      .field("enrollable", false)
-      .field("reviewEvaluation", false)
-      .field("publishDate", new Date("2020-06-23T10:00Z").toISOString())
-      .field("dueDate", new Date("2020-06-24T10:00Z").toISOString())
-      .field("reviewPublishDate", new Date("2020-06-25T10:00Z").toISOString())
-      .field("reviewDueDate", new Date("2020-06-26T10:00Z").toISOString())
-      .field("reviewEvaluationDueDate", "null")
-      .field("description", "Example description")
-      .field("externalLink", "null")
-      .field("submissionExtensions", ".pdf")
-      .field("blockFeedback", true)
-      .field("lateSubmissions", true)
-      .field("lateSubmissionReviews", true)
-      .field("lateReviewEvaluations", "null")
-      .field("automaticStateProgression", false)
-      .field("assignmentType", AssignmentType.CODE);
+    const res4 = await patchAssignmentRequest(
+      server,
+      assignment.id,
+      exampleAssignmentFile,
+      sessionCookie,
+      AssignmentType.CODE
+    );
 
     expect(res4.status).toBe(HttpStatusCode.FORBIDDEN);
   });
 
   test("valid patch assignment with changed type", async () => {
-    const res2 = await request(server)
-      .post("/api/assignments")
-      .set("cookie", sessionCookie)
-      .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
-      .field("name", "Example title")
-      .field("courseId", course.id)
-      .field("enrollable", false)
-      .field("reviewEvaluation", false)
-      .field("publishDate", new Date("2020-06-23T10:00Z").toISOString())
-      .field("dueDate", new Date("2020-06-24T10:00Z").toISOString())
-      .field("reviewPublishDate", new Date("2020-06-25T10:00Z").toISOString())
-      .field("reviewDueDate", new Date("2020-06-26T10:00Z").toISOString())
-      .field("reviewEvaluationDueDate", "null")
-      .field("description", "Example description")
-      .field("externalLink", "null")
-      .field("submissionExtensions", ".pdf")
-      .field("blockFeedback", true)
-      .field("lateSubmissions", true)
-      .field("lateSubmissionReviews", true)
-      .field("lateReviewEvaluations", "null")
-      .field("automaticStateProgression", false)
-      .field("assignmentType", AssignmentType.DOCUMENT);
+    const res2 = await createAssignmentRequest(
+      server,
+      course.id,
+      exampleAssignmentFile,
+      sessionCookie,
+      AssignmentType.DOCUMENT
+    );
 
     const assignment = JSON.parse(res2.text);
     const res3 = await request(server)
@@ -211,28 +138,47 @@ describe("Assignments", () => {
 
     expect(res3.status).toBe(HttpStatusCode.OK);
 
-    const res4 = await request(server)
-      .patch(`/api/assignments/${assignment.id}`)
-      .set("cookie", sessionCookie)
-      .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
-      .field("name", "Example title")
-      .field("enrollable", false)
-      .field("reviewEvaluation", false)
-      .field("publishDate", new Date("2020-06-23T10:00Z").toISOString())
-      .field("dueDate", new Date("2020-06-24T10:00Z").toISOString())
-      .field("reviewPublishDate", new Date("2020-06-25T10:00Z").toISOString())
-      .field("reviewDueDate", new Date("2020-06-26T10:00Z").toISOString())
-      .field("reviewEvaluationDueDate", "null")
-      .field("description", "Example description")
-      .field("externalLink", "null")
-      .field("submissionExtensions", ".pdf")
-      .field("blockFeedback", true)
-      .field("lateSubmissions", true)
-      .field("lateSubmissionReviews", true)
-      .field("lateReviewEvaluations", "null")
-      .field("automaticStateProgression", false)
-      .field("assignmentType", AssignmentType.CODE);
+    const res4 = await patchAssignmentRequest(
+      server,
+      assignment.id,
+      exampleAssignmentFile,
+      sessionCookie,
+      AssignmentType.CODE
+    );
 
     expect(res4.status).toBe(HttpStatusCode.OK);
+  });
+
+  // Makeshift parameterized test
+  test("make an assignments with submission extensions", async () => {
+    // [extensions, valid]
+    const extensionsList: [string, boolean][] = [
+      [".*", true],
+      [".c, .cpp", true],
+      [".c, .cpp, .h,", true],
+      [".", false],
+      ["..", false],
+      [".c_cpp", false],
+      [".c, cpp", false],
+      [".c*", false],
+      ["", false],
+    ];
+
+    for (const extensions of extensionsList) {
+      const res2 = await createAssignmentRequest(
+        server,
+        course.id,
+        exampleAssignmentFile,
+        sessionCookie,
+        undefined,
+        extensions[0]
+      );
+
+      if (extensions[1]) {
+        expect(res2.status).toBe(HttpStatusCode.OK);
+      } else {
+        expect(res2.status).toBe(HttpStatusCode.BAD_REQUEST);
+      }
+    }
   });
 });

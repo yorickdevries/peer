@@ -28,7 +28,6 @@ import File from "./File";
 import moment from "moment";
 import UserRole from "../enum/UserRole";
 import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
-import Extensions from "../enum/Extensions";
 import AssignmentType from "../enum/AssignmentType";
 import AssignmentExport from "./AssignmentExport";
 import AssignmentVersion from "./AssignmentVersion";
@@ -129,10 +128,9 @@ export default class Assignment extends BaseModel {
   @IsDefined()
   @IsString()
   @IsNotEmpty()
-  @IsEnum(Extensions)
   // can be in the form: ".pdf,.zip,.doc,.docx"
   // needs later to be revised to a list of strings
-  submissionExtensions: Extensions;
+  submissionExtensions: string;
 
   @Column()
   @IsDefined()
@@ -206,7 +204,7 @@ export default class Assignment extends BaseModel {
     description: string | null,
     file: File | null,
     externalLink: string | null,
-    submissionExtensions: Extensions,
+    submissionExtensions: string,
     blockFeedback: boolean,
     lateSubmissions: boolean,
     lateSubmissionReviews: boolean,
