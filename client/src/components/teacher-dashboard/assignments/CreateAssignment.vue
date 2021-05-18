@@ -371,7 +371,7 @@ export default {
             ],
             extensionTypesCode: [
                 { value: ".zip", text: ".zip" },
-                { value: ".*", text: ".*" }
+                { value: ".*", text: ".* (Single file submissions)" }
             ],
             assignmentTypes: [
                 { value: "document", text: "Document review" },
