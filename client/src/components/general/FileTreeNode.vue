@@ -4,9 +4,9 @@
             <icon class="text-muted" name="folder"></icon>
             {{ name }}
         </div>
-        <div v-else v-bind:class="background" role="button">
+        <div v-else v-bind:class="`${background} file`" role="button">
             <icon class="text-muted" name="code"></icon>
-            <span v-on:click="onSelect"> {{ name }}</span>
+            <span v-on:click="onSelect" class="filename"> {{ name }}</span>
         </div>
 
         <div style="margin-left: 1.5rem" v-if="dir">
@@ -76,3 +76,12 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+.file:hover {
+    background-color: var(--gray-dark) !important;
+    .filename {
+        color: var(--white) !important;
+    }
+}
+</style>
