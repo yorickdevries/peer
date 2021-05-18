@@ -92,7 +92,7 @@ export default {
                             startLineNumber: row.startLineNumber,
                             endLineNumber: row.endLineNumber,
                             highlightedText: "",
-                            selectedFile: this.selectedFile
+                            selectedFile: row.selectedFile
                         })
                     }
                 } catch (error) {
