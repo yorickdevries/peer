@@ -19,7 +19,7 @@ export default function upload(
     callback: multer.FileFilterCallback
   ) => {
     const extension = path.extname(file.originalname);
-    if (!allowedExtensions.includes(extension)) {
+    if (!allowedExtensions.includes(extension) && !allowedExtensions.includes(".*")) {
       return callback(new Error(`Extension not allowed: ${extension}`));
     } else {
       return callback(null, true);

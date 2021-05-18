@@ -130,8 +130,10 @@ export default class Submission extends BaseModel {
       throw new Error("Group is not part of this assignment");
     }
     // check if the file has the right extension
+    const submissionExtensions = assignment.submissionExtensions.split(/\s*,\s*/);
     if (
-      !assignment.submissionExtensions.split(",").includes(this.file.extension)
+      !submissionExtensions.includes(this.file.extension) &&
+      !submissionExtensions.includes(".*")
     ) {
       throw new Error("The file is of the wrong extension");
     }
