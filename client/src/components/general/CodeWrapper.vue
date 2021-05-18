@@ -3,7 +3,15 @@
         <div style="flex-shrink: 0; max-width: 40%">
             <FileTree :files="files" :selectedFile="selected" @selected="onSelect" />
         </div>
-        <div class="ml-3" style="overflow: hidden; flex-grow: 1; position: relative">
+        <div
+            class="ml-3"
+            v-bind:style="{
+                position: 'relative',
+                overflow: 'hidden',
+                'flex-grow': '1',
+                'max-height': showWarning || !showFile ? '80vh' : 'none'
+            }"
+        >
             <b-alert variant="primary" show v-if="!content || content.length === 0">This file is empty</b-alert>
             <CodeViewer v-else-if="readOnly" :content="content" />
             <CodeAnnotator
@@ -60,6 +68,12 @@ export default {
             this.content = highlighted.value.split(/\r?\n/g)
             this.showFile = true
         },
+        async verifyTextContent(text) {
+            // A regular expression to match any `Special` characters
+            const specials = /[\u{FFF9}\u{FFFA}\u{FFFB}\u{FFFC}\u{FFFD}\u{FFFE}\u{FFFF}]/gu
+            this.showWarning = text.match(specials) !== null
+            return text // Return text here to make chaining possible
+        },
         async loadZip(file) {
             JSZip.loadAsync(file)
                 .then(zip => {
@@ -74,26 +88,24 @@ export default {
                 .catch(console.warn)
         },
         async loadSingleFile(file) {
+            this.showFile = false
             this.selected = file.name
             this.files = [{ dir: false, name: file.name }]
 
             Promise.resolve(file.text())
-                .then(text => this.highlightContent(text))
+                .then(this.verifyTextContent)
+                .then(this.highlightContent)
                 .catch(console.warn)
         },
         async onSelect(file) {
             if (file != this.selected) {
                 this.showFile = false
-                // A regular expression to match any `Special` characters
-                const specials = /[\u{FFF9}\u{FFFA}\u{FFFB}\u{FFFC}\u{FFFD}\u{FFFE}\u{FFFF}]/gu
                 this.selected = file
                 this.files
                     .find(f => !f.dir && f.name === file)
                     .async("string")
-                    .then(text => {
-                        this.showWarning = text.match(specials) !== null
-                        this.highlightContent(text)
-                    })
+                    .then(this.verifyTextContent)
+                    .then(this.highlightContent)
                     .catch(console.warn)
             }
         }
