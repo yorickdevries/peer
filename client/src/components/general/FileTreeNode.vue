@@ -1,12 +1,12 @@
 <template>
     <div>
-        <div v-if="dir">
+        <div v-if="dir" class="dir">
             <icon class="text-muted" name="folder"></icon>
             {{ name }}
         </div>
-        <div v-else v-bind:class="background">
+        <div v-else v-bind:class="`${background} file`" role="button">
             <icon class="text-muted" name="code"></icon>
-            <span v-on:click="onSelect"> {{ name }}</span>
+            <span v-on:click="onSelect" class="filename"> {{ name }}</span>
         </div>
 
         <div style="margin-left: 1.5rem" v-if="dir">
@@ -68,7 +68,7 @@ export default {
         background() {
             // The selected file is equal to the path of this file
             if (this.selected === this.children.path) {
-                return "bg-dark text-light"
+                return "bg-dark text-light selected"
             } else {
                 return "bg-white"
             }
@@ -76,3 +76,25 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+$text-hover: #212529;
+$background-hover: #f8f8f8;
+$text-light: #f8f9fa;
+$bg-dark: #343a40;
+.selected.file:hover {
+    background-color: mix($bg-dark, $background-hover, 75%) !important;
+    .filename {
+        color: mix($text-light, $text-hover, 75%);
+    }
+}
+.file:hover {
+    background-color: $background-hover !important;
+    .filename {
+        color: $text-hover;
+    }
+}
+.dir:hover {
+    cursor: default;
+}
+</style>
