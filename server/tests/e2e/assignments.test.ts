@@ -155,10 +155,13 @@ describe("Assignments", () => {
     const extensionsList: [string, boolean][] = [
       [".*", true],
       [".c, .cpp", true],
+      [".c, .cpp, .h,", true],
       [".", false],
       ["..", false],
       [".c_cpp", false],
       [".c, cpp", false],
+      [".c*", false],
+      ["", false],
     ];
 
     for (const extensions of extensionsList) {

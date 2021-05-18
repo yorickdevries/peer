@@ -526,14 +526,29 @@ export default {
     },
     computed: {
         validWhitelist() {
-            return (
+            if (
                 this.assignment.assignmentType !== "code" ||
                 this.assignment.submissionExtensions !== ".*" ||
                 !this.assignment.whitelistExtensions ||
-                this.assignment.whitelistExtensions.length == 0 ||
-                // Match list of comma separated file extensions
-                /^(\.[A-Za-z*]+\s*,\s*)*(\.[A-Za-z*]+\s*)$/.test(this.assignment.whitelistExtensions)
-            )
+                this.assignment.whitelistExtensions.length == 0
+            ) {
+                return true
+            }
+
+            const extensions = this.assignment.whitelistExtensions.split(/\s*,\s*/)
+
+            // Remove empty extension belonging to trailing comma
+            if (extensions.length > 1 && extensions[extensions.length - 1].length == 0) {
+                extensions.pop()
+            }
+
+            for (const extension of extensions) {
+                if (!/^\.([A-Za-z]+|\*)$/.test(extension)) {
+                    console.log(extension)
+                    return false
+                }
+            }
+            return true
         }
     }
 }

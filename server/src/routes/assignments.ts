@@ -223,12 +223,20 @@ router.get(
 );
 
 const extensionValidation = (value: string, helpers: CustomHelpers) => {
-  // Match list of comma separated file extensions
-  if (/^(\.[A-Za-z*]+\s*,\s*)*(\.[A-Za-z*]+\s*)$/.test(value)) {
-    return value;
-  } else {
-    return helpers.error("any.invalid");
+  const extensions = value.split(/\s*,\s*/);
+  // Remove empty extension belonging to trailing comma
+  if (extensions.length > 1 && extensions[extensions.length - 1].length == 0) {
+    extensions.pop();
   }
+
+  for (const extension of extensions) {
+    // Match file extensions starting with . followed by 1 or more alphabetic characters or a star
+    if (!/^\.([A-Za-z]+|\*)$/.test(extension)) {
+      return helpers.error("any.invalid");
+    }
+  }
+
+  return value;
 };
 
 // Joi inputvalidation
