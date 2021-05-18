@@ -86,14 +86,7 @@ export default {
                     const res = await api.codeannotations.getAnnotations(this.review.id)
                     const rows = res.data
                     for (const row of rows) {
-                        this.comments.push({
-                            commentId: row.id,
-                            commentText: row.commentText,
-                            startLineNumber: row.startLineNumber,
-                            endLineNumber: row.endLineNumber,
-                            highlightedText: "",
-                            selectedFile: row.selectedFile
-                        })
+                        this.pushComment(row)
                     }
                 } catch (error) {
                     this.comments = []
@@ -182,16 +175,7 @@ export default {
                     this.selectedFile
                 )
                 const comment = res.data
-
-                // Add comment to comments array using Array.splice to make CodeAnnotations.vue react to the change
-                this.comments.push({
-                    commentId: comment.id,
-                    commentText: comment.commentText,
-                    startLineNumber: comment.startLineNumber,
-                    endLineNumber: comment.endLineNumber,
-                    highlightedText: this.highlightedText,
-                    selectedFile: comment.selectedFile
-                })
+                this.pushComment(comment)
             } catch (error) {
                 this.showErrorMessage({ message: "Unable to submit comment" })
             }
@@ -202,6 +186,17 @@ export default {
             this.startLineNumber = null
             this.endLineNumber = null
             this.highlightedFile = null
+        },
+        // Add comment to comments array using Array.splice to make CodeAnnotations.vue react to the change
+        pushComment(comment) {
+            this.comments.push({
+                commentId: comment.id,
+                commentText: comment.commentText,
+                startLineNumber: comment.startLineNumber,
+                endLineNumber: comment.endLineNumber,
+                highlightedText: "TO DO",
+                selectedFile: comment.selectedFile
+            })
         },
         deleteSelection() {
             this.commentText = null
