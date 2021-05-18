@@ -32,6 +32,7 @@ import multiplechoicequestionanswers from "./multiplechoicequestionanswers";
 import checkboxquestionanswers from "./checkboxquestionanswers";
 import pdfannotations from "./pdfannotations";
 import assignmentexports from "./assignmentexports";
+import codeannotations from "./codeannotations";
 
 const router = express.Router();
 router.use(eventLogger);
@@ -83,6 +84,7 @@ router.use("/multiplechoicequestionanswers", multiplechoicequestionanswers);
 router.use("/checkboxquestionanswers", checkboxquestionanswers);
 router.use("/pdfannotations", pdfannotations);
 router.use("/assignmentexports", assignmentexports);
+router.use("/codeannotations", codeannotations);
 
 // If no other routes apply, send a 404
 router.use((_req, res) => {
