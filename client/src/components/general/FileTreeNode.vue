@@ -79,10 +79,7 @@ export default {
 
 <style lang="scss" scoped>
 .file:hover {
-    background-color: var(--gray-dark) !important;
-    .filename {
-        color: var(--white) !important;
-    }
+    background-color: #f8f8f8 !important;
 }
 .dir:hover {
     cursor: default;
