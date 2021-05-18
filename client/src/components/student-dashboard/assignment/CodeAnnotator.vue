@@ -187,14 +187,13 @@ export default {
             this.endLineNumber = null
             this.highlightedFile = null
         },
-        // Add comment to comments array using Array.splice to make CodeAnnotations.vue react to the change
+        // Add comment to comments array
         pushComment(comment) {
             this.comments.push({
                 commentId: comment.id,
                 commentText: comment.commentText,
                 startLineNumber: comment.startLineNumber,
                 endLineNumber: comment.endLineNumber,
-                highlightedText: "TO DO",
                 selectedFile: comment.selectedFile
             })
         },
