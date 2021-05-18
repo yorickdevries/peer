@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="dir">
+        <div v-if="dir" class="dir">
             <icon class="text-muted" name="folder"></icon>
             {{ name }}
         </div>
@@ -83,5 +83,8 @@ export default {
     .filename {
         color: var(--white) !important;
     }
+}
+.dir:hover {
+    cursor: default;
 }
 </style>
