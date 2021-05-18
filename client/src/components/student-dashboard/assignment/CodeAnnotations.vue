@@ -67,12 +67,15 @@ export default {
     props: ["content", "comments", "selectedFile"],
     methods: {
         isStartingLine(lineNr) {
-            return this.isCommentedOn(lineNr) && (lineNr === 0 || this.lineNumbers[lineNr - 1] === -1)
+            return (
+                this.isCommentedOn(lineNr) &&
+                (lineNr === 0 || this.lineNumbers[lineNr - 1] !== this.lineNumbers[lineNr])
+            )
         },
         isEndingLine(lineNr) {
             return (
                 this.isCommentedOn(lineNr) &&
-                (lineNr === this.lineNumbers.length - 1 || this.lineNumbers[lineNr + 1] === -1)
+                (lineNr === this.lineNumbers.length - 1 || this.lineNumbers[lineNr + 1] !== this.lineNumbers[lineNr])
             )
         },
         isCommentedOn(lineNr) {
