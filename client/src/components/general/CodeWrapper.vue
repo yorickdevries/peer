@@ -1,10 +1,10 @@
 <template>
     <div v-if="files" class="d-flex">
-        <div style="flex-shrink: 0; max-width: 40%">
+        <div v-if="!singleFile" style="flex-shrink: 0; max-width: 40%">
             <FileTree :files="files" :selectedFile="selected" @selected="onSelect" />
         </div>
         <div
-            class="ml-3"
+            v-bind:class="{ 'ml-3': !singleFile }"
             v-bind:style="{
                 position: 'relative',
                 overflow: 'hidden',
@@ -76,7 +76,7 @@ export default {
             return text // Return text here to make chaining possible
         },
         async loadZip(file) {
-            JSZip.loadAsync(file)
+            return JSZip.loadAsync(file)
                 .then(zip => {
                     return (
                         Object.keys(zip.files)
@@ -86,12 +86,11 @@ export default {
                     )
                 })
                 .then(files => (this.files = files))
-                .catch(console.warn)
         },
         async loadSingleFile(file) {
             this.showFile = false
-            this.selected = file.name
-            this.files = [{ dir: false, name: file.name }]
+            this.selected = this.fileUrl.split("/").pop()
+            this.files = [{ dir: false, name: this.selected }]
 
             Promise.resolve(file.text())
                 .then(this.verifyTextContent)
@@ -113,13 +112,20 @@ export default {
     },
     async created() {
         const file = await this.getFile()
-        const isZipFile = !file.type.includes("text/plain")
+        const isPossibleZipFile = !file.type.includes("text/plain")
 
         // If we get a zip file, we'll try to unzip it and show one of the code files
-        if (isZipFile) {
-            this.loadZip(file)
+        if (isPossibleZipFile) {
+            this.loadZip(file).catch(() => {
+                this.loadSingleFile(file)
+            })
         } else {
             this.loadSingleFile(file)
+        }
+    },
+    computed: {
+        singleFile() {
+            return this.files && this.files.length <= 1
         }
     }
 }
