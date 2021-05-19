@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-alert v-if="readOnly" show variant="warning">
-            The file is read only, so annotations cannot be added.
+            The file is read only, so annotations cannot be added, removed or edited.
         </b-alert>
         <b-alert v-else-if="!review || review.submitted" show variant="warning">
             The review is submitted, so any annotations will not be saved.
