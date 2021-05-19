@@ -149,6 +149,7 @@
                         <FileAnnotator
                             :submissionId="finalSubmission.id"
                             :readOnly="true"
+                            :showCodeAnnotations="false"
                             :assignmentType="assignment.assignmentType"
                         />
                     </div>

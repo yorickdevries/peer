@@ -2,14 +2,27 @@
     <b-container fluid class="px-0">
         <b-tabs card>
             <b-tab title="File Annotation Feedback">
-                <FileAnnotator
-                    :submissionId="finalSubmission.id"
-                    :readOnly="true"
-                    :assignmentType="assignment.assignmentType"
-                />
-                <div v-if="finalSubmission.file.extension !== '.pdf' && assignment.assignmentType === 'document'">
-                    Your submission was not a .pdf file, so it was not annotated by reviewers
+                <div v-if="finalSubmission == null">
+                    No final was submission found.
                 </div>
+                <div v-else-if="finalSubmission.file.extension !== '.pdf' && assignment.assignmentType === 'document'">
+                    Your submission was not a .pdf file, so it was not annotated by reviewers.
+                </div>
+                <div v-else-if="feedbackReviews.length === 0">No feedback available.</div>
+                <b-tabs v-else>
+                    <b-tab
+                        v-for="feedbackReview in feedbackReviews"
+                        :key="feedbackReview.id"
+                        :title="feedbackReview.id"
+                    >
+                        <FileAnnotator
+                            :reviewId="feedbackReview.id"
+                            :readOnly="true"
+                            :assignmentType="assignment.assignmentType"
+                            :showCodeAnnotations="true"
+                        />
+                    </b-tab>
+                </b-tabs>
             </b-tab>
             <b-tab title="Questionnaire Feedback">
                 <!--Feedback Information-->
