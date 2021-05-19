@@ -45,7 +45,7 @@ export default {
     mixins: [notifications],
     components: { /*CodeViewer,*/ CodeAnnotations },
     // either "reviewId" or "submissionId" is passed, not both
-    props: ["reviewId", "submissionId", "readOnly", "disableAnnotations", "content", "selectedFile"],
+    props: ["reviewId", "submissionId", "readOnly", "showAnnotations", "content", "selectedFile"],
     data() {
         return {
             review: null,
