@@ -27,7 +27,7 @@ import rangequestionanswers from "./rangequestionanswers"
 import uploadquestionanswers from "./uploadquestionanswers"
 import pdfannotations from "./pdfannotations"
 import assignmentexports from "./assignmentexports"
-import codeannotation from "./codeannotation"
+import codeannotations from "./codeannotations"
 
 export default {
     getAuthenticated: () => {
@@ -63,5 +63,5 @@ export default {
     uploadquestionanswers: uploadquestionanswers,
     pdfannotations: pdfannotations,
     assignmentexports: assignmentexports,
-    codeannotation: codeannotation
+    codeannotations: codeannotations
 }
