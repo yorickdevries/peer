@@ -6,6 +6,7 @@
                     :submissionId="finalSubmission.id"
                     :readOnly="true"
                     :assignmentType="assignment.assignmentType"
+                    :showAnnotations="true"
                 />
                 <div v-if="finalSubmission.file.extension !== '.pdf' && assignment.assignmentType === 'document'">
                     Your submission was not a .pdf file, so it was not annotated by reviewers

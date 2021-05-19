@@ -12,7 +12,7 @@
             :readOnly="readOnly"
             :submissionId="submissionId"
             :reviewId="reviewId"
-            :showAnnotations="reviewId ? true : false"
+            :showAnnotations="showCodeAnnotations"
         />
         <div v-else>
             <b-alert show variant="secondary">
@@ -32,7 +32,7 @@ export default {
         CodeWrapper,
         PDFAnnotator
     },
-    props: ["reviewId", "submissionId", "readOnly", "assignmentType"],
+    props: ["reviewId", "submissionId", "readOnly", "assignmentType", "showCodeAnnotations"],
     computed: {
         filePath() {
             if (this.reviewId) {

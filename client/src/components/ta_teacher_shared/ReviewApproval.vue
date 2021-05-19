@@ -98,6 +98,7 @@
                                 :reviewId="review.id"
                                 :readOnly="true"
                                 :assignmentType="assignment.assignmentType"
+                                :showCodeAnnotations="true"
                             />
                         </b-col>
                         <b-col :cols="columnWidthFileAndQuestionnaire">
