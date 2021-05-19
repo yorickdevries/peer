@@ -30,6 +30,7 @@
                 :content="content"
                 :comments="comments"
                 :selectedFile="selectedFile"
+                :readOnly="readOnly"
                 ref="annotator"
             />
         </b-card>
