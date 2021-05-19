@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-alert v-if="readOnly" show variant="warning">
-            The file is read only, any annotations will not be saved
+            The file is read only, so annotations cannot be added.
         </b-alert>
         <b-alert v-else-if="!review || review.submitted" show variant="warning">
             The review is submitted, so any annotations will not be saved.
@@ -10,7 +10,8 @@
 
         <!-- The buttons and text area for the actual comments, somewhat primitive -->
         <!-- TODO: Upgrade the look of these buttons -->
-        <form @submit.prevent="writeComment" v-if="!readOnly">
+        <!-- Only show annotation buttons if this component is inside a review -->
+        <form @submit.prevent="writeComment" v-if="!readOnly && review && showAnnotations">
             <button type="submit" v-if="!writing">Leave a comment on highlighted part</button>
         </form>
         <form @submit.prevent="submitComment" @reset.prevent="deleteSelection" v-if="writing && !readOnly">
@@ -26,12 +27,14 @@
 
         <b-card v-show="showCode">
             <CodeAnnotations
+                v-if="showAnnotations"
                 @deleted="onDeleteComment"
                 :content="content"
                 :comments="comments"
                 :selectedFile="selectedFile"
                 ref="annotator"
             />
+            <CodeAnnotations v-else :content="content" :comments="[]" :selectedFile="selectedFile" ref="annotator" />
         </b-card>
     </div>
 </template>
@@ -43,9 +46,9 @@ import CodeAnnotations from "./CodeAnnotations"
 
 export default {
     mixins: [notifications],
-    components: { /*CodeViewer,*/ CodeAnnotations },
+    components: { CodeAnnotations },
     // either "reviewId" or "submissionId" is passed, not both
-    props: ["reviewId", "submissionId", "readOnly", "showAnnotations", "content", "selectedFile"],
+    props: ["reviewId", "submissionId", "readOnly", "content", "selectedFile", "showAnnotations"],
     data() {
         return {
             review: null,

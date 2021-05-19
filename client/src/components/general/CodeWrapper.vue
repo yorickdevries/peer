@@ -43,7 +43,7 @@ import FileTree from "./FileTree"
 import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 
 export default {
-    props: ["fileUrl", "readOnly", "showAnnotations", "submissionId", "reviewId"],
+    props: ["fileUrl", "readOnly", "submissionId", "reviewId", "showAnnotations"],
     components: { FileTree, CodeAnnotator },
     data() {
         return {
