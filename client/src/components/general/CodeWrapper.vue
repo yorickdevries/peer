@@ -13,14 +13,13 @@
             }"
         >
             <b-alert variant="primary" show v-if="!content || content.length === 0">This file is empty</b-alert>
-            <CodeViewer v-else-if="readOnly" :content="content" />
             <CodeAnnotator
-                v-else
                 :content="content"
                 :readOnly="readOnly"
                 :submissionId="submissionId"
                 :reviewId="reviewId"
                 :selectedFile="selected"
+                :disableAnnotations="disableAnnotations"
             />
             <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
                 <template #overlay>
@@ -41,12 +40,11 @@ import hljs from "highlight.js"
 import "highlight.js/styles/default.css"
 import JSZip from "jszip"
 import FileTree from "./FileTree"
-import CodeViewer from "./CodeViewer"
 import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 
 export default {
-    props: ["fileUrl", "readOnly", "submissionId", "reviewId"],
-    components: { CodeViewer, FileTree, CodeAnnotator },
+    props: ["fileUrl", "readOnly", "disableAnnotations", "submissionId", "reviewId"],
+    components: { FileTree, CodeAnnotator },
     data() {
         return {
             content: null,
