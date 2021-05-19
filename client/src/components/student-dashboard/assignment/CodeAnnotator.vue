@@ -53,7 +53,6 @@ export default {
         return {
             review: null,
             submission: null,
-            fileMetaData: null,
             showCode: false,
             writing: false,
             highlightedText: null,
@@ -64,19 +63,9 @@ export default {
             comments: []
         }
     },
-    computed: {
-        reviewFileName() {
-            if (this.fileMetadata) {
-                return this.fileMetadata.name + this.fileMetadata.extension
-            } else {
-                return ""
-            }
-        }
-    },
     async created() {
         await this.fetchReview()
         await this.fetchSubmission()
-        await this.fetchFileMetadata()
         await this.fetchComments()
         this.showCode = true
         this.writing = false
@@ -94,17 +83,18 @@ export default {
                 this.submission = res.data
             }
         },
-        async fetchFileMetadata() {
-            if (this.review) {
-                const res = await api.reviewofsubmissions.getFileMetadata(this.review.id)
-                this.fileMetadata = res.data
-            } else if (this.submission) {
-                this.fileMetadata = this.submission.file
-            }
-        },
         async fetchComments() {
-            // TODO: update method call
-            this.comments = api.codeannotation.get(/*null, null*/)
+            if (this.review) {
+                try {
+                    const res = await api.codeannotations.getAnnotations(this.review.id)
+                    const rows = res.data
+                    for (const row of rows) {
+                        this.pushComment(row)
+                    }
+                } catch (error) {
+                    this.comments = []
+                }
+            }
         },
         async writeComment() {
             const selection = window.getSelection()
@@ -174,22 +164,24 @@ export default {
             this.highlightedText = selectedText
             this.highlightedFile = this.selectedFile
         },
-        // TODO: send all comments to the server
         async submitComment() {
             // Update the current state
             this.writing = false
 
-            // Add comment to comments array using Array.splice to make CodeAnnotations.vue react to the change
-            this.comments.push({
-                commentText: this.commentText,
-                startLineNumber: this.startLineNumber,
-                endLineNumber: this.endLineNumber,
-                highlightedText: this.highlightedText,
-                selectedFile: this.highlightedFile
-            })
-            // Send the comment to the server
-            // TODO: update this method call
-            api.codeannotation.post(/*this.commentText, this.startLineNumber, null, null*/)
+            try {
+                // Send the comment to the server
+                const res = await api.codeannotations.postAnnotation(
+                    this.review.id,
+                    this.commentText,
+                    this.startLineNumber,
+                    this.endLineNumber,
+                    this.selectedFile
+                )
+                const comment = res.data
+                this.pushComment(comment)
+            } catch (error) {
+                this.showErrorMessage({ message: "Unable to submit comment" })
+            }
 
             // Reset the highlighted text, comment text and line number
             this.commentText = null
@@ -197,6 +189,16 @@ export default {
             this.startLineNumber = null
             this.endLineNumber = null
             this.highlightedFile = null
+        },
+        // Add comment to comments array
+        pushComment(comment) {
+            this.comments.push({
+                commentId: comment.id,
+                commentText: comment.commentText,
+                startLineNumber: comment.startLineNumber,
+                endLineNumber: comment.endLineNumber,
+                selectedFile: comment.selectedFile
+            })
         },
         deleteSelection() {
             this.commentText = null
@@ -211,7 +213,10 @@ export default {
                 return
             }
 
-            this.comments.splice(index, 1)
+            // Remove comment from comment array
+            const removedComment = this.comments.splice(index, 1)
+            // Remove comment from back-end
+            api.codeannotations.deleteAnnotation(removedComment[0].commentId)
             this.showSuccessMessage({ message: "Successfully deleted comment" })
         }
     }
