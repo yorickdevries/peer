@@ -22,7 +22,7 @@
                 :selectedFile="selected"
                 :showAnnotations="showAnnotations"
             />
-            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
+            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap class="file-overlay">
                 <template #overlay>
                     <b-spinner v-if="!showFile" variant="primary"></b-spinner>
                     <div v-else-if="showWarning" class="text-center">
@@ -123,3 +123,9 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+.file-overlay {
+    max-height: 50vh;
+}
+</style>
