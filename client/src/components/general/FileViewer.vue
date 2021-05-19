@@ -1,7 +1,7 @@
 <template>
     <div>
         <PDFViewer v-if="renderAs === 'document'" :fileUrl="fileUrl" />
-        <CodeWrapper v-else-if="renderAs === 'code'" :fileUrl="fileUrl" :readOnly="true" />
+        <CodeWrapper v-else-if="renderAs === 'code'" :fileUrl="fileUrl" :readOnly="true" :showAnnotations="true" />
         <div v-else>
             <b-alert show variant="secondary">
                 No file preview is available, because the assignment type was not recognized.</b-alert

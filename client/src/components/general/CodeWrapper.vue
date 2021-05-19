@@ -13,15 +13,16 @@
             }"
         >
             <b-alert variant="primary" show v-if="!content || content.length === 0">This file is empty</b-alert>
-            <CodeViewer v-else-if="readOnly" :content="content" />
             <CodeAnnotator
+                v-else
                 :content="content"
                 :readOnly="readOnly"
                 :submissionId="submissionId"
                 :reviewId="reviewId"
                 :selectedFile="selected"
+                :showAnnotations="showAnnotations"
             />
-            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
+            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap class="file-overlay">
                 <template #overlay>
                     <b-spinner v-if="!showFile" variant="primary"></b-spinner>
                     <div v-else-if="showWarning" class="text-center">
@@ -43,7 +44,7 @@ import FileTree from "./FileTree"
 import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 
 export default {
-    props: ["fileUrl", "readOnly", "submissionId", "reviewId"],
+    props: ["fileUrl", "readOnly", "submissionId", "reviewId", "showAnnotations"],
     components: { FileTree, CodeAnnotator },
     data() {
         return {
@@ -122,3 +123,9 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+.file-overlay {
+    max-height: 50vh;
+}
+</style>

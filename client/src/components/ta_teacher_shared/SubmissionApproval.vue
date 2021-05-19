@@ -62,6 +62,7 @@
                                 :submissionId="submission.id"
                                 :readOnly="true"
                                 :assignmentType="assignment.assignmentType"
+                                :showCodeAnnotations="false"
                             />
                         </b-col>
                     </b-row>

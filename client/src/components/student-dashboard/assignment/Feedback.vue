@@ -19,6 +19,7 @@
                             :reviewId="feedbackReview.id"
                             :readOnly="true"
                             :assignmentType="assignment.assignmentType"
+                            :showCodeAnnotations="true"
                         />
                     </b-tab>
                 </b-tabs>
