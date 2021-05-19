@@ -14,6 +14,7 @@
         >
             <b-alert variant="primary" show v-if="!content || content.length === 0">This file is empty</b-alert>
             <CodeAnnotator
+                v-else
                 :content="content"
                 :readOnly="readOnly"
                 :submissionId="submissionId"
