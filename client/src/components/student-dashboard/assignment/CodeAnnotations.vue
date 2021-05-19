@@ -42,6 +42,7 @@
                         <div class="d-flex justify-content-between">
                             <span>{{ comments[lineNumbers[index + 1]].commentText }}</span>
                             <icon
+                                v-if="!readOnly"
                                 name="trash"
                                 class="ml-auto text-danger"
                                 style="flex-shrink: 0"
@@ -64,7 +65,7 @@
 
 <script>
 export default {
-    props: ["content", "comments", "selectedFile"],
+    props: ["content", "comments", "selectedFile", "readOnly"],
     methods: {
         isStartingLine(lineNr) {
             return (
