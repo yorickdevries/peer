@@ -1,6 +1,5 @@
 <template>
-    <pre>
-        <div class="code-annotations-wrapper">
+    <pre><div class="code-annotations-wrapper">
             <div
                 class="position-relative code-annotations-line"
                 v-for="(line, index) in content"
@@ -68,12 +67,15 @@ export default {
     props: ["content", "comments", "selectedFile"],
     methods: {
         isStartingLine(lineNr) {
-            return this.isCommentedOn(lineNr) && (lineNr === 0 || this.lineNumbers[lineNr - 1] === -1)
+            return (
+                this.isCommentedOn(lineNr) &&
+                (lineNr === 0 || this.lineNumbers[lineNr - 1] !== this.lineNumbers[lineNr])
+            )
         },
         isEndingLine(lineNr) {
             return (
                 this.isCommentedOn(lineNr) &&
-                (lineNr === this.lineNumbers.length - 1 || this.lineNumbers[lineNr + 1] === -1)
+                (lineNr === this.lineNumbers.length - 1 || this.lineNumbers[lineNr + 1] !== this.lineNumbers[lineNr])
             )
         },
         isCommentedOn(lineNr) {
@@ -115,7 +117,8 @@ pre {
     .code-annotations-wrapper {
         display: flex;
         flex-direction: column;
-        width: min-content;
+        min-width: min-content;
+        width: 100%;
 
         .code-annotations-line {
             flex-grow: 1;
