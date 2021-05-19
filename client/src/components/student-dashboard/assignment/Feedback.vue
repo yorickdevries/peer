@@ -210,7 +210,6 @@ import FileAnnotator from "./FileAnnotator"
 import PDFViewer from "../../general/PDFViewer"
 
 export default {
-    // FileAnnotator
     components: { StarRating, FileAnnotator, PDFViewer },
     data() {
         return {
