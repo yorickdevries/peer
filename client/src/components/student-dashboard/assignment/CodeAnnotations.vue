@@ -119,6 +119,7 @@ pre {
         flex-direction: column;
         min-width: min-content;
         width: 100%;
+        max-height: 50rem;
 
         .code-annotations-line {
             flex-grow: 1;
