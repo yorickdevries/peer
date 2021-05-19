@@ -254,8 +254,13 @@ router.post(
     // file info
     const fileExtension = path.extname(req.file.originalname);
 
-    const submissionExtensions = assignment.submissionExtensions.split(/\s*,\s*/);
-    if (!submissionExtensions.includes(fileExtension) && !submissionExtensions.includes(".*")) {
+    const submissionExtensions = assignment.submissionExtensions.split(
+      /\s*,\s*/
+    );
+    if (
+      !submissionExtensions.includes(fileExtension) &&
+      !submissionExtensions.includes(".*")
+    ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send(`Extension not allowed: ${fileExtension}`);

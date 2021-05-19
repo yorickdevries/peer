@@ -1,12 +1,10 @@
 import http from "http";
 import request from "supertest";
-import fs from "fs";
 import AssignmentType from "../../src/enum/AssignmentType";
 
 export default async function createAssignmentRequest(
   server: http.Server,
   courseId: number,
-  exampleAssignmentFile: string,
   sessionCookie: string,
   assignmentType?: string,
   submissionExtensions?: string
@@ -14,10 +12,9 @@ export default async function createAssignmentRequest(
   return await request(server)
     .post("/api/assignments")
     .set("cookie", sessionCookie)
-    .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
     .field("name", "Example title")
     .field("courseId", courseId)
-    .field("enrollable", false)
+    .field("enrollable", true)
     .field("reviewEvaluation", false)
     .field("publishDate", new Date("2020-06-23T10:00Z").toISOString())
     .field("dueDate", new Date("2020-06-24T10:00Z").toISOString())
