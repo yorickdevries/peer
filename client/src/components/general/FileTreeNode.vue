@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="dir" class="dir" v-on:click="onCollapse" role="button">
+        <div v-if="dir" class="dir" v-on:click="toggleCollapsed" role="button">
             <icon :name="collapsed ? 'chevron-right' : 'chevron-down'" class="chevron" role="button" />
             <icon class="text-muted" name="folder"></icon>
             {{ name }}
@@ -65,7 +65,7 @@ export default {
         onSelect() {
             this.$emit("selected", this.children.path)
         },
-        onCollapse() {
+        toggleCollapsed() {
             this.collapsed = !this.collapsed
         }
     },
