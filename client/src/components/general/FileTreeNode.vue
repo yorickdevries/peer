@@ -1,6 +1,7 @@
 <template>
     <div>
-        <div v-if="dir" class="dir">
+        <div v-if="dir" class="dir" v-on:click="onCollapse" role="button">
+            <icon :name="collapsed ? 'chevron-right' : 'chevron-down'" class="chevron" role="button" />
             <icon class="text-muted" name="folder"></icon>
             {{ name }}
         </div>
@@ -9,7 +10,7 @@
             <span v-on:click="onSelect" class="filename"> {{ name }}</span>
         </div>
 
-        <div style="margin-left: 1.5rem" v-if="dir">
+        <div style="margin-left: 1.5rem" v-if="dir" v-show="!collapsed">
             <FileTreeNode
                 @selected="onChildSelect"
                 v-for="key in Object.keys(children)"
@@ -30,7 +31,8 @@ export default {
         return {
             name: null,
             children: null,
-            dir: false
+            dir: false,
+            collapsed: false
         }
     },
     created() {
@@ -62,6 +64,9 @@ export default {
         },
         onSelect() {
             this.$emit("selected", this.children.path)
+        },
+        onCollapse() {
+            this.collapsed = !this.collapsed
         }
     },
     computed: {
@@ -94,7 +99,7 @@ $bg-dark: #343a40;
         color: $text-hover;
     }
 }
-.dir:hover {
-    cursor: default;
+.fa-icon.chevron {
+    margin: 5px;
 }
 </style>
