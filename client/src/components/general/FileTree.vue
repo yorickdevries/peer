@@ -71,6 +71,9 @@ export default {
         onSelect(file) {
             this.selected = file
             this.$emit("selected", file)
+        },
+        toggleCollapse() {
+            this.collapsed = !this.collapsed
         }
     }
 }
