@@ -32,7 +32,8 @@ export default {
     data() {
         return {
             root: null,
-            selected: null
+            selected: null,
+            collapsed: false
         }
     },
     created() {
