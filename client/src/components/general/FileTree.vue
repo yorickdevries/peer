@@ -21,13 +21,12 @@
 
 <script>
 import FileTreeNode from "./FileTreeNode"
-import { JSZipObject } from "jszip"
 
 export default {
     // "files" is an array of JSZip ZipObjects.
     // "selectedFile" is a path to the selected file
     props: {
-        files: JSZipObject,
+        files: Array,
         selectedFile: String,
         startCollapsed: Boolean
     },
