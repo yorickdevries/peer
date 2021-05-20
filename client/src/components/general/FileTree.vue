@@ -2,7 +2,7 @@
     <b-card>
         <b-card-header role="button" @click="toggleCollapse">
             <icon :name="collapsed ? 'chevron-right' : 'chevron-down'" class="chevron" />
-            Files
+            {{ collapsed ? "" : "Files" }}
         </b-card-header>
         <b-collapse :visible="!collapsed">
             <b-card-body>
