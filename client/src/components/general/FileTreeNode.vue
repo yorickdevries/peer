@@ -10,7 +10,7 @@
             <span v-on:click="onSelect" class="filename"> {{ name }}</span>
         </div>
 
-        <div style="margin-left: 1.5rem" v-if="dir" v-show="!collapsed">
+        <b-collapse style="margin-left: 1.5rem" v-if="dir" :visible="!collapsed">
             <FileTreeNode
                 @selected="onChildSelect"
                 v-for="key in Object.keys(children)"
@@ -19,7 +19,7 @@
                 :propChildren="children[key]"
                 :selected="selected"
             />
-        </div>
+        </b-collapse>
     </div>
 </template>
 
