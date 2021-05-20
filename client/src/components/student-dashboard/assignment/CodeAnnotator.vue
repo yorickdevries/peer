@@ -26,6 +26,11 @@
         </form>
 
         <b-card v-show="showCode">
+            <!--
+                Displays the code with annotations in the mode specified by the readOnly variable.
+                This is used to allow students to annotate code during the review stage, where readOnly is then false.
+                This is also used to display the feedback received, where readOnly is then true.
+             -->
             <CodeAnnotations
                 v-if="showAnnotations"
                 @deleted="onDeleteComment"
@@ -33,9 +38,12 @@
                 :comments="comments"
                 :selectedFile="selectedFile"
                 :readOnly="readOnly"
-                ref="annotator"
             />
-            <CodeAnnotations v-else :content="content" :comments="[]" :selectedFile="selectedFile" ref="annotator" />
+            <!--
+                Display the code without annotations.
+                This is used for students to view their current final submission, where readOnly is always true.
+            -->
+            <CodeAnnotations v-else :content="content" :comments="[]" :selectedFile="selectedFile" :readOnly="true" />
         </b-card>
     </div>
 </template>
@@ -49,7 +57,12 @@ export default {
     mixins: [notifications],
     components: { CodeAnnotations },
     // either "reviewId" or "submissionId" is passed, not both
-    props: ["reviewId", "submissionId", "readOnly", "content", "selectedFile", "showAnnotations"],
+    props: ["reviewId", "submissionId", "readOnly", "content", "selectedFile"],
+    computed: {
+        showAnnotations() {
+            return !(this.reviewId == null)
+        }
+    },
     data() {
         return {
             review: null,

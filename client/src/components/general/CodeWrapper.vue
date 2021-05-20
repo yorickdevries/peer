@@ -20,7 +20,6 @@
                 :submissionId="submissionId"
                 :reviewId="reviewId"
                 :selectedFile="selected"
-                :showAnnotations="showAnnotations"
             />
             <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap class="file-overlay">
                 <template #overlay>
@@ -44,7 +43,7 @@ import FileTree from "./FileTree"
 import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 
 export default {
-    props: ["fileUrl", "readOnly", "submissionId", "reviewId", "showAnnotations"],
+    props: ["fileUrl", "readOnly", "submissionId", "reviewId"],
     components: { FileTree, CodeAnnotator },
     data() {
         return {
