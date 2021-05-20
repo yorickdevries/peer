@@ -5,7 +5,6 @@ import app from "../../src/app";
 import createDatabaseConnection from "../../src/databaseConnection";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
-import path from "path";
 import initializeData from "../../src/util/initializeData";
 import AssignmentType from "../../src/enum/AssignmentType";
 import Course from "../../src/models/Course";
@@ -17,7 +16,6 @@ describe("Assignments", () => {
   let connection: Connection;
   let server: http.Server;
   let course: Course;
-  let exampleAssignmentFile: string;
   let sessionCookie: string;
 
   beforeAll(async () => {
@@ -44,12 +42,6 @@ describe("Assignments", () => {
       .set("cookie", sessionCookie);
 
     course = JSON.parse(res1.text);
-
-    // create am assignment course
-    exampleAssignmentFile = path.resolve(
-      __dirname,
-      "../../exampleData/assignments/assignment1.pdf"
-    );
   });
 
   afterAll(async () => {
@@ -61,7 +53,6 @@ describe("Assignments", () => {
     const res2 = await createAssignmentRequest(
       server,
       course.id,
-      exampleAssignmentFile,
       sessionCookie,
       AssignmentType.DOCUMENT
     );
@@ -76,7 +67,6 @@ describe("Assignments", () => {
     const res2 = await createAssignmentRequest(
       server,
       course.id,
-      exampleAssignmentFile,
       sessionCookie,
       "invalid"
     );
@@ -88,7 +78,6 @@ describe("Assignments", () => {
     const res2 = await createAssignmentRequest(
       server,
       course.id,
-      exampleAssignmentFile,
       sessionCookie,
       AssignmentType.DOCUMENT
     );
@@ -109,7 +98,6 @@ describe("Assignments", () => {
     const res4 = await patchAssignmentRequest(
       server,
       assignment.id,
-      exampleAssignmentFile,
       sessionCookie,
       AssignmentType.CODE
     );
@@ -121,7 +109,6 @@ describe("Assignments", () => {
     const res2 = await createAssignmentRequest(
       server,
       course.id,
-      exampleAssignmentFile,
       sessionCookie,
       AssignmentType.DOCUMENT
     );
@@ -141,7 +128,6 @@ describe("Assignments", () => {
     const res4 = await patchAssignmentRequest(
       server,
       assignment.id,
-      exampleAssignmentFile,
       sessionCookie,
       AssignmentType.CODE
     );
@@ -168,7 +154,6 @@ describe("Assignments", () => {
       const res2 = await createAssignmentRequest(
         server,
         course.id,
-        exampleAssignmentFile,
         sessionCookie,
         undefined,
         extensions[0]

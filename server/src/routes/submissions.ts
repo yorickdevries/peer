@@ -26,7 +26,6 @@ import { startExportSubmissionsForAssignmentVersionWorker } from "../workers/poo
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
-const allowedExtensions = config.get("allowedExtensions") as string[];
 const maxFileSize = config.get("maxFileSize") as number;
 
 const router = express.Router();
@@ -184,7 +183,7 @@ const submissionSchema = Joi.object({
 // post a submission in a course
 router.post(
   "/",
-  upload(allowedExtensions, maxFileSize, "file"),
+  upload([".*"], maxFileSize, "file"),
   validateBody(submissionSchema),
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -254,6 +253,19 @@ router.post(
 
     // file info
     const fileExtension = path.extname(req.file.originalname);
+
+    const submissionExtensions = assignment.submissionExtensions.split(
+      /\s*,\s*/
+    );
+    if (
+      !submissionExtensions.includes(fileExtension) &&
+      !submissionExtensions.includes(".*")
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(`Extension not allowed: ${fileExtension}`);
+      return;
+    }
     const fileName = path.basename(req.file.originalname, fileExtension);
     // run removePDFMetadata in case the file is a pdf
     if (fileExtension === ".pdf") {
