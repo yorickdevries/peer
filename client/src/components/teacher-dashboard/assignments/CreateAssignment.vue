@@ -44,7 +44,6 @@ export default {
                 file: null,
                 externalLink: null,
                 submissionExtensions: ".pdf",
-                whitelistExtensions: null,
                 blockFeedback: true,
                 lateSubmissions: true,
                 lateSubmissionReviews: true,

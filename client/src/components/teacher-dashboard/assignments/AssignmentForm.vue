@@ -280,8 +280,7 @@
                         label="Whitelist specific file extensions"
                         description="Comma separated list. Leave this unchanged to allow any file to be submitted, this includes .zip files and single files."
                     >
-                        <b-form-input v-model="assignment.whitelistExtensions" type="text" placeholder=".*">
-                        </b-form-input>
+                        <b-form-input v-model="whitelistExtensions" type="text" placeholder=".*"></b-form-input>
                         <small v-if="!validWhitelist" class="text-danger">
                             Invalid extensions, please specify a comma separated list of allowed file extensions.
                         </small>
@@ -369,6 +368,7 @@ export default {
             changeFile: false,
             // new file which replaces oldfile (or is added when no oldfile is present)
             newFile: null,
+            whitelistExtensions: null,
             extensionTypes: null,
             extensionTypesDocument: [
                 { value: ".pdf", text: ".pdf" },
@@ -411,10 +411,10 @@ export default {
                 if (
                     this.assignment.assignmentType === "code" &&
                     this.assignment.submissionExtensions === ".*" &&
-                    this.assignment.whitelistExtensions &&
-                    this.assignment.whitelistExtensions.length > 0
+                    this.whitelistExtensions &&
+                    this.whitelistExtensions.length > 0
                 ) {
-                    submissionExtensions = this.assignment.whitelistExtensions
+                    submissionExtensions = this.whitelistExtensions
                 }
                 // Check for empty date fields
                 this.checkDateFormat()
@@ -537,7 +537,7 @@ export default {
                     this.assignment.submissionExtensions &&
                     !this.extensionTypes.some(extension => this.assignment.submissionExtensions === extension.value)
                 ) {
-                    this.assignment.whitelistExtensions = this.assignment.submissionExtensions
+                    this.whitelistExtensions = this.assignment.submissionExtensions
                     this.assignment.submissionExtensions = ".*"
                 }
             }
@@ -548,13 +548,12 @@ export default {
             if (
                 this.assignment.assignmentType !== "code" ||
                 this.assignment.submissionExtensions !== ".*" ||
-                !this.assignment.whitelistExtensions ||
-                this.assignment.whitelistExtensions.length === 0
+                !this.whitelistExtensions
             ) {
                 return true
             }
 
-            const extensions = this.assignment.whitelistExtensions.split(/\s*,\s*/)
+            const extensions = this.whitelistExtensions.split(/\s*,\s*/)
 
             // Remove empty extension belonging to trailing comma
             if (extensions.length > 1 && extensions[extensions.length - 1].length === 0) {
