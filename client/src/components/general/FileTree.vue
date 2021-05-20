@@ -86,6 +86,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .chevron {
-    margin: 5px;
+    margin-right: 5px;
 }
 </style>
