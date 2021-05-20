@@ -142,7 +142,13 @@
                                 v-b-modal="`editModal${question.id}`"
                                 variant="primary float-right"
                             >
-                                {{ blockQuestionnaireEditing ? "Edit Points" : "Edit/Delete Question" }}
+                                {{
+                                    blockQuestionnaireEditing
+                                        ? question.graded
+                                            ? "Edit Points"
+                                            : "Edit Question"
+                                        : "Edit/Delete Question"
+                                }}
                             </b-button>
                             <b-modal :id="`editModal${question.id}`" centered hide-footer class="p-0 m-0">
                                 <EditQuestionPointsWizard
