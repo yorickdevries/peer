@@ -57,7 +57,12 @@ export default {
     mixins: [notifications],
     components: { CodeAnnotations },
     // either "reviewId" or "submissionId" is passed, not both
-    props: ["reviewId", "submissionId", "readOnly", "content", "selectedFile", "showAnnotations"],
+    props: ["reviewId", "submissionId", "readOnly", "content", "selectedFile"],
+    computed: {
+        showAnnotations() {
+            return !(this.reviewId == null)
+        }
+    },
     data() {
         return {
             review: null,
