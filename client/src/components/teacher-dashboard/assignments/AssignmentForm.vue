@@ -532,9 +532,10 @@ export default {
                 this.extensionTypes = this.extensionTypesDocument
             } else if (this.assignment.assignmentType === "code") {
                 this.extensionTypes = this.extensionTypesCode
+                // If submission extensions is not a value in the extension types
                 if (
                     this.assignment.submissionExtensions &&
-                    !this.extensionTypes.includes(this.assignment.submissionExtensions)
+                    !this.extensionTypes.some(extension => this.assignment.submissionExtensions === extension.value)
                 ) {
                     this.assignment.whitelistExtensions = this.assignment.submissionExtensions
                     this.assignment.submissionExtensions = ".*"
@@ -574,6 +575,7 @@ export default {
         }
     },
     watch: {
+        // This only runs when the assignment object itself changes due to an async parent update
         assignment() {
             this.setExtensionTypes()
         }
