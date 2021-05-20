@@ -29,6 +29,7 @@
             <CodeAnnotations
                 v-if="showAnnotations"
                 @deleted="onDeleteComment"
+                @edited="onEditedComment"
                 :content="content"
                 :comments="comments"
                 :selectedFile="selectedFile"
@@ -219,6 +220,14 @@ export default {
             // Remove comment from back-end
             api.codeannotations.deleteAnnotation(removedComment[0].commentId)
             this.showSuccessMessage({ message: "Successfully deleted comment" })
+        },
+        async onEditedComment(index, updatedText) {
+            let comment = this.comments[index]
+            const res = await api.codeannotations.patchAnnotation(comment.commentId, updatedText)
+            // Update only the comment text
+            comment.commentText = res.data.commentText
+            this.comments.splice(index, 1, comment)
+            this.showSuccessMessage({ message: "Successfully updated comment" })
         }
     }
 }

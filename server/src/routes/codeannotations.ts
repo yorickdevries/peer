@@ -181,4 +181,44 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
   res.send(annotation);
 });
 
+const updateAnnotationSchema = Joi.object({
+  commentText: Joi.string().required()
+});
+
+router.patch("/:id", validateParams(idSchema), validateBody(updateAnnotationSchema), async (req, res)=>{
+  const annotation = await CodeAnnotation.findOne(req.params.id);
+  if (!annotation) {
+    res.status(HttpStatusCode.BAD_REQUEST).send(`Annotation with id ${req.params.id} does not exist`);
+    return;
+  }
+  const user = req.user!
+  const review = await annotation.getReview();
+  if (!review.isReviewer(user)) {
+    res.status(HttpStatusCode.FORBIDDEN).send("You are not the reviewer of this review");
+    return;
+  }
+  if (review.submitted) {
+    res.status(HttpStatusCode.FORBIDDEN).send("The review is already submitted");
+    return;
+  }
+  // get assignment
+  const questionnaire = await review.getQuestionnaire();
+  const assignmentVersion = await questionnaire.getAssignmentVersion();
+  const assignment = await assignmentVersion.getAssignment();
+  if (
+    !assignment.lateSubmissionReviews &&
+    moment().isAfter(assignment.reviewDueDate)
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(
+        "The due date for submissionReview has passed and late submission reviews are not allowed by the teacher"
+      );
+    return;
+  }
+  annotation.commentText = req.body.commentText;
+  await CodeAnnotation.save(annotation); 
+  res.send(annotation);
+});
+
 export default router;

@@ -39,12 +39,37 @@
                     :ref="`comment_${lineNumbers[index + 1]}`"
                     v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }">
                     <b-card>
-                        <div class="d-flex justify-content-between">
-                            <span>{{ comments[lineNumbers[index + 1]].commentText }}</span>
+                        <div v-if="editing && editingEndingLine === index + 1">
+                            <b-form @submit="submitEditedComment(index + 1)" @reset="cancelEdit">
+                                <b-form-textarea v-model="commentText" rows="3" max-rows="5"></b-form-textarea>
+                                <b-button type="submit" variant="primary">Submit</b-button>
+                                <b-button type="reset" variant="danger">Cancel</b-button>
+                            </b-form>
+                        </div><div class="d-flex" v-else>
+                            <span class="mr-auto">{{ comments[lineNumbers[index + 1]].commentText }}</span>
+                            <icon
+                                v-if="!readOnly"
+                                name="edit"
+                                class="mt-auto mb-auto text-info"
+                                role="button" 
+                                style="flex-shrink: 0"
+                                @click.native="editComment(index + 1)"
+                                v-b-modal="`editModal_${lineNumbers[index + 1]}`"
+                            />
+                            <b-modal 
+                                :id="`editModal_${lineNumbers[index + 1]}`" 
+                                @ok="editModalOk(lineNumbers[index + 1])"
+                                variant="danger"
+                                title="Warning!"
+                                v-if="showEditModal"
+                                centered>
+                                If you start editing this comment, your edit on line {{ editingEndingLine }} will be lost.
+                            </b-modal>
+                            <div style="width:10px"/>
                             <icon
                                 v-if="!readOnly"
                                 name="trash"
-                                class="ml-auto text-danger"
+                                class="mt-auto mb-auto text-danger"
                                 style="flex-shrink: 0"
                                 role="button"
                                 v-b-modal="`modal_${lineNumbers[index + 1]}`"
@@ -66,6 +91,14 @@
 <script>
 export default {
     props: ["content", "comments", "selectedFile", "readOnly"],
+    data() {
+        return {
+            editing: false,
+            editingEndingLine: null,
+            commentText: null,
+            showEditModal: false
+        }
+    },
     methods: {
         isStartingLine(lineNr) {
             return (
@@ -84,6 +117,29 @@ export default {
         },
         deleteComment(index) {
             this.$emit("deleted", index)
+        },
+        editComment(lineNr) {
+            if (this.editing) {
+                this.showEditModal = true
+                return
+            }
+            this.editing = true
+            this.editingEndingLine = lineNr
+            this.commentText = this.comments[this.lineNumbers[lineNr]].commentText
+        },
+        submitEditedComment(index) {
+            this.$emit("edited", this.lineNumbers[index], this.commentText)
+            // Reset all variables after updating the comment
+            this.cancelEdit()
+        },
+        cancelEdit() {
+            this.editing = false
+            this.editingEndingLine = null
+            this.commentText = null
+        },
+        editModalOk(lineNr) {
+            this.editing = false
+            this.editComment(lineNr)
         }
     },
     computed: {
