@@ -89,7 +89,7 @@ describe("Submissions", () => {
   test("make a submission with valid file type", async () => {
     const exampleSubmissionFile = path.resolve(
       __dirname,
-      "../../exampleData/submissions/submission1.pdf"
+      "../../exampleData/submissions/submission1.c"
     );
     const res = await request(server)
       .post("/api/submissions")
@@ -104,7 +104,7 @@ describe("Submissions", () => {
   test("make a submission with invalid file type", async () => {
     const exampleSubmissionFile = path.resolve(
       __dirname,
-      "../../exampleData/submissions/submission1.pdf"
+      "../../exampleData/submissions/submission1.c"
     );
     const res = await request(server)
       .post("/api/submissions")
