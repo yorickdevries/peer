@@ -20,7 +20,7 @@
                         <div class="input-group-append">
                             <b-button
                                 v-if="!option.delete"
-                                @click="markOptionforDeletion(option)"
+                                @click="markOptionForDeletion(option)"
                                 variant="danger"
                                 size="sm"
                                 >Delete
@@ -172,7 +172,7 @@ export default {
             const optionPrototype = this.question.graded ? { text: "", points: 0 } : { text: "" }
             this.question.options.push(optionPrototype)
         },
-        markOptionforDeletion(option) {
+        markOptionForDeletion(option) {
             if (!option.id) {
                 // just remove it as the question isnt saved to the database yet
                 this.question.options = _.without(this.question.options, option)

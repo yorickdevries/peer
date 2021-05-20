@@ -52,13 +52,7 @@
             <b-row v-if="questionnaire">
                 <b-col>
                     <!--Question Information-->
-                    <b-card
-                        v-for="question in questionnaire.questions"
-                        :key="question.id"
-                        class="mb-3"
-                        :class="{ 'disabled-view': blockQuestionnaireEditing && !question.graded }"
-                        no-body
-                    >
+                    <b-card v-for="question in questionnaire.questions" :key="question.id" class="mb-3" no-body>
                         <b-card-header class="d-flex align-items-center">
                             <span class="w-100"
                                 >Question {{ question.number }} of {{ questionnaire.questions.length }}</span
@@ -115,6 +109,7 @@
                             <StarRating
                                 v-if="question.type === 'range'"
                                 class="align-middle"
+                                :class="{ 'disabled-view': blockQuestionnaireEditing }"
                                 :border-color="'#007bff'"
                                 :active-color="'#007bff'"
                                 :border-width="2"
@@ -128,7 +123,11 @@
                             />
 
                             <!-- UPLOAD QUESTION -->
-                            <b-form-group v-if="question.type === 'upload'" class="mb-0">
+                            <b-form-group
+                                v-if="question.type === 'upload'"
+                                class="mb-0"
+                                :class="{ 'disabled-view': blockQuestionnaireEditing }"
+                            >
                                 <b-alert show variant="warning" class="p-2">
                                     Currently, no file has been uploaded. <br />
                                     Allowed file types: {{ question.extensions }}
@@ -138,16 +137,16 @@
 
                             <!-- Edit button-->
                             <br />
-                            <b-button v-b-modal="`editModal${question.id}`" variant="primary float-right">
-                                {{
-                                    blockQuestionnaireEditing && question.graded
-                                        ? "Edit Points"
-                                        : "Edit/Delete Question"
-                                }}
+                            <b-button
+                                :disabled="blockQuestionnaireEditing && !isOptionQuestion(question.type)"
+                                v-b-modal="`editModal${question.id}`"
+                                variant="primary float-right"
+                            >
+                                {{ blockQuestionnaireEditing ? "Edit Points" : "Edit/Delete Question" }}
                             </b-button>
                             <b-modal :id="`editModal${question.id}`" centered hide-footer class="p-0 m-0">
                                 <EditQuestionPointsWizard
-                                    v-if="blockQuestionnaireEditing && question.graded"
+                                    v-if="blockQuestionnaireEditing"
                                     :question="question"
                                     @questionSaved="getQuestionnaire"
                                 ></EditQuestionPointsWizard>
@@ -222,6 +221,9 @@ export default {
             await this.getAssignmentVersion()
             await this.getQuestionnaire()
             await this.getAllQuestionnairesOfCourse()
+        },
+        isOptionQuestion(questionType) {
+            return questionType === "multiplechoice" || questionType === "checkbox"
         },
         pointsDisplay(points) {
             return points / 100

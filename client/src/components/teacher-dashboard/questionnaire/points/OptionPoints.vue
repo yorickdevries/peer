@@ -3,6 +3,14 @@
         <b-form-group label="Question" label-class="font-weight-bold pt-0" label-size="lg">
             {{ question.text }}
         </b-form-group>
+        <b-form-checkbox
+            id="is-graded-checkbox"
+            v-model="question.graded"
+            @click="formatOptions()"
+            name="is-graded-checkbox"
+        >
+            Grade answers
+        </b-form-checkbox>
         <b-form-group
             :label="`${questionType === 'multiplechoice' ? 'Multiple Choice' : 'Checkbox'} Options`"
             label-class="font-weight-bold pt-0"
@@ -12,10 +20,10 @@
             <template v-for="(option, index) in question.options">
                 <b-form :key="index">
                     <div class="input-group">
-                        <div class="input-group-prepend">
+                        <div :class="question.graded ? 'w-75' : 'w-100'">
                             <b-input-group-text>{{ option.text }}</b-input-group-text>
                         </div>
-                        <div class="input-group-append">
+                        <div v-if="question.graded" class="w-25">
                             <b-form-input
                                 :id="`option-${index}`"
                                 v-model="option.points"
@@ -28,7 +36,7 @@
                             >
                             </b-form-input>
                         </div>
-                        <b-alert :show="!gradeIsOk(option.points)" variant="danger" dismissible>
+                        <b-alert :show="question.graded && !gradeIsOk(option.points)" variant="danger" dismissible>
                             Number must be in range of -1 and 1, and have up to 2 decimal points!
                         </b-alert>
                     </div>
@@ -53,6 +61,13 @@ import notifications from "../../../../mixins/notifications"
 export default {
     mixins: [notifications],
     props: ["questionId", "questionnaireId", "questionNumber", "questionType"],
+    watch: {
+        "question.graded": {
+            handler: function() {
+                return this.formatOptions()
+            }
+        }
+    },
     computed: {
         allGradedOptionsOk() {
             // check all grades are in -1 to 1 range and have at maximum 2 decimal points
@@ -104,15 +119,15 @@ export default {
             const questionOptions = this.question.options
             this.question.options = questionOptions.map(option => {
                 const { id, text, points } = option
-                return { id, text, points: points || 0 }
+                return this.question.graded ? { id, text, points: points || 0 } : { id, text }
             })
         },
         async fetchQuestion() {
             // load the question in case an id is passed
             if (this.questionId) {
-                const questionObject =
+                const questionApiObject =
                     this.questionType === "multiplechoice" ? api.multiplechoicequestions : api.checkboxquestions
-                const res = await questionObject.get(this.questionId)
+                const res = await questionApiObject.get(this.questionId)
                 let loadedQuestion = res.data
                 const formattedQuestion = this.formatGradedOptions(loadedQuestion.options)
                 loadedQuestion.options = formattedQuestion
@@ -128,6 +143,7 @@ export default {
         async save() {
             // patch in case the id is defined
             if (this.question.id) {
+                await this.patchQuestion()
                 await this.patchQuestionOptions()
             }
             const message = `Successfully edited ${
@@ -137,14 +153,25 @@ export default {
             this.$emit("questionSaved")
             await this.fetchQuestion()
         },
+        async patchQuestion() {
+            const questionApiObject =
+                this.questionType === "multiplechoice" ? api.multiplechoicequestions : api.checkboxquestions
+            await questionApiObject.patch(
+                this.question.id,
+                this.question.text,
+                this.question.number,
+                this.question.optional,
+                this.question.graded
+            )
+        },
         async patchQuestionOptions() {
-            const questionOptionType =
+            const questionApiObject =
                 this.questionType === "multiplechoice" ? api.multiplechoicequestionoptions : api.checkboxquestionoptions
             for (const option of this.question.options) {
                 try {
                     if (option.id) {
                         // just patch the option text
-                        await questionOptionType.patch(option.text, option.points, option.id)
+                        await questionApiObject.patch(option.text, option.points, option.id)
                         const message = `Successfully edited ${
                             this.questionType === "multiplechoice" ? "multiple choice" : "checkbox"
                         } question option points.`
