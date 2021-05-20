@@ -1583,5 +1583,53 @@ describe("Integration", () => {
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+
+    res = await request(server)
+      .patch(`/api/multiplechoicequestions/${reviewQuestionnaire.id}`)
+      .send({
+        text: "This is a multiple q",
+        number: 12,
+        optional: true,
+        graded: true,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
+
+    // Test that you can ungrade questions after distributing reviews
+    // Test that you can change grades after distributing reviews
+    res = await request(server)
+      .patch(`/api/multiplechoicequestions/${multipleChoiceQuestionReview.id}`)
+      .send({
+        text: "This is a Multiple question",
+        number: 12,
+        optional: true,
+        graded: false,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const ungradedReviewQuestion = JSON.parse(res.text);
+    expect(ungradedReviewQuestion).toMatchObject({
+      text: "This is a Multiple question",
+      number: 12,
+      optional: true,
+      graded: false,
+    });
+
+    // Ungrade option
+    res = await request(server)
+      .patch(
+        `/api/multiplechoicequestionoptions/${multipleChoiceOptionReview.id}`
+      )
+      .send({
+        text: "option 1",
+        points: null,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const ungradedReviewQuestionOption = JSON.parse(res.text);
+    expect(ungradedReviewQuestionOption).toMatchObject({
+      text: "option 1",
+      points: null,
+    });
   });
 });
