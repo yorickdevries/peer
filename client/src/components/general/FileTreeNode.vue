@@ -100,6 +100,6 @@ $bg-dark: #343a40;
     }
 }
 .fa-icon.chevron {
-    margin: 5px;
+    margin-right: 5px;
 }
 </style>
