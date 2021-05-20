@@ -1,13 +1,21 @@
 <template>
-    <b-card header="Files">
-        <FileTreeNode
-            @selected="onSelect"
-            v-for="key in Object.keys(root)"
-            :key="key"
-            :propName="key"
-            :propChildren="root[key]"
-            :selected="selected"
-        />
+    <b-card>
+        <b-card-header role="button" @click="toggleCollapse">
+            <icon :name="collapsed ? 'chevron-right' : 'chevron-down'" class="chevron" />
+            Files
+        </b-card-header>
+        <b-collapse :visible="!collapsed">
+            <b-card-body>
+                <FileTreeNode
+                    @selected="onSelect"
+                    v-for="key in Object.keys(root)"
+                    :key="key"
+                    :propName="key"
+                    :propChildren="root[key]"
+                    :selected="selected"
+                />
+            </b-card-body>
+        </b-collapse>
     </b-card>
 </template>
 
