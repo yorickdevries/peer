@@ -42,6 +42,7 @@ export default {
         }
     },
     created() {
+        this.collapsed = this.startCollapsed
         this.selected = this.selectedFile
         this.root = new Map()
 
