@@ -58,12 +58,12 @@
                             />
                             <b-modal 
                                 :id="`editModal_${lineNumbers[index + 1]}`" 
-                                @ok="editModalOk(lineNumbers[index + 1])"
+                                @ok="editModalOk(index + 1)"
                                 variant="danger"
                                 title="Warning!"
                                 v-if="showEditModal"
                                 centered>
-                                If you start editing this comment, your edit on line {{ editingEndingLine }} will be lost.
+                                {{ getModalText() }}
                             </b-modal>
                             <div style="width:10px"/>
                             <icon
@@ -96,6 +96,7 @@ export default {
             editing: false,
             editingEndingLine: null,
             commentText: null,
+            editingFilePath: null,
             showEditModal: false
         }
     },
@@ -126,6 +127,7 @@ export default {
             this.editing = true
             this.editingEndingLine = lineNr
             this.commentText = this.comments[this.lineNumbers[lineNr]].commentText
+            this.editingFilePath = this.selectedFile
         },
         submitEditedComment(index) {
             this.$emit("edited", this.lineNumbers[index], this.commentText)
@@ -136,10 +138,34 @@ export default {
             this.editing = false
             this.editingEndingLine = null
             this.commentText = null
+            this.editingFilePath = null
         },
         editModalOk(lineNr) {
             this.editing = false
             this.editComment(lineNr)
+        },
+        getModalText() {
+            // If there is an edit in another file, redirect the user to that file.
+            if (this.selectedFile !== this.editingFilePath) {
+                return "If you start editing this comment, your edit on file " + this.editingFilePath + " will be lost."
+            }
+
+            // Default value for the modal text
+            let returnString =
+                "If you start editing this comment, your edit on line " + this.editingEndingLine + " will be lost."
+            // Starting line number of the comment
+            let startingLineNr = this.comments[this.lineNumbers[this.editingEndingLine]].startLineNumber
+
+            // If the lines are not the same, customize the text a bit
+            if (startingLineNr !== this.editingEndingLine) {
+                returnString =
+                    "If you start editing this comment, your edit between the lines " +
+                    startingLineNr +
+                    " and " +
+                    this.editingEndingLine +
+                    " will be lost."
+            }
+            return returnString
         }
     },
     computed: {
