@@ -5,7 +5,7 @@
             {{ collapsed ? "" : "Files" }}
         </b-card-header>
         <b-collapse :visible="!collapsed">
-            <b-card-body>
+            <b-card-body :style="{ 'min-width': collapsed ? 'auto' : fixedWidth }">
                 <FileTreeNode
                     @selected="onSelect"
                     v-for="key in Object.keys(root)"
@@ -37,13 +37,16 @@ export default {
         return {
             root: null,
             selected: null,
-            collapsed: false
+            collapsed: false,
+            maxDepth: -1,
+            maxFileNameLength: -1
         }
     },
     created() {
         this.collapsed = this.startCollapsed
         this.selected = this.selectedFile
         this.root = new Map()
+        this.maxDepth = -1
 
         // Iterate over every file to populate the tree
         for (const file of this.files) {
@@ -56,13 +59,20 @@ export default {
 
             // Iteratively insert directories when needed
             let currentDir = this.root
+            // Variable to count the file tree depth
+            let currentDepth = 0
             for (const subdir of subdirs) {
-                currentDir[subdir] = currentDir[subdir] ?? new Map()
+                if (!currentDir[subdir]) {
+                    currentDir[subdir] = new Map()
+                    currentDepth++
+                }
                 currentDir = currentDir[subdir]
+                this.maxDepth = Math.max(this.maxDepth, currentDepth)
             }
 
             // Insert full file path if it is a file
             if (entry) {
+                this.maxFileNameLength = Math.max(this.maxFileNameLength, file.name.length)
                 currentDir[entry] = { file: true, path: file.name }
                 //  When no file is selected, select first file that it comes across
                 if (!this.selected) {
@@ -79,6 +89,11 @@ export default {
         },
         toggleCollapse() {
             this.collapsed = !this.collapsed
+        }
+    },
+    computed: {
+        fixedWidth() {
+            return `${this.maxDepth * 1 + this.maxFileNameLength}rem!important`
         }
     }
 }
