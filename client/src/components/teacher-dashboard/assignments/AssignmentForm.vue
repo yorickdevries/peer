@@ -562,7 +562,6 @@ export default {
 
             for (const extension of extensions) {
                 if (!/^\.([A-Za-z]+|\*)$/.test(extension)) {
-                    console.log(extension)
                     return false
                 }
             }
