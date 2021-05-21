@@ -1,5 +1,5 @@
 <template>
-    <b-card :style="{}">
+    <b-card>
         <b-card-header role="button" @click="toggleCollapse">
             <icon :name="collapsed ? 'chevron-right' : 'chevron-down'" class="chevron" />
             {{ collapsed ? "" : "Files" }}
