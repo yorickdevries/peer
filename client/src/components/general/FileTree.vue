@@ -1,13 +1,21 @@
 <template>
-    <b-card header="Files">
-        <FileTreeNode
-            @selected="onSelect"
-            v-for="key in Object.keys(root)"
-            :key="key"
-            :propName="key"
-            :propChildren="root[key]"
-            :selected="selected"
-        />
+    <b-card>
+        <b-card-header role="button" @click="toggleCollapse">
+            <icon :name="collapsed ? 'chevron-right' : 'chevron-down'" class="chevron" />
+            {{ collapsed ? "" : "Files" }}
+        </b-card-header>
+        <b-collapse :visible="!collapsed">
+            <b-card-body>
+                <FileTreeNode
+                    @selected="onSelect"
+                    v-for="key in Object.keys(root)"
+                    :key="key"
+                    :propName="key"
+                    :propChildren="root[key]"
+                    :selected="selected"
+                />
+            </b-card-body>
+        </b-collapse>
     </b-card>
 </template>
 
@@ -17,17 +25,23 @@ import FileTreeNode from "./FileTreeNode"
 export default {
     // "files" is an array of JSZip ZipObjects.
     // "selectedFile" is a path to the selected file
-    props: ["files", "selectedFile"],
+    props: {
+        files: Array,
+        selectedFile: String,
+        startCollapsed: Boolean
+    },
     components: {
         FileTreeNode
     },
     data() {
         return {
             root: null,
-            selected: null
+            selected: null,
+            collapsed: false
         }
     },
     created() {
+        this.collapsed = this.startCollapsed
         this.selected = this.selectedFile
         this.root = new Map()
 
@@ -62,7 +76,15 @@ export default {
         onSelect(file) {
             this.selected = file
             this.$emit("selected", file)
+        },
+        toggleCollapse() {
+            this.collapsed = !this.collapsed
         }
     }
 }
 </script>
+<style lang="scss" scoped>
+.chevron {
+    margin-right: 5px;
+}
+</style>
