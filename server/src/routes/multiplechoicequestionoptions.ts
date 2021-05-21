@@ -135,7 +135,7 @@ router.patch(
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is already in review state");
+        .send("The assignment is already in feedback state");
       return;
     }
     questionOption.text = req.body.text;
