@@ -70,13 +70,13 @@ export default {
         isStartingLine(lineNr) {
             return (
                 this.isCommentedOn(lineNr) &&
-                (lineNr === 0 || this.lineNumbers[lineNr - 1] !== this.lineNumbers[lineNr])
+                (lineNr === 1 || this.lineNumbers[lineNr - 1] !== this.lineNumbers[lineNr])
             )
         },
         isEndingLine(lineNr) {
             return (
                 this.isCommentedOn(lineNr) &&
-                (lineNr === this.lineNumbers.length - 1 || this.lineNumbers[lineNr + 1] !== this.lineNumbers[lineNr])
+                (lineNr === this.lineNumbers.length || this.lineNumbers[lineNr + 1] !== this.lineNumbers[lineNr])
             )
         },
         isCommentedOn(lineNr) {
@@ -88,7 +88,7 @@ export default {
     },
     computed: {
         lineNumbers: function() {
-            const res = new Array(this.content.length)
+            const res = new Array(this.content.length + 1)
                 .fill(-1)
                 .map((_, lineNr) =>
                     this.comments.findIndex(
