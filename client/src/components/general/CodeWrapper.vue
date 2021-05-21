@@ -1,7 +1,7 @@
 <template>
     <div v-if="files" class="d-flex">
-        <div v-if="!singleFile" style="flex-shrink: 0; max-width: 40%">
-            <FileTree :files="files" :selectedFile="selected" @selected="onSelect" />
+        <div style="flex-shrink: 0; max-width: 40%">
+            <FileTree :files="files" :selectedFile="selected" @selected="onSelect" :startCollapsed="singleFile" />
         </div>
         <div
             v-bind:class="{ 'ml-3': !singleFile }"
@@ -88,7 +88,7 @@ export default {
         async loadSingleFile(file) {
             this.showFile = false
             this.selected = "file"
-            this.files = []
+            this.files = [{ dir: false, name: this.selected }]
 
             Promise.resolve(file.text())
                 .then(this.verifyTextContent)
