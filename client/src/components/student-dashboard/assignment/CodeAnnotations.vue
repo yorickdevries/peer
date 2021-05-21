@@ -21,23 +21,23 @@
                         :linenr="index + 1"
                         v-bind:class="{ comment_start: isStartingLine(index + 1), comment: true, comment_end: isEndingLine(index + 1) }"
                         v-html="line.replace(/^$/, '<br />')"
-                        v-b-toggle="`comment_${lineNumbers[index + 1]}`"
+                        role="button"
+                        @click="toggleComment(lineNumbers[index + 1])"
                     ></code>
                 </div>
-                <!-- TODO: Dynamically change icon -->
                 <icon
                     v-if="isStartingLine(index + 1)"
-                    class="position-absolute mt-1 mr-2"
+                    class="position-absolute mt-1 mr-2 arrow"
+                    :class="{ rotate: comment[lineNumbers[index + 1]]}"
                     style="top: 0; right: 0; z-index: 1"
                     role="button"
-                    name="plus"
-                    v-b-toggle="`comment_${lineNumbers[index + 1]}`"
+                    name="chevron-down"
+                    @click.native="toggleComment(lineNumbers[index + 1])"
                 />
                 <b-collapse
                     v-if="isEndingLine(index + 1)"
-                    :id="`comment_${lineNumbers[index + 1]}`"
-                    :ref="`comment_${lineNumbers[index + 1]}`"
-                    v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }">
+                    v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }"
+                    v-model="comment[`${lineNumbers[index + 1]}`]">
                     <b-card>
                         <div class="d-flex justify-content-between">
                             <span>{{ comments[lineNumbers[index + 1]].commentText }}</span>
@@ -66,6 +66,11 @@
 <script>
 export default {
     props: ["content", "comments", "selectedFile", "readOnly"],
+    data() {
+        return {
+            comment: {}
+        }
+    },
     methods: {
         isStartingLine(lineNr) {
             return (
@@ -84,6 +89,9 @@ export default {
         },
         deleteComment(index) {
             this.$emit("deleted", index)
+        },
+        toggleComment(index) {
+            this.comment[index] = !this.comment[index]
         }
     },
     computed: {
@@ -190,5 +198,13 @@ pre {
 
 .card {
     font-family: initial;
+}
+
+.arrow {
+    transition: transform 0.2s ease-in-out;
+}
+
+.rotate {
+    transform: rotate(180deg);
 }
 </style>
