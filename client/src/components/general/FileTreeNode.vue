@@ -4,9 +4,9 @@
             <icon class="text-muted" name="folder"></icon>
             {{ name }}
         </div>
-        <div v-else v-bind:class="`${background} file`" role="button">
+        <div v-else @click="onSelect" v-bind:class="`${background} file`" role="button">
             <icon class="text-muted" name="code"></icon>
-            <span v-on:click="onSelect" class="filename"> {{ name }}</span>
+            <span class="filename"> {{ name }}</span>
         </div>
 
         <div style="margin-left: 1.5rem" v-if="dir">
