@@ -87,6 +87,8 @@ export default {
         },
         async loadSingleFile(file) {
             this.showFile = false
+            this.selected = "file"
+            this.files = []
 
             Promise.resolve(file.text())
                 .then(this.verifyTextContent)
