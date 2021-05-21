@@ -150,12 +150,10 @@ export default {
             // load the question in case an id is passed
             if (this.questionId) {
                 const res = await api.checkboxquestions.get(this.questionId)
-                let loadedQuestion = res.data
-                if (loadedQuestion.graded) {
-                    const formattedQuestion = this.formatGradedOptions(loadedQuestion.options)
-                    loadedQuestion.options = formattedQuestion
-                }
-                this.question = loadedQuestion
+                res.data.options = res.data.graded
+                    ? this.formatGradedOptions(res.data.options)
+                    : this.formatUngradedOptions(res.data.options)
+                this.question = res.data
             } else {
                 // only add empty options when the question is not fetched from the database
                 this.addEmptyOption()
@@ -166,6 +164,11 @@ export default {
             return options.map(option => {
                 const decimals = option.points / 100
                 return { id: option.id, text: option.text, points: decimals }
+            })
+        },
+        formatUngradedOptions(options) {
+            return options.map(option => {
+                return { id: option.id, text: option.text }
             })
         },
         addEmptyOption() {

@@ -128,16 +128,21 @@ export default {
                 const questionApiObject =
                     this.questionType === "multiplechoice" ? api.multiplechoicequestions : api.checkboxquestions
                 const res = await questionApiObject.get(this.questionId)
-                let loadedQuestion = res.data
-                const formattedQuestion = this.formatGradedOptions(loadedQuestion.options)
-                loadedQuestion.options = formattedQuestion
-                this.question = loadedQuestion
+                res.data.options = res.data.graded
+                    ? this.formatGradedOptions(res.data.options)
+                    : this.formatUngradedOptions(res.data.options)
+                this.question = res.data
             }
         },
         formatGradedOptions(options) {
             return options.map(option => {
                 const decimals = option.points / 100
                 return { id: option.id, text: option.text, points: decimals }
+            })
+        },
+        formatUngradedOptions(options) {
+            return options.map(option => {
+                return { id: option.id, text: option.text }
             })
         },
         async save() {
