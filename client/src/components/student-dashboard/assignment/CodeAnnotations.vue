@@ -114,13 +114,13 @@ pre {
     width: 100%;
     background-color: white;
     margin: 0;
+    max-height: 80vh;
 
     .code-annotations-wrapper {
         display: flex;
         flex-direction: column;
         min-width: min-content;
         width: 100%;
-        max-height: 50vh;
 
         .code-annotations-line {
             flex-grow: 1;
