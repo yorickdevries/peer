@@ -8,8 +8,7 @@
             v-bind:style="{
                 position: 'relative',
                 overflow: 'hidden',
-                'flex-grow': '1',
-                'max-height': showWarning || !showFile ? '80vh' : 'none'
+                'flex-grow': '1'
             }"
         >
             <b-alert variant="primary" show v-if="!content || content.length === 0">This file is empty</b-alert>
@@ -21,7 +20,7 @@
                 :reviewId="reviewId"
                 :selectedFile="selected"
             />
-            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap class="file-overlay">
+            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
                 <template #overlay>
                     <b-spinner v-if="!showFile" variant="primary"></b-spinner>
                     <div v-else-if="showWarning" class="text-center">
@@ -128,9 +127,3 @@ export default {
     }
 }
 </script>
-
-<style lang="scss" scoped>
-.file-overlay {
-    max-height: 50vh;
-}
-</style>
