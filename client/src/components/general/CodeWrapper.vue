@@ -20,7 +20,7 @@
                 :reviewId="reviewId"
                 :selectedFile="selected"
             />
-            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap class="file-overlay">
+            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
                 <template #overlay>
                     <b-spinner v-if="!showFile" variant="primary"></b-spinner>
                     <div v-else-if="showWarning" class="text-center">
