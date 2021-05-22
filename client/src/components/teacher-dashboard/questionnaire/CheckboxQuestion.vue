@@ -10,7 +10,7 @@
             Grade answers
         </b-form-checkbox>
         <b-form-group
-            label="Multiple Choice Options"
+            label="Checkbox Options"
             description="Delete, edit and add checkbox options here. Make sure to save."
         >
             <template v-for="(option, index) in question.options">
