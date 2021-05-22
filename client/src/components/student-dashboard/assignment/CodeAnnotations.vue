@@ -150,22 +150,18 @@ export default {
                 return "If you start editing this comment, your edit on file " + this.editingFilePath + " will be lost."
             }
 
-            // Default value for the modal text
-            let returnString =
-                "If you start editing this comment, your edit on line " + this.editingEndingLine + " will be lost."
             // Starting line number of the comment
-            let startingLineNr = this.comments[this.lineNumbers[this.editingEndingLine]].startLineNumber
+            const startingLineNr = this.comments[this.lineNumbers[this.editingEndingLine]].startLineNumber
 
-            // If the lines are not the same, customize the text a bit
-            if (startingLineNr !== this.editingEndingLine) {
-                returnString =
-                    "If you start editing this comment, your edit between the lines " +
-                    startingLineNr +
-                    " and " +
-                    this.editingEndingLine +
-                    " will be lost."
+            // If the lines are the same, return only one line
+            if (startingLineNr === this.editingEndingLine) {
+                return `If you start editing this comment, your edit on line ${this.editingEndingLine} will be lost.`
+            } else {
+                return (
+                    `If you start editing this comment, your edit between the lines ` +
+                    `${startingLineNr} and ${this.editingEndingLine} will be lost.`
+                )
             }
-            return returnString
         }
     },
     computed: {
