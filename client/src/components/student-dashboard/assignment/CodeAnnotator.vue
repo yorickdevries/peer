@@ -18,8 +18,9 @@
             <button type="submit">Submit your comment</button>
             <button type="reset">Delete selection and comment</button>
             <b-form-textarea
-                placeholder="Type your comment"
+                placeholder="Type your comment with a maximum length of 255 characters."
                 v-model="commentText"
+                :state="commentText.length <= 255"
                 rows="3"
                 max-rows="5"
             ></b-form-textarea>
@@ -73,7 +74,7 @@ export default {
             highlightedText: null,
             startLineNumber: null,
             endLineNumber: null,
-            commentText: null,
+            commentText: "",
             highlightedFile: null,
             comments: []
         }
@@ -180,6 +181,11 @@ export default {
             this.highlightedFile = this.selectedFile
         },
         async submitComment() {
+            if (this.commentText.length > 255) {
+                this.showErrorMessage({ message: "Your annotation is longer than 255 characters." })
+                return
+            }
+
             // Update the current state
             this.writing = false
 

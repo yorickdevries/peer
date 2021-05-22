@@ -40,8 +40,13 @@
                     v-model="comment[`${lineNumbers[index + 1]}`]">
                     <b-card>
                         <div v-if="editing && editingEndingLine === index + 1">
-                            <b-form @submit="submitEditedComment(index + 1)" @reset="cancelEdit">
-                                <b-form-textarea v-model="commentText" rows="3" max-rows="5"></b-form-textarea>
+                            <b-form @submit.prevent="submitEditedComment(index + 1)" @reset.prevent="cancelEdit">
+                                <b-form-textarea
+                                    v-model="commentText"
+                                    :state="commentText.length <= 255"
+                                    rows="3"
+                                    max-rows="5">
+                                </b-form-textarea>
                                 <b-button type="submit" variant="primary">Submit</b-button>
                                 <b-button type="reset" variant="danger">Cancel</b-button>
                             </b-form>
@@ -89,13 +94,16 @@
 </template>
 
 <script>
+import notifications from "../../../mixins/notifications"
+
 export default {
     props: ["content", "comments", "selectedFile", "readOnly"],
+    mixins: [notifications],
     data() {
         return {
             editing: false,
             editingEndingLine: null,
-            commentText: null,
+            commentText: "",
             editingFilePath: null,
             showEditModal: false,
             comment: {}
@@ -131,6 +139,15 @@ export default {
             this.editingFilePath = this.selectedFile
         },
         submitEditedComment(index) {
+            console.log("submitting edited comment")
+            if (this.commentText.length > 255) {
+                console.log("comment text too long")
+                this.showErrorMessage({ message: "Your annotation is longer than 255 characters." })
+                console.log("error message shown")
+                return
+            }
+
+            console.log("comment text good enough")
             this.$emit("edited", this.lineNumbers[index], this.commentText)
             // Reset all variables after updating the comment
             this.cancelEdit()
