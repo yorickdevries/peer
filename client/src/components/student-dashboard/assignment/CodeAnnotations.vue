@@ -21,23 +21,23 @@
                         :linenr="index + 1"
                         v-bind:class="{ comment_start: isStartingLine(index + 1), comment: true, comment_end: isEndingLine(index + 1) }"
                         v-html="line.replace(/^$/, '<br />')"
-                        v-b-toggle="`comment_${lineNumbers[index + 1]}`"
+                        role="button"
+                        @click="toggleComment(lineNumbers[index + 1])"
                     ></code>
                 </div>
-                <!-- TODO: Dynamically change icon -->
                 <icon
                     v-if="isStartingLine(index + 1)"
-                    class="position-absolute mt-1 mr-2"
+                    class="position-absolute mt-1 mr-2 arrow"
+                    :class="{ rotate: comment[lineNumbers[index + 1]]}"
                     style="top: 0; right: 0; z-index: 1"
                     role="button"
-                    name="plus"
-                    v-b-toggle="`comment_${lineNumbers[index + 1]}`"
+                    name="chevron-down"
+                    @click.native="toggleComment(lineNumbers[index + 1])"
                 />
                 <b-collapse
                     v-if="isEndingLine(index + 1)"
-                    :id="`comment_${lineNumbers[index + 1]}`"
-                    :ref="`comment_${lineNumbers[index + 1]}`"
-                    v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }">
+                    v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }"
+                    v-model="comment[`${lineNumbers[index + 1]}`]">
                     <b-card>
                         <div v-if="editing && editingEndingLine === index + 1">
                             <b-form @submit="submitEditedComment(index + 1)" @reset="cancelEdit">
@@ -97,20 +97,21 @@ export default {
             editingEndingLine: null,
             commentText: null,
             editingFilePath: null,
-            showEditModal: false
+            showEditModal: false,
+            comment: {}
         }
     },
     methods: {
         isStartingLine(lineNr) {
             return (
                 this.isCommentedOn(lineNr) &&
-                (lineNr === 0 || this.lineNumbers[lineNr - 1] !== this.lineNumbers[lineNr])
+                (lineNr === 1 || this.lineNumbers[lineNr - 1] !== this.lineNumbers[lineNr])
             )
         },
         isEndingLine(lineNr) {
             return (
                 this.isCommentedOn(lineNr) &&
-                (lineNr === this.lineNumbers.length - 1 || this.lineNumbers[lineNr + 1] !== this.lineNumbers[lineNr])
+                (lineNr === this.lineNumbers.length || this.lineNumbers[lineNr + 1] !== this.lineNumbers[lineNr])
             )
         },
         isCommentedOn(lineNr) {
@@ -162,11 +163,14 @@ export default {
                     `${startingLineNr} and ${this.editingEndingLine} will be lost.`
                 )
             }
+        },
+        toggleComment(index) {
+            this.comment[index] = !this.comment[index]
         }
     },
     computed: {
         lineNumbers: function() {
-            const res = new Array(this.content.length)
+            const res = new Array(this.content.length + 1)
                 .fill(-1)
                 .map((_, lineNr) =>
                     this.comments.findIndex(
@@ -192,13 +196,13 @@ pre {
     width: 100%;
     background-color: white;
     margin: 0;
+    max-height: 80vh;
 
     .code-annotations-wrapper {
         display: flex;
         flex-direction: column;
         min-width: min-content;
         width: 100%;
-        max-height: 50vh;
 
         .code-annotations-line {
             flex-grow: 1;
@@ -268,5 +272,13 @@ pre {
 
 .card {
     font-family: initial;
+}
+
+.arrow {
+    transition: transform 0.2s ease-in-out;
+}
+
+.rotate {
+    transform: rotate(180deg);
 }
 </style>

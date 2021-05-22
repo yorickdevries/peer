@@ -1,15 +1,14 @@
 <template>
     <div v-if="files" class="d-flex">
-        <div v-if="!singleFile" style="flex-shrink: 0; max-width: 40%">
-            <FileTree :files="files" :selectedFile="selected" @selected="onSelect" />
+        <div style="flex-shrink: 0; max-width: 40%">
+            <FileTree :files="files" :selectedFile="selected" @selected="onSelect" :startCollapsed="singleFile" />
         </div>
         <div
             v-bind:class="{ 'ml-3': !singleFile }"
             v-bind:style="{
                 position: 'relative',
                 overflow: 'hidden',
-                'flex-grow': '1',
-                'max-height': showWarning || !showFile ? '80vh' : 'none'
+                'flex-grow': '1'
             }"
         >
             <b-alert variant="primary" show v-if="!content || content.length === 0">This file is empty</b-alert>
@@ -20,9 +19,8 @@
                 :submissionId="submissionId"
                 :reviewId="reviewId"
                 :selectedFile="selected"
-                :showAnnotations="showAnnotations"
             />
-            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap class="file-overlay">
+            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
                 <template #overlay>
                     <b-spinner v-if="!showFile" variant="primary"></b-spinner>
                     <div v-else-if="showWarning" class="text-center">
@@ -44,7 +42,7 @@ import FileTree from "./FileTree"
 import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 
 export default {
-    props: ["fileUrl", "readOnly", "submissionId", "reviewId", "showAnnotations"],
+    props: ["fileUrl", "readOnly", "submissionId", "reviewId"],
     components: { FileTree, CodeAnnotator },
     data() {
         return {
@@ -88,7 +86,7 @@ export default {
         },
         async loadSingleFile(file) {
             this.showFile = false
-            this.selected = this.fileUrl.split("/").pop()
+            this.selected = "file"
             this.files = [{ dir: false, name: this.selected }]
 
             Promise.resolve(file.text())
@@ -129,9 +127,3 @@ export default {
     }
 }
 </script>
-
-<style lang="scss" scoped>
-.file-overlay {
-    max-height: 50vh;
-}
-</style>

@@ -12,7 +12,6 @@
             :readOnly="readOnly"
             :submissionId="submissionId"
             :reviewId="reviewId"
-            :showAnnotations="showCodeAnnotations"
         />
         <div v-else>
             <b-alert show variant="secondary">
