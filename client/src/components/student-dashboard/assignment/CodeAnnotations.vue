@@ -139,15 +139,11 @@ export default {
             this.editingFilePath = this.selectedFile
         },
         submitEditedComment(index) {
-            console.log("submitting edited comment")
             if (this.commentText.length > 255) {
-                console.log("comment text too long")
                 this.showErrorMessage({ message: "Your annotation is longer than 255 characters." })
-                console.log("error message shown")
                 return
             }
 
-            console.log("comment text good enough")
             this.$emit("edited", this.lineNumbers[index], this.commentText)
             // Reset all variables after updating the comment
             this.cancelEdit()
