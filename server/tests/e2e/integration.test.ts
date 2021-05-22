@@ -775,6 +775,74 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
 
     res = await request(server)
+      .post(`/api/checkboxquestions/`)
+      .send({
+        text: "This is a Checkbox question",
+        number: 11,
+        optional: true,
+        questionnaireId: reviewQuestionnaire.id,
+        graded: true,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const checkboxQuestionReview = JSON.parse(res.text);
+    expect(checkboxQuestionReview).toMatchObject({
+      text: "This is a Checkbox question",
+      number: 11,
+      optional: true,
+      graded: true,
+    });
+
+    res = await request(server)
+      .post(`/api/multiplechoicequestions/`)
+      .send({
+        text: "This is a Multiple question",
+        number: 12,
+        optional: true,
+        questionnaireId: reviewQuestionnaire.id,
+        graded: true,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const multipleChoiceQuestionReview = JSON.parse(res.text);
+    expect(multipleChoiceQuestionReview).toMatchObject({
+      text: "This is a Multiple question",
+      number: 12,
+      optional: true,
+      graded: true,
+    });
+
+    res = await request(server)
+      .post(`/api/checkboxquestionoptions/`)
+      .send({
+        text: "option 1",
+        checkboxQuestionId: checkboxQuestionReview.id,
+        points: 15,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const checkboxOptionReview = JSON.parse(res.text);
+    expect(checkboxOptionReview).toMatchObject({
+      text: "option 1",
+      points: 15,
+    });
+
+    res = await request(server)
+      .post(`/api/multiplechoicequestionoptions/`)
+      .send({
+        text: "option 1",
+        multipleChoiceQuestionId: multipleChoiceQuestionReview.id,
+        points: 15,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const multipleChoiceOptionReview = JSON.parse(res.text);
+    expect(multipleChoiceOptionReview).toMatchObject({
+      text: "option 1",
+      points: 15,
+    });
+
+    res = await request(server)
       .post("/api/assignments")
       .set("cookie", await teacherCookie())
       .attach("file", fs.readFileSync(exampleAssignmentFile), "assignment1.pdf")
@@ -1403,7 +1471,7 @@ describe("Integration", () => {
       )
       .set("cookie", await studentCookie2());
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text).questions.length).toBe(10);
+    expect(JSON.parse(res.text).questions.length).toBe(12);
 
     // get the current answers
     res = await request(server)
@@ -1411,5 +1479,157 @@ describe("Integration", () => {
       .set("cookie", await studentCookie2());
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text).length).toBe(0);
+
+    // Test that you can change grades after closing submissions
+    res = await request(server)
+      .patch(`/api/checkboxquestionoptions/${checkboxQuestionOptionObject.id}`)
+      .send({
+        text: "option 1",
+        points: 0,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const checkboxQuestionOptionObject2 = JSON.parse(res.text);
+    expect(checkboxQuestionOptionObject2).toMatchObject({
+      text: "option 1",
+      points: 0,
+    });
+
+    // Test that you cannot change text after closing submissions
+    res = await request(server)
+      .patch(`/api/checkboxquestionoptions/${checkboxQuestionOptionObject.id}`)
+      .send({
+        text: "option a",
+        points: 1,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+
+    // Test that you cannot change text after closing submissions
+    res = await request(server)
+      .patch(`/api/multiplechoicequestionoptions/${mcoption1graded.id}`)
+      .send({
+        text: "option A",
+        points: 50,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const multipleChoiceQuestionOptionObject2 = JSON.parse(res.text);
+    expect(multipleChoiceQuestionOptionObject2).toMatchObject({
+      text: "option A",
+      points: 50,
+    });
+
+    // Test that you cannot change text after closing submissions
+    res = await request(server)
+      .patch(`/api/multiplechoicequestionoptions/${mcoption1graded.id}`)
+      .send({
+        text: "option a",
+        points: 10,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+
+    // Test that you can change grades after distributing reviews
+    res = await request(server)
+      .patch(`/api/checkboxquestionoptions/${checkboxOptionReview.id}`)
+      .send({
+        text: "option 1",
+        points: 0,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const checkboxOptionReviewObject2 = JSON.parse(res.text);
+    expect(checkboxOptionReviewObject2).toMatchObject({
+      text: "option 1",
+      points: 0,
+    });
+
+    // Test that you cannot change option text after distributing reviews
+    res = await request(server)
+      .patch(`/api/checkboxquestionoptions/${checkboxOptionReview.id}`)
+      .send({
+        text: "option a",
+        points: 0,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+
+    // Test that you can change grades after distributing reviews
+    res = await request(server)
+      .patch(
+        `/api/multiplechoicequestionoptions/${multipleChoiceOptionReview.id}`
+      )
+      .send({
+        text: "option 1",
+        points: 0,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const multipleChoiceOptionReviewObject2 = JSON.parse(res.text);
+    expect(multipleChoiceOptionReviewObject2).toMatchObject({
+      text: "option 1",
+      points: 0,
+    });
+
+    // Test that you cannot change option text after distributing reviews
+    res = await request(server)
+      .patch(
+        `/api/multiplechoicequestionoptions/${multipleChoiceOptionReview.id}`
+      )
+      .send({
+        text: "option a",
+        points: 0,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+
+    res = await request(server)
+      .patch(`/api/multiplechoicequestions/${reviewQuestionnaire.id}`)
+      .send({
+        text: "This is a multiple q",
+        number: 12,
+        optional: true,
+        graded: true,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
+
+    // Test that you can ungrade questions after distributing reviews
+    // Test that you can change grades after distributing reviews
+    res = await request(server)
+      .patch(`/api/multiplechoicequestions/${multipleChoiceQuestionReview.id}`)
+      .send({
+        text: "This is a Multiple question",
+        number: 12,
+        optional: true,
+        graded: false,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const ungradedReviewQuestion = JSON.parse(res.text);
+    expect(ungradedReviewQuestion).toMatchObject({
+      text: "This is a Multiple question",
+      number: 12,
+      optional: true,
+      graded: false,
+    });
+
+    // Ungrade option
+    res = await request(server)
+      .patch(
+        `/api/multiplechoicequestionoptions/${multipleChoiceOptionReview.id}`
+      )
+      .send({
+        text: "option 1",
+        points: null,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const ungradedReviewQuestionOption = JSON.parse(res.text);
+    expect(ungradedReviewQuestionOption).toMatchObject({
+      text: "option 1",
+      points: null,
+    });
   });
 });

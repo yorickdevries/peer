@@ -120,7 +120,8 @@ router.patch(
     const assignment = await assignmentVersion.getAssignment();
     if (
       questionnaire instanceof SubmissionQuestionnaire &&
-      assignment.isAtOrAfterState(AssignmentState.REVIEW)
+      assignment.isAtOrAfterState(AssignmentState.REVIEW) &&
+      questionOption.text !== req.body.text
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -129,7 +130,8 @@ router.patch(
     }
     if (
       questionnaire instanceof ReviewQuestionnaire &&
-      assignment.isAtOrAfterState(AssignmentState.FEEDBACK)
+      assignment.isAtOrAfterState(AssignmentState.FEEDBACK) &&
+      questionOption.text !== req.body.text
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
