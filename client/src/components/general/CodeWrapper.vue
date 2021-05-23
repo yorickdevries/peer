@@ -36,10 +36,11 @@
 
 <script>
 import hljs from "highlight.js"
-import "highlight.js/styles/default.css"
+import "highlight.js/styles/atom-one-light.css"
 import JSZip from "jszip"
 import FileTree from "./FileTree"
 import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
+import api from "../../api/api"
 
 export default {
     props: ["fileUrl", "readOnly", "submissionId", "reviewId"],
@@ -60,9 +61,15 @@ export default {
                 .catch(console.error)
         },
         async highlightContent(text) {
-            // hljs.highlightAuto expects a string (code) and optionally an array
-            // of language names / aliases
-            const highlighted = hljs.highlightAuto(text)
+            const fileExtension = this.selected.split(".").pop()
+            let highlighted
+
+            if (hljs.getLanguage(fileExtension)) {
+                highlighted = hljs.highlight(text, { language: fileExtension })
+            } else {
+                highlighted = hljs.highlightAuto(text)
+            }
+
             this.content = highlighted.value.split(/\r?\n/g)
             this.showFile = true
         },
@@ -84,9 +91,21 @@ export default {
                 })
                 .then(files => (this.files = files))
         },
+        async getSingleFileName() {
+            let promise = Promise.reject("Found no submission or review id")
+
+            if (this.submissionId) {
+                promise = api.submissions.get(this.submissionId).then(res => res.data.file)
+            }
+            if (this.reviewId) {
+                promise = api.reviewofsubmissions.getFileMetadata(this.reviewId).then(res => res.data)
+            }
+
+            return promise.then(file => file.name + file.extension).catch()
+        },
         async loadSingleFile(file) {
             this.showFile = false
-            this.selected = "file"
+            this.selected = await this.getSingleFileName()
             this.files = [{ dir: false, name: this.selected }]
 
             Promise.resolve(file.text())
