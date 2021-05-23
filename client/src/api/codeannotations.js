@@ -19,5 +19,9 @@ export default {
     },
     deleteAnnotation(id) {
         return client.delete(`codeannotations/${id}`)
+    },
+    patchAnnotation(id, commentText) {
+        const body = { commentText: commentText }
+        return client.patch(`codeannotations/${id}`, body)
     }
 }

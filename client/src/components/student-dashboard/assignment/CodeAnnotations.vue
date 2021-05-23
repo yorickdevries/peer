@@ -39,12 +39,37 @@
                     v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }"
                     v-model="comment[`${lineNumbers[index + 1]}`]">
                     <b-card>
-                        <div class="d-flex justify-content-between">
-                            <span>{{ comments[lineNumbers[index + 1]].commentText }}</span>
+                        <div v-if="editing && editingEndingLine === index + 1">
+                            <b-form @submit="submitEditedComment(index + 1)" @reset="cancelEdit">
+                                <b-form-textarea v-model="commentText" rows="3" max-rows="5"></b-form-textarea>
+                                <b-button type="submit" variant="primary">Submit</b-button>
+                                <b-button type="reset" variant="danger">Cancel</b-button>
+                            </b-form>
+                        </div><div class="d-flex" v-else>
+                            <span class="mr-auto">{{ comments[lineNumbers[index + 1]].commentText }}</span>
+                            <icon
+                                v-if="!readOnly"
+                                name="edit"
+                                class="mt-auto mb-auto text-info"
+                                role="button" 
+                                style="flex-shrink: 0"
+                                @click.native="editComment(index + 1)"
+                                v-b-modal="`editModal_${lineNumbers[index + 1]}`"
+                            />
+                            <b-modal 
+                                :id="`editModal_${lineNumbers[index + 1]}`" 
+                                @ok="editModalOk(index + 1)"
+                                variant="danger"
+                                title="Warning!"
+                                v-if="showEditModal"
+                                centered>
+                                {{ getModalText() }}
+                            </b-modal>
+                            <div style="width:10px"/>
                             <icon
                                 v-if="!readOnly"
                                 name="trash"
-                                class="ml-auto text-danger"
+                                class="mt-auto mb-auto text-danger"
                                 style="flex-shrink: 0"
                                 role="button"
                                 v-b-modal="`modal_${lineNumbers[index + 1]}`"
@@ -68,6 +93,11 @@ export default {
     props: ["content", "comments", "selectedFile", "readOnly"],
     data() {
         return {
+            editing: false,
+            editingEndingLine: null,
+            commentText: null,
+            editingFilePath: null,
+            showEditModal: false,
             comment: {}
         }
     },
@@ -75,13 +105,13 @@ export default {
         isStartingLine(lineNr) {
             return (
                 this.isCommentedOn(lineNr) &&
-                (lineNr === 0 || this.lineNumbers[lineNr - 1] !== this.lineNumbers[lineNr])
+                (lineNr === 1 || this.lineNumbers[lineNr - 1] !== this.lineNumbers[lineNr])
             )
         },
         isEndingLine(lineNr) {
             return (
                 this.isCommentedOn(lineNr) &&
-                (lineNr === this.lineNumbers.length - 1 || this.lineNumbers[lineNr + 1] !== this.lineNumbers[lineNr])
+                (lineNr === this.lineNumbers.length || this.lineNumbers[lineNr + 1] !== this.lineNumbers[lineNr])
             )
         },
         isCommentedOn(lineNr) {
@@ -90,13 +120,57 @@ export default {
         deleteComment(index) {
             this.$emit("deleted", index)
         },
+        editComment(lineNr) {
+            if (this.editing) {
+                this.showEditModal = true
+                return
+            }
+            this.editing = true
+            this.editingEndingLine = lineNr
+            this.commentText = this.comments[this.lineNumbers[lineNr]].commentText
+            this.editingFilePath = this.selectedFile
+        },
+        submitEditedComment(index) {
+            this.$emit("edited", this.lineNumbers[index], this.commentText)
+            // Reset all variables after updating the comment
+            this.cancelEdit()
+        },
+        cancelEdit() {
+            this.editing = false
+            this.editingEndingLine = null
+            this.commentText = null
+            this.editingFilePath = null
+        },
+        editModalOk(lineNr) {
+            this.editing = false
+            this.editComment(lineNr)
+        },
+        getModalText() {
+            // If there is an edit in another file, redirect the user to that file.
+            if (this.selectedFile !== this.editingFilePath) {
+                return "If you start editing this comment, your edit on file " + this.editingFilePath + " will be lost."
+            }
+
+            // Starting line number of the comment
+            const startingLineNr = this.comments[this.lineNumbers[this.editingEndingLine]].startLineNumber
+
+            // If the lines are the same, return only one line
+            if (startingLineNr === this.editingEndingLine) {
+                return `If you start editing this comment, your edit on line ${this.editingEndingLine} will be lost.`
+            } else {
+                return (
+                    `If you start editing this comment, your edit between the lines ` +
+                    `${startingLineNr} and ${this.editingEndingLine} will be lost.`
+                )
+            }
+        },
         toggleComment(index) {
             this.comment[index] = !this.comment[index]
         }
     },
     computed: {
         lineNumbers: function() {
-            const res = new Array(this.content.length)
+            const res = new Array(this.content.length + 1)
                 .fill(-1)
                 .map((_, lineNr) =>
                     this.comments.findIndex(
