@@ -138,9 +138,14 @@ router.patch(
     const questionnaire = await question.getQuestionnaire();
     const assignmentVersion = await questionnaire.getAssignmentVersion();
     const assignment = await assignmentVersion.getAssignment();
+    const illegalChanges =
+      question.text !== req.body.text &&
+      question.number !== req.body.number &&
+      question.optional !== req.body.optional;
     if (
       questionnaire instanceof SubmissionQuestionnaire &&
-      assignment.isAtOrAfterState(AssignmentState.REVIEW)
+      assignment.isAtOrAfterState(AssignmentState.REVIEW) &&
+      illegalChanges
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -149,7 +154,8 @@ router.patch(
     }
     if (
       questionnaire instanceof ReviewQuestionnaire &&
-      assignment.isAtOrAfterState(AssignmentState.FEEDBACK)
+      assignment.isAtOrAfterState(AssignmentState.FEEDBACK) &&
+      illegalChanges
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -159,7 +165,7 @@ router.patch(
     // graded changed
     const gradedChanged = question.graded !== req.body.graded;
     if (!gradedChanged) {
-      // if grades isnt changed, we can just update the question
+      // if grades isn't changed, we can just update the question
       question.text = req.body.text;
       question.number = req.body.number;
       question.optional = req.body.optional;

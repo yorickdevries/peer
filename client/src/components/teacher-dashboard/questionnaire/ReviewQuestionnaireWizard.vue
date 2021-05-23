@@ -3,8 +3,8 @@
         <b-alert :show="blockQuestionnaireEditing" variant="info"
             >Questionnaire editing is not allowed anymore since the peer review due date has already passed.</b-alert
         >
-        <b-container v-bind:class="{ 'disabled-view': blockQuestionnaireEditing }">
-            <b-card class="mb-3 mt-3">
+        <b-container>
+            <b-card class="mb-3 mt-3" :class="{ 'disabled-view': blockQuestionnaireEditing }">
                 <div class="d-flex justify-content-between">
                     <b-row>
                         <b-col>
@@ -130,6 +130,7 @@
                             <StarRating
                                 v-if="question.type === 'range'"
                                 class="align-middle"
+                                :class="{ 'disabled-view': blockQuestionnaireEditing }"
                                 :border-color="'#007bff'"
                                 :active-color="'#007bff'"
                                 :border-width="2"
@@ -143,7 +144,11 @@
                             />
 
                             <!-- UPLOAD QUESTION -->
-                            <b-form-group v-if="question.type === 'upload'" class="mb-0">
+                            <b-form-group
+                                v-if="question.type === 'upload'"
+                                class="mb-0"
+                                :class="{ 'disabled-view': blockQuestionnaireEditing }"
+                            >
                                 <b-alert show variant="warning" class="p-2">
                                     Currently, no file has been uploaded. <br />
                                     Allowed file types: {{ question.extensions }}
@@ -153,11 +158,27 @@
 
                             <!-- Edit button-->
                             <br />
-                            <b-button v-b-modal="`editModal${question.id}`" variant="primary float-right">
-                                Edit/Delete Question
+                            <b-button
+                                :disabled="blockQuestionnaireEditing && !isOptionQuestion(question.type)"
+                                v-b-modal="`editModal${question.id}`"
+                                variant="primary float-right"
+                            >
+                                {{
+                                    blockQuestionnaireEditing
+                                        ? question.graded
+                                            ? "Edit Points"
+                                            : "Edit Question"
+                                        : "Edit/Delete Question"
+                                }}
                             </b-button>
                             <b-modal :id="`editModal${question.id}`" centered hide-footer class="p-0 m-0">
+                                <EditQuestionPointsWizard
+                                    v-if="blockQuestionnaireEditing"
+                                    :question="question"
+                                    @questionSaved="getQuestionnaire"
+                                ></EditQuestionPointsWizard>
                                 <EditQuestionWizard
+                                    v-else
                                     :question="question"
                                     @questionSaved="getQuestionnaire"
                                 ></EditQuestionWizard>
@@ -176,6 +197,7 @@ import notifications from "../../../mixins/notifications"
 import _ from "lodash"
 import CreateQuestionWizard from "./CreateQuestionWizard"
 import EditQuestionWizard from "./EditQuestionWizard"
+import EditQuestionPointsWizard from "./EditQuestionPointsWizard"
 import { StarRating } from "vue-rate-it"
 
 export default {
@@ -184,6 +206,7 @@ export default {
     components: {
         CreateQuestionWizard,
         EditQuestionWizard,
+        EditQuestionPointsWizard,
         StarRating
     },
     data() {
@@ -226,6 +249,9 @@ export default {
             await this.getAssignmentVersion()
             await this.getQuestionnaire()
             await this.getAllQuestionnairesOfCourse()
+        },
+        isOptionQuestion(questionType) {
+            return questionType === "multiplechoice" || questionType === "checkbox"
         },
         pointsDisplay(points) {
             return points / 100

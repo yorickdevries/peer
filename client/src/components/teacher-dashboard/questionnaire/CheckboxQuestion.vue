@@ -10,7 +10,7 @@
             Grade answers
         </b-form-checkbox>
         <b-form-group
-            label="Multiple Choice Options"
+            label="Checkbox Options"
             description="Delete, edit and add checkbox options here. Make sure to save."
         >
             <template v-for="(option, index) in question.options">
@@ -20,7 +20,7 @@
                         <div class="input-group-append">
                             <b-button
                                 v-if="!option.delete"
-                                @click="markOptionforDeletion(option)"
+                                @click="markOptionForDeletion(option)"
                                 variant="danger"
                                 size="sm"
                                 >Delete
@@ -150,12 +150,10 @@ export default {
             // load the question in case an id is passed
             if (this.questionId) {
                 const res = await api.checkboxquestions.get(this.questionId)
-                let loadedQuestion = res.data
-                if (loadedQuestion.graded) {
-                    const formattedQuestion = this.formatGradedOptions(loadedQuestion.options)
-                    loadedQuestion.options = formattedQuestion
-                }
-                this.question = loadedQuestion
+                res.data.options = res.data.graded
+                    ? this.formatGradedOptions(res.data.options)
+                    : this.formatUngradedOptions(res.data.options)
+                this.question = res.data
             } else {
                 // only add empty options when the question is not fetched from the database
                 this.addEmptyOption()
@@ -168,11 +166,16 @@ export default {
                 return { id: option.id, text: option.text, points: decimals }
             })
         },
+        formatUngradedOptions(options) {
+            return options.map(option => {
+                return { id: option.id, text: option.text }
+            })
+        },
         addEmptyOption() {
             const optionPrototype = this.question.graded ? { text: "", points: 0 } : { text: "" }
             this.question.options.push(optionPrototype)
         },
-        markOptionforDeletion(option) {
+        markOptionForDeletion(option) {
             if (!option.id) {
                 // just remove it as the question isnt saved to the database yet
                 this.question.options = _.without(this.question.options, option)
