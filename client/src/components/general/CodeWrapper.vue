@@ -1,7 +1,13 @@
 <template>
     <div v-if="files" class="d-flex">
         <div style="flex-shrink: 0; max-width: 40%">
-            <FileTree :files="files" :selectedFile="selected" @selected="onSelect" :startCollapsed="singleFile" />
+            <FileTree
+                @selected="onSelect"
+                :commentedFiles="commentedFiles"
+                :files="files"
+                :selectedFile="selected"
+                :startCollapsed="singleFile"
+            />
         </div>
         <div
             v-bind:class="{ 'ml-3': !singleFile }"
@@ -147,6 +153,9 @@ export default {
     computed: {
         singleFile() {
             return this.files && this.files.length <= 1
+        },
+        commentedFiles() {
+            return new Set(this.comments.map(comment => comment.selectedFile))
         }
     }
 }
