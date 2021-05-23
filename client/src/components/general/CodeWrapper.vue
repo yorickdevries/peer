@@ -16,7 +16,6 @@
                 v-else
                 :content="content"
                 :readOnly="readOnly"
-                :submissionId="submissionId"
                 :reviewId="reviewId"
                 :selectedFile="selected"
             />
@@ -42,7 +41,7 @@ import FileTree from "./FileTree"
 import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 
 export default {
-    props: ["fileUrl", "readOnly", "submissionId", "reviewId"],
+    props: ["fileUrl", "readOnly", "reviewId"],
     components: { FileTree, CodeAnnotator },
     data() {
         return {

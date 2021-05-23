@@ -56,8 +56,7 @@ import CodeAnnotations from "./CodeAnnotations"
 export default {
     mixins: [notifications],
     components: { CodeAnnotations },
-    // either "reviewId" or "submissionId" is passed, not both
-    props: ["reviewId", "submissionId", "readOnly", "content", "selectedFile"],
+    props: ["reviewId", "readOnly", "content", "selectedFile"],
     computed: {
         showAnnotations() {
             return !(this.reviewId == null)
@@ -66,7 +65,6 @@ export default {
     data() {
         return {
             review: null,
-            submission: null,
             showCode: false,
             writing: false,
             highlightedText: null,
@@ -79,7 +77,6 @@ export default {
     },
     async created() {
         await this.fetchReview()
-        await this.fetchSubmission()
         await this.fetchComments()
         this.showCode = true
         this.writing = false
@@ -89,12 +86,6 @@ export default {
             if (this.reviewId) {
                 const res = await api.reviewofsubmissions.get(this.reviewId)
                 this.review = res.data
-            }
-        },
-        async fetchSubmission() {
-            if (this.submissionId) {
-                const res = await api.submissions.get(this.submissionId)
-                this.submission = res.data
             }
         },
         async fetchComments() {
