@@ -56,51 +56,28 @@ import CodeAnnotations from "./CodeAnnotations"
 export default {
     mixins: [notifications],
     components: { CodeAnnotations },
-    props: ["reviewId", "readOnly", "content", "selectedFile"],
+    props: ["comments", "content", "selectedFile", "readOnly", "review"],
     computed: {
         showAnnotations() {
-            return !(this.reviewId == null)
+            return !(this.review == null)
         }
     },
     data() {
         return {
-            review: null,
             showCode: false,
             writing: false,
             highlightedText: null,
             startLineNumber: null,
             endLineNumber: null,
             commentText: null,
-            highlightedFile: null,
-            comments: []
+            highlightedFile: null
         }
     },
     async created() {
-        await this.fetchReview()
-        await this.fetchComments()
         this.showCode = true
         this.writing = false
     },
     methods: {
-        async fetchReview() {
-            if (this.reviewId) {
-                const res = await api.reviewofsubmissions.get(this.reviewId)
-                this.review = res.data
-            }
-        },
-        async fetchComments() {
-            if (this.review) {
-                try {
-                    const res = await api.codeannotations.getAnnotations(this.review.id)
-                    const rows = res.data
-                    for (const row of rows) {
-                        this.pushComment(row)
-                    }
-                } catch (error) {
-                    this.comments = []
-                }
-            }
-        },
         async writeComment() {
             const selection = window.getSelection()
             const selectedText = selection.toString()
@@ -183,7 +160,7 @@ export default {
                     this.selectedFile
                 )
                 const comment = res.data
-                this.pushComment(comment)
+                this.comments.push(comment)
             } catch (error) {
                 this.showErrorMessage({ message: "Unable to submit comment" })
             }
@@ -195,16 +172,6 @@ export default {
             this.endLineNumber = null
             this.highlightedFile = null
         },
-        // Add comment to comments array
-        pushComment(comment) {
-            this.comments.push({
-                commentId: comment.id,
-                commentText: comment.commentText,
-                startLineNumber: comment.startLineNumber,
-                endLineNumber: comment.endLineNumber,
-                selectedFile: comment.selectedFile
-            })
-        },
         deleteSelection() {
             this.commentText = null
             this.highlightedText = null
@@ -214,14 +181,10 @@ export default {
             this.showSuccessMessage({ message: "Your selection and comment was deleted" })
         },
         onDeleteComment(index) {
-            if (index < 0 || index >= this.comments.length) {
-                return
-            }
-
             // Remove comment from comment array
             const removedComment = this.comments.splice(index, 1)
             // Remove comment from back-end
-            api.codeannotations.deleteAnnotation(removedComment[0].commentId)
+            api.codeannotations.deleteAnnotation(removedComment[0].id)
             this.showSuccessMessage({ message: "Successfully deleted comment" })
         }
     }
