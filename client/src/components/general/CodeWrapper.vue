@@ -92,16 +92,17 @@ export default {
                 .then(files => (this.files = files))
         },
         async getSingleFileName() {
-            let promise = Promise.reject("Found no submission or review id")
-
-            if (this.submissionId) {
-                promise = api.submissions.get(this.submissionId).then(res => res.data.file)
-            }
-            if (this.reviewId) {
-                promise = api.reviewofsubmissions.getFileMetadata(this.reviewId).then(res => res.data)
-            }
-
-            return promise.then(file => file.name + file.extension).catch()
+            return new Promise((resolve, reject) => {
+                if (this.submissionId) {
+                    resolve(api.submissions.get(this.submissionId).then(res => res.data.file))
+                } else if (this.reviewId) {
+                    resolve(api.reviewofsubmissions.getFileMetadata(this.reviewId).then(res => res.data))
+                } else {
+                    reject("Found no submission or review id")
+                }
+            })
+                .then(file => file.name + file.extension)
+                .catch(console.warn)
         },
         async loadSingleFile(file) {
             this.showFile = false
