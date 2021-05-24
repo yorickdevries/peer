@@ -41,7 +41,6 @@
 </template>
 
 <script>
-import api from "../../api/api"
 import hljs from "highlight.js"
 import "highlight.js/styles/atom-one-light.css"
 import JSZip from "jszip"
@@ -50,7 +49,7 @@ import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 import api from "../../api/api"
 
 export default {
-    props: ["fileUrl", "readOnly", "reviewId"],
+    props: ["fileUrl", "readOnly", "submissionId", "reviewId"],
     components: { FileTree, CodeAnnotator },
     data() {
         return {
