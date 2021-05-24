@@ -2,6 +2,7 @@ import moment from "moment";
 import schedule from "node-schedule";
 import { AssignmentState } from "../enum/AssignmentState";
 import Assignment from "../models/Assignment";
+import Submission from "../models/Submission";
 import {
   startPublishAssignmentWorker,
   startCloseSubmissionForAssignmentWorker,
@@ -14,6 +15,8 @@ const scheduledJobs: Map<number, schedule.Job[]> = new Map<
   number,
   schedule.Job[]
 >();
+
+var numAssignmentJobs = 0;
 
 const cancelJobsForAssignment = function (assignment: Assignment) {
   const jobsOfAssignment = scheduledJobs.get(assignment.id);
@@ -90,12 +93,48 @@ const scheduleJobsForAssignment = function (assignment: Assignment): void {
   }
 };
 
+const cancelJobsForSubmission = function (submission: Submission) {
+  const jobsOfSubmission = scheduledJobs.get(numAssignmentJobs + submission.id);
+  if (jobsOfSubmission) {
+    for (const job of jobsOfSubmission) {
+      job.cancel();
+    }
+  }
+  scheduledJobs.delete(submission.id);
+};
+
+const scheduleJobsForSubmission = function (submmission: Submission): void {
+  cancelJobsForSubmission(submmission);
+
+  // if the submission hasn't been flagged by the server yet
+  if (submmission.flaggedByServer == null) {
+    const jobsOfSubmission = [];
+    const now = new Date();
+    const job = schedule.scheduleJob(now, () => {
+      //TODO: ADD ACTUAL SUBMISSION FLAGGING
+      console.log("flagging job scheduled");
+    });
+    if (job) {
+      jobsOfSubmission.push(job);
+    }
+
+    scheduledJobs.set(numAssignmentJobs + submmission.id, jobsOfSubmission);
+  }
+};
+
 const scheduleAllJobs = async function (): Promise<void> {
   // find all assignments
   const assignments = await Assignment.find();
   for (const assignment of assignments) {
     scheduleJobsForAssignment(assignment);
+    numAssignmentJobs++;
   }
+  // Find all submissions
+  const submissions = await Submission.find();
+  for (const submission of submissions) {
+    scheduleJobsForSubmission(submission);
+  }
+
   let counter = 0;
   for (const element of scheduledJobs) {
     counter += element[1].length;
