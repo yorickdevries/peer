@@ -1,7 +1,13 @@
 <template>
     <div v-if="files" class="d-flex">
         <div style="flex-shrink: 0; max-width: 40%">
-            <FileTree :files="files" :selectedFile="selected" @selected="onSelect" :startCollapsed="singleFile" />
+            <FileTree
+                @selected="onSelect"
+                :commentedFiles="commentedFiles"
+                :files="files"
+                :selectedFile="selected"
+                :startCollapsed="singleFile"
+            />
         </div>
         <div
             v-bind:class="{ 'ml-3': !singleFile }"
@@ -14,10 +20,10 @@
             <b-alert variant="primary" show v-if="!content || content.length === 0">This file is empty</b-alert>
             <CodeAnnotator
                 v-else
+                :comments="comments"
                 :content="content"
                 :readOnly="readOnly"
-                :submissionId="submissionId"
-                :reviewId="reviewId"
+                :review="review"
                 :selectedFile="selected"
             />
             <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
@@ -35,6 +41,7 @@
 </template>
 
 <script>
+import api from "../../api/api"
 import hljs from "highlight.js"
 import "highlight.js/styles/atom-one-light.css"
 import JSZip from "jszip"
@@ -43,18 +50,54 @@ import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 import api from "../../api/api"
 
 export default {
-    props: ["fileUrl", "readOnly", "submissionId", "reviewId"],
+    props: ["fileUrl", "readOnly", "reviewId"],
     components: { FileTree, CodeAnnotator },
     data() {
         return {
+            comments: [],
             content: null,
             files: null,
             selected: null,
             showWarning: false,
-            showFile: false
+            showFile: false,
+            review: null
         }
     },
+    async created() {
+        const file = await this.getFile()
+        const isPossibleZipFile = !file.type.includes("text/plain")
+
+        // If we get a zip file, we'll try to unzip it and show one of the code files
+        if (isPossibleZipFile) {
+            this.loadZip(file).catch(() => {
+                this.loadSingleFile(file)
+            })
+        } else {
+            this.loadSingleFile(file)
+        }
+        await this.fetchReview()
+        await this.fetchComments()
+    },
     methods: {
+        async fetchReview() {
+            if (this.reviewId) {
+                const res = await api.reviewofsubmissions.get(this.reviewId)
+                this.review = res.data
+            }
+        },
+        async fetchComments() {
+            if (this.review) {
+                try {
+                    const res = await api.codeannotations.getAnnotations(this.review.id)
+                    const rows = res.data
+                    for (const row of rows) {
+                        this.comments.push(row)
+                    }
+                } catch (error) {
+                    console.error(error)
+                }
+            }
+        },
         async getFile() {
             return await fetch(this.fileUrl)
                 .then(res => res.blob())
@@ -127,22 +170,12 @@ export default {
             }
         }
     },
-    async created() {
-        const file = await this.getFile()
-        const isPossibleZipFile = !file.type.includes("text/plain")
-
-        // If we get a zip file, we'll try to unzip it and show one of the code files
-        if (isPossibleZipFile) {
-            this.loadZip(file).catch(() => {
-                this.loadSingleFile(file)
-            })
-        } else {
-            this.loadSingleFile(file)
-        }
-    },
     computed: {
         singleFile() {
             return this.files && this.files.length <= 1
+        },
+        commentedFiles() {
+            return new Set(this.comments.map(comment => comment.selectedFile))
         }
     }
 }

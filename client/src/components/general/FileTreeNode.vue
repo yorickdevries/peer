@@ -5,15 +5,21 @@
             <icon class="text-muted" name="folder"></icon>
             {{ name }}
         </div>
-        <div v-else @click="onSelect" v-bind:class="`${background} file`" role="button">
-            <icon class="text-muted" name="code"></icon>
-            <span class="filename"> {{ name }}</span>
+        <div v-else @click="onSelect" v-bind:class="`${background} file d-flex justify-content-between`" role="button">
+            <div>
+                <icon class="text-muted" name="code"></icon>
+                <span class="filename"> {{ name }}</span>
+            </div>
+            <div v-if="commented">
+                <icon class="text-muted" name="comments"></icon>
+            </div>
         </div>
 
         <b-collapse style="margin-left: 1.5rem" v-if="dir" :visible="!collapsed">
             <FileTreeNode
                 @selected="onChildSelect"
                 v-for="key in Object.keys(children)"
+                :commentedFiles="commentedFiles"
                 :key="key"
                 :propName="key"
                 :propChildren="children[key]"
@@ -26,7 +32,7 @@
 <script>
 export default {
     name: "FileTreeNode",
-    props: ["propName", "propChildren", "selected"],
+    props: ["commentedFiles", "propName", "propChildren", "selected"],
     data() {
         return {
             name: null,
@@ -77,6 +83,10 @@ export default {
             } else {
                 return "bg-white"
             }
+        },
+        commented() {
+            console.log(this.commentedFiles)
+            return this.commentedFiles.has(this.children.path)
         }
     }
 }
