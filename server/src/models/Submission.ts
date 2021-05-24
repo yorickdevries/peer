@@ -92,6 +92,11 @@ export default class Submission extends BaseModel {
   @ManyToOne((_type) => User, { eager: true })
   approvingTA: User | null;
 
+  @Column("boolean", { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  flaggedByServer: boolean | null;
+
   constructor(
     user: User,
     group: Group,
@@ -109,6 +114,7 @@ export default class Submission extends BaseModel {
     this.approvalByTA = null;
     this.commentByTA = null;
     this.approvingTA = null;
+    this.flaggedByServer = null;
   }
 
   // validation: check whether the group is in the assingment and the user in the group
