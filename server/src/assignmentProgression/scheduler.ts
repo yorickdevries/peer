@@ -8,6 +8,7 @@ import {
   startCloseSubmissionForAssignmentWorker,
   startDistributeReviewsForAssignmentWorker,
   startOpenFeedbackForAssignmentWorker,
+  startSubmissionFlaggingWorker,
 } from "../workers/pool";
 
 // map assignments to jobs
@@ -16,7 +17,7 @@ const scheduledJobs: Map<number, schedule.Job[]> = new Map<
   schedule.Job[]
 >();
 
-var numAssignmentJobs = 0;
+let numAssignmentJobs = 0;
 
 const cancelJobsForAssignment = function (assignment: Assignment) {
   const jobsOfAssignment = scheduledJobs.get(assignment.id);
@@ -103,22 +104,22 @@ const cancelJobsForSubmission = function (submission: Submission) {
   scheduledJobs.delete(submission.id);
 };
 
-const scheduleJobsForSubmission = function (submmission: Submission): void {
-  cancelJobsForSubmission(submmission);
+const scheduleJobsForSubmission = function (submission: Submission): void {
+  cancelJobsForSubmission(submission);
 
   // if the submission hasn't been flagged by the server yet
-  if (submmission.flaggedByServer == null) {
+  if (submission.flaggedByServer == null) {
     const jobsOfSubmission = [];
     const now = new Date();
     const job = schedule.scheduleJob(now, () => {
       //TODO: ADD ACTUAL SUBMISSION FLAGGING
-      console.log("flagging job scheduled");
+      startSubmissionFlaggingWorker(submission.id);
     });
     if (job) {
       jobsOfSubmission.push(job);
     }
 
-    scheduledJobs.set(numAssignmentJobs + submmission.id, jobsOfSubmission);
+    scheduledJobs.set(numAssignmentJobs + submission.id, jobsOfSubmission);
   }
 };
 
