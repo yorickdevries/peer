@@ -3,32 +3,35 @@
         <b-alert v-if="readOnly" show variant="warning">
             The file is read only, so annotations cannot be added, removed or edited.
         </b-alert>
-        <b-alert v-else-if="!review || review.submitted" show variant="warning">
-            The review is submitted, so any annotations will not be saved.
+        <b-alert v-else-if="reviewSubmitted" show variant="warning">
+            The review is submitted, so annotations cannot be added, removed or edited.
         </b-alert>
         <b-alert :show="!showCode" variant="primary">LOADING {{ review ? "REVIEW" : "SUBMISSION" }}</b-alert>
 
         <!-- The buttons and text area for the actual comments, somewhat primitive -->
         <!-- TODO: Upgrade the look of these buttons -->
-        <!-- Only show annotation buttons if this component is inside a review -->
-        <form @submit.prevent="writeComment" v-if="!readOnly && review && showAnnotations">
-            <button type="submit" v-if="!writing">Leave a comment on highlighted part</button>
-        </form>
-        <form @submit.prevent="submitComment" @reset.prevent="deleteSelection" v-if="writing && !readOnly">
-            <button type="submit">Submit your comment</button>
-            <button type="reset">Delete selection and comment</button>
-            <b-form-textarea
-                placeholder="Type your comment"
-                v-model="commentText"
-                rows="3"
-                max-rows="5"
-            ></b-form-textarea>
-        </form>
+        <!-- Only show annotation buttons if this component is inside a non-submitted review -->
+        <div v-if="!readOnly && !reviewSubmitted && showAnnotations">
+            <form @submit.prevent="writeComment">
+                <button type="submit" v-if="!writing">Leave a comment on highlighted part</button>
+            </form>
+            <form @submit.prevent="submitComment" @reset.prevent="deleteSelection" v-if="writing">
+                <button type="submit">Submit your comment</button>
+                <button type="reset">Delete selection and comment</button>
+                <b-form-textarea
+                    placeholder="Type your comment"
+                    v-model="commentText"
+                    rows="3"
+                    max-rows="5"
+                ></b-form-textarea>
+            </form>
+        </div>
 
         <b-card v-show="showCode">
             <!--
                 Displays the code with annotations in the mode specified by the readOnly variable.
                 This is used to allow students to annotate code during the review stage, where readOnly is then false.
+                When the review is submitted, but viewed in the review stage, readOnly will be true.
                 This is also used to display the feedback received, where readOnly is then true.
              -->
             <CodeAnnotations
@@ -38,7 +41,7 @@
                 :content="content"
                 :comments="comments"
                 :selectedFile="selectedFile"
-                :readOnly="readOnly"
+                :readOnly="readOnly || reviewSubmitted"
             />
             <!--
                 Display the code without annotations.
@@ -61,6 +64,9 @@ export default {
     computed: {
         showAnnotations() {
             return !(this.review == null)
+        },
+        reviewSubmitted() {
+            return this.review && this.review.submitted
         }
     },
     data() {
