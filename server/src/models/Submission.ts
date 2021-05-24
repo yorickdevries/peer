@@ -97,6 +97,12 @@ export default class Submission extends BaseModel {
   @IsBoolean()
   flaggedByServer: boolean | null;
 
+  @Column("text", { nullable: true })
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  commentByServer: string | null;
+
   constructor(
     user: User,
     group: Group,
@@ -115,6 +121,7 @@ export default class Submission extends BaseModel {
     this.commentByTA = null;
     this.approvingTA = null;
     this.flaggedByServer = null;
+    this.commentByServer = null;
   }
 
   // validation: check whether the group is in the assingment and the user in the group
