@@ -13,11 +13,11 @@ const submissionFlagging = async function (
   const submission = await Submission.findOneOrFail(submissionId);
 
   const filePath = submission.file.getPath();
-  await fsPromises.readFile(filePath).then((contents) => {
-    console.log(contents);
+  await fsPromises.readFile(filePath).then((_contents) => {
+    console.log("Found file contents");
   });
 
-  return `Flagged file: ${filePath}`;
+  return `Flagged file: ${submission.file.getFileNamewithExtension()}`;
 };
 
 export default submissionFlagging;
