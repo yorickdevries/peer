@@ -196,7 +196,7 @@ export default {
         },
         async onEditedComment(index, updatedText) {
             let comment = this.comments[index]
-            const res = await api.codeannotations.patchAnnotation(comment.commentId, updatedText)
+            const res = await api.codeannotations.patchAnnotation(comment.id, updatedText)
             // Update only the comment text
             comment.commentText = res.data.commentText
             this.comments.splice(index, 1, comment)
