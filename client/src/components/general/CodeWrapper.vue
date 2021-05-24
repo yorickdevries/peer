@@ -107,6 +107,32 @@ export default {
             // of language names / aliases
             const highlighted = hljs.highlightAuto(text)
             this.content = highlighted.value.split(/\r?\n/g)
+
+            const unopened = /^[^<\n]*<\/span>/gm
+            const unclosed = /<span class=\\?"([\w-]*)\\?">[^<\n]*$/gm
+            const stack = []
+            for (let i = 0; i < this.content.length; i++) {
+                const unopenedMatch = unopened.exec(this.content[i]) // needs an opening span
+                const unclosedMatch = unclosed.exec(this.content[i]) // needs a closing span
+
+                if (stack.length > 0) {
+                    if (!unclosedMatch) {
+                        this.content[i] = `<span class="${stack[stack.length - 1]}">${this.content[i]}`
+                    }
+                    if (!unopenedMatch) {
+                        this.content[i] += "</span>"
+                    }
+                }
+
+                if (unopenedMatch) {
+                    stack.pop()
+                }
+
+                if (unclosedMatch) {
+                    stack.push(unclosedMatch[1])
+                }
+            }
+
             this.showFile = true
         },
         async verifyTextContent(text) {
