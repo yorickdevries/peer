@@ -12,6 +12,8 @@ import { clear, advanceTo } from "jest-date-mock";
 import UserRole from "../../src/enum/UserRole";
 import { AssignmentState } from "../../src/enum/AssignmentState";
 import AssignmentType from "../../src/enum/AssignmentType";
+import _ from "lodash";
+import expectFlaggedSubmission from "../helpers/expectedFlaggedSubmission";
 
 describe("Integration", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -740,7 +742,13 @@ describe("Integration", () => {
       .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject([submission1]);
+
+    // To support submission flagging
+    const flaggedSubmission1 = expectFlaggedSubmission(submission1, false);
+
+    expect(JSON.parse(res.text)[0]).toEqual(
+      expect.objectContaining(flaggedSubmission1)
+    );
 
     // get final submissions for this assignment by this group
     res = await request(server)
@@ -750,7 +758,9 @@ describe("Integration", () => {
       .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject(submission1);
+    expect(JSON.parse(res.text)).toEqual(
+      expect.objectContaining(flaggedSubmission1)
+    );
 
     // get all submissions for this assignment as teacher
     res = await request(server)
@@ -758,11 +768,20 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject([
-      submission1,
-      unsubmittedSubmission,
-      submission2,
-    ]);
+
+    const flaggedSubmission2 = expectFlaggedSubmission(submission2, false);
+
+    expect(JSON.parse(res.text)[0]).toEqual(
+      expect.objectContaining(flaggedSubmission1)
+    );
+
+    expect(JSON.parse(res.text)[1]).toEqual(
+      expect.objectContaining(unsubmittedSubmission)
+    );
+
+    expect(JSON.parse(res.text)[2]).toEqual(
+      expect.objectContaining(flaggedSubmission2)
+    );
 
     // get a single submission as teacher
     res = await request(server)
@@ -770,7 +789,9 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject(submission1);
+    expect(JSON.parse(res.text)).toEqual(
+      expect.objectContaining(flaggedSubmission1)
+    );
 
     // close the submission phase of an assingment for the course
     res = await request(server)
