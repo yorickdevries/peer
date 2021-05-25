@@ -227,7 +227,8 @@ pre {
             &.comment {
                 border-left: 1px solid var(--gray);
                 border-right: 1px solid var(--gray);
-                background-color: #f8f8f8;
+                background-color: rgba(0, 0, 0, 0.03);
+                margin-right: 1ch;
             }
 
             &.comment_start {
@@ -263,6 +264,10 @@ pre {
             &::v-deep span {
                 font-family: inherit;
             }
+        }
+
+        &.collapse {
+            margin-right: 1ch;
         }
     }
 
