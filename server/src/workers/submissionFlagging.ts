@@ -14,8 +14,8 @@ import ServerFlagReason from "../enum/ServerFlagReason";
  */
 const verifyTextContent = async function (text: string) {
   // A regular expression to only match non-whitespace characters.
-  const nonWhiteSpace = /\S*/gu;
-  return nonWhiteSpace.exec(text) !== null;
+  const nonWhiteSpace = /\S+/gm;
+  return nonWhiteSpace.exec(text) !== null; // If we find non-whitespace characters, this file is probably not empty
 };
 
 const loadZip = async function (fileBuffer: Buffer) {
@@ -61,9 +61,9 @@ const submissionFlagging = async function (
   await submission.save();
 
   if (flag) {
-    return `Flagged submission: ${submission.id} for reason : "${reason}"`;
+    return `Flagged submission ${submission.id} for reason : "${reason}"`;
   } else {
-    return "";
+    return `Submission ${submission.id} is okay.`;
   }
 };
 
