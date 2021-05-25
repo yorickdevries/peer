@@ -42,8 +42,10 @@
                         <div v-if="editing && editingEndingLine === index + 1">
                             <b-form @submit="submitEditedComment(index + 1)" @reset="cancelEdit">
                                 <b-form-textarea v-model="commentText" rows="3" max-rows="5"></b-form-textarea>
-                                <b-button type="submit" variant="primary">Submit</b-button>
-                                <b-button type="reset" variant="danger">Cancel</b-button>
+                                <div class="float-right">
+                                    <b-button type="reset" variant="secondary">Cancel</b-button>
+                                    <b-button type="submit" variant="primary">Submit</b-button>
+                                </div>
                             </b-form>
                         </div><div class="d-flex" v-else>
                             <span class="mr-auto">{{ comments[lineNumbers[index + 1]].commentText }}</span>
