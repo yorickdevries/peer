@@ -1,11 +1,11 @@
 <template>
     <pre><div class="code-annotations-wrapper">
             <div
-                class="position-relative code-annotations-line"
+                class="code-annotations-line"
                 v-for="(line, index) in content"
                 :key="index + 'code'"
             >
-                <div class="d-flex">
+                <div class="position-relative d-flex">
                     <code
                         class="code-annotations-linenr"
                         :linenr="index + 1"
@@ -24,15 +24,15 @@
                         role="button"
                         @click="toggleComment(lineNumbers[index + 1])"
                     ></code>
+                    <icon
+                        v-if="isStartingLine(index + 1)"
+                        class="position-absolute my-auto arrow"
+                        :class="{ rotate: comment[lineNumbers[index + 1]]}"
+                        role="button"
+                        name="chevron-up"
+                        @click.native="toggleComment(lineNumbers[index + 1])"
+                    />
                 </div>
-                <icon
-                    v-if="isStartingLine(index + 1)"
-                    class="position-absolute mt-1 mr-2 arrow"
-                    :class="{ rotate: comment[lineNumbers[index + 1]]}"
-                    role="button"
-                    name="chevron-up"
-                    @click.native="toggleComment(lineNumbers[index + 1])"
-                />
                 <b-collapse
                     v-if="isEndingLine(index + 1)"
                     v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }"
@@ -229,6 +229,7 @@ pre {
                 border-right: 1px solid var(--gray);
                 background-color: rgba(0, 0, 0, 0.03);
                 margin-right: 1ch;
+                padding-right: 7ch;
             }
 
             &.comment_start {
@@ -286,8 +287,10 @@ pre {
 
 .arrow {
     top: 0;
+    bottom: 0;
     right: 0;
     z-index: 1;
+    margin-right: 2ch;
     transition: transform 0.2s ease-in-out;
 }
 
