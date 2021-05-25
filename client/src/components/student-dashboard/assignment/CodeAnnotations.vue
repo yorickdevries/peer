@@ -287,6 +287,7 @@ pre {
     word-wrap: break-word;
     overflow-wrap: break-word;
     word-break: break-all;
+    white-space: pre-wrap;
 }
 
 .arrow {
