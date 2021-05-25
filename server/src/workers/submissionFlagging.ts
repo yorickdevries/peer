@@ -57,7 +57,9 @@ const submissionFlagging = async function (
       return flagged;
     });
   submission.flaggedByServer = flag;
-  submission.commentByServer = reason;
+
+  submission.commentByServer = flag ? reason : null;
+
   await submission.save();
 
   if (flag) {
