@@ -41,7 +41,7 @@ const submissionFlagging = async function (
     .then(async (files) => {
       let flagged = false;
       for (const file of files) {
-        flagged = !(await file!.async("string").then(verifyTextContent));
+        flagged = !flagged && !(await file!.async("string").then(verifyTextContent)); // To make sure the flags remains true if we have already encountered a suspicious file
       }
       if (flagged) reason = ServerFlagReason.EMPTY_FILES_IN_ZIP;
       return flagged;
