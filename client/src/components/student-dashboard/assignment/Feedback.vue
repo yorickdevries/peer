@@ -13,7 +13,7 @@
                     <b-tab
                         v-for="feedbackReview in feedbackReviews"
                         :key="feedbackReview.id"
-                        :title="feedbackReview.id"
+                        :title="`${feedbackReview.id}`"
                     >
                         <FileAnnotator
                             :reviewId="feedbackReview.id"

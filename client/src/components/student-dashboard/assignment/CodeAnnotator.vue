@@ -3,33 +3,36 @@
         <b-alert v-if="readOnly" show variant="warning">
             The file is read only, so annotations cannot be added, removed or edited.
         </b-alert>
-        <b-alert v-else-if="!review || review.submitted" show variant="warning">
-            The review is submitted, so any annotations will not be saved.
+        <b-alert v-else-if="reviewSubmitted" show variant="warning">
+            The review is submitted, so annotations cannot be added, removed or edited.
         </b-alert>
         <b-alert :show="!showCode" variant="primary">LOADING {{ review ? "REVIEW" : "SUBMISSION" }}</b-alert>
 
         <!-- The buttons and text area for the actual comments, somewhat primitive -->
         <!-- TODO: Upgrade the look of these buttons -->
-        <!-- Only show annotation buttons if this component is inside a review -->
-        <form @submit.prevent="writeComment" v-if="!readOnly && review && showAnnotations">
-            <button type="submit" v-if="!writing">Leave a comment on highlighted part</button>
-        </form>
-        <form @submit.prevent="submitComment" @reset.prevent="deleteSelection" v-if="writing && !readOnly">
-            <button type="submit">Submit your comment</button>
-            <button type="reset">Delete selection and comment</button>
-            <b-form-textarea
-                placeholder="Please type your comment."
-                v-model="commentText"
-                :state="commentText.length <= maxCommentLength"
-                rows="3"
-                max-rows="5"
-            ></b-form-textarea>
-        </form>
+        <!-- Only show annotation buttons if this component is inside a non-submitted review -->
+        <div v-if="!readOnly && !reviewSubmitted && showAnnotations">
+            <form @submit.prevent="writeComment">
+                <button type="submit" v-if="!writing">Leave a comment on highlighted part</button>
+            </form>
+            <form @submit.prevent="submitComment" @reset.prevent="deleteSelection" v-if="writing">
+                <button type="submit">Submit your comment</button>
+                <button type="reset">Delete selection and comment</button>
+                <b-form-textarea
+                    placeholder="Type your comment"
+                    :state="commentText.length <= maxCommentLength"
+                    v-model="commentText"
+                    rows="3"
+                    max-rows="5"
+                ></b-form-textarea>
+            </form>
+        </div>
 
         <b-card v-show="showCode">
             <!--
                 Displays the code with annotations in the mode specified by the readOnly variable.
                 This is used to allow students to annotate code during the review stage, where readOnly is then false.
+                When the review is submitted, but viewed in the review stage, readOnly will be true.
                 This is also used to display the feedback received, where readOnly is then true.
              -->
             <CodeAnnotations
@@ -39,7 +42,7 @@
                 :content="content"
                 :comments="comments"
                 :selectedFile="selectedFile"
-                :readOnly="readOnly"
+                :readOnly="readOnly || reviewSubmitted"
                 :maxCommentLength="maxCommentLength"
             />
             <!--
@@ -59,17 +62,17 @@ import CodeAnnotations from "./CodeAnnotations"
 export default {
     mixins: [notifications],
     components: { CodeAnnotations },
-    // either "reviewId" or "submissionId" is passed, not both
-    props: ["reviewId", "submissionId", "readOnly", "content", "selectedFile"],
+    props: ["comments", "content", "selectedFile", "readOnly", "review"],
     computed: {
         showAnnotations() {
-            return !(this.reviewId == null)
+            return !(this.review == null)
+        },
+        reviewSubmitted() {
+            return this.review && this.review.submitted
         }
     },
     data() {
         return {
-            review: null,
-            submission: null,
             showCode: false,
             writing: false,
             highlightedText: null,
@@ -77,44 +80,15 @@ export default {
             endLineNumber: null,
             commentText: "",
             highlightedFile: null,
-            comments: [],
             maxCommentLength: null
         }
     },
     async created() {
-        await this.fetchReview()
-        await this.fetchSubmission()
-        await this.fetchComments()
         await this.getMaxCommentLength()
         this.showCode = true
         this.writing = false
     },
     methods: {
-        async fetchReview() {
-            if (this.reviewId) {
-                const res = await api.reviewofsubmissions.get(this.reviewId)
-                this.review = res.data
-            }
-        },
-        async fetchSubmission() {
-            if (this.submissionId) {
-                const res = await api.submissions.get(this.submissionId)
-                this.submission = res.data
-            }
-        },
-        async fetchComments() {
-            if (this.review) {
-                try {
-                    const res = await api.codeannotations.getAnnotations(this.review.id)
-                    const rows = res.data
-                    for (const row of rows) {
-                        this.pushComment(row)
-                    }
-                } catch (error) {
-                    this.comments = []
-                }
-            }
-        },
         async getMaxCommentLength() {
             this.maxCommentLength = await api.codeannotations.getMaxCommentLength()
             this.maxCommentLength = this.maxCommentLength.data
@@ -206,7 +180,7 @@ export default {
                     this.selectedFile
                 )
                 const comment = res.data
-                this.pushComment(comment)
+                this.comments.push(comment)
             } catch (error) {
                 this.showErrorMessage({ message: "Unable to submit comment" })
             }
@@ -218,16 +192,6 @@ export default {
             this.endLineNumber = null
             this.highlightedFile = null
         },
-        // Add comment to comments array
-        pushComment(comment) {
-            this.comments.push({
-                commentId: comment.id,
-                commentText: comment.commentText,
-                startLineNumber: comment.startLineNumber,
-                endLineNumber: comment.endLineNumber,
-                selectedFile: comment.selectedFile
-            })
-        },
         deleteSelection() {
             this.commentText = ""
             this.highlightedText = null
@@ -237,19 +201,15 @@ export default {
             this.showSuccessMessage({ message: "Your selection and comment was deleted" })
         },
         onDeleteComment(index) {
-            if (index < 0 || index >= this.comments.length) {
-                return
-            }
-
             // Remove comment from comment array
             const removedComment = this.comments.splice(index, 1)
             // Remove comment from back-end
-            api.codeannotations.deleteAnnotation(removedComment[0].commentId)
+            api.codeannotations.deleteAnnotation(removedComment[0].id)
             this.showSuccessMessage({ message: "Successfully deleted comment" })
         },
         async onEditedComment(index, updatedText) {
             let comment = this.comments[index]
-            const res = await api.codeannotations.patchAnnotation(comment.commentId, updatedText)
+            const res = await api.codeannotations.patchAnnotation(comment.id, updatedText)
             // Update only the comment text
             comment.commentText = res.data.commentText
             this.comments.splice(index, 1, comment)

@@ -1,7 +1,13 @@
 <template>
     <div v-if="files" class="d-flex">
         <div style="flex-shrink: 0; max-width: 40%">
-            <FileTree :files="files" :selectedFile="selected" @selected="onSelect" :startCollapsed="singleFile" />
+            <FileTree
+                @selected="onSelect"
+                :commentedFiles="commentedFiles"
+                :files="files"
+                :selectedFile="selected"
+                :startCollapsed="singleFile"
+            />
         </div>
         <div
             v-bind:class="{ 'ml-3': !singleFile }"
@@ -14,10 +20,10 @@
             <b-alert variant="primary" show v-if="!content || content.length === 0">This file is empty</b-alert>
             <CodeAnnotator
                 v-else
+                :comments="comments"
                 :content="content"
                 :readOnly="readOnly"
-                :submissionId="submissionId"
-                :reviewId="reviewId"
+                :review="review"
                 :selectedFile="selected"
             />
             <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
@@ -36,34 +42,100 @@
 
 <script>
 import hljs from "highlight.js"
-import "highlight.js/styles/default.css"
+import "highlight.js/styles/atom-one-light.css"
 import JSZip from "jszip"
 import FileTree from "./FileTree"
 import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
+import api from "../../api/api"
 
 export default {
     props: ["fileUrl", "readOnly", "submissionId", "reviewId"],
     components: { FileTree, CodeAnnotator },
     data() {
         return {
+            comments: [],
             content: null,
             files: null,
             selected: null,
             showWarning: false,
-            showFile: false
+            showFile: false,
+            review: null
         }
     },
+    async created() {
+        const file = await this.getFile()
+        const isPossibleZipFile = !file.type.includes("text/plain")
+
+        // If we get a zip file, we'll try to unzip it and show one of the code files
+        if (isPossibleZipFile) {
+            this.loadZip(file).catch(() => {
+                this.loadSingleFile(file)
+            })
+        } else {
+            this.loadSingleFile(file)
+        }
+        await this.fetchReview()
+        await this.fetchComments()
+    },
     methods: {
+        async fetchReview() {
+            if (this.reviewId) {
+                const res = await api.reviewofsubmissions.get(this.reviewId)
+                this.review = res.data
+            }
+        },
+        async fetchComments() {
+            if (this.review) {
+                try {
+                    const res = await api.codeannotations.getAnnotations(this.review.id)
+                    const rows = res.data
+                    for (const row of rows) {
+                        this.comments.push(row)
+                    }
+                } catch (error) {
+                    console.error(error)
+                }
+            }
+        },
         async getFile() {
             return await fetch(this.fileUrl)
                 .then(res => res.blob())
                 .catch(console.error)
         },
+        fixMultiLineHighlighting(lines) {
+            // For each line, this function checks for any opening or closing span tags that do not have their respective counterpart.
+            // If the stack is not empty, we place the current line in a span with the class name from the top of the stack
+            // If an opening span is found, its class name is pushed to the stack because the following lines need the same highlight.
+            // If a closing span is found, the top class name is popped from the stack because that highlight is done.
+            const unopened = /<span[^<]*<\/span>|(<\/span>)/gm
+            const unclosed = /<span class=\\?"([\w-]*)\\?">[^<]*(?=<span|$)/gm
+            const stack = []
+            for (let i = 0; i < lines.length; i++) {
+                const unopenedMatch = [...lines[i].matchAll(unopened)].map(x => x[1]) // needs an opening span
+                const unclosedMatch = [...lines[i].matchAll(unclosed)].map(x => x[1]) // needs a closing span
+
+                if (stack.length > 0) {
+                    lines[i] = `<span class="${stack[stack.length - 1]}">${lines[i]}</span>`
+                }
+
+                unopenedMatch.filter(x => x).forEach(() => stack.pop())
+                unclosedMatch.forEach(className => stack.push(className))
+            }
+
+            return lines
+        },
         async highlightContent(text) {
-            // hljs.highlightAuto expects a string (code) and optionally an array
-            // of language names / aliases
-            const highlighted = hljs.highlightAuto(text)
-            this.content = highlighted.value.split(/\r?\n/g)
+            const fileExtension = this.selected.split(".").pop()
+            let highlighted
+
+            if (hljs.getLanguage(fileExtension)) {
+                highlighted = hljs.highlight(text, { language: fileExtension })
+            } else {
+                highlighted = hljs.highlightAuto(text)
+            }
+
+            this.content = this.fixMultiLineHighlighting(highlighted.value.split(/\r?\n/g))
+
             this.showFile = true
         },
         async verifyTextContent(text) {
@@ -84,9 +156,22 @@ export default {
                 })
                 .then(files => (this.files = files))
         },
+        async getSingleFileName() {
+            return new Promise((resolve, reject) => {
+                if (this.submissionId) {
+                    resolve(api.submissions.get(this.submissionId).then(res => res.data.file))
+                } else if (this.reviewId) {
+                    resolve(api.reviewofsubmissions.getFileMetadata(this.reviewId).then(res => res.data))
+                } else {
+                    reject("Found no submission or review id")
+                }
+            })
+                .then(file => file.name + file.extension)
+                .catch(console.warn)
+        },
         async loadSingleFile(file) {
             this.showFile = false
-            this.selected = "file"
+            this.selected = await this.getSingleFileName()
             this.files = [{ dir: false, name: this.selected }]
 
             Promise.resolve(file.text())
@@ -107,22 +192,12 @@ export default {
             }
         }
     },
-    async created() {
-        const file = await this.getFile()
-        const isPossibleZipFile = !file.type.includes("text/plain")
-
-        // If we get a zip file, we'll try to unzip it and show one of the code files
-        if (isPossibleZipFile) {
-            this.loadZip(file).catch(() => {
-                this.loadSingleFile(file)
-            })
-        } else {
-            this.loadSingleFile(file)
-        }
-    },
     computed: {
         singleFile() {
             return this.files && this.files.length <= 1
+        },
+        commentedFiles() {
+            return new Set(this.comments.map(comment => comment.selectedFile))
         }
     }
 }

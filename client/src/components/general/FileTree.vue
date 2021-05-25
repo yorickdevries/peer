@@ -9,6 +9,7 @@
                 <FileTreeNode
                     @selected="onSelect"
                     v-for="key in Object.keys(root)"
+                    :commentedFiles="commentedFiles"
                     :key="key"
                     :propName="key"
                     :propChildren="root[key]"
@@ -23,13 +24,7 @@
 import FileTreeNode from "./FileTreeNode"
 
 export default {
-    // "files" is an array of JSZip ZipObjects.
-    // "selectedFile" is a path to the selected file
-    props: {
-        files: Array,
-        selectedFile: String,
-        startCollapsed: Boolean
-    },
+    props: ["commentedFiles", "files", "selectedFile", "startCollapsed"],
     components: {
         FileTreeNode
     },
