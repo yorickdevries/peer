@@ -59,7 +59,7 @@ const submissionFlagging = async function (
   await submission.save();
 
   if (flag) {
-    return `Flagged file: ${submission.file.getFileNamewithExtension()} for reason : "${reason}"`;
+    return `Flagged submission: ${submission.id} for reason : "${reason}"`;
   } else {
     return "";
   }
