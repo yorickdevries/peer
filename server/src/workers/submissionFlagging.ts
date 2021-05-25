@@ -23,7 +23,7 @@ const loadZip = async function (fileBuffer: Buffer) {
     return Object.keys(zip.files)
       .map((name) => zip.file(name))
       .filter((f) => f) // filter out null files
-      .filter((f) => !f?.dir);
+      .filter((f) => !f!.dir);
   });
 };
 
@@ -41,9 +41,7 @@ const submissionFlagging = async function (
     .then(async (files) => {
       let flagged = false;
       for (const file of files) {
-        flagged = !(
-          (await file?.async("string").then(verifyTextContent)) ?? true
-        );
+        flagged = !(await file!.async("string").then(verifyTextContent));
       }
       if (flagged) reason = ServerFlagReason.EMPTY_FILES_IN_ZIP;
       return flagged;
