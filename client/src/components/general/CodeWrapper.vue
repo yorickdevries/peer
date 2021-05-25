@@ -108,7 +108,7 @@ export default {
             // If an opening span is found, its class name is pushed to the stack because the following lines need the same highlight.
             // If a closing span is found, the top class name is popped from the stack because that highlight is done.
             const unopened = /<span[^<]*<\/span>|(<\/span>)/gm
-            const unclosed = /<span class=\\?"([\w-]*)\\?">[^<]*(?=<span|$)/gm
+            const unclosed = /<span.*?<\/span>|<span class=\\?"(.*?)\\?">/gm
             const stack = []
             for (let i = 0; i < lines.length; i++) {
                 const unopenedMatch = [...lines[i].matchAll(unopened)].map(x => x[1]) // needs an opening span
@@ -129,7 +129,7 @@ export default {
             let highlighted
 
             if (hljs.getLanguage(fileExtension)) {
-                highlighted = hljs.highlight(text, { language: fileExtension })
+                highlighted = hljs.highlight(text, { language: fileExtension, ignoreIllegals: true })
             } else {
                 highlighted = hljs.highlightAuto(text)
             }

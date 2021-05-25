@@ -128,7 +128,7 @@ export default {
                 codeBlock,
                 (match, delimiter, language, separator, code) => {
                     if (hljs.getLanguage(language)) {
-                        code = hljs.highlight(code, { language }).value
+                        code = hljs.highlight(code, { language, ignoreIllegals: true }).value
                     } else {
                         code = language + separator + code
                     }
