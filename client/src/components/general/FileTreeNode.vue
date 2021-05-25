@@ -85,7 +85,6 @@ export default {
             }
         },
         commented() {
-            console.log(this.commentedFiles)
             return this.commentedFiles.has(this.children.path)
         }
     }
