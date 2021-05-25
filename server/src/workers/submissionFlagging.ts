@@ -41,16 +41,18 @@ const submissionFlagging = async function (
     .then(async (files) => {
       let flagged = false;
       for (const file of files) {
-        flagged = (await file?.async("string").then(verifyTextContent)) ?? true;
+        flagged = !(
+          (await file?.async("string").then(verifyTextContent)) ?? true
+        );
       }
       if (flagged) reason = ServerFlagReason.EMPTY_FILES_IN_ZIP;
       return flagged;
     })
     .catch(async () => {
       // It's not a zip file, so try to read is as a single file with utf-8 encoding
-      const flagged = await fsPromises
+      const flagged = !(await fsPromises
         .readFile(filePath, "utf8")
-        .then(verifyTextContent);
+        .then(verifyTextContent));
       if (flagged) reason = ServerFlagReason.EMPTY;
       return flagged;
     });
