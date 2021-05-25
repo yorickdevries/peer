@@ -266,6 +266,10 @@ pre {
             }
         }
     }
+
+    span {
+        font-size: initial;
+    }
 }
 
 .collapse {
