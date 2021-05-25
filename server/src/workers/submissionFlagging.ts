@@ -17,7 +17,11 @@ const verifyTextContent = async function (text: string) {
   const nonWhiteSpace = /\S+/gm;
   return nonWhiteSpace.exec(text) !== null; // If we find non-whitespace characters, this file is probably not empty
 };
-
+/**
+ * Method to load a zip file
+ * @param fileBuffer The file buffer to load as zip file
+ * @returns An object with all the files if it was loaded, and an error otherwise
+ */
 const loadZip = async function (fileBuffer: Buffer) {
   return JSZip.loadAsync(fileBuffer).then((zip) => {
     return Object.keys(zip.files)
@@ -27,6 +31,11 @@ const loadZip = async function (fileBuffer: Buffer) {
   });
 };
 
+/**
+ * 
+ * @param submissionId The submission id to check for irregularities
+ * @returns `Flagged submission ${submission.id} for reason : "${reason}"` if any irregularity was found. `Submission ${submission.id} is okay.` if it was okay.
+ */
 const submissionFlagging = async function (
   submissionId: number
 ): Promise<string> {
