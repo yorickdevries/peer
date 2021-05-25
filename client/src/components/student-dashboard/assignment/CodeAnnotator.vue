@@ -23,6 +23,7 @@
                     v-model="commentText"
                     rows="3"
                     max-rows="5"
+                    class="overflow-auto"
                 ></b-form-textarea>
             </form>
         </div>

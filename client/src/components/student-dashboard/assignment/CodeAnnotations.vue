@@ -41,7 +41,7 @@
                     <b-card>
                         <div v-if="editing && editingEndingLine === index + 1">
                             <b-form @submit="submitEditedComment(index + 1)" @reset="cancelEdit">
-                                <b-form-textarea v-model="commentText" rows="3" max-rows="5"></b-form-textarea>
+                                <b-form-textarea v-model="commentText" rows="3" max-rows="5" class="overflow-auto"></b-form-textarea>
                                 <div class="float-right">
                                     <b-button type="reset" variant="secondary">Cancel</b-button>
                                     <b-button type="submit" variant="primary">Submit</b-button>
