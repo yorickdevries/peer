@@ -46,12 +46,17 @@ const submissionFlagging = async function (
       if (flagged) reason = ServerFlagReason.EMPTY_FILES_IN_ZIP;
       return flagged;
     })
-    .catch(async () => {
-      // It's not a zip file, so try to read is as a single file with utf-8 encoding
-      const flagged = !(await fsPromises
-        .readFile(filePath, "utf8")
-        .then(verifyTextContent));
-      if (flagged) reason = ServerFlagReason.EMPTY;
+    .catch(async (err: Error) => {
+      let flagged: boolean;
+      if (err.message.includes("Corrupted")) {// The zip file is corrupted, so just say it's corrupted
+        reason = ServerFlagReason.CORRUPTED_ZIP;
+        flagged = true;
+      } else {// It's probably not a zip file, so try to read is as a single file with utf-8 encoding
+        flagged = !(await fsPromises
+          .readFile(filePath, "utf8")
+          .then(verifyTextContent));
+        if (flagged) reason = ServerFlagReason.EMPTY;
+      }
       return flagged;
     });
   submission.flaggedByServer = flag;
