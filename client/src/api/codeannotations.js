@@ -25,6 +25,6 @@ export default {
         return client.patch(`codeannotations/${id}`, body)
     },
     getMaxCommentLength() {
-        return client.get("codeannotations/getCommentMaxLength")
+        return client.get("codeannotations/getMaxCommentLength")
     }
 }

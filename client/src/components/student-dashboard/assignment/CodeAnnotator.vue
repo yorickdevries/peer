@@ -188,7 +188,7 @@ export default {
             this.highlightedFile = this.selectedFile
         },
         async submitComment() {
-            if (this.commentText.length > this.commentMaxLength) {
+            if (this.commentText.length > this.maxCommentLength) {
                 this.showErrorMessage({ message: "Your annotation is too long." })
                 return
             }

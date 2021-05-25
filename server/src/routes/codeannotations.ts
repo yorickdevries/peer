@@ -15,7 +15,7 @@ import moment from "moment";
 
 const router = express.Router();
 
-router.get("/getCommentMaxLength", async (req, res) => {
+router.get("/getMaxCommentLength", async (req, res) => {
   const user = req.user;
   if (!user) {
     res
