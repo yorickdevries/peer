@@ -18,7 +18,9 @@
             <form @submit.prevent="submitComment" @reset.prevent="deleteSelection" v-if="writing">
                 <button type="submit">Submit your comment</button>
                 <button type="reset">Delete selection and comment</button>
+                <button type="button" @click="insertCodeBlock()">Insert inline code block</button>
                 <b-form-textarea
+                    ref="comment_ta"
                     placeholder="Type your comment"
                     v-model="commentText"
                     rows="3"
@@ -85,6 +87,18 @@ export default {
         this.writing = false
     },
     methods: {
+        insertCodeBlock() {
+            const cursorPosition = this.$refs.comment_ta.selectionStart
+            const untilCursor = this.commentText.substr(0, cursorPosition)
+            const fromCursor = this.commentText.substr(cursorPosition)
+            const codeBlockTemplate = "```@```"
+            this.commentText = `${untilCursor}${codeBlockTemplate.replace("@", "")}${fromCursor}`
+            this.$refs.comment_ta.$nextTick(() => {
+                this.$refs.comment_ta.focus()
+                this.$refs.comment_ta.selectionStart = cursorPosition + codeBlockTemplate.indexOf("@")
+                this.$refs.comment_ta.selectionEnd = this.$refs.comment_ta.selectionStart
+            })
+        },
         async writeComment() {
             const selection = window.getSelection()
             const selectedText = selection.toString()

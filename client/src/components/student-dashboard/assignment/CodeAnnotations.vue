@@ -46,7 +46,7 @@
                                 <b-button type="reset" variant="danger">Cancel</b-button>
                             </b-form>
                         </div><div class="d-flex" v-else>
-                            <span class="mr-auto">{{ comments[lineNumbers[index + 1]].commentText }}</span>
+                            <span class="mr-auto comment-text" v-html="highlightComment(index + 1)"></span>
                             <icon
                                 v-if="!readOnly"
                                 name="edit"
@@ -89,6 +89,9 @@
 </template>
 
 <script>
+import hljs from "highlight.js"
+import "highlight.js/styles/atom-one-light.css"
+
 export default {
     props: ["content", "comments", "selectedFile", "readOnly"],
     data() {
@@ -116,6 +119,22 @@ export default {
         },
         isCommentedOn(lineNr) {
             return lineNr >= 1 && lineNr <= this.lineNumbers.length && this.lineNumbers[lineNr] >= 0
+        },
+        highlightComment(lineNr) {
+            const codeBlock = /(```)([^\s]*)(\s?)((?:.|\s)*?)\1/g
+            const commentIndex = this.lineNumbers[lineNr]
+
+            return this.comments[commentIndex].commentText.replaceAll(
+                codeBlock,
+                (match, delimiter, language, separator, code) => {
+                    if (hljs.getLanguage(language)) {
+                        code = hljs.highlight(code, { language }).value
+                    } else {
+                        code = language + separator + code
+                    }
+                    return `<code><span style="white-space: pre">${code}</span></code>`
+                }
+            )
         },
         deleteComment(index) {
             this.$emit("deleted", index)
@@ -190,6 +209,29 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+code,
+.comment-text::v-deep {
+    background-color: inherit;
+    font-family: var(--font-family-monospace);
+    white-space: pre;
+    display: inline-block;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.comment-text {
+    display: inline-block;
+
+    &::v-deep code {
+        background-color: #f8f8f8;
+        display: inline-block;
+
+        span {
+            font-family: inherit !important;
+        }
+    }
+}
+
 pre {
     white-space: pre-line;
     display: inline-block;
@@ -216,12 +258,9 @@ pre {
         background-color: inherit;
 
         code {
-            background-color: inherit;
-            font-family: var(--font-family-monospace);
-            white-space: pre;
-            display: inline-block;
-            box-sizing: border-box;
-            width: 100%;
+            &::v-deep span {
+                font-family: inherit !important;
+            }
 
             &.comment {
                 border-left: 1px solid var(--gray);
@@ -257,10 +296,6 @@ pre {
 
             &.code-annotations-code {
                 padding-right: 7ch;
-            }
-
-            &::v-deep span {
-                font-family: inherit;
             }
         }
     }
