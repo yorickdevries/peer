@@ -17,8 +17,6 @@ const scheduledJobs: Map<number, schedule.Job[]> = new Map<
   schedule.Job[]
 >();
 
-let numAssignmentJobs = 0;
-
 const cancelJobsForAssignment = function (assignment: Assignment) {
   const jobsOfAssignment = scheduledJobs.get(assignment.id);
   if (jobsOfAssignment) {
@@ -95,7 +93,7 @@ const scheduleJobsForAssignment = function (assignment: Assignment): void {
 };
 
 const cancelJobsForSubmission = function (submission: Submission) {
-  const jobsOfSubmission = scheduledJobs.get(numAssignmentJobs + 1 + submission.id);
+  const jobsOfSubmission = scheduledJobs.get(submission.id);
   if (jobsOfSubmission) {
     for (const job of jobsOfSubmission) {
       job.cancel();
@@ -119,7 +117,7 @@ const scheduleJobsForSubmission = function (submission: Submission): void {
       jobsOfSubmission.push(job);
     }
 
-    scheduledJobs.set(numAssignmentJobs + 1 + submission.id, jobsOfSubmission);
+    scheduledJobs.set(submission.id, jobsOfSubmission);
   }
 };
 
@@ -128,7 +126,6 @@ const scheduleAllJobs = async function (): Promise<void> {
   const assignments = await Assignment.find();
   for (const assignment of assignments) {
     scheduleJobsForAssignment(assignment);
-    numAssignmentJobs++;
   }
   // Find all submissions
   const submissions = await Submission.find();
