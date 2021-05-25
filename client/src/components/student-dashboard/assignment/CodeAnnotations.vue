@@ -48,37 +48,39 @@
                             </b-form>
                         </div><div v-else class="d-flex">
                             <span class="comment-text mr-auto">{{ comments[lineNumbers[index + 1]].commentText }}</span>
-                            <icon
-                                v-if="!readOnly"
-                                name="edit"
-                                class="my-auto mx-2 text-primary"
-                                role="button" 
-                                @click.native="editComment(index + 1)"
-                                v-b-modal="`editModal_${lineNumbers[index + 1]}`"
-                            />
-                            <b-modal 
-                                :id="`editModal_${lineNumbers[index + 1]}`" 
-                                @ok="editModalOk(index + 1)"
-                                variant="danger"
-                                title="Warning!"
-                                v-if="showEditModal"
-                                centered>
-                                {{ getModalText() }}
-                            </b-modal>
-                            <icon
-                                v-if="!readOnly"
-                                name="trash"
-                                class="my-auto text-danger"
-                                role="button"
-                                v-b-modal="`modal_${lineNumbers[index + 1]}`"
-                            />
-                            <b-modal
-                                @ok="deleteComment(lineNumbers[index + 1])"
-                                :id="`modal_${lineNumbers[index + 1]}`"
-                                title="Confirmation"
-                                centered>
-                                Are you sure you want to delete this comment?
-                            </b-modal>
+                            <div style="flex-shrink: 0">
+                                <icon
+                                    v-if="!readOnly"
+                                    name="edit"
+                                    class="mx-2 text-primary"
+                                    role="button" 
+                                    @click.native="editComment(index + 1)"
+                                    v-b-modal="`editModal_${lineNumbers[index + 1]}`"
+                                />
+                                <b-modal 
+                                    :id="`editModal_${lineNumbers[index + 1]}`" 
+                                    @ok="editModalOk(index + 1)"
+                                    variant="danger"
+                                    title="Warning!"
+                                    v-if="showEditModal"
+                                    centered>
+                                    {{ getModalText() }}
+                                </b-modal>
+                                <icon
+                                    v-if="!readOnly"
+                                    name="trash"
+                                    class="text-danger"
+                                    role="button"
+                                    v-b-modal="`modal_${lineNumbers[index + 1]}`"
+                                />
+                                <b-modal
+                                    @ok="deleteComment(lineNumbers[index + 1])"
+                                    :id="`modal_${lineNumbers[index + 1]}`"
+                                    title="Confirmation"
+                                    centered>
+                                    Are you sure you want to delete this comment?
+                                </b-modal>
+                            </div>
                         </div>
                     </b-card>
                 </b-collapse>
@@ -274,7 +276,8 @@ pre {
         }
 
         .fa-icon {
-            flex-shrink: 0;
+            display: inline;
+            vertical-align: middle;
         }
     }
 }
