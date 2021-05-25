@@ -29,9 +29,8 @@
                     v-if="isStartingLine(index + 1)"
                     class="position-absolute mt-1 mr-2 arrow"
                     :class="{ rotate: comment[lineNumbers[index + 1]]}"
-                    style="top: 0; right: 0; z-index: 1"
                     role="button"
-                    name="chevron-down"
+                    name="chevron-up"
                     @click.native="toggleComment(lineNumbers[index + 1])"
                 />
                 <b-collapse
@@ -281,6 +280,9 @@ pre {
 }
 
 .arrow {
+    top: 0;
+    right: 0;
+    z-index: 1;
     transition: transform 0.2s ease-in-out;
 }
 
