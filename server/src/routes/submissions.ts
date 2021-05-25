@@ -22,7 +22,7 @@ import moment from "moment";
 import { getManager } from "typeorm";
 import removePDFMetadata from "../util/removePDFMetadata";
 import AssignmentExport from "../models/AssignmentExport";
-import { startExportSubmissionsForAssignmentVersionWorker } from "../workers/pool";
+import { startExportSubmissionsForAssignmentVersionWorker, startSubmissionFlaggingWorker } from "../workers/pool";
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
@@ -330,6 +330,7 @@ router.post(
     await submission!.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(submission!);
+    startSubmissionFlaggingWorker(submission!.id)
   }
 );
 
