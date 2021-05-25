@@ -52,7 +52,7 @@
                             <icon
                                 v-if="!readOnly"
                                 name="edit"
-                                class="mt-auto mb-auto text-info"
+                                class="mt-auto mb-auto text-primary"
                                 role="button" 
                                 style="flex-shrink: 0"
                                 @click.native="editComment(index + 1)"
