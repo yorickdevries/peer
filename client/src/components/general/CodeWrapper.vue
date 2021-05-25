@@ -102,6 +102,28 @@ export default {
                 .then(res => res.blob())
                 .catch(console.error)
         },
+        fixMultiLineHighlighting(lines) {
+            // For each line, this function checks for any opening or closing span tags that do not have their respective counterpart.
+            // If the stack is not empty, we place the current line in a span with the class name from the top of the stack
+            // If an opening span is found, its class name is pushed to the stack because the following lines need the same highlight.
+            // If a closing span is found, the top class name is popped from the stack because that highlight is done.
+            const unopened = /<span[^<]*<\/span>|(<\/span>)/gm
+            const unclosed = /<span class=\\?"([\w-]*)\\?">[^<]*(?=<span|$)/gm
+            const stack = []
+            for (let i = 0; i < lines.length; i++) {
+                const unopenedMatch = [...lines[i].matchAll(unopened)].map(x => x[1]) // needs an opening span
+                const unclosedMatch = [...lines[i].matchAll(unclosed)].map(x => x[1]) // needs a closing span
+
+                if (stack.length > 0) {
+                    lines[i] = `<span class="${stack[stack.length - 1]}">${lines[i]}</span>`
+                }
+
+                unopenedMatch.filter(x => x).forEach(() => stack.pop())
+                unclosedMatch.forEach(className => stack.push(className))
+            }
+
+            return lines
+        },
         async highlightContent(text) {
             const fileExtension = this.selected.split(".").pop()
             let highlighted
@@ -112,32 +134,7 @@ export default {
                 highlighted = hljs.highlightAuto(text)
             }
 
-            this.content = highlighted.value.split(/\r?\n/g)
-
-            const unopened = /^[^<\n]*<\/span>/gm
-            const unclosed = /<span class=\\?"([\w-]*)\\?">[^<\n]*$/gm
-            const stack = []
-            for (let i = 0; i < this.content.length; i++) {
-                const unopenedMatch = unopened.exec(this.content[i]) // needs an opening span
-                const unclosedMatch = unclosed.exec(this.content[i]) // needs a closing span
-
-                if (stack.length > 0) {
-                    if (!unclosedMatch) {
-                        this.content[i] = `<span class="${stack[stack.length - 1]}">${this.content[i]}`
-                    }
-                    if (!unopenedMatch) {
-                        this.content[i] += "</span>"
-                    }
-                }
-
-                if (unopenedMatch) {
-                    stack.pop()
-                }
-
-                if (unclosedMatch) {
-                    stack.push(unclosedMatch[1])
-                }
-            }
+            this.content = this.fixMultiLineHighlighting(highlighted.value.split(/\r?\n/g))
 
             this.showFile = true
         },
