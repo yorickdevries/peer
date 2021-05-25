@@ -46,14 +46,13 @@
                                     <b-button type="submit" variant="primary">Submit</b-button>
                                 </div>
                             </b-form>
-                        </div><div class="d-flex" v-else>
-                            <span class="mr-auto">{{ comments[lineNumbers[index + 1]].commentText }}</span>
+                        </div><div v-else class="d-flex">
+                            <span class="comment-text mr-auto">{{ comments[lineNumbers[index + 1]].commentText }}</span>
                             <icon
                                 v-if="!readOnly"
                                 name="edit"
-                                class="mt-auto mb-auto text-primary"
+                                class="my-auto mx-2 text-primary"
                                 role="button" 
-                                style="flex-shrink: 0"
                                 @click.native="editComment(index + 1)"
                                 v-b-modal="`editModal_${lineNumbers[index + 1]}`"
                             />
@@ -66,12 +65,10 @@
                                 centered>
                                 {{ getModalText() }}
                             </b-modal>
-                            <div style="width:10px"/>
                             <icon
                                 v-if="!readOnly"
                                 name="trash"
-                                class="mt-auto mb-auto text-danger"
-                                style="flex-shrink: 0"
+                                class="my-auto text-danger"
                                 role="button"
                                 v-b-modal="`modal_${lineNumbers[index + 1]}`"
                             />
@@ -269,20 +266,24 @@ pre {
 
         &.collapse {
             margin-right: 1ch;
+            font-family: var(--font-family-monospace);
+        }
+
+        &.card {
+            font-family: initial;
+        }
+
+        .fa-icon {
+            flex-shrink: 0;
         }
     }
-
-    span {
-        font-size: initial;
-    }
 }
 
-.collapse {
-    font-family: var(--font-family-monospace);
-}
-
-.card {
-    font-family: initial;
+.comment-text {
+    font-size: initial;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-all;
 }
 
 .arrow {
