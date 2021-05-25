@@ -95,7 +95,7 @@ const scheduleJobsForAssignment = function (assignment: Assignment): void {
 };
 
 const cancelJobsForSubmission = function (submission: Submission) {
-  const jobsOfSubmission = scheduledJobs.get(numAssignmentJobs + submission.id);
+  const jobsOfSubmission = scheduledJobs.get(numAssignmentJobs + 1 + submission.id);
   if (jobsOfSubmission) {
     for (const job of jobsOfSubmission) {
       job.cancel();
@@ -119,7 +119,7 @@ const scheduleJobsForSubmission = function (submission: Submission): void {
       jobsOfSubmission.push(job);
     }
 
-    scheduledJobs.set(numAssignmentJobs + submission.id, jobsOfSubmission);
+    scheduledJobs.set(numAssignmentJobs + 1 + submission.id, jobsOfSubmission);
   }
 };
 
