@@ -56,6 +56,7 @@
 
 <script>
 import api from "../../../api/api"
+import hljs from "highlight.js"
 import notifications from "../../../mixins/notifications"
 import CodeAnnotations from "./CodeAnnotations"
 
@@ -91,7 +92,15 @@ export default {
             const cursorPosition = this.$refs.comment_ta.selectionStart
             const untilCursor = this.commentText.substr(0, cursorPosition)
             const fromCursor = this.commentText.substr(cursorPosition)
-            const codeBlockTemplate = "```@```"
+            const languageAlias = this.selectedFile.split(".").pop()
+
+            let language = ""
+            if (hljs.getLanguage(languageAlias)) {
+                language = languageAlias + " "
+            }
+
+            const codeBlockTemplate = `\`\`\`${language}@\`\`\``
+
             this.commentText = `${untilCursor}${codeBlockTemplate.replace("@", "")}${fromCursor}`
             this.$refs.comment_ta.$nextTick(() => {
                 this.$refs.comment_ta.focus()
