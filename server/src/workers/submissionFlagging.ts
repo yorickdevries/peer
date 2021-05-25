@@ -23,7 +23,7 @@ const loadZip = async function (fileBuffer: Buffer) {
     return Object.keys(zip.files)
       .map((name) => zip.file(name))
       .filter((f) => f) // filter out null files
-      .filter((f) => !f!.dir);
+      .filter((f) => !f!.dir); // filter out all files that are directories
   });
 };
 
