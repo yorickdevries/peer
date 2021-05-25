@@ -23,5 +23,8 @@ export default {
     patchAnnotation(id, commentText) {
         const body = { commentText: commentText }
         return client.patch(`codeannotations/${id}`, body)
+    },
+    getMaxCommentLength() {
+        return client.get("codeannotations/getCommentMaxLength")
     }
 }

@@ -18,9 +18,9 @@
             <button type="submit">Submit your comment</button>
             <button type="reset">Delete selection and comment</button>
             <b-form-textarea
-                placeholder="Type your comment with a maximum length of 255 characters."
+                placeholder="Please type your comment."
                 v-model="commentText"
-                :state="commentText.length <= 255"
+                :state="commentText.length <= maxCommentLength"
                 rows="3"
                 max-rows="5"
             ></b-form-textarea>
@@ -40,6 +40,7 @@
                 :comments="comments"
                 :selectedFile="selectedFile"
                 :readOnly="readOnly"
+                :maxCommentLength="maxCommentLength"
             />
             <!--
                 Display the code without annotations.
@@ -76,13 +77,15 @@ export default {
             endLineNumber: null,
             commentText: "",
             highlightedFile: null,
-            comments: []
+            comments: [],
+            maxCommentLength: null
         }
     },
     async created() {
         await this.fetchReview()
         await this.fetchSubmission()
         await this.fetchComments()
+        await this.getMaxCommentLength()
         this.showCode = true
         this.writing = false
     },
@@ -111,6 +114,10 @@ export default {
                     this.comments = []
                 }
             }
+        },
+        async getMaxCommentLength() {
+            this.maxCommentLength = await api.codeannotations.getMaxCommentLength()
+            this.maxCommentLength = this.maxCommentLength.data
         },
         async writeComment() {
             const selection = window.getSelection()
@@ -181,8 +188,8 @@ export default {
             this.highlightedFile = this.selectedFile
         },
         async submitComment() {
-            if (this.commentText.length > 255) {
-                this.showErrorMessage({ message: "Your annotation is longer than 255 characters." })
+            if (this.commentText.length > this.commentMaxLength) {
+                this.showErrorMessage({ message: "Your annotation is too long." })
                 return
             }
 
@@ -205,7 +212,7 @@ export default {
             }
 
             // Reset the highlighted text, comment text and line number
-            this.commentText = null
+            this.commentText = ""
             this.highlightedText = null
             this.startLineNumber = null
             this.endLineNumber = null
@@ -222,7 +229,7 @@ export default {
             })
         },
         deleteSelection() {
-            this.commentText = null
+            this.commentText = ""
             this.highlightedText = null
             this.startLineNumber = null
             this.endLineNumber = null

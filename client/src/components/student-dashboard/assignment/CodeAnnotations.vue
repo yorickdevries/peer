@@ -43,7 +43,7 @@
                             <b-form @submit.prevent="submitEditedComment(index + 1)" @reset.prevent="cancelEdit">
                                 <b-form-textarea
                                     v-model="commentText"
-                                    :state="commentText.length <= 255"
+                                    :state="commentText.length <= maxCommentLength"
                                     rows="3"
                                     max-rows="5">
                                 </b-form-textarea>
@@ -97,7 +97,7 @@
 import notifications from "../../../mixins/notifications"
 
 export default {
-    props: ["content", "comments", "selectedFile", "readOnly"],
+    props: ["content", "comments", "selectedFile", "readOnly", "maxCommentLength"],
     mixins: [notifications],
     data() {
         return {
@@ -139,8 +139,8 @@ export default {
             this.editingFilePath = this.selectedFile
         },
         submitEditedComment(index) {
-            if (this.commentText.length > 255) {
-                this.showErrorMessage({ message: "Your annotation is longer than 255 characters." })
+            if (this.commentText.length > this.maxCommentLength) {
+                this.showErrorMessage({ message: "Your annotation is too long." })
                 return
             }
 

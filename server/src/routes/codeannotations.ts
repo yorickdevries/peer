@@ -15,6 +15,16 @@ import moment from "moment";
 
 const router = express.Router();
 
+router.get("/getCommentMaxLength", async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send("Please make sure you are logged in.");
+  }
+  res.status(HttpStatusCode.OK).send("255");
+});
+
 // Joi inputvalidation for query
 const getAnnotationsSchema = Joi.object({
   reviewId: Joi.number().integer().required(),
