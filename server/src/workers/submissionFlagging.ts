@@ -17,18 +17,30 @@ const verifyTextContent = async function (text: string) {
   const nonWhiteSpace = /\S+/gm;
   return nonWhiteSpace.exec(text) !== null; // If we find non-whitespace characters, this file is probably not empty
 };
+
 /**
  * Method to load a zip file
- * @param fileBuffer The file buffer to load as zip file
+ * @param filePath The file path to load as zip file
  * @returns An object with all the files if it was loaded, and an error otherwise
  */
-const loadZip = async function (fileBuffer: Buffer) {
-  return JSZip.loadAsync(fileBuffer).then((zip) => {
+const loadZip = async function (filePath: string) {
+  const file = await fsPromises.readFile(filePath);
+
+  return JSZip.loadAsync(file).then((zip) => {
     return Object.keys(zip.files)
       .map((name) => zip.file(name))
       .filter((f) => f) // filter out null files
       .filter((f) => !f?.dir); // filter out all files that are directories
   });
+};
+
+/**
+ * Method to load a file that's not a zip archive
+ * @param filePath The file path to load
+ * @returns An object with all the files if it was loaded, and an error otherwise
+ */
+const loadFile = async function (filePath: string): Promise<string> {
+  return fsPromises.readFile(filePath, "utf8");
 };
 
 /**
@@ -44,41 +56,42 @@ const submissionFlagging = async function (
   const submission = await Submission.findOneOrFail(submissionId);
 
   const filePath = submission.file.getPath();
-  const file = await fsPromises.readFile(filePath);
-  let reason = "";
-  const flag = await loadZip(file)
-    .then(async (files) => {
-      let flagged = false;
+  const fileExtension = submission.file.extension;
 
-      // If there are no files in this zip archive, i.e. it's empty
-      if (Object.keys(files).length === 0) {
-        flagged = true;
-        reason = ServerFlagReason.EMPTY;
-        return flagged;
-      } else {
-        for (const file of files) {
-          flagged =
-            !flagged && !(await file?.async("string").then(verifyTextContent)); // To make sure the flag remains true if we have already encountered a suspicious file
+  let reason = "";
+
+  let flag: boolean;
+
+  if (fileExtension === "zip") {
+    flag = await loadZip(filePath)
+      .then(async (files) => {
+        let flagged = false;
+
+        // If there are no files in this zip archive, i.e. it's empty
+        if (Object.keys(files).length === 0) {
+          flagged = true;
+          reason = ServerFlagReason.EMPTY;
+          return flagged;
+        } else {
+          for (const file of files) {
+            flagged =
+              !flagged &&
+              !(await file?.async("string").then(verifyTextContent)); // To make sure the flag remains true if we have already encountered a suspicious file
+          }
+          if (flagged) reason = ServerFlagReason.EMPTY_FILES_IN_ZIP;
+          return flagged;
         }
-        if (flagged) reason = ServerFlagReason.EMPTY_FILES_IN_ZIP;
-        return flagged;
-      }
-    })
-    .catch(async (err: Error) => {
-      let flagged: boolean;
-      if (err.message.includes("Corrupted")) {
+      })
+      .catch(async () => {
         // The zip file is corrupted, so just say it's corrupted
         reason = ServerFlagReason.CORRUPTED_ZIP;
-        flagged = true;
-      } else {
-        // It's probably not a zip file, so try to read is as a single file with utf-8 encoding
-        flagged = !(await fsPromises
-          .readFile(filePath, "utf8")
-          .then(verifyTextContent));
-        if (flagged) reason = ServerFlagReason.EMPTY;
-      }
-      return flagged;
-    });
+        return true;
+      });
+  } else {
+    flag = !(await loadFile(filePath).then(verifyTextContent));
+    reason = ServerFlagReason.EMPTY;
+  }
+
   submission.flaggedByServer = flag;
 
   submission.commentByServer = flag ? reason : null;
