@@ -12,8 +12,7 @@ import { clear, advanceTo } from "jest-date-mock";
 import UserRole from "../../src/enum/UserRole";
 import { AssignmentState } from "../../src/enum/AssignmentState";
 import AssignmentType from "../../src/enum/AssignmentType";
-import _ from "lodash";
-import expectFlaggedSubmission from "../helpers/expectedFlaggedSubmission";
+import ServerFlagReason from "../../src/enum/ServerFlagReason";
 
 describe("Integration", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -678,6 +677,23 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     const submission1 = JSON.parse(res.text);
 
+    // try ro make an empty submission for student 1
+    const emptySubmissionFile = path.resolve(
+      __dirname,
+      "../../exampleData/submissions/empty.pdf"
+    );
+
+    res = await request(server)
+      .post("/api/submissions")
+      .set("cookie", await studentCookie1())
+      .attach("file", fs.readFileSync(emptySubmissionFile), "empty.pdf")
+      .field("groupId", group1.id)
+      .field("assignmentVersionId", assignmentVersion.id);
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    const emptySubmission = JSON.parse(res.text);
+
     // make a submission for student 2
     res = await request(server)
       .post("/api/submissions")
@@ -743,11 +759,13 @@ describe("Integration", () => {
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
 
-    // To support submission flagging
-    const flaggedSubmission1 = expectFlaggedSubmission(submission1, false);
-
     expect(JSON.parse(res.text)[0]).toEqual(
-      expect.objectContaining(flaggedSubmission1)
+      expect.objectContaining({
+        flaggedByServer: false,
+        final: false,
+        id: submission1.id,
+        file: submission1.file,
+      })
     );
 
     // get final submissions for this assignment by this group
@@ -759,7 +777,13 @@ describe("Integration", () => {
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toEqual(
-      expect.objectContaining(flaggedSubmission1)
+      expect.objectContaining({
+        final: true,
+        flaggedByServer: true,
+        id: emptySubmission.id,
+        file: emptySubmission.file,
+        commentByServer: ServerFlagReason.EMPTY,
+      })
     );
 
     // get all submissions for this assignment as teacher
@@ -769,18 +793,42 @@ describe("Integration", () => {
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
 
-    const flaggedSubmission2 = expectFlaggedSubmission(submission2, false);
+    const allSubmissions = JSON.parse(res.text);
 
-    expect(JSON.parse(res.text)[0]).toEqual(
-      expect.objectContaining(flaggedSubmission1)
+    expect(allSubmissions[0]).toEqual(
+      expect.objectContaining({
+        final: false,
+        flaggedByServer: false,
+        id: submission1.id,
+        file: submission1.file,
+      })
     );
 
-    expect(JSON.parse(res.text)[1]).toEqual(
-      expect.objectContaining(unsubmittedSubmission)
+    expect(allSubmissions[1]).toEqual(
+      expect.objectContaining({
+        file: emptySubmission.file,
+        id: emptySubmission.id,
+        final: true,
+        flaggedByServer: true,
+        commentByServer: ServerFlagReason.EMPTY, // This submission will be flagged because it's empty
+      })
     );
 
-    expect(JSON.parse(res.text)[2]).toEqual(
-      expect.objectContaining(flaggedSubmission2)
+    expect(allSubmissions[2]).toEqual(
+      expect.objectContaining({
+        final: false,
+        id: unsubmittedSubmission.id,
+        file: unsubmittedSubmission.file,
+      })
+    );
+
+    expect(allSubmissions[3]).toEqual(
+      expect.objectContaining({
+        final: true,
+        id: submission2.id,
+        file: submission2.file,
+        flaggedByServer: false,
+      })
     );
 
     // get a single submission as teacher
@@ -790,7 +838,12 @@ describe("Integration", () => {
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toEqual(
-      expect.objectContaining(flaggedSubmission1)
+      expect.objectContaining({
+        id: submission1.id,
+        groupId: submission1.groupId,
+        flaggedByServer: false,
+        file: submission1.file,
+      })
     );
 
     // close the submission phase of an assingment for the course
