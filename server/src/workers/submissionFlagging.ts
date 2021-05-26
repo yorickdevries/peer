@@ -27,12 +27,12 @@ const loadZip = async function (fileBuffer: Buffer) {
     return Object.keys(zip.files)
       .map((name) => zip.file(name))
       .filter((f) => f) // filter out null files
-      .filter((f) => !f!.dir); // filter out all files that are directories
+      .filter((f) => !f?.dir); // filter out all files that are directories
   });
 };
 
 /**
- * 
+ *
  * @param submissionId The submission id to check for irregularities
  * @returns `Flagged submission ${submission.id} for reason : "${reason}"` if any irregularity was found. `Submission ${submission.id} is okay.` if it was okay.
  */
@@ -57,7 +57,8 @@ const submissionFlagging = async function (
         return flagged;
       } else {
         for (const file of files) {
-          flagged = !flagged && !(await file!.async("string").then(verifyTextContent)); // To make sure the flag remains true if we have already encountered a suspicious file
+          flagged =
+            !flagged && !(await file?.async("string").then(verifyTextContent)); // To make sure the flag remains true if we have already encountered a suspicious file
         }
         if (flagged) reason = ServerFlagReason.EMPTY_FILES_IN_ZIP;
         return flagged;
@@ -65,10 +66,12 @@ const submissionFlagging = async function (
     })
     .catch(async (err: Error) => {
       let flagged: boolean;
-      if (err.message.includes("Corrupted")) {// The zip file is corrupted, so just say it's corrupted
+      if (err.message.includes("Corrupted")) {
+        // The zip file is corrupted, so just say it's corrupted
         reason = ServerFlagReason.CORRUPTED_ZIP;
         flagged = true;
-      } else {// It's probably not a zip file, so try to read is as a single file with utf-8 encoding
+      } else {
+        // It's probably not a zip file, so try to read is as a single file with utf-8 encoding
         flagged = !(await fsPromises
           .readFile(filePath, "utf8")
           .then(verifyTextContent));
