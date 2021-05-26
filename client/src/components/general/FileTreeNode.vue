@@ -9,9 +9,7 @@
             <div>
                 <icon class="text-muted" name="code"></icon>
                 <span class="filename"> {{ name }}</span>
-            </div>
-            <div v-if="commented">
-                <icon class="text-muted" name="comments"></icon>
+                <icon v-if="commented" class="text-muted comment-icon" name="comments" />
             </div>
         </div>
 
@@ -110,5 +108,8 @@ $bg-dark: #343a40;
 }
 .fa-icon.chevron {
     margin-right: 5px;
+}
+.comment-icon {
+    margin-left: 5px;
 }
 </style>
