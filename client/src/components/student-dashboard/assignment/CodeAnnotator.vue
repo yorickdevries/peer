@@ -15,19 +15,16 @@
             <form @submit.prevent="writeComment">
                 <button type="submit" v-if="!writing">Leave a comment on highlighted part</button>
             </form>
-            <form @submit.prevent="submitComment" @reset.prevent="deleteSelection" v-if="writing">
-                <button type="submit">Submit your comment</button>
-                <button type="reset">Delete selection and comment</button>
-                <button type="button" @click="insertCodeBlock()">Insert inline code block</button>
-                <b-form-textarea
-                    ref="comment_ta"
-                    placeholder="Type your comment"
-                    :state="commentText.length <= maxCommentLength"
-                    v-model="commentText"
-                    rows="3"
-                    max-rows="5"
-                ></b-form-textarea>
-            </form>
+            <PeerTextarea
+                v-if="writing"
+                placeholder="Type your comment"
+                rows="3"
+                max-rows="5"
+                @submit="submitComment"
+                @cancel="deleteSelection"
+                :maxLength="maxCommentLength"
+                :defaultLanguage="selectedFile.split('.').pop()"
+            />
         </div>
 
         <b-card v-show="showCode">
@@ -61,10 +58,11 @@ import api from "../../../api/api"
 import hljs from "highlight.js"
 import notifications from "../../../mixins/notifications"
 import CodeAnnotations from "./CodeAnnotations"
+import PeerTextarea from "./PeerTextarea"
 
 export default {
     mixins: [notifications],
-    components: { CodeAnnotations },
+    components: { CodeAnnotations, PeerTextarea },
     props: ["comments", "content", "selectedFile", "readOnly", "review"],
     computed: {
         showAnnotations() {
@@ -184,12 +182,7 @@ export default {
             this.highlightedText = selectedText
             this.highlightedFile = this.selectedFile
         },
-        async submitComment() {
-            if (this.commentText.length > this.maxCommentLength) {
-                this.showErrorMessage({ message: "Your annotation is too long." })
-                return
-            }
-
+        async submitComment(commentText) {
             // Update the current state
             this.writing = false
 
@@ -197,7 +190,7 @@ export default {
                 // Send the comment to the server
                 const res = await api.codeannotations.postAnnotation(
                     this.review.id,
-                    this.commentText,
+                    commentText,
                     this.startLineNumber,
                     this.endLineNumber,
                     this.selectedFile
@@ -209,25 +202,23 @@ export default {
             }
 
             // Reset the highlighted text, comment text and line number
-            this.commentText = ""
             this.highlightedText = null
             this.startLineNumber = null
             this.endLineNumber = null
             this.highlightedFile = null
         },
         deleteSelection() {
-            this.commentText = ""
             this.highlightedText = null
             this.startLineNumber = null
             this.endLineNumber = null
             this.writing = false
             this.showSuccessMessage({ message: "Your selection and comment was deleted" })
         },
-        onDeleteComment(index) {
+        async onDeleteComment(index) {
             // Remove comment from comment array
             const removedComment = this.comments.splice(index, 1)
             // Remove comment from back-end
-            api.codeannotations.deleteAnnotation(removedComment[0].id)
+            await api.codeannotations.deleteAnnotation(removedComment[0].id)
             this.showSuccessMessage({ message: "Successfully deleted comment" })
         },
         async onEditedComment(index, updatedText) {
