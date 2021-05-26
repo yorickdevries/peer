@@ -5,7 +5,7 @@
             {{ collapsed ? "" : "Files" }}
         </b-card-header>
         <b-collapse :visible="!collapsed">
-            <b-card-body>
+            <b-card-body class="filetree-body">
                 <FileTreeNode
                     @selected="onSelect"
                     v-for="key in Object.keys(root)"
@@ -32,7 +32,9 @@ export default {
         return {
             root: null,
             selected: null,
-            collapsed: false
+            collapsed: false,
+            uncollapsedWidth: null,
+            uncollapsedHeight: null
         }
     },
     created() {
@@ -72,8 +74,25 @@ export default {
             this.selected = file
             this.$emit("selected", file)
         },
+        calculateUnCollapsed() {
+            const body = document.querySelector(".filetree-body")
+            const width = window.getComputedStyle(body).getPropertyValue("width")
+            const height = window.getComputedStyle(body).getPropertyValue("height")
+            this.uncollapsedWidth = width
+            this.uncollapsedHeight = height
+        },
         toggleCollapse() {
+            if (this.startCollapsed && !this.uncollapsedHeight && !this.uncollapsedWidth) {
+                // If uncollapsed width and height weren't calculated yet.
+                this.calculateUnCollapsed()
+            }
             this.collapsed = !this.collapsed
+        }
+    },
+    mounted() {
+        if (!this.startCollapsed) {
+            // Calculate fixed width and height
+            this.calculateUnCollapsed()
         }
     }
 }
