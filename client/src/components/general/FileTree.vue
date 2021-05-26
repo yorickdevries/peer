@@ -7,6 +7,7 @@
         <b-collapse :visible="!collapsed">
             <b-card-body>
                 <FileTreeNode
+                    :root="true"
                     @selected="onSelect"
                     v-for="key in Object.keys(root)"
                     :commentedFiles="commentedFiles"

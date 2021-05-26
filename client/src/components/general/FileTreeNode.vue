@@ -30,7 +30,7 @@
 <script>
 export default {
     name: "FileTreeNode",
-    props: ["commentedFiles", "propName", "propChildren", "selected"],
+    props: ["commentedFiles", "propName", "propChildren", "selected", "root"],
     data() {
         return {
             name: null,
@@ -70,6 +70,8 @@ export default {
             this.$emit("selected", this.children.path)
         },
         toggleCollapsed() {
+            this.$el.style.setProperty("min-width", `${this.width}px`)
+            if (this.root) this.$el.style.setProperty("min-height", `${this.height}px`)
             this.collapsed = !this.collapsed
         }
     },
@@ -86,7 +88,10 @@ export default {
             return this.commentedFiles.has(this.children.path)
         },
         width() {
-            return window.getComputedStyle(this.$el).getPropertyValue("width")
+            return this.$el.offsetWidth
+        },
+        height() {
+            return this.$el.offsetHeight
         }
     }
 }
