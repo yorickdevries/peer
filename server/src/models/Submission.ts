@@ -169,6 +169,14 @@ export default class Submission extends BaseModel {
         );
       }
     }
+
+    if (this.flaggedByServer) {
+      if (!this.commentByServer) {
+        throw new Error(
+          "A server comment should be set if the submission is flagged."
+        );
+      }
+    }
     // if it succeeds the super validateOrReject can be called
     return super.validateOrReject();
   }
