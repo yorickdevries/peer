@@ -14,6 +14,7 @@ import {
   IsOptional,
   IsString,
   IsNotEmpty,
+  IsEnum,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
@@ -21,6 +22,7 @@ import AssignmentVersion from "../models/AssignmentVersion";
 import Group from "./Group";
 import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
+import ServerFlagReason from "../enum/ServerFlagReason";
 
 @Entity()
 export default class Submission extends BaseModel {
@@ -101,7 +103,8 @@ export default class Submission extends BaseModel {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  commentByServer: string | null;
+  @IsEnum(ServerFlagReason)
+  commentByServer: ServerFlagReason | null;
 
   constructor(
     user: User,

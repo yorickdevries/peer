@@ -58,7 +58,7 @@ const submissionFlagging = async function (
   const filePath = submission.file.getPath();
   const fileExtension = submission.file.extension;
 
-  let reason = "";
+  let reason: ServerFlagReason | null = null;
 
   let flag: boolean;
   if (fileExtension === ".zip") {
