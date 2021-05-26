@@ -110,7 +110,6 @@ const scheduleJobsForSubmission = function (submission: Submission): void {
     const jobsOfSubmission = [];
     const now = new Date();
     const job = schedule.scheduleJob(now, () => {
-      //TODO: ADD ACTUAL SUBMISSION FLAGGING
       startSubmissionFlaggingWorker(submission.id);
     });
     if (job) {
