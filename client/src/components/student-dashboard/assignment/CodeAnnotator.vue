@@ -55,7 +55,6 @@
 
 <script>
 import api from "../../../api/api"
-import hljs from "highlight.js"
 import notifications from "../../../mixins/notifications"
 import CodeAnnotations from "./CodeAnnotations"
 import PeerTextarea from "./PeerTextarea"
@@ -90,26 +89,6 @@ export default {
         this.writing = false
     },
     methods: {
-        insertCodeBlock() {
-            const cursorPosition = this.$refs.comment_ta.selectionStart
-            const untilCursor = this.commentText.substr(0, cursorPosition)
-            const fromCursor = this.commentText.substr(cursorPosition)
-            const languageAlias = this.selectedFile.split(".").pop()
-
-            let language = ""
-            if (hljs.getLanguage(languageAlias)) {
-                language = languageAlias + " "
-            }
-
-            const codeBlockTemplate = `\`\`\`${language}@\`\`\``
-
-            this.commentText = `${untilCursor}${codeBlockTemplate.replace("@", "")}${fromCursor}`
-            this.$refs.comment_ta.$nextTick(() => {
-                this.$refs.comment_ta.focus()
-                this.$refs.comment_ta.selectionStart = cursorPosition + codeBlockTemplate.indexOf("@")
-                this.$refs.comment_ta.selectionEnd = this.$refs.comment_ta.selectionStart
-            })
-        },
         async getMaxCommentLength() {
             this.maxCommentLength = await api.codeannotations.getMaxCommentLength()
             this.maxCommentLength = this.maxCommentLength.data
