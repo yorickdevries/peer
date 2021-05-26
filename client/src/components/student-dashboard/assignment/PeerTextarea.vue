@@ -38,15 +38,7 @@ export default {
     },
     methods: {
         validateContentLength() {
-            return this.maxLength && this.escapeHTML(this.text).length <= this.maxLength
-        },
-        escapeHTML(text) {
-            return text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#x27;")
+            return this.maxLength && this.text.length <= this.maxLength
         },
         insertCodeBlock() {
             const cursorPosition = this.$refs.textarea.selectionStart
@@ -63,12 +55,10 @@ export default {
         onSubmit() {
             if (!this.validateContentLength()) {
                 this.showErrorMessage({
-                    message: `Your input is ${
-                        this.escapeHTML(this.text).length
-                    } characters long, which is over the allowed limit of ${this.maxLength} characters.`
+                    message: `Your input is ${this.text.length} characters long, which is over the allowed limit of ${this.maxLength} characters.`
                 })
             } else {
-                this.$emit("submit", this.escapeHTML(this.text))
+                this.$emit("submit", this.text)
             }
         },
         onCancel() {

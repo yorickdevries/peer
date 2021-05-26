@@ -128,6 +128,14 @@ export default {
         isCommentedOn(lineNr) {
             return lineNr >= 1 && lineNr <= this.lineNumbers.length && this.lineNumbers[lineNr] >= 0
         },
+        escapeHTML(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#x27;")
+        },
         unescapeHTML(text) {
             return text
                 .replace(/&amp;/g, "&")
@@ -140,7 +148,7 @@ export default {
             const codeBlock = /(```)([^\s]*)(\s?)((?:.|\s)*?)\1/g
             const commentIndex = this.lineNumbers[lineNr]
 
-            return this.comments[commentIndex].commentText.replaceAll(
+            return this.escapeHTML(this.comments[commentIndex].commentText).replaceAll(
                 codeBlock,
                 (match, delimiter, language, separator, code) => {
                     if (hljs.getLanguage(language)) {
