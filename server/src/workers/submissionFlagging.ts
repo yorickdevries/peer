@@ -61,25 +61,21 @@ const submissionFlagging = async function (
   let reason = "";
 
   let flag: boolean;
-
-  if (fileExtension === "zip") {
+  if (fileExtension === ".zip") {
     flag = await loadZip(filePath)
       .then(async (files) => {
-        let flagged = false;
-
         // If there are no files in this zip archive, i.e. it's empty
         if (Object.keys(files).length === 0) {
-          flagged = true;
           reason = ServerFlagReason.EMPTY;
-          return flagged;
+          return true;
         } else {
           for (const file of files) {
-            flagged =
-              !flagged &&
-              !(await file?.async("string").then(verifyTextContent)); // To make sure the flag remains true if we have already encountered a suspicious file
+            if (!(await file?.async("string").then(verifyTextContent))) {
+              reason = ServerFlagReason.EMPTY_FILES_IN_ZIP;
+              return true;
+            }
           }
-          if (flagged) reason = ServerFlagReason.EMPTY_FILES_IN_ZIP;
-          return flagged;
+          return false;
         }
       })
       .catch(async () => {
