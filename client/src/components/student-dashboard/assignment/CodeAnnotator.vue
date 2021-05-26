@@ -22,6 +22,7 @@
                 <b-form-textarea
                     ref="comment_ta"
                     placeholder="Type your comment"
+                    :state="commentText.length <= maxCommentLength"
                     v-model="commentText"
                     rows="3"
                     max-rows="5"
@@ -44,6 +45,7 @@
                 :comments="comments"
                 :selectedFile="selectedFile"
                 :readOnly="readOnly || reviewSubmitted"
+                :maxCommentLength="maxCommentLength"
             />
             <!--
                 Display the code without annotations.
@@ -79,11 +81,13 @@ export default {
             highlightedText: null,
             startLineNumber: null,
             endLineNumber: null,
-            commentText: null,
-            highlightedFile: null
+            commentText: "",
+            highlightedFile: null,
+            maxCommentLength: null
         }
     },
     async created() {
+        await this.getMaxCommentLength()
         this.showCode = true
         this.writing = false
     },
@@ -107,6 +111,10 @@ export default {
                 this.$refs.comment_ta.selectionStart = cursorPosition + codeBlockTemplate.indexOf("@")
                 this.$refs.comment_ta.selectionEnd = this.$refs.comment_ta.selectionStart
             })
+        },
+        async getMaxCommentLength() {
+            this.maxCommentLength = await api.codeannotations.getMaxCommentLength()
+            this.maxCommentLength = this.maxCommentLength.data
         },
         async writeComment() {
             const selection = window.getSelection()
@@ -177,6 +185,11 @@ export default {
             this.highlightedFile = this.selectedFile
         },
         async submitComment() {
+            if (this.commentText.length > this.maxCommentLength) {
+                this.showErrorMessage({ message: "Your annotation is too long." })
+                return
+            }
+
             // Update the current state
             this.writing = false
 
@@ -196,14 +209,14 @@ export default {
             }
 
             // Reset the highlighted text, comment text and line number
-            this.commentText = null
+            this.commentText = ""
             this.highlightedText = null
             this.startLineNumber = null
             this.endLineNumber = null
             this.highlightedFile = null
         },
         deleteSelection() {
-            this.commentText = null
+            this.commentText = ""
             this.highlightedText = null
             this.startLineNumber = null
             this.endLineNumber = null

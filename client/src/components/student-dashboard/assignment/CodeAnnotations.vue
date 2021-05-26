@@ -40,8 +40,13 @@
                     v-model="comment[`${lineNumbers[index + 1]}`]">
                     <b-card>
                         <div v-if="editing && editingEndingLine === index + 1">
-                            <b-form @submit="submitEditedComment(index + 1)" @reset="cancelEdit">
-                                <b-form-textarea v-model="commentText" rows="3" max-rows="5"></b-form-textarea>
+                            <b-form @submit.prevent="submitEditedComment(index + 1)" @reset.prevent="cancelEdit">
+                                <b-form-textarea
+                                    v-model="commentText"
+                                    :state="commentText.length <= maxCommentLength"
+                                    rows="3"
+                                    max-rows="5">
+                                </b-form-textarea>
                                 <b-button type="submit" variant="primary">Submit</b-button>
                                 <b-button type="reset" variant="danger">Cancel</b-button>
                             </b-form>
@@ -91,14 +96,16 @@
 <script>
 import hljs from "highlight.js"
 import "highlight.js/styles/atom-one-light.css"
+import notifications from "../../../mixins/notifications"
 
 export default {
-    props: ["content", "comments", "selectedFile", "readOnly"],
+    props: ["content", "comments", "selectedFile", "readOnly", "maxCommentLength"],
+    mixins: [notifications],
     data() {
         return {
             editing: false,
             editingEndingLine: null,
-            commentText: null,
+            commentText: "",
             editingFilePath: null,
             showEditModal: false,
             comment: {}
@@ -150,6 +157,11 @@ export default {
             this.editingFilePath = this.selectedFile
         },
         submitEditedComment(index) {
+            if (this.commentText.length > this.maxCommentLength) {
+                this.showErrorMessage({ message: "Your annotation is too long." })
+                return
+            }
+
             this.$emit("edited", this.lineNumbers[index], this.commentText)
             // Reset all variables after updating the comment
             this.cancelEdit()
