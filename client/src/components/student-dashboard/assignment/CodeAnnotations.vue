@@ -178,7 +178,7 @@ export default {
             }
         },
         toggleComment(index) {
-            this.comment[index] = !this.comment[index]
+            this.$set(this.comment, index, !this.comment[index])
         }
     },
     computed: {
