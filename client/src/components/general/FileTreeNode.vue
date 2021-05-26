@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="dir" class="dir" v-on:click="toggleCollapsed" role="button">
-            <icon :name="collapsed ? 'chevron-right' : 'chevron-down'" class="chevron" role="button" />
+            <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" role="button" />
             <icon class="text-muted" name="folder"></icon>
             {{ name }}
         </div>
@@ -113,9 +113,6 @@ $bg-dark: #343a40;
     .filename {
         color: $text-hover;
     }
-}
-.fa-icon.chevron {
-    margin-right: 5px;
 }
 .comment-icon {
     margin-left: 5px;

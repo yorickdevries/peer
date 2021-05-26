@@ -1,7 +1,7 @@
 <template>
     <b-card>
         <b-card-header role="button" @click="toggleCollapse">
-            <icon :name="collapsed ? 'chevron-right' : 'chevron-down'" class="chevron" />
+            <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" />
             {{ collapsed ? "" : "Files" }}
         </b-card-header>
         <b-collapse :visible="!collapsed">
@@ -79,8 +79,13 @@ export default {
     }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .chevron {
     margin-right: 5px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.rotate {
+    transform: rotate(-90deg);
 }
 </style>
