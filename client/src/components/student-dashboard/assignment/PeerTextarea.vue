@@ -38,7 +38,10 @@ export default {
     },
     methods: {
         validateContentLength() {
-            return this.maxLength && this.text.length <= this.maxLength
+            if (this.maxLength === undefined) {
+                return null
+            }
+            return this.text.length <= this.maxLength
         },
         insertCodeBlock() {
             const cursorPosition = this.$refs.textarea.selectionStart
