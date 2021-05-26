@@ -95,9 +95,9 @@ $background-hover: #f8f8f8;
 $text-light: #f8f9fa;
 $bg-dark: #343a40;
 .selected.file:hover {
-    background-color: mix($bg-dark, $background-hover, 75%) !important;
+    background-color: scale-color($color: $bg-dark, $lightness: -30%) !important;
     .filename {
-        color: mix($text-light, $text-hover, 75%);
+        color: $text-light !important;
     }
 }
 .file:hover {
