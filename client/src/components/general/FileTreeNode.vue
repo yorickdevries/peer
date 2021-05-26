@@ -84,6 +84,9 @@ export default {
         },
         commented() {
             return this.commentedFiles.has(this.children.path)
+        },
+        width() {
+            return window.getComputedStyle(this.$el).getPropertyValue("width")
         }
     }
 }
