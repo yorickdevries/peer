@@ -98,11 +98,6 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.filetree {
-    max-height: 40vh;
-    overflow-y: auto;
-}
-
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.15s ease;
