@@ -69,9 +69,9 @@ export default {
         onSelect() {
             this.$emit("selected", this.children.path)
         },
-        async toggleCollapsed() {
+        toggleCollapsed() {
             // Let file tree know that its child is collapsing
-            await this.$emit("toggleCollapse")
+            this.$emit("toggleCollapse")
             this.collapsed = !this.collapsed
         }
     },

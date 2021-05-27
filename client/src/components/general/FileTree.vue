@@ -33,7 +33,9 @@ export default {
         return {
             root: null,
             selected: null,
-            collapsed: false
+            collapsed: false,
+            minWidth: null,
+            minHeight: null
         }
     },
     created() {
@@ -74,14 +76,23 @@ export default {
             this.$emit("selected", file)
         },
         toggleCollapse() {
+            if (!this.collapsed) {
+                this.minHeight = this.$el.style.getPropertyValue("min-height")
+                this.minWidth = this.$el.style.getPropertyValue("min-width")
+                this.$el.style.setProperty("min-height", "unset")
+                this.$el.style.setProperty("min-width", "unset")
+            } else {
+                this.$el.style.setProperty("min-height", this.minHeight ?? "unset")
+                this.$el.style.setProperty("min-width", this.minWidth ?? "unset")
+            }
             this.collapsed = !this.collapsed
         }, // Used to conserve file tree size on child collapse
         onChildCollapse() {
             const el = this.$el
             const height = el.offsetHeight
             const width = el.offsetWidth
-            el.style.setProperty("height", `${height}px`)
-            el.style.setProperty("width", `${width}px`)
+            el.style.setProperty("min-height", `${height}px`)
+            el.style.setProperty("min-width", `${width}px`)
         }
     }
 }
