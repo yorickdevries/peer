@@ -96,6 +96,18 @@ const startOpenFeedbackForAssignmentWorker = function (
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const startSubmissionFlaggingWorker = function (submissionId: number): void {
+  if (isTSNode) {
+    workerFunctions
+      .submissionFlagging(submissionId)
+      .then((result) => console.log(result))
+      .catch((err) => console.error(err));
+  } else {
+    startWorker("submissionFlagging", [submissionId]);
+  }
+};
+
 interface groupNameWithNetidList {
   groupName: string;
   netids: string[];
@@ -244,4 +256,5 @@ export {
   startExportGradesForAssignmentVersionWorker,
   startExportReviewsForAssignmentVersionWorker,
   startExportSubmissionsForAssignmentVersionWorker,
+  startSubmissionFlaggingWorker,
 };
