@@ -80,7 +80,6 @@ export default {
             const el = this.$el
             const height = el.offsetHeight
             const width = el.offsetWidth
-            console.log(height, width)
             el.style.setProperty("height", `${height}px`)
             el.style.setProperty("width", `${width}px`)
         }
