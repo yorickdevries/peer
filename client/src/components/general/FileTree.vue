@@ -7,7 +7,6 @@
         <b-collapse :visible="!collapsed">
             <b-card-body>
                 <FileTreeNode
-                    :root="true"
                     @selected="onSelect"
                     v-for="key in Object.keys(root)"
                     :commentedFiles="commentedFiles"
@@ -15,6 +14,7 @@
                     :propName="key"
                     :propChildren="root[key]"
                     :selected="selected"
+                    @toggleCollapse="onChildCollapse"
                 />
             </b-card-body>
         </b-collapse>
@@ -75,6 +75,14 @@ export default {
         },
         toggleCollapse() {
             this.collapsed = !this.collapsed
+        }, // Used to conserve file tree size on child collapse
+        onChildCollapse() {
+            const el = this.$el
+            const height = el.offsetHeight
+            const width = el.offsetWidth
+            console.log(height, width)
+            el.style.setProperty("height", `${height}px`)
+            el.style.setProperty("width", `${width}px`)
         }
     }
 }
