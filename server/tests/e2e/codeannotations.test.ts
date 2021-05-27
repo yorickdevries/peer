@@ -11,7 +11,6 @@ import AssignmentType from "../../src/enum/AssignmentType";
 import AssignmentVersion from "../../src/models/AssignmentVersion";
 import publishAssignment from "../../src/assignmentProgression/publishAssignment";
 import closeSubmission from "../../src/assignmentProgression/closeSubmission";
-import {distributeReviewsForAssignment} from "../../src/assignmentProgression/distributeReviews";
 import Group from "../../src/models/Group";
 import fs from "fs";
 import path from "path";
@@ -139,7 +138,6 @@ describe("CodeAnnotations", () => {
       .set("cookie", teacherCookie)
       .send({ assignmentVersionId: assignmentVersion.id});
     let questionnaire = JSON.parse(res10.text)
-    console.log(questionnaire.assignmentVersion)
 
     // Create question for questionnaire
     await request(server)
@@ -155,25 +153,23 @@ describe("CodeAnnotations", () => {
     const res13 = await request(server)
       .get(`/api/submissionquestionnaires/${questionnaire.id}`)
       .set("cookie", teacherCookie)
-    console.log(res13.text)
     questionnaire = JSON.parse(res13.text);
-    console.log(questionnaire.assignmentVersion)
 
     const res12 = await request(server)
       .get(`/api/assignmentversions/${assignmentVersion.id}`)
       .set("cookie", teacherCookie);
-    console.log(assignmentVersion)
     assignmentVersion = JSON.parse(res12.text);
-    console.log(assignmentVersion.submissionQuestionnaireId)
 
     // distribute the revies for this assignment
-    await distributeReviewsForAssignment(assignment.id);
+    await request(server)
+      .post(`/api/reviewofsubmissions/distribute?assignmentId=${assignment.id}`)
+      .set("cookie", teacherCookie);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     
     const res6 = await request(server)
-      .get(`/api/submissionquestionaires/${assignmentVersion.submissionQuestionnaireId}/reviews`)
+      .get(`/api/submissionquestionnaires/${assignmentVersion.submissionQuestionnaireId}/reviews`)
       .set("cookie", sessionCookie1);
-    console.log(res6.text);
-    //reviewId1 = JSON.parse(res6.text);
+    reviewId1 = JSON.parse(res6.text)[0].id;
 
     /*await request(server)
       .get(`/api/submissionquestionaires/${questionnaire.id}/reviews`)
@@ -193,10 +189,9 @@ describe("CodeAnnotations", () => {
 
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text) === 255);
-    console.log(reviewId1);
   });
 
-  /*test("create new annotation", async () => {
+  test("create new annotation", async () => {
     const body = {
       reviewId: reviewId1,
       commentText: "Some text",
@@ -211,6 +206,176 @@ describe("CodeAnnotations", () => {
 
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject(body);
-  });*/
+  });
+
+  test("create and edit annotation", async () => {
+    const body = {
+      reviewId: reviewId1,
+      commentText: "Some text",
+      startLineNumber: 10,
+      endLineNumber: 11,
+      selectedFile: "submission1.c"
+    }
+    let res = await request(server)
+      .post("/api/codeannotations")
+      .set("cookie", sessionCookie1)
+      .send(body);
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject(body);
+
+    let commentId = JSON.parse(res.text).id;
+
+    res = await request(server)
+      .patch(`/api/codeannotations/${commentId}`)
+      .set("cookie", sessionCookie1)
+      .send({ commentText: "Updated text" });
+    
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject({
+      reviewId: reviewId1,
+      commentText: "Updated text",
+      startLineNumber: 10,
+      endLineNumber: 11,
+      selectedFile: "submission1.c",
+      id: commentId
+    });
+  });
+
+  test("create and delete annotation", async () => {
+    const body = {
+      reviewId: reviewId1,
+      commentText: "Some text",
+      startLineNumber: 10,
+      endLineNumber: 11,
+      selectedFile: "submission1.c"
+    }
+    let res = await request(server)
+      .post("/api/codeannotations")
+      .set("cookie", sessionCookie1)
+      .send(body);
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject(body);
+
+    let commentId = JSON.parse(res.text).id;
+
+    res = await request(server)
+      .delete(`/api/codeannotations/${commentId}`)
+      .set("cookie", sessionCookie1);
+    
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject({
+      reviewId: reviewId1,
+      commentText: "Some text",
+      startLineNumber: 10,
+      endLineNumber: 11,
+      selectedFile: "submission1.c",
+    });
+  });
+
+  test("create and edit annotation", async () => {
+    const body = {
+      reviewId: reviewId1,
+      commentText: "Some text",
+      startLineNumber: 10,
+      endLineNumber: 11,
+      selectedFile: "submission1.c"
+    }
+    let res = await request(server)
+      .post("/api/codeannotations")
+      .set("cookie", sessionCookie1)
+      .send(body);
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject(body);
+
+    let commentId = JSON.parse(res.text).id;
+
+    res = await request(server)
+      .patch(`/api/codeannotations/${commentId}`)
+      .set("cookie", sessionCookie1)
+      .send({ commentText: "Updated text" });
+    
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject({
+      reviewId: reviewId1,
+      commentText: "Updated text",
+      startLineNumber: 10,
+      endLineNumber: 11,
+      selectedFile: "submission1.c"
+    });
+  });
+
+  test("Delete non-existent annotation", async () => {
+    const res = await request(server)
+      .delete(`/api/codeannotations/-1`)
+      .set("cookie", sessionCookie1);
+    expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
+    expect(res.text).toMatch("Annotation with id -1 does not exist")
+  });
+
+  test("Get annotations test", async () => {
+    let res = await request(server)
+      .get(`/api/codeannotations?reviewId=${reviewId1}`)
+      .set("cookie", sessionCookie1);
+
+    console.log(res.text);
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject([]);
+
+    const body = {
+      reviewId: reviewId1,
+      commentText: "Some text",
+      startLineNumber: 10,
+      endLineNumber: 11,
+      selectedFile: "submission1.c"
+    }
+    res = await request(server)
+      .post("/api/codeannotations")
+      .set("cookie", sessionCookie1)
+      .send(body);
+
+      res = await request(server)
+      .get(`/api/codeannotations?reviewId=${reviewId1}`)
+      .set("cookie", sessionCookie1)
+      .send({ reviewId: reviewId1 });
+
+    console.log(res.text);
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject([body]);
+  });
+
+  test("wrong user, forbidden access", async () => {
+    const body = {
+      reviewId: reviewId1,
+      commentText: "Some text",
+      startLineNumber: 10,
+      endLineNumber: 11,
+      selectedFile: "submission1.c"
+    }
+    let res = await request(server)
+      .post("/api/codeannotations")
+      .set("cookie", sessionCookie1)
+      .send(body);
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const commentId = JSON.parse(res.text).id;
+
+    res = await request(server)
+      .patch(`/api/codeannotations/${commentId}`)
+      .set("cookie", sessionCookie2)
+      .send({ commentText: "updated text" });
+
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+
+    res = await request(server)
+      .delete(`/api/codeannotations/${commentId}`)
+      .set("cookie", sessionCookie2);
+
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+  });
 
 });
