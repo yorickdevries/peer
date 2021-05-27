@@ -63,14 +63,6 @@ export default {
     mixins: [notifications],
     components: { CodeAnnotations, PeerTextarea },
     props: ["comments", "content", "selectedFile", "readOnly", "review"],
-    computed: {
-        showAnnotations() {
-            return !(this.review == null)
-        },
-        reviewSubmitted() {
-            return this.review && this.review.submitted
-        }
-    },
     data() {
         return {
             showCode: false,
@@ -90,8 +82,9 @@ export default {
     },
     methods: {
         async getMaxCommentLength() {
-            this.maxCommentLength = await api.codeannotations.getMaxCommentLength()
-            this.maxCommentLength = this.maxCommentLength.data
+            const res = await api.codeannotations.getMaxCommentLength()
+            console.log(res)
+            this.maxCommentLength = res.data
         },
         async writeComment() {
             const selection = window.getSelection()
@@ -207,6 +200,14 @@ export default {
             comment.commentText = res.data.commentText
             this.comments.splice(index, 1, comment)
             this.showSuccessMessage({ message: "Successfully updated comment" })
+        }
+    },
+    computed: {
+        showAnnotations() {
+            return !(this.review == null)
+        },
+        reviewSubmitted() {
+            return this.review && this.review.submitted
         }
     }
 }
