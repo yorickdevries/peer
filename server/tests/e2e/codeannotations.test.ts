@@ -120,7 +120,7 @@ describe("CodeAnnotations", () => {
       .attach("file", fs.readFileSync(exampleSubmissionFile), "submission1.c")
       .field("groupId", group1.id)
       .field("assignmentVersionId", assignmentVersion.id);
-    
+
     // Hand in example file for student 2
     await request(server)
       .post("/api/submissions")
@@ -131,13 +131,13 @@ describe("CodeAnnotations", () => {
 
     // close the submission stage
     await closeSubmission(assignment.id);
-    
+
     // Create questionnaire for the assignment
     const res10 = await request(server)
       .post("/api/submissionquestionnaires")
       .set("cookie", teacherCookie)
-      .send({ assignmentVersionId: assignmentVersion.id});
-    let questionnaire = JSON.parse(res10.text)
+      .send({ assignmentVersionId: assignmentVersion.id });
+    let questionnaire = JSON.parse(res10.text);
 
     // Create question for questionnaire
     await request(server)
@@ -149,10 +149,10 @@ describe("CodeAnnotations", () => {
         optional: "true",
         questionnaireId: questionnaire.id,
       });
-    
+
     const res13 = await request(server)
       .get(`/api/submissionquestionnaires/${questionnaire.id}`)
-      .set("cookie", teacherCookie)
+      .set("cookie", teacherCookie);
     questionnaire = JSON.parse(res13.text);
 
     const res12 = await request(server)
@@ -165,9 +165,11 @@ describe("CodeAnnotations", () => {
       .post(`/api/reviewofsubmissions/distribute?assignmentId=${assignment.id}`)
       .set("cookie", teacherCookie);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    
+
     const res6 = await request(server)
-      .get(`/api/submissionquestionnaires/${assignmentVersion.submissionQuestionnaireId}/reviews`)
+      .get(
+        `/api/submissionquestionnaires/${assignmentVersion.submissionQuestionnaireId}/reviews`
+      )
       .set("cookie", sessionCookie1);
     reviewId1 = JSON.parse(res6.text)[0].id;
 
@@ -197,8 +199,8 @@ describe("CodeAnnotations", () => {
       commentText: "Some text",
       startLineNumber: 10,
       endLineNumber: 11,
-      selectedFile: "submission1.c"
-    }
+      selectedFile: "submission1.c",
+    };
     const res = await request(server)
       .post("/api/codeannotations")
       .set("cookie", sessionCookie1)
@@ -214,8 +216,8 @@ describe("CodeAnnotations", () => {
       commentText: "Some text",
       startLineNumber: 10,
       endLineNumber: 11,
-      selectedFile: "submission1.c"
-    }
+      selectedFile: "submission1.c",
+    };
     let res = await request(server)
       .post("/api/codeannotations")
       .set("cookie", sessionCookie1)
@@ -224,13 +226,13 @@ describe("CodeAnnotations", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject(body);
 
-    let commentId = JSON.parse(res.text).id;
+    const commentId = JSON.parse(res.text).id;
 
     res = await request(server)
       .patch(`/api/codeannotations/${commentId}`)
       .set("cookie", sessionCookie1)
       .send({ commentText: "Updated text" });
-    
+
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject({
       reviewId: reviewId1,
@@ -238,7 +240,7 @@ describe("CodeAnnotations", () => {
       startLineNumber: 10,
       endLineNumber: 11,
       selectedFile: "submission1.c",
-      id: commentId
+      id: commentId,
     });
   });
 
@@ -248,8 +250,8 @@ describe("CodeAnnotations", () => {
       commentText: "Some text",
       startLineNumber: 10,
       endLineNumber: 11,
-      selectedFile: "submission1.c"
-    }
+      selectedFile: "submission1.c",
+    };
     let res = await request(server)
       .post("/api/codeannotations")
       .set("cookie", sessionCookie1)
@@ -258,12 +260,12 @@ describe("CodeAnnotations", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject(body);
 
-    let commentId = JSON.parse(res.text).id;
+    const commentId = JSON.parse(res.text).id;
 
     res = await request(server)
       .delete(`/api/codeannotations/${commentId}`)
       .set("cookie", sessionCookie1);
-    
+
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject({
       reviewId: reviewId1,
@@ -280,8 +282,8 @@ describe("CodeAnnotations", () => {
       commentText: "Some text",
       startLineNumber: 10,
       endLineNumber: 11,
-      selectedFile: "submission1.c"
-    }
+      selectedFile: "submission1.c",
+    };
     let res = await request(server)
       .post("/api/codeannotations")
       .set("cookie", sessionCookie1)
@@ -290,20 +292,20 @@ describe("CodeAnnotations", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject(body);
 
-    let commentId = JSON.parse(res.text).id;
+    const commentId = JSON.parse(res.text).id;
 
     res = await request(server)
       .patch(`/api/codeannotations/${commentId}`)
       .set("cookie", sessionCookie1)
       .send({ commentText: "Updated text" });
-    
+
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject({
       reviewId: reviewId1,
       commentText: "Updated text",
       startLineNumber: 10,
       endLineNumber: 11,
-      selectedFile: "submission1.c"
+      selectedFile: "submission1.c",
     });
   });
 
@@ -312,7 +314,7 @@ describe("CodeAnnotations", () => {
       .delete(`/api/codeannotations/-1`)
       .set("cookie", sessionCookie1);
     expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
-    expect(res.text).toMatch("Annotation with id -1 does not exist")
+    expect(res.text).toMatch("Annotation with id -1 does not exist");
   });
 
   test("Get annotations test", async () => {
@@ -330,14 +332,14 @@ describe("CodeAnnotations", () => {
       commentText: "Some text",
       startLineNumber: 10,
       endLineNumber: 11,
-      selectedFile: "submission1.c"
-    }
+      selectedFile: "submission1.c",
+    };
     res = await request(server)
       .post("/api/codeannotations")
       .set("cookie", sessionCookie1)
       .send(body);
 
-      res = await request(server)
+    res = await request(server)
       .get(`/api/codeannotations?reviewId=${reviewId1}`)
       .set("cookie", sessionCookie1)
       .send({ reviewId: reviewId1 });
@@ -354,8 +356,8 @@ describe("CodeAnnotations", () => {
       commentText: "Some text",
       startLineNumber: 10,
       endLineNumber: 11,
-      selectedFile: "submission1.c"
-    }
+      selectedFile: "submission1.c",
+    };
     let res = await request(server)
       .post("/api/codeannotations")
       .set("cookie", sessionCookie1)
@@ -377,5 +379,4 @@ describe("CodeAnnotations", () => {
 
     expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
   });
-
 });
