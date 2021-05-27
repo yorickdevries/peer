@@ -23,7 +23,7 @@
                 @submit="submitComment"
                 @cancel="deleteSelection"
                 :maxLength="maxCommentLength"
-                :defaultLanguage="selectedFile.split('.').pop()"
+                :defaultLanguage="language"
             />
         </div>
 
@@ -40,9 +40,10 @@
                 @edited="onEditedComment"
                 :content="content"
                 :comments="comments"
+                :language="language"
+                :maxCommentLength="maxCommentLength"
                 :selectedFile="selectedFile"
                 :readOnly="readOnly || reviewSubmitted"
-                :maxCommentLength="maxCommentLength"
             />
             <!--
                 Display the code without annotations.
@@ -62,7 +63,7 @@ import PeerTextarea from "./PeerTextarea"
 export default {
     mixins: [notifications],
     components: { CodeAnnotations, PeerTextarea },
-    props: ["comments", "content", "selectedFile", "readOnly", "review"],
+    props: ["comments", "content", "language", "selectedFile", "readOnly", "review"],
     data() {
         return {
             showCode: false,
@@ -83,7 +84,6 @@ export default {
     methods: {
         async getMaxCommentLength() {
             const res = await api.codeannotations.getMaxCommentLength()
-            console.log(res)
             this.maxCommentLength = res.data
         },
         async writeComment() {

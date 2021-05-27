@@ -22,9 +22,10 @@
                 v-else
                 :comments="comments"
                 :content="content"
+                :language="language"
+                :selectedFile="selected"
                 :readOnly="readOnly"
                 :review="review"
-                :selectedFile="selected"
             />
             <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
                 <template #overlay>
@@ -59,7 +60,8 @@ export default {
             selected: null,
             showWarning: false,
             showFile: false,
-            review: null
+            review: null,
+            language: null
         }
     },
     async created() {
@@ -138,7 +140,7 @@ export default {
             }
 
             this.content = this.fixMultiLineHighlighting(highlighted.value.split(/\r?\n/g))
-
+            this.language = highlighted.language
             this.showFile = true
         },
         async verifyTextContent(text) {

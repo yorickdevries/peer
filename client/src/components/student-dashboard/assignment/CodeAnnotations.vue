@@ -46,7 +46,7 @@
                                 @submit="(text) => submitEditedComment(index + 1, text)"
                                 @cancel="cancelEdit"
                                 :maxLength="maxCommentLength"
-                                :defaultLanguage="editingFilePath.split('.').pop()"
+                                :defaultLanguage="language"
                                 :defaultContent="unescapeHTML(comments[lineNumbers[index + 1]].commentText)"
                             />
                         </div><div v-else class="d-flex">
@@ -98,7 +98,7 @@ import notifications from "../../../mixins/notifications"
 import PeerTextarea from "./PeerTextarea"
 
 export default {
-    props: ["content", "comments", "selectedFile", "readOnly", "maxCommentLength"],
+    props: ["content", "comments", "language", "maxCommentLength", "selectedFile", "readOnly"],
     mixins: [notifications],
     components: { PeerTextarea },
     data() {
