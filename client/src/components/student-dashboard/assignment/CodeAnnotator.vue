@@ -15,17 +15,16 @@
             <form @submit.prevent="writeComment">
                 <button type="submit" v-if="!writing">Leave a comment on highlighted part</button>
             </form>
-            <form @submit.prevent="submitComment" @reset.prevent="deleteSelection" v-if="writing">
-                <button type="submit">Submit your comment</button>
-                <button type="reset">Delete selection and comment</button>
-                <b-form-textarea
-                    placeholder="Type your comment"
-                    v-model="commentText"
-                    rows="3"
-                    max-rows="5"
-                    class="overflow-auto"
-                ></b-form-textarea>
-            </form>
+            <PeerTextarea
+                v-if="writing"
+                placeholder="Type your comment"
+                rows="3"
+                max-rows="5"
+                @submit="submitComment"
+                @cancel="deleteSelection"
+                :maxLength="maxCommentLength"
+                :defaultLanguage="selectedFile.split('.').pop()"
+            />
         </div>
 
         <b-card v-show="showCode">
@@ -43,6 +42,7 @@
                 :comments="comments"
                 :selectedFile="selectedFile"
                 :readOnly="readOnly || reviewSubmitted"
+                :maxCommentLength="maxCommentLength"
             />
             <!--
                 Display the code without annotations.
@@ -57,10 +57,11 @@
 import api from "../../../api/api"
 import notifications from "../../../mixins/notifications"
 import CodeAnnotations from "./CodeAnnotations"
+import PeerTextarea from "./PeerTextarea"
 
 export default {
     mixins: [notifications],
-    components: { CodeAnnotations },
+    components: { CodeAnnotations, PeerTextarea },
     props: ["comments", "content", "selectedFile", "readOnly", "review"],
     computed: {
         showAnnotations() {
@@ -77,15 +78,21 @@ export default {
             highlightedText: null,
             startLineNumber: null,
             endLineNumber: null,
-            commentText: null,
-            highlightedFile: null
+            commentText: "",
+            highlightedFile: null,
+            maxCommentLength: null
         }
     },
     async created() {
+        await this.getMaxCommentLength()
         this.showCode = true
         this.writing = false
     },
     methods: {
+        async getMaxCommentLength() {
+            this.maxCommentLength = await api.codeannotations.getMaxCommentLength()
+            this.maxCommentLength = this.maxCommentLength.data
+        },
         async writeComment() {
             const selection = window.getSelection()
             const selectedText = selection.toString()
@@ -154,7 +161,7 @@ export default {
             this.highlightedText = selectedText
             this.highlightedFile = this.selectedFile
         },
-        async submitComment() {
+        async submitComment(commentText) {
             // Update the current state
             this.writing = false
 
@@ -162,7 +169,7 @@ export default {
                 // Send the comment to the server
                 const res = await api.codeannotations.postAnnotation(
                     this.review.id,
-                    this.commentText,
+                    commentText,
                     this.startLineNumber,
                     this.endLineNumber,
                     this.selectedFile
@@ -174,25 +181,23 @@ export default {
             }
 
             // Reset the highlighted text, comment text and line number
-            this.commentText = null
             this.highlightedText = null
             this.startLineNumber = null
             this.endLineNumber = null
             this.highlightedFile = null
         },
         deleteSelection() {
-            this.commentText = null
             this.highlightedText = null
             this.startLineNumber = null
             this.endLineNumber = null
             this.writing = false
             this.showSuccessMessage({ message: "Your selection and comment was deleted" })
         },
-        onDeleteComment(index) {
+        async onDeleteComment(index) {
             // Remove comment from comment array
             const removedComment = this.comments.splice(index, 1)
             // Remove comment from back-end
-            api.codeannotations.deleteAnnotation(removedComment[0].id)
+            await api.codeannotations.deleteAnnotation(removedComment[0].id)
             this.showSuccessMessage({ message: "Successfully deleted comment" })
         },
         async onEditedComment(index, updatedText) {

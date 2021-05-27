@@ -39,15 +39,18 @@
                     v-model="comment[`${lineNumbers[index + 1]}`]">
                     <b-card>
                         <div v-if="editing && editingEndingLine === index + 1">
-                            <b-form @submit="submitEditedComment(index + 1)" @reset="cancelEdit">
-                                <b-form-textarea v-model="commentText" rows="3" max-rows="5" class="overflow-auto"></b-form-textarea>
-                                <div class="float-right">
-                                    <b-button type="reset" variant="secondary">Cancel</b-button>
-                                    <b-button type="submit" variant="primary">Submit</b-button>
-                                </div>
-                            </b-form>
+                            <PeerTextarea
+                                placeholder="Type your comment"
+                                rows="3"
+                                max-rows="5"
+                                @submit="(text) => submitEditedComment(index + 1, text)"
+                                @cancel="cancelEdit"
+                                :maxLength="maxCommentLength"
+                                :defaultLanguage="editingFilePath.split('.').pop()"
+                                :defaultContent="unescapeHTML(comments[lineNumbers[index + 1]].commentText)"
+                            />
                         </div><div v-else class="d-flex">
-                            <span class="comment-text mr-auto">{{ comments[lineNumbers[index + 1]].commentText }}</span>
+                            <span class="mr-auto comment-text" v-html="highlightComment(index + 1)"></span>
                             <div style="flex-shrink: 0">
                                 <icon
                                     v-if="!readOnly"
@@ -89,13 +92,19 @@
 </template>
 
 <script>
+import hljs from "highlight.js"
+import "highlight.js/styles/atom-one-light.css"
+import notifications from "../../../mixins/notifications"
+import PeerTextarea from "./PeerTextarea"
+
 export default {
-    props: ["content", "comments", "selectedFile", "readOnly"],
+    props: ["content", "comments", "selectedFile", "readOnly", "maxCommentLength"],
+    mixins: [notifications],
+    components: { PeerTextarea },
     data() {
         return {
             editing: false,
             editingEndingLine: null,
-            commentText: null,
             editingFilePath: null,
             showEditModal: false,
             comment: {}
@@ -117,6 +126,38 @@ export default {
         isCommentedOn(lineNr) {
             return lineNr >= 1 && lineNr <= this.lineNumbers.length && this.lineNumbers[lineNr] >= 0
         },
+        escapeHTML(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#x27;")
+        },
+        unescapeHTML(text) {
+            return text
+                .replace(/&amp;/g, "&")
+                .replace(/&lt;/g, "<")
+                .replace(/&gt;/g, ">")
+                .replace(/&quot;/g, '"')
+                .replace(/&#x27;/g, "'")
+        },
+        highlightComment(lineNr) {
+            const codeBlock = /(```)([^\s]*)(\s?)((?:.|\s)*?)\1/g
+            const commentIndex = this.lineNumbers[lineNr]
+
+            return this.escapeHTML(this.comments[commentIndex].commentText).replaceAll(
+                codeBlock,
+                (match, delimiter, language, separator, code) => {
+                    if (hljs.getLanguage(language)) {
+                        code = hljs.highlight(this.unescapeHTML(code), { language, ignoreIllegals: true }).value
+                    } else {
+                        code = language + separator + code
+                    }
+                    return `<code><span style="white-space: pre">${code}</span></code>`
+                }
+            )
+        },
         deleteComment(index) {
             this.$emit("deleted", index)
         },
@@ -127,18 +168,15 @@ export default {
             }
             this.editing = true
             this.editingEndingLine = lineNr
-            this.commentText = this.comments[this.lineNumbers[lineNr]].commentText
             this.editingFilePath = this.selectedFile
         },
-        submitEditedComment(index) {
-            this.$emit("edited", this.lineNumbers[index], this.commentText)
-            // Reset all variables after updating the comment
+        submitEditedComment(index, commentText) {
+            this.$emit("edited", this.lineNumbers[index], commentText)
             this.cancelEdit()
         },
         cancelEdit() {
             this.editing = false
             this.editingEndingLine = null
-            this.commentText = null
             this.editingFilePath = null
         },
         editModalOk(lineNr) {
@@ -165,7 +203,7 @@ export default {
             }
         },
         toggleComment(index) {
-            this.comment[index] = !this.comment[index]
+            this.$set(this.comment, index, !this.comment[index])
         }
     },
     computed: {
@@ -190,6 +228,34 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+code,
+.comment-text::v-deep {
+    background-color: inherit;
+    font-family: var(--font-family-monospace);
+    white-space: pre;
+    display: inline-block;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.comment-text {
+    display: inline-block;
+    font-size: initial;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    white-space: pre-wrap;
+
+    &::v-deep code {
+        background-color: #f8f8f8;
+        display: inline-block;
+
+        span {
+            font-family: inherit !important;
+        }
+    }
+}
+
 pre {
     white-space: pre-line;
     display: inline-block;
@@ -216,12 +282,9 @@ pre {
         background-color: inherit;
 
         code {
-            background-color: inherit;
-            font-family: var(--font-family-monospace);
-            white-space: pre;
-            display: inline-block;
-            box-sizing: border-box;
-            width: 100%;
+            &::v-deep span {
+                font-family: inherit !important;
+            }
 
             &.comment {
                 border-left: 1px solid var(--gray);
@@ -260,10 +323,6 @@ pre {
             &.code-annotations-code {
                 padding-right: 7ch;
             }
-
-            &::v-deep span {
-                font-family: inherit;
-            }
         }
 
         &.collapse {
@@ -280,14 +339,6 @@ pre {
             vertical-align: middle;
         }
     }
-}
-
-.comment-text {
-    font-size: initial;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    word-break: break-all;
-    white-space: pre-wrap;
 }
 
 .arrow {
