@@ -94,7 +94,7 @@ export default {
 
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 0.15s ease-in-out;
+    transition: opacity 0.15s ease;
 }
 
 .fade-enter-from,
