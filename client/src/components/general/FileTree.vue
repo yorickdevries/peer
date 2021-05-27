@@ -1,6 +1,6 @@
 <template>
-    <b-card class="filetree-body">
-        <b-card-header role="button" @click="toggleCollapse">
+    <b-card class="filetree">
+        <b-card-header role="button" @click="toggleCollapse" :class="{ 'header-collapse': collapsed }">
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" />
             <transition name="fade"> <span v-if="!collapsed">Files</span> </transition>
         </b-card-header>
@@ -87,7 +87,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.filetree-body {
+.filetree {
     max-height: 40vh;
     overflow-y: auto;
 }
