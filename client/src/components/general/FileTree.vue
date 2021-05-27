@@ -2,7 +2,7 @@
     <b-card class="filetree-body">
         <b-card-header role="button" @click="toggleCollapse">
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" />
-            {{ collapsed ? "" : "Files" }}
+            <transition name="fade"> <span v-if="!collapsed">Files</span> </transition>
         </b-card-header>
         <b-collapse :visible="!collapsed">
             <b-card-body>
@@ -90,6 +90,16 @@ export default {
 .filetree-body {
     max-height: 40vh;
     overflow-y: auto;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.15s ease-in-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>
 
