@@ -1,5 +1,5 @@
 <template>
-    <b-card>
+    <b-card class="filetree-body">
         <b-card-header role="button" @click="toggleCollapse">
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" />
             {{ collapsed ? "" : "Files" }}
@@ -87,6 +87,13 @@ export default {
     }
 }
 </script>
+<style lang="scss" scoped>
+.filetree-body {
+    max-height: 40vh;
+    overflow-y: auto;
+}
+</style>
+
 <style lang="scss">
 .chevron {
     margin-right: 5px;
