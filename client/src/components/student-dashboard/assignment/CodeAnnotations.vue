@@ -241,17 +241,18 @@ code,
 
 .comment-text {
     display: inline-block;
-    font-size: initial;
     word-wrap: break-word;
     overflow-wrap: break-word;
     word-break: break-all;
     white-space: pre-wrap;
     margin-right: auto;
     font-family: "Nunito Sans", sans-serif;
+    font-size: initial;
 
     &::v-deep code {
         background-color: #f8f8f8;
         display: inline-block;
+        font-size: 87.5%;
 
         span {
             font-family: inherit !important;
@@ -266,6 +267,7 @@ pre {
     background-color: white;
     margin: 0;
     max-height: 80vh;
+    font-size: 87.5%;
 
     .code-annotations-wrapper {
         display: flex;
