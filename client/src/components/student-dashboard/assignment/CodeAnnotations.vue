@@ -250,6 +250,7 @@ code,
     word-break: break-all;
     white-space: pre-wrap;
     margin-right: auto;
+    font-family: "Nunito Sans", sans-serif;
 
     &::v-deep code {
         background-color: #f8f8f8;
