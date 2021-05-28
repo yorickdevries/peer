@@ -58,7 +58,7 @@
                             <div style="flex-shrink: 0">
                                 <icon
                                     v-if="!readOnly"
-                                    name="edit"
+                                    name="pen"
                                     class="mx-2 text-primary"
                                     role="button" 
                                     @click.native="editComment(index + 1)"
