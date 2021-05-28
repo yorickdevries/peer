@@ -1,5 +1,5 @@
 <template>
-    <pre><div class="code-annotations-wrapper">
+    <pre ref="container"><div class="code-annotations-wrapper">
             <div
                 class="code-annotations-line"
                 v-for="(line, index) in content"
@@ -35,7 +35,13 @@
                 </div>
                 <b-collapse
                     v-if="isEndingLine(index + 1)"
-                    v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }"
+                    v-bind:style="{
+                        left: `calc(${maxLineNumberDigits + 2}ch + 1px)`,
+                        width:
+                            $refs.container ?
+                                `calc(${$refs.container.clientWidth}px - (${maxLineNumberDigits + 3}ch + 1px))` : null
+                    }"
+                    class="comment-container"
                     v-model="comment[`${lineNumbers[index + 1]}`]">
                     <b-card>
                         <div v-if="editing && editingEndingLine === index + 1">
@@ -107,7 +113,6 @@ export default {
             editingEndingLine: null,
             editingFilePath: null,
             showEditModal: false,
-            annotationWidth: 0,
             comment: {}
         }
     },
@@ -258,6 +263,10 @@ code,
             font-family: inherit !important;
         }
     }
+}
+
+.comment-container {
+    position: sticky;
 }
 
 pre {
