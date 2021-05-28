@@ -116,6 +116,9 @@ export default {
             comment: {}
         }
     },
+    created() {
+        window.addEventListener("resize", () => this.$forceUpdate())
+    },
     methods: {
         isStartingLine(lineNr) {
             return (
