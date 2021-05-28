@@ -23,6 +23,7 @@ describe("CodeAnnotations", () => {
   let body: Object;
   // Possibility for testing with a second enrolled student
   //let reviewId2: number;
+  const maxCommentLength = 255;
 
   beforeAll(async () => {
     connection = await createDatabaseConnection();
@@ -204,7 +205,7 @@ describe("CodeAnnotations", () => {
 
     // Check if the response is correct
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text) === 255);
+    expect(JSON.parse(res.text) === maxCommentLength);
   });
 
   test("create new annotation", async () => {
@@ -300,7 +301,7 @@ describe("CodeAnnotations", () => {
 
     // Check if the response is what is expected
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject([]);
+    expect(JSON.parse(res.text)).toEqual([]);
 
     // Send annotation to the server
     res = await request(server)
@@ -346,5 +347,56 @@ describe("CodeAnnotations", () => {
 
     // Check if response equals what is expected
     expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+  });
+
+  test("Try too long comment", async () => {
+    // Send default annotation to the server
+    let res = await request(server)
+      .post("/api/codeannotations")
+      .set("cookie", sessionCookie1)
+      .send({
+        reviewId: reviewId1,
+        commentText: "A".repeat(maxCommentLength + 1),
+        startLineNumber: 10,
+        endLineNumber: 11,
+        selectedFile: "submission1.c",
+      });
+
+    expect(res.status).toBe(HttpStatusCode.INTERNAL_SERVER_ERROR);
+
+    res = await request(server)
+      .get(`/api/codeannotations?reviewId=${reviewId1}`)
+      .set("cookie", sessionCookie1);
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toEqual([]);
+
+    res = await request(server)
+      .post("/api/codeannotations")
+      .set("cookie", sessionCookie1)
+      .send({
+        reviewId: reviewId1,
+        commentText: "A".repeat(maxCommentLength),
+        startLineNumber: 10,
+        endLineNumber: 11,
+        selectedFile: "submission1.c",
+      });
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    res = await request(server)
+      .get(`/api/codeannotations?reviewId=${reviewId1}`)
+      .set("cookie", sessionCookie1);
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject([
+      {
+        reviewId: reviewId1,
+        commentText: "A".repeat(maxCommentLength),
+        startLineNumber: 10,
+        endLineNumber: 11,
+        selectedFile: "submission1.c",
+      },
+    ]);
   });
 });
