@@ -35,11 +35,7 @@
                 </div>
                 <b-collapse
                     v-if="isEndingLine(index + 1)"
-                    class="comment-container"
-                    v-bind:style="{
-                        left: `calc(${maxLineNumberDigits + 1}ch + 1px)`,
-                        marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)`
-                    }"
+                    v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }"
                     v-model="comment[`${lineNumbers[index + 1]}`]">
                     <b-card>
                         <div v-if="editing && editingEndingLine === index + 1">
@@ -111,6 +107,7 @@ export default {
             editingEndingLine: null,
             editingFilePath: null,
             showEditModal: false,
+            annotationWidth: 0,
             comment: {}
         }
     },
@@ -260,13 +257,6 @@ code,
             font-family: inherit !important;
         }
     }
-}
-
-.comment-container {
-    position: sticky;
-    display: inline-block;
-    width: auto;
-    right: 0;
 }
 
 pre {
