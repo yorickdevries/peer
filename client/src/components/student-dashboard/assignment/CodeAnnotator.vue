@@ -9,11 +9,10 @@
         <b-alert :show="!showCode" variant="primary">LOADING {{ review ? "REVIEW" : "SUBMISSION" }}</b-alert>
 
         <!-- The buttons and text area for the actual comments, somewhat primitive -->
-        <!-- TODO: Upgrade the look of these buttons -->
         <!-- Only show annotation buttons if this component is inside a non-submitted review -->
-        <div v-if="!readOnly && !reviewSubmitted && showAnnotations">
+        <div v-if="!readOnly && !reviewSubmitted && showAnnotations" class="mb-2">
             <form @submit.prevent="writeComment">
-                <button type="submit" v-if="!writing">Leave a comment on highlighted part</button>
+                <b-button v-if="!writing" type="submit" variant="primary">Leave a comment on highlighted part</b-button>
             </form>
             <PeerTextarea
                 v-if="writing"
@@ -184,7 +183,6 @@ export default {
             this.startLineNumber = null
             this.endLineNumber = null
             this.writing = false
-            this.showSuccessMessage({ message: "Your selection and comment was deleted" })
         },
         async onDeleteComment(index) {
             // Remove comment from comment array
