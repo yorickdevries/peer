@@ -26,7 +26,7 @@
                     ></code>
                     <icon
                         v-if="isStartingLine(index + 1)"
-                        class="position-absolute my-auto arrow"
+                        class="arrow"
                         :class="{ rotate: comment[lineNumbers[index + 1]]}"
                         role="button"
                         name="chevron-up"
@@ -50,7 +50,7 @@
                                 :defaultContent="unescapeHTML(comments[lineNumbers[index + 1]].commentText)"
                             />
                         </div><div v-else class="d-flex">
-                            <span class="mr-auto comment-text" v-html="highlightComment(index + 1)"></span>
+                            <span class="comment-text" v-html="highlightComment(index + 1)"></span>
                             <div style="flex-shrink: 0">
                                 <icon
                                     v-if="!readOnly"
@@ -245,6 +245,7 @@ code,
     overflow-wrap: break-word;
     word-break: break-all;
     white-space: pre-wrap;
+    margin-right: auto;
 
     &::v-deep code {
         background-color: #f8f8f8;
@@ -347,6 +348,9 @@ pre {
     right: 0;
     z-index: 1;
     margin-right: 2ch;
+    position: absolute;
+    margin-top: auto;
+    margin-bottom: auto;
     transition: transform 0.2s ease-in-out;
 }
 
