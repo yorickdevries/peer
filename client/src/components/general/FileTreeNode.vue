@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="dir" class="dir" v-on:click="toggleCollapsed" role="button">
+        <div v-if="dir" class="dir" v-on:click="notifyCollapsing" role="button">
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" role="button" />
             <icon class="text-muted" name="folder"></icon>
             {{ name }}
@@ -15,6 +15,7 @@
 
         <b-collapse style="margin-left: 1.5rem" v-if="dir" :visible="!collapsed">
             <FileTreeNode
+                @toggleCollapse="onChildCollapse"
                 @selected="onChildSelect"
                 v-for="key in Object.keys(children)"
                 :commentedFiles="commentedFiles"
@@ -69,10 +70,15 @@ export default {
         onSelect() {
             this.$emit("selected", this.children.path)
         },
+        notifyCollapsing() {
+            // Let file tree know that its child has the intention to collapse
+            this.$emit("toggleCollapse", this.name)
+        },
         toggleCollapsed() {
-            // Let file tree know that its child is collapsing
-            this.$emit("toggleCollapse")
             this.collapsed = !this.collapsed
+        },
+        onChildCollapse(name) {
+            this.$emit("toggleCollapse", name)
         }
     },
     computed: {
@@ -87,6 +93,14 @@ export default {
         commented() {
             return this.commentedFiles.has(this.children.path)
         }
+    },
+    mounted() {
+        // Event listener waiting for the go-ahead to toggle the collapse state
+        this.$root.$on("filetreenode::collapse", name => {
+            if (this.name === name) {
+                this.toggleCollapsed()
+            }
+        })
     }
 }
 </script>

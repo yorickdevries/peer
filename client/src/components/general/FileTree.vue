@@ -87,12 +87,14 @@ export default {
             }
             this.collapsed = !this.collapsed
         }, // Used to conserve file tree size on child collapse
-        onChildCollapse() {
+        onChildCollapse(name) {
             const el = this.$el
             const height = el.offsetHeight
             const width = el.offsetWidth
             el.style.setProperty("min-height", `${height}px`)
             el.style.setProperty("min-width", `${width}px`)
+            // Gives the file tree node by this name the go-ahead to toggle collapse state
+            this.$root.$emit("filetreenode::collapse", name)
         }
     }
 }
