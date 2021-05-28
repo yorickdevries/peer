@@ -12,7 +12,9 @@
         <!-- Only show annotation buttons if this component is inside a non-submitted review -->
         <div v-if="!readOnly && !reviewSubmitted && showAnnotations" class="mb-2">
             <form @submit.prevent="writeComment">
-                <b-button v-if="!writing" type="submit" variant="primary">Leave a comment on highlighted part</b-button>
+                <b-button v-if="!writing" type="submit" variant="primary">
+                    Leave a comment on the selected code
+                </b-button>
             </form>
             <PeerTextarea
                 v-if="writing"
