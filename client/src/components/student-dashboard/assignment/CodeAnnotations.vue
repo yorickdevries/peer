@@ -37,7 +37,7 @@
                     v-if="isEndingLine(index + 1)"
                     v-bind:style="{
                         left: `calc(${maxLineNumberDigits + 2}ch + 1px)`,
-                        width:
+                        minWidth:
                             $refs.container ?
                                 `calc(${$refs.container.clientWidth}px - (${maxLineNumberDigits + 3}ch + 1px))` : null
                     }"
@@ -61,7 +61,7 @@
                                 <icon
                                     v-if="!readOnly"
                                     name="pen"
-                                    class="mx-2 text-primary"
+                                    class="mx-1 text-primary"
                                     role="button" 
                                     @click.native="editComment(index + 1)"
                                     v-b-modal="`editModal_${lineNumbers[index + 1]}`"
@@ -270,6 +270,7 @@ code,
 
 .comment-container {
     position: sticky;
+    width: fit-content;
 }
 
 pre {
