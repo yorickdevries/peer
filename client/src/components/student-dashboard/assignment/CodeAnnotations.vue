@@ -36,6 +36,7 @@
                 <b-collapse
                     v-if="isEndingLine(index + 1)"
                     v-bind:style="{
+                        marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)`,
                         left: `calc(${maxLineNumberDigits + 2}ch + 1px)`,
                         minWidth:
                             $refs.container ?
