@@ -362,7 +362,7 @@ describe("CodeAnnotations", () => {
         selectedFile: "submission1.c",
       });
 
-    expect(res.status).toBe(HttpStatusCode.INTERNAL_SERVER_ERROR);
+    expect(res.status).toBe(HttpStatusCode.BAD_REQUEST);
 
     res = await request(server)
       .get(`/api/codeannotations?reviewId=${reviewId1}`)
