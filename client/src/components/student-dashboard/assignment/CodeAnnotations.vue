@@ -238,6 +238,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$code-annotation-background: rgba(0, 0, 0, 0.03);
+
 code,
 .comment-text::v-deep {
     background-color: inherit;
@@ -259,7 +261,7 @@ code,
     font-size: initial;
 
     &::v-deep code {
-        background-color: #f8f8f8;
+        background-color: $code-annotation-background;
         display: inline-block;
         font-size: 87.5%;
 
@@ -308,7 +310,7 @@ pre {
             &.comment {
                 border-left: 1px solid var(--gray);
                 border-right: 1px solid var(--gray);
-                background-color: rgba(0, 0, 0, 0.03);
+                background-color: $code-annotation-background;
                 margin-right: 1ch;
                 padding-right: 7ch;
             }
