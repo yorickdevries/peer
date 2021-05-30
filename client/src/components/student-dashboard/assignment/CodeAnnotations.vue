@@ -255,7 +255,7 @@ code,
     word-break: break-all;
     white-space: pre-wrap;
     margin-right: auto;
-    font-family: "Nunito Sans", sans-serif;
+    font-family: var(--default-font);
     font-size: initial;
 
     &::v-deep code {
