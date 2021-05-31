@@ -9,8 +9,8 @@
             <div>
                 <icon class="text-muted" name="code"></icon>
                 <span class="filename"> {{ name }}</span>
-                <icon v-if="commented" class="text-muted comment-icon" name="comments" />
             </div>
+            <icon v-if="commented" class="text-muted comment-icon" name="comments" />
         </div>
 
         <b-collapse style="margin-left: 1.5rem" v-if="dir" :visible="!collapsed">
@@ -123,6 +123,7 @@ $bg-dark: #343a40;
     }
 }
 .comment-icon {
-    margin-left: 5px;
+    margin: auto 5px;
+    display: inline-block;
 }
 </style>
