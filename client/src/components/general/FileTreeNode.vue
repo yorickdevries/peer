@@ -2,12 +2,12 @@
     <div>
         <div v-if="dir" class="dir" v-on:click="notifyCollapsing" role="button">
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" role="button" />
-            <icon class="text-muted file-icon" name="folder"></icon>
+            <icon class="text-muted" name="folder"></icon>
             {{ name }}
         </div>
         <div v-else @click="onSelect" v-bind:class="`${background} file d-flex justify-content-between`" role="button">
             <div>
-                <icon class="text-muted file-icon" name="code"></icon>
+                <icon class="text-muted" name="code"></icon>
                 <span class="filename"> {{ name }}</span>
                 <icon v-if="commented" class="text-muted comment-icon" name="comments" />
             </div>
@@ -124,8 +124,5 @@ $bg-dark: #343a40;
 }
 .comment-icon {
     margin-left: 5px;
-}
-.file-icon {
-    margin-right: 1px;
 }
 </style>
