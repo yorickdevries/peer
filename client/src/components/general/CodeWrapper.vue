@@ -112,23 +112,26 @@ export default {
                 .catch(console.error)
         },
         fixMultiLineHighlighting(lines) {
-            // For each line, this function checks for any opening or closing span tags that do not have their respective counterpart.
-            // If the stack is not empty, we place the current line in a span with the class name from the top of the stack
-            // If an opening span is found, its class name is pushed to the stack because the following lines need the same highlight.
-            // If a closing span is found, the top class name is popped from the stack because that highlight is done.
-            const unopened = /<span[^<]*<\/span>|(<\/span>)/gm
-            const unclosed = /<span class=\\?"([\w-]*)\\?">[^<]*(?=<span|$)/gm
+            // For each line, this function finds all opening and closing span tags
+            // For all opening span tags, the class name is pushed to the stack
+            // For all closing span tags, the top of the stack is popped
+            const spanTags = /<span.*?\\?"(.*?)\\?">|<\/span>/g
             const stack = []
             for (let i = 0; i < lines.length; i++) {
-                const unopenedMatch = [...lines[i].matchAll(unopened)].map(x => x[1]) // needs an opening span
-                const unclosedMatch = [...lines[i].matchAll(unclosed)].map(x => x[1]) // needs a closing span
+                // Add all opening span tags
+                const prepend = stack.join("")
 
-                if (stack.length > 0) {
-                    lines[i] = `<span class="${stack[stack.length - 1]}">${lines[i]}</span>`
-                }
+                // Go through the line, modify the stack
+                ;[...lines[i].matchAll(spanTags)].forEach(match => {
+                    if (match[1] === undefined) {
+                        stack.pop()
+                    } else {
+                        stack.push(`<span class="${match[1]}">`)
+                    }
+                })
 
-                unopenedMatch.filter(x => x).forEach(() => stack.pop())
-                unclosedMatch.forEach(className => stack.push(className))
+                // Add all closing span tags
+                lines[i] = prepend + lines[i] + "</span>".repeat(stack.length)
             }
 
             return lines
@@ -138,7 +141,7 @@ export default {
             let highlighted
 
             if (hljs.getLanguage(fileExtension)) {
-                highlighted = hljs.highlight(text, { language: fileExtension })
+                highlighted = hljs.highlight(text, { language: fileExtension, ignoreIllegals: true })
             } else {
                 highlighted = hljs.highlightAuto(text)
             }
