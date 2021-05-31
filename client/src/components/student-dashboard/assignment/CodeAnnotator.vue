@@ -9,11 +9,12 @@
         <b-alert :show="!showCode" variant="primary">LOADING {{ review ? "REVIEW" : "SUBMISSION" }}</b-alert>
 
         <!-- The buttons and text area for the actual comments, somewhat primitive -->
-        <!-- TODO: Upgrade the look of these buttons -->
         <!-- Only show annotation buttons if this component is inside a non-submitted review -->
-        <div v-if="!readOnly && !reviewSubmitted && showAnnotations">
+        <div v-if="!readOnly && !reviewSubmitted && showAnnotations" class="mb-2">
             <form @submit.prevent="writeComment">
-                <button type="submit" v-if="!writing">Leave a comment on highlighted part</button>
+                <b-button v-if="!writing" type="submit" variant="primary">
+                    Leave a comment on the selected code
+                </b-button>
             </form>
             <PeerTextarea
                 v-if="writing"
@@ -23,7 +24,7 @@
                 @submit="submitComment"
                 @cancel="deleteSelection"
                 :maxLength="maxCommentLength"
-                :defaultLanguage="selectedFile.split('.').pop()"
+                :defaultLanguage="language"
             />
         </div>
 
@@ -40,9 +41,10 @@
                 @edited="onEditedComment"
                 :content="content"
                 :comments="comments"
+                :language="language"
+                :maxCommentLength="maxCommentLength"
                 :selectedFile="selectedFile"
                 :readOnly="readOnly || reviewSubmitted"
-                :maxCommentLength="maxCommentLength"
             />
             <!--
                 Display the code without annotations.
@@ -62,15 +64,7 @@ import PeerTextarea from "./PeerTextarea"
 export default {
     mixins: [notifications],
     components: { CodeAnnotations, PeerTextarea },
-    props: ["comments", "content", "selectedFile", "readOnly", "review"],
-    computed: {
-        showAnnotations() {
-            return !(this.review == null)
-        },
-        reviewSubmitted() {
-            return this.review && this.review.submitted
-        }
-    },
+    props: ["comments", "content", "language", "selectedFile", "readOnly", "review"],
     data() {
         return {
             showCode: false,
@@ -90,8 +84,8 @@ export default {
     },
     methods: {
         async getMaxCommentLength() {
-            this.maxCommentLength = await api.codeannotations.getMaxCommentLength()
-            this.maxCommentLength = this.maxCommentLength.data
+            const res = await api.codeannotations.getMaxCommentLength()
+            this.maxCommentLength = res.data
         },
         async writeComment() {
             const selection = window.getSelection()
@@ -191,7 +185,6 @@ export default {
             this.startLineNumber = null
             this.endLineNumber = null
             this.writing = false
-            this.showSuccessMessage({ message: "Your selection and comment was deleted" })
         },
         async onDeleteComment(index) {
             // Remove comment from comment array
@@ -207,6 +200,14 @@ export default {
             comment.commentText = res.data.commentText
             this.comments.splice(index, 1, comment)
             this.showSuccessMessage({ message: "Successfully updated comment" })
+        }
+    },
+    computed: {
+        showAnnotations() {
+            return !(this.review == null)
+        },
+        reviewSubmitted() {
+            return this.review && this.review.submitted
         }
     }
 }

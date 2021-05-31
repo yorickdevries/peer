@@ -3,15 +3,20 @@
         <form @submit.prevent="onSubmit" @reset.prevent="onCancel">
             <b-form-textarea
                 ref="textarea"
+                class="overflow-auto"
                 v-bind="$attrs"
                 v-model="text"
                 :state="validateContentLength()"
             ></b-form-textarea>
-            <b-button variant="outline-primary" type="button" @click="insertCodeBlock()">
-                Insert inline code block
-            </b-button>
-            <b-button variant="primary" type="submit">Submit</b-button>
-            <b-button variant="danger" type="reset">Cancel</b-button>
+            <div class="mt-2">
+                <b-button variant="outline-primary" type="button" @click="insertCodeBlock()">
+                    Insert inline code block
+                </b-button>
+                <div style="float: right">
+                    <b-button variant="secondary" type="reset" class="mr-2">Cancel</b-button>
+                    <b-button variant="primary" type="submit">Submit</b-button>
+                </div>
+            </div>
         </form>
     </div>
 </template>

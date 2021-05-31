@@ -68,7 +68,8 @@ export default {
             selected: null,
             showWarning: false,
             showFile: false,
-            review: null
+            review: null,
+            language: null
         }
     },
     async created() {
@@ -147,7 +148,7 @@ export default {
             }
 
             this.content = this.fixMultiLineHighlighting(highlighted.value.split(/\r?\n/g))
-
+            this.language = highlighted.language
             this.showFile = true
         },
         async verifyTextContent(text) {

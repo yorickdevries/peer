@@ -14,6 +14,7 @@ import { AssignmentState } from "../enum/AssignmentState";
 import moment from "moment";
 
 const router = express.Router();
+const maxCommentLength = 255;
 
 router.get("/getMaxCommentLength", async (req, res) => {
   const user = req.user;
@@ -22,7 +23,7 @@ router.get("/getMaxCommentLength", async (req, res) => {
       .status(HttpStatusCode.FORBIDDEN)
       .send("Please make sure you are logged in.");
   }
-  res.status(HttpStatusCode.OK).send("255");
+  res.status(HttpStatusCode.OK).send(maxCommentLength.toString());
 });
 
 // Joi inputvalidation for query
@@ -88,7 +89,7 @@ router.get("/", validateQuery(getAnnotationsSchema), async (req, res) => {
 // Joi inputvalidation
 const annotationSchema = Joi.object({
   reviewId: Joi.number().integer().required(),
-  commentText: Joi.string(),
+  commentText: Joi.string().max(maxCommentLength),
   startLineNumber: Joi.number().integer(),
   endLineNumber: Joi.number().integer(),
   selectedFile: Joi.string(),
@@ -192,7 +193,7 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
 });
 
 const updateAnnotationSchema = Joi.object({
-  commentText: Joi.string().required(),
+  commentText: Joi.string().required().max(maxCommentLength),
 });
 
 router.patch(

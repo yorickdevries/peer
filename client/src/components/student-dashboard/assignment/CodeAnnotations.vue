@@ -1,11 +1,11 @@
 <template>
-    <pre><div class="code-annotations-wrapper">
+    <pre ref="container"><div class="code-annotations-wrapper">
             <div
-                class="position-relative code-annotations-line"
+                class="code-annotations-line"
                 v-for="(line, index) in content"
                 :key="index + 'code'"
             >
-                <div class="d-flex">
+                <div class="position-relative d-flex">
                     <code
                         class="code-annotations-linenr"
                         :linenr="index + 1"
@@ -24,19 +24,25 @@
                         role="button"
                         @click="toggleComment(lineNumbers[index + 1])"
                     ></code>
+                    <icon
+                        v-if="isStartingLine(index + 1)"
+                        class="arrow"
+                        :class="{ rotate: comment[lineNumbers[index + 1]]}"
+                        role="button"
+                        name="chevron-up"
+                        @click.native="toggleComment(lineNumbers[index + 1])"
+                    />
                 </div>
-                <icon
-                    v-if="isStartingLine(index + 1)"
-                    class="position-absolute mt-1 mr-2 arrow"
-                    :class="{ rotate: comment[lineNumbers[index + 1]]}"
-                    style="top: 0; right: 0; z-index: 1"
-                    role="button"
-                    name="chevron-down"
-                    @click.native="toggleComment(lineNumbers[index + 1])"
-                />
                 <b-collapse
                     v-if="isEndingLine(index + 1)"
-                    v-bind:style="{ marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)` }"
+                    v-bind:style="{
+                        marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)`,
+                        left: `calc(${maxLineNumberDigits + 2}ch + 1px)`,
+                        minWidth:
+                            $refs.container ?
+                                `calc(${$refs.container.clientWidth}px - (${maxLineNumberDigits + 3}ch + 1px))` : null
+                    }"
+                    class="comment-container"
                     v-model="comment[`${lineNumbers[index + 1]}`]">
                     <b-card>
                         <div v-if="editing && editingEndingLine === index + 1">
@@ -47,45 +53,44 @@
                                 @submit="(text) => submitEditedComment(index + 1, text)"
                                 @cancel="cancelEdit"
                                 :maxLength="maxCommentLength"
-                                :defaultLanguage="editingFilePath.split('.').pop()"
+                                :defaultLanguage="language"
                                 :defaultContent="unescapeHTML(comments[lineNumbers[index + 1]].commentText)"
                             />
-                        </div><div class="d-flex" v-else>
-                            <span class="mr-auto comment-text" v-html="highlightComment(index + 1)"></span>
-                            <icon
-                                v-if="!readOnly"
-                                name="edit"
-                                class="mt-auto mb-auto text-info"
-                                role="button" 
-                                style="flex-shrink: 0"
-                                @click.native="editComment(index + 1)"
-                                v-b-modal="`editModal_${lineNumbers[index + 1]}`"
-                            />
-                            <b-modal 
-                                :id="`editModal_${lineNumbers[index + 1]}`" 
-                                @ok="editModalOk(index + 1)"
-                                variant="danger"
-                                title="Warning!"
-                                v-if="showEditModal"
-                                centered>
-                                {{ getModalText() }}
-                            </b-modal>
-                            <div style="width:10px"/>
-                            <icon
-                                v-if="!readOnly"
-                                name="trash"
-                                class="mt-auto mb-auto text-danger"
-                                style="flex-shrink: 0"
-                                role="button"
-                                v-b-modal="`modal_${lineNumbers[index + 1]}`"
-                            />
-                            <b-modal
-                                @ok="deleteComment(lineNumbers[index + 1])"
-                                :id="`modal_${lineNumbers[index + 1]}`"
-                                title="Confirmation"
-                                centered>
-                                Are you sure you want to delete this comment?
-                            </b-modal>
+                        </div><div v-else class="d-flex">
+                            <span class="comment-text" v-html="highlightComment(index + 1)"></span>
+                            <div style="flex-shrink: 0">
+                                <icon
+                                    v-if="!readOnly"
+                                    name="pen"
+                                    class="mx-1 text-primary"
+                                    role="button" 
+                                    @click.native="editComment(index + 1)"
+                                    v-b-modal="`editModal_${lineNumbers[index + 1]}`"
+                                />
+                                <b-modal 
+                                    :id="`editModal_${lineNumbers[index + 1]}`" 
+                                    @ok="editModalOk(index + 1)"
+                                    variant="danger"
+                                    title="Warning!"
+                                    v-if="showEditModal"
+                                    centered>
+                                    {{ getModalText() }}
+                                </b-modal>
+                                <icon
+                                    v-if="!readOnly"
+                                    name="trash"
+                                    class="text-danger"
+                                    role="button"
+                                    v-b-modal="`modal_${lineNumbers[index + 1]}`"
+                                />
+                                <b-modal
+                                    @ok="deleteComment(lineNumbers[index + 1])"
+                                    :id="`modal_${lineNumbers[index + 1]}`"
+                                    title="Confirmation"
+                                    centered>
+                                    Are you sure you want to delete this comment?
+                                </b-modal>
+                            </div>
                         </div>
                     </b-card>
                 </b-collapse>
@@ -100,7 +105,7 @@ import notifications from "../../../mixins/notifications"
 import PeerTextarea from "./PeerTextarea"
 
 export default {
-    props: ["content", "comments", "selectedFile", "readOnly", "maxCommentLength"],
+    props: ["content", "comments", "language", "maxCommentLength", "selectedFile", "readOnly"],
     mixins: [notifications],
     components: { PeerTextarea },
     data() {
@@ -111,6 +116,9 @@ export default {
             showEditModal: false,
             comment: {}
         }
+    },
+    created() {
+        window.addEventListener("resize", () => this.$forceUpdate())
     },
     methods: {
         isStartingLine(lineNr) {
@@ -230,6 +238,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+$code-annotation-background: rgba(0, 0, 0, 0.03);
+
 code,
 .comment-text::v-deep {
     background-color: inherit;
@@ -242,15 +252,28 @@ code,
 
 .comment-text {
     display: inline-block;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    white-space: pre-wrap;
+    margin-right: auto;
+    font-family: var(--default-font);
+    font-size: initial;
 
     &::v-deep code {
-        background-color: #f8f8f8;
+        background-color: $code-annotation-background;
         display: inline-block;
+        font-size: 87.5%;
 
         span {
             font-family: inherit !important;
         }
     }
+}
+
+.comment-container {
+    position: sticky;
+    width: fit-content;
 }
 
 pre {
@@ -260,6 +283,7 @@ pre {
     background-color: white;
     margin: 0;
     max-height: 80vh;
+    font-size: 87.5%;
 
     .code-annotations-wrapper {
         display: flex;
@@ -286,7 +310,9 @@ pre {
             &.comment {
                 border-left: 1px solid var(--gray);
                 border-right: 1px solid var(--gray);
-                background-color: #f8f8f8;
+                background-color: $code-annotation-background;
+                margin-right: 1ch;
+                padding-right: 7ch;
             }
 
             &.comment_start {
@@ -319,18 +345,32 @@ pre {
                 padding-right: 7ch;
             }
         }
+
+        &.collapse {
+            margin-right: 1ch;
+            font-family: var(--font-family-monospace);
+        }
+
+        &.card {
+            font-family: initial;
+        }
+
+        .fa-icon {
+            display: inline;
+            vertical-align: middle;
+        }
     }
 }
 
-.collapse {
-    font-family: var(--font-family-monospace);
-}
-
-.card {
-    font-family: initial;
-}
-
 .arrow {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+    margin-right: 2ch;
+    position: absolute;
+    margin-top: auto;
+    margin-bottom: auto;
     transition: transform 0.2s ease-in-out;
 }
 
