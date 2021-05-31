@@ -399,4 +399,15 @@ export default class Assignment extends BaseModel {
     }
     return false;
   }
+
+  async hasSubmissionQuestionnaires(): Promise<boolean> {
+    for (const assignmentVersion of this.versions) {
+      const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+      if (!submissionQuestionnaire) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
