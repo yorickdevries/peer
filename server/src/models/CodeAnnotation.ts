@@ -25,7 +25,7 @@ export default class CodeAnnotation extends BaseModel {
   review?: ReviewOfSubmission;
 
   // The contents of the code annotation
-  @Column({type: "text"})
+  @Column({ type: "text" })
   @IsString()
   @IsNotEmpty()
   commentText: string;
