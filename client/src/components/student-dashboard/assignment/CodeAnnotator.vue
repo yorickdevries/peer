@@ -5,8 +5,8 @@
         <!-- The buttons and text area for the actual comments, somewhat primitive -->
         <!-- Only show annotation buttons if this component is inside a non-submitted review -->
         <div v-if="!readOnly && !reviewSubmitted && showAnnotations" class="mb-3">
-            <form @submit.prevent="writeComment" class="annotation-form">
-                <b-button v-if="!writing" type="submit" variant="primary">
+            <form v-if="!writing" @submit.prevent="writeComment" class="annotation-form">
+                <b-button type="submit" variant="primary">
                     Leave a comment on the selected code
                 </b-button>
                 <b-alert variant="info" class="ml-3" show>
