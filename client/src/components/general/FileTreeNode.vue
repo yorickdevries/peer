@@ -5,7 +5,7 @@
             <icon class="text-muted" name="folder"></icon>
             {{ name }}
         </div>
-        <div v-else @click="onSelect" v-bind:class="`${background} file d-flex justify-content-between`" role="button">
+        <div v-else @click="onSelect" v-bind:class="`${background} file`" role="button">
             <div>
                 <icon class="text-muted" name="code"></icon>
                 <span class="filename"> {{ name }}</span>
@@ -13,7 +13,7 @@
             <icon v-if="commented" class="text-muted comment-icon" name="comments" />
         </div>
 
-        <b-collapse style="margin-left: 1.5rem" v-if="dir" :visible="!collapsed">
+        <b-collapse class="ml-4" v-if="dir" :visible="!collapsed">
             <FileTreeNode
                 @toggleCollapse="onChildCollapse"
                 @selected="onChildSelect"
@@ -110,18 +110,26 @@ $text-hover: #212529;
 $background-hover: #f8f8f8;
 $text-light: #f8f9fa;
 $bg-dark: #343a40;
+
 .selected.file:hover {
     background-color: scale-color($color: $bg-dark, $lightness: -30%) !important;
     .filename {
         color: $text-light !important;
     }
 }
+
+.file {
+    display: flex;
+    justify-content: space-between;
+}
+
 .file:hover {
     background-color: $background-hover !important;
     .filename {
         color: $text-hover;
     }
 }
+
 .comment-icon {
     margin: auto 5px;
     display: inline-block;
