@@ -5,7 +5,7 @@
             :reviewId="reviewId"
             :submissionId="submissionId"
             :readOnly="readOnly"
-            :reviewColors="reviewColors"
+            :reviewColors="reviewColors || defaultReviewColor"
         />
         <CodeWrapper
             v-else-if="renderAs === 'code'"
@@ -13,7 +13,7 @@
             :readOnly="readOnly"
             :submissionId="submissionId"
             :reviewId="reviewId"
-            :reviewColors="reviewColors"
+            :reviewColors="reviewColors || defaultReviewColor"
         />
         <div v-else>
             <b-alert show variant="secondary">
@@ -43,6 +43,9 @@ export default {
             } else {
                 return ""
             }
+        },
+        defaultReviewColor() {
+            return { [this.reviewId]: "#648fff" }
         }
     },
     data() {
