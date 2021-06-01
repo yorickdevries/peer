@@ -694,7 +694,7 @@ router.post(
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send("An assignmentversion is missing a submission questionnaire");
+        .send("An assignmentversion is missing a submissionquestionnaire");
       return;
     }
     // offload a function to a worker
