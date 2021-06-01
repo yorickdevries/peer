@@ -7,7 +7,7 @@
             >
                 <div class="position-relative d-flex">
                     <code
-                        class="code-annotations-linenr"
+                        v-bind:class="['code-annotations-linenr', `depth_${lineNumbers[index + 1].length}`]"
                         :linenr="index + 1"
                         v-bind:style="{ width: `${maxLineNumberDigits}ch` }"
                     >{{ index + 1 }}</code>
@@ -19,7 +19,7 @@
                     ></code><code
                         v-else
                         :linenr="index + 1"
-                        v-bind:class="{ comment_start: isStartingLine(index + 1), comment: true, comment_end: isEndingLine(index + 1) }"
+                        v-bind:class="{ comment: true, comment_start: isStartingLine(index + 1), comment_end: isEndingLine(index + 1) }"
                         v-html="line.replace(/^$/, '<br />')"
                         role="button"
                         @click="toggleComment(lineNumbers[index + 1])"
@@ -65,10 +65,10 @@
                                     class="mx-1 text-primary"
                                     role="button" 
                                     @click.native="editComment(index + 1)"
-                                    v-b-modal="`editModal_${lineNumbers[index + 1]}`"
+                                    v-b-modal="`editModal_${lineNumbers[index + 1][0]}`"
                                 />
                                 <b-modal 
-                                    :id="`editModal_${lineNumbers[index + 1]}`" 
+                                    :id="`editModal_${lineNumbers[index + 1][0]}`" 
                                     @ok="editModalOk(index + 1)"
                                     variant="danger"
                                     title="Warning!"
@@ -81,11 +81,11 @@
                                     name="trash"
                                     class="text-danger"
                                     role="button"
-                                    v-b-modal="`modal_${lineNumbers[index + 1]}`"
+                                    v-b-modal="`modal_${lineNumbers[index + 1][0]}`"
                                 />
                                 <b-modal
-                                    @ok="deleteComment(lineNumbers[index + 1])"
-                                    :id="`modal_${lineNumbers[index + 1]}`"
+                                    @ok="deleteComment(lineNumbers[index + 1][0])"
+                                    :id="`modal_${lineNumbers[index + 1][0]}`"
                                     title="Confirmation"
                                     centered>
                                     Are you sure you want to delete this comment?
@@ -118,24 +118,24 @@ export default {
         }
     },
     created() {
-        console.warn(this.comments)
+        console.warn(this.comment)
         window.addEventListener("resize", () => this.$forceUpdate())
     },
     methods: {
         isStartingLine(lineNr) {
             return (
                 this.isCommentedOn(lineNr) &&
-                (lineNr === 1 || this.lineNumbers[lineNr - 1] !== this.lineNumbers[lineNr])
+                this.lineNumbers[lineNr].some(id => this.comments[id].startLineNumber === lineNr)
             )
         },
         isEndingLine(lineNr) {
             return (
                 this.isCommentedOn(lineNr) &&
-                (lineNr === this.lineNumbers.length || this.lineNumbers[lineNr + 1] !== this.lineNumbers[lineNr])
+                this.lineNumbers[lineNr].some(id => this.comments[id].endLineNumber === lineNr)
             )
         },
         isCommentedOn(lineNr) {
-            return lineNr >= 1 && lineNr <= this.lineNumbers.length && this.lineNumbers[lineNr] >= 0
+            return lineNr >= 1 && lineNr <= this.lineNumbers.length && this.lineNumbers[lineNr].length > 0
         },
         escapeHTML(text) {
             return text
@@ -155,7 +155,7 @@ export default {
         },
         highlightComment(lineNr) {
             const codeBlock = /(```)([^\s]*)(\s?)((?:.|\s)*?)\1/g
-            const commentIndex = this.lineNumbers[lineNr]
+            const commentIndex = this.lineNumbers[lineNr][this.lineNumbers[lineNr].length - 1]
 
             return this.escapeHTML(this.comments[commentIndex].commentText).replaceAll(
                 codeBlock,
@@ -214,21 +214,25 @@ export default {
             }
         },
         toggleComment(index) {
-            this.$set(this.comment, index, !this.comment[index])
+            console.warn(index)
+            this.$set(this.comment, index[index.length - 1], !this.comment[index])
         }
     },
     computed: {
         lineNumbers: function() {
-            const res = new Array(this.content.length + 1)
-                .fill(-1)
-                .map((_, lineNr) =>
-                    this.comments.findIndex(
-                        comment =>
-                            comment.startLineNumber <= lineNr &&
-                            comment.endLineNumber >= lineNr &&
-                            comment.selectedFile === this.selectedFile
-                    )
-                )
+            const res = new Array(this.content.length + 1).fill(-1).map((_, lineNr) => {
+                const result = []
+                for (let i = 0; i < this.comments.length; i++) {
+                    if (
+                        this.comments[i].startLineNumber <= lineNr &&
+                        this.comments[i].endLineNumber >= lineNr &&
+                        this.comments[i].selectedFile === this.selectedFile
+                    ) {
+                        result.push(i)
+                    }
+                }
+                return result.sort((a, b) => this.comments[b].endLineNumber - this.comments[a].endLineNumber)
+            })
             return res
         },
         maxLineNumberDigits() {
@@ -330,8 +334,6 @@ pre {
 
             &.code-annotations-linenr {
                 flex-shrink: 0;
-                margin-right: 1ch;
-                border-right: 1px solid var(--gray);
                 box-sizing: content-box;
                 padding-right: 1ch;
                 user-select: none;
@@ -377,5 +379,47 @@ pre {
 
 .rotate {
     transform: rotate(180deg);
+}
+
+$color_depth_1: #ff7675;
+$color_depth_2: #ffeaa7;
+$color_depth_3: #55efc4;
+$color_depth_4: #81ecec;
+$alpha_adjustment: 0;
+
+.depth_0,
+.depth_1,
+.depth_2,
+.depth_3 {
+    border-right-width: 0.25ch;
+    border-right-style: solid;
+    border-right-color: var(--gray);
+    padding-right: 1ch;
+    margin-right: 1ch;
+    position: relative;
+}
+
+.depth_1::after,
+.depth_2::after,
+.depth_3::after {
+    content: "";
+    display: inline-block;
+    width: 0.5ch;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: calc(-0.25ch - 0.125ch);
+}
+
+.depth_1::after {
+    background-color: adjust-color($color_depth_1, $alpha: $alpha_adjustment);
+}
+
+.depth_2::after {
+    background-color: adjust-color(mix($color_depth_1, $color_depth_2), $alpha: $alpha_adjustment);
+}
+
+.depth_3::after {
+    background-color: adjust-color(mix(mix($color_depth_1, $color_depth_2), $color_depth_3), $alpha: $alpha_adjustment);
 }
 </style>
