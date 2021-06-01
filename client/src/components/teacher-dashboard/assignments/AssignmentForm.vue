@@ -276,7 +276,7 @@
                         <b-form-select
                             :options="extensionTypes"
                             v-model="assignment.submissionExtensions"
-                            :class="{ 'disabled-select': assignment.state !== 'unpublished' }"
+                            :disabled="assignment.state !== 'unpublished'"
                         ></b-form-select>
                     </b-form-group>
 

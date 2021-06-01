@@ -95,8 +95,3 @@ body {
   background-color: black;
   opacity: .5;
 }
-// Disables a selection dropdown from being clickable (used in assignment editing screen)
-.disabled-select {
-  pointer-events: none;
-  opacity: .5;
-}
