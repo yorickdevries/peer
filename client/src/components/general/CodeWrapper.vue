@@ -8,7 +8,6 @@
         </b-alert>
         <b-container
             fluid
-            v-bind:class="{ 'ml-3': !singleFile }"
             v-bind:style="{
                 position: 'relative',
                 overflow: 'hidden'
@@ -20,7 +19,7 @@
                 </b-alert>
             </b-row>
             <b-row>
-                <b-col md="auto" :style="{ 'margin-top': readOnly ? '2em' : 'unset' }">
+                <b-col md="auto">
                     <FileTree
                         style="height: 100%"
                         @selected="onSelect"
