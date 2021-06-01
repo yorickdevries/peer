@@ -43,7 +43,7 @@
                                 `calc(${$refs.container.clientWidth}px - (${maxLineNumberDigits + 3}ch + 1px))` : null
                     }"
                     class="comment-container"
-                    v-model="comment[`${lineNumbers[index + 1]}`]">
+                    v-model="comment[`${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`]">
                     <b-card>
                         <div v-if="editing && editingEndingLine === index + 1">
                             <PeerTextarea
@@ -54,7 +54,7 @@
                                 @cancel="cancelEdit"
                                 :maxLength="maxCommentLength"
                                 :defaultLanguage="language"
-                                :defaultContent="unescapeHTML(comments[lineNumbers[index + 1]].commentText)"
+                                :defaultContent="unescapeHTML(comments[lineNumbers[index + 1][lineNumbers[index + 1].length - 1]].commentText)"
                             />
                         </div><div v-else class="d-flex">
                             <span class="comment-text" v-html="highlightComment(index + 1)"></span>
@@ -65,10 +65,10 @@
                                     class="mx-1 text-primary"
                                     role="button" 
                                     @click.native="editComment(index + 1)"
-                                    v-b-modal="`editModal_${lineNumbers[index + 1][0]}`"
+                                    v-b-modal="`editModal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`"
                                 />
                                 <b-modal 
-                                    :id="`editModal_${lineNumbers[index + 1][0]}`" 
+                                    :id="`editModal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`" 
                                     @ok="editModalOk(index + 1)"
                                     variant="danger"
                                     title="Warning!"
@@ -81,11 +81,11 @@
                                     name="trash"
                                     class="text-danger"
                                     role="button"
-                                    v-b-modal="`modal_${lineNumbers[index + 1][0]}`"
+                                    v-b-modal="`modal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`"
                                 />
                                 <b-modal
-                                    @ok="deleteComment(lineNumbers[index + 1][0])"
-                                    :id="`modal_${lineNumbers[index + 1][0]}`"
+                                    @ok="deleteComment(lineNumbers[index + 1][lineNumbers[index + 1].length - 1])"
+                                    :id="`modal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`"
                                     title="Confirmation"
                                     centered>
                                     Are you sure you want to delete this comment?
@@ -214,8 +214,7 @@ export default {
             }
         },
         toggleComment(index) {
-            console.warn(index)
-            this.$set(this.comment, index[index.length - 1], !this.comment[index])
+            this.$set(this.comment, index[index.length - 1], !this.comment[index[index.length - 1]])
         }
     },
     computed: {
@@ -381,10 +380,10 @@ pre {
     transform: rotate(180deg);
 }
 
-$color_depth_1: #ff7675;
-$color_depth_2: #ffeaa7;
-$color_depth_3: #55efc4;
-$color_depth_4: #81ecec;
+$color_depth_1: #ff7979;
+$color_depth_2: #ffbe76;
+$color_depth_3: #f6e58d;
+$color_depth_4: #badc58;
 $alpha_adjustment: 0;
 
 .depth_0,
@@ -412,14 +411,17 @@ $alpha_adjustment: 0;
 }
 
 .depth_1::after {
-    background-color: adjust-color($color_depth_1, $alpha: $alpha_adjustment);
+    // background-color: adjust-color($color_depth_1, $alpha: $alpha_adjustment);
+    background-color: $color_depth_1;
 }
 
 .depth_2::after {
-    background-color: adjust-color(mix($color_depth_1, $color_depth_2), $alpha: $alpha_adjustment);
+    // background-color: adjust-color(mix($color_depth_1, $color_depth_2), $alpha: $alpha_adjustment);
+    background-color: $color_depth_2;
 }
 
 .depth_3::after {
-    background-color: adjust-color(mix(mix($color_depth_1, $color_depth_2), $color_depth_3), $alpha: $alpha_adjustment);
+    // background-color: adjust-color(mix(mix($color_depth_1, $color_depth_2), $color_depth_3), $alpha: $alpha_adjustment);
+    background-color: $color_depth_3;
 }
 </style>
