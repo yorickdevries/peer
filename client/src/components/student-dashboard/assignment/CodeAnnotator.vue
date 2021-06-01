@@ -25,7 +25,7 @@
             />
         </div>
 
-        <b-card v-show="showCode">
+        <b-card v-show="showCode" class="h-100">
             <!--
                 Displays the code with annotations in the mode specified by the readOnly variable.
                 This is used to allow students to annotate code during the review stage, where readOnly is then false.
@@ -213,7 +213,6 @@ export default {
 <style lang="scss" scoped>
 .annotation-form {
     display: flex;
-    justify-content: stretch;
     align-items: stretch;
 
     .alert {

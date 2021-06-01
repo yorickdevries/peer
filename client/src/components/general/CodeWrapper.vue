@@ -20,7 +20,7 @@
             <b-row>
                 <b-col md="auto">
                     <FileTree
-                        style="height: 100%"
+                        class="h-100"
                         @selected="onSelect"
                         :commentedFiles="commentedFiles"
                         :files="files"
@@ -30,6 +30,7 @@
                 </b-col>
                 <b-col>
                     <CodeAnnotator
+                        class="h-100"
                         :comments="comments"
                         :content="content"
                         :readOnly="readOnly"
