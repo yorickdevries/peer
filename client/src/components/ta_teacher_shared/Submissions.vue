@@ -161,6 +161,8 @@ export default {
                 { key: "final", label: "Final" },
                 { key: "approvalByTA", label: "Approval by TA" },
                 { key: "approvingTA", label: "Approving TA" },
+                { key: "flaggedByServer", label: "Flagged by server" },
+                { key: "commentByServer", label: "Comment by server" },
                 { key: "action", label: "Action" }
             ],
             currentPage: 1,
