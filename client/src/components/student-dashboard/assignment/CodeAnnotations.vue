@@ -6,11 +6,20 @@
                 :key="index + 'code'"
             >
                 <div class="position-relative d-flex">
-                    <code
-                        v-bind:class="['code-annotations-linenr', `depth_${lineNumbers[index + 1].length}`]"
-                        :linenr="index + 1"
-                        v-bind:style="{ width: `${maxLineNumberDigits}ch` }"
-                    >{{ index + 1 }}</code>
+                    <div class="gutter">
+                        <code
+                            class="code-annotations-linenr"
+                            :linenr="index + 1"
+                            v-bind:style="{ width: `${maxLineNumberDigits}ch` }"
+                        >{{ index + 1 }}</code>
+                        <div class="review-bar">
+                            <span
+                                v-for="review in reviewsInFile"
+                                :key="index + 'review_' + review"
+                                :class="{ annotated: lineNumbers[index + 1].some(id => comments[id].reviewId === review) }"
+                            ></span>
+                        </div>
+                    </div>
                     <code
                         class="code-annotations-code"
                         v-if="!isCommentedOn(index + 1)"
@@ -118,7 +127,7 @@ export default {
         }
     },
     created() {
-        console.warn(this.comment)
+        console.warn(this.reviewsInFile, this.lineNumbers)
         window.addEventListener("resize", () => this.$forceUpdate())
     },
     methods: {
@@ -213,12 +222,14 @@ export default {
                 )
             }
         },
-        toggleComment(index) {
-            this.$set(this.comment, index[index.length - 1], !this.comment[index[index.length - 1]])
+        toggleComment(line) {
+            line.forEach(id => {
+                this.$set(this.comment, id, !this.comment[id])
+            })
         }
     },
     computed: {
-        lineNumbers: function() {
+        lineNumbers() {
             const res = new Array(this.content.length + 1).fill(-1).map((_, lineNr) => {
                 const result = []
                 for (let i = 0; i < this.comments.length; i++) {
@@ -230,9 +241,12 @@ export default {
                         result.push(i)
                     }
                 }
-                return result.sort((a, b) => this.comments[b].endLineNumber - this.comments[a].endLineNumber)
+                return result
             })
             return res
+        },
+        reviewsInFile() {
+            return new Set(this.comments.map(comment => comment.reviewId))
         },
         maxLineNumberDigits() {
             return Math.ceil(Math.log(this.content.length + 1) / Math.log(10))
@@ -333,9 +347,7 @@ pre {
 
             &.code-annotations-linenr {
                 flex-shrink: 0;
-                box-sizing: content-box;
-                padding-right: 1ch;
-                user-select: none;
+                padding-right: 0.5ch;
                 position: sticky;
                 left: 0;
                 background-color: inherit;
@@ -380,48 +392,88 @@ pre {
     transform: rotate(180deg);
 }
 
-$color_depth_1: #ff7979;
-$color_depth_2: #ffbe76;
-$color_depth_3: #f6e58d;
-$color_depth_4: #badc58;
-$alpha_adjustment: 0;
-
-.depth_0,
-.depth_1,
-.depth_2,
-.depth_3 {
-    border-right-width: 0.25ch;
-    border-right-style: solid;
-    border-right-color: var(--gray);
-    padding-right: 1ch;
+.gutter {
+    display: flex;
+    border-right: 1px solid var(--gray);
     margin-right: 1ch;
-    position: relative;
+    padding-right: 0.5ch;
+    user-select: none;
+    box-sizing: content-box;
+
+    $ibm_colors: #648fff, #ffb000, #785ef0, #fe6100, #dc267f;
+    --ibm_colors_0: #648fff;
+    --ibm_colors_1: #ffb000;
+    --ibm_colors_2: #785ef0;
+    --ibm_colors_3: #fe6100;
+    --ibm-colors_4: #dc267f;
+
+    .review-bar {
+        padding: 0 0.5ch;
+        display: flex;
+        align-items: stretch;
+
+        span {
+            width: 0.25ch;
+
+            &:not(:last-of-type) {
+                margin-right: 0.25ch;
+            }
+
+            &:not(.annotated) {
+                background-color: transparent;
+            }
+
+            @for $i from 1 through length($ibm_colors) {
+                &.annotated:nth-child(#{length($ibm_colors)}n + #{$i}) {
+                    background-color: nth($ibm_colors, $i);
+                }
+            }
+        }
+    }
 }
 
-.depth_1::after,
-.depth_2::after,
-.depth_3::after {
-    content: "";
-    display: inline-block;
-    width: 0.5ch;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    right: calc(-0.25ch - 0.125ch);
-}
+// $color_depth_1: #ff7979;
+// $color_depth_2: #ffbe76;
+// $color_depth_3: #f6e58d;
+// $color_depth_4: #badc58;
+// $alpha_adjustment: 0;
 
-.depth_1::after {
-    // background-color: adjust-color($color_depth_1, $alpha: $alpha_adjustment);
-    background-color: $color_depth_1;
-}
+// .depth_0,
+// .depth_1,
+// .depth_2,
+// .depth_3 {
+//     border-right-width: 0.25ch;
+//     border-right-style: solid;
+//     border-right-color: var(--gray);
+//     padding-right: 1ch;
+//     margin-right: 1ch;
+//     position: relative;
+// }
 
-.depth_2::after {
-    // background-color: adjust-color(mix($color_depth_1, $color_depth_2), $alpha: $alpha_adjustment);
-    background-color: $color_depth_2;
-}
+// .depth_1::after,
+// .depth_2::after,
+// .depth_3::after {
+//     content: "";
+//     display: inline-block;
+//     width: 0.5ch;
+//     height: 100%;
+//     position: absolute;
+//     top: 0;
+//     right: calc(-0.25ch - 0.125ch);
+// }
 
-.depth_3::after {
-    // background-color: adjust-color(mix(mix($color_depth_1, $color_depth_2), $color_depth_3), $alpha: $alpha_adjustment);
-    background-color: $color_depth_3;
-}
+// .depth_1::after {
+//     // background-color: adjust-color($color_depth_1, $alpha: $alpha_adjustment);
+//     background-color: $color_depth_1;
+// }
+
+// .depth_2::after {
+//     // background-color: adjust-color(mix($color_depth_1, $color_depth_2), $alpha: $alpha_adjustment);
+//     background-color: $color_depth_2;
+// }
+
+// .depth_3::after {
+//     // background-color: adjust-color(mix(mix($color_depth_1, $color_depth_2), $color_depth_3), $alpha: $alpha_adjustment);
+//     background-color: $color_depth_3;
+// }
 </style>
