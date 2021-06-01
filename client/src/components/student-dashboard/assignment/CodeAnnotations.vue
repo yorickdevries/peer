@@ -40,17 +40,17 @@
                     <icon
                         v-if="isStartingLine(index + 1)"
                         class="arrow"
-                        :class="{ rotate: comment[lineNumbers[index + 1]]}"
+                        :class="{ rotate: comment[lineNumbers[index + 1].find(id => comments[id].startLineNumber === index + 1)] }"
                         role="button"
-                        name="chevron-up"
+                        name="chevron-down"
                         @click.native="toggleComment(lineNumbers[index + 1])"
                     />
                 </div>
                 <b-collapse
                     v-if="isEndingLine(index + 1)"
                     v-bind:style="{
-                        marginLeft: `calc(${maxLineNumberDigits + 2}ch + 1px)`,
-                        left: `calc(${maxLineNumberDigits + 2}ch + 1px)`,
+                        marginLeft: `calc(${maxLineNumberDigits + 1.5 + reviewsInFile.length * 0.5 - 0.25}ch + 1px)`,
+                        left: `calc(${maxLineNumberDigits + 1.5 + reviewsInFile.length * 0.5 - 0.25}ch + 1px)`,
                         minWidth:
                             $refs.container ?
                                 `calc(${$refs.container.clientWidth}px - (${maxLineNumberDigits + 3}ch + 1px))` : null
@@ -226,8 +226,9 @@ export default {
             }
         },
         toggleComment(line) {
+            const allExtended = line.every(id => !!this.comment[id])
             line.forEach(id => {
-                this.$set(this.comment, id, !this.comment[id])
+                this.$set(this.comment, id, !allExtended)
             })
         }
     },
@@ -249,7 +250,7 @@ export default {
             return res
         },
         reviewsInFile() {
-            return new Set(this.comments.map(comment => comment.reviewId))
+            return Array.from(new Set(this.comments.map(comment => comment.reviewId)))
         },
         maxLineNumberDigits() {
             return Math.ceil(Math.log(this.content.length + 1) / Math.log(10))
