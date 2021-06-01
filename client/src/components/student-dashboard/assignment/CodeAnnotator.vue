@@ -4,11 +4,14 @@
 
         <!-- The buttons and text area for the actual comments, somewhat primitive -->
         <!-- Only show annotation buttons if this component is inside a non-submitted review -->
-        <div v-if="!readOnly && !reviewSubmitted && showAnnotations" class="mb-2">
-            <form @submit.prevent="writeComment">
+        <div v-if="!readOnly && !reviewSubmitted && showAnnotations" class="mb-3">
+            <form @submit.prevent="writeComment" class="annotation-form">
                 <b-button v-if="!writing" type="submit" variant="primary">
                     Leave a comment on the selected code
                 </b-button>
+                <b-alert variant="info" class="ml-3" show>
+                    Select a piece of code with you cursor to leave a comment
+                </b-alert>
             </form>
             <PeerTextarea
                 v-if="writing"
@@ -206,3 +209,16 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+.annotation-form {
+    display: flex;
+    justify-content: stretch;
+    align-items: stretch;
+
+    .alert {
+        margin: 0;
+        flex-grow: 1;
+    }
+}
+</style>
