@@ -1,5 +1,5 @@
 <template>
-    <div v-if="files" class="d-flex">
+    <div v-if="files">
         <b-alert v-if="readOnly" show variant="warning">
             The file is read only, so annotations cannot be added, removed or edited.
         </b-alert>
@@ -11,8 +11,7 @@
             v-bind:class="{ 'ml-3': !singleFile }"
             v-bind:style="{
                 position: 'relative',
-                overflow: 'hidden',
-                'flex-grow': '1'
+                overflow: 'hidden'
             }"
         >
             <b-row>
