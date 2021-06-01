@@ -1,7 +1,7 @@
 <template>
     <div>
-        <div v-if="dir" class="dir" v-on:click="toggleCollapsed" role="button">
-            <icon :name="collapsed ? 'chevron-right' : 'chevron-down'" class="chevron" role="button" />
+        <div v-if="dir" class="dir" v-on:click="notifyCollapsing" role="button">
+            <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" role="button" />
             <icon class="text-muted" name="folder"></icon>
             {{ name }}
         </div>
@@ -10,13 +10,12 @@
                 <icon class="text-muted" name="code"></icon>
                 <span class="filename"> {{ name }}</span>
             </div>
-            <div v-if="commented">
-                <icon class="text-muted" name="comments"></icon>
-            </div>
+            <icon v-if="commented" class="text-muted comment-icon" name="comments" />
         </div>
 
         <b-collapse style="margin-left: 1.5rem" v-if="dir" :visible="!collapsed">
             <FileTreeNode
+                @toggleCollapse="onChildCollapse"
                 @selected="onChildSelect"
                 v-for="key in Object.keys(children)"
                 :commentedFiles="commentedFiles"
@@ -71,8 +70,15 @@ export default {
         onSelect() {
             this.$emit("selected", this.children.path)
         },
+        notifyCollapsing() {
+            // Let file tree know that its child has the intention to collapse
+            this.$emit("toggleCollapse", this.name)
+        },
         toggleCollapsed() {
             this.collapsed = !this.collapsed
+        },
+        onChildCollapse(name) {
+            this.$emit("toggleCollapse", name)
         }
     },
     computed: {
@@ -87,6 +93,14 @@ export default {
         commented() {
             return this.commentedFiles.has(this.children.path)
         }
+    },
+    mounted() {
+        // Event listener waiting for the go-ahead to toggle the collapse state
+        this.$root.$on("filetreenode::collapse", name => {
+            if (this.name === name) {
+                this.toggleCollapsed()
+            }
+        })
     }
 }
 </script>
@@ -97,9 +111,9 @@ $background-hover: #f8f8f8;
 $text-light: #f8f9fa;
 $bg-dark: #343a40;
 .selected.file:hover {
-    background-color: mix($bg-dark, $background-hover, 75%) !important;
+    background-color: scale-color($color: $bg-dark, $lightness: -30%) !important;
     .filename {
-        color: mix($text-light, $text-hover, 75%);
+        color: $text-light !important;
     }
 }
 .file:hover {
@@ -108,7 +122,8 @@ $bg-dark: #343a40;
         color: $text-hover;
     }
 }
-.fa-icon.chevron {
-    margin-right: 5px;
+.comment-icon {
+    margin: auto 5px;
+    display: inline-block;
 }
 </style>

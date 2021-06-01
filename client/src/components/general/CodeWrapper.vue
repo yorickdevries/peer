@@ -1,15 +1,7 @@
 <template>
     <div v-if="files" class="d-flex">
-        <div style="flex-shrink: 0; max-width: 40%">
-            <FileTree
-                @selected="onSelect"
-                :commentedFiles="commentedFiles"
-                :files="files"
-                :selectedFile="selected"
-                :startCollapsed="singleFile"
-            />
-        </div>
-        <div
+        <b-container
+            fluid
             v-bind:class="{ 'ml-3': !singleFile }"
             v-bind:style="{
                 position: 'relative',
@@ -17,26 +9,42 @@
                 'flex-grow': '1'
             }"
         >
-            <b-alert variant="primary" show v-if="!content || content.length === 0">This file is empty</b-alert>
-            <CodeAnnotator
-                v-else
-                :comments="comments"
-                :content="content"
-                :language="language"
-                :selectedFile="selected"
-                :readOnly="readOnly"
-                :review="review"
-            />
-            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
-                <template #overlay>
-                    <b-spinner v-if="!showFile" variant="primary"></b-spinner>
-                    <div v-else-if="showWarning" class="text-center">
-                        <p>This file contains characters that can not be displayed properly</p>
-                        <b-button variant="outline-primary" @click="showWarning = false">Show anyway</b-button>
-                    </div>
-                </template>
-            </b-overlay>
-        </div>
+            <b-row>
+                <b-alert variant="primary" show v-if="!content || content.length === 0">
+                    This file is empty
+                </b-alert>
+            </b-row>
+            <b-row>
+                <b-col md="auto" :style="{ 'margin-top': readOnly ? '2em' : 'unset' }">
+                    <FileTree
+                        style="height: 100%"
+                        @selected="onSelect"
+                        :commentedFiles="commentedFiles"
+                        :files="files"
+                        :selectedFile="selected"
+                        :startCollapsed="singleFile"
+                    />
+                </b-col>
+                <b-col>
+                    <CodeAnnotator
+                        :comments="comments"
+                        :content="content"
+                        :readOnly="readOnly"
+                        :review="review"
+                        :selectedFile="selected"
+                    />
+                    <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
+                        <template #overlay>
+                            <b-spinner v-if="!showFile" variant="primary"></b-spinner>
+                            <div v-else-if="showWarning" class="text-center">
+                                <p>This file contains characters that can not be displayed properly</p>
+                                <b-button variant="outline-primary" @click="showWarning = false">Show anyway</b-button>
+                            </div>
+                        </template>
+                    </b-overlay>
+                </b-col>
+            </b-row>
+        </b-container>
     </div>
     <b-alert v-else show variant="primary">Loading source files</b-alert>
 </template>
