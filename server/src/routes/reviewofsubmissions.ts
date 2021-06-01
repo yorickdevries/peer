@@ -688,6 +688,15 @@ router.post(
         .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
       return;
     }
+    if (
+      // missing submission questionnaires
+      !(await assignment.hasSubmissionQuestionnaires())
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("An assignmentversion is missing a submissionquestionnaire");
+      return;
+    }
     // offload a function to a worker
     startDistributeReviewsForAssignmentWorker(assignment.id);
 
