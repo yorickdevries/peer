@@ -28,7 +28,7 @@ import izitoast from "izitoast"
 
 export default {
     // either "reviewId" or "submissionId" is passed, not both
-    props: ["reviewId", "submissionId", "readOnly"],
+    props: ["reviewId", "submissionId", "readOnly", "reviewColors"],
     data() {
         return {
             // my API key for localhost
@@ -194,6 +194,7 @@ export default {
                             /* API to add annotations */
                             for (const annotation of annotations) {
                                 try {
+                                    annotation.target.selector.strokeColor = vm.reviewColors[review.id]
                                     await annotationManager.addAnnotations([annotation])
                                 } catch (error) {
                                     console.log(error)

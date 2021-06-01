@@ -13,8 +13,10 @@
                     <b-tab v-for="review in feedbackReviews" :key="review.id">
                         <template slot="title">
                             <div class="d-flex align-items-center">
-                                <b-badge v-if="review.aggregated" variant="warning" class="mr-2">Total</b-badge>
-                                <b-badge v-else variant="warning" class="mr-2">ID: {{ review.id }}</b-badge>
+                                <b-badge v-if="review.aggregated" variant="warning" class="mr-2">ALL</b-badge>
+                                <b-badge v-else :style="{ 'background-color': reviewColors[review.id] }" class="mr-2">
+                                    ID: {{ review.id }}
+                                </b-badge>
                                 <b-badge variant="primary">
                                     {{ review.annotationCount }}
                                     annotations
@@ -26,12 +28,14 @@
                             :submissionId="finalSubmission.id"
                             :readOnly="true"
                             :assignmentType="assignment.assignmentType"
+                            :reviewColors="reviewColors"
                         />
                         <FileAnnotator
                             v-else
                             :reviewId="review.id"
                             :readOnly="true"
                             :assignmentType="assignment.assignmentType"
+                            :reviewColors="reviewColors"
                         />
                     </b-tab>
                 </b-tabs>
@@ -240,6 +244,17 @@ export default {
     computed: {
         numberOfFlaggedByReviewer() {
             return _.filter(this.feedbackReviews, "flaggedByReviewer").length
+        },
+        reviewColors() {
+            // https://davidmathlogic.com/colorblind/#%23648FFF-%23785EF0-%23DC267F-%23FE6100-%23FFB000
+            const colors = ["#648fff", "#ffb000", "#785ef0", "#fe6100", "#dc267f"]
+            const result = {}
+            this.feedbackReviews.forEach((review, index) => {
+                if (!review.aggregated) {
+                    result[review.id] = colors[index % colors.length]
+                }
+            })
+            return result
         }
     },
     async created() {
@@ -253,6 +268,7 @@ export default {
             await this.fetchAssignmentVersion()
             await this.fetchSubmissionQuestionnaire()
             await this.fetchFeedbackReviews()
+            await this.fetchAnnotationCount()
             await this.aggregateFeedback()
             this.feedbackReviews.unshift({
                 aggregated: true,
@@ -289,10 +305,16 @@ export default {
         async fetchFeedbackReviews() {
             const res = await api.submissions.getFeedback(this.finalSubmission.id)
             this.feedbackReviews = res.data
-
+        },
+        async fetchAnnotationCount() {
+            // TODO: Make this an actual endpoint (for both annotation types) to prevent loading all annotations here as well as in the annotators.
             await this.feedbackReviews.forEach(async review => {
                 if (this.assignment.assignmentType === "document") {
-                    review.annotationCount = 0
+                    const res = await api.pdfannotations.get(
+                        review.id,
+                        (await api.reviewofsubmissions.getFileMetadata(review.id)).data.id
+                    )
+                    review.annotationCount = res.data.length
                 } else if (this.assignment.assignmentType === "code") {
                     const res = await api.codeannotations.getAnnotations(review.id)
                     review.annotationCount = res.data.length

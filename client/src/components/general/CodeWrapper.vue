@@ -26,6 +26,7 @@
                 :selectedFile="selected"
                 :readOnly="readOnly"
                 :review="review"
+                :reviewColors="reviewColors"
             />
             <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
                 <template #overlay>
@@ -50,7 +51,7 @@ import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 import api from "../../api/api"
 
 export default {
-    props: ["fileUrl", "readOnly", "submissionId", "reviewId"],
+    props: ["fileUrl", "readOnly", "submissionId", "reviewId", "reviewColors"],
     components: { FileTree, CodeAnnotator },
     data() {
         return {

@@ -16,7 +16,11 @@
                             <span
                                 v-for="review in reviewsInFile"
                                 :key="index + 'review_' + review"
-                                :class="{ annotated: lineNumbers[index + 1].some(id => comments[id].reviewId === review) }"
+                                v-bind:style="{
+                                    'background-color': lineNumbers[index + 1].some(id => comments[id].reviewId === review)
+                                        ? reviewColors[review]
+                                        : 'transparent'
+                                }"
                             ></span>
                         </div>
                     </div>
@@ -114,7 +118,7 @@ import notifications from "../../../mixins/notifications"
 import PeerTextarea from "./PeerTextarea"
 
 export default {
-    props: ["content", "comments", "language", "maxCommentLength", "selectedFile", "readOnly"],
+    props: ["content", "comments", "language", "maxCommentLength", "selectedFile", "readOnly", "reviewColors"],
     mixins: [notifications],
     components: { PeerTextarea },
     data() {
@@ -127,7 +131,6 @@ export default {
         }
     },
     created() {
-        console.warn(this.reviewsInFile, this.lineNumbers)
         window.addEventListener("resize", () => this.$forceUpdate())
     },
     methods: {
@@ -417,16 +420,6 @@ pre {
 
             &:not(:last-of-type) {
                 margin-right: 0.25ch;
-            }
-
-            &:not(.annotated) {
-                background-color: transparent;
-            }
-
-            @for $i from 1 through length($ibm_colors) {
-                &.annotated:nth-child(#{length($ibm_colors)}n + #{$i}) {
-                    background-color: nth($ibm_colors, $i);
-                }
             }
         }
     }

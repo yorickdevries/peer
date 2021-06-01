@@ -45,6 +45,7 @@
                 :maxCommentLength="maxCommentLength"
                 :selectedFile="selectedFile"
                 :readOnly="readOnly || reviewSubmitted"
+                :reviewColors="reviewColors"
             />
             <!--
                 Display the code without annotations.
@@ -64,7 +65,7 @@ import PeerTextarea from "./PeerTextarea"
 export default {
     mixins: [notifications],
     components: { CodeAnnotations, PeerTextarea },
-    props: ["comments", "content", "language", "selectedFile", "readOnly", "review"],
+    props: ["comments", "content", "language", "selectedFile", "readOnly", "review", "reviewColors"],
     data() {
         return {
             showCode: false,
