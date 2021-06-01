@@ -10,11 +10,15 @@
                 </div>
                 <div v-else-if="feedbackReviews.length === 0">No feedback available.</div>
                 <b-tabs v-else>
-                    <b-tab
-                        v-for="feedbackReview in feedbackReviews"
-                        :key="feedbackReview.id"
-                        :title="`${feedbackReview.id}`"
-                    >
+                    <b-tab v-for="feedbackReview in feedbackReviews" :key="feedbackReview.id">
+                        <template slot="title">
+                            <div class="d-flex align-items-center">
+                                <b-badge variant="warning" class="mr-2">ID: {{ feedbackReview.id }}</b-badge>
+                                <b-badge variant="primary">{{
+                                    codeannotations[feedbackReview.id] ? codeannotations[feedbackReview.id].length : -1
+                                }}</b-badge>
+                            </div>
+                        </template>
                         <FileAnnotator
                             :reviewId="feedbackReview.id"
                             :readOnly="true"
@@ -220,6 +224,7 @@ export default {
             finalSubmission: null,
             questionnaire: {},
             feedbackReviews: [],
+            codeannotations: {},
             answers: null,
             // selected question
             question: null
@@ -241,6 +246,7 @@ export default {
             await this.fetchAssignmentVersion()
             await this.fetchSubmissionQuestionnaire()
             await this.fetchFeedbackReviews()
+            await this.fetchCodeAnnotations()
             await this.aggregateFeedback()
             // automatically open first question
             if (this.questionnaire.questions.length !== 0) {
@@ -273,6 +279,12 @@ export default {
         async fetchFeedbackReviews() {
             const res = await api.submissions.getFeedback(this.finalSubmission.id)
             this.feedbackReviews = res.data
+        },
+        async fetchCodeAnnotations() {
+            for (const review of this.feedbackReviews) {
+                const res = await api.codeannotations.getAnnotations(review.id)
+                this.codeannotations[review.id] = res.data
+            }
         },
         async aggregateFeedback() {
             // construct answer map with empty lists
