@@ -1,11 +1,5 @@
 <template>
     <div>
-        <b-alert v-if="readOnly" show variant="warning">
-            The file is read only, so annotations cannot be added, removed or edited.
-        </b-alert>
-        <b-alert v-else-if="reviewSubmitted" show variant="warning">
-            The review is submitted, so annotations cannot be added, removed or edited.
-        </b-alert>
         <b-alert :show="!showCode" variant="primary">LOADING {{ review ? "REVIEW" : "SUBMISSION" }}</b-alert>
 
         <!-- The buttons and text area for the actual comments, somewhat primitive -->

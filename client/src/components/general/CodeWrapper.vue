@@ -1,5 +1,11 @@
 <template>
     <div v-if="files" class="d-flex">
+        <b-alert v-if="readOnly" show variant="warning">
+            The file is read only, so annotations cannot be added, removed or edited.
+        </b-alert>
+        <b-alert v-else-if="reviewSubmitted" show variant="warning">
+            The review is submitted, so annotations cannot be added, removed or edited.
+        </b-alert>
         <b-container
             fluid
             v-bind:class="{ 'ml-3': !singleFile }"
@@ -211,6 +217,9 @@ export default {
         },
         commentedFiles() {
             return new Set(this.comments.map(comment => comment.selectedFile))
+        },
+        reviewSubmitted() {
+            return this.review && this.review.submitted
         }
     }
 }
