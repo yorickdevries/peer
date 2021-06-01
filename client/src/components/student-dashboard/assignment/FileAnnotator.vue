@@ -45,7 +45,7 @@ export default {
             }
         },
         defaultReviewColor() {
-            return { [this.reviewId]: "#648fff" }
+            return { [this.reviewId]: "#ffb000" }
         }
     },
     data() {

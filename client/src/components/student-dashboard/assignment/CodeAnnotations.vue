@@ -403,13 +403,6 @@ pre {
     user-select: none;
     box-sizing: content-box;
 
-    $ibm_colors: #648fff, #ffb000, #785ef0, #fe6100, #dc267f;
-    --ibm_colors_0: #648fff;
-    --ibm_colors_1: #ffb000;
-    --ibm_colors_2: #785ef0;
-    --ibm_colors_3: #fe6100;
-    --ibm-colors_4: #dc267f;
-
     .review-bar {
         padding: 0 0.5ch;
         display: flex;
@@ -424,49 +417,4 @@ pre {
         }
     }
 }
-
-// $color_depth_1: #ff7979;
-// $color_depth_2: #ffbe76;
-// $color_depth_3: #f6e58d;
-// $color_depth_4: #badc58;
-// $alpha_adjustment: 0;
-
-// .depth_0,
-// .depth_1,
-// .depth_2,
-// .depth_3 {
-//     border-right-width: 0.25ch;
-//     border-right-style: solid;
-//     border-right-color: var(--gray);
-//     padding-right: 1ch;
-//     margin-right: 1ch;
-//     position: relative;
-// }
-
-// .depth_1::after,
-// .depth_2::after,
-// .depth_3::after {
-//     content: "";
-//     display: inline-block;
-//     width: 0.5ch;
-//     height: 100%;
-//     position: absolute;
-//     top: 0;
-//     right: calc(-0.25ch - 0.125ch);
-// }
-
-// .depth_1::after {
-//     // background-color: adjust-color($color_depth_1, $alpha: $alpha_adjustment);
-//     background-color: $color_depth_1;
-// }
-
-// .depth_2::after {
-//     // background-color: adjust-color(mix($color_depth_1, $color_depth_2), $alpha: $alpha_adjustment);
-//     background-color: $color_depth_2;
-// }
-
-// .depth_3::after {
-//     // background-color: adjust-color(mix(mix($color_depth_1, $color_depth_2), $color_depth_3), $alpha: $alpha_adjustment);
-//     background-color: $color_depth_3;
-// }
 </style>

@@ -247,7 +247,7 @@ export default {
         },
         reviewColors() {
             // https://davidmathlogic.com/colorblind/#%23648FFF-%23785EF0-%23DC267F-%23FE6100-%23FFB000
-            const colors = ["#648fff", "#ffb000", "#785ef0", "#fe6100", "#dc267f"]
+            const colors = ["#ffb000", "#648fff", "#fe6100", "#785ef0", "#dc267f"]
             const result = {}
             this.feedbackReviews.forEach((review, index) => {
                 if (!review.aggregated) {
