@@ -9,13 +9,32 @@
                     Your submission was not a .pdf file, so it was not annotated by reviewers.
                 </div>
                 <div v-else-if="feedbackReviews.length === 0">No feedback available.</div>
-                <FileAnnotator
-                    v-else
-                    :submissionId="finalSubmission.id"
-                    :readOnly="true"
-                    :assignmentType="assignment.assignmentType"
-                    :showCodeAnnotations="true"
-                />
+                <b-tabs v-else>
+                    <b-tab v-for="review in feedbackReviews" :key="review.id">
+                        <template slot="title">
+                            <div class="d-flex align-items-center">
+                                <b-badge v-if="review.aggregated" variant="warning" class="mr-2">Total</b-badge>
+                                <b-badge v-else variant="warning" class="mr-2">ID: {{ review.id }}</b-badge>
+                                <b-badge variant="primary">
+                                    {{ review.annotationCount }}
+                                    annotations
+                                </b-badge>
+                            </div>
+                        </template>
+                        <FileAnnotator
+                            v-if="review.aggregated"
+                            :submissionId="finalSubmission.id"
+                            :readOnly="true"
+                            :assignmentType="assignment.assignmentType"
+                        />
+                        <FileAnnotator
+                            v-else
+                            :reviewId="review.id"
+                            :readOnly="true"
+                            :assignmentType="assignment.assignmentType"
+                        />
+                    </b-tab>
+                </b-tabs>
             </b-tab>
             <b-tab title="Questionnaire Feedback">
                 <!--Feedback Information-->
@@ -235,6 +254,10 @@ export default {
             await this.fetchSubmissionQuestionnaire()
             await this.fetchFeedbackReviews()
             await this.aggregateFeedback()
+            this.feedbackReviews.unshift({
+                aggregated: true,
+                annotationCount: this.feedbackReviews.reduce((acc, val) => acc + val.annotationCount, 0)
+            })
             // automatically open first question
             if (this.questionnaire.questions.length !== 0) {
                 this.question = this.questionnaire.questions[0]
@@ -266,6 +289,17 @@ export default {
         async fetchFeedbackReviews() {
             const res = await api.submissions.getFeedback(this.finalSubmission.id)
             this.feedbackReviews = res.data
+
+            await this.feedbackReviews.forEach(async review => {
+                if (this.assignment.assignmentType === "document") {
+                    review.annotationCount = 0
+                } else if (this.assignment.assignmentType === "code") {
+                    const res = await api.codeannotations.getAnnotations(review.id)
+                    review.annotationCount = res.data.length
+                } else {
+                    review.annotationCount = 0
+                }
+            })
         },
         async aggregateFeedback() {
             // construct answer map with empty lists
