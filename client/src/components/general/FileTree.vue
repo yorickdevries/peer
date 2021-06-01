@@ -13,7 +13,7 @@
                     :key="key"
                     :propName="key"
                     :propChildren="root[key]"
-                    :selected="selected"
+                    :selectedFile="selected"
                     @toggleCollapse="onChildCollapse"
                 />
             </b-card-body>
