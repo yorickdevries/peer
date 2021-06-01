@@ -107,6 +107,7 @@ $background-hover: rgba(0, 0, 0, 0.03);
 .selected.file {
     background-color: var(--gray);
     color: var(--light);
+    font-weight: bolder;
 
     &:hover {
         opacity: 0.7;
@@ -128,6 +129,10 @@ $background-hover: rgba(0, 0, 0, 0.03);
 .file {
     display: flex;
     justify-content: space-between;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
 .comment-icon {
