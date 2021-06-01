@@ -118,6 +118,7 @@ export default {
         }
     },
     created() {
+        console.warn(this.comments)
         window.addEventListener("resize", () => this.$forceUpdate())
     },
     methods: {

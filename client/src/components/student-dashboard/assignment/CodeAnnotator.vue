@@ -204,7 +204,7 @@ export default {
     },
     computed: {
         showAnnotations() {
-            return !(this.review == null)
+            return !(this.review == null) || true
         },
         reviewSubmitted() {
             return this.review && this.review.submitted

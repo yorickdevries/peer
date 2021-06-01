@@ -9,20 +9,13 @@
                     Your submission was not a .pdf file, so it was not annotated by reviewers.
                 </div>
                 <div v-else-if="feedbackReviews.length === 0">No feedback available.</div>
-                <b-tabs v-else>
-                    <b-tab
-                        v-for="feedbackReview in feedbackReviews"
-                        :key="feedbackReview.id"
-                        :title="`${feedbackReview.id}`"
-                    >
-                        <FileAnnotator
-                            :reviewId="feedbackReview.id"
-                            :readOnly="true"
-                            :assignmentType="assignment.assignmentType"
-                            :showCodeAnnotations="true"
-                        />
-                    </b-tab>
-                </b-tabs>
+                <FileAnnotator
+                    v-else
+                    :submissionId="finalSubmission.id"
+                    :readOnly="true"
+                    :assignmentType="assignment.assignmentType"
+                    :showCodeAnnotations="true"
+                />
             </b-tab>
             <b-tab title="Questionnaire Feedback">
                 <!--Feedback Information-->

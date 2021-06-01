@@ -61,7 +61,8 @@ export default {
             showWarning: false,
             showFile: false,
             review: null,
-            language: null
+            language: null,
+            feedbackReviews: []
         }
     },
     async created() {
@@ -77,6 +78,7 @@ export default {
             this.loadSingleFile(file)
         }
         await this.fetchReview()
+        await this.fetchFeedbackReviews()
         await this.fetchComments()
     },
     methods: {
@@ -84,6 +86,12 @@ export default {
             if (this.reviewId) {
                 const res = await api.reviewofsubmissions.get(this.reviewId)
                 this.review = res.data
+            }
+        },
+        async fetchFeedbackReviews() {
+            if (this.submissionId) {
+                const res = await api.submissions.getFeedback(this.submissionId)
+                this.feedbackReviews = res.data
             }
         },
         async fetchComments() {
@@ -97,6 +105,64 @@ export default {
                 } catch (error) {
                     console.error(error)
                 }
+            } else if (this.submissionId) {
+                const comments = {}
+                const annotations = []
+                for (const review of this.feedbackReviews) {
+                    const res = await api.codeannotations.getAnnotations(review.id)
+                    annotations.push(...res.data)
+                }
+
+                for (const annotation of annotations) {
+                    if (!comments[annotation.selectedFile]) comments[annotation.selectedFile] = {}
+                    for (let i = annotation.startLineNumber; i <= annotation.endLineNumber; i++) {
+                        if (comments[annotation.selectedFile][i]) {
+                            comments[annotation.selectedFile][i].push(annotation.id)
+                        } else {
+                            comments[annotation.selectedFile][i] = [annotation.id]
+                        }
+                    }
+                }
+
+                const a = []
+                for (const file in comments) {
+                    const current = comments[file]
+                    let startLine = -1
+                    let lastLine = -1
+                    let line = -1
+                    for (line in comments[file]) {
+                        if (startLine === -1) startLine = line
+
+                        if (
+                            current[line].length !== current[startLine].length ||
+                            current[line].some((element, index) => current[startLine][index] !== current[line][index])
+                        ) {
+                            console.warn(startLine, line)
+                            a.push({
+                                startLineNumber: parseInt(startLine),
+                                endLineNumber: parseInt(lastLine),
+                                selectedFile: file,
+                                commentText: annotations
+                                    .filter(annotation => current[startLine].includes(annotation.id))
+                                    .map(x => x.commentText)
+                                    .join("\n")
+                            })
+                            startLine = line
+                        }
+                        lastLine = line
+                    }
+                    a.push({
+                        startLineNumber: parseInt(startLine),
+                        endLineNumber: parseInt(line),
+                        selectedFile: file,
+                        commentText: annotations
+                            .filter(annotation => current[startLine].includes(annotation.id))
+                            .map(x => x.commentText)
+                            .join("\n")
+                    })
+                }
+                console.warn(a)
+                this.comments = a
             }
         },
         async getFile() {
