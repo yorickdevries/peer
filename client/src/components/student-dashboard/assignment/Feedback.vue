@@ -14,9 +14,14 @@
                         <template slot="title">
                             <div class="d-flex align-items-center">
                                 <b-badge variant="warning" class="mr-2">ID: {{ feedbackReview.id }}</b-badge>
-                                <b-badge variant="primary">{{
-                                    codeannotations[feedbackReview.id] ? codeannotations[feedbackReview.id].length : -1
-                                }}</b-badge>
+                                <b-badge variant="primary">
+                                    {{
+                                        codeannotations[feedbackReview.id]
+                                            ? codeannotations[feedbackReview.id].length
+                                            : 0
+                                    }}
+                                    annotations
+                                </b-badge>
                             </div>
                         </template>
                         <FileAnnotator
