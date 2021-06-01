@@ -133,6 +133,10 @@ $background-hover: rgba(0, 0, 0, 0.03);
     &:hover {
         text-decoration: underline;
     }
+
+    div:first-child {
+        margin-left: 5px;
+    }
 }
 
 .comment-icon {
