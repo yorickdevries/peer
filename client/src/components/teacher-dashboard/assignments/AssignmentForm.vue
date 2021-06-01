@@ -269,9 +269,14 @@
                             annotated within this website. This is a new experimental feature and some pdf's might not
                             render, but the students can always download the submission files as well.
                         </b-alert>
+                        <b-alert v-if="edit" variant="danger" show>
+                            The allowed submission file extensions cannot be changed once the assignment has been
+                            published.
+                        </b-alert>
                         <b-form-select
                             :options="extensionTypes"
                             v-model="assignment.submissionExtensions"
+                            :class="{ 'disabled-select': edit }"
                         ></b-form-select>
                     </b-form-group>
 
