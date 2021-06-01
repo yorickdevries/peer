@@ -6,8 +6,7 @@
         <b-alert v-else-if="reviewSubmitted" show variant="warning">
             The review is submitted, so annotations cannot be added, removed or edited.
         </b-alert>
-        <b-container
-            fluid
+        <div
             v-bind:style="{
                 position: 'relative',
                 overflow: 'hidden'
@@ -48,7 +47,7 @@
                     </b-overlay>
                 </b-col>
             </b-row>
-        </b-container>
+        </div>
     </div>
     <b-alert v-else show variant="primary">Loading source files</b-alert>
 </template>
