@@ -31,7 +31,10 @@ const parseSubmissionReviewsForExport = async function (
     const reviewer = review.reviewer;
     const reviewerGroup = await assignment.getGroup(reviewer);
 
-    const annotations = assignment.assignmentType === "document" ? await review.getPDFAnnotations() : await review.getCodeAnnotations();
+    const annotations =
+      assignment.assignmentType === "document"
+        ? await review.getPDFAnnotations()
+        : await review.getCodeAnnotations();
 
     // id
     parsedReview["id"] = review.id;
