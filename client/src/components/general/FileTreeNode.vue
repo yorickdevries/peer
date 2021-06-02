@@ -8,7 +8,7 @@
         <div v-else @click="onSelect" :class="{ selected, file: true }" role="button">
             <div>
                 <icon name="code"></icon>
-                <span class="filename"> {{ name }}</span>
+                <span class="filename">{{ name }}</span>
             </div>
             <icon v-if="commented" class="comment-icon" name="comments" />
         </div>
@@ -136,6 +136,10 @@ $background-hover: rgba(0, 0, 0, 0.03);
 
     div:first-child {
         margin-left: 5px;
+
+        span {
+            margin-left: 5px;
+        }
     }
 }
 
