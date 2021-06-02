@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="d-flex flex-column">
         <b-alert :show="!showCode" variant="primary">LOADING {{ review ? "REVIEW" : "SUBMISSION" }}</b-alert>
 
         <!-- The buttons and text area for the actual comments, somewhat primitive -->
@@ -25,7 +25,7 @@
             />
         </div>
 
-        <b-card v-show="showCode" class="h-100">
+        <b-card v-show="showCode" style="flex-grow: 1">
             <!--
                 Displays the code with annotations in the mode specified by the readOnly variable.
                 This is used to allow students to annotate code during the review stage, where readOnly is then false.
