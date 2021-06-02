@@ -10,7 +10,7 @@
                     Leave a comment on the selected code
                 </b-button>
                 <b-alert variant="info" class="ml-3" show>
-                    Select a piece of code with you cursor to leave a comment
+                    Select a piece of code with your cursor to leave a comment
                 </b-alert>
             </form>
             <PeerTextarea
