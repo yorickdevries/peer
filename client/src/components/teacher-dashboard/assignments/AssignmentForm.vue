@@ -177,7 +177,7 @@
                             @change="typeChangeFunc"
                             :options="assignmentTypes"
                             v-model="assignment.assignmentType"
-                            :disabled="published"
+                            :disabled="assignmentStateAfter('published')"
                         ></b-form-select>
                     </b-form-group>
 
@@ -276,7 +276,7 @@
                         <b-form-select
                             :options="extensionTypes"
                             v-model="assignment.submissionExtensions"
-                            :disabled="published"
+                            :disabled="assignmentStateAfter('published')"
                         ></b-form-select>
                     </b-form-group>
 
@@ -291,7 +291,10 @@
                         </small>
                     </b-form-group>
 
-                    <b-form-group>
+                    <b-form-group
+                        :disabled="assignmentStateAfter('submission')"
+                        description="This cannot be changed after the submission stage."
+                    >
                         <b-form-checkbox v-model="assignment.enrollable">
                             Self enrollable
                             <b-badge
@@ -307,7 +310,8 @@
                         <b-col>
                             <b-form-group
                                 label="Students can evaluate their received reviews"
-                                description="This can not be changed after creating the assignment."
+                                description="This cannot be changed at or after the feedback stage."
+                                :disabled="assignmentStateAfter('review')"
                             >
                                 <b-form-checkbox v-model="assignment.reviewEvaluation">
                                     Enable review evaluation
@@ -360,6 +364,8 @@
 import moment from "moment"
 import notifications from "../../../mixins/notifications"
 import Datepicker from "vuejs-datepicker"
+
+const assignmentStates = ["unpublished", "submission", "waitingforreview", "review", "feedback"]
 
 export default {
     mixins: [notifications],
@@ -546,6 +552,11 @@ export default {
                     this.assignment.submissionExtensions = ".*"
                 }
             }
+        },
+        assignmentStateAfter(state) {
+            const currentIndex = assignmentStates.indexOf(this.assignment.state)
+            const newIndex = assignmentStates.indexOf(state)
+            return currentIndex > newIndex
         }
     },
     computed: {
@@ -575,9 +586,6 @@ export default {
         assignmentFilePath() {
             // Get the assignment file path.
             return `/api/assignments/${this.assignment.id}/file`
-        },
-        published() {
-            return this.assignment.state !== "unpublished"
         }
     },
     watch: {
