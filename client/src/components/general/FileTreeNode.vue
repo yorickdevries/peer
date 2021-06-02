@@ -3,12 +3,12 @@
         <div v-if="dir" class="dir" v-on:click="notifyCollapsing" role="button">
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" role="button" />
             <icon class="text-muted" name="folder"></icon>
-            {{ name }}
+            <span>{{ name }}</span>
         </div>
         <div v-else @click="onSelect" :class="{ selected, file: true }" role="button">
             <div>
                 <icon name="code"></icon>
-                <span class="filename">{{ name }}</span>
+                <span>{{ name }}</span>
             </div>
             <icon v-if="commented" class="comment-icon" name="comments" />
         </div>
@@ -112,11 +112,13 @@ $background-hover: rgba(0, 0, 0, 0.03);
         opacity: 0.7;
     }
 }
-
 :not(.selected).file {
     color: var(--gray);
+}
 
-    .filename {
+:not(.selected).file,
+:not(.selected).dir {
+    span {
         color: initial;
     }
 
@@ -128,17 +130,20 @@ $background-hover: rgba(0, 0, 0, 0.03);
 .file {
     display: flex;
     justify-content: space-between;
+}
 
+.file,
+.dir {
     &:hover {
         text-decoration: underline;
     }
 
     div:first-child {
         margin-left: 5px;
+    }
 
-        span {
-            margin-left: 5px;
-        }
+    span {
+        margin-left: 5px;
     }
 }
 
