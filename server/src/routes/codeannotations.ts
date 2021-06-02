@@ -14,7 +14,7 @@ import { AssignmentState } from "../enum/AssignmentState";
 import moment from "moment";
 
 const router = express.Router();
-const maxCommentLength = 255;
+const maxCommentLength = 65535;
 
 router.get("/getMaxCommentLength", async (req, res) => {
   const user = req.user;
