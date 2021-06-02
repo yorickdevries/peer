@@ -169,11 +169,15 @@
 
                     <hr />
                     <!--Assignment type-->
-                    <b-form-group label="Assignment type" description="Choose the type of assignment to be submitted">
+                    <b-form-group
+                        label="Assignment type"
+                        description="Choose the type of assignment to be submitted. This cannot be changed after publishing the assignment."
+                    >
                         <b-form-select
                             @change="typeChangeFunc"
                             :options="assignmentTypes"
                             v-model="assignment.assignmentType"
+                            :disabled="published"
                         ></b-form-select>
                     </b-form-group>
 
@@ -258,7 +262,7 @@
                     <!--Allowed Submission extensions-->
                     <b-form-group
                         label="Allowed submission file extensions"
-                        description="The extensions for the submission files that are allowed."
+                        description="The extensions for the submission files that are allowed. This cannot be changed after publishing the assignment."
                     >
                         <b-alert
                             v-if="assignment.submissionExtensions !== '.pdf' && assignment.assignmentType == 'document'"
@@ -269,14 +273,10 @@
                             annotated within this website. This is a new experimental feature and some pdf's might not
                             render, but the students can always download the submission files as well.
                         </b-alert>
-                        <b-alert v-if="assignment.state !== 'unpublished'" variant="danger" show>
-                            The allowed submission file extensions cannot be changed once the assignment has been
-                            published.
-                        </b-alert>
                         <b-form-select
                             :options="extensionTypes"
                             v-model="assignment.submissionExtensions"
-                            :disabled="assignment.state !== 'unpublished'"
+                            :disabled="published"
                         ></b-form-select>
                     </b-form-group>
 
@@ -575,6 +575,9 @@ export default {
         assignmentFilePath() {
             // Get the assignment file path.
             return `/api/assignments/${this.assignment.id}/file`
+        },
+        published() {
+            return this.assignment.state !== "unpublished"
         }
     },
     watch: {
