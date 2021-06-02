@@ -53,7 +53,7 @@
                                 <dd v-if="submission.flaggedByServer === false">Not flagged as suspicious✔️</dd>
                                 <dd v-if="submission.flaggedByServer === null">No action by the server yet</dd>
                             </dl>
-                            <dl v-if="submission.flaggedByServer">
+                            <dl>
                                 <dt>Server's reason for flagging</dt>
                                 <dd>{{ submission.commentByServer }}</dd>
                             </dl>
