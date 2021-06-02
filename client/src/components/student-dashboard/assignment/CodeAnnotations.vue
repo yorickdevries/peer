@@ -58,7 +58,7 @@
                                     `calc(${$refs.container.clientWidth}px - (${maxLineNumberDigits + 3}ch + 1px))` : null
                         }"
                         class="comment-container"
-                        v-model="comment[`${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`]">
+                        v-model="comment[`${comments.findIndex(comment => comment.reviewId === review && comment.endLineNumber === index + 1)}`]">
                         <b-card>
                             <div v-if="editing && editingEndingLine === index + 1">
                                 <PeerTextarea
@@ -69,10 +69,10 @@
                                     @cancel="cancelEdit"
                                     :maxLength="maxCommentLength"
                                     :defaultLanguage="language"
-                                    :defaultContent="unescapeHTML(comments[lineNumbers[index + 1][lineNumbers[index + 1].length - 1]].commentText)"
+                                    :defaultContent="unescapeHTML(comments.find(comment => comment.reviewId === review).commentText)"
                                 />
                             </div><div v-else class="d-flex">
-                                <span class="comment-text" v-html="highlightComment(index + 1)"></span>
+                                <span class="comment-text" v-html="highlightComment(comments.find(comment => comment.reviewId === review).commentText)"></span>
                                 <div style="flex-shrink: 0">
                                     <icon
                                         v-if="!readOnly"
@@ -80,10 +80,10 @@
                                         class="mx-1 text-primary"
                                         role="button" 
                                         @click.native="editComment(index + 1)"
-                                        v-b-modal="`editModal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`"
+                                        v-b-modal="`editModal_${comments.findIndex(comment => comment.reviewId === review)}`"
                                     />
                                     <b-modal 
-                                        :id="`editModal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`" 
+                                        :id="`editModal_${comments.findIndex(comment => comment.reviewId === review)}`" 
                                         @ok="editModalOk(index + 1)"
                                         variant="danger"
                                         title="Warning!"
@@ -96,11 +96,11 @@
                                         name="trash"
                                         class="text-danger"
                                         role="button"
-                                        v-b-modal="`modal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`"
+                                        v-b-modal="`modal_${comments.findIndex(comment => comment.reviewId === review)}`"
                                     />
                                     <b-modal
-                                        @ok="deleteComment(lineNumbers[index + 1][lineNumbers[index + 1].length - 1])"
-                                        :id="`modal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`"
+                                        @ok="deleteComment(comments.findIndex(comment => comment.reviewId === review))"
+                                        :id="`modal_${comments.findIndex(comment => comment.reviewId === review)}`"
                                         title="Confirmation"
                                         centered>
                                         Are you sure you want to delete this comment?
@@ -171,21 +171,17 @@ export default {
                 .replace(/&quot;/g, '"')
                 .replace(/&#x27;/g, "'")
         },
-        highlightComment(lineNr) {
+        highlightComment(text) {
             const codeBlock = /(```)([^\s]*)(\s?)((?:.|\s)*?)\1/g
-            const commentIndex = this.lineNumbers[lineNr][this.lineNumbers[lineNr].length - 1]
 
-            return this.escapeHTML(this.comments[commentIndex].commentText).replaceAll(
-                codeBlock,
-                (match, delimiter, language, separator, code) => {
-                    if (hljs.getLanguage(language)) {
-                        code = hljs.highlight(this.unescapeHTML(code), { language, ignoreIllegals: true }).value
-                    } else {
-                        code = language + separator + code
-                    }
-                    return `<code><span style="white-space: pre">${code}</span></code>`
+            return this.escapeHTML(text).replaceAll(codeBlock, (match, delimiter, language, separator, code) => {
+                if (hljs.getLanguage(language)) {
+                    code = hljs.highlight(this.unescapeHTML(code), { language, ignoreIllegals: true }).value
+                } else {
+                    code = language + separator + code
                 }
-            )
+                return `<code><span style="white-space: pre">${code}</span></code>`
+            })
         },
         deleteComment(index) {
             this.$emit("deleted", index)
