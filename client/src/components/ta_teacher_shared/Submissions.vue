@@ -83,7 +83,6 @@
             :current-page="currentPage"
             :per-page="Number(perPage)"
             :filter="filter"
-            responsive
         >
             <template v-slot:cell(file)="data">
                 <a :href="submissionFilePath(data.item.id)" target="_blank">
