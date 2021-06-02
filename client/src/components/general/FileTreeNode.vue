@@ -83,7 +83,6 @@ export default {
     },
     computed: {
         selected() {
-            console.log(this.selectedFile, this.children.path)
             return this.selectedFile === this.children.path
         },
         commented() {
