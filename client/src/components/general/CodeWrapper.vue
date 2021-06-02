@@ -1,12 +1,15 @@
 <template>
-    <div v-if="files" class="d-flex">
-        <b-container
-            fluid
-            v-bind:class="{ 'ml-3': !singleFile }"
+    <div v-if="files">
+        <b-alert v-if="readOnly" show variant="warning">
+            The file is read only, so annotations cannot be added, removed or edited.
+        </b-alert>
+        <b-alert v-else-if="reviewSubmitted" show variant="warning">
+            The review is submitted, so annotations cannot be added, removed or edited.
+        </b-alert>
+        <div
             v-bind:style="{
                 position: 'relative',
-                overflow: 'hidden',
-                'flex-grow': '1'
+                overflow: 'hidden'
             }"
         >
             <b-row>
@@ -15,9 +18,9 @@
                 </b-alert>
             </b-row>
             <b-row>
-                <b-col md="auto" :style="{ 'margin-top': readOnly ? '2em' : 'unset' }">
+                <b-col md="auto">
                     <FileTree
-                        style="height: 100%"
+                        class="h-100"
                         @selected="onSelect"
                         :commentedFiles="commentedFiles"
                         :files="files"
@@ -27,6 +30,7 @@
                 </b-col>
                 <b-col>
                     <CodeAnnotator
+                        class="h-100"
                         :comments="comments"
                         :content="content"
                         :readOnly="readOnly"
@@ -44,7 +48,7 @@
                     </b-overlay>
                 </b-col>
             </b-row>
-        </b-container>
+        </div>
     </div>
     <b-alert v-else show variant="primary">Loading source files</b-alert>
 </template>
@@ -211,6 +215,9 @@ export default {
         },
         commentedFiles() {
             return new Set(this.comments.map(comment => comment.selectedFile))
+        },
+        reviewSubmitted() {
+            return this.review && this.review.submitted
         }
     }
 }

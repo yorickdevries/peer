@@ -1,5 +1,5 @@
 <template>
-    <b-card class="filetree">
+    <b-card class="filetree" no-body>
         <b-card-header role="button" @click="toggleCollapse" :class="{ 'header-collapse': collapsed }">
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" />
             <transition name="fade"> <span v-if="!collapsed">Files</span> </transition>
@@ -13,7 +13,7 @@
                     :key="key"
                     :propName="key"
                     :propChildren="root[key]"
-                    :selected="selected"
+                    :selectedFile="selected"
                     @toggleCollapse="onChildCollapse"
                 />
             </b-card-body>
