@@ -31,7 +31,7 @@ const parseSubmissionReviewsForExport = async function (
     const reviewer = review.reviewer;
     const reviewerGroup = await assignment.getGroup(reviewer);
 
-    const pdfAnnotations = await review.getPDFAnnotations();
+    const annotations = assignment.assignmentType === "document" ? await review.getPDFAnnotations() : await review.getCodeAnnotations();
 
     // id
     parsedReview["id"] = review.id;
@@ -75,8 +75,8 @@ const parseSubmissionReviewsForExport = async function (
     parsedReview["Submissionreview Reviewer reported the submission"] =
       review.flaggedByReviewer;
 
-    // number of pdf annotations
-    parsedReview["number of PDF annotations"] = pdfAnnotations.length;
+    // number of annotations in review
+    parsedReview["number of annotations"] = annotations.length;
 
     // QUESTIONS
     // iterate over all questions
