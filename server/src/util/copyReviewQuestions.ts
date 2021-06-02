@@ -156,7 +156,7 @@ const addCopyOfQuestions = async function (
             const option = new CheckboxQuestionOption(
               optionToCopy.text,
               question,
-              optionToCopy.points
+              optionToCopy.points || null
             );
             await option.validateOrReject();
             await transactionalEntityManager.save(option);
@@ -176,7 +176,7 @@ const addCopyOfQuestions = async function (
             const option = new MultipleChoiceQuestionOption(
               optionToCopy.text,
               question,
-              optionToCopy.points
+              optionToCopy.points || null
             );
             await option.validateOrReject();
             await transactionalEntityManager.save(option);

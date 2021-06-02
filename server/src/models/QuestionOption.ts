@@ -42,7 +42,7 @@ export default abstract class QuestionOption extends BaseModel {
   @IsInt()
   @Min(-100)
   @Max(100) // value needs to be between -100 and 100
-  points: number | null;
+  points?: number | null;
 
   abstract question?: Question;
 
