@@ -34,9 +34,9 @@ const parseSubmissionsForExport = async function (
     // approvingTA
     parsedSubmission["TA netid"] = submission.approvingTA?.netid;
     // flagged by server
-    parsedSubmission["Flagged by server"] = submission.flaggedByServer;
+    parsedSubmission["flagged by server"] = submission.flaggedByServer;
     // comment by server
-    parsedSubmission["Comment by server"] = submission.commentByServer;
+    parsedSubmission["comment by server"] = submission.commentByServer;
     // created At
     parsedSubmission["created at"] = submission.createdAt;
     // updated At
