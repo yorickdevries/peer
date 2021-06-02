@@ -46,67 +46,70 @@
                         @click.native="toggleComment(lineNumbers[index + 1])"
                     />
                 </div>
-                <b-collapse
-                    v-if="isEndingLine(index + 1)"
-                    v-bind:style="{
-                        marginLeft: `calc(${maxLineNumberDigits + 1.5 + reviewsInFile.length * 0.5 - 0.25}ch + 1px)`,
-                        left: `calc(${maxLineNumberDigits + 1.5 + reviewsInFile.length * 0.5 - 0.25}ch + 1px)`,
-                        minWidth:
-                            $refs.container ?
-                                `calc(${$refs.container.clientWidth}px - (${maxLineNumberDigits + 3}ch + 1px))` : null
-                    }"
-                    class="comment-container"
-                    v-model="comment[`${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`]">
-                    <b-card>
-                        <div v-if="editing && editingEndingLine === index + 1">
-                            <PeerTextarea
-                                placeholder="Type your comment"
-                                rows="3"
-                                max-rows="5"
-                                @submit="(text) => submitEditedComment(index + 1, text)"
-                                @cancel="cancelEdit"
-                                :maxLength="maxCommentLength"
-                                :defaultLanguage="language"
-                                :defaultContent="unescapeHTML(comments[lineNumbers[index + 1][lineNumbers[index + 1].length - 1]].commentText)"
-                            />
-                        </div><div v-else class="d-flex">
-                            <span class="comment-text" v-html="highlightComment(index + 1)"></span>
-                            <div style="flex-shrink: 0">
-                                <icon
-                                    v-if="!readOnly"
-                                    name="pen"
-                                    class="mx-1 text-primary"
-                                    role="button" 
-                                    @click.native="editComment(index + 1)"
-                                    v-b-modal="`editModal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`"
+                <div v-for="(review, reviewIndex) in reviewsInFile" :key="review">
+                    <b-collapse
+                        v-if="getCommentsEndingAt(index + 1).some(id => comments[id].reviewId === review)"
+                        v-bind:style="{
+                            paddingLeft: `calc(${(reviewsInFile.length - reviewIndex) * 0.5 + 1.5}ch + 1px)`,
+                            left: `calc(${maxLineNumberDigits + 0.5 * (1 + reviewIndex)}ch + 1px)`,
+                            borderLeft: `0.25ch solid ${reviewColors[review]}`,
+                            minWidth:
+                                $refs.container ?
+                                    `calc(${$refs.container.clientWidth}px - (${maxLineNumberDigits + 3}ch + 1px))` : null
+                        }"
+                        class="comment-container"
+                        v-model="comment[`${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`]">
+                        <b-card>
+                            <div v-if="editing && editingEndingLine === index + 1">
+                                <PeerTextarea
+                                    placeholder="Type your comment"
+                                    rows="3"
+                                    max-rows="5"
+                                    @submit="(text) => submitEditedComment(index + 1, text)"
+                                    @cancel="cancelEdit"
+                                    :maxLength="maxCommentLength"
+                                    :defaultLanguage="language"
+                                    :defaultContent="unescapeHTML(comments[lineNumbers[index + 1][lineNumbers[index + 1].length - 1]].commentText)"
                                 />
-                                <b-modal 
-                                    :id="`editModal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`" 
-                                    @ok="editModalOk(index + 1)"
-                                    variant="danger"
-                                    title="Warning!"
-                                    v-if="showEditModal"
-                                    centered>
-                                    {{ getModalText() }}
-                                </b-modal>
-                                <icon
-                                    v-if="!readOnly"
-                                    name="trash"
-                                    class="text-danger"
-                                    role="button"
-                                    v-b-modal="`modal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`"
-                                />
-                                <b-modal
-                                    @ok="deleteComment(lineNumbers[index + 1][lineNumbers[index + 1].length - 1])"
-                                    :id="`modal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`"
-                                    title="Confirmation"
-                                    centered>
-                                    Are you sure you want to delete this comment?
-                                </b-modal>
+                            </div><div v-else class="d-flex">
+                                <span class="comment-text" v-html="highlightComment(index + 1)"></span>
+                                <div style="flex-shrink: 0">
+                                    <icon
+                                        v-if="!readOnly"
+                                        name="pen"
+                                        class="mx-1 text-primary"
+                                        role="button" 
+                                        @click.native="editComment(index + 1)"
+                                        v-b-modal="`editModal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`"
+                                    />
+                                    <b-modal 
+                                        :id="`editModal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`" 
+                                        @ok="editModalOk(index + 1)"
+                                        variant="danger"
+                                        title="Warning!"
+                                        v-if="showEditModal"
+                                        centered>
+                                        {{ getModalText() }}
+                                    </b-modal>
+                                    <icon
+                                        v-if="!readOnly"
+                                        name="trash"
+                                        class="text-danger"
+                                        role="button"
+                                        v-b-modal="`modal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`"
+                                    />
+                                    <b-modal
+                                        @ok="deleteComment(lineNumbers[index + 1][lineNumbers[index + 1].length - 1])"
+                                        :id="`modal_${lineNumbers[index + 1][lineNumbers[index + 1].length - 1]}`"
+                                        title="Confirmation"
+                                        centered>
+                                        Are you sure you want to delete this comment?
+                                    </b-modal>
+                                </div>
                             </div>
-                        </div>
-                    </b-card>
-                </b-collapse>
+                        </b-card>
+                    </b-collapse>
+                </div>
             </div>
     </div></pre>
 </template>
@@ -145,6 +148,9 @@ export default {
                 this.isCommentedOn(lineNr) &&
                 this.lineNumbers[lineNr].some(id => this.comments[id].endLineNumber === lineNr)
             )
+        },
+        getCommentsEndingAt(lineNr) {
+            return this.lineNumbers[lineNr].filter(id => this.comments[id].endLineNumber === lineNr)
         },
         isCommentedOn(lineNr) {
             return lineNr >= 1 && lineNr <= this.lineNumbers.length && this.lineNumbers[lineNr].length > 0
@@ -352,8 +358,6 @@ pre {
             &.code-annotations-linenr {
                 flex-shrink: 0;
                 padding-right: 0.5ch;
-                position: sticky;
-                left: 0;
                 background-color: inherit;
                 display: inline-block;
                 text-align: right;
@@ -403,6 +407,8 @@ pre {
     padding-right: 0.5ch;
     user-select: none;
     box-sizing: content-box;
+    position: sticky;
+    left: 0;
 
     .review-bar {
         padding: 0 0.5ch;
