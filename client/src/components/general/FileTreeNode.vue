@@ -109,9 +109,10 @@ $background-hover: rgba(0, 0, 0, 0.03);
     font-weight: bolder;
 
     &:hover {
-        opacity: 0.7;
+        background-color: var(--dark);
     }
 }
+
 :not(.selected).file {
     color: var(--gray);
 }
