@@ -85,12 +85,15 @@
                                 </template>
                                 <datepicker placeholder="Select date" v-model="assignment.dueDay" required></datepicker>
                                 <b-form-input v-model="assignment.dueTime" type="time" required> </b-form-input>
-                                <b-form-checkbox v-model="assignment.lateSubmissions">
+                                <b-form-checkbox
+                                    v-model="assignment.lateSubmissions"
+                                    :disabled="assignmentStateAfter('submission')"
+                                >
                                     Allow late submissions after the deadline while the submission phase isn't closed
                                     yet
                                     <b-badge
                                         v-b-tooltip.hover
-                                        title="This allows submissions to be made until the submission phase is manually closed by the teacher"
+                                        title="This allows submissions to be made until the submission phase is manually closed by the teacher. This cannot be changed after the submission stage."
                                         variant="primary"
                                         >?</b-badge
                                     >
