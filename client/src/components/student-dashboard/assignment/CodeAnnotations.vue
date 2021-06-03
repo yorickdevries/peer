@@ -52,11 +52,12 @@
                 <div v-for="annotation in getAnnotationsEndingAt(index)" :key="annotation.id">
                     <b-collapse
                         v-bind:style="{
-                            left: `calc(${maxLineNumberDigits + 0.5 * (1 + reviewsInFile.indexOf(annotation.reviewId)) - 0.125}ch + 1px)`,
+                            paddingLeft: `calc(${(reviewsInFile.length - reviewsInFile.indexOf(annotation.reviewId)) * 0.5 + 1.5}ch + 1px)`,
+                            left: `calc(${maxLineNumberDigits + 0.5 * (1 + reviewsInFile.indexOf(annotation.reviewId)) + 0.375}ch + 1px)`,
                             borderLeft: `0.25ch solid ${reviewColors[annotation.reviewId]}`,
                             minWidth:
                                 $refs.container ?
-                                    `calc(${$refs.container.clientWidth}px - (${maxLineNumberDigits + 3}ch + 1px))` : null
+                                    `calc(${$refs.container.clientWidth}px - (${maxLineNumberDigits + 0.5 * (1 + reviewsInFile.indexOf(annotation.reviewId)) + 1.375}ch + 1px))` : null
                         }"
                         class="comment-container"
                         v-model="annotationState[annotation.id]">
@@ -360,6 +361,7 @@ pre {
             &.code-annotations-linenr {
                 flex-shrink: 0;
                 padding-right: 0.5ch;
+                box-sizing: content-box;
                 background-color: inherit;
                 display: inline-block;
                 text-align: right;
@@ -411,9 +413,10 @@ pre {
     box-sizing: content-box;
     position: sticky;
     left: 0;
+    font-family: var(--font-family-monospace);
 
     .review-bar {
-        font-family: var(--font-family-monospace);
+        font-family: inherit !important;
         padding: 0 0.5ch;
         display: flex;
         align-items: stretch;
@@ -421,7 +424,7 @@ pre {
         span {
             width: 0.25ch;
             box-sizing: content-box;
-            font-family: inherit;
+            font-family: inherit !important;
 
             &:not(:last-of-type) {
                 margin-right: 0.25ch;
