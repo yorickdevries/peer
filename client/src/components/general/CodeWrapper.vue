@@ -1,42 +1,55 @@
 <template>
-    <div v-if="files" class="d-flex">
-        <div style="flex-shrink: 0; max-width: 40%">
-            <FileTree
-                @selected="onSelect"
-                :commentedFiles="commentedFiles"
-                :files="files"
-                :selectedFile="selected"
-                :startCollapsed="singleFile"
-            />
-        </div>
+    <div v-if="files">
+        <b-alert v-if="readOnly" show variant="warning">
+            The file is read only, so annotations cannot be added, removed or edited.
+        </b-alert>
+        <b-alert v-else-if="reviewSubmitted" show variant="warning">
+            The review is submitted, so annotations cannot be added, removed or edited.
+        </b-alert>
         <div
-            v-bind:class="{ 'ml-3': !singleFile }"
             v-bind:style="{
                 position: 'relative',
-                overflow: 'hidden',
-                'flex-grow': '1'
+                overflow: 'hidden'
             }"
         >
-            <b-alert variant="primary" show v-if="!content || content.length === 0">This file is empty</b-alert>
-            <CodeAnnotator
-                v-else
-                :comments="comments"
-                :content="content"
-                :language="language"
-                :selectedFile="selected"
-                :readOnly="readOnly"
-                :review="review"
-                :reviewColors="reviewColors"
-            />
-            <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
-                <template #overlay>
-                    <b-spinner v-if="!showFile" variant="primary"></b-spinner>
-                    <div v-else-if="showWarning" class="text-center">
-                        <p>This file contains characters that can not be displayed properly</p>
-                        <b-button variant="outline-primary" @click="showWarning = false">Show anyway</b-button>
-                    </div>
-                </template>
-            </b-overlay>
+            <b-row>
+                <b-alert variant="primary" show v-if="!content || content.length === 0">
+                    This file is empty
+                </b-alert>
+            </b-row>
+            <b-row>
+                <b-col md="auto">
+                    <FileTree
+                        class="h-100"
+                        @selected="onSelect"
+                        :commentedFiles="commentedFiles"
+                        :files="files"
+                        :selectedFile="selected"
+                        :startCollapsed="singleFile"
+                    />
+                </b-col>
+                <b-col>
+                    <CodeAnnotator
+                        class="h-100"
+                        :comments="comments"
+                        :content="content"
+                        :language="language"
+                        :selectedFile="selected"
+                        :readOnly="readOnly"
+                        :review="review"
+                        :reviewColors="reviewColors"
+                    />
+                    <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
+                        <template #overlay>
+                            <b-spinner v-if="!showFile" variant="primary"></b-spinner>
+                            <div v-else-if="showWarning" class="text-center">
+                                <p>This file contains characters that can not be displayed properly</p>
+                                <b-button variant="outline-primary" @click="showWarning = false">Show anyway</b-button>
+                            </div>
+                        </template>
+                    </b-overlay>
+                </b-col>
+            </b-row>
         </div>
     </div>
     <b-alert v-else show variant="primary">Loading source files</b-alert>
@@ -217,6 +230,9 @@ export default {
         },
         commentedFiles() {
             return new Set(this.comments.map(comment => comment.selectedFile))
+        },
+        reviewSubmitted() {
+            return this.review && this.review.submitted
         }
     }
 }

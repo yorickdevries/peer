@@ -1,20 +1,17 @@
 <template>
-    <div>
-        <b-alert v-if="readOnly" show variant="warning">
-            The file is read only, so annotations cannot be added, removed or edited.
-        </b-alert>
-        <b-alert v-else-if="reviewSubmitted" show variant="warning">
-            The review is submitted, so annotations cannot be added, removed or edited.
-        </b-alert>
+    <div class="d-flex flex-column">
         <b-alert :show="!showCode" variant="primary">LOADING {{ review ? "REVIEW" : "SUBMISSION" }}</b-alert>
 
         <!-- The buttons and text area for the actual comments, somewhat primitive -->
         <!-- Only show annotation buttons if this component is inside a non-submitted review -->
-        <div v-if="!readOnly && !reviewSubmitted && showAnnotations" class="mb-2">
-            <form @submit.prevent="writeComment">
-                <b-button v-if="!writing" type="submit" variant="primary">
+        <div v-if="!readOnly && !reviewSubmitted && showAnnotations" class="mb-3">
+            <form v-if="!writing" @submit.prevent="writeComment" class="annotation-form">
+                <b-button type="submit" variant="primary">
                     Leave a comment on the selected code
                 </b-button>
+                <b-alert variant="info" class="ml-3" show>
+                    Select a piece of code with your cursor to leave a comment
+                </b-alert>
             </form>
             <PeerTextarea
                 v-if="writing"
@@ -28,7 +25,7 @@
             />
         </div>
 
-        <b-card v-show="showCode">
+        <b-card v-show="showCode" style="flex-grow: 1">
             <!--
                 Displays the code with annotations in the mode specified by the readOnly variable.
                 This is used to allow students to annotate code during the review stage, where readOnly is then false.
@@ -216,3 +213,15 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+.annotation-form {
+    display: flex;
+    align-items: stretch;
+
+    .alert {
+        margin: 0;
+        flex-grow: 1;
+    }
+}
+</style>

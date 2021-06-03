@@ -23,7 +23,7 @@ describe("CodeAnnotations", () => {
   let body: Object;
   // Possibility for testing with a second enrolled student
   //let reviewId2: number;
-  const maxCommentLength = 255;
+  const maxCommentLength = 65535;
 
   beforeAll(async () => {
     connection = await createDatabaseConnection();
