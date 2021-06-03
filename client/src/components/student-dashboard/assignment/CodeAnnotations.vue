@@ -9,7 +9,6 @@
                     <div class="gutter">
                         <code
                             class="code-annotations-linenr"
-                            :linenr="index + 1"
                             v-bind:style="{ width: `${maxLineNumberDigits}ch` }"
                         >{{ index + 1 }}</code>
                         <div class="review-bar">
@@ -17,7 +16,7 @@
                                 v-for="review in reviewsInFile"
                                 :key="index + 'review_' + review"
                                 v-bind:style="{
-                                    'background-color': lineNumbers[index + 1].some(id => comments[id].reviewId === review)
+                                    'background-color': filterAnnotationsAt(index, false, false, review).length > 0
                                         ? reviewColors[review]
                                         : 'transparent'
                                 }"
@@ -25,66 +24,69 @@
                         </div>
                     </div>
                     <code
-                        class="code-annotations-code"
-                        v-if="!isCommentedOn(index + 1)"
+                        v-if="!hasAnnotationsAt(index)"
                         :linenr="index + 1"
+                        class="code-annotations-code"
                         v-html="line.replace(/^$/, '<br />')"
                     ></code><code
                         v-else
                         :linenr="index + 1"
-                        v-bind:class="{ comment: true, comment_start: isStartingLine(index + 1), comment_end: isEndingLine(index + 1) }"
+                        v-bind:class="{
+                            comment: true,
+                            comment_start: hasAnnotationsStartingAt(index),
+                            comment_end: hasAnnotationsEndingAt(index)
+                        }"
                         v-html="line.replace(/^$/, '<br />')"
                         role="button"
-                        @click="toggleComment(lineNumbers[index + 1])"
+                        @click="toggleAnnotationsAt(index)"
                     ></code>
                     <icon
-                        v-if="isStartingLine(index + 1)"
+                        v-if="hasAnnotationsStartingAt(index)"
                         class="arrow"
-                        :class="{ rotate: comment[lineNumbers[index + 1].find(id => comments[id].startLineNumber === index + 1)] }"
+                        :class="{ rotate: getAnnotationsStartingAt(index).every(annotation => annotationState[annotation.id] === true) }"
                         role="button"
                         name="chevron-down"
-                        @click.native="toggleComment(lineNumbers[index + 1])"
+                        @click.native="toggleAnnotationsAt(index)"
                     />
                 </div>
-                <div v-for="(review, reviewIndex) in reviewsInFile" :key="review">
+                <div v-for="annotation in getAnnotationsEndingAt(index)" :key="annotation.id">
                     <b-collapse
-                        v-if="getCommentsEndingAt(index + 1).some(id => comments[id].reviewId === review)"
                         v-bind:style="{
-                            paddingLeft: `calc(${(reviewsInFile.length - reviewIndex) * 0.5 + 1.5}ch + 1px)`,
-                            left: `calc(${maxLineNumberDigits + 0.5 * (1 + reviewIndex)}ch + 1px)`,
-                            borderLeft: `0.25ch solid ${reviewColors[review]}`,
+                            paddingLeft: `calc(${(reviewsInFile.length - reviewsInFile.indexOf(annotation.reviewId)) * 0.5 + 1.5}ch + 1px)`,
+                            left: `calc(${maxLineNumberDigits + 0.5 * (1 + reviewsInFile.indexOf(annotation.reviewId))}ch + 1px)`,
+                            borderLeft: `0.25ch solid ${reviewColors[annotation.reviewId]}`,
                             minWidth:
                                 $refs.container ?
                                     `calc(${$refs.container.clientWidth}px - (${maxLineNumberDigits + 3}ch + 1px))` : null
                         }"
                         class="comment-container"
-                        v-model="comment[`${comments.findIndex(comment => comment.reviewId === review && comment.endLineNumber === index + 1)}`]">
+                        v-model="annotationState[annotation.id]">
                         <b-card>
-                            <div v-if="editing && editingEndingLine === index + 1">
+                            <div v-if="editingAnnotation !== null && editingAnnotation.endLineNumber === index + 1">
                                 <PeerTextarea
                                     placeholder="Type your comment"
                                     rows="3"
                                     max-rows="5"
-                                    @submit="(text) => submitEditedComment(index + 1, text)"
+                                    @submit="(text) => submitAnnotation(annotation, text)"
                                     @cancel="cancelEdit"
                                     :maxLength="maxCommentLength"
                                     :defaultLanguage="language"
-                                    :defaultContent="unescapeHTML(comments.find(comment => comment.reviewId === review).commentText)"
+                                    :defaultContent="unescapeHTML(annotation.commentText)"
                                 />
                             </div><div v-else class="d-flex">
-                                <span class="comment-text" v-html="highlightComment(comments.find(comment => comment.reviewId === review).commentText)"></span>
+                                <span class="comment-text" v-html="highlightComment(annotation.commentText)"></span>
                                 <div style="flex-shrink: 0">
                                     <icon
                                         v-if="!readOnly"
                                         name="pen"
                                         class="mx-1 text-primary"
                                         role="button" 
-                                        @click.native="editComment(index + 1)"
-                                        v-b-modal="`editModal_${comments.findIndex(comment => comment.reviewId === review)}`"
+                                        @click.native="editAnnotation(annotation)"
+                                        v-b-modal="`editModal_${annotation.id}`"
                                     />
                                     <b-modal 
-                                        :id="`editModal_${comments.findIndex(comment => comment.reviewId === review)}`" 
-                                        @ok="editModalOk(index + 1)"
+                                        :id="`editModal_${annotation.id}`" 
+                                        @ok="editModalOk(index)"
                                         variant="danger"
                                         title="Warning!"
                                         v-if="showEditModal"
@@ -96,11 +98,11 @@
                                         name="trash"
                                         class="text-danger"
                                         role="button"
-                                        v-b-modal="`modal_${comments.findIndex(comment => comment.reviewId === review)}`"
+                                        v-b-modal="`modal_${annotation.id}`"
                                     />
                                     <b-modal
-                                        @ok="deleteComment(comments.findIndex(comment => comment.reviewId === review))"
-                                        :id="`modal_${comments.findIndex(comment => comment.reviewId === review)}`"
+                                        @ok="deleteAnnotation(annotation)"
+                                        :id="`modal_${annotation.id}`"
                                         title="Confirmation"
                                         centered>
                                         Are you sure you want to delete this comment?
@@ -126,34 +128,41 @@ export default {
     components: { PeerTextarea },
     data() {
         return {
-            editing: false,
-            editingEndingLine: null,
-            editingFilePath: null,
             showEditModal: false,
-            comment: {}
+            editingAnnotation: null,
+            annotationState: {}
         }
     },
     created() {
         window.addEventListener("resize", () => this.$forceUpdate())
     },
     methods: {
-        isStartingLine(lineNr) {
-            return (
-                this.isCommentedOn(lineNr) &&
-                this.lineNumbers[lineNr].some(id => this.comments[id].startLineNumber === lineNr)
-            )
+        getAnnotationsAt(lineIndex) {
+            return this.lineAnnotationMap[lineIndex.toString()] || []
         },
-        isEndingLine(lineNr) {
-            return (
-                this.isCommentedOn(lineNr) &&
-                this.lineNumbers[lineNr].some(id => this.comments[id].endLineNumber === lineNr)
-            )
+        hasAnnotationsAt(lineIndex) {
+            return this.getAnnotationsAt(lineIndex).length > 0
         },
-        getCommentsEndingAt(lineNr) {
-            return this.lineNumbers[lineNr].filter(id => this.comments[id].endLineNumber === lineNr)
+        getAnnotationsStartingAt(lineIndex) {
+            return this.filterAnnotationsAt(lineIndex, true, false, -1)
         },
-        isCommentedOn(lineNr) {
-            return lineNr >= 1 && lineNr <= this.lineNumbers.length && this.lineNumbers[lineNr].length > 0
+        hasAnnotationsStartingAt(lineIndex) {
+            return this.getAnnotationsStartingAt(lineIndex).length > 0
+        },
+        getAnnotationsEndingAt(lineIndex) {
+            return this.filterAnnotationsAt(lineIndex, false, true, -1)
+        },
+        hasAnnotationsEndingAt(lineIndex) {
+            return this.getAnnotationsEndingAt(lineIndex).length > 0
+        },
+        filterAnnotationsAt(lineIndex, startsAt = false, endsAt = false, reviewId = -1) {
+            return this.getAnnotationsAt(lineIndex).filter(comment => {
+                return (
+                    (!startsAt || comment.startLineNumber - 1 === lineIndex) &&
+                    (!endsAt || comment.endLineNumber - 1 === lineIndex) &&
+                    (reviewId < 0 || comment.reviewId === reviewId)
+                )
+            })
         },
         escapeHTML(text) {
             return text
@@ -183,73 +192,71 @@ export default {
                 return `<code><span style="white-space: pre">${code}</span></code>`
             })
         },
-        deleteComment(index) {
-            this.$emit("deleted", index)
+        deleteAnnotation(annotation) {
+            this.$emit("delete", annotation.id)
         },
-        editComment(lineNr) {
-            if (this.editing) {
+        editAnnotation(annotation) {
+            if (this.editingAnnotation !== null) {
                 this.showEditModal = true
                 return
             }
-            this.editing = true
-            this.editingEndingLine = lineNr
-            this.editingFilePath = this.selectedFile
+            this.editingAnnotation = annotation
         },
-        submitEditedComment(index, commentText) {
-            this.$emit("edited", this.lineNumbers[index], commentText)
+        submitAnnotation(annotation, updatedText) {
+            this.$emit("edit", annotation.id, updatedText)
             this.cancelEdit()
         },
         cancelEdit() {
-            this.editing = false
-            this.editingEndingLine = null
-            this.editingFilePath = null
+            this.editingAnnotation = null
         },
-        editModalOk(lineNr) {
-            this.editing = false
-            this.editComment(lineNr)
+        editModalOk(lineIndex) {
+            this.editingAnnotation = false
+            this.editComment(lineIndex)
         },
         getModalText() {
+            const annotation = this.editingAnnotation
             // If there is an edit in another file, redirect the user to that file.
-            if (this.selectedFile !== this.editingFilePath) {
-                return "If you start editing this comment, your edit on file " + this.editingFilePath + " will be lost."
+            if (this.selectedFile !== annotation.selectedFile) {
+                return `If you start editing this comment, your edit on file ${annotation.selectedFile} will be lost.`
             }
-
-            // Starting line number of the comment
-            const startingLineNr = this.comments[this.lineNumbers[this.editingEndingLine]].startLineNumber
 
             // If the lines are the same, return only one line
-            if (startingLineNr === this.editingEndingLine) {
-                return `If you start editing this comment, your edit on line ${this.editingEndingLine} will be lost.`
+            if (annotation.startLineNumber === annotation.endLineNumber) {
+                return `If you start editing this comment, your edit on line ${annotation.endLineNumber} will be lost.`
             } else {
-                return (
-                    `If you start editing this comment, your edit between the lines ` +
-                    `${startingLineNr} and ${this.editingEndingLine} will be lost.`
-                )
+                return `If you start editing this comment, your edit between the lines ${annotation.startLineNumber} and ${annotation.endLineNumber} will be lost.`
             }
         },
-        toggleComment(line) {
-            const allExtended = line.every(id => !!this.comment[id])
-            line.forEach(id => {
-                this.$set(this.comment, id, !allExtended)
+        toggleAnnotationsAt(lineIndex) {
+            const allExtended = this.getAnnotationsAt(lineIndex).every(
+                annotation => this.annotationState[annotation.id] === true
+            )
+            this.getAnnotationsAt(lineIndex).forEach(annotation => {
+                this.$set(this.annotationState, annotation.id, !allExtended)
             })
         }
     },
     computed: {
-        lineNumbers() {
-            const res = new Array(this.content.length + 1).fill(-1).map((_, lineNr) => {
-                const result = []
-                for (let i = 0; i < this.comments.length; i++) {
+        // Compute map<line number, map<reviewId, *comment?>>
+        lineAnnotationMap() {
+            const result = {}
+            for (let i = 0; i < this.content.length; i++) {
+                const line = []
+                for (let j = 0; j < this.comments.length; j++) {
                     if (
-                        this.comments[i].startLineNumber <= lineNr &&
-                        this.comments[i].endLineNumber >= lineNr &&
-                        this.comments[i].selectedFile === this.selectedFile
+                        this.comments[j].startLineNumber - 1 <= i &&
+                        this.comments[j].endLineNumber - 1 >= i &&
+                        this.comments[j].selectedFile === this.selectedFile
                     ) {
-                        result.push(i)
+                        line.push(this.comments[j])
                     }
                 }
-                return result
-            })
-            return res
+
+                if (line.length > 0) {
+                    result[i.toString()] = line
+                }
+            }
+            return result
         },
         reviewsInFile() {
             return Array.from(new Set(this.comments.map(comment => comment.reviewId)))

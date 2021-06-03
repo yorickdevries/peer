@@ -37,8 +37,8 @@
              -->
             <CodeAnnotations
                 v-if="showAnnotations"
-                @deleted="onDeleteComment"
-                @edited="onEditedComment"
+                @delete="onDeleteComment"
+                @edit="onEditedComment"
                 :content="content"
                 :comments="comments"
                 :language="language"
@@ -187,19 +187,22 @@ export default {
             this.endLineNumber = null
             this.writing = false
         },
-        async onDeleteComment(index) {
+        async onDeleteComment(id) {
             // Remove comment from comment array
-            const removedComment = this.comments.splice(index, 1)
+            this.comments.splice(
+                this.comments.findIndex(comment => comment.id === id),
+                1
+            )
             // Remove comment from back-end
-            await api.codeannotations.deleteAnnotation(removedComment[0].id)
+            await api.codeannotations.deleteAnnotation(id)
             this.showSuccessMessage({ message: "Successfully deleted comment" })
         },
-        async onEditedComment(index, updatedText) {
-            let comment = this.comments[index]
-            const res = await api.codeannotations.patchAnnotation(comment.id, updatedText)
+        async onEditedComment(id, updatedText) {
+            const index = this.comments.findIndex(comment => comment.id === id)
+            const res = await api.codeannotations.patchAnnotation(id, updatedText)
             // Update only the comment text
-            comment.commentText = res.data.commentText
-            this.comments.splice(index, 1, comment)
+            this.comments[index].commentText = res.data.commentText
+            this.comments.splice(index, 1, this.comments[index])
             this.showSuccessMessage({ message: "Successfully updated comment" })
         }
     },
