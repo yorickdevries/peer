@@ -47,10 +47,20 @@
                                 <dt>Current submission status</dt>
                                 <dd>{{ submission.final ? "" : "Not " }}Final</dd>
                             </dl>
-                            <dt>Current approval status</dt>
+                            <dl>
+                                <dt>Current server flagging status</dt>
+                                <dd v-if="submission.flaggedByServer">Flagged as suspicious⚠️</dd>
+                                <dd v-if="submission.flaggedByServer === false">Not flagged as suspicious✔️</dd>
+                                <dd v-if="submission.flaggedByServer === null">No action by the server yet</dd>
+                            </dl>
+                            <dl>
+                                <dt>Server's reason for flagging</dt>
+                                <dd>{{ submission.commentByServer }}</dd>
+                            </dl>
+                            <dt>Current TA approval status</dt>
                             <dd v-if="submission.approvalByTA">Approved 👍</dd>
                             <dd v-if="submission.approvalByTA === false">Disapproved 👎</dd>
-                            <dd v-if="submission.approvalByTA === null">No action yet by any TA.</dd>
+                            <dd v-if="submission.approvalByTA === null">No action yet by any TA</dd>
                             <dt>Current TA Comment</dt>
                             <b-form-textarea :rows="10" :max-rows="15" v-model="submission.commentByTA" readonly />
                         </b-col>

@@ -83,6 +83,7 @@
             :current-page="currentPage"
             :per-page="Number(perPage)"
             :filter="filter"
+            class="table-responsive"
         >
             <template v-slot:cell(file)="data">
                 <a :href="submissionFilePath(data.item.id)" target="_blank">
@@ -161,6 +162,8 @@ export default {
                 { key: "final", label: "Final" },
                 { key: "approvalByTA", label: "Approval by TA" },
                 { key: "approvingTA", label: "Approving TA" },
+                { key: "flaggedByServer", label: "Flagged by server" },
+                { key: "commentByServer", label: "Comment by server" },
                 { key: "action", label: "Action" }
             ],
             currentPage: 1,
