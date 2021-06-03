@@ -111,5 +111,7 @@ start-server:
 
 sast:
   stage: test
-  only:
-  - schedules
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+    when: always
+  - when: never
