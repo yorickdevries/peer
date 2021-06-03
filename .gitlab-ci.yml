@@ -1,3 +1,6 @@
+include:
+  template: SAST.gitlab-ci.yml
+
 image: node:14
 
 variables:
@@ -13,7 +16,6 @@ stages:
     - test
     - migration
     - start
-    - sast
 
 lint-server:
   stage: static-analysis
@@ -107,5 +109,7 @@ start-server:
   only:
   - merge_requests
 
-include:
-  template: SAST.gitlab-ci.yml
+sast:
+  stage: test
+  only:
+  - schedules
