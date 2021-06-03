@@ -52,8 +52,7 @@
                 <div v-for="annotation in getAnnotationsEndingAt(index)" :key="annotation.id">
                     <b-collapse
                         v-bind:style="{
-                            paddingLeft: `calc(${(reviewsInFile.length - reviewsInFile.indexOf(annotation.reviewId)) * 0.5 + 1.5}ch + 1px)`,
-                            left: `calc(${maxLineNumberDigits + 0.5 * (1 + reviewsInFile.indexOf(annotation.reviewId))}ch + 1px)`,
+                            left: `calc(${maxLineNumberDigits + 0.5 * (1 + reviewsInFile.indexOf(annotation.reviewId)) - 0.125}ch + 1px)`,
                             borderLeft: `0.25ch solid ${reviewColors[annotation.reviewId]}`,
                             minWidth:
                                 $refs.container ?
@@ -414,12 +413,15 @@ pre {
     left: 0;
 
     .review-bar {
+        font-family: var(--font-family-monospace);
         padding: 0 0.5ch;
         display: flex;
         align-items: stretch;
 
         span {
             width: 0.25ch;
+            box-sizing: content-box;
+            font-family: inherit;
 
             &:not(:last-of-type) {
                 margin-right: 0.25ch;

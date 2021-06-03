@@ -104,8 +104,12 @@ export default {
         },
         async fetchFeedbackReviews() {
             if (this.submissionId) {
-                const res = await api.submissions.getFeedback(this.submissionId)
-                this.feedbackReviews = res.data
+                try {
+                    const res = await api.submissions.getFeedback(this.submissionId)
+                    this.feedbackReviews = res.data
+                } catch (error) {
+                    console.log(error)
+                }
             }
         },
         async fetchComments() {
