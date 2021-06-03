@@ -146,7 +146,7 @@
                                     encourages students to more actively make reviews.</b-alert
                                 >
                                 <b-form-checkbox v-model="assignment.lateSubmissionReviews">
-                                    Allow late submission reviews indefinetely after the deadline
+                                    Allow late submission reviews indefinitely after the deadline
                                     <b-badge
                                         v-b-tooltip.hover
                                         title="Students can finish any unsubmitted reviews any time after the deadline. When feedback is open, submitted reviews cannot be unsubmitted anymore."
@@ -339,7 +339,7 @@
                                 ></datepicker>
                                 <b-form-input v-model="assignment.reviewEvaluationDueTime" type="time"></b-form-input>
                                 <b-form-checkbox v-model="assignment.lateReviewEvaluations">
-                                    Allow late review evaluations indefinetely after the deadline
+                                    Allow late review evaluations indefinitely after the deadline
                                     <b-badge
                                         v-b-tooltip.hover
                                         title="Students can finish any unsubmitted review evaluations any time after the deadline. After the deadline, submitted reviews cannot be unsubmitted anymore."
