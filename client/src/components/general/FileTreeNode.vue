@@ -3,17 +3,17 @@
         <div v-if="dir" class="dir" v-on:click="notifyCollapsing" role="button">
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" role="button" />
             <icon class="text-muted" name="folder"></icon>
-            {{ name }}
+            <span>{{ name }}</span>
         </div>
-        <div v-else @click="onSelect" v-bind:class="`${background} file d-flex justify-content-between`" role="button">
+        <div v-else @click="onSelect" :class="{ selected, file: true }" role="button">
             <div>
-                <icon class="text-muted" name="code"></icon>
-                <span class="filename"> {{ name }}</span>
+                <icon name="code"></icon>
+                <span>{{ name }}</span>
             </div>
-            <icon v-if="commented" class="text-muted comment-icon" name="comments" />
+            <icon v-if="commented" class="comment-icon" name="comments" />
         </div>
 
-        <b-collapse style="margin-left: 1.5rem" v-if="dir" :visible="!collapsed">
+        <b-collapse class="ml-4" v-if="dir" :visible="!collapsed">
             <FileTreeNode
                 @toggleCollapse="onChildCollapse"
                 @selected="onChildSelect"
@@ -22,7 +22,7 @@
                 :key="key"
                 :propName="key"
                 :propChildren="children[key]"
-                :selected="selected"
+                :selectedFile="selectedFile"
             />
         </b-collapse>
     </div>
@@ -31,7 +31,7 @@
 <script>
 export default {
     name: "FileTreeNode",
-    props: ["commentedFiles", "propName", "propChildren", "selected"],
+    props: ["commentedFiles", "propName", "propChildren", "selectedFile"],
     data() {
         return {
             name: null,
@@ -82,13 +82,8 @@ export default {
         }
     },
     computed: {
-        background() {
-            // The selected file is equal to the path of this file
-            if (this.selected === this.children.path) {
-                return "bg-dark text-light selected"
-            } else {
-                return "bg-white"
-            }
+        selected() {
+            return this.selectedFile === this.children.path
         },
         commented() {
             return this.commentedFiles.has(this.children.path)
@@ -106,22 +101,53 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$text-hover: #212529;
-$background-hover: #f8f8f8;
-$text-light: #f8f9fa;
-$bg-dark: #343a40;
-.selected.file:hover {
-    background-color: scale-color($color: $bg-dark, $lightness: -30%) !important;
-    .filename {
-        color: $text-light !important;
+$background-hover: rgba(0, 0, 0, 0.03);
+
+.selected.file {
+    background-color: var(--gray);
+    color: var(--light);
+    font-weight: bolder;
+
+    &:hover {
+        background-color: var(--dark);
     }
 }
-.file:hover {
-    background-color: $background-hover !important;
-    .filename {
-        color: $text-hover;
+
+:not(.selected).file {
+    color: var(--gray);
+}
+
+:not(.selected).file,
+:not(.selected).dir {
+    span {
+        color: initial;
+    }
+
+    &:hover {
+        background-color: $background-hover;
     }
 }
+
+.file {
+    display: flex;
+    justify-content: space-between;
+}
+
+.file,
+.dir {
+    &:hover {
+        text-decoration: underline;
+    }
+
+    div:first-child {
+        margin-left: 5px;
+    }
+
+    span {
+        margin-left: 5px;
+    }
+}
+
 .comment-icon {
     margin: auto 5px;
     display: inline-block;
