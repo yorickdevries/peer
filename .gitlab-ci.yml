@@ -9,6 +9,7 @@ variables:
   MYSQL_USER: peer
   MYSQL_PASSWORD: password
   MYSQL_HOST: mariadb
+  SAST_EXCLUDED_ANALYZERS: "bandit, brakeman, gosec, spotbugs, flawfinder, phpcs-security-audit, security-code-scan, sobelow, pmd-apex, kubesec, mobsf"
 
 stages:
     - static-analysis
@@ -16,6 +17,7 @@ stages:
     - test
     - migration
     - start
+    - sast
 
 lint-server:
   stage: static-analysis
@@ -109,9 +111,17 @@ start-server:
   only:
   - merge_requests
 
-sast:
-  stage: test
+eslint-sast:
+  stage: sast
   rules:
   - if: $CI_PIPELINE_SOURCE == "schedule"
-    when: always
-  - when: never
+
+nodejs-scan-sast:
+  stage: sast
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+
+semgrep-sast:
+  stage: sast
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
