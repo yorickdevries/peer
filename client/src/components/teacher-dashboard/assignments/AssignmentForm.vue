@@ -85,12 +85,15 @@
                                 </template>
                                 <datepicker placeholder="Select date" v-model="assignment.dueDay" required></datepicker>
                                 <b-form-input v-model="assignment.dueTime" type="time" required> </b-form-input>
-                                <b-form-checkbox v-model="assignment.lateSubmissions">
+                                <b-form-checkbox
+                                    v-model="assignment.lateSubmissions"
+                                    :disabled="assignmentStateAfter('submission')"
+                                >
                                     Allow late submissions after the deadline while the submission phase isn't closed
                                     yet
                                     <b-badge
                                         v-b-tooltip.hover
-                                        title="This allows submissions to be made until the submission phase is manually closed by the teacher"
+                                        title="This allows submissions to be made until the submission phase is manually closed by the teacher. This cannot be changed after the submission stage."
                                         variant="primary"
                                         >?</b-badge
                                     >
@@ -146,7 +149,7 @@
                                     encourages students to more actively make reviews.</b-alert
                                 >
                                 <b-form-checkbox v-model="assignment.lateSubmissionReviews">
-                                    Allow late submission reviews indefinetely after the deadline
+                                    Allow late submission reviews indefinitely after the deadline
                                     <b-badge
                                         v-b-tooltip.hover
                                         title="Students can finish any unsubmitted reviews any time after the deadline. When feedback is open, submitted reviews cannot be unsubmitted anymore."
@@ -169,11 +172,15 @@
 
                     <hr />
                     <!--Assignment type-->
-                    <b-form-group label="Assignment type" description="Choose the type of assignment to be submitted">
+                    <b-form-group
+                        label="Assignment type"
+                        description="Choose the type of assignment to be submitted. This cannot be changed after publishing the assignment."
+                    >
                         <b-form-select
                             @change="typeChangeFunc"
                             :options="assignmentTypes"
                             v-model="assignment.assignmentType"
+                            :disabled="assignmentStateAfter('published')"
                         ></b-form-select>
                     </b-form-group>
 
@@ -258,7 +265,7 @@
                     <!--Allowed Submission extensions-->
                     <b-form-group
                         label="Allowed submission file extensions"
-                        description="The extensions for the submission files that are allowed."
+                        description="The extensions for the submission files that are allowed. This cannot be changed after publishing the assignment."
                     >
                         <b-alert
                             v-if="assignment.submissionExtensions !== '.pdf' && assignment.assignmentType == 'document'"
@@ -272,6 +279,7 @@
                         <b-form-select
                             :options="extensionTypes"
                             v-model="assignment.submissionExtensions"
+                            :disabled="assignmentStateAfter('published')"
                         ></b-form-select>
                     </b-form-group>
 
@@ -286,7 +294,10 @@
                         </small>
                     </b-form-group>
 
-                    <b-form-group>
+                    <b-form-group
+                        :disabled="assignmentStateAfter('submission')"
+                        description="This cannot be changed after the submission stage."
+                    >
                         <b-form-checkbox v-model="assignment.enrollable">
                             Self enrollable
                             <b-badge
@@ -302,7 +313,8 @@
                         <b-col>
                             <b-form-group
                                 label="Students can evaluate their received reviews"
-                                description="This can not be changed after creating the assignment."
+                                description="This cannot be changed at or after the feedback stage."
+                                :disabled="assignmentStateAfter('review')"
                             >
                                 <b-form-checkbox v-model="assignment.reviewEvaluation">
                                     Enable review evaluation
@@ -330,7 +342,7 @@
                                 ></datepicker>
                                 <b-form-input v-model="assignment.reviewEvaluationDueTime" type="time"></b-form-input>
                                 <b-form-checkbox v-model="assignment.lateReviewEvaluations">
-                                    Allow late review evaluations indefinetely after the deadline
+                                    Allow late review evaluations indefinitely after the deadline
                                     <b-badge
                                         v-b-tooltip.hover
                                         title="Students can finish any unsubmitted review evaluations any time after the deadline. After the deadline, submitted reviews cannot be unsubmitted anymore."
@@ -355,6 +367,8 @@
 import moment from "moment"
 import notifications from "../../../mixins/notifications"
 import Datepicker from "vuejs-datepicker"
+
+const assignmentStates = ["unpublished", "submission", "waitingforreview", "review", "feedback"]
 
 export default {
     mixins: [notifications],
@@ -541,6 +555,11 @@ export default {
                     this.assignment.submissionExtensions = ".*"
                 }
             }
+        },
+        assignmentStateAfter(state) {
+            const currentIndex = assignmentStates.indexOf(this.assignment.state)
+            const newIndex = assignmentStates.indexOf(state)
+            return currentIndex > newIndex
         }
     },
     computed: {
