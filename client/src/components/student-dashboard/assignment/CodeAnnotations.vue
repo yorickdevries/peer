@@ -63,21 +63,16 @@
                     :key="annotation.id"
                     :style="{
                         'margin-left': annotationMarginLeft(annotation.reviewId),
-                        'margin-right': '1ch',
-                        'font-family': 'var(--font-family-monospace)'
                     }"
+                    class="comment-container"
                 >
                     <b-collapse
                         :style="{
-                            position: 'sticky',
                             left: annotationMarginLeft(annotation.reviewId),
                             'padding-left': annotationPaddingLeft(annotation.reviewId),
                             'border-left': `${reviewBarSpanWidth} solid ${reviewColors[annotation.reviewId]}`,
-                            'margin-right': '0px',
-                            'max-width': 'fit-content',
                             'width': `calc(${$refs.container ? $refs.container.clientWidth : 0}px - ${annotationMarginLeft(annotation.reviewId)} - 1ch)`
                         }"
-                        class="comment-container"
                         v-model="annotationState[annotation.id]">
                         <b-card>
                             <div v-if="editingAnnotation !== null && editingAnnotation.endLineNumber === index + 1">
@@ -340,13 +335,15 @@ code,
     font-family: var(--default-font);
     font-size: initial;
 
-    &::v-deep code {
-        background-color: $code-annotation-background;
-        display: inline-block;
-        font-size: 87.5%;
+    &::v-deep {
+        code {
+            background-color: $code-annotation-background;
+            display: inline-block;
+            font-size: 87.5%;
 
-        span {
-            font-family: inherit !important;
+            span {
+                font-family: inherit !important;
+            }
         }
     }
 }
@@ -378,8 +375,10 @@ pre {
         background-color: inherit;
 
         code {
-            &::v-deep span {
-                font-family: inherit !important;
+            &::v-deep {
+                span {
+                    font-family: inherit !important;
+                }
             }
 
             &.comment {
@@ -465,6 +464,18 @@ pre {
         span {
             box-sizing: content-box;
             font-family: inherit !important;
+        }
+    }
+}
+
+.comment-container {
+    margin-right: 1ch;
+    font-family: var(--font-family-monospace);
+
+    &::v-deep {
+        .collapse {
+            position: sticky;
+            margin-right: 0px;
         }
     }
 }
