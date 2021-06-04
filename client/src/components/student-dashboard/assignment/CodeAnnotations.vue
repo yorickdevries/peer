@@ -294,19 +294,19 @@ export default {
             return Math.ceil(Math.log(this.content.length + 1) / Math.log(10))
         },
         reviewBarSpanWidth() {
-            return "0.375ch"
+            return "3px"
         },
         reviewBarSpanMarginRight() {
-            return "0.5ch"
+            return "4px"
         },
         reviewBarPaddingLeft() {
-            return "0.5ch"
+            return "4px"
         },
         reviewBarMarginSides() {
-            return "0.5ch"
+            return "4px"
         },
         gutterMarginRight() {
-            return "1ch"
+            return "8px"
         }
     }
 }
