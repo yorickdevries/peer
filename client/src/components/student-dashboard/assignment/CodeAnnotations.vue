@@ -274,7 +274,6 @@ export default {
         }
     },
     computed: {
-        // Compute map<line number, map<reviewId, *comment?>>
         lineAnnotationMap() {
             const result = {}
             for (let i = 0; i < this.content.length; i++) {
@@ -453,7 +452,6 @@ pre {
 
 .gutter {
     display: flex;
-    // border-right: 1px solid var(--gray);
     box-shadow: inset -5px 0 0 -4px var(--gray);
     user-select: none;
     box-sizing: content-box;
@@ -469,10 +467,6 @@ pre {
         span {
             box-sizing: content-box;
             font-family: inherit !important;
-
-            // &:not(:last-of-type) {
-            //     margin-right: 0.25ch;
-            // }
         }
     }
 }
