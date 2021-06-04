@@ -116,10 +116,7 @@ export default {
             if (this.review) {
                 try {
                     const res = await api.codeannotations.getAnnotations(this.review.id)
-                    const rows = res.data
-                    for (const row of rows) {
-                        this.comments.push(row)
-                    }
+                    this.comments.push(...res.data)
                 } catch (error) {
                     console.error(error)
                 }

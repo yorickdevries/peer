@@ -40,7 +40,7 @@
                     ></code><code
                         v-else
                         :linenr="index + 1"
-                        v-bind:class="{
+                        :class="{
                             comment: true,
                             comment_start: hasAnnotationsStartingAt(index),
                             comment_end: hasAnnotationsEndingAt(index)
@@ -93,9 +93,8 @@
                                 />
                             </div><div v-else class="d-flex">
                                 <span class="comment-text" v-html="highlightComment(annotation.commentText)"></span>
-                                <div style="flex-shrink: 0">
+                                <div v-if="!readOnly" style="flex-shrink: 0">
                                     <icon
-                                        v-if="!readOnly"
                                         name="pen"
                                         class="mx-1 text-primary"
                                         role="button" 
@@ -112,7 +111,6 @@
                                         {{ getModalText() }}
                                     </b-modal>
                                     <icon
-                                        v-if="!readOnly"
                                         name="trash"
                                         class="text-danger"
                                         role="button"
