@@ -4,7 +4,7 @@
 
         <!-- The buttons and text area for the actual comments, somewhat primitive -->
         <!-- Only show annotation buttons if this component is inside a non-submitted review -->
-        <div v-if="!readOnly && !reviewSubmitted && showAnnotations" class="mb-3">
+        <div v-if="!readOnly && !reviewSubmitted" class="mb-3">
             <form v-if="!writing" @submit.prevent="writeComment" class="annotation-form">
                 <b-button type="submit" variant="primary">
                     Leave a comment on the selected code
@@ -33,7 +33,6 @@
                 This is also used to display the feedback received, where readOnly is then true.
              -->
             <CodeAnnotations
-                v-if="showAnnotations"
                 @delete="onDeleteComment"
                 @edit="onEditedComment"
                 :content="content"
@@ -44,11 +43,6 @@
                 :readOnly="readOnly || reviewSubmitted"
                 :reviewColors="reviewColors"
             />
-            <!--
-                Display the code without annotations.
-                This is used for students to view their current final submission, where readOnly is always true.
-            -->
-            <CodeAnnotations v-else :content="content" :comments="[]" :selectedFile="selectedFile" :readOnly="true" />
         </b-card>
     </div>
 </template>
@@ -204,9 +198,6 @@ export default {
         }
     },
     computed: {
-        showAnnotations() {
-            return !(this.review == null) || true
-        },
         reviewSubmitted() {
             return this.review && this.review.submitted
         }

@@ -26,15 +26,15 @@
                         <FileAnnotator
                             v-if="tab.aggregated"
                             :submissionId="finalSubmission.id"
-                            :readOnly="true"
                             :assignmentType="assignment.assignmentType"
+                            :readOnly="true"
                             :reviewColors="reviewColors"
                         />
                         <FileAnnotator
                             v-else
                             :reviewId="tab.id"
-                            :readOnly="true"
                             :assignmentType="assignment.assignmentType"
+                            :readOnly="true"
                             :reviewColors="reviewColors"
                         />
                     </b-tab>
