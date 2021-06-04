@@ -6,16 +6,25 @@
                 :key="index + 'code'"
             >
                 <div class="position-relative d-flex">
-                    <div class="gutter">
+                    <div class="gutter" :style="{ 'margin-right': gutterMarginRight }">
                         <code
                             class="code-annotations-linenr"
-                            v-bind:style="{ width: `${maxLineNumberDigits}ch` }"
+                            :style="{ width: `${maxLineNumberDigits}ch` }"
                         >{{ index + 1 }}</code>
-                        <div class="review-bar">
+                        <div
+                            class="review-bar"
+                            :style="{
+                                'margin-left': reviewBarMarginSides,
+                                'margin-right': reviewBarMarginSides,
+                                'padding-left': reviewBarPaddingLeft
+                            }"
+                        >
                             <span
                                 v-for="review in reviewsInFile"
                                 :key="index + 'review_' + review"
-                                v-bind:style="{
+                                :style="{
+                                    width: reviewBarSpanWidth,
+                                    'margin-right': reviewBarSpanMarginRight,
                                     'background-color': filterAnnotationsAt(index, false, false, review).length > 0
                                         ? reviewColors[review]
                                         : 'transparent'
@@ -49,15 +58,24 @@
                         @click.native="toggleAnnotationsAt(index)"
                     />
                 </div>
-                <div v-for="annotation in getAnnotationsEndingAt(index)" :key="annotation.id">
+                <div
+                    v-for="annotation in getAnnotationsEndingAt(index)"
+                    :key="annotation.id"
+                    :style="{
+                        'margin-left': annotationMarginLeft(annotation.reviewId),
+                        'margin-right': '1ch',
+                        'font-family': 'var(--font-family-monospace)'
+                    }"
+                >
                     <b-collapse
-                        v-bind:style="{
-                            paddingLeft: `calc(${(reviewsInFile.length - reviewsInFile.indexOf(annotation.reviewId)) * 0.5 + 1.5}ch + 1px)`,
-                            left: `calc(${maxLineNumberDigits + 0.5 * (1 + reviewsInFile.indexOf(annotation.reviewId)) + 0.375}ch + 1px)`,
-                            borderLeft: `0.25ch solid ${reviewColors[annotation.reviewId]}`,
-                            minWidth:
-                                $refs.container ?
-                                    `calc(${$refs.container.clientWidth}px - (${maxLineNumberDigits + 0.5 * (1 + reviewsInFile.indexOf(annotation.reviewId)) + 1.375}ch + 1px))` : null
+                        :style="{
+                            position: 'sticky',
+                            left: annotationMarginLeft(annotation.reviewId),
+                            'padding-left': annotationPaddingLeft(annotation.reviewId),
+                            'border-left': `${reviewBarSpanWidth} solid ${reviewColors[annotation.reviewId]}`,
+                            'margin-right': '0px',
+                            'max-width': 'fit-content',
+                            'width': `calc(${$refs.container ? $refs.container.clientWidth : 0}px - ${annotationMarginLeft(annotation.reviewId)} - 1ch)`
                         }"
                         class="comment-container"
                         v-model="annotationState[annotation.id]">
@@ -234,6 +252,25 @@ export default {
             this.getAnnotationsAt(lineIndex).forEach(annotation => {
                 this.$set(this.annotationState, annotation.id, !allExtended)
             })
+        },
+        annotationMarginLeft(reviewId) {
+            return `calc(${this.maxLineNumberDigits}ch + ${this.reviewBarMarginSides} + ${
+                this.reviewBarPaddingLeft
+            } + (${this.reviewBarSpanWidth} + ${this.reviewBarSpanMarginRight}) * ${this.reviewsInFile.indexOf(
+                reviewId
+            )})`
+        },
+        annotationPaddingLeft(reviewId) {
+            return `calc(${this.gutterMarginRight} + ${this.reviewBarMarginSides} + (${this.reviewBarSpanWidth} + ${
+                this.reviewBarSpanMarginRight
+            }) * ${this.reviewsInFile.length - this.reviewsInFile.indexOf(reviewId)} - ${this.reviewBarSpanWidth})`
+        },
+        annotationLeft(reviewId) {
+            return `calc(${this.maxLineNumberDigits}ch + ${this.reviewBarMarginSides} * 2 + ${
+                this.reviewBarPaddingLeft
+            } + (${this.reviewBarSpanWidth} + ${this.reviewBarSpanMarginRight}) * ${this.reviewsInFile.indexOf(
+                reviewId
+            ) + 1} + ${this.gutterMarginRight})`
         }
     },
     computed: {
@@ -263,6 +300,21 @@ export default {
         },
         maxLineNumberDigits() {
             return Math.ceil(Math.log(this.content.length + 1) / Math.log(10))
+        },
+        reviewBarSpanWidth() {
+            return "0.375ch"
+        },
+        reviewBarSpanMarginRight() {
+            return "0.5ch"
+        },
+        reviewBarPaddingLeft() {
+            return "0.5ch"
+        },
+        reviewBarMarginSides() {
+            return "0.5ch"
+        },
+        gutterMarginRight() {
+            return "1ch"
         }
     }
 }
@@ -300,11 +352,6 @@ code,
             font-family: inherit !important;
         }
     }
-}
-
-.comment-container {
-    position: sticky;
-    width: fit-content;
 }
 
 pre {
@@ -360,7 +407,6 @@ pre {
 
             &.code-annotations-linenr {
                 flex-shrink: 0;
-                padding-right: 0.5ch;
                 box-sizing: content-box;
                 background-color: inherit;
                 display: inline-block;
@@ -379,6 +425,7 @@ pre {
 
         &.card {
             font-family: initial;
+            overflow: hidden;
         }
 
         .fa-icon {
@@ -406,9 +453,8 @@ pre {
 
 .gutter {
     display: flex;
-    border-right: 1px solid var(--gray);
-    margin-right: 1ch;
-    padding-right: 0.5ch;
+    // border-right: 1px solid var(--gray);
+    box-shadow: inset -5px 0 0 -4px var(--gray);
     user-select: none;
     box-sizing: content-box;
     position: sticky;
@@ -417,18 +463,16 @@ pre {
 
     .review-bar {
         font-family: inherit !important;
-        padding: 0 0.5ch;
         display: flex;
         align-items: stretch;
 
         span {
-            width: 0.25ch;
             box-sizing: content-box;
             font-family: inherit !important;
 
-            &:not(:last-of-type) {
-                margin-right: 0.25ch;
-            }
+            // &:not(:last-of-type) {
+            //     margin-right: 0.25ch;
+            // }
         }
     }
 }
