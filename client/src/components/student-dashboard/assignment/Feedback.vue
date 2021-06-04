@@ -323,8 +323,16 @@ export default {
                 })
             })
 
-            this.tabs[0].annotationCount = this.tabs.reduce((acc, val) => acc + val.annotationCount, 0)
-            this.tabs.sort((a, b) => a.id - b.id)
+            if (this.tabs.length === 2) {
+                // Only one review, having an aggregated tab does not make sense
+                this.tabs.splice(
+                    this.tabs.findIndex(tab => tab.aggregated),
+                    1
+                )
+            } else {
+                this.tabs[0].annotationCount = this.tabs.reduce((acc, val) => acc + val.annotationCount, 0)
+                this.tabs.sort((a, b) => a.id - b.id)
+            }
         },
         async aggregateFeedback() {
             // construct answer map with empty lists
