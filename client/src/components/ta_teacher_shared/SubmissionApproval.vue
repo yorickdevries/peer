@@ -72,6 +72,7 @@
                                 :submissionId="submission.id"
                                 :assignmentType="assignment.assignmentType"
                                 :readOnly="true"
+                                :ignoreAnnotations="true"
                             />
                         </b-col>
                     </b-row>

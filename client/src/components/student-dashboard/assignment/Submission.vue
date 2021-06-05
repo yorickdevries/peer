@@ -150,6 +150,7 @@
                             :submissionId="finalSubmission.id"
                             :assignmentType="assignment.assignmentType"
                             :readOnly="true"
+                            :ignoreAnnotations="true"
                         />
                     </div>
                 </b-col>

@@ -64,7 +64,7 @@ import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 import api from "../../api/api"
 
 export default {
-    props: ["fileUrl", "readOnly", "submissionId", "reviewId", "reviewColors"],
+    props: ["fileUrl", "readOnly", "submissionId", "reviewId", "reviewColors", "ignoreAnnotations"],
     components: { FileTree, CodeAnnotator },
     data() {
         return {
@@ -91,9 +91,12 @@ export default {
         } else {
             this.loadSingleFile(file)
         }
-        await this.fetchReview()
-        await this.fetchFeedbackReviews()
-        await this.fetchComments()
+
+        if (!this.ignoreAnnotations) {
+            await this.fetchReview()
+            await this.fetchFeedbackReviews()
+            await this.fetchComments()
+        }
     },
     methods: {
         async fetchReview() {

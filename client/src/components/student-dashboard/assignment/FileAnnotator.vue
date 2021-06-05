@@ -14,6 +14,7 @@
             :submissionId="submissionId"
             :reviewId="reviewId"
             :reviewColors="reviewColors || defaultReviewColor"
+            :ignoreAnnotations="ignoreAnnotations"
         />
         <div v-else>
             <b-alert show variant="secondary">
@@ -33,7 +34,7 @@ export default {
         CodeWrapper,
         PDFAnnotator
     },
-    props: ["reviewId", "submissionId", "readOnly", "assignmentType", "reviewColors"],
+    props: ["reviewId", "submissionId", "readOnly", "assignmentType", "reviewColors", "ignoreAnnotations"],
     computed: {
         filePath() {
             if (this.reviewId) {

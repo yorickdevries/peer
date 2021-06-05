@@ -288,7 +288,13 @@ export default {
             return result
         },
         reviewsInFile() {
-            return Array.from(new Set(this.comments.map(comment => comment.reviewId)))
+            return Array.from(
+                new Set(
+                    this.comments
+                        .filter(comment => comment.selectedFile === this.selectedFile)
+                        .map(comment => comment.reviewId)
+                )
+            )
         },
         maxLineNumberDigits() {
             return Math.ceil(Math.log(this.content.length + 1) / Math.log(10))
