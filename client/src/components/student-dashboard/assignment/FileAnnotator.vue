@@ -5,6 +5,7 @@
             :reviewId="reviewId"
             :submissionId="submissionId"
             :readOnly="readOnly"
+            :reviewColors="reviewColors || defaultReviewColor"
         />
         <CodeWrapper
             v-else-if="renderAs === 'code'"
@@ -12,6 +13,8 @@
             :readOnly="readOnly"
             :submissionId="submissionId"
             :reviewId="reviewId"
+            :reviewColors="reviewColors || defaultReviewColor"
+            :ignoreAnnotations="ignoreAnnotations"
         />
         <div v-else>
             <b-alert show variant="secondary">
@@ -31,7 +34,7 @@ export default {
         CodeWrapper,
         PDFAnnotator
     },
-    props: ["reviewId", "submissionId", "readOnly", "assignmentType", "showCodeAnnotations"],
+    props: ["reviewId", "submissionId", "readOnly", "assignmentType", "reviewColors", "ignoreAnnotations"],
     computed: {
         filePath() {
             if (this.reviewId) {
@@ -41,6 +44,9 @@ export default {
             } else {
                 return ""
             }
+        },
+        defaultReviewColor() {
+            return { [this.reviewId]: "#ffb000" }
         }
     },
     data() {

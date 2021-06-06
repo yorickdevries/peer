@@ -33,9 +33,11 @@
                         class="h-100"
                         :comments="comments"
                         :content="content"
+                        :language="language"
+                        :selectedFile="selected"
                         :readOnly="readOnly"
                         :review="review"
-                        :selectedFile="selected"
+                        :reviewColors="reviewColors"
                     />
                     <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
                         <template #overlay>
@@ -62,7 +64,7 @@ import CodeAnnotator from "./../student-dashboard/assignment/CodeAnnotator"
 import api from "../../api/api"
 
 export default {
-    props: ["fileUrl", "readOnly", "submissionId", "reviewId"],
+    props: ["fileUrl", "readOnly", "submissionId", "reviewId", "reviewColors", "ignoreAnnotations"],
     components: { FileTree, CodeAnnotator },
     data() {
         return {
@@ -73,7 +75,8 @@ export default {
             showWarning: false,
             showFile: false,
             review: null,
-            language: null
+            language: null,
+            feedbackReviews: []
         }
     },
     async created() {
@@ -88,8 +91,12 @@ export default {
         } else {
             this.loadSingleFile(file)
         }
-        await this.fetchReview()
-        await this.fetchComments()
+
+        if (!this.ignoreAnnotations) {
+            await this.fetchReview()
+            await this.fetchFeedbackReviews()
+            await this.fetchComments()
+        }
     },
     methods: {
         async fetchReview() {
@@ -98,16 +105,28 @@ export default {
                 this.review = res.data
             }
         },
+        async fetchFeedbackReviews() {
+            if (this.submissionId) {
+                try {
+                    const res = await api.submissions.getFeedback(this.submissionId)
+                    this.feedbackReviews = res.data
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+        },
         async fetchComments() {
             if (this.review) {
                 try {
                     const res = await api.codeannotations.getAnnotations(this.review.id)
-                    const rows = res.data
-                    for (const row of rows) {
-                        this.comments.push(row)
-                    }
+                    this.comments.push(...res.data)
                 } catch (error) {
                     console.error(error)
+                }
+            } else if (this.submissionId) {
+                for (const review of this.feedbackReviews) {
+                    const res = await api.codeannotations.getAnnotations(review.id)
+                    this.comments.push(...res.data)
                 }
             }
         },

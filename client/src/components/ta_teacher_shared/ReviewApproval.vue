@@ -96,9 +96,8 @@
                             <br />
                             <FileAnnotator
                                 :reviewId="review.id"
-                                :readOnly="true"
                                 :assignmentType="assignment.assignmentType"
-                                :showCodeAnnotations="true"
+                                :readOnly="true"
                             />
                         </b-col>
                         <b-col :cols="columnWidthFileAndQuestionnaire">

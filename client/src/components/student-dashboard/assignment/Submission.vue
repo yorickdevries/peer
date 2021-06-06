@@ -148,9 +148,9 @@
                         >
                         <FileAnnotator
                             :submissionId="finalSubmission.id"
-                            :readOnly="true"
-                            :showCodeAnnotations="false"
                             :assignmentType="assignment.assignmentType"
+                            :readOnly="true"
+                            :ignoreAnnotations="true"
                         />
                     </div>
                 </b-col>

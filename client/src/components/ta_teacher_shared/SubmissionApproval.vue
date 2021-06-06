@@ -70,9 +70,9 @@
                             <FileAnnotator
                                 v-if="viewFile"
                                 :submissionId="submission.id"
-                                :readOnly="true"
                                 :assignmentType="assignment.assignmentType"
-                                :showCodeAnnotations="false"
+                                :readOnly="true"
+                                :ignoreAnnotations="true"
                             />
                         </b-col>
                     </b-row>

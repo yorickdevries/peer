@@ -57,12 +57,7 @@
                 </b-button>
                 <br />
                 <br />
-                <FileAnnotator
-                    :reviewId="review.id"
-                    :readOnly="reviewsAreReadOnly"
-                    :showCodeAnnotations="true"
-                    :assignmentType="assignmentType"
-                />
+                <FileAnnotator :reviewId="review.id" :assignmentType="assignmentType" :readOnly="reviewsAreReadOnly" />
             </b-col>
             <b-col :cols="columnWidthFileAndQuestionnaire">
                 <template v-if="!reviewsAreReadOnly">

@@ -4,7 +4,7 @@
 
         <!-- The buttons and text area for the actual comments, somewhat primitive -->
         <!-- Only show annotation buttons if this component is inside a non-submitted review -->
-        <div v-if="!readOnly && !reviewSubmitted && showAnnotations" class="mb-3">
+        <div v-if="!readOnly && !reviewSubmitted" class="mb-3">
             <form v-if="!writing" @submit.prevent="writeComment" class="annotation-form">
                 <b-button type="submit" variant="primary">
                     Leave a comment on the selected code
@@ -33,21 +33,16 @@
                 This is also used to display the feedback received, where readOnly is then true.
              -->
             <CodeAnnotations
-                v-if="showAnnotations"
-                @deleted="onDeleteComment"
-                @edited="onEditedComment"
+                @delete="onDeleteComment"
+                @edit="onEditedComment"
                 :content="content"
                 :comments="comments"
                 :language="language"
                 :maxCommentLength="maxCommentLength"
                 :selectedFile="selectedFile"
                 :readOnly="readOnly || reviewSubmitted"
+                :reviewColors="reviewColors"
             />
-            <!--
-                Display the code without annotations.
-                This is used for students to view their current final submission, where readOnly is always true.
-            -->
-            <CodeAnnotations v-else :content="content" :comments="[]" :selectedFile="selectedFile" :readOnly="true" />
         </b-card>
     </div>
 </template>
@@ -61,7 +56,7 @@ import PeerTextarea from "./PeerTextarea"
 export default {
     mixins: [notifications],
     components: { CodeAnnotations, PeerTextarea },
-    props: ["comments", "content", "language", "selectedFile", "readOnly", "review"],
+    props: ["comments", "content", "language", "selectedFile", "readOnly", "review", "reviewColors"],
     data() {
         return {
             showCode: false,
@@ -183,26 +178,26 @@ export default {
             this.endLineNumber = null
             this.writing = false
         },
-        async onDeleteComment(index) {
+        async onDeleteComment(id) {
             // Remove comment from comment array
-            const removedComment = this.comments.splice(index, 1)
+            this.comments.splice(
+                this.comments.findIndex(comment => comment.id === id),
+                1
+            )
             // Remove comment from back-end
-            await api.codeannotations.deleteAnnotation(removedComment[0].id)
+            await api.codeannotations.deleteAnnotation(id)
             this.showSuccessMessage({ message: "Successfully deleted comment" })
         },
-        async onEditedComment(index, updatedText) {
-            let comment = this.comments[index]
-            const res = await api.codeannotations.patchAnnotation(comment.id, updatedText)
+        async onEditedComment(id, updatedText) {
+            const index = this.comments.findIndex(comment => comment.id === id)
+            const res = await api.codeannotations.patchAnnotation(id, updatedText)
             // Update only the comment text
-            comment.commentText = res.data.commentText
-            this.comments.splice(index, 1, comment)
+            this.comments[index].commentText = res.data.commentText
+            this.comments.splice(index, 1, this.comments[index])
             this.showSuccessMessage({ message: "Successfully updated comment" })
         }
     },
     computed: {
-        showAnnotations() {
-            return !(this.review == null)
-        },
         reviewSubmitted() {
             return this.review && this.review.submitted
         }
