@@ -3,7 +3,7 @@
         <b-alert class="d-flex justify-content-between flex-wrap" show variant="primary">
             <p>Please upload a zip file with WebLab submissions, i.e. an assignment exported from WebLab</p>
             <ul class="mb-0">
-                <li>The zip file should contain a folder called "submissions"</li>
+                <li>The zip file should contain a folder called "submissions" containing all submissions</li>
                 <li>
                     Each submission should be in a separate folder named with the format
                     "StudentNumber_FirstName_LastName"
