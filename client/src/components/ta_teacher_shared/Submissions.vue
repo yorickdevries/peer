@@ -25,31 +25,39 @@
                     Export submissions .xls
                 </b-button>
             </b-col>
-            <b-col v-if="assignmentType === 'code'">
-                <!--Importing Submissions-->
-                <dt>Import submissions from WebLab</dt>
-                <dd>Imports a file with info of all submissions for this assignment from a WebLab export.</dd>
-                <b-button
-                    v-b-modal="`importSubmissions${assignmentVersionId}`"
-                    variant="primary"
-                    size="sm"
-                    class="mb-3"
-                >
-                    Import WebLab submissions .zip
-                </b-button>
+            <b-col v-if="assignment.assignmentType === 'code'">
+                <template v-if="assignment.enrollable">
+                    <dt>Import submissions from WebLab</dt>
+                    <dd>
+                        Not available. On creation of the assignment, this assignment has been set as self-enrollable.
+                    </dd>
+                </template>
+                <template v-else>
+                    <!--Importing Submissions-->
+                    <dt>Import submissions from WebLab</dt>
+                    <dd>Imports a file with info of all submissions for this assignment from a WebLab export.</dd>
+                    <b-button
+                        v-b-modal="`importSubmissions${assignmentVersionId}`"
+                        variant="primary"
+                        size="sm"
+                        class="mb-3"
+                    >
+                        Import WebLab submissions .zip
+                    </b-button>
 
-                <!--Import Sumbissions Modal-->
-                <b-modal
-                    :id="`importSubmissions${assignmentVersionId}`"
-                    :assignmentVersionId="assignmentVersionId"
-                    centered
-                    hide-header
-                    hide-footer
-                    class="p-0 m-0"
-                    size="lg"
-                >
-                    <ImportSubmissionsWizard></ImportSubmissionsWizard>
-                </b-modal>
+                    <!--Import Sumbissions Modal-->
+                    <b-modal
+                        :id="`importSubmissions${assignmentVersionId}`"
+                        :assignmentVersionId="assignmentVersionId"
+                        centered
+                        hide-header
+                        hide-footer
+                        class="p-0 m-0"
+                        size="lg"
+                    >
+                        <ImportSubmissionsWizard></ImportSubmissionsWizard>
+                    </b-modal>
+                </template>
             </b-col>
         </b-row>
         <hr />
@@ -200,7 +208,7 @@ export default {
             perPage: 10,
             filter: "",
             disableSubmissionExportButton: false,
-            assignmentType: null
+            assignment: null
         }
     },
     async created() {
@@ -234,7 +242,7 @@ export default {
         },
         async fetchAssignmentType() {
             const res = await api.assignments.get(this.$route.params.assignmentId)
-            this.assignmentType = res.data.assignmentType
+            this.assignment = res.data
         },
         getGroup(id) {
             return _.find(this.groups, group => {
