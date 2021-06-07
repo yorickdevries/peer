@@ -34,5 +34,12 @@ export default {
     export(assignmentVersionId, exportType) {
         const params = { assignmentVersionId, exportType }
         return client.post("submissions/export", null, { params: params })
+    },
+    import(assignmentVersionId, file) {
+        // Create formData and append data
+        const formData = new FormData()
+        formData.append("assignmentVersionId", assignmentVersionId)
+        formData.append("file", file)
+        return client.post("submissions/import", formData)
     }
 }
