@@ -4,7 +4,10 @@
             <p>Please upload a zip file with WebLab submissions, i.e. an assignment exported from WebLab</p>
             <ul class="mb-0">
                 <li>The zip file should contain a folder called "submissions"</li>
-                <li>Each submission should be in a separate folder named with the format "StudentNumber_FirstName_LastName"</li>
+                <li>
+                    Each submission should be in a separate folder named with the format
+                    "StudentNumber_FirstName_LastName"
+                </li>
                 <li>The file should have the extension .zip</li>
                 <li>Max file size is 50MB</li>
             </ul>

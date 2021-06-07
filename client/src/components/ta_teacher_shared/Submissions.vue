@@ -30,14 +30,26 @@
                 <dt>Import submissions from WebLab</dt>
                 <dd>Imports a file with info of all submissions for this assignment from a WebLab export.</dd>
                 <b-button
-                    :disabled="disableSubmissionImportButton"
-                    size="sm"
+                    v-b-modal="`importSubmissions${assignmentVersionId}`"
                     variant="primary"
-                    @click="importSubmissions"
-                    class="mb-3 mr-2"
+                    size="sm"
+                    class="mb-3"
                 >
                     Import WebLab submissions .zip
                 </b-button>
+
+                <!--Import Sumbissions Modal-->
+                <b-modal
+                    :id="`importSubmissions${assignmentVersionId}`"
+                    :assignmentVersionId="assignmentVersionId"
+                    centered
+                    hide-header
+                    hide-footer
+                    class="p-0 m-0"
+                    size="lg"
+                >
+                    <ImportSubmissionsWizard></ImportSubmissionsWizard>
+                </b-modal>
             </b-col>
         </b-row>
         <hr />
@@ -154,10 +166,14 @@
 import api from "../../api/api"
 import _ from "lodash"
 import notifications from "../../mixins/notifications"
+import ImportSubmissionsWizard from "../teacher-dashboard/ImportSubmissionsWizard"
 
 export default {
     props: ["assignmentVersionId"],
     mixins: [notifications],
+    components: {
+        ImportSubmissionsWizard
+    },
     data() {
         return {
             allSubmissions: null,
