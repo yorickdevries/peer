@@ -9,7 +9,7 @@
                 <FileTreeNode
                     @selected="onSelect"
                     v-for="key in Object.keys(root)"
-                    :commentedFiles="commentedFiles"
+                    :annotatedFiles="annotatedFiles"
                     :key="key"
                     :propName="key"
                     :propChildren="root[key]"
@@ -25,7 +25,7 @@
 import FileTreeNode from "./FileTreeNode"
 
 export default {
-    props: ["commentedFiles", "files", "selectedFile", "startCollapsed"],
+    props: ["annotatedFiles", "files", "selectedFile", "startCollapsed"],
     components: {
         FileTreeNode
     },

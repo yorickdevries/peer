@@ -22,7 +22,7 @@
                     <FileTree
                         class="h-100"
                         @selected="onSelect"
-                        :commentedFiles="commentedFiles"
+                        :annotatedFiles="annotatedFiles"
                         :files="files"
                         :selectedFile="selected"
                         :startCollapsed="singleFile"
@@ -31,7 +31,7 @@
                 <b-col>
                     <CodeAnnotator
                         class="h-100"
-                        :comments="comments"
+                        :annotations="annotations"
                         :content="content"
                         :language="language"
                         :selectedFile="selected"
@@ -68,7 +68,7 @@ export default {
     components: { FileTree, CodeAnnotator },
     data() {
         return {
-            comments: [],
+            annotations: [],
             content: null,
             files: null,
             selected: null,
@@ -95,7 +95,7 @@ export default {
         if (!this.ignoreAnnotations) {
             await this.fetchReview()
             await this.fetchFeedbackReviews()
-            await this.fetchComments()
+            await this.fetchAnnotations()
         }
     },
     methods: {
@@ -115,18 +115,18 @@ export default {
                 }
             }
         },
-        async fetchComments() {
+        async fetchAnnotations() {
             if (this.review) {
                 try {
                     const res = await api.codeannotations.getAnnotations(this.review.id)
-                    this.comments.push(...res.data)
+                    this.annotations.push(...res.data)
                 } catch (error) {
                     console.error(error)
                 }
             } else if (this.submissionId) {
                 for (const review of this.feedbackReviews) {
                     const res = await api.codeannotations.getAnnotations(review.id)
-                    this.comments.push(...res.data)
+                    this.annotations.push(...res.data)
                 }
             }
         },
@@ -232,8 +232,8 @@ export default {
         singleFile() {
             return this.files && this.files.length <= 1
         },
-        commentedFiles() {
-            return new Set(this.comments.map(comment => comment.selectedFile))
+        annotatedFiles() {
+            return new Set(this.annotations.map(annotation => annotation.selectedFile))
         },
         reviewSubmitted() {
             return this.review && this.review.submitted

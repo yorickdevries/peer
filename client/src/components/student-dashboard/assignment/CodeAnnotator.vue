@@ -2,25 +2,25 @@
     <div class="d-flex flex-column">
         <b-alert :show="!showCode" variant="primary">LOADING {{ review ? "REVIEW" : "SUBMISSION" }}</b-alert>
 
-        <!-- The buttons and text area for the actual comments, somewhat primitive -->
+        <!-- The buttons and text area for the actual annotations, somewhat primitive -->
         <!-- Only show annotation buttons if this component is inside a non-submitted review -->
         <div v-if="!readOnly && !reviewSubmitted" class="mb-3">
-            <form v-if="!writing" @submit.prevent="writeComment" class="annotation-form">
+            <form v-if="!writing" @submit.prevent="writeAnnotation" class="annotation-form">
                 <b-button type="submit" variant="primary">
-                    Leave a comment on the selected code
+                    Leave an annotation on the selected code
                 </b-button>
                 <b-alert variant="info" class="ml-3" show>
-                    Select a piece of code with your cursor to leave a comment
+                    Select a piece of code with your cursor to leave an annotation
                 </b-alert>
             </form>
             <PeerTextarea
                 v-if="writing"
-                placeholder="Type your comment"
+                placeholder="Type your annotation"
                 rows="3"
                 max-rows="5"
-                @submit="submitComment"
+                @submit="submitAnnotation"
                 @cancel="deleteSelection"
-                :maxLength="maxCommentLength"
+                :maxLength="maxAnnotationLength"
                 :defaultLanguage="language"
             />
         </div>
@@ -33,12 +33,12 @@
                 This is also used to display the feedback received, where readOnly is then true.
              -->
             <CodeAnnotations
-                @delete="onDeleteComment"
-                @edit="onEditedComment"
+                @delete="onDeleteAnnotation"
+                @edit="onEditedAnnotation"
                 :content="content"
-                :comments="comments"
+                :annotations="annotations"
                 :language="language"
-                :maxCommentLength="maxCommentLength"
+                :maxAnnotationLength="maxAnnotationLength"
                 :selectedFile="selectedFile"
                 :readOnly="readOnly || reviewSubmitted"
                 :reviewColors="reviewColors"
@@ -56,7 +56,7 @@ import PeerTextarea from "./PeerTextarea"
 export default {
     mixins: [notifications],
     components: { CodeAnnotations, PeerTextarea },
-    props: ["comments", "content", "language", "selectedFile", "readOnly", "review", "reviewColors"],
+    props: ["annotations", "content", "language", "selectedFile", "readOnly", "review", "reviewColors"],
     data() {
         return {
             showCode: false,
@@ -64,22 +64,22 @@ export default {
             highlightedText: null,
             startLineNumber: null,
             endLineNumber: null,
-            commentText: "",
+            annotationText: "",
             highlightedFile: null,
-            maxCommentLength: null
+            maxAnnotationLength: null
         }
     },
     async created() {
-        await this.getMaxCommentLength()
+        await this.getMaxAnnotationLength()
         this.showCode = true
         this.writing = false
     },
     methods: {
-        async getMaxCommentLength() {
-            const res = await api.codeannotations.getMaxCommentLength()
-            this.maxCommentLength = res.data
+        async getMaxAnnotationLength() {
+            const res = await api.codeannotations.getMaxAnnotationLength()
+            this.maxAnnotationLength = res.data
         },
-        async writeComment() {
+        async writeAnnotation() {
             const selection = window.getSelection()
             const selectedText = selection.toString()
 
@@ -116,28 +116,28 @@ export default {
                 this.endLineNumber = temp
             }
 
-            /* Check if the new comment overlaps with an already made comment in the same file. 
-            This is done by iterating over all stored comments, then checking if the new comment 
+            /* Check if the new annotation overlaps with an already made annotation in the same file. 
+            This is done by iterating over all stored annotations, then checking if the new annotation
             is not either entirely before or after any of the stored and is in the same file.
 
             Because startLineNumber is always smaller than endLineNumber, this is checked by: 
-            this.selectedFile === comment.selectedFile &&
-            (!(this.startLineNumber > comment.endLineNumber || this.endLineNumber < comment.startLineNumber))
+            this.selectedFile === annotation.selectedFile &&
+            (!(this.startLineNumber > annotation.endLineNumber || this.endLineNumber < annotation.startLineNumber))
 
             Applying DeMorgans law gives us:
-            this.selectedFile === comment.selectedFile &&
-            (this.startLineNumber <= comment.endLineNumber && this.endLineNumber >= comment.startLineNumber)
+            this.selectedFile === annotation.selectedFile &&
+            (this.startLineNumber <= annotation.endLineNumber && this.endLineNumber >= annotation.startLineNumber)
             
-            If at any time a clash occures, the user is shown an error message and is not allowed to write a comment.*/
-            for (const comment of this.comments) {
+            If at any time a clash occures, the user is shown an error message and is not allowed to write a annotation.*/
+            for (const annotation of this.annotations) {
                 if (
-                    this.selectedFile === comment.selectedFile &&
-                    this.startLineNumber <= comment.endLineNumber &&
-                    this.endLineNumber >= comment.startLineNumber
+                    this.selectedFile === annotation.selectedFile &&
+                    this.startLineNumber <= annotation.endLineNumber &&
+                    this.endLineNumber >= annotation.startLineNumber
                 ) {
                     this.startLineNumber = null
                     this.endLineNumber = null
-                    this.showErrorMessage({ message: "Please select lines not yet commented on" })
+                    this.showErrorMessage({ message: "Please select lines not yet annotated" })
                     return
                 }
             }
@@ -147,26 +147,26 @@ export default {
             this.highlightedText = selectedText
             this.highlightedFile = this.selectedFile
         },
-        async submitComment(commentText) {
+        async submitAnnotation(annotationText) {
             // Update the current state
             this.writing = false
 
             try {
-                // Send the comment to the server
+                // Send the annotation to the server
                 const res = await api.codeannotations.postAnnotation(
                     this.review.id,
-                    commentText,
+                    annotationText,
                     this.startLineNumber,
                     this.endLineNumber,
                     this.selectedFile
                 )
-                const comment = res.data
-                this.comments.push(comment)
+                const annotation = res.data
+                this.annotations.push(annotation)
             } catch (error) {
-                this.showErrorMessage({ message: "Unable to submit comment" })
+                this.showErrorMessage({ message: "Unable to submit annotation" })
             }
 
-            // Reset the highlighted text, comment text and line number
+            // Reset the highlighted text, annotation text and line number
             this.highlightedText = null
             this.startLineNumber = null
             this.endLineNumber = null
@@ -178,23 +178,23 @@ export default {
             this.endLineNumber = null
             this.writing = false
         },
-        async onDeleteComment(id) {
-            // Remove comment from comment array
-            this.comments.splice(
-                this.comments.findIndex(comment => comment.id === id),
+        async onDeleteAnnotation(id) {
+            // Remove annotation from annotation array
+            this.annotations.splice(
+                this.annotations.findIndex(annotation => annotation.id === id),
                 1
             )
-            // Remove comment from back-end
+            // Remove annotation from back-end
             await api.codeannotations.deleteAnnotation(id)
-            this.showSuccessMessage({ message: "Successfully deleted comment" })
+            this.showSuccessMessage({ message: "Successfully deleted annotation" })
         },
-        async onEditedComment(id, updatedText) {
-            const index = this.comments.findIndex(comment => comment.id === id)
+        async onEditedAnnotation(id, updatedText) {
+            const index = this.annotations.findIndex(annotation => annotation.id === id)
             const res = await api.codeannotations.patchAnnotation(id, updatedText)
-            // Update only the comment text
-            this.comments[index].commentText = res.data.commentText
-            this.comments.splice(index, 1, this.comments[index])
-            this.showSuccessMessage({ message: "Successfully updated comment" })
+            // Update only the annotation text
+            this.annotations[index].annotationText = res.data.annotationText
+            this.annotations.splice(index, 1, this.annotations[index])
+            this.showSuccessMessage({ message: "Successfully updated annotation" })
         }
     },
     computed: {

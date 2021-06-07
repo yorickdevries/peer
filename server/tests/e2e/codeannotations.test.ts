@@ -23,7 +23,7 @@ describe("CodeAnnotations", () => {
   let body: Object;
   // Possibility for testing with a second enrolled student
   //let reviewId2: number;
-  const maxCommentLength = 65535;
+  const maxAnnotationLength = 65535;
 
   beforeAll(async () => {
     connection = await createDatabaseConnection();
@@ -179,7 +179,7 @@ describe("CodeAnnotations", () => {
     // Create default annotation body
     body = {
       reviewId: reviewId1,
-      commentText: "Some text",
+      annotationText: "Some text",
       startLineNumber: 10,
       endLineNumber: 11,
       selectedFile: "submission1.c",
@@ -197,15 +197,15 @@ describe("CodeAnnotations", () => {
     await connection.close();
   });
 
-  test("get maximum comment length", async () => {
-    //Get the maximum comment length
+  test("get maximum annotation length", async () => {
+    //Get the maximum annotation length
     const res = await request(server)
-      .get("/api/codeannotations/getMaxCommentLength")
+      .get("/api/codeannotations/getMaxAnnotationLength")
       .set("cookie", sessionCookie1);
 
     // Check if the response is correct
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text) === maxCommentLength);
+    expect(JSON.parse(res.text) === maxAnnotationLength);
   });
 
   test("create new annotation", async () => {
@@ -231,24 +231,24 @@ describe("CodeAnnotations", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject(body);
 
-    // Save the comment id
-    const commentId = JSON.parse(res.text).id;
+    // Save the annotation id
+    const annotationId = JSON.parse(res.text).id;
 
-    // Send a request to update the comment to the server
+    // Send a request to update the annotation to the server
     res = await request(server)
-      .patch(`/api/codeannotations/${commentId}`)
+      .patch(`/api/codeannotations/${annotationId}`)
       .set("cookie", sessionCookie1)
-      .send({ commentText: "Updated text" });
+      .send({ annotationText: "Updated text" });
 
     // Check if the response equals what is expected
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject({
       reviewId: reviewId1,
-      commentText: "Updated text",
+      annotationText: "Updated text",
       startLineNumber: 10,
       endLineNumber: 11,
       selectedFile: "submission1.c",
-      id: commentId,
+      id: annotationId,
     });
   });
 
@@ -263,19 +263,19 @@ describe("CodeAnnotations", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject(body);
 
-    // save the comment id
-    const commentId = JSON.parse(res.text).id;
+    // save the annotation id
+    const annotationId = JSON.parse(res.text).id;
 
     // Send a deletion request to the server
     res = await request(server)
-      .delete(`/api/codeannotations/${commentId}`)
+      .delete(`/api/codeannotations/${annotationId}`)
       .set("cookie", sessionCookie1);
 
     // Check if the response equals what is expected
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toMatchObject({
       reviewId: reviewId1,
-      commentText: "Some text",
+      annotationText: "Some text",
       startLineNumber: 10,
       endLineNumber: 11,
       selectedFile: "submission1.c",
@@ -327,36 +327,36 @@ describe("CodeAnnotations", () => {
       .set("cookie", sessionCookie1)
       .send(body);
 
-    // Check if response is ok and save comment id
+    // Check if response is ok and save annotation id
     expect(res.status).toBe(HttpStatusCode.OK);
-    const commentId = JSON.parse(res.text).id;
+    const annotationId = JSON.parse(res.text).id;
 
-    // Try to update comment as a different user
+    // Try to update annotation as a different user
     res = await request(server)
-      .patch(`/api/codeannotations/${commentId}`)
+      .patch(`/api/codeannotations/${annotationId}`)
       .set("cookie", sessionCookie2)
-      .send({ commentText: "updated text" });
+      .send({ annotationText: "updated text" });
 
     // Check if response equals what is expected
     expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
 
     // Try to delete the annotation as a different user
     res = await request(server)
-      .delete(`/api/codeannotations/${commentId}`)
+      .delete(`/api/codeannotations/${annotationId}`)
       .set("cookie", sessionCookie2);
 
     // Check if response equals what is expected
     expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
   });
 
-  test("Try too long comment", async () => {
+  test("Try too long annotation", async () => {
     // Send default annotation to the server
     let res = await request(server)
       .post("/api/codeannotations")
       .set("cookie", sessionCookie1)
       .send({
         reviewId: reviewId1,
-        commentText: "A".repeat(maxCommentLength + 1),
+        annotationText: "A".repeat(maxAnnotationLength + 1),
         startLineNumber: 10,
         endLineNumber: 11,
         selectedFile: "submission1.c",
@@ -376,7 +376,7 @@ describe("CodeAnnotations", () => {
       .set("cookie", sessionCookie1)
       .send({
         reviewId: reviewId1,
-        commentText: "A".repeat(maxCommentLength),
+        annotationText: "A".repeat(maxAnnotationLength),
         startLineNumber: 10,
         endLineNumber: 11,
         selectedFile: "submission1.c",
@@ -392,7 +392,7 @@ describe("CodeAnnotations", () => {
     expect(JSON.parse(res.text)).toMatchObject([
       {
         reviewId: reviewId1,
-        commentText: "A".repeat(maxCommentLength),
+        annotationText: "A".repeat(maxAnnotationLength),
         startLineNumber: 10,
         endLineNumber: 11,
         selectedFile: "submission1.c",

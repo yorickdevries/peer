@@ -7,10 +7,10 @@ export default {
         return client.get("codeannotations", { params: params })
     },
     // Send a new annotation
-    postAnnotation(reviewId, commentText, startLineNumber, endLineNumber, selectedFile) {
+    postAnnotation(reviewId, annotationText, startLineNumber, endLineNumber, selectedFile) {
         const body = {
             reviewId: reviewId,
-            commentText: commentText,
+            annotationText: annotationText,
             startLineNumber: startLineNumber,
             endLineNumber: endLineNumber,
             selectedFile: selectedFile
@@ -20,11 +20,11 @@ export default {
     deleteAnnotation(id) {
         return client.delete(`codeannotations/${id}`)
     },
-    patchAnnotation(id, commentText) {
-        const body = { commentText: commentText }
+    patchAnnotation(id, annotationText) {
+        const body = { annotationText: annotationText }
         return client.patch(`codeannotations/${id}`, body)
     },
-    getMaxCommentLength() {
-        return client.get("codeannotations/getMaxCommentLength")
+    getMaxAnnotationLength() {
+        return client.get("codeannotations/getMaxAnnotationLength")
     }
 }

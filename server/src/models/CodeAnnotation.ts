@@ -28,7 +28,7 @@ export default class CodeAnnotation extends BaseModel {
   @Column({ type: "text" })
   @IsString()
   @IsNotEmpty()
-  commentText: string;
+  annotationText: string;
 
   // The starting line of highlighted text
   @Column()
@@ -48,14 +48,14 @@ export default class CodeAnnotation extends BaseModel {
 
   constructor(
     review: ReviewOfSubmission,
-    commentText: string,
+    annotationText: string,
     startLineNumber: number,
     endLineNumber: number,
     selectedFile: string
   ) {
     super();
     this.review = review;
-    this.commentText = commentText;
+    this.annotationText = annotationText;
     this.startLineNumber = startLineNumber;
     this.endLineNumber = endLineNumber;
     this.selectedFile = selectedFile;
