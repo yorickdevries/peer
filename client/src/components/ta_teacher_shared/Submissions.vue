@@ -25,7 +25,7 @@
                     Export submissions .xls
                 </b-button>
             </b-col>
-            <b-col>
+            <b-col v-if="assignmentType === 'code'">
                 <!--Importing Submissions-->
                 <dt>Import submissions from WebLab</dt>
                 <dd>Imports a file with info of all submissions for this assignment from a WebLab export.</dd>
@@ -183,12 +183,14 @@ export default {
             currentPage: 1,
             perPage: 10,
             filter: "",
-            disableSubmissionExportButton: false
+            disableSubmissionExportButton: false,
+            assignmentType: null
         }
     },
     async created() {
         await this.fetchSubmissions()
         await this.fetchGroups()
+        await this.fetchAssignmentType()
     },
     computed: {
         selectedSubmissions() {
@@ -213,6 +215,10 @@ export default {
         async fetchGroups() {
             const res = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
             this.groups = res.data
+        },
+        async fetchAssignmentType() {
+            const res = await api.assignments.get(this.$route.params.assignmentId)
+            this.assignmentType = res.data.assignmentType
         },
         getGroup(id) {
             return _.find(this.groups, group => {
