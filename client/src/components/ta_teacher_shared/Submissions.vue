@@ -25,6 +25,20 @@
                     Export submissions .xls
                 </b-button>
             </b-col>
+            <b-col>
+                <!--Importing Submissions-->
+                <dt>Import submissions from WebLab</dt>
+                <dd>Imports a file with info of all submissions for this assignment from a WebLab export.</dd>
+                <b-button
+                    :disabled="disableSubmissionImportButton"
+                    size="sm"
+                    variant="primary"
+                    @click="importSubmissions"
+                    class="mb-3 mr-2"
+                >
+                    Import WebLab submissions .zip
+                </b-button>
+            </b-col>
         </b-row>
         <hr />
         <!--Table Options-->
