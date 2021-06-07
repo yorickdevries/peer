@@ -32,6 +32,12 @@
                         Not available. On creation of the assignment, this assignment has been set as self-enrollable.
                     </dd>
                 </template>
+                <template v-else-if="assignment.state !== 'unpublished' && assignment.state !== 'submission'">
+                    <dt>Import submissions from WebLab</dt>
+                    <dd>
+                        Not available. The assignment is already past the submission state.
+                    </dd>
+                </template>
                 <template v-else>
                     <!--Importing Submissions-->
                     <dt>Import submissions from WebLab</dt>
