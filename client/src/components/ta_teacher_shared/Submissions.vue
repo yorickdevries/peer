@@ -220,7 +220,7 @@ export default {
     async created() {
         await this.fetchSubmissions()
         await this.fetchGroups()
-        await this.fetchAssignmentType()
+        await this.fetchAssignment()
     },
     computed: {
         selectedSubmissions() {
@@ -246,7 +246,7 @@ export default {
             const res = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
             this.groups = res.data
         },
-        async fetchAssignmentType() {
+        async fetchAssignment() {
             const res = await api.assignments.get(this.$route.params.assignmentId)
             this.assignment = res.data
         },
