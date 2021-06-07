@@ -41,7 +41,7 @@
                 <template v-else>
                     <!--Importing Submissions-->
                     <dt>Import submissions from WebLab</dt>
-                    <dd>Imports a file with info of all submissions for this assignment from a WebLab export.</dd>
+                    <dd>This action will import the submissions from WebLab in this assignment version.</dd>
                     <b-button
                         v-b-modal="`importSubmissions${assignmentVersionId}`"
                         variant="primary"
