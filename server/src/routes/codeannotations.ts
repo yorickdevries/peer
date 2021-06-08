@@ -14,16 +14,16 @@ import { AssignmentState } from "../enum/AssignmentState";
 import moment from "moment";
 
 const router = express.Router();
-const maxCommentLength = 65535;
+const maxAnnotationLength = 65535;
 
-router.get("/getMaxCommentLength", async (req, res) => {
+router.get("/getMaxAnnotationLength", async (req, res) => {
   const user = req.user;
   if (!user) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send("Please make sure you are logged in.");
   }
-  res.status(HttpStatusCode.OK).send(maxCommentLength.toString());
+  res.status(HttpStatusCode.OK).send(maxAnnotationLength.toString());
 });
 
 // Joi inputvalidation for query
@@ -89,7 +89,7 @@ router.get("/", validateQuery(getAnnotationsSchema), async (req, res) => {
 // Joi inputvalidation
 const annotationSchema = Joi.object({
   reviewId: Joi.number().integer().required(),
-  commentText: Joi.string().max(maxCommentLength),
+  annotationText: Joi.string().max(maxAnnotationLength),
   startLineNumber: Joi.number().integer(),
   endLineNumber: Joi.number().integer(),
   selectedFile: Joi.string(),
@@ -141,7 +141,7 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
   // COMMENTING
   const codeAnnotation = new CodeAnnotation(
     review,
-    req.body.commentText,
+    req.body.annotationText,
     req.body.startLineNumber,
     req.body.endLineNumber,
     req.body.selectedFile
@@ -193,7 +193,7 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
 });
 
 const updateAnnotationSchema = Joi.object({
-  commentText: Joi.string().required().max(maxCommentLength),
+  annotationText: Joi.string().required().max(maxAnnotationLength),
 });
 
 router.patch(
@@ -238,7 +238,7 @@ router.patch(
         );
       return;
     }
-    annotation.commentText = req.body.commentText;
+    annotation.annotationText = req.body.annotationText;
     await CodeAnnotation.save(annotation);
     res.send(annotation);
   }

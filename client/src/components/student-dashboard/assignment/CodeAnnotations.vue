@@ -41,9 +41,9 @@
                         v-else
                         :linenr="index + 1"
                         :class="{
-                            comment: true,
-                            comment_start: hasAnnotationsStartingAt(index),
-                            comment_end: hasAnnotationsEndingAt(index)
+                            annotation: true,
+                            annotation_start: hasAnnotationsStartingAt(index),
+                            annotation_end: hasAnnotationsEndingAt(index)
                         }"
                         v-html="line.replace(/^$/, '<br />')"
                         role="button"
@@ -64,7 +64,7 @@
                     :style="{
                         'margin-left': annotationMarginLeft(annotation.reviewId),
                     }"
-                    class="comment-container"
+                    class="annotation-container"
                 >
                     <b-collapse
                         :style="{
@@ -77,17 +77,17 @@
                         <b-card>
                             <div v-if="editingAnnotation !== null && editingAnnotation.endLineNumber === index + 1">
                                 <PeerTextarea
-                                    placeholder="Type your comment"
+                                    placeholder="Type your annotation"
                                     rows="3"
                                     max-rows="5"
                                     @submit="(text) => submitAnnotation(annotation, text)"
                                     @cancel="cancelEdit"
-                                    :maxLength="maxCommentLength"
+                                    :maxLength="maxAnnotationLength"
                                     :defaultLanguage="language"
-                                    :defaultContent="unescapeHTML(annotation.commentText)"
+                                    :defaultContent="unescapeHTML(annotation.annotationText)"
                                 />
                             </div><div v-else class="d-flex">
-                                <span class="comment-text" v-html="highlightComment(annotation.commentText)"></span>
+                                <span class="annotation-text" v-html="highlightAnnotation(annotation.annotationText)"></span>
                                 <div v-if="!readOnly" style="flex-shrink: 0">
                                     <icon
                                         name="pen"
@@ -116,7 +116,7 @@
                                         :id="`modal_${annotation.id}`"
                                         title="Confirmation"
                                         centered>
-                                        Are you sure you want to delete this comment?
+                                        Are you sure you want to delete this annotation?
                                     </b-modal>
                                 </div>
                             </div>
@@ -134,7 +134,7 @@ import notifications from "../../../mixins/notifications"
 import PeerTextarea from "./PeerTextarea"
 
 export default {
-    props: ["content", "comments", "language", "maxCommentLength", "selectedFile", "readOnly", "reviewColors"],
+    props: ["content", "annotations", "language", "maxAnnotationLength", "selectedFile", "readOnly", "reviewColors"],
     mixins: [notifications],
     components: { PeerTextarea },
     data() {
@@ -167,11 +167,11 @@ export default {
             return this.getAnnotationsEndingAt(lineIndex).length > 0
         },
         filterAnnotationsAt(lineIndex, startsAt = false, endsAt = false, reviewId = -1) {
-            return this.getAnnotationsAt(lineIndex).filter(comment => {
+            return this.getAnnotationsAt(lineIndex).filter(annotation => {
                 return (
-                    (!startsAt || comment.startLineNumber - 1 === lineIndex) &&
-                    (!endsAt || comment.endLineNumber - 1 === lineIndex) &&
-                    (reviewId < 0 || comment.reviewId === reviewId)
+                    (!startsAt || annotation.startLineNumber - 1 === lineIndex) &&
+                    (!endsAt || annotation.endLineNumber - 1 === lineIndex) &&
+                    (reviewId < 0 || annotation.reviewId === reviewId)
                 )
             })
         },
@@ -191,7 +191,7 @@ export default {
                 .replace(/&quot;/g, '"')
                 .replace(/&#x27;/g, "'")
         },
-        highlightComment(text) {
+        highlightAnnotation(text) {
             const codeBlock = /(```)([^\s]*)(\s?)((?:.|\s)*?)\1/g
 
             return this.escapeHTML(text).replaceAll(codeBlock, (match, delimiter, language, separator, code) => {
@@ -222,20 +222,20 @@ export default {
         },
         editModalOk(lineIndex) {
             this.editingAnnotation = false
-            this.editComment(lineIndex)
+            this.editAnnotation(lineIndex)
         },
         getModalText() {
             const annotation = this.editingAnnotation
             // If there is an edit in another file, redirect the user to that file.
             if (this.selectedFile !== annotation.selectedFile) {
-                return `If you start editing this comment, your edit on file ${annotation.selectedFile} will be lost.`
+                return `If you start editing this annotation, your edit on file ${annotation.selectedFile} will be lost.`
             }
 
             // If the lines are the same, return only one line
             if (annotation.startLineNumber === annotation.endLineNumber) {
-                return `If you start editing this comment, your edit on line ${annotation.endLineNumber} will be lost.`
+                return `If you start editing this annotation, your edit on line ${annotation.endLineNumber} will be lost.`
             } else {
-                return `If you start editing this comment, your edit between the lines ${annotation.startLineNumber} and ${annotation.endLineNumber} will be lost.`
+                return `If you start editing this annotation, your edit between the lines ${annotation.startLineNumber} and ${annotation.endLineNumber} will be lost.`
             }
         },
         toggleAnnotationsAt(lineIndex) {
@@ -271,13 +271,13 @@ export default {
             const result = {}
             for (let i = 0; i < this.content.length; i++) {
                 const line = []
-                for (let j = 0; j < this.comments.length; j++) {
+                for (let j = 0; j < this.annotations.length; j++) {
                     if (
-                        this.comments[j].startLineNumber - 1 <= i &&
-                        this.comments[j].endLineNumber - 1 >= i &&
-                        this.comments[j].selectedFile === this.selectedFile
+                        this.annotations[j].startLineNumber - 1 <= i &&
+                        this.annotations[j].endLineNumber - 1 >= i &&
+                        this.annotations[j].selectedFile === this.selectedFile
                     ) {
-                        line.push(this.comments[j])
+                        line.push(this.annotations[j])
                     }
                 }
 
@@ -290,9 +290,9 @@ export default {
         reviewsInFile() {
             return Array.from(
                 new Set(
-                    this.comments
-                        .filter(comment => comment.selectedFile === this.selectedFile)
-                        .map(comment => comment.reviewId)
+                    this.annotations
+                        .filter(annotation => annotation.selectedFile === this.selectedFile)
+                        .map(annotation => annotation.reviewId)
                 )
             )
         },
@@ -322,7 +322,7 @@ export default {
 $code-annotation-background: rgba(0, 0, 0, 0.03);
 
 code,
-.comment-text::v-deep {
+.annotation-text::v-deep {
     background-color: inherit;
     font-family: var(--font-family-monospace);
     white-space: pre;
@@ -331,7 +331,7 @@ code,
     width: 100%;
 }
 
-.comment-text {
+.annotation-text {
     display: inline-block;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -387,7 +387,7 @@ pre {
                 }
             }
 
-            &.comment {
+            &.annotation {
                 border-left: 1px solid var(--gray);
                 border-right: 1px solid var(--gray);
                 background-color: $code-annotation-background;
@@ -395,13 +395,13 @@ pre {
                 padding-right: 7ch;
             }
 
-            &.comment_start {
+            &.annotation_start {
                 border-top: 1px solid var(--gray);
                 border-top-left-radius: 3px;
                 border-top-right-radius: 3px;
             }
 
-            &.comment_end {
+            &.annotation_end {
                 border-bottom: 1px solid var(--gray);
                 border-bottom-left-radius: 3px;
                 border-bottom-right-radius: 3px;
@@ -474,7 +474,7 @@ pre {
     }
 }
 
-.comment-container {
+.annotation-container {
     margin-right: 1ch;
     font-family: var(--font-family-monospace);
 

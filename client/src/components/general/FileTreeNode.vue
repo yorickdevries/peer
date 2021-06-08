@@ -10,7 +10,7 @@
                 <icon name="code"></icon>
                 <span>{{ name }}</span>
             </div>
-            <icon v-if="commented" class="comment-icon" name="comments" />
+            <icon v-if="annotated" class="annotation-icon" name="comments" />
         </div>
 
         <b-collapse class="ml-4" v-if="dir" :visible="!collapsed">
@@ -18,7 +18,7 @@
                 @toggleCollapse="onChildCollapse"
                 @selected="onChildSelect"
                 v-for="key in Object.keys(children)"
-                :commentedFiles="commentedFiles"
+                :annotatedFiles="annotatedFiles"
                 :key="key"
                 :propName="key"
                 :propChildren="children[key]"
@@ -31,7 +31,7 @@
 <script>
 export default {
     name: "FileTreeNode",
-    props: ["commentedFiles", "propName", "propChildren", "selectedFile"],
+    props: ["annotatedFiles", "propName", "propChildren", "selectedFile"],
     data() {
         return {
             name: null,
@@ -85,8 +85,8 @@ export default {
         selected() {
             return this.selectedFile === this.children.path
         },
-        commented() {
-            return this.commentedFiles.has(this.children.path)
+        annotated() {
+            return this.annotatedFiles.has(this.children.path)
         }
     },
     mounted() {
@@ -148,7 +148,7 @@ $background-hover: rgba(0, 0, 0, 0.03);
     }
 }
 
-.comment-icon {
+.annotation-icon {
     margin: auto 5px;
     display: inline-block;
 }
