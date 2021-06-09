@@ -46,6 +46,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   if (!(await questionnaire.isTeacherInCourse(user))) {
     question.options.map((option) => {
       delete option.points;
+      return option;
     });
   }
   const sortedOptions = _.sortBy(question.options, "text");

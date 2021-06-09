@@ -52,9 +52,21 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   // sort the options alphabetically in case it is a question with options
   for (const question of sortedQuestions) {
     if (question instanceof CheckboxQuestion) {
+      if (!(await questionnaire.isTeacherInCourse(user))) {
+        question.options.map((option) => {
+          delete option.points;
+          return option;
+        });
+      }
       const sortedOptions = _.sortBy(question.options, "text");
       question.options = sortedOptions;
     } else if (question instanceof MultipleChoiceQuestion) {
+      if (!(await questionnaire.isTeacherInCourse(user))) {
+        question.options.map((option) => {
+          delete option.points;
+          return option;
+        });
+      }
       const sortedOptions = _.sortBy(question.options, "text");
       question.options = sortedOptions;
     }
