@@ -37,9 +37,9 @@
                         :linenr="index + 1"
                         class="code-annotations-code"
                         :class="{
-                            annotation: hasSelectionAt(index),
-                            annotation_start: hasSelectionStartingAt(index),
-                            annotation_end: hasSelectionEndingAt(index)
+                            selection: hasSelectionAt(index),
+                            selection_start: hasSelectionStartingAt(index),
+                            selection_end: hasSelectionEndingAt(index)
                         }"
                         v-html="line.replace(/^$/, '<br />')"
                     ></code><code
@@ -411,24 +411,46 @@ pre {
                 }
             }
 
-            &.annotation {
-                border-left: 1px solid var(--gray);
-                border-right: 1px solid var(--gray);
+            &.annotation, &.selection {
                 background-color: $code-annotation-background;
                 margin-right: 1ch;
                 padding-right: 7ch;
             }
 
-            &.annotation_start {
-                border-top: 1px solid var(--gray);
+            &.annotation {
+                border-left: 1px solid var(--gray);
+                border-right: 1px solid var(--gray);
+            }
+
+            &.selection {
+                border-left: 1px dashed var(--gray);
+                border-right: 1px dashed var(--gray);
+            }
+
+            &.annotation_start, &.selection_start {
                 border-top-left-radius: 3px;
                 border-top-right-radius: 3px;
             }
 
-            &.annotation_end {
-                border-bottom: 1px solid var(--gray);
+            &.annotation_start {
+                border-top: 1px solid var(--gray);
+            }
+
+            &.selection_start {
+                border-top: 1px dashed var(--gray);
+            }
+
+            &.annotation_end, &.selection_end {
                 border-bottom-left-radius: 3px;
                 border-bottom-right-radius: 3px;
+            }
+
+            &.annotation_end {
+                border-bottom: 1px solid var(--gray);
+            }
+
+            &.selection_end {
+                border-bottom: 1px dashed var(--gray);
             }
 
             &.code-annotations-linenr {
