@@ -42,6 +42,8 @@
                 :selectedFile="selectedFile"
                 :readOnly="readOnly || reviewSubmitted"
                 :reviewColors="reviewColors"
+                :selectionStart="startLineNumber"
+                :selectionEnd="endLineNumber"
             />
         </b-card>
     </div>

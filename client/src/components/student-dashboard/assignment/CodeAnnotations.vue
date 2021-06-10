@@ -134,7 +134,17 @@ import notifications from "../../../mixins/notifications"
 import PeerTextarea from "./PeerTextarea"
 
 export default {
-    props: ["content", "annotations", "language", "maxAnnotationLength", "selectedFile", "readOnly", "reviewColors"],
+    props: [
+        "annotations",
+        "content",
+        "language",
+        "maxAnnotationLength",
+        "readOnly",
+        "reviewColors",
+        "selectedFile",
+        "selectionStart",
+        "selectionEnd"
+    ],
     mixins: [notifications],
     components: { PeerTextarea },
     data() {
@@ -154,17 +164,26 @@ export default {
         hasAnnotationsAt(lineIndex) {
             return this.getAnnotationsAt(lineIndex).length > 0
         },
+        hasSelectionAt(lineIndex) {
+            return lineIndex + 1 >= this.selectionStart && lineIndex + 1 <= this.selectionEnd
+        },
         getAnnotationsStartingAt(lineIndex) {
             return this.filterAnnotationsAt(lineIndex, true, false, -1)
         },
         hasAnnotationsStartingAt(lineIndex) {
             return this.getAnnotationsStartingAt(lineIndex).length > 0
         },
+        hasSelectionStartingAt(lineIndex) {
+            return lineIndex + 1 === this.selectionStart
+        },
         getAnnotationsEndingAt(lineIndex) {
             return this.filterAnnotationsAt(lineIndex, false, true, -1)
         },
         hasAnnotationsEndingAt(lineIndex) {
             return this.getAnnotationsEndingAt(lineIndex).length > 0
+        },
+        hasSelectionEndingAt(lineIndex) {
+            return lineIndex + 1 === this.selectionEnd
         },
         filterAnnotationsAt(lineIndex, startsAt = false, endsAt = false, reviewId = -1) {
             return this.getAnnotationsAt(lineIndex).filter(annotation => {
