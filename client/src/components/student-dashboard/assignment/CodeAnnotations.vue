@@ -36,6 +36,11 @@
                         v-if="!hasAnnotationsAt(index)"
                         :linenr="index + 1"
                         class="code-annotations-code"
+                        :class="{
+                            annotation: hasSelectionAt(index),
+                            annotation_start: hasSelectionStartingAt(index),
+                            annotation_end: hasSelectionEndingAt(index)
+                        }"
                         v-html="line.replace(/^$/, '<br />')"
                     ></code><code
                         v-else
