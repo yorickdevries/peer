@@ -411,7 +411,8 @@ pre {
                 }
             }
 
-            &.annotation, &.selection {
+            &.annotation,
+            &.selection {
                 background-color: $code-annotation-background;
                 margin-right: 1ch;
                 padding-right: 7ch;
@@ -427,7 +428,8 @@ pre {
                 border-right: 1px dashed var(--gray);
             }
 
-            &.annotation_start, &.selection_start {
+            &.annotation_start,
+            &.selection_start {
                 border-top-left-radius: 3px;
                 border-top-right-radius: 3px;
             }
@@ -440,7 +442,8 @@ pre {
                 border-top: 1px dashed var(--gray);
             }
 
-            &.annotation_end, &.selection_end {
+            &.annotation_end,
+            &.selection_end {
                 border-bottom-left-radius: 3px;
                 border-bottom-right-radius: 3px;
             }
