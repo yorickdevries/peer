@@ -15,6 +15,7 @@
             </form>
             <PeerTextarea
                 v-if="writing"
+                ref="textarea"
                 placeholder="Type your annotation"
                 rows="3"
                 max-rows="5"
@@ -148,6 +149,7 @@ export default {
             this.writing = true
             this.highlightedText = selectedText
             this.highlightedFile = this.selectedFile
+            window.getSelection().empty()
         },
         async submitAnnotation(annotationText) {
             // Update the current state
