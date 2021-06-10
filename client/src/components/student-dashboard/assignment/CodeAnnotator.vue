@@ -150,6 +150,7 @@ export default {
             this.highlightedText = selectedText
             this.highlightedFile = this.selectedFile
             window.getSelection().empty()
+            this.$nextTick(() => this.$refs.textarea.$refs.textarea.focus())
         },
         async submitAnnotation(annotationText) {
             // Update the current state
