@@ -6,7 +6,7 @@
                 :key="index + 'code'"
             >
                 <div class="position-relative d-flex" style="align-items: stretch">
-                    <div class="gutter" :style="{ 'margin-right': gutterMarginRight }">
+                    <div class="gutter sticky-left" :style="{ 'margin-right': gutterMarginRight }">
                         <code
                             class="code-annotations-linenr"
                             :style="{
@@ -65,8 +65,10 @@
                 <div 
                     v-for="annotation of getAnnotationsEndingAt(index)"
                     :key="annotation"
-                    class="position-relative d-flex"
-                    style="align-items: stretch"
+                    class="annotation-container sticky-left"
+                    :style="{
+                        width: $refs.container ? `${$refs.container.clientWidth}px` : `auto`
+                    }"
                 >
                     <div class="gutter" :style="{ 'margin-right': gutterMarginRight }">
                         <code
@@ -306,19 +308,19 @@ export default {
             return Math.ceil(Math.log(this.content.length + 1) / Math.log(10))
         },
         reviewBarSpanWidth() {
-            return "3px"
+            return "0.375ch"
         },
         reviewBarSpanMarginRight() {
-            return "4px"
+            return "0.5ch"
         },
         reviewBarPaddingLeft() {
-            return "4px"
+            return "0.5ch"
         },
         reviewBarMarginSides() {
-            return "4px"
+            return "0.5ch"
         },
         gutterMarginRight() {
-            return "8px"
+            return "1ch"
         }
     }
 }
@@ -426,18 +428,6 @@ pre {
             }
         }
 
-        &.collapse {
-            font-family: var(--font-family-monospace);
-            width: 100%;
-            margin-right: 1ch;
-        }
-
-        &.card {
-            width: 100%;
-            font-family: initial;
-            overflow: hidden;
-        }
-
         .fa-icon {
             display: inline;
             vertical-align: middle;
@@ -466,8 +456,6 @@ pre {
     box-shadow: inset -5px 0 0 -4px var(--gray);
     user-select: none;
     box-sizing: content-box;
-    position: sticky;
-    left: 0;
     font-family: var(--font-family-monospace);
 
     .review-bar {
@@ -483,14 +471,25 @@ pre {
 }
 
 .annotation-container {
-    margin-right: 1ch;
-    font-family: var(--font-family-monospace);
+    display: flex;
+    width: 50vw;
 
-    &::v-deep {
-        .collapse {
-            position: sticky;
-            margin-right: 0px;
-        }
+    .collapse {
+        font-family: var(--font-family-monospace);
+        width: 100%;
+        margin-right: 1ch;
     }
+
+    .card {
+        margin: 1ch 0;
+        width: 100%;
+        font-family: initial;
+        overflow: hidden;
+    }
+}
+
+.sticky-left {
+    position: sticky;
+    left: 0px;
 }
 </style>
