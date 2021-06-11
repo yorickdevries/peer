@@ -37,7 +37,7 @@ const importWebLabSubmissions = async function (
     await fsPromises.unlink(file.path);
 
     // can throw an error if corrupted
-    const submissionRegex = /^.*?\/submissions\/.*/;
+    const submissionRegex = /^[^\/]*?\/submissions\/.*/;
     const files = await JSZip.loadAsync(fileData).then((zip) => {
       return Object.keys(zip.files)
         .map((name) => zip.file(name))
@@ -47,7 +47,7 @@ const importWebLabSubmissions = async function (
     });
 
     // create map with submissions files for each user
-    const userRegex = /^.*?\/submissions\/(.*?)\//;
+    const userRegex = /^[^\/]*?\/submissions\/(.*?)\//;
     const rawSubmissions: Map<string, Array<JSZip.JSZipObject>> = new Map();
     for (const file of files) {
       const userString = userRegex.exec(file.name);
@@ -64,11 +64,11 @@ const importWebLabSubmissions = async function (
     }
 
     // create zip file with all submissions for each user
-    const fileRegex = /^.*?\/submissions\/(.*)$/;
-    for (const studentNumber in rawSubmissions) {
+    const fileRegex = /^[^\/]*?\/submissions\/(.*)$/;
+    for (const [studentNumber, files] of rawSubmissions) {
       // populate zip file
       const zip = new JSZip();
-      for (const file of rawSubmissions.get(studentNumber) ?? []) {
+      for (const file of files) {
         const fileString = fileRegex.exec(file.name);
         if (!fileString) {
           continue;
