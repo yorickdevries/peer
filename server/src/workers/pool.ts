@@ -246,6 +246,12 @@ const startExportSubmissionsForAssignmentVersionWorker = function (
   }
 };
 
+const startImportWebLabSubmissionsWorker = function (
+  assignmentVersionId: number,
+  file: Express.Multer.File
+): void {
+};
+
 export {
   startPublishAssignmentWorker,
   startCloseSubmissionForAssignmentWorker,
@@ -257,4 +263,5 @@ export {
   startExportReviewsForAssignmentVersionWorker,
   startExportSubmissionsForAssignmentVersionWorker,
   startSubmissionFlaggingWorker,
+  startImportWebLabSubmissionsWorker,
 };
