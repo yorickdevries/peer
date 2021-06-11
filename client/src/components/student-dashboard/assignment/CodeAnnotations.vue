@@ -93,7 +93,7 @@
                                     'margin-right': reviewBarSpanMarginRight,
                                     'border-left-width': reviewBarSpanWidth,
                                     'border-left-style': 'solid',
-                                    'border-left-color': filterAnnotationsAt(index, false, true, review).length > 0
+                                    'border-left-color': review === annotation.reviewId
                                         ? reviewColors[review]
                                         : 'transparent'
                                 }"
@@ -396,21 +396,21 @@ pre {
             }
 
             &.annotation {
-                border-left: 1px solid var(--gray);
-                border-right: 1px solid var(--gray);
+                border-left: thin solid var(--gray);
+                border-right: thin solid var(--gray);
                 background-color: $code-annotation-background;
                 margin-right: 1ch;
                 padding-right: 7ch;
             }
 
             &.annotation_start {
-                border-top: 1px solid var(--gray);
+                border-top: thin solid var(--gray);
                 border-top-left-radius: 3px;
                 border-top-right-radius: 3px;
             }
 
             &.annotation_end {
-                border-bottom: 1px solid var(--gray);
+                border-bottom: thin solid var(--gray);
                 border-bottom-left-radius: 3px;
                 border-bottom-right-radius: 3px;
             }
@@ -453,7 +453,7 @@ pre {
 
 .gutter {
     display: flex;
-    box-shadow: inset -5px 0 0 -4px var(--gray);
+    border-right: thin solid var(--gray);
     user-select: none;
     box-sizing: content-box;
     font-family: var(--font-family-monospace);
