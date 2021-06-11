@@ -180,7 +180,7 @@
                             @change="typeChangeFunc"
                             :options="assignmentTypes"
                             v-model="assignment.assignmentType"
-                            :disabled="assignmentStateAfter('published')"
+                            :disabled="assignmentStateAfter('unpublished')"
                         ></b-form-select>
                     </b-form-group>
 
@@ -279,7 +279,7 @@
                         <b-form-select
                             :options="extensionTypes"
                             v-model="assignment.submissionExtensions"
-                            :disabled="assignmentStateAfter('published')"
+                            :disabled="assignmentStateAfter('unpublished')"
                         ></b-form-select>
                     </b-form-group>
 
