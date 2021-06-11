@@ -535,4 +535,13 @@ router.post(
   }
 );
 
+router.post(
+  "/import",
+  upload([".zip"], maxFileSize, "file"),
+  validateBody(assignmentVersionIdSchema),
+  async (req, res) => {
+
+  }
+);
+
 export default router;
