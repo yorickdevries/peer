@@ -38,12 +38,14 @@ const importWebLabSubmissions = async function (
 
     // can throw an error if corrupted
     const submissionRegex = /^[^\/]*?\/submissions\/.*/;
+    const excludeFiles = [".DS_Store", "submission-link.url"]
     const files = await JSZip.loadAsync(fileData).then((zip) => {
       return Object.keys(zip.files)
         .map((name) => zip.file(name))
         .filter((f): f is JSZip.JSZipObject => !!f) // filter out null files
         .filter((f) => !f.dir) // filter out all files that are directories
-        .filter((f) => submissionRegex.test(f.name)); // filter out non-submission files
+        .filter((f) => submissionRegex.test(f.name)) // filter out non-submission files
+        .filter((f) => !excludeFiles.includes(f.name.split("/").pop() ?? "")); // filter out excluded files
     });
 
     // create map with submissions files for each user
