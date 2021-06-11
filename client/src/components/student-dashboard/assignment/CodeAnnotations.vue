@@ -5,11 +5,13 @@
                 v-for="(line, index) in content"
                 :key="index + 'code'"
             >
-                <div class="position-relative d-flex">
+                <div class="position-relative d-flex" style="align-items: stretch">
                     <div class="gutter" :style="{ 'margin-right': gutterMarginRight }">
                         <code
                             class="code-annotations-linenr"
-                            :style="{ width: `${maxLineNumberDigits}ch` }"
+                            :style="{
+                                width: `${maxLineNumberDigits}ch`
+                            }"
                         >{{ index + 1 }}</code>
                         <div
                             class="review-bar"
@@ -23,9 +25,11 @@
                                 v-for="review in reviewsInFile"
                                 :key="index + 'review_' + review"
                                 :style="{
-                                    width: reviewBarSpanWidth,
+                                    width: '0px',
                                     'margin-right': reviewBarSpanMarginRight,
-                                    'background-color': filterAnnotationsAt(index, false, false, review).length > 0
+                                    'border-left-width': reviewBarSpanWidth,
+                                    'border-left-style': 'solid',
+                                    'border-left-color': filterAnnotationsAt(index, false, false, review).length > 0
                                         ? reviewColors[review]
                                         : 'transparent'
                                 }"
@@ -58,23 +62,46 @@
                         @click.native="toggleAnnotationsAt(index)"
                     />
                 </div>
-                <div
-                    v-for="annotation in getAnnotationsEndingAt(index)"
-                    :key="annotation.id"
-                    :style="{
-                        'margin-left': annotationMarginLeft(annotation.reviewId),
-                    }"
-                    class="annotation-container"
+                <div 
+                    v-for="annotation of getAnnotationsEndingAt(index)"
+                    :key="annotation"
+                    class="position-relative d-flex"
+                    style="align-items: stretch"
                 >
+                    <div class="gutter" :style="{ 'margin-right': gutterMarginRight }">
+                        <code
+                            class="code-annotations-linenr"
+                            :style="{
+                                width: `${maxLineNumberDigits}ch`
+                            }"
+                        ></code>
+                        <div
+                            class="review-bar"
+                            :style="{
+                                'margin-left': reviewBarMarginSides,
+                                'margin-right': reviewBarMarginSides,
+                                'padding-left': reviewBarPaddingLeft
+                            }"
+                        >
+                            <span
+                                v-for="review in reviewsInFile"
+                                :key="index + 'review_' + review"
+                                :style="{
+                                    width: '0px',
+                                    'margin-right': reviewBarSpanMarginRight,
+                                    'border-left-width': reviewBarSpanWidth,
+                                    'border-left-style': 'solid',
+                                    'border-left-color': filterAnnotationsAt(index, false, true, review).length > 0
+                                        ? reviewColors[review]
+                                        : 'transparent'
+                                }"
+                            ></span>
+                        </div>
+                    </div>
                     <b-collapse
-                        :style="{
-                            left: annotationMarginLeft(annotation.reviewId),
-                            'padding-left': annotationPaddingLeft(annotation.reviewId),
-                            'border-left': `${reviewBarSpanWidth} solid ${reviewColors[annotation.reviewId]}`,
-                            'width': `calc(${$refs.container ? $refs.container.clientWidth : 0}px - ${annotationMarginLeft(annotation.reviewId)} - 1ch)`
-                        }"
-                        v-model="annotationState[annotation.id]">
-                        <b-card>
+                        v-model="annotationState[annotation.id]"
+                    >
+                        <b-card style="display: inline-block">
                             <div v-if="editingAnnotation !== null && editingAnnotation.endLineNumber === index + 1">
                                 <PeerTextarea
                                     placeholder="Type your annotation"
@@ -131,12 +158,10 @@
 import hljs from "highlight.js"
 import "highlight.js/styles/atom-one-light.css"
 import notifications from "../../../mixins/notifications"
-import PeerTextarea from "./PeerTextarea"
 
 export default {
     props: ["content", "annotations", "language", "maxAnnotationLength", "selectedFile", "readOnly", "reviewColors"],
     mixins: [notifications],
-    components: { PeerTextarea },
     data() {
         return {
             showEditModal: false,
@@ -245,25 +270,6 @@ export default {
             this.getAnnotationsAt(lineIndex).forEach(annotation => {
                 this.$set(this.annotationState, annotation.id, !allExtended)
             })
-        },
-        annotationMarginLeft(reviewId) {
-            return `calc(${this.maxLineNumberDigits}ch + ${this.reviewBarMarginSides} + ${
-                this.reviewBarPaddingLeft
-            } + (${this.reviewBarSpanWidth} + ${this.reviewBarSpanMarginRight}) * ${this.reviewsInFile.indexOf(
-                reviewId
-            )})`
-        },
-        annotationPaddingLeft(reviewId) {
-            return `calc(${this.gutterMarginRight} + ${this.reviewBarMarginSides} + (${this.reviewBarSpanWidth} + ${
-                this.reviewBarSpanMarginRight
-            }) * ${this.reviewsInFile.length - this.reviewsInFile.indexOf(reviewId)} - ${this.reviewBarSpanWidth})`
-        },
-        annotationLeft(reviewId) {
-            return `calc(${this.maxLineNumberDigits}ch + ${this.reviewBarMarginSides} * 2 + ${
-                this.reviewBarPaddingLeft
-            } + (${this.reviewBarSpanWidth} + ${this.reviewBarSpanMarginRight}) * ${this.reviewsInFile.indexOf(
-                reviewId
-            ) + 1} + ${this.gutterMarginRight})`
         }
     },
     computed: {
@@ -421,11 +427,13 @@ pre {
         }
 
         &.collapse {
-            margin-right: 1ch;
             font-family: var(--font-family-monospace);
+            width: 100%;
+            margin-right: 1ch;
         }
 
         &.card {
+            width: 100%;
             font-family: initial;
             overflow: hidden;
         }
