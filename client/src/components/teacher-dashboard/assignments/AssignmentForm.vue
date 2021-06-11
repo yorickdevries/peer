@@ -559,6 +559,7 @@ export default {
         assignmentStateAfter(state) {
             const currentIndex = assignmentStates.indexOf(this.assignment.state)
             const newIndex = assignmentStates.indexOf(state)
+            if (newIndex < 0) throw new Error(`Illegal assignment state: ${state}`)
             return currentIndex > newIndex
         }
     },
