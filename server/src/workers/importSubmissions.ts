@@ -66,7 +66,7 @@ const importWebLabSubmissions = async function (
     }
 
     // create zip file with all submissions for each user
-    const fileRegex = /^[^\/]*?\/submissions\/(.*)$/;
+    const fileRegex = /^[^\/]*?\/submissions\/.*?\/(.*)$/;
     for (const [studentNumber, files] of rawSubmissions) {
       // populate zip file
       const zip = new JSZip();
