@@ -396,21 +396,21 @@ pre {
             }
 
             &.annotation {
-                border-left: thin solid var(--gray);
-                border-right: thin solid var(--gray);
+                border-left: 1.5px solid var(--gray);
+                border-right: 1.5px solid var(--gray);
                 background-color: $code-annotation-background;
                 margin-right: 1ch;
                 padding-right: 7ch;
             }
 
             &.annotation_start {
-                border-top: thin solid var(--gray);
+                border-top: 1.5px solid var(--gray);
                 border-top-left-radius: 3px;
                 border-top-right-radius: 3px;
             }
 
             &.annotation_end {
-                border-bottom: thin solid var(--gray);
+                border-bottom: 1.5px solid var(--gray);
                 border-bottom-left-radius: 3px;
                 border-bottom-right-radius: 3px;
             }
@@ -453,7 +453,7 @@ pre {
 
 .gutter {
     display: flex;
-    border-right: thin solid var(--gray);
+    border-right: 1.5px solid var(--gray);
     user-select: none;
     box-sizing: content-box;
     font-family: var(--font-family-monospace);
