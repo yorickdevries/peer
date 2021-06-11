@@ -180,7 +180,7 @@
                             @change="typeChangeFunc"
                             :options="assignmentTypes"
                             v-model="assignment.assignmentType"
-                            :disabled="assignmentStateAfter('published')"
+                            :disabled="assignmentStateAfter('unpublished')"
                         ></b-form-select>
                     </b-form-group>
 
@@ -279,7 +279,7 @@
                         <b-form-select
                             :options="extensionTypes"
                             v-model="assignment.submissionExtensions"
-                            :disabled="assignmentStateAfter('published')"
+                            :disabled="assignmentStateAfter('unpublished')"
                         ></b-form-select>
                     </b-form-group>
 
@@ -559,6 +559,7 @@ export default {
         assignmentStateAfter(state) {
             const currentIndex = assignmentStates.indexOf(this.assignment.state)
             const newIndex = assignmentStates.indexOf(state)
+            if (newIndex < 0) throw new Error(`Illegal assignment state: ${state}`)
             return currentIndex > newIndex
         }
     },
