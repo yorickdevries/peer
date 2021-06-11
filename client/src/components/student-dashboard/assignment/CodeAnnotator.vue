@@ -15,6 +15,7 @@
             </form>
             <PeerTextarea
                 v-if="writing"
+                ref="textarea"
                 placeholder="Type your annotation"
                 rows="3"
                 max-rows="5"
@@ -42,6 +43,8 @@
                 :selectedFile="selectedFile"
                 :readOnly="readOnly || reviewSubmitted"
                 :reviewColors="reviewColors"
+                :selectionStart="startLineNumber"
+                :selectionEnd="endLineNumber"
             />
         </b-card>
     </div>
@@ -146,6 +149,8 @@ export default {
             this.writing = true
             this.highlightedText = selectedText
             this.highlightedFile = this.selectedFile
+            window.getSelection().empty()
+            this.$nextTick(() => this.$refs.textarea.$refs.textarea.focus())
         },
         async submitAnnotation(annotationText) {
             // Update the current state
