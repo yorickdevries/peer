@@ -1,7 +1,7 @@
 import { getManager } from "typeorm";
 import AssignmentVersion from "../models/AssignmentVersion";
 import ensureConnection from "../util/ensureConnection";
-import Group from "../models/Group"
+import Group from "../models/Group";
 import Submission from "../models/Submission";
 import fsPromises from "fs/promises";
 import JSZip from "jszip";
@@ -19,12 +19,14 @@ const importWebLabSubmissions = async function (
 ): Promise<string> {
   await ensureConnection();
 
-  const assignmentVersion = await AssignmentVersion.findOne(assignmentVersionId);
+  const assignmentVersion = await AssignmentVersion.findOne(
+    assignmentVersionId
+  );
   if (!assignmentVersion) {
     throw new Error("Invalid assignment version");
   }
   const assignment = await assignmentVersion.getAssignment();
-  const submissions: Map<string, { file: File, buffer: Buffer }> = new Map();
+  const submissions: Map<string, { file: File; buffer: Buffer }> = new Map();
 
   const course = await assignment.getCourse();
 
@@ -41,7 +43,7 @@ const importWebLabSubmissions = async function (
         .map((name) => zip.file(name))
         .filter((f): f is JSZip.JSZipObject => !!f) // filter out null files
         .filter((f) => !f.dir) // filter out all files that are directories
-        .filter((f) => submissionRegex.test(f.name)) // filter out non-submission files
+        .filter((f) => submissionRegex.test(f.name)); // filter out non-submission files
     });
 
     // create map with submissions files for each user
@@ -52,7 +54,10 @@ const importWebLabSubmissions = async function (
       if (!userString) {
         continue;
       }
-      const studentNumber = userString[1].substring(0, userString[1].indexOf("_"));
+      const studentNumber = userString[1].substring(
+        0,
+        userString[1].indexOf("_")
+      );
       const files = rawSubmissions.get(studentNumber) ?? [];
       files.push(file);
       rawSubmissions.set(studentNumber, files);
@@ -61,7 +66,7 @@ const importWebLabSubmissions = async function (
     // create zip file with all submissions for each user
     const fileRegex = /^.*?\/submissions\/(.*)$/;
     for (const studentNumber in rawSubmissions) {
-      // populate zip file 
+      // populate zip file
       const zip = new JSZip();
       for (const file of rawSubmissions.get(studentNumber) ?? []) {
         const fileString = fileRegex.exec(file.name);
@@ -75,69 +80,70 @@ const importWebLabSubmissions = async function (
       const buffer = await zip.generateAsync({ type: "nodebuffer" });
       const fileName = `assignmentversion${assignmentVersion.id}_submission${studentNumber}`;
       const file = new File(fileName, ".zip", null);
-      submissions.set(studentNumber, {file, buffer});
+      submissions.set(studentNumber, { file, buffer });
     }
   } catch (error) {
     throw new Error(error);
   }
 
   await getManager().transaction(
-      "SERIALIZABLE", // serializable is the only way to make sure groups and submissions exist before import
-      async (transactionalEntityManager) => {
-          const existingGroups = await transactionalEntityManager
-              .createQueryBuilder(Group, "group")
-              .leftJoin("group.assignments", "assignment")
-              .where(
-                  "assignment.id = :id",
-                  { id: assignment.id }
-              )
-              .getMany();
-          if (existingGroups.length > 0) {
-              throw new Error("There are already groups for this assignment");
-          }
-
-          const existingSubmissions = await transactionalEntityManager
-              .createQueryBuilder(Submission, "submission")
-              .where(
-                  "submission.assignmentVersionId = :id",
-                  { id: assignmentVersionId }
-              )
-              .getMany();
-          if (existingSubmissions.length > 0) {
-              throw new Error("There are already submissions for this assignment");
-          }
-
-          for (const [studentNumber, {file, buffer}] of submissions) {
-            // get user from directory names
-            const user = await transactionalEntityManager.findOneOrFail(
-              User,
-              { studentNumber: parseInt(studentNumber) }
-            );
-
-            // make the group
-            const group = new Group(user.netid, course, [user], [assignment]);
-            await group.validateOrReject();
-            await transactionalEntityManager.save(group);
-
-            // save file entry to database
-            await file.validateOrReject();
-            await transactionalEntityManager.save(file);
-
-            // make the submission
-            const submission = new Submission(user, group, assignmentVersion, file, true);
-            await submission.validateOrReject();
-            await transactionalEntityManager.save(submission);
-
-            // write the file (so if this fails everything above fails)
-            // new place where the file will be saved
-            const filePath = path.resolve(uploadFolder, file.id.toString());
-            // write
-            await fsPromises.writeFile(filePath, buffer);
-          }
+    "SERIALIZABLE", // serializable is the only way to make sure groups and submissions exist before import
+    async (transactionalEntityManager) => {
+      const existingGroups = await transactionalEntityManager
+        .createQueryBuilder(Group, "group")
+        .leftJoin("group.assignments", "assignment")
+        .where("assignment.id = :id", { id: assignment.id })
+        .getMany();
+      if (existingGroups.length > 0) {
+        throw new Error("There are already groups for this assignment");
       }
+
+      const existingSubmissions = await transactionalEntityManager
+        .createQueryBuilder(Submission, "submission")
+        .where("submission.assignmentVersionId = :id", {
+          id: assignmentVersionId,
+        })
+        .getMany();
+      if (existingSubmissions.length > 0) {
+        throw new Error("There are already submissions for this assignment");
+      }
+
+      for (const [studentNumber, { file, buffer }] of submissions) {
+        // get user from directory names
+        const user = await transactionalEntityManager.findOneOrFail(User, {
+          studentNumber: parseInt(studentNumber),
+        });
+
+        // make the group
+        const group = new Group(user.netid, course, [user], [assignment]);
+        await group.validateOrReject();
+        await transactionalEntityManager.save(group);
+
+        // save file entry to database
+        await file.validateOrReject();
+        await transactionalEntityManager.save(file);
+
+        // make the submission
+        const submission = new Submission(
+          user,
+          group,
+          assignmentVersion,
+          file,
+          true
+        );
+        await submission.validateOrReject();
+        await transactionalEntityManager.save(submission);
+
+        // write the file (so if this fails everything above fails)
+        // new place where the file will be saved
+        const filePath = path.resolve(uploadFolder, file.id.toString());
+        // write
+        await fsPromises.writeFile(filePath, buffer);
+      }
+    }
   );
 
   return `Submissions imported for assignmentVersion ${assignmentVersion.id}`;
-}
+};
 
 export default importWebLabSubmissions;

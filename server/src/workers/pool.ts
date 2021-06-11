@@ -262,10 +262,7 @@ const startImportWebLabSubmissionsWorker = function (
       });
   } else {
     // run worker in a seperate process (Node.js/production)
-    startWorker("importWebLabSubmissions", [
-      assignmentVersionId,
-      file,
-    ]);
+    startWorker("importWebLabSubmissions", [assignmentVersionId, file]);
   }
 };
 

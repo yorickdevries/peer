@@ -551,7 +551,9 @@ router.post(
       return;
     }
 
-    const assignmentVersion = await AssignmentVersion.findOne(req.body.assignmentVersionId);
+    const assignmentVersion = await AssignmentVersion.findOne(
+      req.body.assignmentVersionId
+    );
     if (!assignmentVersion) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -575,9 +577,7 @@ router.post(
       return;
     }
     if (assignment.enrollable) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is enrollable");
+      res.status(HttpStatusCode.FORBIDDEN).send("The assignment is enrollable");
       return;
     }
     if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
