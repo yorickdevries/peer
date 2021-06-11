@@ -125,8 +125,8 @@
                             If you have already uploaded a file, it will not be used for reviewing anymore!
                         </b-alert>
                         <b-alert show variant="warning">
-                            Please make sure you haven't included personal information anywhere (unless specifically
-                            mentioned otherwise)!
+                            Please make sure you have not included personal information anywhere unless specifically
+                            mentioned otherwise!
                         </b-alert>
                         <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
                         <b-alert show variant="secondary"
