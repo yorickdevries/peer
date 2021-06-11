@@ -5,30 +5,19 @@
                 v-for="(line, index) in content"
                 :key="index + 'code'"
             >
-                <div class="position-relative d-flex" style="align-items: stretch">
-                    <div class="gutter sticky-left" :style="{ 'margin-right': gutterMarginRight }">
+                <div class="position-relative d-flex">
+                    <div class="gutter sticky-left">
                         <code
                             class="code-annotations-linenr"
                             :style="{
                                 width: `${maxLineNumberDigits}ch`
                             }"
                         >{{ index + 1 }}</code>
-                        <div
-                            class="review-bar"
-                            :style="{
-                                'margin-left': reviewBarMarginSides,
-                                'margin-right': reviewBarMarginSides,
-                                'padding-left': reviewBarPaddingLeft
-                            }"
-                        >
+                        <div class="review-bar">
                             <span
                                 v-for="review in reviewsInFile"
                                 :key="index + 'review_' + review"
                                 :style="{
-                                    width: '0px',
-                                    'margin-right': reviewBarSpanMarginRight,
-                                    'border-left-width': reviewBarSpanWidth,
-                                    'border-left-style': 'solid',
                                     'border-left-color': filterAnnotationsAt(index, false, false, review).length > 0
                                         ? reviewColors[review]
                                         : 'transparent'
@@ -75,29 +64,18 @@
                         width: $refs.container ? `${$refs.container.clientWidth}px` : `auto`
                     }"
                 >
-                    <div class="gutter" :style="{ 'margin-right': gutterMarginRight }">
+                    <div class="gutter">
                         <code
                             class="code-annotations-linenr"
                             :style="{
                                 width: `${maxLineNumberDigits}ch`
                             }"
                         ></code>
-                        <div
-                            class="review-bar"
-                            :style="{
-                                'margin-left': reviewBarMarginSides,
-                                'margin-right': reviewBarMarginSides,
-                                'padding-left': reviewBarPaddingLeft
-                            }"
-                        >
+                        <div class="review-bar">
                             <span
                                 v-for="review in reviewsInFile"
                                 :key="index + 'review_' + review"
                                 :style="{
-                                    width: '0px',
-                                    'margin-right': reviewBarSpanMarginRight,
-                                    'border-left-width': reviewBarSpanWidth,
-                                    'border-left-style': 'solid',
                                     'border-left-color': review === annotation.reviewId
                                         ? reviewColors[review]
                                         : 'transparent'
@@ -108,7 +86,7 @@
                     <b-collapse
                         v-model="annotationState[annotation.id]"
                     >
-                        <b-card style="display: inline-block">
+                        <b-card>
                             <div v-if="editingAnnotation !== null && editingAnnotation.endLineNumber === index + 1">
                                 <PeerTextarea
                                     placeholder="Type your annotation"
@@ -330,21 +308,6 @@ export default {
         },
         maxLineNumberDigits() {
             return Math.ceil(Math.log(this.content.length + 1) / Math.log(10))
-        },
-        reviewBarSpanWidth() {
-            return "0.375ch"
-        },
-        reviewBarSpanMarginRight() {
-            return "0.5ch"
-        },
-        reviewBarPaddingLeft() {
-            return "0.5ch"
-        },
-        reviewBarMarginSides() {
-            return "0.5ch"
-        },
-        gutterMarginRight() {
-            return "1ch"
         }
     }
 }
@@ -420,10 +383,15 @@ pre {
             }
 
             &.annotation,
+            &.selection,
+            &.code-annotations-code {
+                padding-right: 7ch;
+            }
+
+            &.annotation,
             &.selection {
                 background-color: $code-annotation-background;
                 margin-right: 1ch;
-                padding-right: 7ch;
             }
 
             &.annotation_start,
@@ -477,10 +445,6 @@ pre {
                 display: inline-block;
                 text-align: right;
             }
-
-            &.code-annotations-code {
-                padding-right: 7ch;
-            }
         }
 
         .fa-icon {
@@ -512,13 +476,20 @@ pre {
     user-select: none;
     box-sizing: content-box;
     font-family: var(--font-family-monospace);
+    margin-right: 1ch;
 
     .review-bar {
         font-family: inherit !important;
         display: flex;
         align-items: stretch;
+        margin: 0 0.5ch;
+        padding-left: 0.5ch;
 
         span {
+            width: 0px;
+            border-left-width: 0.4ch;
+            border-left-style: solid;
+            margin-right: 0.5ch;
             box-sizing: content-box;
             font-family: inherit !important;
         }
@@ -527,7 +498,6 @@ pre {
 
 .annotation-container {
     display: flex;
-    width: 50vw;
 
     .collapse {
         font-family: var(--font-family-monospace);
