@@ -6,6 +6,7 @@
             :submissionId="submissionId"
             :readOnly="readOnly"
             :reviewColors="reviewColors || defaultReviewColor"
+            :ignoreAnnotations="ignoreAnnotations"
         />
         <CodeWrapper
             v-else-if="renderAs === 'code'"

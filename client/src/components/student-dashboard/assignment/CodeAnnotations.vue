@@ -40,6 +40,11 @@
                         v-if="!hasAnnotationsAt(index)"
                         :linenr="index + 1"
                         class="code-annotations-code"
+                        :class="{
+                            selection: hasSelectionAt(index),
+                            selection_start: hasSelectionStartingAt(index),
+                            selection_end: hasSelectionEndingAt(index)
+                        }"
                         v-html="line.replace(/^$/, '<br />')"
                     ></code><code
                         v-else
@@ -162,7 +167,17 @@ import "highlight.js/styles/atom-one-light.css"
 import notifications from "../../../mixins/notifications"
 
 export default {
-    props: ["content", "annotations", "language", "maxAnnotationLength", "selectedFile", "readOnly", "reviewColors"],
+    props: [
+        "annotations",
+        "content",
+        "language",
+        "maxAnnotationLength",
+        "readOnly",
+        "reviewColors",
+        "selectedFile",
+        "selectionStart",
+        "selectionEnd"
+    ],
     mixins: [notifications],
     data() {
         return {
@@ -181,17 +196,26 @@ export default {
         hasAnnotationsAt(lineIndex) {
             return this.getAnnotationsAt(lineIndex).length > 0
         },
+        hasSelectionAt(lineIndex) {
+            return lineIndex + 1 >= this.selectionStart && lineIndex + 1 <= this.selectionEnd
+        },
         getAnnotationsStartingAt(lineIndex) {
             return this.filterAnnotationsAt(lineIndex, true, false, -1)
         },
         hasAnnotationsStartingAt(lineIndex) {
             return this.getAnnotationsStartingAt(lineIndex).length > 0
         },
+        hasSelectionStartingAt(lineIndex) {
+            return lineIndex + 1 === this.selectionStart
+        },
         getAnnotationsEndingAt(lineIndex) {
             return this.filterAnnotationsAt(lineIndex, false, true, -1)
         },
         hasAnnotationsEndingAt(lineIndex) {
             return this.getAnnotationsEndingAt(lineIndex).length > 0
+        },
+        hasSelectionEndingAt(lineIndex) {
+            return lineIndex + 1 === this.selectionEnd
         },
         filterAnnotationsAt(lineIndex, startsAt = false, endsAt = false, reviewId = -1) {
             return this.getAnnotationsAt(lineIndex).filter(annotation => {
@@ -395,22 +419,53 @@ pre {
                 }
             }
 
-            &.annotation {
-                border-left: 1.5px solid var(--gray);
-                border-right: 1.5px solid var(--gray);
+            &.annotation,
+            &.selection {
                 background-color: $code-annotation-background;
                 margin-right: 1ch;
                 padding-right: 7ch;
             }
 
+            &.annotation_start,
+            &.annotation,
+            &.annotation_end,
+            &.selection {
+                border-width: 1.5px;
+                border-color: var(--gray);
+            }
+
+            &.annotation {
+                border-style: none solid none solid;
+            }
+
+            &.selection {
+                border-style: none dashed none dashed;
+            }
+
             &.annotation_start {
-                border-top: 1.5px solid var(--gray);
+                border-top-style: solid;
+            }
+
+            &.selection_start {
+                border-top-style: dashed;
+            }
+
+            &.annotation_end {
+                border-bottom-style: solid;
+            }
+
+            &.selection_end {
+                border-bottom-style: dashed;
+            }
+
+            &.annotation_start,
+            &.selection_start {
                 border-top-left-radius: 3px;
                 border-top-right-radius: 3px;
             }
 
-            &.annotation_end {
-                border-bottom: 1.5px solid var(--gray);
+            &.annotation_end,
+            &.selection_end {
                 border-bottom-left-radius: 3px;
                 border-bottom-right-radius: 3px;
             }
