@@ -121,8 +121,11 @@
                         Assignment version:
                         <b-badge pill>{{ assignmentVersion.name }} (ID: {{ assignmentVersion.id }})</b-badge>
                         <hr />
-                        <b-alert show variant="warning"
-                            >If you have already uploaded a file, it will not be used for reviewing anymore!
+                        <b-alert show variant="warning">
+                            If you have already uploaded a file, it will not be used for reviewing anymore!
+                        </b-alert>
+                        <b-alert show variant="warning">
+                            Please make sure you haven't included personal information anywhere (including file names)!
                         </b-alert>
                         <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
                         <b-alert show variant="secondary"
