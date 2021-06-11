@@ -96,6 +96,10 @@
                         >You have not yet made a submission for this assignment version</b-alert
                     >
                     <b-alert show variant="warning">Maximum file size for submission: 50MB</b-alert>
+                    <b-alert show variant="danger">
+                        You should never include any personal information in your submission files unless specifically
+                        mentioned otherwise!
+                    </b-alert>
 
                     <!-- Modal Button -->
                     <b-button
@@ -117,8 +121,12 @@
                         Assignment version:
                         <b-badge pill>{{ assignmentVersion.name }} (ID: {{ assignmentVersion.id }})</b-badge>
                         <hr />
-                        <b-alert show variant="warning"
-                            >If you have already uploaded a file, it will not be used for reviewing anymore!
+                        <b-alert show variant="warning">
+                            If you have already uploaded a file, it will not be used for reviewing anymore!
+                        </b-alert>
+                        <b-alert show variant="warning">
+                            Please make sure you have not included personal information anywhere unless specifically
+                            mentioned otherwise!
                         </b-alert>
                         <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
                         <b-alert show variant="secondary"
