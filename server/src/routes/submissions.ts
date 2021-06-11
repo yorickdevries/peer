@@ -586,6 +586,20 @@ router.post(
         .send("The submission state has passed");
       return;
     }
+    const groups = await assignment.getGroups();
+    if (groups.length > 0) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("There are already groups for this assignment");
+      return;
+    }
+    const submissions = await assignmentVersion.getSubmissions();
+    if (submissions.length > 0) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("There are already submissions for this assignment");
+      return;
+    }
 
     // offload a function to a worker
     startImportWebLabSubmissionsWorker(assignmentVersion.id, req.file);
