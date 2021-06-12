@@ -351,6 +351,8 @@ router.get("/:id/filemetadata", validateParams(idSchema), async (req, res) => {
     assignment.isAtState(AssignmentState.FEEDBACK) &&
     review.submitted
   ) {
+    // Use the same anonymous filename used in its review stage
+    file.name = file.getAnonymousFileName();
     res.send(file);
     return;
   }
