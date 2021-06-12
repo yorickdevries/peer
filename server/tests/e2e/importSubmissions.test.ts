@@ -127,7 +127,9 @@ describe("Submission import", () => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const assignmentVersion = (await AssignmentVersion.findOne(assignmentVersionId))!;
+    const assignmentVersion = (await AssignmentVersion.findOne(
+      assignmentVersionId
+    ))!;
     const submissions = await assignmentVersion.getSubmissions();
     expect(submissions.length).toBe(submissionCount);
     for (const submission of submissions) {
@@ -158,7 +160,9 @@ describe("Submission import", () => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const assignmentVersion = (await AssignmentVersion.findOne(assignmentVersionId))!;
+    const assignmentVersion = (await AssignmentVersion.findOne(
+      assignmentVersionId
+    ))!;
     const submissions = await assignmentVersion.getSubmissions();
     expect(submissions.length).toBe(0);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -174,7 +178,7 @@ describe("Submission import", () => {
       .send({
         name: "group",
         assignmentId: assignmentId,
-    });
+      });
     const group = JSON.parse(res1.text);
 
     await request(server)
@@ -198,21 +202,25 @@ describe("Submission import", () => {
       .send({
         name: "group",
         assignmentId: assignmentId,
-    });
+      });
     const group = JSON.parse(res1.text);
 
     await request(server)
       .post(`/api/groups/${group.id}/adduser`)
       .set("cookie", teacherCookie)
       .field("userNetid", "mrstudent0");
-    
-    const studentCookie = await mockLoginCookie(server, "mrstudent0", "student");
+
+    const studentCookie = await mockLoginCookie(
+      server,
+      "mrstudent0",
+      "student"
+    );
     await request(server)
       .post("/api/submissions")
       .set("cookie", studentCookie)
       .attach("file", exampleFile, "")
       .field("groupId", group.id)
-      .field("assignmentVersionId", assignmentVersionId)
+      .field("assignmentVersionId", assignmentVersionId);
 
     const res = await request(server)
       .post("/api/submissions/import")
@@ -261,6 +269,37 @@ describe("Submission import", () => {
       teacherCookie,
       AssignmentType.CODE,
       ".zip"
+    );
+    const assignment = JSON.parse(res2.text);
+
+    // create an assignment version
+    const res3 = await request(server)
+      .post("/api/assignmentversions/")
+      .send({
+        name: "default",
+        assignmentId: assignment.id,
+        reviewsPerUserPerAssignmentVersionToReview: 1,
+      })
+      .set("cookie", teacherCookie);
+    const assignmentVersion = JSON.parse(res3.text);
+
+    const res = await request(server)
+      .post("/api/submissions/import")
+      .set("cookie", teacherCookie)
+      .attach("file", exampleFile, "weblab.zip")
+      .field("assignmentVersionId", assignmentVersion.id);
+
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+  });
+
+  test("import submissions to assignment without .zip submission extensions", async () => {
+    const res2 = await createAssignmentRequest(
+      server,
+      courseId,
+      teacherCookie,
+      AssignmentType.CODE,
+      ".c",
+      false
     );
     const assignment = JSON.parse(res2.text);
 

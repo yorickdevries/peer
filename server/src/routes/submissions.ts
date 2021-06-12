@@ -586,6 +586,12 @@ router.post(
         .send("The submission state has passed");
       return;
     }
+    if (!assignment.submissionExtensions.includes(".zip")) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment must allow .zip submissions");
+      return;
+    }
     const groups = await assignment.getGroups();
     if (groups.length > 0) {
       res
