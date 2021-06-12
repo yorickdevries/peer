@@ -29,6 +29,12 @@ describe("Submission import", () => {
   const submissionCount = 10;
 
   beforeAll(async () => {
+    // this file has the following structure
+    // assignment
+    // - submissions
+    //   for n from 0 to 9
+    //   - 100000n_Mr_Student
+    //     - main.c
     const filePath = path.resolve(
       __dirname,
       "../../exampleData/submissionImports/weblab.zip"
