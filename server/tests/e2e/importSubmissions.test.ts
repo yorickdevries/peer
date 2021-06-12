@@ -14,6 +14,7 @@ import User from "../../src/models/User";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import Enrollment from "../../src/models/Enrollment";
 import UserRole from "../../src/enum/UserRole";
+import Assignment from "../../src/models/Assignment";
 
 describe("Submission import", () => {
   // will be initialized and closed in beforeEach / afterEach
@@ -21,6 +22,8 @@ describe("Submission import", () => {
   let server: http.Server;
   let teacherCookie: string;
   let assignmentVersionId: number;
+  let assignmentId: number;
+  let courseId: number;
   let exampleFile: Buffer;
 
   const submissionCount = 10;
@@ -54,6 +57,7 @@ describe("Submission import", () => {
       })
       .set("cookie", teacherCookie);
     const course = JSON.parse(res1.text);
+    courseId = course.id;
 
     // create an assignment
     const res2 = await createAssignmentRequest(
@@ -65,6 +69,7 @@ describe("Submission import", () => {
       false
     );
     const assignment = JSON.parse(res2.text);
+    assignmentId = assignment.id;
 
     // create an assignment version
     const res3 = await request(server)
@@ -80,7 +85,7 @@ describe("Submission import", () => {
 
     for (let i = 0; i < submissionCount; i++) {
       const netid = `mrstudent${i}`;
-      const user = new User(
+      const user = await new User(
         netid,
         undefined,
         undefined,
@@ -91,8 +96,7 @@ describe("Submission import", () => {
         "Student",
         null,
         null
-      );
-      await user.save();
+      ).save();
       // enroll user in course
       await new Enrollment(user, course, UserRole.STUDENT).save();
     }
@@ -126,5 +130,151 @@ describe("Submission import", () => {
       expect(user.studentNumber).toBeLessThan(1000000 + submissionCount);
       await submission.validateOrReject();
     }
-  })
+  });
+
+  test("import submissions from empty zip", async () => {
+    const filePath = path.resolve(
+      __dirname,
+      "../../exampleData/submissions/empty.zip"
+    );
+
+    const emptyFile = fs.readFileSync(filePath);
+
+    const res = await request(server)
+      .post("/api/submissions/import")
+      .set("cookie", teacherCookie)
+      .attach("file", emptyFile, "weblab.zip")
+      .field("assignmentVersionId", assignmentVersionId);
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // timeout needs te be set as submission import is asynchronous
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const assignmentVersion = (await AssignmentVersion.findOne(assignmentVersionId))!;
+    const submissions = await assignmentVersion.getSubmissions();
+    expect(submissions.length).toBe(0);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const assignment = (await Assignment.findOne(assignmentId))!;
+    const groups = await assignment.getGroups();
+    expect(groups.length).toBe(0);
+  });
+
+  test("import submissions with existing groups", async () => {
+    const res1 = await request(server)
+      .post("/api/groups/")
+      .set("cookie", teacherCookie)
+      .send({
+        name: "group",
+        assignmentId: assignmentId,
+    });
+    const group = JSON.parse(res1.text);
+
+    await request(server)
+      .post(`/api/groups/${group.id}/adduser`)
+      .set("cookie", teacherCookie)
+      .field("userNetid", "mrstudent0");
+
+    const res2 = await request(server)
+      .post("/api/submissions/import")
+      .set("cookie", teacherCookie)
+      .attach("file", exampleFile, "weblab.zip")
+      .field("assignmentVersionId", assignmentVersionId);
+
+    expect(res2.status).toBe(HttpStatusCode.FORBIDDEN);
+  });
+
+  test("import submissions with existing submission", async () => {
+    const res1 = await request(server)
+      .post("/api/groups/")
+      .set("cookie", teacherCookie)
+      .send({
+        name: "group",
+        assignmentId: assignmentId,
+    });
+    const group = JSON.parse(res1.text);
+
+    await request(server)
+      .post(`/api/groups/${group.id}/adduser`)
+      .set("cookie", teacherCookie)
+      .field("userNetid", "mrstudent0");
+    
+    const studentCookie = await mockLoginCookie(server, "mrstudent0", "student");
+    await request(server)
+      .post("/api/submissions")
+      .set("cookie", studentCookie)
+      .attach("file", exampleFile, "")
+      .field("groupId", group.id)
+      .field("assignmentVersionId", assignmentVersionId)
+
+    const res = await request(server)
+      .post("/api/submissions/import")
+      .set("cookie", teacherCookie)
+      .attach("file", exampleFile, "weblab.zip")
+      .field("assignmentVersionId", assignmentVersionId);
+
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+  });
+
+  test("import submissions to document assignment", async () => {
+    const res2 = await createAssignmentRequest(
+      server,
+      courseId,
+      teacherCookie,
+      AssignmentType.DOCUMENT,
+      ".zip",
+      false
+    );
+    const assignment = JSON.parse(res2.text);
+
+    // create an assignment version
+    const res3 = await request(server)
+      .post("/api/assignmentversions/")
+      .send({
+        name: "default",
+        assignmentId: assignment.id,
+        reviewsPerUserPerAssignmentVersionToReview: 1,
+      })
+      .set("cookie", teacherCookie);
+    const assignmentVersion = JSON.parse(res3.text);
+
+    const res = await request(server)
+      .post("/api/submissions/import")
+      .set("cookie", teacherCookie)
+      .attach("file", exampleFile, "weblab.zip")
+      .field("assignmentVersionId", assignmentVersion.id);
+
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+  });
+
+  test("import submissions to enrollable assignment", async () => {
+    const res2 = await createAssignmentRequest(
+      server,
+      courseId,
+      teacherCookie,
+      AssignmentType.CODE,
+      ".zip"
+    );
+    const assignment = JSON.parse(res2.text);
+
+    // create an assignment version
+    const res3 = await request(server)
+      .post("/api/assignmentversions/")
+      .send({
+        name: "default",
+        assignmentId: assignment.id,
+        reviewsPerUserPerAssignmentVersionToReview: 1,
+      })
+      .set("cookie", teacherCookie);
+    const assignmentVersion = JSON.parse(res3.text);
+
+    const res = await request(server)
+      .post("/api/submissions/import")
+      .set("cookie", teacherCookie)
+      .attach("file", exampleFile, "weblab.zip")
+      .field("assignmentVersionId", assignmentVersion.id);
+
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+  });
 });
