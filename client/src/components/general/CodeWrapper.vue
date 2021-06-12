@@ -6,26 +6,26 @@
         <b-alert v-else-if="reviewSubmitted" show variant="warning">
             The review is submitted, so annotations cannot be added, removed or edited.
         </b-alert>
+        <b-alert v-if="!selected" show variant="primary">
+            The selected file cannot be displayed.
+        </b-alert>
+        <b-alert v-else-if="!content || content.length === 0" show variant="primary">
+            The selected file is empty.
+        </b-alert>
         <div
             v-bind:style="{
                 position: 'relative',
                 overflow: 'hidden'
             }"
         >
-            <b-row>
-                <b-alert variant="primary" show v-if="!content || content.length === 0">
-                    This file is empty
-                </b-alert>
-            </b-row>
-            <b-row>
-                <b-col md="auto">
+            <b-row v-if="files.length > 0">
+                <b-col v-if="files.length > 1" md="auto">
                     <FileTree
                         class="h-100"
                         @selected="onSelect"
                         :annotatedFiles="annotatedFiles"
                         :files="files"
                         :selectedFile="selected"
-                        :startCollapsed="singleFile"
                     />
                 </b-col>
                 <b-col>
@@ -43,7 +43,7 @@
                         <template #overlay>
                             <b-spinner v-if="!showFile" variant="primary"></b-spinner>
                             <div v-else-if="showWarning" class="text-center">
-                                <p>This file contains characters that can not be displayed properly</p>
+                                <p>This file contains characters that might not be displayed properly</p>
                                 <b-button variant="outline-primary" @click="showWarning = false">Show anyway</b-button>
                             </div>
                         </template>
@@ -190,7 +190,15 @@ export default {
                             .filter(file => file)
                     )
                 })
-                .then(files => (this.files = files))
+                .then(files => {
+                    this.files = files
+                    for (const file of this.files) {
+                        if (!file.dir) {
+                            this.onSelect(file.name)
+                            break
+                        }
+                    }
+                })
         },
         async getSingleFileName() {
             return new Promise((resolve, reject) => {
@@ -229,9 +237,6 @@ export default {
         }
     },
     computed: {
-        singleFile() {
-            return this.files && this.files.length <= 1
-        },
         annotatedFiles() {
             return new Set(this.annotations.map(annotation => annotation.selectedFile))
         },
