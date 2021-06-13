@@ -19,7 +19,7 @@
             }"
         >
             <b-row v-if="files.length > 0">
-                <b-col v-if="files.length > 1" md="auto">
+                <b-col v-if="!isOnlyFile" md="auto">
                     <FileTree
                         class="h-100"
                         @selected="onSelect"
@@ -38,6 +38,7 @@
                         :readOnly="readOnly"
                         :review="review"
                         :reviewColors="reviewColors"
+                        :isOnlyFile="isOnlyFile"
                     />
                     <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
                         <template #overlay>
@@ -242,6 +243,9 @@ export default {
         },
         reviewSubmitted() {
             return this.review && this.review.submitted
+        },
+        isOnlyFile() {
+            return this.files.length == 1
         }
     }
 }
