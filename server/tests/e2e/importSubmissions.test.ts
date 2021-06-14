@@ -171,6 +171,36 @@ describe("Submission import", () => {
     expect(groups.length).toBe(0);
   });
 
+  test("import submissions from weblab export with missing student", async () => {
+    const netid = "mrstudent9";
+    await connection.manager.delete(Enrollment, { userNetid: netid });
+    await connection.manager.delete(User, { netid });
+
+    const res = await request(server)
+      .post("/api/submissions/import")
+      .set("cookie", teacherCookie)
+      .attach("file", exampleFile, "weblab.zip")
+      .field("assignmentVersionId", assignmentVersionId);
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // timeout needs te be set as submission import is asynchronous
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const assignmentVersion = (await AssignmentVersion.findOne(
+      assignmentVersionId
+    ))!;
+    const submissions = await assignmentVersion.getSubmissions();
+    expect(submissions.length).toBe(submissionCount - 1);
+    for (const submission of submissions) {
+      const user = await submission.getUser();
+      expect(user.studentNumber).toBeGreaterThanOrEqual(1000000);
+      expect(user.studentNumber).toBeLessThan(1000000 + submissionCount - 1);
+      await submission.validateOrReject();
+    }
+  });
+
   test("import submissions with existing groups", async () => {
     const res1 = await request(server)
       .post("/api/groups/")

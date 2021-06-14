@@ -9,6 +9,7 @@ import User from "../models/User";
 import File from "../models/File";
 import config from "config";
 import path from "path";
+import { sendMailToTeachersOfAssignment } from "../util/mailer";
 
 // config value
 const uploadFolder = config.get("uploadFolder") as string;
@@ -22,11 +23,14 @@ const importWebLabSubmissions = async function (
   const assignmentVersion = await AssignmentVersion.findOne(
     assignmentVersionId
   );
+  // this should realistically never happen
   if (!assignmentVersion) {
     throw new Error("Invalid assignment version");
   }
   const assignment = await assignmentVersion.getAssignment();
   const submissions: Map<string, { file: File; buffer: Buffer }> = new Map();
+  const names: Map<string, string> = new Map();
+  const invalidSubmissions: Array<string> = [];
 
   const course = await assignment.getCourse();
 
@@ -53,13 +57,17 @@ const importWebLabSubmissions = async function (
     const rawSubmissions: Map<string, Array<JSZip.JSZipObject>> = new Map();
     for (const file of files) {
       const userString = userRegex.exec(file.name);
-      if (!userString) {
+      if (!userString || !userString[1]) {
+        invalidSubmissions.push(file.name);
         continue;
       }
-      const studentNumber = userString[1].substring(
-        0,
-        userString[1].indexOf("_")
-      );
+      const info = userString[1].split("_");
+      const studentNumber = info.shift();
+      if (!studentNumber) {
+        invalidSubmissions.push(file.name);
+        continue;
+      }
+      names.set(studentNumber, info.join(" "));
       const files = rawSubmissions.get(studentNumber) ?? [];
       files.push(file);
       rawSubmissions.set(studentNumber, files);
@@ -85,12 +93,18 @@ const importWebLabSubmissions = async function (
       submissions.set(studentNumber, { file, buffer });
     }
   } catch (error) {
-    throw new Error(error);
+    await sendMailToTeachersOfAssignment(
+      "Error while importing submissions from WebLab",
+      `The imported zip file is invalid and no submissions were imported, error message:\n${error}`,
+      assignment
+    );
   }
 
+  const skippedStudents: Array<string> = [];
   await getManager().transaction(
     "SERIALIZABLE", // serializable is the only way to make sure groups and submissions exist before import
     async (transactionalEntityManager) => {
+      // groups and submissions should only rarely exist if groups or submissions were created during the processing of the zip file
       const existingGroups = await transactionalEntityManager
         .createQueryBuilder(Group, "group")
         .leftJoin("group.assignments", "assignment")
@@ -112,9 +126,15 @@ const importWebLabSubmissions = async function (
 
       for (const [studentNumber, { file, buffer }] of submissions) {
         // get user from directory names
-        const user = await transactionalEntityManager.findOneOrFail(User, {
+        const user = await transactionalEntityManager.findOne(User, {
           studentNumber: parseInt(studentNumber),
         });
+
+        // skip the user if they do not exist in the database
+        if (!user) {
+          skippedStudents.push(studentNumber);
+          continue;
+        }
 
         // make the group
         const group = new Group(user.netid, course, [user], [assignment]);
@@ -144,6 +164,29 @@ const importWebLabSubmissions = async function (
       }
     }
   );
+
+  const errors: Array<string> = [];
+  if (invalidSubmissions.length > 0) {
+    errors.push(
+      `The following submission folders were invalid:\n` +
+        `${invalidSubmissions.join("\n")}`
+    );
+  }
+  if (skippedStudents.length > 0) {
+    errors.push(
+      `The following students were not in the database:\n` +
+        `${skippedStudents.map((s) => `${names.get(s)} (${s})`).join("\n")}`
+    );
+  }
+
+  if (errors.length > 0) {
+    await sendMailToTeachersOfAssignment(
+      "Warning while importing submissions from WebLab",
+      `The submissions were imported from WebLab, however the following errors occurred.\n` +
+        `${errors.join("\n\n")}`,
+      assignment
+    );
+  }
 
   return `Submissions imported for assignmentVersion ${assignmentVersion.id}`;
 };
