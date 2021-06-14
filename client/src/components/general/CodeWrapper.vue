@@ -162,18 +162,24 @@ export default {
             return lines
         },
         async highlightContent(text) {
-            const fileExtension = this.selected.split(".").pop()
-            let highlighted
-
-            if (hljs.getLanguage(fileExtension)) {
-                highlighted = hljs.highlight(text, { language: fileExtension, ignoreIllegals: true })
+            if (text.length === 0) {
+                this.content = []
             } else {
-                highlighted = hljs.highlightAuto(text)
+                const fileExtension = this.selected.split(".").pop()
+                let highlighted
+
+                if (hljs.getLanguage(fileExtension)) {
+                    highlighted = hljs.highlight(text, { language: fileExtension, ignoreIllegals: true })
+                } else {
+                    highlighted = hljs.highlightAuto(text)
+                }
+
+                this.content = this.fixMultiLineHighlighting(highlighted.value.split(/\r?\n/g))
+                this.language = highlighted.language
             }
 
-            this.content = this.fixMultiLineHighlighting(highlighted.value.split(/\r?\n/g))
-            this.language = highlighted.language
             this.showFile = true
+ 
         },
         async verifyTextContent(text) {
             // A regular expression to match any `Special` characters
