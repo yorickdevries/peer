@@ -45,6 +45,7 @@
                 :reviewColors="reviewColors"
                 :selectionStart="startLineNumber"
                 :selectionEnd="endLineNumber"
+                tabindex="0"
             />
         </b-card>
     </div>

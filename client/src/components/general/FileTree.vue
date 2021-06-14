@@ -1,6 +1,13 @@
 <template>
     <b-card class="filetree" no-body>
-        <b-card-header role="button" @click="toggleCollapse" :class="{ 'header-collapse': collapsed }">
+        <b-card-header
+            role="button"
+            @click="toggleCollapse"
+            :class="{ 'header-collapse': collapsed }"
+            tabindex="0"
+            @keydown.enter.space="toggleCollapse"
+            @keydown.space.prevent
+        >
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" />
             <transition name="fade"> <span v-if="!collapsed">Files</span> </transition>
         </b-card-header>

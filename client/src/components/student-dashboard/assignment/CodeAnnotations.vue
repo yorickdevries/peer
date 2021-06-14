@@ -53,7 +53,10 @@
                         :class="{ rotate: getAnnotationsStartingAt(index).every(annotation => annotationState[annotation.id] === true) }"
                         role="button"
                         name="chevron-down"
+                        tabindex="0"
                         @click.native="toggleAnnotationsAt(index)"
+                        @keydown.native.enter.space="toggleAnnotationsAt(index)"
+                        @keydown.native.space.prevent
                     />
                 </div>
                 <div 
@@ -105,8 +108,11 @@
                                         name="pen"
                                         class="mx-1 text-primary"
                                         role="button" 
-                                        @click.native="editAnnotation(annotation)"
                                         v-b-modal="`editModal_${annotation.id}`"
+                                        @click.native="editAnnotation(annotation)"
+                                        tabindex="0"
+                                        v-on:keydown.native.enter.space="editAnnotation(annotation)"
+                                        @keydown.native.space.prevent
                                     />
                                     <b-modal 
                                         :id="`editModal_${annotation.id}`" 
@@ -121,7 +127,9 @@
                                         name="trash"
                                         class="text-danger"
                                         role="button"
+                                        @keydown.native.space.prevent
                                         v-b-modal="`modal_${annotation.id}`"
+                                        tabindex="0"
                                     />
                                     <b-modal
                                         @ok="deleteAnnotation(annotation)"

@@ -1,11 +1,27 @@
 <template>
     <div>
-        <div v-if="dir" class="dir" v-on:click="notifyCollapsing" role="button">
+        <div
+            v-if="dir"
+            class="dir"
+            v-on:click="notifyCollapsing"
+            v-on:keydown.enter.space="notifyCollapsing"
+            @keydown.space.prevent
+            role="button"
+            tabindex="0"
+        >
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" role="button" />
             <icon class="text-muted" name="folder"></icon>
             <span>{{ name }}</span>
         </div>
-        <div v-else @click="onSelect" :class="{ selected, file: true }" role="button">
+        <div
+            v-else
+            v-on:click="onSelect"
+            v-on:keydown.enter.space="onSelect"
+            @keydown.space.prevent
+            :class="{ selected, file: true }"
+            role="button"
+            tabindex="0"
+        >
             <div>
                 <icon name="code"></icon>
                 <span>{{ name }}</span>
