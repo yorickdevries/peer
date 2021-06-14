@@ -143,6 +143,7 @@
 import hljs from "highlight.js"
 import "highlight.js/styles/atom-one-light.css"
 import notifications from "../../../mixins/notifications"
+import PeerTextarea from "./PeerTextarea"
 
 export default {
     props: [
@@ -156,6 +157,7 @@ export default {
         "selectionStart",
         "selectionEnd"
     ],
+    components: { PeerTextarea },
     mixins: [notifications],
     data() {
         return {
