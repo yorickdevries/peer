@@ -355,7 +355,7 @@ pre {
     width: 100%;
     background-color: white;
     margin: 0;
-    max-height: 80vh;
+    max-height: 100%;
     font-size: 87.5%;
 
     .code-annotations-wrapper {
