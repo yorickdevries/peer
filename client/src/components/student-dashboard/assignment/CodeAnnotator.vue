@@ -1,14 +1,25 @@
 <template>
-    <div class="d-flex flex-column">
+    <div class="d-flex flex-column" @mouseup="onMouseUp">
         <b-alert :show="!showCode" variant="primary">LOADING {{ review ? "REVIEW" : "SUBMISSION" }}</b-alert>
 
         <!-- The buttons and text area for the actual annotations, somewhat primitive -->
         <!-- Only show annotation buttons if this component is inside a non-submitted review -->
         <div v-if="!readOnly && !reviewSubmitted" class="mb-3">
             <form v-if="!writing" @submit.prevent="writeAnnotation" class="annotation-form">
-                <b-button type="submit" variant="primary">
-                    Leave an annotation on the selected code
-                </b-button>
+                <!-- TODO: beautify these input fields -->
+                <b-form-input
+                    :type="number"
+                    placeholder="Starting line number"
+                    v-model="startLineNumber"
+                    :state="validateLineNumbers()"
+                ></b-form-input>
+                <b-form-input
+                    :type="number"
+                    placeholder="Ending line number"
+                    v-model="endLineNumber"
+                    :state="validateLineNumbers()"
+                ></b-form-input>
+                <b-button type="submit" variant="primary"> Leave an annotation </b-button>
                 <b-alert variant="info" class="ml-3" show>
                     Select a piece of code with your cursor to leave an annotation
                 </b-alert>
@@ -65,7 +76,6 @@ export default {
         return {
             showCode: false,
             writing: false,
-            highlightedText: null,
             startLineNumber: null,
             endLineNumber: null,
             annotationText: "",
@@ -84,71 +94,29 @@ export default {
             this.maxAnnotationLength = res.data
         },
         async writeAnnotation() {
-            const selection = window.getSelection()
-            const selectedText = selection.toString()
-
-            // Do not update the state if nothing is selected
-            if (selectedText.length == 0) {
-                this.showErrorMessage({ message: "Please make sure to select a piece of code" })
-                return
-            }
-
-            // Get start line number by navigating to the code element which contains the line number
-            let startCodeElement = selection.getRangeAt(0).startContainer
-            while (startCodeElement != null && startCodeElement.nodeName != "CODE") {
-                startCodeElement = startCodeElement.parentElement
-            }
-            // Get end line number like the start line number
-            let endCodeElement = selection.getRangeAt(selection.rangeCount - 1).endContainer
-            while (endCodeElement != null && endCodeElement.nodeName != "CODE") {
-                endCodeElement = endCodeElement.parentElement
-            }
-
-            // If no code element is found for either the child or parent, the user is asked to
-            // confirm they have selected code
-            if (startCodeElement == null || endCodeElement == null) {
-                this.showErrorMessage({ message: "Please make sure to select a piece of code" })
-                return
-            }
-            this.startLineNumber = parseInt(startCodeElement.getAttribute("linenr"))
-            this.endLineNumber = parseInt(endCodeElement.getAttribute("linenr"))
-
-            // Swap startLineNumber and endLineNumber if startLineNumber is larger
-            if (this.startLineNumber > this.endLineNumber) {
-                let temp = this.startLineNumber
-                this.startLineNumber = this.endLineNumber
-                this.endLineNumber = temp
-            }
-
-            /* Check if the new annotation overlaps with an already made annotation in the same file. 
-            This is done by iterating over all stored annotations, then checking if the new annotation
-            is not either entirely before or after any of the stored and is in the same file.
-
-            Because startLineNumber is always smaller than endLineNumber, this is checked by: 
-            this.selectedFile === annotation.selectedFile &&
-            (!(this.startLineNumber > annotation.endLineNumber || this.endLineNumber < annotation.startLineNumber))
-
-            Applying DeMorgans law gives us:
-            this.selectedFile === annotation.selectedFile &&
-            (this.startLineNumber <= annotation.endLineNumber && this.endLineNumber >= annotation.startLineNumber)
-            
-            If at any time a clash occures, the user is shown an error message and is not allowed to write a annotation.*/
-            for (const annotation of this.annotations) {
-                if (
-                    this.selectedFile === annotation.selectedFile &&
-                    this.startLineNumber <= annotation.endLineNumber &&
-                    this.endLineNumber >= annotation.startLineNumber
-                ) {
-                    this.startLineNumber = null
-                    this.endLineNumber = null
-                    this.showErrorMessage({ message: "Please select lines not yet annotated" })
+            // Get the line numbers from the input areas if they arent empty
+            if (this.startLineNumber != "" && this.endLineNumber != "") {
+                if (!this.validateLineNumbers()) {
+                    this.showErrorMessage({
+                        message: "The inputted line numbers are not allowed"
+                    })
                     return
                 }
+            }
+            // If there is no selection and no numbers in the input areas show an error
+            else {
+                this.showErrorMessage({ message: "Please make sure to select a piece of code" })
+                return
+            }
+
+            if (!this.areLineNumbersAllowed()) {
+                this.startLineNumber = null
+                this.endLineNumber = null
+                this.showErrorMessage({ message: "Please select lines not yet annotated" })
             }
 
             // Update the current state and get highlighed text
             this.writing = true
-            this.highlightedText = selectedText
             this.highlightedFile = this.selectedFile
             window.getSelection().empty()
             this.$nextTick(() => this.$refs.textarea.$refs.textarea.focus())
@@ -173,15 +141,14 @@ export default {
             }
 
             // Reset the highlighted text, annotation text and line number
-            this.highlightedText = null
             this.startLineNumber = null
             this.endLineNumber = null
             this.highlightedFile = null
         },
         deleteSelection() {
-            this.highlightedText = null
             this.startLineNumber = null
             this.endLineNumber = null
+            this.highlightedFile = null
             this.writing = false
         },
         async onDeleteAnnotation(id) {
@@ -201,6 +168,84 @@ export default {
             this.annotations[index].annotationText = res.data.annotationText
             this.annotations.splice(index, 1, this.annotations[index])
             this.showSuccessMessage({ message: "Successfully updated annotation" })
+        },
+        validateLineNumbers() {
+            console.log(`startlinenumber: ${this.startLineNumber}`)
+            console.log(`endLinenumber: ${this.endLineNumber}`)
+            if (
+                !this.startLineNumber ||
+                this.startLineNumber === "" ||
+                !this.endLineNumber ||
+                this.endLineNumber === ""
+            ) {
+                return null
+            }
+            return (
+                this.endLineNumber < this.content.length + 1 &&
+                this.startLineNumber > 0 &&
+                this.startLineNumber <= this.endLineNumber &&
+                this.areLineNumbersAllowed()
+            )
+        },
+        onMouseUp() {
+            //TODO: not show selection when not allowed
+            const selection = window.getSelection()
+            const selectedText = selection.toString()
+
+            // Get the line numbers from the selection when the selection is not empty
+            if (selectedText.length != 0) {
+                // Get start line number by navigating to the code element which contains the line number
+                let startCodeElement = selection.getRangeAt(0).startContainer
+                while (startCodeElement != null && startCodeElement.nodeName != "CODE") {
+                    startCodeElement = startCodeElement.parentElement
+                }
+                // Get end line number like the start line number
+                let endCodeElement = selection.getRangeAt(selection.rangeCount - 1).endContainer
+                while (endCodeElement != null && endCodeElement.nodeName != "CODE") {
+                    endCodeElement = endCodeElement.parentElement
+                }
+
+                // If no code element is found for either the child or parent, the user is asked to
+                // confirm they have selected code
+                if (startCodeElement == null || endCodeElement == null) {
+                    this.showErrorMessage({ message: "Please make sure to select a piece of code" })
+                    return
+                }
+                this.startLineNumber = parseInt(startCodeElement.getAttribute("linenr"))
+                this.endLineNumber = parseInt(endCodeElement.getAttribute("linenr"))
+
+                // Swap startLineNumber and endLineNumber if startLineNumber is larger
+                if (this.startLineNumber > this.endLineNumber) {
+                    let temp = this.startLineNumber
+                    this.startLineNumber = this.endLineNumber
+                    this.endLineNumber = temp
+                }
+            }
+        },
+        areLineNumbersAllowed() {
+            /* Check if the new annotation overlaps with an already made annotation in the same file. 
+            This is done by iterating over all stored annotations, then checking if the new annotation
+            is not either entirely before or after any of the stored and is in the same file.
+
+            Because startLineNumber is always smaller than endLineNumber, this is checked by: 
+            this.selectedFile === annotation.selectedFile &&
+            (!(this.startLineNumber > annotation.endLineNumber || this.endLineNumber < annotation.startLineNumber))
+
+            Applying DeMorgans law gives us:
+            this.selectedFile === annotation.selectedFile &&
+            (this.startLineNumber <= annotation.endLineNumber && this.endLineNumber >= annotation.startLineNumber)
+            
+            If at any time a clash occures, the user is shown an error message and is not allowed to write a annotation.*/
+            for (const annotation of this.annotations) {
+                if (
+                    this.selectedFile === annotation.selectedFile &&
+                    this.startLineNumber <= annotation.endLineNumber &&
+                    this.endLineNumber >= annotation.startLineNumber
+                ) {
+                    return false
+                }
+            }
+            return true
         }
     },
     computed: {
