@@ -7,7 +7,8 @@
                 <li>The zip file should contain a folder called "submissions" containing all submissions</li>
                 <li>
                     Each submission should be in a separate folder named with the format
-                    "StudentNumber_FirstName_LastName"
+                    "StudentNumber_FirstName_LastName", where the student has to have logged in to Peer at least once
+                    for their submission to be imported
                 </li>
                 <li>The file should have the extension .zip</li>
                 <li>Max file size is 50MB</li>
