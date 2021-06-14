@@ -586,7 +586,7 @@ router.post(
         .send("The submission state has passed");
       return;
     }
-    if (!/.zip($|[\s,])/.test(assignment.submissionExtensions)) {
+    if (!/\.zip($|[\s,])/.test(assignment.submissionExtensions)) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The assignment must allow .zip submissions");
