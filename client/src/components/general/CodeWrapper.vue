@@ -179,7 +179,6 @@ export default {
             }
 
             this.showFile = true
- 
         },
         async verifyTextContent(text) {
             // A regular expression to match any `Special` characters
