@@ -7,14 +7,15 @@ export default async function createAssignmentRequest(
   courseId: number,
   sessionCookie: string,
   assignmentType?: string,
-  submissionExtensions?: string
+  submissionExtensions?: string,
+  enrollable?: boolean
 ): Promise<request.Response> {
   return await request(server)
     .post("/api/assignments")
     .set("cookie", sessionCookie)
     .field("name", "Example title")
     .field("courseId", courseId)
-    .field("enrollable", true)
+    .field("enrollable", enrollable ?? true)
     .field("reviewEvaluation", false)
     .field("publishDate", new Date("2020-06-23T10:00Z").toISOString())
     .field("dueDate", new Date("2020-06-24T10:00Z").toISOString())
