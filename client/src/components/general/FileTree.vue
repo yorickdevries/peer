@@ -109,6 +109,10 @@ export default {
 .fade-leave-to {
     opacity: 0;
 }
+
+.filetree {
+    max-height: 80vh;
+}
 </style>
 
 <style lang="scss">
