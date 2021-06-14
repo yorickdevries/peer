@@ -251,7 +251,7 @@ export default {
             return this.review && this.review.submitted
         },
         isOnlyFile() {
-            return this.files.length == 1
+            return this.files && this.files.length === 1
         }
     }
 }
