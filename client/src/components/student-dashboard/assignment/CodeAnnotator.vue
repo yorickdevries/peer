@@ -230,5 +230,9 @@ export default {
 #codeannotations-card {
     flex-grow: 1;
     overflow: hidden;
+
+    > .card-body {
+        overflow: auto;
+    }
 }
 </style>
