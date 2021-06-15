@@ -6,17 +6,15 @@
         <b-alert v-else-if="reviewSubmitted" show variant="warning">
             The review is submitted, so annotations cannot be added, removed or edited.
         </b-alert>
+        <b-alert variant="primary" show v-if="!content || content.length === 0">
+            This file is empty
+        </b-alert>
         <div
             v-bind:style="{
                 position: 'relative',
                 overflow: 'hidden'
             }"
         >
-            <b-row>
-                <b-alert variant="primary" show v-if="!content || content.length === 0">
-                    This file is empty
-                </b-alert>
-            </b-row>
             <b-row>
                 <b-col md="auto">
                     <FileTree
