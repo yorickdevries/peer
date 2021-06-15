@@ -4,26 +4,36 @@
 
         <!-- The buttons and text area for the actual annotations, somewhat primitive -->
         <!-- Only show annotation buttons if this component is inside a non-submitted review -->
-        <div v-if="!readOnly && !reviewSubmitted" class="mb-3">
-            <form v-if="!writing" @submit.prevent="writeAnnotation" class="annotation-form">
-                <!-- TODO: beautify these input fields -->
-                <b-form-input
-                    :type="number"
-                    placeholder="Starting line number"
-                    v-model="startLineNumber"
-                    :state="validateLineNumbers()"
-                ></b-form-input>
-                <b-form-input
-                    :type="number"
-                    placeholder="Ending line number"
-                    v-model="endLineNumber"
-                    :state="validateLineNumbers()"
-                ></b-form-input>
-                <b-button type="submit" variant="primary"> Leave an annotation </b-button>
-                <b-alert variant="info" class="ml-3" show>
-                    Select a piece of code with your cursor to leave an annotation
-                </b-alert>
-            </form>
+        <div v-if="!readOnly && !reviewSubmitted">
+            <!-- TODO: beautify these input fields -->
+            <b-alert variant="info" class="mb-1" show>
+                Select a piece of code with your cursor to leave an annotation
+            </b-alert>
+            <b-row class="mb-1">
+                <b-form v-if="!writing" @submit.prevent="writeAnnotation" class="annotation-form">
+                    <b-col fluid>
+                        <b-form-input
+                            :type="number"
+                            placeholder="Starting line number"
+                            v-model="startLineNumber"
+                            :state="validateLineNumbers()"
+                        >
+                        </b-form-input>
+                    </b-col>
+                    <b-col fluid>
+                        <b-form-input
+                            :type="number"
+                            placeholder="Ending line number"
+                            v-model="endLineNumber"
+                            :state="validateLineNumbers()"
+                        >
+                        </b-form-input>
+                    </b-col>
+                    <b-col fluid>
+                        <b-button type="submit" variant="primary"> Leave an annotation </b-button>
+                    </b-col>
+                </b-form>
+            </b-row>
             <PeerTextarea
                 v-if="writing"
                 ref="textarea"
@@ -54,8 +64,8 @@
                 :selectedFile="selectedFile"
                 :readOnly="readOnly || reviewSubmitted"
                 :reviewColors="reviewColors"
-                :selectionStart="startLineNumber"
-                :selectionEnd="endLineNumber"
+                :selectionStart="propStartLine"
+                :selectionEnd="propEndLine"
                 tabindex="0"
             />
         </b-card>
@@ -80,7 +90,9 @@ export default {
             endLineNumber: null,
             annotationText: "",
             highlightedFile: null,
-            maxAnnotationLength: null
+            maxAnnotationLength: null,
+            propStartLine: null,
+            propEndLine: null
         }
     },
     async created() {
@@ -170,16 +182,18 @@ export default {
             this.showSuccessMessage({ message: "Successfully updated annotation" })
         },
         validateLineNumbers() {
-            console.log(`startlinenumber: ${this.startLineNumber}`)
-            console.log(`endLinenumber: ${this.endLineNumber}`)
             if (
                 !this.startLineNumber ||
                 this.startLineNumber === "" ||
                 !this.endLineNumber ||
                 this.endLineNumber === ""
             ) {
+                this.propStartLine = null
+                this.propEndLine = null
                 return null
             }
+            this.startLineNumber = parseInt(this.startLineNumber)
+            this.endLineNumber = parseInt(this.endLineNumber)
             return (
                 this.endLineNumber < this.content.length + 1 &&
                 this.startLineNumber > 0 &&
@@ -205,10 +219,8 @@ export default {
                     endCodeElement = endCodeElement.parentElement
                 }
 
-                // If no code element is found for either the child or parent, the user is asked to
-                // confirm they have selected code
+                // If no code element is selected, the line numbers aren't updated
                 if (startCodeElement == null || endCodeElement == null) {
-                    this.showErrorMessage({ message: "Please make sure to select a piece of code" })
                     return
                 }
                 this.startLineNumber = parseInt(startCodeElement.getAttribute("linenr"))
@@ -223,8 +235,8 @@ export default {
             }
         },
         areLineNumbersAllowed() {
-            /* Check if the new annotation overlaps with an already made annotation in the same file. 
-            This is done by iterating over all stored annotations, then checking if the new annotation
+            /* Check if the line numbers overlap with an already made annotation in the same file. 
+            This is done by iterating over all stored annotations, then checking if the line numbers
             is not either entirely before or after any of the stored and is in the same file.
 
             Because startLineNumber is always smaller than endLineNumber, this is checked by: 
@@ -242,9 +254,18 @@ export default {
                     this.startLineNumber <= annotation.endLineNumber &&
                     this.endLineNumber >= annotation.startLineNumber
                 ) {
+                    // If the line numbers are not allowed, no selection is shown
+                    this.propStartLine = null
+                    this.propEndLine = null
                     return false
                 }
             }
+            // If the line numbers are allowed, the selection is shown to the user
+            this.propStartLine = parseInt(this.startLineNumber)
+            this.propEndLine = parseInt(this.endLineNumber)
+            console.log(`propstartLine: ${this.propStartLine}`)
+            console.log(`propEndLine: ${this.propEndLine}`)
+            console.log(`startLineNumber: ${this.startLineNumber}`)
             return true
         }
     },
