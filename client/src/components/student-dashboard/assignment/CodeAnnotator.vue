@@ -224,5 +224,6 @@ export default {
 #codeannotations-card {
     flex-grow: 1;
     max-height: 80vh;
+    overflow: hidden;
 }
 </style>
