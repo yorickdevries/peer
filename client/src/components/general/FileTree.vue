@@ -4,7 +4,7 @@
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" />
             <transition name="fade"> <span v-if="!collapsed">Files</span> </transition>
         </b-card-header>
-        <b-collapse :visible="!collapsed">
+        <b-collapse :visible="!collapsed" class="filetree-body">
             <b-card-body>
                 <FileTreeNode
                     @selected="onSelect"
@@ -108,6 +108,10 @@ export default {
 .fade-leave-to {
     opacity: 0;
 }
+
+.filetree {
+    max-height: 80vh;
+}
 </style>
 
 <style lang="scss">
@@ -118,5 +122,11 @@ export default {
 
 .rotate {
     transform: rotate(-90deg);
+}
+
+.filetree {
+    .filetree-body {
+        overflow-y: auto;
+    }
 }
 </style>

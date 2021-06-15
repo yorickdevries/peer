@@ -26,7 +26,7 @@
             />
         </div>
 
-        <b-card v-show="showCode" style="flex-grow: 1">
+        <b-card v-show="showCode" id="codeannotations-card">
             <!--
                 Displays the code with annotations in the mode specified by the readOnly variable.
                 This is used to allow students to annotate code during the review stage, where readOnly is then false.
@@ -220,5 +220,11 @@ export default {
         margin: 0;
         flex-grow: 1;
     }
+}
+
+#codeannotations-card {
+    flex-grow: 1;
+    max-height: 80vh;
+    overflow: hidden;
 }
 </style>
