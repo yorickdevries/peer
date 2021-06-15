@@ -9,34 +9,33 @@
             <b-alert variant="info" class="mb-1" show>
                 Select a piece of code with your cursor to leave an annotation
             </b-alert>
-            <b-row class="mb-1">
-                <b-form v-if="!writing" @submit.prevent="writeAnnotation" class="annotation-form">
-                    <b-col fluid>
-                        <b-form-input
-                            :type="number"
-                            placeholder="Starting line number"
-                            v-model="startLineNumber"
-                            :state="validateLineNumbers()"
-                        >
-                        </b-form-input>
-                    </b-col>
-                    <b-col fluid>
-                        <b-form-input
-                            :type="number"
-                            placeholder="Ending line number"
-                            v-model="endLineNumber"
-                            :state="validateLineNumbers()"
-                        >
-                        </b-form-input>
-                    </b-col>
-                    <b-col fluid>
-                        <b-button type="submit" variant="primary"> Leave an annotation </b-button>
-                    </b-col>
-                </b-form>
-            </b-row>
+            <b-form v-if="!writing" @submit.prevent="writeAnnotation" class="annotation-form mb-1">
+                <b-button type="submit" variant="primary" style="margin-right: 10px" :disabled="!validateLineNumbers()">
+                    Write an annotation
+                </b-button>
+                <p class="mb-auto mt-auto">Creating annotation from line</p>
+                <b-form-input
+                    :type="number"
+                    v-model="startLineNumber"
+                    :state="validateLineNumbers()"
+                    style="width: 90px; margin: 0px 10px"
+                    class="mt-auto mb-auto"
+                >
+                </b-form-input>
+                <p class="mb-auto mt-auto">to</p>
+                <b-form-input
+                    :type="number"
+                    v-model="endLineNumber"
+                    :state="validateLineNumbers()"
+                    style="width: 90px; margin: 0px 10px"
+                    class="mt-auto mb-auto"
+                >
+                </b-form-input>
+            </b-form>
             <PeerTextarea
                 v-if="writing"
                 ref="textarea"
+                class="mb-1"
                 placeholder="Type your annotation"
                 rows="3"
                 max-rows="5"
@@ -263,9 +262,6 @@ export default {
             // If the line numbers are allowed, the selection is shown to the user
             this.propStartLine = parseInt(this.startLineNumber)
             this.propEndLine = parseInt(this.endLineNumber)
-            console.log(`propstartLine: ${this.propStartLine}`)
-            console.log(`propEndLine: ${this.propEndLine}`)
-            console.log(`startLineNumber: ${this.startLineNumber}`)
             return true
         }
     },
