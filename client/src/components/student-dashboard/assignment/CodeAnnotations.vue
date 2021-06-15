@@ -57,6 +57,9 @@
                         @click.native="toggleAnnotationsAt(index)"
                         @keydown.native.enter.space="toggleAnnotationsAt(index)"
                         @keydown.native.space.prevent
+                        aria-expanded="false"
+                        :aria-controls="`annotation_${index + 1}`"
+                        ref="chevron"
                     />
                 </div>
                 <div 
@@ -88,6 +91,7 @@
                     </div>
                     <b-collapse
                         v-model="annotationState[annotation.id]"
+                        :id="`annotation_${annotation.startLineNumber}`"
                     >
                         <b-card>
                             <div v-if="editingAnnotation !== null && editingAnnotation.endLineNumber === index + 1">
@@ -284,6 +288,12 @@ export default {
             this.getAnnotationsAt(lineIndex).forEach(annotation => {
                 this.$set(this.annotationState, annotation.id, !allExtended)
             })
+            const annotation = this.getAnnotationsAt(lineIndex)[0]
+            const reference = this.$refs["chevron"]
+            console.log(reference)
+            console.log(this.annotationState[annotation.id])
+            console.log(this.$refs)
+            reference.setAttribute("aria-expanded", this.annotationState[annotation.id].toString())
         }
     },
     computed: {

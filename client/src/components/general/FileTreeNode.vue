@@ -8,6 +8,9 @@
             @keydown.space.prevent
             role="button"
             tabindex="0"
+            :aria-controls="`collapse_${name}`"
+            aria-expanded="true"
+            ref="button"
         >
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" role="button" />
             <icon class="text-muted" name="folder"></icon>
@@ -29,7 +32,7 @@
             <icon v-if="annotated" class="annotation-icon" name="comments" />
         </div>
 
-        <b-collapse class="ml-4" v-if="dir" :visible="!collapsed">
+        <b-collapse class="ml-4" v-if="dir" :visible="!collapsed" :id="`collapse_${name}`">
             <FileTreeNode
                 @toggleCollapse="onChildCollapse"
                 @selected="onChildSelect"
@@ -89,6 +92,9 @@ export default {
         notifyCollapsing() {
             // Let file tree know that its child has the intention to collapse
             this.$emit("toggleCollapse", this.name)
+            console.log(this.$refs["button"])
+            console.log(this.$refs)
+            this.$refs["button"].setAttribute("aria-expanded", this.collapsed ? "false" : "true")
         },
         toggleCollapsed() {
             this.collapsed = !this.collapsed
