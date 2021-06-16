@@ -107,16 +107,14 @@ export default {
         },
         async writeAnnotation() {
             if (!this.validateLineNumbers()) {
-                this.showErrorMessage({
-                    message: "The inputted line numbers are not allowed"
-                })
+                if (!this.doLineNumbersNotClash()) {
+                    this.showErrorMessage({ message: "Please select lines not yet annotated" })
+                } else {
+                    this.showErrorMessage({
+                        message: "The inputted line numbers are not allowed"
+                    })
+                }
                 return
-            }
-
-            if (!this.doLineNumbersNotClash()) {
-                this.startLineNumber = null
-                this.endLineNumber = null
-                this.showErrorMessage({ message: "Please select lines not yet annotated" })
             }
 
             // Update the current state and get highlighed text
