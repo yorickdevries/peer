@@ -46,7 +46,7 @@
             />
         </div>
 
-        <b-card v-show="showCode" style="flex-grow: 1">
+        <b-card v-show="showCode" id="codeannotations-card">
             <!--
                 Displays the code with annotations in the mode specified by the readOnly variable.
                 This is used to allow students to annotate code during the review stage, where readOnly is then false.
@@ -65,6 +65,7 @@
                 :reviewColors="reviewColors"
                 :selectionStart="propStartLine"
                 :selectionEnd="propEndLine"
+                :isOnlyFile="isOnlyFile"
                 tabindex="0"
             />
         </b-card>
@@ -80,7 +81,7 @@ import PeerTextarea from "./PeerTextarea"
 export default {
     mixins: [notifications],
     components: { CodeAnnotations, PeerTextarea },
-    props: ["annotations", "content", "language", "selectedFile", "readOnly", "review", "reviewColors"],
+    props: ["annotations", "content", "language", "selectedFile", "readOnly", "review", "reviewColors", "isOnlyFile"],
     data() {
         return {
             showCode: false,
@@ -282,5 +283,11 @@ export default {
         margin: 0;
         flex-grow: 1;
     }
+}
+
+#codeannotations-card {
+    flex-grow: 1;
+    max-height: 80vh;
+    overflow: hidden;
 }
 </style>

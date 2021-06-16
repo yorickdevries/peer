@@ -14,7 +14,7 @@
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" />
             <transition name="fade"> <span v-if="!collapsed">Files</span> </transition>
         </b-card-header>
-        <b-collapse :visible="!collapsed" id="filetree">
+        <b-collapse :visible="!collapsed" class="filetree-body" id="filetree">
             <b-card-body>
                 <FileTreeNode
                     @selected="onSelect"
@@ -35,7 +35,7 @@
 import FileTreeNode from "./FileTreeNode"
 
 export default {
-    props: ["annotatedFiles", "files", "selectedFile", "startCollapsed"],
+    props: ["annotatedFiles", "files", "selectedFile"],
     components: {
         FileTreeNode
     },
@@ -49,7 +49,6 @@ export default {
         }
     },
     created() {
-        this.collapsed = this.startCollapsed
         this.selected = this.selectedFile
         this.root = new Map()
 
@@ -121,6 +120,10 @@ export default {
 .fade-leave-to {
     opacity: 0;
 }
+
+.filetree {
+    max-height: 80vh;
+}
 </style>
 
 <style lang="scss">
@@ -131,5 +134,11 @@ export default {
 
 .rotate {
     transform: rotate(-90deg);
+}
+
+.filetree {
+    .filetree-body {
+        overflow-y: auto;
+    }
 }
 </style>

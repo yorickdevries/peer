@@ -60,7 +60,6 @@
                         aria-expanded="false"
                         :aria-controls="`annotation_${index + 1}`"
                         :ref="`chevron_${index + 1}`"
-                        v-bind="$attrs"
                     />
                 </div>
                 <div 
@@ -168,7 +167,8 @@ export default {
         "reviewColors",
         "selectedFile",
         "selectionStart",
-        "selectionEnd"
+        "selectionEnd",
+        "isOnlyFile"
     ],
     components: { PeerTextarea },
     mixins: [notifications],
@@ -296,6 +296,9 @@ export default {
                 "aria-expanded",
                 this.annotationState[annotation.id].toString()
             )
+        },
+        isCorrespondingFile(file) {
+            return this.isOnlyFile || file === this.selectedFile
         }
     },
     computed: {
@@ -307,7 +310,7 @@ export default {
                     if (
                         this.annotations[j].startLineNumber - 1 <= i &&
                         this.annotations[j].endLineNumber - 1 >= i &&
-                        this.annotations[j].selectedFile === this.selectedFile
+                        this.isCorrespondingFile(this.annotations[j].selectedFile)
                     ) {
                         line.push(this.annotations[j])
                     }
@@ -323,7 +326,7 @@ export default {
             return Array.from(
                 new Set(
                     this.annotations
-                        .filter(annotation => annotation.selectedFile === this.selectedFile)
+                        .filter(annotation => this.isCorrespondingFile(annotation.selectedFile))
                         .map(annotation => annotation.reviewId)
                 )
             )
@@ -377,7 +380,7 @@ pre {
     width: 100%;
     background-color: white;
     margin: 0;
-    max-height: 80vh;
+    max-height: 100%;
     font-size: 87.5%;
 
     .code-annotations-wrapper {

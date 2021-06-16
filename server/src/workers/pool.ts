@@ -246,6 +246,26 @@ const startExportSubmissionsForAssignmentVersionWorker = function (
   }
 };
 
+const startImportWebLabSubmissionsWorker = function (
+  assignmentVersionId: number,
+  file: Express.Multer.File
+): void {
+  if (isTSNode) {
+    // run the function directly in this process (TS Node/development)
+    workerFunctions
+      .importWebLabSubmissions(assignmentVersionId, file)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("importWebLabSubmissions", [assignmentVersionId, file]);
+  }
+};
+
 export {
   startPublishAssignmentWorker,
   startCloseSubmissionForAssignmentWorker,
@@ -257,4 +277,5 @@ export {
   startExportReviewsForAssignmentVersionWorker,
   startExportSubmissionsForAssignmentVersionWorker,
   startSubmissionFlaggingWorker,
+  startImportWebLabSubmissionsWorker,
 };
