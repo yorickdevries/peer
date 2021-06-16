@@ -106,22 +106,14 @@ export default {
             this.maxAnnotationLength = res.data
         },
         async writeAnnotation() {
-            // Get the line numbers from the input areas if they arent empty
-            if (this.startLineNumber != "" && this.endLineNumber != "") {
-                if (!this.validateLineNumbers()) {
-                    this.showErrorMessage({
-                        message: "The inputted line numbers are not allowed"
-                    })
-                    return
-                }
-            }
-            // If there is no selection and no numbers in the input areas show an error
-            else {
-                this.showErrorMessage({ message: "Please make sure to select a piece of code" })
+            if (!this.validateLineNumbers()) {
+                this.showErrorMessage({
+                    message: "The inputted line numbers are not allowed"
+                })
                 return
             }
 
-            if (!this.areLineNumbersAllowed()) {
+            if (!this.doLineNumbersNotClash()) {
                 this.startLineNumber = null
                 this.endLineNumber = null
                 this.showErrorMessage({ message: "Please select lines not yet annotated" })
@@ -198,7 +190,7 @@ export default {
                 this.endLineNumber < this.content.length + 1 &&
                 this.startLineNumber > 0 &&
                 this.startLineNumber <= this.endLineNumber &&
-                this.areLineNumbersAllowed()
+                this.doLineNumbersNotClash()
             )
         },
         onMouseUp() {
@@ -234,7 +226,7 @@ export default {
                 }
             }
         },
-        areLineNumbersAllowed() {
+        doLineNumbersNotClash() {
             /* Check if the line numbers overlap with an already made annotation in the same file. 
             This is done by iterating over all stored annotations, then checking if the line numbers
             is not either entirely before or after any of the stored and is in the same file.
