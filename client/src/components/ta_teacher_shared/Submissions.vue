@@ -38,6 +38,12 @@
                         Not available. The assignment is already past the submission state.
                     </dd>
                 </template>
+                <template v-else-if="!/\.zip($|[\s,])/.test(assignment.submissionExtensions)">
+                    <dt>Import submissions from WebLab</dt>
+                    <dd>
+                        Not available. On creation of the assignment, .zip extensions have not been allowed.
+                    </dd>
+                </template>
                 <template v-else>
                     <!--Importing Submissions-->
                     <dt>Import submissions from WebLab</dt>
@@ -61,7 +67,7 @@
                         class="p-0 m-0"
                         size="lg"
                     >
-                        <ImportSubmissionsWizard></ImportSubmissionsWizard>
+                        <ImportSubmissionsWizard :assignmentVersionId="assignmentVersionId"></ImportSubmissionsWizard>
                     </b-modal>
                 </template>
             </b-col>

@@ -143,6 +143,7 @@
 import hljs from "highlight.js"
 import "highlight.js/styles/atom-one-light.css"
 import notifications from "../../../mixins/notifications"
+import PeerTextarea from "./PeerTextarea"
 
 export default {
     props: [
@@ -154,8 +155,10 @@ export default {
         "reviewColors",
         "selectedFile",
         "selectionStart",
-        "selectionEnd"
+        "selectionEnd",
+        "isOnlyFile"
     ],
+    components: { PeerTextarea },
     mixins: [notifications],
     data() {
         return {
@@ -274,6 +277,9 @@ export default {
             this.getAnnotationsAt(lineIndex).forEach(annotation => {
                 this.$set(this.annotationState, annotation.id, !allExtended)
             })
+        },
+        isCorrespondingFile(file) {
+            return this.isOnlyFile || file === this.selectedFile
         }
     },
     computed: {
@@ -285,7 +291,7 @@ export default {
                     if (
                         this.annotations[j].startLineNumber - 1 <= i &&
                         this.annotations[j].endLineNumber - 1 >= i &&
-                        this.annotations[j].selectedFile === this.selectedFile
+                        this.isCorrespondingFile(this.annotations[j].selectedFile)
                     ) {
                         line.push(this.annotations[j])
                     }
@@ -301,7 +307,7 @@ export default {
             return Array.from(
                 new Set(
                     this.annotations
-                        .filter(annotation => annotation.selectedFile === this.selectedFile)
+                        .filter(annotation => this.isCorrespondingFile(annotation.selectedFile))
                         .map(annotation => annotation.reviewId)
                 )
             )

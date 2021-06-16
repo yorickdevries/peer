@@ -6,18 +6,20 @@
         <b-alert v-else-if="reviewSubmitted" show variant="warning">
             The review is submitted, so annotations cannot be added, removed or edited.
         </b-alert>
-        <b-alert variant="primary" show v-if="!content || content.length === 0">
-            This file is empty
+        <b-alert v-if="!selected" show variant="primary">
+            The selected file cannot be displayed.
         </b-alert>
-        <b-row class="position-relative overflow-hidden">
-            <b-col md="auto">
+        <b-alert v-else-if="!content || content.length === 0" show variant="primary">
+            The selected file is empty.
+        </b-alert>
+        <b-row v-if="files.length > 0" class="position-relative overflow-hidden">
+            <b-col v-if="!isOnlyFile" md="auto">
                 <FileTree
                     class="h-100"
                     @selected="onSelect"
                     :annotatedFiles="annotatedFiles"
                     :files="files"
                     :selectedFile="selected"
-                    :startCollapsed="singleFile"
                 />
             </b-col>
             <b-col>
@@ -30,6 +32,7 @@
                     :readOnly="readOnly"
                     :review="review"
                     :reviewColors="reviewColors"
+                    :isOnlyFile="isOnlyFile"
                 />
                 <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
                     <template #overlay>
@@ -152,17 +155,22 @@ export default {
             return lines
         },
         async highlightContent(text) {
-            const fileExtension = this.selected.split(".").pop()
-            let highlighted
-
-            if (hljs.getLanguage(fileExtension)) {
-                highlighted = hljs.highlight(text, { language: fileExtension, ignoreIllegals: true })
+            if (text.length === 0) {
+                this.content = []
             } else {
-                highlighted = hljs.highlightAuto(text)
+                const fileExtension = this.selected.split(".").pop()
+                let highlighted
+
+                if (hljs.getLanguage(fileExtension)) {
+                    highlighted = hljs.highlight(text, { language: fileExtension, ignoreIllegals: true })
+                } else {
+                    highlighted = hljs.highlightAuto(text)
+                }
+
+                this.content = this.fixMultiLineHighlighting(highlighted.value.split(/\r?\n/g))
+                this.language = highlighted.language
             }
 
-            this.content = this.fixMultiLineHighlighting(highlighted.value.split(/\r?\n/g))
-            this.language = highlighted.language
             this.showFile = true
         },
         async verifyTextContent(text) {
@@ -181,7 +189,15 @@ export default {
                             .filter(file => file)
                     )
                 })
-                .then(files => (this.files = files))
+                .then(files => {
+                    this.files = files
+                    for (const file of this.files) {
+                        if (!file.dir) {
+                            this.onSelect(file.name)
+                            break
+                        }
+                    }
+                })
         },
         async getSingleFileName() {
             return new Promise((resolve, reject) => {
@@ -220,14 +236,14 @@ export default {
         }
     },
     computed: {
-        singleFile() {
-            return this.files && this.files.length <= 1
-        },
         annotatedFiles() {
             return new Set(this.annotations.map(annotation => annotation.selectedFile))
         },
         reviewSubmitted() {
             return this.review && this.review.submitted
+        },
+        isOnlyFile() {
+            return this.files && this.files.length === 1
         }
     }
 }

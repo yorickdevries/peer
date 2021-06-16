@@ -45,6 +45,7 @@
                 :reviewColors="reviewColors"
                 :selectionStart="startLineNumber"
                 :selectionEnd="endLineNumber"
+                :isOnlyFile="isOnlyFile"
             />
         </b-card>
     </div>
@@ -59,7 +60,7 @@ import PeerTextarea from "./PeerTextarea"
 export default {
     mixins: [notifications],
     components: { CodeAnnotations, PeerTextarea },
-    props: ["annotations", "content", "language", "selectedFile", "readOnly", "review", "reviewColors"],
+    props: ["annotations", "content", "language", "selectedFile", "readOnly", "review", "reviewColors", "isOnlyFile"],
     data() {
         return {
             showCode: false,

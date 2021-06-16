@@ -25,7 +25,7 @@
 import FileTreeNode from "./FileTreeNode"
 
 export default {
-    props: ["annotatedFiles", "files", "selectedFile", "startCollapsed"],
+    props: ["annotatedFiles", "files", "selectedFile"],
     components: {
         FileTreeNode
     },
@@ -39,7 +39,6 @@ export default {
         }
     },
     created() {
-        this.collapsed = this.startCollapsed
         this.selected = this.selectedFile
         this.root = new Map()
 
