@@ -13,7 +13,7 @@
                 <b-button type="submit" variant="primary" style="margin-right: 10px" :disabled="!validateLineNumbers()">
                     Write an annotation
                 </b-button>
-                <p class="mb-auto mt-auto">Creating annotation from line</p>
+                <p class="mb-auto mt-auto">Write annotation from line</p>
                 <b-form-input
                     :type="number"
                     v-model="startLineNumber"

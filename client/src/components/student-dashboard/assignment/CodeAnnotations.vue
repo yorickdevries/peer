@@ -59,7 +59,8 @@
                         @keydown.native.space.prevent
                         aria-expanded="false"
                         :aria-controls="`annotation_${index + 1}`"
-                        ref="chevron"
+                        :ref="`chevron_${index + 1}`"
+                        v-bind="$attrs"
                     />
                 </div>
                 <div 
@@ -288,12 +289,13 @@ export default {
             this.getAnnotationsAt(lineIndex).forEach(annotation => {
                 this.$set(this.annotationState, annotation.id, !allExtended)
             })
+
+            //sets aria-expanded to the right value
             const annotation = this.getAnnotationsAt(lineIndex)[0]
-            const reference = this.$refs["chevron"]
-            console.log(reference)
-            console.log(this.annotationState[annotation.id])
-            console.log(this.$refs)
-            reference.setAttribute("aria-expanded", this.annotationState[annotation.id].toString())
+            this.$refs[`chevron_${lineIndex + 1}`][0].$el.setAttribute(
+                "aria-expanded",
+                this.annotationState[annotation.id].toString()
+            )
         }
     },
     computed: {
