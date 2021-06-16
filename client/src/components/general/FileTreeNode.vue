@@ -92,8 +92,6 @@ export default {
         notifyCollapsing() {
             // Let file tree know that its child has the intention to collapse
             this.$emit("toggleCollapse", this.name)
-            console.log(this.$refs["button"])
-            console.log(this.$refs)
             this.$refs["button"].setAttribute("aria-expanded", this.collapsed ? "false" : "true")
         },
         toggleCollapsed() {

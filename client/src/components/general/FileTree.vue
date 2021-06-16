@@ -96,7 +96,6 @@ export default {
             }
             this.collapsed = !this.collapsed
             this.$refs.cardheader.setAttribute("aria-expanded", this.collapsed ? "false" : "true")
-            console.log(this.$refs.cardheader)
         }, // Used to conserve file tree size on child collapse
         onChildCollapse(name) {
             const el = this.$el
