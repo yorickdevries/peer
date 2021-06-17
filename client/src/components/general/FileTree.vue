@@ -111,6 +111,7 @@ export default {
 
 .filetree {
     max-height: 80vh;
+    max-width: 40vw;
 }
 </style>
 

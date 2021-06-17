@@ -12,46 +12,39 @@
         <b-alert v-else-if="!content || content.length === 0" show variant="primary">
             The selected file is empty.
         </b-alert>
-        <div
-            v-bind:style="{
-                position: 'relative',
-                overflow: 'hidden'
-            }"
-        >
-            <b-row v-if="files.length > 0">
-                <b-col v-if="!isOnlyFile" md="auto">
-                    <FileTree
-                        class="h-100"
-                        @selected="onSelect"
-                        :annotatedFiles="annotatedFiles"
-                        :files="files"
-                        :selectedFile="selected"
-                    />
-                </b-col>
-                <b-col>
-                    <CodeAnnotator
-                        class="h-100"
-                        :annotations="annotations"
-                        :content="content"
-                        :language="language"
-                        :selectedFile="selected"
-                        :readOnly="readOnly"
-                        :review="review"
-                        :reviewColors="reviewColors"
-                        :isOnlyFile="isOnlyFile"
-                    />
-                    <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
-                        <template #overlay>
-                            <b-spinner v-if="!showFile" variant="primary"></b-spinner>
-                            <div v-else-if="showWarning" class="text-center">
-                                <p>This file contains characters that might not be displayed properly</p>
-                                <b-button variant="outline-primary" @click="showWarning = false">Show anyway</b-button>
-                            </div>
-                        </template>
-                    </b-overlay>
-                </b-col>
-            </b-row>
-        </div>
+        <b-row v-if="files.length > 0" class="position-relative overflow-hidden">
+            <b-col v-if="!isOnlyFile" md="auto">
+                <FileTree
+                    class="h-100"
+                    @selected="onSelect"
+                    :annotatedFiles="annotatedFiles"
+                    :files="files"
+                    :selectedFile="selected"
+                />
+            </b-col>
+            <b-col>
+                <CodeAnnotator
+                    class="h-100"
+                    :annotations="annotations"
+                    :content="content"
+                    :language="language"
+                    :selectedFile="selected"
+                    :readOnly="readOnly"
+                    :review="review"
+                    :reviewColors="reviewColors"
+                    :isOnlyFile="isOnlyFile"
+                />
+                <b-overlay :show="showWarning || !showFile" :opacity="1" no-fade no-wrap>
+                    <template #overlay>
+                        <b-spinner v-if="!showFile" variant="primary"></b-spinner>
+                        <div v-else-if="showWarning" class="text-center">
+                            <p>This file contains characters that cannot be displayed properly.</p>
+                            <b-button variant="outline-primary" @click="showWarning = false">Show anyway</b-button>
+                        </div>
+                    </template>
+                </b-overlay>
+            </b-col>
+        </b-row>
     </div>
     <b-alert v-else show variant="primary">Loading source files</b-alert>
 </template>

@@ -321,6 +321,7 @@ export default {
 
 <style lang="scss" scoped>
 $code-annotation-background: rgba(0, 0, 0, 0.03);
+$padding-left: 1.25rem;
 
 code,
 .annotation-text::v-deep {
@@ -363,6 +364,7 @@ pre {
     margin: 0;
     max-height: 100%;
     font-size: 87.5%;
+    overflow: visible;
 
     .code-annotations-wrapper {
         display: flex;
@@ -499,6 +501,16 @@ pre {
             box-sizing: content-box;
             font-family: inherit !important;
         }
+    }
+
+    &::before {
+        content: "";
+        background: white;
+        position: absolute;
+        left: -$padding-left;
+        top: 0;
+        bottom: 0;
+        width: $padding-left;
     }
 }
 
