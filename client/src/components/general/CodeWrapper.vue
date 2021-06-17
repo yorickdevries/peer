@@ -38,7 +38,7 @@
                     <template #overlay>
                         <b-spinner v-if="!showFile" variant="primary"></b-spinner>
                         <div v-else-if="showWarning" class="text-center">
-                            <p>This file contains characters that can not be displayed properly</p>
+                            <p>This file contains characters that cannot be displayed properly.</p>
                             <b-button variant="outline-primary" @click="showWarning = false">Show anyway</b-button>
                         </div>
                     </template>
