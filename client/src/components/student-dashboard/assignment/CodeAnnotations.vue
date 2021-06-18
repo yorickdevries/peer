@@ -47,20 +47,19 @@
                         role="button"
                         @click="toggleAnnotationsAt(index)"
                     ></code>
-                    <icon
+                    <div
                         v-if="hasAnnotationsStartingAt(index)"
-                        class="arrow"
+                        class="arrow code-annotations-icon-button"
                         :class="{ rotate: getAnnotationsStartingAt(index).every(annotation => annotationState[annotation.id] === true) }"
                         role="button"
-                        name="chevron-down"
                         tabindex="0"
-                        @click.native="toggleAnnotationsAt(index)"
-                        @keydown.native.enter.space="toggleAnnotationsAt(index)"
-                        @keydown.native.space.prevent
+                        @click="toggleAnnotationsAt(index)"
+                        @keydown.enter.space="toggleAnnotationsAt(index)"
+                        @keydown.space.prevent
                         aria-expanded="false"
                         :aria-controls="`annotation_${index + 1}`"
                         :ref="`chevron_${index + 1}`"
-                    />
+                    ><icon name="chevron-down" /></div>
                 </div>
                 <div 
                     v-for="annotation of getAnnotationsEndingAt(index)"
@@ -108,16 +107,15 @@
                             </div><div v-else class="d-flex">
                                 <span class="annotation-text" v-html="highlightAnnotation(annotation.annotationText)"></span>
                                 <div v-if="!readOnly" style="flex-shrink: 0">
-                                    <icon
-                                        name="pen"
-                                        class="mx-1 text-primary"
+                                    <div
+                                        class="mx-1 text-primary code-annotations-icon-button"
                                         role="button" 
                                         v-b-modal="`editModal_${annotation.id}`"
-                                        @click.native="editAnnotation(annotation)"
                                         tabindex="0"
-                                        v-on:keydown.native.enter.space="editAnnotation(annotation)"
-                                        @keydown.native.space.prevent
-                                    />
+                                        @click="editAnnotation(annotation)"
+                                        @keydown.enter.space="editAnnotation(annotation)"
+                                        @keydown.space.prevent
+                                    ><icon name="pen" /></div>
                                     <b-modal 
                                         :id="`editModal_${annotation.id}`" 
                                         @ok="editModalOk(index)"
@@ -127,14 +125,13 @@
                                         centered>
                                         {{ getModalText() }}
                                     </b-modal>
-                                    <icon
-                                        name="trash"
-                                        class="text-danger"
+                                    <div
+                                        class="text-danger code-annotations-icon-button"
                                         role="button"
-                                        @keydown.native.space.prevent
                                         v-b-modal="`modal_${annotation.id}`"
                                         tabindex="0"
-                                    />
+                                        @keydown.space.prevent
+                                    ><icon name="trash" /></div>
                                     <b-modal
                                         @ok="deleteAnnotation(annotation)"
                                         :id="`modal_${annotation.id}`"
@@ -474,7 +471,8 @@ pre {
             }
         }
 
-        .fa-icon {
+        .code-annotations-icon-button {
+            background-color: transparent;
             display: inline;
             vertical-align: middle;
         }
