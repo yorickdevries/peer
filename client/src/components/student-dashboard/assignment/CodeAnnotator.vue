@@ -264,6 +264,11 @@ export default {
     },
     watch: {
         selectedFile: function(newVal) {
+            if (!this.writing) {
+                this.startLineNumber = ""
+                this.endLineNumber = ""
+                return
+            }
             if (newVal === this.highlightedFile) {
                 this.propStartLine = parseInt(this.startLineNumber)
                 this.propEndLine = parseInt(this.endLineNumber)
