@@ -47,14 +47,19 @@
                         role="button"
                         @click="toggleAnnotationsAt(index)"
                     ></code>
-                    <icon
+                    <div
                         v-if="hasAnnotationsStartingAt(index)"
-                        class="arrow"
+                        class="arrow code-annotations-icon-button"
                         :class="{ rotate: getAnnotationsStartingAt(index).every(annotation => annotationState[annotation.id] === true) }"
                         role="button"
-                        name="chevron-down"
-                        @click.native="toggleAnnotationsAt(index)"
-                    />
+                        tabindex="0"
+                        @click="toggleAnnotationsAt(index)"
+                        @keydown.enter.space="toggleAnnotationsAt(index)"
+                        @keydown.space.prevent
+                        aria-expanded="false"
+                        :aria-controls="`annotation_${index + 1}`"
+                        :ref="`chevron_${index + 1}`"
+                    ><icon name="chevron-down" /></div>
                 </div>
                 <div 
                     v-for="annotation of getAnnotationsEndingAt(index)"
@@ -85,6 +90,7 @@
                     </div>
                     <b-collapse
                         v-model="annotationState[annotation.id]"
+                        :id="`annotation_${annotation.startLineNumber}`"
                     >
                         <b-card>
                             <div v-if="editingAnnotation !== null && editingAnnotation.endLineNumber === index + 1">
@@ -101,13 +107,15 @@
                             </div><div v-else class="d-flex">
                                 <span class="annotation-text" v-html="highlightAnnotation(annotation.annotationText)"></span>
                                 <div v-if="!readOnly" style="flex-shrink: 0">
-                                    <icon
-                                        name="pen"
-                                        class="mx-1 text-primary"
+                                    <div
+                                        class="mx-1 text-primary code-annotations-icon-button"
                                         role="button" 
-                                        @click.native="editAnnotation(annotation)"
                                         v-b-modal="`editModal_${annotation.id}`"
-                                    />
+                                        tabindex="0"
+                                        @click="editAnnotation(annotation)"
+                                        @keydown.enter.space="editAnnotation(annotation)"
+                                        @keydown.space.prevent
+                                    ><icon name="pen" /></div>
                                     <b-modal 
                                         :id="`editModal_${annotation.id}`" 
                                         @ok="editModalOk(index)"
@@ -117,12 +125,13 @@
                                         centered>
                                         {{ getModalText() }}
                                     </b-modal>
-                                    <icon
-                                        name="trash"
-                                        class="text-danger"
+                                    <div
+                                        class="text-danger code-annotations-icon-button"
                                         role="button"
                                         v-b-modal="`modal_${annotation.id}`"
-                                    />
+                                        tabindex="0"
+                                        @keydown.space.prevent
+                                    ><icon name="trash" /></div>
                                     <b-modal
                                         @ok="deleteAnnotation(annotation)"
                                         :id="`modal_${annotation.id}`"
@@ -277,6 +286,13 @@ export default {
             this.getAnnotationsAt(lineIndex).forEach(annotation => {
                 this.$set(this.annotationState, annotation.id, !allExtended)
             })
+
+            //sets aria-expanded to the right value
+            const annotation = this.getAnnotationsAt(lineIndex)[0]
+            this.$refs[`chevron_${lineIndex + 1}`][0].setAttribute(
+                "aria-expanded",
+                this.annotationState[annotation.id].toString()
+            )
         },
         isCorrespondingFile(file) {
             return this.isOnlyFile || file === this.selectedFile
@@ -455,7 +471,8 @@ pre {
             }
         }
 
-        .fa-icon {
+        .code-annotations-icon-button {
+            background-color: transparent;
             display: inline;
             vertical-align: middle;
         }

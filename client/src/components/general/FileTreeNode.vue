@@ -1,11 +1,30 @@
 <template>
     <div>
-        <div v-if="dir" class="dir" v-on:click="notifyCollapsing" role="button">
+        <div
+            v-if="dir"
+            class="dir"
+            v-on:click="notifyCollapsing"
+            v-on:keydown.enter.space="notifyCollapsing"
+            @keydown.space.prevent
+            role="button"
+            tabindex="0"
+            :aria-controls="`collapse_${name}`"
+            aria-expanded="true"
+            ref="button"
+        >
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" role="button" />
             <icon class="text-muted" name="folder"></icon>
             <span>{{ name }}</span>
         </div>
-        <div v-else @click="onSelect" :class="{ selected, file: true }" role="button">
+        <div
+            v-else
+            v-on:click="onSelect"
+            v-on:keydown.enter.space="onSelect"
+            @keydown.space.prevent
+            :class="{ selected, file: true }"
+            role="button"
+            tabindex="0"
+        >
             <div>
                 <icon name="code"></icon>
                 <span>{{ name }}</span>
@@ -13,7 +32,7 @@
             <icon v-if="annotated" class="annotation-icon" name="comments" />
         </div>
 
-        <b-collapse class="ml-4" v-if="dir" :visible="!collapsed">
+        <b-collapse class="ml-4" v-if="dir" :visible="!collapsed" :id="`collapse_${name}`">
             <FileTreeNode
                 @toggleCollapse="onChildCollapse"
                 @selected="onChildSelect"
@@ -73,6 +92,7 @@ export default {
         notifyCollapsing() {
             // Let file tree know that its child has the intention to collapse
             this.$emit("toggleCollapse", this.name)
+            this.$refs["button"].setAttribute("aria-expanded", this.collapsed ? "false" : "true")
         },
         toggleCollapsed() {
             this.collapsed = !this.collapsed

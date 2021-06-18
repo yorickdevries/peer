@@ -1,10 +1,20 @@
 <template>
     <b-card class="filetree" no-body>
-        <b-card-header role="button" @click="toggleCollapse" :class="{ 'header-collapse': collapsed }">
+        <b-card-header
+            role="button"
+            @click="toggleCollapse"
+            :class="{ 'header-collapse': collapsed }"
+            tabindex="0"
+            @keydown.enter.space="toggleCollapse"
+            @keydown.space.prevent
+            aria-controls="filetree"
+            aria-expanded="true"
+            ref="cardheader"
+        >
             <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" />
             <transition name="fade"> <span v-if="!collapsed">Files</span> </transition>
         </b-card-header>
-        <b-collapse :visible="!collapsed" class="filetree-body">
+        <b-collapse :visible="!collapsed" class="filetree-body" id="filetree">
             <b-card-body>
                 <FileTreeNode
                     @selected="onSelect"
@@ -85,6 +95,7 @@ export default {
                 this.$el.style.setProperty("min-width", this.minWidth ?? "unset")
             }
             this.collapsed = !this.collapsed
+            this.$refs.cardheader.setAttribute("aria-expanded", this.collapsed ? "false" : "true")
         }, // Used to conserve file tree size on child collapse
         onChildCollapse(name) {
             const el = this.$el
