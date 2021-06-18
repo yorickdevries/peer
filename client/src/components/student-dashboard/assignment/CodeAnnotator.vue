@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex flex-column" @mouseup="onMouseUp">
+    <div class="code-annotator" @mouseup="onMouseUp">
         <b-alert :show="!showCode" variant="primary">LOADING {{ review ? "REVIEW" : "SUBMISSION" }}</b-alert>
 
         <!-- The buttons and text area for the actual annotations, somewhat primitive -->
@@ -277,6 +277,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.code-annotator {
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+}
+
 .annotation-form {
     display: flex;
     align-items: stretch;
@@ -289,7 +295,10 @@ export default {
 
 #codeannotations-card {
     flex-grow: 1;
-    max-height: 80vh;
     overflow: hidden;
+
+    > .card-body {
+        overflow: auto;
+    }
 }
 </style>
