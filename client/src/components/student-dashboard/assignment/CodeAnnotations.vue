@@ -289,7 +289,8 @@ export default {
 
             //sets aria-expanded to the right value
             const annotation = this.getAnnotationsAt(lineIndex)[0]
-            this.$refs[`chevron_${lineIndex + 1}`][0].$el.setAttribute(
+            console.log(this.$refs[`chevron_${lineIndex + 1}`])
+            this.$refs[`chevron_${lineIndex + 1}`][0].setAttribute(
                 "aria-expanded",
                 this.annotationState[annotation.id].toString()
             )
