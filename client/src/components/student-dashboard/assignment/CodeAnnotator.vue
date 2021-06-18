@@ -117,7 +117,7 @@ export default {
                 return
             }
 
-            // Update the current state and get highlighed text
+            // Update the current state and get highlighted file
             this.writing = true
             this.highlightedFile = this.selectedFile
             window.getSelection().empty()
@@ -134,7 +134,7 @@ export default {
                     annotationText,
                     this.startLineNumber,
                     this.endLineNumber,
-                    this.selectedFile
+                    this.highlightedFile
                 )
                 const annotation = res.data
                 this.annotations.push(annotation)
@@ -250,7 +250,8 @@ export default {
                     return false
                 }
             }
-            // If the line numbers are allowed, the selection is shown to the user
+            // If the line numbers are allowed and the currently selected file is the same as
+            // the file the user wants to highlight, the selection is shown to the user
             this.propStartLine = parseInt(this.startLineNumber)
             this.propEndLine = parseInt(this.endLineNumber)
             return true
@@ -259,6 +260,17 @@ export default {
     computed: {
         reviewSubmitted() {
             return this.review && this.review.submitted
+        }
+    },
+    watch: {
+        selectedFile: function(newVal) {
+            if (newVal === this.highlightedFile) {
+                this.propStartLine = parseInt(this.startLineNumber)
+                this.propEndLine = parseInt(this.endLineNumber)
+            } else {
+                this.propStartLine = null
+                this.propEndLine = null
+            }
         }
     }
 }
