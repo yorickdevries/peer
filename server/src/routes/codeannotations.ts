@@ -73,7 +73,7 @@ router.get("/", validateQuery(getAnnotationsSchema), async (req, res) => {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send(
-          "One of youre reviews isn't submitted, you are not allowed to see feedback"
+          "One of your reviews isn't submitted, you are not allowed to see feedback"
         );
       return;
     }
