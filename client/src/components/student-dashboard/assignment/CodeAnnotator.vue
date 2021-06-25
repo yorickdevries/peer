@@ -213,8 +213,19 @@ export default {
                 if (startCodeElement == null || endCodeElement == null) {
                     return
                 }
-                this.startLineNumber = parseInt(startCodeElement.getAttribute("linenr"))
-                this.endLineNumber = parseInt(endCodeElement.getAttribute("linenr"))
+
+                //Check if the code element contains the attribute linenr, to avoid errors with code suggestions
+                const attrStartLineNumber = startCodeElement.getAttribute("linenr")
+                const attrEndLineNumber = endCodeElement.getAttribute("linenr")
+
+                if (!attrStartLineNumber || !attrEndLineNumber) {
+                    this.startLineNumber = ""
+                    this.endLineNumber = ""
+                    return
+                }
+
+                this.startLineNumber = parseInt(attrStartLineNumber)
+                this.endLineNumber = parseInt(attrEndLineNumber)
 
                 // Swap startLineNumber and endLineNumber if startLineNumber is larger
                 if (this.startLineNumber > this.endLineNumber) {
