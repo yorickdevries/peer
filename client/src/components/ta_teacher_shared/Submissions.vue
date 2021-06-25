@@ -67,7 +67,10 @@
                         class="p-0 m-0"
                         size="lg"
                     >
-                        <ImportSubmissionsWizard :assignmentVersionId="assignmentVersionId"></ImportSubmissionsWizard>
+                        <ImportSubmissionsWizard
+                            :modalId="`importSubmissions${assignmentVersionId}`"
+                            :assignmentVersionId="assignmentVersionId"
+                        ></ImportSubmissionsWizard>
                     </b-modal>
                 </template>
             </b-col>

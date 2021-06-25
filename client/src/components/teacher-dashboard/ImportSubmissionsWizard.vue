@@ -1,17 +1,32 @@
 <template>
     <b-card header="Import Submissions">
         <b-alert class="d-flex justify-content-between flex-wrap" show variant="primary">
-            <p>Please upload a zip file with WebLab submissions, i.e. an assignment exported from WebLab</p>
-            <ul class="mb-0">
-                <li>Make sure no groups or submissions exist for this assignment</li>
-                <li>The zip file should contain a folder called "submissions" containing all submissions</li>
+            <p>To import submissions for an assignment from WebLab:</p>
+            <ol>
                 <li>
-                    Each submission should be in a separate folder named with the format
-                    "StudentNumber_FirstName_LastName", where the student has to have logged in to Peer at least once
-                    for their submission to be imported
+                    Manually export submissions by downloading them via the <b>"Actions"</b> menu, located at the top
+                    right-hand corner of the target assignment webpage on WebLab, where there is an option to
+                    <b>"Download Submissions"</b>.
                 </li>
-                <li>The file should have the extension .zip</li>
-                <li>Max file size is 50MB</li>
+                <li>
+                    Format the downloaded submissions into a single zip file, that has a folder called
+                    <b>"submissions"</b> containing all submissions. Where each submission should be in a separate
+                    subfolder using the following format: <b>"StudentNumber_FirstName_LastName"</b>.
+                </li>
+                <li>
+                    Use the file browser below to locate and upload the formatted zip file.
+                </li>
+            </ol>
+            <p>Note: the importing of submissions can <b>only</b> be perform when:</p>
+            <ul>
+                <li>The assignment is not passed the Submission stage.</li>
+                <li>The assignment is not self enrollable.</li>
+                <li>No groups or submissions already exist for the assignmnet.</li>
+                <li>
+                    The corresponding students must already exist in the Peer database, i.e. they must have logged into
+                    Peer at least once.
+                </li>
+                <li>The file size of the formatted zip file is at most 50 MB.</li>
             </ul>
         </b-alert>
         <!--File upload-->
@@ -24,7 +39,12 @@
                 :state="Boolean(file)"
             >
             </b-form-file>
-            <b-button variant="primary" class="mt-3" @click="importSubmissions">Import submissions</b-button>
+            <div class="modal-footer">
+                <b-button variant="primary" class="mt-2 mr-auto" @click="importSubmissions">
+                    Import submissions
+                </b-button>
+                <b-button variant="secondary" class="mt-2" @click="closeModal">Close</b-button>
+            </div>
         </b-form-group>
     </b-card>
 </template>
@@ -35,7 +55,7 @@ import notifications from "../../mixins/notifications"
 
 export default {
     mixins: [notifications],
-    props: ["assignmentVersionId"],
+    props: ["modalId", "assignmentVersionId"],
     data() {
         return {
             file: null
@@ -46,6 +66,10 @@ export default {
             this.disableSubmissionImportButton = true
             await api.submissions.import(this.assignmentVersionId, this.file)
             this.showSuccessMessage({ message: "Submissions are being imported" })
+            this.closeModal()
+        },
+        async closeModal() {
+            this.$bvModal.hide(this.modalId)
         }
     }
 }
