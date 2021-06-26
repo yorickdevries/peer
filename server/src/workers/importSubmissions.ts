@@ -102,9 +102,9 @@ const importWebLabSubmissions = async function (
   }
 
   const skippedStudents: Array<string> = [];
-  const students: Array<User> = [];
+  // Enroll students in in the course
   await getManager().transaction(
-    "SERIALIZABLE", // serializable is the only way to make sure groups and submissions exist before import
+    "REPEATABLE READ", // make sure the role isnt changed while importing
     async (transactionalEntityManager) => {
       // groups and submissions should only rarely exist if groups or submissions were created during the processing of the zip file
       const existingGroups = await transactionalEntityManager
@@ -140,10 +140,10 @@ const importWebLabSubmissions = async function (
         // skip the user if they do not exist in the database
         if (!user) {
           skippedStudents.push(studentNumber);
+          // remove non-existing students to make group and submission import easier
+          submissions.delete(studentNumber);
           continue;
         }
-
-        students.push(user);
 
         // enroll user in the course if not already
         let enrollment = await transactionalEntityManager.findOne(Enrollment, {
@@ -156,13 +156,11 @@ const importWebLabSubmissions = async function (
               `${user.netid} is ${enrollment.role} in this course`
             );
           }
-          console.log("Existing: " + user.netid);
         } else {
           // enroll the user as student in the course
           enrollment = new Enrollment(user, course, UserRole.STUDENT);
           await enrollment.validateOrReject();
           await transactionalEntityManager.save(enrollment);
-          console.log("Added: " + user.netid + " to " + course.id);
         }
       }
     }
@@ -176,18 +174,23 @@ const importWebLabSubmissions = async function (
         assignment.courseId
       );
 
-      for (const user of students) {
+      for (const [studentNumber, { file, buffer }] of submissions) {
+        // get user from directory names
+        const user = await transactionalEntityManager.findOne(User, {
+          studentNumber: parseInt(studentNumber),
+        });
+
+        // skip the user if they do not exist in the database
+        if (!user) {
+          skippedStudents.push(studentNumber);
+          continue;
+        }
+
         // make the group
         const group = new Group(user.netid, course, [user], [assignment]);
         await group.validateOrReject();
         await transactionalEntityManager.save(group);
 
-        const file = submissions.get("" + user.studentNumber)?.file;
-        const buffer = submissions.get("" + user.studentNumber)?.buffer;
-        if (!file || !buffer) {
-          console.log("Submission not found for: " + user.studentNumber);
-          continue;
-        }
         // save file entry to database
         await file.validateOrReject();
         await transactionalEntityManager.save(file);
