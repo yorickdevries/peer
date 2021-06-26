@@ -1,5 +1,8 @@
 import { getManager } from "typeorm";
+import UserRole from "../enum/UserRole";
 import AssignmentVersion from "../models/AssignmentVersion";
+import Course from "../models/Course";
+import Enrollment from "../models/Enrollment";
 import ensureConnection from "../util/ensureConnection";
 import Group from "../models/Group";
 import Submission from "../models/Submission";
@@ -31,8 +34,6 @@ const importWebLabSubmissions = async function (
   const submissions: Map<string, { file: File; buffer: Buffer }> = new Map();
   const names: Map<string, string> = new Map();
   const invalidSubmissions: Array<string> = [];
-
-  const course = await assignment.getCourse();
 
   // do all the heavy lifting before the transaction
   try {
@@ -101,6 +102,7 @@ const importWebLabSubmissions = async function (
   }
 
   const skippedStudents: Array<string> = [];
+  const students: Array<User> = [];
   await getManager().transaction(
     "SERIALIZABLE", // serializable is the only way to make sure groups and submissions exist before import
     async (transactionalEntityManager) => {
@@ -124,7 +126,12 @@ const importWebLabSubmissions = async function (
         throw new Error("There are already submissions for this assignment");
       }
 
-      for (const [studentNumber, { file, buffer }] of submissions) {
+      const course = await transactionalEntityManager.findOneOrFail(
+        Course,
+        assignment.courseId
+      );
+
+      for (const studentNumber of submissions.keys()) {
         // get user from directory names
         const user = await transactionalEntityManager.findOne(User, {
           studentNumber: parseInt(studentNumber),
@@ -136,11 +143,51 @@ const importWebLabSubmissions = async function (
           continue;
         }
 
+        students.push(user);
+
+        // enroll user in the course if not already
+        let enrollment = await transactionalEntityManager.findOne(Enrollment, {
+          where: { userNetid: user.netid, courseId: course.id },
+        });
+
+        if (enrollment) {
+          if (enrollment.role !== UserRole.STUDENT) {
+            throw new Error(
+              `${user.netid} is ${enrollment.role} in this course`
+            );
+          }
+          console.log("Existing: " + user.netid);
+        } else {
+          // enroll the user as student in the course
+          enrollment = new Enrollment(user, course, UserRole.STUDENT);
+          await enrollment.validateOrReject();
+          await transactionalEntityManager.save(enrollment);
+          console.log("Added: " + user.netid + " to " + course.id);
+        }
+      }
+    }
+  );
+
+  await getManager().transaction(
+    "SERIALIZABLE", // serializable is the only way to make sure groups and submissions exist before import
+    async (transactionalEntityManager) => {
+      const course = await transactionalEntityManager.findOneOrFail(
+        Course,
+        assignment.courseId
+      );
+
+      for (const user of students) {
         // make the group
         const group = new Group(user.netid, course, [user], [assignment]);
         await group.validateOrReject();
         await transactionalEntityManager.save(group);
 
+        const file = submissions.get("" + user.studentNumber)?.file;
+        const buffer = submissions.get("" + user.studentNumber)?.buffer;
+        if (!file || !buffer) {
+          console.log("Submission not found for: " + user.studentNumber);
+          continue;
+        }
         // save file entry to database
         await file.validateOrReject();
         await transactionalEntityManager.save(file);
