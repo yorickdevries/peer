@@ -17,7 +17,7 @@
                     Use the file browser below to locate and upload the formatted zip file.
                 </li>
             </ol>
-            <p>Note: the importing of submissions can <b>only</b> be perform when:</p>
+            <p>The importing of submissions can <b>only</b> be performed when:</p>
             <ul>
                 <li>The assignment is not passed the Submission stage.</li>
                 <li>The assignment is not self enrollable.</li>
@@ -28,6 +28,10 @@
                 </li>
                 <li>The file size of the formatted zip file is at most 50 MB.</li>
             </ul>
+            <p>
+                Note: It may take time for the imported submissions to appear in the "Submissions" tab. If the import
+                was unsuccessful, then you will be notified by email.
+            </p>
         </b-alert>
         <!--File upload-->
         <b-form-group label="Zip file from WebLab" class="mb-0">
