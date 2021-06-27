@@ -176,15 +176,9 @@ const importWebLabSubmissions = async function (
 
       for (const [studentNumber, { file, buffer }] of submissions) {
         // get user from directory names
-        const user = await transactionalEntityManager.findOne(User, {
+        const user = await transactionalEntityManager.findOneOrFail(User, {
           studentNumber: parseInt(studentNumber),
         });
-
-        // skip the user if they do not exist in the database
-        if (!user) {
-          skippedStudents.push(studentNumber);
-          continue;
-        }
 
         // make the group
         const group = new Group(user.netid, course, [user], [assignment]);
