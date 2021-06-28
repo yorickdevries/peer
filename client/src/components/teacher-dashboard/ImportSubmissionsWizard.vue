@@ -1,18 +1,32 @@
 <template>
     <b-card header="Import Submissions">
         <b-alert class="d-flex justify-content-between flex-wrap" show variant="primary">
-            <p>Please upload a zip file with WebLab submissions, i.e. an assignment exported from WebLab</p>
-            <ul class="mb-0">
-                <li>Make sure no groups or submissions exist for this assignment</li>
-                <li>The zip file should contain a folder called "submissions" containing all submissions</li>
+            <p>The importing of submissions can <b>only</b> be performed when:</p>
+            <ul>
+                <li>No groups or submissions already exist for the assignmnet.</li>
                 <li>
-                    Each submission should be in a separate folder named with the format
-                    "StudentNumber_FirstName_LastName", where the student has to have logged in to Peer at least once
-                    for their submission to be imported
+                    The corresponding students must already exist in the Peer database, i.e. they must have logged into
+                    Peer at least once.
                 </li>
-                <li>The file should have the extension .zip</li>
-                <li>Max file size is 50MB</li>
+                <li>The file size at most 50 MB.</li>
             </ul>
+            <p>To import submissions for an assignment from WebLab:</p>
+            <ul>
+                <li>
+                    Manually export submissions by downloading them via the <b>"Actions"</b> menu, located at the top
+                    right-hand corner of the target assignment webpage on WebLab, where there is an option to
+                    <b>"Download Submissions"</b>.
+                </li>
+                <li>
+                    The downloaded submissions should be in a single zip file, that has a folder called
+                    <b>"submissions"</b> containing all submissions. Where each submission is in a separate subfolder
+                    using the following format: <b>"StudentNumber_FirstName_LastName"</b>.
+                </li>
+            </ul>
+            <p>
+                Note: It may take time for the imported submissions to appear in the "Submissions" tab. If the import
+                was unsuccessful, then you will be notified by email.
+            </p>
         </b-alert>
         <!--File upload-->
         <b-form-group label="Zip file from WebLab" class="mb-0">
@@ -35,7 +49,7 @@ import notifications from "../../mixins/notifications"
 
 export default {
     mixins: [notifications],
-    props: ["assignmentVersionId"],
+    props: ["modalId", "assignmentVersionId"],
     data() {
         return {
             file: null
@@ -46,6 +60,8 @@ export default {
             this.disableSubmissionImportButton = true
             await api.submissions.import(this.assignmentVersionId, this.file)
             this.showSuccessMessage({ message: "Submissions are being imported" })
+            // Close modal after submitting
+            this.$bvModal.hide(this.modalId)
         }
     }
 }
