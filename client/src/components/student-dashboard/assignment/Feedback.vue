@@ -17,7 +17,10 @@
                                 <b-badge v-else :style="{ 'background-color': reviewColors[tab.id] }" class="mr-2">
                                     ID: {{ tab.id }}
                                 </b-badge>
-                                <b-badge variant="primary">
+                                <b-badge v-if="tab.annotationCount == 1" variant="primary">
+                                    1 annotation
+                                </b-badge>
+                                <b-badge v-else variant="primary">
                                     {{ tab.annotationCount }}
                                     annotations
                                 </b-badge>
