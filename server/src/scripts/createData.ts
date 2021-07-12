@@ -10,7 +10,6 @@ const createData = async function (): Promise<void> {
   return;
 };
 
-// initialize data in case of running in development
 if (!runScript) {
   throw new Error(`Not allowed to run script`);
 } else {
@@ -19,7 +18,7 @@ if (!runScript) {
     .then((_connection) => {
       createData()
         .then(() => {
-          console.log("Initialized data");
+          console.log("Created data");
           process.exit(0);
         })
         .catch((error) => {
