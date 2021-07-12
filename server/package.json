@@ -10,6 +10,7 @@
     "lint-fix": "eslint . --ext .ts --fix",
     "test": "jest --runInBand ./tests",
     "coverage": "jest --runInBand --collectCoverage ./tests",
+    "createdata": "ts-node ./node_modules/typeorm/cli.js src/scripts/createData.ts",
     "initdata": "node ./dist/scripts/initializeData.js",
     "typeorm": "ts-node ./node_modules/typeorm/cli.js --config src/ormconfig.ts",
     "typeorm:migration:generate": "npm run typeorm migration:generate -- -n",
