@@ -861,6 +861,7 @@ describe("Integration", () => {
         "reviewEvaluationDueDate",
         new Date("2020-05-01T10:00Z").toISOString()
       )
+      .field("assignmentType", "document")
       .field("description", "Example description")
       .field("externalLink", "null")
       .field("submissionExtensions", ".pdf")
