@@ -124,16 +124,6 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
       );
     return;
   }
-  // create the annotation
-  /*const existingAnnotation = await CodeAnnotation.findOne(annotation.id);
-  if (existingAnnotation) {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(`Annotation with id ${annotation.id} already exists`);
-    return;
-  }
-  */
-  // COMMENTING
   const codeAnnotation = new CodeAnnotation(
     review,
     req.body.annotationText,
