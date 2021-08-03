@@ -335,7 +335,8 @@ router.post(
     await submission!.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(submission!);
-    startSubmissionFlaggingWorker(submission?.id);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    startSubmissionFlaggingWorker(submission!.id);
   }
 );
 
