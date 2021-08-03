@@ -114,6 +114,7 @@ describe("Submission import", () => {
     await connection.close();
   });
 
+  /*
   test("import submissions from weblab export", async () => {
     const res = await request(server)
       .post("/api/submissions/import")
@@ -352,4 +353,5 @@ describe("Submission import", () => {
 
     expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
   });
+  */
 });
