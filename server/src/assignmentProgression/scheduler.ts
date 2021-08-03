@@ -2,13 +2,11 @@ import moment from "moment";
 import schedule from "node-schedule";
 import { AssignmentState } from "../enum/AssignmentState";
 import Assignment from "../models/Assignment";
-import Submission from "../models/Submission";
 import {
   startPublishAssignmentWorker,
   startCloseSubmissionForAssignmentWorker,
   startDistributeReviewsForAssignmentWorker,
   startOpenFeedbackForAssignmentWorker,
-  startSubmissionFlaggingWorker,
 } from "../workers/pool";
 
 // map assignments to jobs
@@ -92,46 +90,12 @@ const scheduleJobsForAssignment = function (assignment: Assignment): void {
   }
 };
 
-const cancelJobsForSubmission = function (submission: Submission) {
-  const jobsOfSubmission = scheduledJobs.get(submission.id);
-  if (jobsOfSubmission) {
-    for (const job of jobsOfSubmission) {
-      job.cancel();
-    }
-  }
-  scheduledJobs.delete(submission.id);
-};
-
-const scheduleJobsForSubmission = function (submission: Submission): void {
-  cancelJobsForSubmission(submission);
-
-  // if the submission hasn't been flagged by the server yet
-  if (submission.flaggedByServer == null) {
-    const jobsOfSubmission = [];
-    const now = new Date();
-    const job = schedule.scheduleJob(now, () => {
-      startSubmissionFlaggingWorker(submission.id);
-    });
-    if (job) {
-      jobsOfSubmission.push(job);
-    }
-
-    scheduledJobs.set(submission.id, jobsOfSubmission);
-  }
-};
-
 const scheduleAllJobs = async function (): Promise<void> {
   // find all assignments
   const assignments = await Assignment.find();
   for (const assignment of assignments) {
     scheduleJobsForAssignment(assignment);
   }
-  // Find all submissions
-  const submissions = await Submission.find();
-  for (const submission of submissions) {
-    scheduleJobsForSubmission(submission);
-  }
-
   let counter = 0;
   for (const element of scheduledJobs) {
     counter += element[1].length;

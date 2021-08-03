@@ -174,9 +174,15 @@ export default class Submission extends BaseModel {
     }
 
     if (this.flaggedByServer) {
-      if (!this.commentByServer) {
+      if (this.commentByServer === null) {
         throw new Error(
           "A server comment should be set if the submission is flagged."
+        );
+      }
+    } else {
+      if (this.commentByServer !== null) {
+        throw new Error(
+          "A server comment should not be set if the submission is flagged."
         );
       }
     }

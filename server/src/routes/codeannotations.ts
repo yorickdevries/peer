@@ -14,15 +14,10 @@ import { AssignmentState } from "../enum/AssignmentState";
 import moment from "moment";
 
 const router = express.Router();
+// NOTE: should be moved to config file
 const maxAnnotationLength = 65535;
 
-router.get("/getMaxAnnotationLength", async (req, res) => {
-  const user = req.user;
-  if (!user) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("Please make sure you are logged in.");
-  }
+router.get("/getmaxannotationlength", async (_req, res) => {
   res.status(HttpStatusCode.OK).send(maxAnnotationLength.toString());
 });
 
@@ -129,16 +124,6 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
       );
     return;
   }
-  // create the annotation
-  /*const existingAnnotation = await CodeAnnotation.findOne(annotation.id);
-  if (existingAnnotation) {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(`Annotation with id ${annotation.id} already exists`);
-    return;
-  }
-  */
-  // COMMENTING
   const codeAnnotation = new CodeAnnotation(
     review,
     req.body.annotationText,
