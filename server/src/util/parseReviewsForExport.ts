@@ -4,6 +4,7 @@ import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import Question from "../models/Question";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import CheckboxQuestionAnswer from "../models/CheckboxQuestionAnswer";
+import AssignmentType from "../enum/AssignmentType";
 
 const parseSubmissionReviewsForExport = async function (
   submissionQuestionnaire: SubmissionQuestionnaire
@@ -34,7 +35,7 @@ const parseSubmissionReviewsForExport = async function (
     const reviewerGroup = await assignment.getGroup(reviewer);
 
     const annotations =
-      assignment.assignmentType === "document"
+      assignment.assignmentType === AssignmentType.DOCUMENT
         ? await review.getPDFAnnotations()
         : await review.getCodeAnnotations();
 
