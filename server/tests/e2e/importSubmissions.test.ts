@@ -1,4 +1,3 @@
-/*
 import http from "http";
 import request from "supertest";
 import { Connection } from "typeorm";
@@ -354,4 +353,3 @@ describe("Submission import", () => {
     expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
   });
 });
-*/
