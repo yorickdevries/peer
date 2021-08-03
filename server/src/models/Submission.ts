@@ -94,7 +94,7 @@ export default class Submission extends BaseModel {
   @ManyToOne((_type) => User, { eager: true })
   approvingTA: User | null;
 
-  @Column("boolean", { nullable: true })
+  @Column("boolean", { nullable: true, default: false })
   @IsOptional()
   @IsBoolean()
   flaggedByServer: boolean | null;
