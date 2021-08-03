@@ -5,10 +5,8 @@ import {
   ManyToOne,
   RelationId,
 } from "typeorm";
-import { IsString, IsNotEmpty, IsNumber } from "class-validator";
+import { IsString, IsNotEmpty, IsDefined, IsInt, Min } from "class-validator";
 import BaseModel from "./BaseModel";
-//import User from "./User";
-//import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
 
 @Entity()
@@ -25,23 +23,29 @@ export default class CodeAnnotation extends BaseModel {
   review?: ReviewOfSubmission;
 
   // The contents of the code annotation
-  @Column({ type: "text" })
+  @Column("text")
+  @IsDefined()
   @IsString()
   @IsNotEmpty()
   annotationText: string;
 
   // The starting line of highlighted text
   @Column()
-  @IsNumber()
+  @IsDefined()
+  @IsInt()
+  @Min(0)
   startLineNumber: number;
 
   // The final line of highlighted text
   @Column()
-  @IsNumber()
+  @IsDefined()
+  @IsInt()
+  @Min(0)
   endLineNumber: number;
 
   // The path of the file containing the highlighted text
   @Column()
+  @IsDefined()
   @IsString()
   @IsNotEmpty()
   selectedFile: string;
@@ -63,6 +67,9 @@ export default class CodeAnnotation extends BaseModel {
 
   // custom validation which is run before saving
   async validateOrReject(): Promise<void> {
+    if (this.startLineNumber > this.endLineNumber) {
+      throw new Error("startLineNumber cannot be bigger than endLineNumber");
+    }
     return super.validateOrReject();
   }
 
