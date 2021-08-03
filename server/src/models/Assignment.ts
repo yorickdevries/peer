@@ -162,7 +162,7 @@ export default class Assignment extends BaseModel {
   // lets the teacher set the possibillity to automatically progress to the next states of assignments
   automaticStateProgression: boolean;
 
-  @Column({ default: AssignmentType.DOCUMENT })
+  @Column()
   @IsDefined()
   @IsString()
   @IsNotEmpty()
