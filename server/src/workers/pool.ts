@@ -246,6 +246,7 @@ const startExportSubmissionsForAssignmentVersionWorker = function (
   }
 };
 
+/*
 const startImportWebLabSubmissionsWorker = function (
   assignmentVersionId: number,
   file: Express.Multer.File
@@ -265,6 +266,7 @@ const startImportWebLabSubmissionsWorker = function (
     startWorker("importWebLabSubmissions", [assignmentVersionId, file]);
   }
 };
+*/
 
 export {
   startPublishAssignmentWorker,
@@ -277,5 +279,5 @@ export {
   startExportReviewsForAssignmentVersionWorker,
   startExportSubmissionsForAssignmentVersionWorker,
   startSubmissionFlaggingWorker,
-  startImportWebLabSubmissionsWorker,
+  //startImportWebLabSubmissionsWorker,
 };

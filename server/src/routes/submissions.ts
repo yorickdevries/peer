@@ -25,7 +25,7 @@ import AssignmentExport from "../models/AssignmentExport";
 import {
   startExportSubmissionsForAssignmentVersionWorker,
   startSubmissionFlaggingWorker,
-  startImportWebLabSubmissionsWorker,
+  //startImportWebLabSubmissionsWorker,
 } from "../workers/pool";
 import AssignmentType from "../enum/AssignmentType";
 
@@ -538,6 +538,11 @@ router.post(
   }
 );
 
+/*
+This route needs some looking into:
+- users who are not in the database are simply skipped now
+-- they cannot be automatically added as we use netid's are identifiers, not student numbers
+- in the current implementation a Multer object is passed instead of a raw string, which causes it not to work in production
 router.post(
   "/import",
   upload([".zip"], maxFileSize, "file"),
@@ -615,5 +620,6 @@ router.post(
     res.send();
   }
 );
+*/
 
 export default router;
