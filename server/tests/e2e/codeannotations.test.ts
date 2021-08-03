@@ -200,7 +200,7 @@ describe("CodeAnnotations", () => {
   test("get maximum annotation length", async () => {
     //Get the maximum annotation length
     const res = await request(server)
-      .get("/api/codeannotations/getMaxAnnotationLength")
+      .get("/api/codeannotations/getmaxannotationlength")
       .set("cookie", sessionCookie1);
 
     // Check if the response is correct

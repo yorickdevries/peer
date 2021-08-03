@@ -14,9 +14,10 @@ import { AssignmentState } from "../enum/AssignmentState";
 import moment from "moment";
 
 const router = express.Router();
+// NOTE: should be moved to config file
 const maxAnnotationLength = 65535;
 
-router.get("/getMaxAnnotationLength", async (req, res) => {
+router.get("/getmaxannotationlength", async (req, res) => {
   const user = req.user;
   if (!user) {
     res
