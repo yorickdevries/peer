@@ -27,6 +27,7 @@ export default class CodeAnnotation extends BaseModel {
   @IsDefined()
   @IsString()
   @IsNotEmpty()
+  // TODO: incorporate max length of annotation
   annotationText: string;
 
   // The starting line of highlighted text
