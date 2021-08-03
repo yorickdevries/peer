@@ -27,7 +27,7 @@ import {
   startSubmissionFlaggingWorker,
   //startImportWebLabSubmissionsWorker,
 } from "../workers/pool";
-import AssignmentType from "../enum/AssignmentType";
+//import AssignmentType from "../enum/AssignmentType";
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
