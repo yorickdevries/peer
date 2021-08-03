@@ -17,13 +17,7 @@ const router = express.Router();
 // NOTE: should be moved to config file
 const maxAnnotationLength = 65535;
 
-router.get("/getmaxannotationlength", async (req, res) => {
-  const user = req.user;
-  if (!user) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("Please make sure you are logged in.");
-  }
+router.get("/getmaxannotationlength", async (_req, res) => {
   res.status(HttpStatusCode.OK).send(maxAnnotationLength.toString());
 });
 
