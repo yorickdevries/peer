@@ -84,7 +84,7 @@
                                         >?</b-badge
                                     >
                                 </template>
-                                <datepicker 
+                                <datepicker
                                     placeholder="Select date"
                                     v-model="assignment.dueDay"
                                     :monday-first="true"
