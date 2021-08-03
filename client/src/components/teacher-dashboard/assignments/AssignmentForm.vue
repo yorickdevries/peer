@@ -67,6 +67,7 @@
                                 <datepicker
                                     placeholder="Select date"
                                     v-model="assignment.publishDay"
+                                    :monday-first="true"
                                     required
                                 ></datepicker>
                                 <b-form-input v-model="assignment.publishTime" type="time" required></b-form-input>
@@ -83,7 +84,12 @@
                                         >?</b-badge
                                     >
                                 </template>
-                                <datepicker placeholder="Select date" v-model="assignment.dueDay" required></datepicker>
+                                <datepicker 
+                                    placeholder="Select date"
+                                    v-model="assignment.dueDay"
+                                    :monday-first="true"
+                                    required
+                                ></datepicker>
                                 <b-form-input v-model="assignment.dueTime" type="time" required> </b-form-input>
                                 <b-form-checkbox
                                     v-model="assignment.lateSubmissions"
@@ -117,6 +123,7 @@
                                 <datepicker
                                     placeholder="Select date"
                                     v-model="assignment.reviewPublishDay"
+                                    :monday-first="true"
                                     required
                                 ></datepicker>
                                 <b-form-input v-model="assignment.reviewPublishTime" type="time" required>
@@ -137,6 +144,7 @@
                                 <datepicker
                                     placeholder="Select date"
                                     v-model="assignment.reviewDueDay"
+                                    :monday-first="true"
                                     required
                                 ></datepicker>
                                 <b-form-input v-model="assignment.reviewDueTime" type="time" required></b-form-input>
@@ -339,6 +347,7 @@
                                 <datepicker
                                     placeholder="Select date"
                                     v-model="assignment.reviewEvaluationDueDay"
+                                    :monday-first="true"
                                 ></datepicker>
                                 <b-form-input v-model="assignment.reviewEvaluationDueTime" type="time"></b-form-input>
                                 <b-form-checkbox v-model="assignment.lateReviewEvaluations">
