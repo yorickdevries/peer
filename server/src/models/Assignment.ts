@@ -28,7 +28,7 @@ import File from "./File";
 import moment from "moment";
 import UserRole from "../enum/UserRole";
 import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
-import Extensions from "../enum/Extensions";
+import AssignmentType from "../enum/AssignmentType";
 import AssignmentExport from "./AssignmentExport";
 import AssignmentVersion from "./AssignmentVersion";
 
@@ -128,10 +128,9 @@ export default class Assignment extends BaseModel {
   @IsDefined()
   @IsString()
   @IsNotEmpty()
-  @IsEnum(Extensions)
   // can be in the form: ".pdf,.zip,.doc,.docx"
   // needs later to be revised to a list of strings
-  submissionExtensions: Extensions;
+  submissionExtensions: string;
 
   @Column()
   @IsDefined()
@@ -162,6 +161,14 @@ export default class Assignment extends BaseModel {
   @IsBoolean()
   // lets the teacher set the possibillity to automatically progress to the next states of assignments
   automaticStateProgression: boolean;
+
+  @Column({ default: "document" })
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(AssignmentType)
+  // lets the teacher choose the assignment type
+  assignmentType: AssignmentType;
 
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
@@ -197,12 +204,13 @@ export default class Assignment extends BaseModel {
     description: string | null,
     file: File | null,
     externalLink: string | null,
-    submissionExtensions: Extensions,
+    submissionExtensions: string,
     blockFeedback: boolean,
     lateSubmissions: boolean,
     lateSubmissionReviews: boolean,
     lateReviewEvaluations: boolean | null,
-    automaticStateProgression: boolean
+    automaticStateProgression: boolean,
+    assignmentType: AssignmentType
   ) {
     super();
     this.name = name;
@@ -224,6 +232,7 @@ export default class Assignment extends BaseModel {
     this.lateSubmissionReviews = lateSubmissionReviews;
     this.lateReviewEvaluations = lateReviewEvaluations;
     this.automaticStateProgression = automaticStateProgression;
+    this.assignmentType = assignmentType;
   }
 
   // custom validation which is run before saving
@@ -389,5 +398,16 @@ export default class Assignment extends BaseModel {
       }
     }
     return false;
+  }
+
+  async hasSubmissionQuestionnaires(): Promise<boolean> {
+    for (const assignmentVersion of this.versions) {
+      const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+      if (!submissionQuestionnaire) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

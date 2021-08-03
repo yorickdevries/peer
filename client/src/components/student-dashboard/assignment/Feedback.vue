@@ -1,13 +1,47 @@
 <template>
     <b-container fluid class="px-0">
         <b-tabs card>
-            <b-tab title="PDF Annotation Feedback">
-                <PDFAnnotator
-                    v-if="finalSubmission.file.extension === '.pdf'"
-                    :submissionId="finalSubmission.id"
-                    :readOnly="true"
-                ></PDFAnnotator>
-                <div v-else>Your submission was not a .pdf file, so it was not annotated by reviewers</div>
+            <b-tab title="File Annotation Feedback">
+                <div v-if="finalSubmission == null">
+                    No final was submission found.
+                </div>
+                <div v-else-if="finalSubmission.file.extension !== '.pdf' && assignment.assignmentType === 'document'">
+                    Your submission was not a .pdf file, so it was not annotated by reviewers.
+                </div>
+                <div v-else-if="feedbackReviews.length === 0">No feedback available.</div>
+                <b-tabs v-else>
+                    <b-tab v-for="tab in tabs" :key="tab.id">
+                        <template slot="title">
+                            <div class="d-flex align-items-center">
+                                <b-badge v-if="tab.aggregated" variant="warning" class="mr-2">ALL</b-badge>
+                                <b-badge v-else :style="{ 'background-color': reviewColors[tab.id] }" class="mr-2">
+                                    ID: {{ tab.id }}
+                                </b-badge>
+                                <b-badge v-if="tab.annotationCount == 1" variant="primary">
+                                    1 annotation
+                                </b-badge>
+                                <b-badge v-else variant="primary">
+                                    {{ tab.annotationCount }}
+                                    annotations
+                                </b-badge>
+                            </div>
+                        </template>
+                        <FileAnnotator
+                            v-if="tab.aggregated"
+                            :submissionId="finalSubmission.id"
+                            :assignmentType="assignment.assignmentType"
+                            :readOnly="true"
+                            :reviewColors="reviewColors"
+                        />
+                        <FileAnnotator
+                            v-else
+                            :reviewId="tab.id"
+                            :assignmentType="assignment.assignmentType"
+                            :readOnly="true"
+                            :reviewColors="reviewColors"
+                        />
+                    </b-tab>
+                </b-tabs>
             </b-tab>
             <b-tab title="Questionnaire Feedback">
                 <!--Feedback Information-->
@@ -192,11 +226,11 @@
 import api from "../../../api/api"
 import _ from "lodash"
 import { StarRating } from "vue-rate-it"
-import PDFAnnotator from "./PDFAnnotator"
+import FileAnnotator from "./FileAnnotator"
 import PDFViewer from "../../general/PDFViewer"
 
 export default {
-    components: { StarRating, PDFAnnotator, PDFViewer },
+    components: { StarRating, FileAnnotator, PDFViewer },
     data() {
         return {
             assignment: {},
@@ -207,12 +241,24 @@ export default {
             feedbackReviews: [],
             answers: null,
             // selected question
-            question: null
+            question: null,
+            tabs: [{ id: -1, aggregated: true, annotationCount: 0 }]
         }
     },
     computed: {
         numberOfFlaggedByReviewer() {
             return _.filter(this.feedbackReviews, "flaggedByReviewer").length
+        },
+        reviewColors() {
+            // https://davidmathlogic.com/colorblind/#%23648FFF-%23785EF0-%23DC267F-%23FE6100-%23FFB000
+            const colors = ["#ffb000", "#648fff", "#fe6100", "#785ef0", "#dc267f"]
+            const result = {}
+            this.feedbackReviews.forEach((review, index) => {
+                if (!review.aggregated) {
+                    result[review.id] = colors[index % colors.length]
+                }
+            })
+            return result
         }
     },
     async created() {
@@ -227,6 +273,7 @@ export default {
             await this.fetchSubmissionQuestionnaire()
             await this.fetchFeedbackReviews()
             await this.aggregateFeedback()
+            await this.createTabs()
             // automatically open first question
             if (this.questionnaire.questions.length !== 0) {
                 this.question = this.questionnaire.questions[0]
@@ -258,6 +305,37 @@ export default {
         async fetchFeedbackReviews() {
             const res = await api.submissions.getFeedback(this.finalSubmission.id)
             this.feedbackReviews = res.data
+        },
+        async createTabs() {
+            // TODO: Make getting the amount of annotations an actual endpoint (for both annotation types)
+            // to prevent loading all annotations here as well as in the annotators.
+            await Promise.all(
+                this.feedbackReviews.map(async review => {
+                    if (this.assignment.assignmentType === "document") {
+                        return api.pdfannotations.get(
+                            review.id,
+                            (await api.reviewofsubmissions.getFileMetadata(review.id)).data.id
+                        )
+                    } else if (this.assignment.assignmentType === "code") {
+                        return await api.codeannotations.getAnnotations(review.id)
+                    }
+                })
+            ).then(results => {
+                results.forEach((result, index) => {
+                    this.tabs.push({ id: this.feedbackReviews[index].id, annotationCount: result.data.length })
+                })
+            })
+
+            if (this.tabs.length === 2) {
+                // Only one review, having an aggregated tab does not make sense
+                this.tabs.splice(
+                    this.tabs.findIndex(tab => tab.aggregated),
+                    1
+                )
+            } else {
+                this.tabs[0].annotationCount = this.tabs.reduce((acc, val) => acc + val.annotationCount, 0)
+                this.tabs.sort((a, b) => a.id - b.id)
+            }
         },
         async aggregateFeedback() {
             // construct answer map with empty lists

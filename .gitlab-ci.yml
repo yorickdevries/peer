@@ -1,3 +1,6 @@
+include:
+  template: SAST.gitlab-ci.yml
+
 image: node:14
 
 variables:
@@ -6,6 +9,7 @@ variables:
   MYSQL_USER: peer
   MYSQL_PASSWORD: password
   MYSQL_HOST: mariadb
+  SAST_EXCLUDED_ANALYZERS: "bandit, brakeman, gosec, spotbugs, flawfinder, phpcs-security-audit, security-code-scan, sobelow, pmd-apex, kubesec, mobsf"
 
 stages:
     - static-analysis
@@ -24,7 +28,6 @@ lint-server:
   - npm run lint
   only:
   - merge_requests
-  - pushes
 
 lint-client:
   stage: static-analysis
@@ -35,7 +38,6 @@ lint-client:
   - npm run lint
   only:
   - merge_requests
-  - pushes
 
 build-server:
   stage: build
@@ -46,7 +48,6 @@ build-server:
   - npm run build
   only:
   - merge_requests
-  - pushes
 
 build-client:
   stage: build
@@ -57,7 +58,6 @@ build-client:
   - npm run build
   only:
   - merge_requests
-  - pushes
 
 test:
   stage: test
@@ -70,7 +70,6 @@ test:
   - npm run test
   only:
   - merge_requests
-  - pushes
 
 coverage:
   stage: test
@@ -84,7 +83,6 @@ coverage:
   - npm run coverage
   only:
   - merge_requests
-  - pushes
 
 migration:
   stage: migration
@@ -98,7 +96,6 @@ migration:
   - npm run typeorm:migration:run
   only:
   - merge_requests
-  - pushes
 
 start-server:
   stage: start
@@ -113,26 +110,18 @@ start-server:
   - timeout 60s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
   only:
   - merge_requests
-  - pushes
 
-sast:
+eslint-sast:
   stage: sast
-  image: docker:stable
-  variables:
-    DOCKER_DRIVER: overlay2
-  allow_failure: true
-  services:
-    - docker:stable-dind
-  script:
-    - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
-    - docker run
-        --env SAST_CONFIDENCE_LEVEL="${SAST_CONFIDENCE_LEVEL:-3}"
-        --volume "$PWD:/code"
-        --volume /var/run/docker.sock:/var/run/docker.sock
-        "registry.gitlab.com/gitlab-org/security-products/sast:$SP_VERSION" /app/bin/run /code
-  artifacts:
-    reports:
-      sast: gl-sast-report.json
-  only:
-  - merge_requests
-  - pushes
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+
+nodejs-scan-sast:
+  stage: sast
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+
+semgrep-sast:
+  stage: sast
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"

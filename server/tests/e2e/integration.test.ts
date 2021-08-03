@@ -11,6 +11,8 @@ import path from "path";
 import { clear, advanceTo } from "jest-date-mock";
 import UserRole from "../../src/enum/UserRole";
 import { AssignmentState } from "../../src/enum/AssignmentState";
+import AssignmentType from "../../src/enum/AssignmentType";
+import ServerFlagReason from "../../src/enum/ServerFlagReason";
 
 describe("Integration", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -215,7 +217,8 @@ describe("Integration", () => {
       .field("lateSubmissions", true)
       .field("lateSubmissionReviews", true)
       .field("lateReviewEvaluations", false)
-      .field("automaticStateProgression", false);
+      .field("automaticStateProgression", false)
+      .field("assignmentType", AssignmentType.DOCUMENT);
     expect(res.status).toBe(HttpStatusCode.OK);
     const assignment = JSON.parse(res.text);
     expect(assignment).toMatchObject({
@@ -858,6 +861,7 @@ describe("Integration", () => {
         "reviewEvaluationDueDate",
         new Date("2020-05-01T10:00Z").toISOString()
       )
+      .field("assignmentType", "document")
       .field("description", "Example description")
       .field("externalLink", "null")
       .field("submissionExtensions", ".pdf")
@@ -1118,6 +1122,23 @@ describe("Integration", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
     const submission1 = JSON.parse(res.text);
 
+    // try ro make an empty submission for student 1
+    const emptySubmissionFile = path.resolve(
+      __dirname,
+      "../../exampleData/submissions/empty.pdf"
+    );
+
+    res = await request(server)
+      .post("/api/submissions")
+      .set("cookie", await studentCookie1())
+      .attach("file", fs.readFileSync(emptySubmissionFile), "empty.pdf")
+      .field("groupId", group1.id)
+      .field("assignmentVersionId", assignmentVersion.id);
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    const emptySubmission = JSON.parse(res.text);
+
     // make a submission for student 2
     res = await request(server)
       .post("/api/submissions")
@@ -1182,7 +1203,15 @@ describe("Integration", () => {
       .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject([submission1]);
+
+    expect(JSON.parse(res.text)[0]).toEqual(
+      expect.objectContaining({
+        flaggedByServer: false,
+        final: false,
+        id: submission1.id,
+        file: submission1.file,
+      })
+    );
 
     // get final submissions for this assignment by this group
     res = await request(server)
@@ -1192,7 +1221,15 @@ describe("Integration", () => {
       .set("cookie", await studentCookie1());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject(submission1);
+    expect(JSON.parse(res.text)).toEqual(
+      expect.objectContaining({
+        final: true,
+        flaggedByServer: true,
+        id: emptySubmission.id,
+        file: emptySubmission.file,
+        commentByServer: ServerFlagReason.EMPTY,
+      })
+    );
 
     // get all submissions for this assignment as teacher
     res = await request(server)
@@ -1200,11 +1237,44 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject([
-      submission1,
-      unsubmittedSubmission,
-      submission2,
-    ]);
+
+    const allSubmissions = JSON.parse(res.text);
+
+    expect(allSubmissions[0]).toEqual(
+      expect.objectContaining({
+        final: false,
+        flaggedByServer: false,
+        id: submission1.id,
+        file: submission1.file,
+      })
+    );
+
+    expect(allSubmissions[1]).toEqual(
+      expect.objectContaining({
+        file: emptySubmission.file,
+        id: emptySubmission.id,
+        final: true,
+        flaggedByServer: true,
+        commentByServer: ServerFlagReason.EMPTY, // This submission will be flagged because it's empty
+      })
+    );
+
+    expect(allSubmissions[2]).toEqual(
+      expect.objectContaining({
+        final: false,
+        id: unsubmittedSubmission.id,
+        file: unsubmittedSubmission.file,
+      })
+    );
+
+    expect(allSubmissions[3]).toEqual(
+      expect.objectContaining({
+        final: true,
+        id: submission2.id,
+        file: submission2.file,
+        flaggedByServer: false,
+      })
+    );
 
     // get a single submission as teacher
     res = await request(server)
@@ -1212,7 +1282,14 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject(submission1);
+    expect(JSON.parse(res.text)).toEqual(
+      expect.objectContaining({
+        id: submission1.id,
+        groupId: submission1.groupId,
+        flaggedByServer: false,
+        file: submission1.file,
+      })
+    );
 
     // close the submission phase of an assingment for the course
     res = await request(server)

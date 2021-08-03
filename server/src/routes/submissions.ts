@@ -22,11 +22,15 @@ import moment from "moment";
 import { getManager } from "typeorm";
 import removePDFMetadata from "../util/removePDFMetadata";
 import AssignmentExport from "../models/AssignmentExport";
-import { startExportSubmissionsForAssignmentVersionWorker } from "../workers/pool";
+import {
+  startExportSubmissionsForAssignmentVersionWorker,
+  startSubmissionFlaggingWorker,
+  startImportWebLabSubmissionsWorker,
+} from "../workers/pool";
+import AssignmentType from "../enum/AssignmentType";
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
-const allowedExtensions = config.get("allowedExtensions") as string[];
 const maxFileSize = config.get("maxFileSize") as number;
 
 const router = express.Router();
@@ -184,7 +188,7 @@ const submissionSchema = Joi.object({
 // post a submission in a course
 router.post(
   "/",
-  upload(allowedExtensions, maxFileSize, "file"),
+  upload([".*"], maxFileSize, "file"),
   validateBody(submissionSchema),
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -254,6 +258,19 @@ router.post(
 
     // file info
     const fileExtension = path.extname(req.file.originalname);
+
+    const submissionExtensions = assignment.submissionExtensions.split(
+      /\s*,\s*/
+    );
+    if (
+      !submissionExtensions.includes(fileExtension) &&
+      !submissionExtensions.includes(".*")
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(`Extension not allowed: ${fileExtension}`);
+      return;
+    }
     const fileName = path.basename(req.file.originalname, fileExtension);
     // run removePDFMetadata in case the file is a pdf
     if (fileExtension === ".pdf") {
@@ -318,6 +335,7 @@ router.post(
     await submission!.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(submission!);
+    startSubmissionFlaggingWorker(submission?.id);
   }
 );
 
@@ -516,6 +534,84 @@ router.post(
 
     // send message that reviews are being exported
     res.send(assignmentExport);
+  }
+);
+
+router.post(
+  "/import",
+  upload([".zip"], maxFileSize, "file"),
+  validateBody(assignmentVersionIdSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    if (!req.file) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("File is needed for the import");
+      return;
+    }
+
+    const assignmentVersion = await AssignmentVersion.findOne(
+      req.body.assignmentVersionId
+    );
+    if (!assignmentVersion) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignmentVersion.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    const assignment = await assignmentVersion.getAssignment();
+    if (assignment.assignmentType !== AssignmentType.CODE) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(`The assignment must be a '${AssignmentType.CODE}' assignment`);
+      return;
+    }
+    if (assignment.enrollable) {
+      res.status(HttpStatusCode.FORBIDDEN).send("The assignment is enrollable");
+      return;
+    }
+    if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The submission state has passed");
+      return;
+    }
+    if (!/\.zip($|[\s,])/.test(assignment.submissionExtensions)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment must allow .zip submissions");
+      return;
+    }
+    const groups = await assignment.getGroups();
+    if (groups.length > 0) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("There are already groups for this assignment");
+      return;
+    }
+    const submissions = await assignmentVersion.getSubmissions();
+    if (submissions.length > 0) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("There are already submissions for this assignment");
+      return;
+    }
+
+    // offload a function to a worker
+    startImportWebLabSubmissionsWorker(assignmentVersion.id, req.file);
+
+    // send message that submissions are being imported
+    res.send();
   }
 );
 

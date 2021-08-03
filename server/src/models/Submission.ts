@@ -14,6 +14,7 @@ import {
   IsOptional,
   IsString,
   IsNotEmpty,
+  IsEnum,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
@@ -21,6 +22,7 @@ import AssignmentVersion from "../models/AssignmentVersion";
 import Group from "./Group";
 import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
+import ServerFlagReason from "../enum/ServerFlagReason";
 
 @Entity()
 export default class Submission extends BaseModel {
@@ -92,6 +94,18 @@ export default class Submission extends BaseModel {
   @ManyToOne((_type) => User, { eager: true })
   approvingTA: User | null;
 
+  @Column("boolean", { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  flaggedByServer: boolean | null;
+
+  @Column("text", { nullable: true })
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(ServerFlagReason)
+  commentByServer: ServerFlagReason | null;
+
   constructor(
     user: User,
     group: Group,
@@ -109,6 +123,8 @@ export default class Submission extends BaseModel {
     this.approvalByTA = null;
     this.commentByTA = null;
     this.approvingTA = null;
+    this.flaggedByServer = null;
+    this.commentByServer = null;
   }
 
   // validation: check whether the group is in the assingment and the user in the group
@@ -130,8 +146,12 @@ export default class Submission extends BaseModel {
       throw new Error("Group is not part of this assignment");
     }
     // check if the file has the right extension
+    const submissionExtensions = assignment.submissionExtensions.split(
+      /\s*,\s*/
+    );
     if (
-      !assignment.submissionExtensions.split(",").includes(this.file.extension)
+      !submissionExtensions.includes(this.file.extension) &&
+      !submissionExtensions.includes(".*")
     ) {
       throw new Error("The file is of the wrong extension");
     }
@@ -149,6 +169,14 @@ export default class Submission extends BaseModel {
       if (!(await course.isTeacherOrTeachingAssistant(this.approvingTA))) {
         throw new Error(
           `${this.approvingTA.netid} should be enrolled in the course`
+        );
+      }
+    }
+
+    if (this.flaggedByServer) {
+      if (!this.commentByServer) {
+        throw new Error(
+          "A server comment should be set if the submission is flagged."
         );
       }
     }
