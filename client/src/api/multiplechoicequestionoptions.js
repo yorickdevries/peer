@@ -1,12 +1,16 @@
 import client from "./axiosClient"
 
 export default {
-    post(text, multipleChoiceQuestionId) {
-        const body = { text, multipleChoiceQuestionId }
+    post(text, decimalPoints, multipleChoiceQuestionId) {
+        // convert to integer
+        const points = isNaN(decimalPoints) ? null : parseInt(decimalPoints * 100)
+        const body = { text, multipleChoiceQuestionId, points }
         return client.post("multiplechoicequestionoptions/", body)
     },
-    patch(text, id) {
-        const body = { text }
+    patch(text, decimalPoints, id) {
+        // convert to integer
+        const points = isNaN(decimalPoints) ? null : parseInt(decimalPoints * 100)
+        const body = { text, points }
         return client.patch(`multiplechoicequestionoptions/${id}`, body)
     },
     delete(id) {

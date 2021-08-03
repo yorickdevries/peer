@@ -23,7 +23,7 @@ export default class UploadQuestion extends Question {
     questionnaire: Questionnaire,
     extensions: Extensions
   ) {
-    super(text, number, optional, questionnaire);
+    super(text, number, optional, false, questionnaire);
     this.extensions = extensions;
   }
 }

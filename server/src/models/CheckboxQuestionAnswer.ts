@@ -46,4 +46,29 @@ export default class CheckboxQuestionAnswer extends QuestionAnswer {
     }
     return String(answer);
   }
+
+  // method specifically made for checkboxquestionanswers as there are multiple options possible
+  async getAnswerPointsList(): Promise<number[] | undefined> {
+    const question = await this.getQuestion();
+    if (!question.graded) {
+      return undefined;
+    } else {
+      const points = [];
+      for (const option of this.checkboxAnswer) {
+        if (option.points == null) {
+          throw new Error("The option doesn't have points");
+        } else {
+          points.push(option.points);
+        }
+      }
+      return points;
+    }
+  }
+
+  async getAnswerPoints(): Promise<number | undefined> {
+    const pointsList = await this.getAnswerPointsList();
+    return pointsList == undefined
+      ? undefined
+      : pointsList.reduce((a, b) => a + b, 0);
+  }
 }

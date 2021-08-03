@@ -12,7 +12,8 @@ export default {
         const body = { copyFromQuestionnaireId }
         return client.patch(`reviewquestionnaires/${id}/copyquestions`, body)
     },
-    defaultQuestions(id) {
-        return client.patch(`reviewquestionnaires/${id}/defaultquestions`)
+    defaultQuestions(id, graded) {
+        const body = { graded }
+        return client.patch(`reviewquestionnaires/${id}/defaultquestions`, body)
     }
 }
