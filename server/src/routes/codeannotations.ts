@@ -7,6 +7,7 @@ import {
   idSchema,
   validateParams,
 } from "../middleware/validation";
+import config from "config";
 import Joi from "@hapi/joi";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ResponseMessage from "../enum/ResponseMessage";
@@ -14,8 +15,8 @@ import { AssignmentState } from "../enum/AssignmentState";
 import moment from "moment";
 
 const router = express.Router();
-// NOTE: should be moved to config file
-const maxAnnotationLength = 65535;
+
+const maxAnnotationLength: number = config.get("maxCodeAnnotationLength");
 
 router.get("/getmaxannotationlength", async (_req, res) => {
   res.status(HttpStatusCode.OK).send(maxAnnotationLength.toString());

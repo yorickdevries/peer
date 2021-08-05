@@ -15,7 +15,7 @@
                 </b-button>
                 <p class="mb-auto mt-auto">Write annotation from line</p>
                 <b-form-input
-                    :type="number"
+                    type="number"
                     v-model="startLineNumber"
                     :state="validateLineNumbers()"
                     style="width: 90px; margin: 0px 10px"
@@ -24,7 +24,7 @@
                 </b-form-input>
                 <p class="mb-auto mt-auto">to</p>
                 <b-form-input
-                    :type="number"
+                    type="number"
                     v-model="endLineNumber"
                     :state="validateLineNumbers()"
                     style="width: 90px; margin: 0px 10px"
