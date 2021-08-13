@@ -25,6 +25,7 @@
                             :reviewId="review.id"
                             @reviewChanged="fetchReviews"
                             :reviewsAreReadOnly="!isReviewActive"
+                            :assignmentType="assignment.assignmentType"
                         ></Review>
                     </b-tab>
                 </b-tabs>

@@ -39,7 +39,8 @@ export default {
         lateSubmissions,
         lateSubmissionReviews,
         lateReviewEvaluations,
-        automaticStateProgression
+        automaticStateProgression,
+        assignmentType
     ) {
         // Create formData and append data
         const formData = new FormData()
@@ -72,6 +73,7 @@ export default {
             formData.append("lateReviewEvaluations", null)
         }
         formData.append("automaticStateProgression", automaticStateProgression)
+        formData.append("assignmentType", assignmentType)
         return client.post("assignments/", formData)
     },
     patch(
@@ -92,7 +94,8 @@ export default {
         lateSubmissions,
         lateSubmissionReviews,
         lateReviewEvaluations,
-        automaticStateProgression
+        automaticStateProgression,
+        assignmentType
     ) {
         // Create formData and append data
         const formData = new FormData()
@@ -131,6 +134,7 @@ export default {
             formData.append("lateReviewEvaluations", null)
         }
         formData.append("automaticStateProgression", automaticStateProgression)
+        formData.append("assignmentType", assignmentType)
         return client.patch(`assignments/${id}`, formData)
     },
     enroll(id) {

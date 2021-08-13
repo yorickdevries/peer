@@ -47,21 +47,33 @@
                                 <dt>Current submission status</dt>
                                 <dd>{{ submission.final ? "" : "Not " }}Final</dd>
                             </dl>
-                            <dt>Current approval status</dt>
+                            <dl>
+                                <dt>Current server flagging status</dt>
+                                <dd v-if="submission.flaggedByServer">Flagged as suspicious⚠️</dd>
+                                <dd v-if="submission.flaggedByServer === false">Not flagged as suspicious✔️</dd>
+                                <dd v-if="submission.flaggedByServer === null">No action by the server yet</dd>
+                            </dl>
+                            <dl>
+                                <dt>Server's reason for flagging</dt>
+                                <dd>{{ submission.commentByServer }}</dd>
+                            </dl>
+                            <dt>Current TA approval status</dt>
                             <dd v-if="submission.approvalByTA">Approved 👍</dd>
                             <dd v-if="submission.approvalByTA === false">Disapproved 👎</dd>
-                            <dd v-if="submission.approvalByTA === null">No action yet by any TA.</dd>
+                            <dd v-if="submission.approvalByTA === null">No action yet by any TA</dd>
                             <dt>Current TA Comment</dt>
                             <b-form-textarea :rows="10" :max-rows="15" v-model="submission.commentByTA" readonly />
                         </b-col>
                     </b-row>
                     <b-row>
                         <b-col>
-                            <PDFAnnotator
-                                v-if="viewPDF && submission.file.extension === '.pdf'"
+                            <FileAnnotator
+                                v-if="viewFile"
                                 :submissionId="submission.id"
+                                :assignmentType="assignment.assignmentType"
                                 :readOnly="true"
-                            ></PDFAnnotator>
+                                :ignoreAnnotations="true"
+                            />
                         </b-col>
                     </b-row>
                 </b-card-body>
@@ -113,18 +125,18 @@ import api from "../../api/api"
 import _ from "lodash"
 import notifications from "../../mixins/notifications"
 import BreadcrumbTitle from "../BreadcrumbTitle"
-import PDFAnnotator from "../student-dashboard/assignment/PDFAnnotator"
+import FileAnnotator from "../student-dashboard/assignment/FileAnnotator"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle, PDFAnnotator },
+    components: { BreadcrumbTitle, FileAnnotator },
     data() {
         return {
             assignment: {},
             submission: {},
             commentChanged: false,
-            // dont view pdf until data is fetched
-            viewPDF: false
+            // dont view file until data is fetched
+            viewFile: false
         }
     },
     computed: {
@@ -146,9 +158,9 @@ export default {
     methods: {
         async fetchData() {
             await this.fetchAssignment()
-            this.viewPDF = false
+            this.viewFile = false
             await this.fetchSubmission()
-            this.viewPDF = true
+            this.viewFile = true
         },
         async fetchAssignment() {
             // Fetch the assignment information.

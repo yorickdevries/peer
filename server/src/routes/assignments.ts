@@ -1,5 +1,5 @@
 import express from "express";
-import Joi from "@hapi/joi";
+import Joi, { CustomHelpers } from "@hapi/joi";
 import { getManager } from "typeorm";
 import {
   validateBody,
@@ -19,7 +19,7 @@ import _ from "lodash";
 import ResponseMessage from "../enum/ResponseMessage";
 import Group from "../models/Group";
 import { AssignmentState } from "../enum/AssignmentState";
-import Extensions from "../enum/Extensions";
+import AssignmentType from "../enum/AssignmentType";
 import Submission from "../models/Submission";
 import publishAssignment from "../assignmentProgression/publishAssignment";
 import closeSubmission from "../assignmentProgression/closeSubmission";
@@ -222,6 +222,23 @@ router.get(
   }
 );
 
+const extensionValidation = (value: string, helpers: CustomHelpers) => {
+  const extensions = value.split(/\s*,\s*/);
+  // Remove empty extension belonging to trailing comma
+  if (extensions.length > 1 && extensions[extensions.length - 1].length == 0) {
+    extensions.pop();
+  }
+
+  for (const extension of extensions) {
+    // Match file extensions starting with . followed by 1 or more alphabetic characters or a star
+    if (!/^\.([A-Za-z]+|\*)$/.test(extension)) {
+      return helpers.error("any.invalid");
+    }
+  }
+
+  return value;
+};
+
 // Joi inputvalidation
 const assignmentSchema = Joi.object({
   name: Joi.string().required(),
@@ -236,14 +253,15 @@ const assignmentSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
-  submissionExtensions: Joi.string()
-    .valid(...Object.values(Extensions))
-    .required(),
+  submissionExtensions: Joi.string().custom(extensionValidation).required(),
   blockFeedback: Joi.boolean().required(),
   lateSubmissions: Joi.boolean().required(),
   lateSubmissionReviews: Joi.boolean().required(),
   lateReviewEvaluations: Joi.boolean().allow(null).required(),
   automaticStateProgression: Joi.boolean().required(),
+  assignmentType: Joi.string()
+    .valid(...Object.values(AssignmentType))
+    .required(),
 });
 // post an assignment in a course
 router.post(
@@ -286,7 +304,8 @@ router.post(
       req.body.lateSubmissions,
       req.body.lateSubmissionReviews,
       req.body.lateReviewEvaluations,
-      req.body.automaticStateProgression
+      req.body.automaticStateProgression,
+      req.body.assignmentType
     );
 
     // construct file to be saved in transaction
@@ -348,14 +367,15 @@ const assignmentPatchSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
-  submissionExtensions: Joi.string()
-    .valid(...Object.values(Extensions))
-    .required(),
+  submissionExtensions: Joi.string().custom(extensionValidation).required(),
   blockFeedback: Joi.boolean().required(),
   lateSubmissions: Joi.boolean().required(),
   lateSubmissionReviews: Joi.boolean().required(),
   lateReviewEvaluations: Joi.boolean().allow(null).required(),
   automaticStateProgression: Joi.boolean().required(),
+  assignmentType: Joi.string()
+    .valid(...Object.values(AssignmentType))
+    .required(),
 });
 // patch an assignment in a course
 router.patch(
@@ -416,6 +436,15 @@ router.patch(
         .send("You cannot change submissionExtensions at this state");
       return;
     }
+    if (
+      !assignment.isAtState(AssignmentState.UNPUBLISHED) &&
+      assignment.assignmentType !== req.body.assignmentType
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change assignmentType at this state");
+      return;
+    }
     // either a new file can be sent or a file can be removed, not both
     if (req.file && req.body.file === null) {
       res
@@ -471,6 +500,7 @@ router.patch(
         assignment.lateReviewEvaluations = req.body.lateReviewEvaluations;
         assignment.automaticStateProgression =
           req.body.automaticStateProgression;
+        assignment.assignmentType = req.body.assignmentType;
 
         // change the file in case it is not undefined
         if (newFile !== undefined) {

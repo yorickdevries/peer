@@ -96,6 +96,10 @@
                         >You have not yet made a submission for this assignment version</b-alert
                     >
                     <b-alert show variant="warning">Maximum file size for submission: 50MB</b-alert>
+                    <b-alert show variant="danger">
+                        You should never include any personal information in your submission files unless specifically
+                        mentioned otherwise!
+                    </b-alert>
 
                     <!-- Modal Button -->
                     <b-button
@@ -117,8 +121,12 @@
                         Assignment version:
                         <b-badge pill>{{ assignmentVersion.name }} (ID: {{ assignmentVersion.id }})</b-badge>
                         <hr />
-                        <b-alert show variant="warning"
-                            >If you have already uploaded a file, it will not be used for reviewing anymore!
+                        <b-alert show variant="warning">
+                            If you have already uploaded a file, it will not be used for reviewing anymore!
+                        </b-alert>
+                        <b-alert show variant="warning">
+                            Please make sure you have not included personal information anywhere unless specifically
+                            mentioned otherwise!
                         </b-alert>
                         <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
                         <b-alert show variant="secondary"
@@ -140,18 +148,18 @@
             <b-row>
                 <b-col>
                     <dt>You can view your final submission here:</dt>
-                    <div v-if="finalSubmission && finalSubmission.file.extension === '.pdf'">
-                        <b-alert show variant="secondary"
+                    <div v-if="finalSubmission">
+                        <b-alert v-if="finalSubmission.file.extension === '.pdf'" variant="secondary"
                             >In case the viewer shows any errors, your .pdf is malformed and no pdf annotations can be
                             made by your reviewers directly in the browser. Reviewers can always download the file
                             instead.</b-alert
                         >
-                        <PDFAnnotator :submissionId="finalSubmission.id" :readOnly="true"></PDFAnnotator>
-                    </div>
-                    <div v-else>
-                        <b-alert show variant="secondary">
-                            Your final submission is not a .pdf file, so it will not be rendered in the browser</b-alert
-                        >
+                        <FileAnnotator
+                            :submissionId="finalSubmission.id"
+                            :assignmentType="assignment.assignmentType"
+                            :readOnly="true"
+                            :ignoreAnnotations="true"
+                        />
                     </div>
                 </b-col>
             </b-row>
@@ -162,13 +170,12 @@
 <script>
 import api from "../../../api/api"
 import _ from "lodash"
-import PDFAnnotator from "./PDFAnnotator"
+import FileAnnotator from "./FileAnnotator"
 import notifications from "../../../mixins/notifications"
-
 export default {
     props: ["assignmentVersionId"],
     mixins: [notifications],
-    components: { PDFAnnotator },
+    components: { FileAnnotator },
     data() {
         return {
             assignment: null,
