@@ -16,7 +16,7 @@ import moment from "moment";
 
 const router = express.Router();
 
-const maxAnnotationLength: number = config.get("maxCodeAnnotationLength");
+const maxAnnotationLength = config.get("maxCodeAnnotationLength") as number;
 
 router.get("/getmaxannotationlength", async (_req, res) => {
   res.status(HttpStatusCode.OK).send(maxAnnotationLength.toString());
