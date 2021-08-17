@@ -137,16 +137,20 @@ const distributeReviewsForAssignmentHelper = async function (
   for (const assignmentVersion of assignment.versions) {
     // the users of these submissions will be reviewing
     const finalSubmissionsOfEachGroup = await assignmentVersion.getFinalSubmissionsOfEachGroup();
-    finalSubmissionsOfEachGroupMap.set(assignmentVersion.id, finalSubmissionsOfEachGroup);
+    finalSubmissionsOfEachGroupMap.set(
+      assignmentVersion.id,
+      finalSubmissionsOfEachGroup
+    );
   }
   // MAKE REVIEW DISTRIBUTION
   const fullReviewDistribution: reviewAssignment[] = [];
-  // assignmentVersions of which the users will be reviewing
+
+  // first, create self reviews
   for (const assignmentVersion of assignment.versions) {
-    const reviewsPerUserPerAssignmentVersionToReview =
-      assignmentVersion.reviewsPerUserPerAssignmentVersionToReview;
     // the users of these submissions will be reviewing
-    const finalSubmissionsOfEachGroup = finalSubmissionsOfEachGroupMap.get(assignmentVersion.id);
+    const finalSubmissionsOfEachGroup = finalSubmissionsOfEachGroupMap.get(
+      assignmentVersion.id
+    );
     if (finalSubmissionsOfEachGroup === undefined) {
       // should never happen
       throw new Error(
@@ -159,6 +163,22 @@ const distributeReviewsForAssignmentHelper = async function (
         finalSubmissionsOfEachGroup
       );
       fullReviewDistribution.push(...selfReviewAssignments);
+    }
+  }
+
+  // assignmentVersions of which the users will be reviewing
+  for (const assignmentVersion of assignment.versions) {
+    const reviewsPerUserPerAssignmentVersionToReview =
+      assignmentVersion.reviewsPerUserPerAssignmentVersionToReview;
+    // the users of these submissions will be reviewing
+    const finalSubmissionsOfEachGroup = finalSubmissionsOfEachGroupMap.get(
+      assignmentVersion.id
+    );
+    if (finalSubmissionsOfEachGroup === undefined) {
+      // should never happen
+      throw new Error(
+        `assignmentVersion with id ${assignmentVersion.id} is not part of the map`
+      );
     }
     const usersOfLatestSubmissions = await getUniqueUsersOfSubmissions(
       finalSubmissionsOfEachGroup
