@@ -129,13 +129,30 @@ const distributeReviewsForAssignmentHelper = async function (
       }
     }
   }
+  // make a map of the final submissions per assignmentversion
+  const finalSubmissionsOfEachGroupMap: Map<
+    number, // assignmentversion id
+    Submission[]
+  > = new Map();
+  for (const assignmentVersion of assignment.versions) {
+    // the users of these submissions will be reviewing
+    const finalSubmissionsOfEachGroup = await assignmentVersion.getFinalSubmissionsOfEachGroup();
+    finalSubmissionsOfEachGroupMap.set(assignmentVersion.id, finalSubmissionsOfEachGroup);
+  }
+  // MAKE REVIEW DISTRIBUTION
   const fullReviewDistribution: reviewAssignment[] = [];
   // assignmentVersions of which the users will be reviewing
   for (const assignmentVersion of assignment.versions) {
     const reviewsPerUserPerAssignmentVersionToReview =
       assignmentVersion.reviewsPerUserPerAssignmentVersionToReview;
     // the users of these submissions will be reviewing
-    const finalSubmissionsOfEachGroup = await assignmentVersion.getFinalSubmissionsOfEachGroup();
+    const finalSubmissionsOfEachGroup = finalSubmissionsOfEachGroupMap.get(assignmentVersion.id);
+    if (finalSubmissionsOfEachGroup === undefined) {
+      // should never happen
+      throw new Error(
+        `assignmentVersion with id ${assignmentVersion.id} is not part of the map`
+      );
+    }
     // create selfreviews if needed
     if (assignmentVersion.selfReview) {
       const selfReviewAssignments = await generateSelfReviews(
