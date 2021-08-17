@@ -135,16 +135,16 @@ const distributeReviewsForAssignmentHelper = async function (
     const reviewsPerUserPerAssignmentVersionToReview =
       assignmentVersion.reviewsPerUserPerAssignmentVersionToReview;
     // the users of these submissions will be reviewing
-    const latestSubmissionsOfEachGroup = await assignmentVersion.getFinalSubmissionsOfEachGroup();
+    const finalSubmissionsOfEachGroup = await assignmentVersion.getFinalSubmissionsOfEachGroup();
     // create selfreviews if needed
     if (assignmentVersion.selfReview) {
       const selfReviewAssignments = await generateSelfReviews(
-        latestSubmissionsOfEachGroup
+        finalSubmissionsOfEachGroup
       );
       fullReviewDistribution.push(...selfReviewAssignments);
     }
     const usersOfLatestSubmissions = await getUniqueUsersOfSubmissions(
-      latestSubmissionsOfEachGroup
+      finalSubmissionsOfEachGroup
     );
     // iterate over all verions which needs to be reviewed
     const versionsToReview = await assignmentVersion.getVersionsToReview();
