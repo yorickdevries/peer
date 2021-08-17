@@ -12,6 +12,7 @@ import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { sendMailToTeachersOfAssignment } from "../util/mailer";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
+import AssignmentVersion from "../models/AssignmentVersion";
 
 interface reviewAssignment {
   reviewer: User;
@@ -97,6 +98,35 @@ const distributeReviewsForAssignmentHelper = async function (
       throw new Error(
         `assignmentVersion with id ${assignmentVersion.id} is not reviewed by another assignmentVersion`
       );
+    }
+  }
+  // make a map which connects the assignmentversions to the versions it is reviewed by
+  const assignmentVersionsReviewedByMap: Map<
+    number, // assignmentversion id
+    AssignmentVersion[]
+  > = new Map();
+  for (const assignmentVersion of assignment.versions) {
+    // initialize with emtpy lists
+    assignmentVersionsReviewedByMap.set(assignmentVersion.id, []);
+  }
+  // iterate over the versions and fill the map
+  for (const assignmentVersion of assignment.versions) {
+    // iterate over all verions which needs to be reviewed
+    const versionsToReview = await assignmentVersion.getVersionsToReview();
+    for (const assignmentVersionToReview of versionsToReview) {
+      // get list of current versions it is reviewd by
+      const reviewedByList = assignmentVersionsReviewedByMap.get(
+        assignmentVersionToReview.id
+      );
+      if (reviewedByList === undefined) {
+        // should never happen
+        throw new Error(
+          `assignmentVersion with id ${assignmentVersionToReview.id} is of the wrong assignment`
+        );
+      } else {
+        // add the assignment version that is reviewing the assignment to the reviewed By list
+        reviewedByList.push(assignmentVersion);
+      }
     }
   }
   const fullReviewDistribution: reviewAssignment[] = [];
