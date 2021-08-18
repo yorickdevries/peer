@@ -12,7 +12,6 @@ import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { sendMailToTeachersOfAssignment } from "../util/mailer";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
-import AssignmentVersion from "../models/AssignmentVersion";
 
 interface reviewAssignment {
   reviewer: User;
@@ -100,65 +99,92 @@ const distributeReviewsForAssignmentHelper = async function (
       );
     }
   }
-  // make a map which connects the assignmentversions to the versions it is reviewed by
+
+  // make a map which connects the assignmentversions to the users it is reviewed by
   const assignmentVersionsReviewedByMap: Map<
     number, // assignmentversion id
-    AssignmentVersion[]
+    [User, number][] // user-number of reviews user must do tuple
   > = new Map();
-  for (const assignmentVersion of assignment.versions) {
-    // initialize with emtpy lists
-    assignmentVersionsReviewedByMap.set(assignmentVersion.id, []);
-  }
-  // iterate over the versions and fill the map
-  for (const assignmentVersion of assignment.versions) {
-    // iterate over all verions which needs to be reviewed
-    const versionsToReview = await assignmentVersion.getVersionsToReview();
-    for (const assignmentVersionToReview of versionsToReview) {
-      // get list of current versions it is reviewd by
-      const reviewedByList = assignmentVersionsReviewedByMap.get(
-        assignmentVersionToReview.id
-      );
-      if (reviewedByList === undefined) {
-        // should never happen
-        throw new Error(
-          `assignmentVersion with id ${assignmentVersionToReview.id} is of the wrong assignment`
-        );
-      } else {
-        // add the assignment version that is reviewing the assignment to the reviewed By list
-        reviewedByList.push(assignmentVersion);
-      }
-    }
-  }
+
   // make a map of the final submissions per assignmentversion
   const finalSubmissionsOfEachGroupMap: Map<
     number, // assignmentversion id
     Submission[]
   > = new Map();
+
   for (const assignmentVersion of assignment.versions) {
     // the users of these submissions will be reviewing
-    const finalSubmissionsOfEachGroup = await assignmentVersion.getFinalSubmissionsOfEachGroup();
     finalSubmissionsOfEachGroupMap.set(
       assignmentVersion.id,
-      finalSubmissionsOfEachGroup
+      await assignmentVersion.getFinalSubmissionsOfEachGroup()
     );
+    // initialize with empty lists to be filled in the subsequent loop
+    assignmentVersionsReviewedByMap.set(assignmentVersion.id, []);
   }
-  // MAKE REVIEW DISTRIBUTION
-  const fullReviewDistribution: reviewAssignment[] = [];
 
-  // first, create self reviews
+  // iterate over the versions and fill the map
   for (const assignmentVersion of assignment.versions) {
-    // the users of these submissions will be reviewing
+    // number of reviews specific to that version
+    const reviewsPerUserPerAssignmentVersionToReview =
+      assignmentVersion.reviewsPerUserPerAssignmentVersionToReview;
+    // set the users of these submissions will be reviewing
     const finalSubmissionsOfEachGroup = finalSubmissionsOfEachGroupMap.get(
       assignmentVersion.id
     );
     if (finalSubmissionsOfEachGroup === undefined) {
       // should never happen
       throw new Error(
-        `assignmentVersion with id ${assignmentVersion.id} is not part of the map`
+        `finalSubmissionsOfEachGroup of assignmentVersion with id ${assignmentVersion.id} is undefined`
       );
     }
+    const newReviewedByList: [User, number][] = [];
+    const usersOfLatestSubmissions = await getUniqueUsersOfSubmissions(
+      finalSubmissionsOfEachGroup
+    );
+    for (const userOfLatestSubmissions of usersOfLatestSubmissions) {
+      // add one user to the list
+      newReviewedByList.push([
+        userOfLatestSubmissions,
+        reviewsPerUserPerAssignmentVersionToReview,
+      ]);
+    }
+
+    // iterate over all verions which needs to be reviewed and add the users to the map
+    const versionsToReview = await assignmentVersion.getVersionsToReview();
+    for (const assignmentVersionToReview of versionsToReview) {
+      // get list of current users it is reviewd by
+      const oldReviewedByList = assignmentVersionsReviewedByMap.get(
+        assignmentVersionToReview.id
+      );
+      if (oldReviewedByList === undefined) {
+        // should never happen
+        throw new Error(
+          `assignmentVersion with id ${assignmentVersionToReview.id} is of the wrong assignment`
+        );
+      } else {
+        // add the users of the assignment version that is reviewing the assignment to the reviewed By list
+        oldReviewedByList.push(...newReviewedByList);
+      }
+    }
+  }
+
+  // MAKE REVIEW DISTRIBUTION
+  const fullReviewDistribution: reviewAssignment[] = [];
+
+  // first, create self reviews
+  for (const assignmentVersion of assignment.versions) {
     // create selfreviews if needed
     if (assignmentVersion.selfReview) {
+      // the users of these submissions will be reviewing
+      const finalSubmissionsOfEachGroup = finalSubmissionsOfEachGroupMap.get(
+        assignmentVersion.id
+      );
+      if (finalSubmissionsOfEachGroup === undefined) {
+        // should never happen
+        throw new Error(
+          `assignmentVersion with id ${assignmentVersion.id} is not part of the map`
+        );
+      }
       const selfReviewAssignments = await generateSelfReviews(
         finalSubmissionsOfEachGroup
       );
@@ -166,11 +192,19 @@ const distributeReviewsForAssignmentHelper = async function (
     }
   }
 
-  // assignmentVersions of which the users will be reviewing
+  // assignmentVersions of which the users will be reviewed
   for (const assignmentVersion of assignment.versions) {
-    const reviewsPerUserPerAssignmentVersionToReview =
-      assignmentVersion.reviewsPerUserPerAssignmentVersionToReview;
-    // the users of these submissions will be reviewing
+    // the users, number of reviews of these submissions will be reviewing
+    const reviewedByList = assignmentVersionsReviewedByMap.get(
+      assignmentVersion.id
+    );
+    if (reviewedByList === undefined) {
+      // should never happen
+      throw new Error(
+        `assignmentVersion with id ${assignmentVersion.id} is of the wrong assignment`
+      );
+    }
+    // submissions which need to be reviewed
     const finalSubmissionsOfEachGroup = finalSubmissionsOfEachGroupMap.get(
       assignmentVersion.id
     );
@@ -180,23 +214,12 @@ const distributeReviewsForAssignmentHelper = async function (
         `assignmentVersion with id ${assignmentVersion.id} is not part of the map`
       );
     }
-    const usersOfLatestSubmissions = await getUniqueUsersOfSubmissions(
-      finalSubmissionsOfEachGroup
+    const reviewDistributionForCurrentVersion = await generateReviewDistribution(
+      finalSubmissionsOfEachGroup,
+      reviewedByList
     );
-    // iterate over all verions which needs to be reviewed
-    const versionsToReview = await assignmentVersion.getVersionsToReview();
-    for (const assignmentVersionToReview of versionsToReview) {
-      const submissionsToReview = await assignmentVersionToReview.getFinalSubmissionsOfEachGroup();
-      const reviewDistributionForCurrentVersionToReview = await generateReviewDistribution(
-        submissionsToReview,
-        usersOfLatestSubmissions,
-        reviewsPerUserPerAssignmentVersionToReview
-      );
-      // add the distribution to fullReviewDistribution
-      fullReviewDistribution.push(
-        ...reviewDistributionForCurrentVersionToReview
-      );
-    }
+    // add the distribution to fullReviewDistribution
+    fullReviewDistribution.push(...reviewDistributionForCurrentVersion);
   }
 
   // create all reviews in an transaction
@@ -242,45 +265,53 @@ const distributeReviewsForAssignmentHelper = async function (
   return `Distributed ${fullReviewDistribution.length} reviews for assignment ${assignment.id}`;
 };
 
+const getTotalNumberOfReviews = function (userNumberList: [User, number][]) {
+  let totalNumberOfReviews = 0;
+  for (const userNumber of userNumberList) {
+    totalNumberOfReviews += userNumber[1];
+  }
+  return totalNumberOfReviews;
+};
+
 // Takes care of the distribution of reviews of submissions over the students
 const generateReviewDistribution = async function (
   submissions: Submission[],
-  users: User[],
-  reviewsPerUser: number
+  userNumberList: [User, number][]
 ): Promise<reviewAssignment[]> {
-  // basic validation
-  if (reviewsPerUser < 1 || !Number.isInteger(reviewsPerUser)) {
-    throw new Error("reviewsPerUser should be a positive integer");
-  }
-  // If there are less submissions than required to review per person, then no division can be made
-  if (submissions.length < reviewsPerUser) {
-    throw new Error(
-      `There are not enough submissions to assign the required number of reviewsPerUser: ${reviewsPerUser}`
-    );
+  for (const userNumber of userNumberList) {
+    const reviewsOfUser = userNumber[1];
+    // basic validation
+    if (reviewsOfUser < 1 || !Number.isInteger(reviewsOfUser)) {
+      throw new Error("reviewsOfUser should be a positive integer");
+    }
+    // If there are less submissions than required to review per person, then no division can be made
+    if (submissions.length < reviewsOfUser) {
+      throw new Error(
+        `There are not enough submissions to assign the required number of reviewsOfUserr: ${reviewsOfUser}`
+      );
+    }
   }
   // If there are less users * reviews per user than submissions
   // then no division can be made as there will be submissions without reviews
-  if (submissions.length > users.length * reviewsPerUser) {
+  if (submissions.length > getTotalNumberOfReviews(userNumberList)) {
     throw new Error("There are not enough users for the number of submissions");
   }
 
   // findDistribution will try max 10 times to find a distribution (to avoid infinite loops)
-  // it will thor an error if no solution is found
+  // it will throw an error if no solution is found
   const reviewDistribution = await findDistribution(
     submissions,
-    users,
-    reviewsPerUser
+    userNumberList
   );
   return reviewDistribution;
 };
 
 const findDistribution = async function (
   submissions: Submission[],
-  users: User[],
-  reviewsPerUser: number
+  userNumberList: [User, number][]
 ) {
   // calculate ideal upper and lower bounds
-  const totalNumberOfReviews = reviewsPerUser * users.length;
+  const totalNumberOfReviews = getTotalNumberOfReviews(userNumberList);
   const averageNumberOfReviewsPerSubmission =
     totalNumberOfReviews / submissions.length;
   // lowerbound of at least 1
@@ -295,7 +326,7 @@ const findDistribution = async function (
   );
 
   // make shuffled arrays to remove determinism
-  const shuffledUsers = _.shuffle(users);
+  const shuffledUserNumberList = _.shuffle(userNumberList);
   const shuffledSubmissions = _.shuffle(submissions);
 
   // initialize result and attemptcounter
@@ -306,8 +337,7 @@ const findDistribution = async function (
   while (!reviewDistribution && counter < maxAttempts) {
     reviewDistribution = await performMaxFlow(
       shuffledSubmissions,
-      shuffledUsers,
-      reviewsPerUser,
+      shuffledUserNumberList,
       minNumberOfReviewsPerSubmission,
       maxNumberOfReviewsPerSubmission
     );
@@ -330,17 +360,16 @@ const findDistribution = async function (
 // Based on the TI2306 Algorithm Design lectures
 const performMaxFlow = async function (
   submissions: Submission[],
-  users: User[],
-  reviewsPerUser: number,
+  userNumberList: [User, number][],
   minNumberOfReviewsPerSubmission: number,
   maxNumberOfReviewsPerSubmission: number
 ) {
   // k number of users
-  const k = users.length;
+  const k = userNumberList.length;
   // n number of submissions
   const n = submissions.length;
   // total reviews
-  const totalNumberOfReviews = reviewsPerUser * k;
+  const totalNumberOfReviews = getTotalNumberOfReviews(userNumberList);
   // lowerbound c
   const c = minNumberOfReviewsPerSubmission;
   // upperbound C
@@ -375,10 +404,11 @@ const performMaxFlow = async function (
     new jsgraphs.FlowEdge(SOURCE_PRIME, SOURCE, totalNumberOfReviews)
   );
 
-  // 1 SOURCE edge for every user with capacity reviewsPerUser
+  // 1 SOURCE edge for every user with capacity reviews of User
   for (let i = 0; i < k; i++) {
+    const userNumber = userNumberList[i];
     graph.addEdge(
-      new jsgraphs.FlowEdge(SOURCE, nodeNumberOfUserIndex(i), reviewsPerUser)
+      new jsgraphs.FlowEdge(SOURCE, nodeNumberOfUserIndex(i), userNumber[1])
     );
   }
 
@@ -392,7 +422,7 @@ const performMaxFlow = async function (
   }
   // 1 connection per user to submission if the user isn't in the submissiongroup
   for (let i = 0; i < k; i++) {
-    const user = users[i];
+    const user = userNumberList[i][0];
     // iterate over the groups of the submissions
     for (let j = 0; j < n; j++) {
       const groupUsersOfSubmission = groupUsersOfSubmissions[j];
@@ -446,7 +476,7 @@ const performMaxFlow = async function (
     // check whether this is an assignment of a user to submission
     // and not an edge from source/sink
     if (from > 3 && to > 3) {
-      const user = users[userIndexOfNodeNumber(from)];
+      const user = userNumberList[userIndexOfNodeNumber(from)][0];
       const submission = submissions[submissionIndexOfNodeNumber(to)];
       const assignmentVersion = await submission.getAssignmentVersion();
       const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
