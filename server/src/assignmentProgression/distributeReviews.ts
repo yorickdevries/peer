@@ -194,16 +194,6 @@ const distributeReviewsForAssignmentHelper = async function (
 
   // assignmentVersions of which the users will be reviewed
   for (const assignmentVersion of assignment.versions) {
-    // the users, number of reviews of these submissions will be reviewing
-    const reviewedByList = assignmentVersionsReviewedByMap.get(
-      assignmentVersion.id
-    );
-    if (reviewedByList === undefined) {
-      // should never happen
-      throw new Error(
-        `assignmentVersion with id ${assignmentVersion.id} is of the wrong assignment`
-      );
-    }
     // submissions which need to be reviewed
     const finalSubmissionsOfEachGroup = finalSubmissionsOfEachGroupMap.get(
       assignmentVersion.id
@@ -212,6 +202,16 @@ const distributeReviewsForAssignmentHelper = async function (
       // should never happen
       throw new Error(
         `assignmentVersion with id ${assignmentVersion.id} is not part of the map`
+      );
+    }
+    // the users, number of reviews of these submissions will be reviewing
+    const reviewedByList = assignmentVersionsReviewedByMap.get(
+      assignmentVersion.id
+    );
+    if (reviewedByList === undefined) {
+      // should never happen
+      throw new Error(
+        `assignmentVersion with id ${assignmentVersion.id} is of the wrong assignment`
       );
     }
     const reviewDistributionForCurrentVersion = await generateReviewDistribution(
@@ -276,7 +276,7 @@ const getTotalNumberOfReviews = function (userNumberList: [User, number][]) {
 // Takes care of the distribution of reviews of submissions over the students
 const generateReviewDistribution = async function (
   submissions: Submission[],
-  userNumberList: [User, number][]
+  userNumberList: [User, number][] // reviewing students
 ): Promise<reviewAssignment[]> {
   for (const userNumber of userNumberList) {
     const reviewsOfUser = userNumber[1];
@@ -291,10 +291,12 @@ const generateReviewDistribution = async function (
       );
     }
   }
-  // If there are less users * reviews per user than submissions
+  // If there are less reviews than submissions
   // then no division can be made as there will be submissions without reviews
   if (submissions.length > getTotalNumberOfReviews(userNumberList)) {
-    throw new Error("There are not enough users for the number of submissions");
+    throw new Error(
+      "There are not enough reviews for the number of submissions"
+    );
   }
 
   // findDistribution will try max 10 times to find a distribution (to avoid infinite loops)
