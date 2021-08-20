@@ -287,7 +287,7 @@ const generateReviewDistribution = async function (
     // If there are less submissions than required to review per person, then no division can be made
     if (submissions.length < reviewsOfUser) {
       throw new Error(
-        `There are not enough submissions to assign the required number of reviewsOfUserr: ${reviewsOfUser}`
+        `There are not enough submissions to assign the required number of reviewsOfUser: ${reviewsOfUser}`
       );
     }
   }
