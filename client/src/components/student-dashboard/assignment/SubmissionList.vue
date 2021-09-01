@@ -8,6 +8,14 @@
                 >
                 <hr />
                 <b-tabs card lazy>
+                    <b-tab>
+                        <template slot="title">
+                            <div class="d-flex align-items-center">
+                                Select
+                            </div>
+                        </template>
+                        <b-alert show>Please select your assignment version above</b-alert>
+                    </b-tab>
                     <b-tab v-for="assignmentVersion in assignment.versions" :key="assignmentVersion.id">
                         <template slot="title">
                             <div class="d-flex align-items-center">
