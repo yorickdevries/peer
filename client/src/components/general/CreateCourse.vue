@@ -86,15 +86,15 @@ export default {
     },
     async created() {
         await this.fetchFaculties()
-        await this.fetchActiveAcademicYears()
+        await this.fetchAcademicYears()
     },
     methods: {
         async fetchFaculties() {
             let res = await api.faculties.get()
             this.faculties = res.data
         },
-        async fetchActiveAcademicYears() {
-            const res = await api.academicyears.get(true)
+        async fetchAcademicYears() {
+            const res = await api.academicyears.get()
             this.academicYears = res.data
         },
         async onSubmit() {
