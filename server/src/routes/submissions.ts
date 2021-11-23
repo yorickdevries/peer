@@ -461,9 +461,12 @@ router.patch(
         .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
       return;
     }
+    // Only teachers and the TA giving the approval can modify the approval.
+    const teacher = await review.isTeacherInCourse(review.approvingTA);
     if (
       submission.approvingTA !== null &&
-      submission.approvingTA.netid !== user.netid
+      submission.approvingTA.netid !== user.netid &&
+      !teacher
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
