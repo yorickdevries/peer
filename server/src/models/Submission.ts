@@ -210,4 +210,9 @@ export default class Submission extends BaseModel {
     const assignmentVersion = await this.getAssignmentVersion();
     return await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user);
   }
+
+  async isTeacherInCourse(user: User): Promise<boolean> {
+    const assignmentVersion = await this.getAssignmentVersion();
+    return await assignmentVersion.isTeacherInCourse(user);
+  }
 }
