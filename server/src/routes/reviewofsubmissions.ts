@@ -517,9 +517,12 @@ router.patch(
         .send("The assignment is not in feedback state");
       return;
     }
+    // Only teachers and the TA giving the approval can modify the approval.
+    const teacher = await review.isTeacherInCourse(review.approvingTA);
     if (
       review.approvingTA !== null &&
-      review.approvingTA.netid !== user.netid
+      review.approvingTA.netid !== user.netid &&
+      !teacher
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
