@@ -521,7 +521,7 @@ router.patch(
     if (
       review.approvingTA !== null &&
       review.approvingTA.netid !== user.netid &&
-      !(await review.isTeacherInCourse(review.approvingTA!))
+      !(await review.isTeacherInCourse(user))
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
