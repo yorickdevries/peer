@@ -144,7 +144,9 @@ deploy-staging:
     - migration
     - start-server
   before_script:
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - apt-get update -y
+    - apt-get install rsync -y
+    - 'which ssh-agent || ( apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
     - ssh-add <(echo "$SSH_PRIVATE_KEY_STAGING" | base64 -d)
     - mkdir -p ~/.ssh
