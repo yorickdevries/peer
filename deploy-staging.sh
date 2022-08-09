@@ -15,17 +15,13 @@ USER="$(whoami)"
 
 # Setting up the new release
 echo "0 - INIT"
-cd "$RELEASE_DIR"
-echo "         Changing file ownership of $RELEASE_DIR to $USER:www-data"
-chown -R $USER:www-data . || exit 1
-
 # Symlink the config
-echo "         Ensuring config dir exists at $RELEASE_DIR/config"
-echo "         Symlinking config/staging.json..."
+echo "         Ensuring config dir exists at $RELEASE_DIR/server/config"
+echo "         Symlinking server/config/staging.json..."
 # Create folder, delete file from repo (if it exists) and then symlink
-mkdir -p "$RELEASE_DIR/config" || exit 2
-rm "$RELEASE_DIR/config/staging.json" || true
-ln -s "$SHARED_DIR/config/staging.json" "$RELEASE_DIR/config/staging.json" || exit 3
+mkdir -p "$RELEASE_DIR/server/config" || exit 2
+rm "$RELEASE_DIR/server/config/staging.json" || true
+ln -s "$SHARED_DIR/config/staging.json" "$RELEASE_DIR/server/config/staging.json" || exit 3
 
 # Backup
 echo "1 - BACKUP"
@@ -44,15 +40,15 @@ npm install || exit 6
 echo "3 - BUILD"
 echo "         Building server"
 cd "$RELEASE_DIR"
-npm run build_server || exit 7
+NODE_ENV=staging npm run build_server || exit 7
 echo "         Building client"
-npm run build_client || exit 8
+NODE_ENV=staging npm run build_client || exit 8
 
 # Run the migrations
 echo "4 - MIGRATE"
 echo "         Running migrations"
 cd "$RELEASE_DIR/server"
-npm run typeorm:migration:run || exit 9
+NODE_ENV=staging npm run typeorm:migration:run || exit 9
 
 # Switch the symlink
 echo "5 - DEPLOY"
