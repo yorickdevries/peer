@@ -158,6 +158,6 @@ deploy-staging:
     - 'ssh deployer-peer@$CI_ENVIRONMENT_URL "cd $DEPLOY_PATH && ./deploy.sh $TIMESTAMP"'
   environment:
     name: staging
-    url: https://peer.eiptest.ewi.tudelft.nl
+    url: peer.eiptest.ewi.tudelft.nl
   only:
     - dev
