@@ -154,7 +154,7 @@ deploy-staging:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - export TIMESTAMP="$(date '+%Y%m%d%H%M%S')"
-    - "rsync -avh -e ssh . deployer-peer@$CI_ENVIRONMENT_URL:$DEPLOY_PATH/releases/$TIMESTAMP"
+    - "rsync -rtvh --exclude .git -e ssh . deployer-peer@$CI_ENVIRONMENT_URL:$DEPLOY_PATH/releases/$TIMESTAMP"
     - 'ssh deployer-peer@$CI_ENVIRONMENT_URL "cd $DEPLOY_PATH && ./deploy.sh $TIMESTAMP"'
   environment:
     name: staging
