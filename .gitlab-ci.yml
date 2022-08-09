@@ -153,7 +153,7 @@ deploy-staging:
   script:
     - export TIMESTAMP="$(date '+%Y%m%d%H%M%S')"
     - "rsync -avh -e ssh . deployer-peer@$CI_ENVIRONMENT_URL:$DEPLOY_PATH/releases/$TIMESTAMP"
-    - 'ssh deployer-peer@$CI_ENVIRONMENT_URL "cd $DEPLOY_PATH && ./deploy.sh -t $TIMESTAMP"'
+    - 'ssh deployer-peer@$CI_ENVIRONMENT_URL "cd $DEPLOY_PATH && ./deploy.sh $TIMESTAMP"'
   environment:
     name: staging
     url: https://peer.eiptest.ewi.tudelft.nl
