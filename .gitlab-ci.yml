@@ -18,6 +18,7 @@ stages:
     - migration
     - start
     - sast
+    - deploy
 
 lint-server:
   stage: static-analysis
@@ -133,3 +134,28 @@ semgrep-sast:
   stage: sast
   rules:
   - if: $CI_PIPELINE_SOURCE == "schedule"
+
+deploy-staging:
+  stage: deploy
+  variables:
+    DEPLOY_PATH: "/var/www/peer"
+  needs:
+    - test
+    - migration
+    - start-server
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY_STAGING" | base64 -d)
+    - mkdir -p ~/.ssh
+    - ssh-keyscan eiptest.ewi.tudelft.nl >> ~/.ssh/known_hosts
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - export TIMESTAMP="$(date '+%Y%m%d%H%M%S')"
+    - "rsync -avh -e ssh . deployer-peer@$CI_ENVIRONMENT_URL:$DEPLOY_PATH/releases/$TIMESTAMP"
+    - 'ssh deployer-peer@$CI_ENVIRONMENT_URL "cd $DEPLOY_PATH && ./deploy.sh $TIMESTAMP"'
+  environment:
+    name: staging
+    url: https://peer.eiptest.ewi.tudelft.nl
+  only:
+    - dev
