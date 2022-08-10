@@ -2,10 +2,8 @@
     <div>
         <b-container>
             <!--Header-->
-            <BreadcrumbTitle
-                :items="['Assignments', assignment.name, 'Submissions', submission.id]"
-                class="mt-3"
-            ></BreadcrumbTitle>
+            <BreadcrumbTitle :items="['Assignments', assignment.name, 'Submissions', submission.id]" class="mt-3">
+            </BreadcrumbTitle>
 
             <!--Next Submission-->
             <b-card no-body>
@@ -13,8 +11,8 @@
                     <div>Submission information</div>
                     <div>
                         <b-button size="sm" variant="secondary" @click="goToAssignment" class="mr-2"
-                            >Back to Assignment</b-button
-                        >
+                            >Back to Assignment
+                        </b-button>
                         <b-button size="sm" variant="primary" @click="goToNextFinalSubmissionWithoutApproval"
                             >Next (Random) Final Submission Without Approval</b-button
                         >
@@ -92,8 +90,8 @@
                                 class="mr-2"
                                 @click="updateSubmissionApproval(false)"
                                 :disabled="submission.approvalByTA === false && !commentChanged"
-                                >Disapprove 👎</b-button
-                            >
+                                >Disapprove 👎
+                            </b-button>
                             <b-button
                                 variant="success"
                                 @click="updateSubmissionApproval(true)"
