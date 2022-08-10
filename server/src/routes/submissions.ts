@@ -70,28 +70,36 @@ router.get("/", validateQuery(assignmentVersionIdSchema), async (req, res) => {
 });
 
 //get number of submissions
-router.get("/count", validateQuery(assignmentVersionIdSchema), async (req, res) => {
-  const user = req.user!;
-  const assignmentVersionId: number = req.query.assignmentVersionId as any;
-  const assignmentVersion = await AssignmentVersion.findOne(assignmentVersionId);
-  if (!assignmentVersion) {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND).toString();
-    return;
+router.get(
+  "/count",
+  validateQuery(assignmentVersionIdSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const assignmentVersionId: number = req.query.assignmentVersionId as any;
+    const assignmentVersion = await AssignmentVersion.findOne(
+      assignmentVersionId
+    );
+    if (!assignmentVersion) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND)
+        .toString();
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE)
+        .toString();
+      return;
+    }
+    const submissions = await assignmentVersion.getSubmissions();
+    res.send(submissions.length.toString());
   }
-  if (
-    // not a teacher
-    !(await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user))
-  ) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE).toString();
-    return;
-  }
-  const submissions = await assignmentVersion.getSubmissions();
-  res.send((submissions.length).toString());
-});
+);
 
 // get the submission
 router.get("/:id", validateParams(idSchema), async (req, res) => {

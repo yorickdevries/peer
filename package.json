@@ -18,5 +18,8 @@
   "cacheDirectories": [
     "server/node_modules",
     "client/node_modules"
-  ]
+  ],
+  "dependencies": {
+    "lint": "^0.7.0"
+  }
 }
