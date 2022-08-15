@@ -28,12 +28,6 @@ export default {
                 relLink += "../"
             }
             return items
-            // return items.map(item => {
-            //     return {
-            //         text: item.text,
-            //         href: item.link
-            //     }
-            // })
         }
     }
 }
