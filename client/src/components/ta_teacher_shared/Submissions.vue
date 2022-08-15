@@ -254,7 +254,6 @@ export default {
             this.allSubmissions = res1.data
             let count = await api.submissions.getSubmissionCount(this.assignmentVersionId)
             this.numberOfSubmissions = count.data
-            //console.log(count.data)
         },
         async fetchGroups() {
             const res = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
