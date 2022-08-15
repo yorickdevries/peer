@@ -19,12 +19,15 @@ export default {
     },
     methods: {
         breadcrumbItems(items) {
-            return items.map(item => {
-                return {
-                    text: item,
-                    active: true
+            let relLink = ""
+            for (let i = items.length - 1; i >= 0; i--) {
+                items[i] = {
+                    text: items[i],
+                    href: relLink
                 }
-            })
+                relLink += "../"
+            }
+            return items
         }
     }
 }
