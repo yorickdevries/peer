@@ -8,6 +8,10 @@ export default {
         const params = { assignmentVersionId }
         return client.get("submissions", { params: params })
     },
+    getSubmissionCount(assignmentVersionId) {
+        const params = { assignmentVersionId }
+        return client.get("submissions/count", { params: params })
+    },
     getFeedback(id) {
         return client.get(`submissions/${id}/feedback`)
     },

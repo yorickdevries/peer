@@ -121,6 +121,7 @@
                 </b-form-group>
             </b-col>
         </b-row>
+        <b-alert show> Number of submissions: {{ numberOfSubmissions }}</b-alert>
         <!--Table-->
         <b-table
             striped
@@ -200,6 +201,7 @@ export default {
     data() {
         return {
             allSubmissions: null,
+            numberOfSubmissions: 0,
             // groups to get groupName from
             groups: null,
             // boolean to show all or only final submissions
@@ -250,6 +252,8 @@ export default {
             // all submissions
             const res1 = await api.submissions.getAllForAssignmentVersion(this.assignmentVersionId)
             this.allSubmissions = res1.data
+            let count = await api.submissions.getSubmissionCount(this.assignmentVersionId)
+            this.numberOfSubmissions = count.data
         },
         async fetchGroups() {
             const res = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
