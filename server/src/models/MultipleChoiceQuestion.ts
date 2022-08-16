@@ -51,11 +51,15 @@ export default class MultipleChoiceQuestion extends Question {
   }
 
   getMaxPointsFromQuestion(): number | null {
-    let optionPoints: number[] | null = 
-    this.options.every(points => points !== null)? 
-    this.options.map(multipleChoiceAnswer => multipleChoiceAnswer.points as number): null;
-    if(optionPoints) {
-      return Math.max.apply(Math, optionPoints);
+    const optionPoints: number[] | null = this.options.every(
+      (points) => points !== null
+    )
+      ? this.options.map(
+          (multipleChoiceAnswer) => multipleChoiceAnswer.points as number
+        )
+      : null;
+    if (optionPoints) {
+      return Math.max(...optionPoints);
     }
     return null;
   }

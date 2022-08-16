@@ -87,17 +87,26 @@ const parseSubmissionReviewsForExport = async function (
 
     // QUESTIONS
     // iterate over all questions
-    let totalPoints: number = 0;
-    let totalMaxPoints: number = 0;
+    let totalPoints = 0;
+    let totalMaxPoints = 0;
     for (const question of questions) {
       const questionText = `R${question.number}. ${question.text}`;
       const answer = await review.getAnswer(question);
       const answerText = answer?.getAnswerText();
-      let q = question as MultipleChoiceQuestion;
-      let maxPoints = q.getMaxPointsFromQuestion();
-      if(maxPoints){
-        totalMaxPoints += maxPoints;
+      if (question instanceof MultipleChoiceQuestion) {
+        const q = question as MultipleChoiceQuestion;
+        const maxPoints = q.getMaxPointsFromQuestion();
+        if (maxPoints) {
+          totalMaxPoints += maxPoints;
+        }
+      } else if (question instanceof CheckboxQuestion) {
+        const q = question as CheckboxQuestion;
+        const maxPoints = q.getMaxPointsFromQuestion();
+        if (maxPoints) {
+          totalMaxPoints += maxPoints;
+        }
       }
+
       // answer in text form
       parsedReview[questionText] = answerText;
       if (question.graded) {
@@ -109,7 +118,7 @@ const parseSubmissionReviewsForExport = async function (
         const pointsQuestionText = questionText + " (POINTS)";
         // answer in total points form
         parsedReview[pointsQuestionText] = points;
-        if(points){
+        if (points) {
           totalPoints += points;
         }
         if (question instanceof CheckboxQuestion) {
@@ -211,7 +220,7 @@ const parseSubmissionReviewsForExport = async function (
       }
     }
     parsedReview["Total number of points"] = totalPoints;
-    parsedReview["Maximum points achievable"] = totalMaxPoints/100;
+    parsedReview["Maximum points achievable"] = totalMaxPoints / 100;
     parsedReviews.push(parsedReview);
   }
 
