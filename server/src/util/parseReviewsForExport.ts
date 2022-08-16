@@ -5,6 +5,7 @@ import Question from "../models/Question";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import CheckboxQuestionAnswer from "../models/CheckboxQuestionAnswer";
 import AssignmentType from "../enum/AssignmentType";
+import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 
 const parseSubmissionReviewsForExport = async function (
   submissionQuestionnaire: SubmissionQuestionnaire
@@ -86,10 +87,17 @@ const parseSubmissionReviewsForExport = async function (
 
     // QUESTIONS
     // iterate over all questions
+    let totalPoints: number = 0;
+    let totalMaxPoints: number = 0;
     for (const question of questions) {
       const questionText = `R${question.number}. ${question.text}`;
       const answer = await review.getAnswer(question);
       const answerText = answer?.getAnswerText();
+      let q = question as MultipleChoiceQuestion;
+      let maxPoints = q.getMaxPointsFromQuestion();
+      if(maxPoints){
+        totalMaxPoints += maxPoints;
+      }
       // answer in text form
       parsedReview[questionText] = answerText;
       if (question.graded) {
@@ -101,6 +109,9 @@ const parseSubmissionReviewsForExport = async function (
         const pointsQuestionText = questionText + " (POINTS)";
         // answer in total points form
         parsedReview[pointsQuestionText] = points;
+        if(points){
+          totalPoints += points;
+        }
         if (question instanceof CheckboxQuestion) {
           let pointsList = undefined;
           if (answer instanceof CheckboxQuestionAnswer) {
@@ -199,8 +210,11 @@ const parseSubmissionReviewsForExport = async function (
         }
       }
     }
+    parsedReview["Total number of points"] = totalPoints;
+    parsedReview["Maximum points achievable"] = totalMaxPoints/100;
     parsedReviews.push(parsedReview);
   }
+
   return parsedReviews;
 };
 
