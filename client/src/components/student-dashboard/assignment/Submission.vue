@@ -30,6 +30,7 @@
                                     <dl>
                                         <dt>Current server flagging status</dt>
                                         <dd v-if="data.item.flaggedByServer">Flagged as suspicious⚠️</dd>
+                                        <dd v-if="data.item.flaggedByServer === false">Not flagged as suspicious✔️</dd>
                                         <dd v-if="data.item.flaggedByServer === null">No action by the server yet</dd>
                                     </dl>
                                     <dl>
