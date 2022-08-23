@@ -90,9 +90,6 @@ const parseSubmissionReviewsForExport = async function (
     let totalPoints = 0;
     let totalMaxPoints = 0;
     for (const question of questions) {
-      const questionText = `R${question.number}. ${question.text}`;
-      const answer = await review.getAnswer(question);
-      const answerText = answer?.getAnswerText();
       if (question instanceof MultipleChoiceQuestion) {
         const q = question as MultipleChoiceQuestion;
         const maxPoints = q.getMaxPointsFromQuestion();
@@ -106,9 +103,19 @@ const parseSubmissionReviewsForExport = async function (
           totalMaxPoints += maxPoints;
         }
       }
+    }
 
+    for (const question of questions) {
+      const questionText = `R${question.number}. ${question.text}`;
       // answer in text form
+      const answer = await review.getAnswer(question);
+      const answerText = answer?.getAnswerText();
       parsedReview[questionText] = answerText;
+    }
+
+    for(const question of questions) {
+      const questionText = `R${question.number}. ${question.text}`;
+      const answer = await review.getAnswer(question);
       if (question.graded) {
         let points = await answer?.getAnswerPoints();
         if (points !== undefined) {
@@ -152,37 +159,6 @@ const parseSubmissionReviewsForExport = async function (
         }
       );
     }
-    const reviewEvaluationReviewer = reviewEvaluation?.reviewer;
-
-    // EVALUATOR
-    // Evaluator netid
-    parsedReview["Evaluator netid"] = reviewEvaluationReviewer?.netid;
-    // Evaluator studentnumber
-    parsedReview["Evaluator studentnumber"] =
-      reviewEvaluationReviewer?.studentNumber;
-
-    // Review evaluation started_at
-    parsedReview["Reviewevaluation started at"] = reviewEvaluation?.startedAt;
-    // Review evaluation downloaded_at
-    parsedReview["Reviewevaluation downloaded at"] =
-      reviewEvaluation?.downloadedAt;
-    // Review evaluation submitted_at
-    parsedReview["Reviewevaluation submitted at"] =
-      reviewEvaluation?.submittedAt;
-    // Submission review done
-    parsedReview["Reviewevaluation submitted"] = reviewEvaluation?.submitted;
-    // Approval status
-    parsedReview["Reviewevaluation approval by TA"] =
-      reviewEvaluation?.approvalByTA;
-    // commentByTA
-    parsedReview["Reviewevaluation comment by TA"] =
-      reviewEvaluation?.commentByTA;
-    // TA netid
-    parsedReview["Reviewevaluation TA netid"] =
-      reviewEvaluation?.approvingTA?.netid;
-    // Reviewer reported the submission
-    parsedReview["Reviewevaluation Reviewer reported the submission"] =
-      reviewEvaluation?.flaggedByReviewer;
 
     // iterate over all questions
     for (const question of reviewEvaluationQuestions) {
@@ -221,6 +197,39 @@ const parseSubmissionReviewsForExport = async function (
     }
     parsedReview["Total number of points"] = totalPoints;
     parsedReview["Maximum points achievable"] = totalMaxPoints / 100;
+
+    const reviewEvaluationReviewer = reviewEvaluation?.reviewer;
+
+    // EVALUATOR
+    // Evaluator netid
+    parsedReview["Evaluator netid"] = reviewEvaluationReviewer?.netid;
+    // Evaluator studentnumber
+    parsedReview["Evaluator studentnumber"] =
+      reviewEvaluationReviewer?.studentNumber;
+
+    // Review evaluation started_at
+    parsedReview["Reviewevaluation started at"] = reviewEvaluation?.startedAt;
+    // Review evaluation downloaded_at
+    parsedReview["Reviewevaluation downloaded at"] =
+      reviewEvaluation?.downloadedAt;
+    // Review evaluation submitted_at
+    parsedReview["Reviewevaluation submitted at"] =
+      reviewEvaluation?.submittedAt;
+    // Submission review done
+    parsedReview["Reviewevaluation submitted"] = reviewEvaluation?.submitted;
+    // Approval status
+    parsedReview["Reviewevaluation approval by TA"] =
+      reviewEvaluation?.approvalByTA;
+    // commentByTA
+    parsedReview["Reviewevaluation comment by TA"] =
+      reviewEvaluation?.commentByTA;
+    // TA netid
+    parsedReview["Reviewevaluation TA netid"] =
+      reviewEvaluation?.approvingTA?.netid;
+    // Reviewer reported the submission
+    parsedReview["Reviewevaluation Reviewer reported the submission"] =
+      reviewEvaluation?.flaggedByReviewer;
+
     parsedReviews.push(parsedReview);
   }
 
