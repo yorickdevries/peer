@@ -3,6 +3,8 @@ import { IsDefined, IsString, IsNotEmpty, IsHash } from "class-validator";
 import BaseModel from "./BaseModel";
 import path from "path";
 import config from "config";
+//import { file } from "jszip";
+//import { fileURLToPath } from "url";
 
 const uploadFolder = config.get("uploadFolder") as string;
 
@@ -30,7 +32,17 @@ export default class File extends BaseModel {
   @IsNotEmpty()
   hash: string;
 
-  constructor(name: string, extension: string, hash: string | null) {
+  @Column()
+  @IsDefined()
+  @IsString()
+  filePath: string;
+
+  constructor(
+    name: string,
+    extension: string,
+    hash: string | null,
+    filePath?: string | null
+  ) {
     super();
     this.name = name;
     this.extension = extension;
@@ -41,6 +53,11 @@ export default class File extends BaseModel {
         "0000000000000000000000000000000000000000000000000000000000000000";
     } else {
       this.hash = hash;
+    }
+    if (filePath) {
+      this.filePath = filePath;
+    } else {
+      this.filePath = "";
     }
   }
 
@@ -57,7 +74,9 @@ export default class File extends BaseModel {
   }
 
   getPath(): string {
-    const filePath = path.resolve(uploadFolder, this.id.toString());
-    return filePath;
+    if (this.filePath.length == 0) {
+      this.filePath = path.resolve(uploadFolder, this.id.toString());
+    }
+    return this.filePath;
   }
 }

@@ -24,6 +24,15 @@
                 >
                     Export submissions .xls
                 </b-button>
+                <b-button
+                    :disabled="disableSubmissionExportButton"
+                    size="sm"
+                    variant="primary"
+                    @click="exportAllSubmissions()"
+                    class="mb-3 mr-2"
+                >
+                    Export all submissions .zip
+                </b-button>
             </b-col>
             <b-col v-if="assignment.assignmentType === 'code'">
                 <template v-if="assignment.enrollable">
@@ -253,6 +262,7 @@ export default {
             const res1 = await api.submissions.getAllForAssignmentVersion(this.assignmentVersionId)
             this.allSubmissions = res1.data
             let count = await api.submissions.getSubmissionCount(this.assignmentVersionId)
+            console.log(await api.submissions.getZipExport(this.assignmentVersionId))
             this.numberOfSubmissions = count.data
         },
         async fetchGroups() {
@@ -278,6 +288,10 @@ export default {
             this.showSuccessMessage({
                 message: "Export is being generated, you can download it in the exports tab when ready"
             })
+        },
+        async exportAllSubmissions() {
+            await api.submissions.getZipExport(this.assignmentVersionId)
+            window.open(`/api/submissions/zip?assignmentVersionId=${this.assignmentVersionId}`)
         }
     }
 }

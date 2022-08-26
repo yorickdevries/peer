@@ -41,6 +41,10 @@ const assignmentVersionIdSchema = Joi.object({
 });
 // get all the submissions for an assignment
 router.get("/", validateQuery(assignmentVersionIdSchema), async (req, res) => {
+  /* eslint-disable */
+  const JSZip = require("jszip");
+  /* eslint-disable */
+  const fs = require("fs");
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // this value has been parsed by the validate function
@@ -66,8 +70,72 @@ router.get("/", validateQuery(assignmentVersionIdSchema), async (req, res) => {
   }
   const submissions = await assignmentVersion.getSubmissions();
   const sortedSubmissions = _.sortBy(submissions, "id");
+  console.log(submissions[0].file.getPath());
+  console.log(submissions[0].file);
+  const zip = new JSZip();
+  const pdfs = zip.folder("pdfs");
+  for (let i = 0; i < sortedSubmissions.length; i++) {
+    const filePath = submissions[i].file.getPath();
+    pdfs.file(filePath, fs.readFileSync(filePath), { base64: true });
+  }
+
+  const content = await zip.generateAsync({ type: "nodebuffer" });
+  fs.writeFileSync("example.zip", content);
+  // const assignment = await assignmentVersion.getAssignment();
+  // const assignmentExport = new AssignmentExport(user, assignment, new File("example", ".zip", null));
+  // await assignmentExport.save();
   res.send(sortedSubmissions);
+  //res.send(assignmentExport);
+  //res.send("server\example.zip");
 });
+
+//get a zip of all submissions for an assignment
+router.get(
+  "/zip",
+  validateQuery(assignmentVersionIdSchema),
+  async (req, res) => {
+    const user = req.user!;
+    /* eslint-disable */
+    const JSZip = require("jszip");
+    /* eslint-disable */
+    const fs = require("fs");
+    const assignmentVersionId: number = req.query.assignmentVersionId as any;
+    const assignmentVersion = await AssignmentVersion.findOne(
+      assignmentVersionId
+    );
+    if (!assignmentVersion) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
+      return;
+    }
+    const submissions = await assignmentVersion.getSubmissions();
+    const sortedSubmissions = _.sortBy(submissions, "id");
+    const zip = new JSZip();
+    const pdfs = zip.folder("pdfs");
+    for (let i = 0; i < sortedSubmissions.length; i++) {
+      const filePath = submissions[i].file.getPath();
+      pdfs.file(filePath, fs.readFileSync(filePath), { base64: true });
+    }
+
+    const content = await zip.generateAsync({ type: "nodebuffer" });
+    fs.writeFileSync("example.zip", content);
+    const f = new File("example", ".zip", null, path.join(__dirname, '../../', 'example.zip'));
+    console.log(f.getPath());
+    console.log(f.getFileNamewithExtension());
+    const assignment = await assignmentVersion.getAssignment();
+    const assignmentExport = new AssignmentExport(user, assignment, f);
+    console.log(assignmentExport);
+    await assignmentExport.save();
+    console.log(assignmentExport);
+    console.log(assignmentExport.getFile()?.getFileNamewithExtension())
+    console.log(assignmentExport.file?.getPath());
+    console.log(assignmentExport.file?.getFileNamewithExtension());
+    //res.send(assignmentExport);
+    res.download(f.getPath(), f.getFileNamewithExtension());
+    //res.send(f.getPath());
+  }
+);
 
 //get number of submissions
 router.get(

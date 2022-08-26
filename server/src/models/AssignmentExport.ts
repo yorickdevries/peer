@@ -52,4 +52,8 @@ export default class AssignmentExport extends BaseModel {
   async getAssignment(): Promise<Assignment> {
     return Assignment.findOneOrFail(this.assignmentId);
   }
+
+  getFile(): File | null {
+    return this.file;
+  }
 }
