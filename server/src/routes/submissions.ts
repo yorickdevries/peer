@@ -25,6 +25,7 @@ import AssignmentExport from "../models/AssignmentExport";
 import {
   startExportSubmissionsForAssignmentVersionWorker,
   startSubmissionFlaggingWorker,
+  startExportSubmissionsForZipWorker,
   //startImportWebLabSubmissionsWorker,
 } from "../workers/pool";
 //import AssignmentType from "../enum/AssignmentType";
@@ -95,10 +96,10 @@ router.get(
   validateQuery(assignmentVersionIdSchema),
   async (req, res) => {
     const user = req.user!;
-    /* eslint-disable */
-    const JSZip = require("jszip");
-    /* eslint-disable */
-    const fs = require("fs");
+    // /* eslint-disable */
+    // const JSZip = require("jszip");
+    // /* eslint-disable */
+    // const fs = require("fs");
     const assignmentVersionId: number = req.query.assignmentVersionId as any;
     const assignmentVersion = await AssignmentVersion.findOne(
       assignmentVersionId
@@ -109,33 +110,38 @@ router.get(
         .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
       return;
     }
-    const submissions = await assignmentVersion.getSubmissions();
-    const sortedSubmissions = _.sortBy(submissions, "id");
-    const zip = new JSZip();
-    const pdfs = zip.folder("pdfs");
-    for (let i = 0; i < sortedSubmissions.length; i++) {
-      const filePath = submissions[i].file.getPath();
-      //add student number to title instead of just 1,2,3...
-      const fileName = submissions[i].file.getFileNamewithExtension();
-      pdfs.file(fileName, fs.readFileSync(filePath), { base64: true });
-    }
+    // const submissions = await assignmentVersion.getSubmissions();
+    // const sortedSubmissions = _.sortBy(submissions, "id");
+    // const zip = new JSZip();
+    // const pdfs = zip.folder("pdfs");
+    // for (let i = 0; i < sortedSubmissions.length; i++) {
+    //   const filePath = submissions[i].file.getPath();
+    //   //add student number to title instead of just 1,2,3...
+    //   const fileName = submissions[i].file.id;
+    //   pdfs.file(fileName, fs.readFileSync(filePath), { base64: true });
+    // }
 
-    const content = await zip.generateAsync({ type: "nodebuffer" });
-    fs.writeFileSync("example.zip", content);
-    const f = new File("example", ".zip", null, path.join(__dirname, '../../', 'example.zip'));
-    console.log(f.getPath());
-    console.log(f.getFileNamewithExtension());
+    // const content = await zip.generateAsync({ type: "nodebuffer" });
+    // fs.writeFileSync("example.zip", content);
+    // const f = new File("example", ".zip", null, path.join(__dirname, '../../', 'example.zip'));
     const assignment = await assignmentVersion.getAssignment();
     //replace f with null, save, then assign assignmentExport.file = f
-    const assignmentExport = new AssignmentExport(user, assignment, f);
-    console.log(assignmentExport);
+    const assignmentExport = new AssignmentExport(user, assignment, null);
     await assignmentExport.save();
-    console.log(assignmentExport);
-    console.log(assignmentExport.getFile()?.getFileNamewithExtension())
-    console.log(assignmentExport.file?.getPath());
-    console.log(assignmentExport.file?.getFileNamewithExtension());
-    //res.send(assignmentExport);
-    res.download(f.getPath(), f.getFileNamewithExtension());
+
+    //offload to worker function
+    startExportSubmissionsForZipWorker(
+      assignmentVersion.id,
+      assignmentExport.id
+    );
+    console.log("END");
+    //assignmentExport.file = f;
+    //console.log(assignmentExport.file);
+    // console.log(assignmentExport.getFile()?.getFileNamewithExtension())
+    // console.log(assignmentExport.file?.getPath());
+    // console.log(assignmentExport.file?.getFileNamewithExtension());
+    res.send(assignmentExport);
+    //res.download(f.getPath(), f.getFileNamewithExtension());
     //res.send(f.getPath());
   }
 );
@@ -637,7 +643,7 @@ router.post(
       assignmentExport.id,
       exportType
     );
-
+    console.log(`Supposed ${assignmentExport.file}`);
     // send message that reviews are being exported
     res.send(assignmentExport);
   }
