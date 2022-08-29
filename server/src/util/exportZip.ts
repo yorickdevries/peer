@@ -1,17 +1,8 @@
 import AssignmentExport from "../models/AssignmentExport";
 import File from "../models/File";
 import path from "path";
-// import config from "config";
-// import fsPromises from "fs/promises";
 import { getManager } from "typeorm";
-
-// parse libraries
-// import { parse } from "json2csv";
-// import exportFromJSON from "export-from-json";
-// import JSZip from "jszip";
 import Submission from "../models/Submission";
-
-// const uploadFolder = config.get("uploadFolder") as string;
 
 const exportToZip = async function (
     assignmentExport: AssignmentExport,
@@ -36,7 +27,6 @@ const exportToZip = async function (
     const content = await zip.generateAsync({ type: "nodebuffer" });
     fs.writeFileSync("example.zip", content);
     const file = new File("example", ".zip", null, path.join(__dirname, '../../', 'example.zip'));
-    console.log("DONE");
     await getManager().transaction(
         "READ COMMITTED",
         async (transactionalEntityManager) => {
@@ -48,12 +38,6 @@ const exportToZip = async function (
           assignmentExport.file = file;
           await assignmentExport.validateOrReject();
           await transactionalEntityManager.save(assignmentExport);
-    
-          // write the file (so if this fails everything above fails)
-          // new place where the file will be saved
-        //   const filePath = path.resolve(uploadFolder, file.id.toString());
-        //   // write
-        //   await fsPromises.writeFile(filePath, fileBuffer);
         }
       );
 }

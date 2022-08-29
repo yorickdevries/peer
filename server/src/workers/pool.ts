@@ -219,7 +219,6 @@ const startExportReviewsForAssignmentVersionWorker = function (
 const startExportSubmissionsForZipWorker = function (
   assignmentVersionId: number,
   assignmentExportId: number): void {
-    console.log(`FIRST: ${assignmentExportId}`);
     if (isTSNode) {
       // run the function directly in this process (TS Node/development)
       workerFunctions
@@ -234,7 +233,6 @@ const startExportSubmissionsForZipWorker = function (
           console.error(err);
         });
     } else {
-      console.log("WORKER RUNNING")
       // run worker in a seperate process (Node.js/production)
       startWorker("exportSubmissionsForZip", [
         assignmentVersionId,
