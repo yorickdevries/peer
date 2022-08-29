@@ -25,6 +25,19 @@
                             <template v-slot:cell(date)="data">
                                 {{ data.item.createdAt | formatDate }}
                             </template>
+                            <template v-slot:cell(serverStatus)="data">
+                                <dl>
+                                    <dt>Current server flagging status</dt>
+                                    <dd v-if="data.item.flaggedByServer">Flagged as suspicious⚠️</dd>
+                                    <dd v-if="data.item.flaggedByServer === false">Not flagged as suspicious✔️</dd>
+                                    <dd v-if="data.item.flaggedByServer === null">No action by the server yet</dd>
+                                </dl>
+                                <dl>
+                                    <dd v-if="data.item.flaggedByServer">
+                                        Server's reason for flagging {{ data.item.commentByServer }}
+                                    </dd>
+                                </dl>
+                            </template>
                             <!--Actions-->
                             <template v-slot:cell(action)="data">
                                 <!--Trigger final /  not final-->
@@ -191,6 +204,7 @@ export default {
                 { key: "file", label: "File" },
                 { key: "userNetid", label: "Submitted by" },
                 { key: "date", label: "​​​Date" },
+                { key: "serverStatus", label: "Server Status" },
                 { key: "final", label: "Final" },
                 { key: "action", label: "Action" },
                 { key: "taFeedback", label: "TA Feedback" }
