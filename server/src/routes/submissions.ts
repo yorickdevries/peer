@@ -115,7 +115,9 @@ router.get(
     const pdfs = zip.folder("pdfs");
     for (let i = 0; i < sortedSubmissions.length; i++) {
       const filePath = submissions[i].file.getPath();
-      pdfs.file(filePath, fs.readFileSync(filePath), { base64: true });
+      //add student number to title instead of just 1,2,3...
+      const fileName = submissions[i].file.getFileNamewithExtension();
+      pdfs.file(fileName, fs.readFileSync(filePath), { base64: true });
     }
 
     const content = await zip.generateAsync({ type: "nodebuffer" });
@@ -124,6 +126,7 @@ router.get(
     console.log(f.getPath());
     console.log(f.getFileNamewithExtension());
     const assignment = await assignmentVersion.getAssignment();
+    //replace f with null, save, then assign assignmentExport.file = f
     const assignmentExport = new AssignmentExport(user, assignment, f);
     console.log(assignmentExport);
     await assignmentExport.save();
