@@ -19,8 +19,8 @@ const exportSubmissionsForZip = async function (
   // asynchronically make export
   const submissions = await assignmentVersion.getSubmissions();
   const sortedSubmissions = _.sortBy(submissions, "id");
-  //const filename = `ZIP_of_${assignmentVersion.id}_submissions`;
-  await exportToZip(assignmentExport, sortedSubmissions);
+  const filename = `ZIP_of_assignment_version_${assignmentVersion.id}_submissions`;
+  await exportToZip(assignmentExport, sortedSubmissions, filename);
 
   return `Exported ZIP file for assignmentVersion ${assignmentVersion.id}`;
 };

@@ -6,7 +6,8 @@ import Submission from "../models/Submission";
 
 const exportToZip = async function (
   assignmentExport: AssignmentExport,
-  sortedSubmissions: Submission[]
+  sortedSubmissions: Submission[],
+  fileName: string
 ): Promise<void> {
   /* eslint-disable */
     const JSZip = require("jszip");
@@ -18,15 +19,15 @@ const exportToZip = async function (
     for (let i = 0; i < sortedSubmissions.length; i++) {
       const filePath = sortedSubmissions[i].file.getPath();
       //add student number to title instead of just 1,2,3...
-      const fileName = `${sortedSubmissions[i].file.id}`;
+      const fileName = `${sortedSubmissions[i].userNetid}`;
       if(pdfs) {
         pdfs.file(fileName, fs.readFileSync(filePath), { base64: true });
       }
     }
 
     const content = await zip.generateAsync({ type: "nodebuffer" });
-    fs.writeFileSync("example.zip", content);
-    const file = new File("example", ".zip", null, path.join(__dirname, '../../', 'example.zip'));
+    fs.writeFileSync(`${fileName}.zip`, content);
+    const file = new File(`${fileName}`, ".zip", null, path.join(__dirname, '../../', `${fileName}.zip`));
     await getManager().transaction(
         "READ COMMITTED",
         async (transactionalEntityManager) => {
