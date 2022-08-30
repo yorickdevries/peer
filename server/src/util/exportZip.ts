@@ -5,10 +5,10 @@ import { getManager } from "typeorm";
 import Submission from "../models/Submission";
 
 const exportToZip = async function (
-    assignmentExport: AssignmentExport,
-    sortedSubmissions: Submission[],
+  assignmentExport: AssignmentExport,
+  sortedSubmissions: Submission[]
 ): Promise<void> {
-    /* eslint-disable */
+  /* eslint-disable */
     const JSZip = require("jszip");
     /* eslint-disable */
     const fs = require("fs");

@@ -5,23 +5,23 @@ import exportToZip from "../util/exportZip";
 import _ from "lodash";
 
 const exportSubmissionsForZip = async function (
-    assignmentVersionId: number,
-    assignmentExportId: number,
-  ): Promise<string> {
-    await ensureConnection();
+  assignmentVersionId: number,
+  assignmentExportId: number
+): Promise<string> {
+  await ensureConnection();
 
-    const assignmentVersion = await AssignmentVersion.findOneOrFail(
-      assignmentVersionId
-    );
-    const assignmentExport = await AssignmentExport.findOneOrFail(
-      assignmentExportId
-    );
-    // asynchronically make export
-    const submissions = await assignmentVersion.getSubmissions();
-    const sortedSubmissions = _.sortBy(submissions, "id");
-    //const filename = `ZIP_of_${assignmentVersion.id}_submissions`;
-    await exportToZip(assignmentExport, sortedSubmissions);
-  
-    return `Exported ZIP file for assignmentVersion ${assignmentVersion.id}`;
-  }
-  export default exportSubmissionsForZip;
+  const assignmentVersion = await AssignmentVersion.findOneOrFail(
+    assignmentVersionId
+  );
+  const assignmentExport = await AssignmentExport.findOneOrFail(
+    assignmentExportId
+  );
+  // asynchronically make export
+  const submissions = await assignmentVersion.getSubmissions();
+  const sortedSubmissions = _.sortBy(submissions, "id");
+  //const filename = `ZIP_of_${assignmentVersion.id}_submissions`;
+  await exportToZip(assignmentExport, sortedSubmissions);
+
+  return `Exported ZIP file for assignmentVersion ${assignmentVersion.id}`;
+};
+export default exportSubmissionsForZip;

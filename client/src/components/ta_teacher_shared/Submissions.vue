@@ -262,7 +262,6 @@ export default {
             const res1 = await api.submissions.getAllForAssignmentVersion(this.assignmentVersionId)
             this.allSubmissions = res1.data
             let count = await api.submissions.getSubmissionCount(this.assignmentVersionId)
-            console.log(await api.submissions.getZipExport(this.assignmentVersionId))
             this.numberOfSubmissions = count.data
         },
         async fetchGroups() {
@@ -291,7 +290,9 @@ export default {
         },
         async exportAllSubmissions() {
             await api.submissions.getZipExport(this.assignmentVersionId)
-            window.open(`/api/submissions/zip?assignmentVersionId=${this.assignmentVersionId}`)
+            this.showSuccessMessage({
+                message: "Export is being generated, you can download it in the exports tab when ready"
+            })
         }
     }
 }
