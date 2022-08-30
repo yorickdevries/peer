@@ -113,7 +113,7 @@ const parseSubmissionReviewsForExport = async function (
       parsedReview[questionText] = answerText;
     }
 
-    for(const question of questions) {
+    for (const question of questions) {
       const questionText = `R${question.number}. ${question.text}`;
       const answer = await review.getAnswer(question);
       if (question.graded) {
