@@ -26,20 +26,25 @@
                                 </b-badge>
                             </div>
                         </template>
-                        <FileAnnotator
-                            v-if="tab.aggregated"
-                            :submissionId="finalSubmission.id"
-                            :assignmentType="assignment.assignmentType"
-                            :readOnly="true"
-                            :reviewColors="reviewColors"
-                        />
-                        <FileAnnotator
-                            v-else
-                            :reviewId="tab.id"
-                            :assignmentType="assignment.assignmentType"
-                            :readOnly="true"
-                            :reviewColors="reviewColors"
-                        />
+                        <div v-if="feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id).approvalByTA">
+                            <FileAnnotator
+                                v-if="tab.aggregated"
+                                :submissionId="finalSubmission.id"
+                                :assignmentType="assignment.assignmentType"
+                                :readOnly="true"
+                                :reviewColors="reviewColors"
+                            />
+                            <FileAnnotator
+                                v-else
+                                :reviewId="tab.id"
+                                :assignmentType="assignment.assignmentType"
+                                :readOnly="true"
+                                :reviewColors="reviewColors"
+                            />
+                        </div>
+                        <div v-else>
+                            <b-alert show variant="success" class="p-2">This review was redacted</b-alert>
+                        </div>
                     </b-tab>
                 </b-tabs>
             </b-tab>
