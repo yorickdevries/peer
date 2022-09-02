@@ -21,6 +21,7 @@
     "client/node_modules"
   ],
   "dependencies": {
+    "csv-parse": "^5.3.0",
     "lint": "^0.7.0"
   }
 }

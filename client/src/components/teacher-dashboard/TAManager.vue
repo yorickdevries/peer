@@ -76,6 +76,40 @@
                         >
                     </div>
                 </b-card>
+
+                <!-- Modal Button -->
+                <b-button v-b-modal="`uploadModal${2}`" :disabled="false" variant="primary" @click="resetFile"
+                    >Upload new CSV</b-button
+                >
+
+                <!-- Upload Modal-->
+                <b-modal :id="`uploadModal${2}`" ref="uploadModal" centered hide-footer title="Upload Submission">
+                    Assignment version:
+                    <b-badge pill>{{ ThisName }} (ID: {{ 2 }})</b-badge>
+                    <hr />
+                    <b-alert show variant="warning">
+                        If you have already uploaded a file, it will not be used for reviewing anymore!
+                    </b-alert>
+                    <b-alert show variant="warning">
+                        Please make sure you have not included personal information anywhere unless specifically
+                        mentioned otherwise!
+                    </b-alert>
+                    <b-alert show variant="secondary">Allowed file types: {{ csv }}</b-alert>
+                    <b-form-file
+                        v-model="file"
+                        :accept="csv"
+                        placeholder="Choose a file..."
+                        required
+                        :state="Boolean(file)"
+                    />
+                    <b-button
+                        variant="primary"
+                        class="mt-3"
+                        :disabled="buttonDisabled"
+                        @click="addMultipleTeachingAssistants()"
+                        >Upload</b-button
+                    >
+                </b-modal>
             </b-col>
         </b-row>
     </b-container>
@@ -92,6 +126,7 @@ export default {
     components: { BreadcrumbTitle, UserInfo },
     data() {
         return {
+            file: null,
             enrollments: [],
             // used to find a user from the database
             queryNetid: "",
@@ -149,6 +184,16 @@ export default {
             return this.showErrorMessage({
                 message: `At this moment deletion of user ${netid} is not supported, please contact the administrator to do this`
             })
+        },
+        async addMultipleTeachingAssistants() {
+            console.log("front end func run")
+            try {
+                //upload csv file to server
+                await api.enrollments.postMultipleTAs(this.file)
+            } catch (error) {
+                console.log("failed first")
+                return
+            }
         }
     }
 }

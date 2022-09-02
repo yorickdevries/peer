@@ -8,6 +8,11 @@ import { validateQuery, validateBody } from "../middleware/validation";
 import ResponseMessage from "../enum/ResponseMessage";
 import { getManager } from "typeorm";
 import User from "../models/User";
+import upload from "../middleware/upload";
+import config from "config";
+import path from "path";
+import { parse } from "csv-parse";
+import * as fs from "fs";
 
 const router = express.Router();
 
@@ -120,5 +125,125 @@ router.get("/enrolled", async (req, res) => {
   });
   res.send(enrollments);
 });
+
+//enroll multiple TAs for a course from a csv file
+const maxFileSize = config.get("maxFileSize") as number;
+router.post(
+  "/enrollMultiple",
+  upload([".*"], maxFileSize, "file"),
+  async (req, res) => {
+    const user = req.user!;
+    if (!req.file) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("File is needed for enrollment");
+      console.log("DID NOT GET THE FILE!");
+      return;
+    } else {
+      console.log(req.file.path);
+      // const fileExtension = path.extname(req.file.originalname);
+      // res.status(HttpStatusCode.BAD_REQUEST).send("GOT THE FILE!");
+      // console.log(fileExtension);
+
+      type TAObj = {
+        courseId: string;
+        netId: string;
+        role: string;
+      };
+
+      (() => {
+        const csvFilePath = path.resolve(__dirname, `../../${req.file.path}`);
+
+        console.log(csvFilePath);
+
+        const headers = ["courseId", "netId", "role"];
+
+        const fileContent = fs.readFileSync(csvFilePath, { encoding: "utf-8" });
+
+        let listOfTAs: TAObj[];
+
+        parse(
+          fileContent,
+          {
+            delimiter: ",",
+            columns: headers,
+          },
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          async (error, result: TAObj[]) => {
+            if (error) {
+              console.error(error);
+            }
+            console.log("Result", result);
+            listOfTAs = result;
+
+            for (const t of listOfTAs) {
+              const userNetid: string = t.netId;
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              let role: UserRole;
+              if (t.role === "TA") {
+                role = UserRole.TEACHING_ASSISTANT;
+                console.log(`This person's a TA ${role}`);
+              } else {
+                res
+                  .status(HttpStatusCode.BAD_REQUEST)
+                  .send("Not everyone is a TA");
+              }
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const courseId = Number(t.courseId);
+
+              const course = await Course.findOne(courseId);
+              if (!course) {
+                res
+                  .status(HttpStatusCode.BAD_REQUEST)
+                  .send(ResponseMessage.COURSE_NOT_FOUND);
+                return;
+              }
+              if (!(await course.isTeacher(user))) {
+                res
+                  .status(HttpStatusCode.FORBIDDEN)
+                  .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+                return;
+              }
+              const existingEnrollment = await Enrollment.findOne({
+                where: { userNetid: userNetid, courseId: course.id },
+              });
+              if (existingEnrollment) {
+                res
+                  .status(HttpStatusCode.FORBIDDEN)
+                  .send("User is already enrolled in this course");
+                return;
+              }
+              let enrollment: Enrollment;
+              await getManager().transaction(
+                "READ COMMITTED",
+                async (transactionalEntityManager) => {
+                  let user = await transactionalEntityManager.findOne(
+                    User,
+                    userNetid
+                  );
+                  // in case the user doesnt exists in the database yet, create it
+                  if (!user) {
+                    user = new User(userNetid);
+                    await user.validateOrReject();
+                    await transactionalEntityManager.save(user);
+                  }
+                  // enroll user in the course if not already
+                  enrollment = new Enrollment(user, course, role);
+                  // in case another enrollment is made in the meantime it will error due to primary key constraints
+                  await enrollment.validateOrReject();
+                  await transactionalEntityManager.save(enrollment);
+                }
+              );
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              await enrollment!.reload();
+            }
+          }
+        );
+      })();
+
+      return;
+    }
+  }
+);
 
 export default router;
