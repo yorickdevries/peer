@@ -16,7 +16,6 @@ export default {
         console.log("second func run")
         const formData = new FormData()
         formData.append("file", file)
-        //const body = { file }
         return client.post("enrollments/enrollMultiple", formData)
     }
 }

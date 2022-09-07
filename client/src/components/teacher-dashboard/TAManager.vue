@@ -78,23 +78,28 @@
                 </b-card>
 
                 <!-- Modal Button -->
-                <b-button v-b-modal="`uploadModal${2}`" :disabled="false" variant="primary" @click="resetFile"
+                <b-button
+                    v-b-modal="`uploadModal${this.courseId}`"
+                    :disabled="false"
+                    variant="primary"
+                    @click="resetFile"
                     >Upload new CSV</b-button
                 >
 
                 <!-- Upload Modal-->
-                <b-modal :id="`uploadModal${2}`" ref="uploadModal" centered hide-footer title="Upload Submission">
-                    Assignment version:
-                    <b-badge pill>{{ ThisName }} (ID: {{ 2 }})</b-badge>
+                <b-modal
+                    :id="`uploadModal${this.courseId}`"
+                    ref="uploadModal"
+                    centered
+                    hide-footer
+                    title="Upload CSV File"
+                >
                     <hr />
                     <b-alert show variant="warning">
-                        If you have already uploaded a file, it will not be used for reviewing anymore!
+                        Make sure the information in the CSV file is in the following format: Course ID, TA NetId,
+                        role(TA)
                     </b-alert>
-                    <b-alert show variant="warning">
-                        Please make sure you have not included personal information anywhere unless specifically
-                        mentioned otherwise!
-                    </b-alert>
-                    <b-alert show variant="secondary">Allowed file types: {{ csv }}</b-alert>
+                    <b-alert show variant="secondary">Allowed file types: .csv{{ csv }}</b-alert>
                     <b-form-file
                         v-model="file"
                         :accept="csv"
@@ -186,12 +191,17 @@ export default {
             })
         },
         async addMultipleTeachingAssistants() {
-            console.log("front end func run")
             try {
                 //upload csv file to server
+                this.buttonDisabled = true
                 await api.enrollments.postMultipleTAs(this.file)
+                this.showSuccessMessage({ message: "Successfully submitted file." })
+                console.log("this")
+                this.$refs.uploadModal.hide()
+                await this.fetchTeachingAssistants()
+                this.buttonDisabled = false
             } catch (error) {
-                console.log("failed first")
+                this.buttonDisabled = false
                 return
             }
         }
