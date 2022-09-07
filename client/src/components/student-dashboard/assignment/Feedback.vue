@@ -26,7 +26,12 @@
                                 </b-badge>
                             </div>
                         </template>
-                        <div v-if="feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id).approvalByTA">
+                        <div
+                            v-if="
+                                feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id).approvalByTA ||
+                                    !feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id)
+                            "
+                        >
                             <FileAnnotator
                                 v-if="tab.aggregated"
                                 :submissionId="finalSubmission.id"
@@ -369,7 +374,7 @@ export default {
                 // iterate over questions and get answers
 
                 for (const question of this.questionnaire.questions) {
-                    if (feedbackReviewApproval) {
+                    if (feedbackReviewApproval || feedbackReviewApproval == null) {
                         const answer = this.getAnswerForQuestion(feedbackReviewAnswers, question)
                         if (answer !== null) {
                             // add review id so users can download files
