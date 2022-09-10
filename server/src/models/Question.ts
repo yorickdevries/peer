@@ -1,23 +1,25 @@
 import {
-  PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   Entity,
-  TableInheritance,
+  getManager,
+  ManyToOne,
+  PrimaryGeneratedColumn,
   RelationId,
+  TableInheritance,
 } from "typeorm";
 import {
-  IsDefined,
-  IsString,
-  IsNotEmpty,
-  IsInt,
-  IsPositive,
   IsBoolean,
+  IsDefined,
+  IsInt,
+  IsNotEmpty,
+  IsPositive,
+  IsString,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import Questionnaire from "./Questionnaire";
 import QuestionType from "../enum/QuestionType";
 import User from "./User";
+import QuestionOperation from "../enum/QuestionOperation";
 
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "type" } })
@@ -93,5 +95,74 @@ export default abstract class Question extends BaseModel {
   async isTeacherInCourse(user: User): Promise<boolean> {
     const questionnaire = await this.getQuestionnaire();
     return await questionnaire.isTeacherInCourse(user);
+  }
+
+  orderMakeSpace(questions: Question[], num: number) {
+    questions.map((q) => {
+      if (q.number >= num) q.number++;
+      return q;
+    });
+  }
+
+  orderRemoveSpace(questions: Question[], num: number) {
+    questions.map((q) => {
+      if (q.number > num) q.number--;
+      return q;
+    });
+  }
+
+  async saveAndOrder(operation: QuestionOperation): Promise<Question> {
+    const questionnaireId = this.questionnaireId
+      ? this.questionnaireId
+      : this.questionnaire?.id;
+    let questions: Question[] = await getManager()
+      .createQueryBuilder(Question, "q")
+      .where("q.questionnaireId = :id", { id: questionnaireId })
+      .orderBy("q.number")
+      .getMany();
+
+    const oldQuestion = questions.find((q) => q.id === this.id);
+    const sameNumQuestion = questions.find((q) => q.number === this.number);
+
+    switch (operation) {
+      case QuestionOperation.CREATE: {
+        if (!sameNumQuestion) break;
+
+        this.orderMakeSpace(questions, this.number);
+        break;
+      }
+      case QuestionOperation.MODIFY: {
+        if (!oldQuestion) break;
+        questions = questions.filter((q) => q.id !== this.id);
+
+        //"Close" space by reordering after the old question position
+        if (questions.find((q) => q.number > oldQuestion.number)) {
+          this.orderRemoveSpace(questions, oldQuestion.number);
+        }
+        //"Open" space by reordering after the new question position
+        if (sameNumQuestion) {
+          this.orderMakeSpace(questions, this.number);
+        }
+        break;
+      }
+      case QuestionOperation.DELETE: {
+        if (!oldQuestion) break;
+        questions = questions.filter((q) => q.id !== this.id);
+
+        if (questions.find((q) => q.number > this.number)) {
+          this.orderRemoveSpace(questions, this.number);
+        }
+        break;
+      }
+    }
+    for (const q of questions) {
+      await q.save();
+    }
+
+    if (operation !== QuestionOperation.DELETE) {
+      return this.save();
+    } else {
+      return this.remove();
+    }
   }
 }
