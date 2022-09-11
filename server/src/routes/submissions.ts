@@ -90,7 +90,7 @@ router.get(
         .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
       return;
     }
-    
+
     const assignment = await assignmentVersion.getAssignment();
     const assignmentExport = new AssignmentExport(user, assignment, null);
     await assignmentExport.save();
