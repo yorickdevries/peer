@@ -11,7 +11,8 @@
     "dev_server": "npm run dev --prefix ./server",
     "dev_client": "npm run serve --prefix ./client",
     "heroku-postbuild": "npm run postinstall && npm run build",
-    "serve": "cd server && nodemon app.ts"
+    "serve": "cd server && nodemon app.ts",
+    "hot_reload": "start npm run dev_server && start npm run dev_client"
   },
   "engines": {
     "node": "14.x"
