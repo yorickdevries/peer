@@ -97,14 +97,14 @@ export default abstract class Question extends BaseModel {
     return await questionnaire.isTeacherInCourse(user);
   }
 
-  orderMakeSpace(questions: Question[], num: number) {
+  orderMakeSpace(questions: Question[], num: number): void {
     questions.map((q) => {
       if (q.number >= num) q.number++;
       return q;
     });
   }
 
-  orderRemoveSpace(questions: Question[], num: number) {
+  orderRemoveSpace(questions: Question[], num: number): void {
     questions.map((q) => {
       if (q.number > num) q.number--;
       return q;

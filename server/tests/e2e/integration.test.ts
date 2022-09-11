@@ -845,6 +845,92 @@ describe("Integration", () => {
       points: 15,
     });
 
+    //Verify reordering of questions works properly
+    //Move MC question to pos 1
+    res = await request(server)
+      .patch(`/api/multiplechoicequestions/${multipleChoiceQuestionReview.id}`)
+      .send({
+        text: "This is a Multiple question",
+        number: 1,
+        optional: true,
+        graded: true,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    //Check other question has moved forward one spot
+    res = await request(server)
+      .get(`/api/multiplechoicequestions/${mcQuestionGraded.id}`)
+      .send()
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text).number).toEqual(5);
+
+    //Move MC question to last position
+    res = await request(server)
+      .patch(`/api/multiplechoicequestions/${multipleChoiceQuestionReview}`)
+      .send({
+        text: "This is a Multiple question",
+        number: 20,
+        optional: true,
+        graded: true,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    //Check other question has moved back 1 position
+    res = await request(server)
+      .get(`/api/multiplechoicequestions/${mcQuestionGraded.id}`)
+      .send()
+      .set("cookie", await teacherCookie());
+    expect(JSON.parse(res.text).number).toEqual(4);
+
+    //Move MC question back to original position
+    res = await request(server)
+      .patch(`/api/multiplechoicequestions/${multipleChoiceQuestionReview}`)
+      .send({
+        text: "This is a Multiple question",
+        number: 12,
+        optional: true,
+        graded: true,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    //Add open question
+    res = await request(server)
+      .post(`/api/openquestions/`)
+      .send({
+        text: "This is an Open question",
+        number: 12,
+        optional: false,
+        questionnaireId: submissionQuestionnaire.id,
+      })
+      .set("cookie", await teacherCookie());
+    const testOpenQuestion = JSON.parse(res.text);
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    //Check other question has moved forward one
+    res = await request(server)
+      .get(`/api/multiplechoicequestions/${multipleChoiceQuestionReview.id}`)
+      .send()
+      .set("cookie", await teacherCookie());
+    expect(JSON.parse(res.text).number).toEqual(13);
+
+    //Delete open question
+    res = await request(server)
+      .delete(`/api/openquestions/${testOpenQuestion.id}`)
+      .send()
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    //Check other question has moved back one
+    res = await request(server)
+      .get(`/api/multiplechoicequestions/${multipleChoiceQuestionReview.id}`)
+      .send()
+      .set("cookie", await teacherCookie());
+    expect(JSON.parse(res.text).number).toEqual(12);
+
     res = await request(server)
       .post("/api/assignments")
       .set("cookie", await teacherCookie())
