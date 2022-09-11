@@ -95,7 +95,8 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
     questionnaire,
     req.body.extensions
   );
-  await question.saveAndOrder(QuestionOperation.CREATE);
+  await question.save();
+  await question.reorder(QuestionOperation.CREATE);
   res.send(question);
 });
 
@@ -158,7 +159,8 @@ router.patch(
     question.number = req.body.number;
     question.optional = req.body.optional;
     question.extensions = req.body.extensions;
-    await question.saveAndOrder(QuestionOperation.MODIFY);
+    await question.save();
+    await question.reorder(QuestionOperation.MODIFY);
     res.send(question);
   }
 );
@@ -205,7 +207,8 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
     return;
   }
   // otherwise update the question
-  await question.saveAndOrder(QuestionOperation.DELETE);
+  await question.remove();
+  await question.reorder(QuestionOperation.DELETE);
   res.send(question);
 });
 

@@ -97,6 +97,7 @@ export default abstract class Question extends BaseModel {
     return await questionnaire.isTeacherInCourse(user);
   }
 
+  //"Open" space by reordering after the new question position
   orderMakeSpace(questions: Question[], num: number): void {
     questions.map((q) => {
       if (q.number >= num) q.number++;
@@ -104,65 +105,52 @@ export default abstract class Question extends BaseModel {
     });
   }
 
-  orderRemoveSpace(questions: Question[], num: number): void {
-    questions.map((q) => {
-      if (q.number > num) q.number--;
-      return q;
-    });
+  //"Close" space by reordering after the question position
+  orderRemoveSpace(questions: Question[]): void {
+    if (questions.length > 0 && questions[0].number > 1) {
+      questions[0].number = 1;
+    }
+    for (let i = 0; i < questions.length - 1; i++) {
+      if (questions[i + 1].number - questions[i].number > 1) {
+        questions[i + 1].number = questions[i].number + 1;
+      }
+    }
   }
 
-  async saveAndOrder(operation: QuestionOperation): Promise<Question> {
+  async reorder(operation: QuestionOperation): Promise<void> {
     const questionnaireId = this.questionnaireId
       ? this.questionnaireId
       : this.questionnaire?.id;
+
     let questions: Question[] = await getManager()
       .createQueryBuilder(Question, "q")
       .where("q.questionnaireId = :id", { id: questionnaireId })
       .orderBy("q.number")
       .getMany();
 
-    const oldQuestion = questions.find((q) => q.id === this.id);
-    const sameNumQuestion = questions.find((q) => q.number === this.number);
+    questions = questions.filter((q) => q.id !== this.id);
 
     switch (operation) {
       case QuestionOperation.CREATE: {
-        if (!sameNumQuestion) break;
+        if (!questions.find((q) => q.number === this.number)) break;
 
         this.orderMakeSpace(questions, this.number);
         break;
       }
       case QuestionOperation.MODIFY: {
-        if (!oldQuestion) break;
-        questions = questions.filter((q) => q.id !== this.id);
+        this.orderRemoveSpace(questions);
 
-        //"Close" space by reordering after the old question position
-        if (questions.find((q) => q.number > oldQuestion.number)) {
-          this.orderRemoveSpace(questions, oldQuestion.number);
-        }
-        //"Open" space by reordering after the new question position
-        if (sameNumQuestion) {
-          this.orderMakeSpace(questions, this.number);
-        }
+        this.orderMakeSpace(questions, this.number);
         break;
       }
       case QuestionOperation.DELETE: {
-        if (!oldQuestion) break;
-        questions = questions.filter((q) => q.id !== this.id);
-
-        if (questions.find((q) => q.number > this.number)) {
-          this.orderRemoveSpace(questions, this.number);
-        }
+        //"Close" extra space
+        this.orderRemoveSpace(questions);
         break;
       }
     }
     for (const q of questions) {
       await q.save();
-    }
-
-    if (operation !== QuestionOperation.DELETE) {
-      return this.save();
-    } else {
-      return this.remove();
     }
   }
 }
