@@ -387,9 +387,9 @@ export default {
                         answers[question.id].push(null)
                     }
                 }
-                // set the answer object so all fields are reactive now
-                this.answers = answers
             }
+            // set the answer object so all fields are reactive now
+            this.answers = answers
         },
         getAnswerForQuestion(existingAnswers, question) {
             let answer = null
