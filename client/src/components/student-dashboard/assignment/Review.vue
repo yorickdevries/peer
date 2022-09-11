@@ -373,7 +373,7 @@ export default {
             // View file next to questionnaire
             viewFileNextToQuestionnaire: false,
             // Currently pressed keys
-            keys: new Set(),
+            keys: { Enter: false, ControlLeft: false, ControlRight: false },
             // Index of currently active question
             questionIndex: null
         }
@@ -441,14 +441,14 @@ export default {
     },
     methods: {
         keyDown(e) {
-            this.keys.add(e.code)
-            if (this.keys.has("Enter") && (this.keys.has("ControlLeft") || this.keys.has("ControlRight"))) {
+            this.keys[e.code] = true
+            if (this.keys["Enter"] && (this.keys["ControlLeft"] || this.keys["ControlRight"])) {
                 const saveButton = this.$refs.saveButton[this.questionIndex]
                 saveButton.click()
             }
         },
         keyUp(e) {
-            this.keys.delete(e.code)
+            this.keys[e.code] = false
         },
         async fetchData() {
             this.viewFile = false
