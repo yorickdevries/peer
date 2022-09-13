@@ -28,8 +28,9 @@
                         </template>
                         <div
                             v-if="
-                                feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id).approvalByTA ||
-                                    !feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id)
+                                !feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id) ||
+                                    feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id).approvalByTA ||
+                                    feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id).approvalByTA === null
                             "
                         >
                             <FileAnnotator
@@ -124,6 +125,7 @@
                                         </b-list-group-item>
 
                                         <b-list-group-item v-for="(answer, index) in answers[question.id]" :key="index">
+                                            <!-- It can be null when a review is redacted -->
                                             <div v-if="answer !== null">
                                                 <!-- OPEN QUESTION -->
                                                 <b-form-textarea
