@@ -120,7 +120,7 @@
                                 :class="{ 'disabled-view': blockQuestionnaireEditing }"
                             >
                                 <b-alert show variant="warning" class="p-2">
-                                    Currently, no file has b@een uploaded. <br />
+                                    Currently, no file has been uploaded. <br />
                                     Allowed file types: {{ question.extensions }}
                                 </b-alert>
                                 <b-form-file placeholder="Choose a new file..." disabled> </b-form-file>
@@ -216,7 +216,6 @@ export default {
     },
     methods: {
         async fetchData() {
-            console.log("refetch NOW")
             await this.getAssignment()
             await this.getAssignmentVersion()
             await this.getQuestionnaire()
