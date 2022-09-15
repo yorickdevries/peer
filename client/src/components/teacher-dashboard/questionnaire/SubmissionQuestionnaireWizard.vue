@@ -7,8 +7,8 @@
         <b-container>
             <b-card class="mb-3 mt-3" :class="{ 'disabled-view': blockQuestionnaireEditing }">
                 <div class="d-flex justify-content-between">
-                    <b-row>
-                        <b-col>
+                    <b-row class="flex-grow-1">
+                        <b-col cols="3">
                             <div v-if="questionnaire === null">
                                 <b-button @click="makeQuestionnaire" class="mb-3" variant="primary"
                                     >Make questionnaire</b-button
@@ -27,22 +27,13 @@
                                 </b-modal>
                             </div>
                         </b-col>
-                        <b-col>
+                        <b-col cols="9">
                             <div v-if="questionnaire && questionnaire.questions.length === 0">
-                                <div class="text-muted">Copy questions from another questionnaire</div>
-                                <div class="input-group mb-2">
-                                    <div class="input-group-prepend">
-                                        <b-button variant="primary" @click="copyQuestionnaire">Copy</b-button>
-                                    </div>
-                                    <b-form-select v-model="questionnaireIdToCopyFrom">
-                                        <b-form-select-option
-                                            v-for="questionnaire in allQuestionnairesOfCourse"
-                                            :key="questionnaire.id"
-                                            :value="questionnaire.id"
-                                            >{{ questionnaire.name }}</b-form-select-option
-                                        >
-                                    </b-form-select>
-                                </div>
+                                <CopyQuestionWizard
+                                    @copyQuestionSuccess="fetchData"
+                                    :questionnaire="this.questionnaire"
+                                    type="submission"
+                                />
                             </div>
                         </b-col>
                     </b-row>
@@ -129,7 +120,7 @@
                                 :class="{ 'disabled-view': blockQuestionnaireEditing }"
                             >
                                 <b-alert show variant="warning" class="p-2">
-                                    Currently, no file has been uploaded. <br />
+                                    Currently, no file has b@een uploaded. <br />
                                     Allowed file types: {{ question.extensions }}
                                 </b-alert>
                                 <b-form-file placeholder="Choose a new file..." disabled> </b-form-file>
@@ -178,11 +169,13 @@ import CreateQuestionWizard from "./CreateQuestionWizard"
 import EditQuestionWizard from "./EditQuestionWizard"
 import EditQuestionPointsWizard from "./EditQuestionPointsWizard"
 import { StarRating } from "vue-rate-it"
+import CopyQuestionWizard from "@/components/teacher-dashboard/questionnaire/CopyQuestionWizard"
 
 export default {
     props: ["assignmentVersionId"],
     mixins: [notifications],
     components: {
+        CopyQuestionWizard,
         CreateQuestionWizard,
         EditQuestionWizard,
         EditQuestionPointsWizard,
@@ -223,10 +216,10 @@ export default {
     },
     methods: {
         async fetchData() {
+            console.log("refetch NOW")
             await this.getAssignment()
             await this.getAssignmentVersion()
             await this.getQuestionnaire()
-            await this.getAllQuestionnairesOfCourse()
         },
         isOptionQuestion(questionType) {
             return questionType === "multiplechoice" || questionType === "checkbox"
@@ -253,39 +246,6 @@ export default {
         async makeQuestionnaire() {
             await api.submissionquestionnaires.post(this.assignmentVersion.id)
             this.showSuccessMessage({ message: "Questionnaire made, you can now add questions." })
-            await this.fetchData()
-        },
-        async getAllQuestionnairesOfCourse() {
-            const res = await api.assignments.getAllForCourse(this.$route.params.courseId)
-            const allAssignmentsOfCourse = res.data
-            // iterate over assignments
-            this.allQuestionnairesOfCourse = []
-            for (const assignment of allAssignmentsOfCourse) {
-                for (const assignmentVersion of assignment.versions) {
-                    if (
-                        assignmentVersion.submissionQuestionnaireId &&
-                        assignmentVersion.submissionQuestionnaireId !== this.questionnaire.id
-                    ) {
-                        this.allQuestionnairesOfCourse.push({
-                            name: assignment.name + "-" + assignmentVersion.name + " (submissionquestionnaire)",
-                            id: assignmentVersion.submissionQuestionnaireId
-                        })
-                    }
-                    if (
-                        assignmentVersion.reviewQuestionnaireId &&
-                        assignmentVersion.reviewQuestionnaireId !== this.questionnaire.id
-                    ) {
-                        this.allQuestionnairesOfCourse.push({
-                            name: assignment.name + "-" + assignmentVersion.name + " (reviewquestionnaire)",
-                            id: assignmentVersion.reviewQuestionnaireId
-                        })
-                    }
-                }
-            }
-        },
-        async copyQuestionnaire() {
-            await api.submissionquestionnaires.copyQuestions(this.questionnaire.id, this.questionnaireIdToCopyFrom)
-            this.showSuccessMessage({ message: "succesfully copied over questions" })
             await this.fetchData()
         }
     }
