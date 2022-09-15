@@ -58,7 +58,8 @@ export default {
     },
     computed: {
         activeEnrollments() {
-            return !this.loading && this.selectedYear
+            //find courses we are a teacher in matching the selected academic year
+            return this.selectedYear
                 ? this.enrollments.filter(e => e.role === "teacher" && e.course.academicYear.id === this.selectedYear)
                 : null
         }
