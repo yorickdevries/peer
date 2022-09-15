@@ -59,7 +59,7 @@ export default {
     computed: {
         activeEnrollments() {
             //find courses we are a teacher in matching the selected academic year
-            return this.selectedYear
+            return this.selectedYear !== null
                 ? this.enrollments.filter(e => e.role === "teacher" && e.course.academicYear.id === this.selectedYear)
                 : null
         }
@@ -70,7 +70,6 @@ export default {
         //select the year of the current course
         const course = this.enrollments.find(e => e.course.id.toString() === this.$route.params.courseId).course
         this.selectedYear = course.academicYear.id
-        this.selectYear()
         //select the current course
         this.selectedCourse = course.id
         this.selectCourse()
