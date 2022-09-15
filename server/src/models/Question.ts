@@ -122,35 +122,40 @@ export default abstract class Question extends BaseModel {
       ? this.questionnaireId
       : this.questionnaire?.id;
 
-    let questions: Question[] = await getManager()
-      .createQueryBuilder(Question, "q")
-      .where("q.questionnaireId = :id", { id: questionnaireId })
-      .orderBy("q.number")
-      .getMany();
+    await getManager().transaction(
+      "READ COMMITTED",
+      async (transactionalEntityManager) => {
+        let questions: Question[] = await transactionalEntityManager
+          .createQueryBuilder(Question, "q")
+          .where("q.questionnaireId = :id", { id: questionnaireId })
+          .orderBy("q.number")
+          .getMany();
 
-    questions = questions.filter((q) => q.id !== this.id);
+        questions = questions.filter((q) => q.id !== this.id);
 
-    switch (operation) {
-      case QuestionOperation.CREATE: {
-        if (!questions.find((q) => q.number === this.number)) break;
+        switch (operation) {
+          case QuestionOperation.CREATE: {
+            if (!questions.find((q) => q.number === this.number)) break;
 
-        this.orderMakeSpace(questions, this.number);
-        break;
+            this.orderMakeSpace(questions, this.number);
+            break;
+          }
+          case QuestionOperation.MODIFY: {
+            this.orderRemoveSpace(questions);
+
+            this.orderMakeSpace(questions, this.number);
+            break;
+          }
+          case QuestionOperation.DELETE: {
+            //"Close" extra space
+            this.orderRemoveSpace(questions);
+            break;
+          }
+        }
+        for (const q of questions) {
+          await transactionalEntityManager.save(q);
+        }
       }
-      case QuestionOperation.MODIFY: {
-        this.orderRemoveSpace(questions);
-
-        this.orderMakeSpace(questions, this.number);
-        break;
-      }
-      case QuestionOperation.DELETE: {
-        //"Close" extra space
-        this.orderRemoveSpace(questions);
-        break;
-      }
-    }
-    for (const q of questions) {
-      await q.save();
-    }
+    );
   }
 }
