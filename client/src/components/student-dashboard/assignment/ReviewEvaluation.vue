@@ -172,11 +172,12 @@
                     />
 
                     <!-- MULTIPLE CHOICE QUESTION -->
+                    <!--prettier-ignore-->
                     <b-form-radio-group
                         v-if="question.type === 'multiplechoice'"
                         v-model="answers[question.id].answer"
                         @input="
-                            answers[question.id].answer !== null ? (answers[question.id].changed = true) : '',
+                            ;(answers[question.id].answer !== null ? (answers[question.id].changed = true) : ''),
                                 (questionIndex = index)
                         "
                         stacked
