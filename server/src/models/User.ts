@@ -9,6 +9,7 @@ import {
   IsPositive,
   IsEmail,
   IsNotEmpty,
+  IsBoolean,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import Affiliation from "./Affiliation";
@@ -65,6 +66,11 @@ export default class User extends BaseModel {
   @IsString()
   @IsNotEmpty()
   displayName: string | null;
+
+  @Column("boolean", { nullable: false })
+  @IsDefined()
+  @IsBoolean()
+  admin = false;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToMany((_type) => Affiliation, {
