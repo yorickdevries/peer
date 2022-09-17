@@ -30,7 +30,8 @@
                             v-if="
                                 !feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id) ||
                                     feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id).approvalByTA ||
-                                    feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id).approvalByTA === null
+                                    feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id)
+                                        .approvalByTA === null
                             "
                         >
                             <FileAnnotator
