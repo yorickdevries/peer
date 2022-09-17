@@ -5,7 +5,6 @@ import Question from "../models/Question";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import CheckboxQuestionAnswer from "../models/CheckboxQuestionAnswer";
 import AssignmentType from "../enum/AssignmentType";
-import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 
 const parseSubmissionReviewsForExport = async function (
   submissionQuestionnaire: SubmissionQuestionnaire
@@ -90,19 +89,10 @@ const parseSubmissionReviewsForExport = async function (
     let totalPoints = 0;
     let totalMaxPoints = 0;
     for (const question of questions) {
-      if (question instanceof MultipleChoiceQuestion) {
-        const q = question as MultipleChoiceQuestion;
-        const maxPoints = q.getMaxPointsFromQuestion();
+        const maxPoints = question.getMaxPointsFromQuestion();
         if (maxPoints) {
           totalMaxPoints += maxPoints;
-        }
-      } else if (question instanceof CheckboxQuestion) {
-        const q = question as CheckboxQuestion;
-        const maxPoints = q.getMaxPointsFromQuestion();
-        if (maxPoints) {
-          totalMaxPoints += maxPoints;
-        }
-      }
+        } 
     }
 
     for (const question of questions) {
