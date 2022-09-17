@@ -89,17 +89,20 @@ const parseSubmissionReviewsForExport = async function (
     let totalPoints = 0;
     let totalMaxPoints = 0;
     for (const question of questions) {
-        const maxPoints = question.getMaxPointsFromQuestion();
-        if (maxPoints) {
-          totalMaxPoints += maxPoints;
-        } 
+      const maxPoints = question.getMaxPointsFromQuestion();
+      if (maxPoints) {
+        totalMaxPoints += maxPoints;
+      }
     }
 
     for (const question of questions) {
       const questionText = `R${question.number}. ${question.text}`;
       // answer in text form
-      const answer = await review.getAnswer(question);
-      const answerText = answer?.getAnswerText();
+      const answer = await review?.getAnswer(question);
+      let answerText = "";
+      if (answer) {
+        answerText = answer?.getAnswerText();
+      }
       parsedReview[questionText] = answerText;
     }
 
@@ -154,11 +157,15 @@ const parseSubmissionReviewsForExport = async function (
     for (const question of reviewEvaluationQuestions) {
       const questionText = `E${question.number}. ${question.text}`;
       const answer = await reviewEvaluation?.getAnswer(question);
-      const answerText = answer?.getAnswerText();
+
+      let answerText = "";
+      if (answer) {
+        answerText = answer?.getAnswerText();
+      }
       // answer in text form
       parsedReview[questionText] = answerText;
     }
-    for(const question of reviewEvaluationQuestions) {
+    for (const question of reviewEvaluationQuestions) {
       const questionText = `E${question.number}. ${question.text}`;
       const answer = await reviewEvaluation?.getAnswer(question);
       if (question.graded) {
