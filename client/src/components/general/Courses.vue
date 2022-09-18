@@ -383,14 +383,12 @@ export default {
             this.showSuccessMessage({ message: "Successfully enrolled in course." })
             // reload the data from the server
             await this.fetchEnrollableCourses()
-            await this.fetchEnrollableCourses()
             await this.fetchEnrollments()
         },
         async enrollInCourseAsAdmin(courseId) {
             await api.courses.enrollAsAdmin(courseId)
             this.showSuccessMessage({ message: "Successfully enrolled in course as admin." })
             // reload the data from the server
-            await this.fetchEnrollableCourses()
             await this.fetchEnrollableCourses()
             await this.fetchEnrollments()
         }

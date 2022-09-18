@@ -157,10 +157,10 @@ export default class Course extends BaseModel {
   }
 
   static async getAdminEnrollable(user: User): Promise<Course[]> {
-    // all enrollable courses
-    const allEnrollableCourses = await Course.find();
+    // all courses
+    const allCourses = await Course.find();
     const enrollableCourses = [];
-    for (const course of allEnrollableCourses) {
+    for (const course of allCourses) {
       if (!(await course.isEnrolled(user))) {
         enrollableCourses.push(course);
       }
