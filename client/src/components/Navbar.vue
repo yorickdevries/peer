@@ -22,7 +22,7 @@
                 <b-collapse is-nav id="nav_collapse">
                     <!-- Right aligned nav items -->
                     <b-navbar-nav v-if="authenticated" class="ml-auto">
-                        <b-nav-item v-if="user.admin" :to="{ name: 'admin-dashboard' }" exact>
+                        <b-nav-item v-if="user.admin" :to="{ name: 'admin-dashboard.home' }" exact>
                             <icon name="lock" class="mr-2 align-middle"></icon>
                             <span class="align-middle">Admin</span>
                         </b-nav-item>

@@ -20,6 +20,11 @@ export default [
         },
         children: [
             {
+                path: "",
+                name: "admin-dashboard.home",
+                component: () => import("../components/admin-dashboard/Home")
+            },
+            {
                 path: "faculties",
                 name: "admin-dashboard.faculties",
                 component: () => import("../components/admin-dashboard/FacultyManager")

@@ -21,7 +21,9 @@ enum ResponseMessage {
   GRADED_OPTION_FOR_NON_QUESTION_GRADED = "Your provided a GRADED option for a NON-GRADED question",
   NO_ADMIN = "You are not an administrator",
   FACULTY_NOT_FOUND = "The specified faculty was not found",
-  FACULTY_HAS_COURSES = "The specified faculty already has courses assigned"
+  FACULTY_HAS_COURSES = "The specified faculty already has courses assigned",
+  YEAR_NOT_FOUND = "The specified year was not found",
+  YEAR_HAS_COURSES = "The specified year already has courses assigned",
 }
 
 export default ResponseMessage;
