@@ -24,6 +24,7 @@ import Submission from "../models/Submission";
 import publishAssignment from "../assignmentProgression/publishAssignment";
 import closeSubmission from "../assignmentProgression/closeSubmission";
 import { scheduleJobsForAssignment } from "../assignmentProgression/scheduler";
+import Faculty from "../models/Faculty";
 
 const router = express.Router();
 
@@ -57,7 +58,10 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
     return;
   }
   const allAssignments = await course.getAssignments();
-  const sortedAllAssignments = _.sortBy(allAssignments, "id");
+  const sortedAllAssignments = _.sortBy(allAssignments, "id");router.get("/", async (_req, res) => {
+    const faculties = await Faculty.find({ order: { name: "ASC" } });
+    res.send(faculties);
+  });
   res.send(sortedAllAssignments);
 });
 

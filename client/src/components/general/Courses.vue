@@ -234,6 +234,35 @@
                                                     Enroll in Course
                                                 </b-button>
                                             </b-modal>
+                                            <template v-if="user.admin">
+                                                <b-button
+                                                    class="ml-1"
+                                                    variant="outline-warning"
+                                                    v-b-modal="`enrollAdmin-${course.id}`"
+                                                    >Admin Enrol</b-button
+                                                >
+                                                <b-modal
+                                                    :id="`enrollAdmin-${course.id}`"
+                                                    :title="`Enroll in ${course.name} as a teacher?`"
+                                                    centered
+                                                    hide-footer
+                                                >
+                                                    Are you sure you want to enroll in the course "{{ course.name }}" as
+                                                    <b>teacher</b>? This action cannot be undone.
+                                                    <b-alert show
+                                                        >Making comments, marking reviews, or any other actions which
+                                                        assign your user to a database entry will prevent you from later
+                                                        removing yourself.</b-alert
+                                                    >
+                                                    <b-button
+                                                        variant="warning"
+                                                        size="sm"
+                                                        @click="enrollInCourseAsAdmin(course.id)"
+                                                    >
+                                                        Enroll in course as admin
+                                                    </b-button>
+                                                </b-modal>
+                                            </template>
                                         </div>
                                     </b-card-body>
                                 </b-card>
@@ -352,6 +381,14 @@ export default {
         async enrollInCourse(courseId) {
             await api.courses.enroll(courseId)
             this.showSuccessMessage({ message: "Successfully enrolled in course." })
+            // reload the data from the server
+            await this.fetchEnrollableCourses()
+            await this.fetchEnrollableCourses()
+            await this.fetchEnrollments()
+        },
+        async enrollInCourseAsAdmin(courseId) {
+            await api.courses.enrollAsAdmin(courseId)
+            this.showSuccessMessage({ message: "Successfully enrolled in course as admin." })
             // reload the data from the server
             await this.fetchEnrollableCourses()
             await this.fetchEnrollableCourses()

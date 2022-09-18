@@ -9,7 +9,6 @@ import {
   IsPositive,
   IsEmail,
   IsNotEmpty,
-  IsBoolean,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import Affiliation from "./Affiliation";
@@ -68,8 +67,6 @@ export default class User extends BaseModel {
   displayName: string | null;
 
   @Column("boolean", { default: false })
-  @IsDefined()
-  @IsBoolean()
   admin!: boolean;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
