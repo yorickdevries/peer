@@ -233,7 +233,7 @@ const parseSubmissionReviewsForExport = async function (
 
     parsedReviews.push(parsedReview);
   }
-
+  console.log(parsedReviews);
   return parsedReviews;
 };
 
