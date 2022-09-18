@@ -928,6 +928,109 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
 
+    // QUESTIONNAIRE COPYING TESTS
+    // create new assignment version
+    res = await request(server)
+      .post("/api/assignmentversions/")
+      .send({
+        name: "copy",
+        assignmentId: assignment_2.id,
+        reviewsPerUserPerAssignmentVersionToReview: 1,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const assignmentVersion_copy = JSON.parse(res.text);
+    expect(assignmentVersion_copy).toMatchObject({
+      name: "copy",
+    });
+
+    // make a reviewquestionnaire
+    res = await request(server)
+      .post("/api/reviewquestionnaires/")
+      .send({
+        assignmentVersionId: assignmentVersion_copy.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // make a submissionquestionnaire
+    res = await request(server)
+      .post("/api/submissionquestionnaires/")
+      .send({
+        assignmentVersionId: assignmentVersion_copy.id,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // get the assignment version including questionnaire
+    res = await request(server)
+      .get(`/api/assignmentversions/${assignmentVersion_copy.id}`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const assignmentVersion_copy_copy = JSON.parse(res.text);
+
+    // get the review questionnaire
+    res = await request(server)
+      .get(
+        `/api/reviewquestionnaires/${assignmentVersion_copy_copy.reviewQuestionnaireId}`
+      )
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const reviewQuestionnaire_copy = JSON.parse(res.text);
+    expect(reviewQuestionnaire_copy.questions.length).toEqual(0);
+
+    // get the submission questionnaire
+    res = await request(server)
+      .get(
+        `/api/submissionquestionnaires/${assignmentVersion_copy_copy.submissionQuestionnaireId}`
+      )
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const submissionQuestionnaire_copy = JSON.parse(res.text);
+    expect(submissionQuestionnaire_copy.questions.length).toEqual(0);
+
+    // copy previous questionnaire to review questionnaire
+    res = await request(server)
+      .patch(
+        `/api/reviewquestionnaires/${reviewQuestionnaire_copy.id}/copyQuestions`
+      )
+      .send({
+        copyFromQuestionnaireId: assignmentVersion.submissionQuestionnaireId,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // copy previous questionnaire to submission questionnaire
+    res = await request(server)
+      .patch(
+        `/api/submissionquestionnaires/${submissionQuestionnaire_copy.id}/copyQuestions`
+      )
+      .send({
+        copyFromQuestionnaireId: assignmentVersion.submissionQuestionnaireId,
+      })
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // get the review questionnaire
+    res = await request(server)
+      .get(
+        `/api/reviewquestionnaires/${assignmentVersion_copy_copy.reviewQuestionnaireId}`
+      )
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const reviewQuestionnaire_copy_updated = JSON.parse(res.text);
+    expect(reviewQuestionnaire_copy_updated.questions.length).toEqual(9);
+
+    // get the submission questionnaire
+    res = await request(server)
+      .get(
+        `/api/submissionquestionnaires/${assignmentVersion_copy_copy.submissionQuestionnaireId}`
+      )
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const submissionQuestionnaire_copy_updated = JSON.parse(res.text);
+    expect(submissionQuestionnaire_copy_updated.questions.length).toEqual(9);
+
     // publish an assingment for the course
     res = await request(server)
       .patch(`/api/assignments/${assignment.id}/publish`)
