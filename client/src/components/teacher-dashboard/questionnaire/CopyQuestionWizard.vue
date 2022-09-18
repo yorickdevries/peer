@@ -68,7 +68,7 @@ export default {
         await this.fetchData()
         this.loading = false
         //select the year of the current course
-        const course = this.enrollments.find(e => e.course.id.toString() === this.$route.params.courseId).course
+        const course = this.enrollments.find(e => e.course.id === parseInt(this.$route.params.courseId)).course
         this.selectedYear = course.academicYear.id
         //select the current course
         this.selectedCourse = course.id
