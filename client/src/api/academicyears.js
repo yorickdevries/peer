@@ -15,6 +15,7 @@ export default {
         return client.post("academicyears", year)
     },
     patch(year) {
-        return client.patch(`academicyears/${year.id}`, year)
+        const data = { name: year.name, active: year.active }
+        return client.patch(`academicyears/${year.id}`, data)
     }
 }

@@ -14,6 +14,7 @@ export default {
         return client.post("faculties", faculty)
     },
     patch(faculty) {
-        return client.patch(`faculties/${faculty.id}`, faculty)
+        const data = { name: faculty.name, longName: faculty.longName }
+        return client.patch(`faculties/${faculty.id}`, data)
     }
 }

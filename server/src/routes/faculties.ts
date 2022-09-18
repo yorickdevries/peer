@@ -17,7 +17,6 @@ const postSchema = Joi.object({
   longName: Joi.string().required(),
 });
 const patchSchema = Joi.object({
-  id: Joi.number().integer().required(),
   name: Joi.string().required(),
   longName: Joi.string().required(),
 });

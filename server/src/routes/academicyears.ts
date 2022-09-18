@@ -24,7 +24,6 @@ const postSchema = Joi.object({
   active: Joi.boolean().required(),
 });
 const patchSchema = Joi.object({
-  id: Joi.number().integer().required(),
   name: Joi.string().required(),
   active: Joi.boolean().required(),
 });
