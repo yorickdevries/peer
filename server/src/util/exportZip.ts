@@ -3,17 +3,13 @@ import File from "../models/File";
 import path from "path";
 import { getManager } from "typeorm";
 import Submission from "../models/Submission";
-
+const JSZip = require("jszip");
+const fs = require("fs");
 const exportToZip = async function (
   assignmentExport: AssignmentExport,
   sortedSubmissions: Submission[],
   fileName: string
 ): Promise<void> {
-  /* eslint-disable */
-    const JSZip = require("jszip");
-    /* eslint-disable */
-    const fs = require("fs");
-    //create file object
     const zip = new JSZip();
     const pdfs = zip.folder("pdfs");
     for (let i = 0; i < sortedSubmissions.length; i++) {

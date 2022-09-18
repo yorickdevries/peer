@@ -76,10 +76,6 @@ router.get(
   validateQuery(assignmentVersionIdSchema),
   async (req, res) => {
     const user = req.user!;
-    // /* eslint-disable */
-    // const JSZip = require("jszip");
-    // /* eslint-disable */
-    // const fs = require("fs");
     const assignmentVersionId: number = req.query.assignmentVersionId as any;
     const assignmentVersion = await AssignmentVersion.findOne(
       assignmentVersionId
@@ -601,7 +597,6 @@ router.post(
       assignmentExport.id,
       exportType
     );
-    console.log(`Supposed ${assignmentExport.file}`);
     // send message that reviews are being exported
     res.send(assignmentExport);
   }

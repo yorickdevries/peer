@@ -3,8 +3,6 @@ import { IsDefined, IsString, IsNotEmpty, IsHash } from "class-validator";
 import BaseModel from "./BaseModel";
 import path from "path";
 import config from "config";
-//import { file } from "jszip";
-//import { fileURLToPath } from "url";
 
 const uploadFolder = config.get("uploadFolder") as string;
 
@@ -54,7 +52,7 @@ export default class File extends BaseModel {
     } else {
       this.hash = hash;
     }
-    if (filePath) {
+    if (filePath != null || filePath != undefined) {
       this.filePath = filePath;
     } else {
       this.filePath = "";
@@ -74,7 +72,7 @@ export default class File extends BaseModel {
   }
 
   getPath(): string {
-    if (this.filePath.length == 0) {
+    if (this.filePath.length === 0) {
       this.filePath = path.resolve(uploadFolder, this.id.toString());
     }
     return this.filePath;
