@@ -192,10 +192,18 @@ router.post(
     const user = req.user!;
     const courseId = req.params.id;
     const course = await Course.findOne(courseId);
+
     if (!course) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send(ResponseMessage.COURSE_NOT_FOUND);
+      return;
+    }
+
+    if (await course.isEnrolled(user)) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("This course is not enrollable");
       return;
     }
     const enrollment = new Enrollment(user, course, UserRole.TEACHER);

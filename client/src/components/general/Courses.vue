@@ -234,7 +234,7 @@
                                                     Enroll in Course
                                                 </b-button>
                                             </b-modal>
-                                            <template v-if="user.admin">
+                                            <template v-if="user && user.admin">
                                                 <b-button
                                                     class="ml-1"
                                                     variant="outline-warning"
