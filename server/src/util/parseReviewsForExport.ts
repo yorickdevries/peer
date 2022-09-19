@@ -14,11 +14,9 @@ const parseSubmissionReviewsForExport = async function (
   const questions = _.sortBy(submissionQuestionnaire.questions, (question) => {
     return question.number;
   });
-
   const reviews = (await submissionQuestionnaire.getReviews()) as ReviewOfSubmission[];
   const assignmentVersion = await submissionQuestionnaire.getAssignmentVersion();
   const assignment = await assignmentVersion.getAssignment();
-
   // the parsed review is too extensive to make an interface
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const parsedReviews: any[] = [];
