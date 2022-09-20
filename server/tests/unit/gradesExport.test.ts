@@ -14,23 +14,7 @@ import MultipleChoiceQuestionAnswer from "../../src/models/MultipleChoiceQuestio
 import MultipleChoiceQuestionOption from "../../src/models/MultipleChoiceQuestionOption";
 import ReviewOfReview from "../../src/models/ReviewOfReview";
 import parseSubmissionReviewsForExport from "../../src/util/parseReviewsForExport";
-import { Connection } from "typeorm";
-import createDatabaseConnection from "../../src/databaseConnection";
-import initializeData from "../../src/util/initializeData";
-
-describe("Single MCQ Question", () => {
-  // will be initialized and closed in beforeAll / afterAll
-  let connection: Connection;
-
-  beforeAll(async () => {
-    // For the in memory test database, the schema is automatically dropped upon connect
-    connection = await createDatabaseConnection();
-    await initializeData();
-  });
-
-  afterAll(async () => {
-    await connection.close();
-  });
+test("Single MCQ Question Correct", async () => {
   const mockedQuestionnaire: SubmissionQuestionnaire = mock(
     SubmissionQuestionnaire
   );
@@ -43,7 +27,7 @@ describe("Single MCQ Question", () => {
     instanceOfQ
   );
   m.options = [
-    new MultipleChoiceQuestionOption("correct", m, 1),
+    new MultipleChoiceQuestionOption("correct", m, 100),
     new MultipleChoiceQuestionOption("wrong", m, 0),
   ];
   instanceOfQ.questions = [m];
@@ -128,6 +112,8 @@ describe("Single MCQ Question", () => {
       resolve(instanceOfMa);
     })
   );
+  when(ma.getAnswerText()).thenReturn("answer");
+  when(ma.getAnswerPoints()).thenReturn(new Promise<number | undefined>((resolve) => {resolve(100)}));
   when(r1.getReviewOfThisReview()).thenReturn(
     new Promise<ReviewOfReview | undefined>((reject) => {
       reject(undefined);
@@ -146,6 +132,41 @@ describe("Single MCQ Question", () => {
   );
 
 
-
-  expect(parseSubmissionReviewsForExport(instanceOfQ)).toBe({});
+  let exp =  new Promise<any[]>((resolve) => resolve(    [                                                                                                                                                                
+    {
+      id: 1,
+      'Submitter netid': 'u1',
+      'Submitter studentnumber': undefined,
+      'Submitter group id': 1,
+      'Submitter group name': 'g1',
+      'Reviewer netid': 'u2',
+      'Reviewer studentnumber': undefined,
+      'Reviewer group id': 1,
+      'Reviewer group name': 'g1',
+      'Submissionreview started at': null,
+      'Submissionreview downloaded at': null,
+      'Submissionreview submitted at': null,
+      'Submissionreview submitted': true,
+      'Submissionreview approval by TA': null,
+      'Submissionreview comment by TA': null,
+      'Submissionreview TA netid': undefined,
+      'Submissionreview Reviewer reported the submission': false,
+      'number of annotations': 1,
+      'R1. this is mcq': 'answer',
+      'R1. this is mcq (POINTS)': 1,
+      'Total number of points': 1,
+      'Maximum points achievable': 1,
+      'Evaluator netid': undefined,
+      'Evaluator studentnumber': undefined,
+      'Reviewevaluation started at': undefined,
+      'Reviewevaluation downloaded at': undefined,
+      'Reviewevaluation submitted at': undefined,
+      'Reviewevaluation submitted': undefined,
+      'Reviewevaluation approval by TA': undefined,
+      'Reviewevaluation comment by TA': undefined,
+      'Reviewevaluation TA netid': undefined,
+      'Reviewevaluation Reviewer reported the submission': undefined
+    }
+  ]));
+  expect(parseSubmissionReviewsForExport(instanceOfQ)).toEqual(exp);
 });
