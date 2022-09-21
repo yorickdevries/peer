@@ -17,15 +17,16 @@ USER="$(whoami)"
 echo "0 - INIT"
 # Symlink the config
 echo "         Ensuring config dir exists at $RELEASE_DIR/server/config"
-echo "         Symlinking server/config/staging.json..."
+echo "         Symlinking server/config/production.json..."
 # Create folder, delete file from repo (if it exists) and then symlink
 mkdir -p "$RELEASE_DIR/server/config" || exit 2
-rm "$RELEASE_DIR/server/config/staging.json" || true
-ln -s "$SHARED_DIR/config/staging.json" "$RELEASE_DIR/server/config/staging.json" || exit 3
+rm "$RELEASE_DIR/server/config/production.json" || true
+ln -s "$SHARED_DIR/server/config/production.json" "$RELEASE_DIR/server/config/production.json" || exit 3
 
 # Backup
 echo "1 - BACKUP"
-echo "         Skipping backup for staging"
+echo "         Backing up database"
+backupninja -n
 
 # Install packages
 echo "2 - INSTALL"
@@ -40,15 +41,15 @@ npm install || exit 6
 echo "3 - BUILD"
 echo "         Building server"
 cd "$RELEASE_DIR"
-NODE_ENV=staging npm run build_server || exit 7
+NODE_ENV=production npm run build_server || exit 7
 echo "         Building client"
-NODE_ENV=staging npm run build_client || exit 8
+NODE_ENV=production npm run build_client || exit 8
 
 # Run the migrations
 echo "4 - MIGRATE"
 echo "         Running migrations"
 cd "$RELEASE_DIR/server"
-NODE_ENV=staging npm run typeorm:migration:run || exit 9
+NODE_ENV=production npm run typeorm:migration:run || exit 9
 
 # Switch the symlink
 echo "5 - DEPLOY"
