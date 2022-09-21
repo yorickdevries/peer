@@ -115,7 +115,12 @@
                     </b-card-header>
 
                     <!--Question Information-->
-                    <b-card v-for="question in questionnaire.questions" :key="question.id" class="mb-3" no-body>
+                    <b-card
+                        v-for="(question, index) in questionnaire.questions"
+                        :key="question.id"
+                        class="mb-3"
+                        no-body
+                    >
                         <b-card-header class="d-flex align-items-center">
                             <span class="w-100"
                                 >Question {{ question.number }} of {{ questionnaire.questions.length }}</span
@@ -142,17 +147,19 @@
                                 :rows="10"
                                 :max-rows="15"
                                 v-model="answers[question.id].answer"
-                                @input="answers[question.id].changed = true"
+                                @input=";(answers[question.id].changed = true), (questionIndex = index)"
                                 :readonly="review.submitted || reviewsAreReadOnly"
                                 required
                             />
 
                             <!-- MULTIPLE CHOICE QUESTION -->
+                            <!--prettier-ignore-->
                             <b-form-radio-group
                                 v-if="question.type === 'multiplechoice'"
                                 v-model="answers[question.id].answer"
                                 @input="
-                                    answers[question.id].answer !== null ? (answers[question.id].changed = true) : ''
+                                    ;(answers[question.id].answer !== null ? (answers[question.id].changed = true) : ''),
+                                        (questionIndex = index)
                                 "
                                 stacked
                                 required
@@ -167,7 +174,7 @@
                             <b-form-checkbox-group
                                 v-if="question.type === 'checkbox'"
                                 v-model="answers[question.id].answer"
-                                @input="answers[question.id].changed = true"
+                                @input=";(answers[question.id].changed = true), (questionIndex = index)"
                                 stacked
                                 required
                                 :disabled="review.submitted || reviewsAreReadOnly"
@@ -181,7 +188,7 @@
                             <StarRating
                                 v-if="question.type === 'range'"
                                 v-model="answers[question.id].answer"
-                                @rating-selected="answers[question.id].changed = true"
+                                @rating-selected=";(answers[question.id].changed = true), (questionIndex = index)"
                                 class="align-middle"
                                 :border-color="'#007bff'"
                                 :active-color="'#007bff'"
@@ -239,7 +246,10 @@
                                     placeholder="Choose a new file..."
                                     v-model="answers[question.id].newAnswer"
                                     :state="Boolean(answers[question.id].newAnswer)"
-                                    @input="answers[question.id].changed = Boolean(answers[question.id].newAnswer)"
+                                    @input="
+                                        ;(answers[question.id].changed = Boolean(answers[question.id].newAnswer)),
+                                            (questionIndex = index)
+                                    "
                                     :accept="`${question.extensions}`"
                                     :disabled="review.submitted || reviewsAreReadOnly"
                                 >
@@ -255,6 +265,7 @@
                                 >Delete Answer</b-button
                             >
                             <b-button
+                                ref="saveButton"
                                 :variant="
                                     (answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'
                                 "
@@ -361,7 +372,11 @@ export default {
             // disable save/delete buttons when a call is busy
             buttonDisabled: false,
             // View file next to questionnaire
-            viewFileNextToQuestionnaire: false
+            viewFileNextToQuestionnaire: false,
+            // Currently pressed keys
+            keys: { Enter: false, ControlLeft: false, ControlRight: false },
+            // Index of currently active question
+            questionIndex: null
         }
     },
     computed: {
@@ -417,9 +432,25 @@ export default {
         }
     },
     async created() {
+        window.addEventListener("keydown", this.keyDown)
+        window.addEventListener("keyup", this.keyUp)
         await this.fetchData()
     },
+    destroyed() {
+        window.removeEventListener("keydown", this.keyDown)
+        window.removeEventListener("keyup", this.keyUp)
+    },
     methods: {
+        keyDown(e) {
+            this.keys[e.code] = true
+            if (this.keys["Enter"] && (this.keys["ControlLeft"] || this.keys["ControlRight"])) {
+                const saveButton = this.$refs.saveButton[this.questionIndex]
+                saveButton.click()
+            }
+        },
+        keyUp(e) {
+            this.keys[e.code] = false
+        },
         async fetchData() {
             this.viewFile = false
             await this.fetchReview()
