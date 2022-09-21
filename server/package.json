@@ -19,7 +19,7 @@
   "dependencies": {
     "@hapi/joi": "^17.1.1",
     "@types/compression": "^1.7.2",
-    "@types/config": "3.3.0",
+    "@types/config": "^3.3.0",
     "@types/cookie-parser": "^1.4.3",
     "@types/express-session": "^1.17.5",
     "@types/hapi__joi": "^17.1.8",
