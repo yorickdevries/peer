@@ -15,7 +15,6 @@ import MultipleChoiceQuestionOption from "../../src/models/MultipleChoiceQuestio
 import ReviewOfReview from "../../src/models/ReviewOfReview";
 import parseSubmissionReviewsForExport from "../../src/util/parseReviewsForExport";
 
-
 describe("MCQ Question Test", () => {
   let mockedQuestionnaire: SubmissionQuestionnaire;
   let instanceOfQ: SubmissionQuestionnaire;
@@ -23,7 +22,7 @@ describe("MCQ Question Test", () => {
   let instanceOfG1: Group;
   let instanceOfU1: User;
   let instanceOfU2: User;
-  let s1: Submission; 
+  let s1: Submission;
   let instanceOfS1: Submission;
   let r1: ReviewOfSubmission;
   let instanceOfR1: ReviewOfSubmission;
@@ -39,7 +38,7 @@ describe("MCQ Question Test", () => {
     mockedQuestionnaire = mock(SubmissionQuestionnaire);
     instanceOfQ = instance(mockedQuestionnaire);
     g1 = mock(Group);
-    instanceOfG1 = instance(g1)
+    instanceOfG1 = instance(g1);
     instanceOfG1.id = 1;
     instanceOfG1.name = "g1";
 
@@ -50,8 +49,7 @@ describe("MCQ Question Test", () => {
     instanceOfU2 = new User("u2");
     //instanceOfU2.studentNumber = 2;
     s1 = mock(Submission);
-    instanceOfS1 = instance(s1)
-
+    instanceOfS1 = instance(s1);
 
     r1 = mock(ReviewOfSubmission);
     instanceOfR1 = instance(r1);
@@ -62,13 +60,7 @@ describe("MCQ Question Test", () => {
     instanceOfR1.submitted = true;
     instanceOfR1.flaggedByReviewer = false;
 
-    m = new MultipleChoiceQuestion(
-      "this is mcq",
-      1,
-      false,
-      true,
-      instanceOfQ
-    );
+    m = new MultipleChoiceQuestion("this is mcq", 1, false, true, instanceOfQ);
     m.options = [
       new MultipleChoiceQuestionOption("correct", m, 100),
       new MultipleChoiceQuestionOption("wrong", m, 0),
@@ -76,24 +68,22 @@ describe("MCQ Question Test", () => {
     instanceOfQ.questions = [m];
 
     ma = mock(MultipleChoiceQuestionAnswer);
-    instanceOfMa = instance(ma)
+    instanceOfMa = instance(ma);
     instanceOfMa.question = m;
     instanceOfMa.review = instanceOfR1;
-    
+
     a1 = mock(Assignment);
-    instanceOfA1 = instance(a1)
+    instanceOfA1 = instance(a1);
 
     //assignment is a pdf
     instanceOfA1.assignmentType = AssignmentType.DOCUMENT;
-    
+
     pdfA = mock(PDFAnnotation);
-    
-    reviewSubmissionList = new Promise<Review[]>(
-      (resolve) => {
-        const lst: ReviewOfSubmission[] = [instanceOfR1];
-        resolve(lst);
-      }
-    );
+
+    reviewSubmissionList = new Promise<Review[]>((resolve) => {
+      const lst: ReviewOfSubmission[] = [instanceOfR1];
+      resolve(lst);
+    });
     aVersion = mock(AssignmentVersion);
 
     when(s1.getUser()).thenReturn(
@@ -122,7 +112,11 @@ describe("MCQ Question Test", () => {
       })
     );
     when(ma.getAnswerText()).thenReturn("answer");
-    when(ma.getAnswerPoints()).thenReturn(new Promise<number | undefined>((resolve) => {resolve(100)}));
+    when(ma.getAnswerPoints()).thenReturn(
+      new Promise<number | undefined>((resolve) => {
+        resolve(100);
+      })
+    );
     when(r1.getReviewOfThisReview()).thenReturn(
       new Promise<ReviewOfReview | undefined>((reject) => {
         reject(undefined);
@@ -139,94 +133,94 @@ describe("MCQ Question Test", () => {
         resolve(instance(aVersion));
       })
     );
-
-
   });
-  
-  test("Single MCQ Question Correct", async () => {
 
+  test("Single MCQ Question Correct", async () => {
     const instanceOfAnswerOption = m.options[0];
     instanceOfMa.multipleChoiceAnswer = instanceOfAnswerOption;
-    
-    let exp =  new Promise<any[]>((resolve) => resolve(    [                                                                                                                                                                
-      {
-        id: 1,
-        'Submitter netid': 'u1',
-        'Submitter studentnumber': undefined,
-        'Submitter group id': 1,
-        'Submitter group name': 'g1',
-        'Reviewer netid': 'u2',
-        'Reviewer studentnumber': undefined,
-        'Reviewer group id': 1,
-        'Reviewer group name': 'g1',
-        'Submissionreview started at': null,
-        'Submissionreview downloaded at': null,
-        'Submissionreview submitted at': null,
-        'Submissionreview submitted': true,
-        'Submissionreview approval by TA': null,
-        'Submissionreview comment by TA': null,
-        'Submissionreview TA netid': undefined,
-        'Submissionreview Reviewer reported the submission': false,
-        'number of annotations': 1,
-        'R1. this is mcq': 'answer',
-        'R1. this is mcq (POINTS)': 1,
-        'Total number of points': 1,
-        'Maximum points achievable': 1,
-        'Evaluator netid': undefined,
-        'Evaluator studentnumber': undefined,
-        'Reviewevaluation started at': undefined,
-        'Reviewevaluation downloaded at': undefined,
-        'Reviewevaluation submitted at': undefined,
-        'Reviewevaluation submitted': undefined,
-        'Reviewevaluation approval by TA': undefined,
-        'Reviewevaluation comment by TA': undefined,
-        'Reviewevaluation TA netid': undefined,
-        'Reviewevaluation Reviewer reported the submission': undefined
-      }
-    ]));
-    expect(parseSubmissionReviewsForExport(instanceOfQ)).toEqual(exp);
-  })
-  test("Single MCQ Question incorrect", async () => {
 
+    const exp = new Promise<any[]>((resolve) =>
+      resolve([
+        {
+          id: 1,
+          "Submitter netid": "u1",
+          "Submitter studentnumber": undefined,
+          "Submitter group id": 1,
+          "Submitter group name": "g1",
+          "Reviewer netid": "u2",
+          "Reviewer studentnumber": undefined,
+          "Reviewer group id": 1,
+          "Reviewer group name": "g1",
+          "Submissionreview started at": null,
+          "Submissionreview downloaded at": null,
+          "Submissionreview submitted at": null,
+          "Submissionreview submitted": true,
+          "Submissionreview approval by TA": null,
+          "Submissionreview comment by TA": null,
+          "Submissionreview TA netid": undefined,
+          "Submissionreview Reviewer reported the submission": false,
+          "number of annotations": 1,
+          "R1. this is mcq": "answer",
+          "R1. this is mcq (POINTS)": 1,
+          "Total number of points": 1,
+          "Maximum points achievable": 1,
+          "Evaluator netid": undefined,
+          "Evaluator studentnumber": undefined,
+          "Reviewevaluation started at": undefined,
+          "Reviewevaluation downloaded at": undefined,
+          "Reviewevaluation submitted at": undefined,
+          "Reviewevaluation submitted": undefined,
+          "Reviewevaluation approval by TA": undefined,
+          "Reviewevaluation comment by TA": undefined,
+          "Reviewevaluation TA netid": undefined,
+          "Reviewevaluation Reviewer reported the submission": undefined,
+        },
+      ])
+    );
+    expect(parseSubmissionReviewsForExport(instanceOfQ)).toEqual(exp);
+  });
+  test("Single MCQ Question incorrect", async () => {
     const instanceOfAnswerOption = m.options[1];
     instanceOfMa.multipleChoiceAnswer = instanceOfAnswerOption;
-    
-    let exp =  new Promise<any[]>((resolve) => resolve(    [                                                                                                                                                                
-      {
-        id: 1,
-        'Submitter netid': 'u1',
-        'Submitter studentnumber': undefined,
-        'Submitter group id': 1,
-        'Submitter group name': 'g1',
-        'Reviewer netid': 'u2',
-        'Reviewer studentnumber': undefined,
-        'Reviewer group id': 1,
-        'Reviewer group name': 'g1',
-        'Submissionreview started at': null,
-        'Submissionreview downloaded at': null,
-        'Submissionreview submitted at': null,
-        'Submissionreview submitted': true,
-        'Submissionreview approval by TA': null,
-        'Submissionreview comment by TA': null,
-        'Submissionreview TA netid': undefined,
-        'Submissionreview Reviewer reported the submission': false,
-        'number of annotations': 1,
-        'R1. this is mcq': 'answer',
-        'R1. this is mcq (POINTS)': 0,
-        'Total number of points': 1,
-        'Maximum points achievable': 1,
-        'Evaluator netid': undefined,
-        'Evaluator studentnumber': undefined,
-        'Reviewevaluation started at': undefined,
-        'Reviewevaluation downloaded at': undefined,
-        'Reviewevaluation submitted at': undefined,
-        'Reviewevaluation submitted': undefined,
-        'Reviewevaluation approval by TA': undefined,
-        'Reviewevaluation comment by TA': undefined,
-        'Reviewevaluation TA netid': undefined,
-        'Reviewevaluation Reviewer reported the submission': undefined
-      }
-    ]));
+
+    const exp = new Promise<any[]>((resolve) =>
+      resolve([
+        {
+          id: 1,
+          "Submitter netid": "u1",
+          "Submitter studentnumber": undefined,
+          "Submitter group id": 1,
+          "Submitter group name": "g1",
+          "Reviewer netid": "u2",
+          "Reviewer studentnumber": undefined,
+          "Reviewer group id": 1,
+          "Reviewer group name": "g1",
+          "Submissionreview started at": null,
+          "Submissionreview downloaded at": null,
+          "Submissionreview submitted at": null,
+          "Submissionreview submitted": true,
+          "Submissionreview approval by TA": null,
+          "Submissionreview comment by TA": null,
+          "Submissionreview TA netid": undefined,
+          "Submissionreview Reviewer reported the submission": false,
+          "number of annotations": 1,
+          "R1. this is mcq": "answer",
+          "R1. this is mcq (POINTS)": 0,
+          "Total number of points": 1,
+          "Maximum points achievable": 1,
+          "Evaluator netid": undefined,
+          "Evaluator studentnumber": undefined,
+          "Reviewevaluation started at": undefined,
+          "Reviewevaluation downloaded at": undefined,
+          "Reviewevaluation submitted at": undefined,
+          "Reviewevaluation submitted": undefined,
+          "Reviewevaluation approval by TA": undefined,
+          "Reviewevaluation comment by TA": undefined,
+          "Reviewevaluation TA netid": undefined,
+          "Reviewevaluation Reviewer reported the submission": undefined,
+        },
+      ])
+    );
     expect(parseSubmissionReviewsForExport(instanceOfQ)).toEqual(exp);
-  })
-})
+  });
+});

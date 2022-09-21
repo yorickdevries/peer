@@ -8,6 +8,7 @@
     "dev": "nodemon",
     "lint": "eslint . --ext .ts",
     "lint-fix": "eslint . --ext .ts --fix",
+    "lint-fix-tests": "eslint . --ext .test.ts --fix",
     "test": "jest --runInBand ./tests",
     "testGrades": "jest --runInBand ./tests/unit/gradesExport.test.ts",
     "coverage": "jest --runInBand --collectCoverage ./tests",
