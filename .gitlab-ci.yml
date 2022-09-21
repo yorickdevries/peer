@@ -3,6 +3,16 @@ include:
 
 image: node:14
 
+# Cache modules in between jobs
+cache:
+  key:
+    files:
+      - server/package-lock.json
+      - client/package-lock.json
+  paths:
+    - server/.npm/
+    - client/.npm/
+
 variables:
   MYSQL_ROOT_PASSWORD: password
   MYSQL_DATABASE: peer
@@ -25,7 +35,7 @@ lint-server:
   variables:
     NODE_ENV: development
   script:
-  - cd server && npm install
+  - cd server && npm install --cache .npm --prefer-offline
   - npm run lint
   only:
   - merge_requests
@@ -36,7 +46,7 @@ lint-client:
   variables:
     NODE_ENV: development
   script:
-  - cd client && npm install
+  - cd client && npm install --cache .npm --prefer-offline
   - npm run lint
   only:
   - merge_requests
@@ -47,7 +57,7 @@ build-server:
   variables:
     NODE_ENV: production
   script:
-  - cd server && npm install
+  - cd server && npm install --cache .npm --prefer-offline
   - npm run build
   only:
   - merge_requests
@@ -58,7 +68,7 @@ build-client:
   variables:
     NODE_ENV: production
   script:
-  - cd client && npm install
+  - cd client && npm install --cache .npm --prefer-offline
   - npm run build
   only:
   - merge_requests
@@ -71,7 +81,7 @@ test:
   services:
   - mariadb:10.1
   script:
-  - cd server && npm install
+  - cd server && npm install --cache .npm --prefer-offline
   - npm run test
   only:
   - merge_requests
@@ -85,7 +95,7 @@ coverage:
   services:
   - mariadb:10.1
   script:
-  - cd server && npm install
+  - cd server && npm install --cache .npm --prefer-offline
   - npm run coverage
   only:
   - merge_requests
@@ -105,7 +115,7 @@ migration:
   services:
   - mariadb:10.1
   script:
-  - cd server && npm install
+  - cd server && npm install --cache .npm --prefer-offline
   - npm run build
   - npm run typeorm:migration:run
   only:
@@ -119,7 +129,7 @@ start-server:
   services:
   - mariadb:10.1
   script:
-  - cd server && npm install
+  - cd server && npm install --cache .npm --prefer-offline
   - npm run build
   - npm run typeorm:migration:run
   - timeout 60s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
