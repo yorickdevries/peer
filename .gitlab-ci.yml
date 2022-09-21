@@ -5,7 +5,10 @@ image: node:14
 
 # Cache modules in between jobs
 cache:
-  key: $CI_COMMIT_REF_SLUG
+  key:
+    files:
+      - server/package-lock.json
+      - client/package-lock.json
   paths:
     - .npmserver/
     - .npmclient/
