@@ -10,7 +10,8 @@
     "start": "npm run start --prefix ./server",
     "dev_server": "npm run dev --prefix ./server",
     "dev_client": "npm run serve --prefix ./client",
-    "heroku-postbuild": "npm run postinstall && npm run build"
+    "heroku-postbuild": "npm run postinstall && npm run build",
+    "serve": "cd server && nodemon app.ts"
   },
   "engines": {
     "node": "14.x"
@@ -18,5 +19,8 @@
   "cacheDirectories": [
     "server/node_modules",
     "client/node_modules"
-  ]
+  ],
+  "dependencies": {
+    "lint": "^0.7.0"
+  }
 }

@@ -18,5 +18,11 @@
     "ServiceProviderMetadataFile": "./ServiceProviderMetadata.xml",
     "url": "https://peer.tudelft.nl/",
     "uploadFolder": "/data_nfs/peer/uploadFolder/",
-    "temporaryFolder": "/data_nfs/peer/temp/"
+    "temporaryFolder": "/data_nfs/peer/temp/",
+    "mail": {
+        "host": "smtp.tudelft.nl",
+        "port": 25,
+        "from": "noreply@peer.tudelft.nl",
+        "adminMail": "y.c.devries-1@student.tudelft.nl"
+    }
 }

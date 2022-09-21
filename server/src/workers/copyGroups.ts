@@ -2,7 +2,7 @@ import { getManager } from "typeorm";
 import Assignment from "../models/Assignment";
 import Course from "../models/Course";
 import Group from "../models/Group";
-import ensureConnection from "./ensureConnection";
+import ensureConnection from "../util/ensureConnection";
 
 const copyGroupsForAssignment = async function (
   assignmentId: number,

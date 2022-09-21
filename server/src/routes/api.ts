@@ -32,6 +32,7 @@ import multiplechoicequestionanswers from "./multiplechoicequestionanswers";
 import checkboxquestionanswers from "./checkboxquestionanswers";
 import pdfannotations from "./pdfannotations";
 import assignmentexports from "./assignmentexports";
+import codeannotations from "./codeannotations";
 
 const router = express.Router();
 router.use(eventLogger);
@@ -43,9 +44,6 @@ authenticationRoutes(router);
 router.get("/authenticated", (req, res) => {
   res.send({ authenticated: req.isAuthenticated() });
 });
-
-// move faculties outside of checkAndSetAuthentication for debugging
-router.use("/faculties", faculties);
 
 // Check always whether someone is logged in before accessing the other routes below
 // additionally fixes the user object so all fields are copied over from the database
@@ -60,6 +58,7 @@ router.get("/me", async (req, res) => {
 
 // TODO: Complete routing of the new API
 router.use("/users", users);
+router.use("/faculties", faculties);
 router.use("/academicyears", academicyears);
 router.use("/courses", courses);
 router.use("/enrollments", enrollments);
@@ -85,6 +84,7 @@ router.use("/multiplechoicequestionanswers", multiplechoicequestionanswers);
 router.use("/checkboxquestionanswers", checkboxquestionanswers);
 router.use("/pdfannotations", pdfannotations);
 router.use("/assignmentexports", assignmentexports);
+router.use("/codeannotations", codeannotations);
 
 // If no other routes apply, send a 404
 router.use((_req, res) => {

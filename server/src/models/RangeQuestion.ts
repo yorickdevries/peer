@@ -27,7 +27,7 @@ export default class RangeQuestion extends Question {
     questionnaire: Questionnaire,
     range: number
   ) {
-    super(text, number, optional, questionnaire);
+    super(text, number, optional, false, questionnaire);
     this.range = range;
   }
 }

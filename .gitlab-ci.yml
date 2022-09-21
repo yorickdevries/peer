@@ -1,4 +1,17 @@
+include:
+  template: SAST.gitlab-ci.yml
+
 image: node:14
+
+# Cache modules in between jobs
+cache:
+  key:
+    files:
+      - server/package-lock.json
+      - client/package-lock.json
+  paths:
+    - server/.npm/
+    - client/.npm/
 
 variables:
   MYSQL_ROOT_PASSWORD: password
@@ -6,6 +19,7 @@ variables:
   MYSQL_USER: peer
   MYSQL_PASSWORD: password
   MYSQL_HOST: mariadb
+  SAST_EXCLUDED_ANALYZERS: "bandit, brakeman, gosec, spotbugs, flawfinder, phpcs-security-audit, security-code-scan, sobelow, pmd-apex, kubesec, mobsf"
 
 stages:
     - static-analysis
@@ -14,13 +28,14 @@ stages:
     - migration
     - start
     - sast
+    - deploy
 
 lint-server:
   stage: static-analysis
   variables:
     NODE_ENV: development
   script:
-  - cd server && npm install
+  - cd server && npm install --cache .npm --prefer-offline
   - npm run lint
   only:
   - merge_requests
@@ -31,7 +46,7 @@ lint-client:
   variables:
     NODE_ENV: development
   script:
-  - cd client && npm install
+  - cd client && npm install --cache .npm --prefer-offline
   - npm run lint
   only:
   - merge_requests
@@ -42,7 +57,7 @@ build-server:
   variables:
     NODE_ENV: production
   script:
-  - cd server && npm install
+  - cd server && npm install --cache .npm --prefer-offline
   - npm run build
   only:
   - merge_requests
@@ -53,7 +68,7 @@ build-client:
   variables:
     NODE_ENV: production
   script:
-  - cd client && npm install
+  - cd client && npm install --cache .npm --prefer-offline
   - npm run build
   only:
   - merge_requests
@@ -66,7 +81,7 @@ test:
   services:
   - mariadb:10.1
   script:
-  - cd server && npm install
+  - cd server && npm install --cache .npm --prefer-offline
   - npm run test
   only:
   - merge_requests
@@ -76,14 +91,22 @@ coverage:
   stage: test
   variables:
     NODE_ENV: test
+  allow_failure: true
   services:
   - mariadb:10.1
   script:
-  - cd server && npm install
+  - cd server && npm install --cache .npm --prefer-offline
   - npm run coverage
   only:
   - merge_requests
   - pushes
+  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - junit.xml
+      cobertura: coverage/cobertura-coverage.xml
 
 migration:
   stage: migration
@@ -92,7 +115,7 @@ migration:
   services:
   - mariadb:10.1
   script:
-  - cd server && npm install
+  - cd server && npm install --cache .npm --prefer-offline
   - npm run build
   - npm run typeorm:migration:run
   only:
@@ -106,32 +129,79 @@ start-server:
   services:
   - mariadb:10.1
   script:
-  - cd server && npm install
+  - cd server && npm install --cache .npm --prefer-offline
   - npm run build
   - npm run typeorm:migration:run
-  - timeout 30s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
+  - timeout 60s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
   only:
   - merge_requests
   - pushes
 
-sast:
+eslint-sast:
   stage: sast
-  image: docker:stable
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+
+nodejs-scan-sast:
+  stage: sast
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+
+semgrep-sast:
+  stage: sast
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+
+deploy-staging:
+  stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
-  allow_failure: true
-  services:
-    - docker:stable-dind
+    DEPLOY_PATH: "/var/www/peer"
+  needs:
+    - test
+    - migration
+    - start-server
+  before_script:
+    - apt-get update -y
+    - apt-get install rsync -y
+    - 'which ssh-agent || ( apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY_STAGING" | base64 -d)
+    - mkdir -p ~/.ssh
+    - ssh-keyscan eiptest.ewi.tudelft.nl >> ~/.ssh/known_hosts
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
-    - docker run
-        --env SAST_CONFIDENCE_LEVEL="${SAST_CONFIDENCE_LEVEL:-3}"
-        --volume "$PWD:/code"
-        --volume /var/run/docker.sock:/var/run/docker.sock
-        "registry.gitlab.com/gitlab-org/security-products/sast:$SP_VERSION" /app/bin/run /code
-  artifacts:
-    reports:
-      sast: gl-sast-report.json
+    - export TIMESTAMP="$(date '+%Y%m%d%H%M%S')"
+    - "rsync -rtvh --exclude .git -e ssh . deployer-peer@$CI_ENVIRONMENT_URL:$DEPLOY_PATH/releases/$TIMESTAMP"
+    - 'ssh deployer-peer@$CI_ENVIRONMENT_URL "cd $DEPLOY_PATH && ./deploy.sh $TIMESTAMP"'
+  environment:
+    name: staging
+    url: peer.eiptest.ewi.tudelft.nl
   only:
-  - merge_requests
-  - pushes
+    - dev
+
+deploy-production:
+  stage: deploy
+  variables:
+    DEPLOY_PATH: "/var/www/peer"
+  needs:
+    - test
+    - migration
+    - start-server
+  before_script:
+    - apt-get update -y
+    - apt-get install rsync -y
+    - 'which ssh-agent || ( apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY_PRODUCTION" | base64 -d)
+    - mkdir -p ~/.ssh
+    - ssh-keyscan peer.tudelft.nl >> ~/.ssh/known_hosts
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - export TIMESTAMP="$(date '+%Y%m%d%H%M%S')"
+    - "rsync -rtvh --exclude .git -e ssh . deploy@$CI_ENVIRONMENT_URL:$DEPLOY_PATH/releases/$TIMESTAMP"
+    - 'ssh deploy@$CI_ENVIRONMENT_URL "cd $DEPLOY_PATH && ./deploy.sh $TIMESTAMP"'
+  environment:
+    name: production
+    url: peer.tudelft.nl
+  only:
+    - master

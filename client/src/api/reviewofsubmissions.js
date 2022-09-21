@@ -17,8 +17,12 @@ export default {
     postEvaluation(id) {
         return client.post(`reviewofsubmissions/${id}/evaluation`)
     },
-    setApproval(id, approvalByTA) {
-        const body = { approvalByTA }
+    setApproval(id, approvalByTA, commentByTA) {
+        // set to null in case of empty string
+        if (!commentByTA) {
+            commentByTA = null
+        }
+        const body = { approvalByTA, commentByTA }
         return client.patch(`reviewofsubmissions/${id}/approval`, body)
     },
     openFeedback(assignmentId) {

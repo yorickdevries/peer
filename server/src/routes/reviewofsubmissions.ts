@@ -15,8 +15,6 @@ import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { getManager } from "typeorm";
 import moment from "moment";
 import ReviewOfReview from "../models/ReviewOfReview";
-import CheckboxQuestion from "../models/CheckboxQuestion";
-import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 import AssignmentExport from "../models/AssignmentExport";
 import {
   startDistributeReviewsForAssignmentWorker,
@@ -227,51 +225,6 @@ router.patch(
         .status(HttpStatusCode.FORBIDDEN)
         .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
       return;
-    }
-    // get assignmentstate
-    if (!assignment.isAtState(AssignmentState.REVIEW)) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is not in review state");
-      return;
-    }
-    // check whether review evaluation is enabled and questionnaire is present
-    if (assignment.reviewEvaluation) {
-      for (const assignmentVersion of assignment.versions) {
-        if (!assignmentVersion.reviewQuestionnaireId) {
-          res
-            .status(HttpStatusCode.FORBIDDEN)
-            .send("No reviewQuestionnaire is present to evaluate the reviews");
-          return;
-        }
-      }
-    }
-    for (const assignmentVersion of assignment.versions) {
-      const reviewQuestionnaire = await assignmentVersion.getReviewQuestionnaire();
-      if (reviewQuestionnaire) {
-        if (reviewQuestionnaire.questions.length === 0) {
-          res
-            .status(HttpStatusCode.FORBIDDEN)
-            .send("The questionnaire doesn't have questions");
-          return;
-        }
-        // check whether there is a question without option:
-        for (const question of reviewQuestionnaire.questions) {
-          if (
-            question instanceof CheckboxQuestion ||
-            question instanceof MultipleChoiceQuestion
-          ) {
-            if (question.options.length === 0) {
-              res
-                .status(HttpStatusCode.FORBIDDEN)
-                .send(
-                  "One of the questions in the questionnaire doesn't have options"
-                );
-              return;
-            }
-          }
-        }
-      }
     }
     // offload a function to a worker
     startOpenFeedbackForAssignmentWorker(assignmentId);
@@ -527,6 +480,7 @@ router.patch(
 // Joi inputvalidation for query
 const reviewApprovalSchema = Joi.object({
   approvalByTA: Joi.boolean().required(),
+  commentByTA: Joi.string().allow(null).required(),
 });
 // change a review approval
 router.patch(
@@ -563,9 +517,11 @@ router.patch(
         .send("The assignment is not in feedback state");
       return;
     }
+    // Only teachers and the TA giving the approval can modify the approval.
     if (
       review.approvingTA !== null &&
-      review.approvingTA.netid !== user.netid
+      review.approvingTA.netid !== user.netid &&
+      !(await review.isTeacherInCourse(user))
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -574,6 +530,7 @@ router.patch(
     }
     // set new values
     review.approvalByTA = req.body.approvalByTA;
+    review.commentByTA = req.body.commentByTA;
     review.approvingTA = user;
     await review.save();
     res.send(review);
@@ -683,8 +640,6 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
     new Date(), // set startedAt
     null,
     null,
-    null,
-    null,
     review
   );
   // validate outside transaction as it otherwise might block the transaction
@@ -735,90 +690,15 @@ router.post(
         .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
       return;
     }
-    // assignmentstate
-    if (!assignment.isAtState(AssignmentState.WAITING_FOR_REVIEW)) {
+    if (
+      // missing submission questionnaires
+      !(await assignment.hasSubmissionQuestionnaires())
+    ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
-        .send(
-          "The submission state has not been passed or reviews are already assigned"
-        );
+        .send("An assignmentversion is missing a submissionquestionnaire");
       return;
     }
-    for (const assignmentVersion of assignment.versions) {
-      const questionnaire = await assignmentVersion.getSubmissionQuestionnaire();
-      if (!questionnaire) {
-        res
-          .status(HttpStatusCode.FORBIDDEN)
-          .send(ResponseMessage.QUESTIONNAIRE_NOT_FOUND);
-        return;
-      }
-      if (questionnaire.questions.length === 0) {
-        res
-          .status(HttpStatusCode.FORBIDDEN)
-          .send("The questionnaire doesn't have questions");
-        return;
-      }
-      // check whether there is a question without option:
-      for (const question of questionnaire.questions) {
-        if (
-          question instanceof CheckboxQuestion ||
-          question instanceof MultipleChoiceQuestion
-        ) {
-          if (question.options.length === 0) {
-            res
-              .status(HttpStatusCode.FORBIDDEN)
-              .send(
-                "One of the questions in the questionnaire doesn't have options"
-              );
-            return;
-          }
-        }
-      }
-      // check for existing reviews
-      const existingReviews = await questionnaire.getReviews();
-      if (existingReviews.length > 0) {
-        res
-          .status(HttpStatusCode.FORBIDDEN)
-          .send("There are already reviews for this assignment");
-        return;
-      }
-    }
-
-    // Check whether all versions are reviewed
-    // ans all VersionsToReview are not empty
-    const assignmentVersions = assignment.versions;
-    // check for every version whether it is reviewed
-    for (const assignmentVersion of assignmentVersions) {
-      if ((await assignmentVersion.getVersionsToReview()).length === 0) {
-        res
-          .status(HttpStatusCode.FORBIDDEN)
-          .send(
-            `assignmentVersion with id ${assignmentVersion.id} is not reviewing any assignmentVersions`
-          );
-        return;
-      }
-
-      let isReviewed = false;
-      // check all other assignmentversions
-      for (const otherAssignmentVersion of assignmentVersions) {
-        const versionsToReview = await otherAssignmentVersion.getVersionsToReview();
-        // check all other assignmentversions whether it is reviewing the version
-        for (const versionToReview of versionsToReview) {
-          if (versionToReview.id === assignmentVersion.id) {
-            isReviewed = true;
-          }
-        }
-      }
-      if (!isReviewed) {
-        res
-          .status(HttpStatusCode.FORBIDDEN)
-          .send(
-            `assignmentVersion with id ${assignmentVersion.id} is not reviewed by another assignmentVersion`
-          );
-        return;
-      }
-    }
-
     // offload a function to a worker
     startDistributeReviewsForAssignmentWorker(assignment.id);
 

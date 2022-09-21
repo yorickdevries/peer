@@ -11,7 +11,7 @@
             while doing a review, you can always download the file with a button above.
             <br />
             <b
-                >NOTE: Altough annotations contain your netid, anonymous annotations will be shown to the reviewed
+                >NOTE: Although annotations contain your netid, anonymous annotations will be shown to the reviewed
                 person.</b
             >
         </b-alert>
@@ -28,7 +28,7 @@ import izitoast from "izitoast"
 
 export default {
     // either "reviewId" or "submissionId" is passed, not both
-    props: ["reviewId", "submissionId", "readOnly"],
+    props: ["reviewId", "submissionId", "readOnly", "reviewColors", "ignoreAnnotations"],
     data() {
         return {
             // my API key for localhost
@@ -171,11 +171,11 @@ export default {
                         // get existing annotations
                         let reviews = []
                         // add single review
-                        if (vm.review) {
+                        if (!vm.ignoreAnnotations && vm.review) {
                             reviews.push(vm.review)
                         }
                         // add all feedback of submission
-                        if (vm.submission) {
+                        if (!vm.ignoreAnnotations && vm.submission) {
                             try {
                                 const res = await api.submissions.getFeedback(vm.submission.id)
                                 const feedbackReviews = res.data
@@ -194,6 +194,7 @@ export default {
                             /* API to add annotations */
                             for (const annotation of annotations) {
                                 try {
+                                    annotation.target.selector.strokeColor = vm.reviewColors[review.id]
                                     await annotationManager.addAnnotations([annotation])
                                 } catch (error) {
                                     console.log(error)

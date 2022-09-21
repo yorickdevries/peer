@@ -4,6 +4,9 @@
             <dt>Description</dt>
             <dd>{{ assignment.description }}</dd>
 
+            <dt>Assignment type</dt>
+            <dd>{{ assignment.assignmentType }}</dd>
+
             <dt>Enrollable</dt>
             <dd>{{ assignment.enrollable }}</dd>
 
@@ -38,6 +41,9 @@
                 <dt>Allow late review evaluations</dt>
                 <dd>{{ assignment.lateReviewEvaluations }}</dd>
             </div>
+
+            <dt>Automatic State Progression</dt>
+            <dd>{{ assignment.automaticStateProgression }}</dd>
 
             <dt>Allowed submission file extensions</dt>
             <dd>{{ assignment.submissionExtensions }}</dd>

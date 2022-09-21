@@ -21,10 +21,16 @@ import _ from "lodash";
 import moment from "moment";
 import { getManager } from "typeorm";
 import removePDFMetadata from "../util/removePDFMetadata";
+import AssignmentExport from "../models/AssignmentExport";
+import {
+  startExportSubmissionsForAssignmentVersionWorker,
+  startSubmissionFlaggingWorker,
+  //startImportWebLabSubmissionsWorker,
+} from "../workers/pool";
+//import AssignmentType from "../enum/AssignmentType";
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
-const allowedExtensions = config.get("allowedExtensions") as string[];
 const maxFileSize = config.get("maxFileSize") as number;
 
 const router = express.Router();
@@ -62,6 +68,38 @@ router.get("/", validateQuery(assignmentVersionIdSchema), async (req, res) => {
   const sortedSubmissions = _.sortBy(submissions, "id");
   res.send(sortedSubmissions);
 });
+
+//get number of submissions
+router.get(
+  "/count",
+  validateQuery(assignmentVersionIdSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const assignmentVersionId: number = req.query.assignmentVersionId as any;
+    const assignmentVersion = await AssignmentVersion.findOne(
+      assignmentVersionId
+    );
+    if (!assignmentVersion) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND)
+        .toString();
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE)
+        .toString();
+      return;
+    }
+    const submissions = await assignmentVersion.getSubmissions();
+    res.send(submissions.length.toString());
+  }
+);
 
 // get the submission
 router.get("/:id", validateParams(idSchema), async (req, res) => {
@@ -182,7 +220,7 @@ const submissionSchema = Joi.object({
 // post a submission in a course
 router.post(
   "/",
-  upload(allowedExtensions, maxFileSize, "file"),
+  upload([".*"], maxFileSize, "file"),
   validateBody(submissionSchema),
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -252,6 +290,19 @@ router.post(
 
     // file info
     const fileExtension = path.extname(req.file.originalname);
+
+    const submissionExtensions = assignment.submissionExtensions.split(
+      /\s*,\s*/
+    );
+    if (
+      !submissionExtensions.includes(fileExtension) &&
+      !submissionExtensions.includes(".*")
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(`Extension not allowed: ${fileExtension}`);
+      return;
+    }
     const fileName = path.basename(req.file.originalname, fileExtension);
     // run removePDFMetadata in case the file is a pdf
     if (fileExtension === ".pdf") {
@@ -316,6 +367,8 @@ router.post(
     await submission!.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(submission!);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    startSubmissionFlaggingWorker(submission!.id);
   }
 );
 
@@ -414,5 +467,193 @@ router.patch(
     res.send(submission!);
   }
 );
+
+const submissionApprovalSchema = Joi.object({
+  approvalByTA: Joi.boolean().required(),
+  commentByTA: Joi.string().allow(null).required(),
+});
+// change a review approval
+router.patch(
+  "/:id/approval",
+  validateParams(idSchema),
+  validateBody(submissionApprovalSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const submission = await Submission.findOne(req.params.id);
+    if (!submission) {
+      res
+        .status(HttpStatusCode.NOT_FOUND)
+        .send(ResponseMessage.SUBMISSION_NOT_FOUND);
+      return;
+    }
+    if (!(await submission.isTeacherOrTeachingAssistantInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
+      return;
+    }
+    // Only teachers and the TA giving the approval can modify the approval.
+    if (
+      submission.approvingTA !== null &&
+      submission.approvingTA.netid !== user.netid &&
+      !(await submission.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The submission has already been evaluated by another TA");
+      return;
+    }
+    // set new values
+    submission.approvalByTA = req.body.approvalByTA;
+    submission.commentByTA = req.body.commentByTA;
+    submission.approvingTA = user;
+    await submission.save();
+    res.send(submission);
+    return;
+  }
+);
+
+// Joi inputvalidation for query
+const assignmentExportIdSchema = Joi.object({
+  assignmentVersionId: Joi.number().integer().required(),
+  exportType: Joi.string().valid("csv", "xls"),
+});
+router.post(
+  "/export",
+  validateQuery(assignmentExportIdSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    // this value has been parsed by the validate function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const assignmentVersionId: number = req.query.assignmentVersionId as any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const exportType: "csv" | "xls" = req.query.exportType as any;
+    const assignmentVersion = await AssignmentVersion.findOne(
+      assignmentVersionId
+    );
+    if (!assignmentVersion) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignmentVersion.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    // make sure there is something to export
+    const submissions = await assignmentVersion.getSubmissions();
+    if (submissions.length == 0) {
+      res.status(HttpStatusCode.BAD_REQUEST);
+      res.send("Nothing to export.");
+      return;
+    }
+    // make export entry without file
+    const assignment = await assignmentVersion.getAssignment();
+    const assignmentExport = new AssignmentExport(user, assignment, null);
+    await assignmentExport.save();
+
+    // offload a function to a worker
+    startExportSubmissionsForAssignmentVersionWorker(
+      assignmentVersion.id,
+      assignmentExport.id,
+      exportType
+    );
+
+    // send message that reviews are being exported
+    res.send(assignmentExport);
+  }
+);
+
+/*
+This route needs some looking into:
+- users who are not in the database are simply skipped now
+-- they cannot be automatically added as we use netid's are identifiers, not student numbers
+- in the current implementation a Multer object is passed instead of a raw string, which causes it not to work in production
+router.post(
+  "/import",
+  upload([".zip"], maxFileSize, "file"),
+  validateBody(assignmentVersionIdSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    if (!req.file) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("File is needed for the import");
+      return;
+    }
+
+    const assignmentVersion = await AssignmentVersion.findOne(
+      req.body.assignmentVersionId
+    );
+    if (!assignmentVersion) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignmentVersion.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    const assignment = await assignmentVersion.getAssignment();
+    if (assignment.assignmentType !== AssignmentType.CODE) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(`The assignment must be a '${AssignmentType.CODE}' assignment`);
+      return;
+    }
+    if (assignment.enrollable) {
+      res.status(HttpStatusCode.FORBIDDEN).send("The assignment is enrollable");
+      return;
+    }
+    if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The submission state has passed");
+      return;
+    }
+    if (!/\.zip($|[\s,])/.test(assignment.submissionExtensions)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment must allow .zip submissions");
+      return;
+    }
+    const groups = await assignment.getGroups();
+    if (groups.length > 0) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("There are already groups for this assignment");
+      return;
+    }
+    const submissions = await assignmentVersion.getSubmissions();
+    if (submissions.length > 0) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("There are already submissions for this assignment");
+      return;
+    }
+
+    // offload a function to a worker
+    startImportWebLabSubmissionsWorker(assignmentVersion.id, req.file);
+
+    // send message that submissions are being imported
+    res.send();
+  }
+);
+*/
 
 export default router;

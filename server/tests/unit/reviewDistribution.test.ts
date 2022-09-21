@@ -9,13 +9,14 @@ import Course from "../../src/models/Course";
 import AcademicYear from "../../src/models/AcademicYear";
 import Faculty from "../../src/models/Faculty";
 import File from "../../src/models/File";
-import { generateReviewDistribution } from "../../src/workers/distributeReviews";
+import { generateReviewDistribution } from "../../src/assignmentProgression/distributeReviews";
 import Enrollment from "../../src/models/Enrollment";
 import UserRole from "../../src/enum/UserRole";
 import AssignmentVersion from "../../src/models/AssignmentVersion";
 import { AssignmentState } from "../../src/enum/AssignmentState";
 import Extensions from "../../src/enum/Extensions";
 import SubmissionQuestionnaire from "../../src/models/SubmissionQuestionnaire";
+import AssignmentType from "../../src/enum/AssignmentType";
 
 describe("Review distribution", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -66,7 +67,9 @@ describe("Review distribution", () => {
       true,
       true,
       true,
-      null
+      null,
+      false,
+      AssignmentType.DOCUMENT
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
@@ -136,11 +139,15 @@ describe("Review distribution", () => {
     }
 
     const reviewsPerUser = 3;
+    const studentNumbers: [User, number][] = [];
+    for (const student of students) {
+      studentNumbers.push([student, reviewsPerUser]);
+    }
+
     // need to be made into an object
     const reviewAssignments = await generateReviewDistribution(
       submissions,
-      students,
-      reviewsPerUser
+      studentNumbers
     );
     expect(reviewAssignments.length).toBe(reviewsPerUser * numStudents);
     for (const reviewAssignment of reviewAssignments) {
@@ -186,7 +193,9 @@ describe("Review distribution", () => {
       true,
       true,
       true,
-      null
+      null,
+      false,
+      AssignmentType.DOCUMENT
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
@@ -261,11 +270,15 @@ describe("Review distribution", () => {
     // however for the group with 4 students, thre are only 6 other students whcih can review
     // so the algorithm should find a less fair solution
     const reviewsPerUser = 3;
+    const studentNumbers: [User, number][] = [];
+    for (const student of students) {
+      studentNumbers.push([student, reviewsPerUser]);
+    }
+
     // need to be made into an object
     const reviewAssignments = await generateReviewDistribution(
       submissions,
-      students,
-      reviewsPerUser
+      studentNumbers
     );
     expect(reviewAssignments.length).toBe(reviewsPerUser * numStudents);
     // check whether the solution is valid
@@ -312,7 +325,9 @@ describe("Review distribution", () => {
       true,
       true,
       true,
-      null
+      null,
+      false,
+      AssignmentType.DOCUMENT
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
@@ -393,8 +408,10 @@ describe("Review distribution", () => {
     // need to be made into an object
     const generateDistributionPromise = generateReviewDistribution(
       submissions,
-      [student2, student3],
-      reviewsPerUser
+      [
+        [student2, reviewsPerUser],
+        [student3, reviewsPerUser],
+      ]
     );
     expect.assertions(1);
     await expect(generateDistributionPromise).rejects.toThrow();

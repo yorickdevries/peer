@@ -1,5 +1,5 @@
 import express from "express";
-import Joi from "@hapi/joi";
+import Joi, { CustomHelpers } from "@hapi/joi";
 import { getManager } from "typeorm";
 import {
   validateBody,
@@ -19,8 +19,11 @@ import _ from "lodash";
 import ResponseMessage from "../enum/ResponseMessage";
 import Group from "../models/Group";
 import { AssignmentState } from "../enum/AssignmentState";
-import Extensions from "../enum/Extensions";
+import AssignmentType from "../enum/AssignmentType";
 import Submission from "../models/Submission";
+import publishAssignment from "../assignmentProgression/publishAssignment";
+import closeSubmission from "../assignmentProgression/closeSubmission";
+import { scheduleJobsForAssignment } from "../assignmentProgression/scheduler";
 
 const router = express.Router();
 
@@ -219,6 +222,23 @@ router.get(
   }
 );
 
+const extensionValidation = (value: string, helpers: CustomHelpers) => {
+  const extensions = value.split(/\s*,\s*/);
+  // Remove empty extension belonging to trailing comma
+  if (extensions.length > 1 && extensions[extensions.length - 1].length == 0) {
+    extensions.pop();
+  }
+
+  for (const extension of extensions) {
+    // Match file extensions starting with . followed by 1 or more alphabetic characters or a star
+    if (!/^\.([A-Za-z]+|\*)$/.test(extension)) {
+      return helpers.error("any.invalid");
+    }
+  }
+
+  return value;
+};
+
 // Joi inputvalidation
 const assignmentSchema = Joi.object({
   name: Joi.string().required(),
@@ -233,13 +253,15 @@ const assignmentSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
-  submissionExtensions: Joi.string()
-    .valid(...Object.values(Extensions))
-    .required(),
+  submissionExtensions: Joi.string().custom(extensionValidation).required(),
   blockFeedback: Joi.boolean().required(),
   lateSubmissions: Joi.boolean().required(),
   lateSubmissionReviews: Joi.boolean().required(),
   lateReviewEvaluations: Joi.boolean().allow(null).required(),
+  automaticStateProgression: Joi.boolean().required(),
+  assignmentType: Joi.string()
+    .valid(...Object.values(AssignmentType))
+    .required(),
 });
 // post an assignment in a course
 router.post(
@@ -281,7 +303,9 @@ router.post(
       req.body.blockFeedback,
       req.body.lateSubmissions,
       req.body.lateSubmissionReviews,
-      req.body.lateReviewEvaluations
+      req.body.lateReviewEvaluations,
+      req.body.automaticStateProgression,
+      req.body.assignmentType
     );
 
     // construct file to be saved in transaction
@@ -323,6 +347,8 @@ router.post(
     // reload the assignment
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await assignment!.reload();
+    // schedule automated tasks
+    scheduleJobsForAssignment(assignment);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(assignment!);
   }
@@ -341,13 +367,15 @@ const assignmentPatchSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
-  submissionExtensions: Joi.string()
-    .valid(...Object.values(Extensions))
-    .required(),
+  submissionExtensions: Joi.string().custom(extensionValidation).required(),
   blockFeedback: Joi.boolean().required(),
   lateSubmissions: Joi.boolean().required(),
   lateSubmissionReviews: Joi.boolean().required(),
   lateReviewEvaluations: Joi.boolean().allow(null).required(),
+  automaticStateProgression: Joi.boolean().required(),
+  assignmentType: Joi.string()
+    .valid(...Object.values(AssignmentType))
+    .required(),
 });
 // patch an assignment in a course
 router.patch(
@@ -408,6 +436,15 @@ router.patch(
         .send("You cannot change submissionExtensions at this state");
       return;
     }
+    if (
+      !assignment.isAtState(AssignmentState.UNPUBLISHED) &&
+      assignment.assignmentType !== req.body.assignmentType
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change assignmentType at this state");
+      return;
+    }
     // either a new file can be sent or a file can be removed, not both
     if (req.file && req.body.file === null) {
       res
@@ -461,6 +498,9 @@ router.patch(
         assignment.lateSubmissions = req.body.lateSubmissions;
         assignment.lateSubmissionReviews = req.body.lateSubmissionReviews;
         assignment.lateReviewEvaluations = req.body.lateReviewEvaluations;
+        assignment.automaticStateProgression =
+          req.body.automaticStateProgression;
+        assignment.assignmentType = req.body.assignmentType;
 
         // change the file in case it is not undefined
         if (newFile !== undefined) {
@@ -498,6 +538,8 @@ router.patch(
     // reload the assignment
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await assignment!.reload();
+    // reschedule automated tasks
+    scheduleJobsForAssignment(assignment);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(assignment!);
   }
@@ -521,21 +563,14 @@ router.patch("/:id/publish", validateParams(idSchema), async (req, res) => {
       .send("User is not a teacher of the course");
     return;
   }
-  if (!assignment.isAtState(AssignmentState.UNPUBLISHED)) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("The assignment is not in unpublished state");
+  try {
+    const result = await publishAssignment(assignment.id);
+    res.send(result);
+    return;
+  } catch (error) {
+    res.status(HttpStatusCode.FORBIDDEN).send(String(error));
     return;
   }
-  if (assignment.versions.length === 0) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("No assignment versions have been defined");
-    return;
-  }
-  assignment.state = AssignmentState.SUBMISSION;
-  await assignment.save();
-  res.send(assignment);
 });
 
 // close an assignment from submission state
@@ -559,24 +594,14 @@ router.patch(
         .send("User is not a teacher of the course");
       return;
     }
-    if (!assignment.isAtState(AssignmentState.SUBMISSION)) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("The assignment is not in submission state");
+    try {
+      const result = await closeSubmission(assignment.id);
+      res.send(result);
+      return;
+    } catch (error) {
+      res.status(HttpStatusCode.FORBIDDEN).send(String(error));
       return;
     }
-    for (const assignmentVersion of assignment.versions) {
-      const submissions = await assignmentVersion.getFinalSubmissionsOfEachGroup();
-      if (submissions.length === 0) {
-        res
-          .status(HttpStatusCode.FORBIDDEN)
-          .send("There are no submissions for one of the assignment versions");
-        return;
-      }
-    }
-    assignment.state = AssignmentState.WAITING_FOR_REVIEW;
-    await assignment.save();
-    res.send(assignment);
   }
 );
 

@@ -4,8 +4,8 @@
             >Questionnaire editing is not allowed anymore since the peer review publish date has already
             passed.</b-alert
         >
-        <b-container v-bind:class="{ 'disabled-view': blockQuestionnaireEditing }">
-            <b-card class="mb-3 mt-3">
+        <b-container>
+            <b-card class="mb-3 mt-3" :class="{ 'disabled-view': blockQuestionnaireEditing }">
                 <div class="d-flex justify-content-between">
                     <b-row>
                         <b-col>
@@ -66,6 +66,9 @@
                             <b-badge v-else variant="danger" class="ml-2 float-right p-1">
                                 REQUIRED
                             </b-badge>
+                            <b-badge v-if="question.graded" variant="secondary" class="ml-2 float-right p-1">
+                                GRADED
+                            </b-badge>
                         </b-card-header>
 
                         <b-card-body>
@@ -84,22 +87,29 @@
 
                             <!-- MULTIPLE CHOICE QUESTION -->
                             <b-form-radio-group v-if="question.type === 'multiplechoice'" stacked required disabled>
-                                <b-form-radio v-for="option in question.options" :key="option.id" :value="option">{{
-                                    option.text
-                                }}</b-form-radio>
+                                <b-form-radio v-for="option in question.options" :key="option.id" :value="option">
+                                    {{ option.text }}
+                                    <b-badge v-if="question.graded" variant="dark"
+                                        >Points: {{ pointsDisplay(option.points) }}</b-badge
+                                    >
+                                </b-form-radio>
                             </b-form-radio-group>
 
                             <!-- CHECKBOX QUESTION -->
                             <b-form-checkbox-group v-if="question.type === 'checkbox'" stacked required disabled>
-                                <b-form-checkbox v-for="option in question.options" :key="option.id" :value="option">{{
-                                    option.text
-                                }}</b-form-checkbox>
+                                <b-form-checkbox v-for="option in question.options" :key="option.id" :value="option">
+                                    {{ option.text }}
+                                    <b-badge v-if="question.graded" variant="dark"
+                                        >Points: {{ pointsDisplay(option.points) }}</b-badge
+                                    >
+                                </b-form-checkbox>
                             </b-form-checkbox-group>
 
                             <!-- RANGE QUESTION -->
                             <StarRating
                                 v-if="question.type === 'range'"
                                 class="align-middle"
+                                :class="{ 'disabled-view': blockQuestionnaireEditing }"
                                 :border-color="'#007bff'"
                                 :active-color="'#007bff'"
                                 :border-width="2"
@@ -113,7 +123,11 @@
                             />
 
                             <!-- UPLOAD QUESTION -->
-                            <b-form-group v-if="question.type === 'upload'" class="mb-0">
+                            <b-form-group
+                                v-if="question.type === 'upload'"
+                                class="mb-0"
+                                :class="{ 'disabled-view': blockQuestionnaireEditing }"
+                            >
                                 <b-alert show variant="warning" class="p-2">
                                     Currently, no file has been uploaded. <br />
                                     Allowed file types: {{ question.extensions }}
@@ -123,11 +137,27 @@
 
                             <!-- Edit button-->
                             <br />
-                            <b-button v-b-modal="`editModal${question.id}`" variant="primary float-right">
-                                Edit/Delete Question
+                            <b-button
+                                :disabled="blockQuestionnaireEditing && !isOptionQuestion(question.type)"
+                                v-b-modal="`editModal${question.id}`"
+                                variant="primary float-right"
+                            >
+                                {{
+                                    blockQuestionnaireEditing
+                                        ? question.graded
+                                            ? "Edit Points"
+                                            : "Edit Question"
+                                        : "Edit/Delete Question"
+                                }}
                             </b-button>
                             <b-modal :id="`editModal${question.id}`" centered hide-footer class="p-0 m-0">
+                                <EditQuestionPointsWizard
+                                    v-if="blockQuestionnaireEditing"
+                                    :question="question"
+                                    @questionSaved="getQuestionnaire"
+                                ></EditQuestionPointsWizard>
                                 <EditQuestionWizard
+                                    v-else
                                     :question="question"
                                     @questionSaved="getQuestionnaire"
                                 ></EditQuestionWizard>
@@ -146,6 +176,7 @@ import notifications from "../../../mixins/notifications"
 import _ from "lodash"
 import CreateQuestionWizard from "./CreateQuestionWizard"
 import EditQuestionWizard from "./EditQuestionWizard"
+import EditQuestionPointsWizard from "./EditQuestionPointsWizard"
 import { StarRating } from "vue-rate-it"
 
 export default {
@@ -154,6 +185,7 @@ export default {
     components: {
         CreateQuestionWizard,
         EditQuestionWizard,
+        EditQuestionPointsWizard,
         StarRating
     },
     data() {
@@ -195,6 +227,12 @@ export default {
             await this.getAssignmentVersion()
             await this.getQuestionnaire()
             await this.getAllQuestionnairesOfCourse()
+        },
+        isOptionQuestion(questionType) {
+            return questionType === "multiplechoice" || questionType === "checkbox"
+        },
+        pointsDisplay(points) {
+            return points / 100
         },
         async getAssignment() {
             const res = await api.assignments.get(this.$route.params.assignmentId)

@@ -8,11 +8,13 @@ import {
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Questionnaire from "../models/Questionnaire";
 import CheckboxQuestion from "../models/CheckboxQuestion";
+import CheckboxQuestionOption from "../models/CheckboxQuestionOption";
 import ResponseMessage from "../enum/ResponseMessage";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { AssignmentState } from "../enum/AssignmentState";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import _ from "lodash";
+import { getManager } from "typeorm";
 
 const router = express.Router();
 
@@ -52,6 +54,7 @@ const questionSchema = Joi.object({
   number: Joi.number().integer().required(),
   optional: Joi.boolean().required(),
   questionnaireId: Joi.number().integer().required(),
+  graded: Joi.boolean().required(),
 });
 // post a question
 router.post("/", validateBody(questionSchema), async (req, res) => {
@@ -94,6 +97,7 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
     req.body.text,
     req.body.number,
     req.body.optional,
+    req.body.graded,
     questionnaire
   );
   await question.save();
@@ -105,6 +109,7 @@ const questionPatchSchema = Joi.object({
   text: Joi.string().required(),
   number: Joi.number().integer().required(),
   optional: Joi.boolean().required(),
+  graded: Joi.boolean().required(),
 });
 // patch a question
 router.patch(
@@ -133,9 +138,14 @@ router.patch(
     const questionnaire = await question.getQuestionnaire();
     const assignmentVersion = await questionnaire.getAssignmentVersion();
     const assignment = await assignmentVersion.getAssignment();
+    const illegalChanges =
+      question.text !== req.body.text &&
+      question.number !== req.body.number &&
+      question.optional !== req.body.optional;
     if (
       questionnaire instanceof SubmissionQuestionnaire &&
-      assignment.isAtOrAfterState(AssignmentState.REVIEW)
+      assignment.isAtOrAfterState(AssignmentState.REVIEW) &&
+      illegalChanges
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -144,18 +154,52 @@ router.patch(
     }
     if (
       questionnaire instanceof ReviewQuestionnaire &&
-      assignment.isAtOrAfterState(AssignmentState.FEEDBACK)
+      assignment.isAtOrAfterState(AssignmentState.FEEDBACK) &&
+      illegalChanges
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send("The assignment is already in feedback state");
       return;
     }
-    // otherwise update the question
-    question.text = req.body.text;
-    question.number = req.body.number;
-    question.optional = req.body.optional;
-    await question.save();
+    // graded changed
+    const gradedChanged = question.graded !== req.body.graded;
+    if (!gradedChanged) {
+      // if grades isn't changed, we can just update the question
+      question.text = req.body.text;
+      question.number = req.body.number;
+      question.optional = req.body.optional;
+      question.graded = req.body.graded;
+      await question.save();
+    } else {
+      await getManager().transaction(
+        "SERIALIZABLE", // make sure no new options can be added in the mean time
+        async (transactionalEntityManager) => {
+          // reload the question in transaction
+          const reloadedQuestion = await transactionalEntityManager.findOneOrFail(
+            CheckboxQuestion,
+            questionId
+          );
+          const reloadedQuestionOptions = await transactionalEntityManager.find(
+            CheckboxQuestionOption,
+            { where: { question: reloadedQuestion } }
+          );
+          // update question
+          reloadedQuestion.text = req.body.text;
+          reloadedQuestion.number = req.body.number;
+          reloadedQuestion.optional = req.body.optional;
+          reloadedQuestion.graded = req.body.graded;
+          // make sure all points are valid and save the updated version
+          for (const reloadedQuestionOption of reloadedQuestionOptions) {
+            reloadedQuestionOption.points = reloadedQuestion.graded ? 0 : null;
+            await transactionalEntityManager.save(reloadedQuestionOption);
+          }
+          // lastly update the question itself (including graded value)
+          await transactionalEntityManager.save(reloadedQuestion);
+        }
+      );
+    }
+    await question.reload();
     res.send(question);
   }
 );

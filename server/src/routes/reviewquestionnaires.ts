@@ -186,10 +186,15 @@ router.patch(
   }
 );
 
+const gradedSchema = Joi.object({
+  graded: Joi.boolean().required(),
+});
+
 // add default questions to the reviewquestionnaire
 router.patch(
   "/:id/defaultquestions",
   validateParams(idSchema),
+  validateBody(gradedSchema),
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
@@ -215,7 +220,7 @@ router.patch(
         .send("The assignment is already in feedback state");
       return;
     }
-    await addDefaultReviewEvaluationQuestions(questionnaire);
+    await addDefaultReviewEvaluationQuestions(questionnaire, req.body.graded);
     await questionnaire.reload();
     res.send(questionnaire);
   }

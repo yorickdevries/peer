@@ -14,7 +14,7 @@
                 <b-modal
                     :title="`Review (ID: ${feedbackReviewId})`"
                     :id="`reviewModal${feedbackReviewId}`"
-                    size="lg"
+                    size="xl"
                     hide-footer
                 >
                     <b-alert variant="info" show>
@@ -23,6 +23,7 @@
                     <ReviewViewForEvaluation
                         :reviewId="feedbackReviewId"
                         :reviewsAreReadOnly="true"
+                        :assignmentType="assignmentType"
                     ></ReviewViewForEvaluation>
                 </b-modal>
             </b-col>
@@ -82,6 +83,8 @@
                     <dd v-if="review.approvalByTA">Approved 👍</dd>
                     <dd v-if="review.approvalByTA === false">Disapproved 👎</dd>
                     <dd v-if="review.approvalByTA === null">No action yet by any TA.</dd>
+                    <dt>Current TA Comment</dt>
+                    <b-form-textarea :rows="10" :max-rows="15" v-model="review.commentByTA" readonly />
                 </dl>
             </b-col>
         </b-row>
@@ -130,15 +133,15 @@
         <!--Form, load only when answers are available-->
         <b-card v-if="answers" no-body class="mt-3">
             <!--Title-->
-            <b-card-body v-if="userIsOwner && !reviewsAreReadOnly">
+            <b-card-header v-if="userIsOwner && !reviewsAreReadOnly">
                 <h4>Review Evaluation</h4>
                 <h6 class="card-subtitle text-muted">
                     Evaluate the review you have gotten from one of your peers here.
                 </h6>
-            </b-card-body>
+            </b-card-header>
 
             <!--Question Information-->
-            <b-card v-for="question in questionnaire.questions" :key="question.id" class="mb-3" no-body>
+            <b-card v-for="(question, index) in questionnaire.questions" :key="question.id" class="mb-3" no-body>
                 <b-card-header class="d-flex align-items-center">
                     <span class="w-100">Question {{ question.number }} of {{ questionnaire.questions.length }}</span>
                     <b-badge variant="primary" class="ml-2 float-right p-1"
@@ -163,16 +166,20 @@
                         :rows="10"
                         :max-rows="15"
                         v-model="answers[question.id].answer"
-                        @input="answers[question.id].changed = true"
+                        @input=";(answers[question.id].changed = true), (questionIndex = index)"
                         :readonly="!questionsCanBeChanged"
                         required
                     />
 
                     <!-- MULTIPLE CHOICE QUESTION -->
+                    <!--prettier-ignore-->
                     <b-form-radio-group
                         v-if="question.type === 'multiplechoice'"
                         v-model="answers[question.id].answer"
-                        @input="answers[question.id].answer !== null ? (answers[question.id].changed = true) : ''"
+                        @input="
+                            ;(answers[question.id].answer !== null ? (answers[question.id].changed = true) : ''),
+                                (questionIndex = index)
+                        "
                         stacked
                         required
                         :disabled="!questionsCanBeChanged"
@@ -186,7 +193,7 @@
                     <b-form-checkbox-group
                         v-if="question.type === 'checkbox'"
                         v-model="answers[question.id].answer"
-                        @input="answers[question.id].changed = true"
+                        @input=";(answers[question.id].changed = true), (questionIndex = index)"
                         stacked
                         required
                         :disabled="!questionsCanBeChanged"
@@ -200,7 +207,7 @@
                     <StarRating
                         v-if="question.type === 'range'"
                         v-model="answers[question.id].answer"
-                        @rating-selected="answers[question.id].changed = true"
+                        @rating-selected=";(answers[question.id].changed = true), (questionIndex = index)"
                         class="align-middle"
                         :border-color="'#007bff'"
                         :active-color="'#007bff'"
@@ -215,13 +222,35 @@
 
                     <!-- UPLOAD QUESTION -->
                     <b-form-group v-if="question.type === 'upload'" class="mb-0">
-                        <!--Show whether file has been uploaded-->
-                        <b-alert v-if="answers[question.id].answer" show variant="success" class="p-2"
-                            >File uploaded:
-                            <a :href="uploadAnswerFilePath(review.id, question.id)">
-                                {{ answers[question.id].answer.name }}{{ answers[question.id].answer.extension }}
-                            </a>
-                        </b-alert>
+                        <b-row v-if="answers[question.id].answer">
+                            <b-col>
+                                <!--Show whether file has been uploaded-->
+                                <b-alert show variant="success" class="p-2"
+                                    >File uploaded:
+                                    <a :href="uploadAnswerFilePath(review.id, question.id)">
+                                        {{ answers[question.id].answer.name
+                                        }}{{ answers[question.id].answer.extension }}
+                                    </a>
+                                </b-alert>
+                            </b-col>
+                            <b-col>
+                                <b-button
+                                    v-if="answers[question.id].answer.extension === '.pdf'"
+                                    v-b-modal="`showPDF-${review.id}-${question.id}`"
+                                >
+                                    Show PDF
+                                </b-button>
+                                <b-modal
+                                    :id="`showPDF-${review.id}-${question.id}`"
+                                    title="PDF"
+                                    size="xl"
+                                    centered
+                                    hide-footer
+                                >
+                                    <PDFViewer :fileUrl="uploadAnswerFilePath(review.id, question.id)" />
+                                </b-modal>
+                            </b-col>
+                        </b-row>
                         <!--Show note if a file has been uploaded and review not submitted-->
                         <b-alert v-if="answers[question.id].answer" show variant="secondary" class="p-2"
                             >Note: uploading a new file will overwrite your current file. <br />
@@ -235,7 +264,10 @@
                             placeholder="Choose a new file..."
                             v-model="answers[question.id].newAnswer"
                             :state="Boolean(answers[question.id].newAnswer)"
-                            @input="answers[question.id].changed = Boolean(answers[question.id].newAnswer)"
+                            @input="
+                                ;(answers[question.id].changed = Boolean(answers[question.id].newAnswer)),
+                                    (questionIndex = index)
+                            "
                             :accept="`${question.extensions}`"
                             :disabled="!questionsCanBeChanged"
                         >
@@ -253,6 +285,7 @@
                         >Delete Answer</b-button
                     >
                     <b-button
+                        ref="saveButton"
                         :variant="(answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'"
                         :disabled="
                             !answers[question.id].changed ||
@@ -341,11 +374,12 @@ import _ from "lodash"
 import notifications from "../../../mixins/notifications"
 import { StarRating } from "vue-rate-it"
 import ReviewViewForEvaluation from "./ReviewViewForEvaluation"
+import PDFViewer from "../../general/PDFViewer"
 
 export default {
     mixins: [notifications],
-    components: { ReviewViewForEvaluation, StarRating },
-    props: ["feedbackReviewId", "reviewsAreReadOnly"],
+    components: { ReviewViewForEvaluation, StarRating, PDFViewer },
+    props: ["feedbackReviewId", "reviewsAreReadOnly", "assignmentType"],
     data() {
         return {
             // current user
@@ -356,7 +390,11 @@ export default {
             // all answers will be saved in this object
             answers: null,
             // disable save/delete buttons when a call is busy
-            buttonDisabled: false
+            buttonDisabled: false,
+            // Currently pressed keys
+            keys: { Enter: false, ControlLeft: false, ControlRight: false },
+            // Index of currently active question
+            questionIndex: null
         }
     },
     computed: {
@@ -402,9 +440,25 @@ export default {
         }
     },
     async created() {
+        window.addEventListener("keydown", this.keyDown)
+        window.addEventListener("keyup", this.keyUp)
         await this.fetchData()
     },
+    destroyed() {
+        window.removeEventListener("keydown", this.keyDown)
+        window.removeEventListener("keyup", this.keyUp)
+    },
     methods: {
+        keyDown(e) {
+            this.keys[e.code] = true
+            if (this.keys["Enter"] && (this.keys["ControlLeft"] || this.keys["ControlRight"])) {
+                const saveButton = this.$refs.saveButton[this.questionIndex]
+                saveButton.click()
+            }
+        },
+        keyUp(e) {
+            this.keys[e.code] = false
+        },
         async fetchData() {
             await this.fetchUser()
             await this.fetchReview()

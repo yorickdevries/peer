@@ -22,6 +22,42 @@ const startWorker = function (
     });
 };
 
+const startPublishAssignmentWorker = function (assignmentId: number): void {
+  if (isTSNode) {
+    // run the function directly in this process (TS Node/development)
+    workerFunctions
+      .publishAssignment(assignmentId)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("publishAssignment", [assignmentId]);
+  }
+};
+
+const startCloseSubmissionForAssignmentWorker = function (
+  assignmentId: number
+): void {
+  if (isTSNode) {
+    // run the function directly in this process (TS Node/development)
+    workerFunctions
+      .closeSubmission(assignmentId)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("closeSubmission", [assignmentId]);
+  }
+};
+
 const startDistributeReviewsForAssignmentWorker = function (
   assignmentId: number
 ): void {
@@ -57,6 +93,18 @@ const startOpenFeedbackForAssignmentWorker = function (
   } else {
     // run worker in a seperate process (Node.js/production)
     startWorker("openFeedbackForAssignment", [assignmentId]);
+  }
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const startSubmissionFlaggingWorker = function (submissionId: number): void {
+  if (isTSNode) {
+    workerFunctions
+      .submissionFlagging(submissionId)
+      .then((result) => console.log(result))
+      .catch((err) => console.error(err));
+  } else {
+    startWorker("submissionFlagging", [submissionId]);
   }
 };
 
@@ -169,11 +217,67 @@ const startExportReviewsForAssignmentVersionWorker = function (
   }
 };
 
+const startExportSubmissionsForAssignmentVersionWorker = function (
+  assignmentVersionId: number,
+  assignmentExportId: number,
+  exportType: "xls" | "csv"
+): void {
+  if (isTSNode) {
+    // run the function directly in this process (TS Node/development)
+    workerFunctions
+      .exportSubmissionsForAssignmentVersion(
+        assignmentVersionId,
+        assignmentExportId,
+        exportType
+      )
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("exportSubmissionsForAssignmentVersion", [
+      assignmentVersionId,
+      assignmentExportId,
+      exportType,
+    ]);
+  }
+};
+
+/*
+const startImportWebLabSubmissionsWorker = function (
+  assignmentVersionId: number,
+  file: Express.Multer.File
+): void {
+  if (isTSNode) {
+    // run the function directly in this process (TS Node/development)
+    workerFunctions
+      .importWebLabSubmissions(assignmentVersionId, file)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("importWebLabSubmissions", [assignmentVersionId, file]);
+  }
+};
+*/
+
 export {
+  startPublishAssignmentWorker,
+  startCloseSubmissionForAssignmentWorker,
   startDistributeReviewsForAssignmentWorker,
   startOpenFeedbackForAssignmentWorker,
   startImportGroupsForAssignmentWorker,
   startCopyGroupsForAssignmentWorker,
   startExportGradesForAssignmentVersionWorker,
   startExportReviewsForAssignmentVersionWorker,
+  startExportSubmissionsForAssignmentVersionWorker,
+  startSubmissionFlaggingWorker,
+  //startImportWebLabSubmissionsWorker,
 };

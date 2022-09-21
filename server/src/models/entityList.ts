@@ -33,12 +33,11 @@ import MultipleChoiceQuestionAnswer from "./MultipleChoiceQuestionAnswer";
 import OpenQuestionAnswer from "./OpenQuestionAnswer";
 import RangeQuestionAnswer from "./RangeQuestionAnswer";
 import UploadQuestionAnswer from "./UploadQuestionAnswer";
-import SubmissionComment from "./SubmissionComment";
-import ReviewComment from "./ReviewComment";
 import PDFAnnotation from "./PDFAnnotation";
 import CommentingPDFAnnotation from "./CommentingPDFAnnotation";
 import ReplyingPDFAnnotation from "./ReplyingPDFAnnotation";
 import AssignmentExport from "./AssignmentExport";
+import CodeAnnotation from "./CodeAnnotation";
 // End of All Database models
 
 const entityList = [
@@ -76,12 +75,11 @@ const entityList = [
   OpenQuestionAnswer,
   RangeQuestionAnswer,
   UploadQuestionAnswer,
-  SubmissionComment,
-  ReviewComment,
   PDFAnnotation,
   CommentingPDFAnnotation,
   ReplyingPDFAnnotation,
   AssignmentExport,
+  CodeAnnotation,
 ];
 
 export default entityList;

@@ -6,6 +6,7 @@ import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import Review from "./Review";
 import ReviewOfReview from "./ReviewOfReview";
 import PDFAnnotation from "./PDFAnnotation";
+import CodeAnnotation from "./CodeAnnotation";
 
 @ChildEntity(ReviewType.REVIEW_OF_SUBMISSION)
 export default class ReviewOfSubmission extends Review {
@@ -26,8 +27,6 @@ export default class ReviewOfSubmission extends Review {
     startedAt: Date | null,
     downloadedAt: Date | null,
     submittedAt: Date | null,
-    approvalByTA: boolean | null,
-    approvingTA: User | null,
     submission: Submission
   ) {
     super(
@@ -37,9 +36,7 @@ export default class ReviewOfSubmission extends Review {
       submitted,
       startedAt,
       downloadedAt,
-      submittedAt,
-      approvalByTA,
-      approvingTA
+      submittedAt
     );
     this.submission = submission;
   }
@@ -80,5 +77,9 @@ export default class ReviewOfSubmission extends Review {
 
   async getPDFAnnotations(): Promise<PDFAnnotation[]> {
     return await PDFAnnotation.find({ where: { review: this } });
+  }
+
+  async getCodeAnnotations(): Promise<CodeAnnotation[]> {
+    return CodeAnnotation.find({ where: { review: this } });
   }
 }

@@ -13,6 +13,7 @@
     },
     "allowedExtensions": [".pdf", ".zip", ".doc", ".docx"],
     "maxFileSize": 52428800, // 50 MB
+    "maxCodeAnnotationLength": 65535,
     "uploadFolder": "./files/development/",
     "temporaryFolder": "./files/temp/",
     "rangeQuestion": {
@@ -23,5 +24,11 @@
         "exampleAssignmentFolder": "./exampleData/assignments",
         "exampleSubmissionFolder": "./exampleData/submissions",
         "exampleReviewFolder": "./exampleData/reviews"
+    },
+    "mail": {
+        "host": "localhost",
+        "port": 25,
+        "from": "noreply@mail.com",
+        "adminMail": "admin@mail.com"
     }
 }
