@@ -91,10 +91,12 @@ coverage:
   - merge_requests
   - pushes
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
-  reports:
-    junit:
-      - junit.xml
-    cobertura: coverage/cobertura-coverage.xml
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - junit.xml
+      cobertura: coverage/cobertura-coverage.xml
 
 migration:
   stage: migration
