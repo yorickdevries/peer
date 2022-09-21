@@ -8,9 +8,11 @@
     "build_client": "npm run build --prefix ./client",
     "lint-fix": "npm run lint-fix --prefix ./server && npm run lint-fix --prefix ./client",
     "start": "npm run start --prefix ./server",
-    "dev_server": "npm run dev --prefix ./server",
-    "dev_client": "npm run serve --prefix ./client",
-    "heroku-postbuild": "npm run postinstall && npm run build"
+    "watch:dev_server": "npm run dev --prefix ./server",
+    "watch:dev_client": "npm run serve --prefix ./client",
+    "heroku-postbuild": "npm run postinstall && npm run build",
+    "serve": "cd server && nodemon app.ts",
+    "hot_reload": "concurrently npm:watch:*"
   },
   "engines": {
     "node": "14.x"
@@ -21,5 +23,10 @@
   ],
   "dependencies": {
     "lint": "^0.7.0"
+  },
+  "devDependencies": {
+    "@types/date-fns": "^2.6.0",
+    "concurrently": "^7.4.0",
+    "date-fns": "^2.29.3"
   }
 }

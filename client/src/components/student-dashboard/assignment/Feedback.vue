@@ -26,20 +26,32 @@
                                 </b-badge>
                             </div>
                         </template>
-                        <FileAnnotator
-                            v-if="tab.aggregated"
-                            :submissionId="finalSubmission.id"
-                            :assignmentType="assignment.assignmentType"
-                            :readOnly="true"
-                            :reviewColors="reviewColors"
-                        />
-                        <FileAnnotator
-                            v-else
-                            :reviewId="tab.id"
-                            :assignmentType="assignment.assignmentType"
-                            :readOnly="true"
-                            :reviewColors="reviewColors"
-                        />
+                        <div
+                            v-if="
+                                !feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id) ||
+                                    feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id).approvalByTA ||
+                                    feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id)
+                                        .approvalByTA === null
+                            "
+                        >
+                            <FileAnnotator
+                                v-if="tab.aggregated"
+                                :submissionId="finalSubmission.id"
+                                :assignmentType="assignment.assignmentType"
+                                :readOnly="true"
+                                :reviewColors="reviewColors"
+                            />
+                            <FileAnnotator
+                                v-else
+                                :reviewId="tab.id"
+                                :assignmentType="assignment.assignmentType"
+                                :readOnly="true"
+                                :reviewColors="reviewColors"
+                            />
+                        </div>
+                        <div v-else>
+                            <b-alert show variant="success" class="p-2">This review was redacted</b-alert>
+                        </div>
                     </b-tab>
                 </b-tabs>
             </b-tab>
@@ -114,102 +126,116 @@
                                         </b-list-group-item>
 
                                         <b-list-group-item v-for="(answer, index) in answers[question.id]" :key="index">
-                                            <!-- OPEN QUESTION -->
-                                            <b-form-textarea
-                                                v-if="question.type === 'open'"
-                                                placeholder="Enter your answer"
-                                                :rows="10"
-                                                :max-rows="15"
-                                                :value="answer"
-                                                readonly
-                                                required
-                                            />
+                                            <!-- It can be null when a review is redacted -->
+                                            <div v-if="answer !== null">
+                                                <!-- OPEN QUESTION -->
+                                                <b-form-textarea
+                                                    v-if="question.type === 'open'"
+                                                    placeholder="Enter your answer"
+                                                    :rows="10"
+                                                    :max-rows="15"
+                                                    :value="answer"
+                                                    readonly
+                                                    required
+                                                />
 
-                                            <!-- MULTIPLE CHOICE QUESTION -->
-                                            <b-form-radio-group
-                                                v-if="question.type === 'multiplechoice'"
-                                                :checked="answer"
-                                                stacked
-                                                required
-                                                disabled
-                                            >
-                                                <b-form-radio
-                                                    v-for="option in question.options"
-                                                    :key="option.id"
-                                                    :value="option"
-                                                    >{{ option.text }}</b-form-radio
+                                                <!-- MULTIPLE CHOICE QUESTION -->
+                                                <b-form-radio-group
+                                                    v-if="question.type === 'multiplechoice'"
+                                                    :checked="answer"
+                                                    stacked
+                                                    required
+                                                    disabled
                                                 >
-                                            </b-form-radio-group>
+                                                    <b-form-radio
+                                                        v-for="option in question.options"
+                                                        :key="option.id"
+                                                        :value="option"
+                                                        >{{ option.text }}</b-form-radio
+                                                    >
+                                                </b-form-radio-group>
 
-                                            <!-- CHECKBOX QUESTION -->
-                                            <b-form-checkbox-group
-                                                v-if="question.type === 'checkbox'"
-                                                :checked="answer"
-                                                stacked
-                                                required
-                                                disabled
-                                            >
-                                                <b-form-checkbox
-                                                    v-for="option in question.options"
-                                                    :key="option.id"
-                                                    :value="option"
-                                                    >{{ option.text }}</b-form-checkbox
+                                                <!-- CHECKBOX QUESTION -->
+                                                <b-form-checkbox-group
+                                                    v-if="question.type === 'checkbox'"
+                                                    :checked="answer"
+                                                    stacked
+                                                    required
+                                                    disabled
                                                 >
-                                            </b-form-checkbox-group>
+                                                    <b-form-checkbox
+                                                        v-for="option in question.options"
+                                                        :key="option.id"
+                                                        :value="option"
+                                                        >{{ option.text }}</b-form-checkbox
+                                                    >
+                                                </b-form-checkbox-group>
 
-                                            <!-- RANGE QUESTION -->
-                                            <StarRating
-                                                v-if="question.type === 'range'"
-                                                :rating="answer"
-                                                class="align-middle"
-                                                :border-color="'#007bff'"
-                                                :active-color="'#007bff'"
-                                                :border-width="2"
-                                                :item-size="20"
-                                                :spacing="5"
-                                                inline
-                                                :max-rating="question.range"
-                                                :show-rating="true"
-                                                read-only
-                                            />
-                                            <!-- UPLOAD QUESTION -->
-                                            <b-form-group v-if="question.type === 'upload'" class="mb-0">
-                                                <b-row>
-                                                    <b-col>
-                                                        <!--Show whether file has been uploaded-->
-                                                        <b-alert show variant="success" class="p-2"
-                                                            >File uploaded:
-                                                            <a
-                                                                :href="
-                                                                    uploadAnswerFilePath(answer.reviewId, question.id)
-                                                                "
-                                                                >{{ answer.name }}{{ answer.extension }}</a
+                                                <!-- RANGE QUESTION -->
+                                                <StarRating
+                                                    v-if="question.type === 'range'"
+                                                    :rating="answer"
+                                                    class="align-middle"
+                                                    :border-color="'#007bff'"
+                                                    :active-color="'#007bff'"
+                                                    :border-width="2"
+                                                    :item-size="20"
+                                                    :spacing="5"
+                                                    inline
+                                                    :max-rating="question.range"
+                                                    :show-rating="true"
+                                                    read-only
+                                                />
+                                                <!-- UPLOAD QUESTION -->
+                                                <b-form-group v-if="question.type === 'upload'" class="mb-0">
+                                                    <b-row>
+                                                        <b-col>
+                                                            <!--Show whether file has been uploaded-->
+                                                            <b-alert show variant="success" class="p-2"
+                                                                >File uploaded:
+                                                                <a
+                                                                    :href="
+                                                                        uploadAnswerFilePath(
+                                                                            answer.reviewId,
+                                                                            question.id
+                                                                        )
+                                                                    "
+                                                                    >{{ answer.name }}{{ answer.extension }}</a
+                                                                >
+                                                            </b-alert>
+                                                        </b-col>
+                                                        <b-col>
+                                                            <b-button
+                                                                v-if="answer.extension === '.pdf'"
+                                                                v-b-modal="`showPDF-${answer.reviewId}-${question.id}`"
                                                             >
-                                                        </b-alert>
-                                                    </b-col>
-                                                    <b-col>
-                                                        <b-button
-                                                            v-if="answer.extension === '.pdf'"
-                                                            v-b-modal="`showPDF-${answer.reviewId}-${question.id}`"
-                                                        >
-                                                            Show PDF
-                                                        </b-button>
-                                                        <b-modal
-                                                            :id="`showPDF-${answer.reviewId}-${question.id}`"
-                                                            title="PDF"
-                                                            size="xl"
-                                                            centered
-                                                            hide-footer
-                                                        >
-                                                            <PDFViewer
-                                                                :fileUrl="
-                                                                    uploadAnswerFilePath(answer.reviewId, question.id)
-                                                                "
-                                                            />
-                                                        </b-modal>
-                                                    </b-col>
-                                                </b-row>
-                                            </b-form-group>
+                                                                Show PDF
+                                                            </b-button>
+                                                            <b-modal
+                                                                :id="`showPDF-${answer.reviewId}-${question.id}`"
+                                                                title="PDF"
+                                                                size="xl"
+                                                                centered
+                                                                hide-footer
+                                                            >
+                                                                <PDFViewer
+                                                                    :fileUrl="
+                                                                        uploadAnswerFilePath(
+                                                                            answer.reviewId,
+                                                                            question.id
+                                                                        )
+                                                                    "
+                                                                />
+                                                            </b-modal>
+                                                        </b-col>
+                                                    </b-row>
+                                                </b-form-group>
+                                            </div>
+                                            <div v-else>
+                                                <b-alert show variant="success" class="p-2"
+                                                    >This review was redacted</b-alert
+                                                >
+                                            </div>
                                         </b-list-group-item>
                                     </b-list-group>
                                 </b-card>
@@ -347,15 +373,21 @@ export default {
             for (const feedbackReview of this.feedbackReviews) {
                 const res = await api.reviewofsubmissions.getAnswers(feedbackReview.id)
                 const feedbackReviewAnswers = res.data
+                const feedbackReviewApproval = feedbackReview.approvalByTA
                 // iterate over questions and get answers
+
                 for (const question of this.questionnaire.questions) {
-                    const answer = this.getAnswerForQuestion(feedbackReviewAnswers, question)
-                    if (answer !== null) {
-                        // add review id so users can download files
-                        if (question.type === "upload") {
-                            answer.reviewId = feedbackReview.id
+                    if (feedbackReviewApproval || feedbackReviewApproval == null) {
+                        const answer = this.getAnswerForQuestion(feedbackReviewAnswers, question)
+                        if (answer !== null) {
+                            // add review id so users can download files
+                            if (question.type === "upload") {
+                                answer.reviewId = feedbackReview.id
+                            }
+                            answers[question.id].push(answer)
                         }
-                        answers[question.id].push(answer)
+                    } else {
+                        answers[question.id].push(null)
                     }
                 }
             }
