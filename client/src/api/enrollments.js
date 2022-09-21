@@ -13,7 +13,6 @@ export default {
         return client.post("enrollments/", body)
     },
     postMultipleTAs(file) {
-        console.log("second func run")
         const formData = new FormData()
         formData.append("file", file)
         return client.post("enrollments/enrollMultiple", formData)

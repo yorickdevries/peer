@@ -140,11 +140,6 @@ router.post(
       console.log("DID NOT GET THE FILE!");
       return;
     } else {
-      console.log(req.file.path);
-      // const fileExtension = path.extname(req.file.originalname);
-      // res.status(HttpStatusCode.BAD_REQUEST).send("GOT THE FILE!");
-      // console.log(fileExtension);
-
       type TAObj = {
         courseId: string;
         netId: string;
@@ -153,8 +148,6 @@ router.post(
 
       (() => {
         const csvFilePath = path.resolve(__dirname, `../../${req.file.path}`);
-
-        console.log(csvFilePath);
 
         const headers = ["courseId", "netId", "role"];
 
@@ -173,7 +166,6 @@ router.post(
             if (error) {
               console.error(error);
             }
-            console.log("Result", result);
             listOfTAs = result;
 
             for (const t of listOfTAs) {
@@ -182,7 +174,6 @@ router.post(
               let role: UserRole;
               if (t.role === "TA") {
                 role = UserRole.TEACHING_ASSISTANT;
-                console.log(`This person's a TA ${role}`);
               } else {
                 res
                   .status(HttpStatusCode.BAD_REQUEST)

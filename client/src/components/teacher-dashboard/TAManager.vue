@@ -83,7 +83,7 @@
                     :disabled="false"
                     variant="primary"
                     @click="resetFile"
-                    >Upload new CSV</b-button
+                    >Upload role assignment CSV</b-button
                 >
 
                 <!-- Upload Modal-->
@@ -196,7 +196,6 @@ export default {
                 this.buttonDisabled = true
                 await api.enrollments.postMultipleTAs(this.file)
                 this.showSuccessMessage({ message: "Successfully submitted file." })
-                console.log("this")
                 this.$refs.uploadModal.hide()
                 await this.fetchTeachingAssistants()
                 this.buttonDisabled = false
