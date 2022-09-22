@@ -149,7 +149,7 @@ router.post(
       (() => {
         const csvFilePath = path.resolve(__dirname, `../../${req.file.path}`);
 
-        const headers = ["courseId", "netId", "role"];
+        const headers = ["netId", "role"];
 
         const fileContent = fs.readFileSync(csvFilePath, { encoding: "utf-8" });
 
@@ -158,7 +158,7 @@ router.post(
         parse(
           fileContent,
           {
-            delimiter: ",",
+            delimiter: [",", ";"],
             columns: headers,
           },
           // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -180,7 +180,8 @@ router.post(
                   .send("Not everyone is a TA");
               }
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const courseId = Number(t.courseId);
+              const courseId = req.body.courseId;
+              console.log(courseId);
 
               const course = await Course.findOne(courseId);
               if (!course) {
