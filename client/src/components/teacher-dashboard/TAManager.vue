@@ -96,8 +96,7 @@
                 >
                     <hr />
                     <b-alert show variant="warning">
-                        Make sure the information in the CSV file is in the following format: NetId,
-                        role(TA / Teacher)
+                        Make sure the information in the CSV file is in the following format: NetId, role(TA / Teacher)
                     </b-alert>
                     <b-alert show variant="secondary">Allowed file types: .csv{{ csv }}</b-alert>
                     <b-form-file
@@ -194,10 +193,10 @@ export default {
             try {
                 //upload csv file to server
                 this.buttonDisabled = true
+                this.$refs.uploadModal.hide()
+                window.location.reload()
                 await api.enrollments.postMultipleTAs(this.file, this.$route.params.courseId)
                 this.showSuccessMessage({ message: "Successfully submitted file." })
-                this.$refs.uploadModal.hide()
-                await this.fetchTeachingAssistants()
                 this.buttonDisabled = false
             } catch (error) {
                 this.buttonDisabled = false
