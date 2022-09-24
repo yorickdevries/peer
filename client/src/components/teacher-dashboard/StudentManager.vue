@@ -36,6 +36,11 @@
                         :per-page="Number(perPage)"
                         :filter="filter"
                     >
+                        <template v-slot:cell(action)="data">
+                            <b-button @click="deleteStudent(data.item.userNetid)" size="sm" variant="danger"
+                                >Remove
+                            </b-button>
+                        </template>
                     </b-table>
 
                     <!--Pagination-->
@@ -67,7 +72,8 @@ export default {
                 { key: "user.displayName", label: "Name" },
                 { key: "user.netid", label: "NetID" },
                 { key: "user.email", label: "​​​Email" },
-                { key: "user.studentNumber", label: "Studentnumber" }
+                { key: "user.studentNumber", label: "Studentnumber" },
+                { key: "action", label: "Action" }
             ],
             currentPage: 1,
             perPage: 10,
@@ -81,6 +87,10 @@ export default {
         async fetchStudents() {
             const res = await api.enrollments.get(this.$route.params.courseId, "student")
             this.enrollments = res.data
+        },
+        async deleteStudent(netid) {
+            await api.enrollments.delete(netid, this.$route.params.courseId, "student")
+            await this.fetchStudents()
         }
     }
 }
