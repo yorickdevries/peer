@@ -97,7 +97,12 @@ export default abstract class Question extends BaseModel {
     return await questionnaire.isTeacherInCourse(user);
   }
 
-  //"Open" space by reordering after the new question position
+  /**
+   * "Open" space by reordering after the new question position.
+   *
+   * @param questions - The set of questions to potentially change the numbers of to make space
+   * @param num - The number of the question where space is needed
+   */
   orderMakeSpace(questions: Question[], num: number): void {
     questions.map((q) => {
       if (q.number >= num) q.number++;
@@ -105,7 +110,12 @@ export default abstract class Question extends BaseModel {
     });
   }
 
-  //"Close" space by reordering after the question position
+  /**
+   * "Close" space by reordering after the question position
+   *
+   * @param questions - The set of questions to potentially change the numbers of to make space
+   * @param num - The number of the question where space is now available
+   */
   orderRemoveSpace(questions: Question[]): void {
     if (questions.length > 0 && questions[0].number > 1) {
       questions[0].number = 1;
@@ -117,6 +127,11 @@ export default abstract class Question extends BaseModel {
     }
   }
 
+  /**
+   * Change the question numbers to be in ascending order after a modification was made.
+   *
+   * @param operation - The performed operation
+   */
   async reorder(operation: QuestionOperation): Promise<void> {
     const questionnaireId = this.questionnaireId
       ? this.questionnaireId
