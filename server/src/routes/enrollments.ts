@@ -127,11 +127,13 @@ const deleteEnrollmentSchema = Joi.object({
   role: Joi.string().valid(...Object.values(UserRole)),
 });
 //delete a user
-router.delete("/", validateQuery(deleteEnrollmentSchema) , async (req, res) => {
+router.delete("/", validateQuery(deleteEnrollmentSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userNetid: number = req.query.userNetid as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const courseId: number = req.query.courseId as any;
   const course = await Course.findOne(courseId);
   if (!course) {
@@ -149,7 +151,7 @@ router.delete("/", validateQuery(deleteEnrollmentSchema) , async (req, res) => {
   const existingEnrollment = await Enrollment.findOne({
     where: { userNetid: userNetid, courseId: courseId },
   });
-  if(!existingEnrollment) {
+  if (!existingEnrollment) {
     res
       .status(HttpStatusCode.FORBIDDEN)
       .send(ResponseMessage.NOT_ENROLLED_IN_COURSE);

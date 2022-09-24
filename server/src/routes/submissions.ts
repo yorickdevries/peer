@@ -74,7 +74,9 @@ router.get(
   "/count",
   validateQuery(assignmentVersionIdSchema),
   async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const assignmentVersionId: number = req.query.assignmentVersionId as any;
     const assignmentVersion = await AssignmentVersion.findOne(
       assignmentVersionId
