@@ -97,6 +97,10 @@ export default abstract class Question extends BaseModel {
     return await questionnaire.isTeacherInCourse(user);
   }
 
+  getMaxPointsFromQuestion(): number | null {
+    return null;
+  }
+
   /**
    * "Open" space by reordering after the new question position.
    *
