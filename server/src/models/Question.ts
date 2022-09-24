@@ -1,11 +1,11 @@
 import {
   Column,
   Entity,
-  getManager,
   ManyToOne,
   PrimaryGeneratedColumn,
   RelationId,
   TableInheritance,
+  getManager,
 } from "typeorm";
 import {
   IsBoolean,
@@ -16,10 +16,11 @@ import {
   IsString,
 } from "class-validator";
 import BaseModel from "./BaseModel";
-import Questionnaire from "./Questionnaire";
-import QuestionType from "../enum/QuestionType";
-import User from "./User";
 import QuestionOperation from "../enum/QuestionOperation";
+import QuestionType from "../enum/QuestionType";
+import Questionnaire from "./Questionnaire";
+
+import User from "./User";
 
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "type" } })
@@ -108,9 +109,8 @@ export default abstract class Question extends BaseModel {
    * @param num - The number of the question where space is needed
    */
   orderMakeSpace(questions: Question[], num: number): void {
-    questions.map((q) => {
+    questions.forEach((q) => {
       if (q.number >= num) q.number++;
-      return q;
     });
   }
 

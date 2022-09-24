@@ -1,8 +1,9 @@
-import Questionnaire from "./Questionnaire";
-import Question from "./Question";
 import { ChildEntity, Column } from "typeorm";
-import QuestionType from "../enum/QuestionType";
 import { IsDefined, IsInt, IsPositive, Max, Min } from "class-validator";
+
+import Question from "./Question";
+import QuestionType from "../enum/QuestionType";
+import Questionnaire from "./Questionnaire";
 import config from "config";
 
 const rangeconfig: {
