@@ -371,7 +371,7 @@ describe("Integration", () => {
     const checkboxQuestionGradedToReject = JSON.parse(res.text);
     expect(checkboxQuestionGradedToReject).toMatchObject({
       text: "This is a graded Checkbox question too but graded 2",
-      number: 10,
+      number: 3,
       optional: true,
       graded: true,
     });
@@ -648,10 +648,11 @@ describe("Integration", () => {
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
+
     const multipleChoiceQuestionGradedToReject = JSON.parse(res.text);
     expect(multipleChoiceQuestionGradedToReject).toMatchObject({
       text: "This is a graded MULTIPLE CHOICE question too but graded 2",
-      number: 11,
+      number: 6,
       optional: true,
       graded: true,
     });

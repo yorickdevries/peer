@@ -15,6 +15,7 @@ import {
   IsPositive,
   IsString,
 } from "class-validator";
+
 import BaseModel from "./BaseModel";
 import QuestionOperation from "../enum/QuestionOperation";
 import QuestionType from "../enum/QuestionType";
@@ -118,7 +119,6 @@ export default abstract class Question extends BaseModel {
    * "Close" space by reordering after the question position
    *
    * @param questions - The set of questions to potentially change the numbers of to make space
-   * @param num - The number of the question where space is now available
    */
   orderRemoveSpace(questions: Question[]): void {
     if (questions.length > 0 && questions[0].number > 1) {
@@ -171,6 +171,17 @@ export default abstract class Question extends BaseModel {
             break;
           }
         }
+
+        //Ensures spaces > 1 cannot be created
+        if (questions.length > 0) {
+          const maxQuestion = questions[questions.length - 1];
+          const newMaxNumber = maxQuestion.number + 1;
+          if (this.number > newMaxNumber) {
+            this.number = newMaxNumber;
+            await transactionalEntityManager.save(this);
+          }
+        }
+
         for (const q of questions) {
           await transactionalEntityManager.save(q);
         }
