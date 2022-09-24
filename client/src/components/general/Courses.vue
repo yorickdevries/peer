@@ -243,16 +243,17 @@
                                                 >
                                                 <b-modal
                                                     :id="`enrollAdmin-${course.id}`"
-                                                    :title="`Enroll in ${course.name} as a teacher?`"
+                                                    :title="`Enroll in ${course.name} as a admin?`"
                                                     centered
                                                     hide-footer
                                                 >
                                                     Are you sure you want to enroll in the course "{{ course.name }}" as
-                                                    <b>teacher</b>? This action cannot be undone.
+                                                    <b>teacher</b>? You can later delete yourself.
                                                     <b-alert show
-                                                        >Making comments, marking reviews, or any other actions which
-                                                        assign your user to a database entry will prevent you from later
-                                                        removing yourself.</b-alert
+                                                        >Enrolling as an admin will give you the same rights as a
+                                                        teacher of this course. Remember to delete yourself afterwards
+                                                        if you don't want to be visible on the course staff
+                                                        page.</b-alert
                                                     >
                                                     <b-button
                                                         variant="warning"

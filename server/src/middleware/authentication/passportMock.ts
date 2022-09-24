@@ -6,7 +6,8 @@ import { PassportStatic } from "passport";
 const mockPassportConfiguration = async function (
   passport: PassportStatic,
   netid: string,
-  affiliation: string | string[]
+  affiliation: string | string[],
+  admin: boolean
 ): Promise<void> {
   // save the user to the database
   const userNetid = await saveUserFromSSO(
@@ -23,7 +24,8 @@ const mockPassportConfiguration = async function (
       "EWI-ST-CSETT",
       "Electrical Engineering, Mathematics and Computer Science",
       "Software Technology",
-    ]
+    ],
+    admin
   );
   const user = { netid: userNetid };
   const strategy = new MockStrategy({

@@ -17,7 +17,8 @@ const saveUserFromSSO = async function (
   displayName?: string,
   affiliation?: string | string[],
   study?: string | string[],
-  organisationUnit?: string | string[]
+  organisationUnit?: string | string[],
+  admin?: boolean
 ): Promise<string | undefined> {
   try {
     // Try to save the user to database
@@ -33,6 +34,8 @@ const saveUserFromSSO = async function (
       email ? email : null,
       displayName ? displayName : null
     );
+    admin ? (user.admin = true) : (user.admin = false);
+
     // Overwrites existing entry with the same NetID if present
     // might throw an error if the object is not valid
     await user.save();
