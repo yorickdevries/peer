@@ -57,7 +57,7 @@ router.get(
           .filter((r) => r.startedAt && r.submittedAt)
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           .map((r) =>
-            moment(r.submittedAt!).diff(moment(r.startedAt), "minutes")
+            moment.utc(r.submittedAt!).diff(moment.utc(r.startedAt), "minutes")
           );
         res.send(timeDeltas);
         break;
@@ -73,12 +73,13 @@ router.get(
         //get assignment deadline
         const assignmentDeadline = assignment.dueDate;
 
-        const timeDeltas = reviews
+        const lastUpdateTimes = reviews
           .filter((s) => s.updatedAt)
-          .map((s) =>
-            moment(assignmentDeadline).diff(moment(s.updatedAt), "minutes")
-          );
-        res.send(timeDeltas);
+          .map((s) => s.updatedAt);
+        res.send({
+          deadline: assignmentDeadline,
+          times: lastUpdateTimes,
+        });
         break;
       }
     }

@@ -8,6 +8,7 @@
                 <b-tabs card lazy class="mb-3">
                     <!--Details & Action-->
                     <b-tab title="Assignments" active ref="chartTab">
+                        <label>Select an assignment</label>
                         <b-form-select class="mb-2" v-model="selectedAssignment" :disabled="loading" @change="selected">
                             <b-form-select-option
                                 v-for="assignment in assignments"
@@ -16,6 +17,7 @@
                                 >{{ assignment.id }} - {{ assignment.name }}</b-form-select-option
                             >
                         </b-form-select>
+                        <label>Select a chart type</label>
                         <b-form-select
                             class="mb-2"
                             v-model="selectedChart"
@@ -27,6 +29,9 @@
                         <template v-if="renderChart">
                             <template v-if="selectedChart === this.chartEnum.AVG_REVIEW_TIME">
                                 <AverageTimeChart :data="chartData" />
+                            </template>
+                            <template v-if="selectedChart === this.chartEnum.TIME_SUBMIT_BEFORE_DEADLINE">
+                                <TimeBeforeDeadlineSubmissionChart :data="chartData" />
                             </template>
                         </template>
                     </b-tab>
@@ -41,6 +46,7 @@ import notifications from "@/mixins/notifications"
 import BreadcrumbTitle from "@/components/BreadcrumbTitle"
 import api from "@/api/api"
 import AverageTimeChart from "@/components/teacher-dashboard/statistics/AverageTimeChart"
+import TimeBeforeDeadlineSubmissionChart from "@/components/teacher-dashboard/statistics/TimeBeforeDeadlineSubmissionChart"
 
 const chartEnum = {
     AVG_REVIEW_TIME: "avg_review_time",
@@ -49,7 +55,7 @@ const chartEnum = {
 
 export default {
     mixins: [notifications],
-    components: { AverageTimeChart, BreadcrumbTitle },
+    components: { TimeBeforeDeadlineSubmissionChart, AverageTimeChart, BreadcrumbTitle },
     name: "Statistics",
     computed: {
         renderChart() {
@@ -85,6 +91,7 @@ export default {
         selected() {
             if (this.selectedChart !== null && this.selectedAssignment !== null) {
                 this.loading = true
+                this.chartData = null
                 this.fetchData().then(() => {
                     this.loading = false
                 })

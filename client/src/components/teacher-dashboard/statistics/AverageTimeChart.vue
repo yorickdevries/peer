@@ -65,7 +65,7 @@ export default {
                 xaxis: {
                     type: "numeric",
                     title: {
-                        text: "Time range (minutes)"
+                        text: "Time buckets (10 min, exclusive)"
                     },
                     labels: {
                         formatter: value => {
