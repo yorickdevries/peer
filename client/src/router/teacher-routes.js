@@ -26,8 +26,8 @@ export default [
             },
             {
                 path: "courses/:courseId/statistics",
-                name: "teacher-dashboard.course.statistics",
-                component: () => import("../components/teacher-dashboard/Statistics")
+                name: "teacher-dashboard.course.statistics.home",
+                component: () => import("../components/teacher-dashboard/statistics/Layout")
             },
             {
                 path: "courses/:courseId/edit",

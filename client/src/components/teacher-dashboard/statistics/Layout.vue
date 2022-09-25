@@ -8,7 +8,7 @@
                 <b-tabs card lazy class="mb-3">
                     <!--Details & Action-->
                     <b-tab title="Assignments" active ref="chartTab">
-                        <b-form-select class="mb-2" v-model="selectedAssignment" @change="selected">
+                        <b-form-select class="mb-2" v-model="selectedAssignment" :disabled="loading" @change="selected">
                             <b-form-select-option
                                 v-for="assignment in assignments"
                                 :key="assignment.id"
@@ -16,11 +16,17 @@
                                 >{{ assignment.id }} - {{ assignment.name }}</b-form-select-option
                             >
                         </b-form-select>
-                        <b-form-select class="mb-2" v-model="selectedChart" @change="selected" :options="chartTypes">
+                        <b-form-select
+                            class="mb-2"
+                            v-model="selectedChart"
+                            :disabled="loading"
+                            @change="selected"
+                            :options="chartTypes"
+                        >
                         </b-form-select>
                         <template v-if="renderChart">
-                            <template v-if="selectedChart === 1">
-                                <apexchart width="100%" type="bar" :options="chartOptions" :series="series"></apexchart>
+                            <template v-if="selectedChart === this.chartEnum.AVG_REVIEW_TIME">
+                                <AverageTimeChart :data="chartData" />
                             </template>
                         </template>
                     </b-tab>
@@ -34,36 +40,36 @@
 import notifications from "@/mixins/notifications"
 import BreadcrumbTitle from "@/components/BreadcrumbTitle"
 import api from "@/api/api"
+import AverageTimeChart from "@/components/teacher-dashboard/statistics/AverageTimeChart"
+
+const chartEnum = {
+    AVG_REVIEW_TIME: "avg_review_time",
+    TIME_SUBMIT_BEFORE_DEADLINE: "time_before_deadline"
+}
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle },
+    components: { AverageTimeChart, BreadcrumbTitle },
     name: "Statistics",
     computed: {
         renderChart() {
-            return this.selectedAssignment !== null && this.selectedChart !== null && !this.loading
+            return this.selectedAssignment !== null && this.selectedChart !== null && !this.loading && this.chartData
         }
     },
     data() {
         return {
+            chartEnum: {
+                AVG_REVIEW_TIME: "avg_review_time",
+                TIME_SUBMIT_BEFORE_DEADLINE: "time_before_deadline"
+            },
             assignments: [],
-            loading: true,
+            loading: false,
             selectedAssignment: null,
             selectedChart: null,
-            chartTypes: [{ value: 1, text: "Average time spent per review" }],
-            chartOptions: {
-                chart: {
-                    id: "vuechart-example"
-                },
-                xaxis: {
-                    categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
-                }
-            },
-            series: [
-                {
-                    name: "series-1",
-                    data: [30, 40, 35, 50, 49, 60, 70, 91]
-                }
+            chartData: null,
+            chartTypes: [
+                { value: chartEnum.AVG_REVIEW_TIME, text: "Average time spent per review" },
+                { value: chartEnum.TIME_SUBMIT_BEFORE_DEADLINE, text: "Time before deadline submitted" }
             ]
         }
     },
@@ -73,7 +79,8 @@ export default {
     },
     methods: {
         async fetchData() {
-            console.log("fetch")
+            let res = await api.statistics.assignments.get(this.selectedAssignment, this.selectedChart)
+            this.chartData = res.data
         },
         selected() {
             if (this.selectedChart !== null && this.selectedAssignment !== null) {
