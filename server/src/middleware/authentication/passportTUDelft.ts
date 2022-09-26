@@ -81,9 +81,8 @@ const passportConfiguration = function (passport: PassportStatic): void {
       const strategy = new samlStrategy(ppConfig, verificationFunction);
 
       // Generate metadata
-      const metadataXML = strategy.generateServiceProviderMetadata(
-        decryptionCert
-      );
+      const metadataXML =
+        strategy.generateServiceProviderMetadata(decryptionCert);
       const metadataPath = path.resolve(
         config.get("ServiceProviderMetadataFile")
       );

@@ -47,9 +47,11 @@ export default class ReviewOfSubmission extends Review {
     const questionnaire = this.questionnaire
       ? this.questionnaire
       : await this.getQuestionnaire();
-    const questionnaireAssignmentVersion = await questionnaire.getAssignmentVersion();
+    const questionnaireAssignmentVersion =
+      await questionnaire.getAssignmentVersion();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const submissionAssignmentVersion = await this.submission.getAssignmentVersion();
+    const submissionAssignmentVersion =
+      await this.submission.getAssignmentVersion();
     if (questionnaireAssignmentVersion.id !== submissionAssignmentVersion.id) {
       throw new Error(
         "The questionnaire should correspond to the assignmentversion of the submission"

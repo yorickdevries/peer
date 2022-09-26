@@ -15,8 +15,10 @@ const parseSubmissionReviewsForExport = async function (
     return question.number;
   });
 
-  const reviews = (await submissionQuestionnaire.getReviews()) as ReviewOfSubmission[];
-  const assignmentVersion = await submissionQuestionnaire.getAssignmentVersion();
+  const reviews =
+    (await submissionQuestionnaire.getReviews()) as ReviewOfSubmission[];
+  const assignmentVersion =
+    await submissionQuestionnaire.getAssignmentVersion();
   const assignment = await assignmentVersion.getAssignment();
 
   // the parsed review is too extensive to make an interface
@@ -122,7 +124,8 @@ const parseSubmissionReviewsForExport = async function (
     }
 
     const reviewEvaluation = await review.getReviewOfThisReview();
-    const reviewEvaluationQuestionnaire = await reviewEvaluation?.getQuestionnaire();
+    const reviewEvaluationQuestionnaire =
+      await reviewEvaluation?.getQuestionnaire();
     let reviewEvaluationQuestions: Question[] = [];
     if (reviewEvaluationQuestionnaire) {
       reviewEvaluationQuestions = _.sortBy(

@@ -178,7 +178,8 @@ router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
       .send("You are not allowed to view reviews");
     return;
   }
-  const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+  const submissionQuestionnaire =
+    await assignmentVersion.getSubmissionQuestionnaire();
   if (!submissionQuestionnaire) {
     res
       .status(HttpStatusCode.FORBIDDEN)
@@ -291,9 +292,8 @@ router.post(
     // file info
     const fileExtension = path.extname(req.file.originalname);
 
-    const submissionExtensions = assignment.submissionExtensions.split(
-      /\s*,\s*/
-    );
+    const submissionExtensions =
+      assignment.submissionExtensions.split(/\s*,\s*/);
     if (
       !submissionExtensions.includes(fileExtension) &&
       !submissionExtensions.includes(".*")
@@ -326,15 +326,13 @@ router.post(
       async (transactionalEntityManager) => {
         for (const assignmentVersion of assignment.versions) {
           // unsubmit all previous submissions
-          const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
-            Submission,
-            {
+          const submissionsOfGroupForAssignment =
+            await transactionalEntityManager.find(Submission, {
               where: {
                 assignmentVersion: assignmentVersion,
                 group: group,
               },
-            }
-          );
+            });
           // Set boolean of submission of older submissions to false
           for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
             submissionOfGroupForAssignment.final = false;
@@ -438,15 +436,13 @@ router.patch(
       "SERIALIZABLE", // serializable is the only way double final submissions can be prevented
       async (transactionalEntityManager) => {
         for (const assignmentVersion of assignment.versions) {
-          const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
-            Submission,
-            {
+          const submissionsOfGroupForAssignment =
+            await transactionalEntityManager.find(Submission, {
               where: {
                 assignmentVersion: assignmentVersion,
                 group: group,
               },
-            }
-          );
+            });
           // set booleans to false for all other assignments
           for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
             if (submissionOfGroupForAssignment.id !== submission.id) {

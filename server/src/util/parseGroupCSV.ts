@@ -21,9 +21,8 @@ const parseGroupCSV = async function (
   // check and convert it to netidWithGroupNames
   const netidWithGroupNames = getNetidWithGroupNames(studentList);
   // convert to groupNameWithNetidLists
-  const groupNameWithNetidLists = getGroupNameWithNetidLists(
-    netidWithGroupNames
-  );
+  const groupNameWithNetidLists =
+    getGroupNameWithNetidLists(netidWithGroupNames);
   return groupNameWithNetidLists;
 };
 
