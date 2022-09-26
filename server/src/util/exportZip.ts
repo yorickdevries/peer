@@ -22,7 +22,7 @@ const exportToZip = async function (
   }
 
   const content = await zip.generateAsync({ type: "nodebuffer" });
-  fs.writeFile(`${fileName}.zip`, content, () => {console.log(`Written ${fileName} to zip`)});
+  await fs.writeFile(`${fileName}.zip`, content, () => {console.log(`Written ${fileName} to zip`)});
   const file = new File(
     `${fileName}`,
     ".zip",
