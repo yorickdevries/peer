@@ -94,4 +94,8 @@ export default abstract class Question extends BaseModel {
     const questionnaire = await this.getQuestionnaire();
     return await questionnaire.isTeacherInCourse(user);
   }
+
+  getMaxPointsFromQuestion(): number | null {
+    return null;
+  }
 }
