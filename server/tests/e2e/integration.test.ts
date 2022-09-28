@@ -1114,7 +1114,7 @@ describe("Integration", () => {
     //unenroll student3 from course
     res = await request(server)
       .delete(
-        `/api/enrollments/?userNetid=student3&courseId=${course.id}&role=student`
+        `/api/enrollments/?userNetid=student3&courseId=${course.id}`
       )
       .set("cookie", await teacherCookie());
     //assertions
@@ -1134,7 +1134,7 @@ describe("Integration", () => {
     //unenroll as student
     res = await request(server)
       .delete(
-        `/api/enrollments/?userNetid=student3&courseId=${course.id}&role=student`
+        `/api/enrollments/?userNetid=student3&courseId=${course.id}`
       )
       .set("cookie", await studentCookie1());
     //assertions
