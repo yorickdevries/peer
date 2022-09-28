@@ -89,7 +89,8 @@ export default {
             this.enrollments = res.data
         },
         async deleteStudent(netid) {
-            await api.enrollments.delete(netid, this.$route.params.courseId, "student")
+            await api.enrollments.delete(netid, this.$route.params.courseId)
+            this.showSuccessMessage({ message: `Successfully removed student.` })
             await this.fetchStudents()
         }
     }

@@ -154,7 +154,8 @@ export default {
             this.selectedNetid = ""
         },
         async deleteTeacher(netid) {
-            await api.enrollments.delete(netid, this.$route.params.courseId, "teacher")
+            await api.enrollments.delete(netid, this.$route.params.courseId)
+            this.showSuccessMessage({ message: `Successfully removed teacher.` })
             await this.fetchTeachers()
         }
     }

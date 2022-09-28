@@ -124,7 +124,6 @@ router.get("/enrolled", async (req, res) => {
 const deleteEnrollmentSchema = Joi.object({
   userNetid: Joi.string().required(),
   courseId: Joi.number().integer().required(),
-  role: Joi.string().valid(...Object.values(UserRole)),
 });
 //delete a user
 router.delete("/", validateQuery(deleteEnrollmentSchema), async (req, res) => {
