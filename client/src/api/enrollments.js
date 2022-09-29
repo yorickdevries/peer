@@ -11,5 +11,9 @@ export default {
     post(courseId, userNetid, role) {
         const body = { courseId, userNetid, role }
         return client.post("enrollments/", body)
+    },
+    delete(userNetid, courseId) {
+        const params = { userNetid: userNetid, courseId: courseId }
+        return client.delete(`enrollments/`, { params: params })
     }
 }
