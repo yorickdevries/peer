@@ -30,10 +30,12 @@ export default {
             for (const rawDate of this.data.times) {
                 const date = new Date(rawDate)
                 if (this.buckets > 60) {
-                    const hourBuckets = this.buckets / 60 //2
+                    const hourBuckets = this.buckets / 60
                     date.setUTCHours(hourBuckets * Math.floor(date.getUTCHours() / hourBuckets))
+                    date.setUTCMinutes(0)
+                } else {
+                    date.setUTCMinutes(this.buckets * Math.floor(date.getUTCMinutes() / this.buckets))
                 }
-                date.setUTCMinutes(this.buckets * Math.floor(date.getUTCMinutes() / this.buckets))
                 date.setUTCSeconds(0)
                 const index = date.getTime()
                 if (buckets[index] === undefined) {
