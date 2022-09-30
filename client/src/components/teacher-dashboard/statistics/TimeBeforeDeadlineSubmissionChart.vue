@@ -1,12 +1,12 @@
 <template>
-    <div v-if="!loading && this.data.times">
+    <div v-if="!loading">
         <apexchart width="100%" type="area" :options="chartOptions" :series="series"></apexchart>
     </div>
 </template>
 
 <script>
 export default {
-    props: ["data"],
+    props: ["data", "buckets"],
     name: "TimeBeforeDeadlineSubmissionChart",
     data() {
         return {
@@ -16,13 +16,25 @@ export default {
             deadline: null
         }
     },
+    watch: {
+        buckets: {
+            handler() {
+                if (this.loading) return
+                this.parseData()
+            }
+        }
+    },
     methods: {
         createBuckets() {
             const buckets = {}
             for (const rawDate of this.data.times) {
                 const date = new Date(rawDate)
-                date.setMinutes(0)
-                date.setSeconds(0)
+                if (this.buckets > 60) {
+                    const hourBuckets = this.buckets / 60 //2
+                    date.setUTCHours(hourBuckets * Math.floor(date.getUTCHours() / hourBuckets))
+                }
+                date.setUTCMinutes(this.buckets * Math.floor(date.getUTCMinutes() / this.buckets))
+                date.setUTCSeconds(0)
                 const index = date.getTime()
                 if (buckets[index] === undefined) {
                     buckets[index] = 0
@@ -68,7 +80,7 @@ export default {
                 xaxis: {
                     type: "datetime",
                     title: {
-                        text: "Time buckets (1hr, exclusive)"
+                        text: `Time buckets (${this.buckets} min, exclusive)`
                     },
                     labels: {
                         datetimeUTC: true
@@ -85,7 +97,7 @@ export default {
                     }
                 },
                 title: {
-                    text: "Assignment submission time before deadline (1hr buckets, exclusive)",
+                    text: "Assignment submission time before deadline",
                     align: "left"
                 },
                 fill: {

@@ -48,34 +48,33 @@ router.get(
       case ChartType.Assignment.AVG_REVIEW_TIME: {
         const reviews: ReviewOfSubmission[] = await getManager()
           .createQueryBuilder(ReviewOfSubmission, "review")
+          .where("review.submitted IS TRUE")
           .leftJoin("review.submission", "submission")
           .leftJoin("submission.assignmentVersion", "assignmentVersion")
-          .where("assignmentVersion.assignmentId = :id", { id: assignment.id })
+          .andWhere("assignmentVersion.assignmentId = :id", {
+            id: assignment.id,
+          })
           .getMany();
 
-        const timeDeltas = reviews
-          .filter((r) => r.startedAt && r.submittedAt)
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          .map((r) =>
-            moment.utc(r.submittedAt!).diff(moment.utc(r.startedAt), "minutes")
-          );
+        const timeDeltas = reviews.map((r) =>
+          moment.utc(r.submittedAt).diff(moment.utc(r.startedAt), "minutes")
+        );
         res.send(timeDeltas);
         break;
       }
       case ChartType.Assignment.TIME_SUBMIT_BEFORE_DEADLINE: {
-        const reviews: Submission[] = await getManager()
+        const submissions: Submission[] = await getManager()
           .createQueryBuilder(Submission, "submission")
           .where("submission.final = true")
           .leftJoin("submission.assignmentVersion", "assignmentVersion")
-          .where("assignmentVersion.assignmentId = :id", { id: assignment.id })
+          .andWhere("assignmentVersion.assignmentId = :id", {
+            id: assignment.id,
+          })
           .getMany();
 
-        //get assignment deadline
         const assignmentDeadline = assignment.dueDate;
 
-        const lastUpdateTimes = reviews
-          .filter((s) => s.updatedAt)
-          .map((s) => s.updatedAt);
+        const lastUpdateTimes = submissions.map((s) => s.updatedAt);
         res.send({
           deadline: assignmentDeadline,
           times: lastUpdateTimes,

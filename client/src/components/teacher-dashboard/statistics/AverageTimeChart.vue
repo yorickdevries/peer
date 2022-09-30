@@ -6,7 +6,7 @@
 
 <script>
 export default {
-    props: ["data"],
+    props: ["data", "buckets"],
     name: "AverageTimeChart",
     data() {
         return {
@@ -15,11 +15,19 @@ export default {
             loading: true
         }
     },
+    watch: {
+        buckets: {
+            handler() {
+                if (this.loading) return
+                this.parseData()
+            }
+        }
+    },
     methods: {
         createBuckets() {
             const buckets = {}
             for (const time of this.data) {
-                const index = Math.floor(time / 10)
+                const index = Math.floor(time / this.buckets)
                 if (buckets[index] === undefined) {
                     buckets[index] = 0
                 }
@@ -28,7 +36,7 @@ export default {
             return buckets
         },
         parseData() {
-            const averageTime = this.data.reduce((prev, cur) => prev + cur, 0) / this.data.length / 10
+            const averageTime = this.data.reduce((prev, cur) => prev + cur, 0) / this.data.length / this.buckets
             const buckets = this.createBuckets()
 
             this.series = [
@@ -65,16 +73,18 @@ export default {
                 xaxis: {
                     type: "numeric",
                     title: {
-                        text: "Time buckets (10 min, exclusive)"
+                        text: `Time buckets (${this.buckets} min, exclusive)`
                     },
                     labels: {
                         formatter: value => {
-                            return Math.round(value * 10)
+                            return Math.round(value * this.buckets)
                         }
                     },
                     tooltip: {
                         formatter: value => {
-                            return `${Math.round(value * 10)} <= x < ${Math.round((value + 1) * 10)}`
+                            return `${Math.round(value * this.buckets)} <= x < ${Math.round(
+                                (value + 1) * this.buckets
+                            )}`
                         }
                     }
                 },
@@ -84,7 +94,7 @@ export default {
                     }
                 },
                 title: {
-                    text: "Average Time Spent per Review (exclusive)",
+                    text: "Average Time Spent per Review",
                     align: "left"
                 },
                 fill: {
@@ -99,7 +109,7 @@ export default {
             }
         }
     },
-    created() {
+    mounted() {
         this.parseData()
         this.loading = false
     }
