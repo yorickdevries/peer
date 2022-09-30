@@ -81,6 +81,26 @@ router.get(
         });
         break;
       }
+      case ChartType.Assignment.NUM_OF_NO_REVIEWS: {
+        const reviews: ReviewOfSubmission[] = await getManager()
+          .createQueryBuilder(ReviewOfSubmission, "review")
+          .leftJoin("review.submission", "submission")
+          .leftJoin("submission.assignmentVersion", "assignmentVersion")
+          .where("assignmentVersion.assignmentId = :id", {
+            id: assignment.id,
+          })
+          .getMany();
+
+        const numOfAssignedReviews = reviews.length;
+        const numOfReviewsNotCompleted = reviews.filter((r) => !r.submitted)
+          .length;
+
+        res.send({
+          total: numOfAssignedReviews,
+          notCompleted: numOfReviewsNotCompleted,
+        });
+        break;
+      }
     }
 
     res.status(HttpStatusCode.NOT_FOUND).send();

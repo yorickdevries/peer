@@ -10,7 +10,7 @@
                 </b-form-select>
             </b-col>
             <b-col>
-                <label>Select a chart type</label>
+                <label>Select a data type</label>
                 <b-form-select
                     class="mb-2"
                     v-model="selectedChart"
@@ -31,6 +31,16 @@
             </template>
             <template v-if="selectedChart === this.enum.TIME_SUBMIT_BEFORE_DEADLINE">
                 <TimeBeforeDeadlineSubmissionChart :data="chartData" :buckets="bucketsProp" />
+            </template>
+            <template v-if="selectedChart === this.enum.NUM_OF_NO_REVIEWS">
+                <b-card>
+                    <h5 class="text-center bold">Total reviews assigned: {{ this.chartData.total }}</h5>
+                    <h5 class="text-center">Total reviews not completed: {{ this.chartData.notCompleted }}</h5>
+                    <h5 class="text-center">
+                        Percentage of reviews not completed:
+                        {{ (this.chartData.notCompleted / this.chartData.total).toFixed(2) }}
+                    </h5>
+                </b-card>
             </template>
         </template>
     </b-container>
@@ -69,7 +79,8 @@ export default {
             bucketsProp: 10,
             chartTypes: [
                 { value: this.enum.AVG_REVIEW_TIME, text: "Average time spent per review" },
-                { value: this.enum.TIME_SUBMIT_BEFORE_DEADLINE, text: "Time before deadline submitted" }
+                { value: this.enum.TIME_SUBMIT_BEFORE_DEADLINE, text: "Time before deadline submitted" },
+                { value: this.enum.NUM_OF_NO_REVIEWS, text: "Number of assigned reviews not submitted" }
             ]
         }
     },
