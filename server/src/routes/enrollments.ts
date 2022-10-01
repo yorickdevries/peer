@@ -140,7 +140,7 @@ router.post(
       console.log("DID NOT GET THE FILE!");
       return;
     } else {
-      type TAObj = {
+      type PersonObj = {
         courseId: string;
         netId: string;
         role: string;
@@ -153,7 +153,7 @@ router.post(
 
         const fileContent = fs.readFileSync(csvFilePath, { encoding: "utf-8" });
 
-        let listOfTAs: TAObj[];
+        let listOfPeople: PersonObj[];
 
         parse(
           fileContent,
@@ -162,22 +162,24 @@ router.post(
             columns: headers,
           },
           // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          async (error, result: TAObj[]) => {
+          async (error, result: PersonObj[]) => {
             if (error) {
               console.error(error);
             }
-            listOfTAs = result;
+            listOfPeople = result;
 
-            for (const t of listOfTAs) {
+            for (const t of listOfPeople) {
               const userNetid: string = t.netId;
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               let role: UserRole;
               if (t.role === "TA") {
                 role = UserRole.TEACHING_ASSISTANT;
+              } else if (t.role === "Teacher") {
+                role = UserRole.TEACHER;
               } else {
                 res
                   .status(HttpStatusCode.BAD_REQUEST)
-                  .send("Not everyone is a TA");
+                  .send("Not everyone is a TA or a Teacher");
               }
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const courseId = req.body.courseId;
