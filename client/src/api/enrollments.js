@@ -12,7 +12,7 @@ export default {
         const body = { courseId, userNetid, role }
         return client.post("enrollments/", body)
     },
-    postMultipleTAs(file, courseId) {
+    postMultipleStaff(file, courseId) {
         const formData = new FormData()
         formData.append("file", file)
         formData.append("courseId", courseId)
