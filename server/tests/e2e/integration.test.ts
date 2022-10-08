@@ -1510,8 +1510,8 @@ describe("Integration", () => {
         `/api/statistics/assignment/${assignment.id}?chartType=time_before_deadline`
       )
       .set("cookie", await teacherCookie());
-    const date1 = new Date(submission2.updatedAt);
-    const date2 = new Date(emptySubmission.updatedAt);
+    const date2 = new Date(submission2.updatedAt);
+    const date1 = new Date(emptySubmission.updatedAt);
     date1.setMilliseconds(0);
     date2.setMilliseconds(0);
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -1519,6 +1519,7 @@ describe("Integration", () => {
     expect(averageTimes.deadline).toEqual(
       new Date("2020-02-01T10:00Z").toISOString()
     );
+
     expect(averageTimes.times.length).toEqual(2);
     expect(new Date(averageTimes.times[0])).toEqual(date1);
     expect(new Date(averageTimes.times[1])).toEqual(date2);

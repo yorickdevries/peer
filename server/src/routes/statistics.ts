@@ -65,7 +65,7 @@ router.get(
       case ChartType.Assignment.TIME_SUBMIT_BEFORE_DEADLINE: {
         const submissions: Submission[] = await getManager()
           .createQueryBuilder(Submission, "submission")
-          .where("submission.final = true")
+          .where("submission.final IS TRUE")
           .leftJoin("submission.assignmentVersion", "assignmentVersion")
           .andWhere("assignmentVersion.assignmentId = :id", {
             id: assignment.id,
