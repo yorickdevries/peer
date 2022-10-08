@@ -11,8 +11,8 @@ export default {
         const body = { submitted, flaggedByReviewer }
         return client.patch(`reviewofsubmissions/${id}`, body)
     },
-    getEvaluation(id) {
-        return client.get(`reviewofsubmissions/${id}/evaluation`)
+    getEvaluation(id, bypass = false) {
+        return client.get(`reviewofsubmissions/${id}/evaluation`, { bypass })
     },
     postEvaluation(id) {
         return client.post(`reviewofsubmissions/${id}/evaluation`)

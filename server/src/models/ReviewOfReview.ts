@@ -44,12 +44,17 @@ export default class ReviewOfReview extends Review {
     const questionnaire = this.questionnaire
       ? this.questionnaire
       : await this.getQuestionnaire();
-    const questionnaireAssignmentVersion = await questionnaire.getAssignmentVersion();
-    const questionnaireAssignment = await questionnaireAssignmentVersion.getAssignment();
+    const questionnaireAssignmentVersion =
+      await questionnaire.getAssignmentVersion();
+    const questionnaireAssignment =
+      await questionnaireAssignmentVersion.getAssignment();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const reviewOfSubmissionQuestionnaire = await this.reviewOfSubmission!.getQuestionnaire();
-    const reviewOfSubmissionQuestionnaireAssignmentVersion = await reviewOfSubmissionQuestionnaire.getAssignmentVersion();
-    const reviewOfSubmissionQuestionnaireAssignment = await reviewOfSubmissionQuestionnaireAssignmentVersion.getAssignment();
+    const reviewOfSubmissionQuestionnaire =
+      await this.reviewOfSubmission!.getQuestionnaire();
+    const reviewOfSubmissionQuestionnaireAssignmentVersion =
+      await reviewOfSubmissionQuestionnaire.getAssignmentVersion();
+    const reviewOfSubmissionQuestionnaireAssignment =
+      await reviewOfSubmissionQuestionnaireAssignmentVersion.getAssignment();
     if (
       questionnaireAssignment.id !==
       reviewOfSubmissionQuestionnaireAssignment.id

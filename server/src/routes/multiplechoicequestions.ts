@@ -176,10 +176,11 @@ router.patch(
         "SERIALIZABLE", // make sure no new options can be added in the mean time
         async (transactionalEntityManager) => {
           // reload the question in transaction
-          const reloadedQuestion = await transactionalEntityManager.findOneOrFail(
-            MultipleChoiceQuestion,
-            questionId
-          );
+          const reloadedQuestion =
+            await transactionalEntityManager.findOneOrFail(
+              MultipleChoiceQuestion,
+              questionId
+            );
           const reloadedQuestionOptions = await transactionalEntityManager.find(
             MultipleChoiceQuestionOption,
             { where: { question: reloadedQuestion } }
