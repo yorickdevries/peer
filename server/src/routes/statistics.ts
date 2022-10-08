@@ -92,8 +92,9 @@ router.get(
           .getMany();
 
         const numOfAssignedReviews = reviews.length;
-        const numOfReviewsNotCompleted = reviews.filter((r) => !r.submitted)
-          .length;
+        const numOfReviewsNotCompleted = reviews.filter(
+          (r) => !r.submitted
+        ).length;
 
         res.send({
           total: numOfAssignedReviews,
