@@ -82,6 +82,7 @@ test:
   - mariadb:10.1
   script:
   - cd server && npm install --cache .npm --prefer-offline
+  - npm run typeorm:migration:run
   - npm run test
   only:
   - merge_requests
@@ -96,6 +97,7 @@ coverage:
   - mariadb:10.1
   script:
   - cd server && npm install --cache .npm --prefer-offline
+  - npm run typeorm:migration:run
   - npm run coverage
   only:
   - merge_requests
