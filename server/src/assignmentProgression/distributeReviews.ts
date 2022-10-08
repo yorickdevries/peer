@@ -85,7 +85,8 @@ const distributeReviewsForAssignmentHelper = async function (
     let isReviewed = false;
     // check all other assignmentversions
     for (const otherAssignmentVersion of assignment.versions) {
-      const versionsToReview = await otherAssignmentVersion.getVersionsToReview();
+      const versionsToReview =
+        await otherAssignmentVersion.getVersionsToReview();
       // check all other assignmentversions whether it is reviewing the version
       for (const versionToReview of versionsToReview) {
         if (versionToReview.id === assignmentVersion.id) {
@@ -214,10 +215,11 @@ const distributeReviewsForAssignmentHelper = async function (
         `assignmentVersion with id ${assignmentVersion.id} is of the wrong assignment`
       );
     }
-    const reviewDistributionForCurrentVersion = await generateReviewDistribution(
-      finalSubmissionsOfEachGroup,
-      reviewedByList
-    );
+    const reviewDistributionForCurrentVersion =
+      await generateReviewDistribution(
+        finalSubmissionsOfEachGroup,
+        reviewedByList
+      );
     // add the distribution to fullReviewDistribution
     fullReviewDistribution.push(...reviewDistributionForCurrentVersion);
   }
@@ -227,7 +229,8 @@ const distributeReviewsForAssignmentHelper = async function (
     "SERIALIZABLE", // serializable is the only way to make sure to reviews exist before creating them
     async (transactionalEntityManager) => {
       for (const assignmentVersion of assignment.versions) {
-        const questionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+        const questionnaire =
+          await assignmentVersion.getSubmissionQuestionnaire();
         if (!questionnaire) {
           throw new Error("Questionnaire not found");
         }
@@ -481,7 +484,8 @@ const performMaxFlow = async function (
       const user = userNumberList[userIndexOfNodeNumber(from)][0];
       const submission = submissions[submissionIndexOfNodeNumber(to)];
       const assignmentVersion = await submission.getAssignmentVersion();
-      const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+      const submissionQuestionnaire =
+        await assignmentVersion.getSubmissionQuestionnaire();
       if (!submissionQuestionnaire) {
         throw new Error("submissionQuestionnaire not found");
       }
@@ -508,7 +512,8 @@ const generateSelfReviews = async function (
   const selfReviewAssignments: reviewAssignment[] = [];
   for (const submission of submissions) {
     const assignmentVersion = await submission.getAssignmentVersion();
-    const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+    const submissionQuestionnaire =
+      await assignmentVersion.getSubmissionQuestionnaire();
     if (!submissionQuestionnaire) {
       throw new Error("submissionQuestionnaire not found");
     }

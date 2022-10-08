@@ -54,6 +54,9 @@ describe("Integration", () => {
     const studentCookie2 = async () => {
       return await mockLoginCookie(server, "student2", "student");
     };
+    const studentCookie3 = async () => {
+      return await mockLoginCookie(server, "student3", "student");
+    };
 
     // check whether the teacher is logged in
     res = await request(server)
@@ -963,6 +966,17 @@ describe("Integration", () => {
       role: "student",
     });
 
+    // enroll for course as student3
+    res = await request(server)
+      .post(`/api/courses/${course.id}/enroll`)
+      .set("cookie", await studentCookie3());
+    // assertions
+    const enrollment3 = JSON.parse(res.text);
+    expect(enrollment3).toMatchObject({
+      courseId: course.id,
+      role: "student",
+    });
+
     // enroll for course as student for the second time
     res = await request(server)
       .post(`/api/courses/${course.id}/enroll`)
@@ -1091,6 +1105,43 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     // assertions
     expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject([
+      { userNetid: "student1" },
+      { userNetid: "student2" },
+      { userNetid: "student3" },
+    ]);
+
+    //unenroll student3 from course
+    res = await request(server)
+      .delete(`/api/enrollments/?userNetid=student3&courseId=${course.id}`)
+      .set("cookie", await teacherCookie());
+    //assertions
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+    res = await request(server)
+      .get(`/api/enrollments/?courseId=${course.id}&role=student`)
+      .set("cookie", await teacherCookie());
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    expect(JSON.parse(res.text)).toMatchObject([
+      { userNetid: "student1" },
+      { userNetid: "student2" },
+    ]);
+
+    //unenroll as student
+    res = await request(server)
+      .delete(`/api/enrollments/?userNetid=student3&courseId=${course.id}`)
+      .set("cookie", await studentCookie1());
+    //assertions
+
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+    res = await request(server)
+      .get(`/api/enrollments/?courseId=${course.id}&role=student`)
+      .set("cookie", await teacherCookie());
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+
     expect(JSON.parse(res.text)).toMatchObject([
       { userNetid: "student1" },
       { userNetid: "student2" },

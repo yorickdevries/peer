@@ -146,9 +146,9 @@ export default {
             this.selectedNetid = ""
         },
         async deleteTeachingAssistant(netid) {
-            return this.showErrorMessage({
-                message: `At this moment deletion of user ${netid} is not supported, please contact the administrator to do this`
-            })
+            await api.enrollments.delete(netid, this.$route.params.courseId)
+            this.showSuccessMessage({ message: `Successfully removed teaching assistant.` })
+            await this.fetchTeachingAssistants()
         }
     }
 }
