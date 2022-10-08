@@ -164,6 +164,7 @@ router.post(
         async (error, result: PersonObj[]) => {
           if (error) {
             console.error(error);
+            res.send(HttpStatusCode.BAD_REQUEST);
           }
           listOfPeople = result;
 
@@ -206,7 +207,6 @@ router.post(
                 .send("User is already enrolled in this course");
               return;
             }
-            let enrollment: Enrollment;
             await getManager().transaction(
               "READ COMMITTED",
               async (transactionalEntityManager) => {
@@ -221,19 +221,16 @@ router.post(
                   await transactionalEntityManager.save(user);
                 }
                 // enroll user in the course if not already
-                enrollment = new Enrollment(user, course, role);
+                const enrollment = new Enrollment(user, course, role);
                 // in case another enrollment is made in the meantime it will error due to primary key constraints
                 await enrollment.validateOrReject();
                 await transactionalEntityManager.save(enrollment);
               }
             );
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            await enrollment!.reload();
           }
+          res.send(HttpStatusCode.OK);
         }
       );
-
-      return;
     }
   }
 );

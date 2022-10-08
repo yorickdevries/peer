@@ -194,10 +194,10 @@ export default {
                 //upload csv file to server
                 this.buttonDisabled = true
                 this.$refs.uploadModal.hide()
-                window.location.reload()
                 await api.enrollments.postMultipleTAs(this.file, this.$route.params.courseId)
                 this.showSuccessMessage({ message: "Successfully submitted file." })
                 this.buttonDisabled = false
+                await this.fetchTeachingAssistants()
             } catch (error) {
                 this.buttonDisabled = false
                 return
