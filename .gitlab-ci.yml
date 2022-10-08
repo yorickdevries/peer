@@ -24,8 +24,8 @@ variables:
 stages:
     - static-analysis
     - build
-    - test
     - migration
+    - test
     - start
     - sast
     - deploy
