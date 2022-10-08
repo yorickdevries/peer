@@ -21,6 +21,7 @@
     "client/node_modules"
   ],
   "dependencies": {
+    "concurrently": "^7.3.0",
     "lint": "^0.7.0"
   }
 }

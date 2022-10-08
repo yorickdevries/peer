@@ -52,7 +52,7 @@ export default class File extends BaseModel {
     } else {
       this.hash = hash;
     }
-    if (filePath != null || filePath != undefined) {
+    if (filePath !== null && filePath !== undefined) {
       this.filePath = filePath;
     } else {
       this.filePath = "";
