@@ -168,6 +168,18 @@ router.post(
           listOfPeople = result;
 
           for (const t of listOfPeople) {
+            const existingEnrollment = await Enrollment.findOne({
+              where: { userNetid: t.netId, courseId: req.body.courseId },
+            });
+            if (existingEnrollment) {
+              res
+                .status(HttpStatusCode.FORBIDDEN)
+                .send(`User '${t.netId}' is already enrolled in this course`);
+              return;
+            }
+          }
+
+          for (const t of listOfPeople) {
             const userNetid: string = t.netId;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             let role: UserRole;
@@ -194,15 +206,6 @@ router.post(
               res
                 .status(HttpStatusCode.FORBIDDEN)
                 .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
-              return;
-            }
-            const existingEnrollment = await Enrollment.findOne({
-              where: { userNetid: userNetid, courseId: course.id },
-            });
-            if (existingEnrollment) {
-              res
-                .status(HttpStatusCode.FORBIDDEN)
-                .send(`User '${userNetid}' is already enrolled in this course`);
               return;
             }
             await getManager().transaction(
