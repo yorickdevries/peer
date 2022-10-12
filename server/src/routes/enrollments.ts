@@ -137,7 +137,6 @@ router.post(
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send("File is needed for enrollment");
-      console.log("DID NOT GET THE FILE!");
       return;
     } else {
       type PersonObj = {
@@ -183,7 +182,6 @@ router.post(
             }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const courseId = req.body.courseId;
-            console.log(courseId);
 
             const course = await Course.findOne(courseId);
             if (!course) {
@@ -204,7 +202,7 @@ router.post(
             if (existingEnrollment) {
               res
                 .status(HttpStatusCode.FORBIDDEN)
-                .send("User is already enrolled in this course");
+                .send(`User '${userNetid}' is already enrolled in this course`);
               return;
             }
             await getManager().transaction(
