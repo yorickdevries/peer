@@ -2,6 +2,7 @@
 import MockStrategy from "passport-mock-strategy";
 import saveUserFromSSO from "../../util/saveUserFromSSO";
 import { PassportStatic } from "passport";
+import User from "../../models/User";
 
 const mockPassportConfiguration = async function (
   passport: PassportStatic,
@@ -9,22 +10,29 @@ const mockPassportConfiguration = async function (
   affiliation: string | string[]
 ): Promise<void> {
   // save the user to the database
-  const userNetid = await saveUserFromSSO(
-    netid,
-    "1234567",
-    "First",
-    undefined,
-    "Last",
-    "mail@mail.com",
-    netid,
-    affiliation,
-    "M Computer Science",
-    [
-      "EWI-ST-CSETT",
-      "Electrical Engineering, Mathematics and Computer Science",
-      "Software Technology",
-    ]
-  );
+  let userNetid;
+
+  if (!(await User.findOne(netid))) {
+    userNetid = await saveUserFromSSO(
+      netid,
+      "1234567",
+      "First",
+      undefined,
+      "Last",
+      "mail@mail.com",
+      netid,
+      affiliation,
+      "M Computer Science",
+      [
+        "EWI-ST-CSETT",
+        "Electrical Engineering, Mathematics and Computer Science",
+        "Software Technology",
+      ]
+    );
+  } else {
+    userNetid = netid;
+  }
+
   const user = { netid: userNetid };
   const strategy = new MockStrategy({
     name: "mock",

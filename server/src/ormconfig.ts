@@ -35,6 +35,10 @@ const baseConfig = {
   },
   // when testing, the database is refreshed
   dropSchema: process.env.NODE_ENV === "test" ? true : false,
+
+  // add seeder
+  seeds: [path.resolve(__dirname, "seeds/**/*{.ts,.js}")],
+  factories: [path.resolve(__dirname, "factories/**/*{.ts,.js}")]
 };
 // will be assigned in the switch statement
 let connectionConfig: ConnectionOptions;
