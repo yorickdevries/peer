@@ -13,7 +13,7 @@ const facultyList: [string, string][] = [
 ];
 const listLength = facultyList.length;
 
-async function createFaculties(): Promise<Faculty[]> {
+async function createDefaultFaculties(): Promise<Faculty[]> {
   return await factory(Faculty)()
     .map(async (faculty: Faculty) => {
       const tempFaculty = facultyList.pop();
@@ -30,4 +30,4 @@ define(Faculty, () => {
   return new Faculty("name", "longName");
 });
 
-export { createFaculties };
+export { createDefaultFaculties };

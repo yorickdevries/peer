@@ -9,7 +9,7 @@ const yearList: [string, boolean][] = [
 ];
 const listLength = yearList.length;
 
-async function createAcademicYears(): Promise<AcademicYear[]> {
+async function createDefaultAcademicYears(): Promise<AcademicYear[]> {
   return await factory(AcademicYear)()
     .map(async (year: AcademicYear) => {
       const tempYear = yearList.pop();
@@ -26,4 +26,4 @@ define(AcademicYear, () => {
   return new AcademicYear("name", false);
 });
 
-export { createAcademicYears };
+export { createDefaultAcademicYears };

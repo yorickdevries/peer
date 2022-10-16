@@ -1,19 +1,62 @@
-import { Factory, Seeder } from "typeorm-seeding";
-import { createStudents, createTeachers } from "../factories/User.factory";
-import { createFaculties } from "../factories/Faculty.factory";
-import { createAcademicYears } from "../factories/AcademicYear.factory";
+import { Seeder } from "typeorm-seeding";
+import { createUser } from "../factories/User.factory";
+import { createDefaultFaculties } from "../factories/Faculty.factory";
+import { createDefaultAcademicYears } from "../factories/AcademicYear.factory";
+import {
+  parseAndSaveAffiliation,
+  parseAndSaveOrganisationUnit,
+  parseAndSaveStudy,
+} from "../util/parseAndSaveSSOFields";
+import { createCourse } from "../factories/Course.factory";
+import { createAssignment } from "../factories/Assignment.factory";
 
 export default class InitialDatabaseSeed implements Seeder {
-  public async run(factory: Factory): Promise<void> {
+  public async run(): Promise<void> {
+    //Generate utils
+    const employeeAffiliation = await parseAndSaveAffiliation("employee");
+    const studentAffiliation = await parseAndSaveAffiliation("student");
+    const study = await parseAndSaveStudy("M Computer Science");
+    const org = await parseAndSaveOrganisationUnit(
+      "Electrical Engineering, Mathematics and Computer Science"
+    );
+
     //Generate users
-    const students = await createStudents(factory);
-    const teachers = await createTeachers(factory);
+    const students = await Promise.all(
+      [...Array(10)].map(async () => {
+        return await createUser({
+          organisationUnit: org,
+          study,
+          affiliation: studentAffiliation,
+        });
+      })
+    );
+
+    const teachers = await Promise.all(
+      [...Array(10)].map(async () => {
+        return await createUser({
+          organisationUnit: org,
+          study,
+          affiliation: employeeAffiliation,
+        });
+      })
+    );
 
     //Generate academic years
-    const years = await createAcademicYears();
+    const years = await createDefaultAcademicYears();
     //Generate faculties
-    const faculties = await createFaculties();
+    const faculties = await createDefaultFaculties();
 
-    console.log(students, teachers, faculties, years);
+    //Generate first course
+    const c1 = await createCourse({
+      faculty: faculties[0],
+      academicYear: years[0],
+    });
+
+    //Generate first assignment
+    const a1 = await createAssignment({
+      course: c1,
+    });
+
+    console.log(students, teachers, faculties, years, c1, a1);
   }
 }

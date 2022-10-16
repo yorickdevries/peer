@@ -1,52 +1,11 @@
 import User from "../models/User";
-import { define, Factory } from "typeorm-seeding";
+import { define, factory } from "typeorm-seeding";
 import Faker from "faker";
 import parseNetID from "../util/parseNetID";
-import {
-  parseAndSaveAffiliation,
-  parseAndSaveOrganisationUnit,
-  parseAndSaveStudy,
-} from "../util/parseAndSaveSSOFields";
+import { ContainsKey } from "../util/seedData";
 
-async function setProperties(
-  user: User,
-  affiliation: string,
-  study: string,
-  org: string
-): Promise<void> {
-  user.affiliation = await parseAndSaveAffiliation(affiliation);
-  user.study = await parseAndSaveStudy(study);
-  user.organisationUnit = await parseAndSaveOrganisationUnit(org);
-}
-
-async function createStudents(factory: Factory): Promise<User[]> {
-  const students = await factory(User)()
-    .map(async (user: User) => {
-      await setProperties(
-        user,
-        "student",
-        "M Computer Science and Engineering",
-        "EEMCS"
-      );
-      return user;
-    })
-    .createMany(5);
-  return students;
-}
-
-async function createTeachers(factory: Factory): Promise<User[]> {
-  const teachers = await factory(User)()
-    .map(async (user: User) => {
-      await setProperties(
-        user,
-        "employee",
-        "M Computer Science and Engineering",
-        "EEMCS"
-      );
-      return user;
-    })
-    .createMany(2);
-  return teachers;
+async function createUser(override: ContainsKey<User>): Promise<User> {
+  return await factory(User)().create(override);
 }
 
 define(User, (faker: typeof Faker) => {
@@ -64,9 +23,6 @@ define(User, (faker: typeof Faker) => {
     undefined,
     undefined,
     undefined,
-    //await parseAndSaveAffiliation("employee"),
-    //await parseAndSaveStudy("M Computer Science"),
-    //await parseAndSaveOrganisationUnit("Electrical Engineering, Mathematics and Computer Science"),
     studentNumber,
     firstName,
     null,
@@ -76,4 +32,4 @@ define(User, (faker: typeof Faker) => {
   );
 });
 
-export { setProperties, createStudents, createTeachers };
+export { createUser };
