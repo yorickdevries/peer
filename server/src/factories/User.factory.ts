@@ -10,11 +10,11 @@ import {
 
 async function setProperties(
   user: User,
-  affilitation: string,
+  affiliation: string,
   study: string,
   org: string
-) {
-  user.affiliation = await parseAndSaveAffiliation(affilitation);
+): Promise<void> {
+  user.affiliation = await parseAndSaveAffiliation(affiliation);
   user.study = await parseAndSaveStudy(study);
   user.organisationUnit = await parseAndSaveOrganisationUnit(org);
 }
