@@ -40,6 +40,7 @@ export default class InitialDatabaseSeed implements Seeder {
         });
       })
     );
+    const mainTeacher = teachers[0];
 
     //Generate academic years
     const years = await createDefaultAcademicYears();
@@ -52,11 +53,13 @@ export default class InitialDatabaseSeed implements Seeder {
       academicYear: years[0],
     });
 
+    //Assign main teacher to first course
+
     //Generate first assignment
     const a1 = await createAssignment({
       course: c1,
     });
 
-    console.log(students, teachers, faculties, years, c1, a1);
+    console.log(students, teachers, faculties, years, c1, a1, mainTeacher);
   }
 }
