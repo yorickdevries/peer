@@ -1,22 +1,26 @@
 import {
-  PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   Entity,
-  TableInheritance,
+  ManyToOne,
+  PrimaryGeneratedColumn,
   RelationId,
+  TableInheritance,
+  getManager,
 } from "typeorm";
 import {
-  IsDefined,
-  IsString,
-  IsNotEmpty,
-  IsInt,
-  IsPositive,
   IsBoolean,
+  IsDefined,
+  IsInt,
+  IsNotEmpty,
+  IsPositive,
+  IsString,
 } from "class-validator";
+
 import BaseModel from "./BaseModel";
-import Questionnaire from "./Questionnaire";
+import QuestionOperation from "../enum/QuestionOperation";
 import QuestionType from "../enum/QuestionType";
+import Questionnaire from "./Questionnaire";
+
 import User from "./User";
 
 @Entity()
@@ -97,5 +101,91 @@ export default abstract class Question extends BaseModel {
 
   getMaxPointsFromQuestion(): number | null {
     return null;
+  }
+
+  /**
+   * "Open" space by reordering after the new question position.
+   *
+   * @param questions - The set of questions to potentially change the numbers of to make space
+   * @param num - The number of the question where space is needed
+   */
+  orderMakeSpace(questions: Question[], num: number): void {
+    questions.forEach((q) => {
+      if (q.number >= num) q.number++;
+    });
+  }
+
+  /**
+   * "Close" space by reordering after the question position
+   *
+   * @param questions - The set of questions to potentially change the numbers of to make space
+   */
+  orderRemoveSpace(questions: Question[]): void {
+    if (questions.length > 0 && questions[0].number > 1) {
+      questions[0].number = 1;
+    }
+    for (let i = 0; i < questions.length - 1; i++) {
+      if (questions[i + 1].number - questions[i].number > 1) {
+        questions[i + 1].number = questions[i].number + 1;
+      }
+    }
+  }
+
+  /**
+   * Change the question numbers to be in ascending order after a modification was made.
+   *
+   * @param operation - The performed operation
+   */
+  async reorder(operation: QuestionOperation): Promise<void> {
+    const questionnaireId = this.questionnaireId
+      ? this.questionnaireId
+      : this.questionnaire?.id;
+
+    await getManager().transaction(
+      "READ COMMITTED",
+      async (transactionalEntityManager) => {
+        let questions: Question[] = await transactionalEntityManager
+          .createQueryBuilder(Question, "q")
+          .where("q.questionnaireId = :id", { id: questionnaireId })
+          .orderBy("q.number")
+          .getMany();
+
+        questions = questions.filter((q) => q.id !== this.id);
+
+        switch (operation) {
+          case QuestionOperation.CREATE: {
+            if (!questions.find((q) => q.number === this.number)) break;
+
+            this.orderMakeSpace(questions, this.number);
+            break;
+          }
+          case QuestionOperation.MODIFY: {
+            this.orderRemoveSpace(questions);
+
+            this.orderMakeSpace(questions, this.number);
+            break;
+          }
+          case QuestionOperation.DELETE: {
+            //"Close" extra space
+            this.orderRemoveSpace(questions);
+            break;
+          }
+        }
+
+        //Ensures spaces > 1 cannot be created
+        if (questions.length > 0) {
+          const maxQuestion = questions[questions.length - 1];
+          const newMaxNumber = maxQuestion.number + 1;
+          if (this.number > newMaxNumber) {
+            this.number = newMaxNumber;
+            await transactionalEntityManager.save(this);
+          }
+        }
+
+        for (const q of questions) {
+          await transactionalEntityManager.save(q);
+        }
+      }
+    );
   }
 }

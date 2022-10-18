@@ -121,4 +121,43 @@ router.get("/enrolled", async (req, res) => {
   res.send(enrollments);
 });
 
+const deleteEnrollmentSchema = Joi.object({
+  userNetid: Joi.string().required(),
+  courseId: Joi.number().integer().required(),
+});
+//delete a user
+router.delete("/", validateQuery(deleteEnrollmentSchema), async (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const user = req.user!;
+  // this value has been parsed by the validate function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userNetid: number = req.query.userNetid as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const courseId: number = req.query.courseId as any;
+  const course = await Course.findOne(courseId);
+  if (!course) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.COURSE_NOT_FOUND);
+    return;
+  }
+  if (!(await course.isTeacher(user))) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+    return;
+  }
+  const existingEnrollment = await Enrollment.findOne({
+    where: { userNetid: userNetid, courseId: courseId },
+  });
+  if (!existingEnrollment) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_ENROLLED_IN_COURSE);
+    return;
+  }
+  await existingEnrollment.remove();
+  res.send(existingEnrollment);
+});
+
 export default router;
