@@ -16,8 +16,8 @@ const databaseConfig: {
 
 const baseConfig = {
   entities: entityList,
-  // We are using migrations, synchronize should be set to false in production.
-  synchronize: process.env.NODE_ENV === "production" ? false : true,
+  // We are using migrations, synchronize should be set to false.
+  synchronize: false,
 
   // Run migrations automatically,
   // you can disable this if you prefer running migration manually.
@@ -34,7 +34,10 @@ const baseConfig = {
     migrationsDir: "src/migration",
   },
   // when testing, the database is refreshed
-  dropSchema: process.env.NODE_ENV === "test" ? true : false,
+  dropSchema: process.env.NODE_ENV === "test",
+
+  //when testing, automatically run migrations
+  migrationsRun: process.env.NODE_ENV === "test",
 };
 // will be assigned in the switch statement
 let connectionConfig: ConnectionOptions;
