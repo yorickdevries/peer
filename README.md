@@ -8,7 +8,7 @@ This application uses Node 14.x
 2. Create a MariaDB database called `peer`
 3. Run `npm install` in root
 4. Run `npm run build` in root to build the aplication.
-5. Run `npm run initdata` in ./server to initialize basic database elements like faculties and academic years.
+5. Run `npm run initdata` in ./server to initialize basic database elements like faculties and academic years. 
 6. Run `npm run start` in root to start the server.
 7. Access the site through [http://localhost:3000](http://localhost:3000)
 
