@@ -1,9 +1,9 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import {
-  validateParams,
-  validateBody,
   idSchema,
+  validateBody,
+  validateParams,
 } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Questionnaire from "../models/Questionnaire";
@@ -13,6 +13,7 @@ import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { AssignmentState } from "../enum/AssignmentState";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import Extensions from "../enum/Extensions";
+import QuestionOperation from "../enum/QuestionOperation";
 
 const router = express.Router();
 
@@ -99,6 +100,7 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
     req.body.extensions
   );
   await question.save();
+  await question.reorder(QuestionOperation.CREATE);
   res.send(question);
 });
 
@@ -162,6 +164,7 @@ router.patch(
     question.optional = req.body.optional;
     question.extensions = req.body.extensions;
     await question.save();
+    await question.reorder(QuestionOperation.MODIFY);
     res.send(question);
   }
 );
@@ -209,6 +212,7 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
   }
   // otherwise update the question
   await question.remove();
+  await question.reorder(QuestionOperation.DELETE);
   res.send(question);
 });
 
