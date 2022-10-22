@@ -12,6 +12,7 @@ define(User, (faker: typeof Faker) => {
   const studentNumber = faker.random.number({ min: 1, max: 9999999 });
   const firstName = faker.name.firstName().replace(/[^a-zA-Z]/, "");
   const lastName = faker.name.lastName().replace(/[^a-zA-Z]/, "");
+  const displayName = `${firstName} ${lastName}`;
   const netId = `${firstName.charAt(0)}${lastName}${faker.random.number({
     min: 1,
     max: 15,
@@ -28,7 +29,7 @@ define(User, (faker: typeof Faker) => {
     null,
     lastName,
     email,
-    netId
+    displayName
   );
 });
 
