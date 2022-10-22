@@ -1,21 +1,42 @@
-import {Seeder} from "typeorm-seeding";
-import {createUser} from "../factories/User.factory";
-import {createDefaultFaculties} from "../factories/Faculty.factory";
-import {createDefaultAcademicYears} from "../factories/AcademicYear.factory";
-import {parseAndSaveAffiliation, parseAndSaveOrganisationUnit, parseAndSaveStudy,} from "../util/parseAndSaveSSOFields";
-import {createCourse} from "../factories/Course.factory";
-import {createAssignment} from "../factories/Assignment.factory";
-import {createEnrollment} from "../factories/Enrollment.factory";
-import {createAssignmentVersion} from "../factories/AssignmentVersion.factory";
-import {createSubmissionQuestionnaire} from "../factories/SubmissionQuestionnaire.factory";
+import { Seeder } from "typeorm-seeding";
+import { createUser } from "../factories/User.factory";
+import { createDefaultFaculties } from "../factories/Faculty.factory";
+import { createDefaultAcademicYears } from "../factories/AcademicYear.factory";
+import {
+  parseAndSaveAffiliation,
+  parseAndSaveOrganisationUnit,
+  parseAndSaveStudy,
+} from "../util/parseAndSaveSSOFields";
+import { createCourse } from "../factories/Course.factory";
+import { createAssignment } from "../factories/Assignment.factory";
+import { createEnrollment } from "../factories/Enrollment.factory";
+import { createAssignmentVersion } from "../factories/AssignmentVersion.factory";
+import { createSubmissionQuestionnaire } from "../factories/SubmissionQuestionnaire.factory";
 import AssignmentVersion from "../models/AssignmentVersion";
-import {createOpenQuestion} from "../factories/OpenQuestion.factory";
+import { createOpenQuestion } from "../factories/OpenQuestion.factory";
 import UserRole from "../enum/UserRole";
-import {createReviewQuestionnaire} from "../factories/ReviewQuestionnaire.factory";
+import { createReviewQuestionnaire } from "../factories/ReviewQuestionnaire.factory";
 import User from "../models/User";
-import {AssignmentState} from "../enum/AssignmentState";
+import { AssignmentState } from "../enum/AssignmentState";
 import Course from "../models/Course";
-import {createGroup} from "../factories/Group.factory";
+import { createGroup } from "../factories/Group.factory";
+import { createSubmission } from "../factories/Submission.factory";
+import { createFile } from "../factories/File.factory";
+import fsPromises from "fs/promises";
+import config from "config";
+import path from "path";
+import Group from "../models/Group";
+import publishAssignment from "../assignmentProgression/publishAssignment";
+
+const uploadFolder = path.resolve(config.get("uploadFolder") as string);
+const exampleFile = path.join(
+  uploadFolder,
+  "..",
+  "..",
+  "exampleData",
+  "assignments",
+  "assignment1.pdf"
+);
 
 interface StagePlan {
   name: string;
@@ -100,7 +121,7 @@ export default class InitialDatabaseSeed implements Seeder {
     const org = await parseAndSaveOrganisationUnit(
       "Electrical Engineering, Mathematics and Computer Science"
     );
-
+    /*
     //Generate regular users
     const students = await Promise.all(
       [...Array(20)].map(async () => {
@@ -111,9 +132,9 @@ export default class InitialDatabaseSeed implements Seeder {
         });
       })
     );
-
+  */
     //Generate group users
-    const groupStudents: User[] = await Promise.all(
+    const students: User[] = await Promise.all(
       [...Array(40)].map(async () => {
         return await createUser({
           organisationUnit: org,
@@ -124,9 +145,9 @@ export default class InitialDatabaseSeed implements Seeder {
     );
 
     //Generate groups
-    const groups = Array(groupStudents.length / 2);
+    const groups = Array(students.length / 2);
     for (let i = 0; i < groups.length; i++) {
-      groups[i] = [groupStudents[i * 2], groupStudents[i * 2 + 1]];
+      groups[i] = [students[i * 2], students[i * 2 + 1]];
     }
 
     const teachers = await Promise.all(
@@ -190,7 +211,7 @@ export default class InitialDatabaseSeed implements Seeder {
       }
     }
 
-    const plan = getStagePlan(studentCourse, groupCourse);
+    const plan = [getStagePlan(studentCourse, groupCourse)[4]];
 
     for (const schema of plan) {
       exportJSON[schema.name] = {};
@@ -202,17 +223,20 @@ export default class InitialDatabaseSeed implements Seeder {
         course: schema.course,
         name: schema.name,
         reviewEvaluation: false,
+        reviewEvaluationDueDate: null,
+        lateReviewEvaluations: null,
+        submissionExtensions: ".pdf",
       });
 
+      const userGroups: Group[] = [];
       //Enroll students/groups in assignment
       for (const entity of schemaStudents) {
-        for (const student of getStudent(entity)) {
-          await createGroup({
-            course: schema.course,
-            users: getStudent(student),
-            assignments: [assignment],
-          });
-        }
+        const group = await createGroup({
+          course: schema.course,
+          users: getStudent(entity),
+          assignments: [assignment],
+        });
+        userGroups.push(group);
       }
 
       //Generate assignment version
@@ -259,19 +283,37 @@ export default class InitialDatabaseSeed implements Seeder {
       assignmentVersion.versionsToReview = [assignmentVersion];
       assignmentVersion = await AssignmentVersion.save(assignmentVersion);
 
+      //Publish assignment
+      await publishAssignment(assignment.id);
+
       //Submit assignment
-      numSubmittingEntities -= removeLate(numSubmittingEntities);
+      numSubmittingEntities = removeLate(numSubmittingEntities);
+      for (let i = 0; i < numSubmittingEntities; i++) {
+        const file = await createFile({});
+        await fsPromises.copyFile(
+          exampleFile,
+          path.join(uploadFolder, file.id.toString())
+        );
+        await createSubmission({
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          user: userGroups[i].users![0],
+          group: userGroups[i],
+          assignmentVersion: assignmentVersion,
+          file: file,
+        });
+      }
+
+      //Review Assignment
+      numSubmittingEntities = removeLate(numSubmittingEntities);
       for (let i = 0; i < numSubmittingEntities; i++) {
 
       }
 
-      //Review Assignment
-
       //Get Feedback Assignment
 
       //Review Feedback Assignment
-
-
+      console.log("\n\nSEED INFORMATION\n\n");
+      console.log(JSON.stringify(exportJSON, null, 1));
     }
   }
 }
