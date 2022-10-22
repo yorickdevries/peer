@@ -10,8 +10,8 @@ async function createUser(override: ContainsKey<User>): Promise<User> {
 
 define(User, (faker: typeof Faker) => {
   const studentNumber = faker.random.number({ min: 1, max: 9999999 });
-  const firstName = faker.name.firstName();
-  const lastName = faker.name.lastName();
+  const firstName = faker.name.firstName().replace(/[^a-zA-Z]/, "");
+  const lastName = faker.name.lastName().replace(/[^a-zA-Z]/, "");
   const netId = `${firstName.charAt(0)}${lastName}${faker.random.number({
     min: 1,
     max: 15,

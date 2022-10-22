@@ -9,6 +9,11 @@ import {
 } from "../util/parseAndSaveSSOFields";
 import { createCourse } from "../factories/Course.factory";
 import { createAssignment } from "../factories/Assignment.factory";
+import { createEnrollment } from "../factories/Enrollment.factory";
+import { createAssignmentVersion } from "../factories/AssignmentVersion.factory";
+import { createSubmissionQuestionnaire } from "../factories/SubmissionQuestionnaire.factory";
+import AssignmentVersion from "../models/AssignmentVersion";
+import { createOpenQuestion } from "../factories/OpenQuestion.factory";
 
 export default class InitialDatabaseSeed implements Seeder {
   public async run(): Promise<void> {
@@ -47,19 +52,53 @@ export default class InitialDatabaseSeed implements Seeder {
     //Generate faculties
     const faculties = await createDefaultFaculties();
 
-    //Generate first course
+    //Generate course
     const c1 = await createCourse({
       faculty: faculties[0],
       academicYear: years[0],
     });
 
-    //Assign main teacher to first course
-
-    //Generate first assignment
+    //Generate assignment
     const a1 = await createAssignment({
       course: c1,
     });
 
-    console.log(students, teachers, faculties, years, c1, a1, mainTeacher);
+    //Generate assignment version
+    let av1 = await createAssignmentVersion({
+      name: "default",
+      assignment: a1,
+    });
+
+    //Generate submission questionnaire
+    const sq1 = await createSubmissionQuestionnaire({
+      assignmentVersionOfSubmissionQuestionnaire: av1,
+    });
+
+    //Generate submission questionnaire questions
+    await Promise.all(
+      [...Array(5)].map(async (_, i) => {
+        await createOpenQuestion({
+          number: i + 1,
+          questionnaire: sq1,
+        });
+      })
+    );
+
+    av1.submissionQuestionnaire = sq1;
+    av1 = await AssignmentVersion.save(av1);
+
+    //Assign teacher
+    await createEnrollment({
+      course: c1,
+      user: mainTeacher,
+    });
+
+    //Assign students
+    for (const s of students) {
+      await createEnrollment({
+        course: c1,
+        user: s,
+      });
+    }
   }
 }
