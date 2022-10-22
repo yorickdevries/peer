@@ -1,32 +1,33 @@
-import { Seeder } from "typeorm-seeding";
-import { createUser } from "../factories/User.factory";
-import { createDefaultFaculties } from "../factories/Faculty.factory";
-import { createDefaultAcademicYears } from "../factories/AcademicYear.factory";
-import {
-  parseAndSaveAffiliation,
-  parseAndSaveOrganisationUnit,
-  parseAndSaveStudy,
-} from "../util/parseAndSaveSSOFields";
-import { createCourse } from "../factories/Course.factory";
-import { createAssignment } from "../factories/Assignment.factory";
-import { createEnrollment } from "../factories/Enrollment.factory";
-import { createAssignmentVersion } from "../factories/AssignmentVersion.factory";
-import { createSubmissionQuestionnaire } from "../factories/SubmissionQuestionnaire.factory";
+import {Seeder} from "typeorm-seeding";
+import {createUser} from "../factories/User.factory";
+import {createDefaultFaculties} from "../factories/Faculty.factory";
+import {createDefaultAcademicYears} from "../factories/AcademicYear.factory";
+import {parseAndSaveAffiliation, parseAndSaveOrganisationUnit, parseAndSaveStudy,} from "../util/parseAndSaveSSOFields";
+import {createCourse} from "../factories/Course.factory";
+import {createAssignment} from "../factories/Assignment.factory";
+import {createEnrollment} from "../factories/Enrollment.factory";
+import {createAssignmentVersion} from "../factories/AssignmentVersion.factory";
+import {createSubmissionQuestionnaire} from "../factories/SubmissionQuestionnaire.factory";
 import AssignmentVersion from "../models/AssignmentVersion";
-import { createOpenQuestion } from "../factories/OpenQuestion.factory";
+import {createOpenQuestion} from "../factories/OpenQuestion.factory";
 import UserRole from "../enum/UserRole";
-import { createReviewQuestionnaire } from "../factories/ReviewQuestionnaire.factory";
+import {createReviewQuestionnaire} from "../factories/ReviewQuestionnaire.factory";
 import User from "../models/User";
-import { AssignmentState } from "../enum/AssignmentState";
+import {AssignmentState} from "../enum/AssignmentState";
 import Course from "../models/Course";
-import { createGroup } from "../factories/Group.factory";
-import { createSubmission } from "../factories/Submission.factory";
-import { createFile } from "../factories/File.factory";
+import {createGroup} from "../factories/Group.factory";
+import {createSubmission} from "../factories/Submission.factory";
+import {createFile} from "../factories/File.factory";
 import fsPromises from "fs/promises";
 import config from "config";
 import path from "path";
 import Group from "../models/Group";
 import publishAssignment from "../assignmentProgression/publishAssignment";
+import closeSubmission from "../assignmentProgression/closeSubmission";
+import {distributeReviewsForAssignment} from "../assignmentProgression/distributeReviews";
+import Review from "../models/Review";
+import Question from "../models/Question";
+import QuestionType from "../enum/QuestionType";
 
 const uploadFolder = path.resolve(config.get("uploadFolder") as string);
 const exampleFile = path.join(
@@ -51,6 +52,14 @@ function removeLate(num: number): number {
 
 function getStudent(entity: User | User[]): User[] {
   return Array.isArray(entity) ? entity : [entity];
+}
+
+function answerQuestion(q: Question) {
+  switch (q.type) {
+    case QuestionType.OPEN: {
+
+    }
+  }
 }
 
 //users are allowed to submit
@@ -121,18 +130,7 @@ export default class InitialDatabaseSeed implements Seeder {
     const org = await parseAndSaveOrganisationUnit(
       "Electrical Engineering, Mathematics and Computer Science"
     );
-    /*
-    //Generate regular users
-    const students = await Promise.all(
-      [...Array(20)].map(async () => {
-        return await createUser({
-          organisationUnit: org,
-          study,
-          affiliation: studentAffiliation,
-        });
-      })
-    );
-  */
+
     //Generate group users
     const students: User[] = await Promise.all(
       [...Array(40)].map(async () => {
@@ -211,7 +209,7 @@ export default class InitialDatabaseSeed implements Seeder {
       }
     }
 
-    const plan = [getStagePlan(studentCourse, groupCourse)[4]];
+    const plan = getStagePlan(studentCourse, groupCourse).slice(4, 6);
 
     for (const schema of plan) {
       exportJSON[schema.name] = {};
@@ -303,16 +301,28 @@ export default class InitialDatabaseSeed implements Seeder {
         });
       }
 
+      await closeSubmission(assignment.id);
+      await distributeReviewsForAssignment(assignment.id);
+
       //Review Assignment
       numSubmittingEntities = removeLate(numSubmittingEntities);
       for (let i = 0; i < numSubmittingEntities; i++) {
-
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        for (const user of userGroups[i].users!) {
+          const reviews: Review[] =
+            await submissionQuestionnaire.getReviewsWhereUserIsReviewer(user);
+          for (const review of reviews) {
+            review.questionnaire?.questions.forEach((q) => {
+              answerQuestion(q);
+            })
+          }
+        }
       }
 
       //Get Feedback Assignment
 
       //Review Feedback Assignment
-      console.log("\n\nSEED INFORMATION\n\n");
+      console.log("\n\nSEED INFORMATION");
       console.log(JSON.stringify(exportJSON, null, 1));
     }
   }
