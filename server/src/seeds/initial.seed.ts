@@ -37,6 +37,7 @@ import submitReview from "../util/submitReview";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import openFeedback from "../assignmentProgression/openFeedback";
+import moment from "moment";
 
 const uploadFolder = path.resolve(config.get("uploadFolder") as string);
 const exampleFile = path.join(
@@ -71,6 +72,7 @@ async function answerQuestion(question: Question, review: Review) {
         question,
         review,
       });
+      break;
     }
   }
 }
@@ -79,6 +81,19 @@ function isBeforeState(orig: AssignmentState, after: AssignmentState) {
   const currentStateIndex = assignmentStateOrder.indexOf(orig);
   const otherStateIndex = assignmentStateOrder.indexOf(after);
   return currentStateIndex <= otherStateIndex;
+}
+
+//in minutes
+function skewTimes(p: number): number {
+  if (p < 3) {
+    return Math.pow(p, 1);
+  } else if (p < 10) {
+    return Math.pow(p, 2);
+  } else if (p < 20) {
+    return Math.pow(p, 3);
+  } else {
+    return Math.pow(p, 4);
+  }
 }
 
 //users are allowed to submit
@@ -230,7 +245,7 @@ export default class InitialDatabaseSeed implements Seeder {
       }
     }
 
-    const plan = getStagePlan(studentCourse, groupCourse).slice(4, 8);
+    const plan = getStagePlan(studentCourse, groupCourse).slice(6, 8);
 
     for (const schema of plan) {
       exportJSON[schema.name] = {};
@@ -364,6 +379,21 @@ export default class InitialDatabaseSeed implements Seeder {
               await answerQuestion(question, review);
             }
             await submitReview(review, false);
+
+            //Set review submission time
+            const submissionMoment = moment(assignment.reviewDueDate).subtract(
+              skewTimes(i),
+              "minutes"
+            );
+            const startMoment = moment(submissionMoment).subtract(
+              skewTimes(numSubmittingEntities - i),
+              "minutes"
+            );
+
+            await review.reload();
+            review.submittedAt = submissionMoment.toDate();
+            review.startedAt = startMoment.toDate();
+            await Review.save(review);
           }
         }
       }
