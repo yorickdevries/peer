@@ -1,43 +1,43 @@
-import { Seeder } from "typeorm-seeding";
-import { createUser } from "../factories/User.factory";
-import { createDefaultFaculties } from "../factories/Faculty.factory";
-import { createDefaultAcademicYears } from "../factories/AcademicYear.factory";
-import {
-  parseAndSaveAffiliation,
-  parseAndSaveOrganisationUnit,
-  parseAndSaveStudy,
-} from "../util/parseAndSaveSSOFields";
-import { createCourse } from "../factories/Course.factory";
-import { createAssignment } from "../factories/Assignment.factory";
-import { createEnrollment } from "../factories/Enrollment.factory";
-import { createAssignmentVersion } from "../factories/AssignmentVersion.factory";
-import { createSubmissionQuestionnaire } from "../factories/SubmissionQuestionnaire.factory";
+import {Seeder} from "typeorm-seeding";
+import {createUser} from "../factories/User.factory";
+import {createDefaultFaculties} from "../factories/Faculty.factory";
+import {createDefaultAcademicYears} from "../factories/AcademicYear.factory";
+import {parseAndSaveAffiliation, parseAndSaveOrganisationUnit, parseAndSaveStudy,} from "../util/parseAndSaveSSOFields";
+import {createCourse} from "../factories/Course.factory";
+import {createAssignment} from "../factories/Assignment.factory";
+import {createEnrollment} from "../factories/Enrollment.factory";
+import {createAssignmentVersion} from "../factories/AssignmentVersion.factory";
+import {createSubmissionQuestionnaire} from "../factories/SubmissionQuestionnaire.factory";
 import AssignmentVersion from "../models/AssignmentVersion";
-import { createOpenQuestion } from "../factories/OpenQuestion.factory";
+import {createOpenQuestion} from "../factories/OpenQuestion.factory";
 import UserRole from "../enum/UserRole";
-import { createReviewQuestionnaire } from "../factories/ReviewQuestionnaire.factory";
+import {createReviewQuestionnaire} from "../factories/ReviewQuestionnaire.factory";
 import User from "../models/User";
-import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
+import {AssignmentState, assignmentStateOrder} from "../enum/AssignmentState";
 import Course from "../models/Course";
-import { createGroup } from "../factories/Group.factory";
-import { createSubmission } from "../factories/Submission.factory";
-import { createFile } from "../factories/File.factory";
+import {createGroup} from "../factories/Group.factory";
+import {createSubmission} from "../factories/Submission.factory";
+import {createFile} from "../factories/File.factory";
 import fsPromises from "fs/promises";
 import config from "config";
 import path from "path";
 import Group from "../models/Group";
 import publishAssignment from "../assignmentProgression/publishAssignment";
 import closeSubmission from "../assignmentProgression/closeSubmission";
-import { distributeReviewsForAssignment } from "../assignmentProgression/distributeReviews";
+import {distributeReviewsForAssignment} from "../assignmentProgression/distributeReviews";
 import Review from "../models/Review";
 import Question from "../models/Question";
 import QuestionType from "../enum/QuestionType";
-import { createOpenQuestionAnswer } from "../factories/OpenQuestionAnswer.factory";
+import {createOpenQuestionAnswer} from "../factories/OpenQuestionAnswer.factory";
 import submitReview from "../util/submitReview";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import openFeedback from "../assignmentProgression/openFeedback";
 import moment from "moment";
+import {createRangeQuestion} from "../factories/RangeQuestion.factory";
+import Questionnaire from "../models/Questionnaire";
+import {createRangeQuestionAnswer} from "../factories/RangeQuestionAnswer.factory";
+import RangeQuestion from "../models/RangeQuestion";
 
 const uploadFolder = path.resolve(config.get("uploadFolder") as string);
 const exampleFile = path.join(
@@ -74,7 +74,29 @@ async function answerQuestion(question: Question, review: Review) {
       });
       break;
     }
+    case QuestionType.RANGE: {
+      await createRangeQuestionAnswer({
+        question,
+        review,
+        rangeAnswer: Math.max(
+          1,
+          Math.floor(Math.random() * (question as RangeQuestion).range)
+        ),
+      });
+      break;
+    }
   }
+}
+
+async function generateQuestionnaireQuestions(questionnaire: Questionnaire) {
+  await createOpenQuestion({
+    number: 1,
+    questionnaire: questionnaire,
+  });
+  await createRangeQuestion({
+    number: 2,
+    questionnaire: questionnaire,
+  });
 }
 
 function isBeforeState(orig: AssignmentState, after: AssignmentState) {
@@ -290,14 +312,7 @@ export default class InitialDatabaseSeed implements Seeder {
       });
 
       //Generate submission questionnaire questions
-      await Promise.all(
-        [...Array(5)].map(async (_, i) => {
-          await createOpenQuestion({
-            number: i + 1,
-            questionnaire: submissionQuestionnaire,
-          });
-        })
-      );
+      await generateQuestionnaireQuestions(submissionQuestionnaire);
 
       if (assignment.reviewEvaluation) {
         //Generate review questionnaire
@@ -306,14 +321,7 @@ export default class InitialDatabaseSeed implements Seeder {
         });
 
         //Generate review questionnaire questions
-        await Promise.all(
-          [...Array(5)].map(async (_, i) => {
-            await createOpenQuestion({
-              number: i + 1,
-              questionnaire: reviewQuestionnaire,
-            });
-          })
-        );
+        await generateQuestionnaireQuestions(reviewQuestionnaire);
 
         assignmentVersion.reviewQuestionnaire = reviewQuestionnaire;
       }
