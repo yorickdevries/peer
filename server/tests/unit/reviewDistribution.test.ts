@@ -17,6 +17,10 @@ import { AssignmentState } from "../../src/enum/AssignmentState";
 import Extensions from "../../src/enum/Extensions";
 import SubmissionQuestionnaire from "../../src/models/SubmissionQuestionnaire";
 import AssignmentType from "../../src/enum/AssignmentType";
+import AssignmentExport from "../../src/models/AssignmentExport";
+import exportToZip from "../../src/util/exportZip";
+import fs from "fs";
+import JSZip from "jszip";
 
 describe("Review distribution", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -98,6 +102,7 @@ describe("Review distribution", () => {
     const numStudents = numGroups * numStudentPerGroup;
 
     const students = [];
+    let expectedResult: any[] = ["pdfs/"]
     for (let i = 0; i < numStudents; i++) {
       const student = new User(`student${i}`);
       await student.save();
@@ -126,6 +131,7 @@ describe("Review distribution", () => {
       // make submission
       const file = new File("filename", ".pdf", null);
       await file.save();
+      expectedResult.push(`pdfs/${student.netid}.pdf`)
 
       const submission = new Submission(
         student,
@@ -137,6 +143,26 @@ describe("Review distribution", () => {
       await submission.save();
       submissions.push(submission);
     }
+    //make export of submissions
+    const assignmentExport:AssignmentExport = new AssignmentExport(students[0],assignment, null);
+    const zipFileName:string = "zippedSubmissions"
+    await exportToZip(
+      assignmentExport,
+      submissions,
+      zipFileName
+    );
+    const zipFilePath = "zippedSubmissions.zip";
+    let files: any[] = [];
+    // read a zip file
+    await fs.readFile(zipFilePath, (err: any, data: any) => {
+      if (err) throw err;
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      JSZip.loadAsync(data).then((zip: any) => {
+        files = Object.keys(zip.files);
+        console.log(files);
+        expect(files).toStrictEqual(expectedResult);
+      });
+    });
 
     const reviewsPerUser = 3;
     const studentNumbers: [User, number][] = [];
