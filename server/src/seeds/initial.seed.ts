@@ -1,33 +1,42 @@
-import {Seeder} from "typeorm-seeding";
-import {createUser} from "../factories/User.factory";
-import {createDefaultFaculties} from "../factories/Faculty.factory";
-import {createDefaultAcademicYears} from "../factories/AcademicYear.factory";
-import {parseAndSaveAffiliation, parseAndSaveOrganisationUnit, parseAndSaveStudy,} from "../util/parseAndSaveSSOFields";
-import {createCourse} from "../factories/Course.factory";
-import {createAssignment} from "../factories/Assignment.factory";
-import {createEnrollment} from "../factories/Enrollment.factory";
-import {createAssignmentVersion} from "../factories/AssignmentVersion.factory";
-import {createSubmissionQuestionnaire} from "../factories/SubmissionQuestionnaire.factory";
+import { Seeder } from "typeorm-seeding";
+import { createUser } from "../factories/User.factory";
+import { createDefaultFaculties } from "../factories/Faculty.factory";
+import { createDefaultAcademicYears } from "../factories/AcademicYear.factory";
+import {
+  parseAndSaveAffiliation,
+  parseAndSaveOrganisationUnit,
+  parseAndSaveStudy,
+} from "../util/parseAndSaveSSOFields";
+import { createCourse } from "../factories/Course.factory";
+import { createAssignment } from "../factories/Assignment.factory";
+import { createEnrollment } from "../factories/Enrollment.factory";
+import { createAssignmentVersion } from "../factories/AssignmentVersion.factory";
+import { createSubmissionQuestionnaire } from "../factories/SubmissionQuestionnaire.factory";
 import AssignmentVersion from "../models/AssignmentVersion";
-import {createOpenQuestion} from "../factories/OpenQuestion.factory";
+import { createOpenQuestion } from "../factories/OpenQuestion.factory";
 import UserRole from "../enum/UserRole";
-import {createReviewQuestionnaire} from "../factories/ReviewQuestionnaire.factory";
+import { createReviewQuestionnaire } from "../factories/ReviewQuestionnaire.factory";
 import User from "../models/User";
-import {AssignmentState} from "../enum/AssignmentState";
+import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
 import Course from "../models/Course";
-import {createGroup} from "../factories/Group.factory";
-import {createSubmission} from "../factories/Submission.factory";
-import {createFile} from "../factories/File.factory";
+import { createGroup } from "../factories/Group.factory";
+import { createSubmission } from "../factories/Submission.factory";
+import { createFile } from "../factories/File.factory";
 import fsPromises from "fs/promises";
 import config from "config";
 import path from "path";
 import Group from "../models/Group";
 import publishAssignment from "../assignmentProgression/publishAssignment";
 import closeSubmission from "../assignmentProgression/closeSubmission";
-import {distributeReviewsForAssignment} from "../assignmentProgression/distributeReviews";
+import { distributeReviewsForAssignment } from "../assignmentProgression/distributeReviews";
 import Review from "../models/Review";
 import Question from "../models/Question";
 import QuestionType from "../enum/QuestionType";
+import { createOpenQuestionAnswer } from "../factories/OpenQuestionAnswer.factory";
+import submitReview from "../util/submitReview";
+import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
+import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
+import openFeedback from "../assignmentProgression/openFeedback";
 
 const uploadFolder = path.resolve(config.get("uploadFolder") as string);
 const exampleFile = path.join(
@@ -44,6 +53,7 @@ interface StagePlan {
   assignmentState: AssignmentState;
   groupsEnabled: boolean;
   course: Course;
+  reviewQuestionnaire?: boolean;
 }
 
 function removeLate(num: number): number {
@@ -54,12 +64,21 @@ function getStudent(entity: User | User[]): User[] {
   return Array.isArray(entity) ? entity : [entity];
 }
 
-function answerQuestion(q: Question) {
-  switch (q.type) {
+async function answerQuestion(question: Question, review: Review) {
+  switch (question.type) {
     case QuestionType.OPEN: {
-
+      await createOpenQuestionAnswer({
+        question,
+        review,
+      });
     }
   }
+}
+
+function isBeforeState(orig: AssignmentState, after: AssignmentState) {
+  const currentStateIndex = assignmentStateOrder.indexOf(orig);
+  const otherStateIndex = assignmentStateOrder.indexOf(after);
+  return currentStateIndex <= otherStateIndex;
 }
 
 //users are allowed to submit
@@ -115,12 +134,14 @@ function getStagePlan(userCourse: Course, groupCourse: Course): StagePlan[] {
       assignmentState: AssignmentState.FEEDBACK,
       groupsEnabled: true,
       course: groupCourse,
+      reviewQuestionnaire: true,
     },
   ];
 }
 
 export default class InitialDatabaseSeed implements Seeder {
   public async run(): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const exportJSON: any = {};
 
     //Generate utils
@@ -209,7 +230,7 @@ export default class InitialDatabaseSeed implements Seeder {
       }
     }
 
-    const plan = getStagePlan(studentCourse, groupCourse).slice(4, 6);
+    const plan = getStagePlan(studentCourse, groupCourse).slice(4, 8);
 
     for (const schema of plan) {
       exportJSON[schema.name] = {};
@@ -217,14 +238,19 @@ export default class InitialDatabaseSeed implements Seeder {
       let numSubmittingEntities = schemaStudents.length;
 
       //Generate assignment
-      const assignment = await createAssignment({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const assignmentOverride: any = {
         course: schema.course,
         name: schema.name,
-        reviewEvaluation: false,
-        reviewEvaluationDueDate: null,
-        lateReviewEvaluations: null,
         submissionExtensions: ".pdf",
-      });
+      };
+
+      if (schema.reviewQuestionnaire === undefined) {
+        assignmentOverride.reviewEvaluation = false;
+        assignmentOverride.reviewEvaluationDueDate = null;
+        assignmentOverride.lateReviewEvaluations = null;
+      }
+      const assignment = await createAssignment(assignmentOverride);
 
       const userGroups: Group[] = [];
       //Enroll students/groups in assignment
@@ -284,6 +310,10 @@ export default class InitialDatabaseSeed implements Seeder {
       //Publish assignment
       await publishAssignment(assignment.id);
 
+      if (!isBeforeState(AssignmentState.SUBMISSION, schema.assignmentState)) {
+        continue;
+      }
+
       //Submit assignment
       numSubmittingEntities = removeLate(numSubmittingEntities);
       for (let i = 0; i < numSubmittingEntities; i++) {
@@ -301,7 +331,21 @@ export default class InitialDatabaseSeed implements Seeder {
         });
       }
 
+      if (
+        !isBeforeState(
+          AssignmentState.WAITING_FOR_REVIEW,
+          schema.assignmentState
+        )
+      ) {
+        continue;
+      }
+
       await closeSubmission(assignment.id);
+
+      if (!isBeforeState(AssignmentState.REVIEW, schema.assignmentState)) {
+        continue;
+      }
+
       await distributeReviewsForAssignment(assignment.id);
 
       //Review Assignment
@@ -312,18 +356,51 @@ export default class InitialDatabaseSeed implements Seeder {
           const reviews: Review[] =
             await submissionQuestionnaire.getReviewsWhereUserIsReviewer(user);
           for (const review of reviews) {
-            review.questionnaire?.questions.forEach((q) => {
-              answerQuestion(q);
-            })
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const questionnaire = await SubmissionQuestionnaire.findOneOrFail({
+              where: { id: review.questionnaireId },
+            });
+            for (const question of questionnaire.questions) {
+              await answerQuestion(question, review);
+            }
+            await submitReview(review, false);
           }
         }
       }
 
       //Get Feedback Assignment
+      if (!isBeforeState(AssignmentState.FEEDBACK, schema.assignmentState)) {
+        continue;
+      }
+
+      await openFeedback(assignment.id);
 
       //Review Feedback Assignment
-      console.log("\n\nSEED INFORMATION");
-      console.log(JSON.stringify(exportJSON, null, 1));
+      if (assignment.reviewEvaluation) {
+        numSubmittingEntities = removeLate(numSubmittingEntities);
+        for (let i = 0; i < numSubmittingEntities; i++) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          for (const user of userGroups[i].users!) {
+            const reviews: Review[] =
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              await assignmentVersion.reviewQuestionnaire!.getReviewsWhereUserIsReviewer(
+                user
+              );
+            for (const review of reviews) {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              const questionnaire = await ReviewQuestionnaire.findOneOrFail({
+                where: { id: review.questionnaireId },
+              });
+              for (const question of questionnaire.questions) {
+                await answerQuestion(question, review);
+              }
+              await submitReview(review, false);
+            }
+          }
+        }
+      }
     }
+    console.log("\n\nSEED INFORMATION");
+    console.log(JSON.stringify(exportJSON, null, 1));
   }
 }
