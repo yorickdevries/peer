@@ -16,7 +16,6 @@ export default {
         const formData = new FormData()
         formData.append("file", file)
         formData.append("courseId", courseId)
-        console.log(courseId)
         const body = { courseId }
         return client.post("enrollments/enrollMultiple", formData, body)
     },
