@@ -3,9 +3,7 @@ import Faker from "faker";
 import { ContainsKey } from "../util/seedData";
 import File from "../models/File";
 
-async function createFile(
-  override: ContainsKey<File>
-): Promise<File> {
+async function createFile(override: ContainsKey<File>): Promise<File> {
   return await factory(File)().create(override);
 }
 

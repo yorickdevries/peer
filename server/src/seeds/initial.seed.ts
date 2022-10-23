@@ -1,42 +1,46 @@
-import {Seeder} from "typeorm-seeding";
-import {createUser} from "../factories/User.factory";
-import {createDefaultFaculties} from "../factories/Faculty.factory";
-import {createDefaultAcademicYears} from "../factories/AcademicYear.factory";
-import {parseAndSaveAffiliation, parseAndSaveOrganisationUnit, parseAndSaveStudy,} from "../util/parseAndSaveSSOFields";
-import {createCourse} from "../factories/Course.factory";
-import {createAssignment} from "../factories/Assignment.factory";
-import {createEnrollment} from "../factories/Enrollment.factory";
-import {createAssignmentVersion} from "../factories/AssignmentVersion.factory";
-import {createSubmissionQuestionnaire} from "../factories/SubmissionQuestionnaire.factory";
+import { Seeder } from "typeorm-seeding";
+import { createUser } from "../factories/User.factory";
+import { createDefaultFaculties } from "../factories/Faculty.factory";
+import { createDefaultAcademicYears } from "../factories/AcademicYear.factory";
+import {
+  parseAndSaveAffiliation,
+  parseAndSaveOrganisationUnit,
+  parseAndSaveStudy,
+} from "../util/parseAndSaveSSOFields";
+import { createCourse } from "../factories/Course.factory";
+import { createAssignment } from "../factories/Assignment.factory";
+import { createEnrollment } from "../factories/Enrollment.factory";
+import { createAssignmentVersion } from "../factories/AssignmentVersion.factory";
+import { createSubmissionQuestionnaire } from "../factories/SubmissionQuestionnaire.factory";
 import AssignmentVersion from "../models/AssignmentVersion";
-import {createOpenQuestion} from "../factories/OpenQuestion.factory";
+import { createOpenQuestion } from "../factories/OpenQuestion.factory";
 import UserRole from "../enum/UserRole";
-import {createReviewQuestionnaire} from "../factories/ReviewQuestionnaire.factory";
+import { createReviewQuestionnaire } from "../factories/ReviewQuestionnaire.factory";
 import User from "../models/User";
-import {AssignmentState, assignmentStateOrder} from "../enum/AssignmentState";
+import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
 import Course from "../models/Course";
-import {createGroup} from "../factories/Group.factory";
-import {createSubmission} from "../factories/Submission.factory";
-import {createFile} from "../factories/File.factory";
+import { createGroup } from "../factories/Group.factory";
+import { createSubmission } from "../factories/Submission.factory";
+import { createFile } from "../factories/File.factory";
 import fsPromises from "fs/promises";
 import config from "config";
 import path from "path";
 import Group from "../models/Group";
 import publishAssignment from "../assignmentProgression/publishAssignment";
 import closeSubmission from "../assignmentProgression/closeSubmission";
-import {distributeReviewsForAssignment} from "../assignmentProgression/distributeReviews";
+import { distributeReviewsForAssignment } from "../assignmentProgression/distributeReviews";
 import Review from "../models/Review";
 import Question from "../models/Question";
 import QuestionType from "../enum/QuestionType";
-import {createOpenQuestionAnswer} from "../factories/OpenQuestionAnswer.factory";
+import { createOpenQuestionAnswer } from "../factories/OpenQuestionAnswer.factory";
 import submitReview from "../util/submitReview";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import openFeedback from "../assignmentProgression/openFeedback";
 import moment from "moment";
-import {createRangeQuestion} from "../factories/RangeQuestion.factory";
+import { createRangeQuestion } from "../factories/RangeQuestion.factory";
 import Questionnaire from "../models/Questionnaire";
-import {createRangeQuestionAnswer} from "../factories/RangeQuestionAnswer.factory";
+import { createRangeQuestionAnswer } from "../factories/RangeQuestionAnswer.factory";
 import RangeQuestion from "../models/RangeQuestion";
 
 const uploadFolder = path.resolve(config.get("uploadFolder") as string);
