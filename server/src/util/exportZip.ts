@@ -1,7 +1,7 @@
 import AssignmentExport from "../models/AssignmentExport";
 import File from "../models/File";
 import path from "path";
-import { getConnectionManager, getManager } from "typeorm";
+import { getManager } from "typeorm";
 import Submission from "../models/Submission";
 import JSZip from "jszip";
 import fs from "fs";
@@ -31,21 +31,19 @@ const exportToZip = async function (
     null,
     path.join(__dirname, "../../", `${fileName}.zip`)
   );
-  if (getConnectionManager().has("default")) {
-    await getManager().transaction(
-      "READ COMMITTED",
-      async (transactionalEntityManager) => {
-        // save file entry to database
-        await file.validateOrReject();
-        await transactionalEntityManager.save(file);
+  await getManager().transaction(
+    "READ COMMITTED",
+    async (transactionalEntityManager) => {
+      // save file entry to database
+      await file.validateOrReject();
+      await transactionalEntityManager.save(file);
 
-        // add to assignmentExport
-        assignmentExport.file = file;
-        await assignmentExport.validateOrReject();
-        await transactionalEntityManager.save(assignmentExport);
-      }
-    );
-  }
+      // add to assignmentExport
+      assignmentExport.file = file;
+      await assignmentExport.validateOrReject();
+      await transactionalEntityManager.save(assignmentExport);
+    }
+  );
 };
 
 export default exportToZip;
