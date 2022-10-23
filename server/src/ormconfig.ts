@@ -16,8 +16,8 @@ const databaseConfig: {
 
 const baseConfig = {
   entities: entityList,
-  // We are using migrations, synchronize should be set to false in production.
-  synchronize: process.env.NODE_ENV === "production" ? false : true,
+  // We are using migrations, synchronize should be set to false.
+  synchronize: false,
 
   // Run migrations automatically,
   // you can disable this if you prefer running migration manually.
@@ -35,7 +35,8 @@ const baseConfig = {
   },
   // when testing, the database is refreshed
   dropSchema: process.env.NODE_ENV === "test" ? true : false,
-
+  //when testing, automatically run migrations
+  migrationsRun: process.env.NODE_ENV === "test",
   // add seeder
   seeds: [path.resolve(__dirname, "seeds/**/*{.ts,.js}")],
   factories: [path.resolve(__dirname, "factories/**/*{.ts,.js}")],

@@ -12,6 +12,13 @@ export default {
         const body = { courseId, userNetid, role }
         return client.post("enrollments/", body)
     },
+    postMultipleStaff(file, courseId) {
+        const formData = new FormData()
+        formData.append("file", file)
+        formData.append("courseId", courseId)
+        const body = { courseId }
+        return client.post("enrollments/enrollMultiple", formData, body)
+    },
     delete(userNetid, courseId) {
         const params = { userNetid: userNetid, courseId: courseId }
         return client.delete(`enrollments/`, { params: params })
