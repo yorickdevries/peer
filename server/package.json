@@ -15,7 +15,11 @@
     "initdata": "node ./dist/scripts/initializeData.js",
     "typeorm": "ts-node ./node_modules/typeorm/cli.js --config src/ormconfig.ts",
     "typeorm:migration:generate": "npm run typeorm migration:generate -- -n",
-    "typeorm:migration:run": "npm run typeorm migration:run"
+    "typeorm:migration:run": "npm run typeorm migration:run",
+    "seed:config": "ts-node ./node_modules/typeorm-seeding/dist/cli.js config",
+    "seed:run": "echo ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -n ormconfig.ts -r '${PWD}/src' | bash",
+    "schema:drop": "ts-node ./node_modules/typeorm/cli.js schema:drop",
+    "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync",
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
@@ -79,6 +83,7 @@
     "workerpool": "^6.0.0"
   },
   "devDependencies": {
+    "@types/faker": "^5.5.8",
     "@types/jest": "^26.0.24",
     "@types/supertest": "^2.0.9",
     "@typescript-eslint/eslint-plugin": "^3.2.0",
@@ -93,6 +98,7 @@
     "prettier": "^2.7.1",
     "source-map-support": "^0.5.19",
     "supertest": "^4.0.2",
-    "ts-jest": "^26.1.0"
+    "ts-jest": "^26.1.0",
+    "typeorm-seeding": "^1.6.1"
   }
 }
