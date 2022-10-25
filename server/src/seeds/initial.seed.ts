@@ -42,6 +42,7 @@ import { createRangeQuestion } from "../factories/RangeQuestion.factory";
 import Questionnaire from "../models/Questionnaire";
 import { createRangeQuestionAnswer } from "../factories/RangeQuestionAnswer.factory";
 import RangeQuestion from "../models/RangeQuestion";
+import Submission from "../models/Submission";
 
 const uploadFolder = path.resolve(config.get("uploadFolder") as string);
 const exampleFile = path.join(
@@ -349,13 +350,22 @@ export default class InitialDatabaseSeed implements Seeder {
           exampleFile,
           path.join(uploadFolder, file.id.toString())
         );
-        await createSubmission({
+        const submission = await createSubmission({
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           user: userGroups[i].users![0],
           group: userGroups[i],
           assignmentVersion: assignmentVersion,
           file: file,
         });
+
+        //Set submission time
+        const submissionMoment = moment(assignment.dueDate).subtract(
+          skewTimes(i),
+          "minutes"
+        );
+
+        submission.createdAt = submissionMoment.toDate();
+        await Submission.save(submission);
       }
 
       if (
