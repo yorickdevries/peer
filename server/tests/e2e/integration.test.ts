@@ -1510,10 +1510,8 @@ describe("Integration", () => {
         `/api/statistics/assignment/${assignment.id}?chartType=time_before_deadline`
       )
       .set("cookie", await teacherCookie());
-    const date2 = new Date(submission2.updatedAt);
-    const date1 = new Date(emptySubmission.updatedAt);
-    date1.setMilliseconds(0);
-    date2.setMilliseconds(0);
+    const date2 = new Date(submission2.createdAt);
+    const date1 = new Date(emptySubmission.createdAt);
     expect(res.status).toBe(HttpStatusCode.OK);
     const averageTimes = JSON.parse(res.text);
     expect(averageTimes.deadline).toEqual(
