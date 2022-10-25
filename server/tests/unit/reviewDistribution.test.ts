@@ -102,7 +102,7 @@ describe("Review distribution", () => {
     const numStudents = numGroups * numStudentPerGroup;
 
     const students = [];
-    let expectedResult: any[] = ["pdfs/"]
+    const expectedResult: any[] = ["pdfs/"];
     for (let i = 0; i < numStudents; i++) {
       const student = new User(`student${i}`);
       await student.save();
@@ -131,7 +131,7 @@ describe("Review distribution", () => {
       // make submission
       const file = new File("filename", ".pdf", null);
       await file.save();
-      expectedResult.push(`pdfs/${student.netid}.pdf`)
+      expectedResult.push(`pdfs/${student.netid}.pdf`);
 
       const submission = new Submission(
         student,
@@ -144,13 +144,13 @@ describe("Review distribution", () => {
       submissions.push(submission);
     }
     //make export of submissions
-    const assignmentExport:AssignmentExport = new AssignmentExport(students[0],assignment, null);
-    const zipFileName:string = "zippedSubmissions"
-    await exportToZip(
-      assignmentExport,
-      submissions,
-      zipFileName
+    const assignmentExport: AssignmentExport = new AssignmentExport(
+      students[0],
+      assignment,
+      null
     );
+    const zipFileName = "zippedSubmissions";
+    await exportToZip(assignmentExport, submissions, zipFileName);
     const zipFilePath = "zippedSubmissions.zip";
     let files: any[] = [];
     // read a zip file
