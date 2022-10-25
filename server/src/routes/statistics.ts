@@ -74,10 +74,10 @@ router.get(
 
         const assignmentDeadline = assignment.dueDate;
 
-        const lastUpdateTimes = submissions.map((s) => s.updatedAt);
+        const createTimes = submissions.map((s) => s.createdAt);
         res.send({
           deadline: assignmentDeadline,
-          times: lastUpdateTimes,
+          times: createTimes,
         });
         break;
       }
