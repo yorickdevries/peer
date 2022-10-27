@@ -1674,6 +1674,45 @@ describe("Integration", () => {
       flaggedByReviewer: false,
     });
 
+    // check number of assigned reviews not submitted
+    res = await request(server)
+      .get(
+        `/api/statistics/assignment/${assignment.id}?chartType=num_no_reviews`
+      )
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject({
+      total: 2,
+      notCompleted: 1,
+    });
+
+    // check average time taken for review
+    res = await request(server)
+      .get(
+        `/api/statistics/assignment/${assignment.id}?chartType=avg_review_time`
+      )
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(JSON.parse(res.text)).toMatchObject([0]);
+
+    // check average time submitted before deadline
+    res = await request(server)
+      .get(
+        `/api/statistics/assignment/${assignment.id}?chartType=time_before_deadline`
+      )
+      .set("cookie", await teacherCookie());
+    const date2 = new Date(submission2.createdAt);
+    const date1 = new Date(emptySubmission.createdAt);
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const averageTimes = JSON.parse(res.text);
+    expect(averageTimes.deadline).toEqual(
+      new Date("2020-02-01T10:00Z").toISOString()
+    );
+
+    expect(averageTimes.times.length).toEqual(2);
+    expect(new Date(averageTimes.times[0])).toEqual(date1);
+    expect(new Date(averageTimes.times[1])).toEqual(date2);
+
     // get the reviews the other student needs to do
     res = await request(server)
       .get(
