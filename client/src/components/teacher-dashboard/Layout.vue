@@ -22,7 +22,8 @@ export default {
                 { to: { name: "teacher-dashboard.assignments" }, text: "Assignments" },
                 { to: { name: "teacher-dashboard.course.teachers" }, text: "Teacher Management" },
                 { to: { name: "teacher-dashboard.course.teaching-assistants" }, text: "TA Management" },
-                { to: { name: "teacher-dashboard.course.students" }, text: "Student Management" }
+                { to: { name: "teacher-dashboard.course.students" }, text: "Student Management" },
+                { to: { name: "teacher-dashboard.course.statistics.home" }, text: "Statistics" }
             ],
             course: {}
         }

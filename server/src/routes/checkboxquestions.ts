@@ -1,9 +1,9 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import {
-  validateParams,
-  validateBody,
   idSchema,
+  validateBody,
+  validateParams,
 } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Questionnaire from "../models/Questionnaire";
@@ -15,6 +15,7 @@ import { AssignmentState } from "../enum/AssignmentState";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import _ from "lodash";
 import { getManager } from "typeorm";
+import QuestionOperation from "../enum/QuestionOperation";
 
 const router = express.Router();
 
@@ -101,6 +102,7 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
     questionnaire
   );
   await question.save();
+  await question.reorder(QuestionOperation.CREATE);
   res.send(question);
 });
 
@@ -176,10 +178,11 @@ router.patch(
         "SERIALIZABLE", // make sure no new options can be added in the mean time
         async (transactionalEntityManager) => {
           // reload the question in transaction
-          const reloadedQuestion = await transactionalEntityManager.findOneOrFail(
-            CheckboxQuestion,
-            questionId
-          );
+          const reloadedQuestion =
+            await transactionalEntityManager.findOneOrFail(
+              CheckboxQuestion,
+              questionId
+            );
           const reloadedQuestionOptions = await transactionalEntityManager.find(
             CheckboxQuestionOption,
             { where: { question: reloadedQuestion } }
@@ -200,6 +203,7 @@ router.patch(
       );
     }
     await question.reload();
+    await question.reorder(QuestionOperation.MODIFY);
     res.send(question);
   }
 );
@@ -251,6 +255,7 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
   }
   // otherwise update the question
   await question.remove();
+  await question.reorder(QuestionOperation.DELETE);
   res.send(question);
 });
 

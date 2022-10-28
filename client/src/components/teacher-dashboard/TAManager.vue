@@ -75,6 +75,39 @@
                             >Add <b>{{ selectedNetid }}</b> as teaching assistant</b-button
                         >
                     </div>
+                    <!-- Modal Button -->
+                    <b-button
+                        v-b-modal="`uploadModal${this.courseId}`"
+                        :disabled="false"
+                        variant="primary"
+                        @click="resetFile"
+                        >Upload role assignment CSV</b-button
+                    >
+                    <!-- Upload Modal-->
+                    <b-modal
+                        :id="`uploadModal${this.courseId}`"
+                        ref="uploadModal"
+                        centered
+                        hide-footer
+                        title="Upload CSV File"
+                    >
+                        <hr />
+                        <b-alert show variant="warning">
+                            Make sure the information in the CSV file is in the following format: NetId, role(TA /
+                            Teacher)
+                        </b-alert>
+                        <b-alert show variant="secondary">Allowed file types: .csv{{ csv }}</b-alert>
+                        <b-form-file
+                            v-model="file"
+                            :accept="csv"
+                            placeholder="Choose a file..."
+                            required
+                            :state="Boolean(file)"
+                        />
+                        <b-button variant="primary" class="mt-3" :disabled="buttonDisabled" @click="addMultipleStaff()"
+                            >Upload</b-button
+                        >
+                    </b-modal>
                 </b-card>
             </b-col>
         </b-row>
@@ -92,6 +125,7 @@ export default {
     components: { BreadcrumbTitle, UserInfo },
     data() {
         return {
+            file: null,
             enrollments: [],
             // used to find a user from the database
             queryNetid: "",
@@ -146,9 +180,23 @@ export default {
             this.selectedNetid = ""
         },
         async deleteTeachingAssistant(netid) {
-            return this.showErrorMessage({
-                message: `At this moment deletion of user ${netid} is not supported, please contact the administrator to do this`
-            })
+            await api.enrollments.delete(netid, this.$route.params.courseId)
+            this.showSuccessMessage({ message: `Successfully removed teaching assistant.` })
+            await this.fetchTeachingAssistants()
+        },
+        async addMultipleStaff() {
+            try {
+                //upload csv file to server
+                this.buttonDisabled = true
+                this.$refs.uploadModal.hide()
+                await api.enrollments.postMultipleStaff(this.file, this.$route.params.courseId)
+                this.showSuccessMessage({ message: "Successfully submitted file." })
+                this.buttonDisabled = false
+                await this.fetchTeachingAssistants()
+            } catch (error) {
+                this.buttonDisabled = false
+                return
+            }
         }
     }
 }

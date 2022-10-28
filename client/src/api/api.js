@@ -28,6 +28,7 @@ import uploadquestionanswers from "./uploadquestionanswers"
 import pdfannotations from "./pdfannotations"
 import assignmentexports from "./assignmentexports"
 import codeannotations from "./codeannotations"
+import statistics from "./statistics"
 
 export default {
     getAuthenticated: () => {
@@ -63,5 +64,6 @@ export default {
     uploadquestionanswers: uploadquestionanswers,
     pdfannotations: pdfannotations,
     assignmentexports: assignmentexports,
-    codeannotations: codeannotations
+    codeannotations: codeannotations,
+    statistics: statistics
 }
