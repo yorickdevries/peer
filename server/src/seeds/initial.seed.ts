@@ -62,14 +62,34 @@ interface StagePlan {
   reviewQuestionnaire?: boolean;
 }
 
+/**
+ * Removes a set number from another number.
+ *
+ * @param num - The start number
+ *
+ * @returns The new number with the set number subtracted
+ */
 function removeLate(num: number): number {
   return num - 2;
 }
 
+/**
+ * Encases a given user in an array, if not already an array.
+ *
+ * @param entity - A user or array of users
+ *
+ * @returns The encased user or multiple user
+ */
 function getStudent(entity: User | User[]): User[] {
   return Array.isArray(entity) ? entity : [entity];
 }
 
+/**
+ * Answers a given question and saves to the DB.
+ *
+ * @param question - The question to answer
+ * @param review - The review associated with this question answer
+ */
 async function answerQuestion(question: Question, review: Review) {
   switch (question.type) {
     case QuestionType.OPEN: {
@@ -93,6 +113,11 @@ async function answerQuestion(question: Question, review: Review) {
   }
 }
 
+/**
+ * Generates questions for a specific questionnaire.
+ *
+ * @param questionnaire - The questionnaire to generate questions for
+ */
 async function generateQuestionnaireQuestions(questionnaire: Questionnaire) {
   await createOpenQuestion({
     number: 1,
@@ -104,6 +129,14 @@ async function generateQuestionnaireQuestions(questionnaire: Questionnaire) {
   });
 }
 
+/**
+ * Checks if an assignment state is at or before another state.
+ *
+ * @param orig - The original state
+ * @param after - The state to check
+ *
+ * @returns If the current state if before or equal to the passed state
+ */
 function isBeforeState(orig: AssignmentState, after: AssignmentState) {
   const currentStateIndex = assignmentStateOrder.indexOf(orig);
   const otherStateIndex = assignmentStateOrder.indexOf(after);
@@ -111,6 +144,13 @@ function isBeforeState(orig: AssignmentState, after: AssignmentState) {
 }
 
 //in minutes
+/**
+ * Gives a random time skew value based on its position in the array
+ *
+ * @param p - The numbers position
+ *
+ * @returns the time skew in minutes
+ */
 function skewTimes(p: number): number {
   if (p < 3) {
     return Math.pow(p, 1);
@@ -123,10 +163,6 @@ function skewTimes(p: number): number {
   }
 }
 
-//users are allowed to submit
-//submissions are closed but reviews are not open
-//users are allowed to review
-//users receive feedback on their submission
 function getStagePlan(userCourse: Course, groupCourse: Course): StagePlan[] {
   return [
     {
@@ -152,6 +188,7 @@ function getStagePlan(userCourse: Course, groupCourse: Course): StagePlan[] {
       assignmentState: AssignmentState.FEEDBACK,
       groupsEnabled: false,
       course: userCourse,
+      reviewQuestionnaire: true,
     },
     {
       name: "group_submission",
@@ -194,7 +231,7 @@ export default class InitialDatabaseSeed implements Seeder {
       "Electrical Engineering, Mathematics and Computer Science"
     );
 
-    //Generate group users
+    //Generate users
     const students: User[] = await Promise.all(
       [...Array(40)].map(async () => {
         return await createUser({
@@ -261,8 +298,8 @@ export default class InitialDatabaseSeed implements Seeder {
       role: UserRole.TEACHER,
     });
 
+    //Assign students to each course
     for (const course of courses) {
-      //Assign students
       for (const s of students) {
         await createEnrollment({
           course: course,
@@ -272,12 +309,13 @@ export default class InitialDatabaseSeed implements Seeder {
       }
     }
 
-    const plan = getStagePlan(studentCourse, groupCourse).slice(6, 8);
+    const plan = getStagePlan(studentCourse, groupCourse);
 
+    //Iterate through each stage (schema) of the plan
     for (const schema of plan) {
       exportJSON[schema.name] = {};
       const schemaStudents = schema.groupsEnabled ? groups : students;
-      let numSubmittingEntities = schemaStudents.length;
+      let numSubmittingEntities = schemaStudents.length; //number of groups / students
 
       //Generate assignment
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -397,6 +435,7 @@ export default class InitialDatabaseSeed implements Seeder {
             const questionnaire = await SubmissionQuestionnaire.findOneOrFail({
               where: { id: review.questionnaireId },
             });
+            //Answer questions
             for (const question of questionnaire.questions) {
               await answerQuestion(question, review);
             }
@@ -443,6 +482,7 @@ export default class InitialDatabaseSeed implements Seeder {
               const questionnaire = await ReviewQuestionnaire.findOneOrFail({
                 where: { id: review.questionnaireId },
               });
+              //Answer questions
               for (const question of questionnaire.questions) {
                 await answerQuestion(question, review);
               }
