@@ -2,6 +2,7 @@
 import MockStrategy from "passport-mock-strategy";
 import saveUserFromSSO from "../../util/saveUserFromSSO";
 import { PassportStatic } from "passport";
+import User from "../../models/User";
 
 const mockPassportConfiguration = async function (
   passport: PassportStatic,
@@ -24,9 +25,13 @@ const mockPassportConfiguration = async function (
       "EWI-ST-CSETT",
       "Electrical Engineering, Mathematics and Computer Science",
       "Software Technology",
-    ],
-    admin
+    ]
   );
+
+  const tempUser = await User.findOneOrFail(userNetid);
+  tempUser.admin = admin;
+  await User.save(tempUser);
+
   const user = { netid: userNetid };
   const strategy = new MockStrategy({
     name: "mock",
