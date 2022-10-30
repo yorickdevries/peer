@@ -34,9 +34,11 @@ const baseConfig = {
     migrationsDir: "src/migration",
   },
   // when testing, the database is refreshed
-  dropSchema: process.env.NODE_ENV === "test" ? true : false,
+  dropSchema: process.env.NODE_ENV === "test",
+
   //when testing, automatically run migrations
   migrationsRun: process.env.NODE_ENV === "test",
+
   // add seeder
   seeds: [path.resolve(__dirname, "seeds/**/*{.ts,.js}")],
   factories: [path.resolve(__dirname, "factories/**/*{.ts,.js}")],

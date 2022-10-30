@@ -16,10 +16,12 @@
     "typeorm": "ts-node ./node_modules/typeorm/cli.js --config src/ormconfig.ts",
     "typeorm:migration:generate": "npm run typeorm migration:generate -- -n",
     "typeorm:migration:run": "npm run typeorm migration:run",
-    "seed:config": "ts-node ./node_modules/typeorm-seeding/dist/cli.js config",
-    "seed:run": "echo ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -n ormconfig.ts -r '${PWD}/src' | bash",
-    "schema:drop": "ts-node ./node_modules/typeorm/cli.js schema:drop",
-    "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync"
+    "typeorm:migration:revert": "npm run typeorm:migration:revert",
+    "seed:config": "ts-node ./node_modules/typeorm-seeding/dist/cli.js -r 'src/../../src' config",
+    "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -n ormconfig.ts -r 'src/../../src'",
+    "schema:drop": "ts-node ./node_modules/typeorm/cli.js --config src/ormconfig.ts schema:drop",
+    "schema:sync": "ts-node ./node_modules/typeorm/cli.js --config src/ormconfig.ts schema:sync",
+    "seed": "npm run schema:drop && npm run typeorm:migration:run && npm run seed:run"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
