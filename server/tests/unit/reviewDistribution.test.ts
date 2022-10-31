@@ -131,7 +131,7 @@ describe("Review distribution", () => {
       // make submission
       const file = new File("filename", ".pdf", null);
       await file.save();
-      expectedResult.push(`pdfs/${student.netid}.pdf`);
+      expectedResult.push(`pdfs/${student.netid + "_" + j}.pdf`);
 
       const submission = new Submission(
         student,
