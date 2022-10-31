@@ -15,7 +15,7 @@ const exportToZip = async function (
   for (let i = 0; i < sortedSubmissions.length; i++) {
     const filePath = sortedSubmissions[i].file.getPath();
     //add student number to title instead of just 1,2,3...
-    const pdfFileName = `${sortedSubmissions[i].userNetid}.pdf`;
+    const pdfFileName = `${sortedSubmissions[i].userNetid+"_"+i}.pdf`;
     if (pdfs) {
       pdfs.file(pdfFileName, fs.readFileSync(filePath), { base64: true });
     }
