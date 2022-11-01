@@ -30,16 +30,10 @@ export default class File extends BaseModel {
   @IsNotEmpty()
   hash: string;
 
-  @Column()
-  @IsDefined()
-  @IsString()
-  filePath: string;
-
   constructor(
     name: string,
     extension: string,
-    hash: string | null,
-    filePath?: string | null
+    hash: string | null
   ) {
     super();
     this.name = name;
@@ -51,11 +45,6 @@ export default class File extends BaseModel {
         "0000000000000000000000000000000000000000000000000000000000000000";
     } else {
       this.hash = hash;
-    }
-    if (filePath !== null && filePath !== undefined) {
-      this.filePath = filePath;
-    } else {
-      this.filePath = "";
     }
   }
 
@@ -72,9 +61,7 @@ export default class File extends BaseModel {
   }
 
   getPath(): string {
-    if (this.filePath.length === 0) {
-      this.filePath = path.resolve(uploadFolder, this.id.toString());
-    }
-    return this.filePath;
+    const filePath = path.resolve(uploadFolder, this.id.toString());
+    return filePath;
   }
 }

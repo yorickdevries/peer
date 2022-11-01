@@ -1,6 +1,5 @@
 import AssignmentExport from "../models/AssignmentExport";
 import File from "../models/File";
-import path from "path";
 import { getManager } from "typeorm";
 import Submission from "../models/Submission";
 import JSZip from "jszip";
@@ -28,8 +27,7 @@ const exportToZip = async function (
   const file = new File(
     `${fileName}`,
     ".zip",
-    null,
-    path.join(__dirname, "../../", `${fileName}.zip`)
+    null
   );
   await getManager().transaction(
     "READ COMMITTED",

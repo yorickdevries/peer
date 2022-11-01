@@ -59,8 +59,7 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   }
   const file = assignmentExport.file;
   const fileName = file.getFileNamewithExtension();
-  const filePath = file.getPath();
-  res.download(filePath, fileName);
+  res.download(fileName);
 });
 
 export default router;
