@@ -31,9 +31,7 @@ export default class File extends BaseModel {
   hash: string;
 
   constructor(
-    name: string,
-    extension: string,
-    hash: string | null
+    name: string, extension: string, hash: string | null
   ) {
     super();
     this.name = name;

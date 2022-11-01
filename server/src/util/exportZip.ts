@@ -25,9 +25,7 @@ const exportToZip = async function (
     console.log(`Written ${fileName} to zip`);
   });
   const file = new File(
-    `${fileName}`,
-    ".zip",
-    null
+    `${fileName}`, ".zip", null
   );
   await getManager().transaction(
     "READ COMMITTED",
