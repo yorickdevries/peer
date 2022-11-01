@@ -13,6 +13,13 @@ This application uses Node 14.x
 7. Run `npm run start` in root to start the server.
 8. Access the site through [http://localhost:3000](http://localhost:3000)
 
+## Dev Instructions
+1. Complete steps 1 and 2 of `Build Instructions`
+2. Run `npm run seed` in ./server to reset the database, run migrations, and add seed data.
+3. Run `npm run watch:dev_server` in root to start a local dev server.
+4. Run `npm run watch:dev_client` in root to start a local dev client.
+5. Access the site through [http://localhost:8080](http://localhost:8080)
+
 - On the site you can mock a SSO-login login using http://localhost:3000/api/login
 - Only users with the affiliation `employee` can create courses
 
