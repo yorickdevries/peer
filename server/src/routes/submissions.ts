@@ -86,7 +86,15 @@ router.get(
         .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
       return;
     }
-
+    if (
+      // not a teacher
+      !(await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
+      return;
+    }
     const assignment = await assignmentVersion.getAssignment();
     const assignmentExport = new AssignmentExport(user, assignment, null);
     await assignmentExport.save();
