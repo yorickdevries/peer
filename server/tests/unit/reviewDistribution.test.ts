@@ -1,6 +1,6 @@
 import createDatabaseConnection from "../../src/databaseConnection";
 import initializeData from "../../src/util/initializeData";
-import { Connection } from "typeorm";
+import { Connection, getManager } from "typeorm";
 import User from "../../src/models/User";
 import Group from "../../src/models/Group";
 import Submission from "../../src/models/Submission";
@@ -21,6 +21,8 @@ import AssignmentExport from "../../src/models/AssignmentExport";
 import exportToZip from "../../src/util/exportZip";
 import fs from "fs";
 import JSZip from "jszip";
+import path from "path";
+import config from "config";
 
 describe("Review distribution", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -149,9 +151,24 @@ describe("Review distribution", () => {
       assignment,
       null
     );
-    const zipFileName = "zippedSubmissions";
+    const file = new File("a", "ads", null);
+    await getManager().transaction(
+      "READ COMMITTED",
+      async (transactionalEntityManager) => {
+        // save file entry to database
+        await file.validateOrReject();
+        await transactionalEntityManager.save(file);
+
+        // add to assignmentExport
+        assignmentExport.file = file;
+        await assignmentExport.validateOrReject();
+        await transactionalEntityManager.save(assignmentExport);
+      }
+    );
+    const zipFileName = "subZip";
     await exportToZip(assignmentExport, submissions, zipFileName);
-    const zipFilePath = "zippedSubmissions.zip";
+    const uploadFolder = config.get("uploadFolder") as string;
+    const zipFilePath = path.resolve(uploadFolder, "12");
     let files: any[] = [];
     // read a zip file
     await fs.readFile(zipFilePath, (err: any, data: any) => {

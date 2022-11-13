@@ -4,6 +4,8 @@ import { getManager } from "typeorm";
 import Submission from "../models/Submission";
 import JSZip from "jszip";
 import fs from "fs";
+import config from "config";
+import path from "path";
 const exportToZip = async function (
   assignmentExport: AssignmentExport,
   sortedSubmissions: Submission[],
@@ -21,10 +23,10 @@ const exportToZip = async function (
   }
 
   const content = await zip.generateAsync({ type: "nodebuffer" });
-  await fs.writeFile(`${fileName}.zip`, content, () => {
-    console.log(`Written ${fileName} to zip`);
-  });
+
+  const uploadFolder = config.get("uploadFolder") as string;
   const file = new File(`${fileName}`, ".zip", null);
+
   await getManager().transaction(
     "READ COMMITTED",
     async (transactionalEntityManager) => {
@@ -38,6 +40,10 @@ const exportToZip = async function (
       await transactionalEntityManager.save(assignmentExport);
     }
   );
+  const fp = path.resolve(uploadFolder, file.id.toString());
+  await fs.writeFile(fp, content, () => {
+    console.log(file.getFileNamewithExtension());
+  });
 };
 
 export default exportToZip;
