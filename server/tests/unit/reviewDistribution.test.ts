@@ -168,7 +168,7 @@ describe("Review distribution", () => {
     const zipFileName = "subZip";
     await exportToZip(assignmentExport, submissions, zipFileName);
     const uploadFolder = config.get("uploadFolder") as string;
-    const zipFilePath = path.resolve(uploadFolder, "1");
+    const zipFilePath = path.resolve(uploadFolder, "8");
     let files: any[] = [];
     // read a zip file
     await fs.readFile(zipFilePath, (err: any, data: any) => {
