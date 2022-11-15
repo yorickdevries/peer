@@ -62,6 +62,13 @@ interface StagePlan {
   reviewQuestionnaire?: boolean;
 }
 
+const teacherUsernames = [...Array(8)]
+  .map((_e, i) => `employee${i + 2}`)
+  .reverse();
+const studentUsernames = [...Array(200)]
+  .map((_e, i) => `student${i}`)
+  .reverse();
+
 /**
  * Removes a set number from another number.
  *
@@ -238,6 +245,7 @@ export default class InitialDatabaseSeed implements Seeder {
           organisationUnit: org,
           study,
           affiliation: studentAffiliation,
+          netid: studentUsernames.pop(),
         });
       })
     );
@@ -254,6 +262,7 @@ export default class InitialDatabaseSeed implements Seeder {
           organisationUnit: org,
           study,
           affiliation: employeeAffiliation,
+          netid: teacherUsernames.pop(),
         });
       })
     );
