@@ -217,14 +217,12 @@ export default {
                         for (const review of reviews) {
                             const res = await api.pdfannotations.get(review.id, vm.fileMetadata.id)
                             const annotations = res.data
+                            annotations.forEach(a => (a.target.selector.strokeColor = vm.reviewColors[review.id]))
                             /* API to add annotations */
-                            for (const annotation of annotations) {
-                                try {
-                                    annotation.target.selector.strokeColor = vm.reviewColors[review.id]
-                                    await annotationManager.addAnnotations([annotation])
-                                } catch (error) {
-                                    console.log(error)
-                                }
+                            try {
+                                await annotationManager.addAnnotations(annotations)
+                            } catch (error) {
+                                console.log(error)
                             }
                         }
 
