@@ -189,7 +189,6 @@ describe("Review distribution", () => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       JSZip.loadAsync(data).then((zip: any) => {
         files = Object.keys(zip.files);
-        console.log(files);
         expect(files).toStrictEqual(expectedResult);
       });
     });
