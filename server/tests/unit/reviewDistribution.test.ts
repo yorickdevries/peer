@@ -131,8 +131,18 @@ describe("Review distribution", () => {
       ]);
       await group.save();
       // make submission
+      const exampleSubmissionFile = path.resolve(
+        __dirname,
+        "../../exampleData/submissions/submission1.c"
+      );
       const file = new File("filename", ".pdf", null);
       await file.save();
+      const uploadFolder = config.get("uploadFolder") as string;
+      const fp = path.resolve(uploadFolder, file.id.toString());
+      await fs.writeFile(fp, fs.readFileSync(exampleSubmissionFile), () => {
+        console.log(file.getFileNamewithExtension());
+      });
+
       expectedResult.push(`pdfs/${student.netid + "_" + j}.pdf`);
 
       const submission = new Submission(
@@ -168,7 +178,10 @@ describe("Review distribution", () => {
     const zipFileName = "subZip";
     await exportToZip(assignmentExport, submissions, zipFileName);
     const uploadFolder = config.get("uploadFolder") as string;
-    const zipFilePath = path.resolve(uploadFolder, "8");
+    const zipFilePath = path.resolve(
+      uploadFolder,
+      path.resolve(uploadFolder, (file.id + 1).toString())
+    );
     let files: any[] = [];
     // read a zip file
     await fs.readFile(zipFilePath, (err: any, data: any) => {
