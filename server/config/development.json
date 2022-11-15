@@ -1,0 +1,12 @@
+{
+  "passport": {
+    "idpUrl": "https://eipdev.ewi.tudelft.nl/saml/saml2/idp/metadata.php",
+    "protocol": "saml2",
+    "issuer": "http://localhost:8080",
+    "callbackUrl": "http://localhost:8080/api/login/callback",
+    "certificate": "./cert/peer-dev.crt",
+    "key": "./cert/peer-dev.key"
+  },
+  "ServiceProviderMetadataFile": "./ServiceProviderMetadata.xml",
+  "url": "http://localhost:8080"
+}
