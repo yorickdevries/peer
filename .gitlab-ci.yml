@@ -37,9 +37,6 @@ lint-server:
   script:
   - cd server && npm ci --cache .npm --prefer-offline
   - npm run lint
-  only:
-  - merge_requests
-  - pushes
 
 lint-client:
   stage: static-analysis
@@ -48,9 +45,6 @@ lint-client:
   script:
   - cd client && npm ci --cache .npm --prefer-offline
   - npm run lint
-  only:
-  - merge_requests
-  - pushes
 
 build-server:
   stage: build
@@ -59,9 +53,6 @@ build-server:
   script:
   - cd server && npm ci --cache .npm --prefer-offline
   - npm run build
-  only:
-  - merge_requests
-  - pushes
 
 build-client:
   stage: build
@@ -70,9 +61,6 @@ build-client:
   script:
   - cd client && npm ci --cache .npm --prefer-offline
   - npm run build
-  only:
-  - merge_requests
-  - pushes
 
 test:
   stage: test
@@ -83,9 +71,6 @@ test:
   script:
   - cd server && npm ci --cache .npm --prefer-offline
   - npm run test
-  only:
-  - merge_requests
-  - pushes
 
 coverage:
   stage: test
@@ -97,9 +82,6 @@ coverage:
   script:
   - cd server && npm ci --cache .npm --prefer-offline
   - npm run coverage
-  only:
-  - merge_requests
-  - pushes
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
   artifacts:
     when: always
@@ -118,9 +100,6 @@ migration:
   - cd server && npm ci --cache .npm --prefer-offline
   - npm run build
   - npm run typeorm:migration:run
-  only:
-  - merge_requests
-  - pushes
 
 start-server:
   stage: start
@@ -133,9 +112,6 @@ start-server:
   - npm run build
   - npm run typeorm:migration:run
   - timeout 60s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
-  only:
-  - merge_requests
-  - pushes
 
 eslint-sast:
   stage: sast
