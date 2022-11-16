@@ -33,3 +33,6 @@ pnpm-debug.log*
 *.xml
 *.iml
 *.ser
+
+# Ignore zip files generated
+*.zip

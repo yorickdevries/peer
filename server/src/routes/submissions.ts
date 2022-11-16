@@ -25,6 +25,7 @@ import AssignmentExport from "../models/AssignmentExport";
 import {
   startExportSubmissionsForAssignmentVersionWorker,
   startSubmissionFlaggingWorker,
+  startExportSubmissionsForZipWorker,
   //startImportWebLabSubmissionsWorker,
 } from "../workers/pool";
 //import AssignmentType from "../enum/AssignmentType";
@@ -68,6 +69,44 @@ router.get("/", validateQuery(assignmentVersionIdSchema), async (req, res) => {
   const sortedSubmissions = _.sortBy(submissions, "id");
   res.send(sortedSubmissions);
 });
+
+//get a zip of all submissions for an assignment
+router.get(
+  "/zip",
+  validateQuery(assignmentVersionIdSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const assignmentVersionId: number = req.query.assignmentVersionId as any;
+    const assignmentVersion = await AssignmentVersion.findOne(
+      assignmentVersionId
+    );
+    if (!assignmentVersion) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
+      return;
+    }
+    const assignment = await assignmentVersion.getAssignment();
+    const assignmentExport = new AssignmentExport(user, assignment, null);
+    await assignmentExport.save();
+
+    //offload to worker function
+    startExportSubmissionsForZipWorker(
+      assignmentVersion.id,
+      assignmentExport.id
+    );
+    res.send(assignmentExport);
+  }
+);
 
 //get number of submissions
 router.get(
@@ -564,7 +603,6 @@ router.post(
       assignmentExport.id,
       exportType
     );
-
     // send message that reviews are being exported
     res.send(assignmentExport);
   }
