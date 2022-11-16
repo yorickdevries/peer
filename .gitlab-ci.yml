@@ -59,6 +59,8 @@ build-server:
     - server/dist
     - server/files
     expire_in: 30 minutes
+  except:
+  - schedule
 
 build-client:
   stage: build
@@ -67,6 +69,8 @@ build-client:
   script:
   - cd client && npm ci --cache .npm --prefer-offline
   - npm run build
+  except:
+  - schedule
 
 test:
   stage: test
@@ -79,6 +83,8 @@ test:
   script:
   - cd server && npm ci --cache .npm --prefer-offline
   - npm run test
+  except:
+  - schedule
 
 coverage:
   stage: test
@@ -99,6 +105,8 @@ coverage:
       junit:
       - junit.xml
       cobertura: coverage/cobertura-coverage.xml
+  except:
+  - schedule
 
 migration:
   stage: migration
@@ -112,6 +120,8 @@ migration:
   - cd server && npm ci --cache .npm --prefer-offline
   #- npm run build
   - npm run typeorm:migration:run
+  except:
+  - schedule
 
 start-server:
   stage: start
@@ -126,6 +136,8 @@ start-server:
   #- npm run build
   - npm run typeorm:migration:run
   - timeout 60s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
+  except:
+  - schedule
 
 eslint-sast:
   stage: sast
