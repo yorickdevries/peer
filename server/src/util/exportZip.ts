@@ -41,7 +41,7 @@ const exportToZip = async function (
     }
   );
   const fp = path.resolve(uploadFolder, file.id.toString());
-  await fs.writeFile(fp, content, () => {});
+  await fs.writeFile(fp, content, () => undefined);
 };
 
 export default exportToZip;
