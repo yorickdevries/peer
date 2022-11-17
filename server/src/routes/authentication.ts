@@ -50,12 +50,6 @@ const authenticationRoutes = function (router: Router): void {
     router.get("/metadata.xml", async (_, res) => {
       res.sendFile(metadataPath);
     });
-
-    // Route to logout.
-    router.get("/logout", (req, res) => {
-      req.logout();
-      res.redirect("/");
-    });
   } else {
     // Joi inputvalidation
     const mockUserSchema = Joi.object({
@@ -80,6 +74,11 @@ const authenticationRoutes = function (router: Router): void {
       }
     );
   }
+  // Route to logout.
+  router.get("/logout", (req, res) => {
+    req.logout();
+    res.redirect("/");
+  });
 };
 
 export default authenticationRoutes;
