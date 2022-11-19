@@ -7,8 +7,11 @@
             <b-card no-body>
                 <b-tabs card lazy class="mb-3">
                     <!--Details & Action-->
-                    <b-tab title="Assignments" active ref="chartTab">
+                    <b-tab title="Assignments" active>
                         <AssignmentStatistics :enum="this.chartEnum.Assignment" />
+                    </b-tab>
+                    <b-tab title="Participation">
+                        <ParticipationTable />
                     </b-tab>
                 </b-tabs>
             </b-card>
@@ -20,10 +23,11 @@
 import notifications from "@/mixins/notifications"
 import BreadcrumbTitle from "@/components/BreadcrumbTitle"
 import AssignmentStatistics from "@/components/teacher-dashboard/statistics/AssignmentStatistics"
+import ParticipationTable from "@/components/teacher-dashboard/statistics/ParticipationTable"
 
 export default {
     mixins: [notifications],
-    components: { AssignmentStatistics, BreadcrumbTitle },
+    components: { ParticipationTable, AssignmentStatistics, BreadcrumbTitle },
     name: "Statistics",
     data() {
         return {
