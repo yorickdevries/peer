@@ -100,8 +100,8 @@ router.get(
           .getMany();
 
         const numOfAssignedReviews = reviews.length;
-        const numOfReviewsNotCompleted = reviews.filter(
-          (r) => !r.submitted
+        const numOfReviewsSubmitted = reviews.filter(
+          (r) => r.submitted
         ).length;
 
         const reviewIds = reviews.map((r) => r.id);
@@ -115,9 +115,9 @@ router.get(
               })
             : [];
 
-        const numOfAssignedFeedbackReviews = feedbackReviews.length;
-        const numOfFeedbackReviewsNotCompleted = feedbackReviews.filter(
-          (r) => !r.submitted
+        const numOfEvaluations = feedbackReviews.length;
+        const numOfEvaluationsSubmitted = feedbackReviews.filter(
+          (r) => r.submitted
         ).length;
 
         const finalSubmissionNumber = await Promise.all(
@@ -132,13 +132,13 @@ router.get(
             status: "Initial",
             submissions: groups.length,
             reviews: numOfAssignedReviews,
-            feedback: numOfAssignedFeedbackReviews,
+            feedback: numOfEvaluations,
           },
           {
             status: "Final",
             submissions: finalSubmissionLength,
-            reviews: numOfReviewsNotCompleted,
-            feedback: numOfFeedbackReviewsNotCompleted,
+            reviews: numOfReviewsSubmitted,
+            feedback: numOfEvaluationsSubmitted,
           },
         ]);
         break;
