@@ -84,9 +84,6 @@ router.get(
         break;
       }
       case DataType.Assignment.PARTICIPATION: {
-        // num groups, num reviews distributed, num reviews submitted
-        // num groups with final submission, num reviews submitted, num feedback reviews submitted
-
         const groups = await assignment.getGroups();
         const assignmentVersions = assignment.versions;
 
@@ -115,7 +112,6 @@ router.get(
               })
             : [];
 
-        const numOfEvaluations = feedbackReviews.length;
         const numOfEvaluationsSubmitted = feedbackReviews.filter(
           (r) => r.submitted
         ).length;
@@ -132,7 +128,7 @@ router.get(
             status: "Initial",
             submissions: groups.length,
             reviews: numOfAssignedReviews,
-            feedback: numOfEvaluations,
+            feedback: numOfReviewsSubmitted,
           },
           {
             status: "Final",
