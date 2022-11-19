@@ -1680,8 +1680,8 @@ describe("Integration", () => {
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
     expect(JSON.parse(res.text)).toEqual([
-      { status: "Initial", submissions: 2, reviews: 2, feedback: 1 },
-      { status: "Final", submissions: 2, reviews: 1, feedback: 0 },
+      { status: "Initial", submissions: 2, reviews: 2, evaluations: 1 },
+      { status: "Final", submissions: 2, reviews: 1, evaluations: 0 },
     ]);
 
     // check average time taken for review

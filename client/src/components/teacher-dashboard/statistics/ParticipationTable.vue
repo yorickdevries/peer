@@ -21,20 +21,20 @@ export default {
     props: ["data"],
     data() {
         return {
-            fields: ["status", "submissions", "reviews", "feedback"],
+            fields: ["status", "submissions", "reviews", "evaluations"],
             explanation: false,
             explanationData: [
                 {
                     status: "Initial",
                     submissions: "Number of groups/students",
                     reviews: "Number of reviews distributed",
-                    feedback: "Number of evaluations distributed"
+                    evaluations: "Number of evaluations distributed"
                 },
                 {
                     status: "Final",
                     submissions: "Number of final submissions",
                     reviews: "Number of reviews submitted",
-                    feedback: "Number of evaluations submitted"
+                    evaluations: "Number of evaluations submitted"
                 }
             ]
         }

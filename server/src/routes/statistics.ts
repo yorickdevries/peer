@@ -128,13 +128,13 @@ router.get(
             status: "Initial",
             submissions: groups.length,
             reviews: numOfAssignedReviews,
-            feedback: numOfReviewsSubmitted,
+            evaluations: numOfReviewsSubmitted,
           },
           {
             status: "Final",
             submissions: finalSubmissionLength,
             reviews: numOfReviewsSubmitted,
-            feedback: numOfEvaluationsSubmitted,
+            evaluations: numOfEvaluationsSubmitted,
           },
         ]);
         break;
