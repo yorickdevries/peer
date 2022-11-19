@@ -1674,22 +1674,20 @@ describe("Integration", () => {
       flaggedByReviewer: false,
     });
 
-    // check number of assigned reviews not submitted
+    // check participation table
     res = await request(server)
-      .get(
-        `/api/statistics/assignment/${assignment.id}?chartType=num_no_reviews`
-      )
+      .get(`/api/statistics/assignment/${assignment.id}?dataType=participation`)
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
-    expect(JSON.parse(res.text)).toMatchObject({
-      total: 2,
-      notCompleted: 1,
-    });
+    expect(JSON.parse(res.text)).toEqual([
+      { status: "Initial", submissions: 2, reviews: 2, feedback: 1 },
+      { status: "Final", submissions: 2, reviews: 1, feedback: 0 },
+    ]);
 
     // check average time taken for review
     res = await request(server)
       .get(
-        `/api/statistics/assignment/${assignment.id}?chartType=avg_review_time`
+        `/api/statistics/assignment/${assignment.id}?dataType=avg_review_time`
       )
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -1698,7 +1696,7 @@ describe("Integration", () => {
     // check average time submitted before deadline
     res = await request(server)
       .get(
-        `/api/statistics/assignment/${assignment.id}?chartType=time_before_deadline`
+        `/api/statistics/assignment/${assignment.id}?dataType=time_before_deadline`
       )
       .set("cookie", await teacherCookie());
     const date2 = new Date(submission2.createdAt);

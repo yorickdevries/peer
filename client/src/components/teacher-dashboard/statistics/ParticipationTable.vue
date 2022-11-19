@@ -19,8 +19,6 @@
 export default {
     name: "ParticipationTable",
     props: ["data"],
-    // num groups, num reviews distributed, num reviews submitted
-    // num groups with final submission, num reviews submitted, num feedback reviews submitted
     data() {
         return {
             fields: ["status", "submissions", "reviews", "feedback"],
