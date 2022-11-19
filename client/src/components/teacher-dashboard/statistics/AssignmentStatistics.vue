@@ -32,16 +32,6 @@
             <template v-if="selectedChart === this.enum.TIME_SUBMIT_BEFORE_DEADLINE">
                 <TimeBeforeDeadlineSubmissionChart :data="chartData" :buckets="bucketsProp" />
             </template>
-            <template v-if="selectedChart === this.enum.NUM_OF_NO_REVIEWS">
-                <b-card>
-                    <h5 class="text-center bold">Total reviews assigned: {{ this.chartData.total }}</h5>
-                    <h5 class="text-center">Total reviews not completed: {{ this.chartData.notCompleted }}</h5>
-                    <h5 class="text-center">
-                        Percentage of reviews not completed:
-                        {{ reviewPercentage }}
-                    </h5>
-                </b-card>
-            </template>
             <template v-if="selectedChart === this.enum.PARTICIPATION">
                 <ParticipationTable :data="chartData" />
             </template>
@@ -63,13 +53,6 @@ export default {
     computed: {
         renderChart() {
             return this.selectedAssignment !== null && this.selectedChart !== null && !this.loading && this.chartData
-        },
-        reviewPercentage() {
-            if (this.chartData.total === 0) {
-                return "0%"
-            } else {
-                return `${(100 * (this.chartData.notCompleted / this.chartData.total)).toFixed(2)}%`
-            }
         }
     },
     watch: {
@@ -91,7 +74,6 @@ export default {
             chartTypes: [
                 { value: this.enum.AVG_REVIEW_TIME, text: "Average time spent per review" },
                 { value: this.enum.TIME_SUBMIT_BEFORE_DEADLINE, text: "Submission time before deadline" },
-                { value: this.enum.NUM_OF_NO_REVIEWS, text: "Number of assigned reviews not submitted" },
                 { value: this.enum.PARTICIPATION, text: "Participation table" }
             ]
         }
