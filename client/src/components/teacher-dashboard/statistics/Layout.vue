@@ -10,9 +10,6 @@
                     <b-tab title="Assignments" active>
                         <AssignmentStatistics :enum="this.chartEnum.Assignment" />
                     </b-tab>
-                    <b-tab title="Participation">
-                        <ParticipationTable />
-                    </b-tab>
                 </b-tabs>
             </b-card>
         </b-container>
@@ -23,11 +20,10 @@
 import notifications from "@/mixins/notifications"
 import BreadcrumbTitle from "@/components/BreadcrumbTitle"
 import AssignmentStatistics from "@/components/teacher-dashboard/statistics/AssignmentStatistics"
-import ParticipationTable from "@/components/teacher-dashboard/statistics/ParticipationTable"
 
 export default {
     mixins: [notifications],
-    components: { ParticipationTable, AssignmentStatistics, BreadcrumbTitle },
+    components: { AssignmentStatistics, BreadcrumbTitle },
     name: "Statistics",
     data() {
         return {
@@ -35,7 +31,8 @@ export default {
                 Assignment: {
                     AVG_REVIEW_TIME: "avg_review_time",
                     TIME_SUBMIT_BEFORE_DEADLINE: "time_before_deadline",
-                    NUM_OF_NO_REVIEWS: "num_no_reviews"
+                    NUM_OF_NO_REVIEWS: "num_no_reviews",
+                    PARTICIPATION: "participation"
                 }
             }
         }

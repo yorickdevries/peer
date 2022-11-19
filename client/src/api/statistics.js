@@ -2,8 +2,8 @@ import client from "./axiosClient"
 
 export default {
     assignments: {
-        get(assignmentId, chart) {
-            const params = { chartType: chart }
+        get(assignmentId, data) {
+            const params = { dataType: data }
             return client.get(`statistics/assignment/${assignmentId}`, { params: params })
         }
     }

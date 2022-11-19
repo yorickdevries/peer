@@ -1,28 +1,30 @@
 import express from "express";
+import _ from "lodash";
 import Joi from "@hapi/joi";
 import {
   idSchema,
   validateParams,
   validateQuery,
 } from "../middleware/validation";
-import { ChartType } from "../enum/ChartType";
+import { DataType } from "../enum/DataType";
 import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ResponseMessage from "../enum/ResponseMessage";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
-import { getManager } from "typeorm";
+import {getManager, In} from "typeorm";
 import moment from "moment";
 import Submission from "../models/Submission";
+import ReviewOfReview from "../models/ReviewOfReview";
 
 const router = express.Router();
 
 // Joi inputvalidation for query
 const querySchema = Joi.object({
-  chartType: Joi.string()
-    .valid(...Object.values(ChartType.Assignment))
+  dataType: Joi.string()
+    .valid(...Object.values(DataType.Assignment))
     .required(),
 });
-// get data for specified assignment and charttype
+// get data for specified assignment and dataType
 router.get(
   "/assignment/:id",
   validateParams(idSchema),
@@ -44,8 +46,8 @@ router.get(
         .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
     }
 
-    switch (req.query.chartType) {
-      case ChartType.Assignment.AVG_REVIEW_TIME: {
+    switch (req.query.dataType) {
+      case DataType.Assignment.AVG_REVIEW_TIME: {
         const reviews: ReviewOfSubmission[] = await getManager()
           .createQueryBuilder(ReviewOfSubmission, "review")
           .where("review.submitted IS TRUE")
@@ -62,7 +64,7 @@ router.get(
         res.send(timeDeltas);
         break;
       }
-      case ChartType.Assignment.TIME_SUBMIT_BEFORE_DEADLINE: {
+      case DataType.Assignment.TIME_SUBMIT_BEFORE_DEADLINE: {
         const submissions: Submission[] = await getManager()
           .createQueryBuilder(Submission, "submission")
           .where("submission.final IS TRUE")
@@ -81,7 +83,7 @@ router.get(
         });
         break;
       }
-      case ChartType.Assignment.NUM_OF_NO_REVIEWS: {
+      case DataType.Assignment.NUM_OF_NO_REVIEWS: {
         const reviews: ReviewOfSubmission[] = await getManager()
           .createQueryBuilder(ReviewOfSubmission, "review")
           .leftJoin("review.submission", "submission")
@@ -99,6 +101,59 @@ router.get(
         res.send({
           total: numOfAssignedReviews,
           notCompleted: numOfReviewsNotCompleted,
+        });
+        break;
+      }
+      case DataType.Assignment.PARTICIPATION: {
+        // num groups, num reviews distributed, num reviews submitted
+        // num groups with final submission, num reviews submitted, num feedback reviews submitted
+
+        const groups = await assignment.getGroups();
+        const assignmentVersions = assignment.versions;
+
+        const reviews: ReviewOfSubmission[] = await getManager()
+          .createQueryBuilder(ReviewOfSubmission, "review")
+          .leftJoin("review.submission", "submission")
+          .leftJoin("submission.assignmentVersion", "assignmentVersion")
+          .where("assignmentVersion.assignmentId = :id", {
+            id: assignment.id,
+          })
+          .getMany();
+
+        const numOfAssignedReviews = reviews.length;
+        const numOfReviewsNotCompleted = reviews.filter(
+          (r) => !r.submitted
+        ).length;
+
+        const feedbackReviews = await ReviewOfReview.find({
+          where: {
+            reviewOfSubmission: In(reviews),
+          },
+        });
+
+        const numOfAssignedFeedbackReviews = feedbackReviews.length;
+        const numOfFeedbackReviewsNotCompleted = feedbackReviews.filter((r) => !r.submitted).length;
+
+        const finalSubmissionNumber = await Promise.all(
+          assignmentVersions.map(
+            async (v) => (await v.getFinalSubmissionsOfEachGroup()).length
+          )
+        );
+        const finalSubmissionLength = _.sum(finalSubmissionNumber);
+
+        res.send({
+          initial: {
+            status: "Initial",
+            submissions: groups.length,
+            reviews: numOfAssignedReviews,
+            feedback: numOfAssignedFeedbackReviews,
+          },
+          final: {
+            status: "Final",
+            submissions: finalSubmissionLength,
+            reviews: numOfReviewsNotCompleted,
+            feedback: numOfFeedbackReviewsNotCompleted,
+          },
         });
         break;
       }

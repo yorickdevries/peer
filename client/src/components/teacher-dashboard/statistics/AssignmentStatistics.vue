@@ -42,6 +42,9 @@
                     </h5>
                 </b-card>
             </template>
+            <template v-if="selectedChart === this.enum.PARTICIPATION">
+                <ParticipationTable :data="chartData" />
+            </template>
         </template>
     </b-container>
 </template>
@@ -51,11 +54,12 @@ import TimeBeforeDeadlineSubmissionChart from "@/components/teacher-dashboard/st
 import AverageTimeChart from "@/components/teacher-dashboard/statistics/AverageTimeChart"
 import api from "@/api/api"
 import _ from "lodash"
+import ParticipationTable from "@/components/teacher-dashboard/statistics/ParticipationTable"
 
 export default {
     name: "AssignmentStatistics",
     props: ["enum"],
-    components: { TimeBeforeDeadlineSubmissionChart, AverageTimeChart },
+    components: { ParticipationTable, TimeBeforeDeadlineSubmissionChart, AverageTimeChart },
     computed: {
         renderChart() {
             return this.selectedAssignment !== null && this.selectedChart !== null && !this.loading && this.chartData
@@ -87,7 +91,8 @@ export default {
             chartTypes: [
                 { value: this.enum.AVG_REVIEW_TIME, text: "Average time spent per review" },
                 { value: this.enum.TIME_SUBMIT_BEFORE_DEADLINE, text: "Submission time before deadline" },
-                { value: this.enum.NUM_OF_NO_REVIEWS, text: "Number of assigned reviews not submitted" }
+                { value: this.enum.NUM_OF_NO_REVIEWS, text: "Number of assigned reviews not submitted" },
+                { value: this.enum.PARTICIPATION, text: "Participation table" }
             ]
         }
     },
