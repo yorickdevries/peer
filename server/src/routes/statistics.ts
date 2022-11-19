@@ -97,9 +97,7 @@ router.get(
           .getMany();
 
         const numOfAssignedReviews = reviews.length;
-        const numOfReviewsSubmitted = reviews.filter(
-          (r) => r.submitted
-        ).length;
+        const numOfReviewsSubmitted = reviews.filter((r) => r.submitted).length;
 
         const reviewIds = reviews.map((r) => r.id);
 
