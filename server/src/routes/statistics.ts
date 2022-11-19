@@ -11,7 +11,7 @@ import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ResponseMessage from "../enum/ResponseMessage";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
-import {getManager, In} from "typeorm";
+import { getManager, In } from "typeorm";
 import moment from "moment";
 import Submission from "../models/Submission";
 import ReviewOfReview from "../models/ReviewOfReview";
@@ -104,14 +104,21 @@ router.get(
           (r) => !r.submitted
         ).length;
 
-        const feedbackReviews = await ReviewOfReview.find({
-          where: {
-            reviewOfSubmission: In(reviews),
-          },
-        });
+        const reviewIds = reviews.map((r) => r.id);
+
+        const feedbackReviews: ReviewOfReview[] =
+          reviewIds.length > 0
+            ? await ReviewOfReview.find({
+                where: {
+                  reviewOfSubmission: In(reviewIds),
+                },
+              })
+            : [];
 
         const numOfAssignedFeedbackReviews = feedbackReviews.length;
-        const numOfFeedbackReviewsNotCompleted = feedbackReviews.filter((r) => !r.submitted).length;
+        const numOfFeedbackReviewsNotCompleted = feedbackReviews.filter(
+          (r) => !r.submitted
+        ).length;
 
         const finalSubmissionNumber = await Promise.all(
           assignmentVersions.map(
@@ -120,20 +127,20 @@ router.get(
         );
         const finalSubmissionLength = _.sum(finalSubmissionNumber);
 
-        res.send({
-          initial: {
+        res.send([
+          {
             status: "Initial",
             submissions: groups.length,
             reviews: numOfAssignedReviews,
             feedback: numOfAssignedFeedbackReviews,
           },
-          final: {
+          {
             status: "Final",
             submissions: finalSubmissionLength,
             reviews: numOfReviewsNotCompleted,
             feedback: numOfFeedbackReviewsNotCompleted,
           },
-        });
+        ]);
         break;
       }
     }
