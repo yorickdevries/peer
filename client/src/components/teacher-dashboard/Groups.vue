@@ -114,14 +114,8 @@
                     Delete Group
                 </b-button>
 
-                <b-modal :id="`deleteGroup${row.item.id}`" hide-footer="true">
+                <b-modal :id="`deleteGroup${row.item.id}`" centered title="Warning" @ok="deleteGroup(row.item.id)">
                     <div>Are you sure you want to delete this group?</div>
-                    <dd>
-                        <b-button variant="danger" class="mr-2" @click="$bvModal.hide(`deleteGroup${row.item.id}`)"
-                            >No</b-button
-                        >
-                        <b-button variant="success" @click="deleteGroup(row.item.id)">Yes</b-button>
-                    </dd>
                 </b-modal>
             </template>
 
