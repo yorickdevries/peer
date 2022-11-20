@@ -152,15 +152,7 @@ function isBeforeState(orig: AssignmentState, after: AssignmentState) {
  * @returns the time skew in minutes
  */
 function skewTimes(p: number): number {
-  if (p < 3) {
-    return Math.pow(p, 1);
-  } else if (p < 10) {
-    return Math.pow(p, 2);
-  } else if (p < 20) {
-    return Math.pow(p, 3);
-  } else {
-    return Math.pow(p, 4);
-  }
+  return Math.pow(p, 1.5);
 }
 
 function getStagePlan(userCourse: Course, groupCourse: Course): StagePlan[] {
