@@ -43,6 +43,8 @@ import Questionnaire from "../models/Questionnaire";
 import { createRangeQuestionAnswer } from "../factories/RangeQuestionAnswer.factory";
 import RangeQuestion from "../models/RangeQuestion";
 import Submission from "../models/Submission";
+import ReviewOfSubmission from "../models/ReviewOfSubmission";
+import { createReviewOfReview } from "../factories/ReviewOfReview.factory";
 
 const uploadFolder = path.resolve(config.get("uploadFolder") as string);
 const exampleFile = path.join(
@@ -460,26 +462,44 @@ export default class InitialDatabaseSeed implements Seeder {
 
       //Review Feedback Assignment
       if (assignment.reviewEvaluation) {
+        const reviewQuestionnaire = await ReviewQuestionnaire.findOneOrFail({
+          where: { id: assignmentVersion.reviewQuestionnaireId },
+        });
+
         numSubmittingEntities = removeLate(numSubmittingEntities);
         for (let i = 0; i < numSubmittingEntities; i++) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          for (const user of userGroups[i].users!) {
-            const reviews: Review[] =
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              await assignmentVersion.reviewQuestionnaire!.getReviewsWhereUserIsReviewer(
-                user
-              );
-            for (const review of reviews) {
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              const questionnaire = await ReviewQuestionnaire.findOneOrFail({
-                where: { id: review.questionnaireId },
-              });
-              //Answer questions
-              for (const question of questionnaire.questions) {
-                await answerQuestion(question, review);
-              }
-              await submitReview(review, false);
+          const groupUsers = userGroups[i].users!;
+
+          //Find submission made by group
+          const submission = await Submission.find({
+            where: {
+              group: userGroups[i],
+              assignmentVersion: assignmentVersion,
+            },
+          });
+
+          //Find all reviews reviewing this group's submission
+          const submissionReviews = await ReviewOfSubmission.find({
+            where: {
+              submission: submission[0],
+            },
+          });
+
+          for (const review of submissionReviews) {
+            //Generate evaluation
+            const evaluation = await createReviewOfReview({
+              reviewer: groupUsers[0],
+              reviewOfSubmission: review,
+              questionnaire: reviewQuestionnaire,
+            });
+
+            //Answer questions
+            for (const question of reviewQuestionnaire.questions) {
+              await answerQuestion(question, evaluation);
             }
+
+            await submitReview(evaluation, false);
           }
         }
       }
