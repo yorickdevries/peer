@@ -1,6 +1,7 @@
 import neatCsv from "neat-csv";
 import stripBomBuffer from "strip-bom-buf";
 import parseNetID from "./parseNetID";
+import * as CSV from "csv-string";
 
 interface netidWithGroupName {
   netid: string;
@@ -17,8 +18,9 @@ const parseGroupCSV = async function (
   csvFilebuffer: Buffer
 ): Promise<groupNameWithNetidList[]> {
   // parse the file to rows
+  const a: string = csvFilebuffer.toString("utf8");
   const studentList = await neatCsv(stripBomBuffer(csvFilebuffer), {
-    separator: "," || ";",
+    separator: CSV.detect(a),
   });
   // check and convert it to netidWithGroupNames
   const netidWithGroupNames = getNetidWithGroupNames(studentList);
