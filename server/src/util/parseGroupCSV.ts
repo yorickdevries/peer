@@ -18,7 +18,7 @@ const parseGroupCSV = async function (
   csvFilebuffer: Buffer
 ): Promise<groupNameWithNetidList[]> {
   // parse the file to rows
-  const csvFileString = stripBomBuffer(csvFilebuffer).toString("utf8");
+  const csvFileString: string = stripBomBuffer(csvFilebuffer).toString("utf8");
   const studentList = await neatCsv(csvFileString, {
     separator: CSV.detect(csvFileString),
   });
