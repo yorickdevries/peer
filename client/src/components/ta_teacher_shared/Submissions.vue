@@ -221,6 +221,7 @@ export default {
             onlyFinalSubmissions: true,
             // for navigation
             fields: [
+                { key: "action", label: "Action" },
                 { key: "file", label: "File" },
                 { key: "groupName", label: "Group name", sortable: true },
                 { key: "date", label: "Date" },
@@ -229,8 +230,7 @@ export default {
                 { key: "approvalByTA", label: "Approval by TA", sortable: true },
                 { key: "approvingTA", label: "Approving TA" },
                 { key: "flaggedByServer", label: "Flagged by server", sortable: true },
-                { key: "commentByServer", label: "Comment by server" },
-                { key: "action", label: "Action" }
+                { key: "commentByServer", label: "Comment by server" }
             ],
             currentPage: 1,
             perPage: 10,
