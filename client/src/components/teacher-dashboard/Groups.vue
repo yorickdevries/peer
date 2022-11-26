@@ -140,10 +140,10 @@
                             variant="success"
                             class="mr-2"
                             size="sm"
-                            @click="addUserToGroup(row.item.id, newUserNetId)"
+                            @click="addUserToGroup(row.item.id, newUserNetId[row.item.id])"
                             >Add Group Member</b-button
                         >
-                        <b-input v-model="newUserNetId" placeholder="Enter valid NetID here."></b-input>
+                        <b-input v-model="newUserNetId[row.item.id]" placeholder="Enter valid NetID here."></b-input>
                     </dd>
                 </b-card>
                 <b-card header="Submissions" class="h-100">
@@ -307,7 +307,7 @@ export default {
             // add new group
             newGroupName: "",
             // add new user
-            newUserNetId: ""
+            newUserNetId: {}
         }
     },
     computed: {
@@ -373,7 +373,7 @@ export default {
             }
             await api.groups.addUser(groupId, userNetid)
             await this.fetchGroups()
-            this.newUserNetId = ""
+            this.newUserNetId[groupId] = ""
             this.showSuccessMessage({ message: "Succesfully added user to group." })
         },
         async removeUserFromGroup(groupId, userNetid) {
