@@ -238,8 +238,8 @@ export default {
     },
     async created() {
         await this.fetchReviews()
-        await this.fetchSubmissions()
         await this.fetchGroups()
+        await this.fetchSubmissions()
         await this.fetchAssignment()
     },
     computed: {
@@ -263,6 +263,7 @@ export default {
             const submissions = res1.data
             submissions.forEach(s => {
                 s.reportedByReview = this.checkIfReported(s.id)
+                s.groupName = this.groups.find(g => g.id === s.groupId).name
             })
             this.allSubmissions = submissions
             let count = await api.submissions.getSubmissionCount(this.assignmentVersionId)
@@ -271,9 +272,6 @@ export default {
         async fetchGroups() {
             const res = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
             this.groups = res.data
-            this.allSubmissions.forEach(s => {
-                s.groupName = this.groups.find(g => g.id === s.groupId).name
-            })
         },
         async fetchAssignment() {
             const res = await api.assignments.get(this.$route.params.assignmentId)
