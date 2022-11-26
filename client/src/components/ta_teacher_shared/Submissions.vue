@@ -155,7 +155,7 @@
             </template>
 
             <template v-slot:cell(date)="data">
-                {{ data.item.createdAt | formatDate }}
+                {{ data.item.createdAt | formatDateCompact }}
             </template>
 
             <template v-slot:cell(approvalByTA)="data">
