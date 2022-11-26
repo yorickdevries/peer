@@ -19,7 +19,7 @@
             </BreadcrumbTitle>
 
             <b-card no-body>
-                <b-tabs card lazy>
+                <b-tabs-persist card lazy>
                     <!--Details & Action-->
                     <b-tab title="Home" active>
                         <AssignmentHome></AssignmentHome>
@@ -59,7 +59,7 @@
                     <b-tab title="Exports">
                         <AssignmentExports></AssignmentExports>
                     </b-tab>
-                </b-tabs>
+                </b-tabs-persist>
             </b-card>
         </b-container>
     </div>
@@ -76,9 +76,11 @@ import Groups from "../Groups"
 import ReviewList from "../../ta_teacher_shared/ReviewList"
 import SubmissionList from "../../ta_teacher_shared/SubmissionList"
 import AssignmentExports from "../AssignmentExports"
+import BTabsPersist from "@/components/general/b-tabs-persist"
 
 export default {
     components: {
+        BTabsPersist,
         BreadcrumbTitle,
         AssignmentHome,
         AssignmentVersions,

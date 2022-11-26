@@ -12,7 +12,7 @@
                 <b-card-header class="d-flex justify-content-between align-items-center">
                     <div>Review information</div>
                     <div>
-                        <b-button size="sm" variant="secondary" @click="goToReviewList" class="mr-2"
+                        <b-button size="sm" variant="secondary" @click="$router.back()" class="mr-2"
                             >Back to Assignment</b-button
                         >
                         <b-button size="sm" variant="primary" @click="goToNextReviewWithoutApproval"
@@ -453,17 +453,6 @@ export default {
             await api.reviewofsubmissions.setApproval(this.review.id, approvalByTA, this.review.commentByTA)
             this.showSuccessMessage({ message: "Review approval status changed" })
             await this.fetchReview()
-        },
-        goToReviewList() {
-            if (this.$router.currentRoute.name.includes("teacher")) {
-                this.$router.push({
-                    name: "teacher-dashboard.assignments.assignment"
-                })
-            } else {
-                this.$router.push({
-                    name: "teaching-assistant-dashboard.course.assignment"
-                })
-            }
         },
         async goToNextReviewWithoutApproval() {
             const reviews = []
