@@ -158,6 +158,10 @@
                 {{ data.item.createdAt | formatDateCompact }}
             </template>
 
+            <template v-slot:cell(reportedByReview)="data">
+                {{ checkIfReported(data.item.id) }}
+            </template>
+
             <template v-slot:cell(approvalByTA)="data">
                 <span v-if="data.item.approvalByTA === null">No action yet by any TA</span>
                 <span v-if="data.item.approvalByTA === true">Approved 👍</span>
@@ -221,6 +225,7 @@ export default {
                 { key: "groupName", label: "Group name", sortable: true },
                 { key: "date", label: "Date" },
                 { key: "final", label: "Final", sortable: true },
+                { key: "reportedByReview", label: "Reported by Review", sortable: true },
                 { key: "approvalByTA", label: "Approval by TA", sortable: true },
                 { key: "approvingTA", label: "Approving TA" },
                 { key: "flaggedByServer", label: "Flagged by server", sortable: true },
@@ -231,13 +236,15 @@ export default {
             perPage: 10,
             filter: "",
             disableSubmissionExportButton: false,
-            assignment: null
+            assignment: null,
+            reviews: null
         }
     },
     async created() {
         await this.fetchSubmissions()
         await this.fetchGroups()
         await this.fetchAssignment()
+        await this.fetchReviews()
     },
     computed: {
         selectedSubmissions() {
@@ -264,10 +271,22 @@ export default {
         async fetchGroups() {
             const res = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
             this.groups = res.data
+            this.allSubmissions.forEach(s => {
+                s.groupName = this.groups.find(g => g.id === s.groupId).name
+            })
         },
         async fetchAssignment() {
             const res = await api.assignments.get(this.$route.params.assignmentId)
             this.assignment = res.data
+        },
+        async fetchReviews() {
+            const res = await api.reviewofsubmissions.getAllForAssignmentVersion(this.assignmentVersionId, true)
+            this.reviews = res.data
+        },
+        checkIfReported(submissionId) {
+            return _.some(this.reviews, function(r) {
+                return r.flaggedByReviewer && r.submission.id === submissionId
+            })
         },
         getGroup(id) {
             return _.find(this.groups, group => {
