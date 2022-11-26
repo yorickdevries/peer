@@ -185,8 +185,7 @@ export default {
             fields: [
                 { key: "reviewer.netid", label: "Reviewer" },
                 { key: "submissionFile", label: "Submission file" },
-                { key: "submission.groupId", label: "Group ID of submission", sortable: true },
-                { key: "submissionGroupName", label: "Group name of submission" },
+                { key: "submissionGroupName", label: "Group name of submission", sortable: true },
                 { key: "flaggedByReviewer", label: "Reviewer flagged the submission", sortable: true },
                 { key: "submitted", label: "Review submitted", sortable: true },
                 { key: "approvalByTA", label: "Approval by TA", sortable: true },

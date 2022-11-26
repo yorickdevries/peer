@@ -218,12 +218,12 @@ export default {
             // for navigation
             fields: [
                 { key: "file", label: "File" },
-                { key: "groupName", label: "Group name" },
-                { key: "date", label: "Date", sortable: true },
-                { key: "final", label: "Final" },
-                { key: "approvalByTA", label: "Approval by TA" },
+                { key: "groupName", label: "Group name", sortable: true },
+                { key: "date", label: "Date" },
+                { key: "final", label: "Final", sortable: true },
+                { key: "approvalByTA", label: "Approval by TA", sortable: true },
                 { key: "approvingTA", label: "Approving TA" },
-                { key: "flaggedByServer", label: "Flagged by server" },
+                { key: "flaggedByServer", label: "Flagged by server", sortable: true },
                 { key: "commentByServer", label: "Comment by server" },
                 { key: "action", label: "Action" }
             ],
@@ -263,8 +263,6 @@ export default {
         },
         async fetchGroups() {
             const res = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
-            console.log("AAAA")
-            console.log(res.data)
             this.groups = res.data
         },
         async fetchAssignment() {
