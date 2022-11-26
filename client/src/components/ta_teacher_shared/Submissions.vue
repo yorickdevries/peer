@@ -158,10 +158,6 @@
                 {{ data.item.createdAt | formatDateCompact }}
             </template>
 
-            <template v-slot:cell(reportedByReview)="data">
-                {{ checkIfReported(data.item.id) }}
-            </template>
-
             <template v-slot:cell(approvalByTA)="data">
                 <span v-if="data.item.approvalByTA === null">No action yet by any TA</span>
                 <span v-if="data.item.approvalByTA === true">Approved 👍</span>
@@ -241,10 +237,10 @@ export default {
         }
     },
     async created() {
+        await this.fetchReviews()
         await this.fetchSubmissions()
         await this.fetchGroups()
         await this.fetchAssignment()
-        await this.fetchReviews()
     },
     computed: {
         selectedSubmissions() {
@@ -264,7 +260,11 @@ export default {
         async fetchSubmissions() {
             // all submissions
             const res1 = await api.submissions.getAllForAssignmentVersion(this.assignmentVersionId)
-            this.allSubmissions = res1.data
+            const submissions = res1.data
+            submissions.forEach(s => {
+                s.reportedByReview = this.checkIfReported(s.id)
+            })
+            this.allSubmissions = submissions
             let count = await api.submissions.getSubmissionCount(this.assignmentVersionId)
             this.numberOfSubmissions = count.data
         },
