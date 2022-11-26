@@ -217,12 +217,9 @@ export default {
             onlyFinalSubmissions: true,
             // for navigation
             fields: [
-                { key: "id", label: "ID", sortable: true },
                 { key: "file", label: "File" },
-                { key: "groupId", label: "Group ID" },
                 { key: "groupName", label: "Group name" },
-                { key: "userNetid", label: "Submitted by" },
-                { key: "date", label: "​​​Date" },
+                { key: "date", label: "Date", sortable: true },
                 { key: "final", label: "Final" },
                 { key: "approvalByTA", label: "Approval by TA" },
                 { key: "approvingTA", label: "Approving TA" },
@@ -266,6 +263,8 @@ export default {
         },
         async fetchGroups() {
             const res = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
+            console.log("AAAA")
+            console.log(res.data)
             this.groups = res.data
         },
         async fetchAssignment() {

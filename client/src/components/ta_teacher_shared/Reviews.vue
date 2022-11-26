@@ -123,6 +123,7 @@
             :current-page="currentPage"
             :per-page="Number(perPage)"
             :filter="filter"
+            class="table-responsive"
         >
             <template v-slot:cell(submissionFile)="data">
                 <a :href="submissionFilePath(data.item.submission.id)" target="_blank">
