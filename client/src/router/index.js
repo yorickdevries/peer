@@ -3,6 +3,7 @@ import VueRouter from "vue-router"
 import StudentRoutes from "./student-routes"
 import TeacherRoutes from "./teacher-routes"
 import TeachingAssistantRoutes from "./teaching-assistant-routes"
+import AdminRoutes from "./admin-routes"
 Vue.use(VueRouter)
 
 /**
@@ -40,6 +41,7 @@ export default new VueRouter({
         ...StudentRoutes,
         ...TeacherRoutes,
         ...TeachingAssistantRoutes,
+        ...AdminRoutes,
         { path: "*", redirect: "/404" },
         { path: "/404", component: () => import("../components/404") }
     ]

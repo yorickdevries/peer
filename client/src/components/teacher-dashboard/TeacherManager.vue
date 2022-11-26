@@ -38,7 +38,7 @@
                     >
                         <template v-slot:cell(action)="data">
                             <b-button
-                                v-if="data.item.userNetid !== user.netid"
+                                v-if="data.item.userNetid !== user.netid || user.admin"
                                 @click="deleteTeacher(data.item.userNetid)"
                                 size="sm"
                                 variant="danger"
@@ -189,7 +189,13 @@ export default {
         async deleteTeacher(netid) {
             await api.enrollments.delete(netid, this.$route.params.courseId)
             this.showSuccessMessage({ message: `Successfully removed teacher.` })
-            await this.fetchTeachers()
+            if (netid === this.user.netid) {
+                this.$router.push({
+                    name: "courses"
+                })
+            } else {
+                await this.fetchTeachers()
+            }
         },
         async addMultipleStaff() {
             try {

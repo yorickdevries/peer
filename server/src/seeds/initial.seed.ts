@@ -43,6 +43,8 @@ import Questionnaire from "../models/Questionnaire";
 import { createRangeQuestionAnswer } from "../factories/RangeQuestionAnswer.factory";
 import RangeQuestion from "../models/RangeQuestion";
 import Submission from "../models/Submission";
+import ReviewOfSubmission from "../models/ReviewOfSubmission";
+import { createReviewOfReview } from "../factories/ReviewOfReview.factory";
 
 const uploadFolder = path.resolve(config.get("uploadFolder") as string);
 const exampleFile = path.join(
@@ -159,15 +161,7 @@ function isBeforeState(orig: AssignmentState, after: AssignmentState) {
  * @returns the time skew in minutes
  */
 function skewTimes(p: number): number {
-  if (p < 3) {
-    return Math.pow(p, 1);
-  } else if (p < 10) {
-    return Math.pow(p, 2);
-  } else if (p < 20) {
-    return Math.pow(p, 3);
-  } else {
-    return Math.pow(p, 4);
-  }
+  return Math.pow(p, 1.5);
 }
 
 function getStagePlan(userCourse: Course, groupCourse: Course): StagePlan[] {
@@ -477,26 +471,44 @@ export default class InitialDatabaseSeed implements Seeder {
 
       //Review Feedback Assignment
       if (assignment.reviewEvaluation) {
+        const reviewQuestionnaire = await ReviewQuestionnaire.findOneOrFail({
+          where: { id: assignmentVersion.reviewQuestionnaireId },
+        });
+
         numSubmittingEntities = removeLate(numSubmittingEntities);
         for (let i = 0; i < numSubmittingEntities; i++) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          for (const user of userGroups[i].users!) {
-            const reviews: Review[] =
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              await assignmentVersion.reviewQuestionnaire!.getReviewsWhereUserIsReviewer(
-                user
-              );
-            for (const review of reviews) {
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              const questionnaire = await ReviewQuestionnaire.findOneOrFail({
-                where: { id: review.questionnaireId },
-              });
-              //Answer questions
-              for (const question of questionnaire.questions) {
-                await answerQuestion(question, review);
-              }
-              await submitReview(review, false);
+          const groupUsers = userGroups[i].users!;
+
+          //Find submission made by group
+          const submission = await Submission.find({
+            where: {
+              group: userGroups[i],
+              assignmentVersion: assignmentVersion,
+            },
+          });
+
+          //Find all reviews reviewing this group's submission
+          const submissionReviews = await ReviewOfSubmission.find({
+            where: {
+              submission: submission[0],
+            },
+          });
+
+          for (const review of submissionReviews) {
+            //Generate evaluation
+            const evaluation = await createReviewOfReview({
+              reviewer: groupUsers[0],
+              reviewOfSubmission: review,
+              questionnaire: reviewQuestionnaire,
+            });
+
+            //Answer questions
+            for (const question of reviewQuestionnaire.questions) {
+              await answerQuestion(question, evaluation);
             }
+
+            await submitReview(evaluation, false);
           }
         }
       }

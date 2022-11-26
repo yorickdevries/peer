@@ -22,7 +22,6 @@ variables:
   SAST_EXCLUDED_ANALYZERS: "bandit, brakeman, gosec, spotbugs, flawfinder, phpcs-security-audit, security-code-scan, sobelow, pmd-apex, kubesec, mobsf"
 
 stages:
-    - static-analysis
     - build
     - test
     - migration
@@ -31,26 +30,22 @@ stages:
     - deploy
 
 lint-server:
-  stage: static-analysis
+  stage: test
+  needs: []
   variables:
     NODE_ENV: development
   script:
   - cd server && npm ci --cache .npm --prefer-offline
   - npm run lint
-  only:
-  - merge_requests
-  - pushes
 
 lint-client:
-  stage: static-analysis
+  stage: test
+  needs: []
   variables:
     NODE_ENV: development
   script:
   - cd client && npm ci --cache .npm --prefer-offline
   - npm run lint
-  only:
-  - merge_requests
-  - pushes
 
 build-server:
   stage: build
@@ -59,9 +54,13 @@ build-server:
   script:
   - cd server && npm ci --cache .npm --prefer-offline
   - npm run build
-  only:
-  - merge_requests
-  - pushes
+  artifacts:
+    paths:
+    - server/dist
+    - server/files
+    expire_in: 30 minutes
+  except:
+  - schedule
 
 build-client:
   stage: build
@@ -70,12 +69,13 @@ build-client:
   script:
   - cd client && npm ci --cache .npm --prefer-offline
   - npm run build
-  only:
-  - merge_requests
-  - pushes
+  except:
+  - schedule
 
 test:
   stage: test
+  needs:
+  - build-server
   variables:
     NODE_ENV: test
   services:
@@ -83,12 +83,13 @@ test:
   script:
   - cd server && npm ci --cache .npm --prefer-offline
   - npm run test
-  only:
-  - merge_requests
-  - pushes
+  except:
+  - schedule
 
 coverage:
   stage: test
+  needs:
+  - build-server
   variables:
     NODE_ENV: test
   allow_failure: true
@@ -97,45 +98,46 @@ coverage:
   script:
   - cd server && npm ci --cache .npm --prefer-offline
   - npm run coverage
-  only:
-  - merge_requests
-  - pushes
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
   artifacts:
     when: always
     reports:
       junit:
-        - junit.xml
+      - junit.xml
       cobertura: coverage/cobertura-coverage.xml
+  except:
+  - schedule
 
 migration:
   stage: migration
+  needs:
+  - build-server
   variables:
     NODE_ENV: production
   services:
   - mariadb:10.1
   script:
   - cd server && npm ci --cache .npm --prefer-offline
-  - npm run build
+  #- npm run build
   - npm run typeorm:migration:run
-  only:
-  - merge_requests
-  - pushes
+  except:
+  - schedule
 
 start-server:
   stage: start
+  needs:
+  - build-server
   variables:
     NODE_ENV: production
   services:
   - mariadb:10.1
   script:
   - cd server && npm ci --cache .npm --prefer-offline
-  - npm run build
+  #- npm run build
   - npm run typeorm:migration:run
   - timeout 60s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
-  only:
-  - merge_requests
-  - pushes
+  except:
+  - schedule
 
 eslint-sast:
   stage: sast

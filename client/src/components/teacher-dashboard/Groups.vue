@@ -110,9 +110,13 @@
                     {{ row.detailsShowing ? "Hide" : "Show" }} Edit Group/Submissions
                 </b-button>
                 <!--Delete Group-->
-                <b-button size="sm" @click="deleteGroup(row.item.id)" class="mr-2" variant="danger">
+                <b-button size="sm" v-b-modal="`deleteGroup${row.item.id}`" class="mr-2" variant="danger">
                     Delete Group
                 </b-button>
+
+                <b-modal :id="`deleteGroup${row.item.id}`" centered title="Warning" @ok="deleteGroup(row.item.id)">
+                    <div>Are you sure you want to delete this group?</div>
+                </b-modal>
             </template>
 
             <!--Actions-->

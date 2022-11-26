@@ -1,4 +1,7 @@
-# Peer Review #
+# Peer Review
+[![coverage report](https://gitlab.ewi.tudelft.nl/eip/peer/badges/dev/coverage.svg)](https://gitlab.ewi.tudelft.nl/eip/peer/-/commits/dev)
+[![Latest Release](https://gitlab.ewi.tudelft.nl/eip/peer/-/badges/release.svg)](https://gitlab.ewi.tudelft.nl/eip/peer/-/releases)
+
 Peer reviewing can now be done without any hassle with paper. Submit, review and get feedback for your course, all within one app! 
 
 This application uses Node 14.x

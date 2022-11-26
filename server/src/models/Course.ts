@@ -156,6 +156,24 @@ export default class Course extends BaseModel {
     );
   }
 
+  /**
+   * Returns the list of courses that a user is not yet enrolled in.
+   *
+   * @param user
+   * @returns list of courses
+   */
+  static async getAdminEnrollable(user: User): Promise<Course[]> {
+    // all courses
+    const allCourses = await Course.find();
+    const enrollableCourses = [];
+    for (const course of allCourses) {
+      if (!(await course.isEnrolled(user))) {
+        enrollableCourses.push(course);
+      }
+    }
+    return enrollableCourses;
+  }
+
   // get all enrollable courses for a certain user
   static async getEnrollable(user: User): Promise<Course[]> {
     // all enrollable courses

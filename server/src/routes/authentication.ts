@@ -55,6 +55,7 @@ const authenticationRoutes = function (router: Router): void {
     const mockUserSchema = Joi.object({
       netid: Joi.string().required(),
       affiliation: Joi.string().required(),
+      admin: Joi.boolean().optional(),
     });
     // Mock login route
     router.post(
@@ -63,9 +64,10 @@ const authenticationRoutes = function (router: Router): void {
       async (req, _res, next) => {
         const netid = req.body.netid;
         const affiliation = req.body.affiliation;
+        const admin = req.body.admin;
         console.log(`Mocklogin: ${netid}, ${affiliation}`);
         // make Mocked passport configuration
-        await mockPassportConfiguration(passport, netid, affiliation);
+        await mockPassportConfiguration(passport, netid, affiliation, admin);
         next();
       },
       passport.authenticate("mock"),

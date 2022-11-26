@@ -24,6 +24,15 @@
                 >
                     Export submissions .xls
                 </b-button>
+                <b-button
+                    :disabled="disableSubmissionExportButton"
+                    size="sm"
+                    variant="primary"
+                    @click="exportAllSubmissions()"
+                    class="mb-3 mr-2"
+                >
+                    Export all submissions .zip
+                </b-button>
             </b-col>
             <b-col v-if="assignment.assignmentType === 'code'">
                 <template v-if="assignment.enrollable">
@@ -275,6 +284,12 @@ export default {
         async exportSubmissions(exportType) {
             this.disableSubmissionExportButton = true
             await api.submissions.export(this.assignmentVersionId, exportType)
+            this.showSuccessMessage({
+                message: "Export is being generated, you can download it in the exports tab when ready"
+            })
+        },
+        async exportAllSubmissions() {
+            await api.submissions.getZipExport(this.assignmentVersionId)
             this.showSuccessMessage({
                 message: "Export is being generated, you can download it in the exports tab when ready"
             })

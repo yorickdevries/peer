@@ -8,6 +8,10 @@ export default {
         const params = { assignmentVersionId }
         return client.get("submissions", { params: params })
     },
+    getZipExport(assignmentVersionId) {
+        const params = { assignmentVersionId }
+        return client.get("submissions/zip", { params: params })
+    },
     getSubmissionCount(assignmentVersionId) {
         const params = { assignmentVersionId }
         return client.get("submissions/count", { params: params })

@@ -66,6 +66,9 @@ export default class User extends BaseModel {
   @IsNotEmpty()
   displayName: string | null;
 
+  @Column("boolean", { default: false })
+  admin!: boolean;
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToMany((_type) => Affiliation, {
     eager: true,

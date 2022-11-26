@@ -8,6 +8,7 @@ import exportGradesForAssignmentVersion from "./exportGrades";
 import exportReviewsForAssignmentVersion from "./exportReviews";
 import exportSubmissionsForAssignmentVersion from "./exportSubmissions";
 import submissionFlagging from "./submissionFlagging";
+import exportSubmissionsForZip from "./exportZip";
 //import importWebLabSubmissions from "./importSubmissions";
 
 const workerFunctions = {
@@ -21,6 +22,7 @@ const workerFunctions = {
   exportReviewsForAssignmentVersion: exportReviewsForAssignmentVersion,
   exportSubmissionsForAssignmentVersion: exportSubmissionsForAssignmentVersion,
   submissionFlagging: submissionFlagging,
+  exportSubmissionsForZip: exportSubmissionsForZip,
   //importWebLabSubmissions: importWebLabSubmissions,
 };
 

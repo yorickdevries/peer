@@ -37,6 +37,7 @@ export default {
                     date.setUTCMinutes(this.buckets * Math.floor(date.getUTCMinutes() / this.buckets))
                 }
                 date.setUTCSeconds(0)
+                date.setUTCMilliseconds(0)
                 const index = date.getTime()
                 if (buckets[index] === undefined) {
                     buckets[index] = 0
