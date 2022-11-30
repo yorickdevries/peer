@@ -257,15 +257,42 @@ export default {
         }
     },
     methods: {
+        flagSubmissions() {
+            const flaggedReviews = new Map()
+            for (const review of this.reviews) {
+                if (review.flaggedByReviewer) {
+                    flaggedReviews.set(review.submission.id, true)
+                }
+            }
+            return flaggedReviews
+        },
+        parseGroups() {
+            const parsedGroups = new Map()
+            for (const group of this.groups) {
+                parsedGroups.set(group.id, group.name)
+            }
+            return parsedGroups
+        },
+        addSubmissionDetails(submissions) {
+            const parsedGroups = this.parseGroups()
+            const flaggedSubmissions = this.flagSubmissions()
+
+            submissions.forEach(s => {
+                s.reportedByReview = flaggedSubmissions.has(s.id)
+                s.groupName = parsedGroups.get(s.id)
+            })
+
+            return submissions
+        },
         async fetchSubmissions() {
             // all submissions
             const res1 = await api.submissions.getAllForAssignmentVersion(this.assignmentVersionId)
+
             const submissions = res1.data
-            submissions.forEach(s => {
-                s.reportedByReview = this.checkIfReported(s.id)
-                s.groupName = this.groups.find(g => g.id === s.groupId).name
-            })
-            this.allSubmissions = submissions
+
+            //this.allSubmissions = submissions
+            this.allSubmissions = this.addSubmissionDetails(submissions)
+
             let count = await api.submissions.getSubmissionCount(this.assignmentVersionId)
             this.numberOfSubmissions = count.data
         },
@@ -280,6 +307,7 @@ export default {
         async fetchReviews() {
             const res = await api.reviewofsubmissions.getAllForAssignmentVersion(this.assignmentVersionId, true)
             this.reviews = res.data
+            this.flagSubmissions()
         },
         checkIfReported(submissionId) {
             return _.some(this.reviews, function(r) {
