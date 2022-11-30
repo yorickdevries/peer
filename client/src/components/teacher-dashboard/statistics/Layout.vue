@@ -7,7 +7,7 @@
             <b-card no-body>
                 <b-tabs card lazy class="mb-3">
                     <!--Details & Action-->
-                    <b-tab title="Assignments" active ref="chartTab">
+                    <b-tab title="Assignments" active>
                         <AssignmentStatistics :enum="this.chartEnum.Assignment" />
                     </b-tab>
                 </b-tabs>
@@ -31,7 +31,7 @@ export default {
                 Assignment: {
                     AVG_REVIEW_TIME: "avg_review_time",
                     TIME_SUBMIT_BEFORE_DEADLINE: "time_before_deadline",
-                    NUM_OF_NO_REVIEWS: "num_no_reviews"
+                    PARTICIPATION: "participation"
                 }
             }
         }
