@@ -240,7 +240,7 @@ export default class Assignment extends BaseModel {
     this.lateReviewEvaluations = lateReviewEvaluations;
     this.automaticStateProgression = automaticStateProgression;
     this.assignmentType = assignmentType;
-    this.sendNotificationEmails = sendNotifcationEmails
+    this.sendNotificationEmails = sendNotifcationEmails;
   }
 
   // custom validation which is run before saving
