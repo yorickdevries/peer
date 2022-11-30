@@ -8,7 +8,7 @@
         <b-row>
             <b-col>
                 <b-card no-body>
-                    <b-tabs card fill>
+                    <b-tabs-persist card fill>
                         <b-row>
                             <b-col>
                                 <!--Enrollable-->
@@ -181,7 +181,7 @@
                                 </b-tab>
                             </b-col>
                         </b-row>
-                    </b-tabs>
+                    </b-tabs-persist>
                 </b-card>
             </b-col>
         </b-row>
@@ -193,10 +193,11 @@ import api from "../../api/api"
 import _ from "lodash"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 import notifications from "../../mixins/notifications"
+import BTabsPersist from "@/components/general/b-tabs-persist"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle },
+    components: { BTabsPersist, BreadcrumbTitle },
     data() {
         return {
             enrollableAssignments: [],

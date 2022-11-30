@@ -10,7 +10,7 @@
                 <b-card-header class="d-flex justify-content-between align-items-center">
                     <div>Submission information</div>
                     <div>
-                        <b-button size="sm" variant="secondary" @click="goToAssignment" class="mr-2"
+                        <b-button size="sm" variant="secondary" @click="$router.back()" class="mr-2"
                             >Back to Assignment
                         </b-button>
                         <b-button size="sm" variant="primary" @click="goToNextFinalSubmissionWithoutApproval"
@@ -174,17 +174,6 @@ export default {
             await api.submissions.setApproval(this.submission.id, approvalByTA, this.submission.commentByTA)
             this.showSuccessMessage({ message: "Submission approval status changed" })
             await this.fetchSubmission()
-        },
-        goToAssignment() {
-            if (this.$router.currentRoute.name.includes("teacher")) {
-                this.$router.push({
-                    name: "teacher-dashboard.assignments.assignment"
-                })
-            } else {
-                this.$router.push({
-                    name: "teaching-assistant-dashboard.course.assignment"
-                })
-            }
         },
         async goToNextFinalSubmissionWithoutApproval() {
             const submissions = []
