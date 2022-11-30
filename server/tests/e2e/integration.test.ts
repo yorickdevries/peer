@@ -221,7 +221,8 @@ describe("Integration", () => {
       .field("lateSubmissionReviews", true)
       .field("lateReviewEvaluations", false)
       .field("automaticStateProgression", false)
-      .field("assignmentType", AssignmentType.DOCUMENT);
+      .field("assignmentType", AssignmentType.DOCUMENT)
+      .field("sendNotificationEmails", true);
     expect(res.status).toBe(HttpStatusCode.OK);
     const assignment = JSON.parse(res.text);
     expect(assignment).toMatchObject({
@@ -960,7 +961,8 @@ describe("Integration", () => {
       .field("lateSubmissions", true)
       .field("lateSubmissionReviews", true)
       .field("lateReviewEvaluations", false)
-      .field("automaticStateProgression", false);
+      .field("automaticStateProgression", false)
+      .field("sendNotificationEmails", true);
     expect(res.status).toBe(HttpStatusCode.OK);
     const assignment_2 = JSON.parse(res.text);
     expect(assignment_2).toMatchObject({
