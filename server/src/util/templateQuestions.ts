@@ -19,8 +19,7 @@ interface QuestionTemplate {
 
 const templateQuestions: QuestionTemplate[] = [
   {
-    text:
-      "Was the review comprehensive and complete, covering all relevant aspects of the work?",
+    text: "Was the review comprehensive and complete, covering all relevant aspects of the work?",
     number: 1,
     optional: false,
     type: QuestionType.MULTIPLE_CHOICE,
@@ -44,8 +43,7 @@ const templateQuestions: QuestionTemplate[] = [
     graded: true,
   },
   {
-    text:
-      "Did you, during later revision of the original submission, spot any mistakes that the reviewer overlooked?",
+    text: "Did you, during later revision of the original submission, spot any mistakes that the reviewer overlooked?",
     number: 3,
     optional: false,
     type: QuestionType.MULTIPLE_CHOICE,
@@ -81,8 +79,7 @@ const templateQuestions: QuestionTemplate[] = [
     graded: true,
   },
   {
-    text:
-      "If there was any open feedback, did you find it formulated in a clear and understandable way?",
+    text: "If there was any open feedback, did you find it formulated in a clear and understandable way?",
     number: 6,
     optional: false,
     type: QuestionType.MULTIPLE_CHOICE,
@@ -94,8 +91,7 @@ const templateQuestions: QuestionTemplate[] = [
     graded: true,
   },
   {
-    text:
-      "If there was any open feedback, did you find it formulated in a constructive way, so giving an idea how to improve the work?",
+    text: "If there was any open feedback, did you find it formulated in a constructive way, so giving an idea how to improve the work?",
     number: 7,
     optional: false,
     type: QuestionType.MULTIPLE_CHOICE,
@@ -128,8 +124,7 @@ const templateQuestions: QuestionTemplate[] = [
     graded: false,
   },
   {
-    text:
-      'What do you think about the review overall? If you did not choose "Yes, fully" in question 2, then please list the factual mistakes of the review here, in a way that can be read without referring to the original submission or the review.',
+    text: 'What do you think about the review overall? If you did not choose "Yes, fully" in question 2, then please list the factual mistakes of the review here, in a way that can be read without referring to the original submission or the review.',
     number: 10,
     optional: false,
     type: QuestionType.OPEN,

@@ -146,9 +146,8 @@ export default class Submission extends BaseModel {
       throw new Error("Group is not part of this assignment");
     }
     // check if the file has the right extension
-    const submissionExtensions = assignment.submissionExtensions.split(
-      /\s*,\s*/
-    );
+    const submissionExtensions =
+      assignment.submissionExtensions.split(/\s*,\s*/);
     if (
       !submissionExtensions.includes(this.file.extension) &&
       !submissionExtensions.includes(".*")
@@ -209,5 +208,10 @@ export default class Submission extends BaseModel {
   async isTeacherOrTeachingAssistantInCourse(user: User): Promise<boolean> {
     const assignmentVersion = await this.getAssignmentVersion();
     return await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user);
+  }
+
+  async isTeacherInCourse(user: User): Promise<boolean> {
+    const assignmentVersion = await this.getAssignmentVersion();
+    return await assignmentVersion.isTeacherInCourse(user);
   }
 }

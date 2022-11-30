@@ -9,10 +9,10 @@
     },
     "session": {
         "secret": "add something random here",
-        "maxAge": 43200000 // 12 hours in ms
+        "maxAge": 604800000
     },
     "allowedExtensions": [".pdf", ".zip", ".doc", ".docx"],
-    "maxFileSize": 52428800, // 50 MB
+    "maxFileSize": 52428800,
     "maxCodeAnnotationLength": 65535,
     "uploadFolder": "./files/development/",
     "temporaryFolder": "./files/temp/",

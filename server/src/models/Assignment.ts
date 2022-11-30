@@ -386,7 +386,8 @@ export default class Assignment extends BaseModel {
     user: User
   ): Promise<boolean> {
     for (const assignmentVersion of this.versions) {
-      const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+      const submissionQuestionnaire =
+        await assignmentVersion.getSubmissionQuestionnaire();
       if (submissionQuestionnaire) {
         if (
           await submissionQuestionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(
@@ -402,7 +403,8 @@ export default class Assignment extends BaseModel {
 
   async hasSubmissionQuestionnaires(): Promise<boolean> {
     for (const assignmentVersion of this.versions) {
-      const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+      const submissionQuestionnaire =
+        await assignmentVersion.getSubmissionQuestionnaire();
       if (!submissionQuestionnaire) {
         return false;
       }

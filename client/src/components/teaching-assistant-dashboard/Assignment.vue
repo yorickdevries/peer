@@ -6,7 +6,7 @@
 
             <!--Tab Layout-->
             <b-card no-body>
-                <b-tabs card>
+                <b-tabs-persist card>
                     <!--Details-->
                     <b-tab title="Home" active>
                         <AssignmentDetails :assignment="assignment"></AssignmentDetails>
@@ -26,7 +26,7 @@
                     <b-tab title="Reviews">
                         <ReviewList></ReviewList>
                     </b-tab>
-                </b-tabs>
+                </b-tabs-persist>
             </b-card>
         </b-container>
     </div>
@@ -39,9 +39,11 @@ import AssignmentDetails from "../ta_teacher_shared/AssignmentDetails"
 import Groups from "./Groups"
 import ReviewList from "../ta_teacher_shared/ReviewList"
 import SubmissionList from "../ta_teacher_shared/SubmissionList"
+import BTabsPersist from "@/components/general/b-tabs-persist"
 
 export default {
     components: {
+        BTabsPersist,
         BreadcrumbTitle,
         AssignmentDetails,
         Groups,

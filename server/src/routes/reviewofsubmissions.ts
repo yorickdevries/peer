@@ -517,9 +517,11 @@ router.patch(
         .send("The assignment is not in feedback state");
       return;
     }
+    // Only teachers and the TA giving the approval can modify the approval.
     if (
       review.approvingTA !== null &&
-      review.approvingTA.netid !== user.netid
+      review.approvingTA.netid !== user.netid &&
+      !(await review.isTeacherInCourse(user))
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -547,7 +549,8 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   }
   // get assignmentstate
   const submissionQuestionnaire = await review.getQuestionnaire();
-  const assignmentVersion = await submissionQuestionnaire.getAssignmentVersion();
+  const assignmentVersion =
+    await submissionQuestionnaire.getAssignmentVersion();
   const assignment = await assignmentVersion.getAssignment();
   const reviewEvaluation = await ReviewOfReview.findOne({
     where: { reviewOfSubmission: review.id },
@@ -589,7 +592,8 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   }
   // get assignmentstate
   const submissionQuestionnaire = await review.getQuestionnaire();
-  const assignmentVersion = await submissionQuestionnaire.getAssignmentVersion();
+  const assignmentVersion =
+    await submissionQuestionnaire.getAssignmentVersion();
   const assignment = await assignmentVersion.getAssignment();
   if (
     !(
@@ -658,7 +662,8 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   );
   await reviewEvaluation.reload();
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const anonymousReview = reviewEvaluation.getAnonymousVersionWithReviewerNetid();
+  const anonymousReview =
+    reviewEvaluation.getAnonymousVersionWithReviewerNetid();
   res.send(anonymousReview);
 });
 

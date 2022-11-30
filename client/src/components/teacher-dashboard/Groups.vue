@@ -25,7 +25,7 @@
                         class="p-0 m-0"
                         size="lg"
                     >
-                        <ImportGroupsWizard></ImportGroupsWizard>
+                        <ImportGroupsWizard :modalId="`importGroups${assignment.id}`"></ImportGroupsWizard>
                     </b-modal>
                 </template>
             </b-col>
@@ -110,9 +110,13 @@
                     {{ row.detailsShowing ? "Hide" : "Show" }} Edit Group/Submissions
                 </b-button>
                 <!--Delete Group-->
-                <b-button size="sm" @click="deleteGroup(row.item.id)" class="mr-2" variant="danger">
+                <b-button size="sm" v-b-modal="`deleteGroup${row.item.id}`" class="mr-2" variant="danger">
                     Delete Group
                 </b-button>
+
+                <b-modal :id="`deleteGroup${row.item.id}`" centered title="Warning" @ok="deleteGroup(row.item.id)">
+                    <div>Are you sure you want to delete this group?</div>
+                </b-modal>
             </template>
 
             <!--Actions-->
@@ -136,10 +140,10 @@
                             variant="success"
                             class="mr-2"
                             size="sm"
-                            @click="addUserToGroup(row.item.id, newUserNetId)"
+                            @click="addUserToGroup(row.item.id, newUserNetId[row.item.id])"
                             >Add Group Member</b-button
                         >
-                        <b-input v-model="newUserNetId" placeholder="Enter valid NetID here."></b-input>
+                        <b-input v-model="newUserNetId[row.item.id]" placeholder="Enter valid NetID here."></b-input>
                     </dd>
                 </b-card>
                 <b-card header="Submissions" class="h-100">
@@ -303,7 +307,7 @@ export default {
             // add new group
             newGroupName: "",
             // add new user
-            newUserNetId: ""
+            newUserNetId: {}
         }
     },
     computed: {
@@ -369,7 +373,7 @@ export default {
             }
             await api.groups.addUser(groupId, userNetid)
             await this.fetchGroups()
-            this.newUserNetId = ""
+            this.newUserNetId[groupId] = ""
             this.showSuccessMessage({ message: "Succesfully added user to group." })
         },
         async removeUserFromGroup(groupId, userNetid) {

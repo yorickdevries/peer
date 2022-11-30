@@ -2,19 +2,17 @@
     <div>
         <b-container>
             <!--Header-->
-            <BreadcrumbTitle
-                :items="['Assignments', assignment.name, 'Submissions', submission.id]"
-                class="mt-3"
-            ></BreadcrumbTitle>
+            <BreadcrumbTitle :items="['Assignments', assignment.name, 'Submissions', submission.id]" class="mt-3">
+            </BreadcrumbTitle>
 
             <!--Next Submission-->
             <b-card no-body>
                 <b-card-header class="d-flex justify-content-between align-items-center">
                     <div>Submission information</div>
                     <div>
-                        <b-button size="sm" variant="secondary" @click="goToAssignment" class="mr-2"
-                            >Back to Assignment</b-button
-                        >
+                        <b-button size="sm" variant="secondary" @click="$router.back()" class="mr-2"
+                            >Back to Assignment
+                        </b-button>
                         <b-button size="sm" variant="primary" @click="goToNextFinalSubmissionWithoutApproval"
                             >Next (Random) Final Submission Without Approval</b-button
                         >
@@ -92,8 +90,8 @@
                                 class="mr-2"
                                 @click="updateSubmissionApproval(false)"
                                 :disabled="submission.approvalByTA === false && !commentChanged"
-                                >Disapprove 👎</b-button
-                            >
+                                >Disapprove 👎
+                            </b-button>
                             <b-button
                                 variant="success"
                                 @click="updateSubmissionApproval(true)"
@@ -176,17 +174,6 @@ export default {
             await api.submissions.setApproval(this.submission.id, approvalByTA, this.submission.commentByTA)
             this.showSuccessMessage({ message: "Submission approval status changed" })
             await this.fetchSubmission()
-        },
-        goToAssignment() {
-            if (this.$router.currentRoute.name.includes("teacher")) {
-                this.$router.push({
-                    name: "teacher-dashboard.assignments.assignment"
-                })
-            } else {
-                this.$router.push({
-                    name: "teaching-assistant-dashboard.course.assignment"
-                })
-            }
         },
         async goToNextFinalSubmissionWithoutApproval() {
             const submissions = []

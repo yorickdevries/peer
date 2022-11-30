@@ -107,7 +107,8 @@ export default class AssignmentVersion extends BaseModel {
     this.name = name;
     this.assignment = assignment;
     this.versionsToReview = versionsToReview;
-    this.reviewsPerUserPerAssignmentVersionToReview = reviewsPerUserPerAssignmentVersionToReview;
+    this.reviewsPerUserPerAssignmentVersionToReview =
+      reviewsPerUserPerAssignmentVersionToReview;
     this.selfReview = selfReview;
     this.submissionQuestionnaire = submissionQuestionnaire;
     this.reviewQuestionnaire = reviewQuestionnaire;

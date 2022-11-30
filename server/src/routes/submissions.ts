@@ -25,6 +25,7 @@ import AssignmentExport from "../models/AssignmentExport";
 import {
   startExportSubmissionsForAssignmentVersionWorker,
   startSubmissionFlaggingWorker,
+  startExportSubmissionsForZipWorker,
   //startImportWebLabSubmissionsWorker,
 } from "../workers/pool";
 //import AssignmentType from "../enum/AssignmentType";
@@ -68,6 +69,78 @@ router.get("/", validateQuery(assignmentVersionIdSchema), async (req, res) => {
   const sortedSubmissions = _.sortBy(submissions, "id");
   res.send(sortedSubmissions);
 });
+
+//get a zip of all submissions for an assignment
+router.get(
+  "/zip",
+  validateQuery(assignmentVersionIdSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const assignmentVersionId: number = req.query.assignmentVersionId as any;
+    const assignmentVersion = await AssignmentVersion.findOne(
+      assignmentVersionId
+    );
+    if (!assignmentVersion) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
+      return;
+    }
+    const assignment = await assignmentVersion.getAssignment();
+    const assignmentExport = new AssignmentExport(user, assignment, null);
+    await assignmentExport.save();
+
+    //offload to worker function
+    startExportSubmissionsForZipWorker(
+      assignmentVersion.id,
+      assignmentExport.id
+    );
+    res.send(assignmentExport);
+  }
+);
+
+//get number of submissions
+router.get(
+  "/count",
+  validateQuery(assignmentVersionIdSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const assignmentVersionId: number = req.query.assignmentVersionId as any;
+    const assignmentVersion = await AssignmentVersion.findOne(
+      assignmentVersionId
+    );
+    if (!assignmentVersion) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND)
+        .toString();
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE)
+        .toString();
+      return;
+    }
+    const submissions = await assignmentVersion.getSubmissions();
+    res.send(submissions.length.toString());
+  }
+);
 
 // get the submission
 router.get("/:id", validateParams(idSchema), async (req, res) => {
@@ -146,7 +219,8 @@ router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
       .send("You are not allowed to view reviews");
     return;
   }
-  const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+  const submissionQuestionnaire =
+    await assignmentVersion.getSubmissionQuestionnaire();
   if (!submissionQuestionnaire) {
     res
       .status(HttpStatusCode.FORBIDDEN)
@@ -259,9 +333,8 @@ router.post(
     // file info
     const fileExtension = path.extname(req.file.originalname);
 
-    const submissionExtensions = assignment.submissionExtensions.split(
-      /\s*,\s*/
-    );
+    const submissionExtensions =
+      assignment.submissionExtensions.split(/\s*,\s*/);
     if (
       !submissionExtensions.includes(fileExtension) &&
       !submissionExtensions.includes(".*")
@@ -294,15 +367,13 @@ router.post(
       async (transactionalEntityManager) => {
         for (const assignmentVersion of assignment.versions) {
           // unsubmit all previous submissions
-          const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
-            Submission,
-            {
+          const submissionsOfGroupForAssignment =
+            await transactionalEntityManager.find(Submission, {
               where: {
                 assignmentVersion: assignmentVersion,
                 group: group,
               },
-            }
-          );
+            });
           // Set boolean of submission of older submissions to false
           for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
             submissionOfGroupForAssignment.final = false;
@@ -406,15 +477,13 @@ router.patch(
       "SERIALIZABLE", // serializable is the only way double final submissions can be prevented
       async (transactionalEntityManager) => {
         for (const assignmentVersion of assignment.versions) {
-          const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
-            Submission,
-            {
+          const submissionsOfGroupForAssignment =
+            await transactionalEntityManager.find(Submission, {
               where: {
                 assignmentVersion: assignmentVersion,
                 group: group,
               },
-            }
-          );
+            });
           // set booleans to false for all other assignments
           for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
             if (submissionOfGroupForAssignment.id !== submission.id) {
@@ -461,9 +530,11 @@ router.patch(
         .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
       return;
     }
+    // Only teachers and the TA giving the approval can modify the approval.
     if (
       submission.approvingTA !== null &&
-      submission.approvingTA.netid !== user.netid
+      submission.approvingTA.netid !== user.netid &&
+      !(await submission.isTeacherInCourse(user))
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -532,7 +603,6 @@ router.post(
       assignmentExport.id,
       exportType
     );
-
     // send message that reviews are being exported
     res.send(assignmentExport);
   }

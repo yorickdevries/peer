@@ -24,7 +24,8 @@ const openFeedbackForAssignmentHelper = async function (
     }
   }
   for (const assignmentVersion of assignment.versions) {
-    const reviewQuestionnaire = await assignmentVersion.getReviewQuestionnaire();
+    const reviewQuestionnaire =
+      await assignmentVersion.getReviewQuestionnaire();
     if (reviewQuestionnaire) {
       if (reviewQuestionnaire.questions.length === 0) {
         throw new Error("The questionnaire doesn't have questions");

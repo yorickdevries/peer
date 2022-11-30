@@ -337,15 +337,17 @@ router.delete("/:id", validateParams(idStringSchema), async (req, res) => {
     await getManager().transaction(
       "SERIALIZABLE", // serializable is the only way phantom replyingPDFAnnotations can be prevented
       async (transactionalEntityManager) => {
-        const commentingPDFAnnotationWithReplies = await transactionalEntityManager.findOneOrFail(
-          CommentingPDFAnnotation,
-          annotation.id,
-          {
-            relations: ["replyingPDFAnnotations"],
-          }
-        );
+        const commentingPDFAnnotationWithReplies =
+          await transactionalEntityManager.findOneOrFail(
+            CommentingPDFAnnotation,
+            annotation.id,
+            {
+              relations: ["replyingPDFAnnotations"],
+            }
+          );
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const replyingPDFAnnotations = commentingPDFAnnotationWithReplies.replyingPDFAnnotations!;
+        const replyingPDFAnnotations =
+          commentingPDFAnnotationWithReplies.replyingPDFAnnotations!;
         // delete all replies
         for (const replyingPDFAnnotation of replyingPDFAnnotations) {
           await transactionalEntityManager.remove(replyingPDFAnnotation);

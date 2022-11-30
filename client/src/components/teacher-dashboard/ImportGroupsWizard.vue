@@ -31,6 +31,7 @@ import notifications from "../../mixins/notifications"
 
 export default {
     mixins: [notifications],
+    props: ["modalId"],
     data() {
         return {
             file: null
@@ -40,6 +41,8 @@ export default {
         async importGroups() {
             await api.groups.import(this.$route.params.assignmentId, this.file)
             this.showSuccessMessage({ message: "Groups are being imported" })
+            // Close modal after submitting
+            this.$bvModal.hide(this.modalId)
         }
     }
 }

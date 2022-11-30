@@ -216,7 +216,29 @@ const startExportReviewsForAssignmentVersionWorker = function (
     ]);
   }
 };
-
+const startExportSubmissionsForZipWorker = function (
+  assignmentVersionId: number,
+  assignmentExportId: number
+): void {
+  if (isTSNode) {
+    // run the function directly in this process (TS Node/development)
+    workerFunctions
+      .exportSubmissionsForZip(assignmentVersionId, assignmentExportId)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("exportSubmissionsForZip", [
+      assignmentVersionId,
+      assignmentExportId,
+      //exportType,
+    ]);
+  }
+};
 const startExportSubmissionsForAssignmentVersionWorker = function (
   assignmentVersionId: number,
   assignmentExportId: number,
@@ -279,5 +301,6 @@ export {
   startExportReviewsForAssignmentVersionWorker,
   startExportSubmissionsForAssignmentVersionWorker,
   startSubmissionFlaggingWorker,
+  startExportSubmissionsForZipWorker,
   //startImportWebLabSubmissionsWorker,
 };
