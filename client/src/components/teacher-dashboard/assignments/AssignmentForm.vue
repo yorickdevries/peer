@@ -362,7 +362,7 @@
                             </b-form-group>
 
                             <hr />
-                            <!--Assignment type-->
+                            <!--Notifications-->
                             <b-form-group
                                 label="Notification Emails"
                                 description="Progressing through the assignment stages will send email updates to all lecturers."
