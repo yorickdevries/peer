@@ -25,7 +25,7 @@
                         class="p-0 m-0"
                         size="lg"
                     >
-                        <ImportGroupsWizard></ImportGroupsWizard>
+                        <ImportGroupsWizard :modalId="`importGroups${assignment.id}`"></ImportGroupsWizard>
                     </b-modal>
                 </template>
             </b-col>
