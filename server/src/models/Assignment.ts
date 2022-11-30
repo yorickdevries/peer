@@ -162,6 +162,12 @@ export default class Assignment extends BaseModel {
   // lets the teacher set the possibillity to automatically progress to the next states of assignments
   automaticStateProgression: boolean;
 
+  @Column({ default: true })
+  @IsDefined()
+  @IsBoolean()
+  // lets the teacher disable notification emails
+  sendNotificationEmails: boolean;
+
   @Column()
   @IsDefined()
   @IsString()
@@ -210,7 +216,8 @@ export default class Assignment extends BaseModel {
     lateSubmissionReviews: boolean,
     lateReviewEvaluations: boolean | null,
     automaticStateProgression: boolean,
-    assignmentType: AssignmentType
+    assignmentType: AssignmentType,
+    sendNotifcationEmails: boolean
   ) {
     super();
     this.name = name;
@@ -233,6 +240,7 @@ export default class Assignment extends BaseModel {
     this.lateReviewEvaluations = lateReviewEvaluations;
     this.automaticStateProgression = automaticStateProgression;
     this.assignmentType = assignmentType;
+    this.sendNotificationEmails = sendNotifcationEmails
   }
 
   // custom validation which is run before saving
