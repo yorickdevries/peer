@@ -308,11 +308,6 @@ export default {
             const res = await api.reviewofsubmissions.getAllForAssignmentVersion(this.assignmentVersionId, true)
             this.reviews = res.data
         },
-        checkIfReported(submissionId) {
-            return _.some(this.reviews, function(r) {
-                return r.flaggedByReviewer && r.submission.id === submissionId
-            })
-        },
         getGroup(id) {
             return _.find(this.groups, group => {
                 return group.id === id
