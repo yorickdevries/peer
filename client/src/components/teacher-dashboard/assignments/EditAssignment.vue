@@ -89,7 +89,8 @@ export default {
                     this.assignment.lateSubmissionReviews,
                     this.assignment.lateReviewEvaluations,
                     this.assignment.automaticStateProgression,
-                    this.assignment.assignmentType
+                    this.assignment.assignmentType,
+                    this.assignment.sendNotificationEmails
                 )
                 this.showSuccessMessage({ message: "Updated assignment successfully" })
                 // Redirect to updated assignment

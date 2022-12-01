@@ -166,4 +166,29 @@ describe("Assignments", () => {
       }
     }
   });
+
+  test("make assignment and change notification preferences", async () => {
+    const res = await createAssignmentRequest(
+      server,
+      course.id,
+      sessionCookie,
+      AssignmentType.DOCUMENT
+    );
+
+    const assignment = JSON.parse(res.text);
+
+    expect(assignment.sendNotificationEmails).toBe(true);
+
+    const res2 = await patchAssignmentRequest(
+      server,
+      assignment.id,
+      sessionCookie,
+      AssignmentType.DOCUMENT,
+      false
+    );
+
+    const patchAssignment = JSON.parse(res2.text);
+
+    expect(patchAssignment.sendNotificationEmails).toBe(false);
+  });
 });

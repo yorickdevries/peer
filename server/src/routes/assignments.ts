@@ -262,6 +262,7 @@ const assignmentSchema = Joi.object({
   assignmentType: Joi.string()
     .valid(...Object.values(AssignmentType))
     .required(),
+  sendNotificationEmails: Joi.boolean().required(),
 });
 // post an assignment in a course
 router.post(
@@ -305,7 +306,8 @@ router.post(
       req.body.lateSubmissionReviews,
       req.body.lateReviewEvaluations,
       req.body.automaticStateProgression,
-      req.body.assignmentType
+      req.body.assignmentType,
+      req.body.sendNotificationEmails
     );
 
     // construct file to be saved in transaction
@@ -376,6 +378,7 @@ const assignmentPatchSchema = Joi.object({
   assignmentType: Joi.string()
     .valid(...Object.values(AssignmentType))
     .required(),
+  sendNotificationEmails: Joi.boolean().required(),
 });
 // patch an assignment in a course
 router.patch(
@@ -501,6 +504,7 @@ router.patch(
         assignment.automaticStateProgression =
           req.body.automaticStateProgression;
         assignment.assignmentType = req.body.assignmentType;
+        assignment.sendNotificationEmails = req.body.sendNotificationEmails;
 
         // change the file in case it is not undefined
         if (newFile !== undefined) {
