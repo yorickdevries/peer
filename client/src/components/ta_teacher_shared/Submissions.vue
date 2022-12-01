@@ -307,7 +307,6 @@ export default {
         async fetchReviews() {
             const res = await api.reviewofsubmissions.getAllForAssignmentVersion(this.assignmentVersionId, true)
             this.reviews = res.data
-            this.flagSubmissions()
         },
         checkIfReported(submissionId) {
             return _.some(this.reviews, function(r) {
