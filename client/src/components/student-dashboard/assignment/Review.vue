@@ -261,9 +261,17 @@
                             <b-button
                                 :variant="(answers[question.id].exists ? 'danger' : 'outline-danger') + ' float-right'"
                                 :disabled="!answers[question.id].exists || review.submitted || buttonDisabled"
-                                @click="deleteAnswer(question, answers[question.id])"
+                                v-b-modal="`deleteAnswer-${question.id}`"
                                 >Delete Answer</b-button
                             >
+                            <b-modal
+                                :id="`deleteAnswer-${question.id}`"
+                                centered
+                                title="Warning"
+                                @ok="deleteAnswer(question, answers[question.id])"
+                            >
+                                <div>Are you sure you want to delete this answer?</div>
+                            </b-modal>
                             <b-button
                                 ref="saveButton"
                                 :variant="
