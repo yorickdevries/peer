@@ -31,14 +31,14 @@
             <dt>Block feedback for students who did not finish their reviews</dt>
             <dd>{{ assignment.blockFeedback }}</dd>
 
-            <dt>Review Evaluation</dt>
+            <dt>Review Feedback</dt>
             <dd>{{ assignment.reviewEvaluation }}</dd>
 
             <div v-if="assignment.reviewEvaluation">
-                <dt>Review evaluation due date and time</dt>
+                <dt>Review Feedback due date and time</dt>
                 <dd>{{ assignment.reviewEvaluationDueDate | formatDate }}</dd>
 
-                <dt>Allow late review evaluations</dt>
+                <dt>Allow late Review Feedbacks</dt>
                 <dd>{{ assignment.lateReviewEvaluations }}</dd>
             </div>
 

@@ -134,7 +134,7 @@
         <b-card v-if="answers" no-body class="mt-3">
             <!--Title-->
             <b-card-header v-if="userIsOwner && !reviewsAreReadOnly">
-                <h4>Review Evaluation</h4>
+                <h4>Review Feedback</h4>
                 <h6 class="card-subtitle text-muted">
                     Evaluate the review you have gotten from one of your peers here.
                 </h6>
@@ -480,7 +480,7 @@ export default {
             this.user = res.data
         },
         async fetchReview() {
-            // Retrieve the review evaluation.
+            // Retrieve the Review Feedback.
             try {
                 const res = await api.reviewofsubmissions.getEvaluation(this.feedbackReviewId)
                 this.review = res.data

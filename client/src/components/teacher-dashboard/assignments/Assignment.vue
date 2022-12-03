@@ -36,12 +36,12 @@
                     </b-tab>
 
                     <!--SubmissionQuestionnaireList-->
-                    <b-tab title="Submissionquestionnaire">
+                    <b-tab title="Review Questionnaire">
                         <SubmissionQuestionnaireList></SubmissionQuestionnaireList>
                     </b-tab>
 
                     <!--ReviewQuestionnaireList-->
-                    <b-tab v-if="assignment.reviewEvaluation" title="Reviewquestionnaire">
+                    <b-tab v-if="assignment.reviewEvaluation" title="Evaluation Questionnaire">
                         <ReviewQuestionnaireList></ReviewQuestionnaireList>
                     </b-tab>
 

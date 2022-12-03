@@ -61,7 +61,7 @@
                         </b-col>
                     </b-row>
 
-                    <!--See Review Evaluation is exist-->
+                    <!--See Review Feedback is exist-->
                     <b-row v-if="reviewEvaluation">
                         <b-col>
                             <b-button
@@ -69,7 +69,7 @@
                                 variant="warning"
                                 class="w-100"
                                 style="height: 3rem"
-                                >Show Review Evaluation</b-button
+                                >Show Review Feedback</b-button
                             >
                             <b-modal
                                 :title="`Review (ID: ${review.id})`"
@@ -395,7 +395,7 @@ export default {
             this.commentChanged = false
         },
         async fetchReviewEvaluation() {
-            // Retrieve the review evaluation.
+            // Retrieve the Review Feedback.
             try {
                 const res = await api.reviewofsubmissions.getEvaluation(this.$route.params.reviewId)
                 this.reviewEvaluation = res.data

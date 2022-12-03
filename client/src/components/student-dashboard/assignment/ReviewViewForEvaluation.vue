@@ -1,4 +1,4 @@
-<!--This extra file doesn't import review evaluation and will therefore not lead to circular referencing-->
+<!--This extra file doesn't import Review Feedback and will therefore not lead to circular referencing-->
 <template>
     <div>
         <b-row>
@@ -99,7 +99,7 @@
                 >
                     <!--Title-->
                     <b-card-header v-if="!reviewsAreReadOnly">
-                        <h4>Assignment Questionnaire</h4>
+                        <h4>Review Questionnaire</h4>
                         <h6 class="card-subtitle text-muted">Give the review to one of your peers here.</h6>
                     </b-card-header>
 

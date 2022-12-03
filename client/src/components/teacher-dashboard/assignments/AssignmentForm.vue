@@ -325,7 +325,7 @@
                                 :disabled="assignmentStateAfter('review')"
                             >
                                 <b-form-checkbox v-model="assignment.reviewEvaluation">
-                                    Enable review evaluation
+                                    Enable Review Feedback
                                     <b-badge
                                         v-b-tooltip.hover
                                         title="This will enable students to fill in a evaluation form about their received reviews"
@@ -336,7 +336,7 @@
                             </b-form-group>
                             <b-form-group v-if="assignment.reviewEvaluation">
                                 <template slot="label"
-                                    >Review evaluation due date and time
+                                    >Review Feedback due date and time
                                     <b-badge
                                         v-b-tooltip.hover
                                         title="The date and time before which the students have to evaluate reviews. Evaluations can be done once the review deadline has passed"
@@ -351,10 +351,10 @@
                                 ></datepicker>
                                 <b-form-input v-model="assignment.reviewEvaluationDueTime" type="time"></b-form-input>
                                 <b-form-checkbox v-model="assignment.lateReviewEvaluations">
-                                    Allow late review evaluations indefinitely after the deadline
+                                    Allow late Review Feedbacks indefinitely after the deadline
                                     <b-badge
                                         v-b-tooltip.hover
-                                        title="Students can finish any unsubmitted review evaluations any time after the deadline. After the deadline, submitted reviews cannot be unsubmitted anymore."
+                                        title="Students can finish any unsubmitted Review Feedbacks any time after the deadline. After the deadline, submitted reviews cannot be unsubmitted anymore."
                                         variant="primary"
                                         >?</b-badge
                                     >
@@ -534,7 +534,7 @@ export default {
                 throw new Error("Review due date cannot be empty!")
                 // reviewEvaluationDue
             } else if (this.assignment.reviewEvaluation && !this.assignment.reviewEvaluationDueDay) {
-                throw new Error("Review evaluation due date cannot be empty!")
+                throw new Error("Review Feedback due date cannot be empty!")
             } else {
                 return
             }
