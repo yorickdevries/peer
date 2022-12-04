@@ -141,16 +141,17 @@
                             <h4>{{ question.text }}</h4>
 
                             <!-- OPEN QUESTION -->
-                            <b-form-textarea
-                                v-if="question.type === 'open'"
-                                placeholder="Enter your answer"
-                                :rows="10"
-                                :max-rows="15"
-                                v-model="answers[question.id].answer"
-                                @input=";(answers[question.id].changed = true), (questionIndex = index)"
-                                :readonly="review.submitted || reviewsAreReadOnly"
-                                required
-                            />
+                            <div id="editor"></div>
+                            <!--                            <b-form-textarea-->
+                            <!--                                v-if="question.type === 'open'"-->
+                            <!--                                placeholder="Enter your answer"-->
+                            <!--                                :rows="10"-->
+                            <!--                                :max-rows="15"-->
+                            <!--                                v-model="answers[question.id].answer"-->
+                            <!--                                @input=";(answers[question.id].changed = true), (questionIndex = index)"-->
+                            <!--                                :readonly="review.submitted || reviewsAreReadOnly"-->
+                            <!--                                required-->
+                            <!--                            />-->
 
                             <!-- MULTIPLE CHOICE QUESTION -->
                             <!--prettier-ignore-->
@@ -351,6 +352,7 @@
                 discarded.
             </b-modal>
         </b-row>
+        <!--        <div id="editor"></div>-->
     </div>
 </template>
 
@@ -362,6 +364,8 @@ import { StarRating } from "vue-rate-it"
 import ReviewEvaluation from "./ReviewEvaluation"
 import FileAnnotator from "./FileAnnotator"
 import PDFViewer from "../../general/PDFViewer"
+import "@toast-ui/editor/dist/toastui-editor.css"
+import { Editor } from "@toast-ui/editor"
 
 export default {
     mixins: [notifications],
@@ -384,8 +388,16 @@ export default {
             // Currently pressed keys
             keys: { Enter: false, ControlLeft: false, ControlRight: false },
             // Index of currently active question
-            questionIndex: null
+            questionIndex: null,
+            editor: null
         }
+    },
+    mounted() {
+        this.editor = new Editor({
+            el: document.querySelector("#editor"),
+            height: "500px",
+            initialEditType: "markdown"
+        })
     },
     computed: {
         columnWidthFileAndQuestionnaire() {
