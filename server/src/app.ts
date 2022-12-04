@@ -30,9 +30,6 @@ app.use(
       },
     },
     crossOriginEmbedderPolicy: false,
-    crossOriginResourcePolicy: {
-      policy: "cross-origin",
-    },
   })
 );
 app.use(compression());
