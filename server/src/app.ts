@@ -25,7 +25,11 @@ app.use(
           "*.typekit.com",
           "*.typekit.net",
         ],
-        "script-src": ["'self'", "https://documentservices.adobe.com"],
+        "script-src": [
+          "'self'",
+          "'unsafe-eval'",
+          "https://documentservices.adobe.com",
+        ],
         "frame-src": ["'self'", "https://documentservices.adobe.com"],
       },
     },
