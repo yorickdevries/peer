@@ -14,7 +14,20 @@ import ResponseMessage from "./enum/ResponseMessage";
 // instantiate the app
 const app = express();
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        "script-src": ["'self'", "https://documentservices.adobe.com"],
+        "frame-src": ["'self'", "https://documentservices.adobe.com"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: {
+      policy: "cross-origin",
+    },
+  })
+);
 app.use(compression());
 app.use(errorLogger);
 
