@@ -180,7 +180,7 @@
                                     <li>All submitted reviews cannot be changed anymore</li>
                                     <li>
                                         All reviews which are fully filled in (all non-optional questions are answered)
-                                        or flagged as not serious will be submissionted as well
+                                        or flagged as not serious will be submitted as well
                                     </li>
                                     <li>
                                         All reviews which are not submitted yet can still be completed when late

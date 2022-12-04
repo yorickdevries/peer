@@ -351,7 +351,7 @@
                                 ></datepicker>
                                 <b-form-input v-model="assignment.reviewEvaluationDueTime" type="time"></b-form-input>
                                 <b-form-checkbox v-model="assignment.lateReviewEvaluations">
-                                    Allow late Review Feedbacks indefinitely after the deadline
+                                    Allow late Review Feedback indefinitely after the deadline
                                     <b-badge
                                         v-b-tooltip.hover
                                         title="Students can finish any unsubmitted Review Feedbacks any time after the deadline. After the deadline, submitted reviews cannot be unsubmitted anymore."
