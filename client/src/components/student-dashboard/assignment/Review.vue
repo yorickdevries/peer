@@ -139,9 +139,16 @@
                         <b-card-body>
                             <!-- Text-->
                             <h4>{{ question.text }}</h4>
-
+                            <editor
+                                v-if="question.type === 'open'"
+                                :initialValue="editorText"
+                                :options="editorOptions"
+                                height="500px"
+                                initialEditType="markdown"
+                                previewStyle="vertical"
+                            />
                             <!-- OPEN QUESTION -->
-                            <div id="editor"></div>
+
                             <!--                            <b-form-textarea-->
                             <!--                                v-if="question.type === 'open'"-->
                             <!--                                placeholder="Enter your answer"-->
@@ -365,11 +372,11 @@ import ReviewEvaluation from "./ReviewEvaluation"
 import FileAnnotator from "./FileAnnotator"
 import PDFViewer from "../../general/PDFViewer"
 import "@toast-ui/editor/dist/toastui-editor.css"
-import { Editor } from "@toast-ui/editor"
+import { Editor } from "@toast-ui/vue-editor"
 
 export default {
     mixins: [notifications],
-    components: { StarRating, ReviewEvaluation, FileAnnotator, PDFViewer },
+    components: { StarRating, ReviewEvaluation, FileAnnotator, PDFViewer, editor: Editor },
     props: ["reviewId", "reviewsAreReadOnly", "assignmentType"],
     data() {
         return {
@@ -389,15 +396,11 @@ export default {
             keys: { Enter: false, ControlLeft: false, ControlRight: false },
             // Index of currently active question
             questionIndex: null,
-            editor: null
+            editorText: "This is initialValue.",
+            editorOptions: {
+                hideModeSwitch: true
+            }
         }
-    },
-    mounted() {
-        this.editor = new Editor({
-            el: document.querySelector("#editor"),
-            height: "500px",
-            initialEditType: "markdown"
-        })
     },
     computed: {
         columnWidthFileAndQuestionnaire() {
