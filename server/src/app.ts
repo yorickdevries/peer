@@ -18,6 +18,13 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
+        "connect-src": [
+          "'self'",
+          "https://*.adobe.com",
+          "https://*.adobe.io",
+          "*.typekit.com",
+          "*.typekit.net",
+        ],
         "script-src": ["'self'", "https://documentservices.adobe.com"],
         "frame-src": ["'self'", "https://documentservices.adobe.com"],
       },
