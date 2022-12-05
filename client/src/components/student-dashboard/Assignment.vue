@@ -66,7 +66,7 @@
                             >
                                 <div class="text-center border-right border-bottom py-3">
                                     <div class="lead font-weight-bold ">
-                                        Receive Feedback
+                                        Received Feedback
                                         <b-badge variant="success" v-if="isInFeedbackState">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
@@ -86,7 +86,7 @@
                             >
                                 <div class="text-center border-bottom py-3">
                                     <div class="lead font-weight-bold ">
-                                        Review Feedback
+                                        Give Evaluation
                                         <b-badge variant="success" v-if="isEvaluationActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>

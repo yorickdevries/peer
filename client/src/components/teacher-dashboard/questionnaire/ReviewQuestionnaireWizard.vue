@@ -38,7 +38,7 @@
                         <b-col cols="3">
                             <div v-if="questionnaire && questionnaire.questions.length === 0">
                                 <div class="text-muted">
-                                    Load default Review Feedback questions into questionnaire
+                                    Load default review evaluation questions into questionnaire
                                 </div>
                                 <b-input-group>
                                     <template #prepend>

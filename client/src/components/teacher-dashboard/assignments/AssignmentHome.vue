@@ -154,7 +154,7 @@
                                 This action will open the the feedback for the reviewed students
                             </dd>
                             <b-alert v-if="assignment.automaticStateProgression" show warning
-                                >Automatic state progression is enabled. In case you have set up Review Feedback, make
+                                >Automatic state progression is enabled. In case you have set up review evaluation, make
                                 sure you finalised your reviewquestionnaires before the review due date.</b-alert
                             >
                             <b-alert v-if="showOpenFeedbackAlert" show
@@ -187,7 +187,7 @@
                                         submission reviews are allowed
                                     </li>
                                     <li>
-                                        If Review Feedback is enabled, students can evaluate their reviews till the
+                                        If review evaluation is enabled, students can evaluate their reviews till the
                                         deadline you specified
                                     </li>
                                     <li>

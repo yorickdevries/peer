@@ -55,7 +55,7 @@
                     </b-tab>
                 </b-tabs>
             </b-tab>
-            <b-tab title="Evaluation Questionnaire">
+            <b-tab title="Questionnaire Feedback">
                 <!--Feedback Information-->
                 <b-card header="Feedback" class="h-100">
                     <div v-if="feedbackReviews.length === 0">No feedback available.</div>

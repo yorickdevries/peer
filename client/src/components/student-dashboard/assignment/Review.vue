@@ -37,11 +37,11 @@
             </b-col>
         </b-row>
 
-        <!--See Review Feedback is exist-->
+        <!--See Review Evaluation is exist-->
         <b-row v-if="reviewEvaluation">
             <b-col>
                 <b-button v-b-modal="`reviewModal${review.id}`" variant="warning" class="w-100" style="height: 3rem"
-                    >Show Review Feedback</b-button
+                    >Show Review Evaluation</b-button
                 >
                 <b-modal :title="`Review (ID: ${review.id})`" :id="`reviewModal${review.id}`" size="xl" hide-footer>
                     <ReviewEvaluation :feedbackReviewId="reviewId" :reviewsAreReadOnly="true"></ReviewEvaluation>
@@ -477,7 +477,7 @@ export default {
             this.review = res.data
         },
         async fetchReviewEvaluation() {
-            // Retrieve the Review Feedback.
+            // Retrieve the review evaluation.
             try {
                 const res = await api.reviewofsubmissions.getEvaluation(this.reviewId, true)
                 this.reviewEvaluation = res.data
