@@ -4,7 +4,7 @@
             The file is read only, any annotations will not be saved</b-alert
         >
         <b-alert v-else-if="!review || review.submitted" show variant="warning">
-            The review is submitted, any annotations will not be saved</b-alert
+            The review is submitted, any new annotations will not be saved</b-alert
         >
         <b-alert v-else show variant="secondary"
             >PDF viewing and annotation is experimental, in case of any error or when the pdf is not properly loading
