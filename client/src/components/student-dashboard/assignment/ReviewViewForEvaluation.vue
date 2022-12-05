@@ -99,8 +99,8 @@
                 >
                     <!--Title-->
                     <b-card-header v-if="!reviewsAreReadOnly">
-                        <h4>Assignment Questionnaire</h4>
-                        <h6 class="card-subtitle text-muted">Give the review to one of your peers here.</h6>
+                        <h4>Review Questionnaire</h4>
+                        <h6 class="card-subtitle text-muted">Give feedback to one of your peers here.</h6>
                     </b-card-header>
 
                     <!--Question Information-->
@@ -239,9 +239,17 @@
                             <b-button
                                 :variant="(answers[question.id].exists ? 'danger' : 'outline-danger') + ' float-right'"
                                 :disabled="!answers[question.id].exists || review.submitted || buttonDisabled"
-                                @click="deleteAnswer(question, answers[question.id])"
+                                v-b-modal="`deleteAnswer-${question.id}`"
                                 >Delete Answer</b-button
                             >
+                            <b-modal
+                                :id="`deleteAnswer-${question.id}`"
+                                centered
+                                title="Warning"
+                                @ok="deleteAnswer(question, answers[question.id])"
+                            >
+                                <div>Are you sure you want to delete this answer?</div>
+                            </b-modal>
                             <b-button
                                 :variant="
                                     (answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'

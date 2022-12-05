@@ -360,6 +360,17 @@
                                     >
                                 </b-form-checkbox>
                             </b-form-group>
+
+                            <hr />
+                            <!--Notifications-->
+                            <b-form-group
+                                label="Notification Emails"
+                                description="Progressing through the assignment stages will send email updates to all lecturers."
+                            >
+                                <b-form-checkbox v-model="assignment.sendNotificationEmails">
+                                    Send notification emails
+                                </b-form-checkbox>
+                            </b-form-group>
                         </b-col>
                         <b-col></b-col>
                     </b-row>

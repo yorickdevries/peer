@@ -6,7 +6,8 @@ export default async function patchAssignmentRequest(
   server: http.Server,
   assignmentId: number,
   sessionCookie: string,
-  assignmentType?: string
+  assignmentType?: string,
+  sendNotificationEmails?: boolean
 ): Promise<request.Response> {
   return await request(server)
     .patch(`/api/assignments/${assignmentId}`)
@@ -27,5 +28,6 @@ export default async function patchAssignmentRequest(
     .field("lateSubmissionReviews", true)
     .field("lateReviewEvaluations", "null")
     .field("automaticStateProgression", false)
-    .field("assignmentType", assignmentType ?? AssignmentType.DOCUMENT);
+    .field("assignmentType", assignmentType ?? AssignmentType.DOCUMENT)
+    .field("sendNotificationEmails", sendNotificationEmails ?? true);
 }

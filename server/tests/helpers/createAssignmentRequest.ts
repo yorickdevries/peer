@@ -30,5 +30,6 @@ export default async function createAssignmentRequest(
     .field("lateSubmissionReviews", true)
     .field("lateReviewEvaluations", "null")
     .field("automaticStateProgression", false)
-    .field("assignmentType", assignmentType ?? AssignmentType.DOCUMENT);
+    .field("assignmentType", assignmentType ?? AssignmentType.DOCUMENT)
+    .field("sendNotificationEmails", true);
 }

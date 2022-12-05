@@ -49,7 +49,8 @@ export default {
                 lateSubmissionReviews: true,
                 lateReviewEvaluations: true,
                 automaticStateProgression: false,
-                assignmentType: "document"
+                assignmentType: "document",
+                sendNotificationEmails: false
             }
         }
     },
@@ -76,7 +77,8 @@ export default {
                     this.assignment.lateSubmissionReviews,
                     this.assignment.lateReviewEvaluations,
                     this.assignment.automaticStateProgression,
-                    this.assignment.assignmentType
+                    this.assignment.assignmentType,
+                    this.assignment.sendNotificationEmails
                 )
                 this.showSuccessMessage({ message: "Assignment was successfully created" })
                 this.$router.push({

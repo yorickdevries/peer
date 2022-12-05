@@ -48,14 +48,16 @@ const sendMailToTeachersOfAssignment = async function (
   text: string,
   assignment: Assignment
 ): Promise<void> {
-  const course = await assignment.getCourse();
-  const teacherEnrollments = await course.getTeacherEnrollments();
-  for (const teacherEnrollment of teacherEnrollments) {
-    const teacher = await teacherEnrollment.getUser();
-    // only send mail if a mail adress is known
-    if (teacher.email) {
-      const message = constructMessage(teacher.email, subject, text);
-      await sendMessage(message);
+  if (assignment.sendNotificationEmails) {
+    const course = await assignment.getCourse();
+    const teacherEnrollments = await course.getTeacherEnrollments();
+    for (const teacherEnrollment of teacherEnrollments) {
+      const teacher = await teacherEnrollment.getUser();
+      // only send mail if a mail adress is known
+      if (teacher.email) {
+        const message = constructMessage(teacher.email, subject, text);
+        await sendMessage(message);
+      }
     }
   }
   // also send a message to admin for debugging purposes
