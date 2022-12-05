@@ -111,7 +111,7 @@
                     <!--Title-->
                     <b-card-header v-if="!reviewsAreReadOnly">
                         <h4>Review Questionnaire</h4>
-                        <h6 class="card-subtitle text-muted">Give the review to one of your peers here.</h6>
+                        <h6 class="card-subtitle text-muted">Give feedback to one of your peers here.</h6>
                     </b-card-header>
 
                     <!--Question Information-->
