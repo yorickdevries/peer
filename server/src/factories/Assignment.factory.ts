@@ -59,7 +59,8 @@ define(Assignment, (faker: typeof Faker) => {
     lateSubmissionReviews,
     lateReviewEvaluations,
     automaticStateProgression,
-    assignmentType
+    assignmentType,
+    false
   );
 });
 
