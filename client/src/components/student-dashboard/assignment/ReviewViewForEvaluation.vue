@@ -1,4 +1,4 @@
-<!--This extra file doesn't import Review Feedback and will therefore not lead to circular referencing-->
+<!--This extra file doesn't import review evaluation and will therefore not lead to circular referencing-->
 <template>
     <div>
         <b-row>

@@ -74,7 +74,7 @@ export default {
             const reviews = res.data
 
             for (const review of reviews) {
-                // Retrieve the Review Feedback.
+                // Retrieve the review evaluation.
                 try {
                     const res = await api.reviewofsubmissions.getEvaluation(review.id)
                     const evaluation = res.data
