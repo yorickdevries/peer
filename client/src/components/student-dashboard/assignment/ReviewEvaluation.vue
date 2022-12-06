@@ -20,11 +20,13 @@
                     <b-alert variant="info" show>
                         This is a review you have received from one of your peers on your submission.
                     </b-alert>
-                    <ReviewViewForEvaluation
+                    <Review
                         :reviewId="feedbackReviewId"
                         :reviewsAreReadOnly="true"
                         :assignmentType="assignmentType"
-                    ></ReviewViewForEvaluation>
+                        :evaluationButton="false"
+                    >
+                    </Review>
                 </b-modal>
             </b-col>
         </b-row>
@@ -381,12 +383,12 @@ import api from "../../../api/api"
 import _ from "lodash"
 import notifications from "../../../mixins/notifications"
 import { StarRating } from "vue-rate-it"
-import ReviewViewForEvaluation from "./ReviewViewForEvaluation"
+import Review from "./Review"
 import PDFViewer from "../../general/PDFViewer"
 
 export default {
     mixins: [notifications],
-    components: { ReviewViewForEvaluation, StarRating, PDFViewer },
+    components: { Review, StarRating, PDFViewer },
     props: ["feedbackReviewId", "reviewsAreReadOnly", "assignmentType"],
     data() {
         return {

@@ -38,7 +38,7 @@
         </b-row>
 
         <!--See Review Evaluation is exist-->
-        <b-row v-if="reviewEvaluation">
+        <b-row v-if="reviewEvaluation && evaluationButton">
             <b-col>
                 <b-button v-b-modal="`reviewModal${review.id}`" variant="warning" class="w-100" style="height: 3rem"
                     >Show Review Evaluation</b-button
@@ -365,8 +365,9 @@ import PDFViewer from "../../general/PDFViewer"
 
 export default {
     mixins: [notifications],
+    name: "Review",
     components: { StarRating, ReviewEvaluation, FileAnnotator, PDFViewer },
-    props: ["reviewId", "reviewsAreReadOnly", "assignmentType"],
+    props: ["reviewId", "reviewsAreReadOnly", "assignmentType", "evaluationButton"],
     data() {
         return {
             fileMetadata: null,
