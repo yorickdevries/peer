@@ -39,6 +39,7 @@ define(Assignment, (faker: typeof Faker) => {
   const lateReviewEvaluations = faker.random.boolean();
   const automaticStateProgression = false;
   const assignmentType = AssignmentType.DOCUMENT;
+  const sendNotificationEmails = faker.random.boolean();
 
   return new Assignment(
     assignmentName,
@@ -60,7 +61,7 @@ define(Assignment, (faker: typeof Faker) => {
     lateReviewEvaluations,
     automaticStateProgression,
     assignmentType,
-    false
+    sendNotificationEmails
   );
 });
 
