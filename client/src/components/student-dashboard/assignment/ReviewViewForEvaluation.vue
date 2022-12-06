@@ -369,7 +369,7 @@ export default {
             // disable save/delete buttons when a call is busy
             buttonDisabled: false,
             // View file next to questionnaire
-            viewFileNextToQuestionnaire: false
+            viewFileNextToQuestionnaire: true
         }
     },
     computed: {
