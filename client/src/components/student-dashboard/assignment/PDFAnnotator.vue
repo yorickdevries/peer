@@ -4,7 +4,7 @@
             The file is read only, any annotations will not be saved</b-alert
         >
         <b-alert v-else-if="!review || review.submitted" show variant="warning">
-            The review is submitted, any annotations will not be saved</b-alert
+            The review is submitted, any new annotations will not be saved</b-alert
         >
         <b-alert v-else show variant="secondary"
             >PDF viewing and annotation is experimental, in case of any error or when the pdf is not properly loading
@@ -97,7 +97,7 @@ export default {
             // Documentation: https://www.adobe.io/apis/documentcloud/dcsdk/docs.html
             // inject the PDF embed API script
             const script = document.createElement("script")
-            script.setAttribute("src", "https://documentservices.adobe.com/view-sdk/viewer.js")
+            script.setAttribute("src", "https://documentcloud.adobe.com/view-sdk/main.js")
             document.head.appendChild(script)
 
             // set vue model to constant
@@ -156,39 +156,13 @@ export default {
                     enableAnnotationAPIs: true,
                     includePDFAnnotations: true
                 }
-                const metaData = {
-                    fileName: vm.reviewFileName,
-                    id: String(vm.fileMetadata.id) // id needs to be a string
-                }
-
-                //Set auto save
-                const saveOptions = {
-                    autoSaveFrequency: 1,
-                    enableFocusPolling: true,
-                    showSaveButton: false
-                }
-
-                adobeDCView.registerCallback(
-                    // eslint-disable-next-line no-undef
-                    AdobeDC.View.Enum.CallbackType.SAVE_API,
-                    function() {
-                        return new Promise(resolve => {
-                            resolve({
-                                // eslint-disable-next-line no-undef
-                                code: AdobeDC.View.Enum.ApiResponseCode.SUCCESS,
-                                data: {
-                                    metaData
-                                }
-                            })
-                        })
-                    },
-                    saveOptions
-                )
-
                 const previewFilePromise = adobeDCView.previewFile(
                     {
                         content: { promise: filePromise },
-                        metaData
+                        metaData: {
+                            fileName: vm.reviewFileName,
+                            id: String(vm.fileMetadata.id) // id needs to be a string
+                        }
                     },
                     previewConfig
                 )

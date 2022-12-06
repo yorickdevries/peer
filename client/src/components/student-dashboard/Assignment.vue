@@ -30,7 +30,7 @@
                             >
                                 <div class="text-center border-right border-bottom py-3">
                                     <div class="lead font-weight-bold">
-                                        Submission
+                                        Submit
                                         <b-badge variant="success" v-if="isSubmissionActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
@@ -47,7 +47,7 @@
                             >
                                 <div class="text-center border-right border-bottom py-3">
                                     <div class="lead font-weight-bold">
-                                        Review
+                                        Give Feedback
                                         <b-badge variant="success" v-if="isReviewActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
@@ -86,7 +86,7 @@
                             >
                                 <div class="text-center border-bottom py-3">
                                     <div class="lead font-weight-bold ">
-                                        Review Evaluation
+                                        Give Evaluation
                                         <b-badge variant="success" v-if="isEvaluationActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
                                     </div>
