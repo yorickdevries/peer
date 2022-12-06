@@ -7,7 +7,6 @@
                 <div>
                     <dl>
                         <dt>Download</dt>
-                        <dd>The download for the submission this review is about.</dd>
                         <a target="_blank" :href="reviewFilePath">
                             <button type="button" class="btn btn-success success w-100" style="height: 3rem">
                                 Download Submission ({{ reviewFileName }})
