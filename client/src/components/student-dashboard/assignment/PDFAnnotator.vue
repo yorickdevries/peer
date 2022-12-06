@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-alert v-if="readOnly" show variant="warning">
-            The file is read only, any annotations will not be saved</b-alert
+            The file is read only, any new annotations will not be saved</b-alert
         >
         <b-alert v-else-if="!review || review.submitted" show variant="warning">
             The review is submitted, any new annotations will not be saved</b-alert
@@ -17,7 +17,7 @@
         </b-alert>
         <!--Annotation view-->
         <b-alert :show="!showPdf" variant="primary">LOADING REVIEW PDF</b-alert>
-        <div v-show="showPdf" :id="pdfDivId" style="height: 1000px" />
+        <div :id="pdfDivId" :style="{ visibility: showPdf ? 'visible' : 'hidden', height: 1000 + 'px' }" />
     </div>
 </template>
 
@@ -68,7 +68,9 @@ export default {
         await this.fetchFileMetadata()
         // generate random number for id
         this.pdfDivId = "adobe-dc-view-" + String(Math.floor(Math.random() * Math.pow(10, 9)))
-        this.renderPDF()
+        this.$nextTick(() => {
+            this.renderPDF()
+        })
     },
     methods: {
         async fetchReview() {
@@ -191,11 +193,11 @@ export default {
                         for (const review of reviews) {
                             const res = await api.pdfannotations.get(review.id, vm.fileMetadata.id)
                             const annotations = res.data
-                            /* API to add annotations */
-                            for (const annotation of annotations) {
+                            if (annotations.length > 0) {
+                                annotations.forEach(a => (a.target.selector.strokeColor = vm.reviewColors[review.id]))
+                                /* API to add annotations */
                                 try {
-                                    annotation.target.selector.strokeColor = vm.reviewColors[review.id]
-                                    await annotationManager.addAnnotations([annotation])
+                                    await annotationManager.addAnnotations(annotations)
                                 } catch (error) {
                                     console.log(error)
                                 }

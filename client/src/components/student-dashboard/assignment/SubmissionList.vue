@@ -22,11 +22,11 @@
                         </template>
                         <b-alert show>Please select your assignment version above</b-alert>
                     </b-tab>
-                    <b-tab v-for="assignmentVersion in assignment.versions" :key="assignmentVersion.id">
+                    <b-tab v-for="(assignmentVersion, index) in assignment.versions" :key="assignmentVersion.id">
                         <template slot="title">
                             <div class="d-flex align-items-center">
                                 <b-badge variant="warning" class="mr-2"
-                                    >{{ assignmentVersion.name }} (ID: {{ assignmentVersion.id }})</b-badge
+                                    >{{ assignmentVersion.name }} #{{ index + 1 }}</b-badge
                                 >
                             </div>
                         </template>

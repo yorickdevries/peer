@@ -4,10 +4,10 @@
         <div v-else>
             <b-card no-body>
                 <b-tabs card>
-                    <b-tab v-for="review in feedbackReviews" :key="review.id">
+                    <b-tab v-for="(review, index) in feedbackReviews" :key="review.id">
                         <template slot="title">
                             <div class="d-flex align-items-center">
-                                <b-badge variant="warning" class="mr-2">ID: {{ review.id }}</b-badge>
+                                <b-badge variant="warning" class="mr-2">Review #{{ index + 1 }}</b-badge>
                                 <b-badge v-if="review.evaluationDone" variant="success" class="mr-2">DONE</b-badge>
                                 <b-badge v-if="!review.evaluationDone" variant="danger" class="mr-2">DUE</b-badge>
                             </div>
@@ -76,7 +76,7 @@ export default {
             for (const review of reviews) {
                 // Retrieve the review evaluation.
                 try {
-                    const res = await api.reviewofsubmissions.getEvaluation(review.id)
+                    const res = await api.reviewofsubmissions.getEvaluation(review.id, true)
                     const evaluation = res.data
                     review.evaluationDone = evaluation.submitted
                 } catch (error) {

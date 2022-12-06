@@ -27,7 +27,6 @@
                             <div>
                                 <dl>
                                     <dt>Download</dt>
-                                    <dd>The download for the submission this review is about.</dd>
                                     <a target="_blank" :href="reviewFilePath">
                                         <button
                                             type="button"

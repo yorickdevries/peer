@@ -71,20 +71,31 @@
             <!--Approval-->
             <b-col cols="6">
                 <dl>
-                    <dt>Current submission status</dt>
-                    <dd>{{ review.submitted ? "" : "Not " }}Submitted</dd>
+                    <dt>Current status</dt>
+                    <dd v-if="review.submitted">✅ Evaluation submitted</dd>
+                    <dd v-else>⚠️ Evaluation not submitted</dd>
                 </dl>
                 <dl>
                     <dt>Current report status</dt>
-                    <dd>{{ review.flaggedByReviewer ? "" : "Not " }}Reported as insufficient</dd>
+                    <dd v-if="!review.submitted">-</dd>
+                    <dd v-else-if="review.flaggedByReviewer">
+                        ⚠️ This review was reported as empty or not serious
+                    </dd>
+                    <dd v-else>✅ Not reported</dd>
                 </dl>
                 <dl v-if="review.submitted">
                     <dt>Current approval status</dt>
-                    <dd v-if="review.approvalByTA">Approved 👍</dd>
-                    <dd v-if="review.approvalByTA === false">Disapproved 👎</dd>
-                    <dd v-if="review.approvalByTA === null">No action yet by any TA.</dd>
-                    <dt>Current TA Comment</dt>
-                    <b-form-textarea :rows="10" :max-rows="15" v-model="review.commentByTA" readonly />
+                    <dd v-if="review.approvalByTA">👍 Approved</dd>
+                    <dd v-if="review.approvalByTA === false">👎 Disapproved</dd>
+                    <dd v-if="review.approvalByTA === null">Not checked by TA</dd>
+                    <dt v-if="review.commentByTA">Current TA Comment</dt>
+                    <b-form-textarea
+                        v-if="review.commentByTA"
+                        :rows="10"
+                        :max-rows="15"
+                        v-model="review.commentByTA"
+                        readonly
+                    />
                 </dl>
             </b-col>
         </b-row>
@@ -99,10 +110,10 @@
                         name="reportButton"
                         class="float-left"
                     >
-                        Report this review.
+                        ⚠️ Report the review
                     </b-form-checkbox>
                     <br />
-                    <small>Only report if the review is empty or not serious.</small>
+                    <small>Report the review if it is empty or not serious.</small>
                 </div>
                 <b-button
                     v-if="!review.submitted"
@@ -110,14 +121,14 @@
                     type="submit"
                     v-b-modal="`submit${review.id}`"
                     :disabled="buttonDisabled"
-                    >Submit Review</b-button
+                    >Submit Evaluation</b-button
                 >
                 <b-button
                     v-else
                     variant="outline-success float-right"
-                    @click="unSubmitReview"
+                    v-b-modal="`unsubmit${review.id}`"
                     :disabled="buttonDisabled"
-                    >Unsubmit Review</b-button
+                    >Unsubmit Evaluation</b-button
                 >
                 <b-button
                     v-if="questionNumbersOfUnsavedAnswers.length > 0"
@@ -317,10 +328,10 @@
                             name="reportButton"
                             class="float-left"
                         >
-                            Report this review.
+                            ⚠️ Report the review
                         </b-form-checkbox>
                         <br />
-                        <small>Only report if the review is empty or not serious.</small>
+                        <small>Report the review if it is empty or not serious.</small>
                     </div>
                     <b-button
                         v-if="!review.submitted"
@@ -328,14 +339,14 @@
                         type="submit"
                         v-b-modal="`submit${review.id}`"
                         :disabled="buttonDisabled"
-                        >Submit Review</b-button
+                        >Submit Evaluation</b-button
                     >
                     <b-button
                         v-else
                         variant="outline-success float-right"
-                        @click="unSubmitReview"
+                        v-b-modal="`unsubmit${review.id}`"
                         :disabled="buttonDisabled"
-                        >Unsubmit Review</b-button
+                        >Unsubmit Evaluation</b-button
                     >
                     <b-button
                         v-if="questionNumbersOfUnsavedAnswers.length > 0"
@@ -369,6 +380,16 @@
                         >
                         Do you really want to submit? This marks the review as finished and all unsaved changes will be
                         discarded.
+                    </b-modal>
+                    <!--Unsubmit Modal-->
+                    <b-modal
+                        :id="`unsubmit${review.id}`"
+                        title="Unsubmit Confirmation"
+                        :ok-disabled="buttonDisabled"
+                        @ok="unSubmitReview"
+                    >
+                        Do you really want to unsubmit? Your answers will be kept, but your evaluation will not count
+                        until you resubmit it.
                     </b-modal>
                 </b-card-body>
             </template>
@@ -482,7 +503,7 @@ export default {
         async fetchReview() {
             // Retrieve the review evaluation.
             try {
-                const res = await api.reviewofsubmissions.getEvaluation(this.feedbackReviewId)
+                const res = await api.reviewofsubmissions.getEvaluation(this.feedbackReviewId, true)
                 this.review = res.data
             } catch (error) {
                 this.review = null
