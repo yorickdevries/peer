@@ -19,20 +19,31 @@
             <!--Approval-->
             <b-col cols="6">
                 <dl>
-                    <dt>Current submission status</dt>
-                    <dd>{{ review.submitted ? "" : "Not " }}Submitted</dd>
+                    <dt>Current status</dt>
+                    <dd v-if="review.submitted">✅ Feedback submitted</dd>
+                    <dd v-else>⚠️ Feedback not submitted</dd>
                 </dl>
                 <dl>
                     <dt>Current report status</dt>
-                    <dd>{{ review.flaggedByReviewer ? "" : "Not " }}Reported as insufficient</dd>
+                    <dd v-if="!review.submitted">-</dd>
+                    <dd v-else-if="review.flaggedByReviewer">
+                        ⚠️ This submission was reported as empty, not serious or for the wrong assignment
+                    </dd>
+                    <dd v-else>✅ Not reported</dd>
                 </dl>
                 <dl v-if="review.submitted">
                     <dt>Current approval status</dt>
-                    <dd v-if="review.approvalByTA">Approved 👍</dd>
-                    <dd v-if="review.approvalByTA === false">Disapproved 👎</dd>
-                    <dd v-if="review.approvalByTA === null">No action yet by any TA.</dd>
-                    <dt>Current TA Comment</dt>
-                    <b-form-textarea :rows="10" :max-rows="15" v-model="review.commentByTA" readonly />
+                    <dd v-if="review.approvalByTA">👍 Approved</dd>
+                    <dd v-if="review.approvalByTA === false">👎 Disapproved</dd>
+                    <dd v-if="review.approvalByTA === null">Not checked by TA</dd>
+                    <dt v-if="review.commentByTA">Current TA Comment</dt>
+                    <b-form-textarea
+                        v-if="review.commentByTA"
+                        :rows="10"
+                        :max-rows="15"
+                        v-model="review.commentByTA"
+                        readonly
+                    />
                 </dl>
             </b-col>
         </b-row>
@@ -58,10 +69,12 @@
                                 name="reportButton"
                                 class="float-left"
                             >
-                                Report this submission.
+                                ⚠️ Report this submission
                             </b-form-checkbox>
                             <br />
-                            <small>Only report if the submission is empty or not serious.</small>
+                            <small>
+                                Report the submission if it is empty, not serious or for the wrong assignment.
+                            </small>
                         </div>
                         <b-button
                             v-if="!review.submitted"
@@ -271,10 +284,12 @@
                                 name="reportButton"
                                 class="float-left"
                             >
-                                Report this submission.
+                                ⚠️ Report this submission
                             </b-form-checkbox>
                             <br />
-                            <small>Only report if the submission is empty or not serious.</small>
+                            <small>
+                                Report the submission if it is empty, not serious or for the wrong assignment.
+                            </small>
                         </div>
                         <b-button
                             v-if="!review.submitted"
