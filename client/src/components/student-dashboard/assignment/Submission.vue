@@ -24,10 +24,12 @@
                             </template>
                             <template v-slot:cell(serverStatus)="data">
                                 <dl>
-                                    <dt>Current server flagging status</dt>
-                                    <dd v-if="data.item.flaggedByServer">Flagged as suspicious⚠️</dd>
-                                    <dd v-if="data.item.flaggedByServer === false">Not flagged as suspicious✔️</dd>
-                                    <dd v-if="data.item.flaggedByServer === null">No action by the server yet</dd>
+                                    <dt v-if="data.item.flaggedByServer">
+                                        ⚠️ There might be a problem with this file
+                                    </dt>
+                                    <dd v-if="data.item.flaggedByServer === null">
+                                        Your file was not checked by the server
+                                    </dd>
                                 </dl>
                                 <dl>
                                     <dd v-if="data.item.flaggedByServer">
@@ -42,6 +44,11 @@
                                     v-if="!data.item.final"
                                     v-b-modal="`changeSubmissionToFinalModal${data.item.id}`"
                                     :disabled="!isSubmissionActive"
+                                    :title="
+                                        isSubmissionActive
+                                            ? null
+                                            : 'You cannot change the final submission since the deadline has passed'
+                                    "
                                     size="sm"
                                     variant="secondary"
                                     class="mr-2"
@@ -52,6 +59,11 @@
                                     v-else
                                     v-b-modal="`changeSubmissionToNotFinalModal${data.item.id}`"
                                     :disabled="!isSubmissionActive"
+                                    :title="
+                                        isSubmissionActive
+                                            ? null
+                                            : 'You cannot change the final submission since the deadline has passed'
+                                    "
                                     size="sm"
                                     variant="danger"
                                     class="mr-2"
@@ -106,7 +118,6 @@
                         You have not (yet) made a submission for this assignment version
                     </b-alert>
                     <div v-if="isSubmissionActive">
-                        <b-alert show variant="warning">Maximum file size for submission: 50MB</b-alert>
                         <b-alert show variant="danger">
                             You should never include any personal information in your submission files unless
                             specifically mentioned otherwise!
