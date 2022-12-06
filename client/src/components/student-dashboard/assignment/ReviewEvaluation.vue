@@ -110,7 +110,7 @@
                         name="reportButton"
                         class="float-left"
                     >
-                        ⚠️ Report this review
+                        ⚠️ Report the review
                     </b-form-checkbox>
                     <br />
                     <small>Report the review if it is empty or not serious.</small>
@@ -128,7 +128,7 @@
                     variant="outline-success float-right"
                     @click="unSubmitReview"
                     :disabled="buttonDisabled"
-                    >Unsubmit Review</b-button
+                    >Unsubmit Evaluation</b-button
                 >
                 <b-button
                     v-if="questionNumbersOfUnsavedAnswers.length > 0"
@@ -328,7 +328,7 @@
                             name="reportButton"
                             class="float-left"
                         >
-                            ⚠️ Report this review
+                            ⚠️ Report the review
                         </b-form-checkbox>
                         <br />
                         <small>Report the review if it is empty or not serious.</small>
@@ -346,7 +346,7 @@
                         variant="outline-success float-right"
                         @click="unSubmitReview"
                         :disabled="buttonDisabled"
-                        >Unsubmit Review</b-button
+                        >Unsubmit Evaluation</b-button
                     >
                     <b-button
                         v-if="questionNumbersOfUnsavedAnswers.length > 0"

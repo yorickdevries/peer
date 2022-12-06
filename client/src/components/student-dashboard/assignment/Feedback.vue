@@ -3,7 +3,7 @@
         <b-tabs card>
             <b-tab title="File Annotation Feedback">
                 <div v-if="finalSubmission == null">
-                    No final was submission found.
+                    No final submission found.
                 </div>
                 <div v-else-if="finalSubmission.file.extension !== '.pdf' && assignment.assignmentType === 'document'">
                     Your submission was not a .pdf file, so it was not annotated by reviewers.
