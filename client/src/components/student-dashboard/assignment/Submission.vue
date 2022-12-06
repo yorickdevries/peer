@@ -118,7 +118,6 @@
                         You have not (yet) made a submission for this assignment version
                     </b-alert>
                     <div v-if="isSubmissionActive">
-                        <b-alert show variant="warning">Maximum file size for submission: 50MB</b-alert>
                         <b-alert show variant="danger">
                             You should never include any personal information in your submission files unless
                             specifically mentioned otherwise!
