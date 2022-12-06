@@ -126,7 +126,7 @@
                 <b-button
                     v-else
                     variant="outline-success float-right"
-                    @click="unSubmitReview"
+                    v-b-modal="`unsubmit${review.id}`"
                     :disabled="buttonDisabled"
                     >Unsubmit Evaluation</b-button
                 >
@@ -344,7 +344,7 @@
                     <b-button
                         v-else
                         variant="outline-success float-right"
-                        @click="unSubmitReview"
+                        v-b-modal="`unsubmit${review.id}`"
                         :disabled="buttonDisabled"
                         >Unsubmit Evaluation</b-button
                     >
@@ -380,6 +380,16 @@
                         >
                         Do you really want to submit? This marks the review as finished and all unsaved changes will be
                         discarded.
+                    </b-modal>
+                    <!--Unsubmit Modal-->
+                    <b-modal
+                        :id="`unsubmit${review.id}`"
+                        title="Unsubmit Confirmation"
+                        :ok-disabled="buttonDisabled"
+                        @ok="unSubmitReview"
+                    >
+                        Do you really want to unsubmit? Your answers will be kept, but your evaluation will not count
+                        until you resubmit it.
                     </b-modal>
                 </b-card-body>
             </template>
