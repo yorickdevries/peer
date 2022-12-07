@@ -123,6 +123,7 @@
             :current-page="currentPage"
             :per-page="Number(perPage)"
             :filter="filter"
+            class="table-responsive"
         >
             <template v-slot:cell(submissionFile)="data">
                 <a :href="submissionFilePath(data.item.submission.id)" target="_blank">
@@ -182,15 +183,14 @@ export default {
             onlySubmittedReviews: null,
             // for navigation
             fields: [
+                { key: "action", label: "Action" },
                 { key: "reviewer.netid", label: "Reviewer" },
                 { key: "submissionFile", label: "Submission file" },
-                { key: "submission.groupId", label: "Group ID of submission" },
-                { key: "submissionGroupName", label: "Group name of submission" },
-                { key: "flaggedByReviewer", label: "Reviewer flagged the submission" },
-                { key: "submitted", label: "Review submitted" },
-                { key: "approvalByTA", label: "Approval by TA" },
-                { key: "approvingTA", label: "Approving TA" },
-                { key: "action", label: "Action" }
+                { key: "submissionGroupName", label: "Group name of submission", sortable: true },
+                { key: "flaggedByReviewer", label: "Reviewer flagged the submission", sortable: true },
+                { key: "submitted", label: "Review submitted", sortable: true },
+                { key: "approvalByTA", label: "Approval by TA", sortable: true },
+                { key: "approvingTA", label: "Approving TA" }
             ],
             currentPage: 1,
             perPage: 10,

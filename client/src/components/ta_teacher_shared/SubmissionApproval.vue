@@ -25,7 +25,6 @@
                             <div>
                                 <dl>
                                     <dt>Download</dt>
-                                    <dd>The download for the submission.</dd>
                                     <a target="_blank" :href="submissionFilePath">
                                         <button
                                             type="button"
