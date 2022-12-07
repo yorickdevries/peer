@@ -1,11 +1,11 @@
-import { Router } from "express";
-import passport from "passport";
-import path from "path";
-import config from "config";
 import Joi from "@hapi/joi";
-import session from "../middleware/authentication/session";
-import passportConfiguration from "../middleware/authentication/passportTUDelft";
+import { Router } from "express";
+import config from "config";
 import mockPassportConfiguration from "../middleware/authentication/passportMock";
+import passport from "passport";
+import passportConfiguration from "../middleware/authentication/passportTUDelft";
+import path from "path";
+import session from "../middleware/authentication/session";
 import { validateBody } from "../middleware/validation";
 
 // Adds authentication routes
@@ -17,7 +17,7 @@ const authenticationRoutes = function (router: Router): void {
   router.use(passport.session());
 
   // Depending of current mode, setup the login method
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV !== "test") {
     // Initialize TU Delft passport
     passportConfiguration(passport);
 
@@ -51,11 +51,6 @@ const authenticationRoutes = function (router: Router): void {
       res.sendFile(metadataPath);
     });
   } else {
-    // Mock Login form
-    router.get("/login", (_req, res) => {
-      res.sendFile(path.resolve("./mocklogin.html"));
-    });
-
     // Joi inputvalidation
     const mockUserSchema = Joi.object({
       netid: Joi.string().required(),

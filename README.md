@@ -19,6 +19,7 @@ This application uses Node 14.x
 ## Dev Instructions
 1. Complete steps 1 and 2 of `Build Instructions`
 2. Run `npm run seed` in ./server to reset the database, run migrations, and add seed data.
+3. Add `peer-dev.key` in `server/cert`.
 3. Run `npm run watch:dev_server` in root to start a local dev server.
 4. Run `npm run watch:dev_client` in root to start a local dev client.
 5. Access the site through [http://localhost:8080](http://localhost:8080)
