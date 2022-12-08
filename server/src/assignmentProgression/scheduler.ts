@@ -51,7 +51,11 @@ const scheduleJobsForAssignment = function (assignment: Assignment): void {
       assignment.isAtOrBeforeState(AssignmentState.SUBMISSION) &&
       moment(now).isBefore(assignment.dueDate)
     ) {
-      const job = schedule.scheduleJob(assignment.dueDate, () => {
+      const closeSubmissionDate = assignment.lateSubmissions
+        ? moment(assignment.reviewPublishDate).subtract("15", "m").toDate()
+        : assignment.dueDate;
+
+      const job = schedule.scheduleJob(closeSubmissionDate, () => {
         startCloseSubmissionForAssignmentWorker(assignment.id);
       });
       // job can be null if scheduled in the past
