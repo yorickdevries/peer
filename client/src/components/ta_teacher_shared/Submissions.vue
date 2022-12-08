@@ -155,7 +155,7 @@
             </template>
 
             <template v-slot:cell(date)="data">
-                {{ data.item.createdAt | formatDate }}
+                {{ data.item.createdAt | formatDateCompact }}
             </template>
 
             <template v-slot:cell(approvalByTA)="data">
@@ -217,29 +217,29 @@ export default {
             onlyFinalSubmissions: true,
             // for navigation
             fields: [
-                { key: "id", label: "ID", sortable: true },
+                { key: "action", label: "Action" },
                 { key: "file", label: "File" },
-                { key: "groupId", label: "Group ID" },
-                { key: "groupName", label: "Group name" },
-                { key: "userNetid", label: "Submitted by" },
-                { key: "date", label: "​​​Date" },
-                { key: "final", label: "Final" },
-                { key: "approvalByTA", label: "Approval by TA" },
+                { key: "groupName", label: "Group name", sortable: true },
+                { key: "date", label: "Date" },
+                { key: "final", label: "Final", sortable: true },
+                { key: "reportedByReview", label: "Reported by Review", sortable: true },
+                { key: "approvalByTA", label: "Approval by TA", sortable: true },
                 { key: "approvingTA", label: "Approving TA" },
-                { key: "flaggedByServer", label: "Flagged by server" },
-                { key: "commentByServer", label: "Comment by server" },
-                { key: "action", label: "Action" }
+                { key: "flaggedByServer", label: "Flagged by server", sortable: true },
+                { key: "commentByServer", label: "Comment by server" }
             ],
             currentPage: 1,
             perPage: 10,
             filter: "",
             disableSubmissionExportButton: false,
-            assignment: null
+            assignment: null,
+            reviews: null
         }
     },
     async created() {
-        await this.fetchSubmissions()
+        await this.fetchReviews()
         await this.fetchGroups()
+        await this.fetchSubmissions()
         await this.fetchAssignment()
     },
     computed: {
@@ -257,10 +257,42 @@ export default {
         }
     },
     methods: {
+        flagSubmissions() {
+            const flaggedReviews = new Map()
+            for (const review of this.reviews) {
+                if (review.flaggedByReviewer) {
+                    flaggedReviews.set(review.submission.id, true)
+                }
+            }
+            return flaggedReviews
+        },
+        parseGroups() {
+            const parsedGroups = new Map()
+            for (const group of this.groups) {
+                parsedGroups.set(group.id, group.name)
+            }
+            return parsedGroups
+        },
+        addSubmissionDetails(submissions) {
+            const parsedGroups = this.parseGroups()
+            const flaggedSubmissions = this.flagSubmissions()
+
+            submissions.forEach(s => {
+                s.reportedByReview = flaggedSubmissions.has(s.id)
+                s.groupName = parsedGroups.get(s.id)
+            })
+
+            return submissions
+        },
         async fetchSubmissions() {
             // all submissions
             const res1 = await api.submissions.getAllForAssignmentVersion(this.assignmentVersionId)
-            this.allSubmissions = res1.data
+
+            const submissions = res1.data
+
+            //this.allSubmissions = submissions
+            this.allSubmissions = this.addSubmissionDetails(submissions)
+
             let count = await api.submissions.getSubmissionCount(this.assignmentVersionId)
             this.numberOfSubmissions = count.data
         },
@@ -271,6 +303,10 @@ export default {
         async fetchAssignment() {
             const res = await api.assignments.get(this.$route.params.assignmentId)
             this.assignment = res.data
+        },
+        async fetchReviews() {
+            const res = await api.reviewofsubmissions.getAllForAssignmentVersion(this.assignmentVersionId, true)
+            this.reviews = res.data
         },
         getGroup(id) {
             return _.find(this.groups, group => {
