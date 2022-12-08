@@ -95,11 +95,10 @@
                                     v-model="assignment.lateSubmissions"
                                     :disabled="assignmentStateAfter('submission')"
                                 >
-                                    Allow late submissions after the deadline while the submission phase isn't closed
-                                    yet
+                                    Allow late submissions until shortly before the reviews are distributed
                                     <b-badge
                                         v-b-tooltip.hover
-                                        title="This allows submissions to be made until the submission phase is manually closed by the teacher. This cannot be changed after the submission stage."
+                                        title="This allows submissions to be made until 15 minutes before the 'Start date and time for peer review(s)'. This cannot be changed after the submission stage."
                                         variant="primary"
                                         >?</b-badge
                                     >
