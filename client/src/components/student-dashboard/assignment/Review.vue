@@ -404,7 +404,7 @@ export default {
             // disable save/delete buttons when a call is busy
             buttonDisabled: false,
             // View file next to questionnaire
-            viewFileNextToQuestionnaire: true,
+            viewFileNextToQuestionnaire: false,
             // Currently pressed keys
             keys: { Enter: false, ControlLeft: false, ControlRight: false },
             // Index of currently active question
