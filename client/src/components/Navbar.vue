@@ -85,7 +85,7 @@ export default {
             user: { name: null },
             currentCourse: "",
             siteName: process.env.NODE_ENV === "production" ? "Peer Review" : "Peer Review Development",
-            bannerBuffer: 10, //must be in seconds
+            bannerBuffer: 10 * 60, //must be in seconds
             bannerInterval: null,
             curTime: null,
             banner: null
