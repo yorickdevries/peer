@@ -38,11 +38,16 @@ export default class Banner extends BaseModel {
 
   async validateOrReject(): Promise<void> {
     if (this.active) {
+      const params = {
+        active: true,
+      };
+      if (this.id) {
+        Object.defineProperty(params, "id", {
+          value: Not(this.id),
+        });
+      }
       const otherBanners = await Banner.find({
-        where: {
-          active: true,
-          id: Not(this.id),
-        },
+        where: params,
       });
 
       if (otherBanners.length > 0) {
