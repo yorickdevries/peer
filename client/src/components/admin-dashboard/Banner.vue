@@ -1,10 +1,10 @@
 <template>
     <div>
-        <b-form-group label="Name" description="The banner title.">
+        <b-form-group label="Title" description="The banner title.">
             <b-form-input v-model="banner.title" type="text" />
         </b-form-group>
         <b-form-group label="Text" description="The banner text.">
-            <b-form-textarea v-model="banner.text" rows="3" />
+            <b-form-textarea v-model="banner.text" rows="3" maxlength="255" />
         </b-form-group>
         <b-form-group label="Active" description="If the banner is active.">
             <b-form-checkbox v-model="banner.active" />
@@ -51,7 +51,7 @@ export default {
         async patch() {
             await api.banners.patch({
                 id: this.banner.id,
-                name: this.banner.title,
+                title: this.banner.title,
                 text: this.banner.text,
                 active: this.banner.active
             })

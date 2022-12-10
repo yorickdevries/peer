@@ -42,8 +42,8 @@
                                 <b-btn v-b-modal="`delete${data.item.id}`" variant="danger" size="sm">Delete</b-btn>
                             </div>
                             <b-modal :id="`delete${data.item.id}`" centered title="Warning" @ok="remove(data.item.id)">
-                                Are you sure you want to delete the banner "{{ data.item.name }}"? <br /><br />
-                                Deletion will be blocked if this year is already used by another course.
+                                Are you sure you want to delete the banner "{{ data.item.title }}"? <br /><br />
+                                If this banner is active, users will no longer see this banner displayed.
                             </b-modal>
                             <b-modal :id="`edit${data.item.id}`" centered hide-footer class="p-0 m-0" title="Edit">
                                 <Banner :id="data.item.id" @save="save(data.item.id)" />

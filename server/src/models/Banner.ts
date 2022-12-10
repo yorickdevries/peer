@@ -1,6 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, Not } from "typeorm";
 import { IsDefined, IsBoolean, IsString, IsNotEmpty } from "class-validator";
 import BaseModel from "./BaseModel";
+
+interface AnonymousBanner {
+  title: string;
+  text: string;
+}
 
 @Entity()
 export default class Banner extends BaseModel {
@@ -32,6 +37,24 @@ export default class Banner extends BaseModel {
   }
 
   async validateOrReject(): Promise<void> {
-    throw new Error("invalid");
+    if (this.active) {
+      const otherBanners = await Banner.find({
+        where: {
+          active: true,
+          id: Not(this.id),
+        },
+      });
+
+      if (otherBanners.length > 0) {
+        throw new Error("There can only be one active banner at a time.");
+      }
+    }
+  }
+
+  getAnonymousBanner(): AnonymousBanner {
+    return {
+      title: this.title,
+      text: this.text,
+    };
   }
 }

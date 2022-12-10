@@ -1,97 +1,73 @@
-/*
 import {
   idSchema,
   validateBody,
   validateParams,
-  validateQuery,
 } from "../middleware/validation";
-import Course from "../models/Course";
+import Banner from "../models/Banner";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Joi from "@hapi/joi";
-import ResponseMessage from "../enum/ResponseMessage";
 
 import express from "express";
-import isAdmin from "../middleware/authentication/isAdmin";
 
 const router = express.Router();
 
-// Joi inputvalidation for query
-const querySchema = Joi.object({
-  active: Joi.boolean(),
-});
-
-const postSchema = Joi.object({
-  name: Joi.string().required(),
-  active: Joi.boolean().required(),
-});
-const patchSchema = Joi.object({
-  name: Joi.string().required(),
+const schema = Joi.object({
+  title: Joi.string().required(),
+  text: Joi.string().required(),
   active: Joi.boolean().required(),
 });
 
-// get academic years, possibly with filter based on query
-router.get("/", validateQuery(querySchema), async (req, res) => {
-  // check whether the schema is compliant with what is expected
-  const academicYears = await AcademicYear.find({
-    where: req.query,
-    order: { name: "ASC" },
-  });
-  res.send(academicYears);
+// get all banners (admin only)
+router.get("/", async (_req, res) => {
+  // get all banners
+  const banners = await Banner.find();
+  res.send(banners);
 });
 
 router.get("/:id", validateParams(idSchema), async (req, res) => {
-  const year = await AcademicYear.findOne({ where: { id: req.params.id } });
-  if (!year) {
-    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.YEAR_NOT_FOUND);
+  const banner = await Banner.findOne({ where: { id: req.params.id } });
+  if (!banner) {
+    res.status(HttpStatusCode.NOT_FOUND).send();
     return;
   }
-  res.send(year);
+  res.send(banner);
 });
 
-router.post("/", isAdmin, validateBody(postSchema), async (req, res) => {
-  const year = new AcademicYear(req.body.name, req.body.active);
-  await year.save();
-  res.send(year);
+router.post("/", validateBody(schema), async (req, res) => {
+  const banner = new Banner(req.body.title, req.body.text, req.body.active);
+  await banner.save();
+  res.send(banner);
 });
 
 router.patch(
   "/:id",
-  isAdmin,
   validateParams(idSchema),
-  validateBody(patchSchema),
+  validateBody(schema),
   async (req, res) => {
-    const year = await AcademicYear.findOne({ where: { id: req.params.id } });
-    if (!year) {
-      res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.YEAR_NOT_FOUND);
+    const banner = await Banner.findOne({ where: { id: req.params.id } });
+    if (!banner) {
+      res.status(HttpStatusCode.NOT_FOUND).send();
       return;
     }
 
-    year.name = req.body.name;
-    year.active = req.body.active;
-    await year.save();
-    res.send(year);
+    banner.title = req.body.title;
+    banner.text = req.body.text;
+    banner.active = req.body.active;
+    await banner.save();
+    res.send(banner);
   }
 );
 
-router.delete("/:id", isAdmin, validateParams(idSchema), async (req, res) => {
-  const year = await AcademicYear.findOne({ where: { id: req.params.id } });
+router.delete("/:id", validateParams(idSchema), async (req, res) => {
+  const banner = await Banner.findOne({ where: { id: req.params.id } });
 
-  if (!year) {
-    res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.YEAR_NOT_FOUND);
+  if (!banner) {
+    res.status(HttpStatusCode.NOT_FOUND).send();
     return;
   }
 
-  const courses = await Course.find({ where: { academicYear: year } });
-  if (courses.length > 0) {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(ResponseMessage.YEAR_HAS_COURSES);
-    return;
-  }
-
-  await year.remove();
-  res.send(year);
+  await banner.remove();
+  res.send(banner);
 });
 
 export default router;
-*/

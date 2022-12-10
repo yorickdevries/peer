@@ -165,7 +165,7 @@ export default {
             this.curTime = Math.floor(Date.now() / 1000)
             localStorage.setItem("lastBannerCheckTime", this.curTime.toString())
 
-            const res = await api.banners.get(true, true)
+            const res = await api.banners.getActive()
             this.banner = res.data
         }
     }
