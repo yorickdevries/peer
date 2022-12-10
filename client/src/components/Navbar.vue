@@ -1,7 +1,13 @@
 <template>
     <nav class="shadow-sm">
+        <div class="pt-3" :class="headNavbarClass" v-if="banner !== null">
+            <b-container class="text-center">
+                <h5 class="text-white font-weight-bold my-0">{{ banner.title }}</h5>
+                <p class="text-white my-0">{{ banner.text }}</p>
+            </b-container>
+        </div>
         <!--Head Navbar-->
-        <b-navbar toggleable="md" type="dark" class="py-3" :class="headNavbarClass">
+        <b-navbar toggleable="md" type="dark" :class="[headNavbarClass, navbarSizeClass]">
             <b-container>
                 <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
@@ -81,7 +87,8 @@ export default {
             siteName: process.env.NODE_ENV === "production" ? "Peer Review" : "Peer Review Development",
             bannerBuffer: 10, //must be in seconds
             bannerInterval: null,
-            curTime: null
+            curTime: null,
+            banner: null
         }
     },
     computed: {
@@ -112,7 +119,13 @@ export default {
                 default:
                     return { "bg-primary-light": true }
             }
+        },
+        navbarSizeClass() {
+            return this.banner === null ? "py-3" : "pb-3"
         }
+    },
+    beforeMount() {
+        this.getBannerText()
     },
     async mounted() {
         // Fetch authentication & user information.
@@ -137,6 +150,24 @@ export default {
             const res = await api.getMe()
             this.user = res.data
         },
+        getBannerText() {
+            const bannerTitle = localStorage.getItem("bannerTitle")
+            const bannerText = localStorage.getItem("bannerText")
+            if (bannerTitle !== null && bannerText !== null) {
+                this.banner = {
+                    title: bannerTitle,
+                    text: bannerText
+                }
+            }
+        },
+        updateBannerText() {
+            localStorage.setItem("bannerTitle", this.banner.title)
+            localStorage.setItem("bannerText", this.banner.text)
+        },
+        clearBannerText() {
+            localStorage.removeItem("bannerTitle")
+            localStorage.removeItem("bannerText")
+        },
         async startBannerCheck() {
             const lastBannerCheckTime = localStorage.getItem("lastBannerCheckTime")
             this.curTime = Math.floor(Date.now() / 1000)
@@ -144,29 +175,36 @@ export default {
             if (lastBannerCheckTime === null) {
                 //If banner was never checked, set regular interval and check
                 this.bannerInterval = setInterval(this.refreshBanner, this.bannerBuffer * 1000)
-                await this.refreshBanner()
+                this.refreshBanner()
             } else {
                 const lastCheckTimeNum = Number(lastBannerCheckTime)
 
                 if (lastCheckTimeNum + this.bannerBuffer < this.curTime) {
                     //If banner was last checked more than bannerBuffer sec(s) ago, set regular interval and check
                     this.bannerInterval = setInterval(this.refreshBanner, this.bannerBuffer * 1000)
-                    await this.refreshBanner()
+                    this.refreshBanner()
                 } else {
                     //If banner was last checked less than bannerBuffer sec(s) ago, check when necessary and set regular interval
                     setTimeout(async () => {
                         this.bannerInterval = setInterval(this.refreshBanner, this.bannerBuffer * 1000)
-                        await this.refreshBanner()
+                        this.refreshBanner()
                     }, (lastCheckTimeNum + this.bannerBuffer - this.curTime) * 1000)
                 }
             }
         },
-        async refreshBanner() {
+        refreshBanner() {
             this.curTime = Math.floor(Date.now() / 1000)
             localStorage.setItem("lastBannerCheckTime", this.curTime.toString())
 
-            const res = await api.banners.getActive()
-            this.banner = res.data
+            api.banners.getActive().then(res => {
+                if (res.data) {
+                    this.banner = res.data
+                    this.updateBannerText()
+                } else {
+                    this.banner = null
+                    this.clearBannerText()
+                }
+            })
         }
     }
 }

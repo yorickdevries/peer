@@ -56,7 +56,8 @@ router.get("/banners/active", async (_req, res) => {
     where: { active: true },
   });
 
-  const bannerToSend = banner !== undefined ? banner.getAnonymousBanner() : {};
+  const bannerToSend =
+    banner !== undefined ? banner.getAnonymousBanner() : null;
 
   res.send(bannerToSend);
 });
