@@ -46,7 +46,7 @@
                                 Deletion will be blocked if this year is already used by another course.
                             </b-modal>
                             <b-modal :id="`edit${data.item.id}`" centered hide-footer class="p-0 m-0" title="Edit">
-                                <Banner :yearId="data.item.id" @save="save(data.item.id)" />
+                                <Banner :id="data.item.id" @save="save(data.item.id)" />
                             </b-modal>
                         </template>
                     </b-table>

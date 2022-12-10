@@ -1,21 +1,21 @@
 import client from "./axiosClient"
 
 export default {
-    get(active) {
+    get(active, bypass) {
         const params = { active: active }
-        return client.get("banner/", { params: params })
+        return client.get("banners", { bypass: bypass, params: params })
     },
     getById(id) {
-        return client.get(`banner/${id}`)
+        return client.get(`banners/${id}`)
     },
     delete(id) {
-        return client.delete(`banner/${id}`)
+        return client.delete(`banners/${id}`)
     },
-    post(year) {
-        return client.post("banner", year)
+    post(banner) {
+        return client.post("banners", banner)
     },
-    patch(year) {
-        const data = { name: year.name, active: year.active }
-        return client.patch(`banner/${year.id}`, data)
+    patch(banner) {
+        const data = { title: banner.title, text: banner.text, active: banner.active }
+        return client.patch(`banners/${banner.id}`, data)
     }
 }

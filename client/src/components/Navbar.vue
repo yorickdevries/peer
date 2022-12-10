@@ -78,7 +78,10 @@ export default {
             authenticated: null,
             user: { name: null },
             currentCourse: "",
-            siteName: process.env.NODE_ENV === "production" ? "Peer Review" : "Peer Review Development"
+            siteName: process.env.NODE_ENV === "production" ? "Peer Review" : "Peer Review Development",
+            bannerBuffer: 10, //must be in seconds
+            bannerInterval: null,
+            curTime: null
         }
     },
     computed: {
@@ -117,6 +120,11 @@ export default {
         if (this.authenticated) {
             await this.refreshMe()
         }
+
+        await this.startBannerCheck()
+    },
+    destroyed() {
+        clearInterval(this.bannerInterval)
     },
     methods: {
         async refreshAuthenticated() {
@@ -128,6 +136,37 @@ export default {
             // Refresh user information.
             const res = await api.getMe()
             this.user = res.data
+        },
+        async startBannerCheck() {
+            const lastBannerCheckTime = localStorage.getItem("lastBannerCheckTime")
+            this.curTime = Math.floor(Date.now() / 1000)
+
+            if (lastBannerCheckTime === null) {
+                //If banner was never checked, set regular interval and check
+                this.bannerInterval = setInterval(this.refreshBanner, this.bannerBuffer * 1000)
+                await this.refreshBanner()
+            } else {
+                const lastCheckTimeNum = Number(lastBannerCheckTime)
+
+                if (lastCheckTimeNum + this.bannerBuffer < this.curTime) {
+                    //If banner was last checked more than bannerBuffer sec(s) ago, set regular interval and check
+                    this.bannerInterval = setInterval(this.refreshBanner, this.bannerBuffer * 1000)
+                    await this.refreshBanner()
+                } else {
+                    //If banner was last checked less than bannerBuffer sec(s) ago, check when necessary and set regular interval
+                    setTimeout(async () => {
+                        this.bannerInterval = setInterval(this.refreshBanner, this.bannerBuffer * 1000)
+                        await this.refreshBanner()
+                    }, (lastCheckTimeNum + this.bannerBuffer - this.curTime) * 1000)
+                }
+            }
+        },
+        async refreshBanner() {
+            this.curTime = Math.floor(Date.now() / 1000)
+            localStorage.setItem("lastBannerCheckTime", this.curTime.toString())
+
+            const res = await api.banners.get(true, true)
+            this.banner = res.data
         }
     }
 }
