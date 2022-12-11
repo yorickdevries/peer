@@ -129,14 +129,11 @@
                                             <!-- It can be null when a review is redacted -->
                                             <div v-if="answer !== null">
                                                 <!-- OPEN QUESTION -->
-                                                <b-form-textarea
+                                                <viewer
                                                     v-if="question.type === 'open'"
-                                                    placeholder="Enter your answer"
-                                                    :rows="10"
-                                                    :max-rows="15"
-                                                    :value="answer"
-                                                    readonly
-                                                    required
+                                                    :initialValue="answer"
+                                                    :options="editorOptions"
+                                                    height="500px"
                                                 />
 
                                                 <!-- MULTIPLE CHOICE QUESTION -->
@@ -254,9 +251,11 @@ import _ from "lodash"
 import { StarRating } from "vue-rate-it"
 import FileAnnotator from "./FileAnnotator"
 import PDFViewer from "../../general/PDFViewer"
+import "@toast-ui/editor/dist/toastui-editor-viewer.css"
+import { Viewer } from "@toast-ui/vue-editor"
 
 export default {
-    components: { StarRating, FileAnnotator, PDFViewer },
+    components: { StarRating, FileAnnotator, PDFViewer, viewer: Viewer },
     data() {
         return {
             assignment: {},
@@ -268,7 +267,18 @@ export default {
             answers: null,
             // selected question
             question: null,
-            tabs: [{ id: -1, aggregated: true, annotationCount: 0 }]
+            tabs: [{ id: -1, aggregated: true, annotationCount: 0 }],
+            editorOptions: {
+                hideModeSwitch: true,
+                toolbarItems: [
+                    ["heading", "bold", "italic", "strike"],
+                    ["hr", "quote"],
+                    ["ul", "ol", "task", "indent", "outdent"],
+                    ["table", "link"],
+                    ["code", "codeblock"],
+                    ["scrollSync"]
+                ]
+            }
         }
     },
     computed: {

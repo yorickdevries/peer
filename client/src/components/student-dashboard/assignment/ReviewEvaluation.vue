@@ -160,15 +160,21 @@
                     <h4>{{ question.text }}</h4>
 
                     <!-- OPEN QUESTION -->
-                    <b-form-textarea
-                        v-if="question.type === 'open'"
-                        placeholder="Enter your answer"
-                        :rows="10"
-                        :max-rows="15"
-                        v-model="answers[question.id].answer"
-                        @input=";(answers[question.id].changed = true), (questionIndex = index)"
-                        :readonly="!questionsCanBeChanged"
-                        required
+                    <editor
+                        v-if="question.type === 'open' && questionsCanBeChanged"
+                        :initialValue="answers[question.id].answer"
+                        :options="editorOptions"
+                        height="500px"
+                        initialEditType="markdown"
+                        previewStyle="vertical"
+                        @change="getMarkdown(answers, question)"
+                        ref="toastuiEditor"
+                    />
+                    <viewer
+                        v-if="question.type === 'open' && !questionsCanBeChanged"
+                        :initialValue="answers[question.id].answer"
+                        :options="editorOptions"
+                        height="500px"
                     />
 
                     <!-- MULTIPLE CHOICE QUESTION -->
@@ -383,10 +389,14 @@ import notifications from "../../../mixins/notifications"
 import { StarRating } from "vue-rate-it"
 import ReviewViewForEvaluation from "./ReviewViewForEvaluation"
 import PDFViewer from "../../general/PDFViewer"
+import "@toast-ui/editor/dist/toastui-editor.css"
+import { Editor } from "@toast-ui/vue-editor"
+import "@toast-ui/editor/dist/toastui-editor-viewer.css"
+import { Viewer } from "@toast-ui/vue-editor"
 
 export default {
     mixins: [notifications],
-    components: { ReviewViewForEvaluation, StarRating, PDFViewer },
+    components: { ReviewViewForEvaluation, StarRating, PDFViewer, editor: Editor, viewer: Viewer },
     props: ["feedbackReviewId", "reviewsAreReadOnly", "assignmentType"],
     data() {
         return {
@@ -402,7 +412,18 @@ export default {
             // Currently pressed keys
             keys: { Enter: false, ControlLeft: false, ControlRight: false },
             // Index of currently active question
-            questionIndex: null
+            questionIndex: null,
+            editorOptions: {
+                hideModeSwitch: true,
+                toolbarItems: [
+                    ["heading", "bold", "italic", "strike"],
+                    ["hr", "quote"],
+                    ["ul", "ol", "task", "indent", "outdent"],
+                    ["table", "link"],
+                    ["code", "codeblock"],
+                    ["scrollSync"]
+                ]
+            }
         }
     },
     computed: {
@@ -670,6 +691,17 @@ export default {
         },
         uploadAnswerFilePath(reviewId, questionId) {
             return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`
+        },
+        getMarkdown(answers, question) {
+            let counter = 0
+            let questions = this.questionnaire.questions
+            for (let i = 0; i < questions.length; i++) {
+                if (questions[i].type == "open") {
+                    answers[questions[i].id].answer = this.$refs.toastuiEditor[counter].invoke("getMarkdown")
+                    counter++
+                }
+            }
+            answers[question.id].changed = true
         }
     }
 }
