@@ -1,14 +1,11 @@
 <template>
     <b-container v-if="assignmentVersion" fluid class="px-0">
         <!--Submission Information-->
-        <b-card
-            :header="`Submission for Assignment version: ${assignmentVersion.name} (ID: ${assignmentVersion.id})`"
-            class="h-100"
-        >
+        <b-card :header="`Submission for Assignment version: ${assignmentVersion.name}`" class="h-100">
             <b-row>
                 <b-col>
                     <div v-if="submissions.length > 0">
-                        <dt>These are the submission you have made:</dt>
+                        <dt>These are the submissions you have made:</dt>
                         <b-table
                             striped
                             outlined
@@ -27,10 +24,12 @@
                             </template>
                             <template v-slot:cell(serverStatus)="data">
                                 <dl>
-                                    <dt>Current server flagging status</dt>
-                                    <dd v-if="data.item.flaggedByServer">Flagged as suspicious⚠️</dd>
-                                    <dd v-if="data.item.flaggedByServer === false">Not flagged as suspicious✔️</dd>
-                                    <dd v-if="data.item.flaggedByServer === null">No action by the server yet</dd>
+                                    <dt v-if="data.item.flaggedByServer">
+                                        ⚠️ There might be a problem with this file
+                                    </dt>
+                                    <dd v-if="data.item.flaggedByServer === null">
+                                        Your file was not checked by the server
+                                    </dd>
                                 </dl>
                                 <dl>
                                     <dd v-if="data.item.flaggedByServer">
@@ -45,6 +44,11 @@
                                     v-if="!data.item.final"
                                     v-b-modal="`changeSubmissionToFinalModal${data.item.id}`"
                                     :disabled="!isSubmissionActive"
+                                    :title="
+                                        isSubmissionActive
+                                            ? null
+                                            : 'You cannot change the final submission since the deadline has passed'
+                                    "
                                     size="sm"
                                     variant="secondary"
                                     class="mr-2"
@@ -55,6 +59,11 @@
                                     v-else
                                     v-b-modal="`changeSubmissionToNotFinalModal${data.item.id}`"
                                     :disabled="!isSubmissionActive"
+                                    :title="
+                                        isSubmissionActive
+                                            ? null
+                                            : 'You cannot change the final submission since the deadline has passed'
+                                    "
                                     size="sm"
                                     variant="danger"
                                     class="mr-2"
@@ -105,57 +114,62 @@
                         Only the final submission will be used for reviewing
                         <br />
                     </div>
-                    <b-alert v-else show variant="danger"
-                        >You have not yet made a submission for this assignment version</b-alert
-                    >
-                    <b-alert show variant="warning">Maximum file size for submission: 50MB</b-alert>
-                    <b-alert show variant="danger">
-                        You should never include any personal information in your submission files unless specifically
-                        mentioned otherwise!
+                    <b-alert v-else show variant="danger">
+                        You have not (yet) made a submission for this assignment version
                     </b-alert>
-
-                    <!-- Modal Button -->
-                    <b-button
-                        v-b-modal="`uploadModal${assignmentVersion.id}`"
-                        :disabled="!isSubmissionActive"
-                        variant="primary"
-                        @click="resetFile"
-                        >Upload new Submission</b-button
-                    >
-
-                    <!-- Upload Modal-->
-                    <b-modal
-                        :id="`uploadModal${assignmentVersion.id}`"
-                        ref="uploadModal"
-                        centered
-                        hide-footer
-                        title="Upload Submission"
-                    >
-                        Assignment version:
-                        <b-badge pill>{{ assignmentVersion.name }} (ID: {{ assignmentVersion.id }})</b-badge>
-                        <hr />
-                        <b-alert show variant="warning">
-                            If you have already uploaded a file, it will not be used for reviewing anymore!
+                    <div v-if="isSubmissionActive">
+                        <b-alert show variant="danger">
+                            You should never include any personal information in your submission files unless
+                            specifically mentioned otherwise!
                         </b-alert>
-                        <b-alert show variant="warning">
-                            Please make sure you have not included personal information anywhere unless specifically
-                            mentioned otherwise!
-                        </b-alert>
-                        <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
-                        <b-alert show variant="secondary"
-                            >Allowed file types: {{ assignment.submissionExtensions }}</b-alert
+
+                        <!-- Modal Button -->
+                        <b-button
+                            v-b-modal="`uploadModal${assignmentVersion.id}`"
+                            :disabled="!isSubmissionActive"
+                            variant="primary"
+                            @click="resetFile"
+                            >Upload new Submission</b-button
                         >
-                        <b-form-file
-                            v-model="file"
-                            :accept="assignment.submissionExtensions"
-                            placeholder="Choose a file..."
-                            required
-                            :state="Boolean(file)"
-                        />
-                        <b-button variant="primary" class="mt-3" :disabled="buttonDisabled" @click="submitSubmission()"
-                            >Upload</b-button
+
+                        <!-- Upload Modal-->
+                        <b-modal
+                            :id="`uploadModal${assignmentVersion.id}`"
+                            ref="uploadModal"
+                            centered
+                            hide-footer
+                            title="Upload Submission"
                         >
-                    </b-modal>
+                            Assignment version:
+                            <b-badge pill>{{ assignmentVersion.name }}</b-badge>
+                            <hr />
+                            <b-alert show variant="warning">
+                                If you have already uploaded a file, it will not be used for reviewing anymore!
+                            </b-alert>
+                            <b-alert show variant="warning">
+                                Please make sure you have not included personal information anywhere unless specifically
+                                mentioned otherwise!
+                            </b-alert>
+                            <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
+                            <b-alert show variant="secondary"
+                                >Allowed file types: {{ assignment.submissionExtensions }}</b-alert
+                            >
+                            <b-form-file
+                                v-model="file"
+                                :accept="assignment.submissionExtensions"
+                                placeholder="Choose a file..."
+                                required
+                                :state="Boolean(file)"
+                            />
+                            <b-button
+                                variant="primary"
+                                class="mt-3"
+                                :disabled="buttonDisabled"
+                                @click="submitSubmission()"
+                                >Upload</b-button
+                            >
+                        </b-modal>
+                    </div>
                 </b-col>
             </b-row>
             <b-row>

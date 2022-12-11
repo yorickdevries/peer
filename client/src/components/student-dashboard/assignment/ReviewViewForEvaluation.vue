@@ -7,7 +7,6 @@
                 <div>
                     <dl>
                         <dt>Download</dt>
-                        <dd>The download for the submission this review is about.</dd>
                         <a target="_blank" :href="reviewFilePath">
                             <button type="button" class="btn btn-success success w-100" style="height: 3rem">
                                 Download Submission ({{ reviewFileName }})
@@ -20,20 +19,31 @@
             <!--Approval-->
             <b-col cols="6">
                 <dl>
-                    <dt>Current submission status</dt>
-                    <dd>{{ review.submitted ? "" : "Not " }}Submitted</dd>
+                    <dt>Current status</dt>
+                    <dd v-if="review.submitted">✅ Feedback submitted</dd>
+                    <dd v-else>⚠️ Feedback not submitted</dd>
                 </dl>
                 <dl>
                     <dt>Current report status</dt>
-                    <dd>{{ review.flaggedByReviewer ? "" : "Not " }}Reported as insufficient</dd>
+                    <dd v-if="!review.submitted">-</dd>
+                    <dd v-else-if="review.flaggedByReviewer">
+                        ⚠️ This submission was reported as empty, not serious or for the wrong assignment
+                    </dd>
+                    <dd v-else>✅ Not reported</dd>
                 </dl>
                 <dl v-if="review.submitted">
                     <dt>Current approval status</dt>
-                    <dd v-if="review.approvalByTA">Approved 👍</dd>
-                    <dd v-if="review.approvalByTA === false">Disapproved 👎</dd>
-                    <dd v-if="review.approvalByTA === null">No action yet by any TA.</dd>
-                    <dt>Current TA Comment</dt>
-                    <b-form-textarea :rows="10" :max-rows="15" v-model="review.commentByTA" readonly />
+                    <dd v-if="review.approvalByTA">👍 Approved</dd>
+                    <dd v-if="review.approvalByTA === false">👎 Disapproved</dd>
+                    <dd v-if="review.approvalByTA === null">Not checked by TA</dd>
+                    <dt v-if="review.commentByTA">Current TA Comment</dt>
+                    <b-form-textarea
+                        v-if="review.commentByTA"
+                        :rows="10"
+                        :max-rows="15"
+                        v-model="review.commentByTA"
+                        readonly
+                    />
                 </dl>
             </b-col>
         </b-row>
@@ -59,10 +69,12 @@
                                 name="reportButton"
                                 class="float-left"
                             >
-                                Report this submission.
+                                ⚠️ Report this submission
                             </b-form-checkbox>
                             <br />
-                            <small>Only report if the submission is empty or not serious.</small>
+                            <small>
+                                Report the submission if it is empty, not serious or for the wrong assignment.
+                            </small>
                         </div>
                         <b-button
                             v-if="!review.submitted"
@@ -99,8 +111,8 @@
                 >
                     <!--Title-->
                     <b-card-header v-if="!reviewsAreReadOnly">
-                        <h4>Assignment Questionnaire</h4>
-                        <h6 class="card-subtitle text-muted">Give the review to one of your peers here.</h6>
+                        <h4>Review Questionnaire</h4>
+                        <h6 class="card-subtitle text-muted">Give feedback to one of your peers here.</h6>
                     </b-card-header>
 
                     <!--Question Information-->
@@ -272,10 +284,12 @@
                                 name="reportButton"
                                 class="float-left"
                             >
-                                Report this submission.
+                                ⚠️ Report this submission
                             </b-form-checkbox>
                             <br />
-                            <small>Only report if the submission is empty or not serious.</small>
+                            <small>
+                                Report the submission if it is empty, not serious or for the wrong assignment.
+                            </small>
                         </div>
                         <b-button
                             v-if="!review.submitted"
@@ -355,7 +369,7 @@ export default {
             // disable save/delete buttons when a call is busy
             buttonDisabled: false,
             // View file next to questionnaire
-            viewFileNextToQuestionnaire: false
+            viewFileNextToQuestionnaire: true
         }
     },
     computed: {

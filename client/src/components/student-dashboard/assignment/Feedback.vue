@@ -3,21 +3,21 @@
         <b-tabs card>
             <b-tab title="File Annotation Feedback">
                 <div v-if="finalSubmission == null">
-                    No final was submission found.
+                    No final submission found.
                 </div>
                 <div v-else-if="finalSubmission.file.extension !== '.pdf' && assignment.assignmentType === 'document'">
                     Your submission was not a .pdf file, so it was not annotated by reviewers.
                 </div>
                 <div v-else-if="feedbackReviews.length === 0">No feedback available.</div>
                 <b-tabs v-else>
-                    <b-tab v-for="tab in tabs" :key="tab.id">
+                    <b-tab v-for="(tab, index) in tabs" :key="tab.id">
                         <template slot="title">
                             <div class="d-flex align-items-center">
-                                <b-badge v-if="tab.aggregated" variant="warning" class="mr-2">ALL</b-badge>
+                                <b-badge v-if="tab.aggregated" variant="warning" class="mr-2">ALL Reviews</b-badge>
                                 <b-badge v-else :style="{ 'background-color': reviewColors[tab.id] }" class="mr-2">
-                                    ID: {{ tab.id }}
+                                    Review #{{ index + (tabs.length === 1 ? 1 : 0) }}
                                 </b-badge>
-                                <b-badge v-if="tab.annotationCount == 1" variant="primary">
+                                <b-badge v-if="tab.annotationCount === 1" variant="primary">
                                     1 annotation
                                 </b-badge>
                                 <b-badge v-else variant="primary">
