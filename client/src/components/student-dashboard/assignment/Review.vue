@@ -139,26 +139,23 @@
                         <b-card-body>
                             <!-- Text-->
                             <h4>{{ question.text }}</h4>
+                            <!-- OPEN QUESTION -->
                             <editor
-                                v-if="question.type === 'open'"
-                                :initialValue="editorText"
+                                v-if="question.type === 'open' && !(review.submitted || reviewsAreReadOnly)"
+                                :initialValue="answers[question.id].answer"
                                 :options="editorOptions"
                                 height="500px"
                                 initialEditType="markdown"
                                 previewStyle="vertical"
+                                @change="getMarkdown(answers, question)"
+                                ref="toastuiEditor"
                             />
-                            <!-- OPEN QUESTION -->
-
-                            <!--                            <b-form-textarea-->
-                            <!--                                v-if="question.type === 'open'"-->
-                            <!--                                placeholder="Enter your answer"-->
-                            <!--                                :rows="10"-->
-                            <!--                                :max-rows="15"-->
-                            <!--                                v-model="answers[question.id].answer"-->
-                            <!--                                @input=";(answers[question.id].changed = true), (questionIndex = index)"-->
-                            <!--                                :readonly="review.submitted || reviewsAreReadOnly"-->
-                            <!--                                required-->
-                            <!--                            />-->
+                            <viewer
+                                v-if="question.type === 'open' && (review.submitted || reviewsAreReadOnly)"
+                                :initialValue="answers[question.id].answer"
+                                :options="editorOptions"
+                                height="500px"
+                            />
 
                             <!-- MULTIPLE CHOICE QUESTION -->
                             <!--prettier-ignore-->
@@ -373,10 +370,12 @@ import FileAnnotator from "./FileAnnotator"
 import PDFViewer from "../../general/PDFViewer"
 import "@toast-ui/editor/dist/toastui-editor.css"
 import { Editor } from "@toast-ui/vue-editor"
+import "@toast-ui/editor/dist/toastui-editor-viewer.css"
+import { Viewer } from "@toast-ui/vue-editor"
 
 export default {
     mixins: [notifications],
-    components: { StarRating, ReviewEvaluation, FileAnnotator, PDFViewer, editor: Editor },
+    components: { StarRating, ReviewEvaluation, FileAnnotator, PDFViewer, editor: Editor, viewer: Viewer },
     props: ["reviewId", "reviewsAreReadOnly", "assignmentType"],
     data() {
         return {
@@ -396,9 +395,16 @@ export default {
             keys: { Enter: false, ControlLeft: false, ControlRight: false },
             // Index of currently active question
             questionIndex: null,
-            editorText: "This is initialValue.",
             editorOptions: {
-                hideModeSwitch: true
+                hideModeSwitch: true,
+                toolbarItems: [
+                    ["heading", "bold", "italic", "strike"],
+                    ["hr", "quote"],
+                    ["ul", "ol", "task", "indent", "outdent"],
+                    ["table", "link"],
+                    ["code", "codeblock"],
+                    ["scrollSync"]
+                ]
             }
         }
     },
@@ -677,6 +683,17 @@ export default {
         },
         toggleViewFileNextToQuestionnaire() {
             this.viewFileNextToQuestionnaire = !this.viewFileNextToQuestionnaire
+        },
+        getMarkdown(answers, question) {
+            let counter = 0
+            let questions = this.questionnaire.questions
+            for (let i = 0; i < questions.length; i++) {
+                if (questions[i].type == "open") {
+                    answers[questions[i].id].answer = this.$refs.toastuiEditor[counter].invoke("getMarkdown")
+                    counter++
+                }
+            }
+            answers[question.id].changed = true
         }
     }
 }
