@@ -142,14 +142,20 @@
                                             <h4>{{ question.text }}</h4>
 
                                             <!-- OPEN QUESTION -->
-                                            <b-form-textarea
+                                            <!--                                            <b-form-textarea-->
+                                            <!--                                                v-if="question.type === 'open'"-->
+                                            <!--                                                placeholder="Enter your answer"-->
+                                            <!--                                                :rows="10"-->
+                                            <!--                                                :max-rows="15"-->
+                                            <!--                                                v-model="answers[question.id].answer"-->
+                                            <!--                                                readonly-->
+                                            <!--                                                required-->
+                                            <!--                                            />-->
+                                            <viewer
                                                 v-if="question.type === 'open'"
-                                                placeholder="Enter your answer"
-                                                :rows="10"
-                                                :max-rows="15"
-                                                v-model="answers[question.id].answer"
-                                                readonly
-                                                required
+                                                :initialValue="answers[question.id].answer"
+                                                :options="editorOptions"
+                                                height="500px"
                                             />
 
                                             <!-- MULTIPLE CHOICE QUESTION -->
@@ -324,10 +330,12 @@ import { StarRating } from "vue-rate-it"
 import ReviewEvaluation from "../student-dashboard/assignment/ReviewEvaluation"
 import FileAnnotator from "../student-dashboard/assignment/FileAnnotator"
 import PDFViewer from "../general/PDFViewer"
+import "@toast-ui/editor/dist/toastui-editor-viewer.css"
+import { Viewer } from "@toast-ui/vue-editor"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, FileAnnotator, PDFViewer },
+    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, FileAnnotator, PDFViewer, viewer: Viewer },
     data() {
         return {
             assignment: {},
@@ -341,7 +349,18 @@ export default {
             // all answers will be saved in this object
             answers: null,
             // View file next to questionnaire
-            viewFileNextToQuestionnaire: false
+            viewFileNextToQuestionnaire: false,
+            editorOptions: {
+                hideModeSwitch: true,
+                toolbarItems: [
+                    ["heading", "bold", "italic", "strike"],
+                    ["hr", "quote"],
+                    ["ul", "ol", "task", "indent", "outdent"],
+                    ["table", "link"],
+                    ["code", "codeblock"],
+                    ["scrollSync"]
+                ]
+            }
         }
     },
     computed: {
