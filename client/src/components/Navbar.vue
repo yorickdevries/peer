@@ -1,9 +1,9 @@
 <template>
     <nav class="shadow-sm">
-        <div class="pt-3" :class="headNavbarClass" v-if="banner !== null">
+        <div class="py-3 bg-warning" v-if="banner !== null">
             <b-container class="text-center">
-                <h5 class="text-white font-weight-bold my-0">{{ banner.title }}</h5>
-                <p class="text-white my-0">{{ banner.text }}</p>
+                <h5 class="text-black font-weight-bold my-0">{{ banner.title }}</h5>
+                <p class="text-black my-0">{{ banner.text }}</p>
             </b-container>
         </div>
         <!--Head Navbar-->
