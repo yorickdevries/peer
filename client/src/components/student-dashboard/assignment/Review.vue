@@ -387,8 +387,9 @@ import MarkdownEditorViewer from "../../general/MarkdownEditorViewer"
 
 export default {
     mixins: [notifications],
+    name: "Review",
     components: { MarkdownEditorViewer, StarRating, ReviewEvaluation, FileAnnotator, PDFViewer },
-    props: ["reviewId", "reviewsAreReadOnly", "assignmentType"],
+    props: ["reviewId", "reviewsAreReadOnly", "assignmentType", "evaluationButton"],
     data() {
         return {
             fileMetadata: null,

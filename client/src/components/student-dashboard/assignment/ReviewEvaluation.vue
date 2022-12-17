@@ -418,10 +418,11 @@ import { StarRating } from "vue-rate-it"
 import ReviewViewForEvaluation from "./ReviewViewForEvaluation"
 import PDFViewer from "../../general/PDFViewer"
 import MarkdownEditorViewer from "../../general/MarkdownEditorViewer"
+import Review from "@/components/student-dashboard/assignment/Review";
 
 export default {
     mixins: [notifications],
-    components: { ReviewViewForEvaluation, StarRating, PDFViewer, MarkdownEditorViewer },
+    components: { Review, ReviewViewForEvaluation, StarRating, PDFViewer, MarkdownEditorViewer },
     props: ["feedbackReviewId", "reviewsAreReadOnly", "assignmentType"],
     data() {
         return {
