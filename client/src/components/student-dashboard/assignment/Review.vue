@@ -152,21 +152,13 @@
                             <!-- Text-->
                             <h4>{{ question.text }}</h4>
                             <!-- OPEN QUESTION -->
-                            <editor
-                                v-if="question.type === 'open' && !(review.submitted || reviewsAreReadOnly)"
-                                :initialValue="answers[question.id].answer"
-                                :options="editorOptions"
-                                height="500px"
-                                initialEditType="markdown"
-                                previewStyle="vertical"
-                                @change="getMarkdown(answers, question)"
-                                ref="toastuiEditor"
-                            />
-                            <viewer
-                                v-if="question.type === 'open' && (review.submitted || reviewsAreReadOnly)"
-                                :initialValue="answers[question.id].answer"
-                                :options="editorOptions"
-                                height="500px"
+                            <MarkdownEditorViewer
+                                v-if="question.type === 'open'"
+                                :initialvalue="answers[question.id].answer"
+                                :answers="answers"
+                                :question="question"
+                                :questions="questionnaire.questions"
+                                :displayeditor="!(review.submitted || reviewsAreReadOnly)"
                             />
 
                             <!-- MULTIPLE CHOICE QUESTION -->
@@ -391,14 +383,11 @@ import { StarRating } from "vue-rate-it"
 import ReviewEvaluation from "./ReviewEvaluation"
 import FileAnnotator from "./FileAnnotator"
 import PDFViewer from "../../general/PDFViewer"
-import "@toast-ui/editor/dist/toastui-editor.css"
-import { Editor } from "@toast-ui/vue-editor"
-import "@toast-ui/editor/dist/toastui-editor-viewer.css"
-import { Viewer } from "@toast-ui/vue-editor"
+import MarkdownEditorViewer from "../../general/MarkdownEditorViewer"
 
 export default {
     mixins: [notifications],
-    components: { StarRating, ReviewEvaluation, FileAnnotator, PDFViewer, editor: Editor, viewer: Viewer },
+    components: { MarkdownEditorViewer, StarRating, ReviewEvaluation, FileAnnotator, PDFViewer },
     props: ["reviewId", "reviewsAreReadOnly", "assignmentType"],
     data() {
         return {
@@ -417,18 +406,7 @@ export default {
             // Currently pressed keys
             keys: { Enter: false, ControlLeft: false, ControlRight: false },
             // Index of currently active question
-            questionIndex: null,
-            editorOptions: {
-                hideModeSwitch: true,
-                toolbarItems: [
-                    ["heading", "bold", "italic", "strike"],
-                    ["hr", "quote"],
-                    ["ul", "ol", "task", "indent", "outdent"],
-                    ["table", "link"],
-                    ["code", "codeblock"],
-                    ["scrollSync"]
-                ]
-            }
+            questionIndex: null
         }
     },
     computed: {
@@ -706,17 +684,6 @@ export default {
         },
         toggleViewFileNextToQuestionnaire() {
             this.viewFileNextToQuestionnaire = !this.viewFileNextToQuestionnaire
-        },
-        getMarkdown(answers, question) {
-            let counter = 0
-            let questions = this.questionnaire.questions
-            for (let i = 0; i < questions.length; i++) {
-                if (questions[i].type == "open") {
-                    answers[questions[i].id].answer = this.$refs.toastuiEditor[counter].invoke("getMarkdown")
-                    counter++
-                }
-            }
-            answers[question.id].changed = true
         }
     }
 }
