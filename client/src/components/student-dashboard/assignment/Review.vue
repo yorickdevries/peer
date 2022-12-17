@@ -48,7 +48,7 @@
         </b-row>
 
         <!--See Review Evaluation is exist-->
-        <b-row v-if="reviewEvaluation">
+        <b-row v-if="reviewEvaluation && evaluationButton">
             <b-col>
                 <b-button v-b-modal="`reviewModal${review.id}`" variant="warning" class="w-100" style="height: 3rem"
                     >Show Review Evaluation</b-button
