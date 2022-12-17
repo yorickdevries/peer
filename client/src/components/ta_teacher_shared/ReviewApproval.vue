@@ -139,17 +139,6 @@
                                         <b-card-body>
                                             <!-- Text-->
                                             <h4>{{ question.text }}</h4>
-
-                                            <!-- OPEN QUESTION -->
-                                            <!--                                            <b-form-textarea-->
-                                            <!--                                                v-if="question.type === 'open'"-->
-                                            <!--                                                placeholder="Enter your answer"-->
-                                            <!--                                                :rows="10"-->
-                                            <!--                                                :max-rows="15"-->
-                                            <!--                                                v-model="answers[question.id].answer"-->
-                                            <!--                                                readonly-->
-                                            <!--                                                required-->
-                                            <!--                                            />-->
                                             <viewer
                                                 v-if="question.type === 'open'"
                                                 :initialValue="answers[question.id].answer"

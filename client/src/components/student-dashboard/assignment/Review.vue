@@ -380,7 +380,6 @@
                 resubmit it.
             </b-modal>
         </b-row>
-        <!--        <div id="editor"></div>-->
     </div>
 </template>
 
