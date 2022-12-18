@@ -4,6 +4,7 @@ import StudentRoutes from "./student-routes"
 import TeacherRoutes from "./teacher-routes"
 import TeachingAssistantRoutes from "./teaching-assistant-routes"
 import AdminRoutes from "./admin-routes"
+import api from "@/api/api"
 Vue.use(VueRouter)
 
 /**
@@ -24,7 +25,13 @@ export default new VueRouter({
                 {
                     path: "/",
                     name: "landing-page",
-                    component: () => import("../components/general/LandingPage")
+                    component: () => import("../components/general/LandingPage"),
+                    beforeEnter: async (to, from, next) => {
+                        const res = await api.getAuthenticated()
+                        const authenticated = res.data.authenticated
+
+                        authenticated ? next("/courses") : next()
+                    }
                 },
                 {
                     path: "/courses",
