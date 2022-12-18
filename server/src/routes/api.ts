@@ -64,6 +64,7 @@ router.use("/academicyears", academicyears);
 router.use("/courses", courses);
 router.use("/enrollments", enrollments);
 router.use("/assignments", assignments);
+router.use("/deadlines", deadlines);
 router.use("/assignmentversions", assignmentversions);
 router.use("/groups", groups);
 router.use("/submissions", submissions);
