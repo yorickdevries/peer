@@ -1,9 +1,9 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import {
-  idSchema,
   validateBody,
   validateParams,
+  idSchema,
   validateQuery,
 } from "../middleware/validation";
 import Assignment from "../models/Assignment";
