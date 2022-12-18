@@ -44,8 +44,20 @@ echo "3 - BUILD"
 echo "         Building server"
 cd "$RELEASE_DIR"
 NODE_ENV=production npm run build_server || exit 8
+
+# Create server release
+sentry-cli releases new "$TIMESTAMP"
+sentry-cli releases files "$TIMESTAMP" upload-sourcemaps server/dist
+sentry-cli releases finalize "$TIMESTAMP"
+
 echo "         Building client"
 NODE_ENV=production npm run build_client || exit 9
+
+#Create client release
+sentry-cli releases new "$TIMESTAMP"
+sentry-cli releases files "$TIMESTAMP" upload-sourcemaps server/dist/public
+sentry-cli releases finalize "$TIMESTAMP"
+
 
 # Run the migrations
 echo "4 - MIGRATE"

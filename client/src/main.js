@@ -53,6 +53,7 @@ Vue.config.productionTip = false
 Sentry.init({
     Vue,
     dsn: process.env.VUE_APP_SENTRY_DSN,
+    release: process.env.VUE_APP_SENTRY_RELEASE,
     trackComponents: true,
     integrations: [
         new BrowserTracing({

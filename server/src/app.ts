@@ -18,6 +18,7 @@ const app = express();
 
 if (config.has("sentryDSN")) {
   Sentry.init({
+    release: process.env.SENTRY_RELEASE,
     dsn: config.get("sentryDSN"),
     integrations: [
       // enable HTTP calls tracing
