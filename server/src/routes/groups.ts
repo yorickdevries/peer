@@ -1,10 +1,10 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import {
-  validateBody,
-  validateQuery,
-  validateParams,
   idSchema,
+  validateBody,
+  validateParams,
+  validateQuery,
 } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
@@ -337,10 +337,8 @@ router.post(
       return;
     }
     if (await assignment.hasGroups()) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("There are already groups for this assignment");
-      return;
+      const groupsIds = (await assignment.getGroups()).map((g) => g.id);
+      await Group.delete(groupsIds);
     }
 
     // offload a function to a worker
