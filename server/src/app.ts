@@ -8,6 +8,7 @@ import * as Tracing from "@sentry/tracing";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import compression from "compression";
+import { errorLogger } from "./middleware/logger";
 import HttpStatusCode from "./enum/HttpStatusCode";
 
 import api from "./routes/api";
@@ -20,6 +21,7 @@ if (config.has("sentryDSN")) {
   Sentry.init({
     release: process.env.SENTRY_RELEASE,
     dsn: config.get("sentryDSN"),
+    environment: process.env.NODE_ENV,
     integrations: [
       // enable HTTP calls tracing
       new Sentry.Integrations.Http({ tracing: true }),
@@ -87,6 +89,9 @@ if (config.has("sentryDSN")) {
   //Sentry error handler
   app.use(Sentry.Handlers.errorHandler());
 }
+
+app.use(errorLogger);
+
 // Error handler
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: Error, _req: Request, res: Response, _next: NextFunction) => {
