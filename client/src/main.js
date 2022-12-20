@@ -54,6 +54,7 @@ Sentry.init({
     Vue,
     dsn: process.env.VUE_APP_SENTRY_DSN,
     release: process.env.VUE_APP_SENTRY_RELEASE,
+    environment: process.env.NODE_ENV,
     trackComponents: true,
     integrations: [
         new BrowserTracing({
