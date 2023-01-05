@@ -6,6 +6,7 @@
 
 <script>
 import VuePdfEmbed from "vue-pdf-embed/dist/vue2-pdf-embed"
+//style="display: inline-block; width: 100%"
 export default {
     components: {
         VuePdfEmbed,
