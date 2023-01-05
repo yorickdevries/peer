@@ -40,7 +40,7 @@ npm install || exit 6
 echo "3 - BUILD"
 echo "         Building server"
 cd "$RELEASE_DIR"
-NODE_ENV=staging npm run build_server || exit 7
+NODE_ENV=staging npm run build_server && SENTRY_REL="$TIMESTAMP" || exit 7
 
 # Create server release
 sentry-cli releases new --project "peer-backend" "$TIMESTAMP"
