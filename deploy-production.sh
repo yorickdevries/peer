@@ -43,7 +43,7 @@ npm install || exit 7
 echo "3 - BUILD"
 echo "         Building server"
 cd "$RELEASE_DIR"
-NODE_ENV=production && SENTRY_RELEASE="$TIMESTAMP" npm run build_server || exit 8
+NODE_ENV=production && SENTRY_RELEASE="$TIMESTAMP" && npm run build_server || exit 8
 
 # Create server release
 sentry-cli releases new --project "peer-backend" "$TIMESTAMP"
@@ -51,7 +51,7 @@ sentry-cli releases files --project "peer-backend" "$TIMESTAMP" upload-sourcemap
 sentry-cli releases finalize --project "peer-backend" "$TIMESTAMP"
 
 echo "         Building client"
-NODE_ENV=production echo "VUE_APP_SENTRY_RELEASE=$TIMESTAMP" > "$RELEASE_DIR/client/.env" && npm run build_client || exit 9
+NODE_ENV=production && echo "VUE_APP_SENTRY_RELEASE=$TIMESTAMP" > "$RELEASE_DIR/client/.env" && npm run build_client || exit 9
 
 #Create client release
 sentry-cli releases new --project "peer-frontend" "$TIMESTAMP"
