@@ -17,10 +17,10 @@ import ResponseMessage from "./enum/ResponseMessage";
 // instantiate the app
 const app = express();
 
-if (config.has("sentryDSN")) {
+if (config.has("sentry")) {
   Sentry.init({
     release: process.env.SENTRY_RELEASE,
-    dsn: config.get("sentryDSN"),
+    dsn: config.get("sentry.dsn"),
     environment: process.env.NODE_ENV,
     integrations: [
       // enable HTTP calls tracing
@@ -32,7 +32,7 @@ if (config.has("sentryDSN")) {
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
-    tracesSampleRate: 1.0,
+    tracesSampleRate: config.get("sentry.rate"),
   });
 
   // RequestHandler creates a separate execution context using domains, so that every
@@ -85,7 +85,7 @@ const clientIndex = path.resolve(clientWebsite, "index.html");
 app.get("/*", (_req, res) => {
   res.sendFile(clientIndex);
 });
-if (config.has("sentryDSN")) {
+if (config.has("sentry")) {
   //Sentry error handler
   app.use(Sentry.Handlers.errorHandler());
 }
