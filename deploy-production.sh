@@ -58,7 +58,6 @@ sentry-cli releases new --project "peer-frontend" "$TIMESTAMP"
 sentry-cli releases files --project "peer-frontend" "$TIMESTAMP" upload-sourcemaps server/dist/public
 sentry-cli releases finalize --project "peer-frontend" "$TIMESTAMP"
 
-
 # Run the migrations
 echo "4 - MIGRATE"
 echo "         Running migrations"

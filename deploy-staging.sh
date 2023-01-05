@@ -41,8 +41,19 @@ echo "3 - BUILD"
 echo "         Building server"
 cd "$RELEASE_DIR"
 NODE_ENV=staging npm run build_server || exit 7
+
+# Create server release
+sentry-cli releases new --project "peer-backend" "$TIMESTAMP"
+sentry-cli releases files --project "peer-backend" "$TIMESTAMP" upload-sourcemaps server/dist
+sentry-cli releases finalize --project "peer-backend" "$TIMESTAMP"
+
 echo "         Building client"
 NODE_ENV=staging npm run build_client || exit 8
+
+#Create client release
+sentry-cli releases new --project "peer-frontend" "$TIMESTAMP"
+sentry-cli releases files --project "peer-frontend" "$TIMESTAMP" upload-sourcemaps server/dist/public
+sentry-cli releases finalize --project "peer-frontend" "$TIMESTAMP"
 
 # Run the migrations
 echo "4 - MIGRATE"
