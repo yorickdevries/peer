@@ -336,7 +336,32 @@ router.post(
         .send("The submission state has passed");
       return;
     }
+
+    const groups = await assignment.getGroups();
+
+    //Check if submissions have already been made
     if (await assignment.hasGroups()) {
+      for (const group of groups) {
+        const assignmentVersions = assignment.versions;
+        for (const assignmentVersion of assignmentVersions) {
+          const submissions = await assignmentVersion.getSubmissions(group);
+          if (submissions.length > 0) {
+            res
+              .status(HttpStatusCode.FORBIDDEN)
+              .send(
+                "A group you are trying to delete already has already made a submision."
+              );
+            return;
+          }
+        }
+      }
+
+      //Delete all users from their groups
+      for (const group of groups) {
+        group.users = [];
+        await group.save();
+      }
+
       const groupsIds = (await assignment.getGroups()).map((g) => g.id);
       await Group.delete(groupsIds);
     }
