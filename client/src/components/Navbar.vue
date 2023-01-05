@@ -88,7 +88,7 @@ export default {
             bannerBuffer: 10 * 60, //must be in seconds
             bannerInterval: null,
             curTime: null,
-            banner: null
+            banner: null,
         }
     },
     computed: {
@@ -122,7 +122,7 @@ export default {
         },
         navbarSizeClass() {
             return this.banner === null ? "py-3" : "pb-3"
-        }
+        },
     },
     beforeMount() {
         this.getBannerText()
@@ -156,7 +156,7 @@ export default {
             if (bannerTitle !== null && bannerText !== null) {
                 this.banner = {
                     title: bannerTitle,
-                    text: bannerText
+                    text: bannerText,
                 }
             }
         },
@@ -196,7 +196,7 @@ export default {
             this.curTime = Math.floor(Date.now() / 1000)
             localStorage.setItem("lastBannerCheckTime", this.curTime.toString())
 
-            api.banners.getActive().then(res => {
+            api.banners.getActive().then((res) => {
                 if (res.data) {
                     this.banner = res.data
                     this.updateBannerText()
@@ -205,7 +205,7 @@ export default {
                     this.clearBannerText()
                 }
             })
-        }
-    }
+        },
+    },
 }
 </script>

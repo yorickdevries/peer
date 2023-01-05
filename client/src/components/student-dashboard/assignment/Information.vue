@@ -86,8 +86,8 @@ export default {
             userFields: [
                 { key: "displayName", label: "Name" },
                 { key: "netid", label: "NetID" },
-                { key: "email", label: "​​​Email" }
-            ]
+                { key: "email", label: "​​​Email" },
+            ],
         }
     },
     computed: {
@@ -98,7 +98,7 @@ export default {
         submissionFilePath() {
             // Get the submission file path.
             return `/api/submissions/${this.finalSubmission.id}/file`
-        }
+        },
     },
     async created() {
         await this.fetchAssignment()
@@ -120,7 +120,7 @@ export default {
             // Fetch the submission.
             const res = await api.assignments.getFinalSubmission(this.$route.params.assignmentId, this.group.id)
             this.finalSubmission = res.data
-        }
-    }
+        },
+    },
 }
 </script>

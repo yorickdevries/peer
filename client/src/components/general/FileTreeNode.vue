@@ -56,7 +56,7 @@ export default {
             name: null,
             children: null,
             dir: false,
-            collapsed: false
+            collapsed: false,
         }
     },
     created() {
@@ -99,7 +99,7 @@ export default {
         },
         onChildCollapse(name) {
             this.$emit("toggleCollapse", name)
-        }
+        },
     },
     computed: {
         selected() {
@@ -107,16 +107,16 @@ export default {
         },
         annotated() {
             return this.annotatedFiles.has(this.children.path)
-        }
+        },
     },
     mounted() {
         // Event listener waiting for the go-ahead to toggle the collapse state
-        this.$root.$on("filetreenode::collapse", name => {
+        this.$root.$on("filetreenode::collapse", (name) => {
             if (this.name === name) {
                 this.toggleCollapsed()
             }
         })
-    }
+    },
 }
 </script>
 

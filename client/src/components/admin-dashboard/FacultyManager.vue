@@ -93,11 +93,11 @@ export default {
                 { key: "id", label: "ID", sortable: true },
                 { key: "name", label: "Abbreviation", sortable: true },
                 { key: "longName", label: "Name", sortable: true },
-                { key: "action", label: "Action" }
+                { key: "action", label: "Action" },
             ],
             currentPage: 1,
             perPage: 10,
-            filter: ""
+            filter: "",
         }
     },
     async created() {
@@ -118,7 +118,7 @@ export default {
             await api.faculties.delete(id)
             await this.fetchFaculties()
             this.showSuccessMessage({ message: "Faculty has been removed" })
-        }
-    }
+        },
+    },
 }
 </script>

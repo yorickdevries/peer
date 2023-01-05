@@ -84,7 +84,7 @@ export default {
         return {
             course: {},
             faculties: [],
-            academicYears: []
+            academicYears: [],
         }
     },
     async created() {
@@ -115,7 +115,7 @@ export default {
             )
             this.$router.push({ name: "teacher-dashboard.course", params: { courseId: this.course.id } })
             location.reload()
-        }
-    }
+        },
+    },
 }
 </script>

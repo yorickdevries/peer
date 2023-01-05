@@ -28,16 +28,16 @@ import api from "../../../api/api"
 
 export default {
     components: {
-        ReviewQuestionnaireWizard
+        ReviewQuestionnaireWizard,
     },
     data() {
         return {
-            assignment: null
+            assignment: null,
         }
     },
     async created() {
         const res = await api.assignments.get(this.$route.params.assignmentId)
         this.assignment = res.data
-    }
+    },
 }
 </script>

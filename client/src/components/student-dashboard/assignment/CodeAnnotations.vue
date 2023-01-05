@@ -165,7 +165,7 @@ export default {
         "selectedFile",
         "selectionStart",
         "selectionEnd",
-        "isOnlyFile"
+        "isOnlyFile",
     ],
     components: { PeerTextarea },
     mixins: [notifications],
@@ -173,7 +173,7 @@ export default {
         return {
             showEditModal: false,
             editingAnnotation: null,
-            annotationState: {}
+            annotationState: {},
         }
     },
     created() {
@@ -208,7 +208,7 @@ export default {
             return lineIndex + 1 === this.selectionEnd
         },
         filterAnnotationsAt(lineIndex, startsAt = false, endsAt = false, reviewId = -1) {
-            return this.getAnnotationsAt(lineIndex).filter(annotation => {
+            return this.getAnnotationsAt(lineIndex).filter((annotation) => {
                 return (
                     (!startsAt || annotation.startLineNumber - 1 === lineIndex) &&
                     (!endsAt || annotation.endLineNumber - 1 === lineIndex) &&
@@ -281,9 +281,9 @@ export default {
         },
         toggleAnnotationsAt(lineIndex) {
             const allExtended = this.getAnnotationsAt(lineIndex).every(
-                annotation => this.annotationState[annotation.id] === true
+                (annotation) => this.annotationState[annotation.id] === true
             )
-            this.getAnnotationsAt(lineIndex).forEach(annotation => {
+            this.getAnnotationsAt(lineIndex).forEach((annotation) => {
                 this.$set(this.annotationState, annotation.id, !allExtended)
             })
 
@@ -296,7 +296,7 @@ export default {
         },
         isCorrespondingFile(file) {
             return this.isOnlyFile || file === this.selectedFile
-        }
+        },
     },
     computed: {
         lineAnnotationMap() {
@@ -323,15 +323,15 @@ export default {
             return Array.from(
                 new Set(
                     this.annotations
-                        .filter(annotation => this.isCorrespondingFile(annotation.selectedFile))
-                        .map(annotation => annotation.reviewId)
+                        .filter((annotation) => this.isCorrespondingFile(annotation.selectedFile))
+                        .map((annotation) => annotation.reviewId)
                 )
             )
         },
         maxLineNumberDigits() {
             return Math.ceil(Math.log(this.content.length + 1) / Math.log(10))
-        }
-    }
+        },
+    },
 }
 </script>
 

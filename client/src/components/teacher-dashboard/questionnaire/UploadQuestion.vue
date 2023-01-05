@@ -10,9 +10,7 @@
             <b-form-select :options="extensionTypes" v-model="question.extensions"></b-form-select>
         </b-form-group>
         <b-form-group label="Optional Question" description="Make this question optional for the student.">
-            <b-form-checkbox v-model="question.optional">
-                Make this question optional.
-            </b-form-checkbox>
+            <b-form-checkbox v-model="question.optional"> Make this question optional. </b-form-checkbox>
         </b-form-group>
         <b-button @click="save" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
         <span v-if="question.id">
@@ -41,15 +39,15 @@ export default {
                 number: this.questionNumber,
                 optional: false,
                 questionnaireId: this.questionnaireId,
-                extensions: ""
+                extensions: "",
             },
             extensionTypes: [
                 { value: ".pdf", text: ".pdf" },
                 { value: ".zip", text: ".zip" },
                 { value: ".pdf,.zip", text: ".pdf,.zip" },
                 { value: ".doc,.docx", text: ".doc,.docx" },
-                { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" }
-            ]
+                { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" },
+            ],
         }
     },
     async created() {
@@ -97,7 +95,7 @@ export default {
             this.showSuccessMessage({ message: "Successfully deleted upload question." })
             this.$emit("questionSaved")
             this.questionId = null
-        }
-    }
+        },
+    },
 }
 </script>

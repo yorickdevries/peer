@@ -11,7 +11,7 @@
                     variant="success"
                     :to="{
                         name: 'teacher-dashboard.assignments.assignment.edit',
-                        params: { courseId: this.$route.params.courseId, assignmentId: assignment.id }
+                        params: { courseId: this.$route.params.courseId, assignmentId: assignment.id },
                     }"
                 >
                     Edit assignment
@@ -89,11 +89,11 @@ export default {
         Groups,
         ReviewList,
         SubmissionList,
-        AssignmentExports
+        AssignmentExports,
     },
     data() {
         return {
-            assignment: null
+            assignment: null,
         }
     },
     async created() {
@@ -104,7 +104,7 @@ export default {
             this.assignment = null
             let res = await api.assignments.get(this.$route.params.assignmentId)
             this.assignment = res.data
-        }
-    }
+        },
+    },
 }
 </script>

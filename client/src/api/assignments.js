@@ -143,5 +143,5 @@ export default {
     },
     enroll(id) {
         return client.post(`assignments/${id}/enroll`)
-    }
+    },
 }

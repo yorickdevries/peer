@@ -52,7 +52,7 @@ export default {
     props: ["modalId", "assignmentVersionId"],
     data() {
         return {
-            file: null
+            file: null,
         }
     },
     methods: {
@@ -62,7 +62,7 @@ export default {
             this.showSuccessMessage({ message: "Submissions are being imported" })
             // Close modal after submitting
             this.$bvModal.hide(this.modalId)
-        }
-    }
+        },
+    },
 }
 </script>

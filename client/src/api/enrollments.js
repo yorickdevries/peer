@@ -22,5 +22,5 @@ export default {
     delete(userNetid, courseId) {
         const params = { userNetid: userNetid, courseId: courseId }
         return client.delete(`enrollments/`, { params: params })
-    }
+    },
 }

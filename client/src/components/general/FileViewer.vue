@@ -18,12 +18,12 @@ import PDFViewer from "./PDFViewer"
 export default {
     components: {
         CodeWrapper,
-        PDFViewer
+        PDFViewer,
     },
     props: ["fileUrl", "assignmentType"],
     data() {
         return {
-            renderAs: ""
+            renderAs: "",
         }
     },
     created() {
@@ -31,8 +31,8 @@ export default {
             this.renderAs = this.assignmentType
         } else {
             fetch(this.fileUrl)
-                .then(res => res.blob())
-                .then(file => {
+                .then((res) => res.blob())
+                .then((file) => {
                     if (file.type.includes("text/plain")) {
                         // The given file contains plain text and should be rendered as code
                         this.renderAs = "code"
@@ -54,6 +54,6 @@ export default {
                 })
                 .catch(console.error)
         }
-    }
+    },
 }
 </script>

@@ -10,22 +10,22 @@
 <script>
 export default {
     props: {
-        items: Array
+        items: Array,
     },
     computed: {
         hasDefaultSlot() {
             return !!this.$slots.default
-        }
+        },
     },
     methods: {
         breadcrumbItems(items) {
-            return items.map(item => {
+            return items.map((item) => {
                 return {
                     text: item,
-                    active: true
+                    active: true,
                 }
             })
-        }
-    }
+        },
+    },
 }
 </script>

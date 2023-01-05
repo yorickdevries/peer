@@ -24,7 +24,7 @@ function toast({ title, message, type, timeout }) {
         title,
         message,
         timeout,
-        position: "bottomCenter"
+        position: "bottomCenter",
     })
 }
 
@@ -36,7 +36,7 @@ const options = {
     success: toast,
     error: toast,
     info: toast,
-    warn: toast
+    warn: toast,
 }
 
 Vue.use(VueNotifications, options)
@@ -50,5 +50,5 @@ Vue.config.productionTip = false
 
 new Vue({
     router,
-    render: h => h(App)
+    render: (h) => h(App),
 }).$mount("#app")

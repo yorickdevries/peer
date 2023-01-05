@@ -23,12 +23,12 @@ export default [
             {
                 path: "",
                 name: "student-dashboard.course.home",
-                redirect: { name: "student-dashboard.course.assignments" }
+                redirect: { name: "student-dashboard.course.assignments" },
             },
             {
                 path: "assignments",
                 name: "student-dashboard.course.assignments",
-                component: () => import("../components/student-dashboard/Assignments")
+                component: () => import("../components/student-dashboard/Assignments"),
             },
             {
                 path: "assignment/:assignmentId",
@@ -39,30 +39,30 @@ export default [
                     {
                         path: "information",
                         name: "student-dashboard.course.assignment.information",
-                        component: () => import("../components/student-dashboard/assignment/Information")
+                        component: () => import("../components/student-dashboard/assignment/Information"),
                     },
                     {
                         path: "submission",
                         name: "student-dashboard.course.assignment.submission",
-                        component: () => import("../components/student-dashboard/assignment/SubmissionList")
+                        component: () => import("../components/student-dashboard/assignment/SubmissionList"),
                     },
                     {
                         path: "review",
                         name: "student-dashboard.course.assignment.review-list",
-                        component: () => import("../components/student-dashboard/assignment/ReviewList")
+                        component: () => import("../components/student-dashboard/assignment/ReviewList"),
                     },
                     {
                         path: "feedback",
                         name: "student-dashboard.course.assignment.feedback",
-                        component: () => import("../components/student-dashboard/assignment/Feedback")
+                        component: () => import("../components/student-dashboard/assignment/Feedback"),
                     },
                     {
                         path: "review-evaluation",
                         name: "student-dashboard.course.assignment.review-evaluation",
-                        component: () => import("../components/student-dashboard/assignment/ReviewEvaluationList")
-                    }
-                ]
-            }
-        ]
-    }
+                        component: () => import("../components/student-dashboard/assignment/ReviewEvaluationList"),
+                    },
+                ],
+            },
+        ],
+    },
 ]

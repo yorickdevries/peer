@@ -39,9 +39,7 @@
                 </template>
                 <template v-else>
                     <dt>Copy groups</dt>
-                    <dd>
-                        This action will import the groups of another assignment to this assignment.
-                    </dd>
+                    <dd>This action will import the groups of another assignment to this assignment.</dd>
                     <b-button v-b-modal="`copyGroups${assignment.id}`" variant="primary" size="sm"
                         >Copy groups
                     </b-button>
@@ -273,7 +271,7 @@ export default {
     mixins: [notifications],
     components: {
         ImportGroupsWizard,
-        CopyGroupsWizard
+        CopyGroupsWizard,
     },
     data() {
         return {
@@ -283,14 +281,14 @@ export default {
             groupFields: [
                 { key: "id", label: "Group ID", sortable: true },
                 { key: "name", label: "Group name", sortable: true },
-                { key: "actions", label: "Actions" }
+                { key: "actions", label: "Actions" },
             ],
             userFields: [
                 { key: "displayName", label: "Name" },
                 { key: "netid", label: "NetID" },
                 { key: "email", label: "​​​Email" },
                 { key: "studentNumber", label: "Studentnumber" },
-                { key: "action", label: "Action" }
+                { key: "action", label: "Action" },
             ],
             submissionFields: [
                 { key: "id", label: "ID", sortable: true },
@@ -299,7 +297,7 @@ export default {
                 { key: "userNetid", label: "Submitted by" },
                 { key: "date", label: "​​​Date" },
                 { key: "final", label: "Final" },
-                { key: "action", label: "Action" }
+                { key: "action", label: "Action" },
             ],
             currentPage: 1,
             perPage: 10,
@@ -307,7 +305,7 @@ export default {
             // add new group
             newGroupName: "",
             // add new user
-            newUserNetId: {}
+            newUserNetId: {},
         }
     },
     computed: {
@@ -317,12 +315,12 @@ export default {
                 for (const assignmentVersion of this.assignment.versions) {
                     options.push({
                         value: assignmentVersion.id,
-                        text: `${assignmentVersion.name} (ID: ${assignmentVersion.id})`
+                        text: `${assignmentVersion.name} (ID: ${assignmentVersion.id})`,
                     })
                 }
             }
             return options
-        }
+        },
     },
     async created() {
         await this.fetchAssignment()
@@ -411,7 +409,7 @@ export default {
             await api.submissions.patch(id, false)
             this.showSuccessMessage({ message: "Set submission as not final" })
             await this.fetchGroups()
-        }
-    }
+        },
+    },
 }
 </script>

@@ -12,7 +12,7 @@ export default {
         return {
             chartOptions: null,
             series: null,
-            loading: true
+            loading: true,
         }
     },
     watch: {
@@ -20,8 +20,8 @@ export default {
             handler() {
                 if (this.loading) return
                 this.parseData()
-            }
-        }
+            },
+        },
     },
     methods: {
         createBuckets() {
@@ -42,16 +42,16 @@ export default {
             this.series = [
                 {
                     name: "Number of reviewers",
-                    data: Object.keys(buckets).map(k => [Number(k), buckets[k]])
-                }
+                    data: Object.keys(buckets).map((k) => [Number(k), buckets[k]]),
+                },
             ]
             this.chartOptions = {
                 chart: {
                     id: "area",
                     type: "area",
                     zoom: {
-                        autoScaleYaxis: true
-                    }
+                        autoScaleYaxis: true,
+                    },
                 },
                 annotations: {
                     xaxis: [
@@ -64,38 +64,38 @@ export default {
                                 text: "Average",
                                 style: {
                                     color: "#fff",
-                                    background: "#775DD0"
-                                }
-                            }
-                        }
-                    ]
+                                    background: "#775DD0",
+                                },
+                            },
+                        },
+                    ],
                 },
                 xaxis: {
                     type: "numeric",
                     title: {
-                        text: `Time buckets (${this.buckets} min, exclusive)`
+                        text: `Time buckets (${this.buckets} min, exclusive)`,
                     },
                     labels: {
-                        formatter: value => {
+                        formatter: (value) => {
                             return Math.round(value * this.buckets)
-                        }
+                        },
                     },
                     tooltip: {
-                        formatter: value => {
+                        formatter: (value) => {
                             return `${Math.round(value * this.buckets)} <= x < ${Math.round(
                                 (value + 1) * this.buckets
                             )}`
-                        }
-                    }
+                        },
+                    },
                 },
                 yaxis: {
                     title: {
-                        text: "Number of reviewers"
-                    }
+                        text: "Number of reviewers",
+                    },
                 },
                 title: {
                     text: "Average Time Spent per Review",
-                    align: "left"
+                    align: "left",
                 },
                 fill: {
                     type: "gradient",
@@ -103,15 +103,15 @@ export default {
                         shadeIntensity: 1,
                         opacityFrom: 0.7,
                         opacityTo: 0.9,
-                        stops: [0, 100]
-                    }
-                }
+                        stops: [0, 100],
+                    },
+                },
             }
-        }
+        },
     },
     mounted() {
         this.parseData()
         this.loading = false
-    }
+    },
 }
 </script>

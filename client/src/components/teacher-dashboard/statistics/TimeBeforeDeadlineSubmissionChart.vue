@@ -13,7 +13,7 @@ export default {
             chartOptions: null,
             series: null,
             loading: true,
-            deadline: null
+            deadline: null,
         }
     },
     watch: {
@@ -21,8 +21,8 @@ export default {
             handler() {
                 if (this.loading) return
                 this.parseData()
-            }
-        }
+            },
+        },
     },
     methods: {
         createBuckets() {
@@ -52,16 +52,16 @@ export default {
             this.series = [
                 {
                     name: "Number of submissions",
-                    data: Object.keys(buckets).map(k => [Number(k), buckets[k]])
-                }
+                    data: Object.keys(buckets).map((k) => [Number(k), buckets[k]]),
+                },
             ]
             this.chartOptions = {
                 chart: {
                     id: "area-datetime",
                     type: "area",
                     zoom: {
-                        autoScaleYaxis: true
-                    }
+                        autoScaleYaxis: true,
+                    },
                 },
                 annotations: {
                     xaxis: [
@@ -74,34 +74,34 @@ export default {
                                 text: "Deadline",
                                 style: {
                                     color: "#fff",
-                                    background: "#775DD0"
-                                }
-                            }
-                        }
-                    ]
+                                    background: "#775DD0",
+                                },
+                            },
+                        },
+                    ],
                 },
                 xaxis: {
                     type: "datetime",
                     title: {
-                        text: `Time buckets (${this.buckets} min, exclusive)`
+                        text: `Time buckets (${this.buckets} min, exclusive)`,
                     },
                     labels: {
-                        datetimeUTC: true
-                    }
+                        datetimeUTC: true,
+                    },
                 },
                 tooltip: {
                     x: {
-                        format: "HH:mm dd/M"
-                    }
+                        format: "HH:mm dd/M",
+                    },
                 },
                 yaxis: {
                     title: {
-                        text: "Number of submissions"
-                    }
+                        text: "Number of submissions",
+                    },
                 },
                 title: {
                     text: "Assignment submission time before deadline",
-                    align: "left"
+                    align: "left",
                 },
                 fill: {
                     type: "gradient",
@@ -109,15 +109,15 @@ export default {
                         shadeIntensity: 1,
                         opacityFrom: 0.7,
                         opacityTo: 0.9,
-                        stops: [0, 100]
-                    }
-                }
+                        stops: [0, 100],
+                    },
+                },
             }
-        }
+        },
     },
     mounted() {
         this.parseData()
         this.loading = false
-    }
+    },
 }
 </script>
