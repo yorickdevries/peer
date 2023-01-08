@@ -49,6 +49,7 @@
                                 <b-form-group label="" description="Select the academic year">
                                     <b-form-select v-model="filterOptions.academicYear">
                                         <b-form-select-option :value="null">All</b-form-select-option>
+                                        <b-form-select-option value="active">Active</b-form-select-option>
                                         <b-form-select-option
                                             v-for="academicYear in academicYears"
                                             :key="academicYear.id"
@@ -164,7 +165,7 @@
                             <b-col class="mb-3" cols="3">
                                 <b-form-group label="" description="Select the academic year">
                                     <b-form-select v-model="filterOptions.academicYear">
-                                        <b-form-select-option :value="null">All</b-form-select-option>
+                                        <b-form-select-option value="active">Active</b-form-select-option>
                                         <b-form-select-option
                                             v-for="academicYear in academicYears"
                                             :key="academicYear.id"
@@ -297,7 +298,7 @@ export default {
             filterOptions: {
                 name: "",
                 faculty: null,
-                academicYear: null
+                academicYear: "active"
             }
         }
     },
@@ -328,6 +329,7 @@ export default {
                     (course.name.toLowerCase().includes(this.filterOptions.name.toLowerCase()) || this.filter === "") &&
                     (this.filterOptions.faculty == null || course.faculty.id === this.filterOptions.faculty.id) &&
                     (this.filterOptions.academicYear == null ||
+                        (this.filterOptions.academicYear === "active" && course.academicYear.active) ||
                         course.academicYear.id === this.filterOptions.academicYear.id)
                 )
             })
@@ -338,6 +340,7 @@ export default {
                     (course.name.toLowerCase().includes(this.filterOptions.name.toLowerCase()) || this.filter === "") &&
                     (this.filterOptions.faculty == null || course.faculty.id === this.filterOptions.faculty.id) &&
                     (this.filterOptions.academicYear == null ||
+                        (this.filterOptions.academicYear === "active" && course.academicYear.active) ||
                         course.academicYear.id === this.filterOptions.academicYear.id)
                 )
             })
