@@ -191,10 +191,7 @@
                     <!--                    />-->
                     <MarkdownEditorViewer
                         v-if="question.type === 'open'"
-                        :initialvalue="answers[question.id].answer"
-                        :answers="answers"
-                        :question="question"
-                        :questions="questionnaire.questions"
+                        :answer="answers[question.id]"
                         :displayeditor="questionsCanBeChanged"
                         @shortcut-save="questionIndex = index"
                     />

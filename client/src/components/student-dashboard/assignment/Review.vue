@@ -154,10 +154,7 @@
                             <!-- OPEN QUESTION -->
                             <MarkdownEditorViewer
                                 v-if="question.type === 'open'"
-                                :initialvalue="answers[question.id].answer"
-                                :answers="answers"
-                                :question="question"
-                                :questions="questionnaire.questions"
+                                :answer="answers[question.id]"
                                 :displayeditor="!(review.submitted || reviewsAreReadOnly)"
                                 @shortcut-save="questionIndex = index"
                             />

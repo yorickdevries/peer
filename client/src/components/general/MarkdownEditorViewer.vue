@@ -2,20 +2,18 @@
     <div>
         <editor
             v-if="displayeditor"
-            :initialValue="answers[question.id].answer"
+            :initialValue="answer.answer"
             :options="editorOptions"
             height="500px"
             initialEditType="markdown"
             previewStyle="vertical"
-            @change="getMarkdown(answers, question, questions)"
+            @change="getMarkdown()"
             ref="toastuiEditor"
         />
-        <viewer
-            v-if="!displayeditor"
-            :initialValue="answers[question.id].answer"
-            :options="editorOptions"
-            height="500px"
-        />
+        <div v-else>
+            <viewer v-if="answer.answer == null" :initialValue="answer" :options="editorOptions" height="500px" />
+            <viewer :initialValue="answer.answer" :options="editorOptions" height="500px" />
+        </div>
     </div>
 </template>
 
@@ -27,7 +25,7 @@ import { Viewer } from "@toast-ui/vue-editor"
 
 export default {
     components: { editor: Editor, viewer: Viewer },
-    props: ["initialvalue", "answers", "question", "questions", "displayeditor"],
+    props: ["displayeditor", "answer"],
     emits: ["shortcut-save"],
     data() {
         return {
@@ -45,13 +43,9 @@ export default {
         }
     },
     methods: {
-        getMarkdown(answers, question, questions) {
-            for (let i = 0; i < questions.length; i++) {
-                if (questions[i].type == "open") {
-                    answers[questions[i].id].answer = this.$refs.toastuiEditor.invoke("getMarkdown")
-                }
-            }
-            answers[question.id].changed = true
+        getMarkdown() {
+            this.answer.answer = this.$refs.toastuiEditor.invoke("getMarkdown")
+            this.answer.changed = true
             this.$emit("shortcut-save")
         }
     }

@@ -129,11 +129,10 @@
                                             <!-- It can be null when a review is redacted -->
                                             <div v-if="answer !== null">
                                                 <!-- OPEN QUESTION -->
-                                                <viewer
+                                                <MarkdownEditorViewer
                                                     v-if="question.type === 'open'"
-                                                    :initialValue="answer"
-                                                    :options="editorOptions"
-                                                    height="500px"
+                                                    :answer="answer"
+                                                    :displayeditor="false"
                                                 />
 
                                                 <!-- MULTIPLE CHOICE QUESTION -->
@@ -252,10 +251,10 @@ import { StarRating } from "vue-rate-it"
 import FileAnnotator from "./FileAnnotator"
 import PDFViewer from "../../general/PDFViewer"
 import "@toast-ui/editor/dist/toastui-editor-viewer.css"
-import { Viewer } from "@toast-ui/vue-editor"
+import MarkdownEditorViewer from "@/components/general/MarkdownEditorViewer"
 
 export default {
-    components: { StarRating, FileAnnotator, PDFViewer, viewer: Viewer },
+    components: { StarRating, FileAnnotator, PDFViewer, MarkdownEditorViewer },
     data() {
         return {
             assignment: {},
