@@ -159,6 +159,7 @@
                                 :question="question"
                                 :questions="questionnaire.questions"
                                 :displayeditor="!(review.submitted || reviewsAreReadOnly)"
+                                @shortcut-save="questionIndex = index"
                             />
 
                             <!-- MULTIPLE CHOICE QUESTION -->

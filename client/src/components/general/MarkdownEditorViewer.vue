@@ -28,6 +28,7 @@ import { Viewer } from "@toast-ui/vue-editor"
 export default {
     components: { editor: Editor, viewer: Viewer },
     props: ["initialvalue", "answers", "question", "questions", "displayeditor"],
+    emits: ["shortcut-save"],
     data() {
         return {
             editorOptions: {
@@ -51,6 +52,7 @@ export default {
                 }
             }
             answers[question.id].changed = true
+            this.$emit("shortcut-save")
         }
     }
 }

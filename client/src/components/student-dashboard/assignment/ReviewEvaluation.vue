@@ -196,6 +196,7 @@
                         :question="question"
                         :questions="questionnaire.questions"
                         :displayeditor="questionsCanBeChanged"
+                        @shortcut-save="questionIndex = index"
                     />
                     <!-- MULTIPLE CHOICE QUESTION -->
                     <!--prettier-ignore-->
