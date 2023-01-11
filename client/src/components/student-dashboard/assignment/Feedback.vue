@@ -266,18 +266,7 @@ export default {
             answers: null,
             // selected question
             question: null,
-            tabs: [{ id: -1, aggregated: true, annotationCount: 0 }],
-            editorOptions: {
-                hideModeSwitch: true,
-                toolbarItems: [
-                    ["heading", "bold", "italic", "strike"],
-                    ["hr", "quote"],
-                    ["ul", "ol", "task", "indent", "outdent"],
-                    ["table", "link"],
-                    ["code", "codeblock"],
-                    ["scrollSync"]
-                ]
-            }
+            tabs: [{ id: -1, aggregated: true, annotationCount: 0 }]
         }
     },
     computed: {

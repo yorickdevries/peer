@@ -171,24 +171,6 @@
                 <b-card-body>
                     <!-- Text-->
                     <h4>{{ question.text }}</h4>
-
-                    <!-- OPEN QUESTION -->
-                    <!--                    <editor-->
-                    <!--                        v-if="question.type === 'open' && questionsCanBeChanged"-->
-                    <!--                        :initialValue="answers[question.id].answer"-->
-                    <!--                        :options="editorOptions"-->
-                    <!--                        height="500px"-->
-                    <!--                        initialEditType="markdown"-->
-                    <!--                        previewStyle="vertical"-->
-                    <!--                        @change="getMarkdown(answers, question)"-->
-                    <!--                        ref="toastuiEditor"-->
-                    <!--                    />-->
-                    <!--                    <viewer-->
-                    <!--                        v-if="question.type === 'open' && !questionsCanBeChanged"-->
-                    <!--                        :initialValue="answers[question.id].answer"-->
-                    <!--                        :options="editorOptions"-->
-                    <!--                        height="500px"-->
-                    <!--                    />-->
                     <MarkdownEditorViewer
                         v-if="question.type === 'open'"
                         :answer="answers[question.id]"

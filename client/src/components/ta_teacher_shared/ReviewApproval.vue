@@ -139,11 +139,12 @@
                                         <b-card-body>
                                             <!-- Text-->
                                             <h4>{{ question.text }}</h4>
-                                            <viewer
+
+                                            <!-- OPEN QUESTION -->
+                                            <MarkdownEditorViewer
                                                 v-if="question.type === 'open'"
-                                                :initialValue="answers[question.id].answer"
-                                                :options="editorOptions"
-                                                height="500px"
+                                                :answer="answers[question.id]"
+                                                :displayeditor="false"
                                             />
 
                                             <!-- MULTIPLE CHOICE QUESTION -->
@@ -319,11 +320,11 @@ import ReviewEvaluation from "../student-dashboard/assignment/ReviewEvaluation"
 import FileAnnotator from "../student-dashboard/assignment/FileAnnotator"
 import PDFViewer from "../general/PDFViewer"
 import "@toast-ui/editor/dist/toastui-editor-viewer.css"
-import { Viewer } from "@toast-ui/vue-editor"
+import MarkdownEditorViewer from "@/components/general/MarkdownEditorViewer"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, FileAnnotator, PDFViewer, viewer: Viewer },
+    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, FileAnnotator, PDFViewer, MarkdownEditorViewer },
     data() {
         return {
             assignment: {},
@@ -337,18 +338,7 @@ export default {
             // all answers will be saved in this object
             answers: null,
             // View file next to questionnaire
-            viewFileNextToQuestionnaire: false,
-            editorOptions: {
-                hideModeSwitch: true,
-                toolbarItems: [
-                    ["heading", "bold", "italic", "strike"],
-                    ["hr", "quote"],
-                    ["ul", "ol", "task", "indent", "outdent"],
-                    ["table", "link"],
-                    ["code", "codeblock"],
-                    ["scrollSync"]
-                ]
-            }
+            viewFileNextToQuestionnaire: false
         }
     },
     computed: {
