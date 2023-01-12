@@ -48,7 +48,7 @@ npm install || exit 21
 echo "3 - BUILD"
 echo "         Building server"
 cd "$RELEASE_DIR"
-NODE_ENV=staging SENTRY_RELEASE="staging_$TIMESTAMP" npm run build_server || exit 30
+NODE_ENV=staging SENTRY_RELEASE="staging_$TIMESTAMP" npm run build --prefix ./server -- --mode staging || exit 30
 
 echo "         Creating sentry release (server)"
 sentry-cli releases new --project "peer-backend" "$staging_TIMESTAMP"
@@ -57,7 +57,7 @@ sentry-cli releases finalize --project "peer-backend" "staging_$TIMESTAMP"
 
 echo "         Building client"
 echo "VUE_APP_SENTRY_RELEASE=staging_$TIMESTAMP" > "$RELEASE_DIR/client/.env"
-NODE_ENV=staging npm run build_client || exit 31
+NODE_ENV=staging npm run build --prefix ./client -- --mode staging || exit 31
 
 echo "         Creating sentry release (client)"
 sentry-cli releases new --project "peer-frontend" "staging_$TIMESTAMP"
