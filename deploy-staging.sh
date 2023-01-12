@@ -50,18 +50,18 @@ cd "$RELEASE_DIR"
 NODE_ENV=staging SENTRY_RELEASE="staging_$TIMESTAMP" npm run build_server || exit 30
 
 echo "         Creating sentry release (server)"
-sentry-cli releases new --project "peer-backend" "$TIMESTAMP"
-sentry-cli releases files --project "peer-backend" "$TIMESTAMP" upload-sourcemaps server/dist
-sentry-cli releases finalize --project "peer-backend" "$TIMESTAMP"
+sentry-cli releases new --project "peer-backend" "$staging_TIMESTAMP"
+sentry-cli releases files --project "peer-backend" "staging_$TIMESTAMP" upload-sourcemaps server/dist
+sentry-cli releases finalize --project "peer-backend" "staging_$TIMESTAMP"
 
 echo "         Building client"
 echo "VUE_APP_SENTRY_RELEASE=staging_$TIMESTAMP" > "$RELEASE_DIR/client/.env"
 NODE_ENV=staging npm run build_client || exit 31
 
 echo "         Creating sentry release (client)"
-sentry-cli releases new --project "peer-frontend" "$TIMESTAMP"
-sentry-cli releases files --project "peer-frontend" "$TIMESTAMP" upload-sourcemaps server/dist/public
-sentry-cli releases finalize --project "peer-frontend" "$TIMESTAMP"
+sentry-cli releases new --project "peer-frontend" "staging_$TIMESTAMP"
+sentry-cli releases files --project "peer-frontend" "staging_$TIMESTAMP" upload-sourcemaps server/dist/public
+sentry-cli releases finalize --project "peer-frontend" "staging_$TIMESTAMP"
 
 # Run the migrations
 echo "4 - MIGRATE"
