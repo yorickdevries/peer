@@ -26,7 +26,7 @@ echo "         Symlinking server/sessions..."
 ln -sfn "$SHARED_DIR/server/sessions" "$RELEASE_DIR/server/sessions" || exit 4
 
 echo "         Symlinking client/.env.production..."
-rm "$SHARED_DIR/client/.env.production" || true
+rm "$RELEASE_DIR/client/.env.production" || true
 ln -s "$SHARED_DIR/client/.env.production" "$RELEASE_DIR/client/.env.production" || exit 5
 
 # Backup

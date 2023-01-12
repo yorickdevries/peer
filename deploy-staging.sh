@@ -26,7 +26,7 @@ echo "         Symlinking server/sessions..."
 ln -sfn "$SHARED_DIR/server/sessions" "$RELEASE_DIR/server/sessions" || exit 4
 
 echo "         Symlinking client/.env.staging..."
-rm "$SHARED_DIR/client/.env.staging" || true
+rm "$RELEASE_DIR/client/.env.staging" || true
 ln -s "$SHARED_DIR/client/.env.staging" "$RELEASE_DIR/client/.env.staging" || exit 5
 
 
