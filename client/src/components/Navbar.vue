@@ -75,6 +75,7 @@
 <script>
 import api from "../api/api"
 import UserInfo from "./general/UserInfo"
+import * as Sentry from "@sentry/vue"
 
 export default {
     props: ["links", "title", "role", "variant"],
@@ -132,6 +133,7 @@ export default {
         await this.refreshAuthenticated()
         if (this.authenticated) {
             await this.refreshMe()
+            Sentry.setUser({ email: this.user.email, netid: this.user.netid })
         }
 
         await this.startBannerCheck()

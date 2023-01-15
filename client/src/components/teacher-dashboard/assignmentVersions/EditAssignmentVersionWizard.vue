@@ -26,7 +26,7 @@
             <b-form-group
                 label="Assignment versions that students need to review when they made a submission for this assignment version"
             >
-                <b-alert show>You can select multiple versions with CTRL</b-alert>
+                <b-alert show>You can select multiple versions by holding CTRL (Windows) or CMD (Mac)</b-alert>
                 <b-form-select
                     v-model="assignmentVersion.versionsToReview"
                     :options="assignmentVersionOptions"

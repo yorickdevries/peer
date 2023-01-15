@@ -25,7 +25,10 @@
                         class="p-0 m-0"
                         size="lg"
                     >
-                        <ImportGroupsWizard :modalId="`importGroups${assignment.id}`"></ImportGroupsWizard>
+                        <ImportGroupsWizard
+                            :modalId="`importGroups${assignment.id}`"
+                            :overwrite="this.groups && this.groups.length > 0"
+                        ></ImportGroupsWizard>
                     </b-modal>
                 </template>
             </b-col>
