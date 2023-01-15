@@ -65,7 +65,7 @@ Sentry.init({
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
-    tracesSampleRate: process.env.VUE_APP_SENTRY_TRACES_SAMPLE_RATE
+    tracesSampleRate: parseFloat(process.env.VUE_APP_SENTRY_TRACES_SAMPLE_RATE)
 })
 
 new Vue({
