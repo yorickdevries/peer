@@ -78,13 +78,13 @@ Sentry.init({
     integrations: [
         new BrowserTracing({
             routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-            tracePropagationTargets: ["localhost", "peer.tudelft.nl", "peer.eiptest.ewi.tudelft.nl", /^\//]
-        })
+            tracePropagationTargets: ["localhost", "peer.tudelft.nl", "peer.eiptest.ewi.tudelft.nl", /^\//],
+        }),
     ],
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
-    tracesSampleRate: process.env.VUE_APP_SENTRY_TRACES_SAMPLE_RATE
+    tracesSampleRate: process.env.VUE_APP_SENTRY_TRACES_SAMPLE_RATE,
 })
 
 new Vue({
