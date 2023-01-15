@@ -12,8 +12,8 @@
             aria-expanded="true"
             ref="button"
         >
-            <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" role="button" />
-            <icon class="text-muted" name="folder"></icon>
+            <icon icon="fa-solid fa-chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" role="button" />
+            <icon class="text-muted" icon="fa-solid fa-folder"></icon>
             <span>{{ name }}</span>
         </div>
         <div
@@ -26,10 +26,10 @@
             tabindex="0"
         >
             <div>
-                <icon name="code"></icon>
+                <icon icon="fa-solid fa-code"></icon>
                 <span>{{ name }}</span>
             </div>
-            <icon v-if="annotated" class="annotation-icon" name="comments" />
+            <icon v-if="annotated" class="annotation-icon" icon="fa-solid fa-comments" />
         </div>
 
         <b-collapse class="ml-4" v-if="dir" :visible="!collapsed" :id="`collapse_${name}`">

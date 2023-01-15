@@ -11,7 +11,7 @@
             aria-expanded="true"
             ref="cardheader"
         >
-            <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" />
+            <icon icon="fa-solid fa-chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" />
             <transition name="fade"> <span v-if="!collapsed">Files</span> </transition>
         </b-card-header>
         <b-collapse :visible="!collapsed" class="filetree-body" id="filetree">

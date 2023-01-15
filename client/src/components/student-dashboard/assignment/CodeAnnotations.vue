@@ -59,7 +59,7 @@
                         aria-expanded="false"
                         :aria-controls="`annotation_${index + 1}`"
                         :ref="`chevron_${index + 1}`"
-                    ><icon name="chevron-down" /></div>
+                    ><icon icon="fa-solid fa-chevron-down" /></div>
                 </div>
                 <div 
                     v-for="annotation of getAnnotationsEndingAt(index)"
@@ -115,7 +115,7 @@
                                         @click="editAnnotation(annotation)"
                                         @keydown.enter.space="editAnnotation(annotation)"
                                         @keydown.space.prevent
-                                    ><icon name="pen" /></div>
+                                    ><icon icon="fa-solid fa-pen" /></div>
                                     <b-modal 
                                         :id="`editModal_${annotation.id}`" 
                                         @ok="editModalOk(index)"
@@ -131,7 +131,7 @@
                                         v-b-modal="`modal_${annotation.id}`"
                                         tabindex="0"
                                         @keydown.space.prevent
-                                    ><icon name="trash" /></div>
+                                    ><icon icon="fa-solid fa-trash" /></div>
                                     <b-modal
                                         @ok="deleteAnnotation(annotation)"
                                         :id="`modal_${annotation.id}`"

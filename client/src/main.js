@@ -6,10 +6,29 @@ import router from "./router"
 import BootstrapVue from "bootstrap-vue"
 Vue.use(BootstrapVue)
 
-// Use Vue-Awesome
-import "vue-awesome/icons"
-import Icon from "vue-awesome/components/Icon"
-Vue.component("icon", Icon)
+/* import the fontawesome core */
+import { library } from "@fortawesome/fontawesome-svg-core"
+
+/* import font awesome icon component */
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
+
+/* import specific icons */
+import {
+    faPen,
+    faTrash,
+    faChevronDown,
+    faLock,
+    faTableCellsLarge,
+    faFolder,
+    faCode,
+    faComments,
+} from "@fortawesome/free-solid-svg-icons"
+
+/* add icons to the library */
+library.add(faPen, faTrash, faChevronDown, faLock, faTableCellsLarge, faFolder, faCode, faComments)
+
+/* add font awesome icon component */
+Vue.component("icon", FontAwesomeIcon)
 
 // Use custom CSS
 import "./assets/css/_index.scss"

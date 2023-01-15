@@ -29,11 +29,11 @@
                     <!-- Right aligned nav items -->
                     <b-navbar-nav v-if="authenticated" class="ml-auto">
                         <b-nav-item v-if="user.admin" :to="{ name: 'admin-dashboard.home' }" exact>
-                            <icon name="lock" class="mr-2 align-middle"></icon>
+                            <icon icon="fa-solid fa-lock" class="mr-2 align-middle"></icon>
                             <span class="align-middle">Admin</span>
                         </b-nav-item>
                         <b-nav-item :to="{ name: 'courses' }" exact>
-                            <icon name="th-large" class="mr-2 align-middle"></icon
+                            <icon icon="fa-solid fa-th-large" class="mr-2 align-middle"></icon
                             ><span class="align-middle">Courses</span>
                         </b-nav-item>
 
