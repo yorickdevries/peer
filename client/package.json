@@ -37,6 +37,7 @@
     "vue-apexcharts": "^1.6.2",
     "vue-awesome": "^3.5.4",
     "vue-form-wizard": "^0.8.4",
+    "vue-full-calendar": "^2.8.1-0",
     "vue-notifications": "^0.9.0",
     "vue-pdf": "^4.2.0",
     "vue-rate-it": "^2.1.0",

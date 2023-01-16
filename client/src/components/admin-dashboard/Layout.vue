@@ -19,7 +19,8 @@ export default {
             navbarItems: [
                 { to: { name: "admin-dashboard.home" }, text: "Admin Home" },
                 { to: { name: "admin-dashboard.faculties" }, text: "Faculties" },
-                { to: { name: "admin-dashboard.years" }, text: "Academic Years" }
+                { to: { name: "admin-dashboard.years" }, text: "Academic Years" },
+                { to: { name: "admin-dashboard.calendar" }, text: "Assignment Due Dates" }
             ],
             course: {}
         }

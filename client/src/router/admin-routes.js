@@ -33,6 +33,11 @@ export default [
                 path: "years",
                 name: "admin-dashboard.years",
                 component: () => import("../components/admin-dashboard/YearManager")
+            },
+            {
+                path: "calendar",
+                name: "admin-dashboard.calendar",
+                component: () => import("../components/admin-dashboard/Calendar")
             }
         ]
     }

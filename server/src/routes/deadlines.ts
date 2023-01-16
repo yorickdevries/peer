@@ -4,24 +4,10 @@ import HttpStatusCode from "../enum/HttpStatusCode";
 import express from "express";
 const router = express.Router();
 
-router.get("/assignment/:id", async (req, res) => {
-  const user = req.user!;
-  console.log(user);
-  const dueDates = await createQueryBuilder("Assignment")
-    .select([
-      "Assignment.dueDate",
-      "Assignment.reviewDueDate",
-      "Assignment.reviewEvaluationDueDate",
-    ])
-    .getMany();
-  console.log(dueDates);
-  res.status(HttpStatusCode.OK).send(dueDates);
-  return;
-});
-
 router.get("/assignment", async (_req, res) => {
-  //console.log(req);
-  res.status(HttpStatusCode.OK).send("Hello");
+  //This route could possibly be used to show students an overview of their assignments so no admin check
+  const dueDates = await createQueryBuilder("Assignment").getMany();
+  res.status(HttpStatusCode.OK).send(dueDates);
   return;
 });
 

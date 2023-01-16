@@ -34,6 +34,7 @@ import pdfannotations from "./pdfannotations";
 import assignmentexports from "./assignmentexports";
 import codeannotations from "./codeannotations";
 import statistics from "./statistics";
+import deadlines from "./deadlines";
 
 const router = express.Router();
 router.use(eventLogger);
