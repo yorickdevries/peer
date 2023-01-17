@@ -17,8 +17,8 @@ export default {
         return {
             events: [],
             config: {
-                editable: false
-            }
+                editable: false,
+            },
         }
     },
     async created() {
@@ -30,7 +30,7 @@ export default {
             for (let i = 0; i < res.data.length; i++) {
                 this.events.push({ title: res.data[i].name, start: res.data[i].publishDate, end: res.data[i].dueDate })
             }
-        }
-    }
+        },
+    },
 }
 </script>
