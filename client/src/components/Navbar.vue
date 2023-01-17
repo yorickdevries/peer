@@ -29,11 +29,11 @@
                     <!-- Right aligned nav items -->
                     <b-navbar-nav v-if="authenticated" class="ml-auto">
                         <b-nav-item v-if="user.admin" :to="{ name: 'admin-dashboard.home' }" exact>
-                            <icon name="lock" class="mr-2 align-middle"></icon>
+                            <icon icon="fa-solid fa-lock" class="mr-2 align-middle"></icon>
                             <span class="align-middle">Admin</span>
                         </b-nav-item>
                         <b-nav-item :to="{ name: 'courses' }" exact>
-                            <icon name="th-large" class="mr-2 align-middle"></icon
+                            <icon icon="fa-solid fa-th-large" class="mr-2 align-middle"></icon
                             ><span class="align-middle">Courses</span>
                         </b-nav-item>
 
@@ -89,7 +89,7 @@ export default {
             bannerBuffer: 10 * 60, //must be in seconds
             bannerInterval: null,
             curTime: null,
-            banner: null
+            banner: null,
         }
     },
     computed: {
@@ -123,7 +123,7 @@ export default {
         },
         navbarSizeClass() {
             return this.banner === null ? "py-3" : "pb-3"
-        }
+        },
     },
     beforeMount() {
         this.getBannerText()
@@ -158,7 +158,7 @@ export default {
             if (bannerTitle !== null && bannerText !== null) {
                 this.banner = {
                     title: bannerTitle,
-                    text: bannerText
+                    text: bannerText,
                 }
             }
         },
@@ -198,7 +198,7 @@ export default {
             this.curTime = Math.floor(Date.now() / 1000)
             localStorage.setItem("lastBannerCheckTime", this.curTime.toString())
 
-            api.banners.getActive().then(res => {
+            api.banners.getActive().then((res) => {
                 if (res.data) {
                     this.banner = res.data
                     this.updateBannerText()
@@ -207,7 +207,7 @@ export default {
                     this.clearBannerText()
                 }
             })
-        }
-    }
+        },
+    },
 }
 </script>

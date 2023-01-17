@@ -37,13 +37,13 @@ export default {
     data() {
         return {
             assignments: [],
-            assignmentToCopyGroupsFrom: null
+            assignmentToCopyGroupsFrom: null,
         }
     },
     async created() {
         const res = await api.assignments.getAllForCourse(this.$route.params.courseId)
         const allAssignments = res.data
-        this.assignments = _.filter(allAssignments, assignment => {
+        this.assignments = _.filter(allAssignments, (assignment) => {
             return assignment.id !== parseInt(this.$route.params.assignmentId)
         })
     },
@@ -51,7 +51,7 @@ export default {
         async copyGroups() {
             await api.groups.copy(this.$route.params.assignmentId, this.assignmentToCopyGroupsFrom.id)
             this.showSuccessMessage({ message: "Groups are being copied" })
-        }
-    }
+        },
+    },
 }
 </script>

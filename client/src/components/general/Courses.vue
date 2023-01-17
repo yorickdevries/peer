@@ -106,7 +106,7 @@
                                                 size="sm"
                                                 :to="{
                                                     name: 'student-dashboard.course.home',
-                                                    params: { courseId: enrollment.course.id }
+                                                    params: { courseId: enrollment.course.id },
                                                 }"
                                             >
                                                 Enter Course
@@ -117,7 +117,7 @@
                                                 size="sm"
                                                 :to="{
                                                     name: 'teaching-assistant-dashboard.course.home',
-                                                    params: { courseId: enrollment.course.id }
+                                                    params: { courseId: enrollment.course.id },
                                                 }"
                                             >
                                                 Enter Course
@@ -128,7 +128,7 @@
                                                 size="sm"
                                                 :to="{
                                                     name: 'teacher-dashboard.course',
-                                                    params: { courseId: enrollment.course.id }
+                                                    params: { courseId: enrollment.course.id },
                                                 }"
                                             >
                                                 Enter Course
@@ -285,7 +285,7 @@ import CreateCourse from "./CreateCourse"
 export default {
     mixins: [notifications],
     components: {
-        CreateCourse
+        CreateCourse,
     },
     data() {
         return {
@@ -298,8 +298,8 @@ export default {
             filterOptions: {
                 name: "",
                 faculty: null,
-                academicYear: "active"
-            }
+                academicYear: "active",
+            },
         }
     },
     computed: {
@@ -323,7 +323,7 @@ export default {
             return this.enrollableCourses.length === 0
         },
         filteredEnrollments() {
-            return this.enrollments.filter(enrollment => {
+            return this.enrollments.filter((enrollment) => {
                 const course = enrollment.course
                 return (
                     (course.name.toLowerCase().includes(this.filterOptions.name.toLowerCase()) || this.filter === "") &&
@@ -335,7 +335,7 @@ export default {
             })
         },
         filteredEnrollableCourses() {
-            return this.enrollableCourses.filter(course => {
+            return this.enrollableCourses.filter((course) => {
                 return (
                     (course.name.toLowerCase().includes(this.filterOptions.name.toLowerCase()) || this.filter === "") &&
                     (this.filterOptions.faculty == null || course.faculty.id === this.filterOptions.faculty.id) &&
@@ -344,7 +344,7 @@ export default {
                         course.academicYear.id === this.filterOptions.academicYear.id)
                 )
             })
-        }
+        },
     },
     async created() {
         await this.fetchFaculties()
@@ -395,7 +395,7 @@ export default {
             // reload the data from the server
             await this.fetchEnrollableCourses()
             await this.fetchEnrollments()
-        }
-    }
+        },
+    },
 }
 </script>

@@ -10,9 +10,7 @@
             <b-form-input v-model="question.range" type="number" />
         </b-form-group>
         <b-form-group label="Optional Question" description="Make this question optional for the student.">
-            <b-form-checkbox v-model="question.optional">
-                Make this question optional.
-            </b-form-checkbox>
+            <b-form-checkbox v-model="question.optional"> Make this question optional. </b-form-checkbox>
         </b-form-group>
         <b-button @click="save" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
         <span v-if="question.id">
@@ -41,8 +39,8 @@ export default {
                 number: this.questionNumber,
                 optional: false,
                 questionnaireId: this.questionnaireId,
-                range: 10
-            }
+                range: 10,
+            },
         }
     },
     async created() {
@@ -90,7 +88,7 @@ export default {
             this.showSuccessMessage({ message: "Successfully deleted range question." })
             this.$emit("questionSaved")
             this.questionId = null
-        }
-    }
+        },
+    },
 }
 </script>

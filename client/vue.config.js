@@ -1,6 +1,6 @@
 module.exports = {
     configureWebpack: {
-        devtool: "source-map"
+        devtool: "source-map",
     },
     outputDir: "../server/dist/public",
     devServer: {
@@ -8,8 +8,8 @@ module.exports = {
             "/api": {
                 target: "http://localhost:3000",
                 ws: true,
-                changeOrigin: true
-            }
-        }
-    }
+                changeOrigin: true,
+            },
+        },
+    },
 }

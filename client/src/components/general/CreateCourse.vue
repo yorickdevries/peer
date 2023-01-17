@@ -78,10 +78,10 @@ export default {
                 enrollable: false,
                 faculty: null,
                 academicYear: null,
-                description: null
+                description: null,
             },
             faculties: [],
-            academicYears: []
+            academicYears: [],
         }
     },
     async created() {
@@ -107,7 +107,7 @@ export default {
                 this.course.description
             )
             this.$router.push({ name: "teacher-dashboard.course", params: { courseId: res.data.id } })
-        }
-    }
+        },
+    },
 }
 </script>

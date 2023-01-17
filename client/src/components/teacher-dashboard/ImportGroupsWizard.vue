@@ -37,7 +37,7 @@ export default {
     props: ["modalId", "overwrite"],
     data() {
         return {
-            file: null
+            file: null,
         }
     },
     methods: {
@@ -46,7 +46,7 @@ export default {
             this.showSuccessMessage({ message: "Groups are being imported" })
             // Close modal after submitting
             this.$bvModal.hide(this.modalId)
-        }
-    }
+        },
+    },
 }
 </script>

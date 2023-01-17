@@ -15,5 +15,5 @@ export default {
     defaultQuestions(id, graded) {
         const body = { graded }
         return client.patch(`reviewquestionnaires/${id}/defaultquestions`, body)
-    }
+    },
 }

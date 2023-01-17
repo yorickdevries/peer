@@ -8,10 +8,29 @@ import { BrowserTracing } from "@sentry/tracing"
 import BootstrapVue from "bootstrap-vue"
 Vue.use(BootstrapVue)
 
-// Use Vue-Awesome
-import "vue-awesome/icons"
-import Icon from "vue-awesome/components/Icon"
-Vue.component("icon", Icon)
+/* import the fontawesome core */
+import { library } from "@fortawesome/fontawesome-svg-core"
+
+/* import font awesome icon component */
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
+
+/* import specific icons */
+import {
+    faPen,
+    faTrash,
+    faChevronDown,
+    faLock,
+    faTableCellsLarge,
+    faFolder,
+    faCode,
+    faComments,
+} from "@fortawesome/free-solid-svg-icons"
+
+/* add icons to the library */
+library.add(faPen, faTrash, faChevronDown, faLock, faTableCellsLarge, faFolder, faCode, faComments)
+
+/* add font awesome icon component */
+Vue.component("icon", FontAwesomeIcon)
 
 // Use custom CSS
 import "./assets/css/_index.scss"
@@ -26,7 +45,7 @@ function toast({ title, message, type, timeout }) {
         title,
         message,
         timeout,
-        position: "bottomCenter"
+        position: "bottomCenter",
     })
 }
 
@@ -38,7 +57,7 @@ const options = {
     success: toast,
     error: toast,
     info: toast,
-    warn: toast
+    warn: toast,
 }
 
 Vue.use(VueNotifications, options)
@@ -59,16 +78,16 @@ Sentry.init({
     integrations: [
         new BrowserTracing({
             routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-            tracePropagationTargets: ["localhost", "peer.tudelft.nl", "peer.eiptest.ewi.tudelft.nl", /^\//]
-        })
+            tracePropagationTargets: ["localhost", "peer.tudelft.nl", "peer.eiptest.ewi.tudelft.nl", /^\//],
+        }),
     ],
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
-    tracesSampleRate: parseFloat(process.env.VUE_APP_SENTRY_TRACES_SAMPLE_RATE)
+    tracesSampleRate: parseFloat(process.env.VUE_APP_SENTRY_TRACES_SAMPLE_RATE),
 })
 
 new Vue({
     router,
-    render: h => h(App)
+    render: (h) => h(App),
 }).$mount("#app")

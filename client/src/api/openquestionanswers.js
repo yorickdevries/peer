@@ -8,5 +8,5 @@ export default {
     delete(openQuestionId, reviewId) {
         const params = { openQuestionId, reviewId }
         return client.delete("openquestionanswers", { params: params })
-    }
+    },
 }

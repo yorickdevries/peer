@@ -5,6 +5,6 @@ export default {
         get(assignmentId, data) {
             const params = { dataType: data }
             return client.get(`statistics/assignment/${assignmentId}`, { params: params })
-        }
-    }
+        },
+    },
 }

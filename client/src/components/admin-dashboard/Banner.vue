@@ -26,8 +26,8 @@ export default {
             banner: {
                 title: "",
                 text: "",
-                active: false
-            }
+                active: false,
+            },
         }
     },
     async created() {
@@ -45,7 +45,7 @@ export default {
             await api.banners.post({
                 title: this.banner.title,
                 text: this.banner.text,
-                active: this.banner.active
+                active: this.banner.active,
             })
         },
         async patch() {
@@ -53,7 +53,7 @@ export default {
                 id: this.banner.id,
                 title: this.banner.title,
                 text: this.banner.text,
-                active: this.banner.active
+                active: this.banner.active,
             })
         },
         async save() {
@@ -70,7 +70,7 @@ export default {
                 this.banner.active = false
             }
             this.$emit("save")
-        }
-    }
+        },
+    },
 }
 </script>

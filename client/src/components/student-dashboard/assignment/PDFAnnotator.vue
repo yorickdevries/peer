@@ -40,7 +40,7 @@ export default {
             submission: null,
             fileMetadata: null,
             pdfDivId: null,
-            showPdf: false
+            showPdf: false,
         }
     },
     computed: {
@@ -59,7 +59,7 @@ export default {
             } else {
                 return ""
             }
-        }
+        },
     },
     async mounted() {
         // the page needs to be mounted as the pdf library is dynamically inserted
@@ -104,47 +104,47 @@ export default {
             const vm = this
 
             // construct the file promise
-            const filePromise = new Promise(function(resolve, reject) {
+            const filePromise = new Promise(function (resolve, reject) {
                 axios
                     .get(vm.filePath, { responseType: "arraybuffer" })
-                    .then(res => {
+                    .then((res) => {
                         resolve(res.data)
                     })
-                    .catch(error => reject(error))
+                    .catch((error) => reject(error))
             })
 
             // load the pdf in the website
-            document.addEventListener("adobe_dc_view_sdk.ready", function() {
+            document.addEventListener("adobe_dc_view_sdk.ready", function () {
                 // AdobeDC is loaded via the script, so eslint is disabled:
                 // eslint-disable-next-line no-undef
                 const adobeDCView = new AdobeDC.View({
                     clientId: vm.adobeDCViewClientId,
-                    divId: vm.pdfDivId
+                    divId: vm.pdfDivId,
                 })
 
                 // Set user profile
                 // eslint-disable-next-line no-undef
-                adobeDCView.registerCallback(AdobeDC.View.Enum.CallbackType.GET_USER_PROFILE_API, function() {
+                adobeDCView.registerCallback(AdobeDC.View.Enum.CallbackType.GET_USER_PROFILE_API, function () {
                     return new Promise((resolve, reject) => {
                         api.getMe()
-                            .then(res => {
+                            .then((res) => {
                                 // fetch user info
                                 const profile = {
                                     userProfile: {
-                                        name: res.data.netid
-                                    }
+                                        name: res.data.netid,
+                                    },
                                 }
                                 resolve({
                                     // eslint-disable-next-line no-undef
                                     code: AdobeDC.View.Enum.ApiResponseCode.SUCCESS,
-                                    data: profile
+                                    data: profile,
                                 })
                             })
-                            .catch(error =>
+                            .catch((error) =>
                                 reject({
                                     // eslint-disable-next-line no-undef
                                     code: AdobeDC.View.Enum.ApiResponseCode.FAIL,
-                                    data: error
+                                    data: error,
                                 })
                             )
                     })
@@ -154,32 +154,32 @@ export default {
                 const previewConfig = {
                     defaultViewMode: "FIT_WIDTH",
                     enableAnnotationAPIs: true,
-                    includePDFAnnotations: true
+                    includePDFAnnotations: true,
                 }
 
                 const metaData = {
                     fileName: vm.reviewFileName,
-                    id: String(vm.fileMetadata.id) // id needs to be a string
+                    id: String(vm.fileMetadata.id), // id needs to be a string
                 }
 
                 //Set auto save
                 const saveOptions = {
                     autoSaveFrequency: 1,
                     enableFocusPolling: true,
-                    showSaveButton: false
+                    showSaveButton: false,
                 }
 
                 adobeDCView.registerCallback(
                     // eslint-disable-next-line no-undef
                     AdobeDC.View.Enum.CallbackType.SAVE_API,
-                    function() {
-                        return new Promise(resolve => {
+                    function () {
+                        return new Promise((resolve) => {
                             resolve({
                                 // eslint-disable-next-line no-undef
                                 code: AdobeDC.View.Enum.ApiResponseCode.SUCCESS,
                                 data: {
-                                    metaData
-                                }
+                                    metaData,
+                                },
                             })
                         })
                     },
@@ -189,14 +189,14 @@ export default {
                 const previewFilePromise = adobeDCView.previewFile(
                     {
                         content: { promise: filePromise },
-                        metaData
+                        metaData,
                     },
                     previewConfig
                 )
 
                 /* Use the annotation manager interface to invoke the commenting APIs */
-                previewFilePromise.then(function(adobeViewer) {
-                    adobeViewer.getAnnotationManager().then(async function(annotationManager) {
+                previewFilePromise.then(function (adobeViewer) {
+                    adobeViewer.getAnnotationManager().then(async function (annotationManager) {
                         // get existing annotations
                         let reviews = []
                         // add single review
@@ -221,7 +221,7 @@ export default {
                             const res = await api.pdfannotations.get(review.id, vm.fileMetadata.id)
                             const annotations = res.data
                             if (annotations.length > 0) {
-                                annotations.forEach(a => (a.target.selector.strokeColor = vm.reviewColors[review.id]))
+                                annotations.forEach((a) => (a.target.selector.strokeColor = vm.reviewColors[review.id]))
                                 /* API to add annotations */
                                 try {
                                     await annotationManager.addAnnotations(annotations)
@@ -235,14 +235,14 @@ export default {
                         // only if a review is known and the view is not readonly
                         if (vm.review && !vm.review.submitted && !vm.readOnly) {
                             annotationManager.registerEventListener(
-                                async function(event) {
+                                async function (event) {
                                     switch (event.type) {
                                         case "ANNOTATION_ADDED":
                                             await api.pdfannotations.post(event.data, vm.review.id, vm.fileMetadata.id)
                                             izitoast.success({
                                                 title: "Success",
                                                 message: "Succesfully created annotation",
-                                                position: "bottomCenter"
+                                                position: "bottomCenter",
                                             })
                                             break
                                         case "ANNOTATION_UPDATED":
@@ -250,7 +250,7 @@ export default {
                                             izitoast.success({
                                                 title: "Success",
                                                 message: "Succesfully changed annotation",
-                                                position: "bottomCenter"
+                                                position: "bottomCenter",
                                             })
                                             break
                                         case "ANNOTATION_DELETED":
@@ -258,7 +258,7 @@ export default {
                                             izitoast.success({
                                                 title: "Success",
                                                 message: "Succesfully deleted annotation",
-                                                position: "bottomCenter"
+                                                position: "bottomCenter",
                                             })
                                             break
                                         default:
@@ -269,12 +269,12 @@ export default {
                                 {
                                     /* Pass the list of events in listenOn. */
                                     /* If no event is passed in listenOn, then all the annotation events will be received. */
-                                    listenOn: ["ANNOTATION_ADDED", "ANNOTATION_UPDATED", "ANNOTATION_DELETED"]
+                                    listenOn: ["ANNOTATION_ADDED", "ANNOTATION_UPDATED", "ANNOTATION_DELETED"],
                                 }
                             )
                         } else {
                             annotationManager.registerEventListener(
-                                async function(event) {
+                                async function (event) {
                                     if (event.type === "ANNOTATION_ADDED") {
                                         // not allowed, so directly deleting it
                                         annotationManager.deleteAnnotations({ annotationIds: [event.data.id] })
@@ -282,13 +282,13 @@ export default {
                                     izitoast.error({
                                         title: "Error",
                                         message: "Invalid action: " + event.type,
-                                        position: "bottomCenter"
+                                        position: "bottomCenter",
                                     })
                                 },
                                 {
                                     /* Pass the list of events in listenOn. */
                                     /* If no event is passed in listenOn, then all the annotation events will be received. */
-                                    listenOn: ["ANNOTATION_ADDED", "ANNOTATION_UPDATED", "ANNOTATION_DELETED"]
+                                    listenOn: ["ANNOTATION_ADDED", "ANNOTATION_UPDATED", "ANNOTATION_DELETED"],
                                 }
                             )
                         }
@@ -297,7 +297,7 @@ export default {
                     })
                 })
             })
-        }
-    }
+        },
+    },
 }
 </script>

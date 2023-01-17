@@ -31,7 +31,7 @@ export default {
     data() {
         return {
             text: this.defaultContent || "",
-            codeBlockTemplate: ""
+            codeBlockTemplate: "",
         }
     },
     created() {
@@ -63,7 +63,7 @@ export default {
         onSubmit() {
             if (!this.validateContentLength()) {
                 this.showErrorMessage({
-                    message: `Your input is ${this.text.length} characters long, which is over the allowed limit of ${this.maxLength} characters.`
+                    message: `Your input is ${this.text.length} characters long, which is over the allowed limit of ${this.maxLength} characters.`,
                 })
             } else {
                 this.$emit("submit", this.text)
@@ -71,7 +71,7 @@ export default {
         },
         onCancel() {
             this.$emit("cancel")
-        }
-    }
+        },
+    },
 }
 </script>

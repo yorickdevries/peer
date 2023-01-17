@@ -22,7 +22,7 @@
                             variant="primary"
                             :to="{
                                 name: 'teacher-dashboard.assignments.assignment',
-                                params: { courseId: assignment.courseId, assignmentId: assignment.id }
+                                params: { courseId: assignment.courseId, assignmentId: assignment.id },
                             }"
                             >View assignment</b-button
                         >
@@ -41,12 +41,12 @@ export default {
     components: { BreadcrumbTitle },
     data() {
         return {
-            assignments: []
+            assignments: [],
         }
     },
     async created() {
         const res = await api.assignments.getAllForCourse(this.$route.params.courseId)
         this.assignments = res.data
-    }
+    },
 }
 </script>

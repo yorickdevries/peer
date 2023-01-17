@@ -67,5 +67,5 @@ export default {
     assignmentexports: assignmentexports,
     codeannotations: codeannotations,
     statistics: statistics,
-    banners: banners
+    banners: banners,
 }

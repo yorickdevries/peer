@@ -138,11 +138,11 @@ export default {
                 { key: "user.netid", label: "NetID" },
                 { key: "user.email", label: "​​​Email" },
                 { key: "user.studentNumber", label: "Studentnumber" },
-                { key: "action", label: "Action" }
+                { key: "action", label: "Action" },
             ],
             currentPage: 1,
             perPage: 10,
-            filter: ""
+            filter: "",
         }
     },
     async created() {
@@ -197,7 +197,7 @@ export default {
                 this.buttonDisabled = false
                 return
             }
-        }
-    }
+        },
+    },
 }
 </script>

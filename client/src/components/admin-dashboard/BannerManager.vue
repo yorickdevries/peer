@@ -88,11 +88,11 @@ export default {
                 { key: "title", label: "Title" },
                 { key: "text", label: "Text" },
                 { key: "active", label: "Active" },
-                { key: "action", label: "Action" }
+                { key: "action", label: "Action" },
             ],
             currentPage: 1,
             perPage: 10,
-            filter: ""
+            filter: "",
         }
     },
     async created() {
@@ -113,7 +113,7 @@ export default {
             await api.banners.delete(id)
             await this.fetch()
             this.showSuccessMessage({ message: "Banner has been removed" })
-        }
-    }
+        },
+    },
 }
 </script>

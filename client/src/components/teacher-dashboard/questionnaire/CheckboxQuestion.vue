@@ -54,9 +54,7 @@
             <b-button @click="addEmptyOption" variant="success" size="sm">Add new option</b-button>
         </b-form-group>
         <b-form-group label="Optional Question" description="Make this question optional for the student.">
-            <b-form-checkbox v-model="question.optional">
-                Make this question optional.
-            </b-form-checkbox>
+            <b-form-checkbox v-model="question.optional"> Make this question optional. </b-form-checkbox>
         </b-form-group>
         <b-button
             @click="save"
@@ -94,8 +92,8 @@ export default {
                 optional: false,
                 questionnaireId: this.questionnaireId,
                 options: [],
-                graded: false
-            }
+                graded: false,
+            },
         }
     },
     async created() {
@@ -104,10 +102,10 @@ export default {
     },
     watch: {
         "question.graded": {
-            handler: function() {
+            handler: function () {
                 return this.formatOptions()
-            }
-        }
+            },
+        },
     },
     computed: {
         allGradedOptionsOk() {
@@ -119,7 +117,7 @@ export default {
                 }
             }
             return true
-        }
+        },
     },
     methods: {
         gradeIsOk(currentValue) {
@@ -141,7 +139,7 @@ export default {
         },
         formatOptions() {
             const questionOptions = this.question.options
-            this.question.options = questionOptions.map(option => {
+            this.question.options = questionOptions.map((option) => {
                 const { id, text, points } = option
                 return this.question.graded ? { id, text, points: points || 0 } : { id, text }
             })
@@ -161,13 +159,13 @@ export default {
             }
         },
         formatGradedOptions(options) {
-            return options.map(option => {
+            return options.map((option) => {
                 const decimals = option.points / 100
                 return { id: option.id, text: option.text, points: decimals }
             })
         },
         formatUngradedOptions(options) {
-            return options.map(option => {
+            return options.map((option) => {
                 return { id: option.id, text: option.text }
             })
         },
@@ -254,7 +252,7 @@ export default {
             this.showSuccessMessage({ message: "Successfully deleted checkbox question." })
             this.$emit("questionSaved")
             this.questionId = null
-        }
-    }
+        },
+    },
 }
 </script>
