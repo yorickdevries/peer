@@ -37,9 +37,9 @@ export default {
                     ["ul", "ol", "task", "indent", "outdent"],
                     ["table", "link"],
                     ["code", "codeblock"],
-                    ["scrollSync"]
-                ]
-            }
+                    ["scrollSync"],
+                ],
+            },
         }
     },
     methods: {
@@ -47,7 +47,7 @@ export default {
             this.answer.answer = this.$refs.toastuiEditor.invoke("getMarkdown")
             this.answer.changed = true
             this.$emit("shortcut-save")
-        }
-    }
+        },
+    },
 }
 </script>
