@@ -1,7 +1,7 @@
 <template>
     <footer class="text-muted">
         <div class="container d-flex align-items-center h-100">
-            <div class="float-left ">
+            <div class="float-left">
                 <router-link @click.native="scrollToTop" to="/privacy">Privacy Policy</router-link>
                 <div>For technical support, contact: <a href="mailto:eip-ewi@tudelft.nl">eip-ewi@tudelft.nl</a></div>
             </div>
@@ -14,7 +14,7 @@
                 height="30px"
                 class="mr-5 mb-3"
             ></b-img>
-            <div class="float-right ">
+            <div class="float-right">
                 <a href="#">Back to top</a>
             </div>
         </div>
@@ -29,13 +29,13 @@ export default {
             const re = /([A-Z]+[+-][0-9]+.*)/
             const timezone = new Date().toString().match(re)[1]
             return "Timezone: " + timezone
-        }
+        },
     },
     methods: {
         scrollToTop() {
             window.scrollTo(0, 0)
-        }
-    }
+        },
+    },
 }
 </script>
 

@@ -66,11 +66,11 @@ export default {
                 { key: "id", label: "ID", sortable: true },
                 { key: "userNetid", label: "User" },
                 { key: "file", label: "File" },
-                { key: "date", label: "​​​Date" }
+                { key: "date", label: "​​​Date" },
             ],
             currentPage: 1,
             perPage: 10,
-            filter: ""
+            filter: "",
         }
     },
     async created() {
@@ -83,7 +83,7 @@ export default {
         },
         getFilePath(id) {
             return `/api/assignmentexports/${id}/file`
-        }
-    }
+        },
+    },
 }
 </script>

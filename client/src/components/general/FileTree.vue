@@ -11,7 +11,7 @@
             aria-expanded="true"
             ref="cardheader"
         >
-            <icon name="chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" />
+            <icon icon="fa-solid fa-chevron-down" :class="`chevron ${collapsed ? 'rotate' : ''}`" />
             <transition name="fade"> <span v-if="!collapsed">Files</span> </transition>
         </b-card-header>
         <b-collapse :visible="!collapsed" class="filetree-body" id="filetree">
@@ -37,7 +37,7 @@ import FileTreeNode from "./FileTreeNode"
 export default {
     props: ["annotatedFiles", "files", "selectedFile"],
     components: {
-        FileTreeNode
+        FileTreeNode,
     },
     data() {
         return {
@@ -45,7 +45,7 @@ export default {
             selected: null,
             collapsed: false,
             minWidth: null,
-            minHeight: null
+            minHeight: null,
         }
     },
     created() {
@@ -105,8 +105,8 @@ export default {
             el.style.setProperty("min-width", `${width}px`)
             // Gives the file tree node by this name the go-ahead to toggle collapse state
             this.$root.$emit("filetreenode::collapse", name)
-        }
-    }
+        },
+    },
 }
 </script>
 <style lang="scss" scoped>

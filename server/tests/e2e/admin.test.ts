@@ -263,4 +263,133 @@ describe("Admin tests", () => {
       .set("cookie", studentCookie);
     expect(res.status).toBe(HttpStatusCode.NOT_FOUND);
   });
+
+  test("Banner Edit", async () => {
+    const studentCookie = await mockLoginCookie(server, "student");
+    const adminCookie = await mockLoginCookie(server, "admin");
+    await setAdminUser("admin");
+
+    //Ensure admin can create new banner
+    let res = await request(server)
+      .post("/api/banners")
+      .send({
+        title: "title",
+        text: "text",
+        active: true,
+      })
+      .set("cookie", adminCookie);
+    expect(res.status).toBe(HttpStatusCode.OK);
+    let banner = JSON.parse(res.text);
+    expect(banner.title).toEqual("title");
+    expect(banner.text).toEqual("text");
+    expect(banner.active).toEqual(true);
+
+    //Ensure new banner has been created and can be seen by logged in students
+    res = await request(server)
+      .get("/api/banners/active")
+      .send()
+      .set("cookie", studentCookie);
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const bannerStudent = JSON.parse(res.text);
+    expect(bannerStudent.title).toEqual("title");
+    expect(bannerStudent.text).toEqual("text");
+
+    //Ensure new banner has been created and can be seen by random visitor
+    res = await request(server).get("/api/banners/active").send();
+    expect(res.status).toBe(HttpStatusCode.OK);
+    const bannerRandom = JSON.parse(res.text);
+    expect(bannerRandom.title).toEqual("title");
+    expect(bannerRandom.text).toEqual("text");
+
+    //Ensure admin can change banner
+    res = await request(server)
+      .patch(`/api/banners/${banner.id}`)
+      .send({
+        title: "newTitle",
+        text: "newText",
+        active: false,
+      })
+      .set("cookie", adminCookie);
+    expect(res.status).toBe(HttpStatusCode.OK);
+    banner = JSON.parse(res.text);
+    expect(banner.title).toEqual("newTitle");
+    expect(banner.text).toEqual("newText");
+    expect(banner.active).toEqual(false);
+
+    //Ensure banner is no longer visible to students
+    res = await request(server)
+      .get("/api/banners/active")
+      .send()
+      .set("cookie", studentCookie);
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(res.body).toEqual({});
+
+    //Ensure banner is no longer visible to random visitor
+    res = await request(server).get("/api/banners/active").send();
+    expect(res.status).toBe(HttpStatusCode.OK);
+    expect(res.body).toEqual({});
+
+    //Ensure student can't create banner
+    res = await request(server)
+      .post("/api/banners/")
+      .send({
+        title: "title",
+        text: "text",
+        active: true,
+      })
+      .set("cookie", studentCookie);
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+
+    //Ensure random can't create banner
+    res = await request(server).post("/api/banners/").send({
+      title: "title",
+      text: "text",
+      active: true,
+    });
+    expect(res.status).toBe(HttpStatusCode.UNAUTHORIZED);
+
+    //Ensure student can't change banner
+    res = await request(server)
+      .patch(`/api/banners/${banner.id}`)
+      .send({
+        title: "title",
+        text: "text",
+        active: true,
+      })
+      .set("cookie", studentCookie);
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+
+    //Ensure random can't change banner
+    res = await request(server).patch(`/api/banners/${banner.id}`).send({
+      title: "title",
+      text: "text",
+      active: true,
+    });
+    expect(res.status).toBe(HttpStatusCode.UNAUTHORIZED);
+
+    //Ensure student can't delete banner
+    res = await request(server)
+      .delete(`/api/banners/${banner.id}`)
+      .send()
+      .set("cookie", studentCookie);
+    expect(res.status).toBe(HttpStatusCode.FORBIDDEN);
+
+    //Ensure random can't delete banner
+    res = await request(server).delete(`/api/banners/${banner.id}`).send();
+    expect(res.status).toBe(HttpStatusCode.UNAUTHORIZED);
+
+    //Ensure admin can delete banner
+    res = await request(server)
+      .delete(`/api/banners/${banner.id}`)
+      .send()
+      .set("cookie", adminCookie);
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    //Ensure banner was deleted
+    res = await request(server)
+      .get(`/api/banners/${banner.id}`)
+      .send()
+      .set("cookie", adminCookie);
+    expect(res.status).toBe(HttpStatusCode.NOT_FOUND);
+  });
 });

@@ -72,7 +72,7 @@ export default {
         assignmentFilePath() {
             // Get the assignment file path.
             return `/api/assignments/${this.assignment.id}/file`
-        }
-    }
+        },
+    },
 }
 </script>

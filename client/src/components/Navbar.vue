@@ -1,7 +1,13 @@
 <template>
     <nav class="shadow-sm">
+        <div class="py-3 bg-warning" v-if="banner !== null">
+            <b-container class="text-center">
+                <h5 class="text-black font-weight-bold my-0">{{ banner.title }}</h5>
+                <p class="text-black my-0">{{ banner.text }}</p>
+            </b-container>
+        </div>
         <!--Head Navbar-->
-        <b-navbar toggleable="md" type="dark" class="py-3" :class="headNavbarClass">
+        <b-navbar toggleable="md" type="dark" :class="[headNavbarClass, navbarSizeClass]">
             <b-container>
                 <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
@@ -23,11 +29,11 @@
                     <!-- Right aligned nav items -->
                     <b-navbar-nav v-if="authenticated" class="ml-auto">
                         <b-nav-item v-if="user.admin" :to="{ name: 'admin-dashboard.home' }" exact>
-                            <icon name="lock" class="mr-2 align-middle"></icon>
+                            <icon icon="fa-solid fa-lock" class="mr-2 align-middle"></icon>
                             <span class="align-middle">Admin</span>
                         </b-nav-item>
                         <b-nav-item :to="{ name: 'courses' }" exact>
-                            <icon name="th-large" class="mr-2 align-middle"></icon
+                            <icon icon="fa-solid fa-th-large" class="mr-2 align-middle"></icon
                             ><span class="align-middle">Courses</span>
                         </b-nav-item>
 
@@ -69,6 +75,7 @@
 <script>
 import api from "../api/api"
 import UserInfo from "./general/UserInfo"
+import * as Sentry from "@sentry/vue"
 
 export default {
     props: ["links", "title", "role", "variant"],
@@ -78,7 +85,11 @@ export default {
             authenticated: null,
             user: { name: null },
             currentCourse: "",
-            siteName: process.env.NODE_ENV === "production" ? "Peer Review" : "Peer Review Development"
+            siteName: process.env.NODE_ENV === "production" ? "Peer Review" : "Peer Review Development",
+            bannerBuffer: 10 * 60, //must be in seconds
+            bannerInterval: null,
+            curTime: null,
+            banner: null,
         }
     },
     computed: {
@@ -109,14 +120,26 @@ export default {
                 default:
                     return { "bg-primary-light": true }
             }
-        }
+        },
+        navbarSizeClass() {
+            return this.banner === null ? "py-3" : "pb-3"
+        },
+    },
+    beforeMount() {
+        this.getBannerText()
     },
     async mounted() {
         // Fetch authentication & user information.
         await this.refreshAuthenticated()
         if (this.authenticated) {
             await this.refreshMe()
+            Sentry.setUser({ email: this.user.email, netid: this.user.netid })
         }
+
+        await this.startBannerCheck()
+    },
+    destroyed() {
+        clearInterval(this.bannerInterval)
     },
     methods: {
         async refreshAuthenticated() {
@@ -128,7 +151,63 @@ export default {
             // Refresh user information.
             const res = await api.getMe()
             this.user = res.data
-        }
-    }
+        },
+        getBannerText() {
+            const bannerTitle = localStorage.getItem("bannerTitle")
+            const bannerText = localStorage.getItem("bannerText")
+            if (bannerTitle !== null && bannerText !== null) {
+                this.banner = {
+                    title: bannerTitle,
+                    text: bannerText,
+                }
+            }
+        },
+        updateBannerText() {
+            localStorage.setItem("bannerTitle", this.banner.title)
+            localStorage.setItem("bannerText", this.banner.text)
+        },
+        clearBannerText() {
+            localStorage.removeItem("bannerTitle")
+            localStorage.removeItem("bannerText")
+        },
+        async startBannerCheck() {
+            const lastBannerCheckTime = localStorage.getItem("lastBannerCheckTime")
+            this.curTime = Math.floor(Date.now() / 1000)
+
+            if (lastBannerCheckTime === null) {
+                //If banner was never checked, set regular interval and check
+                this.bannerInterval = setInterval(this.refreshBanner, this.bannerBuffer * 1000)
+                this.refreshBanner()
+            } else {
+                const lastCheckTimeNum = Number(lastBannerCheckTime)
+
+                if (lastCheckTimeNum + this.bannerBuffer < this.curTime) {
+                    //If banner was last checked more than bannerBuffer sec(s) ago, set regular interval and check
+                    this.bannerInterval = setInterval(this.refreshBanner, this.bannerBuffer * 1000)
+                    this.refreshBanner()
+                } else {
+                    //If banner was last checked less than bannerBuffer sec(s) ago, check when necessary and set regular interval
+                    setTimeout(async () => {
+                        this.bannerInterval = setInterval(this.refreshBanner, this.bannerBuffer * 1000)
+                        this.refreshBanner()
+                    }, (lastCheckTimeNum + this.bannerBuffer - this.curTime) * 1000)
+                }
+            }
+        },
+        refreshBanner() {
+            this.curTime = Math.floor(Date.now() / 1000)
+            localStorage.setItem("lastBannerCheckTime", this.curTime.toString())
+
+            api.banners.getActive().then((res) => {
+                if (res.data) {
+                    this.banner = res.data
+                    this.updateBannerText()
+                } else {
+                    this.banner = null
+                    this.clearBannerText()
+                }
+            })
+        },
+    },
 }
 </script>

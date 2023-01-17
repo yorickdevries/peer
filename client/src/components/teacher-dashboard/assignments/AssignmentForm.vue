@@ -392,7 +392,7 @@ const assignmentStates = ["unpublished", "submission", "waitingforreview", "revi
 export default {
     mixins: [notifications],
     components: {
-        Datepicker
+        Datepicker,
     },
     props: ["assignment", "edit"],
     data() {
@@ -408,17 +408,17 @@ export default {
                 { value: ".zip", text: ".zip" },
                 { value: ".pdf,.zip", text: ".pdf,.zip" },
                 { value: ".doc,.docx", text: ".doc,.docx" },
-                { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" }
+                { value: ".pdf,.zip,.doc,.docx", text: ".pdf,.zip,.doc,.docx" },
             ],
             extensionTypesCode: [
                 { value: ".zip", text: ".zip" },
-                { value: ".*", text: ".* (Single file submissions)" }
+                { value: ".*", text: ".* (Single file submissions)" },
             ],
             assignmentTypes: [
                 { value: "document", text: "Document review" },
-                { value: "code", text: "Code review" }
+                { value: "code", text: "Code review" },
             ],
-            buttonDisabled: false
+            buttonDisabled: false,
         }
     },
     created() {
@@ -467,19 +467,11 @@ export default {
                 // check chronological order of the dates
                 // the dates must be at least 15 minutes apart from echother
                 if (
-                    moment(publishDate)
-                        .add(15, "minutes")
-                        .isAfter(dueDate) ||
-                    moment(dueDate)
-                        .add(15, "minutes")
-                        .isAfter(reviewPublishDate) ||
-                    moment(reviewPublishDate)
-                        .add(15, "minutes")
-                        .isAfter(reviewDueDate) ||
+                    moment(publishDate).add(15, "minutes").isAfter(dueDate) ||
+                    moment(dueDate).add(15, "minutes").isAfter(reviewPublishDate) ||
+                    moment(reviewPublishDate).add(15, "minutes").isAfter(reviewDueDate) ||
                     (this.assignment.reviewEvaluation &&
-                        moment(reviewDueDate)
-                            .add(15, "minutes")
-                            .isAfter(reviewEvaluationDueDate))
+                        moment(reviewDueDate).add(15, "minutes").isAfter(reviewEvaluationDueDate))
                 ) {
                     throw new Error("The dates must chronologically correct and at least 15 minutes apart")
                 }
@@ -514,7 +506,7 @@ export default {
                 file,
                 callback: () => {
                     this.buttonDisabled = false
-                }
+                },
             })
         },
         checkDateFormat() {
@@ -568,7 +560,7 @@ export default {
                 // If submission extensions is not a value in the extension types
                 if (
                     this.assignment.submissionExtensions &&
-                    !this.extensionTypes.some(extension => this.assignment.submissionExtensions === extension.value)
+                    !this.extensionTypes.some((extension) => this.assignment.submissionExtensions === extension.value)
                 ) {
                     this.whitelistExtensions = this.assignment.submissionExtensions
                     this.assignment.submissionExtensions = ".*"
@@ -580,7 +572,7 @@ export default {
             const newIndex = assignmentStates.indexOf(state)
             if (newIndex < 0) throw new Error(`Illegal assignment state: ${state}`)
             return currentIndex > newIndex
-        }
+        },
     },
     computed: {
         validWhitelist() {
@@ -609,14 +601,14 @@ export default {
         assignmentFilePath() {
             // Get the assignment file path.
             return `/api/assignments/${this.assignment.id}/file`
-        }
+        },
     },
     watch: {
         // This only runs when the assignment object itself changes due to an async parent update
         assignment() {
             this.setExtensionTypes()
-        }
-    }
+        },
+    },
 }
 </script>
 

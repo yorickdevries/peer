@@ -21,11 +21,11 @@ import AssignmentForm from "./AssignmentForm"
 export default {
     mixins: [notifications],
     components: {
-        AssignmentForm
+        AssignmentForm,
     },
     data() {
         return {
-            assignment: {}
+            assignment: {},
         }
     },
     async created() {
@@ -96,12 +96,12 @@ export default {
                 // Redirect to updated assignment
                 this.$router.push({
                     name: "teacher-dashboard.assignments.assignment",
-                    params: { courseId: this.$route.params.courseId, assignmentId: this.assignment.id }
+                    params: { courseId: this.$route.params.courseId, assignmentId: this.assignment.id },
                 })
             } catch (error) {
                 data.callback(error)
             }
-        }
-    }
+        },
+    },
 }
 </script>

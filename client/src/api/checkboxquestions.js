@@ -14,5 +14,5 @@ export default {
     },
     delete(id) {
         return client.delete(`checkboxquestions/${id}`)
-    }
+    },
 }

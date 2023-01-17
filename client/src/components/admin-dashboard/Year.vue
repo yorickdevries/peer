@@ -22,8 +22,8 @@ export default {
         return {
             year: {
                 name: "",
-                active: false
-            }
+                active: false,
+            },
         }
     },
     async created() {
@@ -40,14 +40,14 @@ export default {
         async postYear() {
             await api.academicyears.post({
                 name: this.year.name,
-                active: this.year.active
+                active: this.year.active,
             })
         },
         async patchYear() {
             await api.academicyears.patch({
                 id: this.year.id,
                 name: this.year.name,
-                active: this.year.active
+                active: this.year.active,
             })
         },
         async save() {
@@ -63,7 +63,7 @@ export default {
                 this.year.active = false
             }
             this.$emit("save")
-        }
-    }
+        },
+    },
 }
 </script>

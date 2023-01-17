@@ -58,12 +58,8 @@
                             >
                                 Are you sure you want to publish the assignment?
                                 <ul>
-                                    <li>
-                                        After publication no additional assignment versions can be created
-                                    </li>
-                                    <li>
-                                        After publication the allowed submission file extensions cannot be changed.
-                                    </li>
+                                    <li>After publication no additional assignment versions can be created</li>
+                                    <li>After publication the allowed submission file extensions cannot be changed.</li>
                                 </ul>
                             </b-modal>
                         </div>
@@ -92,12 +88,8 @@
                             >
                                 Are you sure you want to close the submission state?
                                 <ul>
-                                    <li>
-                                        After this no new submissions can be made by students anymore.
-                                    </li>
-                                    <li>
-                                        After this the groups cannot be changed anymore
-                                    </li>
+                                    <li>After this no new submissions can be made by students anymore.</li>
+                                    <li>After this the groups cannot be changed anymore</li>
                                 </ul>
                             </b-modal>
                         </div>
@@ -105,9 +97,7 @@
                         <!--Distribute Reviews-->
                         <div v-if="assignment.state === 'waitingforreview'">
                             <dt>Distribute Reviews</dt>
-                            <dd>
-                                This action will distribute reviews to users of groups which made a submission.
-                            </dd>
+                            <dd>This action will distribute reviews to users of groups which made a submission.</dd>
                             <b-alert v-if="assignment.automaticStateProgression" show warning
                                 >Automatic state progression is enabled. Make sure you finalised your
                                 submissionquestionnaires before the review publish date. In addition, make sure your
@@ -135,9 +125,7 @@
                                     <li>
                                         The submissions which take part in the reviews are definite after this action.
                                     </li>
-                                    <li>
-                                        The submissionquestionnaire cannot be changed after this action.
-                                    </li>
+                                    <li>The submissionquestionnaire cannot be changed after this action.</li>
                                     <li>Only press this button <b>once</b> per assignment.</li>
                                     <li>
                                         If you pressed this button earlier, it can be that reviews are still being
@@ -150,9 +138,7 @@
                         <!--Open feedback-->
                         <div v-if="assignment.state === 'review'">
                             <dt>Open Feedback</dt>
-                            <dd>
-                                This action will open the the feedback for the reviewed students
-                            </dd>
+                            <dd>This action will open the the feedback for the reviewed students</dd>
                             <b-alert v-if="assignment.automaticStateProgression" show warning
                                 >Automatic state progression is enabled. In case you have set up review evaluation, make
                                 sure you finalised your reviewquestionnaires before the review due date.</b-alert
@@ -190,9 +176,7 @@
                                         If review evaluation is enabled, students can evaluate their reviews till the
                                         deadline you specified
                                     </li>
-                                    <li>
-                                        The reviewquestionnaire cannot be changed after this action.
-                                    </li>
+                                    <li>The reviewquestionnaire cannot be changed after this action.</li>
                                 </ul>
                             </b-modal>
                         </div>
@@ -217,7 +201,7 @@ export default {
         FormWizard,
         WizardStep,
         TabContent,
-        AssignmentDetails
+        AssignmentDetails,
     },
     data() {
         return {
@@ -227,11 +211,11 @@ export default {
                 { name: "submission", icon: "fas fa-file-pdf" },
                 { name: "waitingforreview", icon: "fas fa-user-clock" },
                 { name: "review", icon: "fas fa-glasses" },
-                { name: "feedback", icon: "fas fa-comments" }
+                { name: "feedback", icon: "fas fa-comments" },
             ],
             disableButton: false,
             showDistributeAlert: false,
-            showOpenFeedbackAlert: false
+            showOpenFeedbackAlert: false,
         }
     },
     computed: {
@@ -239,10 +223,10 @@ export default {
             if (!this.assignment) {
                 return -1
             }
-            return _.findIndex(this.assignmentStates, o => {
+            return _.findIndex(this.assignmentStates, (o) => {
                 return o.name === this.assignment.state
             })
-        }
+        },
     },
     async created() {
         await this.fetchAssignment()
@@ -278,7 +262,7 @@ export default {
             await api.reviewofsubmissions.openFeedback(this.$route.params.assignmentId)
             this.showSuccessMessage()
             this.showOpenFeedbackAlert = true
-        }
-    }
+        },
+    },
 }
 </script>

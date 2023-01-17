@@ -22,7 +22,7 @@ import AssignmentForm from "./AssignmentForm"
 export default {
     mixins: [notifications],
     components: {
-        AssignmentForm
+        AssignmentForm,
     },
     data() {
         return {
@@ -50,8 +50,8 @@ export default {
                 lateReviewEvaluations: true,
                 automaticStateProgression: false,
                 assignmentType: "document",
-                sendNotificationEmails: false
-            }
+                sendNotificationEmails: false,
+            },
         }
     },
     methods: {
@@ -83,12 +83,12 @@ export default {
                 this.showSuccessMessage({ message: "Assignment was successfully created" })
                 this.$router.push({
                     name: "teacher-dashboard.assignments",
-                    params: { courseId: this.$route.params.courseId }
+                    params: { courseId: this.$route.params.courseId },
                 })
             } catch (error) {
                 data.callback(error)
             }
-        }
-    }
+        },
+    },
 }
 </script>

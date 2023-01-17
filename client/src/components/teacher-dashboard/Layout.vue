@@ -13,7 +13,7 @@ import Navbar from "../Navbar"
 
 export default {
     components: {
-        Navbar
+        Navbar,
     },
     data() {
         return {
@@ -23,15 +23,15 @@ export default {
                 { to: { name: "teacher-dashboard.course.teachers" }, text: "Teacher Management" },
                 { to: { name: "teacher-dashboard.course.teaching-assistants" }, text: "TA Management" },
                 { to: { name: "teacher-dashboard.course.students" }, text: "Student Management" },
-                { to: { name: "teacher-dashboard.course.statistics.home" }, text: "Statistics" }
+                { to: { name: "teacher-dashboard.course.statistics.home" }, text: "Statistics" },
             ],
-            course: {}
+            course: {},
         }
     },
     async created() {
         // Fetch course information (for navbar).
         let res = await api.courses.get(this.$route.params.courseId)
         this.course = res.data
-    }
+    },
 }
 </script>

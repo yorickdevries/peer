@@ -17,5 +17,5 @@ export default {
     patch(year) {
         const data = { name: year.name, active: year.active }
         return client.patch(`academicyears/${year.id}`, data)
-    }
+    },
 }

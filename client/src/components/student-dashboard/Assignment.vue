@@ -65,7 +65,7 @@
                                 :disabled="!isInFeedbackState"
                             >
                                 <div class="text-center border-right border-bottom py-3">
-                                    <div class="lead font-weight-bold ">
+                                    <div class="lead font-weight-bold">
                                         Received Feedback
                                         <b-badge variant="success" v-if="isInFeedbackState">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
@@ -85,7 +85,7 @@
                                 :disabled="!isInFeedbackState"
                             >
                                 <div class="text-center border-bottom py-3">
-                                    <div class="lead font-weight-bold ">
+                                    <div class="lead font-weight-bold">
                                         Give Evaluation
                                         <b-badge variant="success" v-if="isEvaluationActive">Open</b-badge>
                                         <b-badge variant="danger" v-else>Closed</b-badge>
@@ -120,7 +120,7 @@ export default {
     components: { BreadcrumbTitle },
     data() {
         return {
-            assignment: {}
+            assignment: {},
         }
     },
     computed: {
@@ -157,12 +157,12 @@ export default {
                 (this.assignment.lateReviewEvaluations ||
                     new Date() < new Date(this.assignment.reviewEvaluationDueDate))
             )
-        }
+        },
     },
     async created() {
         // Fetch the assignment information.
         const res = await api.assignments.get(this.$route.params.assignmentId)
         this.assignment = res.data
-    }
+    },
 }
 </script>

@@ -296,7 +296,7 @@
                                             name: $router.currentRoute.name.includes('teacher')
                                                 ? 'teacher-dashboard.assignments.assignment.submission'
                                                 : 'teaching-assistant-dashboard.course.assignment.submission',
-                                            params: { submissionId: review.submission.id }
+                                            params: { submissionId: review.submission.id },
                                         }"
                                         >Show submission approval</b-button
                                     >
@@ -338,7 +338,7 @@ export default {
             // all answers will be saved in this object
             answers: null,
             // View file next to questionnaire
-            viewFileNextToQuestionnaire: false
+            viewFileNextToQuestionnaire: false,
         }
     },
     computed: {
@@ -361,7 +361,7 @@ export default {
             } else {
                 return ""
             }
-        }
+        },
     },
     async created() {
         await this.fetchData()
@@ -415,7 +415,7 @@ export default {
                 // answer variable which gets replaced if an answer is present
                 let answer = null
                 // find existing answer
-                const existingAnswer = _.find(existingAnswers, answer => {
+                const existingAnswer = _.find(existingAnswers, (answer) => {
                     return answer.questionId === question.id
                 })
                 if (existingAnswer) {
@@ -457,7 +457,7 @@ export default {
                 const res = await api.reviewofsubmissions.getAllForAssignmentVersion(assignmentVersion.id, true)
                 reviews.push(...res.data)
             }
-            const reviewsWithoutApproval = _.filter(reviews, review => {
+            const reviewsWithoutApproval = _.filter(reviews, (review) => {
                 return review.approvalByTA === null
             })
             if (reviewsWithoutApproval.length === 0) {
@@ -466,7 +466,7 @@ export default {
                 const randomReviewWithoutApproval = _.sample(reviewsWithoutApproval)
                 this.$router.push({
                     name: this.$router.currentRoute.name,
-                    params: { reviewId: randomReviewWithoutApproval.id }
+                    params: { reviewId: randomReviewWithoutApproval.id },
                 })
                 location.reload()
             }
@@ -476,7 +476,7 @@ export default {
         },
         toggleViewFileNextToQuestionnaire() {
             this.viewFileNextToQuestionnaire = !this.viewFileNextToQuestionnaire
-        }
-    }
+        },
+    },
 }
 </script>

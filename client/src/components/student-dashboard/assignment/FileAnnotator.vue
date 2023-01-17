@@ -33,7 +33,7 @@ import PDFAnnotator from "./PDFAnnotator"
 export default {
     components: {
         CodeWrapper,
-        PDFAnnotator
+        PDFAnnotator,
     },
     props: ["reviewId", "submissionId", "readOnly", "assignmentType", "reviewColors", "ignoreAnnotations"],
     computed: {
@@ -48,11 +48,11 @@ export default {
         },
         defaultReviewColor() {
             return { [this.reviewId]: "#ffb000" }
-        }
+        },
     },
     data() {
         return {
-            renderAs: ""
+            renderAs: "",
         }
     },
     created() {
@@ -60,8 +60,8 @@ export default {
             this.renderAs = this.assignmentType
         } else {
             fetch(this.filePath)
-                .then(res => res.blob())
-                .then(file => {
+                .then((res) => res.blob())
+                .then((file) => {
                     if (file.type.includes("text/plain")) {
                         // The given file contains plain text and should be rendered as code
                         this.renderAs = "code"
@@ -83,6 +83,6 @@ export default {
                 })
                 .catch(console.error)
         }
-    }
+    },
 }
 </script>
