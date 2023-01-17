@@ -53,22 +53,22 @@ export default {
             selectedYear: null,
             selectedCourse: null,
             selectedQuestionnaire: null,
-            step: 1
+            step: 1,
         }
     },
     computed: {
         activeEnrollments() {
             //find courses we are a teacher in matching the selected academic year
             return this.selectedYear !== null
-                ? this.enrollments.filter(e => e.role === "teacher" && e.course.academicYear.id === this.selectedYear)
+                ? this.enrollments.filter((e) => e.role === "teacher" && e.course.academicYear.id === this.selectedYear)
                 : null
-        }
+        },
     },
     async created() {
         await this.fetchData()
         this.loading = false
         //select the year of the current course
-        const course = this.enrollments.find(e => e.course.id === parseInt(this.$route.params.courseId)).course
+        const course = this.enrollments.find((e) => e.course.id === parseInt(this.$route.params.courseId)).course
         this.selectedYear = course.academicYear.id
         //select the current course :)
         this.selectedCourse = course.id
@@ -123,7 +123,7 @@ export default {
                         this.allQuestionnairesOfCourse.push({
                             name: assignment.name + "-" + assignmentVersion.name + " (submissionquestionnaire)",
                             id: assignmentVersion.submissionQuestionnaireId,
-                            qType: "submission"
+                            qType: "submission",
                         })
                     }
                     if (
@@ -133,13 +133,13 @@ export default {
                         this.allQuestionnairesOfCourse.push({
                             name: assignment.name + "-" + assignmentVersion.name + " (reviewquestionnaire)",
                             id: assignmentVersion.reviewQuestionnaireId,
-                            qType: "review"
+                            qType: "review",
                         })
                     }
                 }
             }
             this.loading = false
-        }
-    }
+        },
+    },
 }
 </script>

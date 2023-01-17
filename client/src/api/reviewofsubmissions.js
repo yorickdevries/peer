@@ -47,5 +47,5 @@ export default {
     exportGrades(assignmentVersionId, exportType) {
         const params = { assignmentVersionId, exportType }
         return client.post("reviewofsubmissions/exportgrades", null, { params: params })
-    }
+    },
 }

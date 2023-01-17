@@ -48,11 +48,11 @@ export default {
         AssignmentDetails,
         Groups,
         ReviewList,
-        SubmissionList
+        SubmissionList,
     },
     data() {
         return {
-            assignment: null
+            assignment: null,
         }
     },
     async created() {
@@ -63,7 +63,7 @@ export default {
             this.assignment = null
             let res = await api.assignments.get(this.$route.params.assignmentId)
             this.assignment = res.data
-        }
-    }
+        },
+    },
 }
 </script>

@@ -10,6 +10,9 @@
                 <li>Max file size is 1MB</li>
             </ul>
         </b-alert>
+        <b-alert show variant="danger" v-if="overwrite">
+            Uploading new groups will delete all existing groups.
+        </b-alert>
         <!--File upload-->
         <b-form-group label="CSV file from Brightspace" class="mb-0">
             <b-form-file
@@ -31,10 +34,10 @@ import notifications from "../../mixins/notifications"
 
 export default {
     mixins: [notifications],
-    props: ["modalId"],
+    props: ["modalId", "overwrite"],
     data() {
         return {
-            file: null
+            file: null,
         }
     },
     methods: {
@@ -43,7 +46,7 @@ export default {
             this.showSuccessMessage({ message: "Groups are being imported" })
             // Close modal after submitting
             this.$bvModal.hide(this.modalId)
-        }
-    }
+        },
+    },
 }
 </script>

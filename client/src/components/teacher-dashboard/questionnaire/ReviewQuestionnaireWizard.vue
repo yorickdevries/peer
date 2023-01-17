@@ -75,9 +75,7 @@
                             <b-badge pill v-if="question.optional" variant="secondary" class="ml-2 float-right p-1">
                                 OPTIONAL
                             </b-badge>
-                            <b-badge v-else variant="danger" class="ml-2 float-right p-1">
-                                REQUIRED
-                            </b-badge>
+                            <b-badge v-else variant="danger" class="ml-2 float-right p-1"> REQUIRED </b-badge>
                             <b-badge v-if="question.graded" variant="secondary" class="ml-2 float-right p-1">
                                 GRADED
                             </b-badge>
@@ -200,7 +198,7 @@ export default {
         CreateQuestionWizard,
         EditQuestionWizard,
         EditQuestionPointsWizard,
-        StarRating
+        StarRating,
     },
     data() {
         return {
@@ -210,7 +208,7 @@ export default {
             // enables copying of a questonnaire to another
             allQuestionnairesOfCourse: [],
             questionnaireIdToCopyFrom: null,
-            gradedDefault: false
+            gradedDefault: false,
         }
     },
     computed: {
@@ -231,7 +229,7 @@ export default {
             }
             // in case of no questions yet
             return 1
-        }
+        },
     },
     async created() {
         await this.fetchData()
@@ -273,7 +271,7 @@ export default {
             await api.reviewquestionnaires.defaultQuestions(this.questionnaire.id, Boolean(this.gradedDefault))
             this.showSuccessMessage({ message: "succesfully loaded default questions" })
             await this.fetchData()
-        }
-    }
+        },
+    },
 }
 </script>

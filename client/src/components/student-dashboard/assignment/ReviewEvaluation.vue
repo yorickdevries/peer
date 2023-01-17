@@ -59,12 +59,8 @@
                 or submit this evaluation.
             </b-alert>
             <!--Notification if submitted-->
-            <b-alert v-if="review.submitted" variant="success" show>
-                This evaluation has been submitted.
-            </b-alert>
-            <b-alert v-else variant="danger" show>
-                This evaluation has not yet been submitted.
-            </b-alert>
+            <b-alert v-if="review.submitted" variant="success" show> This evaluation has been submitted. </b-alert>
+            <b-alert v-else variant="danger" show> This evaluation has not yet been submitted. </b-alert>
         </div>
 
         <b-row v-if="review">
@@ -80,9 +76,7 @@
                 <dl>
                     <dt>Current report status</dt>
                     <dd v-if="!review.submitted">-</dd>
-                    <dd v-else-if="review.flaggedByReviewer">
-                        ⚠️ This review was reported as empty or not serious
-                    </dd>
+                    <dd v-else-if="review.flaggedByReviewer">⚠️ This review was reported as empty or not serious</dd>
                     <dd v-else>✅ Not reported</dd>
                 </dl>
                 <dl v-if="review.submitted">
@@ -163,9 +157,7 @@
                     <b-badge pill v-if="question.optional" variant="secondary" class="ml-2 float-right p-1">
                         OPTIONAL
                     </b-badge>
-                    <b-badge v-else variant="danger" class="ml-2 float-right p-1">
-                        REQUIRED
-                    </b-badge>
+                    <b-badge v-else variant="danger" class="ml-2 float-right p-1"> REQUIRED </b-badge>
                 </b-card-header>
 
                 <b-card-body>
@@ -310,9 +302,9 @@
                         :variant="(answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'"
                         :disabled="
                             !answers[question.id].changed ||
-                                review.submitted ||
-                                buttonDisabled ||
-                                !questionsCanBeChanged
+                            review.submitted ||
+                            buttonDisabled ||
+                            !questionsCanBeChanged
                         "
                         @click="saveAnswer(question, answers[question.id])"
                         >Save Answer</b-button
@@ -363,8 +355,7 @@
                         title="Submit Confirmation"
                         :ok-disabled="
                             buttonDisabled ||
-                                (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 &&
-                                    !review.flaggedByReviewer)
+                            (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 && !review.flaggedByReviewer)
                         "
                         @ok="submitReview"
                     >
@@ -425,7 +416,7 @@ export default {
             // Currently pressed keys
             keys: { Enter: false, ControlLeft: false, ControlRight: false },
             // Index of currently active question
-            questionIndex: null
+            questionIndex: null,
         }
     },
     computed: {
@@ -468,7 +459,7 @@ export default {
         },
         questionsCanBeChanged() {
             return !(this.review.submitted || !this.userIsOwner || this.reviewsAreReadOnly)
-        }
+        },
     },
     async created() {
         window.addEventListener("keydown", this.keyDown)
@@ -526,7 +517,7 @@ export default {
                 // answer variable which gets replaced if an answer is present
                 let answer = null
                 // find existing answer
-                const existingAnswer = _.find(existingAnswers, answer => {
+                const existingAnswer = _.find(existingAnswers, (answer) => {
                     return answer.questionId === question.id
                 })
                 const answerExists = existingAnswer ? true : false
@@ -576,7 +567,7 @@ export default {
             }
         },
         getQuestion(questionId) {
-            return _.find(this.questionnaire.questions, question => {
+            return _.find(this.questionnaire.questions, (question) => {
                 return question.id === parseInt(questionId)
             })
         },
@@ -693,7 +684,7 @@ export default {
         },
         uploadAnswerFilePath(reviewId, questionId) {
             return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`
-        }
-    }
+        },
+    },
 }
 </script>

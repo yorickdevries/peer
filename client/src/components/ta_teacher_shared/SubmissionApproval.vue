@@ -133,7 +133,7 @@ export default {
             submission: {},
             commentChanged: false,
             // dont view file until data is fetched
-            viewFile: false
+            viewFile: false,
         }
     },
     computed: {
@@ -147,7 +147,7 @@ export default {
             } else {
                 return ""
             }
-        }
+        },
     },
     async created() {
         await this.fetchData()
@@ -180,7 +180,7 @@ export default {
                 const res = await api.submissions.getAllForAssignmentVersion(assignmentVersion.id)
                 submissions.push(...res.data)
             }
-            const finalSubmissionsWithoutApproval = _.filter(submissions, submission => {
+            const finalSubmissionsWithoutApproval = _.filter(submissions, (submission) => {
                 return submission.final && submission.approvalByTA === null
             })
             if (finalSubmissionsWithoutApproval.length === 0) {
@@ -189,11 +189,11 @@ export default {
                 const randomSubmission = _.sample(finalSubmissionsWithoutApproval)
                 this.$router.push({
                     name: this.$router.currentRoute.name,
-                    params: { submissionId: randomSubmission.id }
+                    params: { submissionId: randomSubmission.id },
                 })
                 location.reload()
             }
-        }
-    }
+        },
+    },
 }
 </script>

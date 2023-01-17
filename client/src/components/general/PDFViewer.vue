@@ -1,27 +1,22 @@
 <template>
     <div>
-        <pdf v-for="i in numPages" :key="i" :src="src" :page="i" style="display: inline-block; width: 100%"></pdf>
+        <VuePdfEmbed :source="this.fileUrl" style="display: inline-block; width: 100%"></VuePdfEmbed>
     </div>
 </template>
 
 <script>
-import pdf from "vue-pdf"
+import VuePdfEmbed from "vue-pdf-embed/dist/vue2-pdf-embed"
+//style="display: inline-block; width: 100%"
 export default {
     components: {
-        pdf
+        VuePdfEmbed,
     },
     props: ["fileUrl"],
     data() {
         return {
             src: null,
-            numPages: undefined
+            numPages: undefined,
         }
     },
-    mounted() {
-        this.src = pdf.createLoadingTask(this.fileUrl)
-        this.src.promise.then(pdf => {
-            this.numPages = pdf.numPages
-        })
-    }
 }
 </script>

@@ -76,8 +76,8 @@
                                                     name: 'student-dashboard.course.assignment',
                                                     params: {
                                                         courseId: assignment.courseId,
-                                                        assignmentId: assignment.id
-                                                    }
+                                                        assignmentId: assignment.id,
+                                                    },
                                                 }"
                                                 >View Assignment</b-button
                                             >
@@ -127,8 +127,8 @@
                                                     name: 'student-dashboard.course.assignment',
                                                     params: {
                                                         courseId: assignment.courseId,
-                                                        assignmentId: assignment.id
-                                                    }
+                                                        assignmentId: assignment.id,
+                                                    },
                                                 }"
                                                 >View Assignment</b-button
                                             >
@@ -171,8 +171,8 @@
                                                     name: 'student-dashboard.course.assignment',
                                                     params: {
                                                         courseId: assignment.courseId,
-                                                        assignmentId: assignment.id
-                                                    }
+                                                        assignmentId: assignment.id,
+                                                    },
                                                 }"
                                                 >View Assignment</b-button
                                             >
@@ -202,25 +202,25 @@ export default {
         return {
             enrollableAssignments: [],
             enrolledAssignments: [],
-            assignments: []
+            assignments: [],
         }
     },
     computed: {
         assignmentsInSubmissionState() {
-            return _.filter(this.enrolledAssignments, assignment => {
+            return _.filter(this.enrolledAssignments, (assignment) => {
                 return assignment.state === "submission"
             })
         },
         assignmentsInWaitingForReviewOrReviewState() {
-            return _.filter(this.enrolledAssignments, assignment => {
+            return _.filter(this.enrolledAssignments, (assignment) => {
                 return assignment.state === "waitingforreview" || assignment.state === "review"
             })
         },
         assignmentsInFeedbackState() {
-            return _.filter(this.enrolledAssignments, assignment => {
+            return _.filter(this.enrolledAssignments, (assignment) => {
                 return assignment.state === "feedback"
             })
-        }
+        },
     },
     async created() {
         await this.fetchAssignments()
@@ -242,7 +242,7 @@ export default {
         },
         isInWaitingForReviewState(assignment) {
             return assignment.state === "waitingforreview"
-        }
-    }
+        },
+    },
 }
 </script>

@@ -37,14 +37,14 @@ export default {
         MultipleChoiceQuestion,
         CheckboxQuestion,
         RangeQuestion,
-        UploadQuestion
+        UploadQuestion,
     },
     props: ["question"],
     methods: {
         questionSaved() {
             // emit so the questionnaire is reloaded
             this.$emit("questionSaved")
-        }
-    }
+        },
+    },
 }
 </script>

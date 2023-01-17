@@ -8,5 +8,5 @@ export default {
     delete(checkboxQuestionId, reviewId) {
         const params = { checkboxQuestionId, reviewId }
         return client.delete("checkboxquestionanswers", { params: params })
-    }
+    },
 }

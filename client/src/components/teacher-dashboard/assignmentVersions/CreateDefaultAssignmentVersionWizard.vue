@@ -25,7 +25,7 @@ export default {
     mixins: [notifications],
     data() {
         return {
-            assignmentVersion: {}
+            assignmentVersion: {},
         }
     },
     methods: {
@@ -46,7 +46,7 @@ export default {
             )
             this.showSuccessMessage({ message: "Default assignment version succesfully created" })
             this.$emit("assignmentVersionChanged")
-        }
+        },
     },
     computed: {
         checkReviewsPerUser() {
@@ -55,7 +55,7 @@ export default {
             } else {
                 return this.assignmentVersion.reviewsPerUserPerAssignmentVersionToReview > 0
             }
-        }
-    }
+        },
+    },
 }
 </script>

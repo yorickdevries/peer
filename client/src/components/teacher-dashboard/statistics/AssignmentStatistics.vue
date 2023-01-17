@@ -53,14 +53,14 @@ export default {
     computed: {
         renderChart() {
             return this.selectedAssignment !== null && this.selectedChart !== null && !this.loading && this.chartData
-        }
+        },
     },
     watch: {
         buckets: {
             handler() {
                 this.debounce()
-            }
-        }
+            },
+        },
     },
     data() {
         return {
@@ -74,8 +74,8 @@ export default {
             chartTypes: [
                 { value: this.enum.AVG_REVIEW_TIME, text: "Average time spent per review" },
                 { value: this.enum.TIME_SUBMIT_BEFORE_DEADLINE, text: "Submission time before deadline" },
-                { value: this.enum.PARTICIPATION, text: "Participation table" }
-            ]
+                { value: this.enum.PARTICIPATION, text: "Participation table" },
+            ],
         }
     },
     async created() {
@@ -83,7 +83,7 @@ export default {
         this.assignments = res.data
     },
     methods: {
-        debounce: _.debounce(function() {
+        debounce: _.debounce(function () {
             this.bucketsProp = this.buckets
         }, 500),
         async fetchData() {
@@ -97,7 +97,7 @@ export default {
                     this.loading = false
                 })
             }
-        }
-    }
+        },
+    },
 }
 </script>

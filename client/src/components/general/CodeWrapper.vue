@@ -6,9 +6,7 @@
         <b-alert v-else-if="reviewSubmitted" show variant="warning">
             The review is submitted, so annotations cannot be added, removed or edited.
         </b-alert>
-        <b-alert v-if="!selected" show variant="primary">
-            The selected file cannot be displayed.
-        </b-alert>
+        <b-alert v-if="!selected" show variant="primary"> The selected file cannot be displayed. </b-alert>
         <b-alert v-else-if="!content || content.length === 0" show variant="primary">
             The selected file is empty.
         </b-alert>
@@ -70,7 +68,7 @@ export default {
             showFile: false,
             review: null,
             language: null,
-            feedbackReviews: []
+            feedbackReviews: [],
         }
     },
     async created() {
@@ -126,7 +124,7 @@ export default {
         },
         async getFile() {
             return await fetch(this.fileUrl)
-                .then(res => res.blob())
+                .then((res) => res.blob())
                 .catch(console.error)
         },
         fixMultiLineHighlighting(lines) {
@@ -140,7 +138,7 @@ export default {
                 const prepend = stack.join("")
 
                 // Go through the line, modify the stack
-                ;[...lines[i].matchAll(spanTags)].forEach(match => {
+                ;[...lines[i].matchAll(spanTags)].forEach((match) => {
                     if (match[1] === undefined) {
                         stack.pop()
                     } else {
@@ -181,15 +179,15 @@ export default {
         },
         async loadZip(file) {
             return JSZip.loadAsync(file)
-                .then(zip => {
+                .then((zip) => {
                     return (
                         Object.keys(zip.files)
-                            .map(name => zip.file(name))
+                            .map((name) => zip.file(name))
                             // Filter out all null files
-                            .filter(file => file)
+                            .filter((file) => file)
                     )
                 })
-                .then(files => {
+                .then((files) => {
                     this.files = files
                     for (const file of this.files) {
                         if (!file.dir) {
@@ -202,14 +200,14 @@ export default {
         async getSingleFileName() {
             return new Promise((resolve, reject) => {
                 if (this.submissionId) {
-                    resolve(api.submissions.get(this.submissionId).then(res => res.data.file))
+                    resolve(api.submissions.get(this.submissionId).then((res) => res.data.file))
                 } else if (this.reviewId) {
-                    resolve(api.reviewofsubmissions.getFileMetadata(this.reviewId).then(res => res.data))
+                    resolve(api.reviewofsubmissions.getFileMetadata(this.reviewId).then((res) => res.data))
                 } else {
                     reject("Found no submission or review id")
                 }
             })
-                .then(file => file.name + file.extension)
+                .then((file) => file.name + file.extension)
                 .catch(console.warn)
         },
         async loadSingleFile(file) {
@@ -217,34 +215,31 @@ export default {
             this.selected = await this.getSingleFileName()
             this.files = [{ dir: false, name: this.selected }]
 
-            Promise.resolve(file.text())
-                .then(this.verifyTextContent)
-                .then(this.highlightContent)
-                .catch(console.warn)
+            Promise.resolve(file.text()).then(this.verifyTextContent).then(this.highlightContent).catch(console.warn)
         },
         async onSelect(file) {
             if (file != this.selected) {
                 this.showFile = false
                 this.selected = file
                 this.files
-                    .find(f => !f.dir && f.name === file)
+                    .find((f) => !f.dir && f.name === file)
                     .async("string")
                     .then(this.verifyTextContent)
                     .then(this.highlightContent)
                     .catch(console.warn)
             }
-        }
+        },
     },
     computed: {
         annotatedFiles() {
-            return new Set(this.annotations.map(annotation => annotation.selectedFile))
+            return new Set(this.annotations.map((annotation) => annotation.selectedFile))
         },
         reviewSubmitted() {
             return this.review && this.review.submitted
         },
         isOnlyFile() {
             return this.files && this.files.length === 1
-        }
-    }
+        },
+    },
 }
 </script>

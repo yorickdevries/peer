@@ -35,7 +35,7 @@ export default {
             assignment: {},
             group: null,
             finalSubmission: null,
-            feedbackReviews: []
+            feedbackReviews: [],
         }
     },
     computed: {
@@ -43,7 +43,7 @@ export default {
             return (
                 this.assignment.lateReviewEvaluations || new Date() < new Date(this.assignment.reviewEvaluationDueDate)
             )
-        }
+        },
     },
     async created() {
         await this.fetchData()
@@ -84,7 +84,7 @@ export default {
                 }
             }
             this.feedbackReviews = reviews
-        }
-    }
+        },
+    },
 }
 </script>

@@ -23,23 +23,23 @@ export default [
             {
                 path: "",
                 name: "teaching-assistant-dashboard.course.home",
-                component: () => import("../components/teaching-assistant-dashboard/Course")
+                component: () => import("../components/teaching-assistant-dashboard/Course"),
             },
             {
                 path: "assignment/:assignmentId",
                 name: "teaching-assistant-dashboard.course.assignment",
-                component: () => import("../components/teaching-assistant-dashboard/Assignment")
+                component: () => import("../components/teaching-assistant-dashboard/Assignment"),
             },
             {
                 path: "assignment/:assignmentId/reviews/:reviewId",
                 name: "teaching-assistant-dashboard.course.assignment.review",
-                component: () => import("../components/ta_teacher_shared/ReviewApproval")
+                component: () => import("../components/ta_teacher_shared/ReviewApproval"),
             },
             {
                 path: "courses/:courseId/assignments/:assignmentId/submissions/:submissionId",
                 name: "teaching-assistant-dashboard.course.assignment.submission",
-                component: () => import("../components/ta_teacher_shared/SubmissionApproval")
-            }
-        ]
-    }
+                component: () => import("../components/ta_teacher_shared/SubmissionApproval"),
+            },
+        ],
+    },
 ]

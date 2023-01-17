@@ -7,9 +7,7 @@
             <b-form-textarea v-model="question.text" />
         </b-form-group>
         <b-form-group label="Optional Question" description="Make this question optional for the student.">
-            <b-form-checkbox v-model="question.optional">
-                Make this question optional.
-            </b-form-checkbox>
+            <b-form-checkbox v-model="question.optional"> Make this question optional. </b-form-checkbox>
         </b-form-group>
         <b-button @click="save" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
         <span v-if="question.id">
@@ -37,8 +35,8 @@ export default {
                 text: "",
                 number: this.questionNumber,
                 optional: false,
-                questionnaireId: this.questionnaireId
-            }
+                questionnaireId: this.questionnaireId,
+            },
         }
     },
     async created() {
@@ -84,7 +82,7 @@ export default {
             this.showSuccessMessage({ message: "Successfully deleted open question." })
             this.$emit("questionSaved")
             this.questionId = null
-        }
-    }
+        },
+    },
 }
 </script>

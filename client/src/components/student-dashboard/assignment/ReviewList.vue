@@ -40,12 +40,12 @@ import api from "../../../api/api"
 
 export default {
     components: {
-        Review
+        Review,
     },
     data() {
         return {
             assignment: {},
-            reviews: []
+            reviews: [],
         }
     },
     computed: {
@@ -54,7 +54,7 @@ export default {
                 // either late submission must be enabled or the due date should not have been passed
                 this.assignment.lateSubmissionReviews || new Date() < new Date(this.assignment.reviewDueDate)
             )
-        }
+        },
     },
     async created() {
         await this.fetchAssignment()
@@ -72,7 +72,7 @@ export default {
                 reviews.push(...res.data)
             }
             this.reviews = reviews
-        }
-    }
+        },
+    },
 }
 </script>

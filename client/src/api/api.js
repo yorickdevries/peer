@@ -29,6 +29,7 @@ import pdfannotations from "./pdfannotations"
 import assignmentexports from "./assignmentexports"
 import codeannotations from "./codeannotations"
 import statistics from "./statistics"
+import banners from "./banners"
 import deadlines from "@/api/deadlines"
 
 export default {
@@ -67,5 +68,6 @@ export default {
     assignmentexports: assignmentexports,
     codeannotations: codeannotations,
     statistics: statistics,
-    deadlines: deadlines
+    banners: banners,
+    deadlines: deadlines,
 }

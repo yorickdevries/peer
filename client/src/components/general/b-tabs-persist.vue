@@ -10,19 +10,19 @@ export default {
     inheritAttrs: false,
     data() {
         return {
-            tabIndex: 0
+            tabIndex: 0,
         }
     },
     methods: {
         setTab(index) {
             location.hash = index
-        }
+        },
     },
     mounted() {
         const index = parseInt(location.hash.substring(1))
         if (!isNaN(index)) {
             this.tabIndex = index
         }
-    }
+    },
 }
 </script>
