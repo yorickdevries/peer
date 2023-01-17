@@ -14,5 +14,5 @@ export default {
     copyQuestions(id, copyFromQuestionnaireId) {
         const body = { copyFromQuestionnaireId }
         return client.patch(`submissionquestionnaires/${id}/copyquestions`, body)
-    }
+    },
 }

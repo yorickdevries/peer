@@ -92,11 +92,11 @@ export default {
                 { key: "id", label: "ID", sortable: true },
                 { key: "name", label: "Year" },
                 { key: "active", label: "Active" },
-                { key: "action", label: "Action" }
+                { key: "action", label: "Action" },
             ],
             currentPage: 1,
             perPage: 10,
-            filter: ""
+            filter: "",
         }
     },
     async created() {
@@ -117,7 +117,7 @@ export default {
             await api.academicyears.delete(id)
             await this.fetchYears()
             this.showSuccessMessage({ message: "Year has been removed" })
-        }
-    }
+        },
+    },
 }
 </script>

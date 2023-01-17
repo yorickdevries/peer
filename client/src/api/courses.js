@@ -35,5 +35,5 @@ export default {
         }
         const course = { name, courseCode, enrollable, facultyId, academicYearId, description }
         return client.patch(`courses/${id}`, course)
-    }
+    },
 }

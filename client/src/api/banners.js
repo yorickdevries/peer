@@ -20,5 +20,5 @@ export default {
     patch(banner) {
         const data = { title: banner.title, text: banner.text, active: banner.active }
         return client.patch(`banners/${banner.id}`, data)
-    }
+    },
 }

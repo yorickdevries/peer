@@ -43,15 +43,11 @@
                 </template>
                 <template v-else-if="assignment.state !== 'unpublished' && assignment.state !== 'submission'">
                     <dt>Import submissions from WebLab</dt>
-                    <dd>
-                        Not available. The assignment is already past the submission state.
-                    </dd>
+                    <dd>Not available. The assignment is already past the submission state.</dd>
                 </template>
                 <template v-else-if="!/\.zip($|[\s,])/.test(assignment.submissionExtensions)">
                     <dt>Import submissions from WebLab</dt>
-                    <dd>
-                        Not available. On creation of the assignment, .zip extensions have not been allowed.
-                    </dd>
+                    <dd>Not available. On creation of the assignment, .zip extensions have not been allowed.</dd>
                 </template>
                 <template v-else>
                     <!--Importing Submissions-->
@@ -102,7 +98,7 @@
                             :class="{
                                 'bg-primary': !onlyFinalSubmissions,
                                 'btn-outline-primary': onlyFinalSubmissions,
-                                'text-white': !onlyFinalSubmissions
+                                'text-white': !onlyFinalSubmissions,
                             }"
                             class="btn btn-sm"
                             size="sm"
@@ -114,7 +110,7 @@
                             :class="{
                                 'bg-primary': onlyFinalSubmissions,
                                 'btn-outline-primary': !onlyFinalSubmissions,
-                                'text-white': onlyFinalSubmissions
+                                'text-white': onlyFinalSubmissions,
                             }"
                             class="btn btn-sm"
                             size="sm"
@@ -178,7 +174,7 @@
                         name: $router.currentRoute.name.includes('teacher')
                             ? 'teacher-dashboard.assignments.assignment.submission'
                             : 'teaching-assistant-dashboard.course.assignment.submission',
-                        params: { submissionId: data.item.id }
+                        params: { submissionId: data.item.id },
                     }"
                     >Show submission</b-button
                 >
@@ -205,7 +201,7 @@ export default {
     props: ["assignmentVersionId"],
     mixins: [notifications],
     components: {
-        ImportSubmissionsWizard
+        ImportSubmissionsWizard,
     },
     data() {
         return {
@@ -226,14 +222,14 @@ export default {
                 { key: "approvalByTA", label: "Approval by TA", sortable: true },
                 { key: "approvingTA", label: "Approving TA" },
                 { key: "flaggedByServer", label: "Flagged by server", sortable: true },
-                { key: "commentByServer", label: "Comment by server" }
+                { key: "commentByServer", label: "Comment by server" },
             ],
             currentPage: 1,
             perPage: 10,
             filter: "",
             disableSubmissionExportButton: false,
             assignment: null,
-            reviews: null
+            reviews: null,
         }
     },
     async created() {
@@ -251,10 +247,10 @@ export default {
             }
         },
         finalSubmissions() {
-            return _.filter(this.allSubmissions, function(submission) {
+            return _.filter(this.allSubmissions, function (submission) {
                 return submission.final
             })
-        }
+        },
     },
     methods: {
         flagSubmissions() {
@@ -277,7 +273,7 @@ export default {
             const parsedGroups = this.parseGroups()
             const flaggedSubmissions = this.flagSubmissions()
 
-            submissions.forEach(s => {
+            submissions.forEach((s) => {
                 s.reportedByReview = flaggedSubmissions.has(s.id)
                 s.groupName = parsedGroups.get(s.id)
             })
@@ -309,7 +305,7 @@ export default {
             this.reviews = res.data
         },
         getGroup(id) {
-            return _.find(this.groups, group => {
+            return _.find(this.groups, (group) => {
                 return group.id === id
             })
         },
@@ -321,15 +317,15 @@ export default {
             this.disableSubmissionExportButton = true
             await api.submissions.export(this.assignmentVersionId, exportType)
             this.showSuccessMessage({
-                message: "Export is being generated, you can download it in the exports tab when ready"
+                message: "Export is being generated, you can download it in the exports tab when ready",
             })
         },
         async exportAllSubmissions() {
             await api.submissions.getZipExport(this.assignmentVersionId)
             this.showSuccessMessage({
-                message: "Export is being generated, you can download it in the exports tab when ready"
+                message: "Export is being generated, you can download it in the exports tab when ready",
             })
-        }
-    }
+        },
+    },
 }
 </script>

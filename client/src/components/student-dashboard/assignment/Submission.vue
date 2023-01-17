@@ -24,9 +24,7 @@
                             </template>
                             <template v-slot:cell(serverStatus)="data">
                                 <dl>
-                                    <dt v-if="data.item.flaggedByServer">
-                                        ⚠️ There might be a problem with this file
-                                    </dt>
+                                    <dt v-if="data.item.flaggedByServer">⚠️ There might be a problem with this file</dt>
                                     <dd v-if="data.item.flaggedByServer === null">
                                         Your file was not checked by the server
                                     </dd>
@@ -221,9 +219,9 @@ export default {
                 { key: "serverStatus", label: "Server Status" },
                 { key: "final", label: "Final" },
                 { key: "action", label: "Action" },
-                { key: "taFeedback", label: "TA Feedback" }
+                { key: "taFeedback", label: "TA Feedback" },
             ],
-            buttonDisabled: false
+            buttonDisabled: false,
         }
     },
     computed: {
@@ -235,10 +233,10 @@ export default {
             )
         },
         finalSubmission() {
-            return _.find(this.submissions, submission => {
+            return _.find(this.submissions, (submission) => {
                 return submission.final
             })
-        }
+        },
     },
     async created() {
         await this.fetchAssignment()
@@ -275,9 +273,9 @@ export default {
             // Config set for the HTTP request & updating the progress field.
             let config = {
                 "Content-Type": "multipart/form-data",
-                onUploadProgress: progressEvent => {
+                onUploadProgress: (progressEvent) => {
                     this.fileProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-                }
+                },
             }
             // Perform upload.
             try {
@@ -312,7 +310,7 @@ export default {
             await api.submissions.patch(id, false)
             this.showSuccessMessage({ message: "Set submission as not final" })
             await this.fetchSubmissions()
-        }
-    }
+        },
+    },
 }
 </script>

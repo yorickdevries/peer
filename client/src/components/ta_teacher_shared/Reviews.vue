@@ -5,9 +5,7 @@
                 <!--Exporting Reviews-->
                 <dt>Export reviews</dt>
                 <dd>Exports a file with all reviews for this assignment.</dd>
-                <dd>
-                    Also includes any evaluations which students have given on eachother's reviews.
-                </dd>
+                <dd>Also includes any evaluations which students have given on eachother's reviews.</dd>
                 <b-button
                     :disabled="disableReviewExportButton"
                     size="sm"
@@ -72,7 +70,7 @@
                             :class="{
                                 'bg-primary': onlySubmittedReviews === null,
                                 'btn-outline-primary': onlySubmittedReviews !== null,
-                                'text-white': onlySubmittedReviews === null
+                                'text-white': onlySubmittedReviews === null,
                             }"
                             class="btn btn-sm"
                             size="sm"
@@ -84,7 +82,7 @@
                             :class="{
                                 'bg-primary': onlySubmittedReviews === true,
                                 'btn-outline-primary': onlySubmittedReviews !== true,
-                                'text-white': onlySubmittedReviews === true
+                                'text-white': onlySubmittedReviews === true,
                             }"
                             class="btn btn-sm"
                             size="sm"
@@ -96,7 +94,7 @@
                             :class="{
                                 'bg-primary': onlySubmittedReviews === false,
                                 'btn-outline-primary': onlySubmittedReviews !== false,
-                                'text-white': onlySubmittedReviews === false
+                                'text-white': onlySubmittedReviews === false,
                             }"
                             class="btn btn-sm"
                             size="sm"
@@ -151,7 +149,7 @@
                         name: $router.currentRoute.name.includes('teacher')
                             ? 'teacher-dashboard.assignments.assignment.review'
                             : 'teaching-assistant-dashboard.course.assignment.review',
-                        params: { reviewId: data.item.id }
+                        params: { reviewId: data.item.id },
                     }"
                     >Show review</b-button
                 >
@@ -190,13 +188,13 @@ export default {
                 { key: "flaggedByReviewer", label: "Reviewer flagged the submission", sortable: true },
                 { key: "submitted", label: "Review submitted", sortable: true },
                 { key: "approvalByTA", label: "Approval by TA", sortable: true },
-                { key: "approvingTA", label: "Approving TA" }
+                { key: "approvingTA", label: "Approving TA" },
             ],
             currentPage: 1,
             perPage: 10,
             filter: "",
             disableReviewExportButton: false,
-            disableGradeExportButton: false
+            disableGradeExportButton: false,
         }
     },
     async created() {
@@ -209,7 +207,7 @@ export default {
             const groups = res2.data
             // set submissiongroups
             for (const review of reviews) {
-                const submissionGroup = _.find(groups, group => {
+                const submissionGroup = _.find(groups, (group) => {
                     return group.id === review.submission.groupId
                 })
                 if (submissionGroup) {
@@ -227,11 +225,11 @@ export default {
             if (this.onlySubmittedReviews === null) {
                 return this.reviews
             } else {
-                return _.filter(this.reviews, review => {
+                return _.filter(this.reviews, (review) => {
                     return review.submitted === this.onlySubmittedReviews
                 })
             }
-        }
+        },
     },
     methods: {
         submissionFilePath(id) {
@@ -242,16 +240,16 @@ export default {
             this.disableReviewExportButton = true
             await api.reviewofsubmissions.exportReviews(this.assignmentVersionId, exportType)
             this.showSuccessMessage({
-                message: "Export is being generated, you can download it in the exports tab when ready"
+                message: "Export is being generated, you can download it in the exports tab when ready",
             })
         },
         async exportGrades(exportType) {
             this.disableGradeExportButton = true
             await api.reviewofsubmissions.exportGrades(this.assignmentVersionId, exportType)
             this.showSuccessMessage({
-                message: "Export is being generated, you can download it in the exports tab when ready"
+                message: "Export is being generated, you can download it in the exports tab when ready",
             })
-        }
-    }
+        },
+    },
 }
 </script>

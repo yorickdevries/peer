@@ -15,5 +15,5 @@ export default {
     },
     delete(id) {
         return client.delete(`multiplechoicequestionoptions/${id}`)
-    }
+    },
 }

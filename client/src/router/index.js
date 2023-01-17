@@ -31,25 +31,25 @@ export default new VueRouter({
                         const authenticated = res.data.authenticated
 
                         authenticated ? next("/courses") : next()
-                    }
+                    },
                 },
                 {
                     path: "/courses",
                     name: "courses",
-                    component: () => import("../components/general/Courses")
+                    component: () => import("../components/general/Courses"),
                 },
                 {
                     path: "/privacy",
                     name: "privacy-statement",
-                    component: () => import("../components/general/PrivacyPolicy")
-                }
-            ]
+                    component: () => import("../components/general/PrivacyPolicy"),
+                },
+            ],
         },
         ...StudentRoutes,
         ...TeacherRoutes,
         ...TeachingAssistantRoutes,
         ...AdminRoutes,
         { path: "*", redirect: "/404" },
-        { path: "/404", component: () => import("../components/404") }
-    ]
+        { path: "/404", component: () => import("../components/404") },
+    ],
 })

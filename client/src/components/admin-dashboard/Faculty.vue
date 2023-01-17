@@ -22,8 +22,8 @@ export default {
         return {
             faculty: {
                 name: "",
-                longName: ""
-            }
+                longName: "",
+            },
         }
     },
     async created() {
@@ -40,14 +40,14 @@ export default {
         async postFaculty() {
             await api.faculties.post({
                 name: this.faculty.name,
-                longName: this.faculty.longName
+                longName: this.faculty.longName,
             })
         },
         async patchFaculty() {
             await api.faculties.patch({
                 id: this.faculty.id,
                 name: this.faculty.name,
-                longName: this.faculty.longName
+                longName: this.faculty.longName,
             })
         },
         async save() {
@@ -63,7 +63,7 @@ export default {
                 this.faculty.longName = ""
             }
             this.$emit("save")
-        }
-    }
+        },
+    },
 }
 </script>

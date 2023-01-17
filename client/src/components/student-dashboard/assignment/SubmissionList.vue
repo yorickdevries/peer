@@ -16,9 +16,7 @@
                 <b-tabs card lazy>
                     <b-tab>
                         <template slot="title">
-                            <div class="d-flex align-items-center">
-                                Select
-                            </div>
+                            <div class="d-flex align-items-center">Select</div>
                         </template>
                         <b-alert show>Please select your assignment version above</b-alert>
                     </b-tab>
@@ -44,16 +42,16 @@ import api from "../../../api/api"
 
 export default {
     components: {
-        Submission
+        Submission,
     },
     data() {
         return {
-            assignment: null
+            assignment: null,
         }
     },
     async created() {
         const res = await api.assignments.get(this.$route.params.assignmentId)
         this.assignment = res.data
-    }
+    },
 }
 </script>
