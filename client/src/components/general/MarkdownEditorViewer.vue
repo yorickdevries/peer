@@ -2,7 +2,7 @@
     <div>
         <editor
             v-if="displayeditor"
-            :initialValue="answer.answer"
+            :initialValue="answerObject.answer"
             :options="editorOptions"
             height="500px"
             initialEditType="markdown"
@@ -11,8 +11,13 @@
             ref="toastuiEditor"
         />
         <div v-else>
-            <viewer v-if="answer.answer == null" :initialValue="answer" :options="editorOptions" height="500px" />
-            <viewer :initialValue="answer.answer" :options="editorOptions" height="500px" />
+            <viewer
+                v-if="answerObject.answer == null"
+                :initialValue="answerObject"
+                :options="editorOptions"
+                height="500px"
+            />
+            <viewer v-else :initialValue="answerObject.answer" :options="editorOptions" height="500px" />
         </div>
     </div>
 </template>
@@ -25,7 +30,7 @@ import { Viewer } from "@toast-ui/vue-editor"
 
 export default {
     components: { editor: Editor, viewer: Viewer },
-    props: ["displayeditor", "answer"],
+    props: ["displayeditor", "answerObject"],
     emits: ["shortcut-save"],
     data() {
         return {
@@ -44,9 +49,16 @@ export default {
     },
     methods: {
         getMarkdown() {
-            this.answer.answer = this.$refs.toastuiEditor.invoke("getMarkdown")
-            this.answer.changed = true
+            this.answerObject.answer = this.$refs.toastuiEditor.invoke("getMarkdown")
+            this.answerObject.changed = true
             this.$emit("shortcut-save")
+        },
+    },
+    watch: {
+        "answerObject.answer": function (newAnswer) {
+            if (newAnswer === "") {
+                this.$refs.toastuiEditor.invoke("reset")
+            }
         },
     },
 }

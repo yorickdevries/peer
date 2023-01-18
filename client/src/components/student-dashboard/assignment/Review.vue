@@ -152,7 +152,7 @@
                             <!-- OPEN QUESTION -->
                             <MarkdownEditorViewer
                                 v-if="question.type === 'open'"
-                                :answer="answers[question.id]"
+                                :answer-object="answers[question.id]"
                                 :displayeditor="!(review.submitted || reviewsAreReadOnly)"
                                 @shortcut-save="questionIndex = index"
                             />
@@ -605,6 +605,7 @@ export default {
                 switch (question.type) {
                     case "open":
                         await api.openquestionanswers.delete(question.id, this.review.id)
+                        answer.answer = ""
                         break
                     case "multiplechoice":
                         await api.multiplechoicequestionanswers.delete(question.id, this.review.id)

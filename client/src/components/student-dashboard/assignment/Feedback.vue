@@ -127,7 +127,7 @@
                                                 <!-- OPEN QUESTION -->
                                                 <MarkdownEditorViewer
                                                     v-if="question.type === 'open'"
-                                                    :answer="answer"
+                                                    :answer-object="answer"
                                                     :displayeditor="false"
                                                 />
 

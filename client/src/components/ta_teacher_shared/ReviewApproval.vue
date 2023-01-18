@@ -143,7 +143,7 @@
                                             <!-- OPEN QUESTION -->
                                             <MarkdownEditorViewer
                                                 v-if="question.type === 'open'"
-                                                :answer="answers[question.id]"
+                                                :answer-object="answers[question.id]"
                                                 :displayeditor="false"
                                             />
 
