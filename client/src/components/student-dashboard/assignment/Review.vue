@@ -62,10 +62,6 @@
         <br />
         <b-row>
             <b-col :cols="columnWidthFileAndQuestionnaire" v-if="viewFile">
-                <!--Toggle side by side view-->
-                <b-button @click="toggleViewFileNextToQuestionnaire()">
-                    {{ viewFileNextToQuestionnaire ? "Stop viewing" : "View" }} submission next to questionnaire
-                </b-button>
                 <br />
                 <br />
                 <FileAnnotator :reviewId="review.id" :assignmentType="assignmentType" :readOnly="reviewsAreReadOnly" />
