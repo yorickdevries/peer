@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
 import Assignment from "../models/Assignment";
 import config from "config";
+import Course from "../models/Course";
 
 const mailConfig: {
   host: string;
@@ -15,6 +16,9 @@ const transporter = nodemailer.createTransport({
   host: mailConfig.host,
   port: mailConfig.port,
 });
+
+const sendTimedMails = true;
+const emailList: Mail.Options[] = [];
 
 const constructMessage = function (to: string, subject: string, text: string) {
   return {
@@ -64,4 +68,40 @@ const sendMailToTeachersOfAssignment = async function (
   await sendMailToAdmin(subject, text);
 };
 
-export { sendMailToTeachersOfAssignment, sendMailToAdmin };
+const sendAssignmentPublishedMail = async function (
+  assignment: Assignment
+): Promise<void> {
+  const emails = await assignment.getAllStudentEmails();
+  const courseCode = (await Course.findOneOrFail(assignment.id)).courseCode;
+  for (const email of emails) {
+    const emailTemplate = constructMessage(
+      email,
+      `{${courseCode}} - Assignment Published`,
+      `Assignment '${assignment.name}' is now open for submissions.
+    
+    Make sure to submit before the deadline!`
+    );
+    emailList.push(emailTemplate);
+  }
+};
+
+const delay = function (ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+const emailSendLoop = async function (): Promise<void> {
+  while (sendTimedMails) {
+    const email = emailList.pop();
+    if (email !== undefined) {
+      await sendMessage(email);
+    }
+    await delay(2 * 1000);
+  }
+};
+
+export {
+  sendMailToTeachersOfAssignment,
+  sendMailToAdmin,
+  sendAssignmentPublishedMail,
+  emailSendLoop,
+};

@@ -1,25 +1,16 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  OneToOne,
-  ManyToOne,
-  ManyToMany,
-  JoinColumn,
-  OneToMany,
-  RelationId,
+  Entity,
   getManager,
+  JoinColumn,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  RelationId,
 } from "typeorm";
-import {
-  IsDefined,
-  IsOptional,
-  IsString,
-  IsNotEmpty,
-  IsBoolean,
-  IsDate,
-  IsUrl,
-  IsEnum,
-} from "class-validator";
+import {IsBoolean, IsDate, IsDefined, IsEnum, IsNotEmpty, IsOptional, IsString, IsUrl,} from "class-validator";
 import BaseModel from "./BaseModel";
 import Group from "./Group";
 import Course from "./Course";
@@ -27,7 +18,7 @@ import User from "./User";
 import File from "./File";
 import moment from "moment";
 import UserRole from "../enum/UserRole";
-import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
+import {AssignmentState, assignmentStateOrder} from "../enum/AssignmentState";
 import AssignmentType from "../enum/AssignmentType";
 import AssignmentExport from "./AssignmentExport";
 import AssignmentVersion from "./AssignmentVersion";
@@ -331,6 +322,17 @@ export default class Assignment extends BaseModel {
       await group.reload();
     }
     return groups;
+  }
+
+  async getAllStudentEmails(): Promise<string[]> {
+    return await getManager()
+      .createQueryBuilder(Group, "group")
+      .leftJoin("group.assignments", "assignment")
+      .where("assignment.id = :id", { id: this.id })
+      .leftJoin("group.users", "user")
+      .andWhere("user.email IS NOT NULL")
+      .select("user.email")
+      .getRawMany();
   }
 
   async getGroup(user: User): Promise<Group | undefined> {
