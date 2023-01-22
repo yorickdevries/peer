@@ -67,9 +67,6 @@ import VueApexCharts from "vue-apexcharts"
 Vue.use(VueApexCharts)
 Vue.component("apexchart", VueApexCharts)
 
-import FullCalendar from "vue-full-calendar"
-Vue.use(FullCalendar)
-
 Vue.config.productionTip = false
 
 Sentry.init({
