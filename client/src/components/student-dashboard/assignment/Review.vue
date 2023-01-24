@@ -149,17 +149,12 @@
                         <b-card-body>
                             <!-- Text-->
                             <h4>{{ question.text }}</h4>
-
                             <!-- OPEN QUESTION -->
-                            <b-form-textarea
+                            <MarkdownEditorViewer
                                 v-if="question.type === 'open'"
-                                placeholder="Enter your answer"
-                                :rows="10"
-                                :max-rows="15"
-                                v-model="answers[question.id].answer"
-                                @input=";(answers[question.id].changed = true), (questionIndex = index)"
-                                :readonly="review.submitted || reviewsAreReadOnly"
-                                required
+                                :answer-object="answers[question.id]"
+                                :displayeditor="!(review.submitted || reviewsAreReadOnly)"
+                                @shortcut-save="questionIndex = index"
                             />
 
                             <!-- MULTIPLE CHOICE QUESTION -->
@@ -384,11 +379,12 @@ import { StarRating } from "vue-rate-it"
 import ReviewEvaluation from "./ReviewEvaluation"
 import FileAnnotator from "./FileAnnotator"
 import PDFViewer from "../../general/PDFViewer"
+import MarkdownEditorViewer from "../../general/MarkdownEditorViewer"
 
 export default {
     mixins: [notifications],
     name: "Review",
-    components: { StarRating, ReviewEvaluation, FileAnnotator, PDFViewer },
+    components: { MarkdownEditorViewer, StarRating, ReviewEvaluation, FileAnnotator, PDFViewer },
     props: ["reviewId", "reviewsAreReadOnly", "assignmentType", "evaluationButton"],
     data() {
         return {
@@ -609,6 +605,7 @@ export default {
                 switch (question.type) {
                     case "open":
                         await api.openquestionanswers.delete(question.id, this.review.id)
+                        answer.answer = ""
                         break
                     case "multiplechoice":
                         await api.multiplechoicequestionanswers.delete(question.id, this.review.id)
