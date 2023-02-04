@@ -1,6 +1,8 @@
 <template>
     <div>
-        <b-button id="slideout-btn" variant="warning" v-b-toggle.sidebar>Show Questions</b-button>
+        <b-button id="slideout-btn" variant="warning" v-b-toggle.sidebar>
+            <p>Show Questions</p>
+        </b-button>
         <b-row>
             <!--Download-->
             <b-col cols="6">
@@ -246,6 +248,9 @@
                     <!--Save/Submit Buttons-->
                     <b-card-body>
                         <div>
+                            <b-alert show variant="primary"
+                                >Questions can be accessed by clicking the yellow button on the right.
+                            </b-alert>
                             <b-form-checkbox
                                 :disabled="review.submitted"
                                 v-model="review.flaggedByReviewer"
@@ -284,6 +289,7 @@
                     </b-card-body>
                 </template>
             </b-col>
+
             <!--Submit Modal-->
             <b-modal
                 :id="`submit${review.id}`"
@@ -327,11 +333,19 @@
 #slideout-btn {
     position: fixed;
     transform: rotate(-90deg);
-    right: -80px;
-    height: 40px;
+    right: -100px;
+    height: 80px;
     width: 200px;
     z-index: 999;
     border-radius: 30px 30px 0 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    transition: right 0.5s;
+}
+#slideout-btn:hover {
+    right: -80px;
+    transition: right 0.5s;
 }
 </style>
 
@@ -426,6 +440,15 @@ export default {
         window.addEventListener("keydown", this.keyDown)
         window.addEventListener("keyup", this.keyUp)
         await this.fetchData()
+    },
+    mounted() {
+        document.querySelector("#slideout-btn").animate(
+            { right: ["-100px", "-80px", "-100px", "-80px", "-100px"] },
+            {
+                duration: 3000,
+                iterations: 1,
+            }
+        )
     },
     destroyed() {
         window.removeEventListener("keydown", this.keyDown)
