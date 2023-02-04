@@ -50,6 +50,8 @@
             </b-col>
         </b-row>
 
+        <b-alert show variant="info">Questions can be accessed by clicking the yellow button on the right. </b-alert>
+
         <!--See Review Evaluation is exist-->
         <b-row v-if="reviewEvaluation && evaluationButton">
             <b-col>
@@ -248,9 +250,6 @@
                     <!--Save/Submit Buttons-->
                     <b-card-body>
                         <div>
-                            <b-alert show variant="primary"
-                                >Questions can be accessed by clicking the yellow button on the right.
-                            </b-alert>
                             <b-form-checkbox
                                 :disabled="review.submitted"
                                 v-model="review.flaggedByReviewer"
@@ -442,13 +441,16 @@ export default {
         await this.fetchData()
     },
     mounted() {
-        document.querySelector("#slideout-btn").animate(
-            { right: ["-100px", "-80px", "-100px", "-80px", "-100px"] },
-            {
-                duration: 3000,
-                iterations: 1,
-            }
-        )
+        setTimeout(() => {
+            document.querySelector("#slideout-btn").animate(
+                { right: ["-100px", "-80px", "-100px", "-80px", "-100px"] },
+                {
+                    duration: 3000,
+                    iterations: 1,
+                    easing: "ease",
+                }
+            )
+        }, 2000)
     },
     destroyed() {
         window.removeEventListener("keydown", this.keyDown)
