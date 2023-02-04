@@ -1,4 +1,12 @@
-import { Entity, PrimaryColumn, Column, ManyToMany, JoinTable } from "typeorm";
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  ManyToMany,
+  JoinTable,
+  OneToOne,
+  JoinColumn,
+} from "typeorm";
 import {
   IsDefined,
   IsOptional,
@@ -16,6 +24,7 @@ import Study from "./Study";
 import OrganisationUnit from "./OrganisationUnit";
 import parseNetID from "../util/parseNetID";
 import Group from "./Group";
+import Preferences from "./Preferences";
 
 @Entity()
 export default class User extends BaseModel {
@@ -95,6 +104,10 @@ export default class User extends BaseModel {
   @ManyToMany((_type) => Group, (group) => group.users)
   groups?: Group[];
 
+  @OneToOne(() => Preferences, { eager: true })
+  @JoinColumn()
+  preferences!: Preferences;
+
   constructor(
     netid: string,
     affiliation?: Affiliation[],
@@ -127,6 +140,7 @@ export default class User extends BaseModel {
     this.study = study!;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.organisationUnit = organisationUnit!;
+    this.preferences = new Preferences();
   }
 
   async validateOrReject(): Promise<void> {
