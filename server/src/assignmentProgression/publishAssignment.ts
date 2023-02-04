@@ -1,6 +1,6 @@
 import Assignment from "../models/Assignment";
 import { AssignmentState } from "../enum/AssignmentState";
-import {sendAssignmentPublishedMail, sendMailToTeachersOfAssignment} from "../util/mailer";
+import { sendMailToTeachersOfAssignment } from "../util/mailer";
 import ensureConnection from "../util/ensureConnection";
 
 const publishAssignmentHelper = async function (assignment: Assignment) {
@@ -27,7 +27,6 @@ const publishAssignment = async function (
       result,
       assignment
     );
-    await sendAssignmentPublishedMail(assignment);
     return result;
   } catch (error) {
     await sendMailToTeachersOfAssignment(

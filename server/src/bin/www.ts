@@ -5,7 +5,7 @@ import http from "http";
 import createDatabaseConnection from "../databaseConnection";
 import app from "../app";
 import isTSNode from "../util/isTSNode";
-import { emailSendLoop, sendMailToAdmin } from "../util/mailer";
+import { sendMailToAdmin } from "../util/mailer";
 import { scheduleAllJobs } from "../assignmentProgression/scheduler";
 
 if (isTSNode) {
@@ -66,8 +66,6 @@ createDatabaseConnection()
         console.error("Failed to schedule jobs for assignments");
         throw error;
       });
-
-    void emailSendLoop();
 
     // Event listener for HTTP server "error" event.
     function onError(error: NodeJS.ErrnoException) {
