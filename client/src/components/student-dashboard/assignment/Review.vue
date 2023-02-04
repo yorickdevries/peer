@@ -50,8 +50,6 @@
             </b-col>
         </b-row>
 
-        <b-alert show variant="info">Questions can be accessed by clicking the yellow button on the right. </b-alert>
-
         <!--See Review Evaluation is exist-->
         <b-row v-if="reviewEvaluation && evaluationButton">
             <b-col>
@@ -249,6 +247,9 @@
                 <template v-if="!reviewsAreReadOnly">
                     <!--Save/Submit Buttons-->
                     <b-card-body>
+                        <b-alert show variant="info"
+                            >Questions can be accessed by clicking the yellow button on the right.
+                        </b-alert>
                         <div>
                             <b-form-checkbox
                                 :disabled="review.submitted"
