@@ -6,7 +6,7 @@ import {
   ManyToOne,
   OneToOne,
   RelationId,
-  OneToMany,
+  OneToMany, getManager,
 } from "typeorm";
 import {
   IsDefined,
@@ -213,5 +213,14 @@ export default class Submission extends BaseModel {
   async isTeacherInCourse(user: User): Promise<boolean> {
     const assignmentVersion = await this.getAssignmentVersion();
     return await assignmentVersion.isTeacherInCourse(user);
+  }
+
+  static async hasGroupMadeSubmission(groupId: number): Promise<boolean> {
+    const group = await getManager()
+      .createQueryBuilder(Submission, "submission")
+      .leftJoin("submission.group", "group")
+      .where("group.id = :id", { id: groupId })
+      .getOne();
+    return !!group;
   }
 }

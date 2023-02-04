@@ -1,7 +1,6 @@
 import {
   Column,
   Entity,
-  getManager,
   JoinColumn,
   ManyToMany,
   ManyToOne,
@@ -9,8 +8,18 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   RelationId,
+  getManager,
 } from "typeorm";
-import {IsBoolean, IsDate, IsDefined, IsEnum, IsNotEmpty, IsOptional, IsString, IsUrl,} from "class-validator";
+import {
+  IsBoolean,
+  IsDate,
+  IsDefined,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from "class-validator";
 import BaseModel from "./BaseModel";
 import Group from "./Group";
 import Course from "./Course";
@@ -18,7 +27,7 @@ import User from "./User";
 import File from "./File";
 import moment from "moment";
 import UserRole from "../enum/UserRole";
-import {AssignmentState, assignmentStateOrder} from "../enum/AssignmentState";
+import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
 import AssignmentType from "../enum/AssignmentType";
 import AssignmentExport from "./AssignmentExport";
 import AssignmentVersion from "./AssignmentVersion";
