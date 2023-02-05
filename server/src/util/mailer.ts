@@ -8,6 +8,8 @@ import moment, { Moment } from "moment";
 import Submission from "../models/Submission";
 import { EmailTemplate, templates } from "../enum/EmailTemplate";
 import Course from "../models/Course";
+import ReviewOfReview from "../models/ReviewOfReview";
+import { Any } from "typeorm";
 
 const mailConfig: {
   host: string;
@@ -178,15 +180,80 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
             ) {
               continue;
             }
-            const { subject, text } = templates[
-              EmailTemplate.NO_SUBMISSION_YET
-            ](
+            const { subject, text } = templates[EmailTemplate.NO_REVIEW_YET](
               member.firstName,
               course.courseCode,
               assignment.name,
               assignment.reviewDueDate.toString()
             );
             await sendMessage(constructMessage(member.email, subject, text));
+          }
+        }
+        break;
+      }
+      case AssignmentState.FEEDBACK: {
+        //Skip assignments that are outside the time window
+        if (
+          !shouldSendReminderMail(
+            assignment.reviewDueDate,
+            runDate,
+            prevRunDate
+          )
+        ) {
+          break;
+        }
+
+        //Skip assignments with review feedback disabled
+        if (!assignment.reviewEvaluation) {
+          break;
+        }
+
+        const groups = await assignment.getGroups();
+        for (const group of groups) {
+          //Skip those who haven't made submissions (they won't have reviews to submit)
+          if (!(await Submission.hasGroupMadeSubmission(group.id))) {
+            continue;
+          }
+
+          // send email to group members
+          const members = await group.getUsers();
+          const membersWithDetails = members.filter(
+            (m) => m.email !== null && m.firstName !== null
+          );
+
+          //Get all reviews that this group has received
+          const reviews =
+            await assignment.getSubmittedReviewsWhereUserIsReviewed(group);
+
+          for (const review of reviews) {
+            //Check if received review has an associated feedback review (made by the user(s) in question)
+            const feedbackReview = await ReviewOfReview.findOne({
+              where: {
+                reviewOfSubmissionId: review.id,
+                reviewer: Any(members),
+              },
+            });
+
+            //Send mail if no associated feedback review found and stop
+            if (feedbackReview === undefined) {
+              for (const member of membersWithDetails) {
+                const { subject, text } = templates[
+                  EmailTemplate.NO_EVALUATION_YET
+                ](
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  member.firstName!,
+                  course.courseCode,
+                  assignment.name,
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  assignment.reviewEvaluationDueDate!.toString()
+                );
+                await sendMessage(
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  constructMessage(member.email!, subject, text)
+                );
+              }
+              break;
+            }
           }
         }
         break;
