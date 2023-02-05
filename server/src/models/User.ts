@@ -104,7 +104,10 @@ export default class User extends BaseModel {
   @ManyToMany((_type) => Group, (group) => group.users)
   groups?: Group[];
 
-  @OneToOne(() => Preferences, { eager: true })
+  @OneToOne(() => Preferences, (preferences) => preferences.user, {
+    eager: true,
+    cascade: true,
+  })
   @JoinColumn()
   preferences!: Preferences;
 
