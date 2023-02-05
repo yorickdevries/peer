@@ -2,8 +2,8 @@ import {MigrationInterface, QueryRunner} from "typeorm";
 import User from "../models/User";
 import Preferences from "../models/Preferences";
 
-export class addPreferences1675513981228 implements MigrationInterface {
-    name = 'addPreferences1675513981228'
+export class addPreferences1675611950644 implements MigrationInterface {
+    name = 'addPreferences1675611950644'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query("CREATE TABLE `preferences` (`createdAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `updatedAt` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), `id` int NOT NULL AUTO_INCREMENT, `stRemStageNotSubmitted` tinyint NOT NULL DEFAULT 1, `stRemLateSubmission` tinyint NOT NULL DEFAULT 1, PRIMARY KEY (`id`)) ENGINE=InnoDB");
