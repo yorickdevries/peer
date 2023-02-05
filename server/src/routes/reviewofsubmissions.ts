@@ -24,6 +24,7 @@ import {
 } from "../workers/pool";
 import submitReview from "../util/submitReview";
 import AssignmentVersion from "../models/AssignmentVersion";
+import { sendMailForLateReview } from "../util/mailer";
 
 const router = express.Router();
 
@@ -464,6 +465,10 @@ router.patch(
       // submit review in transaction
       await submitReview(review, flaggedByReviewer);
       await review.reload();
+
+      if (moment().isAfter(assignment.reviewDueDate)) {
+        await sendMailForLateReview(review.submission);
+      }
     } else {
       // just set the fields
       review.flaggedByReviewer = flaggedByReviewer;

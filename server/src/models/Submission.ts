@@ -6,7 +6,8 @@ import {
   ManyToOne,
   OneToOne,
   RelationId,
-  OneToMany, getManager,
+  OneToMany,
+  getManager,
 } from "typeorm";
 import {
   IsDefined,

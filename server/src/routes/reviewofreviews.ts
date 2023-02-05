@@ -11,6 +11,7 @@ import _ from "lodash";
 import ReviewOfReview from "../models/ReviewOfReview";
 import moment from "moment";
 import submitReview from "../util/submitReview";
+import { sendMailForLateEvaluation } from "../util/mailer";
 
 const router = express.Router();
 
@@ -126,6 +127,10 @@ router.patch(
       // submit review in transaction
       await submitReview(review, flaggedByReviewer);
       await review.reload();
+
+      if (moment().isAfter(assignment.reviewEvaluationDueDate)) {
+        await sendMailForLateEvaluation(review.reviewOfSubmissionId);
+      }
     } else {
       // just set the fields
       review.flaggedByReviewer = flaggedByReviewer;

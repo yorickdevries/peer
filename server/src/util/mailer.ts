@@ -11,6 +11,8 @@ import Course from "../models/Course";
 import ReviewOfReview from "../models/ReviewOfReview";
 import { Any } from "typeorm";
 import User from "../models/User";
+import AssignmentVersion from "../models/AssignmentVersion";
+import ReviewOfSubmission from "../models/ReviewOfSubmission";
 
 const mailConfig: {
   host: string;
@@ -70,6 +72,65 @@ const sendMailToTeachersOfAssignment = async function (
   }
   // also send a message to admin for debugging purposes
   await sendMailToAdmin(subject, text);
+};
+
+const sendMailForLateReview = async function (
+  submission: Submission
+): Promise<void> {
+  const user = await User.findOneOrFail(submission.userNetid);
+
+  //Skip if user doesn't have the required details
+  if (user.firstName === null || user.email === null) {
+    return;
+  }
+
+  const assignmentVersion = await AssignmentVersion.findOneOrFail(
+    submission.assignmentVersionId
+  );
+  const assignment = await Assignment.findOneOrFail(
+    assignmentVersion.assignmentId
+  );
+  const course = await Course.findOneOrFail(assignment.courseId);
+
+  if (user.preferences.stRemLateSubmission) {
+    const { subject, text } = templates[EmailTemplate.LATE_REVIEW_SUBMISSION](
+      user.firstName,
+      course.courseCode,
+      assignment.name
+    );
+
+    await sendMessage(constructMessage(user.email, subject, text));
+  }
+};
+
+const sendMailForLateEvaluation = async function (
+  reviewOfSubmissionId: number
+): Promise<void> {
+  const review = await ReviewOfSubmission.findOneOrFail(reviewOfSubmissionId);
+  const submission = await Submission.findOneOrFail(review.submission);
+
+  const user = await User.findOneOrFail(submission.userNetid);
+
+  //Skip if user doesn't have the required details
+  if (user.firstName === null || user.email === null) {
+    return;
+  }
+
+  const assignmentVersion = await AssignmentVersion.findOneOrFail(
+    submission.assignmentVersionId
+  );
+  const assignment = await Assignment.findOneOrFail(
+    assignmentVersion.assignmentId
+  );
+  const course = await Course.findOneOrFail(assignment.courseId);
+
+  if (user.preferences.stRemLateSubmission) {
+    const { subject, text } = templates[
+      EmailTemplate.LATE_EVALUATION_SUBMISSION
+    ](user.firstName, course.courseCode, assignment.name);
+
+    await sendMessage(constructMessage(user.email, subject, text));
+  }
 };
 
 const shouldSendReminderMail = function (
@@ -203,7 +264,7 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
 
         const groups = await assignment.getGroups();
         for (const group of groups) {
-          //Skip those who haven't made submissions (they won't have reviews to submit)
+          //Skip those who haven't made submissions (they won't have reviews to evaluate)
           if (!(await Submission.hasGroupMadeSubmission(group.id))) {
             continue;
           }
@@ -264,4 +325,6 @@ export {
   sendMailToTeachersOfAssignment,
   sendMailToAdmin,
   sendMailForMissingStageSubmission,
+  sendMailForLateReview,
+  sendMailForLateEvaluation,
 };

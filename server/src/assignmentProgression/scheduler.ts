@@ -8,7 +8,7 @@ import {
   startDistributeReviewsForAssignmentWorker,
   startOpenFeedbackForAssignmentWorker,
 } from "../workers/pool";
-import {sendMailForMissingStageSubmission} from "../util/mailer";
+import { sendMailForMissingStageSubmission } from "../util/mailer";
 
 // map assignments to jobs
 const scheduledJobs: Map<number, schedule.Job[]> = new Map<
