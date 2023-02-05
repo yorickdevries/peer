@@ -4,9 +4,9 @@ import Mail from "nodemailer/lib/mailer";
 import Assignment from "../models/Assignment";
 import config from "config";
 import { AssignmentState } from "../enum/AssignmentState";
-import moment from "moment";
+import moment, { Moment } from "moment";
 import Submission from "../models/Submission";
-import {EmailTemplate, templates} from "../enum/EmailTemplate";
+import { EmailTemplate, templates } from "../enum/EmailTemplate";
 import Course from "../models/Course";
 
 const mailConfig: {
@@ -69,6 +69,15 @@ const sendMailToTeachersOfAssignment = async function (
   await sendMailToAdmin(subject, text);
 };
 
+const shouldSendReminderMail = function (
+  date: Date,
+  runDate: Moment,
+  prevRunDate: Moment
+): boolean {
+  const dueDateMinusDay = moment(date).clone().subtract(1, "days");
+  return dueDateMinusDay.isBetween(prevRunDate, runDate, undefined, "[)");
+};
+
 const sendMailForMissingStageSubmission = async function (): Promise<void> {
   const assignments = await Assignment.find();
   //const curDate = new Date();
@@ -93,44 +102,96 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
       continue;
   */
     const today = moment();
-    const yesterday = today.clone().subtract(1, "days");
-    const runDate = today.clone().hour(1).minute(0).second(0).millisecond(0);
-    const prevRunDate = runDate.clone().subtract(1, "days");
+    const runDate = today.clone().startOf("day");
+    const prevRunDate = today.clone().subtract(1, "days").startOf("day");
 
     const course = await Course.findOneOrFail(assignment.courseId);
 
     switch (curState) {
       case AssignmentState.SUBMISSION: {
-        const dueDateMinusDay = moment(assignment.dueDate).subtract(1, "days");
-        if (dueDateMinusDay.isBetween(prevRunDate, runDate, undefined, "[)")) {
-          const groups = await assignment.getGroups();
-          for (const group of groups) {
-            if (!(await Submission.hasGroupMadeSubmission(group.id))) {
-              // send email to group members
-              const members = await group.getUsers();
-              for (const member of members) {
-                if (member.email === null || member.firstName === null) continue;
-                const { subject, text } = templates[
-                  EmailTemplate.NO_SUBMISSION_YET
-                ](
-                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  member.firstName,
-                  course.courseCode,
-                  assignment.name,
-                  assignment.dueDate.toString()
-                );
-                const message = await sendMessage(
-                  constructMessage(member.email, subject, text)
-                );
-              }
+        //Skip assignments that are outside the time window
+        if (!shouldSendReminderMail(assignment.dueDate, runDate, prevRunDate)) {
+          break;
+        }
+
+        const groups = await assignment.getGroups();
+        for (const group of groups) {
+          //Skip those who have already made a submission
+          if (await Submission.hasGroupMadeSubmission(group.id)) {
+            continue;
+          }
+
+          // send email to group members
+          const members = await group.getUsers();
+          for (const member of members) {
+            //Skip this user if required fields aren't present
+            if (member.email === null || member.firstName === null) {
+              continue;
             }
+
+            const { subject, text } = templates[
+              EmailTemplate.NO_SUBMISSION_YET
+            ](
+              member.firstName,
+              course.courseCode,
+              assignment.name,
+              assignment.dueDate.toString()
+            );
+
+            await sendMessage(constructMessage(member.email, subject, text));
+          }
+        }
+        break;
+      }
+      case AssignmentState.REVIEW: {
+        //Skip assignments that are outside the time window
+        if (
+          !shouldSendReminderMail(
+            assignment.reviewDueDate,
+            runDate,
+            prevRunDate
+          )
+        ) {
+          break;
+        }
+
+        const groups = await assignment.getGroups();
+        for (const group of groups) {
+          //Skip those who haven't made submissions (they won't have reviews to submit)
+          if (!(await Submission.hasGroupMadeSubmission(group.id))) {
+            continue;
+          }
+
+          // send email to group members
+          const members = await group.getUsers();
+          for (const member of members) {
+            //Skip this user if required fields aren't present
+            if (member.email === null || member.firstName === null) {
+              continue;
+            }
+
+            //Skip those who have completed all assigned reviews
+            if (
+              !(await assignment.hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
+                member
+              ))
+            ) {
+              continue;
+            }
+            const { subject, text } = templates[
+              EmailTemplate.NO_SUBMISSION_YET
+            ](
+              member.firstName,
+              course.courseCode,
+              assignment.name,
+              assignment.reviewDueDate.toString()
+            );
+            await sendMessage(constructMessage(member.email, subject, text));
           }
         }
         break;
       }
     }
-
-    console.log("hey");
   }
 };
 
