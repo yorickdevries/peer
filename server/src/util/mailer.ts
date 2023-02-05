@@ -10,6 +10,7 @@ import { EmailTemplate, templates } from "../enum/EmailTemplate";
 import Course from "../models/Course";
 import ReviewOfReview from "../models/ReviewOfReview";
 import { Any } from "typeorm";
+import User from "../models/User";
 
 const mailConfig: {
   host: string;
@@ -85,24 +86,6 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
   //const curDate = new Date();
   for (const assignment of assignments) {
     const curState = assignment.state;
-    /*
-    const curStateIndex = assignmentStateOrder.indexOf(curState);
-    const nextState =
-      curStateIndex + 1 < assignmentStateOrder.length
-        ? assignmentStateOrder[curStateIndex + 1]
-        : null;
-
-    //Skip assignment if in feedback period and no reviewEvaluations
-    if (nextState === null && !assignment.reviewEvaluation) continue;
-    //Skip assignments if in feedback period and reviewEvaluations but date has passed
-    if (
-      nextState === null &&
-      assignment.reviewEvaluation &&
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      assignment.reviewEvaluationDueDate! < curDate
-    )
-      continue;
-  */
     const today = moment();
     const runDate = today.clone().startOf("day");
     const prevRunDate = today.clone().subtract(1, "days").startOf("day");
@@ -128,6 +111,11 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
           for (const member of members) {
             //Skip this user if required fields aren't present
             if (member.email === null || member.firstName === null) {
+              continue;
+            }
+
+            //Skip this user if they don't want these emails
+            if (!member.preferences.stRemStageNotSubmitted) {
               continue;
             }
 
@@ -169,6 +157,11 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
           for (const member of members) {
             //Skip this user if required fields aren't present
             if (member.email === null || member.firstName === null) {
+              continue;
+            }
+
+            //Skip this user if they don't want these emails
+            if (!member.preferences.stRemStageNotSubmitted) {
               continue;
             }
 
@@ -237,6 +230,11 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
             //Send mail if no associated feedback review found and stop
             if (feedbackReview === undefined) {
               for (const member of membersWithDetails) {
+                //Skip if user disabled this type of email
+                if (!member.preferences.stRemStageNotSubmitted) {
+                  continue;
+                }
+
                 const { subject, text } = templates[
                   EmailTemplate.NO_EVALUATION_YET
                 ](
