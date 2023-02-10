@@ -1,14 +1,14 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToMany,
+  Entity,
   JoinTable,
-  RelationId,
+  ManyToMany,
   ManyToOne,
+  PrimaryGeneratedColumn,
+  RelationId,
   getManager,
 } from "typeorm";
-import { IsDefined, IsString, IsNotEmpty } from "class-validator";
+import { IsDefined, IsNotEmpty, IsString } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import Assignment from "./Assignment";

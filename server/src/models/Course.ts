@@ -1,16 +1,16 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
+  Entity,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import {
+  IsBoolean,
   IsDefined,
+  IsNotEmpty,
   IsOptional,
   IsString,
-  IsNotEmpty,
-  IsBoolean,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";

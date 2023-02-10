@@ -1,12 +1,12 @@
 import {
-  Entity,
-  PrimaryColumn,
-  ManyToOne,
   Column,
-  TableInheritance,
+  Entity,
+  ManyToOne,
+  PrimaryColumn,
   RelationId,
+  TableInheritance,
 } from "typeorm";
-import { IsString, IsNotEmpty, IsDefined } from "class-validator";
+import { IsDefined, IsNotEmpty, IsString } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
 import File from "./File";

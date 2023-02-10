@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { NextFunction, Request, Response } from "express";
 // library to make sure async errors are handled
 require("express-async-errors");
 import path from "path";

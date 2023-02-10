@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { IsDefined, IsString, IsNotEmpty, IsHash } from "class-validator";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { IsDefined, IsHash, IsNotEmpty, IsString } from "class-validator";
 import BaseModel from "./BaseModel";
 import path from "path";
 import config from "config";

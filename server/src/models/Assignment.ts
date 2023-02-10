@@ -1,24 +1,24 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  OneToOne,
-  ManyToOne,
-  ManyToMany,
+  Entity,
   JoinColumn,
+  ManyToMany,
+  ManyToOne,
   OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
   RelationId,
   getManager,
 } from "typeorm";
 import {
-  IsDefined,
-  IsOptional,
-  IsString,
-  IsNotEmpty,
   IsBoolean,
   IsDate,
-  IsUrl,
+  IsDefined,
   IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import Group from "./Group";
