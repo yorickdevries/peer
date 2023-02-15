@@ -163,19 +163,12 @@
                 <b-card-body>
                     <!-- Text-->
                     <h4>{{ question.text }}</h4>
-
-                    <!-- OPEN QUESTION -->
-                    <b-form-textarea
+                    <MarkdownEditorViewer
                         v-if="question.type === 'open'"
-                        placeholder="Enter your answer"
-                        :rows="10"
-                        :max-rows="15"
-                        v-model="answers[question.id].answer"
-                        @input=";(answers[question.id].changed = true), (questionIndex = index)"
-                        :readonly="!questionsCanBeChanged"
-                        required
+                        :answer-object="answers[question.id]"
+                        :displayeditor="questionsCanBeChanged"
+                        @shortcut-save="questionIndex = index"
                     />
-
                     <!-- MULTIPLE CHOICE QUESTION -->
                     <!--prettier-ignore-->
                     <b-form-radio-group
@@ -395,12 +388,13 @@ import api from "../../../api/api"
 import _ from "lodash"
 import notifications from "../../../mixins/notifications"
 import { StarRating } from "vue-rate-it"
-import Review from "./Review"
 import PDFViewer from "../../general/PDFViewer"
+import MarkdownEditorViewer from "../../general/MarkdownEditorViewer"
+import Review from "@/components/student-dashboard/assignment/Review"
 
 export default {
     mixins: [notifications],
-    components: { Review, StarRating, PDFViewer },
+    components: { Review, StarRating, PDFViewer, MarkdownEditorViewer },
     props: ["feedbackReviewId", "reviewsAreReadOnly", "assignmentType"],
     data() {
         return {
@@ -613,6 +607,7 @@ export default {
                 switch (question.type) {
                     case "open":
                         await api.openquestionanswers.delete(question.id, this.review.id)
+                        answer.answer = ""
                         break
                     case "multiplechoice":
                         await api.multiplechoicequestionanswers.delete(question.id, this.review.id)
@@ -633,6 +628,8 @@ export default {
                 // reset answer
                 if (question.type === "checkbox") {
                     answer.answer = []
+                } else if (question.type === "open") {
+                    answer.answer = ""
                 } else {
                     answer.answer = null
                 }
