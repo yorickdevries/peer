@@ -19,11 +19,12 @@ const templates = {
       
       Your group has not submitted anything for assignment: '${assignmentName}'
       
-      Please make sure to submit something before the due date: '${dueDate}'
-      
+      Don't forget to submit something before the deadline so that others can review your work.
+      Deadline: ${dueDate}
       You can access the website at: https://peer.ewi.tudelft.nl
       
-      - Peer`,
+      - Peer
+      (Don't want to receive these messages? Unsubscribe via the website under your profile settings)`,
     };
   },
   no_review_yet: (
@@ -38,11 +39,13 @@ const templates = {
       
       Review(s) have still not been completed for assignment: '${assignmentName}'
       
-      Please make sure to submit all reviews before the review due date: '${dueDate}'
+      Don't forget to submit your reviews before the deadline so that others can see what you thought of their work.
+      Deadline: ${dueDate}
       
       You can access the website at: https://peer.ewi.tudelft.nl
       
-      - Peer`,
+      - Peer
+      (Don't want to receive these messages? Unsubscribe via the website under your profile settings)`,
     };
   },
   no_evaluation_yet: (
@@ -57,11 +60,13 @@ const templates = {
       
       Evaluation(s) have still not been completed for assignment: '${assignmentName}'
       
-      Please make sure to evaluate all received reviews before the evaluation due date: '${dueDate}'
+      Don't forget to evaluate all reviews you received before the deadline so that other students can improve their reviews for the future.
+      Deadline: ${dueDate}
       
       You can access the website at: https://peer.ewi.tudelft.nl
       
-      - Peer`,
+      - Peer
+      (Don't want to receive these messages? Unsubscribe via the website under your profile settings)`,
     };
   },
   late_review_submission: (
@@ -79,7 +84,8 @@ const templates = {
       
       You can access the website at: https://peer.ewi.tudelft.nl
       
-      - Peer`,
+      - Peer
+      (Don't want to receive these messages? Unsubscribe via the website under your profile settings)`,
     };
   },
   late_evaluation_submission: (
@@ -97,7 +103,8 @@ const templates = {
       
       You can access the website at: https://peer.ewi.tudelft.nl
       
-      - Peer`,
+      - Peer
+      (Don't want to receive these messages? Unsubscribe via the website under your profile settings)`,
     };
   },
 };
