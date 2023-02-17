@@ -143,7 +143,6 @@ export default class User extends BaseModel {
     this.study = study!;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.organisationUnit = organisationUnit!;
-    this.preferences = new Preferences();
   }
 
   async validateOrReject(): Promise<void> {
