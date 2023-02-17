@@ -42,11 +42,24 @@
                             <template slot="button-content">
                                 <span class="p-3 align-middle">{{ user.displayName }}</span>
                             </template>
-                            <b-dropdown-item v-b-modal.userinfo-modal>Userinfo</b-dropdown-item>
+                            <b-dropdown-item v-b-modal.userinfo-modal>
+                                <icon icon="fa-solid fa-user" class="mr-2 align-middle"></icon
+                                ><span class="align-middle">User info</span>
+                            </b-dropdown-item>
                             <b-modal id="userinfo-modal" hide-header hide-footer>
                                 <UserInfo :user="user"></UserInfo>
                             </b-modal>
-                            <b-dropdown-item href="/api/logout">Sign-out</b-dropdown-item>
+                            <b-dropdown-item v-b-modal.settings-modal>
+                                <icon icon="fa-solid fa-gear" class="mr-2 align-middle"></icon
+                                ><span class="align-middle">Settings</span>
+                            </b-dropdown-item>
+                            <b-modal id="settings-modal" hide-header hide-footer>
+                                <Preferences :user="user"></Preferences>
+                            </b-modal>
+                            <b-dropdown-item href="/api/logout">
+                                <icon icon="fa-solid fa-right-from-bracket" class="mr-2 align-middle"></icon
+                                ><span class="align-middle">Sign out</span>
+                            </b-dropdown-item>
                         </b-nav-item-dropdown>
                     </b-navbar-nav>
 
@@ -76,10 +89,11 @@
 import api from "../api/api"
 import UserInfo from "./general/UserInfo"
 import * as Sentry from "@sentry/vue"
+import Preferences from "@/components/general/Preferences.vue"
 
 export default {
     props: ["links", "title", "role", "variant"],
-    components: { UserInfo },
+    components: { UserInfo, Preferences },
     data() {
         return {
             authenticated: null,
