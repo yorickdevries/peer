@@ -10,9 +10,9 @@ import { EmailTemplate, templates } from "../enum/EmailTemplate";
 import Course from "../models/Course";
 import ReviewOfReview from "../models/ReviewOfReview";
 import { Any } from "typeorm";
-import User from "../models/User";
 import AssignmentVersion from "../models/AssignmentVersion";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
+import Group from "../models/Group";
 
 const mailConfig: {
   host: string;
@@ -77,12 +77,11 @@ const sendMailToTeachersOfAssignment = async function (
 const sendMailForLateReview = async function (
   submission: Submission
 ): Promise<void> {
-  const user = await User.findOneOrFail(submission.userNetid);
-
-  //Skip if user doesn't have the required details
-  if (user.firstName === null || user.email === null) {
-    return;
-  }
+  const group = await Group.findOneOrFail(submission.groupId);
+  const members = await group.getUsers();
+  const membersWithDetails = members.filter(
+    (m) => m.email !== null && m.firstName !== null
+  );
 
   const assignmentVersion = await AssignmentVersion.findOneOrFail(
     submission.assignmentVersionId
@@ -92,14 +91,18 @@ const sendMailForLateReview = async function (
   );
   const course = await Course.findOneOrFail(assignment.courseId);
 
-  if (user.preferences.stRemLateSubmission) {
-    const { subject, text } = templates[EmailTemplate.LATE_REVIEW_SUBMISSION](
-      user.firstName,
-      course.courseCode,
-      assignment.name
-    );
+  for (const member of membersWithDetails) {
+    if (member.preferences.stRemLateSubmission) {
+      const { subject, text } = templates[EmailTemplate.LATE_REVIEW_SUBMISSION](
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        member.firstName!,
+        course.courseCode,
+        assignment.name
+      );
 
-    await sendMessage(constructMessage(user.email, subject, text));
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await sendMessage(constructMessage(member.email!, subject, text));
+    }
   }
 };
 
@@ -107,12 +110,10 @@ const sendMailForLateEvaluation = async function (
   reviewOfSubmissionId: number
 ): Promise<void> {
   const review = await ReviewOfSubmission.findOneOrFail(reviewOfSubmissionId);
-  const submission = await Submission.findOneOrFail(review.submission);
+  const reviewUser = review.reviewer;
+  const submission = review.submission;
 
-  const user = await User.findOneOrFail(submission.userNetid);
-
-  //Skip if user doesn't have the required details
-  if (user.firstName === null || user.email === null) {
+  if (reviewUser.email === null || reviewUser.firstName === null) {
     return;
   }
 
@@ -124,39 +125,36 @@ const sendMailForLateEvaluation = async function (
   );
   const course = await Course.findOneOrFail(assignment.courseId);
 
-  if (user.preferences.stRemLateSubmission) {
+  if (reviewUser.preferences.stRemLateSubmission) {
     const { subject, text } = templates[
       EmailTemplate.LATE_EVALUATION_SUBMISSION
-    ](user.firstName, course.courseCode, assignment.name);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    ](reviewUser.firstName!, course.courseCode, assignment.name);
 
-    await sendMessage(constructMessage(user.email, subject, text));
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    await sendMessage(constructMessage(reviewUser.email!, subject, text));
   }
 };
 
-const shouldSendReminderMail = function (
-  date: Date,
-  runDate: Moment,
-  prevRunDate: Moment
-): boolean {
+const shouldSendReminderMail = function (date: Date, runDate: Moment): boolean {
   const dueDateMinusDay = moment(date).clone().subtract(1, "days");
-  return dueDateMinusDay.isBetween(prevRunDate, runDate, undefined, "[)");
+  return dueDateMinusDay.isSame(runDate, "day");
+  //return dueDateMinusDay.isBetween(prevRunDate, runDate, undefined, "[)");
 };
 
 const sendMailForMissingStageSubmission = async function (): Promise<void> {
   const assignments = await Assignment.find();
-  //const curDate = new Date();
+  const today = moment();
+  const runDate = today.clone().startOf("day");
+  //const prevRunDate = today.clone().subtract(1, "days").startOf("day");
   for (const assignment of assignments) {
     const curState = assignment.state;
-    const today = moment();
-    const runDate = today.clone().startOf("day");
-    const prevRunDate = today.clone().subtract(1, "days").startOf("day");
-
     const course = await Course.findOneOrFail(assignment.courseId);
 
     switch (curState) {
       case AssignmentState.SUBMISSION: {
         //Skip assignments that are outside the time window
-        if (!shouldSendReminderMail(assignment.dueDate, runDate, prevRunDate)) {
+        if (!shouldSendReminderMail(assignment.dueDate, runDate)) {
           break;
         }
 
@@ -196,13 +194,7 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
       }
       case AssignmentState.REVIEW: {
         //Skip assignments that are outside the time window
-        if (
-          !shouldSendReminderMail(
-            assignment.reviewDueDate,
-            runDate,
-            prevRunDate
-          )
-        ) {
+        if (!shouldSendReminderMail(assignment.reviewDueDate, runDate)) {
           break;
         }
 
@@ -247,13 +239,7 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
       }
       case AssignmentState.FEEDBACK: {
         //Skip assignments that are outside the time window
-        if (
-          !shouldSendReminderMail(
-            assignment.reviewDueDate,
-            runDate,
-            prevRunDate
-          )
-        ) {
+        if (!shouldSendReminderMail(assignment.reviewDueDate, runDate)) {
           break;
         }
 
