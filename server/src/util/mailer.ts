@@ -9,7 +9,7 @@ import Submission from "../models/Submission";
 import { EmailTemplate, templates } from "../enum/EmailTemplate";
 import Course from "../models/Course";
 import ReviewOfReview from "../models/ReviewOfReview";
-import { Any } from "typeorm";
+import { getManager } from "typeorm";
 import AssignmentVersion from "../models/AssignmentVersion";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import Group from "../models/Group";
@@ -146,7 +146,6 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
   const assignments = await Assignment.find();
   const today = moment();
   const runDate = today.clone().startOf("day");
-  //const prevRunDate = today.clone().subtract(1, "days").startOf("day");
   for (const assignment of assignments) {
     const curState = assignment.state;
     const course = await Course.findOneOrFail(assignment.courseId);
@@ -238,13 +237,16 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
         break;
       }
       case AssignmentState.FEEDBACK: {
-        //Skip assignments that are outside the time window
-        if (!shouldSendReminderMail(assignment.reviewDueDate, runDate)) {
+        //Skip assignments with review feedback disabled
+        if (!assignment.reviewEvaluation) {
           break;
         }
 
-        //Skip assignments with review feedback disabled
-        if (!assignment.reviewEvaluation) {
+        //Skip assignments that are outside the time window
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        if (
+          !shouldSendReminderMail(assignment.reviewEvaluationDueDate!, runDate)
+        ) {
           break;
         }
 
@@ -257,9 +259,7 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
 
           // send email to group members
           const members = await group.getUsers();
-          const membersWithDetails = members.filter(
-            (m) => m.email !== null && m.firstName !== null
-          );
+          const memberNetIds = members.map((m) => m.netid);
 
           //Get all reviews that this group has received
           const reviews =
@@ -267,38 +267,52 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
 
           for (const review of reviews) {
             //Check if received review has an associated feedback review (made by the user(s) in question)
-            const feedbackReview = await ReviewOfReview.findOne({
-              where: {
-                reviewOfSubmissionId: review.id,
-                reviewer: Any(members),
-              },
-            });
+            const feedbackReview = await getManager()
+              .createQueryBuilder(ReviewOfReview, "review")
+              .where("review.reviewOfSubmission = :rid", { rid: review.id })
+              .andWhere("review.reviewer IN (:...reviewers)", {
+                reviewers: memberNetIds,
+              })
+              .getOne();
 
-            //Send mail if no associated feedback review found and stop
-            if (feedbackReview === undefined) {
-              for (const member of membersWithDetails) {
-                //Skip if user disabled this type of email
-                if (!member.preferences.stRemStageNotSubmitted) {
-                  continue;
-                }
-
-                const { subject, text } = templates[
-                  EmailTemplate.NO_EVALUATION_YET
-                ](
-                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  member.firstName!,
-                  course.courseCode,
-                  assignment.name,
-                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  assignment.reviewEvaluationDueDate!.toString()
-                );
-                await sendMessage(
-                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  constructMessage(member.email!, subject, text)
-                );
-              }
-              break;
+            //Skip if feedback review found
+            if (feedbackReview !== undefined) {
+              continue;
             }
+
+            for (const member of members) {
+              //Skip this user if required fields aren't present
+              if (member.email === null || member.firstName === null) {
+                continue;
+              }
+
+              //Skip if user disabled this type of email
+              if (!member.preferences.stRemStageNotSubmitted) {
+                continue;
+              }
+
+              //Skip those who haven't completed all their reviews and blockFeedback is enabled
+              if (
+                assignment.blockFeedback &&
+                (await assignment.hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
+                  member
+                ))
+              ) {
+                continue;
+              }
+
+              const { subject, text } = templates[
+                EmailTemplate.NO_EVALUATION_YET
+              ](
+                member.firstName,
+                course.courseCode,
+                assignment.name,
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                assignment.reviewEvaluationDueDate!.toString()
+              );
+              await sendMessage(constructMessage(member.email, subject, text));
+            }
+            break;
           }
         }
         break;
