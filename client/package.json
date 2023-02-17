@@ -16,6 +16,8 @@
     "@fortawesome/vue-fontawesome": "^2.0.9",
     "@sentry/tracing": "^7.30.0",
     "@sentry/vue": "^7.30.0",
+    "@toast-ui/editor": "^3.2.1",
+    "@toast-ui/vue-editor": "^3.2.2",
     "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-eslint": "^5.0.8",
     "@vue/cli-plugin-router": "^5.0.8",

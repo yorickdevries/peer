@@ -141,14 +141,10 @@
                                             <h4>{{ question.text }}</h4>
 
                                             <!-- OPEN QUESTION -->
-                                            <b-form-textarea
+                                            <MarkdownEditorViewer
                                                 v-if="question.type === 'open'"
-                                                placeholder="Enter your answer"
-                                                :rows="10"
-                                                :max-rows="15"
-                                                v-model="answers[question.id].answer"
-                                                readonly
-                                                required
+                                                :answer-object="answers[question.id]"
+                                                :displayeditor="false"
                                             />
 
                                             <!-- MULTIPLE CHOICE QUESTION -->
@@ -323,10 +319,12 @@ import { StarRating } from "vue-rate-it"
 import ReviewEvaluation from "../student-dashboard/assignment/ReviewEvaluation"
 import FileAnnotator from "../student-dashboard/assignment/FileAnnotator"
 import PDFViewer from "../general/PDFViewer"
+import "@toast-ui/editor/dist/toastui-editor-viewer.css"
+import MarkdownEditorViewer from "@/components/general/MarkdownEditorViewer"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, FileAnnotator, PDFViewer },
+    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, FileAnnotator, PDFViewer, MarkdownEditorViewer },
     data() {
         return {
             assignment: {},
