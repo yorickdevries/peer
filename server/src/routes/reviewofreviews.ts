@@ -11,7 +11,7 @@ import _ from "lodash";
 import ReviewOfReview from "../models/ReviewOfReview";
 import moment from "moment";
 import submitReview from "../util/submitReview";
-import { sendMailForLateEvaluation } from "../util/mailer";
+import { genMailForLateEvaluation, sendMessageBatch } from "../util/mailer";
 
 const router = express.Router();
 
@@ -129,7 +129,10 @@ router.patch(
       await review.reload();
 
       if (moment().isAfter(assignment.reviewEvaluationDueDate)) {
-        await sendMailForLateEvaluation(review.reviewOfSubmissionId);
+        const mailsToSend = await genMailForLateEvaluation(
+          review.reviewOfSubmissionId
+        );
+        await sendMessageBatch(mailsToSend);
       }
     } else {
       // just set the fields

@@ -26,7 +26,11 @@ const transporter = nodemailer.createTransport({
   port: mailConfig.port,
 });
 
-const constructMessage = function (to: string, subject: string, text: string) {
+const constructMessage = function (
+  to: string,
+  subject: string,
+  text: string
+): Mail.Options {
   return {
     from: mailConfig.from,
     to: to,
@@ -42,6 +46,12 @@ const sendMessage = async function (message: Mail.Options) {
     console.log(
       `Mail that will be sent in production: ${JSON.stringify(message)}`
     );
+  }
+};
+
+const sendMessageBatch = async function (messages: Mail.Options[]) {
+  for (const mail of messages) {
+    await sendMessage(mail);
   }
 };
 
@@ -75,13 +85,14 @@ const sendMailToTeachersOfAssignment = async function (
 };
 
 /**
- * Sends an email to group members of a submission that was reviewed late
+ * Generates an email to group members of a submission that was reviewed late
  *
  * @param submission the submission that was reviewed late
  */
-const sendMailForLateReview = async function (
+const genMailForLateReview = async function (
   submission: Submission
-): Promise<void> {
+): Promise<Mail.Options[]> {
+  const mailsToSend: Mail.Options[] = [];
   const group = await Group.findOneOrFail(submission.groupId);
   const members = await group.getUsers();
   const membersWithDetails = members.filter(
@@ -106,9 +117,11 @@ const sendMailForLateReview = async function (
       );
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await sendMessage(constructMessage(member.email!, subject, text));
+      mailsToSend.push(constructMessage(member.email!, subject, text));
     }
   }
+
+  return mailsToSend;
 };
 
 /**
@@ -116,15 +129,16 @@ const sendMailForLateReview = async function (
  *
  * @param reviewOfSubmissionId the ID of the submission review that was evaluated late
  */
-const sendMailForLateEvaluation = async function (
+const genMailForLateEvaluation = async function (
   reviewOfSubmissionId: number
-): Promise<void> {
+): Promise<Mail.Options[]> {
+  const mailsToSend: Mail.Options[] = [];
   const review = await ReviewOfSubmission.findOneOrFail(reviewOfSubmissionId);
   const reviewUser = review.reviewer;
   const submission = review.submission;
 
   if (reviewUser.email === null || reviewUser.firstName === null) {
-    return;
+    return mailsToSend;
   }
 
   const assignmentVersion = await AssignmentVersion.findOneOrFail(
@@ -142,8 +156,10 @@ const sendMailForLateEvaluation = async function (
     ](reviewUser.firstName!, course.courseCode, assignment.name);
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    await sendMessage(constructMessage(reviewUser.email!, subject, text));
+    mailsToSend.push(constructMessage(reviewUser.email!, subject, text));
   }
+
+  return mailsToSend;
 };
 
 /**
@@ -160,10 +176,13 @@ const shouldSendReminderMail = function (date: Date, runDate: Moment): boolean {
 };
 
 /**
- * Sends an email to group members of a submission / review / evaluation if it
+ * Generates an email to group members of a submission / review / evaluation if it
  * hasn't yet been submitted one day before the deadline
  */
-const sendMailForMissingStageSubmission = async function (): Promise<void> {
+const genMailForMissingStageSubmission = async function (): Promise<
+  Mail.Options[]
+> {
+  const mailsToSend: Mail.Options[] = [];
   const assignments = await Assignment.find();
   const today = moment();
   const runDate = today.clone().startOf("day");
@@ -208,7 +227,7 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
               assignment.dueDate.toString()
             );
 
-            await sendMessage(constructMessage(member.email, subject, text));
+            mailsToSend.push(constructMessage(member.email, subject, text));
           }
         }
         break;
@@ -255,7 +274,7 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
               assignment.name,
               assignment.reviewDueDate.toString()
             );
-            await sendMessage(constructMessage(member.email, subject, text));
+            mailsToSend.push(constructMessage(member.email, subject, text));
           }
         }
         break;
@@ -335,7 +354,7 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 assignment.reviewEvaluationDueDate!.toString()
               );
-              await sendMessage(constructMessage(member.email, subject, text));
+              mailsToSend.push(constructMessage(member.email, subject, text));
             }
             break;
           }
@@ -344,12 +363,14 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
       }
     }
   }
+  return mailsToSend;
 };
 
 export {
   sendMailToTeachersOfAssignment,
   sendMailToAdmin,
-  sendMailForMissingStageSubmission,
-  sendMailForLateReview,
-  sendMailForLateEvaluation,
+  genMailForMissingStageSubmission,
+  genMailForLateReview,
+  genMailForLateEvaluation,
+  sendMessageBatch,
 };

@@ -24,7 +24,7 @@ import {
 } from "../workers/pool";
 import submitReview from "../util/submitReview";
 import AssignmentVersion from "../models/AssignmentVersion";
-import { sendMailForLateReview } from "../util/mailer";
+import {genMailForLateReview, sendMessageBatch} from "../util/mailer";
 
 const router = express.Router();
 
@@ -467,7 +467,8 @@ router.patch(
       await review.reload();
 
       if (moment().isAfter(assignment.reviewDueDate)) {
-        await sendMailForLateReview(review.submission);
+        const mailsToSend = await genMailForLateReview(review.submission);
+        await sendMessageBatch(mailsToSend);
       }
     } else {
       // just set the fields

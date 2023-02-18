@@ -8,7 +8,10 @@ import {
   startDistributeReviewsForAssignmentWorker,
   startOpenFeedbackForAssignmentWorker,
 } from "../workers/pool";
-import { sendMailForMissingStageSubmission } from "../util/mailer";
+import {
+  genMailForMissingStageSubmission,
+  sendMessageBatch,
+} from "../util/mailer";
 
 // map assignments to jobs
 const scheduledJobs: Map<number, schedule.Job[]> = new Map<
@@ -96,14 +99,10 @@ const scheduleJobsForAssignment = function (assignment: Assignment): void {
 };
 
 const scheduleReminderJob = function (): void {
-  schedule.scheduleJob("7 1 * * *", () => {
-    sendMailForMissingStageSubmission()
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  schedule.scheduleJob("7 1 * * *", async () => {
+    const emailsToSend = await genMailForMissingStageSubmission();
+    await sendMessageBatch(emailsToSend);
   });
 };
 
