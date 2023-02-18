@@ -26,6 +26,12 @@ export default class SubmissionQuestionnaire extends Questionnaire {
     });
   }
 
+  /**
+   * Returns the list of submission reviews associated with the submission
+   *
+   * @param submission the submission to find reviews for
+   * @returns list of submission reviews
+   */
   async getReviewsWhereUserIsReviewed(
     submission: Submission
   ): Promise<Review[]> {

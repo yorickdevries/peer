@@ -18,7 +18,7 @@ interface SentPref {
 const Preferences: Pref[] = [
   {
     name: "stRemStageNotSubmitted",
-    desc: "Enable Deadline Warnings Emails",
+    desc: "Enable Deadline Warning Emails",
     explanation:
       "Sends reminder emails one day before a deadline if a submission/review/evaluation has not been submitted.",
   },

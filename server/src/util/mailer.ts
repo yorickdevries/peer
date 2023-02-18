@@ -74,6 +74,11 @@ const sendMailToTeachersOfAssignment = async function (
   await sendMailToAdmin(subject, text);
 };
 
+/**
+ * Sends an email to group members of a submission that was reviewed late
+ *
+ * @param submission the submission that was reviewed late
+ */
 const sendMailForLateReview = async function (
   submission: Submission
 ): Promise<void> {
@@ -106,6 +111,11 @@ const sendMailForLateReview = async function (
   }
 };
 
+/**
+ * Sends an email to group members of a review that was evaluated late
+ *
+ * @param reviewOfSubmissionId the ID of the submission review that was evaluated late
+ */
 const sendMailForLateEvaluation = async function (
   reviewOfSubmissionId: number
 ): Promise<void> {
@@ -136,12 +146,23 @@ const sendMailForLateEvaluation = async function (
   }
 };
 
+/**
+ * Checks whether a reminder mail should be sent (if the deadline is tomorrow)
+ *
+ * @param runDate the current date
+ * @param date the deadline
+ * @returns whether a reminder email should be sent
+ */
 const shouldSendReminderMail = function (date: Date, runDate: Moment): boolean {
   const dueDateMinusDay = moment(date).clone().subtract(1, "days");
   return dueDateMinusDay.isSame(runDate, "day");
   //return dueDateMinusDay.isBetween(prevRunDate, runDate, undefined, "[)");
 };
 
+/**
+ * Sends an email to group members of a submission / review / evaluation if it
+ * hasn't yet been submitted one day before the deadline
+ */
 const sendMailForMissingStageSubmission = async function (): Promise<void> {
   const assignments = await Assignment.find();
   const today = moment();
@@ -177,6 +198,7 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
               continue;
             }
 
+            //Construct and send message
             const { subject, text } = templates[
               EmailTemplate.NO_SUBMISSION_YET
             ](
@@ -225,6 +247,8 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
             ) {
               continue;
             }
+
+            //Construct and send message
             const { subject, text } = templates[EmailTemplate.NO_REVIEW_YET](
               member.firstName,
               course.courseCode,
@@ -301,6 +325,7 @@ const sendMailForMissingStageSubmission = async function (): Promise<void> {
                 continue;
               }
 
+              //Construct and send message
               const { subject, text } = templates[
                 EmailTemplate.NO_EVALUATION_YET
               ](

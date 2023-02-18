@@ -216,6 +216,12 @@ export default class Submission extends BaseModel {
     return await assignmentVersion.isTeacherInCourse(user);
   }
 
+  /**
+   * Returns a boolean indicating whether a group has made a submission
+   *
+   * @param groupId the group id
+   * @returns whether the group has made a submission
+   */
   static async hasGroupMadeSubmission(groupId: number): Promise<boolean> {
     const group = await getManager()
       .createQueryBuilder(Submission, "submission")

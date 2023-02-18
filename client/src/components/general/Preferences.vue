@@ -1,7 +1,7 @@
 <template>
     <b-card header="Settings">
-        <div class="inline-parent" v-for="(pref, index) in this.preferences" :key="index">
-            <b-badge v-b-tooltip.hover :title="pref.explanation" class="mr-1" variant="primary">?</b-badge>
+        <div class="inline-parent mb-2" v-for="(pref, index) in this.preferences" :key="index">
+            <b-badge v-b-tooltip.hover :title="pref.explanation" class="mr-2" variant="dark">?</b-badge>
             <b-form-checkbox :disabled="loading" v-model="pref.value">
                 {{ pref.desc }}
             </b-form-checkbox>
@@ -12,8 +12,10 @@
 </template>
 
 <style>
-.inline-parent > * {
-    display: inline-block;
+.inline-parent {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 </style>
 

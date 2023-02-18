@@ -335,17 +335,6 @@ export default class Assignment extends BaseModel {
     return groups;
   }
 
-  async getAllStudentEmails(): Promise<string[]> {
-    return await getManager()
-      .createQueryBuilder(Group, "group")
-      .leftJoin("group.assignments", "assignment")
-      .where("assignment.id = :id", { id: this.id })
-      .leftJoin("group.users", "user")
-      .andWhere("user.email IS NOT NULL")
-      .select("user.email")
-      .getRawMany();
-  }
-
   async getGroup(user: User): Promise<Group | undefined> {
     const group = await getManager()
       .createQueryBuilder(Group, "group")
@@ -422,21 +411,12 @@ export default class Assignment extends BaseModel {
     return false;
   }
 
-  async getSubmittedReviewsWhereUserIsReviewer(user: User): Promise<Review[]> {
-    const reviews: Review[] = [];
-    for (const assignmentVersion of this.versions) {
-      const submissionQuestionnaire =
-        await assignmentVersion.getSubmissionQuestionnaire();
-      if (submissionQuestionnaire) {
-        const newReviews = (
-          await submissionQuestionnaire.getReviewsWhereUserIsReviewer(user)
-        ).filter((r) => r.submitted);
-        reviews.push(...newReviews);
-      }
-    }
-    return reviews;
-  }
-
+  /**
+   * Returns the list of submitted reviews that reviewed this group/user
+   *
+   * @param group the group of the user(s) that were reviewed
+   * @returns the list of reviews
+   */
   async getSubmittedReviewsWhereUserIsReviewed(
     group: Group
   ): Promise<Review[]> {
