@@ -1,29 +1,13 @@
 <template>
     <b-card header="Settings">
-        <div class="inline-parent">
-            <b-badge
-                v-b-tooltip.hover
-                :title="preferences.stRemLateSubmission.explanation"
-                class="mr-1"
-                variant="primary"
-                >?</b-badge
-            >
-            <b-form-checkbox :disabled="loading" v-model="preferences.stRemLateSubmission.value">
-                Enable Deadline Warnings Emails
+        <div class="inline-parent" v-for="(pref, index) in this.preferences" :key="index">
+            <b-badge v-b-tooltip.hover :title="pref.explanation" class="mr-1" variant="primary">?</b-badge>
+            <b-form-checkbox :disabled="loading" v-model="pref.value">
+                {{ pref.desc }}
             </b-form-checkbox>
         </div>
-        <div class="inline-parent">
-            <b-badge
-                v-b-tooltip.hover
-                :title="preferences.stRemStageNotSubmitted.explanation"
-                class="mr-1"
-                variant="primary"
-                >?</b-badge
-            >
-            <b-form-checkbox :disabled="loading" v-model="preferences.stRemStageNotSubmitted.value">
-                Enable Late Review/Evaluation Emails
-            </b-form-checkbox>
-        </div>
+        <br />
+        <b-button @click="save" size="sm">Save</b-button>
     </b-card>
 </template>
 
@@ -35,23 +19,14 @@
 
 <script>
 import api from "../../api/api"
+import notifications from "../../mixins/notifications"
 
 export default {
-    props: ["user"],
+    mixins: [notifications],
+    props: ["modalId"],
     data() {
         return {
-            preferences: {
-                stRemStageNotSubmitted: {
-                    value: null,
-                    explanation:
-                        "Sends reminder emails one day before a deadline if a submission/review/evaluation has not been submitted.",
-                },
-                stRemLateSubmission: {
-                    value: null,
-                    explanation:
-                        "Sends an email whenever someone submits a review/evaluation after the deadline for your submission",
-                },
-            },
+            preferences: {},
             loading: true,
         }
     },
@@ -60,15 +35,35 @@ export default {
         await this.fetchData()
     },
     methods: {
+        async save() {
+            const payload = []
+            for (const [k, v] of Object.entries(this.preferences)) {
+                payload.push({
+                    name: k,
+                    value: v.value,
+                })
+            }
+            await api.preferences.post(payload)
+            this.showSuccessMessage({ message: "Preferences saved" })
+            this.$bvModal.hide(this.modalId)
+        },
         async fetchData() {
             let res = await api.preferences.get()
-            delete res.data["createdAt"]
-            delete res.data["updatedAt"]
-            delete res.data["id"]
+            delete res.data.user["createdAt"]
+            delete res.data.user["updatedAt"]
+            delete res.data.user["id"]
 
-            for (const [name, newValue] of Object.entries(res.data)) {
-                this.preferences[name].value = newValue
+            const newPreferences = {}
+
+            for (const elem of res.data.base) {
+                const prefName = elem.name
+                newPreferences[prefName] = {}
+                newPreferences[prefName].value = res.data.user[prefName]
+                newPreferences[prefName].explanation = elem.explanation
+                newPreferences[prefName].desc = elem.desc
             }
+
+            this.preferences = newPreferences
 
             this.loading = false
         },

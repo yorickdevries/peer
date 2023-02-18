@@ -54,7 +54,7 @@
                                 ><span class="align-middle">Settings</span>
                             </b-dropdown-item>
                             <b-modal id="settings-modal" hide-header hide-footer>
-                                <Preferences :user="user"></Preferences>
+                                <Preferences modalId="settings-modal"></Preferences>
                             </b-modal>
                             <b-dropdown-item href="/api/logout">
                                 <icon icon="fa-solid fa-right-from-bracket" class="mr-2 align-middle"></icon
