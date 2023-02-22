@@ -13,7 +13,7 @@
             >
             <b-card no-body>
                 <b-tabs card>
-                    <b-tab v-for="(review, index) in reviews" :key="review.id" ref="items">
+                    <b-tab v-for="(review, index) in reviews" :key="review.id">
                         <template slot="title">
                             <div class="d-flex align-items-center">
                                 <b-badge variant="warning" class="mr-2">Review #{{ index + 1 }}</b-badge>
@@ -22,7 +22,7 @@
                             </div>
                         </template>
                         <Review
-                            ref="ar"
+                            :ref="'review-' + index"
                             :reviewId="review.id"
                             @reviewChanged="fetchReviews"
                             :reviewsAreReadOnly="!isReviewActive"
@@ -60,7 +60,6 @@ export default {
     beforeRouteLeave(to, from, next) {
         // If the form is dirty and the user did not confirm leave,
         // prevent losing unsaved changes by canceling navigation
-        console.log(this.$refs.ar[0].numberOfUnsavedQuestions())
         if (this.confirmStayInDirtyForm()) {
             next(false)
         } else {
@@ -80,11 +79,16 @@ export default {
         confirmLeave() {
             return window.confirm("Do you really want to leave? you have unsaved changes!")
         },
-        numberOfUnsavedAnswers() {
-            return this.$refs.ar[0].numberOfUnsavedQuestions()
+        isFormDirty() {
+            for (let i = 0; i < this.reviews.length; i++) {
+                if (this.$refs[`review-${i}`][0].numberOfUnsavedQuestions() !== 0) {
+                    return true
+                }
+            }
+            return false
         },
         confirmStayInDirtyForm() {
-            return this.numberOfUnsavedAnswers() !== 0 && !this.confirmLeave()
+            return this.isFormDirty() && !this.confirmLeave()
         },
 
         beforeWindowUnload(e) {
