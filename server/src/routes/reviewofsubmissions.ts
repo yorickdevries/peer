@@ -24,7 +24,7 @@ import {
 } from "../workers/pool";
 import submitReview from "../util/submitReview";
 import AssignmentVersion from "../models/AssignmentVersion";
-import {genMailForLateReview, sendMessageBatch} from "../util/mailer";
+import { genMailForLateReview, sendMessageBatch } from "../util/mailer";
 
 const router = express.Router();
 
