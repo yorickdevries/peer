@@ -411,6 +411,7 @@ export default {
             keys: { Enter: false, ControlLeft: false, ControlRight: false },
             // Index of currently active question
             questionIndex: null,
+            numberOfUnsaved: 0,
         }
     },
     computed: {
@@ -427,6 +428,8 @@ export default {
                 }
             }
             questionNumbersOfUnsavedAnswers.sort()
+            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+            this.numberOfUnsaved = questionNumbersOfUnsavedAnswers.length
             return questionNumbersOfUnsavedAnswers
         },
         questionNumbersOfUnansweredNonOptionalQuestions() {
@@ -465,6 +468,9 @@ export default {
         window.removeEventListener("keyup", this.keyUp)
     },
     methods: {
+        numberOfUnsavedQuestions() {
+            return this.numberOfUnsaved
+        },
         keyDown(e) {
             this.keys[e.code] = true
             if (this.keys["Enter"] && (this.keys["ControlLeft"] || this.keys["ControlRight"])) {
