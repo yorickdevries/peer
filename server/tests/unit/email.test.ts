@@ -5,7 +5,6 @@ import createDatabaseConnection from "../../src/databaseConnection";
 import Assignment from "../../src/models/Assignment";
 import moment from "moment";
 import { genMailForMissingStageSubmission } from "../../src/util/mailer";
-//import Mail from "nodemailer/lib/mailer";
 import User from "../../src/models/User";
 
 async function shiftDueDates(assignments: Assignment[], shift: number) {
@@ -31,7 +30,6 @@ async function shiftDueDates(assignments: Assignment[], shift: number) {
 }
 
 describe("Email notifications", () => {
-  // will be initialized and closed in beforeAll / afterAll
   let connection: Connection;
   jest.setTimeout(600000);
 
@@ -55,7 +53,6 @@ describe("Email notifications", () => {
   let group_feedback: Assignment;
 
   beforeAll(async (done) => {
-    // For the in memory test database, the schema is automatically dropped upon connect
     connection = await createDatabaseConnection();
 
     const options: ConfigureOption = {
@@ -213,8 +210,7 @@ describe("Email notifications", () => {
 
     await shiftDueDates([group_review, student_review], 1);
 
-    //Test evaluations (35,36,34,37
-    // group (30,31,,28,29,,32,33,,34,35
+    //Test evaluations
 
     let expectedEvaluations = [
       {
