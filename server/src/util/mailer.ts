@@ -172,7 +172,6 @@ const genMailForLateEvaluation = async function (
 const shouldSendReminderMail = function (date: Date, runDate: Moment): boolean {
   const dueDateMinusDay = moment(date).clone().subtract(1, "days");
   return dueDateMinusDay.isSame(runDate, "day");
-  //return dueDateMinusDay.isBetween(prevRunDate, runDate, undefined, "[)");
 };
 
 /**

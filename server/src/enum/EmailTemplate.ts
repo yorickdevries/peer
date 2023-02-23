@@ -17,7 +17,7 @@ const templates = {
       subject: `Missing submission in course: '${courseCode}'`,
       text: `${studentName},
       
-      Your group has not submitted anything for assignment: '${assignmentName}'
+      Nothing has been submitted for assignment: '${assignmentName}'
       
       Don't forget to submit something before the deadline so that others can review your work.
       Deadline: ${dueDate}

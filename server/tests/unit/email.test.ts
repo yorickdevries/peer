@@ -162,6 +162,7 @@ describe("Email notifications", () => {
     await shiftDueDates([group_submission, student_submission], 2);
 
     let emails = await genMailForMissingStageSubmission();
+    expect(emails.length).toEqual(6);
     expect(emails).toEqual(expect.arrayContaining(expectedSubmissions));
 
     await shiftDueDates([group_submission, student_submission], 3);
@@ -206,6 +207,7 @@ describe("Email notifications", () => {
     await shiftDueDates([group_review, student_review], 0);
 
     emails = await genMailForMissingStageSubmission();
+    expect(emails.length).toEqual(6);
     expect(emails).toEqual(expect.arrayContaining(expectedReviews));
 
     await shiftDueDates([group_review, student_review], 1);
@@ -252,6 +254,7 @@ describe("Email notifications", () => {
     await shiftDueDates([group_feedback, student_feedback], -1);
 
     emails = await genMailForMissingStageSubmission();
+    expect(emails.length).toEqual(6);
     expect(emails).toEqual(expect.arrayContaining(expectedEvaluations));
 
     await shiftDueDates([group_feedback, student_feedback], 0);
