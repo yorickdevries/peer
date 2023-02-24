@@ -137,7 +137,7 @@ async function generateQuestionnaireQuestions(questionnaire: Questionnaire) {
   await createRangeQuestion({
     number: 2,
     questionnaire: questionnaire,
-    optional: true,
+    optional: false,
   });
 }
 
@@ -238,11 +238,14 @@ export default class InitialDatabaseSeed implements Seeder {
     //Generate users
     const students: User[] = await Promise.all(
       [...Array(40)].map(async () => {
+        const netid = studentUsernames.pop();
         return await createUser({
           organisationUnit: org,
           study,
           affiliation: studentAffiliation,
-          netid: studentUsernames.pop(),
+          netid: netid,
+          firstName: netid,
+          email: `${netid}@tudelft.nl`,
         });
       })
     );
