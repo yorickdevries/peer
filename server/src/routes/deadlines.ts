@@ -1,5 +1,4 @@
 import { createQueryBuilder } from "typeorm";
-import HttpStatusCode from "../enum/HttpStatusCode";
 
 import express from "express";
 const router = express.Router();
@@ -9,12 +8,21 @@ router.get("/assignment", async (_req, res) => {
   const currDate: Date = new Date();
   //reviews
   const dueDates = await createQueryBuilder("Assignment", "assignment")
+    .select([
+      "assignment.name",
+      "assignment.publishDate",
+      "assignment.dueDate",
+      "assignment.reviewPublishDate",
+      "assignment.reviewDueDate",
+      "assignment.reviewEvaluationDueDate",
+      "assignment.reviewEvaluation",
+    ])
     .where(
       "assignment.reviewDueDate >= :cd OR (assignment.reviewEvaluation = 1 AND assignment.reviewEvaluationDueDate >= :cd)",
       { cd: currDate }
     )
     .getMany();
-  res.status(HttpStatusCode.OK).send(dueDates);
+  res.send(dueDates);
   return;
 });
 

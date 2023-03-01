@@ -1,7 +1,7 @@
 <template>
     <b-container>
         <!--Header-->
-        <BreadcrumbTitle :items="['Assignment Due Dates']" class="mt-3"></BreadcrumbTitle>
+        <BreadcrumbTitle :items="['Calendar']" class="mt-3"></BreadcrumbTitle>
         <FullCalendar :options="calendarOptions"></FullCalendar>
     </b-container>
 </template>
