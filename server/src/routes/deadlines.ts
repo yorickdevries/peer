@@ -4,12 +4,12 @@ import express from "express";
 const router = express.Router();
 
 router.get("/assignment", async (_req, res) => {
-  //This route could possibly be used to show students an overview of their assignments so no admin check
   const currDate: Date = new Date();
   //reviews
   const dueDates = await createQueryBuilder("Assignment", "assignment")
+    .leftJoin("assignment.course", "course")
     .select([
-      "assignment.name",
+      "course.courseCode",
       "assignment.publishDate",
       "assignment.dueDate",
       "assignment.reviewPublishDate",
@@ -23,7 +23,6 @@ router.get("/assignment", async (_req, res) => {
     )
     .getMany();
   res.send(dueDates);
-  return;
 });
 
 export default router;

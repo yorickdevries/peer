@@ -43,20 +43,20 @@ export default {
             const res = await api.deadlines.getDeadlines()
             for (let i = 0; i < res.data.length; i++) {
                 this.calendarOptions.events.push({
-                    title: `${res.data[i].name} SUBMISSION`,
+                    title: `${res.data[i].course.courseCode} SUBMISSION`,
                     start: res.data[i].publishDate,
                     end: res.data[i].dueDate,
                     color: "#378006",
                 })
                 this.calendarOptions.events.push({
-                    title: `${res.data[i].name} REVIEW`,
+                    title: `${res.data[i].course.courseCode} REVIEW`,
                     start: res.data[i].reviewPublishDate,
                     end: res.data[i].reviewDueDate,
                     color: "#DB4437",
                 })
                 if (res.data[i].reviewEvaluation === true && res.data[i].reviewEvaluationDueDate !== null) {
                     this.calendarOptions.events.push({
-                        title: `${res.data[i].name} EVALUATION`,
+                        title: `${res.data[i].course.courseCode} EVALUATION`,
                         start: res.data[i].reviewDueDate,
                         end: res.data[i].reviewEvaluationDueDate,
                     })
