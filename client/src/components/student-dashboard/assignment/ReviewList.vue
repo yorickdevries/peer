@@ -77,7 +77,7 @@ export default {
     },
     methods: {
         confirmLeave() {
-            return window.confirm("Do you really want to leave? you have unsaved changes!")
+            return window.confirm("Do you really want to leave? You still have unsaved changes.")
         },
         isFormDirty() {
             for (let i = 0; i < this.reviews.length; i++) {
