@@ -374,6 +374,7 @@
 #slideout-btn {
     position: fixed;
     transform: rotate(-90deg);
+    bottom: calc(50% - 40px);
     right: -100px;
     height: 80px;
     width: 200px;

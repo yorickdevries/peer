@@ -390,10 +390,11 @@ import notifications from "../../../mixins/notifications"
 import { StarRating } from "vue-rate-it"
 import PDFViewer from "../../general/PDFViewer"
 import MarkdownEditorViewer from "../../general/MarkdownEditorViewer"
-import Review from "@/components/student-dashboard/assignment/Review"
+import Review from "./Review.vue"
 
 export default {
     mixins: [notifications],
+    name: "ReviewEvaluation",
     components: { Review, StarRating, PDFViewer, MarkdownEditorViewer },
     props: ["feedbackReviewId", "reviewsAreReadOnly", "assignmentType"],
     data() {
