@@ -394,7 +394,7 @@ export default {
         async fetchReviewEvaluation() {
             // Retrieve the review evaluation.
             try {
-                const res = await api.reviewofsubmissions.getEvaluation(this.$route.params.reviewId)
+                const res = await api.reviewofsubmissions.getEvaluation(this.$route.params.reviewId, true)
                 this.reviewEvaluation = res.data
             } catch (error) {
                 this.reviewEvaluation = null
