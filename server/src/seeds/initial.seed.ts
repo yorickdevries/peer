@@ -238,14 +238,11 @@ export default class InitialDatabaseSeed implements Seeder {
     //Generate users
     const students: User[] = await Promise.all(
       [...Array(40)].map(async () => {
-        const netid = studentUsernames.pop();
         return await createUser({
           organisationUnit: org,
           study,
           affiliation: studentAffiliation,
-          netid: netid,
-          firstName: netid,
-          email: `${netid}@tudelft.nl`,
+          netid: studentUsernames.pop(),
         });
       })
     );
