@@ -464,14 +464,6 @@ export default {
     async created() {
         window.addEventListener("keydown", this.keyDown)
         window.addEventListener("keyup", this.keyUp)
-        window.addEventListener("beforeunload", function (e) {
-            if (this.confirmStayInDirtyForm()) {
-                // Cancel the event
-                e.preventDefault()
-                // Chrome requires returnValue to be set
-                e.returnValue = ""
-            }
-        })
         await this.fetchData()
     },
     destroyed() {
