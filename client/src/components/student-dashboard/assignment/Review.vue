@@ -404,10 +404,12 @@ export default {
             keys: { Enter: false, ControlLeft: false, ControlRight: false },
             // Index of currently active question
             questionIndex: null,
-            numberOfUnsaved: 0,
         }
     },
     computed: {
+        numberOfUnsaved() {
+            return Object.keys(this.answers).filter((key) => this.answers[key].changed).length
+        },
         columnWidthFileAndQuestionnaire() {
             if (this.viewFileNextToQuestionnaire) {
                 // columns are half width
@@ -430,8 +432,6 @@ export default {
                 }
             }
             questionNumbersOfUnsavedAnswers.sort()
-            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-            this.numberOfUnsaved = questionNumbersOfUnsavedAnswers.length
             return questionNumbersOfUnsavedAnswers
         },
         questionNumbersOfUnansweredNonOptionalQuestions() {
