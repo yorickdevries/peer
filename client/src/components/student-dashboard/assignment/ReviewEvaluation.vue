@@ -411,7 +411,6 @@ export default {
             keys: { Enter: false, ControlLeft: false, ControlRight: false },
             // Index of currently active question
             questionIndex: null,
-            numberOfUnsaved: 0,
         }
     },
     computed: {
@@ -428,9 +427,10 @@ export default {
                 }
             }
             questionNumbersOfUnsavedAnswers.sort()
-            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-            this.numberOfUnsaved = questionNumbersOfUnsavedAnswers.length
             return questionNumbersOfUnsavedAnswers
+        },
+        numberOfUnsaved() {
+            return this.questionNumbersOfUnsavedAnswers.length
         },
         questionNumbersOfUnansweredNonOptionalQuestions() {
             const questionNumbersOfUnansweredNonOptionalQuestions = []
