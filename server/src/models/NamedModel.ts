@@ -1,5 +1,5 @@
-import { PrimaryGeneratedColumn, Column } from "typeorm";
-import { IsString, IsNotEmpty, IsDefined } from "class-validator";
+import { Column, PrimaryGeneratedColumn } from "typeorm";
+import { IsDefined, IsNotEmpty, IsString } from "class-validator";
 import BaseModel from "./BaseModel";
 
 // This class is extended by other named models like Affiliation, Study and OrganisationUnit

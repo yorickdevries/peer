@@ -1,4 +1,4 @@
-import { ChildEntity, ManyToMany, JoinTable } from "typeorm";
+import { ChildEntity, JoinTable, ManyToMany } from "typeorm";
 import QuestionAnswerType from "../enum/QuestionAnswerType";
 import QuestionAnswer from "./QuestionAnswer";
 import Review from "./Review";

@@ -3,9 +3,9 @@ import Joi from "@hapi/joi";
 import Assignment from "../models/Assignment";
 import { AssignmentState } from "../enum/AssignmentState";
 import {
+  idSchema,
   validateBody,
   validateParams,
-  idSchema,
   validateQuery,
 } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";

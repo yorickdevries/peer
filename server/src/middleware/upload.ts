@@ -1,5 +1,5 @@
 import path from "path";
-import { Request, Response, NextFunction, RequestHandler } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import multer from "multer";
 import HttpStatusCode from "../enum/HttpStatusCode";
 

@@ -1,9 +1,9 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import {
-  validateParams,
   idSchema,
   validateBody,
+  validateParams,
 } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ResponseMessage from "../enum/ResponseMessage";

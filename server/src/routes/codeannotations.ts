@@ -2,10 +2,10 @@ import express from "express";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import CodeAnnotation from "../models/CodeAnnotation";
 import {
-  validateQuery,
-  validateBody,
   idSchema,
+  validateBody,
   validateParams,
+  validateQuery,
 } from "../middleware/validation";
 import config from "config";
 import Joi from "@hapi/joi";

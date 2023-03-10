@@ -30,6 +30,7 @@ import assignmentexports from "./assignmentexports"
 import codeannotations from "./codeannotations"
 import statistics from "./statistics"
 import banners from "./banners"
+import deadlines from "@/api/deadlines"
 
 export default {
     getAuthenticated: () => {
@@ -68,4 +69,5 @@ export default {
     codeannotations: codeannotations,
     statistics: statistics,
     banners: banners,
+    deadlines: deadlines,
 }

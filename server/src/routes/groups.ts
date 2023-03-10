@@ -1,10 +1,10 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import {
-  validateBody,
-  validateQuery,
-  validateParams,
   idSchema,
+  validateBody,
+  validateParams,
+  validateQuery,
 } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";

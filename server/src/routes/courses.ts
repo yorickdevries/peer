@@ -9,9 +9,9 @@ import AcademicYear from "../models/AcademicYear";
 import Enrollment from "../models/Enrollment";
 import UserRole from "../enum/UserRole";
 import {
+  idSchema,
   validateBody,
   validateParams,
-  idSchema,
 } from "../middleware/validation";
 import _ from "lodash";
 import ResponseMessage from "../enum/ResponseMessage";

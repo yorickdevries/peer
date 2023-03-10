@@ -1,10 +1,10 @@
 import {
   Column,
   Entity,
-  TableInheritance,
+  ManyToOne,
   PrimaryColumn,
   RelationId,
-  ManyToOne,
+  TableInheritance,
 } from "typeorm";
 import BaseModel from "./BaseModel";
 import QuestionAnswerType from "../enum/QuestionAnswerType";

@@ -1,5 +1,5 @@
-import { Entity, Column } from "typeorm";
-import { IsDefined, IsString, IsNotEmpty } from "class-validator";
+import { Column, Entity } from "typeorm";
+import { IsDefined, IsNotEmpty, IsString } from "class-validator";
 import NamedModel from "./NamedModel";
 
 @Entity()
