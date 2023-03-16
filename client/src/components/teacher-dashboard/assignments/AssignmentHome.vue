@@ -133,6 +133,22 @@
                                     </li>
                                 </ul>
                             </b-modal>
+                            <b-button
+                                v-b-modal="`revertState${assignment.id}`"
+                                :disabled="disableButton"
+                                class="mb-3"
+                                variant="primary"
+                                size="sm"
+                                >Revert current stage
+                            </b-button>
+                            <b-modal
+                                :id="`revertState${assignment.id}`"
+                                @ok="revertState"
+                                title="Confirmation"
+                                centered
+                            >
+                                Are you sure you want to revert state to Submission?
+                            </b-modal>
                         </div>
 
                         <!--Open feedback-->
@@ -262,6 +278,13 @@ export default {
             await api.reviewofsubmissions.openFeedback(this.$route.params.assignmentId)
             this.showSuccessMessage()
             this.showOpenFeedbackAlert = true
+        },
+        async revertState() {
+            this.disableButton = true
+            await api.reviewofsubmissions.revertState(this.$route.params.assignmentId)
+            this.showSuccessMessage()
+            this.disableButton = false
+            await this.fetchAssignment()
         },
     },
 }

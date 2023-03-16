@@ -667,6 +667,33 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   res.send(anonymousReview);
 });
 
+router.post("/revert", validateQuery(assignmentIdSchema), async (req, res) => {
+  const user = req.user!;
+  const assignmentId: number = req.query.assignmentId as any;
+  console.log("JSKDFJSLDJFLKSDJFLSDFJK");
+
+  const assignment = await Assignment.findOne(assignmentId);
+  if (!assignment) {
+    res
+      .status(HttpStatusCode.BAD_REQUEST)
+      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+    return;
+  }
+  if (
+    // not a teacher
+    !(await assignment.isTeacherInCourse(user))
+  ) {
+    res
+      .status(HttpStatusCode.FORBIDDEN)
+      .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+    return;
+  }
+  assignment.revertState();
+  await assignment.save();
+  console.log(assignment.state)
+  res.send();
+});
+
 // distribute the reviews for an assignment
 router.post(
   "/distribute",

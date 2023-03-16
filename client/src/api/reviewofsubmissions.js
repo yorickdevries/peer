@@ -48,4 +48,8 @@ export default {
         const params = { assignmentVersionId, exportType }
         return client.post("reviewofsubmissions/exportgrades", null, { params: params })
     },
+    revertState(assignmentId) {
+        const params = { assignmentId }
+        return client.post("reviewofsubmissions/revert", null, { params: params })
+    }
 }
