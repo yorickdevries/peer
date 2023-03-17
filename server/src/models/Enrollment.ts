@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, RelationId } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryColumn, RelationId } from "typeorm";
 import { IsDefined, IsEnum } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";

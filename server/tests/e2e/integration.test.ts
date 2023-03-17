@@ -8,7 +8,7 @@ import mockLoginCookie from "../helpers/mockLoginCookie";
 import initializeData from "../../src/util/initializeData";
 import fs from "fs";
 import path from "path";
-import { clear, advanceTo } from "jest-date-mock";
+import { advanceTo, clear } from "jest-date-mock";
 import UserRole from "../../src/enum/UserRole";
 import { AssignmentState } from "../../src/enum/AssignmentState";
 import AssignmentType from "../../src/enum/AssignmentType";

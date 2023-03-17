@@ -6,7 +6,7 @@ import ReviewOfSubmission from "../../src/models/ReviewOfSubmission";
 import Submission from "../../src/models/Submission";
 import SubmissionQuestionnaire from "../../src/models/SubmissionQuestionnaire";
 import User from "../../src/models/User";
-import { mock, when, instance } from "ts-mockito";
+import { instance, mock, when } from "ts-mockito";
 import Assignment from "../../src/models/Assignment";
 import AssignmentType from "../../src/enum/AssignmentType";
 import PDFAnnotation from "../../src/models/PDFAnnotation";

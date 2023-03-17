@@ -39,6 +39,11 @@ export default [
                 name: "admin-dashboard.banner",
                 component: () => import("../components/admin-dashboard/BannerManager"),
             },
+            {
+                path: "calendar",
+                name: "admin-dashboard.calendar",
+                component: () => import("../components/admin-dashboard/Calendar"),
+            },
         ],
     },
 ]

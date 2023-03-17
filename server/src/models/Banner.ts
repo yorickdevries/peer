@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, Not } from "typeorm";
-import { IsDefined, IsBoolean, IsString, IsNotEmpty } from "class-validator";
+import { Column, Entity, Not, PrimaryGeneratedColumn } from "typeorm";
+import { IsBoolean, IsDefined, IsNotEmpty, IsString } from "class-validator";
 import BaseModel from "./BaseModel";
 
 interface AnonymousBanner {

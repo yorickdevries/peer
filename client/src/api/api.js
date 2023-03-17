@@ -31,6 +31,7 @@ import codeannotations from "./codeannotations"
 import statistics from "./statistics"
 import banners from "./banners"
 import preferences from "./preferences"
+import deadlines from "@/api/deadlines"
 
 export default {
     getAuthenticated: () => {
@@ -70,4 +71,5 @@ export default {
     statistics: statistics,
     banners: banners,
     preferences: preferences,
+    deadlines: deadlines,
 }

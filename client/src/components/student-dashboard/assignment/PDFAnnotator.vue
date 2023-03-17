@@ -32,10 +32,7 @@ export default {
     data() {
         return {
             // my API key for localhost
-            adobeDCViewClientId:
-                process.env.NODE_ENV === "production"
-                    ? "e15abfc9f499445e9acb8cdc19482196"
-                    : "b3c8121ca4ba4dd0af5424097b94538d",
+            adobeDCViewClientId: process.env.VUE_APP_ADOBE_ID,
             review: null,
             submission: null,
             fileMetadata: null,

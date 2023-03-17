@@ -8,15 +8,15 @@ import {
   JoinColumn,
 } from "typeorm";
 import {
-  IsDefined,
-  IsOptional,
-  IsString,
-  IsInt,
   IsAlphanumeric,
-  IsLowercase,
-  IsPositive,
+  IsDefined,
   IsEmail,
+  IsInt,
+  IsLowercase,
   IsNotEmpty,
+  IsOptional,
+  IsPositive,
+  IsString,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import Affiliation from "./Affiliation";

@@ -3,10 +3,10 @@ import schedule from "node-schedule";
 import { AssignmentState } from "../enum/AssignmentState";
 import Assignment from "../models/Assignment";
 import {
-  startPublishAssignmentWorker,
   startCloseSubmissionForAssignmentWorker,
   startDistributeReviewsForAssignmentWorker,
   startOpenFeedbackForAssignmentWorker,
+  startPublishAssignmentWorker,
 } from "../workers/pool";
 import {
   genMailForMissingStageSubmission,

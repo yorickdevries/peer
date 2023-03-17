@@ -84,24 +84,25 @@ Vue.component("apexchart", VueApexCharts)
 
 Vue.config.productionTip = false
 
-Sentry.init({
-    Vue,
-    dsn: process.env.VUE_APP_SENTRY_DSN,
-    release: process.env.VUE_APP_SENTRY_RELEASE,
-    environment: process.env.NODE_ENV,
-    trackComponents: true,
-    integrations: [
-        new BrowserTracing({
-            routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-            tracePropagationTargets: ["localhost", "peer.tudelft.nl", "peer.eiptest.ewi.tudelft.nl", /^\//],
-        }),
-    ],
-    // Set tracesSampleRate to 1.0 to capture 100%
-    // of transactions for performance monitoring.
-    // We recommend adjusting this value in production
-    tracesSampleRate: parseFloat(process.env.VUE_APP_SENTRY_TRACES_SAMPLE_RATE),
-})
-
+if (process.env.NODE_ENV !== "development") {
+    Sentry.init({
+        Vue,
+        dsn: process.env.VUE_APP_SENTRY_DSN,
+        release: process.env.VUE_APP_SENTRY_RELEASE,
+        environment: process.env.NODE_ENV,
+        trackComponents: true,
+        integrations: [
+            new BrowserTracing({
+                routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+                tracePropagationTargets: ["localhost", "peer.tudelft.nl", "peer.eiptest.ewi.tudelft.nl", /^\//],
+            }),
+        ],
+        // Set tracesSampleRate to 1.0 to capture 100%
+        // of transactions for performance monitoring.
+        // We recommend adjusting this value in production
+        tracesSampleRate: parseFloat(process.env.VUE_APP_SENTRY_TRACES_SAMPLE_RATE),
+    })
+}
 new Vue({
     router,
     render: (h) => h(App),

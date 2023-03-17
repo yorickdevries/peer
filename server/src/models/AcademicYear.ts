@@ -1,5 +1,5 @@
-import { Entity, Column } from "typeorm";
-import { IsDefined, IsBoolean } from "class-validator";
+import { Column, Entity } from "typeorm";
+import { IsBoolean, IsDefined } from "class-validator";
 import NamedModel from "./NamedModel";
 
 @Entity()

@@ -429,6 +429,9 @@ export default {
             questionNumbersOfUnsavedAnswers.sort()
             return questionNumbersOfUnsavedAnswers
         },
+        numberOfUnsaved() {
+            return this.questionNumbersOfUnsavedAnswers.length
+        },
         questionNumbersOfUnansweredNonOptionalQuestions() {
             const questionNumbersOfUnansweredNonOptionalQuestions = []
             if (!this.answers) {
@@ -465,6 +468,9 @@ export default {
         window.removeEventListener("keyup", this.keyUp)
     },
     methods: {
+        numberOfUnsavedQuestions() {
+            return this.numberOfUnsaved
+        },
         keyDown(e) {
             this.keys[e.code] = true
             if (this.keys["Enter"] && (this.keys["ControlLeft"] || this.keys["ControlRight"])) {

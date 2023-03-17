@@ -36,6 +36,7 @@ import codeannotations from "./codeannotations";
 import statistics from "./statistics";
 import banners from "./banners";
 import Banner from "../models/Banner";
+import deadlines from "./deadlines";
 import isAdmin from "../middleware/authentication/isAdmin";
 import preferences from "./preferences";
 
@@ -81,6 +82,7 @@ router.use("/academicyears", academicyears);
 router.use("/courses", courses);
 router.use("/enrollments", enrollments);
 router.use("/assignments", assignments);
+router.use("/deadlines", isAdmin, deadlines);
 router.use("/assignmentversions", assignmentversions);
 router.use("/groups", groups);
 router.use("/submissions", submissions);

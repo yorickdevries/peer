@@ -1,21 +1,21 @@
 import {
   Column,
   Entity,
-  PrimaryGeneratedColumn,
   JoinColumn,
   ManyToOne,
-  OneToOne,
-  RelationId,
   OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  RelationId,
   getManager,
 } from "typeorm";
 import {
-  IsDefined,
   IsBoolean,
+  IsDefined,
+  IsEnum,
+  IsNotEmpty,
   IsOptional,
   IsString,
-  IsNotEmpty,
-  IsEnum,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
