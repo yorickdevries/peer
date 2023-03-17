@@ -92,6 +92,22 @@
                                     <li>After this the groups cannot be changed anymore</li>
                                 </ul>
                             </b-modal>
+                            <b-button
+                                v-b-modal="`revertStateSubmission${assignment.id}`"
+                                :disabled="disableButton"
+                                class="mb-3"
+                                variant="primary"
+                                size="sm"
+                                >Revert current stage
+                            </b-button>
+                            <b-modal
+                                :id="`revertStateSubmission${assignment.id}`"
+                                @ok="revertStateSubmission"
+                                title="Confirmation"
+                                centered
+                            >
+                                Are you sure you want to revert state to Unpublished. THIS WILL DELETE ALL SUBMISSIONS!
+                            </b-modal>
                         </div>
 
                         <!--Distribute Reviews-->
@@ -134,7 +150,7 @@
                                 </ul>
                             </b-modal>
                             <b-button
-                                v-b-modal="`revertState${assignment.id}`"
+                                v-b-modal="`revertStateWaiting${assignment.id}`"
                                 :disabled="disableButton"
                                 class="mb-3"
                                 variant="primary"
@@ -142,8 +158,8 @@
                                 >Revert current stage
                             </b-button>
                             <b-modal
-                                :id="`revertState${assignment.id}`"
-                                @ok="revertState"
+                                :id="`revertStateWaiting${assignment.id}`"
+                                @ok="revertStateWaiting"
                                 title="Confirmation"
                                 centered
                             >
@@ -279,9 +295,16 @@ export default {
             this.showSuccessMessage()
             this.showOpenFeedbackAlert = true
         },
-        async revertState() {
+        async revertStateWaiting() {
             this.disableButton = true
             await api.reviewofsubmissions.revertState(this.$route.params.assignmentId)
+            this.showSuccessMessage()
+            this.disableButton = false
+            await this.fetchAssignment()
+        },
+        async revertStateSubmission() {
+            this.disableButton = true
+            await api.assignments.revertState(this.$route.params.assignmentId)
             this.showSuccessMessage()
             this.disableButton = false
             await this.fetchAssignment()

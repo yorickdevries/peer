@@ -51,5 +51,5 @@ export default {
     revertState(assignmentId) {
         const params = { assignmentId }
         return client.post("reviewofsubmissions/revert", null, { params: params })
-    }
+    },
 }

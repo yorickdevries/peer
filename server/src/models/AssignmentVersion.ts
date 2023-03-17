@@ -167,6 +167,24 @@ export default class AssignmentVersion extends BaseModel {
     }
   }
 
+  async deleteAllSubmissions(): Promise<void> {
+    // await Submission.createQueryBuilder("submissions")
+    //   .softDelete()
+    //   .where("assignmentVersionId = :assignmentVersionId", {
+    //     assignmentVersionId: this.id,
+    //   })
+    //   .execute();
+
+    await Submission.createQueryBuilder("submissions")
+      .delete()
+      .from(Submission)
+      .where("assignmentVersionId = :assignmentVersionId", {
+        assignmentVersionId: this.id,
+      })
+      .execute();
+    console.log("DELETED");
+  }
+
   async getFinalSubmissionsOfEachGroup(): Promise<Submission[]> {
     return await Submission.find({
       where: { assignmentVersion: this, final: true },

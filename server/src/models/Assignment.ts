@@ -401,6 +401,13 @@ export default class Assignment extends BaseModel {
     return await course.isTeacherOrTeachingAssistant(user);
   }
 
+  async deleteAllSubmissions(): Promise<string> {
+    console.log("RUNNING INSIDE ASSIGNMENT")
+    for (const assignmentVersion of this.versions) {
+      await assignmentVersion.deleteAllSubmissions();
+    }
+    return "Deleted all submissions";
+  }
   async hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
     user: User
   ): Promise<boolean> {
