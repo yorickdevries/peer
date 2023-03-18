@@ -31,6 +31,8 @@ import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
 import AssignmentType from "../enum/AssignmentType";
 import AssignmentExport from "./AssignmentExport";
 import AssignmentVersion from "./AssignmentVersion";
+import Review from "./Review";
+import Submission from "./Submission";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -407,6 +409,44 @@ export default class Assignment extends BaseModel {
       }
     }
     return false;
+  }
+
+  /**
+   * Returns the list of submitted reviews that reviewed this group/user
+   *
+   * @param group the group of the user(s) that were reviewed
+   * @returns the list of reviews
+   */
+  async getSubmittedReviewsWhereUserIsReviewed(
+    group: Group
+  ): Promise<Review[]> {
+    const reviews: Review[] = [];
+    for (const assignmentVersion of this.versions) {
+      const submissionQuestionnaire =
+        await assignmentVersion.getSubmissionQuestionnaire();
+      if (submissionQuestionnaire) {
+        const submissions: Submission[] = [];
+        for (const version of this.versions) {
+          const versionSubmissions = await Submission.find({
+            where: {
+              group: group,
+              final: true,
+              assignmentVersion: version,
+            },
+          });
+          submissions.push(...versionSubmissions);
+        }
+        for (const submission of submissions) {
+          const submittedReviews = (
+            await submissionQuestionnaire.getReviewsWhereUserIsReviewed(
+              submission
+            )
+          ).filter((r) => r.submitted);
+          reviews.push(...submittedReviews);
+        }
+      }
+    }
+    return reviews;
   }
 
   async hasSubmissionQuestionnaires(): Promise<boolean> {

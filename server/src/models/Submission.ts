@@ -7,6 +7,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   RelationId,
+  getManager,
 } from "typeorm";
 import {
   IsBoolean,
@@ -213,5 +214,20 @@ export default class Submission extends BaseModel {
   async isTeacherInCourse(user: User): Promise<boolean> {
     const assignmentVersion = await this.getAssignmentVersion();
     return await assignmentVersion.isTeacherInCourse(user);
+  }
+
+  /**
+   * Returns a boolean indicating whether a group has made a submission
+   *
+   * @param groupId the group id
+   * @returns whether the group has made a submission
+   */
+  static async hasGroupMadeSubmission(groupId: number): Promise<boolean> {
+    const group = await getManager()
+      .createQueryBuilder(Submission, "submission")
+      .leftJoin("submission.group", "group")
+      .where("group.id = :id", { id: groupId })
+      .getOne();
+    return !!group;
   }
 }

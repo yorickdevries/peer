@@ -38,6 +38,7 @@ import banners from "./banners";
 import Banner from "../models/Banner";
 import deadlines from "./deadlines";
 import isAdmin from "../middleware/authentication/isAdmin";
+import preferences from "./preferences";
 
 const router = express.Router();
 router.use(eventLogger);
@@ -106,6 +107,7 @@ router.use("/assignmentexports", assignmentexports);
 router.use("/codeannotations", codeannotations);
 router.use("/statistics", statistics);
 router.use("/banners", isAdmin, banners);
+router.use("/preferences", preferences);
 
 // If no other routes apply, send a 404
 router.use((_req, res) => {
