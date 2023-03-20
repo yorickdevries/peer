@@ -667,10 +667,43 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   res.send(anonymousReview);
 });
 
+//revert submission state
+router.patch(
+  "/:id/revertReview",
+  validateParams(idSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const assignmentId = req.params.id;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (!(await assignment.isTeacherInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not a teacher of the course");
+      return;
+    }
+    try {
+      assignment.revertState();
+      const result = await assignment.deleteAllReviews();
+      await assignment.save();
+      res.send(result);
+      return;
+    } catch (error) {
+      res.status(HttpStatusCode.FORBIDDEN).send(String(error));
+      return;
+    }
+  }
+);
+
 router.post("/revert", validateQuery(assignmentIdSchema), async (req, res) => {
   const user = req.user!;
   const assignmentId: number = req.query.assignmentId as any;
-  console.log("JSKDFJSLDJFLKSDJFLSDFJK");
 
   const assignment = await Assignment.findOne(assignmentId);
   if (!assignment) {
@@ -690,7 +723,7 @@ router.post("/revert", validateQuery(assignmentIdSchema), async (req, res) => {
   }
   assignment.revertState();
   await assignment.save();
-  console.log(assignment.state)
+  console.log(assignment.state);
   res.send();
 });
 

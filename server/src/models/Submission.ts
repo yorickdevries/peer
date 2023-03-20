@@ -23,6 +23,7 @@ import Group from "./Group";
 import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
 import ServerFlagReason from "../enum/ServerFlagReason";
+import Review from "./Review";
 
 @Entity()
 export default class Submission extends BaseModel {
@@ -213,5 +214,17 @@ export default class Submission extends BaseModel {
   async isTeacherInCourse(user: User): Promise<boolean> {
     const assignmentVersion = await this.getAssignmentVersion();
     return await assignmentVersion.isTeacherInCourse(user);
+  }
+  async deleteAllReviews(): Promise<void> {
+    console.log(this.id);
+    await Review.createQueryBuilder("Review")
+      .delete()
+      .from(Review)
+      .where("submissionId = :submissionId AND type = :submittedType", {
+        submissionId: this.id,
+        submittedType: "reviewofsubmission",
+      })
+      .execute();
+    console.log("DELETEDSubmission");
   }
 }

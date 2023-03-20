@@ -52,4 +52,7 @@ export default {
         const params = { assignmentId }
         return client.post("reviewofsubmissions/revert", null, { params: params })
     },
+    revertStateReview(assignmentId) {
+        return client.patch(`reviewofsubmissions/${assignmentId}/revertReview`)
+    },
 }

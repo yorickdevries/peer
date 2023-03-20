@@ -408,6 +408,14 @@ export default class Assignment extends BaseModel {
     }
     return "Deleted all submissions";
   }
+
+  async deleteAllReviews(): Promise<string> {
+    for (const assignmentVersion of this.versions) {
+      await assignmentVersion.deleteAllReviews();
+    }
+    console.log("DELETING REVIEWS");
+    return "Deleted all reviews";
+  }
   async hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
     user: User
   ): Promise<boolean> {

@@ -211,6 +211,22 @@
                                     <li>The reviewquestionnaire cannot be changed after this action.</li>
                                 </ul>
                             </b-modal>
+                            <b-button
+                                v-b-modal="`revertStateReview${assignment.id}`"
+                                :disabled="disableButton"
+                                class="mb-3"
+                                variant="primary"
+                                size="sm"
+                                >Revert current stage
+                            </b-button>
+                            <b-modal
+                                :id="`revertStateReview${assignment.id}`"
+                                @ok="revertStateReview"
+                                title="Confirmation"
+                                centered
+                            >
+                                Are you sure you want to revert state to Waiting for review?
+                            </b-modal>
                         </div>
                     </dl>
                 </b-card>
@@ -305,6 +321,13 @@ export default {
         async revertStateSubmission() {
             this.disableButton = true
             await api.assignments.revertState(this.$route.params.assignmentId)
+            this.showSuccessMessage()
+            this.disableButton = false
+            await this.fetchAssignment()
+        },
+        async revertStateReview() {
+            this.disableButton = true
+            await api.reviewofsubmissions.revertStateReview(this.$route.params.assignmentId)
             this.showSuccessMessage()
             this.disableButton = false
             await this.fetchAssignment()

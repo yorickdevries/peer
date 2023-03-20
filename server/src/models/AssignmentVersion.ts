@@ -168,13 +168,6 @@ export default class AssignmentVersion extends BaseModel {
   }
 
   async deleteAllSubmissions(): Promise<void> {
-    // await Submission.createQueryBuilder("submissions")
-    //   .softDelete()
-    //   .where("assignmentVersionId = :assignmentVersionId", {
-    //     assignmentVersionId: this.id,
-    //   })
-    //   .execute();
-
     await Submission.createQueryBuilder("submissions")
       .delete()
       .from(Submission)
@@ -183,6 +176,18 @@ export default class AssignmentVersion extends BaseModel {
       })
       .execute();
     console.log("DELETED");
+  }
+
+  async deleteAllReviews(): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    for (let i = 0; i < this.submissions?.length; i++) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const sub: Submission = this.submissions[i];
+      await sub.deleteAllReviews();
+    }
+    console.log("DELETEDAssignmentVersion");
   }
 
   async getFinalSubmissionsOfEachGroup(): Promise<Submission[]> {
