@@ -402,7 +402,7 @@ export default class Assignment extends BaseModel {
   }
 
   async deleteAllSubmissions(): Promise<string> {
-    console.log("RUNNING INSIDE ASSIGNMENT")
+    console.log("RUNNING INSIDE ASSIGNMENT");
     for (const assignmentVersion of this.versions) {
       await assignmentVersion.deleteAllSubmissions();
     }
