@@ -220,11 +220,12 @@ export default class Submission extends BaseModel {
     await Review.createQueryBuilder("Review")
       .delete()
       .from(Review)
-      .where("submissionId = :submissionId AND type = :submittedType", {
+      .where("submissionId = :submissionId", {
         submissionId: this.id,
+      })
+      .andWhere("type = :submittedType", {
         submittedType: "reviewofsubmission",
       })
       .execute();
-    console.log("DELETEDSubmission");
   }
 }
