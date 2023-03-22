@@ -55,4 +55,7 @@ export default {
     revertStateReview(assignmentId) {
         return client.patch(`reviewofsubmissions/${assignmentId}/revertReview`)
     },
+    revertStateFeedback(assignmentId) {
+        return client.patch(`reviewofsubmissions/${assignmentId}/revertFeedback`)
+    },
 }

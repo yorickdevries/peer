@@ -667,7 +667,7 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   res.send(anonymousReview);
 });
 
-//revert submission state
+//revert review state
 router.patch(
   "/:id/revertReview",
   validateParams(idSchema),
@@ -693,6 +693,39 @@ router.patch(
       const result = await assignment.deleteAllReviews();
       await assignment.save();
       res.send(result);
+      return;
+    } catch (error) {
+      res.status(HttpStatusCode.FORBIDDEN).send(String(error));
+      return;
+    }
+  }
+);
+
+//revert feedback state
+router.patch(
+  "/:id/revertFeedback",
+  validateParams(idSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const assignmentId = req.params.id;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (!(await assignment.isTeacherInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not a teacher of the course");
+      return;
+    }
+    try {
+      assignment.revertState();
+      await assignment.save();
+      res.send();
       return;
     } catch (error) {
       res.status(HttpStatusCode.FORBIDDEN).send(String(error));

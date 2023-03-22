@@ -228,6 +228,35 @@
                                 Are you sure you want to revert state to Waiting for review?
                             </b-modal>
                         </div>
+                        <!--Open feedback-->
+                        <div v-if="assignment.state === 'feedback'">
+                            <dt>Open Feedback</dt>
+                            <dd>This action will open the the feedback for the reviewed students</dd>
+                            <b-alert v-if="assignment.automaticStateProgression" show warning
+                                >Automatic state progression is enabled. In case you have set up review evaluation, make
+                                sure you finalised your reviewquestionnaires before the review due date.</b-alert
+                            >
+                            <b-alert v-if="showOpenFeedbackAlert" show
+                                >All flagged and completely filled in reviews are being submitted and feedback will be
+                                opened therafter, check back in a few minutes to see the results</b-alert
+                            >
+                            <b-button
+                                v-b-modal="`revertFeedback${assignment.id}`"
+                                :disabled="disableButton"
+                                class="mb-3"
+                                variant="primary"
+                                size="sm"
+                                >Revert current stage
+                            </b-button>
+                            <b-modal
+                                :id="`revertFeedback${assignment.id}`"
+                                @ok="revertFeedback"
+                                title="Confirmation"
+                                centered
+                            >
+                                Are you sure you want to revert state to Review?
+                            </b-modal>
+                        </div>
                     </dl>
                 </b-card>
             </b-col>
@@ -291,6 +320,7 @@ export default {
             this.showSuccessMessage({ message: "Assignment succesfully published" })
             this.disableButton = false
             await this.fetchAssignment()
+            this.$router.go()
         },
         async closeSubmission() {
             this.disableButton = true
@@ -298,39 +328,53 @@ export default {
             this.showSuccessMessage({ message: "Assignment succesfully closed" })
             this.disableButton = false
             await this.fetchAssignment()
+            this.$router.go()
         },
         async distributeReviews() {
             this.disableButton = true
             await api.reviewofsubmissions.distribute(this.$route.params.assignmentId)
-            this.showSuccessMessage()
+            this.showSuccessMessage({ message: "Reviews successfully distributed" })
             this.showDistributeAlert = true
+            this.$router.go()
         },
         async openFeedback() {
             this.disableButton = true
             await api.reviewofsubmissions.openFeedback(this.$route.params.assignmentId)
             this.showSuccessMessage()
             this.showOpenFeedbackAlert = true
+            this.$router.go()
         },
         async revertStateWaiting() {
             this.disableButton = true
             await api.reviewofsubmissions.revertState(this.$route.params.assignmentId)
-            this.showSuccessMessage()
+            this.showSuccessMessage({ message: "State reverted" })
             this.disableButton = false
             await this.fetchAssignment()
+            this.$router.go()
         },
         async revertStateSubmission() {
             this.disableButton = true
             await api.assignments.revertState(this.$route.params.assignmentId)
-            this.showSuccessMessage()
+            this.showSuccessMessage({ message: "State reverted" })
             this.disableButton = false
             await this.fetchAssignment()
+            this.$router.go()
         },
         async revertStateReview() {
             this.disableButton = true
             await api.reviewofsubmissions.revertStateReview(this.$route.params.assignmentId)
-            this.showSuccessMessage()
+            this.showSuccessMessage({ message: "State reverted" })
             this.disableButton = false
             await this.fetchAssignment()
+            this.$router.go()
+        },
+        async revertFeedback() {
+            this.disableButton = true
+            await api.reviewofsubmissions.revertStateFeedback(this.$route.params.assignmentId)
+            this.showSuccessMessage({ message: "State reverted" })
+            this.disableButton = false
+            await this.fetchAssignment()
+            this.$router.go()
         },
     },
 }

@@ -3,7 +3,7 @@
         "type": "mariadb",
         "host": "localhost",
         "port": 3306,
-        "username": "peer",
+        "username": "root",
         "password": "password",
         "database": "peer"
     },
