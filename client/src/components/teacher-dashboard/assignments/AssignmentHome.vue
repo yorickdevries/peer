@@ -102,7 +102,7 @@
                             </b-button>
                             <b-modal
                                 :id="`revertStateSubmission${assignment.id}`"
-                                @ok="revertStateSubmission"
+                                @ok="revertState"
                                 title="Confirmation"
                                 centered
                             >
@@ -159,7 +159,7 @@
                             </b-button>
                             <b-modal
                                 :id="`revertStateWaiting${assignment.id}`"
-                                @ok="revertStateWaiting"
+                                @ok="revertState"
                                 title="Confirmation"
                                 centered
                             >
@@ -221,7 +221,7 @@
                             </b-button>
                             <b-modal
                                 :id="`revertStateReview${assignment.id}`"
-                                @ok="revertStateReview"
+                                @ok="revertState"
                                 title="Confirmation"
                                 centered
                             >
@@ -250,7 +250,7 @@
                             </b-button>
                             <b-modal
                                 :id="`revertFeedback${assignment.id}`"
-                                @ok="revertFeedback"
+                                @ok="revertState"
                                 title="Confirmation"
                                 centered
                             >
@@ -344,33 +344,9 @@ export default {
             this.showOpenFeedbackAlert = true
             this.$router.go()
         },
-        async revertStateWaiting() {
+        async revertState() {
             this.disableButton = true
-            await api.reviewofsubmissions.revertState(this.$route.params.assignmentId)
-            this.showSuccessMessage({ message: "State reverted" })
-            this.disableButton = false
-            await this.fetchAssignment()
-            this.$router.go()
-        },
-        async revertStateSubmission() {
-            this.disableButton = true
-            await api.assignments.revertState(this.$route.params.assignmentId)
-            this.showSuccessMessage({ message: "State reverted" })
-            this.disableButton = false
-            await this.fetchAssignment()
-            this.$router.go()
-        },
-        async revertStateReview() {
-            this.disableButton = true
-            await api.reviewofsubmissions.revertStateReview(this.$route.params.assignmentId)
-            this.showSuccessMessage({ message: "State reverted" })
-            this.disableButton = false
-            await this.fetchAssignment()
-            this.$router.go()
-        },
-        async revertFeedback() {
-            this.disableButton = true
-            await api.reviewofsubmissions.revertStateFeedback(this.$route.params.assignmentId)
+            await api.assignments.revertState(this.$route.params.assignmentId, this.assignment.state)
             this.showSuccessMessage({ message: "State reverted" })
             this.disableButton = false
             await this.fetchAssignment()

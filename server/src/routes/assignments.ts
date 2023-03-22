@@ -549,35 +549,66 @@ router.patch(
   }
 );
 
-//revert submission state
-router.patch("/:id/revertState", validateParams(idSchema), async (req, res) => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const user = req.user!;
-  const assignmentId = req.params.id;
-  const assignment = await Assignment.findOne(assignmentId);
-  if (!assignment) {
-    res
-      .status(HttpStatusCode.BAD_REQUEST)
-      .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
-    return;
-  }
-  if (!(await assignment.isTeacherInCourse(user))) {
-    res
-      .status(HttpStatusCode.FORBIDDEN)
-      .send("User is not a teacher of the course");
-    return;
-  }
-  try {
-    assignment.revertState();
-    const result = await assignment.deleteAllSubmissions();
-    await assignment.save();
-    res.send(result);
-    return;
-  } catch (error) {
-    res.status(HttpStatusCode.FORBIDDEN).send(String(error));
-    return;
-  }
+const revertSchema = Joi.object({
+  id: Joi.number().integer().required(),
+  state: Joi.string().required(),
 });
+
+//revert submission state
+router.patch(
+  "/:id/:state/revertState",
+  validateParams(revertSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const assignmentId = req.params.id;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (!(await assignment.isTeacherInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not a teacher of the course");
+      return;
+    }
+    try {
+      console.log(req.params);
+      if (req.params.state == "submission") {
+        assignment.revertState();
+        const result = await assignment.deleteAllSubmissions();
+        await assignment.save();
+        res.send(result);
+        return;
+      } else if (req.params.state == "waitingforreview") {
+        assignment.revertState();
+        await assignment.save();
+        res.send();
+        return;
+      } else if (req.params.state == "review") {
+        assignment.revertState();
+        const result = await assignment.deleteAllReviews();
+        await assignment.save();
+        res.send(result);
+        return;
+      } else if (req.params.state == "feedback") {
+        assignment.revertState();
+        await assignment.save();
+        res.send();
+        return;
+      } else {
+        res.status(HttpStatusCode.FORBIDDEN).send("State doesn't exist");
+        return;
+      }
+    } catch (error) {
+      res.status(HttpStatusCode.FORBIDDEN).send(String(error));
+      return;
+    }
+  }
+);
 
 // publish an assignment from unpublished state
 router.patch("/:id/publish", validateParams(idSchema), async (req, res) => {
