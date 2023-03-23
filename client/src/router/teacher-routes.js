@@ -1,4 +1,5 @@
 import api from "../api/api"
+import redir from "@/redirectToUrl"
 
 export default [
     {
@@ -14,8 +15,7 @@ export default [
                 }
                 next()
             } catch (error) {
-                //redirect to root
-                next("/")
+                redir.checkError(to, next, error)
             }
         },
         children: [

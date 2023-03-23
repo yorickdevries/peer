@@ -30,7 +30,17 @@ export default new VueRouter({
                         const res = await api.getAuthenticated()
                         const authenticated = res.data.authenticated
 
-                        authenticated ? next("/courses") : next()
+                        if (authenticated) {
+                            const item = localStorage.getItem("peerOrigPage")
+                            if (item) {
+                                localStorage.removeItem("peerOrigPage")
+                                next(item)
+                            } else {
+                                next("/courses")
+                            }
+                        } else {
+                            next()
+                        }
                     },
                 },
                 {
