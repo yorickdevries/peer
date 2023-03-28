@@ -304,7 +304,7 @@ export default class Assignment extends BaseModel {
 
   revertState(): void {
     const currStateIndex = assignmentStateOrder.indexOf(this.state);
-    if (currStateIndex !== 0) {
+    if (currStateIndex > 0) {
       this.state = assignmentStateOrder[currStateIndex - 1];
     } else {
       throw new Error(
@@ -402,7 +402,6 @@ export default class Assignment extends BaseModel {
   }
 
   async deleteAllSubmissions(): Promise<string> {
-    console.log("RUNNING INSIDE ASSIGNMENT");
     for (const assignmentVersion of this.versions) {
       await assignmentVersion.deleteAllSubmissions();
     }
@@ -413,7 +412,6 @@ export default class Assignment extends BaseModel {
     for (const assignmentVersion of this.versions) {
       await assignmentVersion.deleteAllReviews();
     }
-    console.log("DELETING REVIEWS");
     return "Deleted all reviews";
   }
   async hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(

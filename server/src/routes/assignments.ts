@@ -551,7 +551,7 @@ router.patch(
 
 const revertSchema = Joi.object({
   id: Joi.number().integer().required(),
-  state: Joi.string().required(),
+  state: Joi.string().valid(...Object.values(AssignmentState)).required(),
 });
 
 //revert submission state
@@ -576,7 +576,6 @@ router.patch(
       return;
     }
     try {
-      console.log(req.params);
       if (req.params.state == "submission") {
         assignment.revertState();
         const result = await assignment.deleteAllSubmissions();

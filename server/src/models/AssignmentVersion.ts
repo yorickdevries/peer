@@ -175,23 +175,16 @@ export default class AssignmentVersion extends BaseModel {
         assignmentVersionId: this.id,
       })
       .execute();
-    console.log("DELETED");
   }
 
   async deleteAllReviews(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     const subs = await Submission.createQueryBuilder("submissions")
       .where("assignmentVersionId = :assignmentVersionId", {
         assignmentVersionId: this.id,
       })
       .getMany();
-    console.log(subs.length);
     for (let i = 0; i < subs.length; i++) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const sub: Submission = subs[i];
-      await sub.deleteAllReviews();
+      await subs[i].deleteAllReviews();
     }
   }
 

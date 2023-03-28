@@ -216,7 +216,6 @@ export default class Submission extends BaseModel {
     return await assignmentVersion.isTeacherInCourse(user);
   }
   async deleteAllReviews(): Promise<void> {
-    console.log(this.id);
     await Review.createQueryBuilder("Review")
       .delete()
       .from(Review)

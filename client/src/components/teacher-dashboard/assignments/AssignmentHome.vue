@@ -246,7 +246,7 @@
                                 class="mb-3"
                                 variant="primary"
                                 size="sm"
-                                >Revert current stage
+                                >Revert to previous stage
                             </b-button>
                             <b-modal
                                 :id="`revertFeedback${assignment.id}`"
