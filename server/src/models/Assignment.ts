@@ -401,18 +401,18 @@ export default class Assignment extends BaseModel {
     return await course.isTeacherOrTeachingAssistant(user);
   }
 
-  async deleteAllSubmissions(): Promise<string> {
+  async deleteAllSubmissions(): Promise<void> {
     for (const assignmentVersion of this.versions) {
       await assignmentVersion.deleteAllSubmissions();
     }
-    return "Deleted all submissions";
+    return;
   }
 
-  async deleteAllReviews(): Promise<string> {
+  async deleteAllReviews(): Promise<void> {
     for (const assignmentVersion of this.versions) {
       await assignmentVersion.deleteAllReviews();
     }
-    return "Deleted all reviews";
+    return;
   }
   async hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
     user: User

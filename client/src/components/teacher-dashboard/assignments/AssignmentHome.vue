@@ -106,7 +106,10 @@
                                 title="Confirmation"
                                 centered
                             >
-                                Are you sure you want to revert state to Unpublished. THIS WILL DELETE ALL SUBMISSIONS!
+                                <b-alert show variant="danger"
+                                    >Are you sure you want to revert state to Unpublished? This will delete all
+                                    submissions
+                                </b-alert>
                             </b-modal>
                         </div>
 
@@ -228,18 +231,8 @@
                                 Are you sure you want to revert state to Waiting for review?
                             </b-modal>
                         </div>
-                        <!--Open feedback-->
+                        <!--Revert feedback-->
                         <div v-if="assignment.state === 'feedback'">
-                            <dt>Open Feedback</dt>
-                            <dd>This action will open the the feedback for the reviewed students</dd>
-                            <b-alert v-if="assignment.automaticStateProgression" show warning
-                                >Automatic state progression is enabled. In case you have set up review evaluation, make
-                                sure you finalised your reviewquestionnaires before the review due date.</b-alert
-                            >
-                            <b-alert v-if="showOpenFeedbackAlert" show
-                                >All flagged and completely filled in reviews are being submitted and feedback will be
-                                opened therafter, check back in a few minutes to see the results</b-alert
-                            >
                             <b-button
                                 v-b-modal="`revertFeedback${assignment.id}`"
                                 :disabled="disableButton"
@@ -333,7 +326,7 @@ export default {
         async distributeReviews() {
             this.disableButton = true
             await api.reviewofsubmissions.distribute(this.$route.params.assignmentId)
-            this.showSuccessMessage({ message: "Reviews successfully distributed" })
+            this.showSuccessMessage()
             this.showDistributeAlert = true
             this.$router.go()
         },

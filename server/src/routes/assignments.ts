@@ -551,7 +551,9 @@ router.patch(
 
 const revertSchema = Joi.object({
   id: Joi.number().integer().required(),
-  state: Joi.string().valid(...Object.values(AssignmentState)).required(),
+  state: Joi.string()
+    .valid(...Object.values(AssignmentState))
+    .required(),
 });
 
 //revert submission state
