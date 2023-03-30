@@ -75,6 +75,8 @@
                         :reviewsAreReadOnly="reviewsAreReadOnly"
                         :review="review"
                         :questionnaire="questionnaire"
+                        :reviewId="reviewId"
+                        :buttonDisabled="buttonDisabled"
                         @disableButton="(v) => (this.buttonDisabled = v)"
                         ref="questions"
                     ></ReviewQuestions>
@@ -116,9 +118,9 @@
                             >Unsubmit Review</b-button
                         >
                         <b-button
-                            v-if="this.$refs.questions.questionNumbersOfUnsavedAnswers.length > 0"
+                            v-if="questionNumbersOfUnsavedAnswers.length > 0"
                             variant="info float-right"
-                            @click="this.$refs.questions.saveAllAnswers"
+                            @click="saveAllAnswers"
                             :disabled="buttonDisabled"
                             >Save all unsaved answers</b-button
                         >
@@ -132,26 +134,21 @@
                 title="Submit Confirmation"
                 :ok-disabled="
                     buttonDisabled ||
-                    (this.$refs.questions.questionNumbersOfUnansweredNonOptionalQuestions.length > 0 &&
-                        !review.flaggedByReviewer)
+                    (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 && !review.flaggedByReviewer)
                 "
                 @ok="submitReview"
             >
-                <b-alert
-                    v-if="this.$refs.questions.questionNumbersOfUnsavedAnswers.length > 0"
-                    show
-                    variant="warning"
-                    class="p-2"
+                <b-alert v-if="questionNumbersOfUnsavedAnswers.length > 0" show variant="warning" class="p-2"
                     >There are one or more unsaved answers for the following questions:
-                    {{ this.$refs.questions.questionNumbersOfUnsavedAnswers }}</b-alert
+                    {{ questionNumbersOfUnsavedAnswers }}</b-alert
                 >
                 <b-alert
-                    v-if="this.$refs.questions.questionNumbersOfUnansweredNonOptionalQuestions.length > 0"
+                    v-if="questionNumbersOfUnansweredNonOptionalQuestions.length > 0"
                     show
                     variant="danger"
                     class="p-2"
                     >There are one or more answers missing for the following non-optional questions:
-                    {{ this.$refs.questions.questionNumbersOfUnansweredNonOptionalQuestions }}</b-alert
+                    {{ questionNumbersOfUnansweredNonOptionalQuestions }}</b-alert
                 >
                 Do you really want to submit? This marks the review as finished and all unsaved changes will be
                 discarded.
@@ -219,6 +216,12 @@ export default {
         }
     },
     computed: {
+        questionNumbersOfUnansweredNonOptionalQuestions() {
+            return this.$refs.questions ? this.$refs.questions.questionNumbersOfUnansweredNonOptionalQuestions : []
+        },
+        questionNumbersOfUnsavedAnswers() {
+            return this.$refs.questions ? this.$refs.questions.questionNumbersOfUnsavedAnswers : []
+        },
         columnWidthFileAndQuestionnaire() {
             if (this.viewFileNextToQuestionnaire) {
                 // columns are half width
@@ -244,7 +247,6 @@ export default {
         await this.fetchData()
     },
     mounted() {
-        /*
         setTimeout(() => {
             document.querySelector("#slideout-btn").animate(
                 { right: ["-100px", "-80px", "-100px", "-80px", "-100px"] },
@@ -255,9 +257,11 @@ export default {
                 }
             )
         }, 2000)
-        */
     },
     methods: {
+        saveAllAnswers() {
+            this.$refs.questions ? this.$refs.questions.saveAllAnswers() : null
+        },
         async fetchData() {
             this.viewFile = false
             await this.fetchReview()

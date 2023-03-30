@@ -200,16 +200,16 @@ import api from "@/api/api"
 import _ from "lodash"
 import MarkdownEditorViewer from "../../general/MarkdownEditorViewer"
 import PDFViewer from "../../general/PDFViewer"
+import { StarRating } from "vue-rate-it"
 
 export default {
     name: "ReviewQuestions",
-    components: { MarkdownEditorViewer, PDFViewer },
-    props: ["questionnaire", "review", "reviewsAreReadOnly", "buttonDisabled"],
+    components: { MarkdownEditorViewer, PDFViewer, StarRating },
+    props: ["questionnaire", "review", "reviewsAreReadOnly", "buttonDisabled", "reviewId"],
     emits: ["disableButton"],
     async created() {
         window.addEventListener("keydown", this.keyDown)
         window.addEventListener("keyup", this.keyUp)
-        await this.fetchData()
     },
     destroyed() {
         window.removeEventListener("keydown", this.keyDown)
@@ -223,7 +223,16 @@ export default {
             keys: { Enter: false, ControlLeft: false, ControlRight: false },
             // Index of currently active question
             questionIndex: null,
+            loadedQuestions: false,
         }
+    },
+    watch: {
+        questionnaire(newQ) {
+            if (!this.loadedQuestions && newQ !== undefined) {
+                this.loadedQuestions = true
+                this.fetchAnswers()
+            }
+        },
     },
     computed: {
         questionNumbersOfUnsavedAnswers() {
@@ -258,15 +267,6 @@ export default {
         },
     },
     methods: {
-        async fetchData() {
-            //this.viewFile = false
-            //await this.fetchReview()
-            //await this.fetchFileMetadata()
-            //this.viewFile = true
-            //await this.fetchSubmissionQuestionnaire()
-            await this.fetchAnswers()
-            //await this.fetchReviewEvaluation()
-        },
         uploadAnswerFilePath(reviewId, questionId) {
             return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`
         },
@@ -284,7 +284,7 @@ export default {
                 const existingAnswer = _.find(existingAnswers, (answer) => {
                     return answer.questionId === question.id
                 })
-                const answerExists = existingAnswer ? true : false
+                const answerExists = existingAnswer !== undefined
                 if (existingAnswer) {
                     // get the right field from the answer
                     switch (question.type) {
@@ -331,7 +331,7 @@ export default {
             this.keys[e.code] = false
         },
         async saveAnswer(question, answer) {
-            this.buttonDisabled = true
+            this.$emit("disableButton", true)
             try {
                 switch (question.type) {
                     case "open":
@@ -364,10 +364,10 @@ export default {
             } catch (error) {
                 this.showErrorMessage({ message: error })
             }
-            this.buttonDisabled = false
+            this.$emit("disableButton", false)
         },
         async deleteAnswer(question, answer) {
-            this.buttonDisabled = true
+            this.$emit("disableButton", true)
             try {
                 switch (question.type) {
                     case "open":
@@ -406,7 +406,7 @@ export default {
             } catch (error) {
                 this.showErrorMessage({ message: error })
             }
-            this.buttonDisabled = false
+            this.$emit("disableButton", false)
         },
         async saveAllAnswers() {
             this.$emit("disableButton", true)
