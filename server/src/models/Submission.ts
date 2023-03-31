@@ -24,6 +24,7 @@ import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
 import ServerFlagReason from "../enum/ServerFlagReason";
 import Review from "./Review";
+import QuestionAnswer from "./QuestionAnswer";
 
 @Entity()
 export default class Submission extends BaseModel {
@@ -226,5 +227,35 @@ export default class Submission extends BaseModel {
         submittedType: "reviewofsubmission",
       })
       .execute();
+  }
+  async deleteAllReviewEvals(): Promise<void> {
+    console.log("feedback deleted")
+    const ids = await Review.createQueryBuilder("Review")
+        .select("Review.id")
+        .from(Review, "review")
+        .where("review.submissionId = :submissionId", {
+          submissionId: this.id,
+        })
+        .andWhere("review.type = :submittedType", {
+          submittedType: "reviewofsubmission",
+        })
+        .execute();
+    const idValues = ids.map((idObject: { id: any; }) => idObject.id);
+    console.log(idValues)
+
+    await QuestionAnswer.createQueryBuilder()
+        .delete()
+        .from(QuestionAnswer, "questionanswer")
+        .where("reviewId IN (:...idValues)", { idValues })
+        .execute();
+
+    await Review.createQueryBuilder("Review")
+        .delete()
+        .from(Review, "review")
+        .where("review.reviewOfSubmissionId IN (:...idValues)", { idValues })
+        .andWhere("review.type = :submittedType", {
+          submittedType: "reviewofreview",
+        })
+        .execute();
   }
 }

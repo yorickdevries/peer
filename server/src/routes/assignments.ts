@@ -597,8 +597,10 @@ router.patch(
         return;
       } else if (req.params.state == "feedback") {
         assignment.revertState();
+        //delete of review evaluations
+          const re = await assignment.deleteAllReviewEvals();
         await assignment.save();
-        res.send();
+        res.send(re);
         return;
       } else {
         res.status(HttpStatusCode.FORBIDDEN).send("State doesn't exist");

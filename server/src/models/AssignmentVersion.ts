@@ -187,6 +187,16 @@ export default class AssignmentVersion extends BaseModel {
       await subs[i].deleteAllReviews();
     }
   }
+  async deleteAllReviewEvals(): Promise<void> {
+    const subs = await Submission.createQueryBuilder("submissions")
+        .where("assignmentVersionId = :assignmentVersionId", {
+          assignmentVersionId: this.id,
+        })
+        .getMany();
+    for (let i = 0; i < subs.length; i++) {
+      await subs[i].deleteAllReviewEvals();
+    }
+  }
 
   async getFinalSubmissionsOfEachGroup(): Promise<Submission[]> {
     return await Submission.find({
