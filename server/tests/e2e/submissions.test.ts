@@ -13,6 +13,7 @@ import Group from "../../src/models/Group";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import AssignmentType from "../../src/enum/AssignmentType";
 import publishAssignment from "../../src/assignmentProgression/publishAssignment";
+import Assignment from "../../src/models/Assignment";
 
 describe("Submissions", () => {
   let connection: Connection;
@@ -20,6 +21,8 @@ describe("Submissions", () => {
   let sessionCookie: string;
   let assignmentVersion: AssignmentVersion;
   let group: Group;
+  let teacherCookie: string;
+  let assignment: Assignment;
 
   beforeAll(async () => {
     connection = await createDatabaseConnection();
@@ -29,7 +32,7 @@ describe("Submissions", () => {
   });
 
   beforeEach(async () => {
-    const teacherCookie = await mockLoginCookie(server, "teacher");
+    teacherCookie = await mockLoginCookie(server, "teacher");
     sessionCookie = await mockLoginCookie(server, "student", "student");
 
     // create a course
@@ -54,7 +57,7 @@ describe("Submissions", () => {
       AssignmentType.CODE,
       ".c, .h"
     );
-    const assignment = JSON.parse(res2.text);
+    assignment = JSON.parse(res2.text);
 
     // create an assignment version
     const res3 = await request(server)
@@ -100,6 +103,38 @@ describe("Submissions", () => {
 
     expect(res.status).toBe(HttpStatusCode.OK);
   });
+
+  test("revert from submission stage", async () => {
+    const exampleSubmissionFile = path.resolve(
+        __dirname,
+        "../../exampleData/submissions/submission1.c"
+    );
+    const res = await request(server)
+        .post("/api/submissions")
+        .set("cookie", sessionCookie)
+        .attach("file", fs.readFileSync(exampleSubmissionFile), "submission1.c")
+        .field("groupId", group.id)
+        .field("assignmentVersionId", assignmentVersion.id);
+
+
+    expect(res.status).toBe(HttpStatusCode.OK);
+
+    // revert state
+    const a1 = await request(server)
+        .patch(`assignments/${assignment.id}/${assignment.state}/revertState`)
+        .set("cookie", teacherCookie)
+
+    expect(a1).toBe(0);
+    //get all submissions from assignment
+    const subs = await request(server)
+        .get(`/api/submissions/${assignmentVersion.id}`)
+        .set("cookie", teacherCookie)
+
+    //check if any submissions were retrieved
+    expect(subs).toBe(0);
+  });
+
+
 
   test("make a submission with invalid file type", async () => {
     const exampleSubmissionFile = path.resolve(
