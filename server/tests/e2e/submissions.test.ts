@@ -119,19 +119,36 @@ describe("Submissions", () => {
 
     expect(res.status).toBe(HttpStatusCode.OK);
 
+    const assign1 = await request(server)
+        .get(`/api/assignments/${assignment.id}`)
+        .set("cookie", teacherCookie)
+    expect(JSON.parse(assign1.text)["state"]).toBe("submission")
+
     // revert state
     const a1 = await request(server)
-        .patch(`assignments/${assignment.id}/${assignment.state}/revertState`)
+        .patch(`/api/assignments/${assignment.id}/submission/revertState`)
         .set("cookie", teacherCookie)
 
-    expect(a1).toBe(0);
+    expect(a1.status).toBe(HttpStatusCode.OK);
     //get all submissions from assignment
     const subs = await request(server)
-        .get(`/api/submissions/${assignmentVersion.id}`)
+        .get(`/api/submissions/`)
         .set("cookie", teacherCookie)
+        .query({ assignmentVersionId: assignmentVersion.id })
+
 
     //check if any submissions were retrieved
-    expect(subs).toBe(0);
+    expect(subs.text).toBe("[]");
+
+    const assign = await request(server)
+        .get(`/api/assignments/${assignment.id}`)
+        .set("cookie", teacherCookie)
+    expect(JSON.parse(assign.text)["state"]).toBe("unpublished")
+    // revert state
+    const cut = await request(server)
+        .patch(`/api/assignments/${assignment.id}/submission/revertState`)
+        .set("cookie", teacherCookie)
+    expect(cut.status).toBe(HttpStatusCode.FORBIDDEN)
   });
 
 
