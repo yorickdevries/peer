@@ -243,19 +243,21 @@ export default class Submission extends BaseModel {
     const idValues = ids.map((idObject: { id: any; }) => idObject.id);
     console.log(idValues)
 
-    await QuestionAnswer.createQueryBuilder()
-        .delete()
-        .from(QuestionAnswer, "questionanswer")
-        .where("reviewId IN (:...idValues)", { idValues })
-        .execute();
+    if (idValues.length > 0) {
+      await QuestionAnswer.createQueryBuilder()
+          .delete()
+          .from(QuestionAnswer, "questionanswer")
+          .where("reviewId IN (:...idValues)", {idValues})
+          .execute();
 
-    await Review.createQueryBuilder("Review")
-        .delete()
-        .from(Review, "review")
-        .where("review.reviewOfSubmissionId IN (:...idValues)", { idValues })
-        .andWhere("review.type = :submittedType", {
-          submittedType: "reviewofreview",
-        })
-        .execute();
+      await Review.createQueryBuilder("Review")
+          .delete()
+          .from(Review, "review")
+          .where("review.reviewOfSubmissionId IN (:...idValues)", {idValues})
+          .andWhere("review.type = :submittedType", {
+            submittedType: "reviewofreview",
+          })
+          .execute();
+    }
   }
 }

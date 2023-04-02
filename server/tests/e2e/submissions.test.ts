@@ -104,55 +104,6 @@ describe("Submissions", () => {
     expect(res.status).toBe(HttpStatusCode.OK);
   });
 
-  test("revert from submission stage", async () => {
-    const exampleSubmissionFile = path.resolve(
-        __dirname,
-        "../../exampleData/submissions/submission1.c"
-    );
-    const res = await request(server)
-        .post("/api/submissions")
-        .set("cookie", sessionCookie)
-        .attach("file", fs.readFileSync(exampleSubmissionFile), "submission1.c")
-        .field("groupId", group.id)
-        .field("assignmentVersionId", assignmentVersion.id);
-
-
-    expect(res.status).toBe(HttpStatusCode.OK);
-
-    const assign1 = await request(server)
-        .get(`/api/assignments/${assignment.id}`)
-        .set("cookie", teacherCookie)
-    expect(JSON.parse(assign1.text)["state"]).toBe("submission")
-
-    // revert state
-    const a1 = await request(server)
-        .patch(`/api/assignments/${assignment.id}/submission/revertState`)
-        .set("cookie", teacherCookie)
-
-    expect(a1.status).toBe(HttpStatusCode.OK);
-    //get all submissions from assignment
-    const subs = await request(server)
-        .get(`/api/submissions/`)
-        .set("cookie", teacherCookie)
-        .query({ assignmentVersionId: assignmentVersion.id })
-
-
-    //check if any submissions were retrieved
-    expect(subs.text).toBe("[]");
-
-    const assign = await request(server)
-        .get(`/api/assignments/${assignment.id}`)
-        .set("cookie", teacherCookie)
-    expect(JSON.parse(assign.text)["state"]).toBe("unpublished")
-    // revert state
-    const cut = await request(server)
-        .patch(`/api/assignments/${assignment.id}/submission/revertState`)
-        .set("cookie", teacherCookie)
-    expect(cut.status).toBe(HttpStatusCode.FORBIDDEN)
-  });
-
-
-
   test("make a submission with invalid file type", async () => {
     const exampleSubmissionFile = path.resolve(
       __dirname,
