@@ -166,7 +166,10 @@
                                 title="Confirmation"
                                 centered
                             >
-                                Are you sure you want to revert state to "Submission"?
+                                <b-alert show variant="danger"
+                                    >Are you sure you want to revert state to "Submission"? This will delete all
+                                    submissions
+                                </b-alert>
                             </b-modal>
                         </div>
 
@@ -228,7 +231,10 @@
                                 title="Confirmation"
                                 centered
                             >
-                                Are you sure you want to revert state to "Waiting for review"?
+                                <b-alert show variant="danger"
+                                    >Are you sure you want to revert state to "Waiting for review"? This will delete all
+                                    submissions
+                                </b-alert>
                             </b-modal>
                         </div>
                         <!--Revert feedback-->
@@ -247,7 +253,9 @@
                                 title="Confirmation"
                                 centered
                             >
-                                Are you sure you want to revert state to "Review"?
+                                <b-alert show variant="danger"
+                                    >Are you sure you want to revert state to "Review"? This will delete all submissions
+                                </b-alert>
                             </b-modal>
                         </div>
                     </dl>

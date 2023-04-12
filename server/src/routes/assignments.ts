@@ -593,15 +593,12 @@ router.patch(
         await assignment.save();
         res.send(result);
         return;
-      } else if (state == AssignmentState.FEEDBACK) {
+      } else {
         assignment.revertState();
         //delete of review evaluations
         const re = await assignment.deleteAllReviewEvals();
         await assignment.save();
         res.send(re);
-        return;
-      } else {
-        res.status(HttpStatusCode.FORBIDDEN).send("State doesn't exist");
         return;
       }
     } catch (error) {
