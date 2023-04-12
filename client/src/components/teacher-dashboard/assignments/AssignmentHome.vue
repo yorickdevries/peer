@@ -107,7 +107,7 @@
                                 centered
                             >
                                 <b-alert show variant="danger"
-                                    >Are you sure you want to revert state to Unpublished? This will delete all
+                                    >Are you sure you want to revert state to "Unpublished"? This will delete all
                                     submissions
                                 </b-alert>
                             </b-modal>
@@ -166,7 +166,7 @@
                                 title="Confirmation"
                                 centered
                             >
-                                Are you sure you want to revert state to Submission?
+                                Are you sure you want to revert state to "Submission"?
                             </b-modal>
                         </div>
 
@@ -228,7 +228,7 @@
                                 title="Confirmation"
                                 centered
                             >
-                                Are you sure you want to revert state to Waiting for review?
+                                Are you sure you want to revert state to "Waiting for review"?
                             </b-modal>
                         </div>
                         <!--Revert feedback-->
@@ -247,7 +247,7 @@
                                 title="Confirmation"
                                 centered
                             >
-                                Are you sure you want to revert state to Review?
+                                Are you sure you want to revert state to "Review"?
                             </b-modal>
                         </div>
                     </dl>
