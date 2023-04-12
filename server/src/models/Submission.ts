@@ -229,35 +229,35 @@ export default class Submission extends BaseModel {
       .execute();
   }
   async deleteAllReviewEvals(): Promise<void> {
-    console.log("feedback deleted")
+    console.log("feedback deleted");
     const ids = await Review.createQueryBuilder("Review")
-        .select("Review.id")
-        .from(Review, "review")
-        .where("review.submissionId = :submissionId", {
-          submissionId: this.id,
-        })
-        .andWhere("review.type = :submittedType", {
-          submittedType: "reviewofsubmission",
-        })
-        .execute();
-    const idValues = ids.map((idObject: { id: any; }) => idObject.id);
-    console.log(idValues)
+      .select("Review.id")
+      .from(Review, "review")
+      .where("review.submissionId = :submissionId", {
+        submissionId: this.id,
+      })
+      .andWhere("review.type = :submittedType", {
+        submittedType: "reviewofsubmission",
+      })
+      .execute();
+    const idValues = ids.map((idObject: { id: any }) => idObject.id);
+    console.log(idValues);
 
     if (idValues.length > 0) {
       await QuestionAnswer.createQueryBuilder()
-          .delete()
-          .from(QuestionAnswer, "questionanswer")
-          .where("reviewId IN (:...idValues)", {idValues})
-          .execute();
+        .delete()
+        .from(QuestionAnswer, "questionanswer")
+        .where("reviewId IN (:...idValues)", { idValues })
+        .execute();
 
       await Review.createQueryBuilder("Review")
-          .delete()
-          .from(Review, "review")
-          .where("review.reviewOfSubmissionId IN (:...idValues)", {idValues})
-          .andWhere("review.type = :submittedType", {
-            submittedType: "reviewofreview",
-          })
-          .execute();
+        .delete()
+        .from(Review, "review")
+        .where("review.reviewOfSubmissionId IN (:...idValues)", { idValues })
+        .andWhere("review.type = :submittedType", {
+          submittedType: "reviewofreview",
+        })
+        .execute();
     }
   }
 }

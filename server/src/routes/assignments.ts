@@ -598,7 +598,7 @@ router.patch(
       } else if (req.params.state == "feedback") {
         assignment.revertState();
         //delete of review evaluations
-          const re = await assignment.deleteAllReviewEvals();
+        const re = await assignment.deleteAllReviewEvals();
         await assignment.save();
         res.send(re);
         return;

@@ -129,7 +129,8 @@ export default abstract class Review extends BaseModel {
   @OneToMany(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => QuestionAnswer,
-    (questionAnswer) => questionAnswer.review, { cascade: true }
+    (questionAnswer) => questionAnswer.review,
+    { cascade: true }
   )
   questionAnswers?: QuestionAnswer[];
 

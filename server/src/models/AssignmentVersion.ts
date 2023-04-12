@@ -189,10 +189,10 @@ export default class AssignmentVersion extends BaseModel {
   }
   async deleteAllReviewEvals(): Promise<void> {
     const subs = await Submission.createQueryBuilder("submissions")
-        .where("assignmentVersionId = :assignmentVersionId", {
-          assignmentVersionId: this.id,
-        })
-        .getMany();
+      .where("assignmentVersionId = :assignmentVersionId", {
+        assignmentVersionId: this.id,
+      })
+      .getMany();
     for (let i = 0; i < subs.length; i++) {
       await subs[i].deleteAllReviewEvals();
     }
