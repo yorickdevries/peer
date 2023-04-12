@@ -551,14 +551,11 @@ router.patch(
 
 const revertSchema = Joi.object({
   id: Joi.number().integer().required(),
-  state: Joi.string()
-    .valid(...Object.values(AssignmentState))
-    .required(),
 });
 
 //revert submission state
 router.patch(
-  "/:id/:state/revertState",
+  "/:id/revertState",
   validateParams(revertSchema),
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -578,24 +575,25 @@ router.patch(
       return;
     }
     try {
-      if (req.params.state == "submission") {
+      const state = assignment.state;
+      if (state == AssignmentState.SUBMISSION) {
         assignment.revertState();
         const result = await assignment.deleteAllSubmissions();
         await assignment.save();
         res.send(result);
         return;
-      } else if (req.params.state == "waitingforreview") {
+      } else if (state == AssignmentState.WAITING_FOR_REVIEW) {
         assignment.revertState();
         await assignment.save();
         res.send();
         return;
-      } else if (req.params.state == "review") {
+      } else if (state == AssignmentState.REVIEW) {
         assignment.revertState();
         const result = await assignment.deleteAllReviews();
         await assignment.save();
         res.send(result);
         return;
-      } else if (req.params.state == "feedback") {
+      } else if (state == AssignmentState.FEEDBACK) {
         assignment.revertState();
         //delete of review evaluations
         const re = await assignment.deleteAllReviewEvals();

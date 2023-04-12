@@ -339,7 +339,7 @@ export default {
         },
         async revertState() {
             this.disableButton = true
-            await api.assignments.revertState(this.$route.params.assignmentId, this.assignment.state)
+            await api.assignments.revertState(this.$route.params.assignmentId)
             this.showSuccessMessage({ message: "State reverted" })
             this.disableButton = false
             await this.fetchAssignment()

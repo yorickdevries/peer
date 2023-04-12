@@ -14,8 +14,8 @@ export default {
     closeSubmission(id) {
         return client.patch(`assignments/${id}/closesubmission`)
     },
-    revertState(assignmentId, state) {
-        return client.patch(`assignments/${assignmentId}/${state}/revertState`)
+    revertState(assignmentId) {
+        return client.patch(`assignments/${assignmentId}/revertState`)
     },
     getGroup(id) {
         return client.get(`assignments/${id}/group`)

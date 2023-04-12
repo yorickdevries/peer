@@ -1997,7 +1997,7 @@ describe("Integration", () => {
 
     //revert feedback state
     const e = await request(server)
-      .patch(`/api/assignments/${assignment.id}/feedback/revertState`)
+      .patch(`/api/assignments/${assignment.id}/revertState`)
       .set("cookie", await teacherCookie());
 
     expect(e.status).toBe(HttpStatusCode.OK);
@@ -2015,7 +2015,7 @@ describe("Integration", () => {
 
     //revert state to waiting for reviews
     const reviewRevert = await request(server)
-      .patch(`/api/assignments/${assignment.id}/review/revertState`)
+      .patch(`/api/assignments/${assignment.id}/revertState`)
       .set("cookie", await teacherCookie());
 
     expect(reviewRevert.status).toBe(HttpStatusCode.OK);
@@ -2035,7 +2035,7 @@ describe("Integration", () => {
 
     //revert state to submission
     const waitingReviewRevert = await request(server)
-      .patch(`/api/assignments/${assignment.id}/review/revertState`)
+      .patch(`/api/assignments/${assignment.id}/revertState`)
       .set("cookie", await teacherCookie());
     expect(waitingReviewRevert.status).toBe(HttpStatusCode.OK);
 
@@ -2047,7 +2047,7 @@ describe("Integration", () => {
 
     //revert state to unpublished
     const submissRevert = await request(server)
-      .patch(`/api/assignments/${assignment.id}/submission/revertState`)
+      .patch(`/api/assignments/${assignment.id}/revertState`)
       .set("cookie", await teacherCookie());
     expect(submissRevert.status).toBe(HttpStatusCode.OK);
     //check that state has been reverted
@@ -2065,7 +2065,7 @@ describe("Integration", () => {
 
     //revert state from unpublished
     const errRevert = await request(server)
-      .patch(`/api/assignments/${assignment.id}/unpublished/revertState`)
+      .patch(`/api/assignments/${assignment.id}/revertState`)
       .set("cookie", await teacherCookie());
     expect(errRevert.status).toBe(HttpStatusCode.FORBIDDEN);
   });
