@@ -576,25 +576,22 @@ router.patch(
     }
     try {
       const state = assignment.state;
+      assignment.revertState();
       if (state == AssignmentState.SUBMISSION) {
-        assignment.revertState();
         const result = await assignment.deleteAllSubmissions();
         await assignment.save();
         res.send(result);
         return;
       } else if (state == AssignmentState.WAITING_FOR_REVIEW) {
-        assignment.revertState();
         await assignment.save();
         res.send();
         return;
       } else if (state == AssignmentState.REVIEW) {
-        assignment.revertState();
         const result = await assignment.deleteAllReviews();
         await assignment.save();
         res.send(result);
         return;
       } else {
-        assignment.revertState();
         //delete of review evaluations
         const re = await assignment.deleteAllReviewEvals();
         await assignment.save();

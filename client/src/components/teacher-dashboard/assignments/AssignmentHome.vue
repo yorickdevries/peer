@@ -71,7 +71,7 @@
                             <b-button
                                 v-b-modal="`closeSubmission${assignment.id}`"
                                 :disabled="disableButton"
-                                class="mb-3"
+                                class="mb-3 mr-2"
                                 variant="primary"
                                 size="sm"
                                 >Close submission
@@ -98,7 +98,7 @@
                                 class="mb-3"
                                 variant="primary"
                                 size="sm"
-                                >Revert current stage
+                                >Revert to previous stage
                             </b-button>
                             <b-modal
                                 :id="`revertStateSubmission${assignment.id}`"
@@ -128,7 +128,7 @@
                             <b-button
                                 v-b-modal="`distributeReviews${assignment.id}`"
                                 :disabled="disableButton"
-                                class="mb-3"
+                                class="mb-3 mr-2"
                                 variant="primary"
                                 size="sm"
                                 >Distribute Reviews
@@ -158,7 +158,7 @@
                                 class="mb-3"
                                 variant="primary"
                                 size="sm"
-                                >Revert current stage
+                                >Revert to previous stage
                             </b-button>
                             <b-modal
                                 :id="`revertStateWaiting${assignment.id}`"
@@ -188,7 +188,7 @@
                             <b-button
                                 v-b-modal="`openFeedback${assignment.id}`"
                                 :disabled="disableButton"
-                                class="mb-3"
+                                class="mb-3 mr-2"
                                 variant="primary"
                                 size="sm"
                                 >Open Feedback
@@ -223,7 +223,7 @@
                                 class="mb-3"
                                 variant="primary"
                                 size="sm"
-                                >Revert current stage
+                                >Revert to previous stage
                             </b-button>
                             <b-modal
                                 :id="`revertStateReview${assignment.id}`"
@@ -242,7 +242,7 @@
                             <b-button
                                 v-b-modal="`revertFeedback${assignment.id}`"
                                 :disabled="disableButton"
-                                class="mb-3"
+                                class="mb-3 mr-2"
                                 variant="primary"
                                 size="sm"
                                 >Revert to previous stage
