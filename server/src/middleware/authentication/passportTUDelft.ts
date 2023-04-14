@@ -4,13 +4,12 @@ import path from "path";
 import fileCache from "file-system-cache";
 import { fetch, toPassportConfig } from "passport-saml-metadata";
 import passportSaml from "passport-saml";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const SamlStrategy = require("passport-saml").Strategy;
 import config from "config";
 import { PassportStatic } from "passport";
 import saveUserFromSSO from "../../util/saveUserFromSSO";
 
 const passportConfiguration = function (passport: PassportStatic): void {
+  const samlStrategy = passportSaml.Strategy;
   const backupStore = fileCache({ basePath: os.tmpdir() });
   const passportConfig: {
     idpUrl: string;
@@ -47,9 +46,6 @@ const passportConfiguration = function (passport: PassportStatic): void {
         profile,
         done
       ) => {
-        if (profile === null || profile === undefined) {
-          return done(new Error("Profile does not exist"));
-        }
         // save the user to the database
         const userNetid = await saveUserFromSSO(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -82,7 +78,7 @@ const passportConfiguration = function (passport: PassportStatic): void {
       };
 
       // Setup Strategy
-      const strategy = new SamlStrategy(ppConfig, verificationFunction);
+      const strategy = new samlStrategy(ppConfig, verificationFunction);
 
       // Generate metadata
       const metadataXML =
