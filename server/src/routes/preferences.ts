@@ -1,5 +1,5 @@
 import express from "express";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import { validateBody } from "../middleware/validation";
 
 const router = express.Router();

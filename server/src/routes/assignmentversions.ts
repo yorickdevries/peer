@@ -1,5 +1,5 @@
 import express from "express";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import Assignment from "../models/Assignment";
 import { AssignmentState } from "../enum/AssignmentState";
 import {

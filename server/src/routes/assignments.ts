@@ -1,5 +1,5 @@
 import express from "express";
-import Joi, { CustomHelpers } from "@hapi/joi";
+import Joi, { CustomHelpers } from "joi";
 import { getManager } from "typeorm";
 import {
   idSchema,

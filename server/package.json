@@ -24,14 +24,12 @@
     "seed": "npm run schema:drop && npm run typeorm:migration:run && npm run seed:run"
   },
   "dependencies": {
-    "@hapi/joi": "^17.1.1",
     "@sentry/node": "^7.26.0",
     "@sentry/tracing": "^7.26.0",
     "@types/compression": "^1.7.2",
     "@types/config": "^3.3.0",
     "@types/cookie-parser": "^1.4.3",
     "@types/express-session": "^1.17.5",
-    "@types/hapi__joi": "^17.1.8",
     "@types/helmet": "0.0.48",
     "@types/is-ci": "^3.0.0",
     "@types/json2csv": "^5.0.3",
@@ -61,6 +59,7 @@
     "forwarded-for": "^1.1.0",
     "helmet": "^6.0.0",
     "is-ci": "^3.0.1",
+    "joi": "^17.9.1",
     "js-graph-algorithms": "^1.0.18",
     "json-parse-even-better-errors": "^2.3.1",
     "json2csv": "^5.0.7",
