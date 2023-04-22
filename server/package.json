@@ -85,7 +85,7 @@
     "ts-node": "^10.9.1",
     "typeorm": "^0.2.25",
     "typescript": "^3.9.5",
-    "workerpool": "^6.0.0"
+    "workerpool": "^6.4.0"
   },
   "devDependencies": {
     "@types/faker": "^5.5.8",
