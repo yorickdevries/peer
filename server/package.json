@@ -42,7 +42,7 @@
     "@types/passport-saml-metadata": "^2.2.1",
     "@types/session-file-store": "^1.2.1",
     "@types/workerpool": "^6.0.0",
-    "class-validator": "^0.13.2",
+    "class-validator": "^0.14.0",
     "compression": "^1.7.4",
     "config": "^3.3.9",
     "cookie-parser": "^1.4.6",
