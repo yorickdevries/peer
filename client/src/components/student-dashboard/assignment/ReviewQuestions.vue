@@ -1,5 +1,5 @@
 <template>
-    <b-card v-if="answers" no-body class="mt-3" style="padding: 1.25rem">
+    <div v-if="answers">
         <!--Question Information-->
         <b-card v-for="(question, index) in questionnaire.questions" :key="question.id" class="mb-3" no-body>
             <b-card-header class="d-flex align-items-center">
@@ -152,7 +152,7 @@
                 >
             </b-card-body>
         </b-card>
-    </b-card>
+    </div>
     <b-card v-else class="mt-3" style="padding: 1.25rem">No questions present.</b-card>
 </template>
 

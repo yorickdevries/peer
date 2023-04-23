@@ -25,6 +25,7 @@
                         :reviewsAreReadOnly="true"
                         :assignmentType="assignmentType"
                         :evaluationButton="false"
+                        :popup="true"
                     >
                     </Review>
                 </b-modal>

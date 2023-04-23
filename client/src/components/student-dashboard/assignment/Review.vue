@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-button v-if="!evaluationButton" id="slideout-btn" variant="warning" v-b-toggle.sidebar>
+        <b-button v-if="!popup" id="slideout-btn" variant="warning" v-b-toggle.sidebar>
             <p>Show Questions</p>
         </b-button>
         <b-row>
@@ -69,65 +69,59 @@
                 <FileAnnotator :reviewId="review.id" :assignmentType="assignmentType" :readOnly="reviewsAreReadOnly" />
             </b-col>
             <b-col :cols="columnWidthFileAndQuestionnaire">
-                <b-sidebar
-                    v-if="!evaluationButton"
-                    id="sidebar"
-                    title="Review Questionnaire"
-                    width="75%"
-                    right
-                    shadow
-                    backdrop
-                >
+                <b-sidebar v-if="!popup" id="sidebar" title="Review Questionnaire" width="75%" right shadow backdrop>
                     <!--Form, load only when answers are available-->
-                    <ReviewQuestions
-                        :reviewsAreReadOnly="reviewsAreReadOnly"
-                        :review="review"
-                        :questionnaire="questionnaire"
-                        :reviewId="reviewId"
-                        :buttonDisabled="buttonDisabled"
-                        @disableButton="(v) => (buttonDisabled = v)"
-                        ref="questions"
-                    ></ReviewQuestions>
-                    <b-card v-if="!reviewsAreReadOnly">
-                        <!--Save/Submit Buttons-->
-                        <b-card-body>
-                            <div>
-                                <b-form-checkbox
-                                    :disabled="review.submitted"
-                                    v-model="review.flaggedByReviewer"
-                                    name="reportButton"
-                                    class="float-left"
+                    <b-card no-body class="mt-3">
+                        <ReviewQuestions
+                            :reviewsAreReadOnly="reviewsAreReadOnly"
+                            :review="review"
+                            :questionnaire="questionnaire"
+                            :reviewId="reviewId"
+                            :buttonDisabled="buttonDisabled"
+                            @disableButton="(v) => (buttonDisabled = v)"
+                            ref="questions"
+                        ></ReviewQuestions>
+                        <b-card v-if="!reviewsAreReadOnly">
+                            <!--Save/Submit Buttons-->
+                            <b-card-body>
+                                <div>
+                                    <b-form-checkbox
+                                        :disabled="review.submitted"
+                                        v-model="review.flaggedByReviewer"
+                                        name="reportButton"
+                                        class="float-left"
+                                    >
+                                        ⚠️ Report this submission
+                                    </b-form-checkbox>
+                                    <br />
+                                    <small>
+                                        Report the submission if it is empty, not serious or for the wrong assignment.
+                                    </small>
+                                </div>
+                                <b-button
+                                    v-if="!review.submitted"
+                                    variant="success float-right"
+                                    type="submit"
+                                    v-b-modal="`submit${review.id}`"
+                                    :disabled="buttonDisabled"
+                                    >Submit Review</b-button
                                 >
-                                    ⚠️ Report this submission
-                                </b-form-checkbox>
-                                <br />
-                                <small>
-                                    Report the submission if it is empty, not serious or for the wrong assignment.
-                                </small>
-                            </div>
-                            <b-button
-                                v-if="!review.submitted"
-                                variant="success float-right"
-                                type="submit"
-                                v-b-modal="`submit${review.id}`"
-                                :disabled="buttonDisabled"
-                                >Submit Review</b-button
-                            >
-                            <b-button
-                                v-else
-                                variant="outline-success float-right"
-                                v-b-modal="`unsubmit${review.id}`"
-                                :disabled="buttonDisabled"
-                                >Unsubmit Review</b-button
-                            >
-                            <b-button
-                                v-if="questionNumbersOfUnsavedAnswers.length > 0"
-                                variant="info float-right"
-                                @click="saveAllAnswers"
-                                :disabled="buttonDisabled"
-                                >Save all unsaved answers</b-button
-                            >
-                        </b-card-body>
+                                <b-button
+                                    v-else
+                                    variant="outline-success float-right"
+                                    v-b-modal="`unsubmit${review.id}`"
+                                    :disabled="buttonDisabled"
+                                    >Unsubmit Review</b-button
+                                >
+                                <b-button
+                                    v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                                    variant="info float-right"
+                                    @click="saveAllAnswers"
+                                    :disabled="buttonDisabled"
+                                    >Save all unsaved answers</b-button
+                                >
+                            </b-card-body>
+                        </b-card>
                     </b-card>
                 </b-sidebar>
                 <ReviewQuestions
@@ -258,7 +252,7 @@ export default {
     mixins: [notifications],
     name: "Review",
     components: { ReviewQuestions, ReviewEvaluation, FileAnnotator },
-    props: ["reviewId", "reviewsAreReadOnly", "assignmentType", "evaluationButton"],
+    props: ["reviewId", "reviewsAreReadOnly", "assignmentType", "evaluationButton", "popup"],
     data() {
         return {
             fileMetadata: null,
@@ -306,7 +300,7 @@ export default {
     },
     mounted() {
         setTimeout(() => {
-            if (this.evaluationButton) {
+            if (this.popup) {
                 return
             }
             document.querySelector("#slideout-btn").animate(
