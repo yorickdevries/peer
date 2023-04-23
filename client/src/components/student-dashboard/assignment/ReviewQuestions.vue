@@ -152,45 +152,6 @@
                 >
             </b-card-body>
         </b-card>
-        <b-card v-if="!reviewsAreReadOnly">
-            <!--Save/Submit Buttons-->
-            <b-card-body>
-                <div>
-                    <b-form-checkbox
-                        :disabled="review.submitted"
-                        v-model="review.flaggedByReviewer"
-                        name="reportButton"
-                        class="float-left"
-                    >
-                        ⚠️ Report this submission
-                    </b-form-checkbox>
-                    <br />
-                    <small> Report the submission if it is empty, not serious or for the wrong assignment. </small>
-                </div>
-                <b-button
-                    v-if="!review.submitted"
-                    variant="success float-right"
-                    type="submit"
-                    v-b-modal="`submit${review.id}`"
-                    :disabled="buttonDisabled"
-                    >Submit Review</b-button
-                >
-                <b-button
-                    v-else
-                    variant="outline-success float-right"
-                    v-b-modal="`unsubmit${review.id}`"
-                    :disabled="buttonDisabled"
-                    >Unsubmit Review</b-button
-                >
-                <b-button
-                    v-if="questionNumbersOfUnsavedAnswers.length > 0"
-                    variant="info float-right"
-                    @click="saveAllAnswers"
-                    :disabled="buttonDisabled"
-                    >Save all unsaved answers</b-button
-                >
-            </b-card-body>
-        </b-card>
     </b-card>
     <b-card v-else class="mt-3" style="padding: 1.25rem">No questions present.</b-card>
 </template>
@@ -207,11 +168,14 @@ export default {
     name: "ReviewQuestions",
     mixins: [notifications],
     components: { MarkdownEditorViewer, PDFViewer, StarRating },
-    props: ["questionnaire", "review", "reviewsAreReadOnly", "buttonDisabled", "reviewId"],
+    props: ["questionnaire", "review", "reviewsAreReadOnly", "buttonDisabled", "reviewId", "feedback"],
     emits: ["disableButton"],
     async created() {
         window.addEventListener("keydown", this.keyDown)
         window.addEventListener("keyup", this.keyUp)
+        if (this.feedback) {
+            await this.fetchAnswers()
+        }
     },
     destroyed() {
         window.removeEventListener("keydown", this.keyDown)
@@ -280,7 +244,10 @@ export default {
         async fetchAnswers() {
             // remove existing answers
             this.answers = null
-            const res = await api.reviewofsubmissions.getAnswers(this.reviewId)
+            const res = this.feedback
+                ? await api.reviewquestionnaires.get(this.review.questionnaireId)
+                : await api.reviewofsubmissions.getAnswers(this.reviewId)
+            this.loadedQuestions = true
             const existingAnswers = res.data
             // construct answer map
             const answers = {}
