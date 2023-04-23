@@ -77,7 +77,7 @@
                         :questionnaire="questionnaire"
                         :reviewId="reviewId"
                         :buttonDisabled="buttonDisabled"
-                        @disableButton="(v) => (this.buttonDisabled = v)"
+                        @disableButton="(v) => (buttonDisabled = v)"
                         ref="questions"
                     ></ReviewQuestions>
                 </b-sidebar>
@@ -190,7 +190,6 @@
 
 <script>
 import api from "../../../api/api"
-import _ from "lodash"
 import notifications from "../../../mixins/notifications"
 import ReviewEvaluation from "./ReviewEvaluation"
 import FileAnnotator from "./FileAnnotator"
@@ -290,11 +289,6 @@ export default {
         async fetchSubmissionQuestionnaire() {
             const res = await api.submissionquestionnaires.get(this.review.questionnaireId)
             this.questionnaire = res.data
-        },
-        getQuestion(questionId) {
-            return _.find(this.questionnaire.questions, (question) => {
-                return question.id === parseInt(questionId)
-            })
         },
         async submitReview() {
             this.buttonDisabled = true

@@ -198,12 +198,14 @@
 <script>
 import api from "@/api/api"
 import _ from "lodash"
+import notifications from "../../../mixins/notifications"
 import MarkdownEditorViewer from "../../general/MarkdownEditorViewer"
 import PDFViewer from "../../general/PDFViewer"
 import { StarRating } from "vue-rate-it"
 
 export default {
     name: "ReviewQuestions",
+    mixins: [notifications],
     components: { MarkdownEditorViewer, PDFViewer, StarRating },
     props: ["questionnaire", "review", "reviewsAreReadOnly", "buttonDisabled", "reviewId"],
     emits: ["disableButton"],
@@ -267,6 +269,11 @@ export default {
         },
     },
     methods: {
+        getQuestion(questionId) {
+            return _.find(this.questionnaire.questions, (question) => {
+                return question.id === parseInt(questionId)
+            })
+        },
         uploadAnswerFilePath(reviewId, questionId) {
             return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`
         },
