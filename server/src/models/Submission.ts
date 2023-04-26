@@ -23,8 +23,8 @@ import Group from "./Group";
 import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
 import ServerFlagReason from "../enum/ServerFlagReason";
-import Review from "./Review";
 import QuestionAnswer from "./QuestionAnswer";
+import ReviewOfReview from "./ReviewOfReview";
 
 @Entity()
 export default class Submission extends BaseModel {
@@ -217,45 +217,61 @@ export default class Submission extends BaseModel {
     return await assignmentVersion.isTeacherInCourse(user);
   }
   async deleteAllReviews(): Promise<void> {
-    await Review.createQueryBuilder("Review")
-      .delete()
-      .from(Review)
-      .where("submissionId = :submissionId", {
+    const ids = await ReviewOfSubmission.createQueryBuilder("review")
+      .select("review.id", "rid")
+      .where("review.submissionId = :submissionId", {
         submissionId: this.id,
       })
-      .andWhere("type = :submittedType", {
-        submittedType: "reviewofsubmission",
+      .execute();
+    const reviewIds = ids.map((idObject: { rid: any }) => idObject.rid);
+
+    if (reviewIds.length > 0) {
+      await QuestionAnswer.createQueryBuilder()
+        .delete()
+        .where("reviewId IN (:...idValues)", { idValues: reviewIds })
+        .execute();
+    }
+
+    await ReviewOfSubmission.createQueryBuilder()
+      .delete()
+      .where("submissionId = :submissionId", {
+        submissionId: this.id,
       })
       .execute();
   }
   async deleteAllReviewEvals(): Promise<void> {
     console.log("feedback deleted");
-    const ids = await Review.createQueryBuilder("Review")
-      .select("Review.id")
-      .from(Review, "review")
+    // get all reviews for this submission
+    const ids = await ReviewOfSubmission.createQueryBuilder("review")
+      .select("review.id", "rid")
       .where("review.submissionId = :submissionId", {
         submissionId: this.id,
       })
-      .andWhere("review.type = :submittedType", {
-        submittedType: "reviewofsubmission",
-      })
       .execute();
-    const idValues = ids.map((idObject: { id: any }) => idObject.id);
-    console.log(idValues);
 
-    if (idValues.length > 0) {
+    const reviewIds = ids.map((idObject: { rid: any }) => idObject.rid);
+    console.log(reviewIds);
+
+    // get all review evaluations for this submission
+    const feedbackReviews = await ReviewOfReview.createQueryBuilder("review")
+      .select("review.id", "rid")
+      .where("reviewOfSubmissionId IN (:...idValues)", { idValues: reviewIds })
+      .execute();
+
+    const feedbackReviewIds = feedbackReviews.map(
+      (idObject: { rid: any }) => idObject.rid
+    );
+
+    if (feedbackReviewIds.length > 0) {
       await QuestionAnswer.createQueryBuilder()
         .delete()
-        .from(QuestionAnswer, "questionanswer")
-        .where("reviewId IN (:...idValues)", { idValues })
+        .where("reviewId IN (:...idValues)", { idValues: feedbackReviewIds })
         .execute();
 
-      await Review.createQueryBuilder("Review")
+      await ReviewOfReview.createQueryBuilder()
         .delete()
-        .from(Review, "review")
-        .where("review.reviewOfSubmissionId IN (:...idValues)", { idValues })
-        .andWhere("review.type = :submittedType", {
-          submittedType: "reviewofreview",
+        .where("reviewOfSubmissionId IN (:...idValues)", {
+          idValues: reviewIds,
         })
         .execute();
     }
