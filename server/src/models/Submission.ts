@@ -240,7 +240,6 @@ export default class Submission extends BaseModel {
       .execute();
   }
   async deleteAllReviewEvals(): Promise<void> {
-    console.log("feedback deleted");
     // get all reviews for this submission
     const ids = await ReviewOfSubmission.createQueryBuilder("review")
       .select("review.id", "rid")
@@ -250,7 +249,6 @@ export default class Submission extends BaseModel {
       .execute();
 
     const reviewIds = ids.map((idObject: { rid: any }) => idObject.rid);
-    console.log(reviewIds);
 
     // get all review evaluations for this submission
     const feedbackReviews = await ReviewOfReview.createQueryBuilder("review")

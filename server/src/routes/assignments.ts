@@ -599,7 +599,7 @@ router.patch(
         return;
       }
     } catch (error) {
-      res.status(HttpStatusCode.FORBIDDEN).send(String(error));
+      res.status(HttpStatusCode.FORBIDDEN).send("Something went wrong while reverting the state");
       return;
     }
   }
