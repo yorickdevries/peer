@@ -248,30 +248,34 @@ export default class Submission extends BaseModel {
       })
       .execute();
 
-    const reviewIds = ids.map((idObject: { rid: any }) => idObject.rid);
+    if (ids.length !== 0) {
+      const reviewIds = ids.map((idObject: { rid: any }) => idObject.rid);
 
-    // get all review evaluations for this submission
-    const feedbackReviews = await ReviewOfReview.createQueryBuilder("review")
-      .select("review.id", "rid")
-      .where("reviewOfSubmissionId IN (:...idValues)", { idValues: reviewIds })
-      .execute();
-
-    const feedbackReviewIds = feedbackReviews.map(
-      (idObject: { rid: any }) => idObject.rid
-    );
-
-    if (feedbackReviewIds.length > 0) {
-      await QuestionAnswer.createQueryBuilder()
-        .delete()
-        .where("reviewId IN (:...idValues)", { idValues: feedbackReviewIds })
-        .execute();
-
-      await ReviewOfReview.createQueryBuilder()
-        .delete()
+      // get all review evaluations for this submission
+      const feedbackReviews = await ReviewOfReview.createQueryBuilder("review")
+        .select("review.id", "rid")
         .where("reviewOfSubmissionId IN (:...idValues)", {
           idValues: reviewIds,
         })
         .execute();
+
+      const feedbackReviewIds = feedbackReviews.map(
+        (idObject: { rid: any }) => idObject.rid
+      );
+
+      if (feedbackReviewIds.length > 0) {
+        await QuestionAnswer.createQueryBuilder()
+          .delete()
+          .where("reviewId IN (:...idValues)", { idValues: feedbackReviewIds })
+          .execute();
+
+        await ReviewOfReview.createQueryBuilder()
+          .delete()
+          .where("reviewOfSubmissionId IN (:...idValues)", {
+            idValues: reviewIds,
+          })
+          .execute();
+      }
     }
   }
 }

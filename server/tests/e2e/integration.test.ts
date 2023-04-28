@@ -2067,6 +2067,6 @@ describe("Integration", () => {
     const errRevert = await request(server)
       .patch(`/api/assignments/${assignment.id}/revertState`)
       .set("cookie", await teacherCookie());
-    expect(errRevert.status).toBe(HttpStatusCode.FORBIDDEN);
+    expect(errRevert.status).toBe(HttpStatusCode.INTERNAL_SERVER_ERROR);
   });
 });

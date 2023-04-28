@@ -592,14 +592,14 @@ router.patch(
         res.send(result);
         return;
       } else {
-        //delete of review evaluations
+        //delete review evaluations
         const re = await assignment.deleteAllReviewEvals();
         await assignment.save();
         res.send(re);
         return;
       }
     } catch (error) {
-      res.status(HttpStatusCode.FORBIDDEN).send("Something went wrong while reverting the state");
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Something went wrong while reverting the state");
       return;
     }
   }
