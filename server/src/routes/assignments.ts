@@ -599,7 +599,9 @@ router.patch(
         return;
       }
     } catch (error) {
-      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).send("Something went wrong while reverting the state");
+      res
+        .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+        .send("Something went wrong while reverting the state");
       return;
     }
   }
