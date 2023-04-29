@@ -1,9 +1,9 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import {
-  validateParams,
   idSchema,
   validateBody,
+  validateParams,
 } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ResponseMessage from "../enum/ResponseMessage";
@@ -11,6 +11,7 @@ import _ from "lodash";
 import ReviewOfReview from "../models/ReviewOfReview";
 import moment from "moment";
 import submitReview from "../util/submitReview";
+import { genMailForLateEvaluation, sendMessageBatch } from "../util/mailer";
 
 const router = express.Router();
 
@@ -126,6 +127,13 @@ router.patch(
       // submit review in transaction
       await submitReview(review, flaggedByReviewer);
       await review.reload();
+
+      if (moment().isAfter(assignment.reviewEvaluationDueDate)) {
+        const mailsToSend = await genMailForLateEvaluation(
+          review.reviewOfSubmissionId
+        );
+        await sendMessageBatch(mailsToSend);
+      }
     } else {
       // just set the fields
       review.flaggedByReviewer = flaggedByReviewer;

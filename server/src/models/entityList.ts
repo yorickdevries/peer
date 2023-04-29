@@ -39,6 +39,7 @@ import ReplyingPDFAnnotation from "./ReplyingPDFAnnotation";
 import AssignmentExport from "./AssignmentExport";
 import CodeAnnotation from "./CodeAnnotation";
 import Banner from "./Banner";
+import Preferences from "./Preferences";
 // End of All Database models
 
 const entityList = [
@@ -82,6 +83,7 @@ const entityList = [
   AssignmentExport,
   CodeAnnotation,
   Banner,
+  Preferences,
 ];
 
 export default entityList;

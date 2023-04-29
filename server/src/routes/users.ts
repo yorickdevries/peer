@@ -1,6 +1,6 @@
 import express from "express";
 import User from "../models/User";
-import { validateParams, idStringSchema } from "../middleware/validation";
+import { idStringSchema, validateParams } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import _ from "lodash";
 import checkEmployee from "../middleware/authentication/checkEmployee";

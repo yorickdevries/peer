@@ -1,22 +1,22 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  RelationId,
   Column,
-  ManyToMany,
-  OneToMany,
-  JoinTable,
-  OneToOne,
+  Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  RelationId,
 } from "typeorm";
 import {
+  IsBoolean,
   IsDefined,
   IsInt,
+  IsNotEmpty,
   IsPositive,
   IsString,
-  IsNotEmpty,
-  IsBoolean,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import Assignment from "../models/Assignment";

@@ -1,10 +1,10 @@
 import express from "express";
 import Joi from "@hapi/joi";
 import {
-  validateQuery,
-  validateBody,
   idSchema,
+  validateBody,
   validateParams,
+  validateQuery,
 } from "../middleware/validation";
 import AssignmentVersion from "../models/AssignmentVersion";
 import HttpStatusCode from "../enum/HttpStatusCode";
@@ -24,8 +24,8 @@ import removePDFMetadata from "../util/removePDFMetadata";
 import AssignmentExport from "../models/AssignmentExport";
 import {
   startExportSubmissionsForAssignmentVersionWorker,
-  startSubmissionFlaggingWorker,
   startExportSubmissionsForZipWorker,
+  startSubmissionFlaggingWorker,
   //startImportWebLabSubmissionsWorker,
 } from "../workers/pool";
 //import AssignmentType from "../enum/AssignmentType";

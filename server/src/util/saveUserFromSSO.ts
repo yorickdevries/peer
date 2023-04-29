@@ -1,8 +1,8 @@
 import parseNetID from "./parseNetID";
 import {
   parseAndSaveAffiliation,
-  parseAndSaveStudy,
   parseAndSaveOrganisationUnit,
+  parseAndSaveStudy,
 } from "./parseAndSaveSSOFields";
 import User from "../models/User";
 

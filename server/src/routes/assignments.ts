@@ -2,10 +2,10 @@ import express from "express";
 import Joi, { CustomHelpers } from "@hapi/joi";
 import { getManager } from "typeorm";
 import {
-  validateBody,
-  validateQuery,
-  validateParams,
   idSchema,
+  validateBody,
+  validateParams,
+  validateQuery,
 } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import Course from "../models/Course";

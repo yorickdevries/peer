@@ -201,6 +201,9 @@ export default {
         },
     },
     computed: {
+        numberOfUnsaved() {
+            return Object.keys(this.answers).filter((key) => this.answers[key].changed).length
+        },
         questionNumbersOfUnsavedAnswers() {
             const questionNumbersOfUnsavedAnswers = []
             if (!this.answers) {
@@ -233,6 +236,9 @@ export default {
         },
     },
     methods: {
+        numberOfUnsavedQuestions() {
+            return this.numberOfUnsaved
+        },
         getQuestion(questionId) {
             return _.find(this.questionnaire.questions, (question) => {
                 return question.id === parseInt(questionId)

@@ -34,10 +34,7 @@ export default {
     data() {
         return {
             // my API key for localhost
-            adobeDCViewClientId:
-                process.env.NODE_ENV === "production"
-                    ? "e15abfc9f499445e9acb8cdc19482196"
-                    : "b3c8121ca4ba4dd0af5424097b94538d",
+            adobeDCViewClientId: process.env.VUE_APP_ADOBE_ID,
             review: null,
             submission: null,
             fileMetadata: null,
@@ -223,7 +220,14 @@ export default {
                             const res = await api.pdfannotations.get(review.id, vm.fileMetadata.id)
                             const annotations = res.data
                             if (annotations.length > 0) {
-                                annotations.forEach((a) => (a.target.selector.strokeColor = vm.reviewColors[review.id]))
+                                annotations.forEach((a) => {
+                                    try {
+                                        a.target.selector.strokeColor = vm.reviewColors[review.id]
+                                    } catch (error) {
+                                        // No target selector available
+                                    }
+                                })
+
                                 /* API to add annotations */
                                 try {
                                     await annotationManager.addAnnotations(annotations)

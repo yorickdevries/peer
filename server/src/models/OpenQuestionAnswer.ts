@@ -2,7 +2,7 @@ import { ChildEntity, Column } from "typeorm";
 import QuestionAnswerType from "../enum/QuestionAnswerType";
 import QuestionAnswer from "./QuestionAnswer";
 import Review from "./Review";
-import { IsDefined, IsString, IsNotEmpty } from "class-validator";
+import { IsDefined, IsNotEmpty, IsString } from "class-validator";
 import OpenQuestion from "./OpenQuestion";
 
 @ChildEntity(QuestionAnswerType.OPEN)

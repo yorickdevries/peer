@@ -1,19 +1,19 @@
 import {
-  PrimaryGeneratedColumn,
-  Entity,
-  TableInheritance,
   Column,
+  Entity,
   ManyToOne,
-  RelationId,
   OneToMany,
+  PrimaryGeneratedColumn,
+  RelationId,
+  TableInheritance,
 } from "typeorm";
 import {
-  IsOptional,
-  IsDefined,
   IsBoolean,
   IsDate,
-  IsString,
+  IsDefined,
   IsNotEmpty,
+  IsOptional,
+  IsString,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
