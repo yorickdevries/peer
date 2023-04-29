@@ -358,6 +358,7 @@ export default {
                 switch (question.type) {
                     case "open":
                         await api.openquestionanswers.delete(question.id, this.review.id)
+                        answer.answer = ""
                         break
                     case "multiplechoice":
                         await api.multiplechoicequestionanswers.delete(question.id, this.review.id)
@@ -378,8 +379,6 @@ export default {
                 // reset answer
                 if (question.type === "checkbox") {
                     answer.answer = []
-                } else if (question.type === "open") {
-                    answer.answer = ""
                 } else {
                     answer.answer = null
                 }
