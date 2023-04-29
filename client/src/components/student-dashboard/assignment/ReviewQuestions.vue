@@ -20,7 +20,7 @@
                 <MarkdownEditorViewer
                     v-if="question.type === 'open'"
                     :answer-object="answers[question.id]"
-                    :displayeditor="!(review.submitted || reviewsAreReadOnly)"
+                    :displayeditor="canChange"
                     @shortcut-save="questionIndex = index"
                 />
 
@@ -35,7 +35,7 @@
                                     "
                     stacked
                     required
-                    :disabled="review.submitted || reviewsAreReadOnly"
+                    :disabled="!canChange"
                 >
                     <b-form-radio v-for="option in question.options" :key="option.id" :value="option">{{
                             option.text
@@ -49,7 +49,7 @@
                     @input=";(answers[question.id].changed = true), (questionIndex = index)"
                     stacked
                     required
-                    :disabled="review.submitted || reviewsAreReadOnly"
+                    :disabled="!canChange"
                 >
                     <b-form-checkbox v-for="option in question.options" :key="option.id" :value="option">
                         {{ option.text }}</b-form-checkbox
@@ -70,7 +70,7 @@
                     inline
                     :max-rating="question.range"
                     :show-rating="true"
-                    :read-only="review.submitted || reviewsAreReadOnly"
+                    :read-only="!canChange"
                 />
 
                 <!-- UPLOAD QUESTION -->
@@ -122,7 +122,7 @@
                                 (questionIndex = index)
                         "
                         :accept="`${question.extensions}`"
-                        :disabled="review.submitted || reviewsAreReadOnly"
+                        :disabled="!canChange"
                     >
                     </b-form-file>
                 </b-form-group>
@@ -131,7 +131,7 @@
                 <!--Delete / Save Button-->
                 <b-button
                     :variant="(answers[question.id].exists ? 'danger' : 'outline-danger') + ' float-right'"
-                    :disabled="!answers[question.id].exists || review.submitted || buttonDisabled"
+                    :disabled="!answers[question.id].exists || !canChange"
                     v-b-modal="`deleteAnswer-${question.id}`"
                     >Delete Answer</b-button
                 >
@@ -146,7 +146,7 @@
                 <b-button
                     ref="saveButton"
                     :variant="(answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'"
-                    :disabled="!answers[question.id].changed || review.submitted || buttonDisabled"
+                    :disabled="!answers[question.id].changed || !canChange"
                     @click="saveAnswer(question, answers[question.id])"
                     >Save Answer</b-button
                 >
@@ -168,7 +168,7 @@ export default {
     name: "ReviewQuestions",
     mixins: [notifications],
     components: { MarkdownEditorViewer, PDFViewer, StarRating },
-    props: ["questionnaire", "review", "reviewsAreReadOnly", "buttonDisabled", "reviewId", "feedback"],
+    props: ["questionnaire", "review", "reviewsAreReadOnly", "buttonDisabled", "reviewId", "feedback", "canChange"],
     emits: ["disableButton"],
     async created() {
         window.addEventListener("keydown", this.keyDown)
@@ -245,7 +245,7 @@ export default {
             // remove existing answers
             this.answers = null
             const res = this.feedback
-                ? await api.reviewquestionnaires.get(this.review.questionnaireId)
+                ? await api.reviewofreviews.getAnswers(this.reviewId)
                 : await api.reviewofsubmissions.getAnswers(this.reviewId)
             this.loadedQuestions = true
             const existingAnswers = res.data

@@ -78,6 +78,7 @@
                             :questionnaire="questionnaire"
                             :reviewId="reviewId"
                             :buttonDisabled="buttonDisabled"
+                            :canChange="!(review.submitted || reviewsAreReadOnly)"
                             @disableButton="(v) => (buttonDisabled = v)"
                             ref="questions"
                         ></ReviewQuestions>
