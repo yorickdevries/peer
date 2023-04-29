@@ -128,7 +128,7 @@
                     >Unsubmit Evaluation</b-button
                 >
                 <b-button
-                    v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                    v-if="unsavedAnswer.length > 0"
                     variant="info float-right"
                     @click="saveAllAnswers"
                     :disabled="buttonDisabled"
@@ -139,7 +139,7 @@
         <br />
 
         <!--Form, load only when answers are available-->
-        <b-card no-body class="mt-3">
+        <b-card v-if="readyLoadAnswers" no-body class="mt-3">
             <!--Title-->
             <b-card-header v-if="userIsOwner && !reviewsAreReadOnly">
                 <h4>Review Evaluation</h4>
@@ -159,6 +159,8 @@
                 :canChange="questionsCanBeChanged"
                 ref="questions"
                 @disableButton="(v) => (buttonDisabled = v)"
+                @unsaveAns="(v) => (unsavedAnswer = v)"
+                @unansQues="(v) => (unansweredQuestion = v)"
             ></ReviewQuestions>
 
             <template v-if="userIsOwner && !reviewsAreReadOnly">
@@ -192,7 +194,7 @@
                         >Unsubmit Evaluation</b-button
                     >
                     <b-button
-                        v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                        v-if="unsavedAnswer.length > 0"
                         variant="info float-right"
                         @click="saveAllAnswers"
                         :disabled="buttonDisabled"
@@ -202,23 +204,16 @@
                     <b-modal
                         :id="`submit${review.id}`"
                         title="Submit Confirmation"
-                        :ok-disabled="
-                            buttonDisabled ||
-                            (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 && !review.flaggedByReviewer)
-                        "
+                        :ok-disabled="buttonDisabled || (unansweredQuestion.length > 0 && !review.flaggedByReviewer)"
                         @ok="submitReview"
                     >
-                        <b-alert v-if="questionNumbersOfUnsavedAnswers.length > 0" show variant="warning" class="p-2"
+                        <b-alert v-if="unsavedAnswer.length > 0" show variant="warning" class="p-2"
                             >There are one or more unsaved answers for the following questions:
-                            {{ questionNumbersOfUnsavedAnswers }}</b-alert
+                            {{ unsavedAnswer }}</b-alert
                         >
-                        <b-alert
-                            v-if="questionNumbersOfUnansweredNonOptionalQuestions.length > 0"
-                            show
-                            variant="danger"
-                            class="p-2"
+                        <b-alert v-if="unansweredQuestion.length > 0" show variant="danger" class="p-2"
                             >There are one or more answers missing for the following non-optional questions:
-                            {{ questionNumbersOfUnansweredNonOptionalQuestions }}</b-alert
+                            {{ unansweredQuestion }}</b-alert
                         >
                         Do you really want to submit? This marks the review as finished and all unsaved changes will be
                         discarded.
@@ -259,14 +254,13 @@ export default {
             questionnaire: null,
             // disable save/delete buttons when a call is busy
             buttonDisabled: false,
+            unsavedAnswer: [],
+            unansweredQuestion: [],
         }
     },
     computed: {
-        questionNumbersOfUnansweredNonOptionalQuestions() {
-            return this.$refs.questions ? this.$refs.questions.questionNumbersOfUnansweredNonOptionalQuestions : []
-        },
-        questionNumbersOfUnsavedAnswers() {
-            return this.$refs.questions ? this.$refs.questions.questionNumbersOfUnsavedAnswers : []
+        readyLoadAnswers() {
+            return this.review && this.questionnaire
         },
         userIsOwner() {
             if (this.review && this.user) {

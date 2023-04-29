@@ -169,7 +169,7 @@ export default {
     mixins: [notifications],
     components: { MarkdownEditorViewer, PDFViewer, StarRating },
     props: ["questionnaire", "review", "reviewsAreReadOnly", "buttonDisabled", "reviewId", "feedback", "canChange"],
-    emits: ["disableButton"],
+    emits: ["disableButton", "unansQues", "unsaveAns"],
     async created() {
         window.addEventListener("keydown", this.keyDown)
         window.addEventListener("keyup", this.keyUp)
@@ -198,6 +198,12 @@ export default {
                 this.loadedQuestions = true
                 this.fetchAnswers()
             }
+        },
+        questionNumbersOfUnsavedAnswers(newNumbers) {
+            this.$emit("unsaveAns", newNumbers)
+        },
+        questionNumbersOfUnansweredNonOptionalQuestions(newNumbers) {
+            this.$emit("unansQues", newNumbers)
         },
     },
     computed: {
@@ -352,7 +358,6 @@ export default {
                 switch (question.type) {
                     case "open":
                         await api.openquestionanswers.delete(question.id, this.review.id)
-                        answer.answer = ""
                         break
                     case "multiplechoice":
                         await api.multiplechoicequestionanswers.delete(question.id, this.review.id)

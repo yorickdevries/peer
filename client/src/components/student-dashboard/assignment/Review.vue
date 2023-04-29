@@ -71,7 +71,7 @@
             <b-col :cols="columnWidthFileAndQuestionnaire">
                 <b-sidebar v-if="!popup" id="sidebar" title="Review Questionnaire" width="75%" right shadow backdrop>
                     <!--Form, load only when answers are available-->
-                    <b-card no-body class="mt-3">
+                    <b-card v-if="readyLoadAnswers" no-body class="mt-3">
                         <ReviewQuestions
                             :reviewsAreReadOnly="reviewsAreReadOnly"
                             :review="review"
@@ -80,6 +80,8 @@
                             :buttonDisabled="buttonDisabled"
                             :canChange="!(review.submitted || reviewsAreReadOnly)"
                             @disableButton="(v) => (buttonDisabled = v)"
+                            @unsaveAns="(v) => (unsavedAnswer = v)"
+                            @unansQues="(v) => (unansweredQuestion = v)"
                             ref="questions"
                         ></ReviewQuestions>
                         <b-card v-if="!reviewsAreReadOnly">
@@ -115,7 +117,7 @@
                                     >Unsubmit Review</b-button
                                 >
                                 <b-button
-                                    v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                                    v-if="unsavedAnswer.length > 0"
                                     variant="info float-right"
                                     @click="saveAllAnswers"
                                     :disabled="buttonDisabled"
@@ -132,7 +134,10 @@
                     :questionnaire="questionnaire"
                     :reviewId="reviewId"
                     :buttonDisabled="buttonDisabled"
+                    :canChange="!(review.submitted || reviewsAreReadOnly)"
                     @disableButton="(v) => (buttonDisabled = v)"
+                    @unsaveAns="(v) => (unsavedAnswer = v)"
+                    @unansQues="(v) => (unansweredQuestion = v)"
                     ref="questions"
                 ></ReviewQuestions>
 
@@ -172,7 +177,7 @@
                             >Unsubmit Review</b-button
                         >
                         <b-button
-                            v-if="questionNumbersOfUnsavedAnswers.length > 0"
+                            v-if="unsavedAnswer.length > 0"
                             variant="info float-right"
                             @click="saveAllAnswers"
                             :disabled="buttonDisabled"
@@ -186,23 +191,15 @@
             <b-modal
                 :id="`submit${review.id}`"
                 title="Submit Confirmation"
-                :ok-disabled="
-                    buttonDisabled ||
-                    (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 && !review.flaggedByReviewer)
-                "
+                :ok-disabled="buttonDisabled || (unansweredQuestion.length > 0 && !review.flaggedByReviewer)"
                 @ok="submitReview"
             >
-                <b-alert v-if="questionNumbersOfUnsavedAnswers.length > 0" show variant="warning" class="p-2"
-                    >There are one or more unsaved answers for the following questions:
-                    {{ questionNumbersOfUnsavedAnswers }}</b-alert
+                <b-alert v-if="unsavedAnswer.length > 0" show variant="warning" class="p-2"
+                    >There are one or more unsaved answers for the following questions: {{ unsavedAnswer }}</b-alert
                 >
-                <b-alert
-                    v-if="questionNumbersOfUnansweredNonOptionalQuestions.length > 0"
-                    show
-                    variant="danger"
-                    class="p-2"
+                <b-alert v-if="unansweredQuestion.length > 0" show variant="danger" class="p-2"
                     >There are one or more answers missing for the following non-optional questions:
-                    {{ questionNumbersOfUnansweredNonOptionalQuestions }}</b-alert
+                    {{ unansweredQuestion }}</b-alert
                 >
                 Do you really want to submit? This marks the review as finished and all unsaved changes will be
                 discarded.
@@ -266,14 +263,13 @@ export default {
             buttonDisabled: false,
             // View file next to questionnaire
             viewFileNextToQuestionnaire: false,
+            unsavedAnswer: [],
+            unansweredQuestion: [],
         }
     },
     computed: {
-        questionNumbersOfUnansweredNonOptionalQuestions() {
-            return this.$refs.questions ? this.$refs.questions.questionNumbersOfUnansweredNonOptionalQuestions : []
-        },
-        questionNumbersOfUnsavedAnswers() {
-            return this.$refs.questions ? this.$refs.questions.questionNumbersOfUnsavedAnswers : []
+        readyLoadAnswers() {
+            return this.review && this.questionnaire
         },
         columnWidthFileAndQuestionnaire() {
             if (this.viewFileNextToQuestionnaire) {
