@@ -24,10 +24,25 @@ import {
     faFolder,
     faCode,
     faComments,
+    faGear,
+    faUser,
+    faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons"
 
 /* add icons to the library */
-library.add(faPen, faTrash, faChevronDown, faLock, faTableCellsLarge, faFolder, faCode, faComments)
+library.add(
+    faPen,
+    faTrash,
+    faChevronDown,
+    faLock,
+    faTableCellsLarge,
+    faFolder,
+    faCode,
+    faComments,
+    faGear,
+    faUser,
+    faRightFromBracket
+)
 
 /* add font awesome icon component */
 Vue.component("icon", FontAwesomeIcon)

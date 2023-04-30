@@ -1,4 +1,12 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from "typeorm";
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  ManyToMany,
+  JoinTable,
+  OneToOne,
+  JoinColumn,
+} from "typeorm";
 import {
   IsAlphanumeric,
   IsDefined,
@@ -16,6 +24,7 @@ import Study from "./Study";
 import OrganisationUnit from "./OrganisationUnit";
 import parseNetID from "../util/parseNetID";
 import Group from "./Group";
+import Preferences from "./Preferences";
 
 @Entity()
 export default class User extends BaseModel {
@@ -94,6 +103,13 @@ export default class User extends BaseModel {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToMany((_type) => Group, (group) => group.users)
   groups?: Group[];
+
+  @OneToOne(() => Preferences, (preferences) => preferences.user, {
+    eager: true,
+    cascade: true,
+  })
+  @JoinColumn()
+  preferences!: Preferences;
 
   constructor(
     netid: string,

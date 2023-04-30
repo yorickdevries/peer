@@ -28,10 +28,14 @@ const baseConfig = {
   // __dirname is either dist or src folder, meaning either
   // the compiled js in prod or the ts in dev.
   migrations: [path.resolve(__dirname, "migration/**/*{.ts,.js}")],
+
+  //Add subscribers
+  subscribers: [path.resolve(__dirname, "subscribers/**/*{.ts,.js}")],
   cli: {
     // Location of migration should be inside src folder
     // to be compiled into dist/ folder.
     migrationsDir: "src/migration",
+    subscribersDir: "src/subscribers",
   },
   // when testing, the database is refreshed
   dropSchema: process.env.NODE_ENV === "test",

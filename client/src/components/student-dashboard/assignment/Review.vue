@@ -407,6 +407,9 @@ export default {
         }
     },
     computed: {
+        numberOfUnsaved() {
+            return Object.keys(this.answers).filter((key) => this.answers[key].changed).length
+        },
         columnWidthFileAndQuestionnaire() {
             if (this.viewFileNextToQuestionnaire) {
                 // columns are half width
@@ -468,6 +471,9 @@ export default {
         window.removeEventListener("keyup", this.keyUp)
     },
     methods: {
+        numberOfUnsavedQuestions() {
+            return this.numberOfUnsaved
+        },
         keyDown(e) {
             this.keys[e.code] = true
             if (this.keys["Enter"] && (this.keys["ControlLeft"] || this.keys["ControlRight"])) {

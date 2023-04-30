@@ -30,7 +30,23 @@ export default new VueRouter({
                         const res = await api.getAuthenticated()
                         const authenticated = res.data.authenticated
 
-                        authenticated ? next("/courses") : next()
+                        if (authenticated) {
+                            const item = localStorage.getItem("peerOrigPage")
+                            if (item) {
+                                // User logged in, has stored page
+                                // Remove stored page and send them there
+                                localStorage.removeItem("peerOrigPage")
+                                next(item)
+                            } else {
+                                // User logged in, has no stored page
+                                // Send them to course page
+                                next("/courses")
+                            }
+                        } else {
+                            // User not logged in
+                            // Send them to landing page
+                            next()
+                        }
                     },
                 },
                 {

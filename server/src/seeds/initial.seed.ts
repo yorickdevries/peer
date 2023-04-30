@@ -132,10 +132,12 @@ async function generateQuestionnaireQuestions(questionnaire: Questionnaire) {
   await createOpenQuestion({
     number: 1,
     questionnaire: questionnaire,
+    optional: false,
   });
   await createRangeQuestion({
     number: 2,
     questionnaire: questionnaire,
+    optional: false,
   });
 }
 
