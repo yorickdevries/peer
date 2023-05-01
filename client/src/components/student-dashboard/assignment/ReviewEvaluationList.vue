@@ -15,6 +15,7 @@
                         <ReviewEvaluation
                             :ref="'review-' + index"
                             :feedbackReviewId="review.id"
+                            @reviewChanged="fetchFeedbackReviews"
                             :reviewsAreReadOnly="!isReviewEvaluationActive"
                             :assignmentType="assignment.assignmentType"
                         ></ReviewEvaluation>

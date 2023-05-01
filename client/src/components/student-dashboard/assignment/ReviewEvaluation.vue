@@ -318,6 +318,7 @@ export default {
             this.buttonDisabled = true
             try {
                 await api.reviewofreviews.patch(this.review.id, true, this.review.flaggedByReviewer)
+                this.$emit("reviewChanged")
                 this.showSubmitMessage()
                 await this.fetchData()
             } finally {
@@ -328,6 +329,7 @@ export default {
             this.buttonDisabled = true
             try {
                 await api.reviewofreviews.patch(this.review.id, false, this.review.flaggedByReviewer)
+                this.$emit("reviewChanged")
                 this.showUnSubmitMessage()
                 await this.fetchData()
             } finally {
