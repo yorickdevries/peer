@@ -161,6 +161,7 @@
                 @disableButton="(v) => (buttonDisabled = v)"
                 @unsaveAns="(v) => (unsavedAnswer = v)"
                 @unansQues="(v) => (unansweredQuestion = v)"
+                style="padding: 1.25rem"
             ></ReviewQuestions>
 
             <template v-if="userIsOwner && !reviewsAreReadOnly">

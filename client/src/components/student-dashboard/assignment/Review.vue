@@ -71,7 +71,7 @@
             <b-col :cols="columnWidthFileAndQuestionnaire">
                 <b-sidebar v-if="!popup" id="sidebar" title="Review Questionnaire" width="75%" right shadow backdrop>
                     <!--Form, load only when answers are available-->
-                    <b-card v-if="readyLoadAnswers" no-body class="mt-3">
+                    <b-card v-if="readyLoadAnswers" no-body class="mt-3" style="padding: 1.25rem">
                         <ReviewQuestions
                             :reviewsAreReadOnly="reviewsAreReadOnly"
                             :review="review"
