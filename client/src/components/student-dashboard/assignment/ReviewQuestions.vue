@@ -131,12 +131,12 @@
                 <!--Delete / Save Button-->
                 <b-button
                     :variant="(answers[question.id].exists ? 'danger' : 'outline-danger') + ' float-right'"
-                    :disabled="!answers[question.id].exists || !canChange"
-                    v-b-modal="`deleteAnswer-${question.id}`"
+                    :disabled="!answers[question.id].exists || !canChange || review.submitted || buttonDisabled"
+                    v-b-modal="`deleteAnswer-${review.id}-${question.id}`"
                     >Delete Answer</b-button
                 >
                 <b-modal
-                    :id="`deleteAnswer-${question.id}`"
+                    :id="`deleteAnswer-${review.id}-${question.id}`"
                     centered
                     title="Warning"
                     @ok="deleteAnswer(question, answers[question.id])"
@@ -146,7 +146,7 @@
                 <b-button
                     ref="saveButton"
                     :variant="(answers[question.id].changed ? 'primary' : 'outline-primary') + ' float-right'"
-                    :disabled="!answers[question.id].changed || !canChange"
+                    :disabled="!answers[question.id].changed || !canChange || review.submitted || buttonDisabled"
                     @click="saveAnswer(question, answers[question.id])"
                     >Save Answer</b-button
                 >
@@ -168,7 +168,7 @@ export default {
     name: "ReviewQuestions",
     mixins: [notifications],
     components: { MarkdownEditorViewer, PDFViewer, StarRating },
-    props: ["questionnaire", "review", "reviewsAreReadOnly", "buttonDisabled", "reviewId", "feedback", "canChange"],
+    props: ["questionnaire", "review", "reviewsAreReadOnly", "buttonDisabled", "feedback", "canChange"],
     emits: ["disableButton", "unansQues", "unsaveAns"],
     async created() {
         window.addEventListener("keydown", this.keyDown)
@@ -257,8 +257,8 @@ export default {
             // remove existing answers
             this.answers = null
             const res = this.feedback
-                ? await api.reviewofreviews.getAnswers(this.reviewId)
-                : await api.reviewofsubmissions.getAnswers(this.reviewId)
+                ? await api.reviewofreviews.getAnswers(this.review.id)
+                : await api.reviewofsubmissions.getAnswers(this.review.id)
             this.loadedQuestions = true
             const existingAnswers = res.data
             // construct answer map
@@ -310,7 +310,9 @@ export default {
             this.keys[e.code] = true
             if (this.keys["Enter"] && (this.keys["ControlLeft"] || this.keys["ControlRight"])) {
                 const saveButton = this.$refs.saveButton[this.questionIndex]
-                saveButton.click()
+                if (saveButton) {
+                    saveButton.click()
+                }
             }
         },
         keyUp(e) {

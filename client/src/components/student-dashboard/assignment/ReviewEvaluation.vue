@@ -153,7 +153,6 @@
                 :reviewsAreReadOnly="reviewsAreReadOnly || !userIsOwner"
                 :review="review"
                 :questionnaire="questionnaire"
-                :reviewId="review.id"
                 :buttonDisabled="buttonDisabled"
                 :feedback="true"
                 :canChange="questionsCanBeChanged"
