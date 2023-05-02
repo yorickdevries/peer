@@ -167,8 +167,7 @@
                                 centered
                             >
                                 <b-alert show variant="danger"
-                                    >Are you sure you want to revert state to "Submission"? This will delete all
-                                    submissions
+                                    >Are you sure you want to revert state to "Submission"?
                                 </b-alert>
                             </b-modal>
                         </div>
@@ -233,7 +232,7 @@
                             >
                                 <b-alert show variant="danger"
                                     >Are you sure you want to revert state to "Waiting for review"? This will delete all
-                                    submissions
+                                    reviews
                                 </b-alert>
                             </b-modal>
                         </div>
@@ -254,7 +253,7 @@
                                 centered
                             >
                                 <b-alert show variant="danger"
-                                    >Are you sure you want to revert state to "Review"? This will delete all submissions
+                                    >Are you sure you want to revert state to "Review"? This will delete all evaluations
                                 </b-alert>
                             </b-modal>
                         </div>

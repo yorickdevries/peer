@@ -578,24 +578,24 @@ router.patch(
       const state = assignment.state;
       assignment.revertState();
       if (state == AssignmentState.SUBMISSION) {
-        const result = await assignment.deleteAllSubmissions();
+        await assignment.deleteAllSubmissions();
         await assignment.save();
-        res.send(result);
+        res.send();
         return;
       } else if (state == AssignmentState.WAITING_FOR_REVIEW) {
         await assignment.save();
         res.send();
         return;
       } else if (state == AssignmentState.REVIEW) {
-        const result = await assignment.deleteAllReviews();
+        await assignment.deleteAllReviews();
         await assignment.save();
-        res.send(result);
+        res.send();
         return;
       } else {
         //delete review evaluations
-        const re = await assignment.deleteAllReviewEvals();
+        await assignment.deleteAllReviewEvals();
         await assignment.save();
-        res.send(re);
+        res.send();
         return;
       }
     } catch (error) {
