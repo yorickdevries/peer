@@ -1,6 +1,6 @@
 import express from "express";
 import _ from "lodash";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import {
   idSchema,
   validateParams,

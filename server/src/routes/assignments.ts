@@ -1,5 +1,5 @@
 import express from "express";
-import Joi, { CustomHelpers } from "@hapi/joi";
+import Joi, { CustomHelpers } from "joi";
 import { getManager } from "typeorm";
 import {
   idSchema,
@@ -337,7 +337,8 @@ router.post(
         if (file) {
           // move the file (so if this fails everything above fails)
           // where the file is temporary saved
-          const tempPath = req.file.path;
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const tempPath = req.file!.path;
           // new place where the file will be saved
           const filePath = path.resolve(uploadFolder, file.id.toString());
           // move file
@@ -522,7 +523,8 @@ router.patch(
         if (newFile) {
           // move the file (so if this fails everything above fails)
           // where the file is temporary saved
-          const tempPath = req.file.path;
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const tempPath = req.file!.path;
           // new place where the file will be saved
           const filePath = path.resolve(uploadFolder, newFile.id.toString());
           // move file

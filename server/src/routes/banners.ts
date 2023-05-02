@@ -5,7 +5,7 @@ import {
 } from "../middleware/validation";
 import Banner from "../models/Banner";
 import HttpStatusCode from "../enum/HttpStatusCode";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 
 import express from "express";
 

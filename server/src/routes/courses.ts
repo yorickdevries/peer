@@ -1,6 +1,6 @@
 import express from "express";
 import { getManager } from "typeorm";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import checkEmployee from "../middleware/authentication/checkEmployee";
 import Course from "../models/Course";
 import HttpStatusCode from "../enum/HttpStatusCode";

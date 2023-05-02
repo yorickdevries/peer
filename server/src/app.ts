@@ -4,7 +4,6 @@ require("express-async-errors");
 import path from "path";
 import config from "config";
 import * as Sentry from "@sentry/node";
-import * as Tracing from "@sentry/tracing";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import compression from "compression";
@@ -26,7 +25,7 @@ if (config.has("sentry")) {
       // enable HTTP calls tracing
       new Sentry.Integrations.Http({ tracing: true }),
       // enable Express.js middleware tracing
-      new Tracing.Integrations.Express({ app }),
+      new Sentry.Integrations.Express({ app }),
     ],
 
     // Set tracesSampleRate to 1.0 to capture 100%

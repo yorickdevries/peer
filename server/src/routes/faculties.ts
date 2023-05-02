@@ -7,7 +7,7 @@ import {
 } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ResponseMessage from "../enum/ResponseMessage";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import isAdmin from "../middleware/authentication/isAdmin";
 import Course from "../models/Course";
 const router = express.Router();

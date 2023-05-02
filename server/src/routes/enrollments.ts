@@ -3,7 +3,7 @@ import Enrollment from "../models/Enrollment";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import Course from "../models/Course";
 import UserRole from "../enum/UserRole";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import { validateBody, validateQuery } from "../middleware/validation";
 import ResponseMessage from "../enum/ResponseMessage";
 import { getManager } from "typeorm";
