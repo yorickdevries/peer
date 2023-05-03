@@ -101,13 +101,16 @@
                                 >Revert to previous stage
                             </b-button>
                             <b-modal
+                                :ok-disabled="isMessageAssignmentName"
                                 :id="`revertStateSubmission${assignment.id}`"
                                 @ok="revertState"
                                 title="Confirmation"
                                 centered
                             >
-                                <b-alert show variant="danger"
-                                    >Are you sure you want to revert state to "Unpublished"? This will delete all
+                                <div class="mb-3">Please enter the assignment name to confirm.</div>
+                                <div class="mb-3"><input v-model="message" /></div>
+                                <b-alert show variant="danger">
+                                    Are you sure you want to revert state to "Unpublished"? This will delete all
                                     submissions
                                 </b-alert>
                             </b-modal>
@@ -161,13 +164,16 @@
                                 >Revert to previous stage
                             </b-button>
                             <b-modal
+                                :ok-disabled="isMessageAssignmentName"
                                 :id="`revertStateWaiting${assignment.id}`"
                                 @ok="revertState"
                                 title="Confirmation"
                                 centered
                             >
-                                <b-alert show variant="danger"
-                                    >Are you sure you want to revert state to "Submission"?
+                                <div class="mb-3">Please enter the assignment name to confirm.</div>
+                                <div class="mb-3"><input v-model="message" /></div>
+                                <b-alert show variant="danger">
+                                    Are you sure you want to revert state to "Submission"?
                                 </b-alert>
                             </b-modal>
                         </div>
@@ -225,13 +231,16 @@
                                 >Revert to previous stage
                             </b-button>
                             <b-modal
+                                :ok-disabled="isMessageAssignmentName"
                                 :id="`revertStateReview${assignment.id}`"
                                 @ok="revertState"
                                 title="Confirmation"
                                 centered
                             >
-                                <b-alert show variant="danger"
-                                    >Are you sure you want to revert state to "Waiting for review"? This will delete all
+                                <div class="mb-3">Please enter the assignment name to confirm.</div>
+                                <div class="mb-3"><input v-model="message" /></div>
+                                <b-alert show variant="danger">
+                                    Are you sure you want to revert state to "Waiting for review"? This will delete all
                                     reviews
                                 </b-alert>
                             </b-modal>
@@ -247,13 +256,16 @@
                                 >Revert to previous stage
                             </b-button>
                             <b-modal
+                                :ok-disabled="isMessageAssignmentName"
                                 :id="`revertFeedback${assignment.id}`"
                                 @ok="revertState"
                                 title="Confirmation"
                                 centered
                             >
-                                <b-alert show variant="danger"
-                                    >Are you sure you want to revert state to "Review"? This will delete all evaluations
+                                <div class="mb-3">Please enter the assignment name to confirm.</div>
+                                <div class="mb-3"><input v-model="message" /></div>
+                                <b-alert show variant="danger">
+                                    Are you sure you want to revert state to "Review"? This will delete all evaluations.
                                 </b-alert>
                             </b-modal>
                         </div>
@@ -282,6 +294,7 @@ export default {
     },
     data() {
         return {
+            message: "",
             assignment: null,
             assignmentStates: [
                 { name: "unpublished", icon: "fas fa-eye-slash" },
@@ -296,6 +309,9 @@ export default {
         }
     },
     computed: {
+        isMessageAssignmentName() {
+            return this.message !== this.assignment.name
+        },
         currentStateIndex() {
             if (!this.assignment) {
                 return -1
