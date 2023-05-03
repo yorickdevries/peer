@@ -24,6 +24,7 @@ import Submission from "../models/Submission";
 import publishAssignment from "../assignmentProgression/publishAssignment";
 import closeSubmission from "../assignmentProgression/closeSubmission";
 import { scheduleJobsForAssignment } from "../assignmentProgression/scheduler";
+import * as Sentry from "@sentry/node";
 
 const router = express.Router();
 
@@ -599,6 +600,7 @@ router.patch(
         return;
       }
     } catch (error) {
+      Sentry.captureException(error);
       res
         .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
         .send("Something went wrong while reverting the state");
