@@ -168,6 +168,15 @@ export default class AssignmentVersion extends BaseModel {
   }
 
   async deleteAllSubmissions(): Promise<void> {
+    const ids = await Submission.createQueryBuilder("submissions")
+      .select("fileId")
+      .where("assignmentVersionId = :assignmentVersionId", {
+        assignmentVersionId: this.id,
+      })
+      .execute();
+    const fileIds = ids.map((idObject: { fileId: any }) => idObject.fileId);
+
+    // delete submissions
     await Submission.createQueryBuilder("submissions")
       .delete()
       .from(Submission)
@@ -175,6 +184,9 @@ export default class AssignmentVersion extends BaseModel {
         assignmentVersionId: this.id,
       })
       .execute();
+
+    // delete associated files
+    await File.delete(fileIds);
   }
 
   async deleteAllReviews(): Promise<void> {
