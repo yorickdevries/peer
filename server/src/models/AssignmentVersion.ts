@@ -25,6 +25,7 @@ import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import Group from "./Group";
 import User from "./User";
+import File from "../models/File";
 
 @Entity()
 export default class AssignmentVersion extends BaseModel {
