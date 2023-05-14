@@ -187,7 +187,9 @@ export default class AssignmentVersion extends BaseModel {
       .execute();
 
     // delete associated files
-    await File.delete(fileIds);
+    if (fileIds.length > 0) {
+      await File.delete(fileIds);
+    }
   }
 
   async deleteAllReviews(): Promise<void> {
