@@ -304,6 +304,17 @@ export default class Assignment extends BaseModel {
     return this.state === otherState;
   }
 
+  revertState(): void {
+    const currStateIndex = assignmentStateOrder.indexOf(this.state);
+    if (currStateIndex > 0) {
+      this.state = assignmentStateOrder[currStateIndex - 1];
+    } else {
+      throw new Error(
+        "State cannot be reversed as there are no previous states"
+      );
+    }
+  }
+
   isAtOrAfterState(otherState: AssignmentState): boolean {
     const currentState = this.state;
     const currentStateIndex = assignmentStateOrder.indexOf(currentState);
@@ -392,6 +403,26 @@ export default class Assignment extends BaseModel {
     return await course.isTeacherOrTeachingAssistant(user);
   }
 
+  async deleteAllSubmissions(): Promise<void> {
+    for (const assignmentVersion of this.versions) {
+      await assignmentVersion.deleteAllSubmissions();
+    }
+    return;
+  }
+
+  async deleteAllReviews(): Promise<void> {
+    for (const assignmentVersion of this.versions) {
+      await assignmentVersion.deleteAllReviews();
+    }
+    return;
+  }
+
+  async deleteAllReviewEvals(): Promise<void> {
+    for (const assignmentVersion of this.versions) {
+      await assignmentVersion.deleteAllReviewEvals();
+    }
+    return;
+  }
   async hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
     user: User
   ): Promise<boolean> {

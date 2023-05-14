@@ -71,7 +71,7 @@
                             <b-button
                                 v-b-modal="`closeSubmission${assignment.id}`"
                                 :disabled="disableButton"
-                                class="mb-3"
+                                class="mb-3 mr-2"
                                 variant="primary"
                                 size="sm"
                                 >Close submission
@@ -92,6 +92,28 @@
                                     <li>After this the groups cannot be changed anymore</li>
                                 </ul>
                             </b-modal>
+                            <b-button
+                                v-b-modal="`revertStateSubmission${assignment.id}`"
+                                :disabled="disableButton"
+                                class="mb-3"
+                                variant="primary"
+                                size="sm"
+                                >Revert to previous stage
+                            </b-button>
+                            <b-modal
+                                :ok-disabled="isMessageAssignmentName"
+                                :id="`revertStateSubmission${assignment.id}`"
+                                @ok="revertState"
+                                title="Confirmation"
+                                centered
+                            >
+                                <div class="mb-3">Please enter the assignment name to confirm.</div>
+                                <div class="mb-3"><input v-model="message" /></div>
+                                <b-alert show variant="danger">
+                                    Are you sure you want to revert state to "Unpublished"? This will delete all
+                                    submissions
+                                </b-alert>
+                            </b-modal>
                         </div>
 
                         <!--Distribute Reviews-->
@@ -109,7 +131,7 @@
                             <b-button
                                 v-b-modal="`distributeReviews${assignment.id}`"
                                 :disabled="disableButton"
-                                class="mb-3"
+                                class="mb-3 mr-2"
                                 variant="primary"
                                 size="sm"
                                 >Distribute Reviews
@@ -133,6 +155,27 @@
                                     </li>
                                 </ul>
                             </b-modal>
+                            <b-button
+                                v-b-modal="`revertStateWaiting${assignment.id}`"
+                                :disabled="disableButton"
+                                class="mb-3"
+                                variant="primary"
+                                size="sm"
+                                >Revert to previous stage
+                            </b-button>
+                            <b-modal
+                                :ok-disabled="isMessageAssignmentName"
+                                :id="`revertStateWaiting${assignment.id}`"
+                                @ok="revertState"
+                                title="Confirmation"
+                                centered
+                            >
+                                <div class="mb-3">Please enter the assignment name to confirm.</div>
+                                <div class="mb-3"><input v-model="message" /></div>
+                                <b-alert show variant="danger">
+                                    Are you sure you want to revert state to "Submission"?
+                                </b-alert>
+                            </b-modal>
                         </div>
 
                         <!--Open feedback-->
@@ -150,7 +193,7 @@
                             <b-button
                                 v-b-modal="`openFeedback${assignment.id}`"
                                 :disabled="disableButton"
-                                class="mb-3"
+                                class="mb-3 mr-2"
                                 variant="primary"
                                 size="sm"
                                 >Open Feedback
@@ -179,6 +222,52 @@
                                     <li>The reviewquestionnaire cannot be changed after this action.</li>
                                 </ul>
                             </b-modal>
+                            <b-button
+                                v-b-modal="`revertStateReview${assignment.id}`"
+                                :disabled="disableButton"
+                                class="mb-3"
+                                variant="primary"
+                                size="sm"
+                                >Revert to previous stage
+                            </b-button>
+                            <b-modal
+                                :ok-disabled="isMessageAssignmentName"
+                                :id="`revertStateReview${assignment.id}`"
+                                @ok="revertState"
+                                title="Confirmation"
+                                centered
+                            >
+                                <div class="mb-3">Please enter the assignment name to confirm.</div>
+                                <div class="mb-3"><input v-model="message" /></div>
+                                <b-alert show variant="danger">
+                                    Are you sure you want to revert state to "Waiting for review"? This will delete all
+                                    reviews
+                                </b-alert>
+                            </b-modal>
+                        </div>
+                        <!--Revert feedback-->
+                        <div v-if="assignment.state === 'feedback'">
+                            <b-button
+                                v-b-modal="`revertFeedback${assignment.id}`"
+                                :disabled="disableButton"
+                                class="mb-3 mr-2"
+                                variant="primary"
+                                size="sm"
+                                >Revert to previous stage
+                            </b-button>
+                            <b-modal
+                                :ok-disabled="isMessageAssignmentName"
+                                :id="`revertFeedback${assignment.id}`"
+                                @ok="revertState"
+                                title="Confirmation"
+                                centered
+                            >
+                                <div class="mb-3">Please enter the assignment name to confirm.</div>
+                                <div class="mb-3"><input v-model="message" /></div>
+                                <b-alert show variant="danger">
+                                    Are you sure you want to revert state to "Review"? This will delete all evaluations.
+                                </b-alert>
+                            </b-modal>
                         </div>
                     </dl>
                 </b-card>
@@ -205,6 +294,7 @@ export default {
     },
     data() {
         return {
+            message: "",
             assignment: null,
             assignmentStates: [
                 { name: "unpublished", icon: "fas fa-eye-slash" },
@@ -219,6 +309,9 @@ export default {
         }
     },
     computed: {
+        isMessageAssignmentName() {
+            return this.message !== this.assignment.name
+        },
         currentStateIndex() {
             if (!this.assignment) {
                 return -1
@@ -243,6 +336,7 @@ export default {
             this.showSuccessMessage({ message: "Assignment succesfully published" })
             this.disableButton = false
             await this.fetchAssignment()
+            this.$router.go()
         },
         async closeSubmission() {
             this.disableButton = true
@@ -250,18 +344,29 @@ export default {
             this.showSuccessMessage({ message: "Assignment succesfully closed" })
             this.disableButton = false
             await this.fetchAssignment()
+            this.$router.go()
         },
         async distributeReviews() {
             this.disableButton = true
             await api.reviewofsubmissions.distribute(this.$route.params.assignmentId)
             this.showSuccessMessage()
             this.showDistributeAlert = true
+            this.$router.go()
         },
         async openFeedback() {
             this.disableButton = true
             await api.reviewofsubmissions.openFeedback(this.$route.params.assignmentId)
             this.showSuccessMessage()
             this.showOpenFeedbackAlert = true
+            this.$router.go()
+        },
+        async revertState() {
+            this.disableButton = true
+            await api.assignments.revertState(this.$route.params.assignmentId)
+            this.showSuccessMessage({ message: "State reverted" })
+            this.disableButton = false
+            await this.fetchAssignment()
+            this.$router.go()
         },
     },
 }
