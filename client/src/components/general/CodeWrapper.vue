@@ -78,19 +78,24 @@ export default {
             feedbackReviews: [],
             maxFileSize: 5 * 1000000, //5 MB
             fileSizeBypass: false,
+            originalFile: null,
+            singleFileRender: false,
         }
     },
     async created() {
         const file = await this.getFile()
+        this.originalFile = file
         const isPossibleZipFile = !file.type.includes("text/plain")
 
         // If we get a zip file, we'll try to unzip it and show one of the code files
         if (isPossibleZipFile) {
             this.loadZip(file).catch(() => {
+                this.singleFileRender = true
                 this.loadSingleFile(file)
             })
         } else {
-            this.loadSingleFile(file)
+            this.singleFileRender = true
+            await this.loadSingleFile(file)
         }
 
         if (!this.ignoreAnnotations) {
@@ -244,8 +249,8 @@ export default {
         },
         bypassAndRender() {
             this.fileSizeBypass = true
-            if (this.isOnlyFile) {
-                this.loadSingleFile(this.selected)
+            if (this.singleFileRender) {
+                this.loadSingleFile(this.originalFile)
             } else {
                 this.onSelect(this.selected)
             }
