@@ -1,11 +1,17 @@
 <template>
     <div v-if="files">
-        <b-modal id="file-size-modal" centered title="Large File Warning" @ok="bypassAndRender">
+        <b-modal
+            id="file-size-modal"
+            centered
+            title="Large File Warning"
+            @ok="bypassAndRender"
+            ok-variant="danger"
+            ok-title="Yes"
+        >
+            This file is large and may cause your browser to crash. Downloading the file and opening it on your computer
+            is recommended.
+            <br /><br />
             Are you sure you want to show this file?
-            <br /><br />
-            This file is large and may cause your browser to crash.
-            <br /><br />
-            Downloading the file and opening it on your computer is recommended.
         </b-modal>
         <b-alert v-if="readOnly" show variant="warning">
             The file is read only, so annotations cannot be added, removed or edited.
