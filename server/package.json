@@ -59,7 +59,7 @@
     "is-ci": "^3.0.1",
     "joi": "^17.9.1",
     "js-graph-algorithms": "^1.0.18",
-    "json-parse-even-better-errors": "^2.3.1",
+    "json-parse-even-better-errors": "^3.0.0",
     "json2csv": "^5.0.7",
     "jszip": "^3.10.1",
     "lodash": "^4.17.21",
