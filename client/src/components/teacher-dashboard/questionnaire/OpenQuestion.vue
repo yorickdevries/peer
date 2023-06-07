@@ -9,6 +9,25 @@
         <b-form-group label="Optional Question" description="Make this question optional for the student.">
             <b-form-checkbox v-model="question.optional"> Make this question optional. </b-form-checkbox>
         </b-form-group>
+        <b-form-group label="Wordcount restrictions" description="Enable maximum or minimum wordcount.">
+            <b-form-checkbox v-model="question.wordcount">
+                Enable minimum and maximum wordcount restrictions.
+            </b-form-checkbox>
+        </b-form-group>
+        <b-form-group
+            label="Minimum Word Count"
+            description="Minimum amount of words a student has to answer in."
+            v-if="question.wordcount"
+        >
+            <b-form-input v-model="question.minWordCount" type="number"></b-form-input>
+        </b-form-group>
+        <b-form-group
+            label="Maximum Word Count"
+            description="Maximum amount of words a student has to answer in."
+            v-if="question.wordcount"
+        >
+            <b-form-input v-model="question.maxWordcount" type="number"></b-form-input>
+        </b-form-group>
         <b-button @click="save" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
         <span v-if="question.id">
             <b-btn v-b-modal="`delete${question.id}`" variant="outline-danger" size="sm">Delete</b-btn>
@@ -36,6 +55,9 @@ export default {
                 number: this.questionNumber,
                 optional: false,
                 questionnaireId: this.questionnaireId,
+                wordcount: false,
+                maxWordcount: 200000,
+                minWordCount: 0,
             },
         }
     },
