@@ -50,6 +50,8 @@ const questionSchema = Joi.object({
   number: Joi.number().integer().required(),
   optional: Joi.boolean().required(),
   questionnaireId: Joi.number().integer().required(),
+  maxWordCount: Joi.number().integer().required(),
+  minWordCount: Joi.number().integer().required()
 });
 // post a question
 router.post("/", validateBody(questionSchema), async (req, res) => {
@@ -92,7 +94,9 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
     req.body.text,
     req.body.number,
     req.body.optional,
-    questionnaire
+    questionnaire,
+      req.body.maxWordCount,
+      req.body.minWordCount
   );
   await question.save();
   await question.reorder(QuestionOperation.CREATE);

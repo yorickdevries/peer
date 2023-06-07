@@ -88,7 +88,9 @@ export default {
                 this.question.text,
                 this.question.number,
                 this.question.optional,
-                this.question.questionnaireId
+                this.question.questionnaireId,
+                this.question.maxWordcount,
+                this.question.minWordCount
             )
         },
         async patchQuestion() {
@@ -96,7 +98,9 @@ export default {
                 this.question.id,
                 this.question.text,
                 this.question.number,
-                this.question.optional
+                this.question.optional,
+                this.question.maxWordcount,
+                this.question.minWordCount
             )
         },
         async deleteQuestion() {
