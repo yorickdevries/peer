@@ -81,7 +81,7 @@ export default {
         },
         isFormDirty() {
             for (let i = 0; i < this.reviews.length; i++) {
-                if (this.$refs[`review-${i}`][0].numberOfUnsavedQuestions() !== 0) {
+                if (this.$refs[`review-${i}`][0].$refs["questions"].numberOfUnsavedQuestions() !== 0) {
                     return true
                 }
             }
