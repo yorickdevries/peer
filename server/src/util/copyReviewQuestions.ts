@@ -80,7 +80,9 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionToCopy.text,
               questionToCopy.number,
               questionToCopy.optional,
-              questionnaire
+              questionnaire,
+              questionToCopy.maxWordCount!,
+              questionToCopy.minWordCount!
             );
             await question.validateOrReject();
             await transactionalEntityManager.save(question);
@@ -186,7 +188,9 @@ const addCopyOfQuestions = async function (
             questionToCopy.text,
             questionToCopy.number,
             questionToCopy.optional,
-            questionnaire
+            questionnaire,
+            questionToCopy.maxWordCount,
+            questionToCopy.minWordCount
           );
           await question.validateOrReject();
           await transactionalEntityManager.save(question);
