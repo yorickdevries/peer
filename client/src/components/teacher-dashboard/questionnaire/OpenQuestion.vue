@@ -10,23 +10,23 @@
             <b-form-checkbox v-model="question.optional"> Make this question optional. </b-form-checkbox>
         </b-form-group>
         <b-form-group label="Wordcount restrictions" description="Enable maximum or minimum wordcount.">
-            <b-form-checkbox v-model="question.wordcount">
+            <b-form-checkbox v-model="question.wordCount">
                 Enable minimum and maximum wordcount restrictions.
             </b-form-checkbox>
         </b-form-group>
         <b-form-group
             label="Minimum Word Count"
             description="Minimum amount of words a student has to answer in."
-            v-if="question.wordcount"
+            v-if="question.wordCount"
         >
             <b-form-input v-model="question.minWordCount" type="number"></b-form-input>
         </b-form-group>
         <b-form-group
             label="Maximum Word Count"
             description="Maximum amount of words a student has to answer in."
-            v-if="question.wordcount"
+            v-if="question.wordCount"
         >
-            <b-form-input v-model="question.maxWordcount" type="number"></b-form-input>
+            <b-form-input v-model="question.maxWordCount" type="number"></b-form-input>
         </b-form-group>
         <b-button @click="save" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
         <span v-if="question.id">
@@ -55,9 +55,9 @@ export default {
                 number: this.questionNumber,
                 optional: false,
                 questionnaireId: this.questionnaireId,
-                wordcount: false,
-                maxWordcount: 200000,
-                minWordCount: 0,
+                wordCount: false,
+                maxWordCount: 200000,
+                minWordCount: 1,
             },
         }
     },
@@ -89,9 +89,10 @@ export default {
                 this.question.number,
                 this.question.optional,
                 this.question.questionnaireId,
-                this.question.maxWordcount,
+                this.question.maxWordCount,
                 this.question.minWordCount
             )
+            console.log("posted question")
         },
         async patchQuestion() {
             await api.openquestions.patch(
@@ -99,7 +100,7 @@ export default {
                 this.question.text,
                 this.question.number,
                 this.question.optional,
-                this.question.maxWordcount,
+                this.question.maxWordCount,
                 this.question.minWordCount
             )
         },
