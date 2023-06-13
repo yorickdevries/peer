@@ -354,6 +354,14 @@
                     >There are one or more answers missing for the following non-optional questions:
                     {{ questionNumbersOfUnansweredNonOptionalQuestions }}</b-alert
                 >
+                <b-alert
+                    v-if="questionNumbersOfQuestionsOverOrUnderWordCount.length > 0"
+                    show
+                    variant="danger"
+                    class="p-2"
+                    >The following questions have answers that are not in the word range:
+                    {{ questionNumbersOfQuestionsOverOrUnderWordCount }}</b-alert
+                >
                 Do you really want to submit? This marks the review as finished and all unsaved changes will be
                 discarded.
             </b-modal>
@@ -442,12 +450,32 @@ export default {
             for (const questionId in this.answers) {
                 const answer = this.answers[questionId]
                 const question = this.getQuestion(questionId)
+
                 if (!answer.exists && !question.optional) {
                     questionNumbersOfUnansweredNonOptionalQuestions.push(question.number)
                 }
             }
             questionNumbersOfUnansweredNonOptionalQuestions.sort()
             return questionNumbersOfUnansweredNonOptionalQuestions
+        },
+        questionNumbersOfQuestionsOverOrUnderWordCount() {
+            const questionNumbersOfQuestionsNotInWordRange = []
+            for (const questionId in this.answers) {
+                const answer = this.answers[questionId]
+                const question = this.getQuestion(questionId)
+
+                if (
+                    question.type === "open" &&
+                    (this.getWordCount(answer.answer) > question.maxWordCount ||
+                        this.getWordCount(answer.answer) < question.minWordcount)
+                ) {
+                    questionNumbersOfQuestionsNotInWordRange.push(question.number)
+                }
+            }
+            questionNumbersOfQuestionsNotInWordRange.sort()
+            console.log("BLAHAHAHAHHAHAHA")
+            console.log(questionNumbersOfQuestionsNotInWordRange)
+            return questionNumbersOfQuestionsNotInWordRange
         },
         reviewFilePath() {
             // Get the submission file path.
@@ -471,6 +499,16 @@ export default {
         window.removeEventListener("keyup", this.keyUp)
     },
     methods: {
+        getWordCount(text) {
+            // Remove leading and trailing whitespaces
+            text = text.trim()
+
+            // Split the text by whitespace characters and filter out empty strings
+            const words = text.split(/\s+/).filter((word) => word !== "")
+
+            // Return the count of words
+            return words.length
+        },
         numberOfUnsavedQuestions() {
             return this.numberOfUnsaved
         },
