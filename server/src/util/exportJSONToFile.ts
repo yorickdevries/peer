@@ -22,7 +22,6 @@ const exportJSONToFile = async function (
   const parser = new AsyncParser({}, {}, {});
   let result: string;
   if (exportType === "csv") {
-    //result = parse(data);
     result = await parser.parse(data).promise();
   } else {
     result = exportFromJSON({
