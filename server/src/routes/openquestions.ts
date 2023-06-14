@@ -108,6 +108,8 @@ const questionPatchSchema = Joi.object({
   text: Joi.string().required(),
   number: Joi.number().integer().required(),
   optional: Joi.boolean().required(),
+  maxWordCount: Joi.number().integer().required(),
+  minWordCount: Joi.number().integer().required(),
 });
 // patch a question
 router.patch(
@@ -158,6 +160,8 @@ router.patch(
     question.text = req.body.text;
     question.number = req.body.number;
     question.optional = req.body.optional;
+    question.minWordCount = req.body.minWordCount;
+    question.maxWordCount = req.body.maxWordCount;
     await question.save();
     await question.reorder(QuestionOperation.MODIFY);
     res.send(question);

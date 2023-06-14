@@ -8,8 +8,8 @@ export default {
         const body = { text, number, optional, questionnaireId, maxWordCount, minWordCount }
         return client.post("openquestions/", body)
     },
-    patch(id, text, number, optional, maxWordcount, minWordcount) {
-        const body = { text, number, optional, maxWordcount, minWordcount }
+    patch(id, text, number, optional, maxWordCount, minWordCount) {
+        const body = { text, number, optional, maxWordCount, minWordCount }
         return client.patch(`openquestions/${id}`, body)
     },
     delete(id) {
