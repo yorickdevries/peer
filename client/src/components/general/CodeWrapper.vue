@@ -82,7 +82,7 @@ export default {
             review: null,
             language: null,
             feedbackReviews: [],
-            maxFileSize: 5 * 1000, //5 KB
+            maxFileSize: 500 * 1000, //500 KB
             fileSizeBypass: false,
             originalFile: null,
             singleFileRender: false,
