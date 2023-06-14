@@ -338,7 +338,8 @@
                 title="Submit Confirmation"
                 :ok-disabled="
                     buttonDisabled ||
-                    (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 && !review.flaggedByReviewer)
+                    (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 && !review.flaggedByReviewer) ||
+                    (questionNumbersOfQuestionsOverOrUnderWordCount.length > 0 && !review.flaggedByReviewer)
                 "
                 @ok="submitReview"
             >
@@ -459,23 +460,28 @@ export default {
             return questionNumbersOfUnansweredNonOptionalQuestions
         },
         questionNumbersOfQuestionsOverOrUnderWordCount() {
-            const questionNumbersOfQuestionsNotInWordRange = []
+            const questionNumbersOfQuestionsOverOrUnderWordCount = []
+            if (!this.answers) {
+                return questionNumbersOfQuestionsOverOrUnderWordCount
+            }
             for (const questionId in this.answers) {
                 const answer = this.answers[questionId]
                 const question = this.getQuestion(questionId)
 
                 if (
+                    answer.exists &&
                     question.type === "open" &&
                     (this.getWordCount(answer.answer) > question.maxWordCount ||
                         this.getWordCount(answer.answer) < question.minWordcount)
                 ) {
-                    questionNumbersOfQuestionsNotInWordRange.push(question.number)
+                    questionNumbersOfQuestionsOverOrUnderWordCount.push(question.number)
+                    console.log(question)
                 }
             }
-            questionNumbersOfQuestionsNotInWordRange.sort()
+            questionNumbersOfQuestionsOverOrUnderWordCount.sort()
             console.log("BLAHAHAHAHHAHAHA")
-            console.log(questionNumbersOfQuestionsNotInWordRange)
-            return questionNumbersOfQuestionsNotInWordRange
+            console.log(questionNumbersOfQuestionsOverOrUnderWordCount)
+            return questionNumbersOfQuestionsOverOrUnderWordCount
         },
         reviewFilePath() {
             // Get the submission file path.
