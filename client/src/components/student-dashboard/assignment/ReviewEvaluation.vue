@@ -348,7 +348,8 @@
                         title="Submit Confirmation"
                         :ok-disabled="
                             buttonDisabled ||
-                            (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 && !review.flaggedByReviewer)
+                            (questionNumbersOfUnansweredNonOptionalQuestions.length > 0 && !review.flaggedByReviewer) ||
+                            (questionNumbersOfQuestionsOverOrUnderWordCount.length > 0 && !review.flaggedByReviewer)
                         "
                         @ok="submitReview"
                     >
@@ -363,6 +364,14 @@
                             class="p-2"
                             >There are one or more answers missing for the following non-optional questions:
                             {{ questionNumbersOfUnansweredNonOptionalQuestions }}</b-alert
+                        >
+                        <b-alert
+                            v-if="questionNumbersOfQuestionsOverOrUnderWordCount.length > 0"
+                            show
+                            variant="danger"
+                            class="p-2"
+                            >The following questions have answers that are not in the word range:
+                            {{ questionNumbersOfQuestionsOverOrUnderWordCount }}</b-alert
                         >
                         Do you really want to submit? This marks the review as finished and all unsaved changes will be
                         discarded.
@@ -457,6 +466,30 @@ export default {
         questionsCanBeChanged() {
             return !(this.review.submitted || !this.userIsOwner || this.reviewsAreReadOnly)
         },
+        questionNumbersOfQuestionsOverOrUnderWordCount() {
+            const questionNumbersOfQuestionsOverOrUnderWordCount = []
+            if (!this.answers) {
+                return questionNumbersOfQuestionsOverOrUnderWordCount
+            }
+            for (const questionId in this.answers) {
+                const answer = this.answers[questionId]
+                const question = this.getQuestion(questionId)
+
+                if (
+                    answer.exists &&
+                    question.type === "open" &&
+                    (this.getWordCount(answer.answer) > question.maxWordCount ||
+                        this.getWordCount(answer.answer) < question.minWordcount)
+                ) {
+                    questionNumbersOfQuestionsOverOrUnderWordCount.push(question.number)
+                    console.log(question)
+                }
+            }
+            questionNumbersOfQuestionsOverOrUnderWordCount.sort()
+            console.log("BLAHAHAHAHHAHAHA")
+            console.log(questionNumbersOfQuestionsOverOrUnderWordCount)
+            return questionNumbersOfQuestionsOverOrUnderWordCount
+        },
     },
     async created() {
         window.addEventListener("keydown", this.keyDown)
@@ -468,6 +501,16 @@ export default {
         window.removeEventListener("keyup", this.keyUp)
     },
     methods: {
+        getWordCount(text) {
+            // Remove leading and trailing whitespaces
+            text = text.trim()
+
+            // Split the text by whitespace characters and filter out empty strings
+            const words = text.split(/\s+/).filter((word) => word !== "")
+
+            // Return the count of words
+            return words.length
+        },
         numberOfUnsavedQuestions() {
             return this.numberOfUnsaved
         },
