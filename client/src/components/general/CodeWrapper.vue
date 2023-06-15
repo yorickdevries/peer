@@ -1,5 +1,18 @@
 <template>
     <div v-if="files">
+        <b-modal
+            id="file-size-modal"
+            centered
+            title="Large File Warning"
+            @ok="bypassAndRender"
+            ok-variant="danger"
+            ok-title="Yes"
+        >
+            This file is large and may cause your browser to crash. Downloading the file and opening it on your computer
+            is recommended.
+            <br /><br />
+            Are you sure you want to show this file?
+        </b-modal>
         <b-alert v-if="readOnly" show variant="warning">
             The file is read only, so annotations cannot be added, removed or edited.
         </b-alert>
@@ -69,19 +82,26 @@ export default {
             review: null,
             language: null,
             feedbackReviews: [],
+            maxFileSize: 500 * 1000, //500 KB
+            fileSizeBypass: false,
+            originalFile: null,
+            singleFileRender: false,
         }
     },
     async created() {
         const file = await this.getFile()
+        this.originalFile = file
         const isPossibleZipFile = !file.type.includes("text/plain")
 
         // If we get a zip file, we'll try to unzip it and show one of the code files
         if (isPossibleZipFile) {
             this.loadZip(file).catch(() => {
+                this.singleFileRender = true
                 this.loadSingleFile(file)
             })
         } else {
-            this.loadSingleFile(file)
+            this.singleFileRender = true
+            await this.loadSingleFile(file)
         }
 
         if (!this.ignoreAnnotations) {
@@ -215,18 +235,45 @@ export default {
             this.selected = await this.getSingleFileName()
             this.files = [{ dir: false, name: this.selected }]
 
-            Promise.resolve(file.text()).then(this.verifyTextContent).then(this.highlightContent).catch(console.warn)
-        },
-        async onSelect(file) {
-            if (file != this.selected) {
-                this.showFile = false
-                this.selected = file
-                this.files
-                    .find((f) => !f.dir && f.name === file)
-                    .async("string")
+            const fileContent = await file.text()
+
+            if (!this.fileTooLarge(fileContent)) {
+                Promise.resolve(file.text())
                     .then(this.verifyTextContent)
                     .then(this.highlightContent)
                     .catch(console.warn)
+            }
+        },
+        fileTooLarge(file) {
+            const fileBlob = new Blob([file])
+            if (fileBlob.size > this.maxFileSize && !this.fileSizeBypass) {
+                this.$bvModal.show("file-size-modal")
+                return true
+            }
+            this.fileSizeBypass = false
+            return false
+        },
+        bypassAndRender() {
+            this.fileSizeBypass = true
+            if (this.singleFileRender) {
+                this.loadSingleFile(this.originalFile)
+            } else {
+                this.onSelect(this.selected)
+            }
+        },
+        async onSelect(file) {
+            if (file != this.selected || this.fileSizeBypass) {
+                this.showFile = false
+                this.selected = file
+
+                const selectedFile = await this.files.find((f) => !f.dir && f.name === file).async("string")
+
+                if (!this.fileTooLarge(selectedFile)) {
+                    Promise.resolve(selectedFile)
+                        .then(this.verifyTextContent)
+                        .then(this.highlightContent)
+                        .catch(console.warn)
+                }
             }
         },
     },
