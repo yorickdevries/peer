@@ -698,6 +698,8 @@ describe("Integration", () => {
         number: 5,
         optional: false,
         questionnaireId: submissionQuestionnaire.id,
+        maxWordCount: 100,
+        minWordCount: 10,
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -859,6 +861,8 @@ describe("Integration", () => {
         number: 3,
         optional: false,
         questionnaireId: submissionQuestionnaire.id,
+        maxWordCount: 100,
+        minWordCount: 1,
       })
       .set("cookie", await teacherCookie());
     const testOpenQuestion = JSON.parse(res.text);

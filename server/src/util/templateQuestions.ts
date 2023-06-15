@@ -131,7 +131,7 @@ const templateQuestions: QuestionTemplate[] = [
     optional: false,
     type: QuestionType.OPEN,
     graded: false,
-    minWordCount: 0,
+    minWordCount: 1,
     maxWordCount: 1000,
   },
 ];
