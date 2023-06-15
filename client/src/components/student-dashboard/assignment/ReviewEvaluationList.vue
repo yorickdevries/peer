@@ -15,6 +15,7 @@
                         <ReviewEvaluation
                             :ref="'review-' + index"
                             :feedbackReviewId="review.id"
+                            @reviewChanged="fetchFeedbackReviews"
                             :reviewsAreReadOnly="!isReviewEvaluationActive"
                             :assignmentType="assignment.assignmentType"
                         ></ReviewEvaluation>
@@ -69,7 +70,7 @@ export default {
         },
         isFormDirty() {
             for (let i = 0; i < this.feedbackReviews.length; i++) {
-                if (this.$refs[`review-${i}`][0].numberOfUnsavedQuestions() !== 0) {
+                if (this.$refs[`review-${i}`][0].$refs["questions"].numberOfUnsavedQuestions() !== 0) {
                     return true
                 }
             }

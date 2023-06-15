@@ -6,15 +6,6 @@
         <b-alert v-else-if="!review || review.submitted" show variant="warning">
             The review is submitted, any new annotations will not be saved</b-alert
         >
-        <b-alert v-else show variant="secondary"
-            >PDF viewing and annotation is experimental, in case of any error or when the pdf is not properly loading
-            while doing a review, you can always download the file with a button above.
-            <br />
-            <b
-                >NOTE: Although annotations contain your netid, anonymous annotations will be shown to the reviewed
-                person.</b
-            >
-        </b-alert>
         <!--Annotation view-->
         <b-alert :show="!showPdf" variant="primary">LOADING REVIEW PDF</b-alert>
         <div :id="pdfDivId" :style="{ visibility: showPdf ? 'visible' : 'hidden', height: 1000 + 'px' }" />

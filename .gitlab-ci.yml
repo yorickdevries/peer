@@ -203,3 +203,24 @@ deploy-production:
     url: peer.tudelft.nl
   only:
   - master
+pages:
+  image: python:3
+  stage: deploy
+  before_script:
+    - pip install mkdocs
+    - pip install mkdocs-material
+  script:
+    - cd docs
+    - mkdocs build
+    - mv site ../public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "trigger" ||
+        $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train"
+      when: never
+    - if: $CI_COMMIT_BRANCH == "dev"
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "master"
+

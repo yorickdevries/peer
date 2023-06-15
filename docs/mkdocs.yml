@@ -1,0 +1,13 @@
+site_name: Peer Manual
+docs_dir: '.'
+site_url: https://eip.pages.ewi.tudelft.nl/peer
+theme:
+  name: material
+  features:
+   - navigation.instant
+   - navigation.tabs
+copyright: Copyright &copy; 2023 - 2023 Delft University of Technology
+extra:
+  generator: false
+repo_url: https://gitlab.ewi.tudelft.nl/eip/peer
+
