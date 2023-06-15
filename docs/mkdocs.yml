@@ -1,5 +1,4 @@
 site_name: Peer Manual
-docs_dir: '.'
 site_url: https://eip.pages.ewi.tudelft.nl/peer
 theme:
   name: material
