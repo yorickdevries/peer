@@ -482,12 +482,9 @@ export default {
                         this.getWordCount(answer.answer) < question.minWordCount)
                 ) {
                     questionNumbersOfQuestionsOverOrUnderWordCount.push(question.number)
-                    console.log(question)
                 }
             }
             questionNumbersOfQuestionsOverOrUnderWordCount.sort()
-            console.log("BLAHAHAHAHHAHAHA")
-            console.log(questionNumbersOfQuestionsOverOrUnderWordCount)
             return questionNumbersOfQuestionsOverOrUnderWordCount
         },
     },
