@@ -472,7 +472,7 @@ export default {
                     answer.exists &&
                     question.type === "open" &&
                     (this.getWordCount(answer.answer) > question.maxWordCount ||
-                        this.getWordCount(answer.answer) < question.minWordcount)
+                        this.getWordCount(answer.answer) < question.minWordCount)
                 ) {
                     questionNumbersOfQuestionsOverOrUnderWordCount.push(question.number)
                     console.log(question)
