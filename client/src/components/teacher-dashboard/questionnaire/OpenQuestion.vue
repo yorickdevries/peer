@@ -79,7 +79,6 @@ export default {
                 this.question.maxWordCount,
                 this.question.minWordCount
             )
-            console.log("posted question")
         },
         async patchQuestion() {
             await api.openquestions.patch(
