@@ -172,8 +172,9 @@
             </b-row>
             <b-row>
                 <b-col>
-                    <dt>You can view your final submission here:</dt>
-                    <div v-if="finalSubmission">
+                    <dt v-if="!isMobile">You can view your final submission here:</dt>
+                    <dt v-else>You can download your final submission by clicking on the filename above.</dt>
+                    <div v-if="finalSubmission && !isMobile">
                         <b-alert v-if="finalSubmission.file.extension === '.pdf'" variant="secondary"
                             >In case the viewer shows any errors, your .pdf is malformed and no pdf annotations can be
                             made by your reviewers directly in the browser. Reviewers can always download the file
@@ -197,9 +198,10 @@ import api from "../../../api/api"
 import _ from "lodash"
 import FileAnnotator from "./FileAnnotator"
 import notifications from "../../../mixins/notifications"
+import screenSize from "../../../mixins/screenSize"
 export default {
     props: ["assignmentVersionId"],
-    mixins: [notifications],
+    mixins: [notifications, screenSize],
     components: { FileAnnotator },
     data() {
         return {
