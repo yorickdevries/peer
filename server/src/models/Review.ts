@@ -193,7 +193,7 @@ export default abstract class Review extends BaseModel {
     if (this.submitted && !(await this.canBeSubmitted())) {
       throw new Error("A non-optional question isn't answered yet.");
     }
-    if (this.submitted && !(await this.isNotInWordCountRange())) {
+    if (this.submitted && (await this.isNotInWordCountRange())) {
       throw new Error("An open question answer is not in the word range.");
     }
     // submitted and submittedAt

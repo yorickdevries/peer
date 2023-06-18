@@ -699,7 +699,7 @@ describe("Integration", () => {
         optional: false,
         questionnaireId: submissionQuestionnaire.id,
         maxWordCount: 100,
-        minWordCount: 10,
+        minWordCount: 1,
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
