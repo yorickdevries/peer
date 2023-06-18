@@ -15,8 +15,8 @@ define(OpenQuestion, (faker: typeof Faker) => {
   const number = faker.random.number({ min: 1, max: 10 });
   const optional = faker.random.boolean();
   const questionnaire = Object.create(Questionnaire);
-  const maxWordCount = faker.random.number({ min: 5, max: 20 });
-  const minWordCount = faker.random.number({ min: 1, max: 4 });
+  const maxWordCount = Number.MAX_SAFE_INTEGER;
+  const minWordCount = 1;
 
   return new OpenQuestion(
     text,

@@ -48,7 +48,7 @@ export default {
                 optional: false,
                 questionnaireId: this.questionnaireId,
                 wordCount: false,
-                maxWordCount: Number.MAX_VALUE,
+                maxWordCount: Number.MAX_SAFE_INTEGER,
                 minWordCount: 1,
             },
             enforceWordRange: false,
