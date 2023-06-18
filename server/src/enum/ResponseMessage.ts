@@ -24,6 +24,7 @@ enum ResponseMessage {
   FACULTY_HAS_COURSES = "The specified faculty already has courses assigned",
   YEAR_NOT_FOUND = "The specified year was not found",
   YEAR_HAS_COURSES = "The specified year already has courses assigned",
+  INVALID_WORD_COUNT = "The specified word count is not valid",
 }
 
 export default ResponseMessage;

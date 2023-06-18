@@ -184,7 +184,7 @@ const addCopyOfQuestions = async function (
             await transactionalEntityManager.save(option);
           }
         } else if (questionToCopy instanceof OpenQuestion) {
-          const question = new OpenQuestion(
+          const question: OpenQuestion = new OpenQuestion(
             questionToCopy.text,
             questionToCopy.number,
             questionToCopy.optional,
@@ -223,4 +223,5 @@ const addCopyOfQuestions = async function (
   return;
 };
 
+// @ts-ignore
 export { addDefaultReviewEvaluationQuestions, addCopyOfQuestions };

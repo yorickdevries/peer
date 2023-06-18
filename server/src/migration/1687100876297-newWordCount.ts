@@ -1,12 +1,12 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class AddWordlimit1686315623056 implements MigrationInterface {
-    name = 'AddWordlimit1686315623056'
+export class newWordCount1687100876297 implements MigrationInterface {
+    name = 'newWordCount1687100876297'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query("DROP INDEX `IDX_8e0bb2d261fc46c8fd01333371` ON `user`");
-        await queryRunner.query("ALTER TABLE `question` ADD `minWordCount` bigint NULL");
-        await queryRunner.query("ALTER TABLE `question` ADD `maxWordCount` bigint NULL");
+        await queryRunner.query("ALTER TABLE `question` ADD `minWordCount` bigint UNSIGNED NULL");
+        await queryRunner.query("ALTER TABLE `question` ADD `maxWordCount` bigint UNSIGNED NULL");
         await queryRunner.query("ALTER TABLE `assignment` CHANGE `publishDate` `publishDate` timestamp NOT NULL");
         await queryRunner.query("ALTER TABLE `assignment` CHANGE `dueDate` `dueDate` timestamp NOT NULL");
         await queryRunner.query("ALTER TABLE `assignment` CHANGE `reviewPublishDate` `reviewPublishDate` timestamp NOT NULL");
