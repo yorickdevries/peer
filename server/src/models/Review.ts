@@ -23,6 +23,7 @@ import UserRole from "../enum/UserRole";
 import QuestionAnswer from "./QuestionAnswer";
 import Question from "./Question";
 import _ from "lodash";
+import OpenQuestionAnswer from "./OpenQuestionAnswer";
 
 interface AnonymousReview {
   id: number;
@@ -192,6 +193,9 @@ export default abstract class Review extends BaseModel {
     if (this.submitted && !(await this.canBeSubmitted())) {
       throw new Error("A non-optional question isn't answered yet.");
     }
+    if (this.submitted && !(await this.isNotInWordCountRange())) {
+      throw new Error("An open question answer is not in the word range.");
+    }
     // submitted and submittedAt
     if (this.submitted && !this.submittedAt) {
       throw new Error("submittedAt needs to be defined");
@@ -223,6 +227,23 @@ export default abstract class Review extends BaseModel {
       }
     }
     return true;
+  }
+
+  async isNotInWordCountRange(): Promise<boolean> {
+    const answers = await this.getQuestionAnswers();
+    if (answers !== undefined) {
+      const areNotInWordRange: boolean[] = await Promise.all(
+        answers.map(async (answer) => {
+          if (answer instanceof OpenQuestionAnswer) {
+            return !(await answer.isInWordRange());
+          }
+          return false;
+        })
+      );
+
+      return areNotInWordRange.includes(true);
+    }
+    return false;
   }
 
   async getQuestionnaire(): Promise<Questionnaire> {
