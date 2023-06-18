@@ -1,11 +1,11 @@
 import {
-  Entity,
-  PrimaryColumn,
   Column,
-  ManyToMany,
-  JoinTable,
-  OneToOne,
+  Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
+  OneToOne,
+  PrimaryColumn,
 } from "typeorm";
 import {
   IsAlphanumeric,
