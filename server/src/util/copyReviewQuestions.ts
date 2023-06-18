@@ -223,5 +223,4 @@ const addCopyOfQuestions = async function (
   return;
 };
 
-// @ts-ignore
 export { addDefaultReviewEvaluationQuestions, addCopyOfQuestions };
