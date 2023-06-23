@@ -42,6 +42,7 @@ const passportConfiguration = function (passport: PassportStatic): void {
       const decryptionCert = cert;
       ppConfig.decryptionPvk = key;
 
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       const verificationFunction: passportSaml.VerifyWithoutRequest = async (
         profile,
         done

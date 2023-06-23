@@ -153,7 +153,7 @@ describe("Email notifications", () => {
   let student_feedback: Assignment;
   let group_feedback: Assignment;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     connection = await createDatabaseConnection();
 
     const options: ConfigureOption = {
@@ -200,8 +200,6 @@ describe("Email notifications", () => {
         name: "group_feedback",
       },
     });
-
-    done();
   });
 
   afterAll(async () => {

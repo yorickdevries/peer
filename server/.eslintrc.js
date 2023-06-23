@@ -16,6 +16,6 @@ module.exports = {
     "prefer-arrow-callback": "error",
     "@typescript-eslint/no-misused-promises": "error",
     "@typescript-eslint/no-floating-promises": "error",
-    "sort-imports": "warn"
+    "sort-imports": "off"
   },
 };
