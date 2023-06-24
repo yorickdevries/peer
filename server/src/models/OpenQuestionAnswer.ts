@@ -40,11 +40,12 @@ export default class OpenQuestionAnswer extends QuestionAnswer {
 
   async isInWordRange(): Promise<boolean> {
     const openQuestion: OpenQuestion = await this.getQuestion();
+    const numberOfWords: number = this.numberOfWords();
 
     return (
       this.openAnswer !== null &&
-      this.numberOfWords() >= openQuestion.minWordCount &&
-      this.numberOfWords() <= openQuestion.maxWordCount
+      numberOfWords >= openQuestion.minWordCount &&
+      numberOfWords <= openQuestion.maxWordCount
     );
   }
 

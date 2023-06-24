@@ -232,16 +232,15 @@ export default abstract class Review extends BaseModel {
   async isNotInWordCountRange(): Promise<boolean> {
     const answers = await this.getQuestionAnswers();
     if (answers !== undefined) {
-      const areNotInWordRange: boolean[] = await Promise.all(
-        answers.map(async (answer) => {
-          if (answer instanceof OpenQuestionAnswer) {
-            return !(await answer.isInWordRange());
-          }
-          return false;
-        })
-      );
-
-      return areNotInWordRange.includes(true);
+      for (const answer of answers) {
+        if (
+          answer instanceof OpenQuestionAnswer &&
+          !(await answer.isInWordRange())
+        ) {
+          return true;
+        }
+      }
+      return false;
     }
     return false;
   }
