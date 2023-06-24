@@ -9,8 +9,9 @@
         <b-form-group label="Optional Question" description="Make this question optional for the student.">
             <b-form-checkbox v-model="question.optional"> Make this question optional. </b-form-checkbox>
         </b-form-group>
-        <b-form-checkbox v-model="enforceWordRange">Enforce word range</b-form-checkbox>
-
+        <b-form-group label="Word range" description="Add a minimum and maximum word count.">
+            <b-form-checkbox v-model="enforceWordRange">Enforce word range</b-form-checkbox>
+        </b-form-group>
         <div v-if="enforceWordRange">
             <b-form-group label="Minimum Word Count" description="Minimum amount of words a student has to answer in.">
                 <b-form-input v-model="question.minWordCount" type="number"></b-form-input>
@@ -47,8 +48,7 @@ export default {
                 number: this.questionNumber,
                 optional: false,
                 questionnaireId: this.questionnaireId,
-                wordCount: false,
-                maxWordCount: Number.MAX_SAFE_INTEGER,
+                maxWordCount: 10000,
                 minWordCount: 1,
             },
             enforceWordRange: false,
@@ -63,6 +63,9 @@ export default {
             if (this.questionId) {
                 const res = await api.openquestions.get(this.questionId)
                 this.question = res.data
+                if (this.question.maxWordCount !== 10000 || this.question.minWordCount !== 1) {
+                    this.enforceWordRange = true
+                }
             }
         },
         async save() {

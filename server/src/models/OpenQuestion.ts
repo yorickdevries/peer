@@ -2,17 +2,21 @@ import Questionnaire from "./Questionnaire";
 import Question from "./Question";
 import { ChildEntity, Column } from "typeorm";
 import QuestionType from "../enum/QuestionType";
-import { IsDefined } from "class-validator";
+import { IsInt, IsPositive, Max } from "class-validator";
 import ResponseMessage from "../enum/ResponseMessage";
 
 @ChildEntity(QuestionType.OPEN)
 export default class OpenQuestion extends Question {
-  @Column({ type: "bigint", unsigned: true })
-  @IsDefined()
+  @Column({ default: 20000 })
+  @IsInt()
+  @IsPositive()
+  @Max(20000)
   minWordCount: number;
 
-  @Column({ type: "bigint", unsigned: true })
-  @IsDefined()
+  @Column({ default: 20000 })
+  @IsInt()
+  @IsPositive()
+  @Max(20000)
   maxWordCount: number;
   constructor(
     text: string,

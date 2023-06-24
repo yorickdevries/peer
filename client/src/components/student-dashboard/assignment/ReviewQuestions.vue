@@ -275,11 +275,7 @@ export default {
             })
         },
         getWordCount(text) {
-            const words = text
-                .trim()
-                .split(/\s+/)
-                .filter((word) => word !== "")
-            return words.length
+            return text.split(" ").length
         },
         uploadAnswerFilePath(reviewId, questionId) {
             return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`
