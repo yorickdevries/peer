@@ -17,12 +17,13 @@
                 <!-- Text-->
                 <h4>{{ question.text }}</h4>
                 <!-- OPEN QUESTION -->
-                <MarkdownEditorViewer
-                    v-if="question.type === 'open'"
-                    :answer-object="answers[question.id]"
-                    :displayeditor="canChange"
-                    @shortcut-save="questionIndex = index"
-                />
+                <div v-if="question.type === 'open'">
+                    <MarkdownEditorViewer
+                        :answer-object="answers[question.id]"
+                        :displayeditor="canChange"
+                        @shortcut-save="questionIndex = index"
+                    />
+                </div>
 
                 <!-- MULTIPLE CHOICE QUESTION -->
                 <!--prettier-ignore-->
@@ -275,7 +276,9 @@ export default {
             })
         },
         getWordCount(text) {
-            return text.split(" ").length
+            const plainText = text.replace(/[#_*`-]/g, " ")
+            const words = plainText.split(/\s+/)
+            return words.length
         },
         uploadAnswerFilePath(reviewId, questionId) {
             return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`

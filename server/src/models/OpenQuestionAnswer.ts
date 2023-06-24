@@ -50,6 +50,8 @@ export default class OpenQuestionAnswer extends QuestionAnswer {
   }
 
   private numberOfWords(): number {
-    return this.openAnswer.split(" ").length;
+    const plainText = this.openAnswer.replace(/[#_*`-]/g, " ");
+    const words = plainText.split(/\s+/);
+    return words.length;
   }
 }
