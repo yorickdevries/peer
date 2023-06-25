@@ -47,7 +47,7 @@ export default {
                     ["scrollSync"],
                 ],
             },
-            wordCount: this.answerObject.answer === undefined ? 0 : this.getWordCount(),
+            wordCount: !this.answerObject.answer ? 0 : this.getWordCount(),
         }
     },
     methods: {
