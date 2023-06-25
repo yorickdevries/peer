@@ -11,6 +11,14 @@
                     OPTIONAL
                 </b-badge>
                 <b-badge v-else variant="danger" class="ml-2 float-right p-1"> REQUIRED </b-badge>
+                <div
+                    v-if="question.type === 'open' && (question.minWordCount !== 1 || question.maxWordCount !== 10000)"
+                    class="d-flex flex-row"
+                >
+                    <b-badge variant="secondary" class="ml-2 p-1"> MIN WORDCOUNT: {{ question.minWordCount }} </b-badge>
+
+                    <b-badge variant="secondary" class="ml-2 p-1"> MAX WORDCOUNT: {{ question.maxWordCount }} </b-badge>
+                </div>
             </b-card-header>
 
             <b-card-body>
