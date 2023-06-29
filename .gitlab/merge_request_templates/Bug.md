@@ -1,4 +1,4 @@
-# What does this mr do?
+# What does this MR do?
 <!-- describe in short what the bug was -->
 
 # Actions taken to fix bug
