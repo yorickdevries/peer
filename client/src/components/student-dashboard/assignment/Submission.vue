@@ -439,17 +439,17 @@ export default {
             //pdf creation and conversion
             const firstImg = this.files[0]
             const doc = new jsPDF({
-                orientation: setWidth > setHeight ? "l" : "p",
+                orientation: firstImg.width > firstImg.height ? "l" : "p",
                 unit: "px",
-                format: "a4",
+                format: [firstImg.width, firstImg.height],
                 hotfixes: ["px_scaling"],
             })
-            for (let i = 0; i < this.files.length; i++) {
+            doc.addImage(firstImg.src, "", 0, 0, firstImg.width, firstImg.height)
+
+            for (let i = 1; i < this.files.length; i++) {
                 const curImg = this.files[i]
-                const [setWidth, setHeight] = this.findImgRatio(curImg)
-                doc.addPage([setWidth, setHeight], setWidth > setHeight ? "l" : "p")
-                doc.addImage(curImg.src, "", 0, 0, setWidth, setHeight)
-                //if (i !== this.files.length - 1) doc.addPage()
+                doc.addPage([curImg.width, curImg.height], curImg.width > curImg.height ? "l" : "p")
+                doc.addImage(curImg.src, "", 0, 0, curImg.width, curImg.height)
             }
 
             const outputBlob = doc.output("blob")
