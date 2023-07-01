@@ -214,7 +214,12 @@
                                     </b-col>
                                 </b-row>
                             </b-card>
-                            <b-form-file accept="image/*" @input="uploadImage" placeholder="Add an image" />
+                            <b-form-file
+                                accept="image/*"
+                                @input="uploadImage"
+                                placeholder="Add an image"
+                                ref="imgUploadButton"
+                            />
 
                             <b-button
                                 variant="primary"
@@ -337,6 +342,7 @@ export default {
                         width: img.naturalWidth,
                         height: img.naturalHeight,
                     })
+                    this.$refs.imgUploadButton.reset()
                 }
                 img.src = reader.result
             })
@@ -425,9 +431,6 @@ export default {
             await this.fetchSubmissions()
             this.buttonDisabled = false
         },
-        findImgRatio(file) {
-            return [file.width, file.height]
-        },
         async submitImageSubmission() {
             this.buttonDisabled = true
             if (this.files.length === 0) {
@@ -486,6 +489,7 @@ export default {
             // Reset the upload modal state.
             this.fileProgress = 0
             this.file = null
+            this.files = []
 
             // new submission button clicked
             if (id) {
