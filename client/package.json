@@ -38,6 +38,7 @@
     "eslint-plugin-vue": "^9.8.0",
     "highlight.js": "^11.7.0",
     "izitoast": "^1.4.0",
+    "jspdf": "^2.5.1",
     "jszip": "^3.10.1",
     "jszip-utils": "^0.1.0",
     "lodash": "^4.17.21",
