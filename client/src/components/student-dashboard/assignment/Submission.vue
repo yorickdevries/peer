@@ -334,8 +334,8 @@ export default {
                 img.onload = () => {
                     this.files.push({
                         src: reader.result,
-                        width: img.width,
-                        height: img.height,
+                        width: img.naturalWidth,
+                        height: img.naturalHeight,
                     })
                 }
                 img.src = reader.result
@@ -426,11 +426,7 @@ export default {
             this.buttonDisabled = false
         },
         findImgRatio(file) {
-            //const heightRatio = 210 / ((file.width * 2.54 * 10) / 96)
-            const widthRatio = 297 / ((file.height * 2.54 * 10) / 96)
-
-            return widthRatio
-            //return Math.min(heightRatio, widthRatio)
+            return [file.width, file.height]
         },
         async submitImageSubmission() {
             this.buttonDisabled = true
@@ -441,12 +437,19 @@ export default {
             }
 
             //pdf creation and conversion
-            const doc = new jsPDF()
+            const firstImg = this.files[0]
+            const doc = new jsPDF({
+                orientation: setWidth > setHeight ? "l" : "p",
+                unit: "px",
+                format: "a4",
+                hotfixes: ["px_scaling"],
+            })
             for (let i = 0; i < this.files.length; i++) {
                 const curImg = this.files[i]
-                //const ratio = this.findImgRatio(curImg)
-                doc.addImage(curImg.src, "", 0, 0, 210, 297)
-                if (i !== this.files.length - 1) doc.addPage()
+                const [setWidth, setHeight] = this.findImgRatio(curImg)
+                doc.addPage([setWidth, setHeight], setWidth > setHeight ? "l" : "p")
+                doc.addImage(curImg.src, "", 0, 0, setWidth, setHeight)
+                //if (i !== this.files.length - 1) doc.addPage()
             }
 
             const outputBlob = doc.output("blob")
