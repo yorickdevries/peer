@@ -13,15 +13,25 @@
             <b-form-checkbox v-model="enforceWordRange">Enforce word range</b-form-checkbox>
         </b-form-group>
         <div v-if="enforceWordRange">
-            <b-form-group label="Minimum Word Count" description="Minimum number of words a student must use in their answer.">
-                <b-form-input v-model="question.minWordCount" type="number"></b-form-input>
+            <b-form-group
+                label="Minimum Word Count"
+                description="Minimum number of words a student must use in their answer."
+                :state="isValid ? null : false"
+                :invalid-feedback="minValidationMessage"
+            >
+                <b-form-input v-model="question.minWordCount" type="number" @input="validateInput"></b-form-input>
             </b-form-group>
 
-            <b-form-group label="Maximum Word Count" description="Maximum number of words a student must use in their answer.">
-                <b-form-input v-model="question.maxWordCount" type="number"></b-form-input>
+            <b-form-group
+                label="Maximum Word Count"
+                description="Maximum number of words a student must use in their answer."
+                :state="isValid ? null : false"
+                :invalid-feedback="maxValidationMessage"
+            >
+                <b-form-input v-model="question.maxWordCount" type="number" @input="validateInput"></b-form-input>
             </b-form-group>
         </div>
-        <b-button @click="save" variant="outline-primary" size="sm" class="mr-1">Save</b-button>
+        <b-button @click="save" variant="outline-primary" size="sm" class="mr-1" :disabled="!isValid">Save</b-button>
         <span v-if="question.id">
             <b-btn v-b-modal="`delete${question.id}`" variant="outline-danger" size="sm">Delete</b-btn>
             <b-modal :id="`delete${question.id}`" centered title="Warning" @ok="deleteQuestion">
@@ -52,12 +62,51 @@ export default {
                 minWordCount: 1,
             },
             enforceWordRange: false,
+            isValid: true,
+            maxValidationMessage: "",
+            minValidationMessage: "",
         }
     },
     async created() {
         await this.fetchQuestion()
+        this.validateInput()
+    },
+    watch: {
+        enforceWordRange(newVal) {
+            if (!newVal) {
+                this.question.maxWordCount = 10000
+                this.question.minWordCount = 1
+            }
+        },
     },
     methods: {
+        validateInput() {
+            const maxValue = 20000
+            let isMinValid = true
+            let isMaxValid = true
+
+            if (this.question.minWordCount > maxValue) {
+                isMinValid = false
+                this.minValidationMessage = "The value is too large."
+            } else if (this.question.minWordCount <= 0) {
+                isMinValid = false
+                this.minValidationMessage = "The value should be positive."
+            } else {
+                this.minValidationMessage = ""
+            }
+
+            if (this.question.maxWordCount > maxValue) {
+                isMaxValid = false
+                this.maxValidationMessage = "The value is too large."
+            } else if (this.question.maxWordCount <= 0) {
+                isMaxValid = false
+                this.maxValidationMessage = "The value should be positive."
+            } else {
+                this.maxValidationMessage = ""
+            }
+
+            this.isValid = isMinValid && isMaxValid
+        },
         async fetchQuestion() {
             // load the question in case an id is passed
             if (this.questionId) {

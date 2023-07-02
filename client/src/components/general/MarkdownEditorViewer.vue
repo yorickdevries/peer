@@ -47,14 +47,17 @@ export default {
                     ["scrollSync"],
                 ],
             },
-            wordCount: !this.answerObject.answer ? 0 : this.getWordCount(),
         }
+    },
+    computed: {
+        wordCount() {
+            return !this.answerObject.answer ? 0 : this.getWordCount()
+        },
     },
     methods: {
         getMarkdown() {
             this.answerObject.answer = this.$refs.toastuiEditor.invoke("getMarkdown")
             this.answerObject.changed = true
-            this.wordCount = this.getWordCount()
             this.$emit("shortcut-save")
         },
         getWordCount() {

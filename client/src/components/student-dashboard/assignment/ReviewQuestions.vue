@@ -184,7 +184,6 @@ export default {
         window.addEventListener("keyup", this.keyUp)
         if (this.feedback) {
             await this.fetchAnswers()
-            await this.fetchSavedAnswers()
         }
     },
     destroyed() {
@@ -195,7 +194,6 @@ export default {
         return {
             // all answers will be saved in this object
             answers: null,
-            savedAnswers: null,
             // Currently pressed keys
             keys: { Enter: false, ControlLeft: false, ControlRight: false },
             // Index of currently active question
@@ -208,7 +206,6 @@ export default {
             if (!this.loadedQuestions && newQ !== undefined) {
                 this.loadedQuestions = true
                 this.fetchAnswers()
-                this.fetchSavedAnswers()
             }
         },
         questionNumbersOfUnsavedAnswers(newNumbers) {
@@ -257,11 +254,11 @@ export default {
         },
         questionNumbersOfQuestionsOverOrUnderWordCount() {
             const questionNumbersOfQuestionsOverOrUnderWordCount = []
-            if (!this.savedAnswers) {
+            if (!this.answers) {
                 return questionNumbersOfQuestionsOverOrUnderWordCount
             }
-            for (const questionId in this.savedAnswers) {
-                const answer = this.savedAnswers[questionId]
+            for (const questionId in this.answers) {
+                const answer = this.answers[questionId]
                 const question = this.getQuestion(questionId)
 
                 if (
@@ -347,59 +344,6 @@ export default {
             // set the answer object so all fields are reactive now
             this.answers = answers
         },
-        async fetchSavedAnswers() {
-            // remove existing answers
-            this.savedAnswers = null
-            const res = this.feedback
-                ? await api.reviewofreviews.getAnswers(this.review.id)
-                : await api.reviewofsubmissions.getAnswers(this.review.id)
-            this.loadedQuestions = true
-            const existingAnswers = res.data
-            // construct answer map
-            const answers = {}
-            for (const question of this.questionnaire.questions) {
-                // answer variable which gets replaced if an answer is present
-                let answer = null
-                // find existing answer
-                const existingAnswer = _.find(existingAnswers, (answer) => {
-                    return answer.questionId === question.id
-                })
-                const answerExists = existingAnswer !== undefined
-                if (existingAnswer) {
-                    // get the right field from the answer
-                    switch (question.type) {
-                        case "open":
-                            answer = existingAnswer.openAnswer
-                            break
-                        case "multiplechoice":
-                            answer = existingAnswer.multipleChoiceAnswer
-                            break
-                        case "checkbox":
-                            answer = existingAnswer.checkboxAnswer
-                            break
-                        case "range":
-                            answer = existingAnswer.rangeAnswer
-                            break
-                        case "upload":
-                            answer = existingAnswer.uploadAnswer
-                            break
-                        default:
-                            return this.showErrorMessage({ message: "Invalid question" })
-                    }
-                }
-                if (question.type === "upload") {
-                    // set new answer to null so it can be used for upload
-                    answers[question.id] = { answer: answer, newAnswer: null, exists: answerExists, changed: false }
-                } else if (question.type === "checkbox" && !answer) {
-                    // set the answer object as changed/empty list as this can be saved directly as well
-                    answers[question.id] = { answer: [], exists: answerExists, changed: true }
-                } else {
-                    answers[question.id] = { answer: answer, exists: answerExists, changed: false }
-                }
-            }
-            // set the answer object so all fields are reactive now
-            this.savedAnswers = answers
-        },
         keyDown(e) {
             this.keys[e.code] = true
             if (this.keys["Enter"] && (this.keys["ControlLeft"] || this.keys["ControlRight"])) {
@@ -442,7 +386,6 @@ export default {
                 answer.changed = false
                 // set boolean so the answer is present in the database
                 answer.exists = true
-                this.savedAnswers = this.fetchSavedAnswers()
                 this.showSuccessMessage({ message: "Succesfuly saved answer" })
             } catch (error) {
                 this.showErrorMessage({ message: error })
