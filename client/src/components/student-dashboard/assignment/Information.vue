@@ -51,7 +51,15 @@
                             <dd>{{ group.name }}</dd>
 
                             <dt>Group Members</dt>
-                            <b-table striped outlined show-empty stacked="md" :items="group.users" :fields="userFields">
+                            <b-table
+                                striped
+                                outlined
+                                show-empty
+                                stacked="sm"
+                                responsive
+                                :items="group.users"
+                                :fields="userFields"
+                            >
                             </b-table>
 
                             <dt>Final Submission</dt>
