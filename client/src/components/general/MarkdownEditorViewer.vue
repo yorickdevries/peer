@@ -1,15 +1,17 @@
 <template>
     <div>
-        <editor
-            v-if="displayeditor"
-            :initialValue="answerObject.answer"
-            :options="editorOptions"
-            height="500px"
-            initialEditType="markdown"
-            previewStyle="vertical"
-            @change="getMarkdown()"
-            ref="toastuiEditor"
-        />
+        <div v-if="displayeditor">
+            <editor
+                :initialValue="answerObject.answer"
+                :options="editorOptions"
+                height="500px"
+                initialEditType="markdown"
+                previewStyle="vertical"
+                @change="getMarkdown()"
+                ref="toastuiEditor"
+            />
+            <p>Word Count: {{ this.wordCount }}</p>
+        </div>
         <div v-else>
             <viewer
                 v-if="answerObject.answer == null"
@@ -47,11 +49,21 @@ export default {
             },
         }
     },
+    computed: {
+        wordCount() {
+            return !this.answerObject.answer ? 0 : this.getWordCount()
+        },
+    },
     methods: {
         getMarkdown() {
             this.answerObject.answer = this.$refs.toastuiEditor.invoke("getMarkdown")
             this.answerObject.changed = true
             this.$emit("shortcut-save")
+        },
+        getWordCount() {
+            const plainText = this.answerObject.answer.replace(/[#_*`-]/g, " ")
+            const words = plainText.split(/\s+/)
+            return words.length
         },
     },
     watch: {

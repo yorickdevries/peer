@@ -37,4 +37,21 @@ export default class OpenQuestionAnswer extends QuestionAnswer {
       throw new Error("The question is a graded question");
     }
   }
+
+  async isInWordRange(): Promise<boolean> {
+    const openQuestion: OpenQuestion = await this.getQuestion();
+    const numberOfWords: number = this.numberOfWords();
+
+    return (
+      this.openAnswer !== null &&
+      numberOfWords >= openQuestion.minWordCount &&
+      numberOfWords <= openQuestion.maxWordCount
+    );
+  }
+
+  private numberOfWords(): number {
+    const plainText = this.openAnswer.replace(/[#_*`-]/g, " ");
+    const words = plainText.split(/\s+/);
+    return words.length;
+  }
 }

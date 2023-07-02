@@ -50,6 +50,8 @@ const questionSchema = Joi.object({
   number: Joi.number().integer().required(),
   optional: Joi.boolean().required(),
   questionnaireId: Joi.number().integer().required(),
+  maxWordCount: Joi.number().integer().required().min(1).max(20000),
+  minWordCount: Joi.number().integer().required().min(1).max(20000),
 });
 // post a question
 router.post("/", validateBody(questionSchema), async (req, res) => {
@@ -92,7 +94,9 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
     req.body.text,
     req.body.number,
     req.body.optional,
-    questionnaire
+    questionnaire,
+    req.body.maxWordCount,
+    req.body.minWordCount
   );
   await question.save();
   await question.reorder(QuestionOperation.CREATE);
@@ -104,6 +108,8 @@ const questionPatchSchema = Joi.object({
   text: Joi.string().required(),
   number: Joi.number().integer().required(),
   optional: Joi.boolean().required(),
+  maxWordCount: Joi.number().integer().required().min(1).max(20000),
+  minWordCount: Joi.number().integer().required().min(1).max(20000),
 });
 // patch a question
 router.patch(
@@ -154,6 +160,8 @@ router.patch(
     question.text = req.body.text;
     question.number = req.body.number;
     question.optional = req.body.optional;
+    question.minWordCount = req.body.minWordCount;
+    question.maxWordCount = req.body.maxWordCount;
     await question.save();
     await question.reorder(QuestionOperation.MODIFY);
     res.send(question);

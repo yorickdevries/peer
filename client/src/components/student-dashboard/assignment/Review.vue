@@ -81,6 +81,7 @@
                             @disableButton="(v) => (buttonDisabled = v)"
                             @unsaveAns="(v) => (unsavedAnswer = v)"
                             @unansQues="(v) => (unansweredQuestion = v)"
+                            @wordCountAns="(v) => (wordCountAnswer = v)"
                             ref="questions"
                         ></ReviewQuestions>
                         <b-card v-if="!reviewsAreReadOnly">
@@ -136,6 +137,7 @@
                     @disableButton="(v) => (buttonDisabled = v)"
                     @unsaveAns="(v) => (unsavedAnswer = v)"
                     @unansQues="(v) => (unansweredQuestion = v)"
+                    @wordCountAns="(v) => (wordCountAnswer = v)"
                     ref="questions"
                 ></ReviewQuestions>
 
@@ -189,7 +191,10 @@
             <b-modal
                 :id="`submit${review.id}`"
                 title="Submit Confirmation"
-                :ok-disabled="buttonDisabled || (unansweredQuestion.length > 0 && !review.flaggedByReviewer)"
+                :ok-disabled="
+                    buttonDisabled ||
+                    ((unansweredQuestion.length > 0 || wordCountAnswer.length > 0) && !review.flaggedByReviewer)
+                "
                 @ok="submitReview"
             >
                 <b-alert v-if="unsavedAnswer.length > 0" show variant="warning" class="p-2"
@@ -198,6 +203,9 @@
                 <b-alert v-if="unansweredQuestion.length > 0" show variant="danger" class="p-2"
                     >There are one or more answers missing for the following non-optional questions:
                     {{ unansweredQuestion }}</b-alert
+                >
+                <b-alert v-if="wordCountAnswer.length > 0" show variant="danger" class="p-2"
+                    >The following questions have answers that are not in the word range: {{ wordCountAnswer }}</b-alert
                 >
                 Do you really want to submit? This marks the review as finished and all unsaved changes will be
                 discarded.
@@ -263,6 +271,7 @@ export default {
             viewFileNextToQuestionnaire: false,
             unsavedAnswer: [],
             unansweredQuestion: [],
+            wordCountAnswer: [],
         }
     },
     computed: {

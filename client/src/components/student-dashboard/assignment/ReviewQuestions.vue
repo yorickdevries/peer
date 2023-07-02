@@ -11,18 +11,27 @@
                     OPTIONAL
                 </b-badge>
                 <b-badge v-else variant="danger" class="ml-2 float-right p-1"> REQUIRED </b-badge>
+                <div
+                    v-if="question.type === 'open' && (question.minWordCount !== 1 || question.maxWordCount !== 10000)"
+                    class="d-flex flex-row"
+                >
+                    <b-badge variant="secondary" class="ml-2 p-1"> MIN WORDCOUNT: {{ question.minWordCount }} </b-badge>
+
+                    <b-badge variant="secondary" class="ml-2 p-1"> MAX WORDCOUNT: {{ question.maxWordCount }} </b-badge>
+                </div>
             </b-card-header>
 
             <b-card-body>
                 <!-- Text-->
                 <h4>{{ question.text }}</h4>
                 <!-- OPEN QUESTION -->
-                <MarkdownEditorViewer
-                    v-if="question.type === 'open'"
-                    :answer-object="answers[question.id]"
-                    :displayeditor="canChange"
-                    @shortcut-save="questionIndex = index"
-                />
+                <div v-if="question.type === 'open'">
+                    <MarkdownEditorViewer
+                        :answer-object="answers[question.id]"
+                        :displayeditor="canChange"
+                        @shortcut-save="questionIndex = index"
+                    />
+                </div>
 
                 <!-- MULTIPLE CHOICE QUESTION -->
                 <!--prettier-ignore-->
@@ -169,7 +178,7 @@ export default {
     mixins: [notifications],
     components: { MarkdownEditorViewer, PDFViewer, StarRating },
     props: ["questionnaire", "review", "reviewsAreReadOnly", "buttonDisabled", "feedback", "canChange"],
-    emits: ["disableButton", "unansQues", "unsaveAns"],
+    emits: ["disableButton", "unansQues", "unsaveAns", "wordCountAns"],
     async created() {
         window.addEventListener("keydown", this.keyDown)
         window.addEventListener("keyup", this.keyUp)
@@ -204,6 +213,9 @@ export default {
         },
         questionNumbersOfUnansweredNonOptionalQuestions(newNumbers) {
             this.$emit("unansQues", newNumbers)
+        },
+        questionNumbersOfQuestionsOverOrUnderWordCount(newNumbers) {
+            this.$emit("wordCountAns", newNumbers)
         },
     },
     computed: {
@@ -240,6 +252,27 @@ export default {
             questionNumbersOfUnansweredNonOptionalQuestions.sort()
             return questionNumbersOfUnansweredNonOptionalQuestions
         },
+        questionNumbersOfQuestionsOverOrUnderWordCount() {
+            const questionNumbersOfQuestionsOverOrUnderWordCount = []
+            if (!this.answers) {
+                return questionNumbersOfQuestionsOverOrUnderWordCount
+            }
+            for (const questionId in this.answers) {
+                const answer = this.answers[questionId]
+                const question = this.getQuestion(questionId)
+
+                if (
+                    answer.exists &&
+                    question.type === "open" &&
+                    (this.getWordCount(answer.answer) > question.maxWordCount ||
+                        this.getWordCount(answer.answer) < question.minWordCount)
+                ) {
+                    questionNumbersOfQuestionsOverOrUnderWordCount.push(question.number)
+                }
+            }
+            questionNumbersOfQuestionsOverOrUnderWordCount.sort()
+            return questionNumbersOfQuestionsOverOrUnderWordCount
+        },
     },
     methods: {
         numberOfUnsavedQuestions() {
@@ -249,6 +282,11 @@ export default {
             return _.find(this.questionnaire.questions, (question) => {
                 return question.id === parseInt(questionId)
             })
+        },
+        getWordCount(text) {
+            const plainText = text.replace(/[#_*`-]/g, " ")
+            const words = plainText.split(/\s+/)
+            return words.length
         },
         uploadAnswerFilePath(reviewId, questionId) {
             return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`
