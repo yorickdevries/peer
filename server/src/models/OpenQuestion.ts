@@ -7,13 +7,13 @@ import ResponseMessage from "../enum/ResponseMessage";
 
 @ChildEntity(QuestionType.OPEN)
 export default class OpenQuestion extends Question {
-  @Column()
+  @Column({ default: 1 })
   @IsInt()
   @IsPositive()
   @Max(20000)
   minWordCount: number;
 
-  @Column()
+  @Column({ default: 10000 })
   @IsInt()
   @IsPositive()
   @Max(20000)
