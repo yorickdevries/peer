@@ -13,11 +13,11 @@
             <b-form-checkbox v-model="enforceWordRange">Enforce word range</b-form-checkbox>
         </b-form-group>
         <div v-if="enforceWordRange">
-            <b-form-group label="Minimum Word Count" description="Minimum amount of words a student has to answer in.">
+            <b-form-group label="Minimum Word Count" description="Minimum number of words a student must use in their answer.">
                 <b-form-input v-model="question.minWordCount" type="number"></b-form-input>
             </b-form-group>
 
-            <b-form-group label="Maximum Word Count" description="Maximum amount of words a student has to answer in.">
+            <b-form-group label="Maximum Word Count" description="Maximum number of words a student must use in their answer.">
                 <b-form-input v-model="question.maxWordCount" type="number"></b-form-input>
             </b-form-group>
         </div>
