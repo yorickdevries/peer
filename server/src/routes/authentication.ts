@@ -77,10 +77,14 @@ const authenticationRoutes = function (router: Router): void {
     );
   }
   // Route to logout.
-  router.get("/logout", (req, res) => {
-    req.logout(() => {
-      res.redirect("/");
+  router.get("/logout", (req, res, next) => {
+    // eslint-disable-next-line prefer-arrow-callback
+    req.logout(function (err) {
+      if (err) {
+        return next(err);
+      }
     });
+    res.redirect("/");
   });
 };
 
