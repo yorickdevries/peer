@@ -238,13 +238,10 @@
                             hide-footer
                             title="Select Upload Mode"
                         >
-                                                        <b-alert show> Would you like to upload a PDF or several images from your phone? </b-alert>
-
-                            </b-alert>
-                                                        <b-alert show>
-                                Images can be taken directly with the camera or selected from your gallery.
-                            </b-alert>
-                            </b-alert>
+                            <b-alert show> Would you like to upload a PDF or several images from your phone? </b-alert>
+                            <b-alert show
+                                >Images can be taken directly with the camera or selected from your gallery.</b-alert
+                            >
 
                             <b-container class="d-flex justify-content-between">
                                 <b-button variant="primary" @click="selectUploadType('pdf')">Upload PDF</b-button>
@@ -343,6 +340,10 @@ export default {
                         width: img.naturalWidth,
                         height: img.naturalHeight,
                     })
+                    this.$refs.imgUploadButton.reset()
+                }
+                img.onerror = () => {
+                    this.showErrorMessage({ message: "The image you uploaded is not supported." })
                     this.$refs.imgUploadButton.reset()
                 }
                 img.src = reader.result
