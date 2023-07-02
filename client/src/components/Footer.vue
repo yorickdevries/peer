@@ -8,8 +8,8 @@
                         For technical support, contact: <a href="mailto:eip-ewi@tudelft.nl">eip-ewi@tudelft.nl</a>
                     </div>
                 </b-col>
-                <b-col sm="6" align-self="center" class="flexCenterElem">{{ timezoneString }}</b-col>
-                <b-col sm="1" align-self="center" class="flexCenterElem">
+                <b-col sm="4" align-self="center" class="flexCenterElem">{{ timezoneString }}</b-col>
+                <b-col sm="2" align-self="center" class="flexCenterElem">
                     <b-img
                         id="logoImg"
                         :src="require('../assets/images/tu_delft_logo_black.png')"
@@ -18,7 +18,7 @@
                         style="position: relative"
                     ></b-img>
                 </b-col>
-                <b-col sm="1" align-self="center" class="flexCenterElem">
+                <b-col sm="2" align-self="center" class="flexCenterElem">
                     <a href="#">Back to top</a>
                 </b-col>
             </b-row>
@@ -45,7 +45,7 @@ export default {
 </script>
 
 <style scoped>
-@media (max-width: 767px) {
+@media (max-width: 576px) {
     .flexCenterElem {
         text-align: center;
     }
@@ -53,9 +53,9 @@ export default {
         right: 0;
     }
 }
-@media not (max-width: 767px) {
+@media not (max-width: 576px) {
     #logoImg {
-        right: 35px;
+        right: 17px;
     }
 }
 footer {
