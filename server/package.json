@@ -24,6 +24,7 @@
     "seed": "npm run schema:drop && npm run typeorm:migration:run && npm run seed:run"
   },
   "dependencies": {
+    "@jorgebodega/typeorm-seeding": "^6.0.1",
     "@json2csv/node": "^7.0.1",
     "@sentry/node": "^7.49.0",
     "@types/compression": "^1.7.2",
@@ -79,7 +80,7 @@
     "strip-bom-buf": "^2.0.0",
     "ts-mockito": "^2.6.1",
     "ts-node": "^10.9.1",
-    "typeorm": "^0.2.25",
+    "typeorm": "^0.3.17",
     "typescript": "^5.0.4",
     "workerpool": "^6.4.0"
   },
@@ -99,7 +100,6 @@
     "prettier": "^2.7.1",
     "source-map-support": "^0.5.19",
     "supertest": "^4.0.2",
-    "ts-jest": "^29.1.0",
-    "typeorm-seeding": "^1.6.1"
+    "ts-jest": "^29.1.0"
   }
 }
