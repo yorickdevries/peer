@@ -96,7 +96,8 @@ const passportConfiguration = function (passport: PassportStatic): void {
       });
 
       passport.deserializeUser((user, done) => {
-        done(undefined, user);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        done(undefined, <any>user);
       });
     })
     .catch((error) => {

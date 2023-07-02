@@ -45,7 +45,8 @@ const mockPassportConfiguration = async function (
   });
 
   passport.deserializeUser((user, done) => {
-    done(undefined, user);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    done(undefined, <any>user);
   });
 };
 
