@@ -187,6 +187,10 @@
                                 Please make sure you have not included personal information anywhere unless specifically
                                 mentioned otherwise!
                             </b-alert>
+                            <b-alert show variant="warning">
+                                After taking pictures, make sure the rotation is correct in the preview. If not, retake
+                                the pictures.
+                            </b-alert>
                             <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
                             <b-alert show variant="secondary">Allowed file types: image files</b-alert>
 
@@ -217,6 +221,7 @@
                             <b-form-file
                                 accept="image/*"
                                 @input="uploadImage"
+                                :disabled="buttonDisabled"
                                 placeholder="Add an image"
                                 ref="imgUploadButton"
                             />
@@ -281,6 +286,7 @@ import FileAnnotator from "./FileAnnotator"
 import notifications from "../../../mixins/notifications"
 import screenSize from "../../../mixins/screenSize"
 import { jsPDF } from "jspdf"
+import loadImage from "blueimp-load-image"
 export default {
     props: ["assignmentVersionId"],
     mixins: [notifications, screenSize],
@@ -330,26 +336,37 @@ export default {
         await this.fetchSubmissions()
     },
     methods: {
+        parseTransformedImage(canvas) {
+            if (canvas.type === "error") {
+                this.showErrorMessage({ message: "There was an error parsing your image file." })
+            } else {
+                this.files.push({
+                    src: canvas.toDataURL("image/jpeg", 0.75),
+                    width: canvas.width,
+                    height: canvas.height,
+                })
+            }
+
+            this.$refs.imgUploadButton.reset()
+            this.buttonDisabled = false
+        },
         uploadImage(file) {
             const img = new Image()
             const reader = new FileReader()
             reader.addEventListener("load", () => {
                 img.onload = () => {
-                    this.files.push({
-                        src: reader.result,
-                        width: img.naturalWidth,
-                        height: img.naturalHeight,
-                    })
-                    this.$refs.imgUploadButton.reset()
+                    loadImage(img.src, this.parseTransformedImage, { meta: true, orientation: true, canvas: true })
                 }
                 img.onerror = () => {
                     this.showErrorMessage({ message: "The image you uploaded is not supported." })
                     this.$refs.imgUploadButton.reset()
+                    this.buttonDisabled = false
                 }
                 img.src = reader.result
             })
 
             if (file) {
+                this.buttonDisabled = true
                 reader.readAsDataURL(file)
             }
         },
@@ -449,16 +466,15 @@ export default {
                 format: [firstImg.width, firstImg.height],
                 hotfixes: ["px_scaling"],
             })
-            doc.addImage(firstImg.src, "", 0, 0, firstImg.width, firstImg.height)
+            doc.addImage(firstImg.src, "JPEG", 0, 0, firstImg.width, firstImg.height)
 
             for (let i = 1; i < this.files.length; i++) {
                 const curImg = this.files[i]
                 doc.addPage([curImg.width, curImg.height], curImg.width > curImg.height ? "l" : "p")
-                doc.addImage(curImg.src, "", 0, 0, curImg.width, curImg.height)
+                doc.addImage(curImg.src, "JPEG", 0, 0, curImg.width, curImg.height)
             }
 
             const outputBlob = doc.output("blob")
-            console.log(outputBlob)
             this.file = new File([outputBlob], "submission.pdf")
 
             // Config set for the HTTP request & updating the progress field.

@@ -30,6 +30,7 @@
     "@vue/eslint-config-prettier": "^7.0.0",
     "apexcharts": "^3.36.3",
     "axios": "^1.2.2",
+    "blueimp-load-image": "^5.16.0",
     "bootstrap": "^4.6.2",
     "bootstrap-vue": "^2.23.1",
     "core-js": "^3.27.1",
