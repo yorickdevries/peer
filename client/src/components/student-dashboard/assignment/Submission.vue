@@ -511,7 +511,7 @@ export default {
 
             // new submission button clicked
             if (id) {
-                if (this.isMobile) {
+                if (this.isMobile && this.assignment.submissionExtensions.includes(".pdf")) {
                     this.$bvModal.show(`uploadTypeModal${id}`)
                 } else {
                     this.$bvModal.show(`uploadModal${id}`)
