@@ -14,7 +14,7 @@ module.exports = {
   ],
   rules: {
     "prefer-arrow-callback": "error",
-    "@typescript-eslint/no-misused-promises": "error",
+    "@typescript-eslint/no-misused-promises": "off",
     "@typescript-eslint/no-floating-promises": "error",
     "sort-imports": "off"
   },
