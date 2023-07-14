@@ -148,6 +148,8 @@ describe("CodeAnnotations", () => {
         number: 1,
         optional: "true",
         questionnaireId: questionnaire.id,
+        maxWordCount: 100,
+        minWordCount: 1,
       });
 
     // Update the questionnaire with the open question

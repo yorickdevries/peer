@@ -216,7 +216,7 @@
 
 <script>
 export default {
-    name: "PrivacyPolicy"
+    name: "PrivacyPolicy",
 }
 </script>
 

@@ -8,7 +8,7 @@ import mockLoginCookie from "../helpers/mockLoginCookie";
 import initializeData from "../../src/util/initializeData";
 import fs from "fs";
 import path from "path";
-import { clear, advanceTo } from "jest-date-mock";
+import { advanceTo, clear } from "jest-date-mock";
 import UserRole from "../../src/enum/UserRole";
 import { AssignmentState } from "../../src/enum/AssignmentState";
 import AssignmentType from "../../src/enum/AssignmentType";
@@ -698,6 +698,8 @@ describe("Integration", () => {
         number: 5,
         optional: false,
         questionnaireId: submissionQuestionnaire.id,
+        maxWordCount: 100,
+        minWordCount: 1,
       })
       .set("cookie", await teacherCookie());
     expect(res.status).toBe(HttpStatusCode.OK);
@@ -859,6 +861,8 @@ describe("Integration", () => {
         number: 3,
         optional: false,
         questionnaireId: submissionQuestionnaire.id,
+        maxWordCount: 100,
+        minWordCount: 1,
       })
       .set("cookie", await teacherCookie());
     const testOpenQuestion = JSON.parse(res.text);
@@ -1989,5 +1993,84 @@ describe("Integration", () => {
       text: "option 1",
       points: null,
     });
+
+    const assign2 = await request(server)
+      .get(`/api/assignments/${assignment.id}`)
+      .set("cookie", await teacherCookie());
+    expect(JSON.parse(assign2.text)["state"]).toBe("feedback");
+
+    //revert feedback state
+    const e = await request(server)
+      .patch(`/api/assignments/${assignment.id}/revertState`)
+      .set("cookie", await teacherCookie());
+
+    expect(e.status).toBe(HttpStatusCode.OK);
+
+    //check state is now Review
+    const assign = await request(server)
+      .get(`/api/assignments/${assignment.id}`)
+      .set("cookie", await teacherCookie());
+    expect(JSON.parse(assign.text)["state"]).toBe("review");
+    //check feedback evaluations are gone
+    res = await request(server)
+      .get(`/api/reviewofreviews/${feedback1.id}/`)
+      .set("cookie", await teacherCookie());
+    expect(res.status).toBe(HttpStatusCode.NOT_FOUND);
+
+    //revert state to waiting for reviews
+    const reviewRevert = await request(server)
+      .patch(`/api/assignments/${assignment.id}/revertState`)
+      .set("cookie", await teacherCookie());
+
+    expect(reviewRevert.status).toBe(HttpStatusCode.OK);
+
+    //check state has reverted
+    const waitForReview = await request(server)
+      .get(`/api/assignments/${assignment.id}`)
+      .set("cookie", await teacherCookie());
+    expect(JSON.parse(waitForReview.text)["state"]).toBe("waitingforreview");
+    //check reviewofsubmissions are deleted
+    res = await request(server)
+      .get(`/api/reviewofsubmissions/`)
+      .query({ assignmentVersionId: assignmentVersion.id })
+      .query({ submitted: true })
+      .set("cookie", await teacherCookie());
+    expect(res.text).toBe("[]");
+
+    //revert state to submission
+    const waitingReviewRevert = await request(server)
+      .patch(`/api/assignments/${assignment.id}/revertState`)
+      .set("cookie", await teacherCookie());
+    expect(waitingReviewRevert.status).toBe(HttpStatusCode.OK);
+
+    //check state has been reverted
+    const submiss = await request(server)
+      .get(`/api/assignments/${assignment.id}`)
+      .set("cookie", await teacherCookie());
+    expect(JSON.parse(submiss.text)["state"]).toBe("submission");
+
+    //revert state to unpublished
+    const submissRevert = await request(server)
+      .patch(`/api/assignments/${assignment.id}/revertState`)
+      .set("cookie", await teacherCookie());
+    expect(submissRevert.status).toBe(HttpStatusCode.OK);
+    //check that state has been reverted
+    const unpub = await request(server)
+      .get(`/api/assignments/${assignment.id}`)
+      .set("cookie", await teacherCookie());
+    expect(JSON.parse(unpub.text)["state"]).toBe("unpublished");
+
+    //check that all submissions have been deleted
+    res = await request(server)
+      .get(`/api/submissions/`)
+      .query({ assignmentVersionId: assignmentVersion.id })
+      .set("cookie", await teacherCookie());
+    expect(res.text).toBe("[]");
+
+    //revert state from unpublished
+    const errRevert = await request(server)
+      .patch(`/api/assignments/${assignment.id}/revertState`)
+      .set("cookie", await teacherCookie());
+    expect(errRevert.status).toBe(HttpStatusCode.INTERNAL_SERVER_ERROR);
   });
 });

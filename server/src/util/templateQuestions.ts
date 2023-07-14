@@ -15,6 +15,8 @@ interface QuestionTemplate {
   extensions?: Extensions;
   options?: Option[];
   graded: boolean;
+  minWordCount?: number;
+  maxWordCount?: number;
 }
 
 const templateQuestions: QuestionTemplate[] = [
@@ -129,6 +131,8 @@ const templateQuestions: QuestionTemplate[] = [
     optional: false,
     type: QuestionType.OPEN,
     graded: false,
+    minWordCount: 1,
+    maxWordCount: 1000,
   },
 ];
 

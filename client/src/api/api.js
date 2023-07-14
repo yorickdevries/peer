@@ -29,6 +29,9 @@ import pdfannotations from "./pdfannotations"
 import assignmentexports from "./assignmentexports"
 import codeannotations from "./codeannotations"
 import statistics from "./statistics"
+import banners from "./banners"
+import preferences from "./preferences"
+import deadlines from "@/api/deadlines"
 
 export default {
     getAuthenticated: () => {
@@ -65,5 +68,8 @@ export default {
     pdfannotations: pdfannotations,
     assignmentexports: assignmentexports,
     codeannotations: codeannotations,
-    statistics: statistics
+    statistics: statistics,
+    banners: banners,
+    preferences: preferences,
+    deadlines: deadlines,
 }

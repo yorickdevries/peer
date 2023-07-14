@@ -1,5 +1,5 @@
 // Mock the login of an user for development purposes
-import MockStrategy from "passport-mock-strategy";
+import passportCustom from "passport-custom";
 import saveUserFromSSO from "../../util/saveUserFromSSO";
 import { PassportStatic } from "passport";
 import User from "../../models/User";
@@ -10,6 +10,7 @@ const mockPassportConfiguration = async function (
   affiliation: string | string[],
   admin: boolean
 ): Promise<void> {
+  const CustomStrategy = passportCustom.Strategy;
   // save the user to the database
   const userNetid = await saveUserFromSSO(
     netid,
@@ -33,19 +34,22 @@ const mockPassportConfiguration = async function (
   await User.save(tempUser);
 
   const user = { netid: userNetid };
-  const strategy = new MockStrategy({
-    name: "mock",
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    user: user as any, // Added any as MockStrategy asks for a specific User type
-  });
-  passport.use(strategy);
+
+  passport.use(
+    "mock",
+    new CustomStrategy((_req, callback) => {
+      // Do your custom user finding logic here, or set to false based on req object
+      callback(null, user);
+    })
+  );
 
   passport.serializeUser((user, done) => {
     done(undefined, user);
   });
 
   passport.deserializeUser((user, done) => {
-    done(undefined, user);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    done(undefined, <any>user);
   });
 };
 

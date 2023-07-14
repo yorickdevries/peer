@@ -80,7 +80,9 @@ const addDefaultReviewEvaluationQuestions = async function (
               questionToCopy.text,
               questionToCopy.number,
               questionToCopy.optional,
-              questionnaire
+              questionnaire,
+              questionToCopy.maxWordCount!,
+              questionToCopy.minWordCount!
             );
             await question.validateOrReject();
             await transactionalEntityManager.save(question);
@@ -182,11 +184,13 @@ const addCopyOfQuestions = async function (
             await transactionalEntityManager.save(option);
           }
         } else if (questionToCopy instanceof OpenQuestion) {
-          const question = new OpenQuestion(
+          const question: OpenQuestion = new OpenQuestion(
             questionToCopy.text,
             questionToCopy.number,
             questionToCopy.optional,
-            questionnaire
+            questionnaire,
+            questionToCopy.maxWordCount,
+            questionToCopy.minWordCount
           );
           await question.validateOrReject();
           await transactionalEntityManager.save(question);

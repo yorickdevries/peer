@@ -33,13 +33,13 @@ define(Assignment, (faker: typeof Faker) => {
     ".txt",
     ".md",
   ]);
-  const blockFeedback = faker.random.boolean();
-  const lateSubmissions = faker.random.boolean();
-  const lateSubmissionReviews = faker.random.boolean();
-  const lateReviewEvaluations = faker.random.boolean();
+  const blockFeedback = true;
+  const lateSubmissions = true;
+  const lateSubmissionReviews = true;
+  const lateReviewEvaluations = true;
   const automaticStateProgression = false;
   const assignmentType = AssignmentType.DOCUMENT;
-  const sendNotificationEmails = faker.random.boolean();
+  const sendNotificationEmails = true;
 
   return new Assignment(
     assignmentName,

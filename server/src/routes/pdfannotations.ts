@@ -3,12 +3,12 @@ import File from "../models/File";
 import PDFAnnotation from "../models/PDFAnnotation";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import {
+  idStringSchema,
   validateBody,
   validateParams,
-  idStringSchema,
   validateQuery,
 } from "../middleware/validation";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import PDFAnnotationMotivation from "../enum/PDFAnnotationMotivation";
 import CommentingPDFAnnotation from "../models/CommentingPDFAnnotation";
 import HttpStatusCode from "../enum/HttpStatusCode";

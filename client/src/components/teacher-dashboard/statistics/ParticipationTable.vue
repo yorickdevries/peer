@@ -28,21 +28,21 @@ export default {
                     status: "Initial",
                     submissions: "Number of groups/students",
                     reviews: "Number of reviews distributed",
-                    evaluations: "Number of evaluations distributed"
+                    evaluations: "Number of evaluations distributed",
                 },
                 {
                     status: "Final",
                     submissions: "Number of final submissions",
                     reviews: "Number of reviews submitted",
-                    evaluations: "Number of evaluations submitted"
-                }
-            ]
+                    evaluations: "Number of evaluations submitted",
+                },
+            ],
         }
     },
     computed: {
         message() {
             return this.explanation ? "Hide" : "Show"
-        }
-    }
+        },
+    },
 }
 </script>

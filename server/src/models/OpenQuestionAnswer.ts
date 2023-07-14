@@ -2,7 +2,7 @@ import { ChildEntity, Column } from "typeorm";
 import QuestionAnswerType from "../enum/QuestionAnswerType";
 import QuestionAnswer from "./QuestionAnswer";
 import Review from "./Review";
-import { IsDefined, IsString, IsNotEmpty } from "class-validator";
+import { IsDefined, IsNotEmpty, IsString } from "class-validator";
 import OpenQuestion from "./OpenQuestion";
 
 @ChildEntity(QuestionAnswerType.OPEN)
@@ -36,5 +36,22 @@ export default class OpenQuestionAnswer extends QuestionAnswer {
     } else {
       throw new Error("The question is a graded question");
     }
+  }
+
+  async isInWordRange(): Promise<boolean> {
+    const openQuestion: OpenQuestion = await this.getQuestion();
+    const numberOfWords: number = this.numberOfWords();
+
+    return (
+      this.openAnswer !== null &&
+      numberOfWords >= openQuestion.minWordCount &&
+      numberOfWords <= openQuestion.maxWordCount
+    );
+  }
+
+  private numberOfWords(): number {
+    const plainText = this.openAnswer.replace(/[#_*`-]/g, " ");
+    const words = plainText.split(/\s+/);
+    return words.length;
   }
 }

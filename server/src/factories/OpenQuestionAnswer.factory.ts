@@ -12,9 +12,9 @@ async function createOpenQuestionAnswer(
 }
 
 define(OpenQuestionAnswer, (faker: typeof Faker) => {
-  const question = Object.create(OpenQuestion);
+  const question: OpenQuestion = Object.create(OpenQuestion);
   const review = Object.create(Review);
-  const answer = faker.lorem.sentence();
+  const answer = faker.lorem.sentence().substring(0, question.maxWordCount);
 
   return new OpenQuestionAnswer(question, review, answer);
 });

@@ -54,12 +54,25 @@
                             <b-badge pill v-if="question.optional" variant="secondary" class="ml-2 float-right p-1">
                                 OPTIONAL
                             </b-badge>
-                            <b-badge v-else variant="danger" class="ml-2 float-right p-1">
-                                REQUIRED
-                            </b-badge>
+                            <b-badge v-else variant="danger" class="ml-2 float-right p-1"> REQUIRED </b-badge>
                             <b-badge v-if="question.graded" variant="secondary" class="ml-2 float-right p-1">
                                 GRADED
                             </b-badge>
+                            <div
+                                v-if="
+                                    question.type === 'open' &&
+                                    (question.minWordCount !== 1 || question.maxWordCount !== 10000)
+                                "
+                                class="d-flex flex-row"
+                            >
+                                <b-badge variant="secondary" class="ml-2 p-1">
+                                    MIN WORDCOUNT: {{ question.minWordCount }}
+                                </b-badge>
+
+                                <b-badge variant="secondary" class="ml-2 p-1">
+                                    MAX WORDCOUNT: {{ question.maxWordCount }}
+                                </b-badge>
+                            </div>
                         </b-card-header>
 
                         <b-card-body>
@@ -179,7 +192,7 @@ export default {
         CreateQuestionWizard,
         EditQuestionWizard,
         EditQuestionPointsWizard,
-        StarRating
+        StarRating,
     },
     data() {
         return {
@@ -188,7 +201,7 @@ export default {
             questionnaire: null,
             // enables copying of a questonnaire to another
             allQuestionnairesOfCourse: [],
-            questionnaireIdToCopyFrom: null
+            questionnaireIdToCopyFrom: null,
         }
     },
     computed: {
@@ -209,7 +222,7 @@ export default {
             }
             // in case of no questions yet
             return 1
-        }
+        },
     },
     async created() {
         await this.fetchData()
@@ -246,7 +259,7 @@ export default {
             await api.submissionquestionnaires.post(this.assignmentVersion.id)
             this.showSuccessMessage({ message: "Questionnaire made, you can now add questions." })
             await this.fetchData()
-        }
-    }
+        },
+    },
 }
 </script>

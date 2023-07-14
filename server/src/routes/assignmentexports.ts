@@ -1,12 +1,12 @@
 import express from "express";
 import {
-  validateParams,
   idSchema,
+  validateParams,
   validateQuery,
 } from "../middleware/validation";
 import AssignmentExport from "../models/AssignmentExport";
 import HttpStatusCode from "../enum/HttpStatusCode";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import Assignment from "../models/Assignment";
 import ResponseMessage from "../enum/ResponseMessage";
 

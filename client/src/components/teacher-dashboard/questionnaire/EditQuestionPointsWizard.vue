@@ -8,9 +8,7 @@
             ></OptionPoints>
         </template>
 
-        <template v-else>
-            Changing points is not possible.
-        </template>
+        <template v-else> Changing points is not possible. </template>
     </b-card>
 </template>
 
@@ -20,15 +18,15 @@ import OptionPoints from "./points/OptionPoints"
 export default {
     mixins: [notifications],
     components: {
-        OptionPoints
+        OptionPoints,
     },
     props: ["question"],
     methods: {
         questionSaved() {
             // emit so the questionnaire is reloaded
             this.$emit("questionSaved")
-        }
-    }
+        },
+    },
 }
 </script>
 

@@ -15,18 +15,18 @@ import Navbar from "../Navbar"
 
 export default {
     components: {
-        Navbar
+        Navbar,
     },
     data() {
         return {
             navbarItems: [{ to: { name: "student-dashboard.course.assignments" }, text: "Assignments" }],
-            course: {}
+            course: {},
         }
     },
     async created() {
         // Fetch course information (for navbar).
         const res = await api.courses.get(this.$route.params.courseId)
         this.course = res.data
-    }
+    },
 }
 </script>

@@ -12,17 +12,19 @@ import Navbar from "../Navbar"
 
 export default {
     components: {
-        Navbar
+        Navbar,
     },
     data() {
         return {
             navbarItems: [
                 { to: { name: "admin-dashboard.home" }, text: "Admin Home" },
                 { to: { name: "admin-dashboard.faculties" }, text: "Faculties" },
-                { to: { name: "admin-dashboard.years" }, text: "Academic Years" }
+                { to: { name: "admin-dashboard.years" }, text: "Academic Years" },
+                { to: { name: "admin-dashboard.banner" }, text: "Site Banner" },
+                { to: { name: "admin-dashboard.calendar" }, text: "Calendar" },
             ],
-            course: {}
+            course: {},
         }
-    }
+    },
 }
 </script>

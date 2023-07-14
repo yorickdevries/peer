@@ -1,10 +1,10 @@
 import express from "express";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import {
-  validateQuery,
-  validateBody,
   idSchema,
+  validateBody,
   validateParams,
+  validateQuery,
 } from "../middleware/validation";
 import AssignmentVersion from "../models/AssignmentVersion";
 import HttpStatusCode from "../enum/HttpStatusCode";
@@ -24,8 +24,8 @@ import removePDFMetadata from "../util/removePDFMetadata";
 import AssignmentExport from "../models/AssignmentExport";
 import {
   startExportSubmissionsForAssignmentVersionWorker,
-  startSubmissionFlaggingWorker,
   startExportSubmissionsForZipWorker,
+  startSubmissionFlaggingWorker,
   //startImportWebLabSubmissionsWorker,
 } from "../workers/pool";
 //import AssignmentType from "../enum/AssignmentType";
@@ -393,7 +393,8 @@ router.post(
 
         // move the file (so if this fails everything above fails)
         // where the file is temporary saved
-        const tempPath = req.file.path;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const tempPath = req.file!.path;
         // new place where the file will be saved
         const filePath = path.resolve(uploadFolder, file.id.toString());
         // move file

@@ -12,5 +12,5 @@ export default {
     delete(uploadQuestionId, reviewId) {
         const params = { uploadQuestionId, reviewId }
         return client.delete("uploadquestionanswers", { params: params })
-    }
+    },
 }

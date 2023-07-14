@@ -74,17 +74,17 @@ export default {
             groupFields: [
                 { key: "id", label: "Group ID", sortable: true },
                 { key: "name", label: "Group name", sortable: true },
-                { key: "actions", label: "Actions" }
+                { key: "actions", label: "Actions" },
             ],
             userFields: [
                 { key: "displayName", label: "Name" },
                 { key: "netid", label: "NetID" },
                 { key: "email", label: "​​​Email" },
-                { key: "studentNumber", label: "Studentnumber" }
+                { key: "studentNumber", label: "Studentnumber" },
             ],
             currentPage: 1,
             perPage: 10,
-            filter: ""
+            filter: "",
         }
     },
     async created() {
@@ -100,7 +100,7 @@ export default {
             // set the users in the row element
             row.item.users = res.data.users
             row.toggleDetails()
-        }
-    }
+        },
+    },
 }
 </script>

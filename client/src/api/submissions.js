@@ -49,5 +49,5 @@ export default {
         formData.append("assignmentVersionId", assignmentVersionId)
         formData.append("file", file)
         return client.post("submissions/import", formData)
-    }
+    },
 }

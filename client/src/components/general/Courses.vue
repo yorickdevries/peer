@@ -49,6 +49,7 @@
                                 <b-form-group label="" description="Select the academic year">
                                     <b-form-select v-model="filterOptions.academicYear">
                                         <b-form-select-option :value="null">All</b-form-select-option>
+                                        <b-form-select-option value="active">Active</b-form-select-option>
                                         <b-form-select-option
                                             v-for="academicYear in academicYears"
                                             :key="academicYear.id"
@@ -105,7 +106,7 @@
                                                 size="sm"
                                                 :to="{
                                                     name: 'student-dashboard.course.home',
-                                                    params: { courseId: enrollment.course.id }
+                                                    params: { courseId: enrollment.course.id },
                                                 }"
                                             >
                                                 Enter Course
@@ -116,7 +117,7 @@
                                                 size="sm"
                                                 :to="{
                                                     name: 'teaching-assistant-dashboard.course.home',
-                                                    params: { courseId: enrollment.course.id }
+                                                    params: { courseId: enrollment.course.id },
                                                 }"
                                             >
                                                 Enter Course
@@ -127,7 +128,7 @@
                                                 size="sm"
                                                 :to="{
                                                     name: 'teacher-dashboard.course',
-                                                    params: { courseId: enrollment.course.id }
+                                                    params: { courseId: enrollment.course.id },
                                                 }"
                                             >
                                                 Enter Course
@@ -164,7 +165,7 @@
                             <b-col class="mb-3" cols="3">
                                 <b-form-group label="" description="Select the academic year">
                                     <b-form-select v-model="filterOptions.academicYear">
-                                        <b-form-select-option :value="null">All</b-form-select-option>
+                                        <b-form-select-option value="active">Active</b-form-select-option>
                                         <b-form-select-option
                                             v-for="academicYear in academicYears"
                                             :key="academicYear.id"
@@ -284,7 +285,7 @@ import CreateCourse from "./CreateCourse"
 export default {
     mixins: [notifications],
     components: {
-        CreateCourse
+        CreateCourse,
     },
     data() {
         return {
@@ -297,8 +298,8 @@ export default {
             filterOptions: {
                 name: "",
                 faculty: null,
-                academicYear: null
-            }
+                academicYear: "active",
+            },
         }
     },
     computed: {
@@ -322,26 +323,28 @@ export default {
             return this.enrollableCourses.length === 0
         },
         filteredEnrollments() {
-            return this.enrollments.filter(enrollment => {
+            return this.enrollments.filter((enrollment) => {
                 const course = enrollment.course
                 return (
                     (course.name.toLowerCase().includes(this.filterOptions.name.toLowerCase()) || this.filter === "") &&
                     (this.filterOptions.faculty == null || course.faculty.id === this.filterOptions.faculty.id) &&
                     (this.filterOptions.academicYear == null ||
+                        (this.filterOptions.academicYear === "active" && course.academicYear.active) ||
                         course.academicYear.id === this.filterOptions.academicYear.id)
                 )
             })
         },
         filteredEnrollableCourses() {
-            return this.enrollableCourses.filter(course => {
+            return this.enrollableCourses.filter((course) => {
                 return (
                     (course.name.toLowerCase().includes(this.filterOptions.name.toLowerCase()) || this.filter === "") &&
                     (this.filterOptions.faculty == null || course.faculty.id === this.filterOptions.faculty.id) &&
                     (this.filterOptions.academicYear == null ||
+                        (this.filterOptions.academicYear === "active" && course.academicYear.active) ||
                         course.academicYear.id === this.filterOptions.academicYear.id)
                 )
             })
-        }
+        },
     },
     async created() {
         await this.fetchFaculties()
@@ -392,7 +395,7 @@ export default {
             // reload the data from the server
             await this.fetchEnrollableCourses()
             await this.fetchEnrollments()
-        }
-    }
+        },
+    },
 }
 </script>

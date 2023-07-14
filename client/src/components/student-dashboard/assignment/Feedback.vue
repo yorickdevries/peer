@@ -2,9 +2,7 @@
     <b-container fluid class="px-0">
         <b-tabs card>
             <b-tab title="File Annotation Feedback">
-                <div v-if="finalSubmission == null">
-                    No final submission found.
-                </div>
+                <div v-if="finalSubmission == null">No final submission found.</div>
                 <div v-else-if="finalSubmission.file.extension !== '.pdf' && assignment.assignmentType === 'document'">
                     Your submission was not a .pdf file, so it was not annotated by reviewers.
                 </div>
@@ -17,9 +15,7 @@
                                 <b-badge v-else :style="{ 'background-color': reviewColors[tab.id] }" class="mr-2">
                                     Review #{{ index + (tabs.length === 1 ? 1 : 0) }}
                                 </b-badge>
-                                <b-badge v-if="tab.annotationCount === 1" variant="primary">
-                                    1 annotation
-                                </b-badge>
+                                <b-badge v-if="tab.annotationCount === 1" variant="primary"> 1 annotation </b-badge>
                                 <b-badge v-else variant="primary">
                                     {{ tab.annotationCount }}
                                     annotations
@@ -28,10 +24,10 @@
                         </template>
                         <div
                             v-if="
-                                !feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id) ||
-                                    feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id).approvalByTA ||
-                                    feedbackReviews.find(feedbackReview => feedbackReview.id === tab.id)
-                                        .approvalByTA === null
+                                !feedbackReviews.find((feedbackReview) => feedbackReview.id === tab.id) ||
+                                feedbackReviews.find((feedbackReview) => feedbackReview.id === tab.id).approvalByTA ||
+                                feedbackReviews.find((feedbackReview) => feedbackReview.id === tab.id).approvalByTA ===
+                                    null
                             "
                         >
                             <FileAnnotator
@@ -69,7 +65,7 @@
                                         :key="questionnaireQuestion.id"
                                         @click="question = questionnaireQuestion"
                                         :active="question === questionnaireQuestion"
-                                        style="cursor: pointer;"
+                                        style="cursor: pointer"
                                     >
                                         Question {{ questionnaireQuestion.number }} of
                                         {{ questionnaire.questions.length }}
@@ -129,14 +125,10 @@
                                             <!-- It can be null when a review is redacted -->
                                             <div v-if="answer !== null">
                                                 <!-- OPEN QUESTION -->
-                                                <b-form-textarea
+                                                <MarkdownEditorViewer
                                                     v-if="question.type === 'open'"
-                                                    placeholder="Enter your answer"
-                                                    :rows="10"
-                                                    :max-rows="15"
-                                                    :value="answer"
-                                                    readonly
-                                                    required
+                                                    :answer-object="answer"
+                                                    :displayeditor="false"
                                                 />
 
                                                 <!-- MULTIPLE CHOICE QUESTION -->
@@ -254,9 +246,11 @@ import _ from "lodash"
 import { StarRating } from "vue-rate-it"
 import FileAnnotator from "./FileAnnotator"
 import PDFViewer from "../../general/PDFViewer"
+import "@toast-ui/editor/dist/toastui-editor-viewer.css"
+import MarkdownEditorViewer from "@/components/general/MarkdownEditorViewer"
 
 export default {
-    components: { StarRating, FileAnnotator, PDFViewer },
+    components: { StarRating, FileAnnotator, PDFViewer, MarkdownEditorViewer },
     data() {
         return {
             assignment: {},
@@ -268,7 +262,7 @@ export default {
             answers: null,
             // selected question
             question: null,
-            tabs: [{ id: -1, aggregated: true, annotationCount: 0 }]
+            tabs: [{ id: -1, aggregated: true, annotationCount: 0 }],
         }
     },
     computed: {
@@ -285,7 +279,7 @@ export default {
                 }
             })
             return result
-        }
+        },
     },
     async created() {
         await this.fetchData()
@@ -336,7 +330,7 @@ export default {
             // TODO: Make getting the amount of annotations an actual endpoint (for both annotation types)
             // to prevent loading all annotations here as well as in the annotators.
             await Promise.all(
-                this.feedbackReviews.map(async review => {
+                this.feedbackReviews.map(async (review) => {
                     if (this.assignment.assignmentType === "document") {
                         return api.pdfannotations.get(
                             review.id,
@@ -346,7 +340,7 @@ export default {
                         return await api.codeannotations.getAnnotations(review.id)
                     }
                 })
-            ).then(results => {
+            ).then((results) => {
                 results.forEach((result, index) => {
                     this.tabs.push({ id: this.feedbackReviews[index].id, annotationCount: result.data.length })
                 })
@@ -355,7 +349,7 @@ export default {
             if (this.tabs.length === 2) {
                 // Only one review, having an aggregated tab does not make sense
                 this.tabs.splice(
-                    this.tabs.findIndex(tab => tab.aggregated),
+                    this.tabs.findIndex((tab) => tab.aggregated),
                     1
                 )
             } else {
@@ -397,7 +391,7 @@ export default {
         getAnswerForQuestion(existingAnswers, question) {
             let answer = null
             // find existing answer
-            const existingAnswer = _.find(existingAnswers, answer => {
+            const existingAnswer = _.find(existingAnswers, (answer) => {
                 return answer.questionId === question.id
             })
             if (existingAnswer) {
@@ -426,7 +420,7 @@ export default {
         },
         uploadAnswerFilePath(reviewId, questionId) {
             return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`
-        }
-    }
+        },
+    },
 }
 </script>

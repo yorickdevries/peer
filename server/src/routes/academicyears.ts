@@ -1,5 +1,5 @@
 import express from "express";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import AcademicYear from "../models/AcademicYear";
 import {
   idSchema,

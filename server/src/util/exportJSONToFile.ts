@@ -6,7 +6,7 @@ import fsPromises from "fs/promises";
 import { getManager } from "typeorm";
 
 // parse libraries
-import { parse } from "json2csv";
+import { AsyncParser } from "@json2csv/node";
 import exportFromJSON from "export-from-json";
 
 const uploadFolder = config.get("uploadFolder") as string;
@@ -19,9 +19,10 @@ const exportJSONToFile = async function (
   exportType: "xls" | "csv",
   assignmentExport: AssignmentExport
 ): Promise<void> {
+  const parser = new AsyncParser({}, {}, {});
   let result: string;
   if (exportType === "csv") {
-    result = parse(data);
+    result = await parser.parse(data).promise();
   } else {
     result = exportFromJSON({
       data,

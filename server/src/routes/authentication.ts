@@ -1,4 +1,4 @@
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import { Router } from "express";
 import config from "config";
 import mockPassportConfiguration from "../middleware/authentication/passportMock";
@@ -77,9 +77,13 @@ const authenticationRoutes = function (router: Router): void {
     );
   }
   // Route to logout.
-  router.get("/logout", (req, res) => {
-    req.logout();
-    res.redirect("/");
+  router.get("/logout", (req, res, next) => {
+    req.logout((err) => {
+      if (err) {
+        return next(err);
+      }
+      res.redirect("/");
+    });
   });
 };
 

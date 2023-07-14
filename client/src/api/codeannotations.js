@@ -13,7 +13,7 @@ export default {
             annotationText: annotationText,
             startLineNumber: startLineNumber,
             endLineNumber: endLineNumber,
-            selectedFile: selectedFile
+            selectedFile: selectedFile,
         }
         return client.post("codeannotations", body)
     },
@@ -26,5 +26,5 @@ export default {
     },
     getMaxAnnotationLength() {
         return client.get("codeannotations/getmaxannotationlength")
-    }
+    },
 }

@@ -10,6 +10,6 @@ import BreadcrumbTitle from "@/components/BreadcrumbTitle"
 
 export default {
     name: "Home",
-    components: { BreadcrumbTitle }
+    components: { BreadcrumbTitle },
 }
 </script>

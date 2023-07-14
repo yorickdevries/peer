@@ -1,6 +1,6 @@
 import express from "express";
 import _ from "lodash";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import {
   idSchema,
   validateParams,
@@ -11,7 +11,7 @@ import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ResponseMessage from "../enum/ResponseMessage";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
-import { getManager, In } from "typeorm";
+import { In, getManager } from "typeorm";
 import moment from "moment";
 import Submission from "../models/Submission";
 import ReviewOfReview from "../models/ReviewOfReview";

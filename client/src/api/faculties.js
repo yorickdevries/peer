@@ -16,5 +16,5 @@ export default {
     patch(faculty) {
         const data = { name: faculty.name, longName: faculty.longName }
         return client.patch(`faculties/${faculty.id}`, data)
-    }
+    },
 }

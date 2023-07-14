@@ -2,13 +2,13 @@ import express from "express";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import CodeAnnotation from "../models/CodeAnnotation";
 import {
-  validateQuery,
-  validateBody,
   idSchema,
+  validateBody,
   validateParams,
+  validateQuery,
 } from "../middleware/validation";
 import config from "config";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ResponseMessage from "../enum/ResponseMessage";
 import { AssignmentState } from "../enum/AssignmentState";

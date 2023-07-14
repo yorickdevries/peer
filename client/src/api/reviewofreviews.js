@@ -10,5 +10,5 @@ export default {
     },
     getAnswers(id) {
         return client.get(`reviewofreviews/${id}/answers`)
-    }
+    },
 }

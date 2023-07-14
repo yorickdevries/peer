@@ -92,7 +92,7 @@ export default {
             highlightedFile: null,
             maxAnnotationLength: null,
             propStartLine: null,
-            propEndLine: null
+            propEndLine: null,
         }
     },
     async created() {
@@ -111,7 +111,7 @@ export default {
                     this.showErrorMessage({ message: "Please select lines not yet annotated" })
                 } else {
                     this.showErrorMessage({
-                        message: "The inputted line numbers are not allowed"
+                        message: "The inputted line numbers are not allowed",
                     })
                 }
                 return
@@ -156,7 +156,7 @@ export default {
         async onDeleteAnnotation(id) {
             // Remove annotation from annotation array
             this.annotations.splice(
-                this.annotations.findIndex(annotation => annotation.id === id),
+                this.annotations.findIndex((annotation) => annotation.id === id),
                 1
             )
             // Remove annotation from back-end
@@ -164,7 +164,7 @@ export default {
             this.showSuccessMessage({ message: "Successfully deleted annotation" })
         },
         async onEditedAnnotation(id, updatedText) {
-            const index = this.annotations.findIndex(annotation => annotation.id === id)
+            const index = this.annotations.findIndex((annotation) => annotation.id === id)
             const res = await api.codeannotations.patchAnnotation(id, updatedText)
             // Update only the annotation text
             this.annotations[index].annotationText = res.data.annotationText
@@ -266,15 +266,15 @@ export default {
             this.propStartLine = parseInt(this.startLineNumber)
             this.propEndLine = parseInt(this.endLineNumber)
             return true
-        }
+        },
     },
     computed: {
         reviewSubmitted() {
             return this.review && this.review.submitted
-        }
+        },
     },
     watch: {
-        selectedFile: function(newVal) {
+        selectedFile: function (newVal) {
             if (!this.writing) {
                 this.startLineNumber = ""
                 this.endLineNumber = ""
@@ -287,8 +287,8 @@ export default {
                 this.propStartLine = null
                 this.propEndLine = null
             }
-        }
-    }
+        },
+    },
 }
 </script>
 

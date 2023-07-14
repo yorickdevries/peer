@@ -1,4 +1,4 @@
-import { ChildEntity, OneToOne, JoinColumn } from "typeorm";
+import { ChildEntity, JoinColumn, OneToOne } from "typeorm";
 import QuestionAnswerType from "../enum/QuestionAnswerType";
 import QuestionAnswer from "./QuestionAnswer";
 import Review from "./Review";

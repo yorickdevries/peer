@@ -15,7 +15,7 @@
     "hot_reload": "concurrently npm:watch:*"
   },
   "engines": {
-    "node": "14.x"
+    "node": "18.x"
   },
   "cacheDirectories": [
     "server/node_modules",

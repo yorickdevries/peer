@@ -55,6 +55,7 @@ const exampleFile = path.join(
   "assignments",
   "assignment1.pdf"
 );
+const admins = ["owvisser", "taicoaerts"];
 
 interface StagePlan {
   name: string;
@@ -131,10 +132,12 @@ async function generateQuestionnaireQuestions(questionnaire: Questionnaire) {
   await createOpenQuestion({
     number: 1,
     questionnaire: questionnaire,
+    optional: false,
   });
   await createRangeQuestion({
     number: 2,
     questionnaire: questionnaire,
+    optional: false,
   });
 }
 
@@ -250,6 +253,7 @@ export default class InitialDatabaseSeed implements Seeder {
       groups[i] = [students[i * 2], students[i * 2 + 1]];
     }
 
+    //Generate teachers
     const teachers = await Promise.all(
       [...Array(2)].map(async () => {
         return await createUser({
@@ -260,6 +264,19 @@ export default class InitialDatabaseSeed implements Seeder {
         });
       })
     );
+
+    //Add admin teachers
+    for (const netid of admins) {
+      const admin = await createUser({
+        organisationUnit: org,
+        study,
+        affiliation: employeeAffiliation,
+        netid,
+      });
+      admin.admin = true;
+      await User.save(admin);
+    }
+
     const studentTeacher = teachers[0];
     exportJSON["studentTeacher"] = studentTeacher.netid;
 

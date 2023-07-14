@@ -17,12 +17,16 @@ const submitReview = async function (
         Review,
         review.id
       );
+
       // change flagged by review if its passed in the method
       if (flaggedByReviewer !== undefined) {
         review.flaggedByReviewer = flaggedByReviewer;
       }
       // check whether the review is allowed to be submitted
       if (!review.flaggedByReviewer) {
+        if (await review.isNotInWordCountRange()) {
+          throw new Error(`An open question answer is not in the word range.`);
+        }
         // check whether all non-optional questions are answered
         const answers = await transactionalEntityManager
           .createQueryBuilder(QuestionAnswer, "question_answer")

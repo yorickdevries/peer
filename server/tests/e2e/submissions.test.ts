@@ -13,6 +13,7 @@ import Group from "../../src/models/Group";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import AssignmentType from "../../src/enum/AssignmentType";
 import publishAssignment from "../../src/assignmentProgression/publishAssignment";
+import Assignment from "../../src/models/Assignment";
 
 describe("Submissions", () => {
   let connection: Connection;
@@ -20,6 +21,8 @@ describe("Submissions", () => {
   let sessionCookie: string;
   let assignmentVersion: AssignmentVersion;
   let group: Group;
+  let teacherCookie: string;
+  let assignment: Assignment;
 
   beforeAll(async () => {
     connection = await createDatabaseConnection();
@@ -29,7 +32,7 @@ describe("Submissions", () => {
   });
 
   beforeEach(async () => {
-    const teacherCookie = await mockLoginCookie(server, "teacher");
+    teacherCookie = await mockLoginCookie(server, "teacher");
     sessionCookie = await mockLoginCookie(server, "student", "student");
 
     // create a course
@@ -54,7 +57,7 @@ describe("Submissions", () => {
       AssignmentType.CODE,
       ".c, .h"
     );
-    const assignment = JSON.parse(res2.text);
+    assignment = JSON.parse(res2.text);
 
     // create an assignment version
     const res3 = await request(server)

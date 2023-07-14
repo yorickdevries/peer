@@ -1,11 +1,11 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
+  Entity,
   ManyToOne,
+  PrimaryGeneratedColumn,
   RelationId,
 } from "typeorm";
-import { IsString, IsNotEmpty, IsDefined, IsInt, Min } from "class-validator";
+import { IsDefined, IsInt, IsNotEmpty, IsString, Min } from "class-validator";
 import BaseModel from "./BaseModel";
 import ReviewOfSubmission from "./ReviewOfSubmission";
 

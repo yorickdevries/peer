@@ -1,24 +1,24 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  OneToOne,
-  ManyToOne,
-  ManyToMany,
+  Entity,
   JoinColumn,
+  ManyToMany,
+  ManyToOne,
   OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
   RelationId,
   getManager,
 } from "typeorm";
 import {
-  IsDefined,
-  IsOptional,
-  IsString,
-  IsNotEmpty,
   IsBoolean,
   IsDate,
-  IsUrl,
+  IsDefined,
   IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import Group from "./Group";
@@ -31,6 +31,8 @@ import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
 import AssignmentType from "../enum/AssignmentType";
 import AssignmentExport from "./AssignmentExport";
 import AssignmentVersion from "./AssignmentVersion";
+import Review from "./Review";
+import Submission from "./Submission";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -302,6 +304,17 @@ export default class Assignment extends BaseModel {
     return this.state === otherState;
   }
 
+  revertState(): void {
+    const currStateIndex = assignmentStateOrder.indexOf(this.state);
+    if (currStateIndex > 0) {
+      this.state = assignmentStateOrder[currStateIndex - 1];
+    } else {
+      throw new Error(
+        "State cannot be reversed as there are no previous states"
+      );
+    }
+  }
+
   isAtOrAfterState(otherState: AssignmentState): boolean {
     const currentState = this.state;
     const currentStateIndex = assignmentStateOrder.indexOf(currentState);
@@ -390,6 +403,26 @@ export default class Assignment extends BaseModel {
     return await course.isTeacherOrTeachingAssistant(user);
   }
 
+  async deleteAllSubmissions(): Promise<void> {
+    for (const assignmentVersion of this.versions) {
+      await assignmentVersion.deleteAllSubmissions();
+    }
+    return;
+  }
+
+  async deleteAllReviews(): Promise<void> {
+    for (const assignmentVersion of this.versions) {
+      await assignmentVersion.deleteAllReviews();
+    }
+    return;
+  }
+
+  async deleteAllReviewEvals(): Promise<void> {
+    for (const assignmentVersion of this.versions) {
+      await assignmentVersion.deleteAllReviewEvals();
+    }
+    return;
+  }
   async hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
     user: User
   ): Promise<boolean> {
@@ -407,6 +440,44 @@ export default class Assignment extends BaseModel {
       }
     }
     return false;
+  }
+
+  /**
+   * Returns the list of submitted reviews that reviewed this group/user
+   *
+   * @param group the group of the user(s) that were reviewed
+   * @returns the list of reviews
+   */
+  async getSubmittedReviewsWhereUserIsReviewed(
+    group: Group
+  ): Promise<Review[]> {
+    const reviews: Review[] = [];
+    for (const assignmentVersion of this.versions) {
+      const submissionQuestionnaire =
+        await assignmentVersion.getSubmissionQuestionnaire();
+      if (submissionQuestionnaire) {
+        const submissions: Submission[] = [];
+        for (const version of this.versions) {
+          const versionSubmissions = await Submission.find({
+            where: {
+              group: group,
+              final: true,
+              assignmentVersion: version,
+            },
+          });
+          submissions.push(...versionSubmissions);
+        }
+        for (const submission of submissions) {
+          const submittedReviews = (
+            await submissionQuestionnaire.getReviewsWhereUserIsReviewed(
+              submission
+            )
+          ).filter((r) => r.submitted);
+          reviews.push(...submittedReviews);
+        }
+      }
+    }
+    return reviews;
   }
 
   async hasSubmissionQuestionnaires(): Promise<boolean> {

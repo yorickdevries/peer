@@ -33,12 +33,12 @@ export default {
     components: { BreadcrumbTitle },
     data() {
         return {
-            course: {}
+            course: {},
         }
     },
     async created() {
         let res = await api.courses.get(this.$route.params.courseId)
         this.course = res.data
-    }
+    },
 }
 </script>

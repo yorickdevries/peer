@@ -1,8 +1,8 @@
 import express from "express";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import {
-  validateBody,
   idSchema,
+  validateBody,
   validateParams,
 } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
@@ -10,8 +10,8 @@ import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import { getManager } from "typeorm";
 import ResponseMessage from "../enum/ResponseMessage";
 import {
-  addDefaultReviewEvaluationQuestions,
   addCopyOfQuestions,
+  addDefaultReviewEvaluationQuestions,
 } from "../util/copyReviewQuestions";
 import { AssignmentState } from "../enum/AssignmentState";
 import _ from "lodash";

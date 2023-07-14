@@ -1,4 +1,5 @@
 import api from "../api/api"
+import redir from "@/redirectToUrl"
 
 export default [
     {
@@ -14,26 +15,35 @@ export default [
                 }
                 next()
             } catch (error) {
-                //redirect to root
-                next("/")
+                redir.checkError(to, next, error)
             }
         },
         children: [
             {
                 path: "",
                 name: "admin-dashboard.home",
-                component: () => import("../components/admin-dashboard/Home")
+                component: () => import("../components/admin-dashboard/Home"),
             },
             {
                 path: "faculties",
                 name: "admin-dashboard.faculties",
-                component: () => import("../components/admin-dashboard/FacultyManager")
+                component: () => import("../components/admin-dashboard/FacultyManager"),
             },
             {
                 path: "years",
                 name: "admin-dashboard.years",
-                component: () => import("../components/admin-dashboard/YearManager")
-            }
-        ]
-    }
+                component: () => import("../components/admin-dashboard/YearManager"),
+            },
+            {
+                path: "banner",
+                name: "admin-dashboard.banner",
+                component: () => import("../components/admin-dashboard/BannerManager"),
+            },
+            {
+                path: "calendar",
+                name: "admin-dashboard.calendar",
+                component: () => import("../components/admin-dashboard/Calendar"),
+            },
+        ],
+    },
 ]

@@ -15,8 +15,17 @@ define(OpenQuestion, (faker: typeof Faker) => {
   const number = faker.random.number({ min: 1, max: 10 });
   const optional = faker.random.boolean();
   const questionnaire = Object.create(Questionnaire);
+  const maxWordCount = 10000;
+  const minWordCount = 1;
 
-  return new OpenQuestion(text, number, optional, questionnaire);
+  return new OpenQuestion(
+    text,
+    number,
+    optional,
+    questionnaire,
+    maxWordCount,
+    minWordCount
+  );
 });
 
 export { createOpenQuestion };

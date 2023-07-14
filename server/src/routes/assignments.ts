@@ -1,11 +1,11 @@
 import express from "express";
-import Joi, { CustomHelpers } from "@hapi/joi";
+import Joi, { CustomHelpers } from "joi";
 import { getManager } from "typeorm";
 import {
-  validateBody,
-  validateQuery,
-  validateParams,
   idSchema,
+  validateBody,
+  validateParams,
+  validateQuery,
 } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import Course from "../models/Course";
@@ -24,6 +24,7 @@ import Submission from "../models/Submission";
 import publishAssignment from "../assignmentProgression/publishAssignment";
 import closeSubmission from "../assignmentProgression/closeSubmission";
 import { scheduleJobsForAssignment } from "../assignmentProgression/scheduler";
+import * as Sentry from "@sentry/node";
 
 const router = express.Router();
 
@@ -337,7 +338,8 @@ router.post(
         if (file) {
           // move the file (so if this fails everything above fails)
           // where the file is temporary saved
-          const tempPath = req.file.path;
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const tempPath = req.file!.path;
           // new place where the file will be saved
           const filePath = path.resolve(uploadFolder, file.id.toString());
           // move file
@@ -522,7 +524,8 @@ router.patch(
         if (newFile) {
           // move the file (so if this fails everything above fails)
           // where the file is temporary saved
-          const tempPath = req.file.path;
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const tempPath = req.file!.path;
           // new place where the file will be saved
           const filePath = path.resolve(uploadFolder, newFile.id.toString());
           // move file
@@ -546,6 +549,65 @@ router.patch(
     scheduleJobsForAssignment(assignment);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(assignment!);
+  }
+);
+
+const revertSchema = Joi.object({
+  id: Joi.number().integer().required(),
+});
+
+//revert submission state
+router.patch(
+  "/:id/revertState",
+  validateParams(revertSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const assignmentId = req.params.id;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (!(await assignment.isTeacherInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not a teacher of the course");
+      return;
+    }
+    try {
+      const state = assignment.state;
+      assignment.revertState();
+      if (state == AssignmentState.SUBMISSION) {
+        await assignment.deleteAllSubmissions();
+        await assignment.save();
+        res.send();
+        return;
+      } else if (state == AssignmentState.WAITING_FOR_REVIEW) {
+        await assignment.save();
+        res.send();
+        return;
+      } else if (state == AssignmentState.REVIEW) {
+        await assignment.deleteAllReviews();
+        await assignment.save();
+        res.send();
+        return;
+      } else {
+        //delete review evaluations
+        await assignment.deleteAllReviewEvals();
+        await assignment.save();
+        res.send();
+        return;
+      }
+    } catch (error) {
+      Sentry.captureException(error);
+      res
+        .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+        .send("Something went wrong while reverting the state");
+      return;
+    }
   }
 );
 

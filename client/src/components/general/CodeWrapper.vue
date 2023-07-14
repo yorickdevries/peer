@@ -1,14 +1,25 @@
 <template>
     <div v-if="files">
+        <b-modal
+            id="file-size-modal"
+            centered
+            title="Large File Warning"
+            @ok="bypassAndRender"
+            ok-variant="danger"
+            ok-title="Yes"
+        >
+            This file is large and may cause your browser to crash. Downloading the file and opening it on your computer
+            is recommended.
+            <br /><br />
+            Are you sure you want to show this file?
+        </b-modal>
         <b-alert v-if="readOnly" show variant="warning">
             The file is read only, so annotations cannot be added, removed or edited.
         </b-alert>
         <b-alert v-else-if="reviewSubmitted" show variant="warning">
             The review is submitted, so annotations cannot be added, removed or edited.
         </b-alert>
-        <b-alert v-if="!selected" show variant="primary">
-            The selected file cannot be displayed.
-        </b-alert>
+        <b-alert v-if="!selected" show variant="primary"> The selected file cannot be displayed. </b-alert>
         <b-alert v-else-if="!content || content.length === 0" show variant="primary">
             The selected file is empty.
         </b-alert>
@@ -70,20 +81,27 @@ export default {
             showFile: false,
             review: null,
             language: null,
-            feedbackReviews: []
+            feedbackReviews: [],
+            maxFileSize: 500 * 1000, //500 KB
+            fileSizeBypass: false,
+            originalFile: null,
+            singleFileRender: false,
         }
     },
     async created() {
         const file = await this.getFile()
+        this.originalFile = file
         const isPossibleZipFile = !file.type.includes("text/plain")
 
         // If we get a zip file, we'll try to unzip it and show one of the code files
         if (isPossibleZipFile) {
             this.loadZip(file).catch(() => {
+                this.singleFileRender = true
                 this.loadSingleFile(file)
             })
         } else {
-            this.loadSingleFile(file)
+            this.singleFileRender = true
+            await this.loadSingleFile(file)
         }
 
         if (!this.ignoreAnnotations) {
@@ -126,7 +144,7 @@ export default {
         },
         async getFile() {
             return await fetch(this.fileUrl)
-                .then(res => res.blob())
+                .then((res) => res.blob())
                 .catch(console.error)
         },
         fixMultiLineHighlighting(lines) {
@@ -140,7 +158,7 @@ export default {
                 const prepend = stack.join("")
 
                 // Go through the line, modify the stack
-                ;[...lines[i].matchAll(spanTags)].forEach(match => {
+                ;[...lines[i].matchAll(spanTags)].forEach((match) => {
                     if (match[1] === undefined) {
                         stack.pop()
                     } else {
@@ -181,15 +199,15 @@ export default {
         },
         async loadZip(file) {
             return JSZip.loadAsync(file)
-                .then(zip => {
+                .then((zip) => {
                     return (
                         Object.keys(zip.files)
-                            .map(name => zip.file(name))
+                            .map((name) => zip.file(name))
                             // Filter out all null files
-                            .filter(file => file)
+                            .filter((file) => file)
                     )
                 })
-                .then(files => {
+                .then((files) => {
                     this.files = files
                     for (const file of this.files) {
                         if (!file.dir) {
@@ -202,14 +220,14 @@ export default {
         async getSingleFileName() {
             return new Promise((resolve, reject) => {
                 if (this.submissionId) {
-                    resolve(api.submissions.get(this.submissionId).then(res => res.data.file))
+                    resolve(api.submissions.get(this.submissionId).then((res) => res.data.file))
                 } else if (this.reviewId) {
-                    resolve(api.reviewofsubmissions.getFileMetadata(this.reviewId).then(res => res.data))
+                    resolve(api.reviewofsubmissions.getFileMetadata(this.reviewId).then((res) => res.data))
                 } else {
                     reject("Found no submission or review id")
                 }
             })
-                .then(file => file.name + file.extension)
+                .then((file) => file.name + file.extension)
                 .catch(console.warn)
         },
         async loadSingleFile(file) {
@@ -217,34 +235,58 @@ export default {
             this.selected = await this.getSingleFileName()
             this.files = [{ dir: false, name: this.selected }]
 
-            Promise.resolve(file.text())
-                .then(this.verifyTextContent)
-                .then(this.highlightContent)
-                .catch(console.warn)
-        },
-        async onSelect(file) {
-            if (file != this.selected) {
-                this.showFile = false
-                this.selected = file
-                this.files
-                    .find(f => !f.dir && f.name === file)
-                    .async("string")
+            const fileContent = await file.text()
+
+            if (!this.fileTooLarge(fileContent)) {
+                Promise.resolve(file.text())
                     .then(this.verifyTextContent)
                     .then(this.highlightContent)
                     .catch(console.warn)
             }
-        }
+        },
+        fileTooLarge(file) {
+            const fileBlob = new Blob([file])
+            if (fileBlob.size > this.maxFileSize && !this.fileSizeBypass) {
+                this.$bvModal.show("file-size-modal")
+                return true
+            }
+            this.fileSizeBypass = false
+            return false
+        },
+        bypassAndRender() {
+            this.fileSizeBypass = true
+            if (this.singleFileRender) {
+                this.loadSingleFile(this.originalFile)
+            } else {
+                this.onSelect(this.selected)
+            }
+        },
+        async onSelect(file) {
+            if (file != this.selected || this.fileSizeBypass) {
+                this.showFile = false
+                this.selected = file
+
+                const selectedFile = await this.files.find((f) => !f.dir && f.name === file).async("string")
+
+                if (!this.fileTooLarge(selectedFile)) {
+                    Promise.resolve(selectedFile)
+                        .then(this.verifyTextContent)
+                        .then(this.highlightContent)
+                        .catch(console.warn)
+                }
+            }
+        },
     },
     computed: {
         annotatedFiles() {
-            return new Set(this.annotations.map(annotation => annotation.selectedFile))
+            return new Set(this.annotations.map((annotation) => annotation.selectedFile))
         },
         reviewSubmitted() {
             return this.review && this.review.submitted
         },
         isOnlyFile() {
             return this.files && this.files.length === 1
-        }
-    }
+        },
+    },
 }
 </script>

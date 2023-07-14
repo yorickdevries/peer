@@ -1,6 +1,6 @@
 import express from "express";
 import { getManager } from "typeorm";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import checkEmployee from "../middleware/authentication/checkEmployee";
 import Course from "../models/Course";
 import HttpStatusCode from "../enum/HttpStatusCode";
@@ -9,9 +9,9 @@ import AcademicYear from "../models/AcademicYear";
 import Enrollment from "../models/Enrollment";
 import UserRole from "../enum/UserRole";
 import {
+  idSchema,
   validateBody,
   validateParams,
-  idSchema,
 } from "../middleware/validation";
 import _ from "lodash";
 import ResponseMessage from "../enum/ResponseMessage";

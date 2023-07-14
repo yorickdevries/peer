@@ -1,5 +1,5 @@
 import express from "express";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import { validateBody, validateQuery } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import RangeQuestion from "../models/RangeQuestion";

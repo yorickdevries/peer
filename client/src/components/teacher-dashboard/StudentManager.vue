@@ -73,11 +73,11 @@ export default {
                 { key: "user.netid", label: "NetID" },
                 { key: "user.email", label: "​​​Email" },
                 { key: "user.studentNumber", label: "Studentnumber" },
-                { key: "action", label: "Action" }
+                { key: "action", label: "Action" },
             ],
             currentPage: 1,
             perPage: 10,
-            filter: ""
+            filter: "",
         }
     },
     async created() {
@@ -92,7 +92,7 @@ export default {
             await api.enrollments.delete(netid, this.$route.params.courseId)
             this.showSuccessMessage({ message: `Successfully removed student.` })
             await this.fetchStudents()
-        }
-    }
+        },
+    },
 }
 </script>
