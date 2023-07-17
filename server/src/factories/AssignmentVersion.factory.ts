@@ -19,15 +19,15 @@ define(AssignmentVersion, (faker: typeof Faker) => {
   const submissionQuestionnaire = null;
   const reviewQuestionnaire = null;
 
-  return new AssignmentVersion(
-    name,
-    assignment,
-    versionsToReview,
-    versionsPerUser,
-    selfReview,
-    submissionQuestionnaire,
-    reviewQuestionnaire
-  );
+  return new AssignmentVersion({
+    name: name,
+    assignment: assignment,
+    versionsToReview: versionsToReview,
+    reviewsPerUserPerAssignmentVersionToReview: versionsPerUser,
+    selfReview: selfReview,
+    submissionQuestionnaire: submissionQuestionnaire,
+    reviewQuestionnaire: reviewQuestionnaire,
+  });
 });
 
 export { createAssignmentVersion };

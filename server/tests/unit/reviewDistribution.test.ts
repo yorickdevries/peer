@@ -85,15 +85,15 @@ describe("Review distribution", () => {
     const submissionQuestionnaire = new SubmissionQuestionnaire();
     await submissionQuestionnaire.save();
     // assignmentVersion
-    const assignmentVersion = new AssignmentVersion(
-      "default",
-      assignment,
-      [],
-      2,
-      false,
-      submissionQuestionnaire,
-      null
-    );
+    const assignmentVersion = new AssignmentVersion({
+      name: "default",
+      assignment: assignment,
+      versionsToReview: [],
+      reviewsPerUserPerAssignmentVersionToReview: 2,
+      selfReview: false,
+      submissionQuestionnaire: submissionQuestionnaire,
+      reviewQuestionnaire: null,
+    });
     await assignmentVersion.save();
     // set review setting so users review the same assignment
     assignmentVersion.versionsToReview = [assignmentVersion];
@@ -261,15 +261,15 @@ describe("Review distribution", () => {
     const submissionQuestionnaire = new SubmissionQuestionnaire();
     await submissionQuestionnaire.save();
     // assignmentVersion
-    const assignmentVersion = new AssignmentVersion(
-      "default",
-      assignment,
-      [],
-      2,
-      false,
-      submissionQuestionnaire,
-      null
-    );
+    const assignmentVersion = new AssignmentVersion({
+      name: "default",
+      assignment: assignment,
+      versionsToReview: [],
+      reviewsPerUserPerAssignmentVersionToReview: 2,
+      selfReview: false,
+      submissionQuestionnaire: submissionQuestionnaire,
+      reviewQuestionnaire: null,
+    });
     await assignmentVersion.save();
     // set review setting so users review the same assignment
     assignmentVersion.versionsToReview = [assignmentVersion];
@@ -394,15 +394,15 @@ describe("Review distribution", () => {
     const submissionQuestionnaire = new SubmissionQuestionnaire();
     await submissionQuestionnaire.save();
     // assignmentVersion
-    const assignmentVersion = new AssignmentVersion(
-      "default",
-      assignment,
-      [],
-      2,
-      false,
-      submissionQuestionnaire,
-      null
-    );
+    const assignmentVersion = new AssignmentVersion({
+      name: "default",
+      assignment: assignment,
+      versionsToReview: [],
+      reviewsPerUserPerAssignmentVersionToReview: 2,
+      selfReview: false,
+      submissionQuestionnaire: submissionQuestionnaire,
+      reviewQuestionnaire: null,
+    });
     await assignmentVersion.save();
     // set review setting so users review the same assignment
     assignmentVersion.versionsToReview = [assignmentVersion];
