@@ -119,8 +119,15 @@
                                             </b-badge>
                                             <!-- Text-->
                                             <h4>{{ question.text }}</h4>
+                                            <b-card v-if="question.type === 'multiplechoice'">
+                                                <h6>Multiple Choice Overview:</h6>
+                                                <vue-poll
+                                                    v-bind="aggregateMultipleChoice(question)"
+                                                    showResults="true"
+                                                />
+                                            </b-card>
                                             <b-card v-if="question.type === 'range'">
-                                                <h6>Average rating:</h6>
+                                                <h6>Average Rating:</h6>
                                                 <!-- RANGE QUESTION -->
                                                 <StarRating
                                                     v-if="question.type === 'range'"
@@ -147,7 +154,6 @@
                                                     :answer-object="answer"
                                                     :displayeditor="false"
                                                 />
-
                                                 <!-- MULTIPLE CHOICE QUESTION -->
                                                 <b-form-radio-group
                                                     v-if="question.type === 'multiplechoice'"
@@ -265,9 +271,10 @@ import FileAnnotator from "./FileAnnotator"
 import PDFViewer from "../../general/PDFViewer"
 import "@toast-ui/editor/dist/toastui-editor-viewer.css"
 import MarkdownEditorViewer from "@/components/general/MarkdownEditorViewer"
+import VuePoll from "vue-poll"
 
 export default {
-    components: { StarRating, FileAnnotator, PDFViewer, MarkdownEditorViewer },
+    components: { StarRating, FileAnnotator, PDFViewer, MarkdownEditorViewer, VuePoll },
     data() {
         return {
             assignment: {},
@@ -306,9 +313,28 @@ export default {
             return Math.round(
                 this.answers[question.id].reduce(function (a, b) {
                     return a + b
-                }) /
-                    (this.answers[question.id].length + 1)
+                }) / this.answers[question.id].length
             )
+        },
+        aggregateMultipleChoice(question) {
+            let ret = {
+                options: {
+                    question: "",
+                    answers: [],
+                },
+            }.options
+
+            for (let i = 0; i < question.options.length; i++) {
+                ret.answers.push({
+                    text: question.options[i].text,
+                    votes: 0,
+                })
+            }
+
+            for (let i = 0; i < this.answers[question.id].length; i++) {
+                ret.answers[this.answers[question.id][i].id - 1].votes++
+            }
+            return ret
         },
         async fetchData() {
             await this.fetchAssignment()
