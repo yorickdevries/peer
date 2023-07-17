@@ -56,28 +56,28 @@ describe("Review distribution", () => {
     await course.save();
 
     // assignment
-    const assignment = new Assignment(
-      "Example title",
-      course,
-      true,
-      false,
-      new Date("2020-06-23T10:00Z"),
-      new Date("2020-06-24T10:00Z"),
-      new Date("2020-06-25T10:00Z"),
-      new Date("2020-06-26T10:00Z"),
-      null,
-      null,
-      null,
-      null,
-      Extensions.PDF,
-      true,
-      true,
-      true,
-      null,
-      false,
-      AssignmentType.DOCUMENT,
-      true
-    );
+    const assignment = new Assignment({
+      name: "Example title",
+      course: course,
+      enrollable: true,
+      reviewEvaluation: false,
+      publishDate: new Date("2020-06-23T10:00Z"),
+      dueDate: new Date("2020-06-24T10:00Z"),
+      reviewPublishDate: new Date("2020-06-25T10:00Z"),
+      reviewDueDate: new Date("2020-06-26T10:00Z"),
+      reviewEvaluationDueDate: null,
+      description: null,
+      file: null,
+      externalLink: null,
+      submissionExtensions: Extensions.PDF,
+      blockFeedback: true,
+      lateSubmissions: true,
+      lateSubmissionReviews: true,
+      lateReviewEvaluations: null,
+      automaticStateProgression: false,
+      assignmentType: AssignmentType.DOCUMENT,
+      sendNotifcationEmails: true,
+    });
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
@@ -232,28 +232,28 @@ describe("Review distribution", () => {
     await course.save();
 
     // assignment
-    const assignment = new Assignment(
-      "Example title",
-      course,
-      true,
-      false,
-      new Date("2020-06-23T10:00Z"),
-      new Date("2020-06-24T10:00Z"),
-      new Date("2020-06-25T10:00Z"),
-      new Date("2020-06-26T10:00Z"),
-      null,
-      null,
-      null,
-      null,
-      Extensions.PDF,
-      true,
-      true,
-      true,
-      null,
-      false,
-      AssignmentType.DOCUMENT,
-      true
-    );
+    const assignment = new Assignment({
+      name: "Example title",
+      course: course,
+      enrollable: true,
+      reviewEvaluation: false,
+      publishDate: new Date("2020-06-23T10:00Z"),
+      dueDate: new Date("2020-06-24T10:00Z"),
+      reviewPublishDate: new Date("2020-06-25T10:00Z"),
+      reviewDueDate: new Date("2020-06-26T10:00Z"),
+      reviewEvaluationDueDate: null,
+      description: null,
+      file: null,
+      externalLink: null,
+      submissionExtensions: Extensions.PDF,
+      blockFeedback: true,
+      lateSubmissions: true,
+      lateSubmissionReviews: true,
+      lateReviewEvaluations: null,
+      automaticStateProgression: false,
+      assignmentType: AssignmentType.DOCUMENT,
+      sendNotifcationEmails: true,
+    });
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
@@ -365,28 +365,28 @@ describe("Review distribution", () => {
     await course.save();
 
     // assignment
-    const assignment = new Assignment(
-      "Example title",
-      course,
-      true,
-      false,
-      new Date("2020-06-23T10:00Z"),
-      new Date("2020-06-24T10:00Z"),
-      new Date("2020-06-25T10:00Z"),
-      new Date("2020-06-26T10:00Z"),
-      null,
-      null,
-      null,
-      null,
-      Extensions.PDF,
-      true,
-      true,
-      true,
-      null,
-      false,
-      AssignmentType.DOCUMENT,
-      true
-    );
+    const assignment = new Assignment({
+      name: "Example title",
+      course: course,
+      enrollable: true,
+      reviewEvaluation: false,
+      publishDate: new Date("2020-06-23T10:00Z"),
+      dueDate: new Date("2020-06-24T10:00Z"),
+      reviewPublishDate: new Date("2020-06-25T10:00Z"),
+      reviewDueDate: new Date("2020-06-26T10:00Z"),
+      reviewEvaluationDueDate: null,
+      description: null,
+      file: null,
+      externalLink: null,
+      submissionExtensions: Extensions.PDF,
+      blockFeedback: true,
+      lateSubmissions: true,
+      lateSubmissionReviews: true,
+      lateReviewEvaluations: null,
+      automaticStateProgression: false,
+      assignmentType: AssignmentType.DOCUMENT,
+      sendNotifcationEmails: true,
+    });
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();

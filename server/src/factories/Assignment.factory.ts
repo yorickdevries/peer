@@ -41,28 +41,28 @@ define(Assignment, (faker: typeof Faker) => {
   const assignmentType = AssignmentType.DOCUMENT;
   const sendNotificationEmails = true;
 
-  return new Assignment(
-    assignmentName,
-    course,
-    enrollable,
-    reviewEvaluation,
-    publishDate,
-    dueDate,
-    reviewPublishDate,
-    reviewDueDate,
-    reviewEvaluationDueDate,
-    description,
-    file,
-    externalLink,
-    submissionExtensions,
-    blockFeedback,
-    lateSubmissions,
-    lateSubmissionReviews,
-    lateReviewEvaluations,
-    automaticStateProgression,
-    assignmentType,
-    sendNotificationEmails
-  );
+  return new Assignment({
+    name: assignmentName,
+    course: course,
+    enrollable: enrollable,
+    reviewEvaluation: reviewEvaluation,
+    publishDate: publishDate,
+    dueDate: dueDate,
+    reviewPublishDate: reviewPublishDate,
+    reviewDueDate: reviewDueDate,
+    reviewEvaluationDueDate: reviewEvaluationDueDate,
+    description: description,
+    file: file,
+    externalLink: externalLink,
+    submissionExtensions: submissionExtensions,
+    blockFeedback: blockFeedback,
+    lateSubmissions: lateSubmissions,
+    lateSubmissionReviews: lateSubmissionReviews,
+    lateReviewEvaluations: lateReviewEvaluations,
+    automaticStateProgression: automaticStateProgression,
+    assignmentType: assignmentType,
+    sendNotifcationEmails: sendNotificationEmails,
+  });
 });
 
 export { createAssignment };
