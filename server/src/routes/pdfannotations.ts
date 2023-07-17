@@ -190,14 +190,14 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
         .send("Selector needs to be defined in a commenting annotation");
       return;
     }
-    const commentingPDFAnnotation = new CommentingPDFAnnotation(
-      annotation.id,
-      annotation.bodyValue,
-      user,
-      file,
-      review,
-      selector
-    );
+    const commentingPDFAnnotation = new CommentingPDFAnnotation({
+      id: annotation.id,
+      bodyValue: annotation.bodyValue,
+      user: user,
+      file: file,
+      review: review,
+      selector: selector,
+    });
     await commentingPDFAnnotation.save();
     res.send(commentingPDFAnnotation);
     return;

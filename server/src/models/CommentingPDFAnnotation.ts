@@ -7,6 +7,16 @@ import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
 import ReplyingPDFAnnotation from "./ReplyingPDFAnnotation";
 
+interface CommentingPDFAnnotationInterface {
+  id: string;
+  bodyValue: string;
+  user: User;
+  file: File;
+  review: ReviewOfSubmission;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  selector: object;
+}
+
 @ChildEntity(PDFAnnotationMotivation.COMMENTING)
 export default class CommentingPDFAnnotation extends PDFAnnotation {
   // selector (To annotate where the annotation is put in the document)
@@ -23,17 +33,11 @@ export default class CommentingPDFAnnotation extends PDFAnnotation {
   )
   replyingPDFAnnotations?: ReplyingPDFAnnotation[];
 
-  constructor(
-    id: string,
-    bodyValue: string,
-    user: User,
-    file: File,
-    review: ReviewOfSubmission,
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    selector: object
-  ) {
-    super(id, bodyValue, user, file, review);
-    this.selector = selector;
+  constructor(init?: CommentingPDFAnnotationInterface) {
+    if (init !== undefined) {
+      super(init.id, init.bodyValue, init.user, init.file, init.review);
+      this.selector = init.selector;
+    }
   }
 
   // custom validation which is run before saving
