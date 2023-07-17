@@ -119,8 +119,25 @@
                                             </b-badge>
                                             <!-- Text-->
                                             <h4>{{ question.text }}</h4>
+                                            <b-card v-if="question.type === 'range'">
+                                                <h6>Average rating:</h6>
+                                                <!-- RANGE QUESTION -->
+                                                <StarRating
+                                                    v-if="question.type === 'range'"
+                                                    :rating="aggregateRange(question)"
+                                                    class="align-middle"
+                                                    :border-color="'#007bff'"
+                                                    :active-color="'#007bff'"
+                                                    :border-width="2"
+                                                    :item-size="20"
+                                                    :spacing="5"
+                                                    inline
+                                                    :max-rating="question.range"
+                                                    :show-rating="true"
+                                                    read-only
+                                                />
+                                            </b-card>
                                         </b-list-group-item>
-
                                         <b-list-group-item v-for="(answer, index) in answers[question.id]" :key="index">
                                             <!-- It can be null when a review is redacted -->
                                             <div v-if="answer !== null">
@@ -285,6 +302,14 @@ export default {
         await this.fetchData()
     },
     methods: {
+        aggregateRange(question) {
+            return Math.round(
+                this.answers[question.id].reduce(function (a, b) {
+                    return a + b
+                }) /
+                    (this.answers[question.id].length + 1)
+            )
+        },
         async fetchData() {
             await this.fetchAssignment()
             await this.fetchGroup()
