@@ -5,6 +5,12 @@ import Review from "./Review";
 import CheckboxQuestionOption from "./CheckboxQuestionOption";
 import CheckboxQuestion from "./CheckboxQuestion";
 
+
+interface CheckboxQuestionAnswerInterface {
+  question: CheckboxQuestion;
+  review: Review;
+  answer: CheckboxQuestionOption[];
+}
 @ChildEntity(QuestionAnswerType.CHECKBOX)
 export default class CheckboxQuestionAnswer extends QuestionAnswer {
   // answer int NOT NULL,
@@ -13,13 +19,11 @@ export default class CheckboxQuestionAnswer extends QuestionAnswer {
   @JoinTable()
   checkboxAnswer: CheckboxQuestionOption[];
 
-  constructor(
-    question: CheckboxQuestion,
-    review: Review,
-    answer: CheckboxQuestionOption[]
-  ) {
-    super(question, review);
-    this.checkboxAnswer = answer;
+  constructor(init?: CheckboxQuestionAnswerInterface) {
+    if (init !== undefined) {
+      super(init.question, init.review);
+      this.checkboxAnswer = init.answer;
+    }
   }
 
   async validateOrReject(): Promise<void> {
