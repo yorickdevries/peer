@@ -9,6 +9,14 @@ import { IsDefined, IsInt, IsNotEmpty, IsString, Min } from "class-validator";
 import BaseModel from "./BaseModel";
 import ReviewOfSubmission from "./ReviewOfSubmission";
 
+interface CodeAnnotationInterface {
+  review: ReviewOfSubmission;
+  annotationText: string;
+  startLineNumber: number;
+  endLineNumber: number;
+  selectedFile: string;
+}
+
 @Entity()
 export default class CodeAnnotation extends BaseModel {
   @PrimaryGeneratedColumn()
@@ -51,19 +59,15 @@ export default class CodeAnnotation extends BaseModel {
   @IsNotEmpty()
   selectedFile: string;
 
-  constructor(
-    review: ReviewOfSubmission,
-    annotationText: string,
-    startLineNumber: number,
-    endLineNumber: number,
-    selectedFile: string
-  ) {
-    super();
-    this.review = review;
-    this.annotationText = annotationText;
-    this.startLineNumber = startLineNumber;
-    this.endLineNumber = endLineNumber;
-    this.selectedFile = selectedFile;
+  constructor(init?: CodeAnnotationInterface) {
+    if (init !== undefined) {
+      super();
+      this.review = init.review;
+      this.annotationText = init.annotationText;
+      this.startLineNumber = init.startLineNumber;
+      this.endLineNumber = init.endLineNumber;
+      this.selectedFile = init.selectedFile;
+    }
   }
 
   // custom validation which is run before saving

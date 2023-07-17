@@ -34,6 +34,29 @@ import AssignmentVersion from "./AssignmentVersion";
 import Review from "./Review";
 import Submission from "./Submission";
 
+interface AssignmentInterface {
+  name: string;
+  course: Course;
+  enrollable: boolean;
+  reviewEvaluation: boolean;
+  publishDate: Date;
+  dueDate: Date;
+  reviewPublishDate: Date;
+  reviewDueDate: Date;
+  reviewEvaluationDueDate: Date | null;
+  description: string | null;
+  file: File | null;
+  externalLink: string | null;
+  submissionExtensions: string;
+  blockFeedback: boolean;
+  lateSubmissions: boolean;
+  lateSubmissionReviews: boolean;
+  lateReviewEvaluations: boolean | null;
+  automaticStateProgression: boolean;
+  assignmentType: AssignmentType;
+  sendNotifcationEmails: boolean;
+}
+
 @Entity()
 export default class Assignment extends BaseModel {
   // id SERIAL,
@@ -199,50 +222,31 @@ export default class Assignment extends BaseModel {
   )
   assignmentExports?: AssignmentExport[];
 
-  constructor(
-    name: string,
-    course: Course,
-    enrollable: boolean,
-    reviewEvaluation: boolean,
-    publishDate: Date,
-    dueDate: Date,
-    reviewPublishDate: Date,
-    reviewDueDate: Date,
-    reviewEvaluationDueDate: Date | null,
-    description: string | null,
-    file: File | null,
-    externalLink: string | null,
-    submissionExtensions: string,
-    blockFeedback: boolean,
-    lateSubmissions: boolean,
-    lateSubmissionReviews: boolean,
-    lateReviewEvaluations: boolean | null,
-    automaticStateProgression: boolean,
-    assignmentType: AssignmentType,
-    sendNotifcationEmails: boolean
-  ) {
-    super();
-    this.name = name;
-    this.course = course;
-    this.enrollable = enrollable;
-    this.reviewEvaluation = reviewEvaluation;
-    this.state = AssignmentState.UNPUBLISHED; // initial state
-    this.publishDate = publishDate;
-    this.dueDate = dueDate;
-    this.reviewPublishDate = reviewPublishDate;
-    this.reviewDueDate = reviewDueDate;
-    this.reviewEvaluationDueDate = reviewEvaluationDueDate;
-    this.description = description;
-    this.file = file;
-    this.externalLink = externalLink;
-    this.submissionExtensions = submissionExtensions;
-    this.blockFeedback = blockFeedback;
-    this.lateSubmissions = lateSubmissions;
-    this.lateSubmissionReviews = lateSubmissionReviews;
-    this.lateReviewEvaluations = lateReviewEvaluations;
-    this.automaticStateProgression = automaticStateProgression;
-    this.assignmentType = assignmentType;
-    this.sendNotificationEmails = sendNotifcationEmails;
+  constructor(init?: AssignmentInterface) {
+    if (init !== undefined) {
+      super();
+      this.name = init.name;
+      this.course = init.course;
+      this.enrollable = init.enrollable;
+      this.reviewEvaluation = init.reviewEvaluation;
+      this.state = AssignmentState.UNPUBLISHED; // initial state
+      this.publishDate = init.publishDate;
+      this.dueDate = init.dueDate;
+      this.reviewPublishDate = init.reviewPublishDate;
+      this.reviewDueDate = init.reviewDueDate;
+      this.reviewEvaluationDueDate = init.reviewEvaluationDueDate;
+      this.description = init.description;
+      this.file = init.file;
+      this.externalLink = init.externalLink;
+      this.submissionExtensions = init.submissionExtensions;
+      this.blockFeedback = init.blockFeedback;
+      this.lateSubmissions = init.lateSubmissions;
+      this.lateSubmissionReviews = init.lateSubmissionReviews;
+      this.lateReviewEvaluations = init.lateReviewEvaluations;
+      this.automaticStateProgression = init.automaticStateProgression;
+      this.assignmentType = init.assignmentType;
+      this.sendNotificationEmails = init.sendNotifcationEmails;
+    }
   }
 
   // custom validation which is run before saving

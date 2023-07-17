@@ -53,7 +53,11 @@ const importGroupsForAssignment = async function (
             }
           } else {
             // enroll the user as student in the course
-            enrollment = new Enrollment(user, course, UserRole.STUDENT);
+            enrollment = new Enrollment({
+              user: user,
+              course: course,
+              role: UserRole.STUDENT,
+            });
             await enrollment.validateOrReject();
             await transactionalEntityManager.save(enrollment);
           }

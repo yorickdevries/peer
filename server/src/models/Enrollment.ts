@@ -5,6 +5,12 @@ import User from "./User";
 import Course from "./Course";
 import UserRole from "../enum/UserRole";
 
+interface EnrollmentInterface {
+  user: User;
+  course: Course;
+  role: UserRole;
+}
+
 @Entity()
 export default class Enrollment extends BaseModel {
   // length of max 191 due to UTF-8MB4 encoding of strings
@@ -27,11 +33,13 @@ export default class Enrollment extends BaseModel {
   @IsEnum(UserRole)
   role: UserRole;
 
-  constructor(user: User, course: Course, role: UserRole) {
-    super();
-    this.user = user;
-    this.course = course;
-    this.role = role;
+  constructor(init?: EnrollmentInterface) {
+    if (init !== undefined) {
+      super();
+      this.user = init.user;
+      this.course = init.course;
+      this.role = init.role;
+    }
   }
 
   async getUser(): Promise<User> {

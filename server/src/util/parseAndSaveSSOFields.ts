@@ -36,7 +36,7 @@ const parseAndSaveAffiliation = async function (
                 where: { name: name },
               });
               if (!ssoField) {
-                ssoField = new Affiliation(name);
+                ssoField = new Affiliation({ name: name });
                 await ssoField.validateOrReject();
                 await transactionalEntityManager.save(ssoField);
               }

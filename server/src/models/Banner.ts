@@ -7,6 +7,12 @@ interface AnonymousBanner {
   text: string;
 }
 
+interface BannerInterface {
+  title: string;
+  text: string;
+  active: boolean;
+}
+
 @Entity()
 export default class Banner extends BaseModel {
   @PrimaryGeneratedColumn()
@@ -29,11 +35,13 @@ export default class Banner extends BaseModel {
   @IsBoolean()
   active: boolean;
 
-  constructor(title: string, text: string, active: boolean) {
-    super();
-    this.title = title;
-    this.text = text;
-    this.active = active;
+  constructor(init?: BannerInterface) {
+    if (init !== undefined) {
+      super();
+      this.title = init.title;
+      this.text = init.text;
+      this.active = init.active;
+    }
   }
 
   async validateOrReject(): Promise<void> {

@@ -102,7 +102,7 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
         await transactionalEntityManager.save(user);
       }
       // enroll user in the course if not already
-      enrollment = new Enrollment(user, course, role);
+      enrollment = new Enrollment({ user: user, course: course, role: role });
       // in case another enrollment is made in the meantime it will error due to primary key constraints
       await enrollment.validateOrReject();
       await transactionalEntityManager.save(enrollment);
@@ -222,7 +222,11 @@ router.post(
                   await transactionalEntityManager.save(user);
                 }
                 // enroll user in the course if not already
-                const enrollment = new Enrollment(user, course, role);
+                const enrollment = new Enrollment({
+                  user: user,
+                  course: course,
+                  role: role,
+                });
                 // in case another enrollment is made in the meantime it will error due to primary key constraints
                 await enrollment.validateOrReject();
                 await transactionalEntityManager.save(enrollment);

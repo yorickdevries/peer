@@ -27,6 +27,16 @@ import Group from "./Group";
 import User from "./User";
 import File from "../models/File";
 
+interface AssignmentVersionInterface {
+  name: string;
+  assignment: Assignment;
+  versionsToReview: AssignmentVersion[];
+  reviewsPerUserPerAssignmentVersionToReview: number;
+  selfReview: boolean;
+  submissionQuestionnaire: SubmissionQuestionnaire | null;
+  reviewQuestionnaire: ReviewQuestionnaire | null;
+}
+
 @Entity()
 export default class AssignmentVersion extends BaseModel {
   @PrimaryGeneratedColumn()
@@ -95,24 +105,18 @@ export default class AssignmentVersion extends BaseModel {
   @JoinColumn()
   reviewQuestionnaire?: ReviewQuestionnaire | null;
 
-  constructor(
-    name: string,
-    assignment: Assignment,
-    versionsToReview: AssignmentVersion[],
-    reviewsPerUserPerAssignmentVersionToReview: number,
-    selfReview: boolean,
-    submissionQuestionnaire: SubmissionQuestionnaire | null,
-    reviewQuestionnaire: ReviewQuestionnaire | null
-  ) {
-    super();
-    this.name = name;
-    this.assignment = assignment;
-    this.versionsToReview = versionsToReview;
-    this.reviewsPerUserPerAssignmentVersionToReview =
-      reviewsPerUserPerAssignmentVersionToReview;
-    this.selfReview = selfReview;
-    this.submissionQuestionnaire = submissionQuestionnaire;
-    this.reviewQuestionnaire = reviewQuestionnaire;
+  constructor(init?: AssignmentVersionInterface) {
+    if (init !== undefined) {
+      super();
+      this.name = init.name;
+      this.assignment = init.assignment;
+      this.versionsToReview = init.versionsToReview;
+      this.reviewsPerUserPerAssignmentVersionToReview =
+        init.reviewsPerUserPerAssignmentVersionToReview;
+      this.selfReview = init.selfReview;
+      this.submissionQuestionnaire = init.submissionQuestionnaire;
+      this.reviewQuestionnaire = init.reviewQuestionnaire;
+    }
   }
 
   // validation: check whether the group is in the assingment and the user in the group

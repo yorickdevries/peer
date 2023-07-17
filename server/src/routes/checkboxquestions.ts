@@ -94,13 +94,13 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
       .send("The assignment is already in feedback state");
     return;
   }
-  const question = new CheckboxQuestion(
-    req.body.text,
-    req.body.number,
-    req.body.optional,
-    req.body.graded,
-    questionnaire
-  );
+  const question = new CheckboxQuestion({
+    text: req.body.text,
+    number: req.body.number,
+    optional: req.body.optional,
+    graded: req.body.graded,
+    questionnaire: questionnaire,
+  });
   await question.save();
   await question.reorder(QuestionOperation.CREATE);
   res.send(question);

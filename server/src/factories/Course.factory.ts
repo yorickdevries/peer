@@ -20,7 +20,14 @@ define(Course, (faker: typeof Faker) => {
   const year = Object.create(AcademicYear);
   const desc = faker.lorem.sentence();
 
-  return new Course(courseName, courseCode, enrollable, faculty, year, desc);
+  return new Course({
+    name: courseName,
+    courseCode: courseCode,
+    enrollable: enrollable,
+    faculty: faculty,
+    academicYear: year,
+    description: desc,
+  });
 });
 
 export { createCourse };

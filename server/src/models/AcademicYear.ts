@@ -2,6 +2,11 @@ import { Column, Entity } from "typeorm";
 import { IsBoolean, IsDefined } from "class-validator";
 import NamedModel from "./NamedModel";
 
+interface AcademicYearInterface {
+  name: string;
+  active: boolean;
+}
+
 @Entity()
 export default class AcademicYear extends NamedModel {
   @Column()
@@ -9,8 +14,10 @@ export default class AcademicYear extends NamedModel {
   @IsBoolean()
   active: boolean;
 
-  constructor(name: string, active: boolean) {
-    super(name);
-    this.active = active;
+  constructor(init?: AcademicYearInterface) {
+    if (init !== undefined) {
+      super(init.name);
+      this.active = init.active;
+    }
   }
 }

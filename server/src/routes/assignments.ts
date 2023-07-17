@@ -288,28 +288,28 @@ router.post(
     }
 
     // create asignment and validate
-    const assignment = new Assignment(
-      req.body.name,
-      course,
-      req.body.enrollable,
-      req.body.reviewEvaluation,
-      req.body.publishDate,
-      req.body.dueDate,
-      req.body.reviewPublishDate,
-      req.body.reviewDueDate,
-      req.body.reviewEvaluationDueDate,
-      req.body.description,
-      null, // file, will be set later
-      req.body.externalLink,
-      req.body.submissionExtensions,
-      req.body.blockFeedback,
-      req.body.lateSubmissions,
-      req.body.lateSubmissionReviews,
-      req.body.lateReviewEvaluations,
-      req.body.automaticStateProgression,
-      req.body.assignmentType,
-      req.body.sendNotificationEmails
-    );
+    const assignment = new Assignment({
+      name: req.body.name,
+      course: course,
+      enrollable: req.body.enrollable,
+      reviewEvaluation: req.body.reviewEvaluation,
+      publishDate: req.body.publishDate,
+      dueDate: req.body.dueDate,
+      reviewPublishDate: req.body.reviewPublishDate,
+      reviewDueDate: req.body.reviewDueDate,
+      reviewEvaluationDueDate: req.body.reviewEvaluationDueDate,
+      description: req.body.description,
+      file: null, // file, will be set later
+      externalLink: req.body.externalLink,
+      submissionExtensions: req.body.submissionExtensions,
+      blockFeedback: req.body.blockFeedback,
+      lateSubmissions: req.body.lateSubmissions,
+      lateSubmissionReviews: req.body.lateSubmissionReviews,
+      lateReviewEvaluations: req.body.lateReviewEvaluations,
+      automaticStateProgression: req.body.automaticStateProgression,
+      assignmentType: req.body.assignmentType,
+      sendNotifcationEmails: req.body.sendNotificationEmails
+    });
 
     // construct file to be saved in transaction
     // create the file object or leave it as null if no file is uploaded

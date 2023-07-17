@@ -32,22 +32,22 @@ const addDefaultReviewEvaluationQuestions = async function (
       for (const questionToCopy of templateQuestions) {
         switch (questionToCopy.type) {
           case QuestionType.CHECKBOX: {
-            const question = new CheckboxQuestion(
-              questionToCopy.text,
-              questionToCopy.number,
-              questionToCopy.optional,
-              graded ? questionToCopy.graded : false,
-              questionnaire
-            );
+            const question = new CheckboxQuestion({
+              text: questionToCopy.text,
+              number: questionToCopy.number,
+              optional: questionToCopy.optional,
+              graded: graded ? questionToCopy.graded : false,
+              questionnaire: questionnaire,
+            });
             await question.validateOrReject();
             await transactionalEntityManager.save(question);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
-              const option = new CheckboxQuestionOption(
-                optionToCopy.text,
-                question,
-                graded ? optionToCopy.points : null
-              );
+              const option = new CheckboxQuestionOption({
+                text: optionToCopy.text,
+                question: question,
+                points: graded ? optionToCopy.points : null,
+              });
               await option.validateOrReject();
               await transactionalEntityManager.save(option);
             }
@@ -144,22 +144,22 @@ const addCopyOfQuestions = async function (
       }
       for (const questionToCopy of questions) {
         if (questionToCopy instanceof CheckboxQuestion) {
-          const question = new CheckboxQuestion(
-            questionToCopy.text,
-            questionToCopy.number,
-            questionToCopy.optional,
-            questionToCopy.graded,
-            questionnaire
-          );
+          const question = new CheckboxQuestion({
+            text: questionToCopy.text,
+            number: questionToCopy.number,
+            optional: questionToCopy.optional,
+            graded: questionToCopy.graded,
+            questionnaire: questionnaire,
+          });
           await question.validateOrReject();
           await transactionalEntityManager.save(question);
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           for (const optionToCopy of questionToCopy.options!) {
-            const option = new CheckboxQuestionOption(
-              optionToCopy.text,
-              question,
-              optionToCopy.points
-            );
+            const option = new CheckboxQuestionOption({
+              text: optionToCopy.text,
+              question: question,
+              points: optionToCopy.points,
+            });
             await option.validateOrReject();
             await transactionalEntityManager.save(option);
           }

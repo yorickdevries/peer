@@ -45,39 +45,39 @@ describe("Review distribution", () => {
     const faculty = await Faculty.findOneOrFail(1);
 
     // course
-    const course = new Course(
-      "CourseName",
-      "ABC123",
-      false,
-      faculty,
-      academicYear,
-      null
-    );
+    const course = new Course({
+      name: "CourseName",
+      courseCode: "ABC123",
+      enrollable: false,
+      faculty: faculty,
+      academicYear: academicYear,
+      description: null,
+    });
     await course.save();
 
     // assignment
-    const assignment = new Assignment(
-      "Example title",
-      course,
-      true,
-      false,
-      new Date("2020-06-23T10:00Z"),
-      new Date("2020-06-24T10:00Z"),
-      new Date("2020-06-25T10:00Z"),
-      new Date("2020-06-26T10:00Z"),
-      null,
-      null,
-      null,
-      null,
-      Extensions.PDF,
-      true,
-      true,
-      true,
-      null,
-      false,
-      AssignmentType.DOCUMENT,
-      true
-    );
+    const assignment = new Assignment({
+      name: "Example title",
+      course: course,
+      enrollable: true,
+      reviewEvaluation: false,
+      publishDate: new Date("2020-06-23T10:00Z"),
+      dueDate: new Date("2020-06-24T10:00Z"),
+      reviewPublishDate: new Date("2020-06-25T10:00Z"),
+      reviewDueDate: new Date("2020-06-26T10:00Z"),
+      reviewEvaluationDueDate: null,
+      description: null,
+      file: null,
+      externalLink: null,
+      submissionExtensions: Extensions.PDF,
+      blockFeedback: true,
+      lateSubmissions: true,
+      lateSubmissionReviews: true,
+      lateReviewEvaluations: null,
+      automaticStateProgression: false,
+      assignmentType: AssignmentType.DOCUMENT,
+      sendNotifcationEmails: true,
+    });
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
@@ -85,15 +85,15 @@ describe("Review distribution", () => {
     const submissionQuestionnaire = new SubmissionQuestionnaire();
     await submissionQuestionnaire.save();
     // assignmentVersion
-    const assignmentVersion = new AssignmentVersion(
-      "default",
-      assignment,
-      [],
-      2,
-      false,
-      submissionQuestionnaire,
-      null
-    );
+    const assignmentVersion = new AssignmentVersion({
+      name: "default",
+      assignment: assignment,
+      versionsToReview: [],
+      reviewsPerUserPerAssignmentVersionToReview: 2,
+      selfReview: false,
+      submissionQuestionnaire: submissionQuestionnaire,
+      reviewQuestionnaire: null,
+    });
     await assignmentVersion.save();
     // set review setting so users review the same assignment
     assignmentVersion.versionsToReview = [assignmentVersion];
@@ -109,7 +109,11 @@ describe("Review distribution", () => {
     for (let i = 0; i < numStudents; i++) {
       const student = new User(`student${i}`);
       await student.save();
-      const enrollment = new Enrollment(student, course, UserRole.STUDENT);
+      const enrollment = new Enrollment({
+        user: student,
+        course: course,
+        role: UserRole.STUDENT,
+      });
       await enrollment.save();
       students.push(student);
     }
@@ -157,11 +161,11 @@ describe("Review distribution", () => {
       submissions.push(submission);
     }
     //make export of submissions
-    const assignmentExport: AssignmentExport = new AssignmentExport(
-      students[0],
-      assignment,
-      null
-    );
+    const assignmentExport: AssignmentExport = new AssignmentExport({
+      user: students[0],
+      assignment: assignment,
+      file: null,
+    });
     const file = new File("a", "ads", null);
     await getManager().transaction(
       "READ COMMITTED",
@@ -221,39 +225,39 @@ describe("Review distribution", () => {
     const faculty = await Faculty.findOneOrFail(1);
 
     // course
-    const course = new Course(
-      "CourseName",
-      "ABC123",
-      false,
-      faculty,
-      academicYear,
-      null
-    );
+    const course = new Course({
+      name: "CourseName",
+      courseCode: "ABC123",
+      enrollable: false,
+      faculty: faculty,
+      academicYear: academicYear,
+      description: null,
+    });
     await course.save();
 
     // assignment
-    const assignment = new Assignment(
-      "Example title",
-      course,
-      true,
-      false,
-      new Date("2020-06-23T10:00Z"),
-      new Date("2020-06-24T10:00Z"),
-      new Date("2020-06-25T10:00Z"),
-      new Date("2020-06-26T10:00Z"),
-      null,
-      null,
-      null,
-      null,
-      Extensions.PDF,
-      true,
-      true,
-      true,
-      null,
-      false,
-      AssignmentType.DOCUMENT,
-      true
-    );
+    const assignment = new Assignment({
+      name: "Example title",
+      course: course,
+      enrollable: true,
+      reviewEvaluation: false,
+      publishDate: new Date("2020-06-23T10:00Z"),
+      dueDate: new Date("2020-06-24T10:00Z"),
+      reviewPublishDate: new Date("2020-06-25T10:00Z"),
+      reviewDueDate: new Date("2020-06-26T10:00Z"),
+      reviewEvaluationDueDate: null,
+      description: null,
+      file: null,
+      externalLink: null,
+      submissionExtensions: Extensions.PDF,
+      blockFeedback: true,
+      lateSubmissions: true,
+      lateSubmissionReviews: true,
+      lateReviewEvaluations: null,
+      automaticStateProgression: false,
+      assignmentType: AssignmentType.DOCUMENT,
+      sendNotifcationEmails: true,
+    });
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
@@ -261,15 +265,15 @@ describe("Review distribution", () => {
     const submissionQuestionnaire = new SubmissionQuestionnaire();
     await submissionQuestionnaire.save();
     // assignmentVersion
-    const assignmentVersion = new AssignmentVersion(
-      "default",
-      assignment,
-      [],
-      2,
-      false,
-      submissionQuestionnaire,
-      null
-    );
+    const assignmentVersion = new AssignmentVersion({
+      name: "default",
+      assignment: assignment,
+      versionsToReview: [],
+      reviewsPerUserPerAssignmentVersionToReview: 2,
+      selfReview: false,
+      submissionQuestionnaire: submissionQuestionnaire,
+      reviewQuestionnaire: null,
+    });
     await assignmentVersion.save();
     // set review setting so users review the same assignment
     assignmentVersion.versionsToReview = [assignmentVersion];
@@ -284,7 +288,11 @@ describe("Review distribution", () => {
     for (let i = 0; i < numStudents; i++) {
       const student = new User(`student${i}`);
       await student.save();
-      const enrollment = new Enrollment(student, course, UserRole.STUDENT);
+      const enrollment = new Enrollment({
+        user: student,
+        course: course,
+        role: UserRole.STUDENT,
+      });
       await enrollment.save();
       students.push(student);
     }
@@ -354,39 +362,39 @@ describe("Review distribution", () => {
     const faculty = await Faculty.findOneOrFail(1);
 
     // course
-    const course = new Course(
-      "CourseName",
-      "ABC123",
-      false,
-      faculty,
-      academicYear,
-      null
-    );
+    const course = new Course({
+      name: "CourseName",
+      courseCode: "ABC123",
+      enrollable: false,
+      faculty: faculty,
+      academicYear: academicYear,
+      description: null,
+    });
     await course.save();
 
     // assignment
-    const assignment = new Assignment(
-      "Example title",
-      course,
-      true,
-      false,
-      new Date("2020-06-23T10:00Z"),
-      new Date("2020-06-24T10:00Z"),
-      new Date("2020-06-25T10:00Z"),
-      new Date("2020-06-26T10:00Z"),
-      null,
-      null,
-      null,
-      null,
-      Extensions.PDF,
-      true,
-      true,
-      true,
-      null,
-      false,
-      AssignmentType.DOCUMENT,
-      true
-    );
+    const assignment = new Assignment({
+      name: "Example title",
+      course: course,
+      enrollable: true,
+      reviewEvaluation: false,
+      publishDate: new Date("2020-06-23T10:00Z"),
+      dueDate: new Date("2020-06-24T10:00Z"),
+      reviewPublishDate: new Date("2020-06-25T10:00Z"),
+      reviewDueDate: new Date("2020-06-26T10:00Z"),
+      reviewEvaluationDueDate: null,
+      description: null,
+      file: null,
+      externalLink: null,
+      submissionExtensions: Extensions.PDF,
+      blockFeedback: true,
+      lateSubmissions: true,
+      lateSubmissionReviews: true,
+      lateReviewEvaluations: null,
+      automaticStateProgression: false,
+      assignmentType: AssignmentType.DOCUMENT,
+      sendNotifcationEmails: true,
+    });
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
     await assignment.save();
@@ -394,15 +402,15 @@ describe("Review distribution", () => {
     const submissionQuestionnaire = new SubmissionQuestionnaire();
     await submissionQuestionnaire.save();
     // assignmentVersion
-    const assignmentVersion = new AssignmentVersion(
-      "default",
-      assignment,
-      [],
-      2,
-      false,
-      submissionQuestionnaire,
-      null
-    );
+    const assignmentVersion = new AssignmentVersion({
+      name: "default",
+      assignment: assignment,
+      versionsToReview: [],
+      reviewsPerUserPerAssignmentVersionToReview: 2,
+      selfReview: false,
+      submissionQuestionnaire: submissionQuestionnaire,
+      reviewQuestionnaire: null,
+    });
     await assignmentVersion.save();
     // set review setting so users review the same assignment
     assignmentVersion.versionsToReview = [assignmentVersion];
@@ -410,15 +418,27 @@ describe("Review distribution", () => {
 
     const student1 = new User(`student1`);
     await student1.save();
-    const enrollment1 = new Enrollment(student1, course, UserRole.STUDENT);
+    const enrollment1 = new Enrollment({
+      user: student1,
+      course: course,
+      role: UserRole.STUDENT,
+    });
     await enrollment1.save();
     const student2 = new User(`student2`);
     await student2.save();
-    const enrollment2 = new Enrollment(student2, course, UserRole.STUDENT);
+    const enrollment2 = new Enrollment({
+      user: student2,
+      course: course,
+      role: UserRole.STUDENT,
+    });
     await enrollment2.save();
     const student3 = new User(`student3`);
     await student3.save();
-    const enrollment3 = new Enrollment(student3, course, UserRole.STUDENT);
+    const enrollment3 = new Enrollment({
+      user: student3,
+      course: course,
+      role: UserRole.STUDENT,
+    });
     await enrollment3.save();
 
     const submissions: Submission[] = [];

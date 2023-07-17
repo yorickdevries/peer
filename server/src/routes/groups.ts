@@ -187,7 +187,11 @@ router.patch(
       }
     } else {
       // enroll the user as student in the course
-      enrollment = new Enrollment(newUser, course, UserRole.STUDENT);
+      enrollment = new Enrollment({
+        user: newUser,
+        course: course,
+        role: UserRole.STUDENT,
+      });
       await enrollment.save();
     }
     groupUsers.push(newUser);

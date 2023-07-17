@@ -60,11 +60,11 @@ router.post("/", validateBody(questionOptionSchema), async (req, res) => {
       .send("The assignment is already in feedback state");
     return;
   }
-  const questionOption = new CheckboxQuestionOption(
-    req.body.text,
-    question,
-    req.body.points
-  );
+  const questionOption = new CheckboxQuestionOption({
+    text: req.body.text,
+    question: question,
+    points: req.body.points,
+  });
   if (question.graded && questionOption.points == null) {
     res
       .status(HttpStatusCode.BAD_REQUEST)

@@ -34,7 +34,11 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
 });
 
 router.post("/", validateBody(schema), async (req, res) => {
-  const banner = new Banner(req.body.title, req.body.text, req.body.active);
+  const banner = new Banner({
+    title: req.body.title,
+    text: req.body.text,
+    active: req.body.active,
+  });
   await banner.save();
   res.send(banner);
 });

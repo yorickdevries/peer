@@ -81,15 +81,15 @@ router.post("/", validateBody(assignmentVersionSchema), async (req, res) => {
       .send("The assignment is already published");
     return;
   }
-  const assignmentVersion = new AssignmentVersion(
-    req.body.name,
-    assignment,
-    [], // no versions yet (should be changed via patch route)
-    req.body.reviewsPerUserPerAssignmentVersionToReview,
-    false, // default self review is false (can be changed via patch route)
-    null, // submissionQuestionnaire (initially empty)
-    null // reviewQuestionnaire (initially empty)
-  );
+  const assignmentVersion = new AssignmentVersion({
+    name: req.body.name,
+    assignment: assignment,
+    versionsToReview: [], // no versions yet (should be changed via patch route)
+    reviewsPerUserPerAssignmentVersionToReview: req.body.reviewsPerUserPerAssignmentVersionToReview,
+    selfReview: false, // default self review is false (can be changed via patch route)
+    submissionQuestionnaire: null, // submissionQuestionnaire (initially empty)
+    reviewQuestionnaire: null // reviewQuestionnaire (initially empty)
+  });
   await assignmentVersion.save();
   const assignmentVersionWithVersionsToReview =
     await assignmentVersion.getAssignmentVersionWithVersionsToReview();
