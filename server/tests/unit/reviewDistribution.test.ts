@@ -157,11 +157,11 @@ describe("Review distribution", () => {
       submissions.push(submission);
     }
     //make export of submissions
-    const assignmentExport: AssignmentExport = new AssignmentExport(
-      students[0],
-      assignment,
-      null
-    );
+    const assignmentExport: AssignmentExport = new AssignmentExport({
+      user: students[0],
+      assignment: assignment,
+      file: null,
+    });
     const file = new File("a", "ads", null);
     await getManager().transaction(
       "READ COMMITTED",

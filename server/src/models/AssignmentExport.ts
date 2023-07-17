@@ -11,6 +11,12 @@ import User from "./User";
 import Assignment from "./Assignment";
 import File from "./File";
 
+interface AssignmentExportInterface {
+  user: User;
+  assignment: Assignment;
+  file: File | null;
+}
+
 @Entity()
 export default class AssignmentExport extends BaseModel {
   @PrimaryGeneratedColumn()
@@ -42,11 +48,13 @@ export default class AssignmentExport extends BaseModel {
   @JoinColumn()
   file: File | null;
 
-  constructor(user: User, assignment: Assignment, file: File | null) {
-    super();
-    this.user = user;
-    this.assignment = assignment;
-    this.file = file;
+  constructor(init?: AssignmentExportInterface) {
+    if (init !== undefined) {
+      super();
+      this.user = init.user;
+      this.assignment = init.assignment;
+      this.file = init.file;
+    }
   }
 
   async getAssignment(): Promise<Assignment> {

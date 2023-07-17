@@ -123,7 +123,11 @@ router.post(
       return;
     }
     const assignment = await assignmentVersion.getAssignment();
-    const assignmentExport = new AssignmentExport(user, assignment, null);
+    const assignmentExport = new AssignmentExport({
+      user: user,
+      assignment: assignment,
+      file: null,
+    });
     await assignmentExport.save();
 
     // offload a function to a worker
