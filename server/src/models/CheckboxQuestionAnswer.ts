@@ -5,7 +5,6 @@ import Review from "./Review";
 import CheckboxQuestionOption from "./CheckboxQuestionOption";
 import CheckboxQuestion from "./CheckboxQuestion";
 
-
 interface CheckboxQuestionAnswerInterface {
   question: CheckboxQuestion;
   review: Review;

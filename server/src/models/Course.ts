@@ -21,6 +21,15 @@ import Assignment from "../models/Assignment";
 import UserRole from "../enum/UserRole";
 import { AssignmentState } from "../enum/AssignmentState";
 
+interface CourseInterface {
+  name: string;
+  courseCode: string;
+  enrollable: boolean;
+  faculty: Faculty;
+  academicYear: AcademicYear;
+  description: string | null;
+}
+
 @Entity()
 export default class Course extends BaseModel {
   @PrimaryGeneratedColumn()
@@ -69,21 +78,16 @@ export default class Course extends BaseModel {
   @OneToMany((_type) => Assignment, (assignment) => assignment.course)
   assignments?: Assignment[];
 
-  constructor(
-    name: string,
-    courseCode: string,
-    enrollable: boolean,
-    faculty: Faculty,
-    academicYear: AcademicYear,
-    description: string | null
-  ) {
-    super();
-    this.name = name;
-    this.courseCode = courseCode;
-    this.enrollable = enrollable;
-    this.faculty = faculty;
-    this.academicYear = academicYear;
-    this.description = description;
+  constructor(init?: CourseInterface) {
+    if (init !== undefined) {
+      super();
+      this.name = init.name;
+      this.courseCode = init.courseCode;
+      this.enrollable = init.enrollable;
+      this.faculty = init.faculty;
+      this.academicYear = init.academicYear;
+      this.description = init.description;
+    }
   }
 
   async getAssignments(): Promise<Assignment[]> {

@@ -45,14 +45,14 @@ describe("Review distribution", () => {
     const faculty = await Faculty.findOneOrFail(1);
 
     // course
-    const course = new Course(
-      "CourseName",
-      "ABC123",
-      false,
-      faculty,
-      academicYear,
-      null
-    );
+    const course = new Course({
+      name: "CourseName",
+      courseCode: "ABC123",
+      enrollable: false,
+      faculty: faculty,
+      academicYear: academicYear,
+      description: null,
+    });
     await course.save();
 
     // assignment
@@ -221,14 +221,14 @@ describe("Review distribution", () => {
     const faculty = await Faculty.findOneOrFail(1);
 
     // course
-    const course = new Course(
-      "CourseName",
-      "ABC123",
-      false,
-      faculty,
-      academicYear,
-      null
-    );
+    const course = new Course({
+      name: "CourseName",
+      courseCode: "ABC123",
+      enrollable: false,
+      faculty: faculty,
+      academicYear: academicYear,
+      description: null,
+    });
     await course.save();
 
     // assignment
@@ -354,14 +354,14 @@ describe("Review distribution", () => {
     const faculty = await Faculty.findOneOrFail(1);
 
     // course
-    const course = new Course(
-      "CourseName",
-      "ABC123",
-      false,
-      faculty,
-      academicYear,
-      null
-    );
+    const course = new Course({
+      name: "CourseName",
+      courseCode: "ABC123",
+      enrollable: false,
+      faculty: faculty,
+      academicYear: academicYear,
+      description: null,
+    });
     await course.save();
 
     // assignment

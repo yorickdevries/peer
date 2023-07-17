@@ -85,14 +85,14 @@ router.post(
       return;
     }
     // instantiate the course
-    const course = new Course(
-      req.body.name,
-      req.body.courseCode,
-      req.body.enrollable,
-      faculty,
-      academicYear,
-      req.body.description
-    );
+    const course = new Course({
+      name: req.body.name,
+      courseCode: req.body.courseCode,
+      enrollable: req.body.enrollable,
+      faculty: faculty,
+      academicYear: academicYear,
+      description: req.body.description,
+    });
     // start transaction to both save the course and teacher enrollment
     await getManager().transaction(
       "READ COMMITTED",
