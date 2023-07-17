@@ -3,6 +3,12 @@ import { ChildEntity, ManyToOne, RelationId } from "typeorm";
 import QuestionOptionType from "../enum/QuestionOptionType";
 import CheckboxQuestion from "./CheckboxQuestion";
 
+interface CheckboxQuestionOptionInterface {
+  text: string;
+  question: CheckboxQuestion;
+  points: number | null;
+}
+
 @ChildEntity(QuestionOptionType.CHECKBOX)
 export default class CheckboxQuestionOption extends QuestionOption {
   @RelationId(
@@ -16,9 +22,11 @@ export default class CheckboxQuestionOption extends QuestionOption {
   })
   question?: CheckboxQuestion;
 
-  constructor(text: string, question: CheckboxQuestion, points: number | null) {
-    super(text, points);
-    this.question = question;
+  constructor(init?: CheckboxQuestionOptionInterface) {
+    if (init !== undefined) {
+      super(init.text, init.points);
+      this.question = init.question;
+    }
   }
 
   async getQuestion(): Promise<CheckboxQuestion> {
