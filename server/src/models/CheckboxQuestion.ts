@@ -5,6 +5,14 @@ import QuestionType from "../enum/QuestionType";
 import CheckboxQuestionOption from "./CheckboxQuestionOption";
 import ResponseMessage from "../enum/ResponseMessage";
 
+interface CheckboxQuestionInterface {
+  text: string;
+  number: number;
+  optional: boolean;
+  graded: boolean;
+  questionnaire: Questionnaire;
+}
+
 @ChildEntity(QuestionType.CHECKBOX)
 export default class CheckboxQuestion extends Question {
   @OneToMany(
@@ -17,14 +25,10 @@ export default class CheckboxQuestion extends Question {
   )
   options!: CheckboxQuestionOption[];
 
-  constructor(
-    text: string,
-    number: number,
-    optional: boolean,
-    graded: boolean,
-    questionnaire: Questionnaire
-  ) {
-    super(text, number, optional, graded, questionnaire);
+  constructor(init?: CheckboxQuestionInterface) {
+    if (init !== undefined) {
+      super(init.text, init.number, init.optional, init.graded, init.questionnaire);
+    }
   }
 
   async validateOrReject(): Promise<void> {
