@@ -125,13 +125,13 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
       );
     return;
   }
-  const codeAnnotation = new CodeAnnotation(
-    review,
-    req.body.annotationText,
-    req.body.startLineNumber,
-    req.body.endLineNumber,
-    req.body.selectedFile
-  );
+  const codeAnnotation = new CodeAnnotation({
+    review: review,
+    annotationText: req.body.annotationText,
+    startLineNumber: req.body.startLineNumber,
+    endLineNumber: req.body.endLineNumber,
+    selectedFile: req.body.selectedFile,
+  });
   await codeAnnotation.save();
   res.send(codeAnnotation);
 });
