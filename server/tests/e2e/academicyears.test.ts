@@ -31,10 +31,10 @@ describe("Academic Years", () => {
     }
 
     //insert some academic years
-    await new AcademicYear("2018/2019", false).save();
-    await new AcademicYear("2019/2020", true).save();
-    await new AcademicYear("2020/2021", true).save();
-    await new AcademicYear("2021/2022", false).save();
+    await new AcademicYear({ name: "2018/2019", active: false }).save();
+    await new AcademicYear({ name: "2019/2020", active: true }).save();
+    await new AcademicYear({ name: "2020/2021", active: true }).save();
+    await new AcademicYear({ name: "2021/2022", active: false }).save();
 
     const sessionCookie = await mockLoginCookie(server, "user123");
     const res = await request(server)

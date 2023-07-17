@@ -39,7 +39,10 @@ const initializeData = async function (): Promise<void> {
     const existingAcademicYears = await AcademicYear.find();
     if (existingAcademicYears.length === 0) {
       for (const academicYear of academicYears) {
-        await new AcademicYear(academicYear[0], academicYear[1]).save();
+        await new AcademicYear({
+          name: academicYear[0],
+          active: academicYear[1],
+        }).save();
       }
       console.log("Initialized Academic Years");
     }

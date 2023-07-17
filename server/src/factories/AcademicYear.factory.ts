@@ -23,7 +23,7 @@ async function createDefaultAcademicYears(): Promise<AcademicYear[]> {
 }
 
 define(AcademicYear, () => {
-  return new AcademicYear("name", false);
+  return new AcademicYear({ name: "name", active: false });
 });
 
 export { createDefaultAcademicYears };
