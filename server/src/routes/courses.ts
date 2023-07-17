@@ -101,7 +101,11 @@ router.post(
         await course.validateOrReject();
         await transactionalEntityManager.save(course);
         // here the current user needs to be enrolled as teacher fot he just created course
-        const enrollment = new Enrollment(user, course, UserRole.TEACHER);
+        const enrollment = new Enrollment({
+          user: user,
+          course: course,
+          role: UserRole.TEACHER,
+        });
         await enrollment.validateOrReject();
         await transactionalEntityManager.save(enrollment);
       }
@@ -177,7 +181,7 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.BAD_REQUEST).send("The course is not enrollable");
     return;
   }
-  const enrollment = new Enrollment(user, course, UserRole.STUDENT);
+  const enrollment = new Enrollment({user: user, course: course, role: UserRole.STUDENT});
   await enrollment.save();
   res.send(enrollment);
 });
@@ -206,7 +210,11 @@ router.post(
         .send("This course is not enrollable");
       return;
     }
-    const enrollment = new Enrollment(user, course, UserRole.TEACHER);
+    const enrollment = new Enrollment({
+      user: user,
+      course: course,
+      role: UserRole.TEACHER,
+    });
     await enrollment.save();
     res.send(enrollment);
   }

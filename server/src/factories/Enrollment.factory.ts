@@ -21,7 +21,7 @@ define(Enrollment, (faker: typeof Faker) => {
     UserRole.TEACHING_ASSISTANT,
   ]);
 
-  return new Enrollment(user, course, role);
+  return new Enrollment({ user: user, course: course, role: role });
 });
 
 export { createEnrollment };
