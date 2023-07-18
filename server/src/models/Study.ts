@@ -1,9 +1,15 @@
 import { Entity } from "typeorm";
 import NamedModel from "./NamedModel";
 
+interface StudyInterface {
+  name: string;
+}
+
 @Entity()
 export default class Study extends NamedModel {
-  constructor(name: string) {
-    super(name);
+  constructor(init?: StudyInterface) {
+    if (init !== undefined) {
+      super(init.name);
+    }
   }
 }

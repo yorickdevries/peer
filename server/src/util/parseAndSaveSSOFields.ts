@@ -84,7 +84,7 @@ const parseAndSaveStudy = async function (input: any): Promise<Study[]> {
                 where: { name: name },
               });
               if (!ssoField) {
-                ssoField = new Study(name);
+                ssoField = new Study({ name: name });
                 await ssoField.validateOrReject();
                 await transactionalEntityManager.save(ssoField);
               }
