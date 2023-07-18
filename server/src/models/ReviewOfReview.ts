@@ -5,6 +5,17 @@ import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import Review from "./Review";
 import ReviewOfSubmission from "./ReviewOfSubmission";
 
+interface ReviewOfReviewInterface {
+  questionnaire: ReviewQuestionnaire;
+  user: User;
+  flaggedByReviewer: boolean;
+  submitted: boolean;
+  startedAt: Date | null;
+  downloadedAt: Date | null;
+  submittedAt: Date | null;
+  reviewOfSubmission: ReviewOfSubmission;
+}
+
 @ChildEntity(ReviewType.REVIEW_OF_REVIEW)
 export default class ReviewOfReview extends Review {
   @RelationId(
@@ -16,26 +27,19 @@ export default class ReviewOfReview extends Review {
   // can be null as it is in the same table as reviewOfSubmission
   reviewOfSubmission?: ReviewOfSubmission;
 
-  constructor(
-    questionnaire: ReviewQuestionnaire,
-    user: User,
-    flaggedByReviewer: boolean,
-    submitted: boolean,
-    startedAt: Date | null,
-    downloadedAt: Date | null,
-    submittedAt: Date | null,
-    reviewOfSubmission: ReviewOfSubmission
-  ) {
-    super(
-      questionnaire,
-      user,
-      flaggedByReviewer,
-      submitted,
-      startedAt,
-      downloadedAt,
-      submittedAt
-    );
-    this.reviewOfSubmission = reviewOfSubmission;
+  constructor(init?: ReviewOfReviewInterface) {
+    if (init !== undefined) {
+      super(
+        init.questionnaire,
+        init.user,
+        init.flaggedByReviewer,
+        init.submitted,
+        init.startedAt,
+        init.downloadedAt,
+        init.submittedAt
+      );
+      this.reviewOfSubmission = init.reviewOfSubmission;
+    }
   }
 
   // custom validation which is run before saving

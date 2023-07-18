@@ -16,16 +16,16 @@ define(ReviewOfReview, () => {
   const user = Object.create(User);
   const review = Object.create(Review);
 
-  return new ReviewOfReview(
-    reviewQuestionnaire,
-    user,
-    false,
-    false,
-    new Date(), // set startedAt
-    null,
-    null,
-    review
-  );
+  return new ReviewOfReview({
+    questionnaire: reviewQuestionnaire,
+    user: user,
+    flaggedByReviewer: false,
+    submitted: false,
+    startedAt: new Date(), // set startedAt
+    downloadedAt: null,
+    submittedAt: null,
+    reviewOfSubmission: review,
+  });
 });
 
 export { createReviewOfReview };

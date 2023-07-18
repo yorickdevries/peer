@@ -644,16 +644,16 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   }
 
   // create the reviewEvaluation
-  const reviewEvaluation = new ReviewOfReview(
-    reviewQuestionnaire,
-    user,
-    false,
-    false,
-    new Date(), // set startedAt
-    null,
-    null,
-    review
-  );
+  const reviewEvaluation = new ReviewOfReview({
+    questionnaire: reviewQuestionnaire,
+    user: user,
+    flaggedByReviewer: false,
+    submitted: false,
+    startedAt: new Date(), // set startedAt
+    downloadedAt: null,
+    submittedAt: null,
+    reviewOfSubmission: review,
+  });
   // validate outside transaction as it otherwise might block the transaction
   await reviewEvaluation.validateOrReject();
   await getManager().transaction(
