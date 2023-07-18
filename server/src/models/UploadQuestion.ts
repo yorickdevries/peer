@@ -5,6 +5,14 @@ import QuestionType from "../enum/QuestionType";
 import { IsDefined, IsEnum, IsNotEmpty, IsString } from "class-validator";
 import Extensions from "../enum/Extensions";
 
+interface UploadQuestionInterface {
+  text: string;
+  number: number;
+  optional: boolean;
+  questionnaire: Questionnaire;
+  extensions: Extensions;
+}
+
 @ChildEntity(QuestionType.UPLOAD)
 export default class UploadQuestion extends Question {
   @Column()
@@ -16,14 +24,10 @@ export default class UploadQuestion extends Question {
   // needs later to be revised to a list of strings
   extensions: Extensions;
 
-  constructor(
-    text: string,
-    number: number,
-    optional: boolean,
-    questionnaire: Questionnaire,
-    extensions: Extensions
-  ) {
-    super(text, number, optional, false, questionnaire);
-    this.extensions = extensions;
+  constructor(init?: UploadQuestionInterface) {
+    if (init !== undefined) {
+      super(init.text, init.number, init.optional, false, init.questionnaire);
+      this.extensions = init.extensions;
+    }
   }
 }

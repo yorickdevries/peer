@@ -100,14 +100,14 @@ const addDefaultReviewEvaluationQuestions = async function (
             break;
           }
           case QuestionType.UPLOAD: {
-            const question = new UploadQuestion(
-              questionToCopy.text,
-              questionToCopy.number,
-              questionToCopy.optional,
-              questionnaire,
+            const question = new UploadQuestion({
+              text: questionToCopy.text,
+              number: questionToCopy.number,
+              optional: questionToCopy.optional,
+              questionnaire: questionnaire,
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              questionToCopy.extensions!
-            );
+              extensions: questionToCopy.extensions!,
+            });
             await question.validateOrReject();
             await transactionalEntityManager.save(question);
             break;
@@ -201,13 +201,13 @@ const addCopyOfQuestions = async function (
           await question.validateOrReject();
           await transactionalEntityManager.save(question);
         } else if (questionToCopy instanceof UploadQuestion) {
-          const question = new UploadQuestion(
-            questionToCopy.text,
-            questionToCopy.number,
-            questionToCopy.optional,
-            questionnaire,
-            questionToCopy.extensions
-          );
+          const question = new UploadQuestion({
+            text: questionToCopy.text,
+            number: questionToCopy.number,
+            optional: questionToCopy.optional,
+            questionnaire: questionnaire,
+            extensions: questionToCopy.extensions,
+          });
           await question.validateOrReject();
           await transactionalEntityManager.save(question);
         } else {
