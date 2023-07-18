@@ -11,6 +11,11 @@ import QuestionAnswerType from "../enum/QuestionAnswerType";
 import Question from "./Question";
 import Review from "./Review";
 
+interface QuestionAnswerInterface {
+  question: Question;
+  review: Review;
+}
+
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "type" } })
 export default abstract class QuestionAnswer extends BaseModel {
@@ -45,10 +50,12 @@ export default abstract class QuestionAnswer extends BaseModel {
   // method to get number of points awarded for an answer (if graded)
   abstract getAnswerPoints(): Promise<number | undefined>;
 
-  constructor(question: Question, review: Review) {
-    super();
-    this.question = question;
-    this.review = review;
+  constructor(init?: QuestionAnswerInterface) {
+    if (init !== undefined) {
+      super();
+      this.question = init.question;
+      this.review = init.review;
+    }
   }
 
   async validateOrReject(): Promise<void> {
