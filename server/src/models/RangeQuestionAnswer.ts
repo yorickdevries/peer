@@ -11,6 +11,12 @@ const rangeconfig: {
   max: number;
 } = config.get("rangeQuestion");
 
+interface RangeQuestionInterface {
+  question: RangeQuestion;
+  review: Review;
+  answer: number;
+}
+
 @ChildEntity(QuestionAnswerType.RANGE)
 export default class RangeQuestionAnswer extends QuestionAnswer {
   @Column()
@@ -20,9 +26,11 @@ export default class RangeQuestionAnswer extends QuestionAnswer {
   @Min(rangeconfig.min) //1 star is the minimum, max is set by the questionmaker (needs validation)
   rangeAnswer: number;
 
-  constructor(question: RangeQuestion, review: Review, answer: number) {
-    super(question, review);
-    this.rangeAnswer = answer;
+  constructor(init?: RangeQuestionInterface) {
+    if (init !== undefined) {
+      super(init.question, init.review);
+      this.rangeAnswer = init.answer;
+    }
   }
 
   // validation: answer should be in range of the question

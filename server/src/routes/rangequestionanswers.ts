@@ -93,11 +93,11 @@ router.post("/", validateBody(rangeAnswerSchema), async (req, res) => {
   if (rangeAnswer) {
     rangeAnswer.rangeAnswer = req.body.rangeAnswer;
   } else {
-    rangeAnswer = new RangeQuestionAnswer(
-      question,
-      review,
-      req.body.rangeAnswer
-    );
+    rangeAnswer = new RangeQuestionAnswer({
+      question: question,
+      review: review,
+      answer: req.body.rangeAnswer,
+    });
   }
   await rangeAnswer.save();
   res.send(rangeAnswer);
