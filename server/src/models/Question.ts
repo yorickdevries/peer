@@ -23,6 +23,14 @@ import Questionnaire from "./Questionnaire";
 
 import User from "./User";
 
+interface QuestionInterface {
+  text: string;
+  number: number;
+  optional: boolean;
+  graded: boolean;
+  questionnaire: Questionnaire;
+}
+
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "type" } })
 export default abstract class Question extends BaseModel {
@@ -73,19 +81,15 @@ export default abstract class Question extends BaseModel {
   )
   questionnaire?: Questionnaire;
 
-  constructor(
-    text: string,
-    number: number,
-    optional: boolean,
-    graded: boolean,
-    questionnaire: Questionnaire
-  ) {
-    super();
-    this.text = text;
-    this.number = number;
-    this.optional = optional;
-    this.graded = graded;
-    this.questionnaire = questionnaire;
+  constructor(init?: QuestionInterface) {
+    if (init !== undefined) {
+      super();
+      this.text = init.text;
+      this.number = init.number;
+      this.optional = init.optional;
+      this.graded = init.graded;
+      this.questionnaire = init.questionnaire;
+    }
   }
 
   async getQuestionnaire(): Promise<Questionnaire> {
