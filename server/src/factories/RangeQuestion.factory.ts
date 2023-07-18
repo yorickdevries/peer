@@ -17,7 +17,13 @@ define(RangeQuestion, (faker: typeof Faker) => {
   const questionnaire = Object.create(Questionnaire);
   const range = faker.random.number({ min: 1, max: 50 });
 
-  return new RangeQuestion(text, number, optional, questionnaire, range);
+  return new RangeQuestion({
+    text: text,
+    number: number,
+    optional: optional,
+    questionnaire: questionnaire,
+    range: range,
+  });
 });
 
 export { createRangeQuestion };

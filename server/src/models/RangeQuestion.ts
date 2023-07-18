@@ -11,6 +11,14 @@ const rangeconfig: {
   max: number;
 } = config.get("rangeQuestion");
 
+interface RangeQuestionInterface {
+  text: string;
+  number: number;
+  optional: boolean;
+  questionnaire: Questionnaire;
+  range: number;
+}
+
 @ChildEntity(QuestionType.RANGE)
 export default class RangeQuestion extends Question {
   @Column()
@@ -21,14 +29,10 @@ export default class RangeQuestion extends Question {
   @Max(rangeconfig.max) //needs to be checked whats most useful
   range: number;
 
-  constructor(
-    text: string,
-    number: number,
-    optional: boolean,
-    questionnaire: Questionnaire,
-    range: number
-  ) {
-    super(text, number, optional, false, questionnaire);
-    this.range = range;
+  constructor(init?: RangeQuestionInterface) {
+    if (init !== undefined) {
+      super(init.text, init.number, init.optional, false, init.questionnaire);
+      this.range = init.range;
+    }
   }
 }

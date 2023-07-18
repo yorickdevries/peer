@@ -87,14 +87,14 @@ const addDefaultReviewEvaluationQuestions = async function (
             break;
           }
           case QuestionType.RANGE: {
-            const question = new RangeQuestion(
-              questionToCopy.text,
-              questionToCopy.number,
-              questionToCopy.optional,
-              questionnaire,
+            const question = new RangeQuestion({
+              text: questionToCopy.text,
+              number: questionToCopy.number,
+              optional: questionToCopy.optional,
+              questionnaire: questionnaire,
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              questionToCopy.range!
-            );
+              range: questionToCopy.range!,
+            });
             await question.validateOrReject();
             await transactionalEntityManager.save(question);
             break;
@@ -191,13 +191,13 @@ const addCopyOfQuestions = async function (
           await question.validateOrReject();
           await transactionalEntityManager.save(question);
         } else if (questionToCopy instanceof RangeQuestion) {
-          const question = new RangeQuestion(
-            questionToCopy.text,
-            questionToCopy.number,
-            questionToCopy.optional,
-            questionnaire,
-            questionToCopy.range
-          );
+          const question = new RangeQuestion({
+            text: questionToCopy.text,
+            number: questionToCopy.number,
+            optional: questionToCopy.optional,
+            questionnaire: questionnaire,
+            range: questionToCopy.range,
+          });
           await question.validateOrReject();
           await transactionalEntityManager.save(question);
         } else if (questionToCopy instanceof UploadQuestion) {

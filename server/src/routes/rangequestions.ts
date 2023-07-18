@@ -89,13 +89,13 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
       .send("The assignment is already in feedback state");
     return;
   }
-  const question = new RangeQuestion(
-    req.body.text,
-    req.body.number,
-    req.body.optional,
-    questionnaire,
-    req.body.range
-  );
+  const question = new RangeQuestion({
+    text: req.body.text,
+    number: req.body.number,
+    optional: req.body.optional,
+    questionnaire: questionnaire,
+    range: req.body.range,
+  });
   await question.save();
   await question.reorder(QuestionOperation.CREATE);
   res.send(question);
