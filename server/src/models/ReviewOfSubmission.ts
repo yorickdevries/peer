@@ -32,15 +32,15 @@ export default class ReviewOfSubmission extends Review {
 
   constructor(init?: ReviewOfSubmissionInterface) {
     if (init !== undefined) {
-      super(
-        init.questionnaire,
-        init.user,
-        init.flaggedByReviewer,
-        init.submitted,
-        init.startedAt,
-        init.downloadedAt,
-        init.submittedAt
-      );
+      super({
+        questionnaire: init.questionnaire,
+        reviewer: init.user,
+        flaggedByReviewer: init.flaggedByReviewer,
+        submitted: init.submitted,
+        startedAt: init.startedAt,
+        downloadedAt: init.downloadedAt,
+        submittedAt: init.submittedAt,
+      });
       this.submission = init.submission;
     }
   }

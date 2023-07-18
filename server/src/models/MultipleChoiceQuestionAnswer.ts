@@ -22,7 +22,7 @@ export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
 
   constructor(init?: MultipleChoiceQuestionAnswerInterface) {
     if (init !== undefined) {
-      super(init.question, init.review);
+      super({ question: init.question, review: init.review });
       this.multipleChoiceAnswer = init.answer;
     }
   }

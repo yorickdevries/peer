@@ -20,7 +20,7 @@ export default class CheckboxQuestionAnswer extends QuestionAnswer {
 
   constructor(init?: CheckboxQuestionAnswerInterface) {
     if (init !== undefined) {
-      super(init.question, init.review);
+      super({ question: init.question, review: init.review });
       this.checkboxAnswer = init.answer;
     }
   }

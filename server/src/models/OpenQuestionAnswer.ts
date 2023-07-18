@@ -22,7 +22,7 @@ export default class OpenQuestionAnswer extends QuestionAnswer {
 
   constructor(init?: OpenQuestionAnswerInterface) {
     if (init !== undefined) {
-      super(init.question, init.review);
+      super({ question: init.question, review: init.review });
       this.openAnswer = init.answer;
     }
   }

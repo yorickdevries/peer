@@ -31,7 +31,13 @@ export default class RangeQuestion extends Question {
 
   constructor(init?: RangeQuestionInterface) {
     if (init !== undefined) {
-      super(init.text, init.number, init.optional, false, init.questionnaire);
+      super({
+        text: init.text,
+        number: init.number,
+        optional: init.optional,
+        graded: false,
+        questionnaire: init.questionnaire,
+      });
       this.range = init.range;
     }
   }

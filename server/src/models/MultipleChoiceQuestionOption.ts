@@ -28,7 +28,7 @@ export default class MultipleChoiceQuestionOption extends QuestionOption {
 
   constructor(init?: MultipleChoiceQuestionOptionInterface) {
     if (init !== undefined) {
-      super(init.text, init.points);
+      super({ text: init.text, points: init.points });
       this.question = init.question;
     }
   }

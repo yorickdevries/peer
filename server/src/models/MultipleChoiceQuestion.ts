@@ -27,13 +27,13 @@ export default class MultipleChoiceQuestion extends Question {
 
   constructor(init?: MultipleChoiceQuestionInterface) {
     if (init !== undefined) {
-      super(
-        init.text,
-        init.number,
-        init.optional,
-        init.graded,
-        init.questionnaire
-      );
+      super({
+        text: init.text,
+        number: init.number,
+        optional: init.optional,
+        graded: init.graded,
+        questionnaire: init.questionnaire,
+      });
     }
   }
 

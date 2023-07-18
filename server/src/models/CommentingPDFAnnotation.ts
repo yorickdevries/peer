@@ -35,7 +35,13 @@ export default class CommentingPDFAnnotation extends PDFAnnotation {
 
   constructor(init?: CommentingPDFAnnotationInterface) {
     if (init !== undefined) {
-      super(init.id, init.bodyValue, init.user, init.file, init.review);
+      super({
+        id: init.id,
+        bodyValue: init.bodyValue,
+        user: init.user,
+        file: init.file,
+        review: init.review,
+      });
       this.selector = init.selector;
     }
   }

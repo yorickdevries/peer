@@ -24,7 +24,7 @@ export default class CheckboxQuestionOption extends QuestionOption {
 
   constructor(init?: CheckboxQuestionOptionInterface) {
     if (init !== undefined) {
-      super(init.text, init.points);
+      super({ text: init.text, points: init.points });
       this.question = init.question;
     }
   }

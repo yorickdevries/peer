@@ -14,7 +14,13 @@ interface OpenQuestionInterface {
 export default class OpenQuestion extends Question {
   constructor(init?: OpenQuestionInterface) {
     if (init !== undefined) {
-      super(init.text, init.number, init.optional, false, init.questionnaire);
+      super({
+        text: init.text,
+        number: init.number,
+        optional: init.optional,
+        graded: false,
+        questionnaire: init.questionnaire,
+      });
     }
   }
 }

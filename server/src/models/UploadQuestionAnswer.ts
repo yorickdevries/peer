@@ -23,7 +23,7 @@ export default class UploadQuestionAnswer extends QuestionAnswer {
 
   constructor(init?: UploadQuestionInterface) {
     if (init !== undefined) {
-      super(init.question, init.review);
+      super({ question: init.question, review: init.review });
       this.uploadAnswer = init.answer;
     }
   }
